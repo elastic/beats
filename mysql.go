@@ -383,8 +383,17 @@ func receivedMysqlRequest(msg *MysqlMessage) {
         Server: string(msg.CmdlineTuple.Dst),
     }
 
+    index := strings.Index(msg.Query, " ")
+    var method string
+    if index > 0 {
+        method = strings.ToUpper(msg.Query[:index])
+    } else {
+        method = strings.ToUpper(msg.Query)
+    }
+
     trans.Mysql = bson.M{
         "query": msg.Query,
+        "method": method,
     }
 
     // save Raw message

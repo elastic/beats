@@ -5,6 +5,11 @@ installed before compiling Packetbeat.
 
 ### Compiling Packetbeat
 
+To install GeoIP:
+
+    $ pip install python-geoip
+    $ pip install python-geoip-geolite2
+
 It requires the package to be checked out in the local source tree. To get the sources from github use:
 
     $ go get github.com/packetbeat/packetbeat

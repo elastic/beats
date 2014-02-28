@@ -92,6 +92,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
         t.Mysql, nil, nil})
 
     DEBUG("publish", "Sent MySQL transaction:\n%s", t.Mysql)
+
     return err
 
 }
