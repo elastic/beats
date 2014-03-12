@@ -11,6 +11,7 @@ import (
 
     "github.com/BurntSushi/toml"
     "github.com/akrennmair/gopcap"
+	"github.com/nranchev/go-libGeoIP"
 )
 
 type Packet struct {
@@ -55,6 +56,7 @@ type tomlLogging struct {
 
 var _Config tomlConfig
 var _ConfigMeta toml.MetaData
+var _GeoLite *libgeo.GeoIP
 
 func Bytes_Ipv4_Ntoa(bytes []byte) string {
     var strarr []string = make([]string, 4)
@@ -260,6 +262,12 @@ func main() {
     if datalink != pcap.LINKTYPE_ETHERNET && datalink != pcap.LINKTYPE_LINUX_SLL {
         WARN("Unsuported link type: %d", datalink)
     }
+
+	_GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
+	if err != nil {
+        CRIT(err.Error())
+		return
+	}
 
     counter := 0
     live := true

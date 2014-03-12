@@ -18,6 +18,7 @@ To build Packetbeat successfully, first you need to install all the dependencies
 
     $ go get github.com/mattbaird/elastigo/api
     $ go get github.com/mattbaird/elastigo/core
+    $ go get github.com/nranchev/go-libGeoIP
 
 The *go build* command is used to compile the package. It only builds the package, without its installation.
 

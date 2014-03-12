@@ -56,7 +56,7 @@ type DbEndpoint struct {
     Port    uint16
     Name    string
     Cmdline string
-    Server  string
+    Proc  string
 }
 
 type MysqlTransaction struct {
@@ -375,12 +375,12 @@ func receivedMysqlRequest(msg *MysqlMessage) {
     trans.Src = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Src_ip),
         Port:   tuple.Src_port,
-        Server: string(msg.CmdlineTuple.Src),
+        Proc: string(msg.CmdlineTuple.Src),
     }
     trans.Dst = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Dst_ip),
         Port:   tuple.Dst_port,
-        Server: string(msg.CmdlineTuple.Dst),
+        Proc: string(msg.CmdlineTuple.Dst),
     }
 
     index := strings.Index(msg.Query, " ")

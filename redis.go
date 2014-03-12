@@ -445,12 +445,12 @@ func receivedRedisRequest(msg *RedisMessage) {
     trans.Src = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Src_ip),
         Port:   tuple.Src_port,
-        Server: string(msg.CmdlineTuple.Src),
+        Proc: string(msg.CmdlineTuple.Src),
     }
     trans.Dst = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Dst_ip),
         Port:   tuple.Dst_port,
-        Server: string(msg.CmdlineTuple.Dst),
+        Proc: string(msg.CmdlineTuple.Dst),
     }
 
     if trans.timer != nil {

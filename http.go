@@ -446,12 +446,12 @@ func receivedHttpRequest(msg *HttpMessage) {
     trans.Src = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Src_ip),
         Port:   tuple.Src_port,
-        Server: string(msg.CmdlineTuple.Src),
+        Proc: string(msg.CmdlineTuple.Src),
     }
     trans.Dst = DbEndpoint{
         Ip:     Ipv4_Ntoa(tuple.Dst_ip),
         Port:   tuple.Dst_port,
-        Server: string(msg.CmdlineTuple.Dst),
+        Proc: string(msg.CmdlineTuple.Dst),
     }
 
     // save Raw message
@@ -515,6 +515,7 @@ func receivedHttpResponse(msg *HttpMessage) {
     // save Raw message
     trans.Response_raw = string(cutMessageBody(msg))
 
+	DEBUG("http", "Http transaction %s -> %s\n", trans.Src.Proc, trans.Dst.Proc)
     err := Publisher.PublishHttpTransaction(trans)
 
     if err != nil {
