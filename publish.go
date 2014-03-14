@@ -68,7 +68,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 		}
 	}
     _, err := core.Index(true, index, "http","", Event{
-        t.ts, "tiny", "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country,
+        t.ts, publisher.name, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc,
 		t.ResponseTime, status, t.Request_raw, t.Response_raw,
         nil, t.Http, nil})
@@ -92,7 +92,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     }
 
     _, err := core.Index(true, index, "mysql", "", Event{
-        t.ts, "tiny", "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "",
+        t.ts, publisher.name, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "",
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc,
 		t.ResponseTime, status, t.Request_raw, t.Response_raw,
         t.Mysql, nil, nil})
@@ -114,7 +114,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     status := "OK"
 
     _, err := core.Index(true, index, "redis","", Event{
-        t.ts, "tiny", "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "",
+        t.ts, publisher.name, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "",
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc,
 		t.ResponseTime, status, t.Request_raw, t.Response_raw,
         nil, nil, t.Redis})
