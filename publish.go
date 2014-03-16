@@ -282,12 +282,11 @@ func (publisher *PublisherType) Init() error {
         INFO("No agent name configured, using hostname '%s'", publisher.name)
     }
 
-	RefreshTopologyFreq := 10 * time.Second
-	if _Config.Agent.Refresh_topology_freq != 0 {
-		RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
-	}
+    RefreshTopologyFreq := 10 * time.Second
+    if _Config.Agent.Refresh_topology_freq != 0 {
+        RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
+    }
     publisher.RefreshTopologyTimer = time.Tick( RefreshTopologyFreq )
-	DEBUG("publish", "RefreshTopologyFreq=%d", _Config.Agent.Refresh_topology_freq)
 
     // register agent and its public IP addresses
     err = publisher.PublishTopology()
