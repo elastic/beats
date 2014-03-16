@@ -93,18 +93,20 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
     }
     INFO("Local IP addresses are: %s", proc.LocalAddrs)
 
-    for pstr, procConfig := range config.Monitored {
+    if proc.ReadFromProc {
+        for pstr, procConfig := range config.Monitored {
 
-        grepper := procConfig.Cmdline_grep
-        if len(grepper) == 0 {
-            grepper = pstr
-        }
+            grepper := procConfig.Cmdline_grep
+            if len(grepper) == 0 {
+                grepper = pstr
+            }
 
-        p, err := NewProcess(proc, pstr, grepper, time.Tick(proc.RefreshPidsFreq))
-        if err != nil {
-            ERR("NewProcess: %s", err)
-        } else {
-            proc.Processes = append(proc.Processes, p)
+            p, err := NewProcess(proc, pstr, grepper, time.Tick(proc.RefreshPidsFreq))
+            if err != nil {
+                ERR("NewProcess: %s", err)
+            } else {
+                proc.Processes = append(proc.Processes, p)
+            }
         }
     }
 
