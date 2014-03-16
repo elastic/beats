@@ -28,6 +28,7 @@ var Publisher PublisherType
 // Config
 type tomlAgent struct {
     Name        string
+    RefreshTopologyFreq int
 }
 type tomlMothership struct {
     Host string
@@ -253,7 +254,8 @@ func (publisher *PublisherType) PublishTopology() error {
 
     DEBUG("publish", "Topology: name=%s, ips=%s", publisher.name, strings.Join(localAddrs, " "))
 
-    publisher.RefreshTopologyTimer = time.Tick( 10 * time.Second )
+    RefreshTopologyFreq := time.Duration(_Config.Agent.RefreshTopologyFreq) * time.Second
+    publisher.RefreshTopologyTimer = time.Tick( RefreshTopologyFreq )
     publisher.TopologyMap = make(map[string]TopologyMapping)
 
     go publisher.UpdateTopology()
