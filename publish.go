@@ -176,6 +176,10 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 
 func (publisher *PublisherType) UpdateTopology() {
 
+    // Set the Elasticsearch Host to Connect to
+    api.Domain = publisher.mother_host
+    api.Port = publisher.mother_port
+
     DEBUG("publish", "Updating Topology")
 
     for _ = range publisher.RefreshTopologyTimer {
@@ -214,6 +218,10 @@ func (publisher *PublisherType) UpdateTopology() {
 }
 
 func (publisher *PublisherType) PublishTopology() error {
+
+    // Set the Elasticsearch Host to Connect to
+    api.Domain = publisher.mother_host
+    api.Port = publisher.mother_port
 
     localAddrs, err := LocalAddrs()
     if err != nil {
