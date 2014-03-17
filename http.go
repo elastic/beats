@@ -515,7 +515,6 @@ func receivedHttpResponse(msg *HttpMessage) {
     // save Raw message
     trans.Response_raw = string(cutMessageBody(msg))
 
-	DEBUG("http", "Http transaction %s -> %s\n", trans.Src.Proc, trans.Dst.Proc)
     err := Publisher.PublishHttpTransaction(trans)
 
     if err != nil {

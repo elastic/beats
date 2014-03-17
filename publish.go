@@ -81,7 +81,6 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     api.Domain = publisher.mother_host
     api.Port = publisher.mother_port
 
-    // add single go struct entity
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Http["response"].(bson.M)["phrase"].(string)
@@ -91,6 +90,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 
     if dst_server != publisher.name {
         // duplicated transaction -> ignore it
+        DEBUG("publish", "Ignore duplicated Http transaction  on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
     }
 
@@ -102,6 +102,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
             }
     }
 
+    // add Http transaction
     _, err := core.Index(true, index, "http","", Event{
         t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
@@ -118,7 +119,6 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     api.Domain = publisher.mother_host
     api.Port = publisher.mother_port
 
-    // add single go struct entity
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Mysql["error_message"].(string)
@@ -129,11 +129,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
-    if dst_server != publisher.name {
-        // duplicated transaction -> ignore it
-        return nil
-    }
-
+    // add Mysql transaction
     _, err := core.Index(true, index, "mysql", "", Event{
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
@@ -151,7 +147,6 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     api.Domain = publisher.mother_host
     api.Port = publisher.mother_port
 
-    // add single go struct entity
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := "OK"
@@ -159,11 +154,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
-    if dst_server != publisher.name {
-        // duplicated transaction -> ignore it
-        return nil
-    }
-
+    // add Redis transaction
     _, err := core.Index(true, index, "redis","", Event{
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
