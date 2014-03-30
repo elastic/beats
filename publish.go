@@ -90,7 +90,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 
     if dst_server != publisher.name {
         // duplicated transaction -> ignore it
-        DEBUG("publish", "Ignore duplicated Http transaction  on %s: %s -> %s", publisher.name, src_server, dst_server)
+        DEBUG("publish", "Ignore duplicated Http transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
     }
 
@@ -103,7 +103,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     }
 
     // add Http transaction
-    _, err := core.Index(true, index, "http","", Event{
+    _, err := core.Index(index, "http","", nil, Event{
         t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
 	t.ResponseTime, status, t.Request_raw, t.Response_raw,
@@ -130,7 +130,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     // add Mysql transaction
-    _, err := core.Index(true, index, "mysql", "", Event{
+    _, err := core.Index(index, "mysql", "", nil, Event{
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
 	t.ResponseTime, status, t.Request_raw, t.Response_raw,
@@ -155,7 +155,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     // add Redis transaction
-    _, err := core.Index(true, index, "redis","", Event{
+    _, err := core.Index(index, "redis","", nil, Event{
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
 	t.ResponseTime, status, t.Request_raw, t.Response_raw,
@@ -175,72 +175,101 @@ func (publisher *PublisherType) UpdateTopology() {
 
     for _ = range publisher.RefreshTopologyTimer {
 
-		DEBUG("publish", "Updating Topology")
+	DEBUG("publish", "Updating Topology")
 
+        // add the new IPs found in Elasticsearch
         searchJson := `{
             "query": {
                 "match_all": {}
             }
         }`
-        res, err := core.SearchRequest(true, "packetbeat-topology", "server-ip", searchJson, "", 0)
-        refreshTime := time.Now()
+        res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
         if err == nil {
             for _, server := range res.Hits.Hits {
                 var top Topology
-                err = json.Unmarshal(server.Source, &top)
+                err = json.Unmarshal([]byte(*server.Source), &top)
                 if err != nil {
-                    ERR("Failed to unmarshal json data: %s", err)
+                    ERR("json.Unmarshal fails with: %s", err)
                 }
-
-                // refresh time or add new server ip
-                entry := TopologyMapping{Name: top.Name, RefreshTime: refreshTime}
+                // add or update mapping
+                entry := TopologyMapping{Name: top.Name}
                 publisher.TopologyMap[top.Ip] = entry
-
+                DEBUG("publish", "Update ip %s", top.Ip)
             }
-            // delete old data from map
-            for ip, mapping := range publisher.TopologyMap {
-                if !refreshTime.Equal(mapping.RefreshTime) {
+        } else {
+            ERR("core.SearchRequest fails with: %s", err)
+        }
+
+        // delete old IPs from TopologyMap
+        for ip, _ := range publisher.TopologyMap {
+            found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/ip, nil)
+            if err != nil {
+                ERR("core.Exists fails with: %s", err)
+            } else {
+                if !found {
                    delete(publisher.TopologyMap, ip)
+                   DEBUG("publish", "Delete ip %s", ip)
                 }
             }
-            DEBUG("publish", "Map: %s", publisher.TopologyMap)
-        } else {
-            ERR("Failed to fetch packetbeat-topology data")
         }
+
+        DEBUG("publish", "Map: %s", publisher.TopologyMap)
     }
 }
 
-func (publisher *PublisherType) PublishTopology() error {
+func (publisher *PublisherType) PublishTopology(params ...string) error {
 
     // Set the Elasticsearch Host to Connect to
     api.Domain = publisher.mother_host
     api.Port = publisher.mother_port
 
-    localAddrs, err := LocalAddrs()
-    if err != nil {
-        ERR("Failed to get local IP addresses: %s", err)
+    var localAddrs []string = params
+
+    if len(params) == 0 {
+        addrs, err := LocalAddrs()
+        if err != nil {
+            ERR("Getting local IP addresses fails with: %s", err)
+            return err
+        }
+        localAddrs = addrs
     }
 
+    // add new IP addresses
     for _, addr := range localAddrs {
 
         // check if the IP is already in the elasticsearch, before adding it 
-        searchJson := fmt.Sprintf("{query: {term: {ip: %s}}}",strconv.Quote(addr))
-        res, err := core.SearchRequest(true, "packetbeat-topology", "server-ip", searchJson, "", 0)
-        found := true
-        if err != nil  {
-            found = false
-        } else {
-            if res.Hits.Total == 0 {
-                found = false
-            }
-        }
+        found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/addr, nil)
 
         if !found {
-            _, err = core.Index(true, "packetbeat-topology", "server-ip", "",
+            DEBUG("publish", "Add ip %s", addr)
+            _, err = core.Index("packetbeat-topology", "server-ip", /*id*/addr, nil,
                 Topology{publisher.name, addr})
             if err != nil {
                 return err
             }
+        }
+    }
+
+
+    // delete old IP addresses
+    searchJson := fmt.Sprintf("{query: {term: {name: %s}}}",strconv.Quote(publisher.name))
+    res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
+    if err == nil  {
+        for _, server := range res.Hits.Hits {
+
+            var top Topology
+            err = json.Unmarshal([]byte(*server.Source), &top)
+            if err != nil {
+                ERR("Failed to unmarshal json data: %s", err)
+            }
+
+            if !stringInSlice(top.Ip, localAddrs) {
+                _, err = core.Delete("packetbeat-topology", "server-ip",/*id*/top.Ip,  nil)
+                if err != nil {
+                    ERR("Failed to delete the old IP address from packetbeat-topology")
+                }
+            }
+
         }
     }
 

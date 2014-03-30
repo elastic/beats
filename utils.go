@@ -59,3 +59,13 @@ func Ipv4_Ntoa(ip uint32) string {
         byte(ip>>24), byte(ip>>16),
         byte(ip>>8), byte(ip))
 }
+
+
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}

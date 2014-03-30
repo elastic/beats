@@ -14,6 +14,9 @@ func LocalAddrs() ([]string, error) {
     for _, addr := range addrs {
         // a bit wtf'ish.. Don't know how to do this otherwise
         ip, _, err := net.ParseCIDR(addr.String())
+        if ip.IsLoopback() {
+            continue
+        }
         if err == nil && ip != nil {
             localAddrs = append(localAddrs, ip.String())
         }
