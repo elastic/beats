@@ -20,7 +20,7 @@ type PublisherType struct {
     mother_port     string
 
     RefreshTopologyTimer <-chan time.Time
-    TopologyMap map[string]TopologyMapping
+    TopologyMap map[string]string
 }
 
 var Publisher PublisherType
@@ -28,7 +28,7 @@ var Publisher PublisherType
 // Config
 type tomlAgent struct {
     Name        string
-	Refresh_topology_freq int
+    Refresh_topology_freq int
 }
 type tomlMothership struct {
     Host string
@@ -62,18 +62,23 @@ type Topology struct {
     Ip string `json:"ip"`
 }
 
-type TopologyMapping struct {
-    Name string
-    RefreshTime time.Time
-}
-
 func (publisher *PublisherType) GetServerName(ip string) string {
-    mapping, exists := publisher.TopologyMap[ip]
-
+    // in case the IP is localhost, return current agent name
+    islocal, err := IsLoopback(ip)
+    if err != nil {
+        ERR("Parsing IP %s fails with: %s", ip, err)
+        return ""
+    } else {
+        if islocal {
+            return publisher.name
+        }
+    }
+    // find the agent with the desired IP
+    name, exists := publisher.TopologyMap[ip]
     if !exists {
         return ""
     }
-    return mapping.Name
+    return name
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
@@ -166,55 +171,42 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 
 }
 
+func (publisher *PublisherType) UpdateTopologyPeriodically() {
+
+    for _ = range publisher.RefreshTopologyTimer {
+        publisher.UpdateTopology()
+    }
+}
+
 func (publisher *PublisherType) UpdateTopology() {
 
     // Set the Elasticsearch Host to Connect to
     api.Domain = publisher.mother_host
     api.Port = publisher.mother_port
 
+    DEBUG("publish", "Updating Topology")
 
-    for _ = range publisher.RefreshTopologyTimer {
-
-	DEBUG("publish", "Updating Topology")
-
-        // add the new IPs found in Elasticsearch
-        searchJson := `{
-            "query": {
-                "match_all": {}
-            }
-        }`
-        res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
-        if err == nil {
-            for _, server := range res.Hits.Hits {
-                var top Topology
-                err = json.Unmarshal([]byte(*server.Source), &top)
-                if err != nil {
-                    ERR("json.Unmarshal fails with: %s", err)
-                }
-                // add or update mapping
-                entry := TopologyMapping{Name: top.Name}
-                publisher.TopologyMap[top.Ip] = entry
-                DEBUG("publish", "Update ip %s", top.Ip)
-            }
-        } else {
-            ERR("core.SearchRequest fails with: %s", err)
-        }
-
-        // delete old IPs from TopologyMap
-        for ip, _ := range publisher.TopologyMap {
-            found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/ip, nil)
+    // get all agents IPs from Elasticsearch
+    TopologyMapTmp := make(map[string]string)
+    res, err := core.SearchUri("packetbeat-topology", "server-ip", nil)
+    if err == nil {
+        for _, server := range res.Hits.Hits {
+            var top Topology
+            err = json.Unmarshal([]byte(*server.Source), &top)
             if err != nil {
-                ERR("core.Exists fails with: %s", err)
-            } else {
-                if !found {
-                   delete(publisher.TopologyMap, ip)
-                   DEBUG("publish", "Delete ip %s", ip)
-                }
+                ERR("json.Unmarshal fails with: %s", err)
             }
+            // add mapping
+            TopologyMapTmp[top.Ip] = top.Name
         }
-
-        DEBUG("publish", "Map: %s", publisher.TopologyMap)
+    } else {
+        ERR("core.SearchRequest fails with: %s", err)
     }
+
+    // update topology map
+    publisher.TopologyMap = TopologyMapTmp
+
+    DEBUG("publish", "[%s] Map: %s", publisher.name, publisher.TopologyMap)
 }
 
 func (publisher *PublisherType) PublishTopology(params ...string) error {
@@ -234,23 +226,6 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
         localAddrs = addrs
     }
 
-    // add new IP addresses
-    for _, addr := range localAddrs {
-
-        // check if the IP is already in the elasticsearch, before adding it 
-        found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/addr, nil)
-
-        if !found {
-            DEBUG("publish", "Add ip %s", addr)
-            _, err = core.Index("packetbeat-topology", "server-ip", /*id*/addr, nil,
-                Topology{publisher.name, addr})
-            if err != nil {
-                return err
-            }
-        }
-    }
-
-
     // delete old IP addresses
     searchJson := fmt.Sprintf("{query: {term: {name: %s}}}",strconv.Quote(publisher.name))
     res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
@@ -262,22 +237,45 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
             if err != nil {
                 ERR("Failed to unmarshal json data: %s", err)
             }
-
             if !stringInSlice(top.Ip, localAddrs) {
-                _, err = core.Delete("packetbeat-topology", "server-ip",/*id*/top.Ip,  nil)
+                res, err := core.Delete("packetbeat-topology", "server-ip",/*id*/top.Ip,  nil)
                 if err != nil {
                     ERR("Failed to delete the old IP address from packetbeat-topology")
+                }
+                if !res.Ok {
+                    ERR("Fail to delete old topology entry")
                 }
             }
 
         }
     }
 
+    // add new IP addresses
+    for _, addr := range localAddrs {
+
+        // check if the IP is already in the elasticsearch, before adding it 
+        found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/addr, nil)
+        if err != nil {
+            ERR("core.Exists fails with: %s", err)
+        } else {
+
+            if !found {
+                res, err := core.Index("packetbeat-topology", "server-ip", /*id*/addr, nil,
+                    Topology{publisher.name, addr})
+                if err != nil {
+                    return err
+                }
+                if !res.Ok {
+                    ERR("Fail to add new topology entry")
+                }
+            }
+        }
+    }
+
     DEBUG("publish", "Topology: name=%s, ips=%s", publisher.name, strings.Join(localAddrs, " "))
 
-    publisher.TopologyMap = make(map[string]TopologyMapping)
-
-    go publisher.UpdateTopology()
+    // initialize local topology map
+    publisher.TopologyMap = make(map[string]string)
 
     return nil
 }
@@ -314,5 +312,9 @@ func (publisher *PublisherType) Init() error {
         ERR("Failed to publish topology: %s", err)
         return err
     }
+    // update topology periodically
+
+    go publisher.UpdateTopologyPeriodically()
+
     return nil
 }
