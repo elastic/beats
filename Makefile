@@ -9,4 +9,4 @@ install: agent
 
 .PHONY: clean
 clean:
-	rm packetbeat
+	rm packetbeat || true
