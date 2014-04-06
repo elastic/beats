@@ -1,0 +1,14 @@
+Source: packetbeat
+Section: net
+Priority: optional
+Maintainer: Monica Sarbu <monica@packetbeat.com>
+Build-Depends: debhelper (>= 7.0.50~), libpcap0.8-dev
+Standards-Version: 3.8.3
+Homepage: http://packetbeat.com
+Vcs-browser: https://github.com/packetbeat/packetbeat
+Vcs-git: https://github.com/packetbeat/packetbeat.git
+
+Package: packetbeat
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Packetbeat Agent
