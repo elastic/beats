@@ -128,3 +128,33 @@ func TestMySQLParser_simpleResponse(t *testing.T) {
         t.Error("failed to get the size of the response")
     }
 }
+func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
+    //LogInit(syslog.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
+
+    data := []byte("300000010001000100000028526f7773206d6174636865643a203120204368616e6765643a203120205761726e696e67733a2030")
+
+    message, err := hex.DecodeString(string(data))
+    if err != nil {
+        t.Error("Failed to decode hex string")
+    }
+
+    stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+
+    ok, complete := mysqlMessageParser(stream)
+
+    if !ok {
+        t.Error("Parsing returned error")
+    }
+    if !complete {
+        t.Error("Expecting a complete message")
+    }
+    if stream.message.IsRequest {
+        t.Error("Failed to parse MySQL Query response")
+    }
+    if !stream.message.IsOK || stream.message.IsError {
+        t.Error("Failed to parse MySQL Query response")
+    }
+    if stream.message.AffectedRows != 1 {
+        t.Error("Failed to get the number of affected rows")
+    }
+}

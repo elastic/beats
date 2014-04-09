@@ -150,7 +150,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                 m.IsRequest = false
                 m.Number = int(uint8(s.data[m.start+3]))
 
-                if uint8(hdr[4]) == 0x00 && m.FieldLength == 7 {
+                if uint8(hdr[4]) == 0x00 {
                     DEBUG("mysqldetailed", "OK response")
                     m.start = s.parseOffset
                     s.parseOffset += 4
@@ -308,13 +308,7 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
         // drop this tcp stream. Will retry parsing with the next
         // segment in it
         tcp.mysqlData[dir] = nil
-        return
-    }
-
-    if !ok {
-        // drop this tcp stream. Will retry parsing with the next
-        // segment in it
-        tcp.mysqlData[dir] = nil
+        WARN("Fail parsing MySQL message. Drop tcp stream. Try parsing with the next segment")
         return
     }
 
@@ -424,7 +418,6 @@ func receivedMysqlResponse(msg *MysqlMessage) {
         return
 
     }
-
     // save json details
     trans.Mysql = bson_concat(trans.Mysql, bson.M{
         "isok":          msg.IsOK,
