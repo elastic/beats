@@ -4,7 +4,7 @@ packetbeat:
 	go build
 
 .PHONY: install
-install: agent
+install: packetbeat
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
 
 .PHONY: clean
