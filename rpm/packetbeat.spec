@@ -35,7 +35,7 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 # This adds the proper /etc/rc*.d links for the script
 /sbin/chkconfig --add packetbeat
 
-%postinstall
+%preun
 /etc/init.d/packetbeat stop
 /sbin/chkconfig --del packetbeat
 

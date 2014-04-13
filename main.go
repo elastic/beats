@@ -265,8 +265,7 @@ func main() {
 
 	_GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
 	if err != nil {
-        CRIT(err.Error())
-		return
+        WARN("Could not load GeoIP data: %s", err.Error())
 	}
 
     counter := 0

@@ -100,11 +100,13 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     }
 
     var src_country = ""
-    if len(src_server) == 0 {
+    if _GeoLite != nil {
+        if len(src_server) == 0 {   // only for external IP addresses
             loc := _GeoLite.GetLocationByIP(t.Src.Ip)
             if loc != nil {
                     src_country = loc.CountryCode
             }
+        }
     }
 
     // add Http transaction
