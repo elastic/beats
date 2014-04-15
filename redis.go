@@ -495,7 +495,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 
     trans.Response_raw = msg.Message
 
-    trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e3) // resp_time in micros
+    trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
     err := Publisher.PublishRedisTransaction(trans)
     if err != nil {

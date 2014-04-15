@@ -432,7 +432,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
         "error_message": msg.ErrorInfo,
     })
 
-    trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e3) // resp_time in micros
+    trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
     // save Raw message
     if len(msg.Raw) > 0 {
