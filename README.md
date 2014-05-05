@@ -115,7 +115,143 @@ Kibana is a pure Javascript application running fully in the browser. It doesn't
 Now point your browser to port 8000 and you should see the Kibana web interface. 
 
 
-### Packetbeat
+### Packetbeat agent
+
+Now that you have Elasticsearch and Kibana running, I'm sure you are eager to put some data in them. For this, install the Packetbeat agents on your application servers: 
+
+**deb**
+```bash
+  $ sudo apt-get install lipcap0.8
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_amd64.deb
+  $ sudo dpkg -i packetbeat_0.1.0-1_amd64.deb
+```
+**rpm**
+```bash
+  $ sudo yum install libpcap
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.rpm
+  $ sudo rpm -vi packetbeat-0.1.0-1.el6.x86_64.rpm
+```
+
+**binary**
+```bash
+  $ # install libpcap using your operating system package manager
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.tar.gz
+  $ tar xzvf packetbeat-0.1.0-1.el6.x86_64.tar.gz
+```
+
+For the 32 bits packages, fetch packages:
+
+
+**deb**
+```bash
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_i386.deb
+```
+
+**rpm**
+```bash
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.i686.rpm
+```
+
+**binary**
+```bash
+  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_32.tar.gz
+```
+
+Before starting the agent, edit the configuration file: 
+ 
+```bash
+  $ nano /etc/packetbeat/packetbeat.conf
+```
+First, set the IP address and port where the agent can find the Elasticsearch installation: 
+
+```
+ [elasticsearch]
+    # Set the host and port where to find Elasticsearch.
+    host = "192.168.1.42"
+    port = 9200
+```
+
+Select the network interface from which to capture the traffic. Packetbeat supports capturing all messages sent or received by the server on which it is installed. For this, use "any" as the device: 
+
+```
+    [interfaces]
+    # Select on which network interfaces to sniff. You can use the "any"
+    # keyword to sniff on all connected interfaces.
+    device = "any"
+```
+
+In the next section, you can configure the ports on which Packetbeat can find each protocol. If you use any non-standard ports, add them here. Otherwise, the default values should do just fine. 
+
+```
+   [protocols]
+    # Configure which protocols to monitor and on which ports are they
+    # running. You can disable a given protocol by commenting out its
+    # configuration.
+      [protocols.http]
+      ports = [80, 8080, 8081, 5000, 8002]
+
+      [protocols.mysql]
+      ports = [3306]
+
+      [protocols.redis]
+      ports = [6379]
+```
+
+Finally, you can configure which are the processes that exchange the messages. This part is optional, but configuring the processes enables Packetbeat to not only show you between which servers the traffic is flowing, but also between which processes. It can even show you traffic from between two processes running on the same host. 
+
+```
+ [procs]
+    # Uncomment the following line to disable the process monitoring.
+    # dont_read_from_proc = true
+
+    # Which processes to monitor and how to find them. The processes can
+    # be found by searching their command line by a given string.
+      [procs.monitored.mysqld]
+      cmdline_grep = "mysqld"
+
+      [procs.monitored.nginx]
+      cmdline_grep = "nginx"
+
+      [procs.monitored.app]
+      cmdline_grep = "gunicorn"
+```
+With this, you are ready to start the agent: 
+
+**deb**
+```bash
+  $ /etc/init.d/packetbeat start
+```
+
+**rpm**
+```bash
+   $ service start packetbeat
+```
+
+**binary**
+```bash
+   $ cd packetbeat-0.1.0
+   $ ./packetbeat -c /etc/packetbeat/packetbeat.conf
+```
+
+### Kibana dashboards
+
+Kibana has about dozen panel types that you can combine into pages to create the UI that is best for you. We have created three sample pages to give you a good start and to demonstrate what is possible.
+
+To load our sample pages, follow these steps: 
+
+```bash
+ $ curl -L -O https://github.com/packetbeat/dashboards/archive/v0.1.tar.gz
+ $ tar xzvf v0.1.tar.gz
+ $ cd dashboards-0.1/
+ $ ./load.sh
+```
+
+ You should now have the following pages loaded in Kibana. You can switch between them by using the Load menu.
+
+ - Packetbeat Statistics: Contains high-level views like the network topology, the application layer protocols repartition, the response times repartition, and others.
+ - Packetbeat Search: This page enables you to do full text searches over the indexed network messages.
+ - Packetbeat Query Analysis: This page demonstrates more advanced statistics like the top N slow SQL queries, the database throughput or the most common MySQL errors.
+
 
 ## Authors
 
