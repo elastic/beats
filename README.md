@@ -94,6 +94,26 @@ $ curl http://localhost:9200/
     
 ```
 ### Kibana UI
+ Kibana is a visualisation application that gets its data from Elasticsearch. It provides a customisable and user-friendly UI in which you can combine various panel types to create your own dashboards. The dashboards can be easily saved, shared and linked.
+
+It is recommended to install Kibana on the same server as Elastic search, but not required.
+
+We have extended Kibana to support new panels specialised in visualising network data. So it is best to download it from [packetbeat GitHub account](http://github.com/packetbeat/packetbeat): 
+
+```bash
+ $ curl -L -O https://github.com/packetbeat/kibana/releases/download/v3.0.0-pb/kibana-3.0-packetbeat.tar.gz
+ $ tar -xzvf kibana-3.0-packetbeat.tar.gz
+```
+
+Kibana is a pure Javascript application running fully in the browser. It doesn't have or need a sever side part like most web applications do. Instead, you only needed a web server to serve the Javascript files and the static resources. For example, you can use python to create a simple web server: 
+
+```bash
+  $ cd kibana-3.0-packetbeat
+  $ python -m SimpleHTTPServer
+    Serving HTTP on 0.0.0.0 port 8000 ...
+```
+Now point your browser to port 8000 and you should see the Kibana web interface. 
+
 
 ### Packetbeat
 
