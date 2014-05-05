@@ -46,6 +46,8 @@ The best way to understand the value of a packet monitoring system like Packetbe
 
 For now, you can just install Elasticsearch and Kibana on a single VM or even on your laptop. The only condition is that this machine is accessible from the servers you want to monitor. As you add more agents and your traffic grows, you will want replace the single Elasticsearch instance with a cluster. You will probably also want to automate the installation process. But for now, let's just do the fun part. 
 
+For more details about installing ElasticSearch, Kibana and Packetbeat agents you can find under [Getting started](http://packetbeat.com/getstarted).
+
 ### ElasticSearch
 
 Elasticsearch is a distributed real-time storage, search and analytics engine. It can be used for many purposes, but one context where it excels is indexing streams of semi-structured data, like logs or decoded network packets. 
