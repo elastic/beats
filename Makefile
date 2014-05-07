@@ -11,8 +11,8 @@ install: packetbeat
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
 	install -D packetbeat.conf $(DESTDIR)/$(CONF_PATH)/packetbeat.conf
 
-.PHONY: dest
-dest: packetbeat
+.PHONY: dist
+dist: packetbeat
 	mkdir packetbeat-$(VERSION)
 	cp packetbeat packetbeat-$(VERSION)/
 	cp packetbeat.conf packetbeat-$(VERSION)/
