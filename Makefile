@@ -18,6 +18,10 @@ dist: packetbeat
 	cp packetbeat.conf packetbeat-$(VERSION)/
 	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
 
+.PHONY: gofmt
+gofmt:
+	gofmt -w -tabs=false -tabwidth=4 *.go
+
 .PHONY: clean
 clean:
 	rm packetbeat || true
