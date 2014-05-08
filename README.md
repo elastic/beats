@@ -124,20 +124,20 @@ Now that you have Elasticsearch and Kibana running, I'm sure you are eager to pu
 **deb**
 ```bash
   $ sudo apt-get install libpcap0.8
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_amd64.deb
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_amd64.deb
   $ sudo dpkg -i packetbeat_0.1.0-1_amd64.deb
 ```
 **rpm**
 ```bash
-  $ sudo yum install libpcap
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.rpm
+  $ sudo yum install libpcap daemonize
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.rpm
   $ sudo rpm -vi packetbeat-0.1.0-1.el6.x86_64.rpm
 ```
 
 **binary**
 ```bash
   $ # install libpcap using your operating system package manager
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.tar.gz
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_64.tar.gz
   $ tar xzvf packetbeat-0.1.0-1.el6.x86_64.tar.gz
 ```
 
@@ -146,17 +146,17 @@ For the 32 bits packages, fetch packages:
 
 **deb**
 ```bash
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_i386.deb
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_i386.deb
 ```
 
 **rpm**
 ```bash
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.i686.rpm
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.i686.rpm
 ```
 
 **binary**
 ```bash
-  $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_32.tar.gz
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.0-1.el6.x86_32.tar.gz
 ```
 
 Before starting the agent, edit the configuration file: 
