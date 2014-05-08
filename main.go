@@ -92,14 +92,14 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     }
 
     if len(pkt.Data) < l2hlen+20 {
-        DEBUG("ip", "Packet to short to be ethernet")
+        DEBUG("ip", "Packet too short to be ethernet")
         return
     }
 
     // IP header
     iphl := int((uint16(pkt.Data[l2hlen]) & 0x0f) * 4)
     if len(pkt.Data) < l2hlen+iphl {
-        DEBUG("ip", "Packet to short to be IP")
+        DEBUG("ip", "Packet too short to be IP")
         return
     }
     iphdr := pkt.Data[l2hlen : l2hlen+iphl]
@@ -122,7 +122,7 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
 
     protocol := uint8(iphdr[9])
     if protocol != 6 {
-        DEBUG("ip", "Not TCP packet received. Ignoring")
+        DEBUG("ip", "Not TCP packet. Ignoring")
         return
     }
 
@@ -133,7 +133,7 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
 
     tcphl := int((uint16(pkt.Data[l2hlen+iphl+12]) >> 4) * 4)
     if tcphl > 20 && len(pkt.Data) < l2hlen+iphl+tcphl {
-        DEBUG("ip", "Packet too short for the TCP header")
+        DEBUG("ip", "Packet too short to contain TCP header")
         return
     }
 
@@ -158,7 +158,7 @@ func DropPrivileges() error {
     }
 
     if !_ConfigMeta.IsDefined("runoptions", "gid") {
-        return MsgError("GID must be specified for dropping priviledges")
+        return MsgError("GID must be specified for dropping privileges")
     }
 
     INFO("Switching to user: %d.%d", _Config.RunOptions.Uid, _Config.RunOptions.Gid)
@@ -261,7 +261,7 @@ func main() {
 
     datalink := h.Datalink()
     if datalink != pcap.LINKTYPE_ETHERNET && datalink != pcap.LINKTYPE_LINUX_SLL {
-        WARN("Unsuported link type: %d", datalink)
+        WARN("Unsupported link type: %d", datalink)
     }
 
     _GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
@@ -323,7 +323,7 @@ func main() {
                 if sleep > 0 {
                     time.Sleep(sleep)
                 } else {
-                    WARN("Time in pcap went back in time: %d", sleep)
+                    WARN("Time in pcap went backwards: %d", sleep)
                 }
             }
             _lastPktTime := pkt.Time
