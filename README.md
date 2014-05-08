@@ -123,7 +123,7 @@ Now that you have Elasticsearch and Kibana running, I'm sure you are eager to pu
 
 **deb**
 ```bash
-  $ sudo apt-get install lipcap0.8
+  $ sudo apt-get install libpcap0.8
   $ wget https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat_0.1.0-1_amd64.deb
   $ sudo dpkg -i packetbeat_0.1.0-1_amd64.deb
 ```
