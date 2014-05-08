@@ -196,7 +196,8 @@ func main() {
     var err error
 
     if _ConfigMeta, err = toml.DecodeFile(*configfile, &_Config); err != nil {
-        fmt.Printf("TOML config parsing failed on %s: %s. We will use defaults.\n", *configfile, err)
+        fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
+        return
     }
 
     if len(debugSelectors) == 0 {
