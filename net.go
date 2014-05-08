@@ -4,7 +4,6 @@ import (
     "net"
 )
 
-
 func LocalAddrs() ([]string, error) {
     var localAddrs = []string{}
     addrs, err := net.InterfaceAddrs()
@@ -26,9 +25,9 @@ func LocalAddrs() ([]string, error) {
 
 func IsLoopback(ip_str string) (bool, error) {
 
-   ip := net.ParseIP(ip_str)
-   if ip == nil {
+    ip := net.ParseIP(ip_str)
+    if ip == nil {
         return false, MsgError("Wrong IP format %s", ip_str)
-   }
-   return ip.IsLoopback(), nil
+    }
+    return ip.IsLoopback(), nil
 }

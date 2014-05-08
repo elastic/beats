@@ -1,33 +1,33 @@
 package main
 
 import (
+    "encoding/json"
     "fmt"
-    "labix.org/v2/mgo/bson"
     "github.com/mattbaird/elastigo/api"
     "github.com/mattbaird/elastigo/core"
-    "encoding/json"
+    "labix.org/v2/mgo/bson"
     "os"
-    "time"
-    "strings"
     "strconv"
+    "strings"
+    "time"
 )
 
 type PublisherType struct {
-    name         string
+    name string
 
-    url             string
-    mother_host     string
-    mother_port     string
+    url         string
+    mother_host string
+    mother_port string
 
     RefreshTopologyTimer <-chan time.Time
-    TopologyMap map[string]string
+    TopologyMap          map[string]string
 }
 
 var Publisher PublisherType
 
 // Config
 type tomlAgent struct {
-    Name        string
+    Name                  string
     Refresh_topology_freq int
 }
 type tomlMothership struct {
@@ -36,30 +36,30 @@ type tomlMothership struct {
 }
 
 type Event struct {
-    Timestamp time.Time `json:"@timestamp"`
-    Type string `json:"type"`
-    Src_ip string `json:"src_ip"`
-    Src_port uint16 `json:"src_port"`
-    Src_proc string `json:"src_proc"`
-    Src_country string `json:"src_country"`
-    Src_server string `json:"src_server"`
-    Dst_ip string `json:"dst_ip"`
-    Dst_port uint16 `json:"dst_port"`
-    Dst_proc string `json:"dst_proc"`
-    Dst_server string `json:"dst_server"`
-    ResponseTime int32 `json:"responsetime"`
-    Status string `json:"status"`
-    RequestRaw string `json:"request_raw"`
-    ResponseRaw string `json:"response_raw"`
+    Timestamp    time.Time `json:"@timestamp"`
+    Type         string    `json:"type"`
+    Src_ip       string    `json:"src_ip"`
+    Src_port     uint16    `json:"src_port"`
+    Src_proc     string    `json:"src_proc"`
+    Src_country  string    `json:"src_country"`
+    Src_server   string    `json:"src_server"`
+    Dst_ip       string    `json:"dst_ip"`
+    Dst_port     uint16    `json:"dst_port"`
+    Dst_proc     string    `json:"dst_proc"`
+    Dst_server   string    `json:"dst_server"`
+    ResponseTime int32     `json:"responsetime"`
+    Status       string    `json:"status"`
+    RequestRaw   string    `json:"request_raw"`
+    ResponseRaw  string    `json:"response_raw"`
 
     Mysql bson.M `json:"mysql"`
-    Http bson.M `json:"http"`
+    Http  bson.M `json:"http"`
     Redis bson.M `json:"redis"`
 }
 
 type Topology struct {
     Name string `json:"name"`
-    Ip string `json:"ip"`
+    Ip   string `json:"ip"`
 }
 
 func (publisher *PublisherType) GetServerName(ip string) string {
@@ -101,19 +101,19 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 
     var src_country = ""
     if _GeoLite != nil {
-        if len(src_server) == 0 {   // only for external IP addresses
+        if len(src_server) == 0 { // only for external IP addresses
             loc := _GeoLite.GetLocationByIP(t.Src.Ip)
             if loc != nil {
-                    src_country = loc.CountryCode
+                src_country = loc.CountryCode
             }
         }
     }
 
     // add Http transaction
-    _, err := core.Index(index, "http","", nil, Event{
+    _, err := core.Index(index, "http", "", nil, Event{
         t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-	t.ResponseTime, status, t.Request_raw, t.Response_raw,
+        t.ResponseTime, status, t.Request_raw, t.Response_raw,
         nil, t.Http, nil})
 
     DEBUG("publish", "Sent Http transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Http)
@@ -140,7 +140,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     _, err := core.Index(index, "mysql", "", nil, Event{
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-	t.ResponseTime, status, t.Request_raw, t.Response_raw,
+        t.ResponseTime, status, t.Request_raw, t.Response_raw,
         t.Mysql, nil, nil})
 
     DEBUG("publish", "Sent MySQL transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Mysql)
@@ -162,10 +162,10 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     // add Redis transaction
-    _, err := core.Index(index, "redis","", nil, Event{
+    _, err := core.Index(index, "redis", "", nil, Event{
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-	t.ResponseTime, status, t.Request_raw, t.Response_raw,
+        t.ResponseTime, status, t.Request_raw, t.Response_raw,
         nil, nil, t.Redis})
 
     DEBUG("publish", "Sent Redis transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Redis)
@@ -229,9 +229,9 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
     }
 
     // delete old IP addresses
-    searchJson := fmt.Sprintf("{query: {term: {name: %s}}}",strconv.Quote(publisher.name))
+    searchJson := fmt.Sprintf("{query: {term: {name: %s}}}", strconv.Quote(publisher.name))
     res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
-    if err == nil  {
+    if err == nil {
         for _, server := range res.Hits.Hits {
 
             var top Topology
@@ -240,7 +240,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
                 ERR("Failed to unmarshal json data: %s", err)
             }
             if !stringInSlice(top.Ip, localAddrs) {
-                res, err := core.Delete("packetbeat-topology", "server-ip",/*id*/top.Ip,  nil)
+                res, err := core.Delete("packetbeat-topology", "server-ip" /*id*/, top.Ip, nil)
                 if err != nil {
                     ERR("Failed to delete the old IP address from packetbeat-topology")
                 }
@@ -255,14 +255,14 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
     // add new IP addresses
     for _, addr := range localAddrs {
 
-        // check if the IP is already in the elasticsearch, before adding it 
-        found, err := core.Exists("packetbeat-topology", "server-ip", /*id*/addr, nil)
+        // check if the IP is already in the elasticsearch, before adding it
+        found, err := core.Exists("packetbeat-topology", "server-ip" /*id*/, addr, nil)
         if err != nil {
             ERR("core.Exists fails with: %s", err)
         } else {
 
             if !found {
-                res, err := core.Index("packetbeat-topology", "server-ip", /*id*/addr, nil,
+                res, err := core.Index("packetbeat-topology", "server-ip" /*id*/, addr, nil,
                     Topology{publisher.name, addr})
                 if err != nil {
                     return err
@@ -306,7 +306,7 @@ func (publisher *PublisherType) Init() error {
     if _Config.Agent.Refresh_topology_freq != 0 {
         RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
     }
-    publisher.RefreshTopologyTimer = time.Tick( RefreshTopologyFreq )
+    publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 
     // register agent and its public IP addresses
     err = publisher.PublishTopology()

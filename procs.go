@@ -126,9 +126,9 @@ func NewProcess(proc *ProcessesWatcher, name string, grepper string,
 }
 
 func (p *Process) RefreshPids() {
-	DEBUG("procs", "In RefreshPids")
+    DEBUG("procs", "In RefreshPids")
     for _ = range p.RefreshPidsTimer {
-		DEBUG("procs", "In RefreshPids tick")
+        DEBUG("procs", "In RefreshPids tick")
         var err error
         p.Pids, err = FindPidsByCmdlineGrep(p.proc.proc_prefix, p.Grepper)
         if err != nil {

@@ -1,11 +1,11 @@
 package main
 
 import (
-    "testing"
-    "log/syslog"
-    "time"
     "github.com/mattbaird/elastigo/api"
     "github.com/mattbaird/elastigo/core"
+    "log/syslog"
+    "testing"
+    "time"
 )
 
 func TestTopology(t *testing.T) {
@@ -17,7 +17,6 @@ func TestTopology(t *testing.T) {
     var publisher1 PublisherType = PublisherType{name: "proxy1", mother_host: api.Domain, mother_port: api.Port}
     var publisher2 PublisherType = PublisherType{name: "proxy2", mother_host: api.Domain, mother_port: api.Port}
     var publisher3 PublisherType = PublisherType{name: "proxy3", mother_host: api.Domain, mother_port: api.Port}
-
 
     publisher1.PublishTopology("10.1.0.4")
     publisher2.PublishTopology("10.1.0.9", "fe80::4e8d:79ff:fef2:de6a")

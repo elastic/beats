@@ -443,13 +443,13 @@ func receivedRedisRequest(msg *RedisMessage) {
     trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
     trans.JsTs = msg.Ts
     trans.Src = DbEndpoint{
-        Ip:     Ipv4_Ntoa(tuple.Src_ip),
-        Port:   tuple.Src_port,
+        Ip:   Ipv4_Ntoa(tuple.Src_ip),
+        Port: tuple.Src_port,
         Proc: string(msg.CmdlineTuple.Src),
     }
     trans.Dst = DbEndpoint{
-        Ip:     Ipv4_Ntoa(tuple.Dst_ip),
-        Port:   tuple.Dst_port,
+        Ip:   Ipv4_Ntoa(tuple.Dst_ip),
+        Port: tuple.Dst_port,
         Proc: string(msg.CmdlineTuple.Dst),
     }
 

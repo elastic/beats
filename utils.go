@@ -6,7 +6,6 @@ import (
     "labix.org/v2/mgo/bson"
 )
 
-
 // bare-bone Error type, to make it easy to create
 // our own exceptions with a string.
 type GenericError struct {
@@ -59,7 +58,6 @@ func Ipv4_Ntoa(ip uint32) string {
         byte(ip>>24), byte(ip>>16),
         byte(ip>>8), byte(ip))
 }
-
 
 func stringInSlice(a string, list []string) bool {
     for _, b := range list {

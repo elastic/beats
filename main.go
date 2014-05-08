@@ -11,7 +11,7 @@ import (
 
     "github.com/BurntSushi/toml"
     "github.com/akrennmair/gopcap"
-	"github.com/nranchev/go-libGeoIP"
+    "github.com/nranchev/go-libGeoIP"
 )
 
 type Packet struct {
@@ -32,13 +32,13 @@ const (
 var protocolNames = []string{"unknown", "http", "mysql", "redis"}
 
 type tomlConfig struct {
-    Interfaces      tomlInterfaces
-    RunOptions      tomlRunOptions
-    Protocols       map[string]tomlProtocol
-    Procs           tomlProcs
-    Elasticsearch   tomlMothership
-    Agent           tomlAgent
-    Logging         tomlLogging
+    Interfaces    tomlInterfaces
+    RunOptions    tomlRunOptions
+    Protocols     map[string]tomlProtocol
+    Procs         tomlProcs
+    Elasticsearch tomlMothership
+    Agent         tomlAgent
+    Logging       tomlLogging
 }
 
 type tomlInterfaces struct {
@@ -263,10 +263,10 @@ func main() {
         WARN("Unsuported link type: %d", datalink)
     }
 
-	_GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
-	if err != nil {
+    _GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
+    if err != nil {
         WARN("Could not load GeoIP data: %s", err.Error())
-	}
+    }
 
     counter := 0
     live := true
