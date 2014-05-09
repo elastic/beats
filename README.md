@@ -171,6 +171,10 @@ First, set the IP address and port where the agent can find the Elasticsearch in
     # Set the host and port where to find Elasticsearch.
     host = "192.168.1.42"
     port = 9200
+
+    # Optional basic auth credentials
+    # username = "admin"
+    # password = "s3cr3t"
 ```
 
 Select the network interface from which to capture the traffic. Packetbeat supports capturing all messages sent or received by the server on which it is installed. For this, use "any" as the device: 

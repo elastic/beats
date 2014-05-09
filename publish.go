@@ -27,8 +27,10 @@ type tomlAgent struct {
     Refresh_topology_freq int
 }
 type tomlMothership struct {
-    Host string
-    Port int
+    Host     string
+    Port     int
+    Username string
+    Password string
 }
 
 type Event struct {
@@ -264,6 +266,8 @@ func (publisher *PublisherType) Init() error {
     // Set the Elasticsearch Host to Connect to
     api.Domain = _Config.Elasticsearch.Host
     api.Port = fmt.Sprintf("%d", _Config.Elasticsearch.Port)
+    api.Username = _Config.Elasticsearch.Username
+    api.Password = _Config.Elasticsearch.Password
 
     INFO("Use %s:%s as publisher", api.Domain, api.Port)
 
