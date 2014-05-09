@@ -141,6 +141,7 @@ func (p *Process) RefreshPids() {
 }
 
 func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
+    defer RECOVER("FindPidsByCmdlineGrep exception")
     pids := []int{}
 
     proc, err := os.Open(filepath.Join(prefix, "/proc"))
@@ -198,7 +199,10 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *IpPortTuple) (proc_tuple
     return
 }
 
-func (proc *ProcessesWatcher) FindProc(port uint16) string {
+func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
+    procname = ""
+    defer RECOVER("FindProc exception")
+
     p, exists := proc.PortProcMap[port]
     if exists {
         return p.Proc.Name
