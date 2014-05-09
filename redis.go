@@ -183,6 +183,7 @@ func readLine(data []byte, offset int) (string, int) {
 }
 
 func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
+    defer RECOVER("ParseRedis exception")
 
     if tcp.redisData[dir] == nil {
         tcp.redisData[dir] = &RedisStream{

@@ -287,6 +287,9 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 }
 
 func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
+
+    defer RECOVER("ParseMysql exception")
+
     if tcp.mysqlData[dir] == nil {
         tcp.mysqlData[dir] = &MysqlStream{
             tcpStream: tcp,

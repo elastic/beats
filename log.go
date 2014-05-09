@@ -5,6 +5,7 @@ import (
     "log"
     "log/syslog"
     "os"
+    "runtime/debug"
 )
 
 type Logger struct {
@@ -82,6 +83,13 @@ func WTF(format string, v ...interface{}) {
     }
 
     // TODO: assert here when not in production mode
+}
+
+func RECOVER(msg string) {
+    if r := recover(); r != nil {
+        ERR("%s. Recovering, but please report this: %s.", msg, r)
+        ERR("Stacktrace: %s", debug.Stack())
+    }
 }
 
 func openSyslog(level syslog.Priority, prefix string) *log.Logger {

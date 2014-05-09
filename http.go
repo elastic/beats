@@ -342,6 +342,8 @@ func (stream *HttpStream) PrepareForNewMessage() {
 }
 
 func ParseHttp(pkt *Packet, tcp *TcpStream, dir uint8) {
+    defer RECOVER("ParseHttp exception")
+
     DEBUG("http", "Payload received: [%s]", pkt.payload)
 
     if tcp.httpData[dir] == nil {
