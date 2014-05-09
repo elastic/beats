@@ -29,6 +29,7 @@ type tomlAgent struct {
 type tomlMothership struct {
     Host     string
     Port     int
+    Protocol string
     Username string
     Password string
 }
@@ -269,7 +270,11 @@ func (publisher *PublisherType) Init() error {
     api.Username = _Config.Elasticsearch.Username
     api.Password = _Config.Elasticsearch.Password
 
-    INFO("Use %s:%s as publisher", api.Domain, api.Port)
+    if _Config.Elasticsearch.Protocol != "" {
+        api.Protocol = _Config.Elasticsearch.Protocol
+    }
+
+    INFO("Use %s://%s:%s as publisher", api.Protocol, api.Domain, api.Port)
 
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {

@@ -172,6 +172,9 @@ First, set the IP address and port where the agent can find the Elasticsearch in
     host = "192.168.1.42"
     port = 9200
 
+    # Optional protocol
+    # protocol = "https"
+
     # Optional basic auth credentials
     # username = "admin"
     # password = "s3cr3t"
