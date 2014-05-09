@@ -67,6 +67,7 @@ func Bytes_Ipv4_Ntoa(bytes []byte) string {
 }
 
 func decodePktEth(datalink int, pkt *pcap.Packet) {
+    defer RECOVER("decodePktEth exception")
 
     packet := new(Packet)
     var l2hlen int
@@ -182,7 +183,6 @@ func main() {
     debugSelectorsStr := flag.String("d", "", "Enable certain debug selectors")
     oneAtAtime := flag.Bool("O", false, "Read packets one at a time (press Enter)")
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
-    panicAfter := flag.Int("P", 0, "Panic after a given number of seconds, only for testing")
 
     flag.Parse()
 
@@ -204,13 +204,6 @@ func main() {
         debugSelectors = _Config.Logging.Selectors
     }
     LogInit(logLevel, "", !*toStdout, debugSelectors)
-
-    if *panicAfter > 0 {
-        go func() {
-            time.Sleep(time.Duration(*panicAfter) * time.Second)
-            panic("Panicking as requested")
-        }()
-    }
 
     if *file != "" {
         h, err = pcap.Openoffline(*file)
@@ -331,8 +324,6 @@ func main() {
             pkt.Time = time.Now() // overwrite what we get from the pcap
         }
         counter++
-
-        //DEBUG("pkt received")
 
         decodePktEth(datalink, pkt)
     }
