@@ -13,12 +13,6 @@ const (
     MYSQL_CMD_QUERY = 3
 )
 
-type TcpTuple struct {
-    Src_ip, Dst_ip     uint32
-    Src_port, Dst_port uint16
-    stream_id          uint32
-}
-
 type MysqlMessage struct {
     start int
     end   int
