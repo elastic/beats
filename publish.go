@@ -15,10 +15,6 @@ import (
 type PublisherType struct {
     name string
 
-    url         string
-    mother_host string
-    mother_port string
-
     RefreshTopologyTimer <-chan time.Time
     TopologyMap          map[string]string
 }
@@ -82,10 +78,6 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = publisher.mother_host
-    api.Port = publisher.mother_port
-
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Http["response"].(bson.M)["phrase"].(string)
@@ -122,10 +114,6 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 }
 
 func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = publisher.mother_host
-    api.Port = publisher.mother_port
-
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Mysql["error_message"].(string)
@@ -150,10 +138,6 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 }
 
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = publisher.mother_host
-    api.Port = publisher.mother_port
-
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := "OK"
@@ -182,10 +166,6 @@ func (publisher *PublisherType) UpdateTopologyPeriodically() {
 
 func (publisher *PublisherType) UpdateTopology() {
 
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = publisher.mother_host
-    api.Port = publisher.mother_port
-
     DEBUG("publish", "Updating Topology")
 
     // get all agents IPs from Elasticsearch
@@ -212,10 +192,6 @@ func (publisher *PublisherType) UpdateTopology() {
 }
 
 func (publisher *PublisherType) PublishTopology(params ...string) error {
-
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = publisher.mother_host
-    api.Port = publisher.mother_port
 
     var localAddrs []string = params
 
@@ -285,11 +261,11 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 func (publisher *PublisherType) Init() error {
     var err error
 
-    publisher.mother_host = _Config.Elasticsearch.Host
-    publisher.mother_port = fmt.Sprintf("%d", _Config.Elasticsearch.Port)
+    // Set the Elasticsearch Host to Connect to
+    api.Domain = _Config.Elasticsearch.Host
+    api.Port = fmt.Sprintf("%d", _Config.Elasticsearch.Port)
 
-    publisher.url = fmt.Sprintf("%s:%s", publisher.mother_host, publisher.mother_port)
-    INFO("Use %s as publisher", publisher.url)
+    INFO("Use %s:%s as publisher", api.Domain, api.Port)
 
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {
