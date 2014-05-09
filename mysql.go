@@ -26,7 +26,7 @@ type MysqlMessage struct {
     Ts             time.Time
     Number         int
     IsRequest      bool
-    PacketLength    uint32
+    PacketLength   uint32
     Seq            uint8
     Typ            uint8
     NumberOfRows   int
