@@ -29,6 +29,7 @@ var Publisher PublisherType
 type tomlAgent struct {
     Name                  string
     Refresh_topology_freq int
+    Ignore_outgoing       bool
 }
 type tomlMothership struct {
     Host string
@@ -102,11 +103,13 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
-    if dst_server != publisher.name {
+    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
+            dst_server != publisher.name {
         // duplicated transaction -> ignore it
-        DEBUG("publish", "Ignore duplicated Http transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
+        DEBUG("publish", "Ignore duplicated HTTP transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
     }
+
 
     var src_country = ""
     if _GeoLite != nil {
@@ -150,6 +153,13 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
+    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
+            dst_server != publisher.name {
+        // duplicated transaction -> ignore it
+        DEBUG("publish", "Ignore duplicated MySQL transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
+        return nil
+    }
+
     event := Event{
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
@@ -178,6 +188,13 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
+
+    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
+            dst_server != publisher.name {
+        // duplicated transaction -> ignore it
+        DEBUG("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
+        return nil
+    }
 
     event := Event{
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
