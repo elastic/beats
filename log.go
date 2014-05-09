@@ -33,6 +33,10 @@ func DEBUG(selector string, format string, v ...interface{}) {
     }
 }
 
+func IS_DEBUG(selector string) bool {
+    return _log.selectors[selector]
+}
+
 func INFO(format string, v ...interface{}) {
     if _log.level >= syslog.LOG_INFO {
         if _log.toSyslog {

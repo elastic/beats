@@ -62,6 +62,15 @@ type Topology struct {
     Ip   string `json:"ip"`
 }
 
+func PrintPublishEvent(event *Event) {
+    json, err := json.MarshalIndent(event, "", "  ")
+    if err != nil {
+        ERR("json.Marshal: %s", err)
+    } else {
+        DEBUG("publish", "Publish: %s", string(json))
+    }
+}
+
 func (publisher *PublisherType) GetServerName(ip string) string {
     // in case the IP is localhost, return current agent name
     islocal, err := IsLoopback(ip)
@@ -109,14 +118,19 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
         }
     }
 
-    // add Http transaction
-    _, err := core.Index(index, "http", "", nil, Event{
+    event := Event{
         t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, t.Http, nil})
+        nil, t.Http, nil}
 
-    DEBUG("publish", "Sent Http transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Http)
+    if IS_DEBUG("publish") {
+        PrintPublishEvent(&event)
+    }
+
+    // add Http transaction
+    _, err := core.Index(index, "http", "", nil, event)
+
     return err
 
 }
@@ -136,14 +150,18 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
-    // add Mysql transaction
-    _, err := core.Index(index, "mysql", "", nil, Event{
+    event := Event{
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        t.Mysql, nil, nil})
+        t.Mysql, nil, nil}
 
-    DEBUG("publish", "Sent MySQL transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Mysql)
+    if IS_DEBUG("publish") {
+        PrintPublishEvent(&event)
+    }
+
+    // add Mysql transaction
+    _, err := core.Index(index, "mysql", "", nil, event)
 
     return err
 
@@ -161,14 +179,19 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     src_server := publisher.GetServerName(t.Src.Ip)
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
-    // add Redis transaction
-    _, err := core.Index(index, "redis", "", nil, Event{
+    event := Event{
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, nil, t.Redis})
+        nil, nil, t.Redis}
 
-    DEBUG("publish", "Sent Redis transaction [%s->%s]:\n%s", t.Src.Proc, t.Dst.Proc, t.Redis)
+    if IS_DEBUG("publish") {
+        PrintPublishEvent(&event)
+    }
+
+    // add Redis transaction
+    _, err := core.Index(index, "redis", "", nil, event)
+
     return err
 
 }
