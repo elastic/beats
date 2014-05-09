@@ -3,7 +3,7 @@ CONF_PATH?=/etc/packetbeat
 VERSION?=0.1.0
 ARCH?=$(shell uname -m)
 
-packetbeat:
+packetbeat: *.go
 	go build
 
 .PHONY: install
