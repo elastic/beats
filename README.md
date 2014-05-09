@@ -242,7 +242,7 @@ Kibana has about dozen panel types that you can combine into pages to create the
 To load our sample pages, follow these steps: 
 
 ```bash
- $ curl -L -O https://github.com/packetbeat/dashboards/archive/v0.1.tar.gz
+ $ curl -L -O https://github.com/packetbeat/dashboards/archive/v0.1.0.tar.gz
  $ tar xzvf v0.1.tar.gz
  $ cd dashboards-0.1/
  $ ./load.sh
