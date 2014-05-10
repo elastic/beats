@@ -151,12 +151,12 @@ For the 32 bits packages, fetch packages:
 
 **rpm**
 ```bash
-  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.1-1.el6.i686.rpm
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.1/packetbeat-0.1.1-1.el6.i686.rpm
 ```
 
 **binary**
 ```bash
-  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.0/packetbeat-0.1.1-1.el6.x86_32.tar.gz
+  $ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v0.1.1/packetbeat-0.1.1-1.el6.x86_32.tar.gz
 ```
 
 Before starting the agent, edit the configuration file: 
