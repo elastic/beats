@@ -252,7 +252,7 @@ func isRedisCommand(key string) bool {
         "CONFIG GET":       1,
         "CONFIG REWRITE":   1,
         "CONFIG SET":       1,
-        "CONFIG REsETSTAT": 1,
+        "CONFIG RESETSTAT": 1,
         "DBSIZE":           1,
         "DEBUG OBJECT":     1,
         "DEBUG SEGFAULT":   1,
