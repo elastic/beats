@@ -9,6 +9,21 @@ import (
 const TCP_STREAM_EXPIRY = 10 * 1e9
 const TCP_STREAM_HASH_SIZE = 2 ^ 16
 
+type TcpTuple struct {
+    Src_ip, Dst_ip     uint32
+    Src_port, Dst_port uint16
+    stream_id          uint32
+}
+
+func (t TcpTuple) String() string {
+    return fmt.Sprintf("TcpTuple src[%s:%d] dst[%s:%d] stream_id[%d]",
+        Ipv4_Ntoa(t.Src_ip),
+        t.Src_port,
+        Ipv4_Ntoa(t.Dst_ip),
+        t.Dst_port,
+        t.stream_id)
+}
+
 type TcpStream struct {
     id       uint32
     tuple    *IpPortTuple
