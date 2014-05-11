@@ -179,10 +179,11 @@ func main() {
 
     configfile := flag.String("c", "agent.conf", "Configuration file")
     file := flag.String("I", "", "file")
-    loop := flag.Int("l", 0, "Loop file. 0 - loop forever")
+    loop := flag.Int("l", 1, "Loop file. 0 - loop forever")
     debugSelectorsStr := flag.String("d", "", "Enable certain debug selectors")
     oneAtAtime := flag.Bool("O", false, "Read packets one at a time (press Enter)")
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
+    topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
 
     flag.Parse()
 
@@ -311,7 +312,7 @@ func main() {
         }
 
         if *file != "" {
-            if lastPktTime != nil {
+            if lastPktTime != nil && !*topSpeed {
                 sleep := pkt.Time.Sub(*lastPktTime)
                 if sleep > 0 {
                     time.Sleep(sleep)
