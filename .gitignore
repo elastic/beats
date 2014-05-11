@@ -5,6 +5,7 @@ packetbeat
 *.a
 *.so
 *.swp
+packetbeat.test
 
 # Folders
 _obj
