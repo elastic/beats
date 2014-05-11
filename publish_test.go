@@ -14,9 +14,9 @@ func TestTopology(t *testing.T) {
     api.Port = "9200"
 
     _, _ = core.Delete("packetbeat-topology", "server-ip", "", nil)
-    var publisher1 PublisherType = PublisherType{name: "proxy1", mother_host: api.Domain, mother_port: api.Port}
-    var publisher2 PublisherType = PublisherType{name: "proxy2", mother_host: api.Domain, mother_port: api.Port}
-    var publisher3 PublisherType = PublisherType{name: "proxy3", mother_host: api.Domain, mother_port: api.Port}
+    var publisher1 PublisherType = PublisherType{name: "proxy1"}
+    var publisher2 PublisherType = PublisherType{name: "proxy2"}
+    var publisher3 PublisherType = PublisherType{name: "proxy3"}
 
     publisher1.PublishTopology("10.1.0.4")
     publisher2.PublishTopology("10.1.0.9", "fe80::4e8d:79ff:fef2:de6a")
@@ -73,7 +73,7 @@ func TestGetServerName(t *testing.T) {
     api.Domain = "10.0.50.4"
     api.Port = "9200"
 
-    var publisher PublisherType = PublisherType{name: "proxy1", mother_host: api.Domain, mother_port: api.Port, RefreshTopologyTimer: time.Tick(1 * time.Second)}
+    var publisher PublisherType = PublisherType{name: "proxy1", RefreshTopologyTimer: time.Tick(1 * time.Second)}
 
     name := publisher.GetServerName("127.0.0.1")
     if name != "proxy1" {
