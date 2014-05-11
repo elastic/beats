@@ -9,8 +9,11 @@ import (
 )
 
 func TestTopology(t *testing.T) {
+    if testing.Short() {
+        t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
+    }
 
-    api.Domain = "10.0.50.4"
+    api.Domain = "localhost"
     api.Port = "9200"
 
     _, _ = core.Delete("packetbeat-topology", "server-ip", "", nil)
@@ -68,9 +71,13 @@ func TestTopology(t *testing.T) {
 
 func TestGetServerName(t *testing.T) {
 
+    if testing.Short() {
+        t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
+    }
+
     LogInit(syslog.LOG_DEBUG, "" /*!toSyslog*/, true, []string{})
     // TODO: delete old topology
-    api.Domain = "10.0.50.4"
+    api.Domain = "localhost"
     api.Port = "9200"
 
     var publisher PublisherType = PublisherType{name: "proxy1", RefreshTopologyTimer: time.Tick(1 * time.Second)}

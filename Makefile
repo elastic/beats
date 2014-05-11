@@ -22,6 +22,10 @@ dist: packetbeat
 gofmt:
 	gofmt -w -tabs=false -tabwidth=4 *.go
 
+.PHONY: test
+test:
+	go test -short
+
 .PHONY: clean
 clean:
 	rm packetbeat || true
