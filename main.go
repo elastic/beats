@@ -184,6 +184,7 @@ func main() {
     oneAtAtime := flag.Bool("O", false, "Read packets one at a time (press Enter)")
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
     topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
+    publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
 
     flag.Parse()
 
@@ -238,7 +239,7 @@ func main() {
         }
     }
 
-    if err = Publisher.Init(); err != nil {
+    if err = Publisher.Init(*publishDisabled); err != nil {
         CRIT(err.Error())
         return
     }

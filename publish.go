@@ -13,7 +13,8 @@ import (
 )
 
 type PublisherType struct {
-    name string
+    name     string
+    disabled bool
 
     RefreshTopologyTimer <-chan time.Time
     TopologyMap          map[string]string
@@ -91,6 +92,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
+    var err error
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Http["response"].(bson.M)["phrase"].(string)
@@ -99,12 +101,11 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-            dst_server != publisher.name {
+        dst_server != publisher.name {
         // duplicated transaction -> ignore it
         DEBUG("publish", "Ignore duplicated HTTP transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
     }
-
 
     var src_country = ""
     if _GeoLite != nil {
@@ -127,13 +128,16 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     }
 
     // add Http transaction
-    _, err := core.Index(index, "http", "", nil, event)
+    if !publisher.disabled {
+        _, err = core.Index(index, "http", "", nil, event)
+    }
 
     return err
 
 }
 
 func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
+    var err error
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := t.Mysql["error_message"].(string)
@@ -145,7 +149,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-            dst_server != publisher.name {
+        dst_server != publisher.name {
         // duplicated transaction -> ignore it
         DEBUG("publish", "Ignore duplicated MySQL transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
@@ -162,13 +166,16 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     }
 
     // add Mysql transaction
-    _, err := core.Index(index, "mysql", "", nil, event)
+    if !publisher.disabled {
+        _, err = core.Index(index, "mysql", "", nil, event)
+    }
 
     return err
 
 }
 
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
+    var err error
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
     status := "OK"
@@ -177,7 +184,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     dst_server := publisher.GetServerName(t.Dst.Ip)
 
     if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-            dst_server != publisher.name {
+        dst_server != publisher.name {
         // duplicated transaction -> ignore it
         DEBUG("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
         return nil
@@ -194,14 +201,14 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     }
 
     // add Redis transaction
-    _, err := core.Index(index, "redis", "", nil, event)
+    if !publisher.disabled {
+        _, err = core.Index(index, "redis", "", nil, event)
+    }
 
     return err
-
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
-
     for _ = range publisher.RefreshTopologyTimer {
         publisher.UpdateTopology()
     }
@@ -301,7 +308,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
     return nil
 }
 
-func (publisher *PublisherType) Init() error {
+func (publisher *PublisherType) Init(publishDisabled bool) error {
     var err error
 
     // Set the Elasticsearch Host to Connect to
@@ -327,21 +334,28 @@ func (publisher *PublisherType) Init() error {
         INFO("No agent name configured, using hostname '%s'", publisher.name)
     }
 
+    publisher.disabled = publishDisabled
+    if publisher.disabled {
+        INFO("Dry run mode. Elasticsearch won't be updated or queried.")
+    }
+
     RefreshTopologyFreq := 10 * time.Second
     if _Config.Agent.Refresh_topology_freq != 0 {
         RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
     }
     publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 
-    // register agent and its public IP addresses
-    err = publisher.PublishTopology()
-    if err != nil {
-        ERR("Failed to publish topology: %s", err)
-        return err
-    }
-    // update topology periodically
+    if !publisher.disabled {
+        // register agent and its public IP addresses
+        err = publisher.PublishTopology()
+        if err != nil {
+            ERR("Failed to publish topology: %s", err)
+            return err
+        }
 
-    go publisher.UpdateTopologyPeriodically()
+        // update topology periodically
+        go publisher.UpdateTopologyPeriodically()
+    }
 
     return nil
 }
