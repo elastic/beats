@@ -43,6 +43,14 @@ type ParserStream interface {
     Reset()
 }
 
+type Endpoint struct {
+    Ip      string
+    Port    uint16
+    Name    string
+    Cmdline string
+    Proc    string
+}
+
 var __id uint32 = 0
 
 func GetId() uint32 {

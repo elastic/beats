@@ -38,8 +38,8 @@ type RedisStream struct {
 type RedisTransaction struct {
     Type         string
     tuple        TcpTuple
-    Src          DbEndpoint
-    Dst          DbEndpoint
+    Src          Endpoint
+    Dst          Endpoint
     ResponseTime int32
     Ts           int64
     JsTs         time.Time
@@ -448,12 +448,12 @@ func receivedRedisRequest(msg *RedisMessage) {
     trans.ts = msg.Ts
     trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
     trans.JsTs = msg.Ts
-    trans.Src = DbEndpoint{
+    trans.Src = Endpoint{
         Ip:   Ipv4_Ntoa(tuple.Src_ip),
         Port: tuple.Src_port,
         Proc: string(msg.CmdlineTuple.Src),
     }
-    trans.Dst = DbEndpoint{
+    trans.Dst = Endpoint{
         Ip:   Ipv4_Ntoa(tuple.Dst_ip),
         Port: tuple.Dst_port,
         Proc: string(msg.CmdlineTuple.Dst),
