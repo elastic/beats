@@ -548,14 +548,14 @@ func TestEatBodyChunked(t *testing.T) {
         []byte("\n0\r\n"),
     }
     stream := &HttpStream{
-        data: msgs[0],
-        parseOffset: 0,
+        data:         msgs[0],
+        parseOffset:  0,
         bodyReceived: 0,
-        parseState: BODY_CHUNKED_START,
+        parseState:   BODY_CHUNKED_START,
     }
     message := &HttpMessage{
         chunked_length: 5,
-        ContentLength: 0,
+        ContentLength:  0,
     }
 
     cont, ok, complete := state_body_chunked_start(stream, message)
@@ -593,7 +593,6 @@ func TestEatBodyChunked(t *testing.T) {
         t.Error("Wrong parseOffset")
     }
 
-
     cont, ok, complete = state_body_chunked_start(stream, message)
     if cont != true {
         t.Error("Wrong return values")
@@ -607,7 +606,6 @@ func TestEatBodyChunked(t *testing.T) {
     if stream.parseState != BODY_CHUNKED {
         t.Error("Wrong state")
     }
-
 
     cont, ok, complete = state_body_chunked(stream, message)
     if cont != false || ok != true || complete != false {

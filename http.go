@@ -331,7 +331,6 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
     return true, false, false
 }
 
-
 func state_body_chunked(s *HttpStream, m *HttpMessage) (cont bool, ok bool, complete bool) {
     if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived+2 /*\r\n*/ {
         // Received more data than expected
