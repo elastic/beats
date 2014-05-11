@@ -177,7 +177,7 @@ func DropPrivileges() error {
 
 func main() {
 
-    configfile := flag.String("c", "agent.conf", "Configuration file")
+    configfile := flag.String("c", "packetbeat.conf", "Configuration file")
     file := flag.String("I", "", "file")
     loop := flag.Int("l", 1, "Loop file. 0 - loop forever")
     debugSelectorsStr := flag.String("d", "", "Enable certain debug selectors")
