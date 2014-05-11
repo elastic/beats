@@ -540,3 +540,103 @@ func TestHttpParser_301_response(t *testing.T) {
         t.Error("Expecting content length 290")
     }
 }
+
+func TestEatBodyChunked(t *testing.T) {
+    msgs := [][]byte{
+        []byte("03\r"),
+        []byte("\n123\r\n03\r\n123\r"),
+        []byte("\n0\r\n"),
+    }
+    stream := &HttpStream{
+        data: msgs[0],
+        parseOffset: 0,
+        bodyReceived: 0,
+        parseState: BODY_CHUNKED_START,
+    }
+    message := &HttpMessage{
+        chunked_length: 5,
+        ContentLength: 0,
+    }
+
+    cont, ok, complete := state_body_chunked_start(stream, message)
+    if cont != false || ok != true || complete != false {
+        t.Error("Wrong return values")
+    }
+    if stream.parseOffset != 0 {
+        t.Error("Wrong parseOffset")
+    }
+
+    stream.data = append(stream.data, msgs[1]...)
+
+    cont, ok, complete = state_body_chunked_start(stream, message)
+    if cont != true {
+        t.Error("Wrong return values")
+    }
+    if message.chunked_length != 3 {
+        t.Error("Wrong chunked_length")
+    }
+    if stream.parseOffset != 4 {
+        t.Error("Wrong parseOffset")
+    }
+    if stream.parseState != BODY_CHUNKED {
+        t.Error("Wrong state")
+    }
+
+    cont, ok, complete = state_body_chunked(stream, message)
+    if cont != true {
+        t.Error("Wrong return values")
+    }
+    if stream.parseState != BODY_CHUNKED_START {
+        t.Error("Wrong state")
+    }
+    if stream.parseOffset != 9 {
+        t.Error("Wrong parseOffset")
+    }
+
+
+    cont, ok, complete = state_body_chunked_start(stream, message)
+    if cont != true {
+        t.Error("Wrong return values")
+    }
+    if message.chunked_length != 3 {
+        t.Error("Wrong chunked_length")
+    }
+    if stream.parseOffset != 13 {
+        t.Error("Wrong parseOffset")
+    }
+    if stream.parseState != BODY_CHUNKED {
+        t.Error("Wrong state")
+    }
+
+
+    cont, ok, complete = state_body_chunked(stream, message)
+    if cont != false || ok != true || complete != false {
+        t.Error("Wrong return values")
+    }
+    if stream.parseState != BODY_CHUNKED {
+        t.Error("Wrong state")
+    }
+    if stream.parseOffset != 13 {
+        t.Error("Wrong parseOffset")
+    }
+    if stream.bodyReceived != 0 {
+        t.Error("Wrong bodyReceived")
+    }
+
+    stream.data = append(stream.data, msgs[2]...)
+    cont, ok, complete = state_body_chunked(stream, message)
+    if cont != true {
+        t.Error("Wrong return values")
+    }
+    if stream.parseState != BODY_CHUNKED_START {
+        t.Error("Wrong state")
+    }
+    if stream.parseOffset != 18 {
+        t.Error("Wrong parseOffset")
+    }
+
+    cont, ok, complete = state_body_chunked_start(stream, message)
+    if cont != false || ok != true || complete != true {
+        t.Error("Wrong return values")
+    }
+}

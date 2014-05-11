@@ -158,6 +158,7 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 
 func httpMessageParser(s *HttpStream) (bool, bool) {
 
+    var cont, ok, complete bool
     m := s.message
 
     //DEBUG("http", "Data: [%s]", s.data)
@@ -288,49 +289,69 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
             }
 
         case BODY_CHUNKED_START:
-            // read hexa length
-            i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
-            if i == -1 {
-                return true, false
+            cont, ok, complete = state_body_chunked_start(s, m)
+            if !cont {
+                return ok, complete
             }
-            line := string(s.data[s.parseOffset : s.parseOffset+i])
-            _, err := fmt.Sscanf(line, "%x", &m.chunked_length)
-            if err != nil {
-                WARN("Failed to understand chunked body start line")
-                return false, false
-            }
-
-            s.parseOffset += i + 2 //+ \r\n
-            if m.chunked_length == 0 {
-                s.parseOffset += 2 // final \r\n
-                m.end = s.parseOffset
-                return true, true
-            }
-            s.bodyReceived = 0
-            s.parseState = BODY_CHUNKED
 
         case BODY_CHUNKED:
-            // skip chunked data
-            if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived+2 /*\r\n*/ {
-                // Received more data than expected
-                m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:s.parseOffset+m.chunked_length-s.bodyReceived]...)
-                s.parseOffset += (m.chunked_length - s.bodyReceived + 2 /*\r\n*/)
-                m.ContentLength += m.chunked_length
-                s.parseState = BODY_CHUNKED_START
-                continue
-            } else {
-                // Received less data than expected
-                m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:]...)
-                s.bodyReceived += (len(s.data) - s.parseOffset)
-                s.parseOffset = len(s.data)
-                return true, false
+            cont, ok, complete = state_body_chunked(s, m)
+            if !cont {
+                return ok, complete
             }
-
         }
 
     }
 
     return true, false
+}
+
+func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool, complete bool) {
+    // read hexa length
+    i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
+    if i == -1 {
+        return false, true, false
+    }
+    line := string(s.data[s.parseOffset : s.parseOffset+i])
+    _, err := fmt.Sscanf(line, "%x", &m.chunked_length)
+    if err != nil {
+        WARN("Failed to understand chunked body start line")
+        return false, false, false
+    }
+
+    s.parseOffset += i + 2 //+ \r\n
+    if m.chunked_length == 0 {
+        s.parseOffset += 2 // final \r\n
+        m.end = s.parseOffset
+        return false, true, true
+    }
+    s.bodyReceived = 0
+    s.parseState = BODY_CHUNKED
+
+    return true, false, false
+}
+
+
+func state_body_chunked(s *HttpStream, m *HttpMessage) (cont bool, ok bool, complete bool) {
+    if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived+2 /*\r\n*/ {
+        // Received more data than expected
+        m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:s.parseOffset+m.chunked_length-s.bodyReceived]...)
+        s.parseOffset += (m.chunked_length - s.bodyReceived + 2 /*\r\n*/)
+        m.ContentLength += m.chunked_length
+        s.parseState = BODY_CHUNKED_START
+        return true, false, false
+    } else {
+        if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived {
+            // we need need to wait for the +2, else we can crash on next call
+            return false, true, false
+        }
+        // Received less data than expected
+        m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:]...)
+        s.bodyReceived += (len(s.data) - s.parseOffset)
+        s.parseOffset = len(s.data)
+        return false, true, false
+    }
+    return true, false, false
 }
 
 func (stream *HttpStream) PrepareForNewMessage() {
