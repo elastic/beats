@@ -10,6 +10,7 @@ To get started, check out <http://packetbeat.com>!
  - [Integration with ElasticSearch and Kibana](#about)
  - [Bugs and feature requests](#bugs-and-feature-requests)
  - [Install a complete Application Monitoring system](#get-started)
+ - [Newsletter list](#newsletter)
  - [Authors](#authors)
  - [Copyright and license](#copyright-and-license)
  
@@ -261,6 +262,9 @@ To load our sample pages, follow these steps:
  - Packetbeat Search: This page enables you to do full text searches over the indexed network messages.
  - Packetbeat Query Analysis: This page demonstrates more advanced statistics like the top N slow SQL queries, the database throughput or the most common MySQL errors.
 
+## Newsletter list
+
+Be the first to get packetbeat latest updates by signing in to the newsletter list from [download page](http://packetbeat.com/download). There will be maximum two emails per week with updates about new releases. 
 
 ## Authors
 
