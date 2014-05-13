@@ -2,7 +2,7 @@ package main
 
 import (
     "fmt"
-
+    "bytes"
     "labix.org/v2/mgo/bson"
 )
 
@@ -66,4 +66,13 @@ func stringInSlice(a string, list []string) bool {
         }
     }
     return false
+}
+
+func readString(s []byte) (string, error) {
+    i := bytes.IndexByte(s, 0)
+    if i < 0 {
+        return "", MsgError("No string found")
+    }
+    res := string(s[:i])
+    return res, nil
 }

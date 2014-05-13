@@ -32,15 +32,8 @@ type TcpStream struct {
 
     httpData   [2]*HttpStream
     mysqlData  [2]*MysqlStream
-    parserData [2]ParserStream
     redisData  [2]*RedisStream
-}
-
-type ParserStream interface {
-    Parse() (bool, bool)
-    AddData([]byte)
-    Message() interface{}
-    Reset()
+    pgsqlData  [2]*PgsqlStream
 }
 
 type Endpoint struct {
@@ -121,6 +114,10 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 
     case RedisProtocol:
         ParseRedis(pkt, stream, original_dir)
+        break
+
+    case PgsqlProtocol:
+        ParsePgsql(pkt, stream, original_dir)
         break
     }
 }

@@ -27,9 +27,10 @@ const (
     HttpProtocol
     MysqlProtocol
     RedisProtocol
+    PgsqlProtocol
 )
 
-var protocolNames = []string{"unknown", "http", "mysql", "redis"}
+var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql"}
 
 type tomlConfig struct {
     Interfaces    tomlInterfaces
