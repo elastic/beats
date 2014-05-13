@@ -148,7 +148,6 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     FollowTcp(tcphdr, packet)
 }
 
-
 func main() {
 
     configfile := flag.String("c", "packetbeat.conf", "Configuration file")

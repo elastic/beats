@@ -6,6 +6,7 @@ import (
     "os"
     "runtime/debug"
 )
+
 type Logger struct {
     toSyslog  bool
     level     Priority
@@ -15,6 +16,7 @@ type Logger struct {
 }
 
 type Priority int
+
 const (
     // Severity.
 

@@ -11,6 +11,7 @@ import (
 )
 
 type Priority int
+
 const (
     // Severity.
 
@@ -25,6 +26,7 @@ const (
     LOG_INFO
     LOG_DEBUG
 )
+
 type Logger struct {
     toSyslog  bool
     level     syslog.Priority
