@@ -8,6 +8,21 @@ import (
     "runtime/debug"
 )
 
+type Priority int
+const (
+    // Severity.
+
+    // From /usr/include/sys/syslog.h.
+    // These are the same on Linux, BSD, and OS X.
+    LOG_EMERG Priority = iota
+    LOG_ALERT
+    LOG_CRIT
+    LOG_ERR
+    LOG_WARNING
+    LOG_NOTICE
+    LOG_INFO
+    LOG_DEBUG
+)
 type Logger struct {
     toSyslog  bool
     level     syslog.Priority
@@ -107,9 +122,9 @@ func openSyslog(level syslog.Priority, prefix string) *log.Logger {
     return logger
 }
 
-func LogInit(level syslog.Priority, prefix string, toSyslog bool, debugSelectors []string) {
+func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []string) {
     _log.toSyslog = toSyslog
-    _log.level = level
+    _log.level = syslog.Priority(level)
 
     _log.selectors = make(map[string]bool)
     for _, selector := range debugSelectors {

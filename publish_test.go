@@ -3,7 +3,6 @@ package main
 import (
     "github.com/mattbaird/elastigo/api"
     "github.com/mattbaird/elastigo/core"
-    "log/syslog"
     "testing"
     "time"
 )
@@ -75,7 +74,7 @@ func TestGetServerName(t *testing.T) {
         t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
     }
 
-    LogInit(syslog.LOG_DEBUG, "" /*!toSyslog*/, true, []string{})
+    LogInit(LOG_DEBUG, "" /*!toSyslog*/, true, []string{})
     // TODO: delete old topology
     api.Domain = "localhost"
     api.Port = "9200"

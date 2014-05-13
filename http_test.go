@@ -2,7 +2,6 @@ package main
 
 import (
     "bytes"
-    "log/syslog"
     "testing"
     "time"
     //"fmt"
@@ -382,7 +381,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 }
 
 func TestHttpParser_RequestResponse(t *testing.T) {
-    LogInit(syslog.LOG_CRIT, "" /*toSyslog*/, false, []string{})
+    LogInit(LOG_CRIT, "" /*toSyslog*/, false, []string{})
 
     data := []byte(
         "GET / HTTP/1.1\r\n" +
