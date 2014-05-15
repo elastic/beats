@@ -3,16 +3,17 @@ package main
 import (
     "flag"
     "fmt"
-    "log/syslog"
+    "runtime"
     "strconv"
     "strings"
-    "syscall"
     "time"
 
     "github.com/BurntSushi/toml"
     "github.com/akrennmair/gopcap"
     "github.com/nranchev/go-libGeoIP"
 )
+
+const Version = "0.1.1"
 
 type Packet struct {
     ts      time.Time
@@ -151,31 +152,6 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     FollowTcp(tcphdr, packet)
 }
 
-func DropPrivileges() error {
-    var err error
-
-    if !_ConfigMeta.IsDefined("runoptions", "uid") {
-        // not found, no dropping privileges but no err
-        return nil
-    }
-
-    if !_ConfigMeta.IsDefined("runoptions", "gid") {
-        return MsgError("GID must be specified for dropping privileges")
-    }
-
-    INFO("Switching to user: %d.%d", _Config.RunOptions.Uid, _Config.RunOptions.Gid)
-
-    if err = syscall.Setgid(_Config.RunOptions.Gid); err != nil {
-        return MsgError("setgid: %s", err.Error())
-    }
-
-    if err = syscall.Setuid(_Config.RunOptions.Uid); err != nil {
-        return MsgError("setuid: %s", err.Error())
-    }
-
-    return nil
-}
-
 func main() {
 
     configfile := flag.String("c", "packetbeat.conf", "Configuration file")
@@ -186,11 +162,16 @@ func main() {
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
     topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
     publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
+    printVersion := flag.Bool("version", false, "Print version and exit")
 
     flag.Parse()
 
+    if *printVersion {
+        fmt.Printf("Packetbat verision %s (%s)\n", Version, runtime.GOARCH)
+    }
+
     debugSelectors := []string{}
-    logLevel := syslog.LOG_DEBUG
+    logLevel := LOG_DEBUG
     if len(*debugSelectorsStr) > 0 {
         debugSelectors = strings.Split(*debugSelectorsStr, ",")
     }
