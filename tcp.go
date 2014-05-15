@@ -30,10 +30,10 @@ type TcpStream struct {
     timer    *time.Timer
     protocol protocolType
 
-    httpData   [2]*HttpStream
-    mysqlData  [2]*MysqlStream
-    redisData  [2]*RedisStream
-    pgsqlData  [2]*PgsqlStream
+    httpData  [2]*HttpStream
+    mysqlData [2]*MysqlStream
+    redisData [2]*RedisStream
+    pgsqlData [2]*PgsqlStream
 }
 
 type Endpoint struct {

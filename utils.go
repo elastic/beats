@@ -1,8 +1,8 @@
 package main
 
 import (
-    "fmt"
     "bytes"
+    "fmt"
     "labix.org/v2/mgo/bson"
 )
 
