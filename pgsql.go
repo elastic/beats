@@ -3,10 +3,7 @@ package main
 import (
     "labix.org/v2/mgo/bson"
     "time"
-)
-
-// Packet types
-const (
+    "strings"
 )
 
 type PgsqlMessage struct {
@@ -18,18 +15,17 @@ type PgsqlMessage struct {
     Query          string
     Size           uint64
     Fields         []string
+    FieldsFormat   []byte
     Rows           [][]string
     NumberOfRows   int
     NumberOfFields int
     IsOK           bool
     IsError        bool
 
-
     Stream_id    uint32
     Direction    uint8
     Tuple        *IpPortTuple
     CmdlineTuple *CmdlineTuple
-    Raw          []byte
 }
 
 type PgsqlTransaction struct {
@@ -43,7 +39,7 @@ type PgsqlTransaction struct {
     ts           time.Time
 
 
-    Mysql bson.M
+    Pgsql bson.M
 
     Request_raw  string
     Response_raw string
@@ -58,15 +54,13 @@ type PgsqlStream struct {
 
     parseOffset   int
     parseState    int
-    bytesReceived int
-    isClient      bool
 
     message       *PgsqlMessage
 }
 
 const (
-    ConnectionCycle = iota
-    SimpleQueryCycle
+    PgsqlStartState = iota
+    PgsqlGetDataState
 )
 
 var PgsqlCommands = map[byte]string {
@@ -101,7 +95,7 @@ var PgsqlCommands = map[byte]string {
     'T': "RowDescription",
     'X': "Terminate",
 }
-var pgsqlTransactionsMap = make(map[TcpTuple]*PgsqlTransaction, TransactionsHashSize)
+var pgsqlTransactionsMap = make(map[TcpTuple][]*PgsqlTransaction, TransactionsHashSize)
 
 func isPgsqlCommand(c byte) bool {
     _, exists := PgsqlCommands[c]
@@ -110,62 +104,98 @@ func isPgsqlCommand(c byte) bool {
 
 func (stream *PgsqlStream) PrepareForNewMessage() {
     stream.data = stream.data[stream.message.end:]
-    stream.parseState = ConnectionCycle
+    stream.parseState = PgsqlStartState
     stream.parseOffset = 0
-    stream.bytesReceived = 0
-    stream.isClient = false
     stream.message = nil
 }
 
-func pgsqlFieldsParser(s *PgsqlStream) {
-    // read field count (int16)
-    field_count := Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2])
-    s.parseOffset += 2
-    DEBUG("pgsql", "Row Description field count=%d", field_count)
+// Parse a list of commands separated by semicolon from the query
+func pgsqlQueryParser(q string) []string {
+    array := strings.Split(q, ";")
 
-    for i := 0; i < int(field_count); i++ {
+    queries := []string{}
+
+    for _, query := range array {
+        queries = append(queries, strings.TrimSpace(query))
+        DEBUG("pgsqldetailed", "Query %s", strings.TrimSpace(query))
+    }
+    return queries
+}
+
+// Extract the method from a SQL query
+func getQueryMethod(q string) string {
+
+    index := strings.Index(q, " ")
+    var method string
+    if index > 0 {
+        method = strings.ToUpper(q[:index])
+    } else {
+        method = strings.ToUpper(q)
+    }
+    return method
+}
+
+func pgsqlFieldsParser(s *PgsqlStream) {
+    m := s.message
+
+    // read field count (int16)
+    field_count := int(Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2]))
+    s.parseOffset += 2
+    DEBUG("pgsqldetailed", "Row Description field count=%d", field_count)
+
+    fields := []string{}
+    fields_format := []byte{}
+
+    for i := 0; i < field_count; i++ {
         // read field name (null terminated string)
         field_name, err := readString(s.data[s.parseOffset:])
         if err != nil {
             ERR("Fail to read the column field")
         }
+        fields = append(fields, field_name)
+        m.NumberOfFields  += 1
         s.parseOffset += len(field_name) + 1
 
         // read Table OID (int32)
-        table_oid := int32(Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4]))
         s.parseOffset += 4
 
         // read Column Index (int16)
-        column_index := int16(Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2]))
         s.parseOffset += 2
 
         // read Type OID (int32)
-        type_oid := int32(Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4]))
         s.parseOffset += 4
 
         // read column length (int16)
-        column_length := int16(Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2]))
         s.parseOffset += 2
 
         // read type modifier (int32)
-        type_modif := int32(Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4]))
         s.parseOffset += 4
 
         // read format (int16)
         format := Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2])
+        fields_format = append(fields_format, byte(format))
         s.parseOffset += 2
 
-        DEBUG("pgsql", "Field name=%s table oid=%d column_index=%d, type_oid=%d, column_length=%d, type_modif=%d, format=%d", field_name, table_oid, column_index, type_oid, column_length, type_modif, format)
+        DEBUG("pgsqldetailed", "Field name=%s, format=%d", field_name, format)
+    }
+    m.Fields = fields
+    m.FieldsFormat = fields_format
+    if m.NumberOfFields != field_count {
+        ERR("Missing fields from RowDescription. Expected %d. Received %d", field_count, m.NumberOfFields)
     }
 }
 
 func pgsqlRowsParser(s *PgsqlStream) {
-    // read field count (int16)
-    field_count := Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2])
-    s.parseOffset += 2
-    DEBUG("pgsql", "DataRow field count=%d", field_count)
+    m := s.message
 
-    for i := 0; i < int(field_count); i++ {
+    // read field count (int16)
+    field_count := int(Bytes_Ntohs(s.data[s.parseOffset:s.parseOffset+2]))
+    s.parseOffset += 2
+    DEBUG("pgsqldetailed", "DataRow field count=%d", field_count)
+
+    row := []string{}
+
+    for i := 0; i < field_count; i++ {
 
         // read column length (int32)
         column_length := int32(Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4]))
@@ -181,8 +211,12 @@ func pgsqlRowsParser(s *PgsqlStream) {
             column_value = nil
         }
 
-        DEBUG("pgsql", "Field length=%d, value=%s", column_length, string(column_value))
+        DEBUG("pgsqldetailed", "Value %s, length=%d", string(column_value), column_length)
+
+        row = append(row, string(column_value))
     }
+    m.NumberOfRows += 1
+    m.Rows = append(m.Rows, row)
 }
 
 func pgsqlErrorParser(s *PgsqlStream) {
@@ -205,138 +239,216 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
     m := s.message
     for s.parseOffset < len(s.data) {
         switch s.parseState {
-            case ConnectionCycle:
+            case PgsqlStartState:
                 if len(s.data[s.parseOffset:]) < 5 {
-                    WARN("Postgresql Message too short (length=%d)", len(s.data[s.parseOffset:]))
+                    WARN("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
                     return true, false
                 }
                 // read type
                 typ := byte(s.data[s.parseOffset])
 
-                // check command type
+                // check if the command starts with 1 byte of command type
                 if isPgsqlCommand(typ) {
-                    DEBUG("pgsql", "Pgsql type %c", typ)
-                    s.parseOffset += 1
+                    DEBUG("pgsqldetailed", "Pgsql type %c", typ)
 
-                    if typ == 'Z' {
-                        // ReadyForQuery
-                        s.parseState = SimpleQueryCycle
-                    }
-                } else {
-                    // Startup Message, SSL Message, Cancel Request
-                    DEBUG("pgsql", "Startup command")
-                }
-                // read message length
-                length := Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4])
-                if len(s.data[s.parseOffset:]) >= int(length) {
-                    s.parseOffset += int(length)
-                } else {
-                    // wait for more
-                    return true, false
-                }
+                    // read length
+                    length := int(Bytes_Ntohl(s.data[s.parseOffset+1:s.parseOffset+5]))
 
-                break
-            case SimpleQueryCycle:
-                if len(s.data[s.parseOffset:]) < 5 {
-                    WARN("Postgresql Message too short (length=%d)", len(s.data[s.parseOffset:]))
-                    return true, false
-                }
+                    if typ == 'Q' {
+                        // SimpleQuery
+                        m.start = s.parseOffset
+                        m.IsRequest = true
 
-                // read type
-                typ := byte(s.data[s.parseOffset])
-                s.parseOffset += 1
+                        s.parseOffset += 1 //type
 
-                // read message length
-                length := Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4])
-                DEBUG("pgsql", "SimpleQueryCycle type=%c, length=%d", typ, length)
+                        if len(s.data[s.parseOffset:]) >= length {
+                            s.parseOffset += length
+                            m.end = s.parseOffset
+                            m.Query = string(s.data[m.start+5:m.end])
+                            DEBUG("pgsqldetailed", "Simple Query", "%s", m.Query)
+                            return true, true
+                        } else {
+                            // wait for more
+                            return true, false
+                        }
+                    } else if typ == 'T' {
+                        // RowDescription
 
-                if typ == 'Q' {
-                    // Simple Query
-                    if !s.isClient {
-                        s.isClient = true
-                    }
-                    m.start = s.parseOffset
-                    m.IsRequest = true
-                    if len(s.data[s.parseOffset:]) >= int(length) {
-                        s.parseOffset += int(length)
-                        m.end = s.parseOffset
-                        m.Query = string(s.data[m.start+5 : m.end])
-                        DEBUG("pgsql", "Simple Query", "%s", m.Query)
-                    }
-                    return true, true
-                } else if typ == 'T' {
-                    // RowDescription
+                        m.start = s.parseOffset
+                        m.IsRequest = false
+                        m.IsOK = true
 
-                    m.start = s.parseOffset
-                    m.IsRequest = false
-                    if len(s.data[s.parseOffset:]) > int(length) {
-                        s.parseOffset += 4
-                        pgsqlFieldsParser(s)
-                    } else {
-                        // wait for more
-                        return true, false
-                    }
-                } else if typ == 'D' {
-                    // DataRow
-                    if len(s.data[s.parseOffset:]) > int(length) {
-                        s.parseOffset += 4
-                        pgsqlRowsParser(s)
+                        s.parseOffset += 1 //type
 
+                        if len(s.data[s.parseOffset:]) >= length {
+
+                            s.parseOffset += 4 //length
+
+                            pgsqlFieldsParser(s)
+                            DEBUG("pgsqldetailed", "Fields: %s", m.Fields)
+
+                            s.parseState = PgsqlGetDataState
+                        } else {
+                            // wait for more
+                            return true, false
+                        }
+
+                    } else if typ == 'I' {
+                        // EmptyQueryResponse, appears as a response for empty queries
+                        // substitutes CommandComplete
+
+                        DEBUG("pgsqldetailed", "EmptyQueryResponse")
+                        m.start = s.parseOffset
+                        m.IsOK = true
+                        m.IsRequest = false
+                        s.parseOffset += 5 // type + length
                         m.end = s.parseOffset
                         m.Size = uint64(m.end - m.start)
 
                         return true, true
+
+                    } else if typ == 'E' {
+                        // ErrorResponse
+
+                        DEBUG("pgsqldetailed", "ErrorResponse")
+                        m.start = s.parseOffset
+                        m.IsRequest = false
+                        m.IsError = true
+
+                        s.parseOffset += 1 //type
+
+                        if len(s.data[s.parseOffset:]) >= length {
+                            s.parseOffset += 4 //length
+
+                            pgsqlErrorParser(s)
+
+                            m.end = s.parseOffset
+                            m.Size = uint64(m.end - m.start)
+
+                            return true, true
+                        } else {
+                            // wait for more
+                            return true, false
+                        }
+                    } else if typ == 'C' {
+                        // CommandComplete -> Successful response
+
+                        m.start = s.parseOffset
+                        m.IsRequest = false
+                        m.IsOK = true
+
+                        s.parseOffset += 1 //type
+
+                        if len(s.data[s.parseOffset:]) >= length {
+
+                            name := string(s.data[s.parseOffset+4:s.parseOffset+length])
+                            DEBUG("pgsqldetailed", "CommandComplete: %s", name)
+
+                            s.parseOffset += length
+                            m.end = s.parseOffset
+                            m.Size = uint64(m.end - m.start)
+
+                            return true, true
+                        } else {
+                            // wait for more
+                            return true, false
+                        }
+
+                    } else {
+                        // TODO: add info from NoticeResponse in case there are warning messages for a query
+                        // ignore command
+                        s.parseOffset += 1 //type
+                        if len(s.data[s.parseOffset:]) >= length {
+                            s.parseOffset += length
+                        } else {
+                            // wait for more
+                            return true, false
+                        }
+                    }
+                } else {
+                    // In case of Commands: StartupMessage, SSlRequest, CancelRequest that don't have
+                    // their type in the first byte 
+
+                    // read length
+                    length := int(Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4]))
+
+                    // ignore command
+                    if len(s.data[s.parseOffset:]) >= length {
+                        s.parseOffset += length
+                    } else {
+                        // wait for more
+                        return true, false
+                    }
+                }
+
+                break
+
+            case PgsqlGetDataState:
+
+                // The response to queries that return row sets contains:
+                // RowDescription
+                // zero or more DataRow
+                // CommandComplete
+                // ReadyForQuery
+
+                if len(s.data[s.parseOffset:]) < 5 {
+                    WARN("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
+                    return true, false
+                }
+
+                // read type
+                typ := byte(s.data[s.parseOffset])
+
+                // read message length
+                length := int(Bytes_Ntohl(s.data[s.parseOffset+1:s.parseOffset+5]))
+
+                if typ == 'D' {
+                    // DataRow
+
+                    // skip type
+                    s.parseOffset += 1
+
+                    if len(s.data[s.parseOffset:]) >= length {
+                        // skip length size
+                        s.parseOffset += 4
+
+                        pgsqlRowsParser(s)
+
                     } else {
                         // wait for more
                         return true, false
                     }
 
-                } else if typ == 'I' {
-                    // EmptyQueryResponse
-                    DEBUG("pgsql", "EmptyQueryResponse")
-                    m.start = s.parseOffset
-                    m.IsOK = true
-                    m.IsRequest = false
-                    s.parseOffset += 4 // length
+                } else if typ == 'C' {
+                    // CommandComplete
 
-                    return true, true
+                    // skip type
+                    s.parseOffset += 1
 
-                } else if typ == 'E' {
-                    // ErrorResponse
-                    DEBUG("pgsql", "ErrorResponse")
-                    m.start = s.parseOffset
-                    m.IsRequest = false
-                    m.IsError = true
 
-                    if len(s.data[s.parseOffset:]) > int(length) {
-                        s.parseOffset += 4 //length
-                        pgsqlErrorParser(s)
+                    if len(s.data[s.parseOffset:]) >= length {
 
+                        name := string(s.data[s.parseOffset+4:s.parseOffset+length])
+                        DEBUG("pgsqldetailed", "CommandComplete: %s", name)
+
+                        s.parseOffset += length
                         m.end = s.parseOffset
+
+                        m.Size = uint64(m.end - m.start)
+
+                        s.parseState = PgsqlStartState
+
+                        DEBUG("pgsqldetailed", "Rows: %s", m.Rows)
 
                         return true, true
                     } else {
                         // wait for more
                         return true, false
                     }
-                } else if typ == 'C' {
-                    // CommandComplete
-                    DEBUG("pgsql", "CommandComplete")
-                    if len(s.data[s.parseOffset:]) > int(length) {
-                        s.parseOffset += int(length)
-                    } else {
-                        // wait for more
-                        return true, false
-                    }
-                    s.parseState =  ConnectionCycle
                 } else {
-                    // skip command
-                    if len(s.data[s.parseOffset:]) > int(length) {
-                        s.parseOffset += int(length)
-                    } else {
-                        // wait for more
-                        return true, false
-                    }
+                    // shouldn't happen
+                    DEBUG("pgsqldetailed", "Skip command of type %c", typ)
+                    s.parseState = PgsqlStartState
                 }
                 break
         }
@@ -361,27 +473,35 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 
     stream := tcp.pgsqlData[dir]
-    if stream.message == nil {
-        stream.message = &PgsqlMessage{Ts: pkt.ts}
-    }
 
-    ok, complete := pgsqlMessageParser(tcp.pgsqlData[dir])
-    if !ok {
-        // drop this tcp stream. Will retry parsing with the next
-        // segment in it
-        tcp.pgsqlData[dir] = nil
-        DEBUG("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
-        return
-    }
+    for len(stream.data) > 0 {
 
-    if complete {
-        // all ok, ship it
-        msg := stream.data[stream.message.start:stream.message.end]
+        if stream.message == nil {
+            stream.message = &PgsqlMessage{Ts: pkt.ts}
+        }
 
-        handlePgsql(stream.message, tcp, dir, msg)
+        ok, complete := pgsqlMessageParser(tcp.pgsqlData[dir])
+        if !ok {
+            // drop this tcp stream. Will retry parsing with the next
+            // segment in it
+            tcp.pgsqlData[dir] = nil
+            DEBUG("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
+            return
+        }
 
-        // and reset message
-        stream.PrepareForNewMessage()
+        if complete {
+            // all ok, ship it
+            msg := stream.data[stream.message.start:stream.message.end]
+
+            handlePgsql(stream.message, tcp, dir, msg)
+
+            // and reset message
+            stream.PrepareForNewMessage()
+
+        } else {
+            // wait for more data
+            break
+        }
     }
 }
 
@@ -392,7 +512,6 @@ func handlePgsql(m *PgsqlMessage, tcp *TcpStream,
     m.Tuple = tcp.tuple
     m.Direction = dir
     m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
-    m.Raw = raw_msg
 
     if m.IsRequest {
         receivedPgsqlRequest(m)
@@ -403,13 +522,125 @@ func handlePgsql(m *PgsqlMessage, tcp *TcpStream,
 
 func receivedPgsqlRequest(msg *PgsqlMessage) {
 
+    tuple := TcpTuple{
+        Src_ip:    msg.Tuple.Src_ip,
+        Dst_ip:    msg.Tuple.Dst_ip,
+        Src_port:  msg.Tuple.Src_port,
+        Dst_port:  msg.Tuple.Dst_port,
+        stream_id: msg.Stream_id,
+    }
+
+    // parse the query, as it might contain a list of pgsql command
+    // separated by ';'
+    queries := pgsqlQueryParser(msg.Query)
+
+    DEBUG("pgsqldetailed", "Queries %s", queries)
+
+    if pgsqlTransactionsMap[tuple] == nil {
+        pgsqlTransactionsMap[tuple] = []*PgsqlTransaction{}
+    }
+
+    for _, query := range queries {
+
+        trans := &PgsqlTransaction{Type: "pgsql", tuple: tuple}
+
+        trans.ts = msg.Ts
+        trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
+        trans.JsTs = msg.Ts
+        trans.Src = Endpoint{
+            Ip:   Ipv4_Ntoa(tuple.Src_ip),
+            Port: tuple.Src_port,
+            Proc: string(msg.CmdlineTuple.Src),
+        }
+        trans.Dst = Endpoint{
+            Ip:   Ipv4_Ntoa(tuple.Dst_ip),
+            Port: tuple.Dst_port,
+            Proc: string(msg.CmdlineTuple.Dst),
+        }
+
+        trans.Pgsql = bson.M{
+            "query":  query,
+            "method": getQueryMethod(query),
+        }
+
+        trans.Request_raw = query
+
+        if trans.timer != nil {
+            trans.timer.Stop()
+        }
+        trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+
+        pgsqlTransactionsMap[tuple] = append(pgsqlTransactionsMap[tuple], trans)
+    }
 }
 
 func receivedPgsqlResponse(msg *PgsqlMessage) {
+
+    tuple := TcpTuple{
+        Src_ip:    msg.Tuple.Src_ip,
+        Dst_ip:    msg.Tuple.Dst_ip,
+        Src_port:  msg.Tuple.Src_port,
+        Dst_port:  msg.Tuple.Dst_port,
+        stream_id: msg.Stream_id,
+    }
+    trans_list := pgsqlTransactionsMap[tuple]
+
+    if trans_list == nil || len(trans_list) == 0 {
+        WARN("Response from unknown transaction. Ignoring.")
+        return
+    }
+
+    // extract the first transaction from the array
+    trans := removePgsqlTransaction(tuple, 0)
+
+    // check if the request was received
+    if len(trans.Pgsql) == 0 {
+        WARN("Response from unknown transaction. Ignoring.")
+        return
+    }
+
+    trans.Pgsql = bson_concat(trans.Pgsql, bson.M{
+        "isOK":         msg.IsOK,
+        "iserror":      msg.IsError,
+        "size":         msg.Size,
+        "num_rows":     msg.NumberOfRows,
+        "num_fields":   msg.NumberOfFields,
+    })
+
+
+    trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+    trans.Response_raw = dumpInCSVFormat(msg.Fields, msg.Rows)
+
+    DEBUG("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
+
+    if len(trans_list) == 0 {
+        delete(pgsqlTransactionsMap, trans.tuple)
+    }
+    if trans.timer != nil {
+        trans.timer.Stop()
+    }
 }
 
 func (trans *PgsqlTransaction) Expire() {
     // TODO: Here we need to PUBLISH an incomplete/timeout transaction
     // remove from map
-    delete(pgsqlTransactionsMap, trans.tuple)
+    for i, t := range(pgsqlTransactionsMap[trans.tuple]) {
+        if t == trans {
+            removePgsqlTransaction(trans.tuple, i)
+            break
+        }
+    }
+    if len(pgsqlTransactionsMap[trans.tuple]) == 0 {
+        delete(pgsqlTransactionsMap, trans.tuple)
+    }
+}
+
+func removePgsqlTransaction(tuple TcpTuple, index int) *PgsqlTransaction {
+
+    trans_list := pgsqlTransactionsMap[tuple]
+    trans := trans_list[index]
+    trans_list = append(trans_list[:index], trans_list[index+1:]...)
+    pgsqlTransactionsMap[tuple] = trans_list
+
+    return trans
 }
