@@ -7,53 +7,56 @@ import (
 )
 
 type PgsqlMessage struct {
-    start int
-    end   int
+    start           int
+    end             int
 
-    Ts             time.Time
-    IsRequest      bool
-    Query          string
-    Size           uint64
-    Fields         []string
-    FieldsFormat   []byte
-    Rows           [][]string
-    NumberOfRows   int
-    NumberOfFields int
-    IsOK           bool
-    IsError        bool
+    Ts              time.Time
+    IsRequest       bool
+    Query           string
+    Size            uint64
+    Fields          []string
+    FieldsFormat    []byte
+    Rows            [][]string
+    NumberOfRows    int
+    NumberOfFields  int
+    IsOK            bool
+    IsError         bool
+    ErrorInfo       string
+    ErrorCode       string
+    ErrorSeverity   string
 
-    Stream_id    uint32
-    Direction    uint8
-    Tuple        *IpPortTuple
-    CmdlineTuple *CmdlineTuple
+    Stream_id       uint32
+    Direction       uint8
+    Tuple           *IpPortTuple
+    CmdlineTuple    *CmdlineTuple
 }
 
 type PgsqlTransaction struct {
-    Type         string
-    tuple        TcpTuple
-    Src          Endpoint
-    Dst          Endpoint
-    ResponseTime int32
-    Ts           int64
-    JsTs         time.Time
-    ts           time.Time
+    Type            string
+    tuple           TcpTuple
+    Src             Endpoint
+    Dst             Endpoint
+    ResponseTime    int32
+    Ts              int64
+    JsTs            time.Time
+    ts              time.Time
 
 
-    Pgsql bson.M
+    Pgsql           bson.M
 
-    Request_raw  string
-    Response_raw string
+    Request_raw     string
+    Response_raw    string
 
-    timer *time.Timer
+    timer           *time.Timer
 }
 
 type PgsqlStream struct {
-    tcpStream *TcpStream
+    tcpStream       *TcpStream
 
-    data []byte
+    data            []byte
 
-    parseOffset   int
-    parseState    int
+    parseOffset     int
+    parseState      int
 
     message       *PgsqlMessage
 }
@@ -110,14 +113,17 @@ func (stream *PgsqlStream) PrepareForNewMessage() {
 }
 
 // Parse a list of commands separated by semicolon from the query
-func pgsqlQueryParser(q string) []string {
-    array := strings.Split(q, ";")
+func pgsqlQueryParser(query string) []string {
+    array := strings.Split(query, ";")
 
     queries := []string{}
 
-    for _, query := range array {
-        queries = append(queries, strings.TrimSpace(query))
-        DEBUG("pgsqldetailed", "Query %s", strings.TrimSpace(query))
+    for _, q := range array {
+        qt := strings.TrimSpace(q)
+        DEBUG("pgsqldetailed", "Query {%s}, length=%d", qt, len(qt))
+        if len(qt) > 0 {
+            queries = append(queries, qt)
+        }
     }
     return queries
 }
@@ -221,17 +227,34 @@ func pgsqlRowsParser(s *PgsqlStream) {
 
 func pgsqlErrorParser(s *PgsqlStream) {
 
-    // read field type(byte1)
-    field_type := s.data[s.parseOffset]
-    s.parseOffset += 1
+    m := s.message
 
-    // read field value(string)
-    field_value, err := readString(s.data[s.parseOffset:])
-    if err != nil {
-        ERR("Fail to read the column field")
+    for len(s.data[s.parseOffset:]) > 0 {
+        // read field type(byte1)
+        field_type := s.data[s.parseOffset]
+        s.parseOffset += 1
+
+       if field_type == 0 {
+            break
+        }
+
+        // read field value(string)
+        field_value, err := readString(s.data[s.parseOffset:])
+        if err != nil {
+            ERR("Fail to read the column field")
+        }
+        s.parseOffset += len(field_value) + 1
+
+        if field_type == 'M' {
+            m.ErrorInfo = field_value
+        } else if field_type == 'C' {
+            m.ErrorCode = field_value
+        } else if field_type == 'S' {
+            m.ErrorSeverity = field_value
+        }
+
     }
-
-    DEBUG("pgsql", "Error type=%c, message=%s", field_type, field_value)
+    DEBUG("pgsqldetailed", "%s %s %s", m.ErrorSeverity, m.ErrorCode, m.ErrorInfo)
 }
 
 func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
@@ -264,7 +287,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         if len(s.data[s.parseOffset:]) >= length {
                             s.parseOffset += length
                             m.end = s.parseOffset
-                            m.Query = string(s.data[m.start+5:m.end])
+                            m.Query = string(s.data[m.start+5:m.end-1]) //without string termination
                             DEBUG("pgsqldetailed", "Simple Query", "%s", m.Query)
                             return true, true
                         } else {
@@ -534,7 +557,7 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
     // separated by ';'
     queries := pgsqlQueryParser(msg.Query)
 
-    DEBUG("pgsqldetailed", "Queries %s", queries)
+    DEBUG("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
     if pgsqlTransactionsMap[tuple] == nil {
         pgsqlTransactionsMap[tuple] = []*PgsqlTransaction{}
