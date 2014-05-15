@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "fmt"
+    "runtime"
     "strconv"
     "strings"
     "time"
@@ -11,6 +12,8 @@ import (
     "github.com/akrennmair/gopcap"
     "github.com/nranchev/go-libGeoIP"
 )
+
+const Version = "0.1.1"
 
 type Packet struct {
     ts      time.Time
@@ -158,8 +161,13 @@ func main() {
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
     topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
     publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
+    printVersion := flag.Bool("version", false, "Print version and exit")
 
     flag.Parse()
+
+    if *printVersion {
+        fmt.Printf("Packetbat verision %s (%s)\n", Version, runtime.GOARCH)
+    }
 
     debugSelectors := []string{}
     logLevel := LOG_DEBUG
