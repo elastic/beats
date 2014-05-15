@@ -209,16 +209,23 @@ func pgsqlRowsParser(s *PgsqlStream) {
         // read column value (byten)
         column_value := []byte{}
 
+        if m.FieldsFormat[i] == 0 {
+            // field value in text format
+            if column_length > 0 {
+                column_value = s.data[s.parseOffset : s.parseOffset+int(column_length)]
+            } else if column_length == -1 {
+                column_value = nil
+            }
+        }
+
+        row = append(row, string(column_value))
+
         if column_length > 0 {
-            column_value = s.data[s.parseOffset : s.parseOffset+int(column_length)]
             s.parseOffset += int(column_length)
-        } else if column_length == -1 {
-            column_value = nil
         }
 
         DEBUG("pgsqldetailed", "Value %s, length=%d", string(column_value), column_length)
 
-        row = append(row, string(column_value))
     }
     m.NumberOfRows += 1
     m.Rows = append(m.Rows, row)
