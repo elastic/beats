@@ -56,6 +56,7 @@ type Event struct {
     Mysql bson.M `json:"mysql"`
     Http  bson.M `json:"http"`
     Redis bson.M `json:"redis"`
+    Pgsql bson.M `json:"pgsql"`
 }
 
 type Topology struct {
@@ -121,7 +122,7 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
         t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, t.Http, nil}
+        nil, t.Http, nil, nil}
 
     if IS_DEBUG("publish") {
         PrintPublishEvent(&event)
@@ -159,7 +160,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
         t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        t.Mysql, nil, nil}
+        t.Mysql, nil, nil, nil}
 
     if IS_DEBUG("publish") {
         PrintPublishEvent(&event)
@@ -194,7 +195,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
         t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
         t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
         t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, nil, t.Redis}
+        nil, nil, t.Redis, nil}
 
     if IS_DEBUG("publish") {
         PrintPublishEvent(&event)
@@ -206,6 +207,58 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     }
 
     return err
+}
+
+func (publisher *PublisherType) PublishEvent(ts time.Time, src Endpoint, dst Endpoint, event Event) error {
+    var err error
+    index := fmt.Sprintf("packetbeat-%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
+
+    event.Src_server = publisher.GetServerName(src.Ip)
+    event.Dst_server = publisher.GetServerName(dst.Ip)
+
+    if _Config.Agent.Ignore_outgoing && event.Dst_server != "" &&
+        event.Dst_server != publisher.name {
+        // duplicated transaction -> ignore it
+        DEBUG("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, event.Src_server, event.Dst_server)
+        return nil
+    }
+
+    event.Timestamp = ts
+    event.Src_ip = src.Ip
+    event.Src_port = src.Port
+    event.Src_proc = src.Proc
+    event.Dst_ip = dst.Ip
+    event.Dst_port = dst.Port
+    event.Dst_proc = dst.Proc
+
+    if IS_DEBUG("publish") {
+        PrintPublishEvent(&event)
+    }
+
+    // add Redis transaction
+    if !publisher.disabled {
+        _, err = core.Index(index, event.Type, "", nil, event)
+    }
+
+    return err
+}
+func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
+
+    event := Event{}
+
+    event.Type = "pgsql"
+    if t.Pgsql["iserror"].(bool) {
+        event.Status = t.Pgsql["error_severity"].(string) + ": "+
+            t.Pgsql["error_message"].(string)
+    } else {
+        event.Status = "OK"
+    }
+    event.ResponseTime = t.ResponseTime
+    event.RequestRaw = t.Request_raw
+    event.ResponseRaw = t.Response_raw
+    event.Pgsql = t.Pgsql
+
+    return publisher.PublishEvent(t.ts, t.Src, t.Dst, event)
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {

@@ -641,11 +641,13 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
     trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
     trans.Response_raw = dumpInCSVFormat(msg.Fields, msg.Rows)
 
+    err := Publisher.PublishPgsqlTransaction(trans)
+    if err != nil {
+        WARN("Publish failure: %s", err)
+    }
+
     DEBUG("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
 
-    if len(trans_list) == 0 {
-        delete(pgsqlTransactionsMap, trans.tuple)
-    }
     if trans.timer != nil {
         trans.timer.Stop()
     }
@@ -670,7 +672,11 @@ func removePgsqlTransaction(tuple TcpTuple, index int) *PgsqlTransaction {
     trans_list := pgsqlTransactionsMap[tuple]
     trans := trans_list[index]
     trans_list = append(trans_list[:index], trans_list[index+1:]...)
-    pgsqlTransactionsMap[tuple] = trans_list
+    if len(trans_list) == 0 {
+        delete(pgsqlTransactionsMap, trans.tuple)
+    } else {
+        pgsqlTransactionsMap[tuple] = trans_list
+    }
 
     return trans
 }
