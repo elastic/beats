@@ -26,6 +26,11 @@ gofmt:
 test:
 	go test -short
 
+.PHONY: cover
+cover:
+	go test -short -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
 .PHONY: clean
 clean:
 	rm packetbeat || true

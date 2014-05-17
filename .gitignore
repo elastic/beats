@@ -6,6 +6,7 @@ packetbeat
 *.so
 *.swp
 packetbeat.test
+coverage.out
 
 # Folders
 _obj
