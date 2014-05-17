@@ -209,7 +209,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
     return err
 }
 
-func (publisher *PublisherType) PublishEvent(ts time.Time, src Endpoint, dst Endpoint, event Event) error {
+func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
     var err error
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
 
@@ -232,7 +232,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src Endpoint, dst End
     event.Dst_proc = dst.Proc
 
     if IS_DEBUG("publish") {
-        PrintPublishEvent(&event)
+        PrintPublishEvent(event)
     }
 
     // add Redis transaction
@@ -258,7 +258,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
     event.ResponseRaw = t.Response_raw
     event.Pgsql = t.Pgsql
 
-    return publisher.PublishEvent(t.ts, t.Src, t.Dst, event)
+    return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
