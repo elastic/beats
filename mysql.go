@@ -287,32 +287,38 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 
     stream := tcp.mysqlData[dir]
-    if stream.message == nil {
-        stream.message = &MysqlMessage{Ts: pkt.ts}
-    }
+    for len(stream.data) > 0 {
+        if stream.message == nil {
+            stream.message = &MysqlMessage{Ts: pkt.ts}
+        }
 
-    ok, complete := mysqlMessageParser(tcp.mysqlData[dir])
-    if !ok {
-        // drop this tcp stream. Will retry parsing with the next
-        // segment in it
-        tcp.mysqlData[dir] = nil
-        DEBUG("mysql", "Ignore MySQL message. Drop tcp stream. Try parsing with the next segment")
-        return
-    }
+        ok, complete := mysqlMessageParser(tcp.mysqlData[dir])
+        if !ok {
+            // drop this tcp stream. Will retry parsing with the next
+            // segment in it
+            tcp.mysqlData[dir] = nil
+            DEBUG("mysql", "Ignore MySQL message. Drop tcp stream. Try parsing with the next segment")
+            return
+        }
 
-    if complete {
-        // all ok, ship it
-        msg := stream.data[stream.message.start:stream.message.end]
+        if complete {
+            // all ok, ship it
+            msg := stream.data[stream.message.start:stream.message.end]
 
-        // Publisher.PublishMysql(stream.message, tcp, dir, msg)
-        handleMysql(stream.message, tcp, dir, msg)
+            // Publisher.PublishMysql(stream.message, tcp, dir, msg)
+            handleMysql(stream.message, tcp, dir, msg)
 
-        // and reset message
-        stream.PrepareForNewMessage()
+            // and reset message
+            stream.PrepareForNewMessage()
+        } else {
+            // wait for more data
+            break
+        }
     }
 }
 
-func handleMysql(m *MysqlMessage, tcp *TcpStream,
+
+var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
     dir uint8, raw_msg []byte) {
 
     m.Stream_id = tcp.id
