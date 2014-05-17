@@ -633,6 +633,9 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
         "size":       msg.Size,
         "num_rows":   msg.NumberOfRows,
         "num_fields": msg.NumberOfFields,
+        "error_code": msg.ErrorCode,
+        "error_message": msg.ErrorInfo,
+        "error_severity": msg.ErrorSeverity,
     })
 
     trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
