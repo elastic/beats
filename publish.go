@@ -248,7 +248,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
     event.Type = "pgsql"
     if t.Pgsql["iserror"].(bool) {
-        event.Status = t.Pgsql["error_severity"].(string) + ": "+
+        event.Status = t.Pgsql["error_severity"].(string) + ": " +
             t.Pgsql["error_message"].(string)
     } else {
         event.Status = "OK"

@@ -230,7 +230,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
     }
 
     data, err := hex.DecodeString("300000010001000100000028526f7773206d61746368" +
-                "65643a203120204368616e6765643a203120205761726e696e67733a2030")
+        "65643a203120204368616e6765643a203120205761726e696e67733a2030")
     if err != nil {
         t.Error("Failed to decode string")
     }
@@ -240,7 +240,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
     }
     pkt := Packet{
         payload: data,
-        ts: ts,
+        ts:      ts,
     }
     tcp := TcpStream{
         mysqlData: [2]*MysqlStream{nil, nil},
@@ -261,7 +261,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
     }
 }
 
-// Three OK responses in the same packet
+// Test parsing three OK responses in the same packet
 func TestParseMySQL_threeResponses(t *testing.T) {
     if testing.Verbose() {
         LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
@@ -269,10 +269,10 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 
     data, err := hex.DecodeString(
         "0700000100000000000000" +
-        // second message
-        "0700000100000000000000" +
-        // third message
-        "0700000100000000000000")
+            // second message
+            "0700000100000000000000" +
+            // third message
+            "0700000100000000000000")
     if err != nil {
         t.Error("Failed to decode string")
     }
@@ -282,7 +282,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
     }
     pkt := Packet{
         payload: data,
-        ts: ts,
+        ts:      ts,
     }
     tcp := TcpStream{
         mysqlData: [2]*MysqlStream{nil, nil},
@@ -292,7 +292,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 
     old_handleMysql := handleMysql
     defer func() {
-       handleMysql = old_handleMysql
+        handleMysql = old_handleMysql
     }()
     handleMysql = func(m *MysqlMessage, tcp *TcpStream,
         dir uint8, raw_msg []byte) {
@@ -307,18 +307,18 @@ func TestParseMySQL_threeResponses(t *testing.T) {
     }
 }
 
-// One response split in two packets
-func TestParseMySQL_splitResponse(t * testing.T) {
+// Test parsing one response split in two packets
+func TestParseMySQL_splitResponse(t *testing.T) {
     if testing.Verbose() {
         LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
     }
 
     data, err := hex.DecodeString(
         "0100000105" +
-        "2f00000203646566086d696e697477697404706f737404706f737407706f73745f69640269640c3f000b000000030342000000" +
-        "3b00000303646566086d696e697477697404706f737404706f73740d706f73745f757365726e616d6508757365726e616d650c2100f0000000fd0000000000" +
-        "3500000403646566086d696e697477697404706f737404706f73740a706f73745f7469746c65057469746c650c2100f0000000fd0000000000" +
-        "3300000503646566086d696e697477697404706f737404706f737409706f73745f626f647904626f64790c2100fdff0200fc1000000000")
+            "2f00000203646566086d696e697477697404706f737404706f737407706f73745f69640269640c3f000b000000030342000000" +
+            "3b00000303646566086d696e697477697404706f737404706f73740d706f73745f757365726e616d6508757365726e616d650c2100f0000000fd0000000000" +
+            "3500000403646566086d696e697477697404706f737404706f73740a706f73745f7469746c65057469746c650c2100f0000000fd0000000000" +
+            "3300000503646566086d696e697477697404706f737404706f737409706f73745f626f647904626f64790c2100fdff0200fc1000000000")
 
     if err != nil {
         t.Error("Failed to decode string")
@@ -329,7 +329,7 @@ func TestParseMySQL_splitResponse(t * testing.T) {
     }
     pkt := Packet{
         payload: data,
-        ts: ts,
+        ts:      ts,
     }
     tcp := TcpStream{
         mysqlData: [2]*MysqlStream{nil, nil},
@@ -355,7 +355,7 @@ func TestParseMySQL_splitResponse(t * testing.T) {
     // now second fragment
 
     data, err = hex.DecodeString(
-            "3b00000603646566086d696e697477697404706f737404706f73740d706f73745f7075625f64617465087075625f646174650c3f00130000000c8000000000" +
+        "3b00000603646566086d696e697477697404706f737404706f73740d706f73745f7075625f64617465087075625f646174650c3f00130000000c8000000000" +
             "05000007fe00002100" +
             "2e000008013109416e6f6e796d6f75730474657374086461736461730d0a13323031332d30372d32322031373a33343a3032" +
             "46000009013209416e6f6e796d6f757312506f737465617a6120544f444f206c6973741270656e7472752063756d706172617475726913323031332d30372d32322031383a32393a3330" +
@@ -365,7 +365,7 @@ func TestParseMySQL_splitResponse(t * testing.T) {
 
     pkt = Packet{
         payload: data,
-        ts: ts,
+        ts:      ts,
     }
 
     ParseMysql(&pkt, &tcp, 1)

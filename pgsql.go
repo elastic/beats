@@ -533,7 +533,7 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 }
 
-func handlePgsql(m *PgsqlMessage, tcp *TcpStream,
+var handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
     dir uint8, raw_msg []byte) {
 
     m.Stream_id = tcp.id
@@ -628,13 +628,13 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
     }
 
     trans.Pgsql = bson_concat(trans.Pgsql, bson.M{
-        "isOK":       msg.IsOK,
-        "iserror":    msg.IsError,
-        "size":       msg.Size,
-        "num_rows":   msg.NumberOfRows,
-        "num_fields": msg.NumberOfFields,
-        "error_code": msg.ErrorCode,
-        "error_message": msg.ErrorInfo,
+        "isOK":           msg.IsOK,
+        "iserror":        msg.IsError,
+        "size":           msg.Size,
+        "num_rows":       msg.NumberOfRows,
+        "num_fields":     msg.NumberOfFields,
+        "error_code":     msg.ErrorCode,
+        "error_message":  msg.ErrorInfo,
         "error_severity": msg.ErrorSeverity,
     })
 

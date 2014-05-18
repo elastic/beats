@@ -317,7 +317,6 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 }
 
-
 var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
     dir uint8, raw_msg []byte) {
 
