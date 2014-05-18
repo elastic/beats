@@ -5,6 +5,7 @@ import (
     "net"
     "os"
     "path/filepath"
+    "runtime"
     "strconv"
     "strings"
     "time"
@@ -63,6 +64,12 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
     proc.LastMapUpdate = time.Now()
 
     proc.ReadFromProc = !config.Dont_read_from_proc
+    if proc.ReadFromProc {
+        if runtime.GOOS != "linux" {
+            proc.ReadFromProc = false
+            INFO("Disabled /proc/ reading because not on linux")
+        }
+    }
 
     if config.Max_proc_read_freq == 0 {
         proc.MaxReadFreq = 10 * time.Millisecond
