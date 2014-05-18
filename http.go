@@ -514,7 +514,7 @@ func receivedHttpResponse(msg *HttpMessage) {
 
     trans := transactionsMap[tuple]
     if trans == nil {
-        WARN("Response from unknown transaction. Ignoring.")
+        WARN("Response from unknown transaction. Ignoring: %v", tuple)
         return
     }
 

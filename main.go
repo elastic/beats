@@ -147,7 +147,14 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     //DEBUG(" %s:%d -> %s:%d", packet.tuple.src_ip, packet.tuple.src_port,
     //      packet.tuple.dst_ip, packet.tuple.dst_port)
 
-    packet.payload = pkt.Data[l2hlen+iphl+tcphl : l2hlen+ip_length]
+
+    data_offset := (tcphdr[12] >> 4) * 4
+
+    if (l2hlen+iphl+int(data_offset) > l2hlen+ip_length) {
+        DEBUG("ip", "data_offset pointing outside of packet")
+    }
+
+    packet.payload = pkt.Data[l2hlen+iphl+int(data_offset) : l2hlen+ip_length]
 
     FollowTcp(tcphdr, packet)
 }

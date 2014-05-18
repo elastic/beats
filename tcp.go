@@ -30,6 +30,8 @@ type TcpStream struct {
     timer    *time.Timer
     protocol protocolType
 
+    lastSeq   [2]uint32
+
     httpData  [2]*HttpStream
     mysqlData [2]*MysqlStream
     redisData [2]*RedisStream
@@ -128,6 +130,10 @@ func (stream *TcpStream) Expire() {
     delete(tcpStreamsMap, *stream.tuple)
 }
 
+func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
+    return int32(seq1 - seq2) < 0
+}
+
 func FollowTcp(tcphdr []byte, pkt *Packet) {
     stream, exists := tcpStreamsMap[pkt.tuple]
     var original_dir uint8 = 1
@@ -152,6 +158,21 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
         }
     }
     flags := uint8(tcphdr[13])
+    tcp_seq := Bytes_Ntohl(tcphdr[4:8]) + uint32(len(pkt.payload))
+
+    DEBUG("tcp", "pkt.seq=%v len=%v stream.seq=%v",
+        Bytes_Ntohl(tcphdr[4:8]), len(pkt.payload), stream.lastSeq[original_dir])
+
+    if len(pkt.payload) > 0 &&
+        stream.lastSeq[original_dir] != 0 &&
+        !TcpSeqBefore(stream.lastSeq[original_dir], tcp_seq) {
+
+        DEBUG("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+                Bytes_Ntohl(tcphdr[4:8]), len(pkt.payload), stream.lastSeq[original_dir])
+        return
+    }
+    stream.lastSeq[original_dir] = tcp_seq
+
     stream.AddPacket(pkt, flags, original_dir)
 }
 
