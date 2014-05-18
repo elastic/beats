@@ -40,7 +40,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
     }
 
 }
-func TestMySQLParser_simpleOKResponse(t *testing.T) {
+func TestMySQLParser_OKResponse(t *testing.T) {
 
     data := []byte(
         "0700000100010401000000")
@@ -74,7 +74,36 @@ func TestMySQLParser_simpleOKResponse(t *testing.T) {
     }
 }
 
-func TestMySQLParser_simpleResponse(t *testing.T) {
+func TestMySQLParser_errorResponse(t *testing.T) {
+
+    data := []byte(
+        "2e000001ff7a042334325330325461626c6520276d696e69747769742e706f737373742720646f65736e2774206578697374")
+
+    message, err := hex.DecodeString(string(data))
+    if err != nil {
+        t.Error("Failed to decode hex string")
+    }
+
+    stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+
+    ok, complete := mysqlMessageParser(stream)
+
+    if !ok {
+        t.Error("Parsing returned error")
+    }
+    if !complete {
+        t.Error("Expecting a complete message")
+    }
+    if stream.message.IsRequest {
+        t.Error("Failed to parse MySQL response")
+    }
+    if stream.message.IsOK {
+        t.Error("Failed to parse MySQL error esponse")
+    }
+
+}
+
+func TestMySQLParser_dataResponse(t *testing.T) {
     //LogInit(syslog.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
 
     data := []byte(
@@ -127,7 +156,21 @@ func TestMySQLParser_simpleResponse(t *testing.T) {
     if stream.message.Size != 528 {
         t.Error("failed to get the size of the response")
     }
+
+    // parse fields and rows
+    raw := stream.data[stream.message.start:stream.message.end]
+    if len(raw) == 0 {
+        t.Error("Empty raw data")
+    }
+    fields, rows := parseMysqlResponse(raw)
+    if len(fields) != stream.message.NumberOfFields {
+        t.Error("Failed to parse the fields")
+    }
+    if len(rows) != stream.message.NumberOfRows {
+        t.Error("Failed to parse the rows")
+    }
 }
+
 func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
     //LogInit(syslog.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
 
