@@ -93,124 +93,51 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
-    var err error
-    index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
-    status := t.Http["response"].(bson.M)["phrase"].(string)
+    event := Event{}
 
-    src_server := publisher.GetServerName(t.Src.Ip)
-    dst_server := publisher.GetServerName(t.Dst.Ip)
+    event.Type = "http"
+    event.Status = t.Http["response"].(bson.M)["phrase"].(string)
+    event.ResponseTime = t.ResponseTime
+    event.RequestRaw = t.Request_raw
+    event.ResponseRaw = t.Response_raw
+    event.Http = t.Http
 
-    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-        dst_server != publisher.name {
-        // duplicated transaction -> ignore it
-        DEBUG("publish", "Ignore duplicated HTTP transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-        return nil
-    }
-
-    var src_country = ""
-    if _GeoLite != nil {
-        if len(src_server) == 0 { // only for external IP addresses
-            loc := _GeoLite.GetLocationByIP(t.Src.Ip)
-            if loc != nil {
-                src_country = loc.CountryCode
-            }
-        }
-    }
-
-    event := Event{
-        t.ts, "http", t.Src.Ip, t.Src.Port, t.Src.Proc, src_country, src_server,
-        t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-        t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, t.Http, nil, nil}
-
-    if IS_DEBUG("publish") {
-        PrintPublishEvent(&event)
-    }
-
-    // add Http transaction
-    if !publisher.disabled {
-        _, err = core.Index(index, "http", "", nil, event)
-    }
-
-    return err
+    return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 
 }
 
 func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
-    var err error
-    index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
-    status := t.Mysql["error_message"].(string)
-    if len(status) == 0 {
-        status = "OK"
+    event := Event{}
+    event.Type = "mysql"
+
+    event.Status = t.Mysql["error_message"].(string)
+    if len(event.Status) == 0 {
+        event.Status = "OK"
     }
+    event.ResponseTime = t.ResponseTime
+    event.RequestRaw = t.Request_raw
+    event.ResponseRaw = t.Response_raw
+    event.Mysql = t.Mysql
 
-    src_server := publisher.GetServerName(t.Src.Ip)
-    dst_server := publisher.GetServerName(t.Dst.Ip)
-
-    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-        dst_server != publisher.name {
-        // duplicated transaction -> ignore it
-        DEBUG("publish", "Ignore duplicated MySQL transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-        return nil
-    }
-
-    event := Event{
-        t.ts, "mysql", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
-        t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-        t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        t.Mysql, nil, nil, nil}
-
-    if IS_DEBUG("publish") {
-        PrintPublishEvent(&event)
-    }
-
-    // add Mysql transaction
-    if !publisher.disabled {
-        _, err = core.Index(index, "mysql", "", nil, event)
-    }
-
-    return err
-
+    return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
-    var err error
-    index := fmt.Sprintf("packetbeat-%d.%02d.%02d", t.ts.Year(), t.ts.Month(), t.ts.Day())
 
-    status := "OK"
+    event := Event{}
+    event.Type = "redis"
+    event.Status = "OK"
+    event.ResponseTime = t.ResponseTime
+    event.RequestRaw = t.Request_raw
+    event.ResponseRaw = t.Response_raw
+    event.Redis = t.Redis
 
-    src_server := publisher.GetServerName(t.Src.Ip)
-    dst_server := publisher.GetServerName(t.Dst.Ip)
-
-    if _Config.Agent.Ignore_outgoing && dst_server != "" &&
-        dst_server != publisher.name {
-        // duplicated transaction -> ignore it
-        DEBUG("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-        return nil
-    }
-
-    event := Event{
-        t.ts, "redis", t.Src.Ip, t.Src.Port, t.Src.Proc, "", src_server,
-        t.Dst.Ip, t.Dst.Port, t.Dst.Proc, dst_server,
-        t.ResponseTime, status, t.Request_raw, t.Response_raw,
-        nil, nil, t.Redis, nil}
-
-    if IS_DEBUG("publish") {
-        PrintPublishEvent(&event)
-    }
-
-    // add Redis transaction
-    if !publisher.disabled {
-        _, err = core.Index(index, "redis", "", nil, event)
-    }
-
-    return err
+    return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
-    var err error
     index := fmt.Sprintf("packetbeat-%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
 
     event.Src_server = publisher.GetServerName(src.Ip)
@@ -231,11 +158,23 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
     event.Dst_port = dst.Port
     event.Dst_proc = dst.Proc
 
+    // set src_country if no src_server is set
+    event.Src_country = ""
+    if _GeoLite != nil {
+        if len(event.Src_server) == 0 { // only for external IP addresses
+            loc := _GeoLite.GetLocationByIP(src.Ip)
+            if loc != nil {
+                event.Src_country = loc.CountryCode
+            }
+        }
+    }
+
     if IS_DEBUG("publish") {
         PrintPublishEvent(event)
     }
 
     // add Redis transaction
+    var err error
     if !publisher.disabled {
         _, err = core.Index(index, event.Type, "", nil, event)
     }
