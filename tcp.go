@@ -30,7 +30,7 @@ type TcpStream struct {
     timer    *time.Timer
     protocol protocolType
 
-    lastSeq   [2]uint32
+    lastSeq [2]uint32
 
     httpData  [2]*HttpStream
     mysqlData [2]*MysqlStream
@@ -131,7 +131,7 @@ func (stream *TcpStream) Expire() {
 }
 
 func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
-    return int32(seq1 - seq2) < 0
+    return int32(seq1-seq2) < 0
 }
 
 func FollowTcp(tcphdr []byte, pkt *Packet) {
@@ -168,7 +168,7 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
         !TcpSeqBefore(stream.lastSeq[original_dir], tcp_seq) {
 
         DEBUG("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
-                Bytes_Ntohl(tcphdr[4:8]), len(pkt.payload), stream.lastSeq[original_dir])
+            Bytes_Ntohl(tcphdr[4:8]), len(pkt.payload), stream.lastSeq[original_dir])
         return
     }
     stream.lastSeq[original_dir] = tcp_seq
