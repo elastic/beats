@@ -70,7 +70,6 @@ type MysqlStream struct {
 
     parseOffset   int
     parseState    int
-    bytesReceived int
     isClient      bool
 
     message *MysqlMessage
@@ -94,7 +93,6 @@ func (stream *MysqlStream) PrepareForNewMessage() {
     stream.data = stream.data[stream.message.end:]
     stream.parseState = MysqlStateStart
     stream.parseOffset = 0
-    stream.bytesReceived = 0
     stream.isClient = false
     stream.message = nil
 }
@@ -123,7 +121,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                 m.start = s.parseOffset
                 s.parseState = MysqlStateEatMessage
                 s.parseOffset += 4
-                s.bytesReceived = 0
 
                 if !s.isClient {
                     s.isClient = true
@@ -140,7 +137,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     s.parseOffset += 4
                     s.parseState = MysqlStateEatMessage
-                    s.bytesReceived = 0
                     m.IsOK = true
                 } else if uint8(hdr[4]) == 0xff {
                     DEBUG("mysqldetailed", "Received ERR response")
@@ -154,7 +150,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     s.parseOffset += 5
                     s.parseState = MysqlStateEatFields
-                    s.bytesReceived = 0
                 } else {
                     // something else. ignore
                     DEBUG("mysqldetailed", "Unknown response type received.")
@@ -169,8 +164,8 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             break
 
         case MysqlStateEatMessage:
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
-                s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
+                s.parseOffset += int(m.PacketLength)
                 m.end = s.parseOffset
                 if m.IsRequest {
                     m.Query = string(s.data[m.start+5 : m.end])
@@ -183,8 +178,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                 }
                 return true, true
             } else {
-                s.bytesReceived += (len(s.data) - s.parseOffset)
-                s.parseOffset = len(s.data)
+                // wait for more
                 return true, false
             }
             break
@@ -200,14 +194,13 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             s.parseOffset += 4 // header
             DEBUG("mysqldetailed", "Fields: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
                 if uint8(s.data[s.parseOffset]) == 0xfe {
                     DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
-                    s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
+                    s.parseOffset += int(m.PacketLength)
 
                     s.parseState = MysqlStateEatRows
-                    s.bytesReceived = 0
                 } else {
                     _ /* catalog */, off := read_lstring(s.data, s.parseOffset)
                     db /*schema */, off := read_lstring(s.data, off)
@@ -221,7 +214,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                         m.Tables = m.Tables + ", " + db_table
                     }
 
-                    s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
+                    s.parseOffset += int(m.PacketLength)
                     // go to next field
                 }
             } else {
@@ -242,11 +235,11 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
             DEBUG("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
                 if uint8(s.data[s.parseOffset]) == 0xfe {
                     DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
-                    s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
+                    s.parseOffset += int(m.PacketLength)
 
                     if m.end == 0 {
                         m.end = s.parseOffset
@@ -260,7 +253,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     }
                     return true, true
                 } else {
-                    s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
+                    s.parseOffset += int(m.PacketLength)
                     if m.end == 0 && s.parseOffset > MAX_PAYLOAD_SIZE {
                         // only send up to here, but read until the end
                         m.end = s.parseOffset
