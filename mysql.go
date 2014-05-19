@@ -190,15 +190,20 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             break
 
         case MysqlStateEatFields:
-            if len(s.data[s.parseOffset:]) < 3 {
+            if len(s.data[s.parseOffset:]) < 4 {
+                // wait for more
                 return true, false
             }
-            lensl := s.data[s.parseOffset : s.parseOffset+3]
-            m.PacketLength = uint32(lensl[0]) | uint32(lensl[1])<<8 | uint32(lensl[2])<<16
-            m.PacketLength += 4 // header
+            hdr := s.data[s.parseOffset : s.parseOffset+4]
+            DEBUG("mysqldetailed", "header %X", hdr[:3])
+            m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
+            m.Seq = uint8(hdr[3])
+            s.parseOffset += 4 // header
+            DEBUG("mysqldetailed", "Fields: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
             if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
-                if uint8(s.data[s.parseOffset+4]) == 0xfe {
+                if uint8(s.data[s.parseOffset]) == 0xfe {
+                    DEBUG("mysqldetailed", "EOF packet")
                     // EOF marker
                     s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
 
@@ -227,15 +232,20 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             break
 
         case MysqlStateEatRows:
-            if len(s.data[s.parseOffset:]) < 3 {
+            if len(s.data[s.parseOffset:]) < 4 {
+                // wait for more
                 return true, false
             }
-            lensl := s.data[s.parseOffset : s.parseOffset+3]
-            m.PacketLength = uint32(lensl[0]) | uint32(lensl[1])<<8 | uint32(lensl[2])<<16
+            hdr := s.data[s.parseOffset : s.parseOffset+4]
+            m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
+            m.Seq = uint8(hdr[3])
+            s.parseOffset += 4 //header
 
-            m.PacketLength += 4 //header
+            DEBUG("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
+
             if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
-                if uint8(s.data[s.parseOffset+4]) == 0xfe {
+                if uint8(s.data[s.parseOffset]) == 0xfe {
+                    DEBUG("mysqldetailed", "EOF packet")
                     // EOF marker
                     s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
 
@@ -305,7 +315,6 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
             // all ok, ship it
             msg := stream.data[stream.message.start:stream.message.end]
 
-            // Publisher.PublishMysql(stream.message, tcp, dir, msg)
             handleMysql(stream.message, tcp, dir, msg)
 
             // and reset message
@@ -438,6 +447,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
     }
 
     DEBUG("mysql", "Mysql transaction completed: %s", trans.Mysql)
+    DEBUG("mysql", "%s", trans.Response_raw)
 
     // remove from map
     delete(mysqlTransactionsMap, trans.tuple)
