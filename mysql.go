@@ -195,7 +195,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                 return true, false
             }
             hdr := s.data[s.parseOffset : s.parseOffset+4]
-            DEBUG("mysqldetailed", "header %X", hdr[:3])
             m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
             m.Seq = uint8(hdr[3])
             s.parseOffset += 4 // header
@@ -203,14 +202,14 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
             if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
                 if uint8(s.data[s.parseOffset]) == 0xfe {
-                    DEBUG("mysqldetailed", "EOF packet")
+                    DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
                     s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
 
                     s.parseState = MysqlStateEatRows
                     s.bytesReceived = 0
                 } else {
-                    _ /* catalog */, off := read_lstring(s.data, s.parseOffset+4)
+                    _ /* catalog */, off := read_lstring(s.data, s.parseOffset)
                     db /*schema */, off := read_lstring(s.data, off)
                     table /* table */, off := read_lstring(s.data, off)
 
@@ -245,7 +244,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
             if len(s.data[s.parseOffset:]) >= int(m.PacketLength)-s.bytesReceived {
                 if uint8(s.data[s.parseOffset]) == 0xfe {
-                    DEBUG("mysqldetailed", "EOF packet")
+                    DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
                     s.parseOffset += (int(m.PacketLength) - s.bytesReceived)
 
@@ -256,7 +255,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     }
                     m.Size = uint64(s.parseOffset - m.start)
                     if !m.IsError {
-                        // in case the reponse was sent successfully
+                        // in case the response was sent successfully
                         m.IsOK = true
                     }
                     return true, true
