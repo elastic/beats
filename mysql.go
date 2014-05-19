@@ -68,9 +68,9 @@ type MysqlStream struct {
 
     data []byte
 
-    parseOffset   int
-    parseState    int
-    isClient      bool
+    parseOffset int
+    parseState  int
+    isClient    bool
 
     message *MysqlMessage
 }
