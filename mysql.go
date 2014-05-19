@@ -18,7 +18,6 @@ type MysqlMessage struct {
     end   int
 
     Ts             time.Time
-    Number         int
     IsRequest      bool
     PacketLength   uint32
     Seq            uint8
@@ -113,35 +112,38 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             m.Seq = uint8(hdr[3])
             m.Typ = uint8(hdr[4])
 
-            DEBUG("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d, Start=%d", m.PacketLength, m.Seq, m.Typ, m.start)
+            DEBUG("mysqldetailed", "MySQL Header: Packet length %d, Seq %d, Type=%d", m.PacketLength, m.Seq, m.Typ)
 
-            if m.Seq == 0 && m.Typ == MYSQL_CMD_QUERY {
-                // parse request
-                m.IsRequest = true
-                m.start = s.parseOffset
-                s.parseState = MysqlStateEatMessage
-                s.parseOffset += 4
+            if m.Seq == 0 {
+                // starts Command Phase
+
+                if m.Typ == MYSQL_CMD_QUERY {
+                    // parse request
+                    m.IsRequest = true
+                    m.start = s.parseOffset
+                    s.parseState = MysqlStateEatMessage
+
+                } else {
+                    // ignore command
+                    s.parseState = MysqlStateEatMessage
+                }
 
                 if !s.isClient {
                     s.isClient = true
                 }
-                m.Number = int(uint8(s.data[m.start+3]))
 
-            } else if m.Seq == 1 && !s.isClient {
+            } else if !s.isClient {
                 // parse response
                 m.IsRequest = false
-                m.Number = int(uint8(s.data[m.start+3]))
 
                 if uint8(hdr[4]) == 0x00 {
                     DEBUG("mysqldetailed", "Received OK response")
                     m.start = s.parseOffset
-                    s.parseOffset += 4
                     s.parseState = MysqlStateEatMessage
                     m.IsOK = true
                 } else if uint8(hdr[4]) == 0xff {
                     DEBUG("mysqldetailed", "Received ERR response")
                     m.start = s.parseOffset
-                    s.parseOffset += 4
                     s.parseState = MysqlStateEatMessage
                     m.IsError = true
                 } else if m.PacketLength == 1 {
@@ -152,31 +154,33 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     s.parseState = MysqlStateEatFields
                 } else {
                     // something else. ignore
-                    DEBUG("mysqldetailed", "Unknown response type received.")
-                    return false, false
+                    s.parseState = MysqlStateEatMessage
                 }
 
             } else {
-                // something else. ignore
-                DEBUG("mysqldetailed", "Unknown MySQL message of type %d received.", m.Typ)
+                // something else, not expected
+                WARN("Unexpected MySQL message of type %d received.", m.Typ)
                 return false, false
             }
             break
 
         case MysqlStateEatMessage:
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+                s.parseOffset += 4 //header
                 s.parseOffset += int(m.PacketLength)
                 m.end = s.parseOffset
                 if m.IsRequest {
                     m.Query = string(s.data[m.start+5 : m.end])
+                    return true, true
                 } else if m.IsOK {
                     m.AffectedRows = int(s.data[m.start+5])
                     m.InsertId = int(s.data[m.start+6])
+                    return true, true
                 } else if m.IsError {
                     m.ErrorCode = int(uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+7]))
                     m.ErrorInfo = string(s.data[m.start+9:m.start+14]) + ": " + string(s.data[m.start+15:])
+                    return true, true
                 }
-                return true, true
             } else {
                 // wait for more
                 return true, false
@@ -191,10 +195,11 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             hdr := s.data[s.parseOffset : s.parseOffset+4]
             m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
             m.Seq = uint8(hdr[3])
-            s.parseOffset += 4 // header
             DEBUG("mysqldetailed", "Fields: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+                s.parseOffset += 4 // header
+
                 if uint8(s.data[s.parseOffset]) == 0xfe {
                     DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
@@ -213,7 +218,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     } else if !strings.Contains(m.Tables, db_table) {
                         m.Tables = m.Tables + ", " + db_table
                     }
-
+                    DEBUG("mysqldetailed", "db=%s, table=%s", db, table)
                     s.parseOffset += int(m.PacketLength)
                     // go to next field
                 }
@@ -231,11 +236,12 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             hdr := s.data[s.parseOffset : s.parseOffset+4]
             m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
             m.Seq = uint8(hdr[3])
-            s.parseOffset += 4 //header
 
             DEBUG("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+                s.parseOffset += 4 //header
+
                 if uint8(s.data[s.parseOffset]) == 0xfe {
                     DEBUG("mysqldetailed", "Received EOF packet")
                     // EOF marker
@@ -348,7 +354,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
     trans := mysqlTransactionsMap[tuple]
     if trans != nil {
         if len(trans.Mysql) != 0 {
-            WARN("Two requests without a Response. Dropping old request")
+            WARN("Two requests without a Response. Dropping old request: %s", trans.Mysql)
         }
     } else {
         trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
