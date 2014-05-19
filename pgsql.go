@@ -288,9 +288,8 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     m.IsRequest = true
 
-                    s.parseOffset += 1 //type
-
-                    if len(s.data[s.parseOffset:]) >= length {
+                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                        s.parseOffset += 1 //type
                         s.parseOffset += length
                         m.end = s.parseOffset
                         m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
@@ -307,10 +306,8 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsOK = true
 
-                    s.parseOffset += 1 //type
-
-                    if len(s.data[s.parseOffset:]) >= length {
-
+                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                        s.parseOffset += 1 //type
                         s.parseOffset += 4 //length
 
                         pgsqlFieldsParser(s)
@@ -344,9 +341,8 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsError = true
 
-                    s.parseOffset += 1 //type
-
-                    if len(s.data[s.parseOffset:]) >= length {
+                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                        s.parseOffset += 1 //type
                         s.parseOffset += 4 //length
 
                         pgsqlErrorParser(s)
@@ -366,9 +362,8 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsOK = true
 
-                    s.parseOffset += 1 //type
-
-                    if len(s.data[s.parseOffset:]) >= length {
+                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                        s.parseOffset += 1 //type
 
                         name := string(s.data[s.parseOffset+4 : s.parseOffset+length])
                         DEBUG("pgsqldetailed", "CommandComplete: %s", name)
@@ -386,8 +381,8 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                 } else {
                     // TODO: add info from NoticeResponse in case there are warning messages for a query
                     // ignore command
-                    s.parseOffset += 1 //type
-                    if len(s.data[s.parseOffset:]) >= length {
+                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                        s.parseOffset += 1 //type
                         s.parseOffset += length
                     } else {
                         // wait for more
@@ -434,10 +429,9 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
             if typ == 'D' {
                 // DataRow
 
-                // skip type
-                s.parseOffset += 1
-
-                if len(s.data[s.parseOffset:]) >= length {
+                if len(s.data[s.parseOffset:]) >= length + 1 {
+                    // skip type
+                    s.parseOffset += 1
                     // skip length size
                     s.parseOffset += 4
 
@@ -451,10 +445,10 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
             } else if typ == 'C' {
                 // CommandComplete
 
-                // skip type
-                s.parseOffset += 1
+                if len(s.data[s.parseOffset:]) >= length + 1 {
 
-                if len(s.data[s.parseOffset:]) >= length {
+                    // skip type
+                    s.parseOffset += 1
 
                     name := string(s.data[s.parseOffset+4 : s.parseOffset+length])
                     DEBUG("pgsqldetailed", "CommandComplete: %s", name)
