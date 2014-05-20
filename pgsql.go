@@ -7,8 +7,10 @@ import (
 )
 
 type PgsqlMessage struct {
-    start int
-    end   int
+    start         int
+    end           int
+    isSSLResponse bool
+    isSSLRequest  bool
 
     Ts             time.Time
     IsRequest      bool
@@ -54,8 +56,10 @@ type PgsqlStream struct {
 
     data []byte
 
-    parseOffset int
-    parseState  int
+    parseOffset       int
+    parseState        int
+    seenSSLRequest    bool
+    expectSSLResponse bool
 
     message *PgsqlMessage
 }
@@ -65,44 +69,13 @@ const (
     PgsqlGetDataState
 )
 
-var PgsqlCommands = map[byte]string{
-    'R': "Authentication response",
-    'K': "BackendKeyData",
-    'B': "Bind",
-    '2': "BindComplete",
-    'C': "Close or CommandComplete",
-    '3': "CloseComplete",
-    'd': "CopyData",
-    'c': "CopyDone",
-    'f': "CopyFail",
-    'G': "CopyInResponse",
-    'H': "CopyOutResponse or Flush",
-    'W': "CopyBothResponse",
-    'D': "DataRow or Descrive",
-    'I': "EmptyQueryResponse",
-    'E': "ErrorResponse or Execute",
-    'F': "FunctionCall",
-    'V': "FunctionCallResponse",
-    'n': "NoData",
-    'N': "NoticeResponse",
-    'A': "NotificationResponse",
-    't': "ParameterDescription",
-    'S': "ParameterStatus or Sync",
-    'P': "Parse",
-    '1': "ParseComplete",
-    'p': "PasswordMessage",
-    's': "PortalSuspended",
-    'Q': "Query",
-    'Z': "ReadyForQuery",
-    'T': "RowDescription",
-    'X': "Terminate",
-}
-var pgsqlTransactionsMap = make(map[TcpTuple][]*PgsqlTransaction, TransactionsHashSize)
+const (
+    SSLRequest = iota
+    StartupMessage
+    CancelRequest
+)
 
-func isPgsqlCommand(c byte) bool {
-    _, exists := PgsqlCommands[c]
-    return exists
-}
+var pgsqlTransactionsMap = make(map[TcpTuple][]*PgsqlTransaction, TransactionsHashSize)
 
 func (stream *PgsqlStream) PrepareForNewMessage() {
     stream.data = stream.data[stream.message.end:]
@@ -119,7 +92,6 @@ func pgsqlQueryParser(query string) []string {
 
     for _, q := range array {
         qt := strings.TrimSpace(q)
-        DEBUG("pgsqldetailed", "Query {%s}, length=%d", qt, len(qt))
         if len(qt) > 0 {
             queries = append(queries, qt)
         }
@@ -263,6 +235,35 @@ func pgsqlErrorParser(s *PgsqlStream) {
     DEBUG("pgsqldetailed", "%s %s %s", m.ErrorSeverity, m.ErrorCode, m.ErrorInfo)
 }
 
+func isSpecialPgsqlCommand(data []byte) (bool, int) {
+
+    if len(data) < 8 {
+        // 8 bytes required
+        return false, 0
+    }
+
+    // read length
+    length := int(Bytes_Ntohl(data[0:4]))
+
+    // read command identifier
+    code := int(Bytes_Ntohl(data[4:8]))
+
+    if length == 16 && code == 80877102 {
+        // Cancel Request
+        DEBUG("pgsqldetailed", "Cancel Request, length=%d", length)
+        return true, CancelRequest
+    } else if length == 8 && code == 80877103 {
+        // SSL Request
+        DEBUG("pgsqldetailed", "SSL Request, length=%d", length)
+        return true, SSLRequest
+    } else if code == 196608 {
+        // Startup Message
+        DEBUG("pgsqldetailed", "Startup Message, length=%d", length)
+        return true, StartupMessage
+    }
+    return false, 0
+}
+
 func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
     m := s.message
@@ -270,25 +271,67 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
         switch s.parseState {
         case PgsqlStartState:
             if len(s.data[s.parseOffset:]) < 5 {
-                WARN("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
+                WARN("Postgresql Message too short. %X (length=%d). Wait for more.", s.data[s.parseOffset:], len(s.data[s.parseOffset:]))
                 return true, false
             }
-            // read type
-            typ := byte(s.data[s.parseOffset])
 
-            // check if the command starts with 1 byte of command type
-            if isPgsqlCommand(typ) {
-                DEBUG("pgsqldetailed", "Pgsql type %c", typ)
+            is_special, command := isSpecialPgsqlCommand(s.data[s.parseOffset:])
+
+            if is_special {
+                // In case of Commands: StartupMessage, SSLRequest, CancelRequest that don't have
+                // their type in the first byte
+
+                // read length
+                length := int(Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
+
+                // ignore command
+                if len(s.data[s.parseOffset:]) >= length {
+
+                    if command == SSLRequest {
+                        // if SSLRequest is received, expect for one byte reply (S or N)
+                        m.start = s.parseOffset
+                        s.parseOffset += length
+                        m.end = s.parseOffset
+                        m.isSSLRequest = true
+                        return true, true
+                    }
+                    s.parseOffset += length
+                } else {
+                    // wait for more
+                    WARN("Wait for more data 1")
+                    return true, false
+                }
+
+            } else {
+                // In case of Commands that have their type in the first byte
+
+                // read type
+                typ := byte(s.data[s.parseOffset])
+
+                if s.expectSSLResponse {
+                    // SSLRequest was received in the other stream
+                    if typ == 'N' || typ == 'S' {
+                        // one byte reply to SSLRequest
+                        DEBUG("pgsqldetailed", "Reply for SSLRequest %c", typ)
+                        m.start = s.parseOffset
+                        s.parseOffset += 1
+                        m.end = s.parseOffset
+                        m.isSSLResponse = true
+                        return true, true
+                    }
+                }
 
                 // read length
                 length := int(Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
+
+                DEBUG("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
 
                 if typ == 'Q' {
                     // SimpleQuery
                     m.start = s.parseOffset
                     m.IsRequest = true
 
-                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                    if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
                         s.parseOffset += length
                         m.end = s.parseOffset
@@ -297,6 +340,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
+                        WARN("Wait for more data 2")
                         return true, false
                     }
                 } else if typ == 'T' {
@@ -306,7 +350,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsOK = true
 
-                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                    if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
                         s.parseOffset += 4 //length
 
@@ -316,6 +360,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         s.parseState = PgsqlGetDataState
                     } else {
                         // wait for more
+                        WARN("Wait for more data 3")
                         return true, false
                     }
 
@@ -341,7 +386,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsError = true
 
-                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                    if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
                         s.parseOffset += 4 //length
 
@@ -353,6 +398,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
+                        WARN("Wait for more data 4")
                         return true, false
                     }
                 } else if typ == 'C' {
@@ -362,11 +408,11 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.IsRequest = false
                     m.IsOK = true
 
-                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                    if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
 
-                        name := string(s.data[s.parseOffset+4 : s.parseOffset+length])
-                        DEBUG("pgsqldetailed", "CommandComplete: %s", name)
+                        name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
+                        DEBUG("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
 
                         s.parseOffset += length
                         m.end = s.parseOffset
@@ -375,33 +421,21 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
+                        WARN("Wait for more data 5")
                         return true, false
                     }
 
                 } else {
                     // TODO: add info from NoticeResponse in case there are warning messages for a query
                     // ignore command
-                    if len(s.data[s.parseOffset:]) >= length + 1 {
+                    if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
                         s.parseOffset += length
                     } else {
                         // wait for more
+                        WARN("Wait for more data 6")
                         return true, false
                     }
-                }
-            } else {
-                // In case of Commands: StartupMessage, SSlRequest, CancelRequest that don't have
-                // their type in the first byte
-
-                // read length
-                length := int(Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
-
-                // ignore command
-                if len(s.data[s.parseOffset:]) >= length {
-                    s.parseOffset += length
-                } else {
-                    // wait for more
-                    return true, false
                 }
             }
 
@@ -429,7 +463,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
             if typ == 'D' {
                 // DataRow
 
-                if len(s.data[s.parseOffset:]) >= length + 1 {
+                if len(s.data[s.parseOffset:]) >= length+1 {
                     // skip type
                     s.parseOffset += 1
                     // skip length size
@@ -439,19 +473,20 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
                 } else {
                     // wait for more
+                    WARN("Wait for more data")
                     return true, false
                 }
 
             } else if typ == 'C' {
                 // CommandComplete
 
-                if len(s.data[s.parseOffset:]) >= length + 1 {
+                if len(s.data[s.parseOffset:]) >= length+1 {
 
                     // skip type
                     s.parseOffset += 1
 
-                    name := string(s.data[s.parseOffset+4 : s.parseOffset+length])
-                    DEBUG("pgsqldetailed", "CommandComplete: %s", name)
+                    name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
+                    DEBUG("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
 
                     s.parseOffset += length
                     m.end = s.parseOffset
@@ -465,6 +500,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     return true, true
                 } else {
                     // wait for more
+                    WARN("Wait for more data")
                     return true, false
                 }
             } else {
@@ -496,6 +532,10 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 
     stream := tcp.pgsqlData[dir]
 
+    if tcp.pgsqlData[1-dir] != nil && tcp.pgsqlData[1-dir].seenSSLRequest {
+        stream.expectSSLResponse = true
+    }
+
     for len(stream.data) > 0 {
 
         if stream.message == nil {
@@ -515,7 +555,16 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
             // all ok, ship it
             msg := stream.data[stream.message.start:stream.message.end]
 
-            handlePgsql(stream.message, tcp, dir, msg)
+            if stream.message.isSSLRequest {
+                // SSL request
+                stream.seenSSLRequest = true
+            } else if stream.message.isSSLResponse {
+                // SSL request answered
+                stream.expectSSLResponse = false
+                tcp.pgsqlData[1-dir].seenSSLRequest = false
+            } else {
+                handlePgsql(stream.message, tcp, dir, msg)
+            }
 
             // and reset message
             stream.PrepareForNewMessage()

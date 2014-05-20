@@ -165,7 +165,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             break
 
         case MysqlStateEatMessage:
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
                 s.parseOffset += 4 //header
                 s.parseOffset += int(m.PacketLength)
                 m.end = s.parseOffset
@@ -197,7 +197,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
             m.Seq = uint8(hdr[3])
             DEBUG("mysqldetailed", "Fields: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
                 s.parseOffset += 4 // header
 
                 if uint8(s.data[s.parseOffset]) == 0xfe {
@@ -239,7 +239,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
             DEBUG("mysqldetailed", "Rows: packet length %d, packet number %d", m.PacketLength, m.Seq)
 
-            if len(s.data[s.parseOffset:]) >= int(m.PacketLength) + 4 {
+            if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
                 s.parseOffset += 4 //header
 
                 if uint8(s.data[s.parseOffset]) == 0xfe {
