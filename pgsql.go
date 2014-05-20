@@ -298,7 +298,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     s.parseOffset += length
                 } else {
                     // wait for more
-                    WARN("Wait for more data 1")
+                    DEBUG("pgsqldetailed", "Wait for more data 1")
                     return true, false
                 }
 
@@ -340,7 +340,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
-                        WARN("Wait for more data 2")
+                        DEBUG("pgsqldetailed", "Wait for more data 2")
                         return true, false
                     }
                 } else if typ == 'T' {
@@ -360,7 +360,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         s.parseState = PgsqlGetDataState
                     } else {
                         // wait for more
-                        WARN("Wait for more data 3")
+                        DEBUG("pgsqldetailed", "Wait for more data 3")
                         return true, false
                     }
 
@@ -398,7 +398,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
-                        WARN("Wait for more data 4")
+                        DEBUG("pgsqldetailed", "Wait for more data 4")
                         return true, false
                     }
                 } else if typ == 'C' {
@@ -421,7 +421,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         return true, true
                     } else {
                         // wait for more
-                        WARN("Wait for more data 5")
+                        DEBUG("pgsqldetailed", "Wait for more data 5")
                         return true, false
                     }
 
@@ -433,7 +433,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         s.parseOffset += length
                     } else {
                         // wait for more
-                        WARN("Wait for more data 6")
+                        DEBUG("pgsqldetailed", "Wait for more data 6")
                         return true, false
                     }
                 }
@@ -473,7 +473,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
                 } else {
                     // wait for more
-                    WARN("Wait for more data")
+                    DEBUG("pgsqldetailed", "Wait for more data 7")
                     return true, false
                 }
 
@@ -500,7 +500,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     return true, true
                 } else {
                     // wait for more
-                    WARN("Wait for more data")
+                    DEBUG("pgsqldetailed", "Wait for more data 8")
                     return true, false
                 }
             } else {
