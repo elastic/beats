@@ -1,6 +1,6 @@
 Summary:	Packetbeat network agent
 Name:		packetbeat
-Version:	0.1.1
+Version:	0.2.0
 Release:	1%{?dist}
 Source:		%{name}.tar.gz
 
