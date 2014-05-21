@@ -435,10 +435,6 @@ func receivedRedisRequest(msg *RedisMessage) {
         redisTransactionsMap[tuple] = trans
     }
 
-    var redis bson.M
-
-    DEBUG("redis", "Receive request: %s", redis)
-
     trans.Redis = bson.M{
         "request": msg.Message,
     }
@@ -492,10 +488,6 @@ func receivedRedisResponse(msg *RedisMessage) {
         return
 
     }
-
-    var redis bson.M
-
-    DEBUG("redis", "Receive response: %s", redis)
 
     trans.Redis["response"] = msg.Message
 
