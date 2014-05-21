@@ -13,7 +13,7 @@ import (
     "github.com/nranchev/go-libGeoIP"
 )
 
-const Version = "0.1.1"
+const Version = "0.2.0"
 
 type Packet struct {
     ts      time.Time
