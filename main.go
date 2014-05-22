@@ -173,7 +173,7 @@ func main() {
     flag.Parse()
 
     if *printVersion {
-        fmt.Printf("Packetbat verision %s (%s)\n", Version, runtime.GOARCH)
+        fmt.Printf("Packetbat version %s (%s)\n", Version, runtime.GOARCH)
     }
 
     debugSelectors := []string{}
