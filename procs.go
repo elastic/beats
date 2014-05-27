@@ -40,7 +40,7 @@ type ProcessesWatcher struct {
 
     // test helpers
     proc_prefix string
-    TestSignals chan bool
+    TestSignals *chan bool
 }
 
 var procWatcher ProcessesWatcher
@@ -143,7 +143,9 @@ func (p *Process) RefreshPids() {
         }
         DEBUG("procs", "RefreshPids found pids %s for process %s", p.Pids, p.Name)
 
-        p.proc.TestSignals <- true
+        if p.proc.TestSignals != nil {
+            *p.proc.TestSignals <- true
+        }
     }
 }
 

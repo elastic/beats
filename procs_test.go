@@ -139,8 +139,9 @@ func TestRefreshPids(t *testing.T) {
         return
     }
 
+    testSignals := make(chan bool)
     var procs ProcessesWatcher = ProcessesWatcher{proc_prefix: path_prefix,
-        TestSignals: make(chan bool)}
+        TestSignals: &testSignals}
     var ch chan time.Time = make(chan time.Time)
 
     p, err := NewProcess(&procs, "nginx", "nginx", (<-chan time.Time)(ch))
@@ -149,7 +150,7 @@ func TestRefreshPids(t *testing.T) {
     }
 
     ch <- time.Now()
-    <-procs.TestSignals
+    <-testSignals
 
     t.Log("p and p.Pids: %p %s", p, p.Pids)
     AssertIntArraysAreEqual(t, []int{766, 768, 769}, p.Pids)
@@ -160,7 +161,7 @@ func TestRefreshPids(t *testing.T) {
         []byte("nginx whatever"), 0644)
 
     ch <- time.Now()
-    <-procs.TestSignals
+    <-testSignals
 
     AssertIntArraysAreEqual(t, []int{766, 768, 769, 780}, p.Pids)
 }
