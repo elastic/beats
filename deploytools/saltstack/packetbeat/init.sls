@@ -2,10 +2,10 @@ packetbeat-deps:
   pkg:
     - latest
     - names:
-{% if grains['os'] == 'RedHat' %}
+{% if grains['os_family'] == 'RedHat' %}
       - libpcap
       - daemonize
-{% elif grains['os'] == 'Ubuntu' %}
+{% elif grains['os_family'] == 'Ubuntu' %}
       - libpcap0.8
 {% endif %}
     - require_in: packetbeat
