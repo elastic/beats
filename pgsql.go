@@ -11,6 +11,7 @@ type PgsqlMessage struct {
     end           int
     isSSLResponse bool
     isSSLRequest  bool
+    toExport      bool
 
     Ts             time.Time
     IsRequest      bool
@@ -336,6 +337,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         s.parseOffset += length
                         m.end = s.parseOffset
                         m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
+                        m.toExport = true
                         DEBUG("pgsqldetailed", "Simple Query", "%s", m.Query)
                         return true, true
                     } else {
@@ -349,6 +351,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     m.IsRequest = false
                     m.IsOK = true
+                    m.toExport = true
 
                     if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
@@ -372,6 +375,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     m.IsOK = true
                     m.IsRequest = false
+                    m.toExport = true
                     s.parseOffset += 5 // type + length
                     m.end = s.parseOffset
                     m.Size = uint64(m.end - m.start)
@@ -385,6 +389,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     m.IsRequest = false
                     m.IsError = true
+                    m.toExport = true
 
                     if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
@@ -407,6 +412,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                     m.start = s.parseOffset
                     m.IsRequest = false
                     m.IsOK = true
+                    m.toExport = true
 
                     if len(s.data[s.parseOffset:]) >= length+1 {
                         s.parseOffset += 1 //type
@@ -424,7 +430,20 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
                         DEBUG("pgsqldetailed", "Wait for more data 5")
                         return true, false
                     }
+                } else if typ == 'Z' {
+                    // ReadyForQuery -> backend ready for a new query cycle
+                    if len(s.data[s.parseOffset:]) >= length+1 {
+                        m.start = s.parseOffset
+                        s.parseOffset += 1 // type
+                        s.parseOffset += length
+                        m.end = s.parseOffset
 
+                        return true, true
+                    } else {
+                        // wait for more
+                        DEBUG("pgsqldetailed", "Wait for more 5b")
+                        return true, false
+                    }
                 } else {
                     // TODO: add info from NoticeResponse in case there are warning messages for a query
                     // ignore command
@@ -563,7 +582,9 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
                 stream.expectSSLResponse = false
                 tcp.pgsqlData[1-dir].seenSSLRequest = false
             } else {
-                handlePgsql(stream.message, tcp, dir, msg)
+                if stream.message.toExport {
+                    handlePgsql(stream.message, tcp, dir, msg)
+                }
             }
 
             // and reset message
