@@ -3,6 +3,8 @@ package main
 import (
     "flag"
     "fmt"
+    "io/ioutil"
+    "log"
     "runtime"
     "strconv"
     "strings"
@@ -194,6 +196,11 @@ func main() {
         debugSelectors = _Config.Logging.Selectors
     }
     LogInit(logLevel, "", !*toStdout, debugSelectors)
+
+    if !IS_DEBUG("stdlog") {
+        // disable standard logging by default
+        log.SetOutput(ioutil.Discard)
+    }
 
     if *file != "" {
         h, err = pcap.Openoffline(*file)
