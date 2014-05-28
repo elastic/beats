@@ -17,3 +17,11 @@ func LocalAddrs() ([]string, error) {
     }
     return localAddrs, nil
 }
+
+func IsLoopback(ip_str string) (bool, error) {
+    ip := net.ParseIP(ip_str)
+    if ip == nil {
+        return false, MsgError("Wrong IP format %s", ip_str)
+    }
+    return ip.IsLoopback(), nil
+}
