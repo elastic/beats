@@ -39,6 +39,7 @@ type tomlMothership struct {
 type Event struct {
     Timestamp    time.Time `json:"@timestamp"`
     Type         string    `json:"type"`
+    Agent        string    `json:"agent"`
     Src_ip       string    `json:"src_ip"`
     Src_port     uint16    `json:"src_port"`
     Src_proc     string    `json:"src_proc"`
@@ -151,6 +152,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
     }
 
     event.Timestamp = ts
+    event.Agent = publisher.name
     event.Src_ip = src.Ip
     event.Src_port = src.Port
     event.Src_proc = src.Proc
