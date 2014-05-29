@@ -74,6 +74,11 @@ func PrintPublishEvent(event *Event) {
     }
 }
 
+const (
+    OK_STATUS = "OK"
+    ERROR_STATUS = "Error"
+)
+
 func (publisher *PublisherType) GetServerName(ip string) string {
     // in case the IP is localhost, return current agent name
     islocal, err := IsLoopback(ip)
@@ -100,9 +105,9 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     event.Type = "http"
     code := t.Http["code"].(int)
     if code < 400 {
-        event.Status = "OK"
+        event.Status = OK_STATUS
     } else {
-        event.Status = "Error"
+        event.Status = ERROR_STATUS
     }
     event.ResponseTime = t.ResponseTime
     event.RequestRaw = t.Request_raw
@@ -119,9 +124,9 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     event.Type = "mysql"
 
     if t.Mysql["iserror"].(bool) {
-        event.Status = "Error"
+        event.Status = ERROR_STATUS
     } else {
-        event.Status = "OK"
+        event.Status = OK_STATUS
     }
 
     event.ResponseTime = t.ResponseTime
@@ -136,7 +141,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 
     event := Event{}
     event.Type = "redis"
-    event.Status = "OK"
+    event.Status = OK_STATUS
     event.ResponseTime = t.ResponseTime
     event.RequestRaw = t.Request_raw
     event.ResponseRaw = t.Response_raw
@@ -196,9 +201,9 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
     event.Type = "pgsql"
     if t.Pgsql["iserror"].(bool) {
-        event.Status = "Error"
+        event.Status = ERROR_STATUS
     } else {
-        event.Status = "OK"
+        event.Status = OK_STATUS
     }
     event.ResponseTime = t.ResponseTime
     event.RequestRaw = t.Request_raw
