@@ -153,6 +153,7 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
 
     if l2hlen+iphl+int(data_offset) > l2hlen+ip_length {
         DEBUG("ip", "data_offset pointing outside of packet")
+        return
     }
 
     packet.payload = pkt.Data[l2hlen+iphl+int(data_offset) : l2hlen+ip_length]
