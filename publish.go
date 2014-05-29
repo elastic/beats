@@ -113,10 +113,12 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     event := Event{}
     event.Type = "mysql"
 
-    event.Status = t.Mysql["error_message"].(string)
-    if len(event.Status) == 0 {
+    if t.Mysql["iserror"].(bool) {
+        event.Status = t.Mysql["error_message"].(string)
+    } else {
         event.Status = "OK"
     }
+
     event.ResponseTime = t.ResponseTime
     event.RequestRaw = t.Request_raw
     event.ResponseRaw = t.Response_raw
