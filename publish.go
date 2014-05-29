@@ -98,7 +98,12 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     event := Event{}
 
     event.Type = "http"
-    event.Status = t.Http["response"].(bson.M)["phrase"].(string)
+    code := t.Http["code"].(int)
+    if code < 400 {
+        event.Status = "OK"
+    } else {
+        event.Status = "Error"
+    }
     event.ResponseTime = t.ResponseTime
     event.RequestRaw = t.Request_raw
     event.ResponseRaw = t.Response_raw
@@ -114,7 +119,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
     event.Type = "mysql"
 
     if t.Mysql["iserror"].(bool) {
-        event.Status = t.Mysql["error_message"].(string)
+        event.Status = "Error"
     } else {
         event.Status = "OK"
     }
@@ -191,8 +196,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
     event.Type = "pgsql"
     if t.Pgsql["iserror"].(bool) {
-        event.Status = t.Pgsql["error_severity"].(string) + ": " +
-            t.Pgsql["error_message"].(string)
+        event.Status = "Error"
     } else {
         event.Status = "OK"
     }
