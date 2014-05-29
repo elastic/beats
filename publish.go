@@ -238,13 +238,15 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
     var localAddrs []string = params
 
     if len(params) == 0 {
-        addrs, err := LocalAddrs()
+        addrs, err := LocalIpAddrsAsStrings(false)
         if err != nil {
             ERR("Getting local IP addresses fails with: %s", err)
             return err
         }
         localAddrs = addrs
     }
+
+    DEBUG("publish", "Local IP addresses (without loopbacks): %s", localAddrs)
 
     // delete old IP addresses
     searchJson := fmt.Sprintf("{query: {term: {name: %s}}}", strconv.Quote(publisher.name))

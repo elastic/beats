@@ -84,19 +84,11 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
     }
 
     // Read the local IP addresses
-    proc.LocalAddrs = []net.IP{}
-    addrs, err := net.InterfaceAddrs()
-    if err == nil {
-        for _, addr := range addrs {
-            // a bit wtf'ish.. Don't know how to do this otherwise
-            DEBUG("procaddrs", "Addr: %s", addr.String())
-            ip, _, err := net.ParseCIDR(addr.String())
-            if err == nil && ip != nil {
-                proc.LocalAddrs = append(proc.LocalAddrs, ip)
-            }
-        }
-    } else {
-        ERR("InterfaceAddrs: %s", err)
+    var err error
+    proc.LocalAddrs, err = LocalIpAddrs()
+    if err != nil {
+        ERR("Error getting local IP addresses: %s", err)
+        proc.LocalAddrs = []net.IP{}
     }
     INFO("Local IP addresses are: %s", proc.LocalAddrs)
 

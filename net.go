@@ -4,18 +4,33 @@ import (
     "net"
 )
 
-func LocalAddrs() ([]string, error) {
-    var localAddrs = []string{}
+func LocalIpAddrs() ([]net.IP, error) {
+    var localAddrs = []net.IP{}
     addrs, err := net.InterfaceAddrs()
     if err != nil {
-        return nil, err
+        return []net.IP{}, err
     }
     for _, addr := range addrs {
-        if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-            localAddrs = append(localAddrs, ipnet.IP.String())
+        if ipnet, ok := addr.(*net.IPNet); ok {
+            localAddrs = append(localAddrs, ipnet.IP)
         }
     }
     return localAddrs, nil
+}
+
+func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
+    var localAddrsStrings = []string{}
+    var err error
+    ipaddrs, err := LocalIpAddrs()
+    if err != nil {
+        return []string{}, err
+    }
+    for _, ipaddr := range ipaddrs {
+        if include_loopbacks || !ipaddr.IsLoopback() {
+            localAddrsStrings = append(localAddrsStrings, ipaddr.String())
+        }
+    }
+    return localAddrsStrings, err
 }
 
 func IsLoopback(ip_str string) (bool, error) {
