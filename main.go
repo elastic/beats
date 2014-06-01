@@ -230,13 +230,15 @@ func main() {
         return
     }
 
-    filter := configToFilter(&_Config)
-    if filter != "" {
-        DEBUG("pcapfilter", "Installing filter '%s'", filter)
-        err := h.Setfilter(filter)
-        if err != nil {
-            ERR("pcap.Setfilter failed: %s", err)
-            return
+    if *file == "" {
+        filter := configToFilter(&_Config)
+        if filter != "" {
+            DEBUG("pcapfilter", "Installing filter '%s'", filter)
+            err := h.Setfilter(filter)
+            if err != nil {
+                ERR("pcap.Setfilter failed: %s", err)
+                return
+            }
         }
     }
 
