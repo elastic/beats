@@ -156,6 +156,11 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
         return
     }
 
+    if len(pkt.Data) < l2hlen + ip_length {
+        DEBUG("ip", "Captured packet smaller then advertised in IP layer")
+        return
+    }
+
     packet.payload = pkt.Data[l2hlen+iphl+int(data_offset) : l2hlen+ip_length]
 
     FollowTcp(tcphdr, packet)
