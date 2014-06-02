@@ -1,0 +1,32 @@
+{
+  "order" : 0,
+  "template" : "packetbeat-*",
+  "settings" : {
+    "index.refresh_interval" : "5s"
+  },
+  "mappings" : {
+    "_default_" : {
+      "dynamic_templates" : [ {
+        "string_fields" : {
+          "mapping" : {
+            "index" : "analyzed",
+            "omit_norms" : true,
+            "type" : "string",
+            "fields" : {
+              "raw" : {
+                "index" : "not_analyzed",
+                "type" : "string"
+              }
+            }
+          },
+          "match" : "*",
+          "match_mapping_type" : "string"
+        }
+      } ],
+      "_all" : {
+        "enabled" : true
+      }
+    }
+  },
+  "aliases" : { }
+}
