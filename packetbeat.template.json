@@ -1,32 +1,29 @@
 {
-  "order" : 0,
   "template" : "packetbeat-*",
   "settings" : {
-    "index.refresh_interval" : "5s"
-  },
-  "mappings" : {
-    "_default_" : {
-      "dynamic_templates" : [ {
-        "string_fields" : {
-          "mapping" : {
-            "index" : "analyzed",
-            "omit_norms" : true,
-            "type" : "string",
-            "fields" : {
-              "raw" : {
-                "index" : "not_analyzed",
-                "type" : "string"
-              }
-            }
-          },
-          "match" : "*",
-          "match_mapping_type" : "string"
+    "index.refresh_interval" : "5s",
+    "analysis" : {
+      "analyzer" : {
+        "default" : {
+          "type" : "standard",
+          "stopwords" : "_none_"
         }
-      } ],
-      "_all" : {
-        "enabled" : true
       }
     }
   },
-  "aliases" : { }
+  "mappings" : {
+    "_default_" : {
+       "_all" : {"enabled" : true},
+       "dynamic_templates" : [ {
+         "raw_fields" : {
+           "match" : "*.raw",
+           "match_mapping_type" : "string",
+           "mapping" : {
+                 "type": "string", 
+                 "index" : "not_analyzed" 
+           }
+         }
+       } ]
+    }
+  }
 }
