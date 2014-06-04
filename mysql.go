@@ -385,6 +385,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 
     trans.Mysql = bson.M{
         "query":  msg.Query,
+        "query.raw": msg.Query,
         "method": method,
     }
 
