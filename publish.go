@@ -75,7 +75,7 @@ func PrintPublishEvent(event *Event) {
 }
 
 const (
-    OK_STATUS = "OK"
+    OK_STATUS    = "OK"
     ERROR_STATUS = "Error"
 )
 
@@ -103,7 +103,8 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
     event := Event{}
 
     event.Type = "http"
-    code := t.Http["code"].(int)
+    response := t.Http["response"].(bson.M)
+    code := response["code"].(uint16)
     if code < 400 {
         event.Status = OK_STATUS
     } else {
