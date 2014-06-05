@@ -156,7 +156,7 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
         return
     }
 
-    if len(pkt.Data) < l2hlen + ip_length {
+    if len(pkt.Data) < l2hlen+ip_length {
         DEBUG("ip", "Captured packet smaller then advertised in IP layer")
         return
     }

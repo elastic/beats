@@ -35,6 +35,7 @@ type HttpMessage struct {
     StatusCode    uint16
     Host          string
     RequestUri    string
+    FirstLine     string
     Stream_id     uint32
     Tuple         *IpPortTuple
     CmdlineTuple  *CmdlineTuple
@@ -207,6 +208,7 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
                 if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
                     m.IsRequest = true
                     version = slices[2][5:]
+                    m.FirstLine = string(fline)
                 } else {
                     DEBUG("http", "Couldn't understand HTTP version: %s", fline)
                     return false, false
@@ -482,8 +484,10 @@ func receivedHttpRequest(msg *HttpMessage) {
     trans.Http = bson.M{
         "host": msg.Host,
         "request": bson.M{
-            "method": msg.Method,
-            "uri":    msg.RequestUri,
+            "method":   msg.Method,
+            "uri":      msg.RequestUri,
+            "line":     msg.FirstLine,
+            "line.raw": msg.FirstLine,
         },
     }
 
