@@ -15,6 +15,7 @@ import (
 type PublisherType struct {
     name     string
     disabled bool
+    Index    string
 
     RefreshTopologyTimer <-chan time.Time
     TopologyMap          map[string]string
@@ -34,6 +35,7 @@ type tomlMothership struct {
     Protocol string
     Username string
     Password string
+    Index    string
 }
 
 type Event struct {
@@ -152,7 +154,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 }
 
 func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
-    index := fmt.Sprintf("packetbeat-%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
+    index := fmt.Sprintf("%s-%d.%02d.%02d", publisher.Index, ts.Year(), ts.Month(), ts.Day())
 
     event.Src_server = publisher.GetServerName(src.Ip)
     event.Dst_server = publisher.GetServerName(dst.Ip)
@@ -327,6 +329,12 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 
     if _Config.Elasticsearch.Protocol != "" {
         api.Protocol = _Config.Elasticsearch.Protocol
+    }
+
+    if _Config.Elasticsearch.Index != "" {
+        publisher.Index = _Config.Elasticsearch.Index
+    } else {
+        publisher.Index = "packetbeat"
     }
 
     INFO("Use %s://%s:%s as publisher", api.Protocol, api.Domain, api.Port)
