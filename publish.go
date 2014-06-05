@@ -337,7 +337,8 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         publisher.Index = "packetbeat"
     }
 
-    INFO("Use %s://%s:%s as publisher", api.Protocol, api.Domain, api.Port)
+    INFO("Using %s://%s:%s as publisher", api.Protocol, api.Domain, api.Port)
+    INFO("Using index pattern [%s-]YYYY.MM.DD", publisher.Index)
 
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {
