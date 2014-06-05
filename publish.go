@@ -3,8 +3,8 @@ package main
 import (
     "encoding/json"
     "fmt"
-    "github.com/mattbaird/elastigo/api"
-    "github.com/mattbaird/elastigo/core"
+    "github.com/packetbeat/elastigo/api"
+    "github.com/packetbeat/elastigo/core"
     "labix.org/v2/mgo/bson"
     "os"
     "strconv"
@@ -36,6 +36,7 @@ type tomlMothership struct {
     Username string
     Password string
     Index    string
+    Path     string
 }
 
 type Event struct {
@@ -326,6 +327,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
     api.Port = fmt.Sprintf("%d", _Config.Elasticsearch.Port)
     api.Username = _Config.Elasticsearch.Username
     api.Password = _Config.Elasticsearch.Password
+    api.BasePath = _Config.Elasticsearch.Path
 
     if _Config.Elasticsearch.Protocol != "" {
         api.Protocol = _Config.Elasticsearch.Protocol
@@ -337,7 +339,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         publisher.Index = "packetbeat"
     }
 
-    INFO("Using %s://%s:%s as publisher", api.Protocol, api.Domain, api.Port)
+    INFO("Using %s://%s:%s%s as publisher", api.Protocol, api.Domain, api.Port, api.BasePath)
     INFO("Using index pattern [%s-]YYYY.MM.DD", publisher.Index)
 
     publisher.name = _Config.Agent.Name
