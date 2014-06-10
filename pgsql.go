@@ -652,7 +652,7 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 
         trans.Pgsql = bson.M{
             "query":  query,
-            "query.raw": msg.Query,
+            "query.raw": query,
             "method": getQueryMethod(query),
         }
 
