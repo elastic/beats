@@ -182,6 +182,7 @@ func main() {
 
     if *printVersion {
         fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
+        return
     }
 
     debugSelectors := []string{}
