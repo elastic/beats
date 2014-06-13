@@ -1,8 +1,8 @@
 package main
 
 import (
-    "github.com/mattbaird/elastigo/api"
-    "github.com/mattbaird/elastigo/core"
+    "github.com/packetbeat/elastigo/api"
+    "github.com/packetbeat/elastigo/core"
     "testing"
     "time"
 )
