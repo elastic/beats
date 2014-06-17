@@ -30,6 +30,7 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 /usr/bin/*
 /etc/packetbeat/*
 /etc/rc.d/init.d/packetbeat
+%doc
 
 %post
 # This adds the proper /etc/rc*.d links for the script
@@ -39,7 +40,6 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 /etc/init.d/packetbeat stop
 /sbin/chkconfig --del packetbeat
 
-%doc
 
 %changelog
 
