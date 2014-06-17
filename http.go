@@ -586,6 +586,10 @@ func censorPasswords(m *HttpMessage, msg []byte) {
 
     keywords := _Config.Passwords.Hide_keywords
 
+    if len(keywords) == 0 {
+        keywords = []string{"pass=", "password=", "passwd=", "Password="}
+    }
+
     if m.IsRequest && m.ContentLength > 0 &&
         strings.Contains(m.ContentType, "urlencoded") {
         for _, keyword := range keywords {
