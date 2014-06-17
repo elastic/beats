@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=0.2.1
+VERSION?=0.2.2
 ARCH?=$(shell uname -m)
 
 packetbeat: *.go
