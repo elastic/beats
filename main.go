@@ -43,6 +43,7 @@ type tomlConfig struct {
     Elasticsearch tomlMothership
     Agent         tomlAgent
     Logging       tomlLogging
+    Passwords     tomlPasswords
 }
 
 type tomlInterfaces struct {
@@ -56,6 +57,10 @@ type tomlRunOptions struct {
 
 type tomlLogging struct {
     Selectors []string
+}
+
+type tomlPasswords struct {
+    Hide_keywords []string
 }
 
 var _Config tomlConfig

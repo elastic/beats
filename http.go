@@ -395,6 +395,7 @@ func ParseHttp(pkt *Packet, tcp *TcpStream, dir uint8) {
     if complete {
         // all ok, ship it
         msg := stream.data[stream.message.start:stream.message.end]
+        censorPasswords(stream.message, msg)
 
         handleHttp(stream.message, tcp, dir, msg)
 
@@ -418,6 +419,7 @@ func HttpReceivedFin(tcp *TcpStream, dir uint8) {
         DEBUG("httpdetailed", "Publish something on connection FIN")
 
         msg := stream.data[stream.message.start:]
+        censorPasswords(stream.message, msg)
 
         handleHttp(stream.message, tcp, dir, msg)
 
@@ -578,4 +580,34 @@ func cutMessageBody(m *HttpMessage) []byte {
 func shouldIncludeInBody(contenttype string) bool {
     return strings.Contains(contenttype, "form-urlencoded") ||
         strings.Contains(contenttype, "json")
+}
+
+func censorPasswords(m *HttpMessage, msg []byte) {
+
+    keywords := _Config.Passwords.Hide_keywords
+
+    if m.IsRequest && m.ContentLength > 0 &&
+        strings.Contains(m.ContentType, "urlencoded") {
+        for _, keyword := range keywords {
+            index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
+            if index > 0 {
+                start_index := m.bodyOffset + index + len(keyword)
+                end_index := bytes.IndexAny(msg[m.bodyOffset+index+len(keyword):], "& \r\n")
+                if end_index > 0 {
+                    end_index += m.bodyOffset + index
+                    if end_index > m.end {
+                        end_index = m.end
+                    }
+                } else {
+                    end_index = m.end
+                }
+
+                if end_index-start_index < 120 {
+                    for i := start_index; i < end_index; i++ {
+                        msg[i] = byte('*')
+                    }
+                }
+            }
+        }
+    }
 }
