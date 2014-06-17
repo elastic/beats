@@ -15,7 +15,7 @@ import (
     "github.com/nranchev/go-libGeoIP"
 )
 
-const Version = "0.2.0"
+const Version = "0.2.1"
 
 type Packet struct {
     ts      time.Time
@@ -187,6 +187,7 @@ func main() {
 
     if *printVersion {
         fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
+        return
     }
 
     debugSelectors := []string{}

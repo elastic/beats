@@ -364,12 +364,6 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 
     ok, complete := redisMessageParser(tcp.redisData[dir])
-    if !ok {
-        // drop this tcp stream. Will retry parsing with the next
-        // segment in it
-        tcp.redisData[dir] = nil
-        return
-    }
 
     if !ok {
         // drop this tcp stream. Will retry parsing with the next
