@@ -29,9 +29,7 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 %files
 /usr/bin/*
 /etc/rc.d/init.d/packetbeat
-
-%config
-/etc/packetbeat/*
+%config /etc/packetbeat/packetbeat.conf
 
 %doc
 
