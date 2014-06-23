@@ -9,7 +9,7 @@ packetbeat: *.go
 .PHONY: install
 install: packetbeat
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
-	install -D packetbeat.conf $(DESTDIR)/$(CONF_PATH)/packetbeat.conf
+	install -m 644 -D packetbeat.conf $(DESTDIR)/$(CONF_PATH)/packetbeat.conf
 
 .PHONY: dist
 dist: packetbeat
