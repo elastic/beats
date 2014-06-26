@@ -9,6 +9,8 @@ import (
     "strconv"
     "strings"
     "time"
+    "os"
+    "runtime/pprof"
 
     "github.com/BurntSushi/toml"
     "github.com/akrennmair/gopcap"
@@ -171,6 +173,18 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     FollowTcp(tcphdr, packet)
 }
 
+func writeHeapProfile(filename string) {
+    f, err := os.Create(filename)
+    if err != nil {
+        ERR("Failed creating file %s: %s", filename, err)
+        return
+    }
+    pprof.WriteHeapProfile(f)
+    f.Close()
+
+    INFO("Created memory profile file %s.", filename)
+}
+
 func main() {
 
     configfile := flag.String("c", "packetbeat.conf", "Configuration file")
@@ -183,6 +197,7 @@ func main() {
     publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
     verbose := flag.Bool("v", false, "Log at INFO level")
     printVersion := flag.Bool("version", false, "Print version and exit")
+    memprofile := flag.String("memprofile", "", "write memory profile to this file")
 
     flag.Parse()
 
@@ -235,7 +250,9 @@ func main() {
             return
         }
     }
-    defer h.Close()
+    defer func() {
+        h.Close()
+    }()
 
     if err = DropPrivileges(); err != nil {
         CRIT(err.Error())
@@ -306,8 +323,10 @@ func main() {
                 // to flush
                 time.Sleep(300 * time.Millisecond)
                 live = false
+                continue
             }
-            // reopen the file
+
+            DEBUG("pcapread", "Reopening the file")
             h.Close()
             h, err = pcap.Openoffline(*file)
             if h == nil {
@@ -346,4 +365,8 @@ func main() {
         decodePktEth(datalink, pkt)
     }
     INFO("Input finish. Processed %d packets. Have a nice day!", counter)
+
+    if *memprofile != "" {
+        writeHeapProfile(*memprofile)
+    }
 }
