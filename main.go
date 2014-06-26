@@ -308,6 +308,7 @@ func main() {
                 live = false
             }
             // reopen the file
+            h.Close()
             h, err = pcap.Openoffline(*file)
             if h == nil {
                 ERR("Openoffline(%s) failed: %s", *file, err)
