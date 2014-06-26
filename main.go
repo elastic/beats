@@ -40,7 +40,7 @@ type tomlConfig struct {
     RunOptions    tomlRunOptions
     Protocols     map[string]tomlProtocol
     Procs         tomlProcs
-    Elasticsearch tomlMothership
+    Output        map[string]tomlMothership
     Agent         tomlAgent
     Logging       tomlLogging
     Passwords     tomlPasswords
