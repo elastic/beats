@@ -181,6 +181,7 @@ func main() {
     toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
     topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
     publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
+    verbose := flag.Bool("v", false, "Log at INFO level")
     printVersion := flag.Bool("version", false, "Print version and exit")
 
     flag.Parse()
@@ -190,10 +191,15 @@ func main() {
         return
     }
 
+    logLevel := LOG_ERR
+    if *verbose {
+        logLevel = LOG_INFO
+    }
+
     debugSelectors := []string{}
-    logLevel := LOG_DEBUG
     if len(*debugSelectorsStr) > 0 {
         debugSelectors = strings.Split(*debugSelectorsStr, ",")
+        logLevel = LOG_DEBUG
     }
 
     var h *pcap.Pcap
