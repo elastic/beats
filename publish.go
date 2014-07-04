@@ -2,36 +2,27 @@ package main
 
 import (
     "encoding/json"
+    "errors"
     "labix.org/v2/mgo/bson"
     "os"
     "strings"
     "time"
-    "errors"
 )
 
 type PublisherType struct {
     name     string
     disabled bool
     Index    string
-    Output   []OutputType
+    Output   []OutputInterface
 
     RefreshTopologyTimer <-chan time.Time
 }
 
 type OutputInterface interface {
-    PublishTopology(name string, localAddrs []string) error
-    UpdateTopology()
+    PublishIPs(name string, localAddrs []string) error
+    GetNameByIP(ip string) string
     PublishEvent(event *Event) error
 }
-
-
-type OutputType struct {
-    OutputInterface
-    Index string
-
-    TopologyMap          map[string]string
-}
-
 
 var Publisher PublisherType
 
@@ -40,6 +31,7 @@ type tomlAgent struct {
     Name                  string
     Refresh_topology_freq int
     Ignore_outgoing       bool
+    Topology_expire       int
 }
 type tomlMothership struct {
     Host     string
@@ -51,10 +43,9 @@ type tomlMothership struct {
     Path     string
 }
 
-
 const (
     ElasticsearchOutputName = "elasticsearch"
-    RedisOutputName = "redis"
+    RedisOutputName         = "redis"
 )
 
 var outputTypes = []string{ElasticsearchOutputName, RedisOutputName}
@@ -114,11 +105,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
         }
     }
     // find the agent with the desired IP
-    name, exists := publisher.Output[0].TopologyMap[ip]
-    if !exists {
-        return ""
-    }
-    return name
+    return publisher.Output[0].GetNameByIP(ip)
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
@@ -240,16 +227,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
     for _ = range publisher.RefreshTopologyTimer {
-        publisher.UpdateTopology()
-    }
-}
-
-func (publisher *PublisherType) UpdateTopology() {
-
-    DEBUG("publish", "Updating Topology")
-
-    for i := 0; i < len(publisher.Output); i++ {
-        publisher.Output[i].UpdateTopology()
+        publisher.PublishTopology()
     }
 }
 
@@ -266,10 +244,10 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
         localAddrs = addrs
     }
 
-    DEBUG("publish", "Topology: name=%s, ips=%s", publisher.name, strings.Join(localAddrs, " "))
+    DEBUG("publish", "Add topology entry for %s: %s", publisher.name, strings.Join(localAddrs, " "))
 
     for i := 0; i < len(publisher.Output); i++ {
-        publisher.Output[i].PublishTopology(publisher.name, localAddrs)
+        publisher.Output[i].PublishIPs(publisher.name, localAddrs)
     }
 
     return nil
@@ -278,14 +256,20 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 func (publisher *PublisherType) Init(publishDisabled bool) error {
     var err error
 
-    for  i := 0; i < len(outputTypes); i++ {
+    for i := 0; i < len(outputTypes); i++ {
         output, exists := _Config.Output[outputTypes[i]]
         if exists {
             INFO("Using output %s, type=%s", output, outputTypes[i])
             switch outputTypes[i] {
             case ElasticsearchOutputName:
                 ElasticsearchOutput.Init(output)
-                publisher.Output = append(publisher.Output, ElasticsearchOutput)
+                publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
+                break
+
+            case RedisOutputName:
+                RedisOutput.Init(output)
+                publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
+                INFO("connection %s", publisher.Output[0])
                 break
             }
         }
@@ -317,6 +301,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
     }
     publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
+    INFO("Topology map refreshed every %s", RefreshTopologyFreq)
 
     if !publisher.disabled {
         // register agent and its public IP addresses

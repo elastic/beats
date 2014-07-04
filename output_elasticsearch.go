@@ -1,17 +1,23 @@
 package main
 
 import (
-    "fmt"
     "encoding/json"
-    "strconv"
+    "fmt"
     "github.com/packetbeat/elastigo/api"
     "github.com/packetbeat/elastigo/core"
-
+    "strconv"
 )
 
-var ElasticsearchOutput OutputType
+type ElasticsearchOutputType struct {
+    OutputInterface
+    Index string
 
-func (out *OutputType) Init(config tomlMothership) error {
+    TopologyMap map[string]string
+}
+
+var ElasticsearchOutput ElasticsearchOutputType
+
+func (out *ElasticsearchOutputType) Init(config tomlMothership) error {
 
     api.Domain = config.Host
     api.Port = fmt.Sprintf("%d", config.Port)
@@ -29,13 +35,20 @@ func (out *OutputType) Init(config tomlMothership) error {
         out.Index = "packetbeat"
     }
 
-    INFO("[ElasticsearchOutput] Using %s://%s:%s%s as Elasticsearch publisher", api.Protocol, api.Domain, api.Port, api.BasePath)
+    INFO("[ElasticsearchOutput] Using Elasticsearch %s://%s:%s%s", api.Protocol, api.Domain, api.Port, api.BasePath)
     INFO("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 
     return nil
 }
 
-func (out *OutputType) PublishTopology(name string, localAddrs []string) error {
+func (out *ElasticsearchOutputType) GetNameByIP(ip string) string {
+    name, exists := out.TopologyMap[ip]
+    if !exists {
+        return ""
+    }
+    return name
+}
+func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string) error {
     // delete old IP addresses
     searchJson := fmt.Sprintf("{query: {term: {name: %s}}}", strconv.Quote(name))
     res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
@@ -82,13 +95,12 @@ func (out *OutputType) PublishTopology(name string, localAddrs []string) error {
         }
     }
 
-    // initialize local topology map
-    out.TopologyMap = make(map[string]string)
+    out.UpdateLocalTopologyMap()
 
     return nil
 }
 
-func (out *OutputType) UpdateTopology()  {
+func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 
     // get all agents IPs from Elasticsearch
     TopologyMapTmp := make(map[string]string)
@@ -110,13 +122,12 @@ func (out *OutputType) UpdateTopology()  {
     // update topology map
     out.TopologyMap = TopologyMapTmp
 
-    DEBUG("publish", "Map: %s", out.TopologyMap)
+    DEBUG("output_elasticsearch", "Topology map %s", out.TopologyMap)
 }
 
-func (out *OutputType) PublishEvent(event *Event) error {
+func (out *ElasticsearchOutputType) PublishEvent(event *Event) error {
 
     index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, event.Timestamp.Year(), event.Timestamp.Month(), event.Timestamp.Day())
     _, err := core.Index(index, event.Type, "", nil, event)
     return err
 }
-
