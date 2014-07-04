@@ -3,15 +3,17 @@ package main
 import (
     "encoding/json"
     "fmt"
-    "github.com/garyburd/redigo/redis"
+    "time"
+    "github.com/go-redis/redis"
     "strings"
 )
 
 type RedisOutputType struct {
     OutputInterface
     Index          string
-    Conn           redis.Conn
-    TopologyExpire int
+    Client         *redis.Client
+    TopologyClient         *redis.Client
+    TopologyExpire time.Duration
 
     TopologyMap map[string]string
 }
@@ -21,13 +23,28 @@ var RedisOutput RedisOutputType
 func (out *RedisOutputType) Init(config tomlMothership) error {
 
     hostname := fmt.Sprintf("%s:%d", config.Host, config.Port)
-    c, err := redis.Dial("tcp", hostname)
+
+    // connect to db
+    client := redis.NewTCPClient(&redis.Options{
+        Addr:   hostname,
+        Password: "",
+    })
+
+    _, err := client.Ping().Result()
     if err != nil {
-        ERR("Fail to connect to Redis server %s", hostname)
+        ERR("Failed connection to Redis. ping returns an error: %s", err)
         return err
     }
-    out.Conn = c
-    //defer c.Close()
+    out.Client = client
+
+
+    // connect to db topology
+     out.TopologyClient = redis.NewTCPClient(&redis.Options{
+        Addr:   hostname,
+        Password: "",
+    })
+    out.TopologyClient.Select(1)
+
 
     if config.Index != "" {
         out.Index = config.Index
@@ -35,14 +52,15 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
         out.Index = "packetbeat"
     }
 
-    out.TopologyExpire = 15
+    exp_sec := 15
     if _Config.Agent.Topology_expire != 0 {
-        out.TopologyExpire = _Config.Agent.Topology_expire
+        exp_sec = _Config.Agent.Topology_expire
     }
+    out.TopologyExpire = time.Duration(exp_sec) * time.Second
 
     INFO("[RedisOutput] Using Redis server %s", hostname)
     INFO("[RedisOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
-    INFO("[RedisOutput] Topology expires after %d seconds", out.TopologyExpire)
+    INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
 
     return nil
 }
@@ -59,19 +77,13 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 
     DEBUG("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
-    _, err := out.Conn.Do("SELECT", 1)
-    if err != nil {
-        ERR("[%s] Fail to select redis database: %s", name, err)
-        return err
-    }
-
-    _, err = out.Conn.Do("HSET", name, "ipaddrs", strings.Join(localAddrs, ","))
+    _, err := out.TopologyClient.HSet(name, "ipaddrs", strings.Join(localAddrs, ",")).Result()
     if err != nil {
         ERR("[%s] Fail to set the IP addresses: %s", name, err)
         return err
     }
 
-    _, err = out.Conn.Do("EXPIRE", name, out.TopologyExpire)
+    _, err = out.TopologyClient.Expire(name, out.TopologyExpire).Result()
     if err != nil {
         ERR("[%s] Fail to set the expiration time: %s", name, err)
         return err
@@ -85,15 +97,14 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 func (out *RedisOutputType) UpdateLocalTopologyMap() {
 
     TopologyMapTmp := make(map[string]string)
-    out.Conn.Do("SELECT", 1)
 
-    res, err := redis.Strings(out.Conn.Do("KEYS", "*"))
+    res, err := out.TopologyClient.Keys("*").Result()
     if err != nil {
         ERR("Fail to get the all agents from the topology map %s", err)
         return
     }
     for _, hostname := range res {
-        res, err := redis.String(out.Conn.Do("HGET", hostname, "ipaddrs"))
+        res, err := out.TopologyClient.HGet(hostname, "ipaddrs").Result()
         if err != nil {
             ERR("[%s] Fail to get the IPs: %s", hostname, err)
         } else {
@@ -111,8 +122,6 @@ func (out *RedisOutputType) UpdateLocalTopologyMap() {
 
 func (out *RedisOutputType) PublishEvent(event *Event) error {
 
-    out.Conn.Do("SELECT", 0)
-
     index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, event.Timestamp.Year(), event.Timestamp.Month(), event.Timestamp.Day())
 
     json_event, err := json.Marshal(event)
@@ -121,7 +130,7 @@ func (out *RedisOutputType) PublishEvent(event *Event) error {
         return err
     }
 
-    _, err = out.Conn.Do("RPUSH", index, json_event)
+    _, err = out.Client.RPush(index, string(json_event)).Result()
     if err != nil {
         ERR("Fail to publish event to REDIS: %s", err)
         return err
