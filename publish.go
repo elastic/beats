@@ -41,6 +41,8 @@ type tomlMothership struct {
     Password string
     Index    string
     Path     string
+    Db       int
+    Db_topology int
 }
 
 const (
