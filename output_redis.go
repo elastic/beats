@@ -39,11 +39,17 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
         db_topology = config.Db_topology
     }
 
+    timeout := 5
+    if config.Timeout != 0 {
+        timeout = config.Timeout
+    }
+
     // connect to db
     client := redis.NewTCPClient(&redis.Options{
         Addr:   hostname,
         Password: password,
         DB: int64(db),
+        DialTimeout: time.Duration(timeout) * time.Second,
     })
 
     _, err := client.Ping().Result()
@@ -57,7 +63,8 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     // connect to db topology
      out.TopologyClient = redis.NewTCPClient(&redis.Options{
         Addr:   hostname,
-        Password: "",
+        Password: password,
+        DialTimeout: time.Duration(timeout) * time.Second,
     })
     out.TopologyClient.Select(int64(db_topology))
 
@@ -78,6 +85,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     if password != "" {
         INFO("[RedisOutput] Using password to connect to Redis")
     }
+    INFO("[RedisOutput] Redis connection timeout %ds", timeout)
     INFO("[RedisOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
     INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
     INFO("[RedisOutput] Using db %d for storing events", db)

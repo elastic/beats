@@ -43,6 +43,7 @@ type tomlMothership struct {
     Path     string
     Db       int
     Db_topology int
+    Timeout  int
 }
 
 const (
