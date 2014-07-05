@@ -265,14 +265,21 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
             INFO("Using output %s, type=%s", output, outputTypes[i])
             switch outputTypes[i] {
             case ElasticsearchOutputName:
-                ElasticsearchOutput.Init(output)
+                err := ElasticsearchOutput.Init(output)
+                if err != nil {
+                    ERR("Fail to initialize Elasticsearch as output: %s", err)
+                    return err
+                }
                 publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
                 break
 
             case RedisOutputName:
-                RedisOutput.Init(output)
+                err := RedisOutput.Init(output)
+                if err != nil {
+                    ERR("Fail to initialize Redis as output: %s", err)
+                    return err
+                }
                 publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
-                INFO("connection %s", publisher.Output[0])
                 break
             }
         }
