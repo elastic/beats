@@ -34,16 +34,17 @@ type tomlAgent struct {
     Topology_expire       int
 }
 type tomlMothership struct {
-    Host     string
-    Port     int
-    Protocol string
-    Username string
-    Password string
-    Index    string
-    Path     string
-    Db       int
-    Db_topology int
-    Timeout  int
+    Host               string
+    Port               int
+    Protocol           string
+    Username           string
+    Password           string
+    Index              string
+    Path               string
+    Db                 int
+    Db_topology        int
+    Timeout            int
+    Reconnect_interval int
 }
 
 const (

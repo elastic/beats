@@ -5,6 +5,7 @@ import (
     "testing"
     "time"
 )
+
 const redisAddr = ":6379"
 
 var redisOutput RedisOutputType
@@ -14,7 +15,7 @@ func initOutput() {
     redisOutput = RedisOutputType{Index: "packetbeat"}
 
     redisOutput.Client = redis.NewTCPClient(&redis.Options{
-	Addr: redisAddr,
+        Addr: redisAddr,
     })
 
     redisOutput.TopologyClient = redis.NewTCPClient(&redis.Options{
