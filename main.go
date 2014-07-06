@@ -185,6 +185,13 @@ func writeHeapProfile(filename string) {
     INFO("Created memory profile file %s.", filename)
 }
 
+func debugMemStats() {
+    var m runtime.MemStats
+    runtime.ReadMemStats(&m)
+    DEBUG("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
+            m.Alloc, m.TotalAlloc, m.Sys)
+}
+
 func main() {
 
     configfile := flag.String("c", "packetbeat.conf", "Configuration file")
@@ -367,6 +374,13 @@ func main() {
     INFO("Input finish. Processed %d packets. Have a nice day!", counter)
 
     if *memprofile != "" {
+        // wait for all TCP streams to expire
+        time.Sleep(TCP_STREAM_EXPIRY * 1.2)
+        PrintTcpMap()
+        runtime.GC()
+
         writeHeapProfile(*memprofile)
+
+        debugMemStats()
     }
 }

@@ -126,8 +126,16 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 
 func (stream *TcpStream) Expire() {
 
+    DEBUG("mem", "Tcp stream expired")
+
     // de-register from dict
     delete(tcpStreamsMap, *stream.tuple)
+
+    // nullify to help the GC
+    stream.httpData = [2]*HttpStream{nil, nil}
+    stream.mysqlData = [2]*MysqlStream{nil, nil}
+    stream.redisData = [2]*RedisStream{nil, nil}
+    stream.pgsqlData = [2]*PgsqlStream{nil, nil}
 }
 
 func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
@@ -182,6 +190,8 @@ func PrintTcpMap() {
         fmt.Printf(" %d", stream.id)
     }
     fmt.Printf("\n")
+
+    fmt.Printf("Streams dict: %s", tcpStreamsMap)
 }
 
 func configToPortsMap(config *tomlConfig) map[uint16]protocolType {
