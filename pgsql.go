@@ -651,9 +651,9 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
         }
 
         trans.Pgsql = bson.M{
-            "query":  query,
+            "query":     query,
             "query.raw": query,
-            "method": getQueryMethod(query),
+            "method":    getQueryMethod(query),
         }
 
         trans.Request_raw = query
