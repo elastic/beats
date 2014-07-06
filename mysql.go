@@ -292,6 +292,11 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
     } else {
         // concatenate bytes
         tcp.mysqlData[dir].data = append(tcp.mysqlData[dir].data, pkt.payload...)
+        if len(tcp.mysqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+            DEBUG("mysql", "Stream data too large, dropping TCP stream")
+            tcp.mysqlData[dir] = nil
+            return
+        }
     }
 
     stream := tcp.mysqlData[dir]

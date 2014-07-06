@@ -377,6 +377,11 @@ func ParseHttp(pkt *Packet, tcp *TcpStream, dir uint8) {
     } else {
         // concatenate bytes
         tcp.httpData[dir].data = append(tcp.httpData[dir].data, pkt.payload...)
+        if len(tcp.httpData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+            DEBUG("http", "Stream data too large, dropping TCP stream")
+            tcp.httpData[dir] = nil
+            return
+        }
     }
     stream := tcp.httpData[dir]
     if stream.message == nil {

@@ -356,6 +356,11 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
     } else {
         // concatenate bytes
         tcp.redisData[dir].data = append(tcp.redisData[dir].data, pkt.payload...)
+        if len(tcp.redisData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+            DEBUG("redis", "Stream data too large, dropping TCP stream")
+            tcp.redisData[dir] = nil
+            return
+        }
     }
 
     stream := tcp.redisData[dir]

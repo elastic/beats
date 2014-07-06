@@ -547,6 +547,11 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
     } else {
         // concatenate bytes
         tcp.pgsqlData[dir].data = append(tcp.pgsqlData[dir].data, pkt.payload...)
+        if len(tcp.pgsqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+            DEBUG("pgsql", "Stream data too large, dropping TCP stream")
+            tcp.pgsqlData[dir] = nil
+            return
+        }
     }
 
     stream := tcp.pgsqlData[dir]
