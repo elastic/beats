@@ -85,7 +85,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 
     out.sendingQueue = make(chan RedisQueueMsg, 1000)
 
-    out.Connect()
+    out.Reconnect()
     go out.SendMessagesGoroutine()
 
     return nil
