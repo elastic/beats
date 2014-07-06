@@ -12,8 +12,14 @@ type RedisOutputType struct {
     OutputInterface
     Index          string
     Client         *redis.Client
-    TopologyClient         *redis.Client
+
     TopologyExpire time.Duration
+    ReconnectInterval time.Duration
+    Hostname        string
+    Password        string
+    Db              int
+    DbTopology      int
+    Timeout         time.Duration
 
     TopologyMap map[string]string
 }
@@ -22,52 +28,25 @@ var RedisOutput RedisOutputType
 
 func (out *RedisOutputType) Init(config tomlMothership) error {
 
-    hostname := fmt.Sprintf("%s:%d", config.Host, config.Port)
+    out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
-    password := ""
     if config.Password != "" {
-        password = config.Password
+        out.Password = config.Password
     }
 
-    db := 0
     if config.Db != 0 {
-        db = config.Db
+        out.Db = config.Db
     }
 
-    db_topology := 1
+    out.DbTopology = 1
     if config.Db_topology != 0 {
-        db_topology = config.Db_topology
+        out.DbTopology = config.Db_topology
     }
 
-    timeout := 5
+    out.Timeout = time.Duration(5) * time.Second
     if config.Timeout != 0 {
-        timeout = config.Timeout
+        out.Timeout = time.Duration(config.Timeout) * time.Second
     }
-
-    // connect to db
-    client := redis.NewTCPClient(&redis.Options{
-        Addr:   hostname,
-        Password: password,
-        DB: int64(db),
-        DialTimeout: time.Duration(timeout) * time.Second,
-    })
-
-    _, err := client.Ping().Result()
-    if err != nil {
-        ERR("Failed connection to Redis. ping returns an error: %s", err)
-        return err
-    }
-    out.Client = client
-
-
-    // connect to db topology
-     out.TopologyClient = redis.NewTCPClient(&redis.Options{
-        Addr:   hostname,
-        Password: password,
-        DialTimeout: time.Duration(timeout) * time.Second,
-    })
-    out.TopologyClient.Select(int64(db_topology))
-
 
     if config.Index != "" {
         out.Index = config.Index
@@ -81,15 +60,30 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     }
     out.TopologyExpire = time.Duration(exp_sec) * time.Second
 
-    INFO("[RedisOutput] Using Redis server %s", hostname)
-    if password != "" {
+    INFO("[RedisOutput] Using Redis server %s", out.Hostname)
+    if out.Password != "" {
         INFO("[RedisOutput] Using password to connect to Redis")
     }
-    INFO("[RedisOutput] Redis connection timeout %ds", timeout)
+    INFO("[RedisOutput] Redis connection timeout %s", out.Timeout)
     INFO("[RedisOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
     INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
-    INFO("[RedisOutput] Using db %d for storing events", db)
-    INFO("[RedisOutput] Using db %d for storing topology", db_topology)
+    INFO("[RedisOutput] Using db %d for storing events", out.Db)
+    INFO("[RedisOutput] Using db %d for storing topology", out.DbTopology)
+
+    // connect to db
+    client := redis.NewTCPClient(&redis.Options{
+        Addr:   out.Hostname,
+        Password: out.Password,
+        DB: int64(out.Db),
+        DialTimeout: out.Timeout,
+    })
+
+    _, err := client.Ping().Result()
+    if err != nil {
+        ERR("Failed connection to Redis. ping returns an error: %s", err)
+        return err
+    }
+    out.Client = client
 
     return nil
 }
@@ -106,34 +100,45 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 
     DEBUG("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
-    _, err := out.TopologyClient.HSet(name, "ipaddrs", strings.Join(localAddrs, ",")).Result()
+    // connect to db
+     client := redis.NewTCPClient(&redis.Options{
+        Addr:   out.Hostname,
+        Password: out.Password,
+        DialTimeout: out.Timeout,
+    })
+    client.Select(int64(out.DbTopology))
+
+    defer client.Close()
+
+
+    _, err := client.HSet(name, "ipaddrs", strings.Join(localAddrs, ",")).Result()
     if err != nil {
         ERR("[%s] Fail to set the IP addresses: %s", name, err)
         return err
     }
 
-    _, err = out.TopologyClient.Expire(name, out.TopologyExpire).Result()
+    _, err = client.Expire(name, out.TopologyExpire).Result()
     if err != nil {
         ERR("[%s] Fail to set the expiration time: %s", name, err)
         return err
     }
 
-    out.UpdateLocalTopologyMap()
+    out.UpdateLocalTopologyMap(client)
 
     return nil
 }
 
-func (out *RedisOutputType) UpdateLocalTopologyMap() {
+func (out *RedisOutputType) UpdateLocalTopologyMap(client *redis.Client) {
 
     TopologyMapTmp := make(map[string]string)
 
-    res, err := out.TopologyClient.Keys("*").Result()
+    res, err := client.Keys("*").Result()
     if err != nil {
         ERR("Fail to get the all agents from the topology map %s", err)
         return
     }
     for _, hostname := range res {
-        res, err := out.TopologyClient.HGet(hostname, "ipaddrs").Result()
+        res, err := client.HGet(hostname, "ipaddrs").Result()
         if err != nil {
             ERR("[%s] Fail to get the IPs: %s", hostname, err)
         } else {
