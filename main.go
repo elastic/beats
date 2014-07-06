@@ -5,12 +5,12 @@ import (
     "fmt"
     "io/ioutil"
     "log"
+    "os"
     "runtime"
+    "runtime/pprof"
     "strconv"
     "strings"
     "time"
-    "os"
-    "runtime/pprof"
 
     "github.com/BurntSushi/toml"
     "github.com/akrennmair/gopcap"
@@ -189,7 +189,7 @@ func debugMemStats() {
     var m runtime.MemStats
     runtime.ReadMemStats(&m)
     DEBUG("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
-            m.Alloc, m.TotalAlloc, m.Sys)
+        m.Alloc, m.TotalAlloc, m.Sys)
 }
 
 func main() {
