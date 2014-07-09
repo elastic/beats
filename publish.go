@@ -5,7 +5,6 @@ import (
     "errors"
     "labix.org/v2/mgo/bson"
     "os"
-    "strings"
     "time"
 )
 
@@ -258,7 +257,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
         localAddrs = addrs
     }
 
-    DEBUG("publish", "Add topology entry for %s: %s", publisher.name, strings.Join(localAddrs, " "))
+    DEBUG("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
 
     err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
     if err != nil {
