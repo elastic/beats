@@ -1,7 +1,8 @@
-github.com/mattbaird/elastigo/api
-github.com/mattbaird/elastigo/core
+github.com/packetbeat/elastigo/api
+github.com/packetbeat/elastigo/core
 github.com/nranchev/go-libGeoIP
 github.com/BurntSushi/toml
 github.com/akrennmair/gopcap
 github.com/tsg/fsnotify
+github.com/garyburd/redigo/redis
 labix.org/v2/mgo/bson

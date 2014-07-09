@@ -2,13 +2,9 @@ package main
 
 import (
     "encoding/json"
-    "fmt"
-    "github.com/packetbeat/elastigo/api"
-    "github.com/packetbeat/elastigo/core"
+    "errors"
     "labix.org/v2/mgo/bson"
     "os"
-    "strconv"
-    "strings"
     "time"
 )
 
@@ -16,9 +12,16 @@ type PublisherType struct {
     name     string
     disabled bool
     Index    string
+    Output   []OutputInterface
+    TopologyOutput OutputInterface
 
     RefreshTopologyTimer <-chan time.Time
-    TopologyMap          map[string]string
+}
+
+type OutputInterface interface {
+    PublishIPs(name string, localAddrs []string) error
+    GetNameByIP(ip string) string
+    PublishEvent(event *Event) error
 }
 
 var Publisher PublisherType
@@ -28,16 +31,30 @@ type tomlAgent struct {
     Name                  string
     Refresh_topology_freq int
     Ignore_outgoing       bool
+    Topology_expire       int
 }
 type tomlMothership struct {
-    Host     string
-    Port     int
-    Protocol string
-    Username string
-    Password string
-    Index    string
-    Path     string
+    Enabled            bool
+    Save_topology      bool
+    Host               string
+    Port               int
+    Protocol           string
+    Username           string
+    Password           string
+    Index              string
+    Path               string
+    Db                 int
+    Db_topology        int
+    Timeout            int
+    Reconnect_interval int
 }
+
+const (
+    ElasticsearchOutputName = "elasticsearch"
+    RedisOutputName         = "redis"
+)
+
+var outputTypes = []string{ElasticsearchOutputName, RedisOutputName}
 
 type Event struct {
     Timestamp    time.Time `json:"@timestamp"`
@@ -94,11 +111,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
         }
     }
     // find the agent with the desired IP
-    name, exists := publisher.TopologyMap[ip]
-    if !exists {
-        return ""
-    }
-    return name
+    return publisher.TopologyOutput.GetNameByIP(ip)
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
@@ -155,7 +168,6 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 }
 
 func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
-    index := fmt.Sprintf("%s-%d.%02d.%02d", publisher.Index, ts.Year(), ts.Month(), ts.Day())
 
     event.Src_server = publisher.GetServerName(src.Ip)
     event.Dst_server = publisher.GetServerName(dst.Ip)
@@ -191,13 +203,22 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
         PrintPublishEvent(event)
     }
 
-    // add Redis transaction
-    var err error
+    // add transaction
+    has_error := false
     if !publisher.disabled {
-        _, err = core.Index(index, event.Type, "", nil, event)
+        for i := 0; i < len(publisher.Output); i++ {
+            err := publisher.Output[i].PublishEvent(event)
+            if err != nil {
+                ERR("Fail to publish event type on output %s: %s", publisher.Output, err)
+                has_error = true
+            }
+        }
     }
 
-    return err
+    if has_error  {
+        return errors.New("Fail to publish event")
+    }
+    return nil
 }
 func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
 
@@ -219,35 +240,8 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
     for _ = range publisher.RefreshTopologyTimer {
-        publisher.UpdateTopology()
+        publisher.PublishTopology()
     }
-}
-
-func (publisher *PublisherType) UpdateTopology() {
-
-    DEBUG("publish", "Updating Topology")
-
-    // get all agents IPs from Elasticsearch
-    TopologyMapTmp := make(map[string]string)
-    res, err := core.SearchUri("packetbeat-topology", "server-ip", nil)
-    if err == nil {
-        for _, server := range res.Hits.Hits {
-            var top Topology
-            err = json.Unmarshal([]byte(*server.Source), &top)
-            if err != nil {
-                ERR("json.Unmarshal fails with: %s", err)
-            }
-            // add mapping
-            TopologyMapTmp[top.Ip] = top.Name
-        }
-    } else {
-        ERR("core.SearchRequest fails with: %s", err)
-    }
-
-    // update topology map
-    publisher.TopologyMap = TopologyMapTmp
-
-    DEBUG("publish", "[%s] Map: %s", publisher.name, publisher.TopologyMap)
 }
 
 func (publisher *PublisherType) PublishTopology(params ...string) error {
@@ -263,58 +257,12 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
         localAddrs = addrs
     }
 
-    DEBUG("publish", "Local IP addresses (without loopbacks): %s", localAddrs)
+    DEBUG("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
 
-    // delete old IP addresses
-    searchJson := fmt.Sprintf("{query: {term: {name: %s}}}", strconv.Quote(publisher.name))
-    res, err := core.SearchRequest("packetbeat-topology", "server-ip", nil, searchJson)
-    if err == nil {
-        for _, server := range res.Hits.Hits {
-
-            var top Topology
-            err = json.Unmarshal([]byte(*server.Source), &top)
-            if err != nil {
-                ERR("Failed to unmarshal json data: %s", err)
-            }
-            if !stringInSlice(top.Ip, localAddrs) {
-                res, err := core.Delete("packetbeat-topology", "server-ip" /*id*/, top.Ip, nil)
-                if err != nil {
-                    ERR("Failed to delete the old IP address from packetbeat-topology")
-                }
-                if !res.Ok {
-                    ERR("Fail to delete old topology entry")
-                }
-            }
-
-        }
+    err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
+    if err != nil {
+        return err
     }
-
-    // add new IP addresses
-    for _, addr := range localAddrs {
-
-        // check if the IP is already in the elasticsearch, before adding it
-        found, err := core.Exists("packetbeat-topology", "server-ip" /*id*/, addr, nil)
-        if err != nil {
-            ERR("core.Exists fails with: %s", err)
-        } else {
-
-            if !found {
-                res, err := core.Index("packetbeat-topology", "server-ip" /*id*/, addr, nil,
-                    Topology{publisher.name, addr})
-                if err != nil {
-                    return err
-                }
-                if !res.Ok {
-                    ERR("Fail to add new topology entry")
-                }
-            }
-        }
-    }
-
-    DEBUG("publish", "Topology: name=%s, ips=%s", publisher.name, strings.Join(localAddrs, " "))
-
-    // initialize local topology map
-    publisher.TopologyMap = make(map[string]string)
 
     return nil
 }
@@ -322,26 +270,62 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 func (publisher *PublisherType) Init(publishDisabled bool) error {
     var err error
 
-    // Set the Elasticsearch Host to Connect to
-    api.Domain = _Config.Elasticsearch.Host
-    api.Port = fmt.Sprintf("%d", _Config.Elasticsearch.Port)
-    api.Username = _Config.Elasticsearch.Username
-    api.Password = _Config.Elasticsearch.Password
-    api.BasePath = _Config.Elasticsearch.Path
+    for i := 0; i < len(outputTypes); i++ {
+        output, exists := _Config.Output[outputTypes[i]]
+        if exists {
+            switch outputTypes[i] {
+            case ElasticsearchOutputName:
+                if output.Enabled {
+                    err := ElasticsearchOutput.Init(output)
+                    if err != nil {
+                        ERR("Fail to initialize Elasticsearch as output: %s", err)
+                        return err
+                    }
+                    publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
 
-    if _Config.Elasticsearch.Protocol != "" {
-        api.Protocol = _Config.Elasticsearch.Protocol
+                    if output.Save_topology {
+                        if publisher.TopologyOutput != nil {
+                            ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+                            return errors.New("Multiple outputs defined to store topology")
+                        }
+                        publisher.TopologyOutput = OutputInterface(&ElasticsearchOutput)
+                        INFO("Using Elasticsearch to store the topology")
+                    }
+                }
+                break
+
+            case RedisOutputName:
+                if output.Enabled {
+                    err := RedisOutput.Init(output)
+                    if err != nil {
+                        ERR("Fail to initialize Redis as output: %s", err)
+                        return err
+                    }
+                    publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
+
+                    if output.Save_topology {
+                        if publisher.TopologyOutput != nil {
+                            ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+                            return errors.New("Multiple outputs defined to store topology")
+                        }
+                        publisher.TopologyOutput = OutputInterface(&RedisOutput)
+                        INFO("Using Redis to store the topology")
+                    }
+                }
+                break
+            }
+        }
     }
 
-    if _Config.Elasticsearch.Index != "" {
-        publisher.Index = _Config.Elasticsearch.Index
-    } else {
-        publisher.Index = "packetbeat"
+    if len(publisher.Output) == 0 {
+        INFO("No outputs are defined. Please define one under [output]")
+        return errors.New("No outputs are define")
     }
 
-    INFO("Using %s://%s:%s%s as publisher", api.Protocol, api.Domain, api.Port, api.BasePath)
-    INFO("Using index pattern [%s-]YYYY.MM.DD", publisher.Index)
-
+    if publisher.TopologyOutput == nil {
+        INFO("No output is defined to store the topology. Please add save_topology = true option to one output.")
+        return errors.New("No output to store topology")
+    }
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {
         // use the hostname
@@ -363,6 +347,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
     }
     publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
+    INFO("Topology map refreshed every %s", RefreshTopologyFreq)
 
     if !publisher.disabled {
         // register agent and its public IP addresses

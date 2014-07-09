@@ -90,7 +90,6 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
         ERR("Error getting local IP addresses: %s", err)
         proc.LocalAddrs = []net.IP{}
     }
-    INFO("Local IP addresses are: %s", proc.LocalAddrs)
 
     if proc.ReadFromProc {
         for pstr, procConfig := range config.Monitored {
