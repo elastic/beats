@@ -78,7 +78,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     }
     INFO("[RedisOutput] Redis connection timeout %s", out.Timeout)
     INFO("[RedisOutput] Redis reconnect interval %s", out.ReconnectInterval)
-    INFO("[RedisOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
+    INFO("[RedisOutput] Using index pattern %s", out.Index)
     INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
     INFO("[RedisOutput] Using db %d for storing events", out.Db)
     INFO("[RedisOutput] Using db %d for storing topology", out.DbTopology)
@@ -212,15 +212,13 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(client *redis.Client) {
 
 func (out *RedisOutputType) PublishEvent(event *Event) error {
 
-    index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, event.Timestamp.Year(), event.Timestamp.Month(), event.Timestamp.Day())
-
     json_event, err := json.Marshal(event)
     if err != nil {
         ERR("Fail to convert the event to JSON: %s", err)
         return err
     }
 
-    out.sendingQueue <- RedisQueueMsg{index: index, msg: string(json_event)}
+    out.sendingQueue <- RedisQueueMsg{index: out.Index, msg: string(json_event)}
 
     DEBUG("output_redis", "Publish event")
     return nil
