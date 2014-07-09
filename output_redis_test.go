@@ -11,8 +11,6 @@ func TestTopologyInRedis(t *testing.T) {
     if testing.Short() {
         t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
     }
-    LogInit(LOG_DEBUG, "" /*!toSyslog*/, true, []string{})
-
 
     var publisher1 PublisherType = PublisherType{name: "proxy1"}
     var publisher2 PublisherType = PublisherType{name: "proxy2"}

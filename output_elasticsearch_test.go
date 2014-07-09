@@ -3,7 +3,6 @@ package main
 import (
     "testing"
     "time"
-    "fmt"
 )
 
 const elasticsearchAddr = "localhost"
@@ -32,8 +31,6 @@ func TestTopologyInES(t *testing.T) {
         t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
     }
 
-    LogInit(LOG_DEBUG, "" /*!toSyslog*/, true, []string{})
-
     var publisher1 PublisherType = PublisherType{name: "proxy1"}
     var publisher2 PublisherType = PublisherType{name: "proxy2"}
     var publisher3 PublisherType = PublisherType{name: "proxy3"}
@@ -54,7 +51,6 @@ func TestTopologyInES(t *testing.T) {
     time.Sleep(1 * time.Second)
 
     elasticsearchOutput3.UpdateLocalTopologyMap()
-    fmt.Println(elasticsearchOutput3.TopologyMap)
 
     name2 := publisher3.GetServerName("10.1.0.9")
     if name2 != "proxy2" {
