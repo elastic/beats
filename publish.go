@@ -284,6 +284,10 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
                     publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
 
                     if output.Save_topology {
+                        if publisher.TopologyOutput != nil {
+                            ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+                            return errors.New("Multiple outputs defined to store topology")
+                        }
                         publisher.TopologyOutput = OutputInterface(&ElasticsearchOutput)
                         INFO("Using Elasticsearch to store the topology")
                     }
@@ -300,6 +304,10 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
                     publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
 
                     if output.Save_topology {
+                        if publisher.TopologyOutput != nil {
+                            ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+                            return errors.New("Multiple outputs defined to store topology")
+                        }
                         publisher.TopologyOutput = OutputInterface(&RedisOutput)
                         INFO("Using Redis to store the topology")
                     }
