@@ -14,6 +14,7 @@ type PublisherType struct {
     disabled bool
     Index    string
     Output   []OutputInterface
+    TopologyOutput OutputInterface
 
     RefreshTopologyTimer <-chan time.Time
 }
@@ -34,6 +35,8 @@ type tomlAgent struct {
     Topology_expire       int
 }
 type tomlMothership struct {
+    Enabled            bool
+    Save_topology      bool
     Host               string
     Port               int
     Protocol           string
@@ -109,7 +112,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
         }
     }
     // find the agent with the desired IP
-    return publisher.Output[0].GetNameByIP(ip)
+    return publisher.TopologyOutput.GetNameByIP(ip)
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
@@ -202,14 +205,21 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
     }
 
     // add transaction
-    var err error
+    has_error := false
     if !publisher.disabled {
         for i := 0; i < len(publisher.Output); i++ {
-            publisher.Output[i].PublishEvent(event)
+            err := publisher.Output[i].PublishEvent(event)
+            if err != nil {
+                ERR("Fail to publish event type on output %s: %s", publisher.Output, err)
+                has_error = true
+            }
         }
     }
 
-    return err
+    if has_error  {
+        return errors.New("Fail to publish event")
+    }
+    return nil
 }
 func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
 
@@ -250,8 +260,9 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 
     DEBUG("publish", "Add topology entry for %s: %s", publisher.name, strings.Join(localAddrs, " "))
 
-    for i := 0; i < len(publisher.Output); i++ {
-        publisher.Output[i].PublishIPs(publisher.name, localAddrs)
+    err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
+    if err != nil {
+        return err
     }
 
     return nil
@@ -263,24 +274,37 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
     for i := 0; i < len(outputTypes); i++ {
         output, exists := _Config.Output[outputTypes[i]]
         if exists {
-            INFO("Using output %s, type=%s", output, outputTypes[i])
             switch outputTypes[i] {
             case ElasticsearchOutputName:
-                err := ElasticsearchOutput.Init(output)
-                if err != nil {
-                    ERR("Fail to initialize Elasticsearch as output: %s", err)
-                    return err
+                if output.Enabled {
+                    err := ElasticsearchOutput.Init(output)
+                    if err != nil {
+                        ERR("Fail to initialize Elasticsearch as output: %s", err)
+                        return err
+                    }
+                    publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
+
+                    if output.Save_topology {
+                        publisher.TopologyOutput = OutputInterface(&ElasticsearchOutput)
+                        INFO("Using Elasticsearch to store the topology")
+                    }
                 }
-                publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
                 break
 
             case RedisOutputName:
-                err := RedisOutput.Init(output)
-                if err != nil {
-                    ERR("Fail to initialize Redis as output: %s", err)
-                    return err
+                if output.Enabled {
+                    err := RedisOutput.Init(output)
+                    if err != nil {
+                        ERR("Fail to initialize Redis as output: %s", err)
+                        return err
+                    }
+                    publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
+
+                    if output.Save_topology {
+                        publisher.TopologyOutput = OutputInterface(&RedisOutput)
+                        INFO("Using Redis to store the topology")
+                    }
                 }
-                publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
                 break
             }
         }
@@ -291,6 +315,10 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         return errors.New("No outputs are define")
     }
 
+    if publisher.TopologyOutput == nil {
+        INFO("No output is defined to store the topology. Please add save_topology = true option to one output.")
+        return errors.New("No output to store topology")
+    }
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {
         // use the hostname

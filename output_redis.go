@@ -110,6 +110,10 @@ func (out *RedisOutputType) Connect() error {
     return nil
 }
 
+func (out *RedisOutputType) Close() {
+    out.Client.Close()
+}
+
 func (out *RedisOutputType) SendMessagesGoroutine() {
 
     for queueMsg := range out.sendingQueue {
