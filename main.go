@@ -194,19 +194,22 @@ func debugMemStats() {
 
 func main() {
 
-    configfile := flag.String("c", "packetbeat.conf", "Configuration file")
-    file := flag.String("I", "", "file")
-    loop := flag.Int("l", 1, "Loop file. 0 - loop forever")
-    debugSelectorsStr := flag.String("d", "", "Enable certain debug selectors")
-    oneAtAtime := flag.Bool("O", false, "Read packets one at a time (press Enter)")
-    toStdout := flag.Bool("e", false, "Output to stdout instead of syslog")
-    topSpeed := flag.Bool("t", false, "Read packets as fast as possible, without sleeping")
-    publishDisabled := flag.Bool("N", false, "Disable actual publishing for testing")
-    verbose := flag.Bool("v", false, "Log at INFO level")
-    printVersion := flag.Bool("version", false, "Print version and exit")
-    memprofile := flag.String("memprofile", "", "write memory profile to this file")
+    // Use our own FlagSet, because some libraries pollute the global one
+    var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-    flag.Parse()
+    configfile := cmdLine.String("c", "packetbeat.conf", "Configuration file")
+    file := cmdLine.String("I", "", "file")
+    loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
+    debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
+    oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
+    toStdout := cmdLine.Bool("e", false, "Output to stdout instead of syslog")
+    topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
+    publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
+    verbose := cmdLine.Bool("v", false, "Log at INFO level")
+    printVersion := cmdLine.Bool("version", false, "Print version and exit")
+    memprofile := cmdLine.String("memprofile", "", "write memory profile to this file")
+
+    cmdLine.Parse(os.Args[1:])
 
     if *printVersion {
         fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
