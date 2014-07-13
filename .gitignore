@@ -6,6 +6,7 @@ packetbeat
 *.so
 *.swp
 *.swo
+*.swn
 packetbeat.test
 coverage.out
 
