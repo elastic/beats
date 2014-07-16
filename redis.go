@@ -29,7 +29,6 @@ type RedisStream struct {
     data []byte
 
     parseOffset   int
-    parseState    int
     bytesReceived int
 
     message *RedisMessage
@@ -219,6 +218,8 @@ var RedisCommands = map[string]struct{}{
 var redisTransactionsMap = make(map[TcpTuple]*RedisTransaction, TransactionsHashSize)
 
 func (stream *RedisStream) PrepareForNewMessage() {
+    stream.data = stream.data[stream.parseOffset:]
+    stream.parseOffset = 0
     stream.message.NumberOfBulks = 0
     stream.message.Bulks = []string{}
     stream.message.IsRequest = false
@@ -235,7 +236,11 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
         if s.data[s.parseOffset] == '*' {
             //Multi Bulk Message
 
-            line, off := readLine(s.data, s.parseOffset)
+            found, line, off := readLine(s.data, s.parseOffset)
+            if !found {
+                DEBUG("redis", "End of line not found, waiting for more data")
+                return true, false
+            }
 
             if len(line) == 3 && line[1] == '-' && line[2] == '1' {
                 //NULL Multi Bulk
@@ -256,9 +261,15 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
             }
 
         } else if s.data[s.parseOffset] == '$' {
+            old_offset := s.parseOffset
             // Bulk Reply
 
-            line, off := readLine(s.data, s.parseOffset)
+            found, line, off := readLine(s.data, s.parseOffset)
+            if !found {
+                DEBUG("redis", "End of line not found, waiting for more data")
+                s.parseOffset = old_offset
+                return true, false
+            }
 
             if len(line) == 3 && line[1] == '-' && line[2] == '1' {
                 // NULL Bulk Reply
@@ -273,7 +284,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
                 s.parseOffset = off
 
-                line, off = readLine(s.data, s.parseOffset)
+                found, line, off = readLine(s.data, s.parseOffset)
+                if !found {
+                    DEBUG("redis", "End of line not found, waiting for more data")
+                    s.parseOffset = old_offset
+                    return true, false
+                }
 
                 if int64(len(line)) != length {
                     ERR("Wrong length of data: %d instead of %d", len(line), length)
@@ -285,25 +301,34 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
         } else if s.data[s.parseOffset] == ':' {
             // Integer reply
-            line, off := readLine(s.data, s.parseOffset)
+            found, line, off := readLine(s.data, s.parseOffset)
+            if !found {
+                return true, false
+            }
             n, err := strconv.ParseInt(line[1:], 10, 64)
 
             if err != nil {
                 ERR("Failed to read integer reply: %s", err)
                 return false, false
             }
-            value = string(n)
+            value = strconv.Itoa(int(n))
             s.parseOffset = off
 
         } else if s.data[s.parseOffset] == '+' {
             // Status Reply
-            line, off := readLine(s.data, s.parseOffset)
+            found, line, off := readLine(s.data, s.parseOffset)
+            if !found {
+                return true, false
+            }
 
             value = line[1:]
             s.parseOffset = off
         } else if s.data[s.parseOffset] == '-' {
             // Error Reply
-            line, off := readLine(s.data, s.parseOffset)
+            found, line, off := readLine(s.data, s.parseOffset)
+            if !found {
+                return true, false
+            }
 
             value = line[1:]
             s.parseOffset = off
@@ -339,9 +364,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
     return true, false
 }
 
-func readLine(data []byte, offset int) (string, int) {
+func readLine(data []byte, offset int) (bool, string, int) {
     q := bytes.Index(data[offset:], []byte("\r\n"))
-    return string(data[offset : offset+q]), offset + q + 2
+    if q == -1 {
+        return false, "", 0
+    }
+    return true, string(data[offset : offset+q]), offset + q + 2
 }
 
 func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
@@ -364,32 +392,38 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
     }
 
     stream := tcp.redisData[dir]
-    if stream.message == nil {
-        stream.message = &RedisMessage{Ts: pkt.ts}
-    }
-
-    ok, complete := redisMessageParser(tcp.redisData[dir])
-
-    if !ok {
-        // drop this tcp stream. Will retry parsing with the next
-        // segment in it
-        tcp.redisData[dir] = nil
-        return
-    }
-
-    if complete {
-
-        if stream.message.IsRequest {
-            DEBUG("redis", "REDIS request message: %s", stream.message.Message)
-        } else {
-            DEBUG("redis", "REDIS response message: %s", stream.message.Message)
+    for len(stream.data) > 0 {
+        if stream.message == nil {
+            stream.message = &RedisMessage{Ts: pkt.ts}
         }
 
-        // all ok, go to next level
-        handleRedis(stream.message, tcp, dir)
+        ok, complete := redisMessageParser(tcp.redisData[dir])
 
-        // and reset message
-        stream.PrepareForNewMessage()
+        if !ok {
+            // drop this tcp stream. Will retry parsing with the next
+            // segment in it
+            tcp.redisData[dir] = nil
+            DEBUG("redis", "Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+            return
+        }
+
+        if complete {
+
+            if stream.message.IsRequest {
+                DEBUG("redis", "REDIS request message: %s", stream.message.Message)
+            } else {
+                DEBUG("redis", "REDIS response message: %s", stream.message.Message)
+            }
+
+            // all ok, go to next level
+            handleRedis(stream.message, tcp, dir)
+
+            // and reset message
+            stream.PrepareForNewMessage()
+        } else {
+            // wait for more data
+            break
+        }
     }
 
 }
