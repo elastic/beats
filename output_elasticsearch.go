@@ -66,13 +66,10 @@ func (out *ElasticsearchOutputType) EnableTTL() error {
 	},
     }
 
-    // Make sure the index exists
-    _, err := core.Index("packetbeat-topology", "", "", nil, nil)
-    if err != nil {
-        return err
-    }
+    // Make sure the index exists, but ignore errors (probably exists already)
+    core.Index("packetbeat-topology", "", "", nil, nil)
 
-    _, err = core.Index("packetbeat-topology", "server-ip", "_mapping", nil, setting)
+    _, err := core.Index("packetbeat-topology", "server-ip", "_mapping", nil, setting)
     if err != nil {
         return err
     }
