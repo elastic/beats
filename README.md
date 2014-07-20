@@ -9,8 +9,8 @@ This repository contains the code for the Packetbeat agent.
 
 To learn more about Packetbeat, check out <http://packetbeat.com>.
 
-You also read the [user manual](http://packetbeat.com/docs/) and the [getting
-started guide](http://packetbeat.com/getstarted).
+You can also read the [user manual](http://packetbeat.com/docs/) and the
+[getting started](http://packetbeat.com/getstarted) guide.
 
 ## Bugs and feature requests
 
