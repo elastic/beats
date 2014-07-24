@@ -22,7 +22,7 @@ DESC="Packetbeat agent software"
 NAME=packetbeat
 DAEMON=/usr/bin/$NAME
 DAEMON_ARGS="-c /etc/packetbeat/packetbeat.conf"
-PIDFILE=/var/run/acketbeat.pid
+PIDFILE=/var/run/packetbeat.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Exit if the package is not installed
