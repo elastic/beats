@@ -110,13 +110,16 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
 
     // IP header
     iphl := int((uint16(pkt.Data[l2hlen]) & 0x0f) * 4)
+    if iphl < 20 {
+        DEBUG("ip", "IP header shorter than 20 bytes, ignoring")
+        return
+    }
     if len(pkt.Data) < l2hlen+iphl {
         DEBUG("ip", "Packet too short to be IP")
         return
     }
     iphdr := pkt.Data[l2hlen : l2hlen+iphl]
 
-    //DEBUG("Packet timestamp: %s", pkt.Time)
     packet.ts = pkt.Time
 
     packet.tuple.Src_ip = Bytes_Ntohl(iphdr[12:16])
