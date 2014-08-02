@@ -35,6 +35,7 @@ type MysqlMessage struct {
     ErrorCode      int
     ErrorInfo      string
     Query          string
+    IgnoreMessage  bool
 
     Stream_id    uint32
     Direction    uint8
@@ -98,6 +99,8 @@ func (stream *MysqlStream) PrepareForNewMessage() {
 
 func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
+    DEBUG("mysqldetailed", "MySQL parser called. parseState = %d", s.parseState)
+
     m := s.message
     for s.parseOffset < len(s.data) {
         switch s.parseState {
@@ -125,6 +128,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
                 } else {
                     // ignore command
+                    m.IgnoreMessage = true
                     s.parseState = MysqlStateEatMessage
                 }
 
@@ -154,6 +158,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                     s.parseState = MysqlStateEatFields
                 } else {
                     // something else. ignore
+                    m.IgnoreMessage = true
                     s.parseState = MysqlStateEatMessage
                 }
 
@@ -171,16 +176,15 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
                 m.end = s.parseOffset
                 if m.IsRequest {
                     m.Query = string(s.data[m.start+5 : m.end])
-                    return true, true
                 } else if m.IsOK {
                     m.AffectedRows = int(s.data[m.start+5])
                     m.InsertId = int(s.data[m.start+6])
-                    return true, true
                 } else if m.IsError {
                     m.ErrorCode = int(uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+7]))
                     m.ErrorInfo = string(s.data[m.start+9:m.start+14]) + ": " + string(s.data[m.start+15:])
-                    return true, true
                 }
+                DEBUG("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
+                return true, true
             } else {
                 // wait for more
                 return true, false
@@ -318,7 +322,9 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
             // all ok, ship it
             msg := stream.data[stream.message.start:stream.message.end]
 
-            handleMysql(stream.message, tcp, dir, msg)
+            if !stream.message.IgnoreMessage {
+                handleMysql(stream.message, tcp, dir, msg)
+            }
 
             // and reset message
             stream.PrepareForNewMessage()
