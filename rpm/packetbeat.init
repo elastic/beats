@@ -30,6 +30,8 @@ export PATH
 pidfile=${PIDFILE-/var/run/packetbeat.pid}
 agent=${PB_AGENT-/usr/bin/packetbeat}
 args="-c /etc/packetbeat/packetbeat.conf"
+wrapper="packetbeat-god"
+wrapperopts="-r / -n -p $pidfile"
 RETVAL=0
 
 # Source function library.
@@ -44,7 +46,7 @@ fi
 
 start() {
     echo -n $"Starting packetbeat agent: "
-    daemon $daemonopts daemonize $pidopts $agent $args
+    daemon $daemonopts $wrapper $wrapperopts -- $agent $args
     RETVAL=$?
     echo
     return $RETVAL
@@ -52,19 +54,19 @@ start() {
 
 stop() {
     echo -n $"Stopping packetbeat agent: "
-    killproc $pidopts $agent
+    killproc $pidopts $wrapper
     RETVAL=$?
     echo
     [ $RETVAL = 0 ] && rm -f ${pidfile}
 }
 
-reload() {
-    echo -n $"Restarting packetbeat agent: "
-    killproc $pidopts $agent -HUP
-    RETVAL=$?
-    echo
-    return $RETVAL
-}
+#reload() {
+#    echo -n $"Restarting packetbeat agent: "
+#    killproc $pidopts $wrapper -HUP
+#    RETVAL=$?
+#    echo
+#    return $RETVAL
+#}
 
 restart() {
     stop
@@ -72,7 +74,7 @@ restart() {
 }
 
 rh_status() {
-    status $pidopts $agent
+    status $pidopts $wrapper
     RETVAL=$?
     return $RETVAL
 }
@@ -91,9 +93,6 @@ case "$1" in
     restart)
         restart
     ;;
-    reload|force-reload)
-        reload
-    ;;
     condrestart|try-restart)
         rh_status_q || exit 0
         restart
@@ -102,7 +101,7 @@ case "$1" in
         rh_status
     ;;
     *)
-        echo $"Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart}"
+        echo $"Usage: $0 {start|stop|status|restart|condrestart}"
         exit 1
 esac
 

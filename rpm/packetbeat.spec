@@ -8,7 +8,7 @@ Group:		Network
 License:	GPLv2
 URL:		http://packetbeat.com
 
-Requires:	 libpcap, daemonize
+Requires:	 libpcap
 Requires(post):  chkconfig
 Requires(preun): chkconfig
 Requires(preun): initscripts
