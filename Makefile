@@ -16,7 +16,7 @@ install: packetbeat go-daemon/god
 	install -m 644 -D packetbeat.conf $(DESTDIR)/$(CONF_PATH)/packetbeat.conf
 
 .PHONY: dist
-dist: packetbeat
+dist: packetbeat go-daemon/god
 	mkdir packetbeat-$(VERSION)
 	cp packetbeat packetbeat-$(VERSION)/
 	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
