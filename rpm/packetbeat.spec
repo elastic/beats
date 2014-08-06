@@ -31,7 +31,7 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 /etc/rc.d/init.d/packetbeat
 %config /etc/packetbeat/packetbeat.conf
 
-%doc
+%doc debian/copyright
 
 %post
 # This adds the proper /etc/rc*.d links for the script
