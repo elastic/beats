@@ -17,29 +17,29 @@ func TestTopologyInRedis(t *testing.T) {
     var publisher3 PublisherType = PublisherType{name: "proxy3"}
 
     var redisOutput1 = RedisOutputType{
-        Index: "packetbeat",
-        Hostname: redisAddr,
-        Password: "",
-        DbTopology: 1,
-        Timeout: time.Duration(5) * time.Second,
+        Index:          "packetbeat",
+        Hostname:       redisAddr,
+        Password:       "",
+        DbTopology:     1,
+        Timeout:        time.Duration(5) * time.Second,
         TopologyExpire: time.Duration(15) * time.Second,
     }
 
     var redisOutput2 = RedisOutputType{
-        Index: "packetbeat",
-        Hostname: redisAddr,
-        Password: "",
-        DbTopology: 1,
-        Timeout: time.Duration(5) * time.Second,
+        Index:          "packetbeat",
+        Hostname:       redisAddr,
+        Password:       "",
+        DbTopology:     1,
+        Timeout:        time.Duration(5) * time.Second,
         TopologyExpire: time.Duration(15) * time.Second,
     }
 
     var redisOutput3 = RedisOutputType{
-        Index: "packetbeat",
-        Hostname: redisAddr,
-        Password: "",
-        DbTopology: 1,
-        Timeout: time.Duration(5) * time.Second,
+        Index:          "packetbeat",
+        Hostname:       redisAddr,
+        Password:       "",
+        DbTopology:     1,
+        Timeout:        time.Duration(5) * time.Second,
         TopologyExpire: time.Duration(15) * time.Second,
     }
 

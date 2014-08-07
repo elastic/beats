@@ -3,14 +3,14 @@ package main
 import (
     "encoding/json"
     "fmt"
-    "strings"
     "github.com/packetbeat/elastigo/api"
     "github.com/packetbeat/elastigo/core"
+    "strings"
 )
 
 type ElasticsearchOutputType struct {
     OutputInterface
-    Index string
+    Index          string
     TopologyExpire int
 
     TopologyMap map[string]string
@@ -18,7 +18,7 @@ type ElasticsearchOutputType struct {
 
 type PublishedTopology struct {
     Name string
-    IPs string
+    IPs  string
 }
 
 var ElasticsearchOutput ElasticsearchOutputType
@@ -54,7 +54,7 @@ func (out *ElasticsearchOutputType) Init(config tomlMothership) error {
 
     INFO("[ElasticsearchOutput] Using Elasticsearch %s://%s:%s%s", api.Protocol, api.Domain, api.Port, api.BasePath)
     INFO("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
-    INFO("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire / 1000)
+    INFO("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
 
     return nil
 }
@@ -62,8 +62,8 @@ func (out *ElasticsearchOutputType) Init(config tomlMothership) error {
 func (out *ElasticsearchOutputType) EnableTTL() error {
     setting := map[string]interface{}{
         "server-ip": map[string]interface{}{
-	    "_ttl": map[string]string{"enabled": "true", "default": "15000"},
-	},
+            "_ttl": map[string]string{"enabled": "true", "default": "15000"},
+        },
     }
 
     // Make sure the index exists, but ignore errors (probably exists already)
@@ -87,24 +87,24 @@ func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string)
     DEBUG("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
     _, err := core.IndexWithParameters(
         "packetbeat-topology", /*index*/
-        "server-ip", /*type*/
-        name, /* id */
-        "", /*parent id */
-        0, /* version */
-        "", /* op_type */
-        "", /* routing */
-        "", /* timestamp */
-        out.TopologyExpire, /*ttl*/
-        "", /* percolate */
-        "", /* timeout */
-        false, /*refresh */
-        nil, /*args */
+        "server-ip",           /*type*/
+        name,                  /* id */
+        "",                    /*parent id */
+        0,                     /* version */
+        "",                    /* op_type */
+        "",                    /* routing */
+        "",                    /* timestamp */
+        out.TopologyExpire,    /*ttl*/
+        "",                    /* percolate */
+        "",                    /* timeout */
+        false,                 /*refresh */
+        nil,                   /*args */
         PublishedTopology{name, strings.Join(localAddrs, ",")} /* data */)
 
-        if err != nil {
-            ERR("Fail to publish IP addresses: %s", err)
-            return err
-        }
+    if err != nil {
+        ERR("Fail to publish IP addresses: %s", err)
+        return err
+    }
 
     out.UpdateLocalTopologyMap()
 

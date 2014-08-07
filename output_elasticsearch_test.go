@@ -12,15 +12,15 @@ func createElasticsearchConnection() ElasticsearchOutputType {
 
     var elasticsearchOutput ElasticsearchOutputType
     elasticsearchOutput.Init(tomlMothership{
-        Enabled: true,
+        Enabled:       true,
         Save_topology: true,
-        Host: elasticsearchAddr,
-        Port: elasticsearchPort,
-        Username: "",
-        Password: "",
-        Path: "",
-        Index: "packetbeat",
-        Protocol: "",
+        Host:          elasticsearchAddr,
+        Port:          elasticsearchPort,
+        Username:      "",
+        Password:      "",
+        Path:          "",
+        Index:         "packetbeat",
+        Protocol:      "",
     })
 
     return elasticsearchOutput
@@ -86,5 +86,3 @@ func TestTopologyInES(t *testing.T) {
         t.Error("Failed to delete old IP of proxy2: %s", name2)
     }
 }
-
-

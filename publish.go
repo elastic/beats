@@ -9,10 +9,10 @@ import (
 )
 
 type PublisherType struct {
-    name     string
-    disabled bool
-    Index    string
-    Output   []OutputInterface
+    name           string
+    disabled       bool
+    Index          string
+    Output         []OutputInterface
     TopologyOutput OutputInterface
 
     RefreshTopologyTimer <-chan time.Time
@@ -215,7 +215,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
         }
     }
 
-    if has_error  {
+    if has_error {
         return errors.New("Fail to publish event")
     }
     return nil
