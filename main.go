@@ -6,6 +6,7 @@ import (
     "io/ioutil"
     "log"
     "os"
+    "path/filepath"
     "runtime"
     "runtime/pprof"
     "strconv"
@@ -195,6 +196,29 @@ func debugMemStats() {
         m.Alloc, m.TotalAlloc, m.Sys)
 }
 
+func loadGeoIPData() {
+    geoip_path := "/usr/share/GeoIP/GeoIP.dat"
+    fi, err := os.Lstat(geoip_path)
+    if err != nil {
+        WARN("Could not load GeoIP data: %s", err.Error())
+        return
+    }
+
+    if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+        // follow symlink
+        geoip_path, err = filepath.EvalSymlinks(geoip_path)
+        if err != nil {
+            WARN("Could not load GeoIP data: %s", err.Error())
+            return
+        }
+    }
+
+    _GeoLite, err = libgeo.Load(geoip_path)
+    if err != nil {
+        WARN("Could not load GeoIP data: %s", err.Error())
+    }
+}
+
 func main() {
 
     // Use our own FlagSet, because some libraries pollute the global one
@@ -304,10 +328,7 @@ func main() {
         WARN("Unsupported link type: %d", datalink)
     }
 
-    _GeoLite, err = libgeo.Load("/usr/share/GeoIP/GeoIP.dat")
-    if err != nil {
-        WARN("Could not load GeoIP data: %s", err.Error())
-    }
+    loadGeoIPData()
 
     counter := 0
     live := true
