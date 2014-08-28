@@ -30,6 +30,7 @@ type PgsqlMessage struct {
 
     Stream_id    uint32
     Direction    uint8
+    Incomplete     bool
     Tuple        *IpPortTuple
     CmdlineTuple *CmdlineTuple
 }
@@ -544,9 +545,11 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
             data:      pkt.payload,
             message:   &PgsqlMessage{Ts: pkt.ts},
         }
+        DEBUG("pgsqldetailed", "New stream created")
     } else {
         // concatenate bytes
         tcp.pgsqlData[dir].data = append(tcp.pgsqlData[dir].data, pkt.payload...)
+        DEBUG("pgsqldetailed", "Len data: %d cap data: %d", len(tcp.pgsqlData[dir].data), cap(tcp.pgsqlData[dir].data))
         if len(tcp.pgsqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
             DEBUG("pgsql", "Stream data too large, dropping TCP stream")
             tcp.pgsqlData[dir] = nil
@@ -599,6 +602,42 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
             // wait for more data
             break
         }
+    }
+}
+
+func PgsqlMessageHasEnoughData(msg *PgsqlMessage) bool {
+    if msg == nil {
+        return false
+    }
+    if msg.isSSLRequest || msg.isSSLResponse {
+        return false
+    }
+    if msg.IsRequest {
+        return len(msg.Query) > 0
+    } else {
+        return len(msg.Rows) > 0
+    }
+}
+
+// Called when there's a drop packet
+func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
+
+    defer RECOVER("GapInPgsqlStream exception")
+
+    // If enough data was received, send it to the
+    // next layer but mark it as incomplete.
+    stream := tcp.pgsqlData[dir]
+    if PgsqlMessageHasEnoughData(stream.message) {
+        DEBUG("pgsql", "Message not complete, but sending to the next layer")
+        stream.message.toExport = true
+        stream.message.end = stream.parseOffset
+        stream.message.Incomplete = true
+
+        msg := stream.data[stream.message.start:stream.message.end]
+        handlePgsql(stream.message, tcp, dir, msg)
+
+        // and reset message
+        stream.PrepareForNewMessage()
     }
 }
 
