@@ -377,6 +377,7 @@ func main() {
             panic(fmt.Sprintf("Unexpected return code from pcap.NextEx: %d", res))
         }
 
+
         if pkt == nil {
             panic("Nil packet despite res=1")
         }
@@ -396,6 +397,7 @@ func main() {
         }
         counter++
 
+        DEBUG("pcapread", "Packet number: %d", counter)
         decodePktEth(datalink, pkt)
     }
     INFO("Input finish. Processed %d packets. Have a nice day!", counter)
