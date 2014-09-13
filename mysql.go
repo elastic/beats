@@ -386,16 +386,19 @@ func receivedMysqlRequest(msg *MysqlMessage) {
         Proc: string(msg.CmdlineTuple.Dst),
     }
 
-    index := strings.Index(msg.Query, " ")
+    // Extract the method, by simply taking the first word and
+    // making it upper case.
+    query := strings.Trim(msg.Query, " \n\t")
+    index := strings.IndexAny(query, " \n\t")
     var method string
     if index > 0 {
-        method = strings.ToUpper(msg.Query[:index])
+        method = strings.ToUpper(query[:index])
     } else {
-        method = strings.ToUpper(msg.Query)
+        method = strings.ToUpper(query)
     }
 
     trans.Mysql = bson.M{
-        "query":     msg.Query,
+        "query":     query,
         "query.raw": msg.Query,
         "method":    method,
     }
