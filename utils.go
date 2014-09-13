@@ -33,6 +33,11 @@ func Bytes_Ntohl(b []byte) uint32 {
         uint32(b[2])<<8 | uint32(b[3])
 }
 
+func Bytes_Htohl(b []byte) uint32 {
+    return uint32(b[3])<<24 | uint32(b[2])<<16 |
+        uint32(b[1])<<8 | uint32(b[0])
+}
+
 func Bytes_Ntohll(b []byte) uint64 {
     return uint64(b[0])<<56 | uint64(b[1])<<48 |
         uint64(b[2])<<40 | uint64(b[3])<<32 |

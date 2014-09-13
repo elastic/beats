@@ -85,18 +85,29 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     var l2hlen int
     var eth_type uint16
 
-    if datalink != pcap.LINKTYPE_LINUX_SLL {
-        // we are just assuming ETH
+    switch datalink {
+    case pcap.LINKTYPE_ETHERNET: // Ethernet
         l2hlen = 14
 
         // bytes 12 and 13 are the pkt type
         eth_type = Bytes_Ntohs(pkt.Data[12:14])
 
-    } else {
+    case pcap.LINKTYPE_LINUX_SLL: // linux loopback
         l2hlen = 16
 
         // bytes 14 and 15 are the pkt type
         eth_type = Bytes_Ntohs(pkt.Data[14:16])
+
+    case pcap.LINKTYPE_NULL: // bsd loopback
+        l2hlen = 4
+
+        if Bytes_Htohl(pkt.Data[0:4]) == 2 {
+            eth_type = 0x800
+        } else {
+            // unknown
+            eth_type = 0
+        }
+
     }
 
     if eth_type != 0x800 {
@@ -324,8 +335,9 @@ func main() {
     }
 
     datalink := h.Datalink()
-    if datalink != pcap.LINKTYPE_ETHERNET && datalink != pcap.LINKTYPE_LINUX_SLL {
-        WARN("Unsupported link type: %d", datalink)
+    if datalink != pcap.LINKTYPE_ETHERNET && datalink != pcap.LINKTYPE_LINUX_SLL &&
+        datalink != pcap.LINKTYPE_NULL {
+        ERR("Unsupported link type: %d", datalink)
     }
 
     loadGeoIPData()
@@ -376,7 +388,6 @@ func main() {
         if res != 1 {
             panic(fmt.Sprintf("Unexpected return code from pcap.NextEx: %d", res))
         }
-
 
         if pkt == nil {
             panic("Nil packet despite res=1")

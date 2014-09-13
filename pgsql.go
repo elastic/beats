@@ -30,7 +30,7 @@ type PgsqlMessage struct {
 
     Stream_id    uint32
     Direction    uint8
-    Incomplete     bool
+    Incomplete   bool
     Tuple        *IpPortTuple
     CmdlineTuple *CmdlineTuple
 }

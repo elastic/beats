@@ -150,7 +150,6 @@ func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
     return int32(seq1-seq2) < 0
 }
 
-
 func FollowTcp(tcphdr []byte, pkt *Packet) {
     stream, exists := tcpStreamsMap[pkt.tuple]
     var original_dir uint8 = 1
@@ -186,7 +185,6 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
 
     if len(pkt.payload) > 0 &&
         stream.lastSeq[original_dir] != 0 {
-
 
         if !TcpSeqBefore(stream.lastSeq[original_dir], tcp_seq) {
 
