@@ -47,14 +47,18 @@ type tomlMothership struct {
     Db_topology        int
     Timeout            int
     Reconnect_interval int
+    Filename           string
+    Rotate_every_kb    int
+    Number_of_files    int
 }
 
 const (
     ElasticsearchOutputName = "elasticsearch"
     RedisOutputName         = "redis"
+    FileOutputName          = "file"
 )
 
-var outputTypes = []string{ElasticsearchOutputName, RedisOutputName}
+var outputTypes = []string{ElasticsearchOutputName, RedisOutputName, FileOutputName}
 
 type Event struct {
     Timestamp    time.Time `json:"@timestamp"`
@@ -311,6 +315,19 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
                         publisher.TopologyOutput = OutputInterface(&RedisOutput)
                         INFO("Using Redis to store the topology")
                     }
+                }
+                break
+
+            case FileOutputName:
+                if output.Enabled {
+                    err := FileOutput.Init(output)
+                    if err != nil {
+                        ERR("Fail to initialize file output: %s", err)
+                        return err
+                    }
+                    publisher.Output = append(publisher.Output, OutputInterface(&FileOutput))
+
+                    // topology saving not supported by this one
                 }
                 break
             }
