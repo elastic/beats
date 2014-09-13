@@ -3,6 +3,7 @@ Name:		packetbeat
 Version:	0.3.2
 Release:	1%{?dist}
 Source:		%{name}.tar.gz
+BuildRoot: %{_tmppath}/%{name}
 
 Group:		Network
 License:	GPLv2
