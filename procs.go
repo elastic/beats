@@ -1,15 +1,26 @@
 package main
 
 import (
+    "bufio"
+    "bytes"
     "io/ioutil"
     "net"
     "os"
+    "io"
     "path/filepath"
     "runtime"
     "strconv"
     "strings"
     "time"
 )
+
+type SocketInfo struct {
+    Src_ip, Dst_ip     uint32
+    Src_port, Dst_port uint16
+
+    Uid   uint16
+    Inode int64
+}
 
 type PortProcMapping struct {
     Port uint16
@@ -221,6 +232,25 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
     return ""
 }
 
+func hex_to_ip_port(str []byte) (uint32, uint16, error) {
+    words := bytes.Split(str, []byte(":"))
+    if len(words) < 2 {
+        return 0, 0, MsgError("Didn't find ':' as a separator")
+    }
+
+    ip, err := strconv.ParseInt(string(words[0]), 16, 64)
+    if err != nil {
+        return 0, 0, err
+    }
+
+    port, err := strconv.ParseInt(string(words[1]), 16, 32)
+    if err != nil {
+        return 0, 0, err
+    }
+
+    return uint32(ip), uint16(port), nil
+}
+
 func (proc *ProcessesWatcher) UpdateMap() {
 
     DEBUG("procs", "UpdateMap()")
@@ -256,6 +286,51 @@ func (proc *ProcessesWatcher) UpdateMap() {
 
         }
     }
+}
+
+// Parses the /proc/net/tcp file
+func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
+    buf := bufio.NewReader(input)
+
+    sockets := []*SocketInfo{}
+    var err error = nil
+    var line []byte
+    for err != io.EOF {
+        line, err = buf.ReadBytes('\n')
+        if err != nil && err != io.EOF {
+            ERR("Error reading /proc/net/tcp: %s", err)
+            return nil, err
+        }
+
+        words := bytes.Fields(line)
+        if len(words) < 10 || bytes.Equal(words[0], []byte("sl")) {
+            //DEBUG("Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
+            continue
+        }
+
+        var sock SocketInfo
+        var err_ error
+
+        sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1])
+        if err_ != nil {
+            DEBUG("sockets", "Error parsing IP and port: %s", err_)
+            continue
+        }
+
+        sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2])
+        if err_ != nil {
+            DEBUG("sockets", "Error parsing IP and port: %s", err_)
+            continue
+        }
+
+        uid, _ := strconv.Atoi(string(words[7]))
+        sock.Uid = uint16(uid)
+        inode, _ := strconv.Atoi(string(words[9]))
+        sock.Inode = int64(inode)
+
+        sockets = append(sockets, &sock)
+    }
+    return sockets, nil
 }
 
 func (proc *ProcessesWatcher) UpdateMappingEntry(port uint16, pid int, p *Process) {
