@@ -115,7 +115,11 @@ func (publisher *PublisherType) GetServerName(ip string) string {
         }
     }
     // find the agent with the desired IP
-    return publisher.TopologyOutput.GetNameByIP(ip)
+    if publisher.TopologyOutput != nil {
+        return publisher.TopologyOutput.GetNameByIP(ip)
+    } else {
+        return ""
+    }
 }
 
 func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
@@ -261,11 +265,13 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
         localAddrs = addrs
     }
 
-    DEBUG("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
+    if publisher.TopologyOutput != nil {
+        DEBUG("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
 
-    err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
-    if err != nil {
-        return err
+        err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
+        if err != nil {
+            return err
+        }
     }
 
     return nil
