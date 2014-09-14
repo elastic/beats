@@ -168,9 +168,6 @@ func decodePktEth(datalink int, pkt *pcap.Packet) {
     packet.tuple.Src_port = Bytes_Ntohs(tcphdr[0:2])
     packet.tuple.Dst_port = Bytes_Ntohs(tcphdr[2:4])
 
-    //DEBUG(" %s:%d -> %s:%d", packet.tuple.src_ip, packet.tuple.src_port,
-    //      packet.tuple.dst_ip, packet.tuple.dst_port)
-
     data_offset := (tcphdr[12] >> 4) * 4
 
     if l2hlen+iphl+int(data_offset) > l2hlen+ip_length {

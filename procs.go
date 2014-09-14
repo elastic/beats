@@ -304,7 +304,7 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 
         words := bytes.Fields(line)
         if len(words) < 10 || bytes.Equal(words[0], []byte("sl")) {
-            //DEBUG("Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
+            DEBUG("procs", "Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
             continue
         }
 
@@ -313,13 +313,13 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 
         sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1])
         if err_ != nil {
-            DEBUG("sockets", "Error parsing IP and port: %s", err_)
+            DEBUG("procs", "Error parsing IP and port: %s", err_)
             continue
         }
 
         sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2])
         if err_ != nil {
-            DEBUG("sockets", "Error parsing IP and port: %s", err_)
+            DEBUG("procs", "Error parsing IP and port: %s", err_)
             continue
         }
 

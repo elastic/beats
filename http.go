@@ -162,7 +162,6 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
     var cont, ok, complete bool
     m := s.message
 
-    //DEBUG("http", "Data: [%s]", s.data)
     DEBUG("http", "Stream state=%d", s.parseState)
 
     for s.parseOffset < len(s.data) {
@@ -216,7 +215,6 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
                 DEBUG("http", "HTTP Method=%s, RequestUri=%s", m.Method, m.RequestUri)
             }
 
-            //DEBUG("First line: [%s]", fline)
             m.version_major, m.version_minor, err = parseVersion(version)
             if err != nil {
                 DEBUG("http", "Failed to understand HTTP version: %s", version)
