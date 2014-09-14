@@ -346,8 +346,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         }
 
         if publisher.TopologyOutput == nil {
-            INFO("No output is defined to store the topology. Please add save_topology = true option to one output.")
-            return errors.New("No output to store topology")
+            WARN("No output is defined to store the topology. The server fields might not be filled.")
         }
     }
 
@@ -363,7 +362,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
     }
 
 
-    if !publisher.disabled {
+    if !publisher.disabled && publisher.TopologyOutput != nil {
         RefreshTopologyFreq := 10 * time.Second
         if _Config.Agent.Refresh_topology_freq != 0 {
             RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
