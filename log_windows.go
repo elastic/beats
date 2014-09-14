@@ -11,6 +11,7 @@ type Logger struct {
     toSyslog  bool
     level     Priority
     selectors map[string]bool
+    debug_all_selectors bool
 
     logger *log.Logger
 }
@@ -36,9 +37,11 @@ var _log Logger
 
 func DEBUG(selector string, format string, v ...interface{}) {
     if _log.level >= LOG_DEBUG {
-        selected := _log.selectors[selector]
-        if !selected {
-            return
+        if !_log.debug_all_selectors {
+            selected := _log.selectors[selector]
+            if !selected {
+                return
+            }
         }
         _log.logger.Output(2, fmt.Sprintf("DBG  "+format, v...))
     }
@@ -93,6 +96,9 @@ func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []stri
     _log.selectors = make(map[string]bool)
     for _, selector := range debugSelectors {
         _log.selectors[selector] = true
+        if selector == "*" {
+            _log.debug_all_selectors = true
+        }
     }
 
     _log.logger = log.New(os.Stdout, prefix, log.Lshortfile)

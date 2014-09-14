@@ -31,6 +31,7 @@ type Logger struct {
     toSyslog  bool
     level     syslog.Priority
     selectors map[string]bool
+    debug_all_selectors bool
 
     logger *log.Logger
     syslog [syslog.LOG_DEBUG + 1]*log.Logger
@@ -40,9 +41,11 @@ var _log Logger
 
 func DEBUG(selector string, format string, v ...interface{}) {
     if _log.level >= syslog.LOG_DEBUG {
-        selected := _log.selectors[selector]
-        if !selected {
-            return
+        if !_log.debug_all_selectors {
+            selected := _log.selectors[selector]
+            if !selected {
+                return
+            }
         }
         if _log.toSyslog {
             _log.syslog[syslog.LOG_INFO].Output(2, fmt.Sprintf(format, v...))
@@ -133,6 +136,9 @@ func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []stri
     _log.selectors = make(map[string]bool)
     for _, selector := range debugSelectors {
         _log.selectors[selector] = true
+        if selector == "*" {
+            _log.debug_all_selectors = true
+        }
     }
 
     if _log.toSyslog {
