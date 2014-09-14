@@ -274,12 +274,17 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 func (publisher *PublisherType) Init(publishDisabled bool) error {
     var err error
 
+    publisher.disabled = publishDisabled
+    if publisher.disabled {
+        INFO("Dry run mode. All output types except the file based one are disabled.")
+    }
+
     for i := 0; i < len(outputTypes); i++ {
         output, exists := _Config.Output[outputTypes[i]]
         if exists {
             switch outputTypes[i] {
             case ElasticsearchOutputName:
-                if output.Enabled {
+                if output.Enabled && !publisher.disabled {
                     err := ElasticsearchOutput.Init(output)
                     if err != nil {
                         ERR("Fail to initialize Elasticsearch as output: %s", err)
@@ -299,7 +304,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
                 break
 
             case RedisOutputName:
-                if output.Enabled {
+                if output.Enabled && !publisher.disabled {
                     err := RedisOutput.Init(output)
                     if err != nil {
                         ERR("Fail to initialize Redis as output: %s", err)
@@ -334,15 +339,18 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         }
     }
 
-    if len(publisher.Output) == 0 {
-        INFO("No outputs are defined. Please define one under [output]")
-        return errors.New("No outputs are define")
+    if !publisher.disabled {
+        if len(publisher.Output) == 0 {
+            INFO("No outputs are defined. Please define one under [output]")
+            return errors.New("No outputs are define")
+        }
+
+        if publisher.TopologyOutput == nil {
+            INFO("No output is defined to store the topology. Please add save_topology = true option to one output.")
+            return errors.New("No output to store topology")
+        }
     }
 
-    if publisher.TopologyOutput == nil {
-        INFO("No output is defined to store the topology. Please add save_topology = true option to one output.")
-        return errors.New("No output to store topology")
-    }
     publisher.name = _Config.Agent.Name
     if len(publisher.name) == 0 {
         // use the hostname
@@ -354,19 +362,15 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         INFO("No agent name configured, using hostname '%s'", publisher.name)
     }
 
-    publisher.disabled = publishDisabled
-    if publisher.disabled {
-        INFO("Dry run mode. Elasticsearch won't be updated or queried.")
-    }
-
-    RefreshTopologyFreq := 10 * time.Second
-    if _Config.Agent.Refresh_topology_freq != 0 {
-        RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
-    }
-    publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
-    INFO("Topology map refreshed every %s", RefreshTopologyFreq)
 
     if !publisher.disabled {
+        RefreshTopologyFreq := 10 * time.Second
+        if _Config.Agent.Refresh_topology_freq != 0 {
+            RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
+        }
+        publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
+        INFO("Topology map refreshed every %s", RefreshTopologyFreq)
+
         // register agent and its public IP addresses
         err = publisher.PublishTopology()
         if err != nil {
