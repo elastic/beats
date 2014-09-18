@@ -43,6 +43,7 @@ type HttpMessage struct {
     ContentLength int
     ContentType   string
     ReasonPhrase  string
+    XForwardedFor string
 
     Raw []byte
 
@@ -148,6 +149,8 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
                 m.connection = string(bytes.Trim(data[i+1:p], " \t"))
             } else if bytes.Equal(bytes.ToLower(data[:i]), []byte("transfer-encoding")) {
                 m.transfer_encoding = string(bytes.Trim(data[i+1:p], " \t"))
+            } else if bytes.Equal(bytes.ToLower(data[:i]), []byte("x-forwarded-for")) {
+                m.XForwardedFor = string(bytes.Trim(data[i+1:p], " \t"))
             }
 
             return true, true, p + 2
@@ -489,10 +492,12 @@ func receivedHttpRequest(msg *HttpMessage) {
     trans.Http = bson.M{
         "host": msg.Host,
         "request": bson.M{
-            "method":   msg.Method,
-            "uri":      msg.RequestUri,
-            "line":     msg.FirstLine,
-            "line.raw": msg.FirstLine,
+            "method":          msg.Method,
+            "uri":             msg.RequestUri,
+            "uri.raw":         msg.RequestUri,
+            "line":            msg.FirstLine,
+            "line.raw":        msg.FirstLine,
+            "x-forwarded-for": msg.XForwardedFor,
         },
     }
 

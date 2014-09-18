@@ -3,10 +3,10 @@ package main
 import (
     "bufio"
     "bytes"
+    "io"
     "io/ioutil"
     "net"
     "os"
-    "io"
     "path/filepath"
     "runtime"
     "strconv"

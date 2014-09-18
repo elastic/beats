@@ -367,7 +367,6 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
         INFO("No agent name configured, using hostname '%s'", publisher.name)
     }
 
-
     if !publisher.disabled && publisher.TopologyOutput != nil {
         RefreshTopologyFreq := 10 * time.Second
         if _Config.Agent.Refresh_topology_freq != 0 {

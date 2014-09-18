@@ -28,9 +28,9 @@ const (
 )
 
 type Logger struct {
-    toSyslog  bool
-    level     syslog.Priority
-    selectors map[string]bool
+    toSyslog            bool
+    level               syslog.Priority
+    selectors           map[string]bool
     debug_all_selectors bool
 
     logger *log.Logger
