@@ -2,10 +2,19 @@ package main
 
 import (
     "encoding/json"
+    "errors"
     "fmt"
-    "github.com/go-redis/redis"
     "strings"
     "time"
+
+    "github.com/go-redis/redis"
+)
+
+type RedisDataType uint16
+
+const (
+    RedisListType RedisDataType = iota
+    RedisChannelType
 )
 
 type RedisOutputType struct {
@@ -20,6 +29,7 @@ type RedisOutputType struct {
     Db                int
     DbTopology        int
     Timeout           time.Duration
+    DataType          RedisDataType
 
     TopologyMap  map[string]string
     sendingQueue chan RedisQueueMsg
@@ -72,6 +82,15 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     }
     out.TopologyExpire = time.Duration(exp_sec) * time.Second
 
+    switch config.DataType {
+    case "", "list":
+        out.DataType = RedisListType
+    case "channel":
+        out.DataType = RedisChannelType
+    default:
+        return errors.New("Bad Redis data type")
+    }
+
     INFO("[RedisOutput] Using Redis server %s", out.Hostname)
     if out.Password != "" {
         INFO("[RedisOutput] Using password to connect to Redis")
@@ -82,6 +101,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
     INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
     INFO("[RedisOutput] Using db %d for storing events", out.Db)
     INFO("[RedisOutput] Using db %d for storing topology", out.DbTopology)
+    INFO("[RedisOutput] Using %d data type", out.DataType)
 
     out.sendingQueue = make(chan RedisQueueMsg, 1000)
 
@@ -123,7 +143,13 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
             continue
         }
         DEBUG("output_redis", "Send event to redis")
-        _, err := out.Client.RPush(queueMsg.index, queueMsg.msg).Result()
+        var err error = nil
+        switch out.DataType {
+        case RedisListType:
+            _, err = out.Client.RPush(queueMsg.index, queueMsg.msg).Result()
+        case RedisChannelType:
+            _, err = out.Client.Publish(queueMsg.index, queueMsg.msg).Result()
+        }
         if err != nil {
             ERR("Fail to publish event to REDIS: %s", err)
             out.connected = false
