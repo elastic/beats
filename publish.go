@@ -3,9 +3,10 @@ package main
 import (
     "encoding/json"
     "errors"
-    "labix.org/v2/mgo/bson"
     "os"
     "time"
+
+    "labix.org/v2/mgo/bson"
 )
 
 type PublisherType struct {
@@ -50,6 +51,7 @@ type tomlMothership struct {
     Filename           string
     Rotate_every_kb    int
     Number_of_files    int
+    DataType           string
 }
 
 const (
