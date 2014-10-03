@@ -25,7 +25,7 @@ dist: packetbeat go-daemon/god
 
 .PHONY: gofmt
 gofmt:
-	gofmt -w -tabs=false -tabwidth=4 *.go
+	gofmt -w *.go
 
 .PHONY: test
 test:
