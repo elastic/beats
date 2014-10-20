@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/binary"
+	"math"
 	"time"
+	"strconv"
 
 	"labix.org/v2/mgo/bson"
 )
@@ -22,6 +25,14 @@ type ThriftMessage struct {
 	Type      uint32
 	Method    string
 	SeqId     uint32
+	Fields    []*ThriftField
+}
+
+type ThriftField struct {
+	Type byte
+	Id uint16
+
+	Value string
 }
 
 type ThriftStream struct {
@@ -57,7 +68,7 @@ type ThriftTransaction struct {
 
 const (
 	ThriftStartState = iota
-	ThriftReadFields
+	ThriftFieldState
 )
 
 const (
@@ -66,6 +77,26 @@ const (
 	ThriftTypeMask    = 0x000000ff
 )
 
+// Thrift types
+const (
+	ThriftTypeStop = iota
+	ThriftTypeVoid
+	ThriftTypeBool
+	ThriftTypeByte
+	ThriftTypeDouble
+	ThriftTypeI16 = 6
+	ThriftTypeI32 = 8
+	ThriftTypeI64 = 10
+	ThriftTypeString = 11
+	ThriftTypeStruct = 12
+	ThriftTypeMap = 13
+	ThriftTypeSet = 14
+	ThriftTypeList = 15
+	ThriftTypeUtf8 = 16
+	ThriftTypeUtf16 = 17
+)
+
+// Thrift message types -- TODO: rename to ThriftTypeMsg..
 const (
 	_ = iota
 	ThriftTypeCall
@@ -141,6 +172,10 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 		s.parseOffset = offset + 4
 	}
 
+	if m.Type == ThriftTypeCall || m.Type == ThriftTypeOneway {
+		m.IsRequest = true
+	}
+
 	return true, true
 }
 
@@ -162,6 +197,59 @@ func thriftReadString(data []byte) (str string, ok bool, complete bool, off int)
 	return str, true, true, off // all good
 }
 
+func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftField) {
+
+	field = new(ThriftField)
+
+	if len(s.data) == 0 {
+		return true, false, nil // ok, not complete
+	}
+	field.Type = byte(s.data[s.parseOffset])
+	offset := s.parseOffset + 1
+	if field.Type == ThriftTypeStop {
+		s.parseOffset = offset
+		return true, true, nil	// done
+	}
+
+	if len(s.data[offset:]) < 2 {
+		return true, false, nil // ok, not complete
+	}
+	field.Id = Bytes_Ntohs(s.data[offset:offset+2])
+	offset += 2
+
+	switch field.Type {
+		case ThriftTypeBool:
+			if len(s.data[offset:]) < 1 {
+				return true, false, nil
+			}
+			if s.data[offset] == byte(0) {
+				field.Value = "true"
+			} else {
+				field.Value = "false"
+			}
+			offset += 1
+
+		case ThriftTypeByte:
+			if len(s.data[offset:]) < 1 {
+				return true, false, nil
+			}
+			field.Value = strconv.Itoa(int(s.data[offset]))
+			offset += 1
+
+		case ThriftTypeDouble:
+			if len(s.data[offset:]) < 8 {
+				return true, false, nil
+			}
+			bits := binary.BigEndian.Uint64(s.data[offset:offset+8])
+			double := math.Float64frombits(bits)
+			field.Value = strconv.FormatFloat(double, 'f', -1, 64)
+			offset += 8
+	}
+
+	s.parseOffset = offset
+	return true, false, field
+}
+
 func thriftMessageParser(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var m = s.message
@@ -179,6 +267,21 @@ func thriftMessageParser(s *ThriftStream) (bool, bool) {
 				return true, false
 			}
 
+			s.parseState = ThriftFieldState
+		case ThriftFieldState:
+			ok, complete, field := thriftReadField(s)
+			if !ok {
+				return false, false
+			}
+			if complete {
+				// done
+				return true, true
+			}
+			if field == nil {
+				return true, false // ok, not complete
+			}
+
+			m.Fields = append(m.Fields, field)
 		}
 	}
 
