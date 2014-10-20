@@ -33,10 +33,10 @@ type TcpStream struct {
 
 	lastSeq [2]uint32
 
-	httpData  [2]*HttpStream
-	mysqlData [2]*MysqlStream
-	redisData [2]*RedisStream
-	pgsqlData [2]*PgsqlStream
+	httpData   [2]*HttpStream
+	mysqlData  [2]*MysqlStream
+	redisData  [2]*RedisStream
+	pgsqlData  [2]*PgsqlStream
 	thriftData [2]*ThriftStream
 }
 

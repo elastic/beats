@@ -41,6 +41,91 @@ func TestThrift_thriftReadString(t *testing.T) {
 	}
 }
 
+func TestThrift_readMessageBegin(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var data []byte
+	var ok, complete bool
+	var stream ThriftStream
+	var m *ThriftMessage
+
+	data, _ = hex.DecodeString("800100010000000470696e670000000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || !complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+		m.SeqId != 0 || m.Version != ThriftVersion1 {
+		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+	}
+
+	data, _ = hex.DecodeString("800100010000000470696e6700000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || !complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+		m.SeqId != 0 || m.Version != ThriftVersion1 {
+		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+	}
+
+	data, _ = hex.DecodeString("800100010000000470696e6700000001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || !complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+		m.SeqId != 1 || m.Version != ThriftVersion1 {
+		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+	}
+
+	data, _ = hex.DecodeString("800100010000000570696e6700000001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+
+	data, _ = hex.DecodeString("800100010000000570696e6700000001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+
+	data, _ = hex.DecodeString("0000000470696e670100000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || !complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+		m.SeqId != 0 || m.Version != 0 {
+		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+	}
+
+	data, _ = hex.DecodeString("0000000570696e670100000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	m = stream.message
+	ok, complete = m.readMessageBegin(&stream)
+	if !ok || complete {
+		t.Error("Bad result: %s %s", ok, complete)
+	}
+
+}
+
 func TestThriftParser_simpleRequest(t *testing.T) {
 
 	if testing.Verbose() {

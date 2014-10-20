@@ -6,9 +6,8 @@ import (
 	"labix.org/v2/mgo/bson"
 )
 
-
 type ThriftMessage struct {
-	Ts	time.Time
+	Ts time.Time
 
 	Stream_id    uint32
 	Tuple        *IpPortTuple
@@ -16,13 +15,13 @@ type ThriftMessage struct {
 	Direction    uint8
 
 	start int
-	end int
+	end   int
 
 	IsRequest bool
-	Version	uint32
-	Type uint32
-	Method	string
-	SeqId uint32
+	Version   uint32
+	Type      uint32
+	Method    string
+	SeqId     uint32
 }
 
 type ThriftStream struct {
@@ -31,7 +30,7 @@ type ThriftStream struct {
 	data []byte
 
 	parseOffset   int
-	parseState   int
+	parseState    int
 	bytesReceived int
 
 	message *ThriftMessage
@@ -63,26 +62,38 @@ const (
 
 const (
 	ThriftVersionMask = 0xffff0000
-	ThriftVersion1 = 0x80010000
-	ThriftTypeMask = 0x000000ff
+	ThriftVersion1    = 0x80010000
+	ThriftTypeMask    = 0x000000ff
+)
+
+const (
+	_ = iota
+	ThriftTypeCall
+	ThriftTypeReply
+	ThriftTypeException
+	ThriftTypeOneway
 )
 
 func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var offset, off int
 
-	if len(s.data[s.parseOffset:]) < 12 {
-		return true, false	// ok, not complete
+	if len(s.data[s.parseOffset:]) < 9 {
+		return true, false // ok, not complete
 	}
 
-	sz := Bytes_Ntohl(s.data[s.parseOffset:s.parseOffset+4])
-	if int32(sz) < 0  {
+	sz := Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4])
+	if int32(sz) < 0 {
 		m.Version = sz & ThriftVersionMask
 		if m.Version != ThriftVersion1 {
 			DEBUG("thrift", "Unexpected version: %d", m.Version)
 		}
 
+		DEBUG("thriftdetailed", "version = %d", m.Version)
+
 		offset = s.parseOffset + 4
+
+		DEBUG("thriftdetailed", "offset = %d", offset)
 
 		m.Type = sz & ThriftTypeMask
 		m.Method, ok, complete, off = thriftReadString(s.data[offset:])
@@ -90,18 +101,44 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 			return false, false // not ok, not complete
 		}
 		if !complete {
+			DEBUG("thriftdetailed", "Method name not complete")
 			return true, false // ok, not complete
 		}
 		offset += off
 
+		DEBUG("thriftdetailed", "method = %s", m.Method)
+		DEBUG("thriftdetailed", "offset = %d", offset)
+
 		if len(s.data[offset:]) < 4 {
 			return true, false // ok, not complete
 		}
-		m.SeqId = Bytes_Ntohl(s.data[offset:offset+4])
-		s.parseOffset = offset+4
-
+		m.SeqId = Bytes_Ntohl(s.data[offset : offset+4])
+		s.parseOffset = offset + 4
 	} else {
+		// no version mode
+		offset = s.parseOffset
 
+		m.Method, ok, complete, off = thriftReadString(s.data[offset:])
+		if !ok {
+			return false, false // not ok, not complete
+		}
+		if !complete {
+			DEBUG("thriftdetailed", "Method name not complete")
+			return true, false // ok, not complete
+		}
+		offset += off
+
+		DEBUG("thriftdetailed", "method = %s", m.Method)
+		DEBUG("thriftdetailed", "offset = %d", offset)
+
+		if len(s.data[offset:]) < 5 {
+			return true, false // ok, not complete
+		}
+
+		m.Type = uint32(s.data[offset])
+		offset += 1
+		m.SeqId = Bytes_Ntohl(s.data[offset : offset+4])
+		s.parseOffset = offset + 4
 	}
 
 	return true, true
@@ -109,20 +146,20 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 
 func thriftReadString(data []byte) (str string, ok bool, complete bool, off int) {
 	if len(data) < 4 {
-		return "", true, false, 0	// ok, not complete
+		return "", true, false, 0 // ok, not complete
 	}
 	sz := int(Bytes_Ntohl(data[:4]))
-	if sz < 0 {
+	if int32(sz) < 0 {
 		return "", false, false, 0 // not ok
 	}
 	if len(data[4:]) < sz {
 		return "", true, false, 0 // ok, not complete
 	}
 
-	str = string(data[4:4+sz])
-	off = 4+sz
+	str = string(data[4 : 4+sz])
+	off = 4 + sz
 
-	return str, true, true, off	// all good
+	return str, true, true, off // all good
 }
 
 func thriftMessageParser(s *ThriftStream) (bool, bool) {
@@ -209,4 +246,3 @@ func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8) {
 	}
 
 }
-
