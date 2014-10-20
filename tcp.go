@@ -37,6 +37,7 @@ type TcpStream struct {
 	mysqlData [2]*MysqlStream
 	redisData [2]*RedisStream
 	pgsqlData [2]*PgsqlStream
+	thriftData [2]*ThriftStream
 }
 
 type Endpoint struct {

@@ -4,6 +4,7 @@ VERSION?=0.3.3
 ARCH?=$(shell uname -m)
 
 packetbeat: *.go
+	go get
 	go build
 
 go-daemon/god: go-daemon/god.c
