@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/binary"
 	"math"
-	"time"
 	"strconv"
+	"time"
 
 	"labix.org/v2/mgo/bson"
 )
@@ -30,7 +30,7 @@ type ThriftMessage struct {
 
 type ThriftField struct {
 	Type byte
-	Id uint16
+	Id   uint16
 
 	Value string
 }
@@ -79,21 +79,21 @@ const (
 
 // Thrift types
 const (
-	ThriftTypeStop = 0
-	ThriftTypeVoid = 1
-	ThriftTypeBool = 2
-	ThriftTypeByte = 3
+	ThriftTypeStop   = 0
+	ThriftTypeVoid   = 1
+	ThriftTypeBool   = 2
+	ThriftTypeByte   = 3
 	ThriftTypeDouble = 4
-	ThriftTypeI16 = 6
-	ThriftTypeI32 = 8
-	ThriftTypeI64 = 10
+	ThriftTypeI16    = 6
+	ThriftTypeI32    = 8
+	ThriftTypeI64    = 10
 	ThriftTypeString = 11
 	ThriftTypeStruct = 12
-	ThriftTypeMap = 13
-	ThriftTypeSet = 14
-	ThriftTypeList = 15
-	ThriftTypeUtf8 = 16
-	ThriftTypeUtf16 = 17
+	ThriftTypeMap    = 13
+	ThriftTypeSet    = 14
+	ThriftTypeList   = 15
+	ThriftTypeUtf8   = 16
+	ThriftTypeUtf16  = 17
 )
 
 // Thrift message types -- TODO: rename to ThriftTypeMsg..
@@ -179,7 +179,12 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 	return true, true
 }
 
-func thriftReadString(data []byte) (str string, ok bool, complete bool, off int) {
+// Functions to decode simple types
+// They all have the same signature, returning the string value and the
+// number of bytes consumed (off).
+type ThriftFieldReader func(data []byte) (value string, ok bool, complete bool, off int)
+
+func thriftReadString(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 4 {
 		return "", true, false, 0 // ok, not complete
 	}
@@ -191,13 +196,95 @@ func thriftReadString(data []byte) (str string, ok bool, complete bool, off int)
 		return "", true, false, 0 // ok, not complete
 	}
 
-	str = string(data[4 : 4+sz])
+	value = string(data[4 : 4+sz])
 	off = 4 + sz
 
-	return str, true, true, off // all good
+	return value, true, true, off // all good
+}
+
+func thriftReadBool(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 1 {
+		return "", true, false, 0
+	}
+	if data[0] == byte(0) {
+		value = "false"
+	} else {
+		value = "true"
+	}
+	off = 1
+
+	return value, true, true, off
+}
+
+func thriftReadByte(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 1 {
+		return "", true, false, 0
+	}
+	value = strconv.Itoa(int(data[0]))
+	off = 1
+
+	return value, true, true, off
+}
+
+func thriftReadDouble(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 8 {
+		return "", true, false, 0
+	}
+
+	bits := binary.BigEndian.Uint64(data[:8])
+	double := math.Float64frombits(bits)
+	value = strconv.FormatFloat(double, 'f', -1, 64)
+	off = 1
+
+	return value, true, true, off
+}
+
+func thriftReadI16(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 2 {
+		return "", true, false, 0
+	}
+	i16 := Bytes_Ntohs(data[:2])
+	value = strconv.Itoa(int(i16))
+	off = 2
+
+	return value, true, true, off
+}
+
+func thriftReadI32(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 4 {
+		return "", true, false, 0
+	}
+	i32 := Bytes_Ntohl(data[:4])
+	value = strconv.Itoa(int(i32))
+	off = 4
+
+	return value, true, true, off
+}
+
+func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 8 {
+		return "", true, false, 0
+	}
+	i64 := Bytes_Ntohll(data[:8])
+	value = strconv.FormatInt(int64(i64), 10)
+	off = 8
+
+	return value, true, true, off
+}
+
+var ThriftFuncReadersByType = map[byte]ThriftFieldReader{
+	ThriftTypeBool:   thriftReadBool,
+	ThriftTypeByte:   thriftReadByte,
+	ThriftTypeDouble: thriftReadDouble,
+	ThriftTypeI16:    thriftReadI16,
+	ThriftTypeI32:    thriftReadI32,
+	ThriftTypeI64:    thriftReadI64,
+	ThriftTypeString: thriftReadString,
 }
 
 func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftField) {
+
+	var off int
 
 	field = new(ThriftField)
 
@@ -208,84 +295,30 @@ func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftFiel
 	offset := s.parseOffset + 1
 	if field.Type == ThriftTypeStop {
 		s.parseOffset = offset
-		return true, true, nil	// done
+		return true, true, nil // done
 	}
 
 	if len(s.data[offset:]) < 2 {
 		return true, false, nil // ok, not complete
 	}
-	field.Id = Bytes_Ntohs(s.data[offset:offset+2])
+	field.Id = Bytes_Ntohs(s.data[offset : offset+2])
 	offset += 2
 
-	switch field.Type {
-		case ThriftTypeBool:
-			if len(s.data[offset:]) < 1 {
-				return true, false, nil
-			}
-			if s.data[offset] == byte(0) {
-				field.Value = "false"
-			} else {
-				field.Value = "true"
-			}
-			offset += 1
-
-		case ThriftTypeByte:
-			if len(s.data[offset:]) < 1 {
-				return true, false, nil
-			}
-			field.Value = strconv.Itoa(int(s.data[offset]))
-			offset += 1
-
-		case ThriftTypeDouble:
-			if len(s.data[offset:]) < 8 {
-				return true, false, nil
-			}
-			bits := binary.BigEndian.Uint64(s.data[offset:offset+8])
-			double := math.Float64frombits(bits)
-			field.Value = strconv.FormatFloat(double, 'f', -1, 64)
-			offset += 8
-
-		case ThriftTypeI16:
-			if len(s.data[offset:]) < 2 {
-				return true, false, nil
-			}
-			i16 := Bytes_Ntohs(s.data[offset:offset+2])
-			field.Value = strconv.Itoa(int(i16))
-			offset += 2
-
-		case ThriftTypeI32:
-			if len(s.data[offset:]) < 4 {
-				return true, false, nil
-			}
-			i32 := Bytes_Ntohl(s.data[offset:offset+4])
-			field.Value = strconv.Itoa(int(i32))
-			offset += 4
-
-		case ThriftTypeI64:
-			if len(s.data[offset:]) < 8 {
-				return true, false, nil
-			}
-			i64 := Bytes_Ntohll(s.data[offset:offset+8])
-			field.Value = strconv.FormatInt(int64(i64), 10)
-			offset += 8
-
-		case ThriftTypeString:
-			if len(s.data[offset:]) < 4 {
-				return true, false, nil
-			}
-			sz := int(Bytes_Ntohl(s.data[offset:offset+4]))
-			offset += 4
-			if sz < 0 {
-				DEBUG("thrift", "Negative string length")
-				return false, false, nil
-			}
-			if len(s.data[offset:]) < sz {
-				return true, false, nil // not complete
-			}
-			field.Value = string(s.data[offset:offset+sz])
-			offset += sz
-
+	funcReader, typeFound := ThriftFuncReadersByType[field.Type]
+	if !typeFound {
+		DEBUG("thrift", "Field type %s not found", field.Type)
+		return false, false, nil
 	}
+
+	field.Value, ok, complete, off = funcReader(s.data[offset:])
+
+	if !ok {
+		return false, false, nil
+	}
+	if !complete {
+		return true, false, nil
+	}
+	offset += off
 
 	s.parseOffset = offset
 	return true, false, field
