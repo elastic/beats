@@ -121,12 +121,98 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = m.readMessageBegin(&stream)
 	if !ok || complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Error("Bad result:", ok, complete)
 	}
 
 }
 
-func TestThriftParser_simpleRequest(t *testing.T) {
+func TestThrift_thriftReadField(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var data []byte
+	var ok, complete bool
+	var stream ThriftStream
+	var field *ThriftField
+
+	data, _ = hex.DecodeString("08000100000001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeI32 || field.Value != "1" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	data, _ = hex.DecodeString("0600010001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeI16 || field.Value != "1" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	data, _ = hex.DecodeString("0a00010000000000000001")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeI64 || field.Value != "1" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	data, _ = hex.DecodeString("0400013ff333333333333300")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeDouble || field.Value != "1.2" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	data, _ = hex.DecodeString("02000101")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeBool || field.Value != "true" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	data, _ = hex.DecodeString("0b00010000000568656c6c") // incomplete string
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field != nil {
+		t.Error("Bad result:", ok, complete, field)
+	}
+
+	data, _ = hex.DecodeString("0b00010000000568656c6c6f")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != "hello" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+}
+
+func TestThrift_simpleRequest(t *testing.T) {
 
 	if testing.Verbose() {
 		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})

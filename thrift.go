@@ -79,11 +79,11 @@ const (
 
 // Thrift types
 const (
-	ThriftTypeStop = iota
-	ThriftTypeVoid
-	ThriftTypeBool
-	ThriftTypeByte
-	ThriftTypeDouble
+	ThriftTypeStop = 0
+	ThriftTypeVoid = 1
+	ThriftTypeBool = 2
+	ThriftTypeByte = 3
+	ThriftTypeDouble = 4
 	ThriftTypeI16 = 6
 	ThriftTypeI32 = 8
 	ThriftTypeI64 = 10
@@ -223,9 +223,9 @@ func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftFiel
 				return true, false, nil
 			}
 			if s.data[offset] == byte(0) {
-				field.Value = "true"
-			} else {
 				field.Value = "false"
+			} else {
+				field.Value = "true"
 			}
 			offset += 1
 
@@ -244,6 +244,47 @@ func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftFiel
 			double := math.Float64frombits(bits)
 			field.Value = strconv.FormatFloat(double, 'f', -1, 64)
 			offset += 8
+
+		case ThriftTypeI16:
+			if len(s.data[offset:]) < 2 {
+				return true, false, nil
+			}
+			i16 := Bytes_Ntohs(s.data[offset:offset+2])
+			field.Value = strconv.Itoa(int(i16))
+			offset += 2
+
+		case ThriftTypeI32:
+			if len(s.data[offset:]) < 4 {
+				return true, false, nil
+			}
+			i32 := Bytes_Ntohl(s.data[offset:offset+4])
+			field.Value = strconv.Itoa(int(i32))
+			offset += 4
+
+		case ThriftTypeI64:
+			if len(s.data[offset:]) < 8 {
+				return true, false, nil
+			}
+			i64 := Bytes_Ntohll(s.data[offset:offset+8])
+			field.Value = strconv.FormatInt(int64(i64), 10)
+			offset += 8
+
+		case ThriftTypeString:
+			if len(s.data[offset:]) < 4 {
+				return true, false, nil
+			}
+			sz := int(Bytes_Ntohl(s.data[offset:offset+4]))
+			offset += 4
+			if sz < 0 {
+				DEBUG("thrift", "Negative string length")
+				return false, false, nil
+			}
+			if len(s.data[offset:]) < sz {
+				return true, false, nil // not complete
+			}
+			field.Value = string(s.data[offset:offset+sz])
+			offset += sz
+
 	}
 
 	s.parseOffset = offset
