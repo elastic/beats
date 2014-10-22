@@ -22,7 +22,7 @@ type ThriftMessage struct {
 	start int
 	end   int
 
-	fields    []ThriftField
+	fields []ThriftField
 
 	IsRequest bool
 	Version   uint32
@@ -30,6 +30,7 @@ type ThriftMessage struct {
 	Method    string
 	SeqId     uint32
 	Params    string
+	Result    string
 }
 
 type ThriftField struct {
@@ -114,8 +115,8 @@ var ThriftCollectionMaxSize int = 15
 var ThriftDropAfterNStructFields int = 100
 
 func (m *ThriftMessage) String() string {
-	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s",
-		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params)
+	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s Result: %s",
+		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.Result)
 }
 
 func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
@@ -401,7 +402,7 @@ func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) 
 		offset += bytesRead
 
 		if i < ThriftCollectionMaxSize {
-			fields = append(fields, key + ": " + value)
+			fields = append(fields, key+": "+value)
 		} else if i == ThriftCollectionMaxSize {
 			fields = append(fields, "...")
 		}
@@ -470,7 +471,7 @@ func thriftFormatStruct(fields []ThriftField) string {
 			toJoin = append(toJoin, "...")
 			break
 		}
-		toJoin = append(toJoin, strconv.Itoa(int(field.Id)) + ": " + field.Value)
+		toJoin = append(toJoin, strconv.Itoa(int(field.Id))+": "+field.Value)
 	}
 	return "(" + strings.Join(toJoin, ", ") + ")"
 }
@@ -561,7 +562,11 @@ func thriftMessageParser(s *ThriftStream) (bool, bool) {
 			}
 			if complete {
 				// done
-				m.Params = thriftFormatStruct(m.fields)
+				if m.IsRequest {
+					m.Params = thriftFormatStruct(m.fields)
+				} else {
+					m.Result = thriftFormatStruct(m.fields)
+				}
 				return true, true
 			}
 			if field == nil {

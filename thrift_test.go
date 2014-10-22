@@ -386,7 +386,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 }
 
-func TestThrift_simpleRequest(t *testing.T) {
+func TestThrift_thriftMessageParser(t *testing.T) {
 
 	if testing.Verbose() {
 		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
@@ -410,7 +410,7 @@ func TestThrift_simpleRequest(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000561646431360000000006000100010" +
-								"60002000100")
+		"60002000100")
 	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
 	ok, complete = thriftMessageParser(&stream)
 	m = stream.message
@@ -424,8 +424,7 @@ func TestThrift_simpleRequest(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000963616c63756c617465000000000" +
-								"80001000000010c0002080001000000010800020000" +
-								"0000080003000000040000")
+		"80001000000010c00020800010000000108000200000000080003000000040000")
 	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
 	ok, complete = thriftMessageParser(&stream)
 	m = stream.message
@@ -438,5 +437,86 @@ func TestThrift_simpleRequest(t *testing.T) {
 		t.Error("Bad result:", stream.message)
 	}
 
+	data, _ = hex.DecodeString("8001000200000005616464313600000000060000000200")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "add16" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != "(0: 2)" {
+		t.Error("Bad result:", stream.message)
+	}
+
+	data, _ = hex.DecodeString("800100020000000b6563686f5f737472696e67000000000b00" +
+		"000000000568656c6c6f00")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "echo_string" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != `(0: "hello")` {
+		t.Error("Bad result:", stream.message)
+	}
+
+	data, _ = hex.DecodeString("80010002000000096563686f5f6c697374000000000f0000060" +
+		"000000300010002000300")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "echo_list" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != `(0: [1, 2, 3])` {
+		t.Error("Bad result:", stream.message)
+	}
+
+	data, _ = hex.DecodeString("80010002000000086563686f5f6d6170000000000d00000b06000" +
+		"0000300000001610001000000016300030000000162000200")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "echo_map" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != `(0: {"a": 1, "c": 3, "b": 2})` {
+		t.Error("Bad result:", stream.message)
+	}
+
+	data, _ = hex.DecodeString("800100020000000963616c63756c617465000000000800000000000500")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "calculate" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != `(0: 5)` {
+		t.Error("Bad result:", stream.message)
+	}
+
+	data, _ = hex.DecodeString("800100020000000963616c63756c617465000000000c000108000100" +
+		"0000040b00020000001243616e6e6f742064697669646520627920300000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "calculate" ||
+		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` {
+		t.Error("Bad result:", stream.message)
+	}
 
 }
