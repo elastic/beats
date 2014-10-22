@@ -392,30 +392,51 @@ func TestThrift_simpleRequest(t *testing.T) {
 		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
 	}
 
-	data := []byte(
-		"800100010000000470696e670000000000",
-	)
+	var data []byte
+	var stream ThriftStream
+	var ok, complete bool
+	var m *ThriftMessage
 
-	message, err := hex.DecodeString(string(data))
-	if err != nil {
-		t.Error("Failed to decode hex string")
+	data, _ = hex.DecodeString("800100010000000470696e670000000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if !m.IsRequest || m.Method != "ping" ||
+		m.SeqId != 0 || m.Type != ThriftTypeCall || m.Params != "()" {
+		t.Error("Bad result:", stream.message)
 	}
 
-	stream := &ThriftStream{tcpStream: nil, data: message, message: new(ThriftMessage)}
+	data, _ = hex.DecodeString("800100010000000561646431360000000006000100010" +
+								"60002000100")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if !m.IsRequest || m.Method != "add16" ||
+		m.SeqId != 0 || m.Type != ThriftTypeCall ||
+		m.Params != "(1: 1, 2: 1)" {
+		t.Error("Bad result:", stream.message)
+	}
 
-	ok, complete := thriftMessageParser(stream)
+	data, _ = hex.DecodeString("800100010000000963616c63756c617465000000000" +
+								"80001000000010c0002080001000000010800020000" +
+								"0000080003000000040000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thriftMessageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if !m.IsRequest || m.Method != "calculate" ||
+		m.SeqId != 0 || m.Type != ThriftTypeCall ||
+		m.Params != "(1: 1, 2: (1: 1, 2: 0, 3: 4))" {
+		t.Error("Bad result:", stream.message)
+	}
 
-	if !ok {
-		t.Error("Parsing returned error")
-	}
-	if !complete {
-		t.Error("Expecting a complete message")
-	}
-	if !stream.message.IsRequest {
-		t.Error("Failed to parse Thrift request")
-	}
-	if stream.message.Method != "ping" {
-		t.Error("Failed to parse query")
-	}
 
 }

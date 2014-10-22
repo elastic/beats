@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -21,12 +22,14 @@ type ThriftMessage struct {
 	start int
 	end   int
 
+	fields    []ThriftField
+
 	IsRequest bool
 	Version   uint32
 	Type      uint32
 	Method    string
 	SeqId     uint32
-	Fields    []*ThriftField
+	Params    string
 }
 
 type ThriftField struct {
@@ -109,6 +112,11 @@ const (
 var ThriftStringMaxSize int = 200
 var ThriftCollectionMaxSize int = 15
 var ThriftDropAfterNStructFields int = 100
+
+func (m *ThriftMessage) String() string {
+	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s",
+		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params)
+}
 
 func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
@@ -553,13 +561,14 @@ func thriftMessageParser(s *ThriftStream) (bool, bool) {
 			}
 			if complete {
 				// done
+				m.Params = thriftFormatStruct(m.fields)
 				return true, true
 			}
 			if field == nil {
 				return true, false // ok, not complete
 			}
 
-			m.Fields = append(m.Fields, field)
+			m.fields = append(m.fields, *field)
 		}
 	}
 
