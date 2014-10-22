@@ -283,7 +283,7 @@ func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) 
 	return value, true, true, off
 }
 
-func thriftReadList(data []byte) (value string, ok bool, complete bool, off int) {
+func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 5 {
 		return "", true, false, 0
 	}
@@ -321,10 +321,25 @@ func thriftReadList(data []byte) (value string, ok bool, complete bool, off int)
 		offset += bytesRead
 	}
 
-	joined := strings.Join(fields, ", ")
-
-	return "[" + joined + "]", true, true, off
+	return strings.Join(fields, ", "), true, true, off
 }
+
+func thriftReadSet(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thriftReadListOrSet(data)
+	if value != "" {
+		value = "{" + value + "}"
+	}
+	return value, ok, complete, off
+}
+
+func thriftReadList(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thriftReadListOrSet(data)
+	if value != "" {
+		value = "[" + value + "]"
+	}
+	return value, ok, complete, off
+}
+
 
 // Dictionary wrapped in a function to avoid "initialization loop"
 func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
@@ -337,6 +352,7 @@ func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) 
 		ThriftTypeI64:    thriftReadI64,
 		ThriftTypeString: thriftReadString,
 		ThriftTypeList:   thriftReadList,
+		ThriftTypeSet:    thriftReadSet,
 	}[type_]
 
 	return func_, exists

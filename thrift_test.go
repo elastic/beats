@@ -250,6 +250,32 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 	ThriftListMaxSize = _old
 
+	data, _ = hex.DecodeString("0e0001060000000300010002000300")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeSet ||
+			field.Value != "{1, 2, 3}" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+
+	_old, ThriftListMaxSize = ThriftListMaxSize, 2
+	data, _ = hex.DecodeString("0e0001060000000300010002000300")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete, field = thriftReadField(&stream)
+	if !ok || complete || field == nil {
+		t.Error("Bad result:", ok, complete, field)
+	} else {
+		if field.Id != 1 || field.Type != ThriftTypeSet ||
+			field.Value != "{1, 2, ...}" {
+			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		}
+	}
+	ThriftListMaxSize = _old
+
 }
 
 func TestThrift_simpleRequest(t *testing.T) {
