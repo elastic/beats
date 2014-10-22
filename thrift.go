@@ -107,7 +107,7 @@ const (
 )
 
 var ThriftStringMaxSize int = 200
-var ThriftListMaxSize int = 15
+var ThriftCollectionMaxSize int = 15
 
 func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
@@ -213,6 +213,15 @@ func thriftReadString(data []byte) (value string, ok bool, complete bool, off in
 	return value, true, true, off // all good
 }
 
+func thriftReadAndQuoteString(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thriftReadString(data)
+	if value != "" {
+		value = strconv.Quote(value)
+	}
+
+	return value, ok, complete, off
+}
+
 func thriftReadBool(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 1 {
 		return "", true, false, 0
@@ -283,6 +292,7 @@ func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) 
 	return value, true, true, off
 }
 
+// Common implementation for lists and sets (they share the same binary repr).
 func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 5 {
 		return "", true, false, 0
@@ -297,7 +307,7 @@ func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off
 
 	sz := int(Bytes_Ntohl(data[1:5]))
 	if sz < 0 {
-		DEBUG("thrift", "List too big: %d", sz)
+		DEBUG("thrift", "List/Set too big: %d", sz)
 		return "", false, false, 0
 	}
 
@@ -313,9 +323,9 @@ func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off
 			return "", true, false, 0
 		}
 
-		if i < ThriftListMaxSize {
+		if i < ThriftCollectionMaxSize {
 			fields = append(fields, value)
-		} else if i == ThriftListMaxSize {
+		} else if i == ThriftCollectionMaxSize {
 			fields = append(fields, "...")
 		}
 		offset += bytesRead
@@ -340,6 +350,63 @@ func thriftReadList(data []byte) (value string, ok bool, complete bool, off int)
 	return value, ok, complete, off
 }
 
+func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) {
+	if len(data) < 6 {
+		return "", true, false, 0
+	}
+	type_key := data[0]
+	type_value := data[1]
+
+	funcReaderKey, typeFound := thriftFuncReadersByType(type_key)
+	if !typeFound {
+		DEBUG("thrift", "Field type %d not known", type_key)
+		return "", false, false, 0
+	}
+
+	funcReaderValue, typeFound := thriftFuncReadersByType(type_value)
+	if !typeFound {
+		DEBUG("thrift", "Field type %d not known", type_value)
+		return "", false, false, 0
+	}
+
+	sz := int(Bytes_Ntohl(data[2:6]))
+	if sz < 0 {
+		DEBUG("thrift", "Map too big: %d", sz)
+		return "", false, false, 0
+	}
+
+	fields := []string{}
+	offset := 6
+
+	for i := 0; i < sz; i++ {
+		key, ok, complete, bytesRead := funcReaderKey(data[offset:])
+		if !ok {
+			return "", false, false, 0
+		}
+		if !complete {
+			return "", true, false, 0
+		}
+		offset += bytesRead
+
+		value, ok, complete, bytesRead := funcReaderValue(data[offset:])
+		if !ok {
+			return "", false, false, 0
+		}
+		if !complete {
+			return "", true, false, 0
+		}
+		offset += bytesRead
+
+		if i < ThriftCollectionMaxSize {
+			fields = append(fields, key + ": " + value)
+		} else if i == ThriftCollectionMaxSize {
+			fields = append(fields, "...")
+		}
+	}
+
+	return "{" + strings.Join(fields, ", ") + "}", true, true, off
+}
+
 
 // Dictionary wrapped in a function to avoid "initialization loop"
 func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
@@ -350,9 +417,10 @@ func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) 
 		ThriftTypeI16:    thriftReadI16,
 		ThriftTypeI32:    thriftReadI32,
 		ThriftTypeI64:    thriftReadI64,
-		ThriftTypeString: thriftReadString,
+		ThriftTypeString: thriftReadAndQuoteString,
 		ThriftTypeList:   thriftReadList,
 		ThriftTypeSet:    thriftReadSet,
+		ThriftTypeMap:    thriftReadMap,
 	}[type_]
 
 	return func_, exists
