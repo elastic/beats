@@ -108,6 +108,7 @@ const (
 
 var ThriftStringMaxSize int = 200
 var ThriftCollectionMaxSize int = 15
+var ThriftDropAfterNStructFields int = 100
 
 func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
@@ -331,7 +332,7 @@ func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off
 		offset += bytesRead
 	}
 
-	return strings.Join(fields, ", "), true, true, off
+	return strings.Join(fields, ", "), true, true, offset
 }
 
 func thriftReadSet(data []byte) (value string, ok bool, complete bool, off int) {
@@ -407,6 +408,70 @@ func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) 
 	return "{" + strings.Join(fields, ", ") + "}", true, true, off
 }
 
+func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off int) {
+
+	var bytesRead int
+	offset := 0
+	fields := []ThriftField{}
+
+	// Loop until hitting a STOP or reaching the maximum number of elements
+	// we follow in a stream (at which point, we assume we interpreted something
+	// wrong).
+	for i := 0; ; i++ {
+		var field ThriftField
+
+		if i >= ThriftDropAfterNStructFields {
+			DEBUG("thrift", "Too many fields in struct. Dropping as error")
+			return "", false, false, 0
+		}
+
+		if len(data) < 1 {
+			return "", true, false, 0
+		}
+
+		field.Type = byte(data[offset])
+		offset += 1
+		if field.Type == ThriftTypeStop {
+			return thriftFormatStruct(fields), true, true, offset
+		}
+
+		if len(data[offset:]) < 2 {
+			return "", true, false, 0 // not complete
+		}
+
+		field.Id = Bytes_Ntohs(data[offset : offset+2])
+		offset += 2
+
+		funcReader, typeFound := thriftFuncReadersByType(field.Type)
+		if !typeFound {
+			DEBUG("thrift", "Field type %d not known", field.Type)
+			return "", false, false, 0
+		}
+
+		field.Value, ok, complete, bytesRead = funcReader(data[offset:])
+
+		if !ok {
+			return "", false, false, 0
+		}
+		if !complete {
+			return "", true, false, 0
+		}
+		fields = append(fields, field)
+		offset += bytesRead
+	}
+}
+
+func thriftFormatStruct(fields []ThriftField) string {
+	toJoin := []string{}
+	for i, field := range fields {
+		if i == ThriftCollectionMaxSize {
+			toJoin = append(toJoin, "...")
+			break
+		}
+		toJoin = append(toJoin, strconv.Itoa(int(field.Id)) + ": " + field.Value)
+	}
+	return "(" + strings.Join(toJoin, ", ") + ")"
+}
 
 // Dictionary wrapped in a function to avoid "initialization loop"
 func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
@@ -421,6 +486,7 @@ func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) 
 		ThriftTypeList:   thriftReadList,
 		ThriftTypeSet:    thriftReadSet,
 		ThriftTypeMap:    thriftReadMap,
+		ThriftTypeStruct: thriftReadStruct,
 	}[type_]
 
 	return func_, exists
