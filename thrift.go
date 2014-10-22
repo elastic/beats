@@ -232,9 +232,8 @@ func thriftReadBool(data []byte) (value string, ok bool, complete bool, off int)
 	} else {
 		value = "true"
 	}
-	off = 1
 
-	return value, true, true, off
+	return value, true, true, 1
 }
 
 func thriftReadByte(data []byte) (value string, ok bool, complete bool, off int) {
@@ -242,9 +241,8 @@ func thriftReadByte(data []byte) (value string, ok bool, complete bool, off int)
 		return "", true, false, 0
 	}
 	value = strconv.Itoa(int(data[0]))
-	off = 1
 
-	return value, true, true, off
+	return value, true, true, 1
 }
 
 func thriftReadDouble(data []byte) (value string, ok bool, complete bool, off int) {
@@ -255,9 +253,8 @@ func thriftReadDouble(data []byte) (value string, ok bool, complete bool, off in
 	bits := binary.BigEndian.Uint64(data[:8])
 	double := math.Float64frombits(bits)
 	value = strconv.FormatFloat(double, 'f', -1, 64)
-	off = 1
 
-	return value, true, true, off
+	return value, true, true, 8
 }
 
 func thriftReadI16(data []byte) (value string, ok bool, complete bool, off int) {
@@ -266,9 +263,8 @@ func thriftReadI16(data []byte) (value string, ok bool, complete bool, off int) 
 	}
 	i16 := Bytes_Ntohs(data[:2])
 	value = strconv.Itoa(int(i16))
-	off = 2
 
-	return value, true, true, off
+	return value, true, true, 2
 }
 
 func thriftReadI32(data []byte) (value string, ok bool, complete bool, off int) {
@@ -277,9 +273,8 @@ func thriftReadI32(data []byte) (value string, ok bool, complete bool, off int) 
 	}
 	i32 := Bytes_Ntohl(data[:4])
 	value = strconv.Itoa(int(i32))
-	off = 4
 
-	return value, true, true, off
+	return value, true, true, 4
 }
 
 func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) {
@@ -288,9 +283,8 @@ func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) 
 	}
 	i64 := Bytes_Ntohll(data[:8])
 	value = strconv.FormatInt(int64(i64), 10)
-	off = 8
 
-	return value, true, true, off
+	return value, true, true, 8
 }
 
 // Common implementation for lists and sets (they share the same binary repr).
@@ -405,7 +399,7 @@ func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) 
 		}
 	}
 
-	return "{" + strings.Join(fields, ", ") + "}", true, true, off
+	return "{" + strings.Join(fields, ", ") + "}", true, true, offset
 }
 
 func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off int) {

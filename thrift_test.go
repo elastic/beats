@@ -144,7 +144,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI32 || field.Value != "1" {
+		if field.Id != 1 || field.Type != ThriftTypeI32 || field.Value != "1" ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
@@ -155,7 +156,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI16 || field.Value != "1" {
+		if field.Id != 1 || field.Type != ThriftTypeI16 || field.Value != "1" ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
@@ -166,19 +168,21 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeI64 || field.Value != "1" {
+		if field.Id != 1 || field.Type != ThriftTypeI64 || field.Value != "1" ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
 
-	data, _ = hex.DecodeString("0400013ff333333333333300")
+	data, _ = hex.DecodeString("0400013ff3333333333333")
 	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
 	ok, complete, field = thriftReadField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeDouble || field.Value != "1.2" {
-			t.Error("Bad values:", field.Id, field.Type, field.Value)
+		if field.Id != 1 || field.Type != ThriftTypeDouble || field.Value != "1.2" ||
+			stream.parseOffset != len(stream.data) {
+			t.Error("Bad values:", field.Id, field.Type, field.Value, stream.parseOffset)
 		}
 	}
 
@@ -188,7 +192,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeBool || field.Value != "true" {
+		if field.Id != 1 || field.Type != ThriftTypeBool || field.Value != "true" ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
@@ -218,7 +223,8 @@ func TestThrift_thriftReadField(t *testing.T) {
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
-		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != `"hel..."` {
+		if field.Id != 1 || field.Type != ThriftTypeString || field.Value != `"hel..."` ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
@@ -244,6 +250,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
 		if field.Id != 1 || field.Type != ThriftTypeList ||
+			stream.parseOffset != len(stream.data) ||
 			field.Value != "[1, ...]" {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
@@ -263,27 +270,29 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	_old, ThriftCollectionMaxSize = ThriftCollectionMaxSize, 2
-	data, _ = hex.DecodeString("0e0001060000000300010002000300")
+	data, _ = hex.DecodeString("0e00010600000003000100020003")
 	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
 	ok, complete, field = thriftReadField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
 		if field.Id != 1 || field.Type != ThriftTypeSet ||
+			stream.parseOffset != len(stream.data) ||
 			field.Value != "{1, 2, ...}" {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
 	ThriftCollectionMaxSize = _old
 
-	data, _ = hex.DecodeString("0d00010b060000000300000001610001000000016300030000000162000200")
+	data, _ = hex.DecodeString("0d00010b0600000003000000016100010000000163000300000001620002")
 	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
 	ok, complete, field = thriftReadField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
 	} else {
 		if field.Id != 1 || field.Type != ThriftTypeMap ||
-			field.Value != `{"a": 1, "c": 3, "b": 2}` {
+			field.Value != `{"a": 1, "c": 3, "b": 2}` ||
+			stream.parseOffset != len(stream.data) {
 			t.Error("Bad values:", field.Id, field.Type, field.Value)
 		}
 	}
