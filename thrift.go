@@ -65,8 +65,10 @@ type ThriftTransaction struct {
 
 	Thrift bson.M
 
-	Request_raw  string
-	Response_raw string
+	Method    string
+	Params    string
+	Result    string
+	IsRequest bool
 
 	timer *time.Timer
 }
@@ -586,7 +588,11 @@ func (stream *ThriftStream) PrepareForNewMessage() {
 	stream.message.IsRequest = false
 }
 
-func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8) {
+type ThriftMessageHandler func(m *ThriftMessage)
+
+func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8,
+	handleThrift ThriftMessageHandler) {
+
 	defer RECOVER("ParseThrift exception")
 
 	if tcp.thriftData[dir] == nil {
@@ -630,7 +636,11 @@ func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8) {
 			}
 
 			// all ok, go to next level
-			//handleThrift(stream.message, tcp, dir)
+			stream.message.Stream_id = tcp.id
+			stream.message.Tuple = tcp.tuple
+			stream.message.Direction = dir
+			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+			handleThrift(stream.message)
 
 			// and reset message
 			stream.PrepareForNewMessage()
@@ -640,4 +650,100 @@ func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8) {
 		}
 	}
 
+}
+
+var thriftTransactionsMap = make(map[TcpTuple]*ThriftTransaction, TransactionsHashSize)
+
+func handleThrift(msg *ThriftMessage) {
+	if msg.IsRequest {
+		receivedThriftRequest(msg)
+	} else {
+		receivedThriftReply(msg)
+	}
+}
+
+func receivedThriftRequest(msg *ThriftMessage) {
+	tuple := TcpTuple{
+		Src_ip:    msg.Tuple.Src_ip,
+		Dst_ip:    msg.Tuple.Dst_ip,
+		Src_port:  msg.Tuple.Src_port,
+		Dst_port:  msg.Tuple.Dst_port,
+		stream_id: msg.Stream_id,
+	}
+
+	trans := thriftTransactionsMap[tuple]
+	if trans != nil {
+		DEBUG("thrift", "Two requests without reply, assuming the old one is oneway")
+		// TODO: publish old trans
+	} else {
+		trans = &ThriftTransaction{
+			Type:  "http",
+			tuple: tuple,
+		}
+		thriftTransactionsMap[tuple] = trans
+	}
+
+	trans.ts = msg.Ts
+	trans.Ts = int64(trans.ts.UnixNano() / 1000)
+	trans.JsTs = msg.Ts
+	trans.Src = Endpoint{
+		Ip:   Ipv4_Ntoa(tuple.Src_ip),
+		Port: tuple.Src_port,
+		Proc: string(msg.CmdlineTuple.Src),
+	}
+	trans.Dst = Endpoint{
+		Ip:   Ipv4_Ntoa(tuple.Dst_ip),
+		Port: tuple.Dst_port,
+		Proc: string(msg.CmdlineTuple.Dst),
+	}
+
+	trans.Thrift = bson.M{
+		"request": bson.M{
+			"method": msg.Method,
+			"params": msg.Params,
+		},
+	}
+
+	if trans.timer != nil {
+		trans.timer.Stop()
+	}
+	trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+
+}
+
+func receivedThriftReply(msg *ThriftMessage) {
+
+	// we need to search the request first.
+	tuple := TcpTuple{
+		Src_ip:    msg.Tuple.Src_ip,
+		Dst_ip:    msg.Tuple.Dst_ip,
+		Src_port:  msg.Tuple.Src_port,
+		Dst_port:  msg.Tuple.Dst_port,
+		stream_id: msg.Stream_id,
+	}
+
+	trans := thriftTransactionsMap[tuple]
+	if trans == nil {
+		DEBUG("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
+		return
+	}
+
+	trans.Thrift = bson_concat(trans.Thrift, bson.M{
+		"result": msg.Result,
+	})
+
+	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+
+	//err := Publisher.PublishThriftTransaction(trans)
+
+	// remove from map
+	delete(transactionsMap, trans.tuple)
+	if trans.timer != nil {
+		trans.timer.Stop()
+	}
+}
+
+func (trans *ThriftTransaction) Expire() {
+	// remove from map
+	delete(transactionsMap, trans.tuple)
 }
