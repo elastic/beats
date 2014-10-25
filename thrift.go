@@ -734,13 +734,26 @@ func receivedThriftReply(msg *ThriftMessage) {
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
-	//err := Publisher.PublishThriftTransaction(trans)
+	PublishThriftTransaction(trans)
 
 	// remove from map
 	delete(transactionsMap, trans.tuple)
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
+}
+
+func PublishThriftTransaction(t *ThriftTransaction) error {
+
+	event := Event{}
+
+	event.Type = "thrift"
+	event.Status = OK_STATUS // TODO: always ok?
+	event.ResponseTime = t.ResponseTime
+	event.Thrift = t.Thrift
+
+	return Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+
 }
 
 func (trans *ThriftTransaction) Expire() {

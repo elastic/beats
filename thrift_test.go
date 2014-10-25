@@ -518,5 +518,4 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		m.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}
-
 }

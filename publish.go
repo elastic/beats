@@ -80,10 +80,11 @@ type Event struct {
 	RequestRaw   string    `json:"request_raw"`
 	ResponseRaw  string    `json:"response_raw"`
 
-	Mysql bson.M `json:"mysql"`
-	Http  bson.M `json:"http"`
-	Redis bson.M `json:"redis"`
-	Pgsql bson.M `json:"pgsql"`
+	Mysql  bson.M `json:"mysql"`
+	Http   bson.M `json:"http"`
+	Redis  bson.M `json:"redis"`
+	Pgsql  bson.M `json:"pgsql"`
+	Thrift bson.M `json:"thrift"`
 }
 
 type Topology struct {
