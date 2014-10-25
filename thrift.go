@@ -112,18 +112,29 @@ const (
 	ThriftTypeOneway
 )
 
-var ThriftStringMaxSize int = 200
-var ThriftCollectionMaxSize int = 15
-var ThriftDropAfterNStructFields int = 100
+type Thrift struct {
+	StringMaxSize          int
+	CollectionMaxSize      int
+	DropAfterNStructFields int
+}
+
+func (thrift *Thrift) InitDefaults() {
+	// defaults
+	thrift.StringMaxSize = 200
+	thrift.CollectionMaxSize = 15
+	thrift.DropAfterNStructFields = 100
+}
 
 func (m *ThriftMessage) String() string {
 	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s Result: %s",
 		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.Result)
 }
 
-func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
+func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var offset, off int
+
+	m := s.message
 
 	if len(s.data[s.parseOffset:]) < 9 {
 		return true, false // ok, not complete
@@ -143,7 +154,7 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 		DEBUG("thriftdetailed", "offset = %d", offset)
 
 		m.Type = sz & ThriftTypeMask
-		m.Method, ok, complete, off = thriftReadString(s.data[offset:])
+		m.Method, ok, complete, off = thrift.readString(s.data[offset:])
 		if !ok {
 			return false, false // not ok, not complete
 		}
@@ -165,7 +176,7 @@ func (m *ThriftMessage) readMessageBegin(s *ThriftStream) (bool, bool) {
 		// no version mode
 		offset = s.parseOffset
 
-		m.Method, ok, complete, off = thriftReadString(s.data[offset:])
+		m.Method, ok, complete, off = thrift.readString(s.data[offset:])
 		if !ok {
 			return false, false // not ok, not complete
 		}
@@ -202,7 +213,7 @@ type ThriftFieldReader func(data []byte) (value string, ok bool, complete bool, 
 
 // thriftReadString caps the returned value to ThriftStringMaxSize but returns the
 // off to the end of it.
-func thriftReadString(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readString(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 4 {
 		return "", true, false, 0 // ok, not complete
 	}
@@ -214,8 +225,8 @@ func thriftReadString(data []byte) (value string, ok bool, complete bool, off in
 		return "", true, false, 0 // ok, not complete
 	}
 
-	if sz > ThriftStringMaxSize {
-		value = string(data[4 : 4+ThriftStringMaxSize])
+	if sz > thrift.StringMaxSize {
+		value = string(data[4 : 4+thrift.StringMaxSize])
 		value += "..."
 	} else {
 		value = string(data[4 : 4+sz])
@@ -225,8 +236,8 @@ func thriftReadString(data []byte) (value string, ok bool, complete bool, off in
 	return value, true, true, off // all good
 }
 
-func thriftReadAndQuoteString(data []byte) (value string, ok bool, complete bool, off int) {
-	value, ok, complete, off = thriftReadString(data)
+func (thrift *Thrift) readAndQuoteString(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thrift.readString(data)
 	if value != "" {
 		value = strconv.Quote(value)
 	}
@@ -234,7 +245,7 @@ func thriftReadAndQuoteString(data []byte) (value string, ok bool, complete bool
 	return value, ok, complete, off
 }
 
-func thriftReadBool(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readBool(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 1 {
 		return "", true, false, 0
 	}
@@ -247,7 +258,7 @@ func thriftReadBool(data []byte) (value string, ok bool, complete bool, off int)
 	return value, true, true, 1
 }
 
-func thriftReadByte(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readByte(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 1 {
 		return "", true, false, 0
 	}
@@ -256,7 +267,7 @@ func thriftReadByte(data []byte) (value string, ok bool, complete bool, off int)
 	return value, true, true, 1
 }
 
-func thriftReadDouble(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readDouble(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 8 {
 		return "", true, false, 0
 	}
@@ -268,7 +279,7 @@ func thriftReadDouble(data []byte) (value string, ok bool, complete bool, off in
 	return value, true, true, 8
 }
 
-func thriftReadI16(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readI16(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 2 {
 		return "", true, false, 0
 	}
@@ -278,7 +289,7 @@ func thriftReadI16(data []byte) (value string, ok bool, complete bool, off int) 
 	return value, true, true, 2
 }
 
-func thriftReadI32(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readI32(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 4 {
 		return "", true, false, 0
 	}
@@ -288,7 +299,7 @@ func thriftReadI32(data []byte) (value string, ok bool, complete bool, off int) 
 	return value, true, true, 4
 }
 
-func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readI64(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 8 {
 		return "", true, false, 0
 	}
@@ -299,13 +310,13 @@ func thriftReadI64(data []byte) (value string, ok bool, complete bool, off int) 
 }
 
 // Common implementation for lists and sets (they share the same binary repr).
-func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readListOrSet(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 5 {
 		return "", true, false, 0
 	}
 	type_ := data[0]
 
-	funcReader, typeFound := thriftFuncReadersByType(type_)
+	funcReader, typeFound := thrift.funcReadersByType(type_)
 	if !typeFound {
 		DEBUG("thrift", "Field type %d not known", type_)
 		return "", false, false, 0
@@ -329,9 +340,9 @@ func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off
 			return "", true, false, 0
 		}
 
-		if i < ThriftCollectionMaxSize {
+		if i < thrift.CollectionMaxSize {
 			fields = append(fields, value)
-		} else if i == ThriftCollectionMaxSize {
+		} else if i == thrift.CollectionMaxSize {
 			fields = append(fields, "...")
 		}
 		offset += bytesRead
@@ -340,36 +351,36 @@ func thriftReadListOrSet(data []byte) (value string, ok bool, complete bool, off
 	return strings.Join(fields, ", "), true, true, offset
 }
 
-func thriftReadSet(data []byte) (value string, ok bool, complete bool, off int) {
-	value, ok, complete, off = thriftReadListOrSet(data)
+func (thrift *Thrift) readSet(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thrift.readListOrSet(data)
 	if value != "" {
 		value = "{" + value + "}"
 	}
 	return value, ok, complete, off
 }
 
-func thriftReadList(data []byte) (value string, ok bool, complete bool, off int) {
-	value, ok, complete, off = thriftReadListOrSet(data)
+func (thrift *Thrift) readList(data []byte) (value string, ok bool, complete bool, off int) {
+	value, ok, complete, off = thrift.readListOrSet(data)
 	if value != "" {
 		value = "[" + value + "]"
 	}
 	return value, ok, complete, off
 }
 
-func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readMap(data []byte) (value string, ok bool, complete bool, off int) {
 	if len(data) < 6 {
 		return "", true, false, 0
 	}
 	type_key := data[0]
 	type_value := data[1]
 
-	funcReaderKey, typeFound := thriftFuncReadersByType(type_key)
+	funcReaderKey, typeFound := thrift.funcReadersByType(type_key)
 	if !typeFound {
 		DEBUG("thrift", "Field type %d not known", type_key)
 		return "", false, false, 0
 	}
 
-	funcReaderValue, typeFound := thriftFuncReadersByType(type_value)
+	funcReaderValue, typeFound := thrift.funcReadersByType(type_value)
 	if !typeFound {
 		DEBUG("thrift", "Field type %d not known", type_value)
 		return "", false, false, 0
@@ -403,9 +414,9 @@ func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) 
 		}
 		offset += bytesRead
 
-		if i < ThriftCollectionMaxSize {
+		if i < thrift.CollectionMaxSize {
 			fields = append(fields, key+": "+value)
-		} else if i == ThriftCollectionMaxSize {
+		} else if i == thrift.CollectionMaxSize {
 			fields = append(fields, "...")
 		}
 	}
@@ -413,7 +424,7 @@ func thriftReadMap(data []byte) (value string, ok bool, complete bool, off int) 
 	return "{" + strings.Join(fields, ", ") + "}", true, true, offset
 }
 
-func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off int) {
+func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete bool, off int) {
 
 	var bytesRead int
 	offset := 0
@@ -425,7 +436,7 @@ func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off in
 	for i := 0; ; i++ {
 		var field ThriftField
 
-		if i >= ThriftDropAfterNStructFields {
+		if i >= thrift.DropAfterNStructFields {
 			DEBUG("thrift", "Too many fields in struct. Dropping as error")
 			return "", false, false, 0
 		}
@@ -437,7 +448,7 @@ func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off in
 		field.Type = byte(data[offset])
 		offset += 1
 		if field.Type == ThriftTypeStop {
-			return thriftFormatStruct(fields), true, true, offset
+			return thrift.formatStruct(fields), true, true, offset
 		}
 
 		if len(data[offset:]) < 2 {
@@ -447,7 +458,7 @@ func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off in
 		field.Id = Bytes_Ntohs(data[offset : offset+2])
 		offset += 2
 
-		funcReader, typeFound := thriftFuncReadersByType(field.Type)
+		funcReader, typeFound := thrift.funcReadersByType(field.Type)
 		if !typeFound {
 			DEBUG("thrift", "Field type %d not known", field.Type)
 			return "", false, false, 0
@@ -466,10 +477,10 @@ func thriftReadStruct(data []byte) (value string, ok bool, complete bool, off in
 	}
 }
 
-func thriftFormatStruct(fields []ThriftField) string {
+func (thrift *Thrift) formatStruct(fields []ThriftField) string {
 	toJoin := []string{}
 	for i, field := range fields {
-		if i == ThriftCollectionMaxSize {
+		if i == thrift.CollectionMaxSize {
 			toJoin = append(toJoin, "...")
 			break
 		}
@@ -479,25 +490,25 @@ func thriftFormatStruct(fields []ThriftField) string {
 }
 
 // Dictionary wrapped in a function to avoid "initialization loop"
-func thriftFuncReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
+func (thrift *Thrift) funcReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
 	func_, exists = map[byte]ThriftFieldReader{
-		ThriftTypeBool:   thriftReadBool,
-		ThriftTypeByte:   thriftReadByte,
-		ThriftTypeDouble: thriftReadDouble,
-		ThriftTypeI16:    thriftReadI16,
-		ThriftTypeI32:    thriftReadI32,
-		ThriftTypeI64:    thriftReadI64,
-		ThriftTypeString: thriftReadAndQuoteString,
-		ThriftTypeList:   thriftReadList,
-		ThriftTypeSet:    thriftReadSet,
-		ThriftTypeMap:    thriftReadMap,
-		ThriftTypeStruct: thriftReadStruct,
+		ThriftTypeBool:   thrift.readBool,
+		ThriftTypeByte:   thrift.readByte,
+		ThriftTypeDouble: thrift.readDouble,
+		ThriftTypeI16:    thrift.readI16,
+		ThriftTypeI32:    thrift.readI32,
+		ThriftTypeI64:    thrift.readI64,
+		ThriftTypeString: thrift.readAndQuoteString,
+		ThriftTypeList:   thrift.readList,
+		ThriftTypeSet:    thrift.readSet,
+		ThriftTypeMap:    thrift.readMap,
+		ThriftTypeStruct: thrift.readStruct,
 	}[type_]
 
 	return func_, exists
 }
 
-func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftField) {
+func (thrift *Thrift) readField(s *ThriftStream) (ok bool, complete bool, field *ThriftField) {
 
 	var off int
 
@@ -519,7 +530,7 @@ func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftFiel
 	field.Id = Bytes_Ntohs(s.data[offset : offset+2])
 	offset += 2
 
-	funcReader, typeFound := thriftFuncReadersByType(field.Type)
+	funcReader, typeFound := thrift.funcReadersByType(field.Type)
 	if !typeFound {
 		DEBUG("thrift", "Field type %d not known", field.Type)
 		return false, false, nil
@@ -539,7 +550,7 @@ func thriftReadField(s *ThriftStream) (ok bool, complete bool, field *ThriftFiel
 	return true, false, field
 }
 
-func thriftMessageParser(s *ThriftStream) (bool, bool) {
+func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var m = s.message
 
@@ -548,7 +559,7 @@ func thriftMessageParser(s *ThriftStream) (bool, bool) {
 		case ThriftStartState:
 			m.start = s.parseOffset
 
-			ok, complete = m.readMessageBegin(s)
+			ok, complete = thrift.readMessageBegin(s)
 			if !ok {
 				return false, false
 			}
@@ -558,16 +569,16 @@ func thriftMessageParser(s *ThriftStream) (bool, bool) {
 
 			s.parseState = ThriftFieldState
 		case ThriftFieldState:
-			ok, complete, field := thriftReadField(s)
+			ok, complete, field := thrift.readField(s)
 			if !ok {
 				return false, false
 			}
 			if complete {
 				// done
 				if m.IsRequest {
-					m.Params = thriftFormatStruct(m.fields)
+					m.Params = thrift.formatStruct(m.fields)
 				} else {
-					m.Result = thriftFormatStruct(m.fields)
+					m.Result = thrift.formatStruct(m.fields)
 				}
 				return true, true
 			}
@@ -590,7 +601,7 @@ func (stream *ThriftStream) PrepareForNewMessage() {
 
 type ThriftMessageHandler func(m *ThriftMessage)
 
-func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8,
+func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8,
 	handleThrift ThriftMessageHandler) {
 
 	defer RECOVER("ParseThrift exception")
@@ -617,7 +628,7 @@ func ParseThrift(pkt *Packet, tcp *TcpStream, dir uint8,
 			stream.message = &ThriftMessage{Ts: pkt.ts}
 		}
 
-		ok, complete := thriftMessageParser(tcp.thriftData[dir])
+		ok, complete := thrift.messageParser(tcp.thriftData[dir])
 
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
