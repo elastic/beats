@@ -531,3 +531,53 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", stream.message)
 	}
 }
+
+// Returns a minimally filled Packet struct, only the payload
+// having value.
+func createTestPacket(t *testing.T, hexstr string) *Packet {
+	data, err := hex.DecodeString(hexstr)
+	if err != nil {
+		t.Error("Failed to decode hex string")
+		return nil
+	}
+
+	return &Packet{
+		payload: data,
+	}
+}
+
+func TestThrift_ParseSimpleTBinary(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "800100010000000470696e670000000000")
+	repl := createTestPacket(t, "800100020000000470696e670000000000")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	select {
+	case trans := <-thrift.PublishQueue:
+		if trans.Request.Method != "ping" ||
+			trans.Request.Params != "()" ||
+			trans.Reply.Result != "()" {
+
+			t.Error("Bad result:", trans)
+		}
+
+	default:
+		t.Error("No transaction")
+	}
+}
