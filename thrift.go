@@ -20,7 +20,6 @@ type ThriftMessage struct {
 	Direction    uint8
 
 	start int
-	end   int
 
 	fields []ThriftField
 
@@ -685,6 +684,9 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			stream.message.Tuple = tcp.tuple
 			stream.message.Direction = dir
 			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+			if stream.message.FrameSize != 0 {
+				stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
+			}
 			thrift.handleThrift(stream.message)
 
 			// and reset message
@@ -793,13 +795,17 @@ func (thrift *Thrift) publishTransactions() {
 				"request": bson.M{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
+					"size": t.Reply.FrameSize,
 				},
 			}
 		}
 
 		if t.Reply != nil {
 			event.Thrift = bson_concat(event.Thrift, bson.M{
-				"result": t.Reply.Result,
+				"reply": bson.M{
+					"result": t.Reply.Result,
+					"size": t.Reply.FrameSize,
+				},
 			})
 		}
 
