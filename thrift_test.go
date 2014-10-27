@@ -549,10 +549,10 @@ func createTestPacket(t *testing.T, hexstr string) *Packet {
 // Helper function to read from the Publisher Queue
 func expectThriftTransaction(t *testing.T, thrift Thrift) *ThriftTransaction {
 	select {
-		case trans := <-thrift.PublishQueue:
-			return trans
-		default:
-			t.Error("No transaction")
+	case trans := <-thrift.PublishQueue:
+		return trans
+	default:
+		t.Error("No transaction")
 	}
 	return nil
 }
@@ -605,8 +605,8 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
 	}
 
-	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108" +
-					"00020000000100")
+	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
+		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
 	thrift.Parse(req, &tcp, 0)
@@ -640,8 +640,8 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	}
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
-	req_half2 := createTestPacket(t, "000003616464000000000800010000000108" +
-					"00020000000100")
+	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
+		"00020000000100")
 	repl_half1 := createTestPacket(t, "000000178001000200000003")
 	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
 
@@ -679,8 +679,8 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
 	repl_half1 := createTestPacket(t, "000000178001000200000003")
-	req_half2 := createTestPacket(t, "000003616464000000000800010000000108" +
-					"00020000000100")
+	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
+		"00020000000100")
 	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
 
 	thrift.Parse(req_half1, &tcp, 0)
@@ -745,8 +745,8 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	}
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
-	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108" +
-					"00020000000100")
+	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
+		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
 	thrift.Parse(reqzip, &tcp, 0)
@@ -769,4 +769,3 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
-

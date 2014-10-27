@@ -45,8 +45,8 @@ type ThriftStream struct {
 
 	data []byte
 
-	parseOffset   int
-	parseState    int
+	parseOffset int
+	parseState  int
 
 	message *ThriftMessage
 }
@@ -820,7 +820,7 @@ func (thrift *Thrift) publishTransactions() {
 				"request": bson.M{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
-					"size": t.Reply.FrameSize,
+					"size":   t.Reply.FrameSize,
 				},
 			}
 		}
@@ -829,7 +829,7 @@ func (thrift *Thrift) publishTransactions() {
 			event.Thrift = bson_concat(event.Thrift, bson.M{
 				"reply": bson.M{
 					"result": t.Reply.Result,
-					"size": t.Reply.FrameSize,
+					"size":   t.Reply.FrameSize,
 				},
 			})
 		}
