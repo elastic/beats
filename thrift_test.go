@@ -546,6 +546,17 @@ func createTestPacket(t *testing.T, hexstr string) *Packet {
 	}
 }
 
+// Helper function to read from the Publisher Queue
+func expectThriftTransaction(t *testing.T, thrift Thrift) *ThriftTransaction {
+	select {
+		case trans := <-thrift.PublishQueue:
+			return trans
+		default:
+			t.Error("No transaction")
+	}
+	return nil
+}
+
 func TestThrift_ParseSimpleTBinary(t *testing.T) {
 
 	if testing.Verbose() {
@@ -568,17 +579,12 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	thrift.Parse(req, &tcp, 0)
 	thrift.Parse(repl, &tcp, 1)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "ping" ||
-			trans.Request.Params != "()" ||
-			trans.Reply.Result != "()" {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "ping" ||
+		trans.Request.Params != "()" ||
+		trans.Reply.Result != "()" {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
 }
 
@@ -606,18 +612,14 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 	thrift.Parse(req, &tcp, 0)
 	thrift.Parse(repl, &tcp, 1)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "add" ||
-			trans.Request.Params != "(1: 1, 2: 1)" ||
-			trans.Reply.Result != "(0: 2)" {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "(0: 2)" {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
+
 }
 
 func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
@@ -648,18 +650,14 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	thrift.Parse(repl_half1, &tcp, 1)
 	thrift.Parse(repl_half2, &tcp, 1)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "add" ||
-			trans.Request.Params != "(1: 1, 2: 1)" ||
-			trans.Reply.Result != "(0: 2)" {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "(0: 2)" {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
+
 }
 
 func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
@@ -690,17 +688,12 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 	thrift.Parse(repl_half1, &tcp, 1)
 	thrift.Parse(repl_half2, &tcp, 1)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "add" ||
-			trans.Request.Params != "(1: 1, 2: 1)" ||
-			trans.Reply.Result != "(0: 2)" {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "(0: 2)" {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
 }
 
@@ -726,17 +719,12 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 	thrift.Parse(req, &tcp, 0)
 	thrift.ReceivedFin(&tcp, 0)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "zip" ||
-			trans.Request.Params != "()" ||
-			trans.Reply != nil || trans.ResponseTime != 0 {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "zip" ||
+		trans.Request.Params != "()" ||
+		trans.Reply != nil || trans.ResponseTime != 0 {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
 }
 
@@ -749,7 +737,6 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	var thrift Thrift
 	thrift.Init()
 	thrift.TransportType = ThriftTFramed
-
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
@@ -766,29 +753,20 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	thrift.Parse(req, &tcp, 0)
 	thrift.Parse(repl, &tcp, 1)
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "zip" ||
-			trans.Request.Params != "()" ||
-			trans.Reply != nil || trans.ResponseTime != 0 {
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "zip" ||
+		trans.Request.Params != "()" ||
+		trans.Reply != nil || trans.ResponseTime != 0 {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
 
-	select {
-	case trans := <-thrift.PublishQueue:
-		if trans.Request.Method != "add" ||
-			trans.Request.Params != "(1: 1, 2: 1)" ||
-			trans.Reply.Result != "(0: 2)" {
+	trans = expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "(0: 2)" {
 
-			t.Error("Bad result:", trans)
-		}
-
-	default:
-		t.Error("No transaction")
+		t.Error("Bad result:", trans)
 	}
 }
+
