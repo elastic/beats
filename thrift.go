@@ -31,6 +31,7 @@ type ThriftMessage struct {
 	SeqId     uint32
 	Params    string
 	Result    string
+	FrameSize uint32
 }
 
 type ThriftField struct {
@@ -586,6 +587,14 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 		switch s.parseState {
 		case ThriftStartState:
 			m.start = s.parseOffset
+			if thrift.TransportType == ThriftTFramed {
+				// read I32
+				if len(s.data) < 4 {
+					return true, false
+				}
+				m.FrameSize = Bytes_Ntohl(s.data[:4])
+				s.parseOffset = 4
+			}
 
 			ok, complete = thrift.readMessageBegin(s)
 			if !ok {
