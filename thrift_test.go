@@ -739,3 +739,56 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 		t.Error("No transaction")
 	}
 }
+
+func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+	thrift.TransportType = ThriftTFramed
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
+	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108" +
+					"00020000000100")
+	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
+
+	thrift.Parse(reqzip, &tcp, 0)
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	select {
+	case trans := <-thrift.PublishQueue:
+		if trans.Request.Method != "zip" ||
+			trans.Request.Params != "()" ||
+			trans.Reply != nil || trans.ResponseTime != 0 {
+
+			t.Error("Bad result:", trans)
+		}
+
+	default:
+		t.Error("No transaction")
+	}
+
+	select {
+	case trans := <-thrift.PublishQueue:
+		if trans.Request.Method != "add" ||
+			trans.Request.Params != "(1: 1, 2: 1)" ||
+			trans.Reply.Result != "(0: 2)" {
+
+			t.Error("Bad result:", trans)
+		}
+
+	default:
+		t.Error("No transaction")
+	}
+}

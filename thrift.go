@@ -47,7 +47,6 @@ type ThriftStream struct {
 
 	parseOffset   int
 	parseState    int
-	bytesReceived int
 
 	message *ThriftMessage
 }
@@ -633,8 +632,10 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 
 func (stream *ThriftStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
+	DEBUG("thrift", "remaining data: [%s]", stream.data)
 	stream.parseOffset = 0
-	stream.message.IsRequest = false
+	stream.message = nil
+	stream.parseState = ThriftStartState
 }
 
 func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
@@ -721,14 +722,14 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	trans := thrift.transactionsMap[tuple]
 	if trans != nil {
 		DEBUG("thrift", "Two requests without reply, assuming the old one is oneway")
-		// TODO: publish old trans
-	} else {
-		trans = &ThriftTransaction{
-			Type:  "http",
-			tuple: tuple,
-		}
-		thrift.transactionsMap[tuple] = trans
+		thrift.PublishQueue <- trans
 	}
+
+	trans = &ThriftTransaction{
+		Type:  "http",
+		tuple: tuple,
+	}
+	thrift.transactionsMap[tuple] = trans
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
