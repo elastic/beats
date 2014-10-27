@@ -109,6 +109,7 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 
 		if flags&TCP_FLAG_FIN != 0 {
 			HttpReceivedFin(stream, original_dir)
+			ThriftMod.ReceivedFin(stream, original_dir)
 		}
 		break
 	case MysqlProtocol:

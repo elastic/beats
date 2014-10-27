@@ -136,6 +136,8 @@ type Thrift struct {
 	Publisher    *PublisherType
 }
 
+var ThriftMod Thrift
+
 func (thrift *Thrift) InitDefaults() {
 	// defaults
 	thrift.StringMaxSize = 200
@@ -778,6 +780,28 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	delete(transactionsMap, trans.tuple)
 	if trans.timer != nil {
 		trans.timer.Stop()
+	}
+}
+
+func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
+	tuple := TcpTuple{
+		Src_ip:    tcp.tuple.Src_ip,
+		Dst_ip:    tcp.tuple.Dst_ip,
+		Src_port:  tcp.tuple.Src_port,
+		Dst_port:  tcp.tuple.Dst_port,
+		stream_id: tcp.id,
+	}
+
+	trans := thrift.transactionsMap[tuple]
+	if trans != nil {
+		if trans.Request != nil && trans.Reply == nil {
+			DEBUG("thrift", "FIN and had only one transaction. Assuming one way")
+			thrift.PublishQueue <- trans
+			delete(transactionsMap, trans.tuple)
+			if trans.timer != nil {
+				trans.timer.Stop()
+			}
+		}
 	}
 }
 
