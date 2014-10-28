@@ -130,6 +130,7 @@ type Thrift struct {
 	CollectionMaxSize      int
 	DropAfterNStructFields int
 	CaptureReply		   bool
+	ObfuscateStrings	   bool
 
 	TransportType byte
 	ProtocolType  byte
@@ -150,6 +151,7 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.TransportType = ThriftTSocket
 	thrift.ProtocolType = ThriftTBinary
 	thrift.CaptureReply = true
+	thrift.ObfuscateStrings = false
 }
 
 func (thrift *Thrift) Init() {
@@ -273,7 +275,11 @@ func (thrift *Thrift) readString(data []byte) (value string, ok bool, complete b
 
 func (thrift *Thrift) readAndQuoteString(data []byte) (value string, ok bool, complete bool, off int) {
 	value, ok, complete, off = thrift.readString(data)
-	if value != "" {
+	if value == "" {
+		value = `""`
+	} else if thrift.ObfuscateStrings {
+		value = `"*"`
+	} else {
 		value = strconv.Quote(value)
 	}
 

@@ -838,3 +838,38 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
+
+func TestThrift_ParseObfuscateStrings(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+	thrift.TransportType = ThriftTFramed
+	thrift.ObfuscateStrings = true
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000" +
+		"00000b00010000000568656c6c6f00")
+	repl := createTestPacket(t, "00000024800100020000000b6563686f5f737472696e67000" +
+		"000000b00000000000568656c6c6f00")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "echo_string" ||
+		trans.Request.Params != `(1: "*")` ||
+		trans.Reply.Result != `(0: "*")` {
+
+		t.Error("Bad result:", trans)
+	}
+}
