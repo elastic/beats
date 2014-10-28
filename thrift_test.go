@@ -65,7 +65,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	if !ok || !complete {
 		t.Error("Bad result: %s %s", ok, complete)
 	}
-	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != ThriftVersion1 {
 		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
 	}
@@ -77,7 +77,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	if !ok || !complete {
 		t.Error("Bad result: %s %s", ok, complete)
 	}
-	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != ThriftVersion1 {
 		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
 	}
@@ -89,7 +89,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	if !ok || !complete {
 		t.Error("Bad result: %s %s", ok, complete)
 	}
-	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 1 || m.Version != ThriftVersion1 {
 		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
 	}
@@ -117,7 +117,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	if !ok || !complete {
 		t.Error("Bad result: %s %s", ok, complete)
 	}
-	if m.Method != "ping" || m.Type != ThriftTypeCall ||
+	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != 0 {
 		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
 	}
@@ -417,7 +417,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "ping" ||
-		m.SeqId != 0 || m.Type != ThriftTypeCall || m.Params != "()" {
+		m.SeqId != 0 || m.Type != ThriftMsgTypeCall || m.Params != "()" {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -430,7 +430,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "add16" ||
-		m.SeqId != 0 || m.Type != ThriftTypeCall ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeCall ||
 		m.Params != "(1: 1, 2: 1)" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -444,7 +444,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if !m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftTypeCall ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeCall ||
 		m.Params != "(1: 1, 2: (1: 1, 2: 0, 3: 4))" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -457,7 +457,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "add16" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != "(0: 2)" {
 		t.Error("Bad result:", stream.message)
 	}
@@ -471,7 +471,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_string" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != `(0: "hello")` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -485,7 +485,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_list" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != `(0: [1, 2, 3])` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -499,7 +499,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "echo_map" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != `(0: {"a": 1, "c": 3, "b": 2})` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -512,7 +512,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != `(0: 5)` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -526,7 +526,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
 		m.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}

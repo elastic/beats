@@ -98,13 +98,13 @@ const (
 	ThriftTypeUtf16  = 17
 )
 
-// Thrift message types -- TODO: rename to ThriftTypeMsg..
+// Thrift message types
 const (
 	_ = iota
-	ThriftTypeCall
-	ThriftTypeReply
-	ThriftTypeException
-	ThriftTypeOneway
+	ThriftMsgTypeCall
+	ThriftMsgTypeReply
+	ThriftMsgTypeException
+	ThriftMsgTypeOneway
 )
 
 // Thrift protocol types
@@ -228,7 +228,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		s.parseOffset = offset + 4
 	}
 
-	if m.Type == ThriftTypeCall || m.Type == ThriftTypeOneway {
+	if m.Type == ThriftMsgTypeCall || m.Type == ThriftMsgTypeOneway {
 		m.IsRequest = true
 	}
 
