@@ -873,3 +873,52 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
+
+func BenchmarkThrift_ParseSkipReply(b *testing.B) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+	thrift.TransportType = ThriftTFramed
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+	//thrift.CaptureReply = false
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108"+
+		"00020000000100")
+	req := &Packet{payload: data_req}
+	data_repl, _ := hex.DecodeString("000000178001000200000003616464000000000800000000000200")
+	repl := &Packet{payload: data_repl}
+
+	for n:=0; n < b.N; n++ {
+		thrift.Parse(req, &tcp, 0)
+		thrift.Parse(repl, &tcp, 1)
+
+		select {
+		case trans := <-thrift.PublishQueue:
+
+			if trans.Request.Method != "add" ||
+				trans.Request.Params != "(1: 1, 2: 1)" {
+
+				b.Error("Bad result:", trans)
+			}
+		default:
+			b.Error("No transaction")
+		}
+
+		// next should be empty
+		select {
+		case trans := <-thrift.PublishQueue:
+			b.Error("Transaction still in queue: ", trans)
+		default:
+			// ok
+		}
+	}
+}

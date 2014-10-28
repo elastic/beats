@@ -135,7 +135,7 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transactionsMap map[TcpTuple]*ThriftTransaction
+	transMap map[TcpTuple]*ThriftTransaction
 
 	PublishQueue chan *ThriftTransaction
 	Publisher    *PublisherType
@@ -158,7 +158,7 @@ func (thrift *Thrift) Init() {
 
 	thrift.InitDefaults()
 
-	thrift.transactionsMap = make(map[TcpTuple]*ThriftTransaction, TransactionsHashSize)
+	thrift.transMap = make(map[TcpTuple]*ThriftTransaction, TransactionsHashSize)
 
 }
 
@@ -238,6 +238,8 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 
 	if m.Type == ThriftMsgTypeCall || m.Type == ThriftMsgTypeOneway {
 		m.IsRequest = true
+	} else {
+		m.IsRequest = false
 	}
 
 	return true, true
@@ -618,6 +620,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 
 			if !m.IsRequest && !thrift.CaptureReply {
 				// don't actually read the result
+				DEBUG("thrift", "Don't capture reply")
 				m.Result = ""
 				return true, true
 			}
@@ -647,8 +650,12 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	return true, false
 }
 
-func (stream *ThriftStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.parseOffset:]
+func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
+	if flush {
+		stream.data = []byte{}
+	} else {
+		stream.data = stream.data[stream.parseOffset:]
+	}
 	DEBUG("thrift", "remaining data: [%s]", stream.data)
 	stream.parseOffset = 0
 	stream.message = nil
@@ -698,6 +705,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 		}
 
 		if complete {
+			var flush bool = false
 
 			if stream.message.IsRequest {
 				DEBUG("thrift", "Thrift request message: %s", stream.message.Method)
@@ -713,6 +721,9 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 				if !thrift.CaptureReply {
 					// disable stream in this direction
 					stream.skipInput = true
+
+					// and flush current data
+					flush = true
 				}
 			}
 
@@ -727,7 +738,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			thrift.handleThrift(stream.message)
 
 			// and reset message
-			stream.PrepareForNewMessage()
+			stream.PrepareForNewMessage(flush)
 		} else {
 			// wait for more data
 			break
@@ -753,17 +764,17 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		stream_id: msg.Stream_id,
 	}
 
-	trans := thrift.transactionsMap[tuple]
+	trans := thrift.transMap[tuple]
 	if trans != nil {
 		DEBUG("thrift", "Two requests without reply, assuming the old one is oneway")
 		thrift.PublishQueue <- trans
 	}
 
 	trans = &ThriftTransaction{
-		Type:  "http",
+		Type:  "thrift",
 		tuple: tuple,
 	}
-	thrift.transactionsMap[tuple] = trans
+	thrift.transMap[tuple] = trans
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
@@ -784,7 +795,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+	trans.timer = time.AfterFunc(TransactionTimeout, func() { thrift.expireTransaction(trans) })
 
 }
 
@@ -799,7 +810,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 		stream_id: msg.Stream_id,
 	}
 
-	trans := thrift.transactionsMap[tuple]
+	trans := thrift.transMap[tuple]
 	if trans == nil {
 		DEBUG("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -812,7 +823,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	thrift.PublishQueue <- trans
 
 	// remove from map
-	delete(transactionsMap, trans.tuple)
+	thrift.transMap[tuple] = nil
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
@@ -827,12 +838,12 @@ func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
 		stream_id: tcp.id,
 	}
 
-	trans := thrift.transactionsMap[tuple]
+	trans := thrift.transMap[tuple]
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			DEBUG("thrift", "FIN and had only one transaction. Assuming one way")
 			thrift.PublishQueue <- trans
-			delete(transactionsMap, trans.tuple)
+			delete(thrift.transMap, trans.tuple)
 			if trans.timer != nil {
 				trans.timer.Stop()
 			}
@@ -874,7 +885,8 @@ func (thrift *Thrift) publishTransactions() {
 	}
 }
 
-func (trans *ThriftTransaction) Expire() {
+func (thrift *Thrift) expireTransaction(trans *ThriftTransaction) {
+	// TODO - also publish?
 	// remove from map
-	delete(transactionsMap, trans.tuple)
+	delete(thrift.transMap, trans.tuple)
 }
