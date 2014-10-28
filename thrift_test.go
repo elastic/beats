@@ -884,7 +884,7 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 	thrift.Init()
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
-	//thrift.CaptureReply = false
+	thrift.CaptureReply = false
 
 	var tcp TcpStream
 	tcp.tuple = &IpPortTuple{
