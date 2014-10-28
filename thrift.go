@@ -48,6 +48,10 @@ type ThriftStream struct {
 	parseOffset int
 	parseState  int
 
+	// when this is set, don't care about the
+	// traffic in this direction. Used to skip large responses.
+	skipInput	bool
+
 	message *ThriftMessage
 }
 
@@ -125,6 +129,7 @@ type Thrift struct {
 	StringMaxSize          int
 	CollectionMaxSize      int
 	DropAfterNStructFields int
+	CaptureReply		   bool
 
 	TransportType byte
 	ProtocolType  byte
@@ -144,6 +149,7 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.DropAfterNStructFields = 100
 	thrift.TransportType = ThriftTSocket
 	thrift.ProtocolType = ThriftTBinary
+	thrift.CaptureReply = true
 }
 
 func (thrift *Thrift) Init() {
@@ -604,6 +610,11 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 				return true, false
 			}
 
+			if !m.IsRequest && !thrift.CaptureReply {
+				// don't actually read the result
+				m.Result = ""
+				return true, true
+			}
 			s.parseState = ThriftFieldState
 		case ThriftFieldState:
 			ok, complete, field := thrift.readField(s)
@@ -642,23 +653,29 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 
 	defer RECOVER("ParseThrift exception")
 
-	if tcp.thriftData[dir] == nil {
-		tcp.thriftData[dir] = &ThriftStream{
+	stream := tcp.thriftData[dir]
+
+	if stream == nil {
+		stream = &ThriftStream{
 			tcpStream: tcp,
 			data:      pkt.payload,
 			message:   &ThriftMessage{Ts: pkt.ts},
 		}
+		tcp.thriftData[dir] = stream
 	} else {
+		if stream.skipInput {
+			// stream currently suspended in this direction
+			return
+		}
 		// concatenate bytes
-		tcp.thriftData[dir].data = append(tcp.thriftData[dir].data, pkt.payload...)
-		if len(tcp.thriftData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+		stream.data = append(stream.data, pkt.payload...)
+		if len(stream.data) > TCP_MAX_DATA_IN_STREAM {
 			DEBUG("thrift", "Stream data too large, dropping TCP stream")
 			tcp.thriftData[dir] = nil
 			return
 		}
 	}
 
-	stream := tcp.thriftData[dir]
 	for len(stream.data) > 0 {
 		if stream.message == nil {
 			stream.message = &ThriftMessage{Ts: pkt.ts}
@@ -678,8 +695,19 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 
 			if stream.message.IsRequest {
 				DEBUG("thrift", "Thrift request message: %s", stream.message.Method)
+				if !thrift.CaptureReply {
+					// enable the stream in the other direction to get the reply
+					stream_rev := tcp.thriftData[1-dir]
+					if stream_rev != nil {
+						stream_rev.skipInput = false
+					}
+				}
 			} else {
 				DEBUG("thrift", "Thrift response message: %s", stream.message.Method)
+				if !thrift.CaptureReply {
+					// disable stream in this direction
+					stream.skipInput = true
+				}
 			}
 
 			// all ok, go to next level

@@ -769,3 +769,72 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
+
+func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+	thrift.TransportType = ThriftTFramed
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
+	repladd := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
+
+	thrift.Parse(reqzip, &tcp, 0)
+	thrift.Parse(repladd, &tcp, 1)
+}
+
+func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init()
+	thrift.TransportType = ThriftTFramed
+	thrift.CaptureReply = false
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
+		"00020000000100")
+	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "" {
+
+		t.Error("Bad result:", trans)
+	}
+
+	// play it again in the same stream
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans = expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(1: 1, 2: 1)" ||
+		trans.Reply.Result != "" {
+
+		t.Error("Bad result:", trans)
+	}
+}
