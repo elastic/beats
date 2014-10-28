@@ -857,9 +857,9 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
 	}
 
-	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000" +
+	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000"+
 		"00000b00010000000568656c6c6f00")
-	repl := createTestPacket(t, "00000024800100020000000b6563686f5f737472696e67000" +
+	repl := createTestPacket(t, "00000024800100020000000b6563686f5f737472696e67000"+
 		"000000b00000000000568656c6c6f00")
 
 	thrift.Parse(req, &tcp, 0)
@@ -891,13 +891,13 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
 	}
 
-	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108"+
+	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108" +
 		"00020000000100")
 	req := &Packet{payload: data_req}
 	data_repl, _ := hex.DecodeString("000000178001000200000003616464000000000800000000000200")
 	repl := &Packet{payload: data_repl}
 
-	for n:=0; n < b.N; n++ {
+	for n := 0; n < b.N; n++ {
 		thrift.Parse(req, &tcp, 0)
 		thrift.Parse(repl, &tcp, 1)
 

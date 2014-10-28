@@ -50,7 +50,7 @@ type ThriftStream struct {
 
 	// when this is set, don't care about the
 	// traffic in this direction. Used to skip large responses.
-	skipInput	bool
+	skipInput bool
 
 	message *ThriftMessage
 }
@@ -129,8 +129,8 @@ type Thrift struct {
 	StringMaxSize          int
 	CollectionMaxSize      int
 	DropAfterNStructFields int
-	CaptureReply		   bool
-	ObfuscateStrings	   bool
+	CaptureReply           bool
+	ObfuscateStrings       bool
 
 	TransportType byte
 	ProtocolType  byte
@@ -534,21 +534,32 @@ func (thrift *Thrift) formatStruct(fields []ThriftField) string {
 
 // Dictionary wrapped in a function to avoid "initialization loop"
 func (thrift *Thrift) funcReadersByType(type_ byte) (func_ ThriftFieldReader, exists bool) {
-	func_, exists = map[byte]ThriftFieldReader{
-		ThriftTypeBool:   thrift.readBool,
-		ThriftTypeByte:   thrift.readByte,
-		ThriftTypeDouble: thrift.readDouble,
-		ThriftTypeI16:    thrift.readI16,
-		ThriftTypeI32:    thrift.readI32,
-		ThriftTypeI64:    thrift.readI64,
-		ThriftTypeString: thrift.readAndQuoteString,
-		ThriftTypeList:   thrift.readList,
-		ThriftTypeSet:    thrift.readSet,
-		ThriftTypeMap:    thrift.readMap,
-		ThriftTypeStruct: thrift.readStruct,
-	}[type_]
-
-	return func_, exists
+	switch type_ {
+	case ThriftTypeBool:
+		return thrift.readBool, true
+	case ThriftTypeByte:
+		return thrift.readByte, true
+	case ThriftTypeDouble:
+		return thrift.readDouble, true
+	case ThriftTypeI16:
+		return thrift.readI16, true
+	case ThriftTypeI32:
+		return thrift.readI32, true
+	case ThriftTypeI64:
+		return thrift.readI64, true
+	case ThriftTypeString:
+		return thrift.readAndQuoteString, true
+	case ThriftTypeList:
+		return thrift.readList, true
+	case ThriftTypeSet:
+		return thrift.readSet, true
+	case ThriftTypeMap:
+		return thrift.readMap, true
+	case ThriftTypeStruct:
+		return thrift.readStruct, true
+	default:
+		return nil, false
+	}
 }
 
 func (thrift *Thrift) readField(s *ThriftStream) (ok bool, complete bool, field *ThriftField) {
