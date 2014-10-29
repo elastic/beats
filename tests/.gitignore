@@ -1,0 +1,8 @@
+*.pyc
+*.swp
+*.swo
+*.swn
+
+last_run
+run
+env
