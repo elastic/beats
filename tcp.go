@@ -123,6 +123,11 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 	case PgsqlProtocol:
 		ParsePgsql(pkt, stream, original_dir)
 		break
+
+	case ThriftProtocol:
+		ThriftMod.Parse(pkt, stream, original_dir)
+		break
+
 	}
 }
 

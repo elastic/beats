@@ -143,6 +143,16 @@ type Thrift struct {
 
 var ThriftMod Thrift
 
+type tomlThrift struct {
+	String_max_size int
+	Collection_max_size int
+	Drop_adter_n_struct_fields int
+	Transport_type string
+	Protocol_type string
+	Capture_reply bool
+	Obfuscate_strings bool
+}
+
 func (thrift *Thrift) InitDefaults() {
 	// defaults
 	thrift.StringMaxSize = 200
@@ -154,12 +164,64 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.ObfuscateStrings = false
 }
 
-func (thrift *Thrift) Init() {
+func (thrift *Thrift) readConfig() error {
+	if _ConfigMeta.IsDefined("thrift", "string_max_size") {
+		thrift.StringMaxSize = _Config.Thrift.String_max_size
+	}
+	if _ConfigMeta.IsDefined("thrift", "collection_max_size") {
+		thrift.CollectionMaxSize = _Config.Thrift.Collection_max_size
+	}
+	if _ConfigMeta.IsDefined("thrift", "drop_adter_n_struct_fields") {
+		thrift.DropAfterNStructFields = _Config.Thrift.Drop_adter_n_struct_fields
+	}
+	if _ConfigMeta.IsDefined("thrift", "transport_type") {
+		switch _Config.Thrift.Transport_type {
+		case "socket":
+			thrift.TransportType = ThriftTSocket
+		case "framed":
+			thrift.TransportType = ThriftTFramed
+		default:
+			return fmt.Errorf("Transport type `%s` not known",  _Config.Thrift.Transport_type)
+		}
+	}
+	if _ConfigMeta.IsDefined("thrift", "protocol_type") {
+		switch _Config.Thrift.Transport_type {
+		case "binary":
+			thrift.TransportType = ThriftTBinary
+		default:
+			return fmt.Errorf("Protocol type `%s` not known",  _Config.Thrift.Protocol_type)
+		}
+	}
+	if _ConfigMeta.IsDefined("thrift", "capture_reply") {
+		thrift.CaptureReply = _Config.Thrift.Capture_reply
+	}
+	if _ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
+		thrift.ObfuscateStrings = _Config.Thrift.Obfuscate_strings
+	}
+
+	return nil
+}
+
+func (thrift *Thrift) Init(test_mode bool) error {
 
 	thrift.InitDefaults()
 
+	if !test_mode {
+		err := thrift.readConfig()
+		if err != nil {
+			return err
+		}
+	}
+
 	thrift.transMap = make(map[TcpTuple]*ThriftTransaction, TransactionsHashSize)
 
+	if !test_mode {
+		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
+		thrift.Publisher = &Publisher
+		go thrift.publishTransactions()
+	}
+
+	return nil
 }
 
 func (m *ThriftMessage) String() string {
@@ -833,6 +895,8 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 
 	thrift.PublishQueue <- trans
 
+	DEBUG("thrift", "Transaction queued")
+
 	// remove from map
 	thrift.transMap[tuple] = nil
 	if trans.timer != nil {
@@ -876,7 +940,7 @@ func (thrift *Thrift) publishTransactions() {
 				"request": bson.M{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
-					"size":   t.Reply.FrameSize,
+					"size":   t.Request.FrameSize,
 				},
 			}
 		}
@@ -893,6 +957,8 @@ func (thrift *Thrift) publishTransactions() {
 		if thrift.Publisher != nil {
 			thrift.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 		}
+
+		DEBUG("thrift", "Published event")
 	}
 }
 

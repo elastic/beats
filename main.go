@@ -34,9 +34,10 @@ const (
 	MysqlProtocol
 	RedisProtocol
 	PgsqlProtocol
+	ThriftProtocol
 )
 
-var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql"}
+var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql", "thrift"}
 
 type tomlConfig struct {
 	Interfaces tomlInterfaces
@@ -47,6 +48,7 @@ type tomlConfig struct {
 	Agent      tomlAgent
 	Logging    tomlLogging
 	Passwords  tomlPasswords
+	Thrift     tomlThrift
 }
 
 type tomlInterfaces struct {
@@ -322,6 +324,11 @@ func main() {
 	}
 
 	if err = procWatcher.Init(&_Config.Procs); err != nil {
+		CRIT(err.Error())
+		return
+	}
+
+	if err = ThriftMod.Init(false); err != nil {
 		CRIT(err.Error())
 		return
 	}
