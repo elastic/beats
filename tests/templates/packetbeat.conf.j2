@@ -1,0 +1,98 @@
+###
+### Packetbeat Agent configuration file.
+###
+### Packetbeat is an application monitoring system that works by sniffing
+### the network traffic between your application ### components.
+###
+### For more configuration options, please visit:
+###
+###    http://packetbeat.com/docs/configuration.html
+###
+
+[output]
+
+  [output.elasticsearch]
+    # Comment this option if you don't want to output to Elasticsearch.
+    enabled = false
+
+    # Set the host and port where to find Elasticsearch.
+    host = "localhost"
+    port = 9200
+
+    # Comment this option if you don't want to store the topology in Elasticsearch.
+    save_topology = true
+
+  [output.redis]
+    # Uncomment out this option if you want to output to Redis.
+    enabled = false
+
+    # Set the host and port where to find Redis.
+    #host = "localhost"
+    #port = 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # save_topology = true
+
+  [output.file]
+    # Uncomment the following lines if you want to output to flat files.
+    enabled = true
+    path="{{ output_file_path|default(pb.working_dir + "/output") }}"
+    filename="{{ output_file_filename|default("packetbeat") }}"
+    rotate_every_kb=1000
+    #number_of_files=7
+
+[interfaces]
+# Select on which network interfaces to sniff. You can use the "any"
+# keyword to sniff on all connected interfaces.
+device = "any"
+
+[protocols]
+# Configure which protocols to monitor and on which ports are they
+# running. You can disable a given protocol by commenting out its
+# configuration.
+  [protocols.http]
+  ports = [{{ http_ports|default([80])|join(", ") }}]
+
+  [protocols.mysql]
+  ports = [{{ mysql_ports|default([3306])|join(", ") }}]
+
+  [protocols.pgsql]
+  ports = [{{ pgsql_ports|default([5432])|join(", ") }}]
+
+  [protocols.redis]
+  ports = [{{ redis_ports|default([6379])|join(", ") }}]
+
+[procs]
+# Which processes to monitor and how to find them. The processes can
+# be found by searching their command line by a given string.
+  [procs.monitored.mysqld]
+  cmdline_grep = "mysqld"
+
+  [procs.monitored.pgsql]
+  cmdline_grep = "postgres"
+
+  [procs.monitored.nginx]
+  cmdline_grep = "nginx"
+
+  [procs.monitored.app]
+  cmdline_grep = "gunicorn"
+
+[agent]
+# The name of the agent as it will show up in the web interface. If not
+# defined, we will just use the hostname.
+#
+#name=
+
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the agent is installed. This option is useful
+# to remove duplicates if agents are installed on multiple servers.
+#ignore_outgoing = true
+
+[passwords]
+# Uncomment the following to hide certain parameters from HTTP POST
+# requests. The value of the parameters will be replaced with '*' characters
+# This is generally useful for avoiding storing user passwords or other
+# sensitive information.
+#hide_keywords = ["pass=", "password=", "passwd=", "Password="]
+
+# vim: set ft=toml:

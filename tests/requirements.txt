@@ -1,0 +1,2 @@
+nose
+jinja2
