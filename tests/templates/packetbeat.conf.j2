@@ -62,6 +62,12 @@ device = "any"
   [protocols.redis]
   ports = [{{ redis_ports|default([6379])|join(", ") }}]
 
+  [protocols.thrift]
+  ports = [{{ redis_ports|default([9090])|join(", ") }}]
+
+[thrift]
+transport_type = "{{ thrift_transport_type|default('socket') }}"
+
 [procs]
 # Which processes to monitor and how to find them. The processes can
 # be found by searching their command line by a given string.
