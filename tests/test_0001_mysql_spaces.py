@@ -7,3 +7,19 @@ class Test(TestCase):
             mysql_ports=[3306]
         )
         self.run_packetbeat(pcap="mysql_with_whitespaces.pcap")
+
+        objs = self.read_output()
+        assert all([o["type"] == "mysql" for o in objs])
+        assert len(objs) == 7
+
+        assert objs[0]["mysql"]["method"] == "SET"
+        assert objs[0]["mysql"]["tables"] == ""
+
+        assert objs[2]["mysql"]["method"] == "DROP"
+        assert objs[2]["mysql"]["isok"]
+
+        assert objs[3]["mysql"]["method"] == "CREATE"
+        assert objs[3]["mysql"]["isok"]
+
+        assert objs[5]["mysql"]["method"] == "SELECT"
+        assert objs[5]["mysql"]["tables"] == "test.test"

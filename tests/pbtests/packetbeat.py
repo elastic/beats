@@ -3,6 +3,7 @@ import jinja2
 import unittest
 import os
 import shutil
+import json
 
 
 class TestCase(unittest.TestCase):
@@ -38,6 +39,13 @@ class TestCase(unittest.TestCase):
         output_str = template.render(**kargs)
         with open(os.path.join(self.working_dir, output), "wb") as f:
             f.write(output_str)
+
+    def read_output(self, output_file="output/packetbeat"):
+        jsons = []
+        with open(os.path.join(self.working_dir, output_file), "r") as f:
+            for line in f:
+                jsons.append(json.loads(line))
+        return jsons
 
     def setUp(self):
 
