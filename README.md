@@ -30,6 +30,7 @@ with updates about new releases.
 ## Authors
 
 **Monica Sarbu** (monica@packetbeat.com)
+**Tudor Golubenco** (tudor@packetbeat.com)
 
 ## Copyright and license
 
