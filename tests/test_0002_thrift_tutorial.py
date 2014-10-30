@@ -39,7 +39,8 @@ class Test(TestCase):
         self.render_config_template(
             thrift_ports=[9090]
         )
-        self.run_packetbeat(pcap="thrift_tutorial.pcap", debug_selectors=["thrift"])
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
 
         objs = self.read_output()
 
@@ -51,7 +52,7 @@ class Test(TestCase):
             thrift_transport_type="framed"
         )
         self.run_packetbeat(pcap="thrift_tutorial_framed_transport.pcap",
-            debug_selectors=["thrift"])
+                            debug_selectors=["thrift"])
 
         objs = self.read_output()
 

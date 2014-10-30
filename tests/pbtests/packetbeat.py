@@ -9,18 +9,18 @@ import json
 class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
-                     cmd="../packetbeat/packetbeat",
-                     config="packetbeat.conf",
-                     output="packetbeat.log",
-                     extra_args=[],
-                     debug_selectors=[]):
+                       cmd="../packetbeat/packetbeat",
+                       config="packetbeat.conf",
+                       output="packetbeat.log",
+                       extra_args=[],
+                       debug_selectors=[]):
 
         args = [cmd]
 
         args.extend(["-e",
-            "-I", os.path.join("pcaps", pcap),
-            "-c", os.path.join(self.working_dir, config),
-            "-t"])
+                     "-I", os.path.join("pcaps", pcap),
+                     "-c", os.path.join(self.working_dir, config),
+                     "-t"])
         if extra_args:
             args.extend(extra_args)
 
@@ -29,11 +29,12 @@ class TestCase(unittest.TestCase):
 
         with open(os.path.join(self.working_dir, output), "wb") as outputfile:
             proc = subprocess.Popen(args,
-                            stdout=outputfile,
-                            stderr=subprocess.STDOUT)
+                                    stdout=outputfile,
+                                    stderr=subprocess.STDOUT)
             proc.wait()
 
-    def render_config_template(self, template="packetbeat.conf.j2", output="packetbeat.conf", **kargs):
+    def render_config_template(self, template="packetbeat.conf.j2",
+                               output="packetbeat.conf", **kargs):
         template = self.template_env.get_template(template)
         kargs["pb"] = self
         output_str = template.render(**kargs)
