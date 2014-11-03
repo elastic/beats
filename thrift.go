@@ -23,14 +23,15 @@ type ThriftMessage struct {
 
 	fields []ThriftField
 
-	IsRequest bool
-	Version   uint32
-	Type      uint32
-	Method    string
-	SeqId     uint32
-	Params    string
-	Result    string
-	FrameSize uint32
+	IsRequest    bool
+	HasException bool
+	Version      uint32
+	Type         uint32
+	Method       string
+	SeqId        uint32
+	Params       string
+	Result       string
+	FrameSize    uint32
 }
 
 type ThriftField struct {
@@ -144,13 +145,13 @@ type Thrift struct {
 var ThriftMod Thrift
 
 type tomlThrift struct {
-	String_max_size int
-	Collection_max_size int
+	String_max_size            int
+	Collection_max_size        int
 	Drop_adter_n_struct_fields int
-	Transport_type string
-	Protocol_type string
-	Capture_reply bool
-	Obfuscate_strings bool
+	Transport_type             string
+	Protocol_type              string
+	Capture_reply              bool
+	Obfuscate_strings          bool
 }
 
 func (thrift *Thrift) InitDefaults() {
@@ -181,7 +182,7 @@ func (thrift *Thrift) readConfig() error {
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known",  _Config.Thrift.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", _Config.Thrift.Transport_type)
 		}
 	}
 	if _ConfigMeta.IsDefined("thrift", "protocol_type") {
@@ -189,7 +190,7 @@ func (thrift *Thrift) readConfig() error {
 		case "binary":
 			thrift.TransportType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known",  _Config.Thrift.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", _Config.Thrift.Protocol_type)
 		}
 	}
 	if _ConfigMeta.IsDefined("thrift", "capture_reply") {
@@ -709,6 +710,13 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 					m.Params = thrift.formatStruct(m.fields)
 				} else {
 					m.Result = thrift.formatStruct(m.fields)
+
+					if len(m.fields) > 0 {
+						if m.fields[0].Id > 0 {
+							// Reply field Id > 0 means exceptions
+							m.HasException = true
+						}
+					}
 				}
 				return true, true
 			}
@@ -931,7 +939,11 @@ func (thrift *Thrift) publishTransactions() {
 		event := Event{}
 
 		event.Type = "thrift"
-		event.Status = OK_STATUS // TODO: always ok?
+		if t.Reply != nil && t.Reply.HasException {
+			event.Status = ERROR_STATUS
+		} else {
+			event.Status = OK_STATUS
+		}
 		event.ResponseTime = t.ResponseTime
 		event.Thrift = bson.M{}
 

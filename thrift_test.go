@@ -512,7 +512,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
 		m.Result != `(0: 5)` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -526,7 +526,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		t.Error("Bad result:", ok, complete)
 	}
 	if m.IsRequest || m.Method != "calculate" ||
-		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || !m.HasException ||
 		m.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}
@@ -791,6 +791,8 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 
 	thrift.Parse(reqzip, &tcp, 0)
 	thrift.Parse(repladd, &tcp, 1)
+
+	// TODO
 }
 
 func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
@@ -920,5 +922,39 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 		default:
 			// ok
 		}
+	}
+}
+
+func TestThrift_Parse_Exception(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init(true)
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
+		"1000000010c00020800010000000108000200000000080003000000040000")
+	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
+		"01080001000000040b00020000001243616e6e6f742064697669646520627920300000")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "calculate" ||
+		trans.Request.Params != "(1: 1, 2: (1: 1, 2: 0, 3: 4))" ||
+		trans.Reply.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` ||
+		!trans.Reply.HasException {
+
+		t.Error("Bad result:", trans)
 	}
 }
