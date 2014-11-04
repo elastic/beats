@@ -9,7 +9,7 @@ import json
 class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
-                       cmd="../packetbeat/packetbeat",
+                       cmd="packetbeat/packetbeat",
                        config="packetbeat.conf",
                        output="packetbeat.log",
                        extra_args=[],

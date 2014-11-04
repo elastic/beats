@@ -1,0 +1,3 @@
+[submodule "packetbeat"]
+	path = packetbeat
+	url = git@github.com:packetbeat/packetbeat.git
