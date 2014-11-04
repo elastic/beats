@@ -140,6 +140,7 @@ type Thrift struct {
 
 	PublishQueue chan *ThriftTransaction
 	Publisher    *PublisherType
+	Idl *ThriftIdl
 }
 
 var ThriftMod Thrift
@@ -152,6 +153,7 @@ type tomlThrift struct {
 	Protocol_type              string
 	Capture_reply              bool
 	Obfuscate_strings          bool
+	Idl_files				   []string
 }
 
 func (thrift *Thrift) InitDefaults() {
@@ -166,6 +168,8 @@ func (thrift *Thrift) InitDefaults() {
 }
 
 func (thrift *Thrift) readConfig() error {
+	var err error
+
 	if _ConfigMeta.IsDefined("thrift", "string_max_size") {
 		thrift.StringMaxSize = _Config.Thrift.String_max_size
 	}
@@ -198,6 +202,12 @@ func (thrift *Thrift) readConfig() error {
 	}
 	if _ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
 		thrift.ObfuscateStrings = _Config.Thrift.Obfuscate_strings
+	}
+	if _ConfigMeta.IsDefined("thrift", "idl_files") {
+		thrift.Idl, err = NewThriftIdl(_Config.Thrift.Idl_files)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -554,7 +564,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 		field.Type = byte(data[offset])
 		offset += 1
 		if field.Type == ThriftTypeStop {
-			return thrift.formatStruct(fields), true, true, offset
+			return thrift.formatStruct(fields, false, []*string{}), true, true, offset
 		}
 
 		if len(data[offset:]) < 2 {
@@ -583,14 +593,20 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 	}
 }
 
-func (thrift *Thrift) formatStruct(fields []ThriftField) string {
+func (thrift *Thrift) formatStruct(fields []ThriftField, resolve_names bool,
+	fieldnames []*string) string {
+
 	toJoin := []string{}
 	for i, field := range fields {
 		if i == thrift.CollectionMaxSize {
 			toJoin = append(toJoin, "...")
 			break
 		}
-		toJoin = append(toJoin, strconv.Itoa(int(field.Id))+": "+field.Value)
+		if resolve_names && int(field.Id) < len(fieldnames) && fieldnames[field.Id] != nil {
+			toJoin = append(toJoin, *fieldnames[field.Id]+": "+field.Value)
+		} else {
+			toJoin = append(toJoin, strconv.Itoa(int(field.Id))+": "+field.Value)
+		}
 	}
 	return "(" + strings.Join(toJoin, ", ") + ")"
 }
@@ -706,10 +722,23 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			}
 			if complete {
 				// done
+				var method *ThriftIdlMethod = nil
+				if thrift.Idl != nil {
+					method = thrift.Idl.FindMethod(m.Method)
+				}
 				if m.IsRequest {
-					m.Params = thrift.formatStruct(m.fields)
+					if method != nil {
+						m.Params = thrift.formatStruct(m.fields, true, method.Params)
+					} else {
+						m.Params = thrift.formatStruct(m.fields, false, nil)
+					}
 				} else {
-					m.Result = thrift.formatStruct(m.fields)
+					if method != nil {
+						m.Result = thrift.formatStruct(m.fields, true, method.Exceptions)
+					} else {
+						m.Result = thrift.formatStruct(m.fields, false, nil)
+					}
+
 
 					if len(m.fields) > 0 {
 						if m.fields[0].Id > 0 {

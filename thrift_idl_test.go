@@ -6,32 +6,35 @@ import (
 	"testing"
 )
 
+func thriftIdlForTesting(t *testing.T, content string) (*ThriftIdl) {
+	f, _ := ioutil.TempFile("", "")
+	defer os.Remove(f.Name())
+
+	f.WriteString(content)
+	f.Close()
+
+	idl, err := NewThriftIdl([]string{f.Name()})
+	if err != nil {
+		t.Fatal("Parsing failed:", err)
+	}
+
+	return idl
+}
+
 func TestThriftIdl_thriftReadFiles(t *testing.T) {
 
 	if testing.Verbose() {
 		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
 	}
 
-	f, _ := ioutil.TempFile("", "")
-	defer os.Remove(f.Name())
-
-	f.WriteString(`
+	idl := thriftIdlForTesting(t, `
 /* simple test */
 service Test {
-	i32 add(1:i32 num1, 2: i32 num2)
+       i32 add(1:i32 num1, 2: i32 num2)
 }
-	`)
-	f.Close()
+`)
 
-	thrift_files, err := ReadFiles([]string{f.Name()})
-	if err != nil {
-		t.Error("ReadFiles:", err)
-	}
-	if len(thrift_files) == 0 {
-		t.Errorf("Did not read any files")
-	}
-
-	methods_map := BuildMethodsMap(thrift_files)
+	methods_map := idl.MethodsByName
 	if len(methods_map) == 0 {
 		t.Error("Empty methods_map")
 	}
@@ -40,5 +43,11 @@ service Test {
 		m.Service.Name != "Test" || m.Method.Name != "add" {
 
 		t.Error("Bad data:", m)
+	}
+	if *m.Params[1] != "num1" || *m.Params[2] != "num2" {
+		t.Error("Bad params", m.Params)
+	}
+	if len(m.Exceptions) != 0 {
+		t.Error("Non empty exceptions", m.Exceptions)
 	}
 }

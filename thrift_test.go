@@ -958,3 +958,85 @@ func TestThrift_Parse_Exception(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
+
+func TestThrift_ParametersNames(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init(true)
+	thrift.TransportType = ThriftTFramed
+	thrift.Idl = thriftIdlForTesting(t, `
+		service Test {
+			   i32 add(1:i32 num1, 2: i32 num2)
+		}
+		`)
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
+		"00020000000100")
+	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "add" ||
+		trans.Request.Params != "(num1: 1, num2: 1)" ||
+		trans.Reply.Result != "(0: 2)" {
+
+		t.Error("Bad result:", trans)
+	}
+
+}
+
+func TestThrift_ExceptionName(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init(true)
+	thrift.Idl = thriftIdlForTesting(t, `
+		exception InvalidOperation {
+		  1: i32 what,
+		  2: string why
+		}
+		service Test {
+		   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),
+		}
+		`)
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	var tcp TcpStream
+	tcp.tuple = &IpPortTuple{
+		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
+	}
+
+	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
+		"1000000010c00020800010000000108000200000000080003000000040000")
+	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
+		"01080001000000040b00020000001243616e6e6f742064697669646520627920300000")
+
+	thrift.Parse(req, &tcp, 0)
+	thrift.Parse(repl, &tcp, 1)
+
+	trans := expectThriftTransaction(t, thrift)
+	if trans.Request.Method != "calculate" ||
+		trans.Request.Params != "(logid: 1, w: (1: 1, 2: 0, 3: 4))" ||
+		trans.Reply.Result != `(ouch: (1: 4, 2: "Cannot divide by 0"))` ||
+		!trans.Reply.HasException {
+
+		t.Error("Bad result:", trans)
+	}
+}
