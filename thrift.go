@@ -140,7 +140,7 @@ type Thrift struct {
 
 	PublishQueue chan *ThriftTransaction
 	Publisher    *PublisherType
-	Idl *ThriftIdl
+	Idl          *ThriftIdl
 }
 
 var ThriftMod Thrift
@@ -153,7 +153,7 @@ type tomlThrift struct {
 	Protocol_type              string
 	Capture_reply              bool
 	Obfuscate_strings          bool
-	Idl_files				   []string
+	Idl_files                  []string
 }
 
 func (thrift *Thrift) InitDefaults() {
@@ -738,7 +738,6 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 					} else {
 						m.Result = thrift.formatStruct(m.fields, false, nil)
 					}
-
 
 					if len(m.fields) > 0 {
 						if m.fields[0].Id > 0 {

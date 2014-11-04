@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func thriftIdlForTesting(t *testing.T, content string) (*ThriftIdl) {
+func thriftIdlForTesting(t *testing.T, content string) *ThriftIdl {
 	f, _ := ioutil.TempFile("", "")
 	defer os.Remove(f.Name())
 

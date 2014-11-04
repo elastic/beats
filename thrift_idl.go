@@ -10,7 +10,7 @@ type ThriftIdlMethod struct {
 	Service *parser.Service
 	Method  *parser.Method
 
-	Params []*string
+	Params     []*string
 	Exceptions []*string
 }
 
@@ -18,7 +18,7 @@ type ThriftIdl struct {
 	MethodsByName map[string]*ThriftIdlMethod
 }
 
-func fieldsToArrayById(fields []*parser.Field) ([]*string) {
+func fieldsToArrayById(fields []*parser.Field) []*string {
 	if len(fields) == 0 {
 		return []*string{}
 	}
@@ -53,9 +53,9 @@ func BuildMethodsMap(thrift_files map[string]parser.Thrift) map[string]*ThriftId
 						output[method.Name].Service.Name, service.Name)
 				}
 				output[method.Name] = &ThriftIdlMethod{
-					Service: service,
-					Method:  method,
-					Params: fieldsToArrayById(method.Arguments),
+					Service:    service,
+					Method:     method,
+					Params:     fieldsToArrayById(method.Arguments),
 					Exceptions: fieldsToArrayById(method.Exceptions),
 				}
 			}
