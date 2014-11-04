@@ -48,6 +48,11 @@ class TestCase(unittest.TestCase):
                 jsons.append(json.loads(line))
         return jsons
 
+    def copy_files(self, files, source_dir="files/"):
+        for file_ in files:
+            shutil.copy(os.path.join(source_dir, file_),
+                        self.working_dir)
+
     def setUp(self):
 
         self.template_env = jinja2.Environment(

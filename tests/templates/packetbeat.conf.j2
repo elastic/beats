@@ -67,6 +67,14 @@ device = "any"
 
 [thrift]
 transport_type = "{{ thrift_transport_type|default('socket') }}"
+idl_files = [
+    {%- if thrift_idl_files -%}
+        {%- for file in thrift_idl_files -%}
+            "{{ pb.working_dir + '/' + file }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+]
 
 [procs]
 # Which processes to monitor and how to find them. The processes can

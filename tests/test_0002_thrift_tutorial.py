@@ -57,3 +57,45 @@ class Test(TestCase):
         objs = self.read_output()
 
         self.tutorial_asserts(objs)
+
+    def test_thrift_tutorial_with_idl(self):
+        self.render_config_template(
+            thrift_ports=[9091],
+            thrift_idl_files=["tutorial.thrift", "shared.thrift"]
+        )
+        self.copy_files(["tutorial.thrift", "shared.thrift"])
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
+
+        objs = self.read_output()
+        assert len(objs) == 17
+        assert all([o["type"] == "thrift" for o in objs])
+
+        assert objs[0]["thrift"]["request"]["method"] == "ping"
+        assert objs[0]["thrift"]["request"]["params"] == "()"
+        assert objs[0]["thrift"]["reply"]["result"] == "()"
+
+        assert objs[1]["thrift"]["request"]["method"] == "add"
+        assert objs[1]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
+        assert objs[1]["thrift"]["reply"]["result"] == "(0: 2)"
+
+        assert objs[2]["thrift"]["request"]["method"] == "add16"
+        assert objs[2]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
+        assert objs[2]["thrift"]["reply"]["result"] == "(0: 2)"
+
+        assert objs[3]["thrift"]["request"]["method"] == "add64"
+        assert objs[3]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
+        assert objs[3]["thrift"]["reply"]["result"] == "(0: 2)"
+
+        assert objs[4]["thrift"]["request"]["method"] == "add_doubles"
+        assert objs[4]["thrift"]["request"]["params"] == \
+            "(num1: 1.2, num2: 1.3)"
+        assert objs[4]["thrift"]["reply"]["result"] == "(0: 2.5)"
+
+        assert objs[5]["thrift"]["request"]["method"] == "echo_bool"
+        assert objs[5]["thrift"]["request"]["params"] == "(b: true)"
+        assert objs[5]["thrift"]["reply"]["result"] == "(0: true)"
+
+        assert objs[6]["thrift"]["request"]["method"] == "echo_string"
+        assert objs[6]["thrift"]["request"]["params"] == "(s: \"hello\")"
+        assert objs[6]["thrift"]["reply"]["result"] == "(0: \"hello\")"
