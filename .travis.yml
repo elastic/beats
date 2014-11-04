@@ -10,3 +10,6 @@ before_install:
 install: make
 
 script: make test
+
+notifications:
+    - dev@packetbeat.com
