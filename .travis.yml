@@ -6,3 +6,5 @@ go:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq libpcap-dev
+
+script: make test
