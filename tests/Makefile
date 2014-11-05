@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 .PHONY: build
 build:
 	pushd packetbeat; git pull -u; popd
