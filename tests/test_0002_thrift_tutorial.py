@@ -9,31 +9,31 @@ class Test(TestCase):
 
         assert objs[0]["thrift"]["request"]["method"] == "ping"
         assert objs[0]["thrift"]["request"]["params"] == "()"
-        assert objs[0]["thrift"]["reply"]["result"] == "()"
+        assert objs[0]["thrift"]["reply"]["returnValue"] == ""
 
         assert objs[1]["thrift"]["request"]["method"] == "add"
         assert objs[1]["thrift"]["request"]["params"] == "(1: 1, 2: 1)"
-        assert objs[1]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[1]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[2]["thrift"]["request"]["method"] == "add16"
         assert objs[2]["thrift"]["request"]["params"] == "(1: 1, 2: 1)"
-        assert objs[2]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[2]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[3]["thrift"]["request"]["method"] == "add64"
         assert objs[3]["thrift"]["request"]["params"] == "(1: 1, 2: 1)"
-        assert objs[3]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[3]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[4]["thrift"]["request"]["method"] == "add_doubles"
         assert objs[4]["thrift"]["request"]["params"] == "(1: 1.2, 2: 1.3)"
-        assert objs[4]["thrift"]["reply"]["result"] == "(0: 2.5)"
+        assert objs[4]["thrift"]["reply"]["returnValue"] == "2.5"
 
         assert objs[5]["thrift"]["request"]["method"] == "echo_bool"
         assert objs[5]["thrift"]["request"]["params"] == "(1: true)"
-        assert objs[5]["thrift"]["reply"]["result"] == "(0: true)"
+        assert objs[5]["thrift"]["reply"]["returnValue"] == "true"
 
         assert objs[6]["thrift"]["request"]["method"] == "echo_string"
         assert objs[6]["thrift"]["request"]["params"] == "(1: \"hello\")"
-        assert objs[6]["thrift"]["reply"]["result"] == "(0: \"hello\")"
+        assert objs[6]["thrift"]["reply"]["returnValue"] == "\"hello\""
 
     def test_thrift_tutorial_socket(self):
         self.render_config_template(
@@ -73,29 +73,29 @@ class Test(TestCase):
 
         assert objs[0]["thrift"]["request"]["method"] == "ping"
         assert objs[0]["thrift"]["request"]["params"] == "()"
-        assert objs[0]["thrift"]["reply"]["result"] == "()"
+        assert objs[0]["thrift"]["reply"]["returnValue"] == ""
 
         assert objs[1]["thrift"]["request"]["method"] == "add"
         assert objs[1]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[1]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[1]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[2]["thrift"]["request"]["method"] == "add16"
         assert objs[2]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[2]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[2]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[3]["thrift"]["request"]["method"] == "add64"
         assert objs[3]["thrift"]["request"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[3]["thrift"]["reply"]["result"] == "(0: 2)"
+        assert objs[3]["thrift"]["reply"]["returnValue"] == "2"
 
         assert objs[4]["thrift"]["request"]["method"] == "add_doubles"
         assert objs[4]["thrift"]["request"]["params"] == \
             "(num1: 1.2, num2: 1.3)"
-        assert objs[4]["thrift"]["reply"]["result"] == "(0: 2.5)"
+        assert objs[4]["thrift"]["reply"]["returnValue"] == "2.5"
 
         assert objs[5]["thrift"]["request"]["method"] == "echo_bool"
         assert objs[5]["thrift"]["request"]["params"] == "(b: true)"
-        assert objs[5]["thrift"]["reply"]["result"] == "(0: true)"
+        assert objs[5]["thrift"]["reply"]["returnValue"] == "true"
 
         assert objs[6]["thrift"]["request"]["method"] == "echo_string"
         assert objs[6]["thrift"]["request"]["params"] == "(s: \"hello\")"
-        assert objs[6]["thrift"]["reply"]["result"] == "(0: \"hello\")"
+        assert objs[6]["thrift"]["reply"]["returnValue"] == "\"hello\""
