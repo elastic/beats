@@ -458,7 +458,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "add16" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
-		m.Result != "(0: 2)" {
+		m.ReturnValue != "2" {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -472,7 +472,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "echo_string" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
-		m.Result != `(0: "hello")` {
+		m.ReturnValue != `"hello"` {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -486,7 +486,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "echo_list" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
-		m.Result != `(0: [1, 2, 3])` {
+		m.ReturnValue != `[1, 2, 3]` {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -500,7 +500,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "echo_map" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply ||
-		m.Result != `(0: {"a": 1, "c": 3, "b": 2})` {
+		m.ReturnValue != `{"a": 1, "c": 3, "b": 2}` {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -513,7 +513,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "calculate" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
-		m.Result != `(0: 5)` {
+		m.ReturnValue != `5` {
 		t.Error("Bad result:", stream.message)
 	}
 
@@ -527,7 +527,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 	if m.IsRequest || m.Method != "calculate" ||
 		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || !m.HasException ||
-		m.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` {
+		m.Exceptions != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}
 }
@@ -582,7 +582,7 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "ping" ||
 		trans.Request.Params != "()" ||
-		trans.Reply.Result != "()" {
+		trans.Reply.ReturnValue != "" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -615,7 +615,7 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "(0: 2)" {
+		trans.Reply.ReturnValue != "2" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -653,7 +653,7 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "(0: 2)" {
+		trans.Reply.ReturnValue != "2" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -691,7 +691,7 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "(0: 2)" {
+		trans.Reply.ReturnValue != "2" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -764,7 +764,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	trans = expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "(0: 2)" {
+		trans.Reply.ReturnValue != "2" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -823,7 +823,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "" {
+		trans.Reply.ReturnValue != "" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -835,7 +835,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	trans = expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(1: 1, 2: 1)" ||
-		trans.Reply.Result != "" {
+		trans.Reply.ReturnValue != "" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -870,7 +870,7 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "echo_string" ||
 		trans.Request.Params != `(1: "*")` ||
-		trans.Reply.Result != `(0: "*")` {
+		trans.Reply.ReturnValue != `"*"` {
 
 		t.Error("Bad result:", trans)
 	}
@@ -952,7 +952,7 @@ func TestThrift_Parse_Exception(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "calculate" ||
 		trans.Request.Params != "(1: 1, 2: (1: 1, 2: 0, 3: 4))" ||
-		trans.Reply.Result != `(1: (1: 4, 2: "Cannot divide by 0"))` ||
+		trans.Reply.Exceptions != `(1: (1: 4, 2: "Cannot divide by 0"))` ||
 		!trans.Reply.HasException {
 
 		t.Error("Bad result:", trans)
@@ -991,7 +991,7 @@ func TestThrift_ParametersNames(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(num1: 1, num2: 1)" ||
-		trans.Reply.Result != "(0: 2)" {
+		trans.Reply.ReturnValue != "2" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -1034,7 +1034,8 @@ func TestThrift_ExceptionName(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "calculate" ||
 		trans.Request.Params != "(logid: 1, w: (1: 1, 2: 0, 3: 4))" ||
-		trans.Reply.Result != `(ouch: (1: 4, 2: "Cannot divide by 0"))` ||
+		trans.Reply.ReturnValue != "" ||
+		trans.Reply.Exceptions != `(ouch: (1: 4, 2: "Cannot divide by 0"))` ||
 		!trans.Reply.HasException {
 
 		t.Error("Bad result:", trans)

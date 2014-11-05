@@ -30,7 +30,8 @@ type ThriftMessage struct {
 	Method       string
 	SeqId        uint32
 	Params       string
-	Result       string
+	ReturnValue  string
+	Exceptions   string
 	FrameSize    uint32
 }
 
@@ -236,8 +237,8 @@ func (thrift *Thrift) Init(test_mode bool) error {
 }
 
 func (m *ThriftMessage) String() string {
-	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s Result: %s",
-		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.Result)
+	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s ReturnValue: %s Exceptions: %s",
+		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.ReturnValue, m.Exceptions)
 }
 
 func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
@@ -711,7 +712,8 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			if !m.IsRequest && !thrift.CaptureReply {
 				// don't actually read the result
 				DEBUG("thrift", "Don't capture reply")
-				m.Result = ""
+				m.ReturnValue = ""
+				m.Exceptions = ""
 				return true, true
 			}
 			s.parseState = ThriftFieldState
@@ -733,15 +735,21 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 						m.Params = thrift.formatStruct(m.fields, false, nil)
 					}
 				} else {
-					if method != nil {
-						m.Result = thrift.formatStruct(m.fields, true, method.Exceptions)
-					} else {
-						m.Result = thrift.formatStruct(m.fields, false, nil)
+					if len(m.fields) > 1 {
+						WARN("Thrift RPC response with more than field. Ignoring all but first")
 					}
-
 					if len(m.fields) > 0 {
-						if m.fields[0].Id > 0 {
-							// Reply field Id > 0 means exceptions
+						field := m.fields[0]
+						if field.Id == 0 {
+							m.ReturnValue = field.Value
+							m.Exceptions = ""
+						} else {
+							m.ReturnValue = ""
+							if method != nil {
+								m.Exceptions = thrift.formatStruct(m.fields, true, method.Exceptions)
+							} else {
+								m.Exceptions = thrift.formatStruct(m.fields, false, nil)
+							}
 							m.HasException = true
 						}
 					}
@@ -988,8 +996,9 @@ func (thrift *Thrift) publishTransactions() {
 		if t.Reply != nil {
 			event.Thrift = bson_concat(event.Thrift, bson.M{
 				"reply": bson.M{
-					"result": t.Reply.Result,
-					"size":   t.Reply.FrameSize,
+					"returnValue": t.Reply.ReturnValue,
+					"exceptions":  t.Reply.Exceptions,
+					"size":        t.Reply.FrameSize,
 				},
 			})
 		}
