@@ -6,6 +6,7 @@ class Test(TestCase):
     def tutorial_asserts(self, objs):
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
+        assert all([o["thrift"]["request"]["size"] > 0 for o in objs])
 
         assert objs[0]["thrift"]["request"]["method"] == "ping"
         assert objs[0]["thrift"]["request"]["params"] == "()"
