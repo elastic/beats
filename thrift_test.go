@@ -582,7 +582,9 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "ping" ||
 		trans.Request.Params != "()" ||
-		trans.Reply.ReturnValue != "" {
+		trans.Reply.ReturnValue != "" ||
+		trans.Request.FrameSize == 0 ||
+		trans.Reply.FrameSize == 0 {
 
 		t.Error("Bad result:", trans)
 	}

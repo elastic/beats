@@ -849,7 +849,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			stream.message.Tuple = tcp.tuple
 			stream.message.Direction = dir
 			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
-			if stream.message.FrameSize != 0 {
+			if stream.message.FrameSize == 0 {
 				stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
 			}
 			thrift.handleThrift(stream.message)
