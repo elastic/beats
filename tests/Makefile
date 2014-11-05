@@ -1,5 +1,6 @@
 .PHONY: build
 build:
+	pushd packetbeat; git pull -u; popd
 	make -C packetbeat
 
 env: env/bin/activate
