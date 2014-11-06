@@ -1004,7 +1004,7 @@ func (thrift *Thrift) publishTransactions() {
 			}
 
 			if thrift.Send_request {
-				event.RequestRaw = fmt.Sprintf("%s %s", t.Request.Method,
+				event.RequestRaw = fmt.Sprintf("%s%s", t.Request.Method,
 					t.Request.Params)
 			}
 		}
