@@ -1019,7 +1019,7 @@ func (thrift *Thrift) publishTransactions() {
 			})
 
 			if thrift.Send_response {
-				if t.Reply.HasException {
+				if !t.Reply.HasException {
 					event.ResponseRaw = t.Reply.ReturnValue
 				} else {
 					event.ResponseRaw = fmt.Sprintf("Exceptions: %s",
