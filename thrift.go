@@ -995,40 +995,37 @@ func (thrift *Thrift) publishTransactions() {
 		event.Thrift = bson.M{}
 
 		if t.Request != nil {
-			request_raw := ""
-			if thrift.Send_request {
-				request_raw = fmt.Sprintf("%s %s", t.Request.Method,
-					t.Request.Params)
-			}
 			event.Thrift = bson.M{
 				"request": bson.M{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
 					"size":   t.Request.FrameSize,
 				},
-				"request_raw": request_raw,
+			}
+
+			if thrift.Send_request {
+				event.RequestRaw = fmt.Sprintf("%s %s", t.Request.Method,
+					t.Request.Params)
 			}
 		}
 
 		if t.Reply != nil {
-			response_raw := ""
-			if thrift.Send_response {
-				if t.Reply.HasException {
-					response_raw = t.Reply.ReturnValue
-				} else {
-					response_raw = fmt.Sprintf("Exceptions: %s",
-						t.Reply.Exceptions)
-				}
-
-			}
 			event.Thrift = bson_concat(event.Thrift, bson.M{
 				"reply": bson.M{
 					"returnValue": t.Reply.ReturnValue,
 					"exceptions":  t.Reply.Exceptions,
 					"size":        t.Reply.FrameSize,
 				},
-				"response_raw": response_raw,
 			})
+
+			if thrift.Send_response {
+				if t.Reply.HasException {
+					event.ResponseRaw = t.Reply.ReturnValue
+				} else {
+					event.ResponseRaw = fmt.Sprintf("Exceptions: %s",
+						t.Reply.Exceptions)
+				}
+			}
 		}
 
 		if thrift.Publisher != nil {
