@@ -133,6 +133,8 @@ type Thrift struct {
 	DropAfterNStructFields int
 	CaptureReply           bool
 	ObfuscateStrings       bool
+	Send_request           bool
+	Send_response          bool
 
 	TransportType byte
 	ProtocolType  byte
@@ -166,6 +168,8 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.ProtocolType = ThriftTBinary
 	thrift.CaptureReply = true
 	thrift.ObfuscateStrings = false
+	thrift.Send_request = false
+	thrift.Send_response = false
 }
 
 func (thrift *Thrift) readConfig() error {
@@ -209,6 +213,13 @@ func (thrift *Thrift) readConfig() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	if _ConfigMeta.IsDefined("protocols.thrift", "send_request") {
+		thrift.Send_request = _Config.Protocols["thrift"].Send_request
+	}
+	if _ConfigMeta.IsDefined("protocols.thrift", "send_response") {
+		thrift.Send_response = _Config.Protocols["thrift"].Send_response
 	}
 
 	return nil
@@ -984,22 +995,39 @@ func (thrift *Thrift) publishTransactions() {
 		event.Thrift = bson.M{}
 
 		if t.Request != nil {
+			request_raw := ""
+			if thrift.Send_request {
+				request_raw = fmt.Sprintf("%s %s", t.Request.Method,
+					t.Request.Params)
+			}
 			event.Thrift = bson.M{
 				"request": bson.M{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
 					"size":   t.Request.FrameSize,
 				},
+				"request_raw": request_raw,
 			}
 		}
 
 		if t.Reply != nil {
+			response_raw := ""
+			if thrift.Send_response {
+				if t.Reply.HasException {
+					response_raw = t.Reply.ReturnValue
+				} else {
+					response_raw = fmt.Sprintf("Exceptions: %s",
+						t.Reply.Exceptions)
+				}
+
+			}
 			event.Thrift = bson_concat(event.Thrift, bson.M{
 				"reply": bson.M{
 					"returnValue": t.Reply.ReturnValue,
 					"exceptions":  t.Reply.Exceptions,
 					"size":        t.Reply.FrameSize,
 				},
+				"response_raw": response_raw,
 			})
 		}
 
