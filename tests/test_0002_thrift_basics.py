@@ -47,6 +47,9 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
+        assert all([len(o["request_raw"]) > 0 for o in objs])
+        assert objs[0]["request_raw"] == "ping()"
+
     def test_thrift_tutorial_framed(self):
         self.render_config_template(
             thrift_ports=[9090],
