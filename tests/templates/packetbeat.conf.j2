@@ -64,6 +64,8 @@ device = "any"
 
   [protocols.thrift]
   ports = [{{ redis_ports|default([9090])|join(", ") }}]
+  {% if thrift_no_send_request %}send_request = false{% endif %}
+  {% if thrift_no_send_response %}send_response = false{% endif %}
 
 [thrift]
 transport_type = "{{ thrift_transport_type|default('socket') }}"

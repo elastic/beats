@@ -47,8 +47,12 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
+        # request_raw and response_raw are present by default
         assert all([len(o["request_raw"]) > 0 for o in objs])
+        assert all(["response_raw" in o for o in objs])
         assert objs[0]["request_raw"] == "ping()"
+        assert objs[11]["response_raw"] == "Exceptions: (1: (1: 4, 2: " + \
+            "\"Cannot divide by 0\"))"
 
     def test_thrift_tutorial_framed(self):
         self.render_config_template(
@@ -147,3 +151,36 @@ class Test(TestCase):
             ("Python"*20) + "\")"
         assert objs[20]["thrift"]["reply"]["returnValue"] == '"' + \
             ("Python"*20) + '"'
+
+    def test_thrift_send_request_response(self):
+        # send_request=true send_response=false
+        self.render_config_template(
+            thrift_ports=[9091],
+            thrift_idl_files=["ThriftTest.thrift"],
+            thrift_no_send_request=False,
+            thrift_no_send_response=True,
+        )
+        self.copy_files(["ThriftTest.thrift"])
+        self.run_packetbeat(pcap="thrift_integration.pcap",
+                            debug_selectors=["thrift"])
+
+        objs = self.read_output()
+
+        assert all([len(o["request_raw"]) > 0 for o in objs])
+        assert all([o["response_raw"] == "" for o in objs])
+
+        # send_request=false send_response=false
+        self.render_config_template(
+            thrift_ports=[9091],
+            thrift_idl_files=["ThriftTest.thrift"],
+            thrift_no_send_request=True,
+            thrift_no_send_response=True,
+        )
+        self.copy_files(["ThriftTest.thrift"])
+        self.run_packetbeat(pcap="thrift_integration.pcap",
+                            debug_selectors=["thrift"])
+
+        objs = self.read_output()
+
+        assert all([o["request_raw"] == "" for o in objs])
+        assert all([o["response_raw"] == "" for o in objs])
