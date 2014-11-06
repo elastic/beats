@@ -168,8 +168,8 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.ProtocolType = ThriftTBinary
 	thrift.CaptureReply = true
 	thrift.ObfuscateStrings = false
-	thrift.Send_request = false
-	thrift.Send_response = false
+	thrift.Send_request = true
+	thrift.Send_response = true
 }
 
 func (thrift *Thrift) readConfig() error {
