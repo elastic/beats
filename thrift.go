@@ -215,10 +215,10 @@ func (thrift *Thrift) readConfig() error {
 		}
 	}
 
-	if _ConfigMeta.IsDefined("protocols.thrift", "send_request") {
+	if _ConfigMeta.IsDefined("protocols", "thrift", "send_request") {
 		thrift.Send_request = _Config.Protocols["thrift"].Send_request
 	}
-	if _ConfigMeta.IsDefined("protocols.thrift", "send_response") {
+	if _ConfigMeta.IsDefined("protocols", "thrift", "send_response") {
 		thrift.Send_response = _Config.Protocols["thrift"].Send_response
 	}
 
