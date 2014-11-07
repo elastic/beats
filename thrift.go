@@ -163,7 +163,7 @@ func (thrift *Thrift) InitDefaults() {
 	// defaults
 	thrift.StringMaxSize = 200
 	thrift.CollectionMaxSize = 15
-	thrift.DropAfterNStructFields = 100
+	thrift.DropAfterNStructFields = 500
 	thrift.TransportType = ThriftTSocket
 	thrift.ProtocolType = ThriftTBinary
 	thrift.CaptureReply = true
