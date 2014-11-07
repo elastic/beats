@@ -181,7 +181,7 @@ func (thrift *Thrift) readConfig() error {
 	if _ConfigMeta.IsDefined("thrift", "collection_max_size") {
 		thrift.CollectionMaxSize = _Config.Thrift.Collection_max_size
 	}
-	if _ConfigMeta.IsDefined("thrift", "drop_adter_n_struct_fields") {
+	if _ConfigMeta.IsDefined("thrift", "drop_after_n_struct_fields") {
 		thrift.DropAfterNStructFields = _Config.Thrift.Drop_after_n_struct_fields
 	}
 	if _ConfigMeta.IsDefined("thrift", "transport_type") {
