@@ -151,7 +151,7 @@ var ThriftMod Thrift
 type tomlThrift struct {
 	String_max_size            int
 	Collection_max_size        int
-	Drop_adter_n_struct_fields int
+	Drop_after_n_struct_fields int
 	Transport_type             string
 	Protocol_type              string
 	Capture_reply              bool
@@ -182,7 +182,7 @@ func (thrift *Thrift) readConfig() error {
 		thrift.CollectionMaxSize = _Config.Thrift.Collection_max_size
 	}
 	if _ConfigMeta.IsDefined("thrift", "drop_adter_n_struct_fields") {
-		thrift.DropAfterNStructFields = _Config.Thrift.Drop_adter_n_struct_fields
+		thrift.DropAfterNStructFields = _Config.Thrift.Drop_after_n_struct_fields
 	}
 	if _ConfigMeta.IsDefined("thrift", "transport_type") {
 		switch _Config.Thrift.Transport_type {
