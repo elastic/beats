@@ -37,6 +37,10 @@ cover:
 	go test -short -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
+.PHONY: benchmark
+benchmark:
+	go test -short -bench=.
+
 .PHONY: clean
 clean:
 	rm packetbeat || true
