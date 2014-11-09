@@ -794,7 +794,13 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 	thrift.Parse(reqzip, &tcp, 0)
 	thrift.Parse(repladd, &tcp, 1)
 
-	// TODO
+	// Nothing should be received at this point
+	select {
+	case trans := <-thrift.PublishQueue:
+		t.Error("Bad result:", trans)
+	default:
+		// ok
+	}
 }
 
 func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {

@@ -947,6 +947,12 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 		return
 	}
 
+	if trans.Request.Method != msg.Method {
+		DEBUG("thrift", "Response from another request received '%s' '%s'"+
+			". Ignoring.", trans.Request.Method, msg.Method)
+		return
+	}
+
 	trans.Reply = msg
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
