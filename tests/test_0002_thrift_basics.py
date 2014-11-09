@@ -78,6 +78,7 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
+        assert all([o["thrift"]["service"] == "Calculator"])
 
         assert objs[0]["thrift"]["request"]["method"] == "ping"
         assert objs[0]["thrift"]["request"]["params"] == "()"
@@ -131,6 +132,7 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == 25
         assert all([o["type"] == "thrift" for o in objs])
+        assert all([o["thrift"]["service"] == "ThriftTest"])
 
         # check a few things
 
