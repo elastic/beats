@@ -993,7 +993,8 @@ func TestThrift_ParametersNames(t *testing.T) {
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
 		trans.Request.Params != "(num1: 1, num2: 1)" ||
-		trans.Reply.ReturnValue != "2" {
+		trans.Reply.ReturnValue != "2" ||
+		trans.Request.Service != "Test" {
 
 		t.Error("Bad result:", trans)
 	}
@@ -1038,7 +1039,8 @@ func TestThrift_ExceptionName(t *testing.T) {
 		trans.Request.Params != "(logid: 1, w: (1: 1, 2: 0, 3: 4))" ||
 		trans.Reply.ReturnValue != "" ||
 		trans.Reply.Exceptions != `(ouch: (1: 4, 2: "Cannot divide by 0"))` ||
-		!trans.Reply.HasException {
+		!trans.Reply.HasException ||
+		trans.Request.Service != "Test" {
 
 		t.Error("Bad result:", trans)
 	}

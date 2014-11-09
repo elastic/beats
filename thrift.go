@@ -33,6 +33,7 @@ type ThriftMessage struct {
 	ReturnValue  string
 	Exceptions   string
 	FrameSize    uint32
+	Service      string
 }
 
 type ThriftField struct {
@@ -742,6 +743,8 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 				if m.IsRequest {
 					if method != nil {
 						m.Params = thrift.formatStruct(m.fields, true, method.Params)
+
+						m.Service = method.Service.Name
 					} else {
 						m.Params = thrift.formatStruct(m.fields, false, nil)
 					}
@@ -1001,6 +1004,7 @@ func (thrift *Thrift) publishTransactions() {
 					"params": t.Request.Params,
 					"size":   t.Request.FrameSize,
 				},
+				"service": t.Request.Service,
 			}
 
 			if thrift.Send_request {
