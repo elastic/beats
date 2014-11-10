@@ -10,7 +10,7 @@ project.
 Running a single test, e.g.:
 
         . env/bin/activate
-        nose
+        nosetests test_0002_thrift_basics.py:Test.test_thrift_integration
 
 ## CI
 
