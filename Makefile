@@ -3,15 +3,16 @@ CONF_PATH?=/etc/packetbeat
 VERSION?=0.4.0
 ARCH?=$(shell uname -m)
 
-.PHONY: deps
-deps:
-	go get
 
 packetbeat: *.go
 	go build
 
 go-daemon/god: go-daemon/god.c
 	make -C go-daemon
+
+.PHONY: deps
+deps:
+	go get
 
 .PHONY: install
 install: packetbeat go-daemon/god
