@@ -5,8 +5,14 @@ project.
 
 ## Running
 
-    virtualenv env
-    . env/bin/activate
-    pip install -r requirements.txt
+        make test
 
-    nosetests
+Running a single test, e.g.:
+
+        . env/bin/activate
+        nose
+
+## CI
+
+These tests are executed automatically by Travis-CI here:
+https://travis-ci.org/packetbeat/packetbeat-tests
