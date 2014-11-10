@@ -3,8 +3,11 @@ CONF_PATH?=/etc/packetbeat
 VERSION?=0.4.0
 ARCH?=$(shell uname -m)
 
-packetbeat: *.go
+.PHONY: deps
+deps:
 	go get
+
+packetbeat: *.go
 	go build
 
 go-daemon/god: go-daemon/god.c

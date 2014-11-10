@@ -7,7 +7,9 @@ before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq libpcap-dev
 
-install: make
+install:
+	- make deps
+	- make
 
 script: make test
 
