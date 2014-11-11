@@ -245,6 +245,7 @@ func main() {
 	verbose := cmdLine.Bool("v", false, "Log at INFO level")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
 	memprofile := cmdLine.String("memprofile", "", "write memory profile to this file")
+	cpuprofile := cmdLine.String("cpuprofile", "", "write cpu profile to file")
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -345,6 +346,15 @@ func main() {
 	}
 
 	loadGeoIPData()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	counter := 0
 	live := true
