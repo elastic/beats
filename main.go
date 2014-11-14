@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"runtime/pprof"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"code.google.com/p/gopacket"
@@ -326,8 +328,17 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	counter := 0
 	live := true
+
+	// On ^C or SIGTERM, gracefully set live to false
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigc
+		live = false
+	}()
+
+	counter := 0
 	loopCount := 1
 	var lastPktTime *time.Time = nil
 	for live {
