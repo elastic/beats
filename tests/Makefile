@@ -3,6 +3,7 @@ SHELL := /bin/bash
 .PHONY: build
 build:
 	pushd packetbeat; git pull -u; popd
+	make -C packetbeat deps
 	make -C packetbeat
 
 env: env/bin/activate
