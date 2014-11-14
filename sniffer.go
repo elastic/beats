@@ -9,20 +9,38 @@ import (
 )
 
 type SnifferSetup struct {
-	pcapHandle *pcap.Handle
-	config     *tomlInterfaces
+	pcapHandle     *pcap.Handle
+	afpacketHandle *AfpacketHandle
+	config         *tomlInterfaces
 
 	DataSource gopacket.PacketDataSource
 }
 
 type tomlInterfaces struct {
-	Device     string
-	Devices    []string
-	Type       string
-	File       string
-	With_vlans bool
-	Bpf_filter string
-	Snaplen    int
+	Device         string
+	Devices        []string
+	Type           string
+	File           string
+	With_vlans     bool
+	Bpf_filter     string
+	Snaplen        int
+	Buffer_size_mb int
+}
+
+// Computes the block_size and the num_blocks in such a way that the
+// allocated mmap buffer is close to but smaller than target_size_mb
+func afpacketComputeSize(target_size_mb int, frame_size int) (
+	block_size int, num_blocks int, err error) {
+
+	// 128 is the default from the gopacket library for
+	block_size = frame_size * 128
+	num_blocks = (target_size_mb * 1024 * 1024) / block_size
+
+	if num_blocks == 0 {
+		return 0, 0, fmt.Errorf("Buffer size too small")
+	}
+
+	return block_size, num_blocks, nil
 }
 
 func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) {
@@ -74,6 +92,30 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
+
+	} else if sniffer.config.Type == "af_packet" {
+		if sniffer.config.Buffer_size_mb == 0 {
+			sniffer.config.Buffer_size_mb = 24
+		}
+
+		block_size, num_blocks, err := afpacketComputeSize(
+			sniffer.config.Buffer_size_mb,
+			sniffer.config.Snaplen)
+		if err != nil {
+			return nil, err
+		}
+
+		sniffer.afpacketHandle, err = NewAfpacketHandle(
+			sniffer.config.Devices,
+			int32(sniffer.config.Snaplen),
+			block_size,
+			num_blocks,
+			500*time.Millisecond) // timeout
+		if err != nil {
+			return nil, err
+		}
+
+		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
 
 	} else {
 		return nil, fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
