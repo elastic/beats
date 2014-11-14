@@ -39,6 +39,15 @@ type Packet struct {
 	payload []byte
 }
 
+type IpPortTuple struct {
+	Src_ip, Dst_ip     uint32
+	Src_port, Dst_port uint16
+}
+
+type CmdlineTuple struct {
+	Src, Dst []byte
+}
+
 type protocolType uint16
 
 const (

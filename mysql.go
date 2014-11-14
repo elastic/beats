@@ -13,6 +13,8 @@ const (
 	MYSQL_CMD_QUERY = 3
 )
 
+const MAX_PAYLOAD_SIZE = 100 * 1024
+
 type MysqlMessage struct {
 	start int
 	end   int
@@ -573,4 +575,39 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 		}
 	}
 	return fields, rows
+}
+
+
+
+func read_lstring(data []byte, offset int) ([]byte, int) {
+	length, off := read_linteger(data, offset)
+	return data[off : off+int(length)], off + int(length)
+}
+func read_linteger(data []byte, offset int) (uint64, int) {
+	switch uint8(data[offset]) {
+	case 0xfe:
+		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
+				uint64(data[offset+2])<<16 | uint64(data[offset+3])<<24 |
+				uint64(data[offset+4])<<32 | uint64(data[offset+5])<<40 |
+				uint64(data[offset+6])<<48 | uint64(data[offset+7])<<56,
+			offset + 9
+	case 0xfd:
+		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
+			uint64(data[offset+2])<<16, offset + 4
+	case 0xfc:
+		return uint64(data[offset+1]) | uint64(data[offset+2])<<8, offset + 3
+	}
+
+	if uint64(data[offset]) >= 0xfb {
+		panic("Unexpected value in read_linteger")
+	}
+
+	return uint64(data[offset]), offset + 1
+}
+
+func read_length(data []byte, offset int) int {
+	length := uint32(data[offset]) |
+		uint32(data[offset+1])<<8 |
+		uint32(data[offset+2])<<16
+	return int(length)
 }
