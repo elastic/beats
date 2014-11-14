@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strings"
 	"time"
+
+	"code.google.com/p/gopacket"
+	"code.google.com/p/gopacket/layers"
 )
 
 const TCP_STREAM_EXPIRY = 10 * 1e9
@@ -88,7 +92,7 @@ func decideProtocol(tuple *IpPortTuple) protocolType {
 	return UnknownProtocol
 }
 
-func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8) {
+func (stream *TcpStream) AddPacket(pkt *Packet, tcphdr *layers.TCP, original_dir uint8) {
 
 	// create/reset timer
 	if stream.timer != nil {
@@ -98,7 +102,7 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 
 	// call upper layer
 	if len(pkt.payload) == 0 && stream.protocol == HttpProtocol {
-		if flags&TCP_FLAG_FIN != 0 {
+		if tcphdr.SYN {
 			HttpReceivedFin(stream, original_dir)
 		}
 		return
@@ -107,7 +111,7 @@ func (stream *TcpStream) AddPacket(pkt *Packet, flags uint8, original_dir uint8)
 	case HttpProtocol:
 		ParseHttp(pkt, stream, original_dir)
 
-		if flags&TCP_FLAG_FIN != 0 {
+		if tcphdr.FIN {
 			HttpReceivedFin(stream, original_dir)
 			ThriftMod.ReceivedFin(stream, original_dir)
 		}
@@ -157,7 +161,7 @@ func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) < 0
 }
 
-func FollowTcp(tcphdr []byte, pkt *Packet) {
+func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 	stream, exists := tcpStreamsMap[pkt.tuple]
 	var original_dir uint8 = 1
 	created := false
@@ -183,8 +187,7 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
 			original_dir = 0
 		}
 	}
-	flags := uint8(tcphdr[13])
-	tcp_start_seq := Bytes_Ntohl(tcphdr[4:8])
+	tcp_start_seq := tcphdr.Seq
 	tcp_seq := tcp_start_seq + uint32(len(pkt.payload))
 
 	DEBUG("tcp", "pkt.seq=%v len=%v stream.seq=%v",
@@ -196,7 +199,7 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
 		if !TcpSeqBefore(stream.lastSeq[original_dir], tcp_seq) {
 
 			DEBUG("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
-				Bytes_Ntohl(tcphdr[4:8]), len(pkt.payload), stream.lastSeq[original_dir])
+				tcphdr.Seq, len(pkt.payload), stream.lastSeq[original_dir])
 			return
 		}
 
@@ -212,7 +215,7 @@ func FollowTcp(tcphdr []byte, pkt *Packet) {
 	}
 	stream.lastSeq[original_dir] = tcp_seq
 
-	stream.AddPacket(pkt, flags, original_dir)
+	stream.AddPacket(pkt, tcphdr, original_dir)
 }
 
 func PrintTcpMap() {
@@ -262,4 +265,134 @@ func TcpInit() error {
 	tcpPortMap = configToPortsMap(&_Config)
 
 	return nil
+}
+
+// Reimplementation of the loopback layer type so that it implements
+// the DecodingLayer interface
+type LoopbackLayer struct {
+	layers.BaseLayer
+	Family layers.ProtocolFamily
+}
+
+func (lo *LoopbackLayer) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
+	if len(data) < 4 {
+		return fmt.Errorf("Loopback packet too small")
+	}
+
+	var prot uint32
+	if data[0] == 0 && data[1] == 0 {
+		prot = binary.BigEndian.Uint32(data[:4])
+	} else {
+		prot = binary.LittleEndian.Uint32(data[:4])
+	}
+	if prot > 0xFF {
+		return fmt.Errorf("Invalid loopback protocol %q", data[:4])
+	}
+
+	lo.Family = layers.ProtocolFamily(prot)
+
+	lo.BaseLayer = layers.BaseLayer{data[:4], data[4:]}
+
+	return nil
+}
+func (lo *LoopbackLayer) CanDecode() gopacket.LayerClass {
+	return layers.LayerTypeLoopback
+}
+
+func (lo *LoopbackLayer) NextLayerType() gopacket.LayerType {
+	DEBUG("pcapread", "Layer type: %s", lo.Family.LayerType().String())
+	return lo.Family.LayerType()
+}
+
+type DecoderStruct struct {
+	Parser *gopacket.DecodingLayerParser
+
+	sll     layers.LinuxSLL
+	lo      LoopbackLayer
+	eth     layers.Ethernet
+	ip4     layers.IPv4
+	ip6     layers.IPv6
+	tcp     layers.TCP
+	payload gopacket.Payload
+	decoded []gopacket.LayerType
+}
+
+func CreateDecoder(datalink layers.LinkType) (*DecoderStruct, error) {
+	var d DecoderStruct
+
+	DEBUG("pcapread", "Layer type: %s", datalink.String())
+
+	switch datalink {
+
+	case layers.LinkTypeLinuxSLL:
+		d.Parser = gopacket.NewDecodingLayerParser(
+			layers.LayerTypeLinuxSLL,
+			&d.sll, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+
+	case layers.LinkTypeEthernet:
+		d.Parser = gopacket.NewDecodingLayerParser(
+			layers.LayerTypeEthernet,
+			&d.eth, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+
+	case layers.LinkTypeNull: // loopback on OSx
+		d.Parser = gopacket.NewDecodingLayerParser(
+			layers.LayerTypeLoopback,
+			&d.lo, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+
+	default:
+		return nil, fmt.Errorf("Unsuported link type: %s", datalink.String())
+
+	}
+
+	d.decoded = []gopacket.LayerType{}
+
+	return &d, nil
+}
+
+func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) {
+
+	var err error
+	var packet Packet
+
+	err = decoder.Parser.DecodeLayers(data, &decoder.decoded)
+	if err != nil {
+		DEBUG("pcapread", "Decoding error: %s", err)
+		return
+	}
+
+	has_tcp := false
+
+	for _, layerType := range decoder.decoded {
+		switch layerType {
+		case layers.LayerTypeIPv4:
+			DEBUG("ip", "IPv4 packet")
+
+			packet.tuple.Src_ip = Bytes_Ntohl(decoder.ip4.SrcIP)
+			packet.tuple.Dst_ip = Bytes_Ntohl(decoder.ip4.DstIP)
+
+		case layers.LayerTypeIPv6:
+			DEBUG("ip", "IPv6 currently not supported")
+			return
+
+		case layers.LayerTypeTCP:
+			DEBUG("ip", "TCP packet")
+
+			packet.tuple.Src_port = uint16(decoder.tcp.SrcPort)
+			packet.tuple.Dst_port = uint16(decoder.tcp.DstPort)
+
+			has_tcp = true
+
+		case gopacket.LayerTypePayload:
+			packet.payload = decoder.payload
+		}
+	}
+
+	if !has_tcp {
+		DEBUG("pcapread", "No TCP header found in message")
+		return
+	}
+
+	packet.ts = ci.Timestamp
+
+	FollowTcp(&decoder.tcp, &packet)
 }
