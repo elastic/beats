@@ -14,4 +14,5 @@ install:
 script: make test
 
 notifications:
-    - dev@packetbeat.com
+    email:
+        - dev@packetbeat.com
