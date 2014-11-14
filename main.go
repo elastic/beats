@@ -254,7 +254,7 @@ func main() {
 
 		data, ci, err := sniffer.DataSource.ReadPacketData()
 
-		if err == pcap.NextErrorTimeoutExpired {
+		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
 			continue
 		}
 

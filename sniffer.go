@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/gopacket/layers"
 	"code.google.com/p/gopacket/pcap"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -28,19 +29,26 @@ type tomlInterfaces struct {
 }
 
 // Computes the block_size and the num_blocks in such a way that the
-// allocated mmap buffer is close to but smaller than target_size_mb
-func afpacketComputeSize(target_size_mb int, frame_size int) (
-	block_size int, num_blocks int, err error) {
+// allocated mmap buffer is close to but smaller than target_size_mb.
+// The restriction is that the block_size must be divisible by both the
+// frame size and page size.
+func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
+	frame_size int, block_size int, num_blocks int, err error) {
 
-	// 128 is the default from the gopacket library for
+	if snaplen > page_size {
+		return 0, 0, 0, fmt.Errorf("Snaplen cannot be bigger than the page size")
+	}
+
+	frame_size = page_size / (page_size / snaplen)
+	// 128 is the default from the gopacket library so just use that
 	block_size = frame_size * 128
 	num_blocks = (target_size_mb * 1024 * 1024) / block_size
 
 	if num_blocks == 0 {
-		return 0, 0, fmt.Errorf("Buffer size too small")
+		return 0, 0, 0, fmt.Errorf("Buffer size too small")
 	}
 
-	return block_size, num_blocks, nil
+	return frame_size, block_size, num_blocks, nil
 }
 
 func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) {
@@ -49,7 +57,8 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 
 	sniffer.config = config
 
-	if file != nil {
+	if file != nil && len(*file) > 0 {
+		DEBUG("sniffer", "Reading from file: %s", *file)
 		// we read file with the pcap provider
 		sniffer.config.Type = "pcap"
 		sniffer.config.File = *file
@@ -70,6 +79,8 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 	if sniffer.config.Snaplen == 0 {
 		sniffer.config.Snaplen = 1514
 	}
+
+	DEBUG("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
 
 	if sniffer.config.Type == "pcap" || sniffer.config.Type == "" {
 		if len(sniffer.config.File) > 0 {
@@ -98,23 +109,24 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 			sniffer.config.Buffer_size_mb = 24
 		}
 
-			if len(sniffer.config.Devices) > 1 {
-				return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
-			}
+		if len(sniffer.config.Devices) > 1 {
+			return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
+		}
 
-		block_size, num_blocks, err := afpacketComputeSize(
+		frame_size, block_size, num_blocks, err := afpacketComputeSize(
 			sniffer.config.Buffer_size_mb,
-			sniffer.config.Snaplen)
+			sniffer.config.Snaplen,
+			os.Getpagesize())
 		if err != nil {
 			return nil, err
 		}
 
 		sniffer.afpacketHandle, err = NewAfpacketHandle(
 			sniffer.config.Devices[0],
-			int32(sniffer.config.Snaplen),
+			frame_size,
 			block_size,
 			num_blocks,
-			500*time.Millisecond) // timeout
+			500*time.Millisecond)
 		if err != nil {
 			return nil, err
 		}
