@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/gopacket/layers"
 	"code.google.com/p/gopacket/pcap"
 	"fmt"
+	"time"
 )
 
 type SnifferSetup struct {
@@ -66,7 +67,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 				sniffer.config.Devices[0],
 				int32(sniffer.config.Snaplen),
 				true,
-				pcap.BlockForever)
+				500*time.Millisecond)
 			if err != nil {
 				return nil, err
 			}

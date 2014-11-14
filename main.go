@@ -18,6 +18,7 @@ import (
 
 	"code.google.com/p/gopacket"
 	"code.google.com/p/gopacket/layers"
+	"code.google.com/p/gopacket/pcap"
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
 )
@@ -349,6 +350,10 @@ func main() {
 
 		data, ci, err := sniffer.DataSource.ReadPacketData()
 
+		if err == pcap.NextErrorTimeoutExpired {
+			continue
+		}
+
 		if err == io.EOF {
 			DEBUG("pcapread", "End of file")
 			loopCount += 1
@@ -374,6 +379,7 @@ func main() {
 		if err != nil {
 			CRIT("Sniffing error: %s", err)
 			live = false
+			continue
 		}
 
 		if *file != "" {
