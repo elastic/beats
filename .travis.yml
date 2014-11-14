@@ -8,8 +8,8 @@ before_install:
     - sudo apt-get install -qq libpcap-dev
 
 install:
-	- make deps
-	- make
+    - make deps
+    - make
 
 script: make test
 
