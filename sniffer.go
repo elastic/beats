@@ -98,6 +98,10 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 			sniffer.config.Buffer_size_mb = 24
 		}
 
+			if len(sniffer.config.Devices) > 1 {
+				return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
+			}
+
 		block_size, num_blocks, err := afpacketComputeSize(
 			sniffer.config.Buffer_size_mb,
 			sniffer.config.Snaplen)
@@ -106,7 +110,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		}
 
 		sniffer.afpacketHandle, err = NewAfpacketHandle(
-			sniffer.config.Devices,
+			sniffer.config.Devices[0],
 			int32(sniffer.config.Snaplen),
 			block_size,
 			num_blocks,
