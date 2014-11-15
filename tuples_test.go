@@ -35,3 +35,29 @@ func TestTuples_tuples_ipv4(t *testing.T) {
 	assert.Equal([]byte{0x23, 0xf0}, tuple.revRaw[34:36], "rev src_port")
 	assert.Equal(36, len(tuple.revRaw))
 }
+
+func TestTuples_tuples_ipv6(t *testing.T) {
+	assert := assert.New(t)
+
+	var tuple IpPortTuple
+
+	tuple = NewIpPortTuple(16, net.ParseIP("2001:db8::1"),
+		9200, net.ParseIP("2001:db8::123:12:1"), 9201)
+
+	ip1 := []byte{0x20, 0x1, 0xd, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1}
+	ip2 := []byte{0x20, 0x1, 0xd, 0xb8, 0, 0, 0, 0, 0, 0, 0x1, 0x23, 0, 0x12, 0, 0x1}
+
+	assert.Equal(ip1, tuple.raw[0:16], "src_ip")
+	assert.Equal([]byte{0x23, 0xf0}, tuple.raw[16:18], "src_port")
+
+	assert.Equal(ip2, tuple.raw[18:34], "dst_ip")
+	assert.Equal([]byte{0x23, 0xf1}, tuple.raw[34:36], "dst_port")
+	assert.Equal(36, len(tuple.raw))
+
+	assert.Equal(ip2, tuple.revRaw[0:16], "rev dst_ip")
+	assert.Equal([]byte{0x23, 0xf1}, tuple.revRaw[16:18], "rev dst_port")
+
+	assert.Equal(ip1, tuple.revRaw[18:34], "rev src_ip")
+	assert.Equal([]byte{0x23, 0xf0}, tuple.revRaw[34:36], "rev src_port")
+	assert.Equal(36, len(tuple.revRaw))
+}
