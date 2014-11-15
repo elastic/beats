@@ -13,6 +13,8 @@ go-daemon/god: go-daemon/god.c
 .PHONY: deps
 deps:
 	go get
+	# the testify one we need to spell out, because it's only used in tests
+	go get github.com/stretchr/testify
 
 .PHONY: install
 install: packetbeat go-daemon/god

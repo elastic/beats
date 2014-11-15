@@ -378,15 +378,14 @@ func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
 	return inodes, nil
 }
 
-func (proc *ProcessesWatcher) IsLocalIp(ip uint32) bool {
-	Ip := net.IPv4(uint8(ip>>24), uint8(ip>>16), uint8(ip>>8), uint8(ip))
+func (proc *ProcessesWatcher) IsLocalIp(ip net.IP) bool {
 
-	if Ip.IsLoopback() {
+	if ip.IsLoopback() {
 		return true
 	}
 
 	for _, addr := range proc.LocalAddrs {
-		if Ip.Equal(addr) {
+		if ip.Equal(addr) {
 			return true
 		}
 	}

@@ -14,19 +14,14 @@ const TCP_STREAM_EXPIRY = 10 * 1e9
 const TCP_STREAM_HASH_SIZE = 2 ^ 16
 const TCP_MAX_DATA_IN_STREAM = 10 * 1e6
 
-type TcpTuple struct {
-	Src_ip, Dst_ip     uint32
-	Src_port, Dst_port uint16
-	stream_id          uint32
+type CmdlineTuple struct {
+	Src, Dst []byte
 }
 
-func (t TcpTuple) String() string {
-	return fmt.Sprintf("TcpTuple src[%s:%d] dst[%s:%d] stream_id[%d]",
-		Ipv4_Ntoa(t.Src_ip),
-		t.Src_port,
-		Ipv4_Ntoa(t.Dst_ip),
-		t.Dst_port,
-		t.stream_id)
+type Packet struct {
+	ts      time.Time
+	tuple   IpPortTuple
+	payload []byte
 }
 
 type TcpStream struct {
@@ -75,7 +70,7 @@ type tomlProtocol struct {
 	Send_response bool
 }
 
-var tcpStreamsMap = make(map[IpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
+var tcpStreamsMap = make(map[HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
 var tcpPortMap map[uint16]protocolType
 
 func decideProtocol(tuple *IpPortTuple) protocolType {
@@ -148,7 +143,7 @@ func (stream *TcpStream) Expire() {
 	DEBUG("mem", "Tcp stream expired")
 
 	// de-register from dict
-	delete(tcpStreamsMap, *stream.tuple)
+	delete(tcpStreamsMap, stream.tuple.raw)
 
 	// nullify to help the GC
 	stream.httpData = [2]*HttpStream{nil, nil}
@@ -162,15 +157,11 @@ func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
 }
 
 func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
-	stream, exists := tcpStreamsMap[pkt.tuple]
+	stream, exists := tcpStreamsMap[pkt.tuple.raw]
 	var original_dir uint8 = 1
 	created := false
 	if !exists {
-		// search also the other direction
-		rev_tuple := IpPortTuple{Src_ip: pkt.tuple.Dst_ip, Dst_ip: pkt.tuple.Src_ip,
-			Src_port: pkt.tuple.Dst_port, Dst_port: pkt.tuple.Src_port}
-
-		stream, exists = tcpStreamsMap[rev_tuple]
+		stream, exists = tcpStreamsMap[pkt.tuple.revRaw]
 		if !exists {
 			protocol := decideProtocol(&pkt.tuple)
 			if protocol == UnknownProtocol {
@@ -181,7 +172,7 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 
 			// create
 			stream = &TcpStream{id: GetId(), tuple: &pkt.tuple, protocol: protocol}
-			tcpStreamsMap[pkt.tuple] = stream
+			tcpStreamsMap[pkt.tuple.raw] = stream
 			created = true
 		} else {
 			original_dir = 0
@@ -367,12 +358,16 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 		case layers.LayerTypeIPv4:
 			DEBUG("ip", "IPv4 packet")
 
-			packet.tuple.Src_ip = Bytes_Ntohl(decoder.ip4.SrcIP)
-			packet.tuple.Dst_ip = Bytes_Ntohl(decoder.ip4.DstIP)
+			packet.tuple.Src_ip = decoder.ip4.SrcIP
+			packet.tuple.Dst_ip = decoder.ip4.DstIP
+			packet.tuple.ip_length = 4
 
 		case layers.LayerTypeIPv6:
-			DEBUG("ip", "IPv6 currently not supported")
-			return
+			DEBUG("ip", "IPv6 packet")
+
+			packet.tuple.Src_ip = decoder.ip6.SrcIP
+			packet.tuple.Dst_ip = decoder.ip6.DstIP
+			packet.tuple.ip_length = 16
 
 		case layers.LayerTypeTCP:
 			DEBUG("ip", "TCP packet")
@@ -394,5 +389,6 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 
 	packet.ts = ci.Timestamp
 
+	packet.tuple.ComputeHashebles()
 	FollowTcp(&decoder.tcp, &packet)
 }

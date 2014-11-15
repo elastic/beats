@@ -39,10 +39,9 @@ type MysqlMessage struct {
 	Query          string
 	IgnoreMessage  bool
 
-	Stream_id    uint32
 	Direction    uint8
 	IsTruncated  bool
-	Tuple        *IpPortTuple
+	TcpTuple     TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Raw          []byte
 }
@@ -89,7 +88,7 @@ const (
 	MysqlStateEatRows
 )
 
-var mysqlTransactionsMap = make(map[TcpTuple]*MysqlTransaction, TransactionsHashSize)
+var mysqlTransactionsMap = make(map[HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
 
 func (stream *MysqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
@@ -340,8 +339,7 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
 var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.Stream_id = tcp.id
-	m.Tuple = tcp.tuple
+	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 	m.Raw = raw_msg
@@ -356,35 +354,29 @@ var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
 func receivedMysqlRequest(msg *MysqlMessage) {
 
 	// Add it to the HT
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
-	trans := mysqlTransactionsMap[tuple]
+	trans := mysqlTransactionsMap[tuple.raw]
 	if trans != nil {
 		if len(trans.Mysql) != 0 {
 			WARN("Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
-		mysqlTransactionsMap[tuple] = trans
+		mysqlTransactionsMap[tuple.raw] = trans
 	}
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 	trans.JsTs = msg.Ts
 	trans.Src = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Src_ip),
-		Port: tuple.Src_port,
+		Ip:   msg.TcpTuple.Src_ip.String(),
+		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Dst_ip),
-		Port: tuple.Dst_port,
+		Ip:   msg.TcpTuple.Dst_ip.String(),
+		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 
@@ -415,14 +407,8 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 }
 
 func receivedMysqlResponse(msg *MysqlMessage) {
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
-	trans := mysqlTransactionsMap[tuple]
+	tuple := msg.TcpTuple
+	trans := mysqlTransactionsMap[tuple.raw]
 	if trans == nil {
 		WARN("Response from unknown transaction. Ignoring.")
 		return
@@ -465,7 +451,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 	DEBUG("mysql", "%s", trans.Response_raw)
 
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple)
+	delete(mysqlTransactionsMap, trans.tuple.raw)
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
@@ -474,7 +460,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 func (trans *MysqlTransaction) Expire() {
 	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple)
+	delete(mysqlTransactionsMap, trans.tuple.raw)
 }
 
 func dumpInCSVFormat(fields []string, rows [][]string) string {
@@ -576,8 +562,6 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 	}
 	return fields, rows
 }
-
-
 
 func read_lstring(data []byte, offset int) ([]byte, int) {
 	length, off := read_linteger(data, offset)

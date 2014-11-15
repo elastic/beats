@@ -28,10 +28,9 @@ type PgsqlMessage struct {
 	ErrorCode      string
 	ErrorSeverity  string
 
-	Stream_id    uint32
 	Direction    uint8
 	Incomplete   bool
-	Tuple        *IpPortTuple
+	TcpTuple     TcpTuple
 	CmdlineTuple *CmdlineTuple
 }
 
@@ -77,7 +76,7 @@ const (
 	CancelRequest
 )
 
-var pgsqlTransactionsMap = make(map[TcpTuple][]*PgsqlTransaction, TransactionsHashSize)
+var pgsqlTransactionsMap = make(map[HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
 
 func (stream *PgsqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
@@ -644,8 +643,15 @@ func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
 var handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.Stream_id = tcp.id
-	m.Tuple = tcp.tuple
+	m.TcpTuple = TcpTuple{
+		ip_length: tcp.tuple.ip_length,
+		Src_ip:    tcp.tuple.Src_ip,
+		Dst_ip:    tcp.tuple.Dst_ip,
+		Src_port:  tcp.tuple.Src_port,
+		Dst_port:  tcp.tuple.Dst_port,
+		stream_id: tcp.id,
+	}
+	m.TcpTuple.ComputeHashebles()
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 
@@ -658,13 +664,7 @@ var handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
 
 func receivedPgsqlRequest(msg *PgsqlMessage) {
 
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
 	// parse the query, as it might contain a list of pgsql command
 	// separated by ';'
@@ -672,8 +672,8 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 
 	DEBUG("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
-	if pgsqlTransactionsMap[tuple] == nil {
-		pgsqlTransactionsMap[tuple] = []*PgsqlTransaction{}
+	if pgsqlTransactionsMap[tuple.raw] == nil {
+		pgsqlTransactionsMap[tuple.raw] = []*PgsqlTransaction{}
 	}
 
 	for _, query := range queries {
@@ -684,13 +684,13 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 		trans.JsTs = msg.Ts
 		trans.Src = Endpoint{
-			Ip:   Ipv4_Ntoa(tuple.Src_ip),
-			Port: tuple.Src_port,
+			Ip:   msg.TcpTuple.Src_ip.String(),
+			Port: msg.TcpTuple.Src_port,
 			Proc: string(msg.CmdlineTuple.Src),
 		}
 		trans.Dst = Endpoint{
-			Ip:   Ipv4_Ntoa(tuple.Dst_ip),
-			Port: tuple.Dst_port,
+			Ip:   msg.TcpTuple.Dst_ip.String(),
+			Port: msg.TcpTuple.Dst_port,
 			Proc: string(msg.CmdlineTuple.Dst),
 		}
 
@@ -707,20 +707,14 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 		}
 		trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
 
-		pgsqlTransactionsMap[tuple] = append(pgsqlTransactionsMap[tuple], trans)
+		pgsqlTransactionsMap[tuple.raw] = append(pgsqlTransactionsMap[tuple.raw], trans)
 	}
 }
 
 func receivedPgsqlResponse(msg *PgsqlMessage) {
 
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
-	trans_list := pgsqlTransactionsMap[tuple]
+	tuple := msg.TcpTuple
+	trans_list := pgsqlTransactionsMap[tuple.raw]
 
 	if trans_list == nil || len(trans_list) == 0 {
 		WARN("Response from unknown transaction. Ignoring.")
@@ -765,26 +759,26 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 func (trans *PgsqlTransaction) Expire() {
 	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
 	// remove from map
-	for i, t := range pgsqlTransactionsMap[trans.tuple] {
+	for i, t := range pgsqlTransactionsMap[trans.tuple.raw] {
 		if t == trans {
 			removePgsqlTransaction(trans.tuple, i)
 			break
 		}
 	}
-	if len(pgsqlTransactionsMap[trans.tuple]) == 0 {
-		delete(pgsqlTransactionsMap, trans.tuple)
+	if len(pgsqlTransactionsMap[trans.tuple.raw]) == 0 {
+		delete(pgsqlTransactionsMap, trans.tuple.raw)
 	}
 }
 
 func removePgsqlTransaction(tuple TcpTuple, index int) *PgsqlTransaction {
 
-	trans_list := pgsqlTransactionsMap[tuple]
+	trans_list := pgsqlTransactionsMap[tuple.raw]
 	trans := trans_list[index]
 	trans_list = append(trans_list[:index], trans_list[index+1:]...)
 	if len(trans_list) == 0 {
-		delete(pgsqlTransactionsMap, trans.tuple)
+		delete(pgsqlTransactionsMap, trans.tuple.raw)
 	} else {
-		pgsqlTransactionsMap[tuple] = trans_list
+		pgsqlTransactionsMap[tuple.raw] = trans_list
 	}
 
 	return trans

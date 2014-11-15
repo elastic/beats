@@ -14,8 +14,7 @@ import (
 type ThriftMessage struct {
 	Ts time.Time
 
-	Stream_id    uint32
-	Tuple        *IpPortTuple
+	TcpTuple     TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Direction    uint8
 
@@ -140,7 +139,7 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transMap map[TcpTuple]*ThriftTransaction
+	transMap map[HashableTcpTuple]*ThriftTransaction
 
 	PublishQueue chan *ThriftTransaction
 	Publisher    *PublisherType
@@ -237,7 +236,7 @@ func (thrift *Thrift) Init(test_mode bool) error {
 		}
 	}
 
-	thrift.transMap = make(map[TcpTuple]*ThriftTransaction, TransactionsHashSize)
+	thrift.transMap = make(map[HashableTcpTuple]*ThriftTransaction, TransactionsHashSize)
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
@@ -859,8 +858,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			}
 
 			// all ok, go to next level
-			stream.message.Stream_id = tcp.id
-			stream.message.Tuple = tcp.tuple
+			stream.message.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
 			stream.message.Direction = dir
 			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 			if stream.message.FrameSize == 0 {
@@ -887,15 +885,9 @@ func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
 }
 
 func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple]
+	trans := thrift.transMap[tuple.raw]
 	if trans != nil {
 		DEBUG("thrift", "Two requests without reply, assuming the old one is oneway")
 		thrift.PublishQueue <- trans
@@ -905,19 +897,19 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Type:  "thrift",
 		tuple: tuple,
 	}
-	thrift.transMap[tuple] = trans
+	thrift.transMap[tuple.raw] = trans
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
 	trans.Src = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Src_ip),
-		Port: tuple.Src_port,
+		Ip:   msg.TcpTuple.Src_ip.String(),
+		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Dst_ip),
-		Port: tuple.Dst_port,
+		Ip:   msg.TcpTuple.Dst_ip.String(),
+		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 
@@ -933,15 +925,9 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 
 	// we need to search the request first.
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple]
+	trans := thrift.transMap[tuple.raw]
 	if trans == nil {
 		DEBUG("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -962,27 +948,21 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	DEBUG("thrift", "Transaction queued")
 
 	// remove from map
-	thrift.transMap[tuple] = nil
+	thrift.transMap[tuple.raw] = nil
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
 }
 
 func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
-	tuple := TcpTuple{
-		Src_ip:    tcp.tuple.Src_ip,
-		Dst_ip:    tcp.tuple.Dst_ip,
-		Src_port:  tcp.tuple.Src_port,
-		Dst_port:  tcp.tuple.Dst_port,
-		stream_id: tcp.id,
-	}
+	tuple := TcpTupleFromIpPort(tcp.tuple, tcp.id)
 
-	trans := thrift.transMap[tuple]
+	trans := thrift.transMap[tuple.raw]
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			DEBUG("thrift", "FIN and had only one transaction. Assuming one way")
 			thrift.PublishQueue <- trans
-			delete(thrift.transMap, trans.tuple)
+			delete(thrift.transMap, trans.tuple.raw)
 			if trans.timer != nil {
 				trans.timer.Stop()
 			}
@@ -1049,5 +1029,5 @@ func (thrift *Thrift) publishTransactions() {
 func (thrift *Thrift) expireTransaction(trans *ThriftTransaction) {
 	// TODO - also publish?
 	// remove from map
-	delete(thrift.transMap, trans.tuple)
+	delete(thrift.transMap, trans.tuple.raw)
 }

@@ -36,8 +36,7 @@ type HttpMessage struct {
 	Host          string
 	RequestUri    string
 	FirstLine     string
-	Stream_id     uint32
-	Tuple         *IpPortTuple
+	TcpTuple      TcpTuple
 	CmdlineTuple  *CmdlineTuple
 	Direction     uint8
 	ContentLength int
@@ -82,7 +81,7 @@ type HttpTransaction struct {
 	timer *time.Timer
 }
 
-var transactionsMap = make(map[TcpTuple]*HttpTransaction, TransactionsHashSize)
+var transactionsMap = make(map[HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
@@ -437,8 +436,7 @@ func HttpReceivedFin(tcp *TcpStream, dir uint8) {
 func handleHttp(m *HttpMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.Stream_id = tcp.id
-	m.Tuple = tcp.tuple
+	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 	m.Raw = raw_msg
@@ -452,37 +450,29 @@ func handleHttp(m *HttpMessage, tcp *TcpStream,
 
 func receivedHttpRequest(msg *HttpMessage) {
 
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
-
-	trans := transactionsMap[tuple]
+	trans := transactionsMap[msg.TcpTuple.raw]
 	if trans != nil {
 		if len(trans.Http) != 0 {
 			WARN("Two requests without a response. Dropping old request")
 		}
 	} else {
-		trans = &HttpTransaction{Type: "http", tuple: tuple}
-		transactionsMap[tuple] = trans
+		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
+		transactionsMap[msg.TcpTuple.raw] = trans
 	}
 
-	DEBUG("http", "Received request with tuple: %s", tuple)
+	DEBUG("http", "Received request with tuple: %s", msg.TcpTuple)
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
 	trans.Src = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Src_ip),
-		Port: tuple.Src_port,
+		Ip:   msg.TcpTuple.Src_ip.String(),
+		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Dst_ip),
-		Port: tuple.Dst_port,
+		Ip:   msg.TcpTuple.Dst_ip.String(),
+		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 
@@ -510,23 +500,17 @@ func receivedHttpRequest(msg *HttpMessage) {
 
 func (trans *HttpTransaction) Expire() {
 	// remove from map
-	delete(transactionsMap, trans.tuple)
+	delete(transactionsMap, trans.tuple.raw)
 }
 
 func receivedHttpResponse(msg *HttpMessage) {
 
 	// we need to search the request first.
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
 	DEBUG("http", "Received response with tuple: %s", tuple)
 
-	trans := transactionsMap[tuple]
+	trans := transactionsMap[tuple.raw]
 	if trans == nil {
 		WARN("Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -561,7 +545,7 @@ func receivedHttpResponse(msg *HttpMessage) {
 		trans.Http["response"])
 
 	// remove from map
-	delete(transactionsMap, trans.tuple)
+	delete(transactionsMap, trans.tuple.raw)
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}

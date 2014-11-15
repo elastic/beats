@@ -14,8 +14,7 @@ type RedisMessage struct {
 	NumberOfBulks int64
 	Bulks         []string
 
-	Stream_id    uint32
-	Tuple        *IpPortTuple
+	TcpTuple     TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Direction    uint8
 
@@ -215,7 +214,7 @@ var RedisCommands = map[string]struct{}{
 	"ZUNIONSTORE":      struct{}{},
 }
 
-var redisTransactionsMap = make(map[TcpTuple]*RedisTransaction, TransactionsHashSize)
+var redisTransactionsMap = make(map[HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
 
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
@@ -436,8 +435,7 @@ func isRedisCommand(key string) bool {
 func handleRedis(m *RedisMessage, tcp *TcpStream,
 	dir uint8) {
 
-	m.Stream_id = tcp.id
-	m.Tuple = tcp.tuple
+	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 
@@ -450,22 +448,16 @@ func handleRedis(m *RedisMessage, tcp *TcpStream,
 
 func receivedRedisRequest(msg *RedisMessage) {
 	// Add it to the HT
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
+	tuple := msg.TcpTuple
 
-	trans := redisTransactionsMap[tuple]
+	trans := redisTransactionsMap[tuple.raw]
 	if trans != nil {
 		if len(trans.Redis) != 0 {
 			WARN("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
-		redisTransactionsMap[tuple] = trans
+		redisTransactionsMap[tuple.raw] = trans
 	}
 
 	trans.Redis = bson.M{
@@ -478,13 +470,13 @@ func receivedRedisRequest(msg *RedisMessage) {
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 	trans.JsTs = msg.Ts
 	trans.Src = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Src_ip),
-		Port: tuple.Src_port,
+		Ip:   msg.TcpTuple.Src_ip.String(),
+		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
 	trans.Dst = Endpoint{
-		Ip:   Ipv4_Ntoa(tuple.Dst_ip),
-		Port: tuple.Dst_port,
+		Ip:   msg.TcpTuple.Dst_ip.String(),
+		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
 
@@ -498,19 +490,13 @@ func receivedRedisRequest(msg *RedisMessage) {
 func (trans *RedisTransaction) Expire() {
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple)
+	delete(redisTransactionsMap, trans.tuple.raw)
 }
 
 func receivedRedisResponse(msg *RedisMessage) {
 
-	tuple := TcpTuple{
-		Src_ip:    msg.Tuple.Src_ip,
-		Dst_ip:    msg.Tuple.Dst_ip,
-		Src_port:  msg.Tuple.Src_port,
-		Dst_port:  msg.Tuple.Dst_port,
-		stream_id: msg.Stream_id,
-	}
-	trans := redisTransactionsMap[tuple]
+	tuple := msg.TcpTuple
+	trans := redisTransactionsMap[tuple.raw]
 	if trans == nil {
 		WARN("Response from unknown transaction. Ignoring.")
 		return
@@ -536,7 +522,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 	DEBUG("redis", "Redis transaction completed: %s", trans.Redis)
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple)
+	delete(redisTransactionsMap, trans.tuple.raw)
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}

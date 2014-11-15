@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"net"
 	"testing"
 )
 
@@ -557,6 +558,16 @@ func expectThriftTransaction(t *testing.T, thrift Thrift) *ThriftTransaction {
 	return nil
 }
 
+func testIpPortTuple() *IpPortTuple {
+	t := &IpPortTuple{
+		ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: 9200, Dst_port: 9201,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
 func TestThrift_ParseSimpleTBinary(t *testing.T) {
 
 	if testing.Verbose() {
@@ -569,10 +580,7 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
-
+	tcp.tuple = testIpPortTuple()
 	req := createTestPacket(t, "800100010000000470696e670000000000")
 	repl := createTestPacket(t, "800100020000000470696e670000000000")
 
@@ -603,9 +611,7 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -637,9 +643,7 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
 	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
@@ -675,9 +679,7 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
 	repl_half1 := createTestPacket(t, "000000178001000200000003")
@@ -712,9 +714,7 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "0000001080010001000000037a69700000000000")
 
@@ -742,9 +742,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
@@ -784,9 +782,7 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	repladd := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
@@ -817,9 +813,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -863,9 +857,7 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000"+
 		"00000b00010000000568656c6c6f00")
@@ -897,9 +889,7 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 	thrift.CaptureReply = false
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108" +
 		"00020000000100")
@@ -945,9 +935,7 @@ func TestThrift_Parse_Exception(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
@@ -985,9 +973,7 @@ func TestThrift_ParametersNames(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
@@ -1028,9 +1014,7 @@ func TestThrift_ExceptionName(t *testing.T) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
 	var tcp TcpStream
-	tcp.tuple = &IpPortTuple{
-		Src_ip: 1, Dst_ip: 1, Src_port: 9200, Dst_port: 9201,
-	}
+	tcp.tuple = testIpPortTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
