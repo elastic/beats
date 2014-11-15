@@ -87,25 +87,12 @@ func TcpTupleFromIpPort(t *IpPortTuple, tcp_id uint32) TcpTuple {
 }
 
 func (t *TcpTuple) ComputeHashebles() {
-	if t.ip_length == 4 {
-		copy(t.raw[0:4], []byte(t.Src_ip))
-		copy(t.raw[4:6], []byte{byte(t.Src_port >> 8), byte(t.Src_port)})
-		copy(t.raw[6:10], []byte(t.Dst_ip))
-		copy(t.raw[10:12], []byte{byte(t.Dst_port >> 8), byte(t.Dst_port)})
-		copy(t.raw[12:16], []byte{byte(t.stream_id >> 24), byte(t.stream_id >> 16),
-			byte(t.stream_id >> 8), byte(t.stream_id)})
-
-	} else if t.ip_length == 16 {
-		copy(t.raw[0:16], []byte(t.Src_ip))
-		copy(t.raw[16:18], []byte{byte(t.Src_port >> 8), byte(t.Src_port)})
-		copy(t.raw[18:34], []byte(t.Dst_ip))
-		copy(t.raw[34:36], []byte{byte(t.Dst_port >> 8), byte(t.Dst_port)})
-		copy(t.raw[36:38], []byte{byte(t.stream_id >> 24), byte(t.stream_id >> 16),
-			byte(t.stream_id >> 8), byte(t.stream_id)})
-
-	} else {
-		panic("Unkown length")
-	}
+	copy(t.raw[0:16], t.Src_ip)
+	copy(t.raw[16:18], []byte{byte(t.Src_port >> 8), byte(t.Src_port)})
+	copy(t.raw[18:34], t.Dst_ip)
+	copy(t.raw[34:36], []byte{byte(t.Dst_port >> 8), byte(t.Dst_port)})
+	copy(t.raw[36:40], []byte{byte(t.stream_id >> 24), byte(t.stream_id >> 16),
+		byte(t.stream_id >> 8), byte(t.stream_id)})
 }
 
 func (t TcpTuple) String() string {

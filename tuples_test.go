@@ -34,6 +34,10 @@ func TestTuples_tuples_ipv4(t *testing.T) {
 	assert.Equal([]byte{192, 168, 0, 1}, tuple.revRaw[30:34], "rev src_ip")
 	assert.Equal([]byte{0x23, 0xf0}, tuple.revRaw[34:36], "rev src_port")
 	assert.Equal(36, len(tuple.revRaw))
+
+	tcp_tuple := TcpTupleFromIpPort(&tuple, 1)
+	assert.Equal(tuple.raw[:], tcp_tuple.raw[0:36], "Wrong TCP tuple hashable")
+	assert.Equal([]byte{0, 0, 0, 1}, tcp_tuple.raw[36:40], "stream_id")
 }
 
 func TestTuples_tuples_ipv6(t *testing.T) {
@@ -60,4 +64,8 @@ func TestTuples_tuples_ipv6(t *testing.T) {
 	assert.Equal(ip1, tuple.revRaw[18:34], "rev src_ip")
 	assert.Equal([]byte{0x23, 0xf0}, tuple.revRaw[34:36], "rev src_port")
 	assert.Equal(36, len(tuple.revRaw))
+
+	tcp_tuple := TcpTupleFromIpPort(&tuple, 1)
+	assert.Equal(tuple.raw[:], tcp_tuple.raw[0:36], "Wrong TCP tuple hashable")
+	assert.Equal([]byte{0, 0, 0, 1}, tcp_tuple.raw[36:40], "stream_id")
 }
