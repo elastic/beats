@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/garyburd/redigo/redis"
 )
 
 type RedisDataType uint16
@@ -19,8 +19,8 @@ const (
 
 type RedisOutputType struct {
 	OutputInterface
-	Index  string
-	Client *redis.Client
+	Index string
+	Conn  redis.Conn
 
 	TopologyExpire    time.Duration
 	ReconnectInterval time.Duration
@@ -60,7 +60,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 		out.DbTopology = config.Db_topology
 	}
 
-	out.Timeout = time.Duration(5) * time.Second
+	out.Timeout = 5 * time.Second
 	if config.Timeout != 0 {
 		out.Timeout = time.Duration(config.Timeout) * time.Second
 	}
@@ -111,27 +111,48 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 	return nil
 }
 
-func (out *RedisOutputType) Connect() error {
-	client := redis.NewTCPClient(&redis.Options{
-		Addr:        out.Hostname,
-		Password:    out.Password,
-		DB:          int64(out.Db),
-		DialTimeout: out.Timeout,
-	})
-
-	_, err := client.Ping().Result()
+func (out *RedisOutputType) RedisConnect(db int) (redis.Conn, error) {
+	conn, err := redis.DialTimeout(
+		"tcp",
+		out.Hostname,
+		out.Timeout, out.Timeout, out.Timeout)
 	if err != nil {
-		ERR("Failed connection to Redis. ping returns an error: %s", err)
+		return nil, err
+	}
+
+	if len(out.Password) > 0 {
+		_, err = conn.Do("AUTH", out.Password)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = conn.Do("PING")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = conn.Do("SELECT", db)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn, nil
+}
+
+func (out *RedisOutputType) Connect() error {
+	var err error
+	out.Conn, err = out.RedisConnect(out.Db)
+	if err != nil {
 		return err
 	}
-	out.Client = client
 	out.connected = true
 
 	return nil
 }
 
 func (out *RedisOutputType) Close() {
-	out.Client.Close()
+	out.Conn.Close()
 }
 
 func (out *RedisOutputType) SendMessagesGoroutine() {
@@ -146,9 +167,10 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 		var err error = nil
 		switch out.DataType {
 		case RedisListType:
-			_, err = out.Client.RPush(queueMsg.index, queueMsg.msg).Result()
+			_, err = out.Conn.Do("RPUSH", queueMsg.index, queueMsg.msg)
+			//DEBUG("output_redis", queueMsg.msg)
 		case RedisChannelType:
-			_, err = out.Client.Publish(queueMsg.index, queueMsg.msg).Result()
+			_, err = out.Conn.Do("PUBLISH", queueMsg.index, queueMsg.msg)
 		}
 		if err != nil {
 			ERR("Fail to publish event to REDIS: %s", err)
@@ -184,43 +206,40 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 	DEBUG("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
 	// connect to db
-	client := redis.NewTCPClient(&redis.Options{
-		Addr:        out.Hostname,
-		Password:    out.Password,
-		DialTimeout: out.Timeout,
-	})
-	client.Select(int64(out.DbTopology))
+	conn, err := out.RedisConnect(out.DbTopology)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
 
-	defer client.Close()
-
-	_, err := client.HSet(name, "ipaddrs", strings.Join(localAddrs, ",")).Result()
+	_, err = conn.Do("HSET", name, "ipaddrs", strings.Join(localAddrs, ","))
 	if err != nil {
 		ERR("[%s] Fail to set the IP addresses: %s", name, err)
 		return err
 	}
 
-	_, err = client.Expire(name, out.TopologyExpire).Result()
+	_, err = conn.Do("EXPIRE", name, int(out.TopologyExpire.Seconds()))
 	if err != nil {
 		ERR("[%s] Fail to set the expiration time: %s", name, err)
 		return err
 	}
 
-	out.UpdateLocalTopologyMap(client)
+	out.UpdateLocalTopologyMap(conn)
 
 	return nil
 }
 
-func (out *RedisOutputType) UpdateLocalTopologyMap(client *redis.Client) {
+func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 
 	TopologyMapTmp := make(map[string]string)
 
-	res, err := client.Keys("*").Result()
+	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
 		ERR("Fail to get the all agents from the topology map %s", err)
 		return
 	}
-	for _, hostname := range res {
-		res, err := client.HGet(hostname, "ipaddrs").Result()
+	for _, hostname := range hostnames {
+		res, err := redis.String(conn.Do("HGET", hostname, "ipaddrs"))
 		if err != nil {
 			ERR("[%s] Fail to get the IPs: %s", hostname, err)
 		} else {
