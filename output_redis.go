@@ -22,14 +22,16 @@ type RedisOutputType struct {
 	Index string
 	Conn  redis.Conn
 
-	TopologyExpire    time.Duration
-	ReconnectInterval time.Duration
-	Hostname          string
-	Password          string
-	Db                int
-	DbTopology        int
-	Timeout           time.Duration
-	DataType          RedisDataType
+	TopologyExpire     time.Duration
+	ReconnectInterval  time.Duration
+	Hostname           string
+	Password           string
+	Db                 int
+	DbTopology         int
+	Timeout            time.Duration
+	DataType           RedisDataType
+	FlushInterval      time.Duration
+	flush_immediatelly bool
 
 	TopologyMap  map[string]string
 	sendingQueue chan RedisQueueMsg
@@ -69,6 +71,16 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 		out.Index = config.Index
 	} else {
 		out.Index = "packetbeat"
+	}
+
+	out.FlushInterval = 1000 * time.Millisecond
+	if config.Flush_interval != 0 {
+		if config.Flush_interval < 0 {
+			out.flush_immediatelly = true
+			WARN("Flushing to REDIS on each push, performance migh be affected")
+		} else {
+			out.FlushInterval = out.FlushInterval * time.Millisecond
+		}
 	}
 
 	out.ReconnectInterval = time.Duration(1) * time.Second
@@ -157,25 +169,46 @@ func (out *RedisOutputType) Close() {
 
 func (out *RedisOutputType) SendMessagesGoroutine() {
 
-	for queueMsg := range out.sendingQueue {
+	var err error
+	flushChannel := make(<-chan time.Time)
 
-		if !out.connected {
-			DEBUG("output_redis", "Droping pkt ...")
-			continue
-		}
-		DEBUG("output_redis", "Send event to redis")
-		var err error = nil
-		switch out.DataType {
-		case RedisListType:
-			_, err = out.Conn.Do("RPUSH", queueMsg.index, queueMsg.msg)
-			//DEBUG("output_redis", queueMsg.msg)
-		case RedisChannelType:
-			_, err = out.Conn.Do("PUBLISH", queueMsg.index, queueMsg.msg)
-		}
-		if err != nil {
-			ERR("Fail to publish event to REDIS: %s", err)
-			out.connected = false
-			go out.Reconnect()
+	if !out.flush_immediatelly {
+		flushTimer := time.NewTimer(out.FlushInterval)
+		flushChannel = flushTimer.C
+	}
+
+	for {
+		select {
+		case queueMsg := <-out.sendingQueue:
+
+			if !out.connected {
+				DEBUG("output_redis", "Droping pkt ...")
+				continue
+			}
+			DEBUG("output_redis", "Send event to redis")
+			command := "RPUSH"
+			if out.DataType == RedisChannelType {
+				command = "PUBLISH"
+			}
+
+			if !out.flush_immediatelly {
+				err = out.Conn.Send(command, queueMsg.index, queueMsg.msg)
+			} else {
+				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
+			}
+			if err != nil {
+				ERR("Fail to publish event to REDIS: %s", err)
+				out.connected = false
+				go out.Reconnect()
+			}
+		case _ = <-flushChannel:
+			out.Conn.Flush()
+			_, err = out.Conn.Receive()
+			if err != nil {
+				ERR("Fail to publish event to REDIS: %s", err)
+				out.connected = false
+				go out.Reconnect()
+			}
 		}
 	}
 }

@@ -52,6 +52,7 @@ type tomlMothership struct {
 	Rotate_every_kb    int
 	Number_of_files    int
 	DataType           string
+	Flush_interval     int
 }
 
 const (
