@@ -38,6 +38,10 @@ gofmt:
 test:
 	go test -short
 
+.PHONY: testlong
+testlong:
+	go test
+
 .PHONY: cover
 cover:
 	go test -short -coverprofile=coverage.out
