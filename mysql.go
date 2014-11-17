@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"labix.org/v2/mgo/bson"
 	"strings"
 	"time"
@@ -212,9 +213,30 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 					s.parseState = MysqlStateEatRows
 				} else {
-					_ /* catalog */, off := read_lstring(s.data, s.parseOffset)
-					db /*schema */, off := read_lstring(s.data, off)
-					table /* table */, off := read_lstring(s.data, off)
+					_ /* catalog */, off, complete, err := read_lstring(s.data, s.parseOffset)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						DEBUG("mysql", "Error on read_lstring: %s", err)
+						return false, false
+					}
+					db /*schema */, off, complete, err := read_lstring(s.data, off)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						DEBUG("mysql", "Error on read_lstring: %s", err)
+						return false, false
+					}
+					table /* table */, off, complete, err := read_lstring(s.data, off)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						DEBUG("mysql", "Error on read_lstring: %s", err)
+						return false, false
+					}
 
 					db_table := string(db) + "." + string(table)
 
@@ -517,12 +539,36 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 				break
 			}
 
-			_ /* catalog */, off := read_lstring(data, offset+4)
-			_ /*database*/, off = read_lstring(data, off)
-			_ /*table*/, off = read_lstring(data, off)
-			_ /*org table*/, off = read_lstring(data, off)
-			name, off := read_lstring(data, off)
-			_ /* org name */, off = read_lstring(data, off)
+			_ /* catalog */, off, complete, err := read_lstring(data, offset+4)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
+			_ /*database*/, off, complete, err = read_lstring(data, off)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
+			_ /*table*/, off, complete, err = read_lstring(data, off)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
+			_ /*org table*/, off, complete, err = read_lstring(data, off)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
+			name, off, complete, err := read_lstring(data, off)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
+			_ /* org name */, off, complete, err = read_lstring(data, off)
+			if err != nil || !complete {
+				DEBUG("mysql", "Reading field: %s %b", err, complete)
+				return fields, rows
+			}
 
 			fields = append(fields, string(name))
 
@@ -549,7 +595,14 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 					text = []byte("NULL")
 					off++
 				} else {
-					text, off = read_lstring(data, off)
+					var err error
+					var complete bool
+					text, off, complete, err = read_lstring(data, off)
+					if err != nil {
+						DEBUG("mysql", "Error parsing rows: %s %b", err, complete)
+						// nevertheless, return what we have so far
+						return fields, rows
+					}
 				}
 
 				row = append(row, string(text))
@@ -563,30 +616,49 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 	return fields, rows
 }
 
-func read_lstring(data []byte, offset int) ([]byte, int) {
-	length, off := read_linteger(data, offset)
-	return data[off : off+int(length)], off + int(length)
+func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {
+	length, off, complete, err := read_linteger(data, offset)
+	if err != nil {
+		return nil, 0, false, err
+	}
+	if !complete || len(data[off:]) < int(length) {
+		return nil, 0, false, nil
+	}
+
+	return data[off : off+int(length)], off + int(length), true, nil
 }
-func read_linteger(data []byte, offset int) (uint64, int) {
+func read_linteger(data []byte, offset int) (uint64, int, bool, error) {
+	if len(data) == 0 {
+		return 0, 0, false, nil
+	}
 	switch uint8(data[offset]) {
 	case 0xfe:
+		if len(data[offset+1:]) < 8 {
+			return 0, 0, false, nil
+		}
 		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
 				uint64(data[offset+2])<<16 | uint64(data[offset+3])<<24 |
 				uint64(data[offset+4])<<32 | uint64(data[offset+5])<<40 |
 				uint64(data[offset+6])<<48 | uint64(data[offset+7])<<56,
-			offset + 9
+			offset + 9, true, nil
 	case 0xfd:
+		if len(data[offset+1:]) < 3 {
+			return 0, 0, false, nil
+		}
 		return uint64(data[offset+1]) | uint64(data[offset+2])<<8 |
-			uint64(data[offset+2])<<16, offset + 4
+			uint64(data[offset+3])<<16, offset + 4, true, nil
 	case 0xfc:
-		return uint64(data[offset+1]) | uint64(data[offset+2])<<8, offset + 3
+		if len(data[offset+1:]) < 2 {
+			return 0, 0, false, nil
+		}
+		return uint64(data[offset+1]) | uint64(data[offset+2])<<8, offset + 3, true, nil
 	}
 
 	if uint64(data[offset]) >= 0xfb {
-		panic("Unexpected value in read_linteger")
+		return 0, 0, false, fmt.Errorf("Unexpected value in read_linteger")
 	}
 
-	return uint64(data[offset]), offset + 1
+	return uint64(data[offset]), offset + 1, true, nil
 }
 
 func read_length(data []byte, offset int) int {
