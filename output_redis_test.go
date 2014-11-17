@@ -9,7 +9,7 @@ const redisAddr = ":6379"
 
 func TestTopologyInRedis(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
+		t.Skip("Skipping topology tests in short mode, because they require REDIS")
 	}
 
 	var publisher1 PublisherType = PublisherType{name: "proxy1"}
