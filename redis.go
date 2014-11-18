@@ -479,6 +479,9 @@ func receivedRedisRequest(msg *RedisMessage) {
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
+	if msg.Direction == TcpDirectionReverse {
+		trans.Src, trans.Dst = trans.Dst, trans.Src
+	}
 
 	if trans.timer != nil {
 		trans.timer.Stop()

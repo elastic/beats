@@ -401,6 +401,9 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
+	if msg.Direction == TcpDirectionReverse {
+		trans.Src, trans.Dst = trans.Dst, trans.Src
+	}
 
 	// Extract the method, by simply taking the first word and
 	// making it upper case.
@@ -614,6 +617,25 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 		}
 	}
 	return fields, rows
+}
+
+func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
+
+	event := Event{}
+	event.Type = "mysql"
+
+	if t.Mysql["iserror"].(bool) {
+		event.Status = ERROR_STATUS
+	} else {
+		event.Status = OK_STATUS
+	}
+
+	event.ResponseTime = t.ResponseTime
+	event.RequestRaw = t.Request_raw
+	event.ResponseRaw = t.Response_raw
+	event.Mysql = t.Mysql
+
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {

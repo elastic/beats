@@ -147,25 +147,6 @@ func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error
 
 }
 
-func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
-
-	event := Event{}
-	event.Type = "mysql"
-
-	if t.Mysql["iserror"].(bool) {
-		event.Status = ERROR_STATUS
-	} else {
-		event.Status = OK_STATUS
-	}
-
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Mysql = t.Mysql
-
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
-}
-
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
 
 	event := Event{}

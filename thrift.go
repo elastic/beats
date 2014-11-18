@@ -912,6 +912,9 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
+	if msg.Direction == TcpDirectionReverse {
+		trans.Src, trans.Dst = trans.Dst, trans.Src
+	}
 
 	trans.Request = msg
 

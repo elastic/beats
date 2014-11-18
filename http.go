@@ -475,6 +475,9 @@ func receivedHttpRequest(msg *HttpMessage) {
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
+	if msg.Direction == TcpDirectionReverse {
+		trans.Src, trans.Dst = trans.Dst, trans.Src
+	}
 
 	// save Raw message
 	trans.Request_raw = string(cutMessageBody(msg))

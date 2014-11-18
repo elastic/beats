@@ -18,6 +18,11 @@ type CmdlineTuple struct {
 	Src, Dst []byte
 }
 
+const (
+	TcpDirectionReverse  = 0
+	TcpDirectionOriginal = 1
+)
+
 type Packet struct {
 	ts      time.Time
 	tuple   IpPortTuple
@@ -158,7 +163,7 @@ func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
 
 func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 	stream, exists := tcpStreamsMap[pkt.tuple.raw]
-	var original_dir uint8 = 1
+	var original_dir uint8 = TcpDirectionOriginal
 	created := false
 	if !exists {
 		stream, exists = tcpStreamsMap[pkt.tuple.revRaw]
@@ -175,7 +180,7 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 			tcpStreamsMap[pkt.tuple.raw] = stream
 			created = true
 		} else {
-			original_dir = 0
+			original_dir = TcpDirectionReverse
 		}
 	}
 	tcp_start_seq := tcphdr.Seq
