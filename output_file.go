@@ -33,7 +33,7 @@ func (out *FileOutputType) Init(config tomlMothership) error {
 	out.rotator.Name = config.Filename
 	out.rotator.RotateEveryBytes = uint64(config.Rotate_every_kb) * 1024
 	if out.rotator.RotateEveryBytes == 0 {
-		out.rotator.RotateEveryBytes = 10 * 1024
+		out.rotator.RotateEveryBytes = 10 * 1024 * 1024
 	}
 	out.rotator.KeepFiles = config.Number_of_files
 	if out.rotator.KeepFiles == 0 {
