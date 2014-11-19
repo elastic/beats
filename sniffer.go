@@ -105,6 +105,10 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 			if err != nil {
 				return nil, err
 			}
+			err = sniffer.pcapHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
@@ -137,6 +141,8 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
+
+		// TODO: find a way to set the BPF filter
 
 	} else {
 		return nil, fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
