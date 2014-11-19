@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/gopacket/pcap"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -80,9 +81,13 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		sniffer.config.Snaplen = 1514
 	}
 
+	if sniffer.config.Type == "autodetect" || sniffer.config.Type == "" {
+		sniffer.config.Type = sniffer.autodetectSnifferType(runtime.GOOS)
+	}
+
 	DEBUG("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
 
-	if sniffer.config.Type == "pcap" || sniffer.config.Type == "" {
+	if sniffer.config.Type == "pcap" {
 		if len(sniffer.config.File) > 0 {
 			sniffer.pcapHandle, err = pcap.OpenOffline(sniffer.config.File)
 			if err != nil {
@@ -138,6 +143,14 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 	}
 
 	return &sniffer, nil
+}
+
+func (sniffer *SnifferSetup) autodetectSnifferType(ostype string) string {
+	if ostype == "linux" {
+		return "af_packet"
+	} else {
+		return "pcap"
+	}
 }
 
 func (sniffer *SnifferSetup) Reopen() error {
