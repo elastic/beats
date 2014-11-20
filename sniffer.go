@@ -13,6 +13,7 @@ import (
 type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
 	afpacketHandle *AfpacketHandle
+	pfringHandle   *PfringHandle
 	config         *tomlInterfaces
 
 	DataSource gopacket.PacketDataSource
@@ -87,7 +88,8 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 
 	DEBUG("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
 
-	if sniffer.config.Type == "pcap" {
+	switch sniffer.config.Type {
+	case "pcap":
 		if len(sniffer.config.File) > 0 {
 			sniffer.pcapHandle, err = pcap.OpenOffline(sniffer.config.File)
 			if err != nil {
@@ -113,7 +115,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
 
-	} else if sniffer.config.Type == "af_packet" {
+	case "af_packet":
 		if sniffer.config.Buffer_size_mb == 0 {
 			sniffer.config.Buffer_size_mb = 24
 		}
@@ -140,14 +142,39 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 			return nil, err
 		}
 
-		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
-
 		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.config.Bpf_filter)
 		if err != nil {
 			return nil, fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
 
-	} else {
+		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
+	case "pfring":
+		if len(sniffer.config.Devices) > 1 {
+			return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
+		}
+
+		sniffer.pfringHandle, err = NewPfringHandle(
+			sniffer.config.Devices[0],
+			sniffer.config.Snaplen,
+			true)
+
+		if err != nil {
+			return nil, err
+		}
+
+		err = sniffer.pfringHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+		if err != nil {
+			return nil, fmt.Errorf("SetBPFFilter failed: %s", err)
+		}
+
+		err = sniffer.pfringHandle.Enable()
+		if err != nil {
+			return nil, fmt.Errorf("Enable failed: %s", err)
+		}
+
+		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pfringHandle)
+
+	default:
 		return nil, fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
 	}
 
@@ -186,6 +213,8 @@ func (sniffer *SnifferSetup) Close() {
 		sniffer.pcapHandle.Close()
 	case "af_packet":
 		sniffer.afpacketHandle.Close()
+	case "pfring":
+		sniffer.pfringHandle.Close()
 	}
 }
 

@@ -10,6 +10,10 @@ packetbeat: *.go
 go-daemon/god: go-daemon/god.c
 	make -C go-daemon
 
+.PHONY: with_pfring
+with_pfring:
+	go build --tags havepfring
+
 .PHONY: deps
 deps:
 	go get
