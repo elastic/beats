@@ -1,10 +1,10 @@
 package main
 
 import (
-	"code.google.com/p/gopacket"
-	"code.google.com/p/gopacket/layers"
-	"code.google.com/p/gopacket/pcap"
 	"fmt"
+	"github.com/packetbeat/gopacket"
+	"github.com/packetbeat/gopacket/layers"
+	"github.com/packetbeat/gopacket/pcap"
 	"os"
 	"runtime"
 	"time"

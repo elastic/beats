@@ -5,8 +5,8 @@ package main
 import (
 	"time"
 
-	"code.google.com/p/gopacket"
-	"code.google.com/p/gopacket/afpacket"
+	"github.com/packetbeat/gopacket"
+	"github.com/packetbeat/gopacket/afpacket"
 )
 
 type AfpacketHandle struct {

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"code.google.com/p/gopacket"
-	"code.google.com/p/gopacket/layers"
+	"github.com/packetbeat/gopacket"
+	"github.com/packetbeat/gopacket/layers"
 )
 
 const TCP_STREAM_EXPIRY = 10 * 1e9

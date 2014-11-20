@@ -16,10 +16,10 @@ import (
 	"syscall"
 	"time"
 
-	_ "code.google.com/p/gopacket/layers"
-	"code.google.com/p/gopacket/pcap"
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
+	_ "github.com/packetbeat/gopacket/layers"
+	"github.com/packetbeat/gopacket/pcap"
 )
 
 const Version = "0.4.0"
