@@ -235,7 +235,7 @@ func main() {
 	go func() {
 		<-sigc
 		live = false
-		DEBUG("signal", "Received SIGIN, set live to false")
+		DEBUG("signal", "Received term singal, set live to false")
 	}()
 
 	counter := 0
@@ -279,6 +279,11 @@ func main() {
 		if err != nil {
 			CRIT("Sniffing error: %s", err)
 			live = false
+			continue
+		}
+
+		if len(data) == 0 {
+			// Empty packet, probably timeout from afpacket
 			continue
 		}
 
