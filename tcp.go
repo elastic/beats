@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"strings"
 	"time"
@@ -263,48 +262,11 @@ func TcpInit() error {
 	return nil
 }
 
-// Reimplementation of the loopback layer type so that it implements
-// the DecodingLayer interface
-type LoopbackLayer struct {
-	layers.BaseLayer
-	Family layers.ProtocolFamily
-}
-
-func (lo *LoopbackLayer) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
-	if len(data) < 4 {
-		return fmt.Errorf("Loopback packet too small")
-	}
-
-	var prot uint32
-	if data[0] == 0 && data[1] == 0 {
-		prot = binary.BigEndian.Uint32(data[:4])
-	} else {
-		prot = binary.LittleEndian.Uint32(data[:4])
-	}
-	if prot > 0xFF {
-		return fmt.Errorf("Invalid loopback protocol %q", data[:4])
-	}
-
-	lo.Family = layers.ProtocolFamily(prot)
-
-	lo.BaseLayer = layers.BaseLayer{data[:4], data[4:]}
-
-	return nil
-}
-func (lo *LoopbackLayer) CanDecode() gopacket.LayerClass {
-	return layers.LayerTypeLoopback
-}
-
-func (lo *LoopbackLayer) NextLayerType() gopacket.LayerType {
-	DEBUG("pcapread", "Layer type: %s", lo.Family.LayerType().String())
-	return lo.Family.LayerType()
-}
-
 type DecoderStruct struct {
 	Parser *gopacket.DecodingLayerParser
 
 	sll     layers.LinuxSLL
-	lo      LoopbackLayer
+	lo      layers.Loopback
 	eth     layers.Ethernet
 	ip4     layers.IPv4
 	ip6     layers.IPv6
