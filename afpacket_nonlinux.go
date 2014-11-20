@@ -21,3 +21,10 @@ func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 func (h *AfpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
 	return data, ci, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
+
+func (h *AfpacketHandle) SetBPFFilter(expr string) (_ error) {
+	return fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
+}
+
+func (h *AfpacketHandle) Close() {
+}

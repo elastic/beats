@@ -235,6 +235,7 @@ func main() {
 	go func() {
 		<-sigc
 		live = false
+		DEBUG("signal", "Received SIGIN, set live to false")
 	}()
 
 	counter := 0
@@ -249,6 +250,7 @@ func main() {
 		data, ci, err := sniffer.DataSource.ReadPacketData()
 
 		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
+			DEBUG("pcapread", "Interrupted")
 			continue
 		}
 
