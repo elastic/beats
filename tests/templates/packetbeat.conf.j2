@@ -52,6 +52,8 @@ device = "any"
 # configuration.
   [protocols.http]
   ports = [{{ http_ports|default([80])|join(", ") }}]
+  {% if http_no_send_request %}send_request = false{% endif %}
+  {% if http_no_send_response %}send_response = false{% endif %}
 
   [protocols.mysql]
   ports = [{{ mysql_ports|default([3306])|join(", ") }}]
