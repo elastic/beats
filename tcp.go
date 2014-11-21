@@ -99,38 +99,40 @@ func (stream *TcpStream) AddPacket(pkt *Packet, tcphdr *layers.TCP, original_dir
 	}
 	stream.timer = time.AfterFunc(TCP_STREAM_EXPIRY, func() { stream.Expire() })
 
-	// call upper layer
-	if len(pkt.payload) == 0 && stream.protocol == HttpProtocol {
-		if tcphdr.SYN {
-			HttpReceivedFin(stream, original_dir)
-		}
-		return
-	}
 	switch stream.protocol {
 	case HttpProtocol:
-		ParseHttp(pkt, stream, original_dir)
+		if len(pkt.payload) > 0 {
+			ParseHttp(pkt, stream, original_dir)
+		}
 
 		if tcphdr.FIN {
 			HttpReceivedFin(stream, original_dir)
 			ThriftMod.ReceivedFin(stream, original_dir)
 		}
-		break
+
 	case MysqlProtocol:
-		ParseMysql(pkt, stream, original_dir)
-		break
+		if len(pkt.payload) > 0 {
+			ParseMysql(pkt, stream, original_dir)
+		}
 
 	case RedisProtocol:
-		ParseRedis(pkt, stream, original_dir)
-		break
+		if len(pkt.payload) > 0 {
+			ParseRedis(pkt, stream, original_dir)
+		}
 
 	case PgsqlProtocol:
-		ParsePgsql(pkt, stream, original_dir)
-		break
+		if len(pkt.payload) > 0 {
+			ParsePgsql(pkt, stream, original_dir)
+		}
 
 	case ThriftProtocol:
-		ThriftMod.Parse(pkt, stream, original_dir)
-		break
+		if len(pkt.payload) > 0 {
+			ThriftMod.Parse(pkt, stream, original_dir)
+		}
 
+		if tcphdr.FIN {
+			ThriftMod.ReceivedFin(stream, original_dir)
+		}
 	}
 }
 
