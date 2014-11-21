@@ -126,27 +126,6 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) PublishHttpTransaction(t *HttpTransaction) error {
-
-	event := Event{}
-
-	event.Type = "http"
-	response := t.Http["response"].(bson.M)
-	code := response["code"].(uint16)
-	if code < 400 {
-		event.Status = OK_STATUS
-	} else {
-		event.Status = ERROR_STATUS
-	}
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Http = t.Http
-
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
-
-}
-
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
 
 	event := Event{}

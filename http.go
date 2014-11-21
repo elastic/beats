@@ -81,7 +81,53 @@ type HttpTransaction struct {
 	timer *time.Timer
 }
 
-var transactionsMap = make(map[HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
+type Http struct {
+	// config
+	Send_request  bool
+	Send_response bool
+
+	transactionsMap map[HashableTcpTuple]*HttpTransaction
+
+	Publisher *PublisherType
+}
+
+var HttpMod Http
+
+func (http *Http) InitDefaults() {
+	http.Send_request = true
+	http.Send_response = true
+}
+
+func (http *Http) setFromConfig() (err error) {
+	if _ConfigMeta.IsDefined("protocols", "http", "send_request") {
+		http.Send_request = _Config.Protocols["thrift"].Send_request
+	}
+	if _ConfigMeta.IsDefined("protocols", "http", "send_response") {
+		http.Send_response = _Config.Protocols["thrift"].Send_response
+	}
+
+	return nil
+}
+
+func (http *Http) Init(test_mode bool) error {
+
+	http.InitDefaults()
+
+	if !test_mode {
+		err := http.setFromConfig()
+		if err != nil {
+			return err
+		}
+	}
+
+	http.transactionsMap = make(map[HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
+
+	if !test_mode {
+		http.Publisher = &Publisher
+	}
+
+	return nil
+}
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
@@ -363,7 +409,7 @@ func (stream *HttpStream) PrepareForNewMessage() {
 	stream.message = nil
 }
 
-func ParseHttp(pkt *Packet, tcp *TcpStream, dir uint8) {
+func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 	defer RECOVER("ParseHttp exception")
 
 	DEBUG("http", "Payload received: [%s]", pkt.payload)
@@ -402,14 +448,14 @@ func ParseHttp(pkt *Packet, tcp *TcpStream, dir uint8) {
 		msg := stream.data[stream.message.start:stream.message.end]
 		censorPasswords(stream.message, msg)
 
-		handleHttp(stream.message, tcp, dir, msg)
+		http.handleHttp(stream.message, tcp, dir, msg)
 
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
 }
 
-func HttpReceivedFin(tcp *TcpStream, dir uint8) {
+func (http *Http) ReceivedFin(tcp *TcpStream, dir uint8) {
 	if tcp.httpData[dir] == nil {
 		return
 	}
@@ -426,14 +472,14 @@ func HttpReceivedFin(tcp *TcpStream, dir uint8) {
 		msg := stream.data[stream.message.start:]
 		censorPasswords(stream.message, msg)
 
-		handleHttp(stream.message, tcp, dir, msg)
+		http.handleHttp(stream.message, tcp, dir, msg)
 
 		// and reset message. Probably not needed, just to be sure.
 		stream.PrepareForNewMessage()
 	}
 }
 
-func handleHttp(m *HttpMessage, tcp *TcpStream,
+func (http *Http) handleHttp(m *HttpMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
 	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
@@ -442,22 +488,22 @@ func handleHttp(m *HttpMessage, tcp *TcpStream,
 	m.Raw = raw_msg
 
 	if m.IsRequest {
-		receivedHttpRequest(m)
+		http.receivedHttpRequest(m)
 	} else {
-		receivedHttpResponse(m)
+		http.receivedHttpResponse(m)
 	}
 }
 
-func receivedHttpRequest(msg *HttpMessage) {
+func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
-	trans := transactionsMap[msg.TcpTuple.raw]
+	trans := http.transactionsMap[msg.TcpTuple.raw]
 	if trans != nil {
 		if len(trans.Http) != 0 {
 			WARN("Two requests without a response. Dropping old request")
 		}
 	} else {
 		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
-		transactionsMap[msg.TcpTuple.raw] = trans
+		http.transactionsMap[msg.TcpTuple.raw] = trans
 	}
 
 	DEBUG("http", "Received request with tuple: %s", msg.TcpTuple)
@@ -480,7 +526,9 @@ func receivedHttpRequest(msg *HttpMessage) {
 	}
 
 	// save Raw message
-	trans.Request_raw = string(cutMessageBody(msg))
+	if http.Send_request {
+		trans.Request_raw = string(cutMessageBody(msg))
+	}
 
 	trans.Http = bson.M{
 		"host": msg.Host,
@@ -497,23 +545,23 @@ func receivedHttpRequest(msg *HttpMessage) {
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+	trans.timer = time.AfterFunc(TransactionTimeout, func() { http.expireTransaction(trans) })
 
 }
 
-func (trans *HttpTransaction) Expire() {
+func (http *Http) expireTransaction(trans *HttpTransaction) {
 	// remove from map
-	delete(transactionsMap, trans.tuple.raw)
+	delete(http.transactionsMap, trans.tuple.raw)
 }
 
-func receivedHttpResponse(msg *HttpMessage) {
+func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	// we need to search the request first.
 	tuple := msg.TcpTuple
 
 	DEBUG("http", "Received response with tuple: %s", tuple)
 
-	trans := transactionsMap[tuple.raw]
+	trans := http.transactionsMap[tuple.raw]
 	if trans == nil {
 		WARN("Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -536,9 +584,11 @@ func receivedHttpResponse(msg *HttpMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	// save Raw message
-	trans.Response_raw = string(cutMessageBody(msg))
+	if http.Send_response {
+		trans.Response_raw = string(cutMessageBody(msg))
+	}
 
-	err := Publisher.PublishHttpTransaction(trans)
+	err := http.PublishTransaction(trans)
 
 	if err != nil {
 		WARN("Publish failure: %s", err)
@@ -548,10 +598,39 @@ func receivedHttpResponse(msg *HttpMessage) {
 		trans.Http["response"])
 
 	// remove from map
-	delete(transactionsMap, trans.tuple.raw)
+	delete(http.transactionsMap, trans.tuple.raw)
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
+}
+
+func (http *Http) PublishTransaction(t *HttpTransaction) error {
+
+	if http.Publisher == nil {
+		return nil
+	}
+
+	event := Event{}
+
+	event.Type = "http"
+	response := t.Http["response"].(bson.M)
+	code := response["code"].(uint16)
+	if code < 400 {
+		event.Status = OK_STATUS
+	} else {
+		event.Status = ERROR_STATUS
+	}
+	event.ResponseTime = t.ResponseTime
+	if http.Send_request {
+		event.RequestRaw = t.Request_raw
+	}
+	if http.Send_response {
+		event.ResponseRaw = t.Response_raw
+	}
+	event.Http = t.Http
+
+	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+
 }
 
 func cutMessageBody(m *HttpMessage) []byte {

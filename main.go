@@ -212,6 +212,11 @@ func main() {
 		return
 	}
 
+	if err = HttpMod.Init(false); err != nil {
+		CRIT(err.Error())
+		return
+	}
+
 	if err = TcpInit(); err != nil {
 		CRIT(err.Error())
 		return

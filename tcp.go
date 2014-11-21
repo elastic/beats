@@ -93,12 +93,11 @@ func (stream *TcpStream) AddPacket(pkt *Packet, tcphdr *layers.TCP, original_dir
 	switch stream.protocol {
 	case HttpProtocol:
 		if len(pkt.payload) > 0 {
-			ParseHttp(pkt, stream, original_dir)
+			HttpMod.Parse(pkt, stream, original_dir)
 		}
 
 		if tcphdr.FIN {
-			HttpReceivedFin(stream, original_dir)
-			ThriftMod.ReceivedFin(stream, original_dir)
+			HttpMod.ReceivedFin(stream, original_dir)
 		}
 
 	case MysqlProtocol:
