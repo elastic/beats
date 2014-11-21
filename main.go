@@ -18,7 +18,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
-	_ "github.com/packetbeat/gopacket/layers"
+	"github.com/packetbeat/gopacket/layers"
 	"github.com/packetbeat/gopacket/pcap"
 )
 
@@ -140,8 +140,9 @@ func main() {
 	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
 	verbose := cmdLine.Bool("v", false, "Log at INFO level")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
-	memprofile := cmdLine.String("memprofile", "", "write memory profile to this file")
-	cpuprofile := cmdLine.String("cpuprofile", "", "write cpu profile to file")
+	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
+	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
+	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -227,6 +228,20 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	var dumper *pcap.Dumper = nil
+	if *dumpfile != "" {
+		p, err := pcap.OpenDead(layers.LinkTypeEthernet, 65535)
+		if err != nil {
+			CRIT(err.Error())
+			return
+		}
+		dumper, err = p.NewDumper(*dumpfile)
+		if err != nil {
+			CRIT(err.Error())
+			return
+		}
+	}
+
 	live := true
 
 	// On ^C or SIGTERM, gracefully set live to false
@@ -302,6 +317,9 @@ func main() {
 		}
 		counter++
 
+		if dumper != nil {
+			dumper.WritePacketData(data, ci)
+		}
 		DEBUG("pcapread", "Packet number: %d", counter)
 		Packetbeat.Decoder.DecodePacketData(data, &ci)
 	}
@@ -316,5 +334,9 @@ func main() {
 		writeHeapProfile(*memprofile)
 
 		debugMemStats()
+	}
+
+	if dumper != nil {
+		dumper.Close()
 	}
 }
