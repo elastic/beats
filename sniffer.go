@@ -37,11 +37,12 @@ type tomlInterfaces struct {
 func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
 	frame_size int, block_size int, num_blocks int, err error) {
 
-	if snaplen > page_size {
-		return 0, 0, 0, fmt.Errorf("Snaplen cannot be bigger than the page size")
+	if snaplen < page_size {
+		frame_size = page_size / (page_size / snaplen)
+	} else {
+		frame_size = (snaplen/page_size + 1) * page_size
 	}
 
-	frame_size = page_size / (page_size / snaplen)
 	// 128 is the default from the gopacket library so just use that
 	block_size = frame_size * 128
 	num_blocks = (target_size_mb * 1024 * 1024) / block_size
