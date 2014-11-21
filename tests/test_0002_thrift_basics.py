@@ -131,7 +131,7 @@ class Test(TestCase):
                             debug_selectors=["thrift"])
 
         objs = self.read_output()
-        assert len(objs) == 25
+        assert len(objs) == 26
         assert all([o["type"] == "thrift" for o in objs])
         assert all([o["thrift"]["service"] == "ThriftTest"])
 
@@ -149,10 +149,10 @@ class Test(TestCase):
         assert objs[17]["thrift"]["request"]["params"] == "(secondsToSleep: 1)"
         assert "reply" not in objs[17]["thrift"]
 
-        assert objs[20]["thrift"]["request"]["method"] == "testString"
-        assert objs[20]["thrift"]["request"]["params"] == "(thing: \"" + \
+        assert objs[21]["thrift"]["request"]["method"] == "testString"
+        assert objs[21]["thrift"]["request"]["params"] == "(thing: \"" + \
             ("Python" * 20) + "\")"
-        assert objs[20]["thrift"]["reply"]["returnValue"] == '"' + \
+        assert objs[21]["thrift"]["reply"]["returnValue"] == '"' + \
             ("Python" * 20) + '"'
 
     def test_thrift_send_request_response(self):
