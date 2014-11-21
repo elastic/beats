@@ -58,15 +58,6 @@ func GetId() uint32 {
 	return __id
 }
 
-const (
-	TCP_FLAG_FIN = 0x01
-	TCP_FLAG_SYN = 0x02
-	TCP_FLAG_RST = 0x04
-	TCP_FLAG_PSH = 0x08
-	TCP_FLAG_ACK = 0x10
-	TCP_FLAG_URG = 0x20
-)
-
 // Config
 type tomlProtocol struct {
 	Ports         []int
@@ -162,6 +153,10 @@ func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) < 0
 }
 
+func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
+	return int32(seq1-seq2) <= 0
+}
+
 func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 	stream, exists := tcpStreamsMap[pkt.tuple.raw]
 	var original_dir uint8 = TcpDirectionOriginal
@@ -187,13 +182,13 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 	tcp_start_seq := tcphdr.Seq
 	tcp_seq := tcp_start_seq + uint32(len(pkt.payload))
 
-	DEBUG("tcp", "pkt.seq=%v len=%v stream.seq=%v",
-		tcp_start_seq, len(pkt.payload), stream.lastSeq[original_dir])
+	DEBUG("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
+		tcp_start_seq, tcp_seq, stream.lastSeq[original_dir], len(pkt.payload))
 
 	if len(pkt.payload) > 0 &&
 		stream.lastSeq[original_dir] != 0 {
 
-		if !TcpSeqBefore(stream.lastSeq[original_dir], tcp_seq) {
+		if TcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
 
 			DEBUG("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 				tcphdr.Seq, len(pkt.payload), stream.lastSeq[original_dir])
@@ -353,6 +348,12 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 
 	if !has_tcp {
 		DEBUG("pcapread", "No TCP header found in message")
+		return
+	}
+
+	if len(packet.payload) == 0 && !decoder.tcp.FIN {
+		// We have no use for this atm.
+		DEBUG("pcapread", "Ignore empty non-FIN packet")
 		return
 	}
 
