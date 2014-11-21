@@ -25,14 +25,14 @@ func NewAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 			afpacket.OptBlockSize(block_size),
 			afpacket.OptNumBlocks(num_blocks),
 			afpacket.OptPollTimeout(timeout))
+	} else {
+		h.TPacket, err = afpacket.NewTPacket(
+			afpacket.OptInterface(device),
+			afpacket.OptFrameSize(snaplen),
+			afpacket.OptBlockSize(block_size),
+			afpacket.OptNumBlocks(num_blocks),
+			afpacket.OptPollTimeout(timeout))
 	}
-
-	h.TPacket, err = afpacket.NewTPacket(
-		afpacket.OptInterface(device),
-		afpacket.OptFrameSize(snaplen),
-		afpacket.OptBlockSize(block_size),
-		afpacket.OptNumBlocks(num_blocks),
-		afpacket.OptPollTimeout(timeout))
 
 	return &h, err
 }
