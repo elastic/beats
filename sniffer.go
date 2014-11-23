@@ -80,7 +80,11 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		}
 	}
 	if sniffer.config.Snaplen == 0 {
-		sniffer.config.Snaplen = 1514
+		if sniffer.config.Devices[0] == "any" || sniffer.config.Devices[1] == "lo" {
+			sniffer.config.Snaplen = 16436
+		} else {
+			sniffer.config.Snaplen = 1514
+		}
 	}
 
 	if sniffer.config.Type == "autodetect" || sniffer.config.Type == "" {
