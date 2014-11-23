@@ -381,7 +381,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 	trans := mysqlTransactionsMap[tuple.raw]
 	if trans != nil {
 		if len(trans.Mysql) != 0 {
-			WARN("Two requests without a Response. Dropping old request: %s", trans.Mysql)
+			DEBUG("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
