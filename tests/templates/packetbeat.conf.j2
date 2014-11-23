@@ -101,6 +101,14 @@ idl_files = [
 #
 #name=
 
+tags = [
+    {%- if agent_tags -%}
+        {%- for tag in agent_tags -%}
+            "{{ tag }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif -%}]
+
 # Uncomment the following if you want to ignore transactions created
 # by the server on which the agent is installed. This option is useful
 # to remove duplicates if agents are installed on multiple servers.
