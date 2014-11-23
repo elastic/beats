@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 	"time"
 
 	"labix.org/v2/mgo/bson"
@@ -11,6 +12,7 @@ import (
 
 type PublisherType struct {
 	name           string
+	tags           string
 	disabled       bool
 	Index          string
 	Output         []OutputInterface
@@ -33,6 +35,7 @@ type tomlAgent struct {
 	Refresh_topology_freq int
 	Ignore_outgoing       bool
 	Topology_expire       int
+	Tags                  []string
 }
 type tomlMothership struct {
 	Enabled            bool
@@ -80,6 +83,7 @@ type Event struct {
 	Status       string    `json:"status"`
 	RequestRaw   string    `json:"request_raw"`
 	ResponseRaw  string    `json:"response_raw"`
+	Tags         string    `json:"tags"`
 
 	Mysql  bson.M `json:"mysql"`
 	Http   bson.M `json:"http"`
@@ -159,6 +163,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 	event.Dst_ip = dst.Ip
 	event.Dst_port = dst.Port
 	event.Dst_proc = dst.Proc
+	event.Tags = publisher.tags
 
 	// set src_country if no src_server is set
 	event.Src_country = ""
@@ -329,6 +334,10 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 
 		INFO("No agent name configured, using hostname '%s'", publisher.name)
+	}
+
+	if len(_Config.Agent.Tags) > 0 {
+		publisher.tags = strings.Join(_Config.Agent.Tags, " ")
 	}
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
