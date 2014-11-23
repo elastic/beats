@@ -79,7 +79,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 			out.flush_immediatelly = true
 			WARN("Flushing to REDIS on each push, performance migh be affected")
 		} else {
-			out.FlushInterval = out.FlushInterval * time.Millisecond
+			out.FlushInterval = time.Duration(config.Flush_interval) * time.Millisecond
 		}
 	}
 
@@ -109,6 +109,7 @@ func (out *RedisOutputType) Init(config tomlMothership) error {
 	}
 	INFO("[RedisOutput] Redis connection timeout %s", out.Timeout)
 	INFO("[RedisOutput] Redis reconnect interval %s", out.ReconnectInterval)
+	INFO("[RedisOutput] Redis flushing interval %s", out.FlushInterval)
 	INFO("[RedisOutput] Using index pattern %s", out.Index)
 	INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
 	INFO("[RedisOutput] Using db %d for storing events", out.Db)
