@@ -6,7 +6,6 @@ import (
 	"github.com/packetbeat/gopacket/layers"
 	"github.com/packetbeat/gopacket/pcap"
 	"os"
-	"runtime"
 	"time"
 )
 
@@ -88,7 +87,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 	}
 
 	if sniffer.config.Type == "autodetect" || sniffer.config.Type == "" {
-		sniffer.config.Type = sniffer.autodetectSnifferType(runtime.GOOS)
+		sniffer.config.Type = "pcap"
 	}
 
 	DEBUG("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
@@ -184,14 +183,6 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 	}
 
 	return &sniffer, nil
-}
-
-func (sniffer *SnifferSetup) autodetectSnifferType(ostype string) string {
-	if ostype == "linux" {
-		return "af_packet"
-	} else {
-		return "pcap"
-	}
 }
 
 func (sniffer *SnifferSetup) Reopen() error {
