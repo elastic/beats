@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"labix.org/v2/mgo/bson"
 )
@@ -367,7 +369,11 @@ func (thrift *Thrift) readAndQuoteString(data []byte) (value string, ok bool, co
 	} else if thrift.ObfuscateStrings {
 		value = `"*"`
 	} else {
-		value = strconv.Quote(value)
+		if utf8.ValidString(value) {
+			value = strconv.Quote(value)
+		} else {
+			value = hex.EncodeToString([]byte(value))
+		}
 	}
 
 	return value, ok, complete, off

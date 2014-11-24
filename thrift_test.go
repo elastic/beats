@@ -531,6 +531,20 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 		m.Exceptions != `(1: (1: 4, 2: "Cannot divide by 0"))` {
 		t.Error("Bad result:", stream.message)
 	}
+
+	data, _ = hex.DecodeString("800100020000000b6563686f5f62696e61727900000000" +
+		"0b000000000008ab0c1d281a00000000")
+	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	ok, complete = thrift.messageParser(&stream)
+	m = stream.message
+	if !ok || !complete {
+		t.Error("Bad result:", ok, complete)
+	}
+	if m.IsRequest || m.Method != "echo_binary" ||
+		m.SeqId != 0 || m.Type != ThriftMsgTypeReply || m.HasException ||
+		m.ReturnValue != `ab0c1d281a000000` {
+		t.Error("Bad result:", stream.message)
+	}
 }
 
 // Returns a minimally filled Packet struct, only the payload
