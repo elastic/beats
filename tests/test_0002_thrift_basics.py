@@ -187,3 +187,20 @@ class Test(TestCase):
 
         assert all([o["request_raw"] == "" for o in objs])
         assert all([o["response_raw"] == "" for o in objs])
+
+    def test_thrift_binary(self):
+        self.render_config_template(
+            thrift_ports=[9090],
+            thrift_transport_type="framed",
+            thrift_idl_files=["tutorial.thrift", "shared.thrift"]
+        )
+        self.copy_files(["tutorial.thrift", "shared.thrift"])
+        self.run_packetbeat(pcap="thrift_echo_binary.pcap",
+                            debug_selectors=["thrift"])
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert o["thrift"]["request"]["method"] == "echo_binary"
+        assert o["thrift"]["reply"]["returnValue"] == "ab0c1d281a000000"
