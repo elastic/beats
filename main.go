@@ -55,6 +55,7 @@ type tomlConfig struct {
 	Agent      tomlAgent
 	Logging    tomlLogging
 	Passwords  tomlPasswords
+	ContentTypes tomlContentTypes
 	Thrift     tomlThrift
 }
 
@@ -69,6 +70,9 @@ type tomlLogging struct {
 
 type tomlPasswords struct {
 	Hide_keywords []string
+}
+type tomlContentTypes struct {
+	include_body []string
 }
 
 var _Config tomlConfig
