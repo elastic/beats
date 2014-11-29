@@ -18,7 +18,7 @@ const (
 	BODY_CHUNKED_START
 	BODY_CHUNKED
 )
-
+// Http Message
 type HttpMessage struct {
 	Ts                time.Time
 	hasContentLength  bool
@@ -31,21 +31,21 @@ type HttpMessage struct {
 	chunked_body      []byte
 
 	IsRequest     bool
-	Method        string
-	StatusCode    uint16
-	Host          string
-	RequestUri    string
-	FirstLine     string
 	TcpTuple      TcpTuple
 	CmdlineTuple  *CmdlineTuple
 	Direction     uint8
+	//Request Info
+	FirstLine     string
+	RequestUri    string
+	Method        string
+	StatusCode    uint16
+	StatusPhrase  string
+	// Http Headers
 	ContentLength int
-	ContentType   string
-	ReasonPhrase  string
-	XForwardedFor string
-
+	Headers       map[string]string
+	//Raw Data
 	Raw []byte
-
+	//Timeing
 	start int
 	end   int
 }
@@ -155,12 +155,11 @@ func parseResponseStatus(s []byte) (uint16, string, error) {
 	if p == -1 {
 		return uint16(status_code), "", MsgError("Not beeing able to identify status code")
 	}
-	reason_phrase := s[p+1:]
-	return uint16(status_code), string(reason_phrase), nil
+	status_phrase := s[p+1:]
+	return uint16(status_code), string(status_phrase), nil
 }
 
 func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
-
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
 		// Expected \":\" in headers. Assuming incomplete"
@@ -182,22 +181,25 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 		if len(data) > p && (data[p+1] == ' ' || data[p+1] == '\t') {
 			p = p + 2
 		} else {
-
-			if bytes.Equal(bytes.ToLower(data[:i]), []byte("host")) {
-				m.Host = string(bytes.Trim(data[i+1:p], " \t"))
-			} else if bytes.Equal(bytes.ToLower(data[:i]), []byte("content-length")) {
-				m.ContentLength, _ = strconv.Atoi(string(bytes.Trim(data[i+1:p], " \t")))
-				m.hasContentLength = true
-			} else if bytes.Equal(bytes.ToLower(data[:i]), []byte("content-type")) {
-				m.ContentType = string(bytes.Trim(data[i+1:p], " \t"))
-			} else if bytes.Equal(bytes.ToLower(data[:i]), []byte("connection")) {
-				m.connection = string(bytes.Trim(data[i+1:p], " \t"))
-			} else if bytes.Equal(bytes.ToLower(data[:i]), []byte("transfer-encoding")) {
-				m.transfer_encoding = string(bytes.Trim(data[i+1:p], " \t"))
-			} else if bytes.Equal(bytes.ToLower(data[:i]), []byte("x-forwarded-for")) {
-				m.XForwardedFor = string(bytes.Trim(data[i+1:p], " \t"))
+			headerName :=string(data[:i])
+			headerVal  := string(bytes.Trim(data[i+1:p], " \t"))
+			DEBUG("http", "Header: %s Value: %s\n", headerName, headerVal)
+			if (m.Headers == nil ){
+					DEBUG("http", "ACK Headers is not inialized");
 			}
-
+			if ( headerName == "Set-Cookie" ){
+				cstring := strings.Split(headerVal,";")
+				for _, cval := range cstring {
+					cookie := strings.Split(cval,"=");
+					m.Headers["Set-Cookie-"+strings.Trim(cookie[0]," ")] = cookie[1];
+				}				
+			}else{
+				if val, ok :=m.Headers[headerName]; ok{
+					m.Headers[headerName] = val + "|" + headerVal 
+				}else{
+					m.Headers[headerName] = headerVal;
+				}
+			}
 			return true, true, p + 2
 		}
 	}
@@ -234,12 +236,12 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
 				//RESPONSE
 				m.IsRequest = false
 				version = fline[5:8]
-				m.StatusCode, m.ReasonPhrase, err = parseResponseStatus(fline[9:])
+				m.StatusCode, m.StatusPhrase, err = parseResponseStatus(fline[9:])
 				if err != nil {
 					WARN("Failed to understand HTTP response status: %s", fline[9:])
 					return false, false
 				}
-				DEBUG("http", "HTTP status_code=%d, reason_phrase=%s", m.StatusCode, m.ReasonPhrase)
+				DEBUG("http", "HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
 
 			} else {
 				// REQUEST
@@ -420,6 +422,7 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			data:      pkt.payload,
 			message:   &HttpMessage{Ts: pkt.ts},
 		}
+		
 	} else {
 		// concatenate bytes
 		tcp.httpData[dir].data = append(tcp.httpData[dir].data, pkt.payload...)
@@ -433,7 +436,7 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 	if stream.message == nil {
 		stream.message = &HttpMessage{Ts: pkt.ts}
 	}
-
+	stream.message.Headers = make(map[string]string)
 	ok, complete := httpMessageParser(stream)
 
 	if !ok {
@@ -531,14 +534,11 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	}
 
 	trans.Http = bson.M{
-		"host": msg.Host,
 		"request": bson.M{
 			"method":          msg.Method,
 			"uri":             msg.RequestUri,
-			"uri.raw":         msg.RequestUri,
-			"line":            msg.FirstLine,
-			"line.raw":        msg.FirstLine,
-			"x-forwarded-for": msg.XForwardedFor,
+			"first_line":            msg.FirstLine,
+			"headers": msg.Headers,
 		},
 	}
 
@@ -571,13 +571,12 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		WARN("Response without a known request. Ignoring.")
 		return
 	}
-
+	
 	trans.Http = bson_concat(trans.Http, bson.M{
-		"content_length": msg.ContentLength,
-		"content_type":   msg.ContentType,
 		"response": bson.M{
-			"code":   msg.StatusCode,
-			"phrase": msg.ReasonPhrase,
+			"status_code":   msg.StatusCode,
+			"content_length": msg.ContentLength,
+			"Headers": msg.Headers,
 		},
 	})
 
@@ -614,7 +613,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 
 	event.Type = "http"
 	response := t.Http["response"].(bson.M)
-	code := response["code"].(uint16)
+	code := response["status_code"].(uint16)
 	if code < 400 {
 		event.Status = OK_STATUS
 	} else {
@@ -640,7 +639,8 @@ func cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
 	// add body
-	if len(m.ContentType) == 0 || shouldIncludeInBody(m.ContentType) {
+	contentType, ok := m.Headers["ContentType"];
+	if ok && (len(contentType) == 0 || shouldIncludeInBody(contentType)) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
@@ -652,8 +652,13 @@ func cutMessageBody(m *HttpMessage) []byte {
 }
 
 func shouldIncludeInBody(contenttype string) bool {
-	return strings.Contains(contenttype, "form-urlencoded") ||
-		strings.Contains(contenttype, "json")
+	include_body := _Config.ContentTypes.include_body
+	for _, include := range include_body {
+		if strings.Contains(include,contenttype) {
+			return true;
+		}
+	}
+	return false;
 }
 
 func censorPasswords(m *HttpMessage, msg []byte) {
@@ -661,7 +666,7 @@ func censorPasswords(m *HttpMessage, msg []byte) {
 	keywords := _Config.Passwords.Hide_keywords
 
 	if m.IsRequest && m.ContentLength > 0 &&
-		strings.Contains(m.ContentType, "urlencoded") {
+		strings.Contains(m.Headers["ContentType"], "urlencoded") {
 		for _, keyword := range keywords {
 			index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
 			if index > 0 {
