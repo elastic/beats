@@ -45,7 +45,7 @@ type HttpMessage struct {
 	Headers       map[string]string
 	//Raw Data
 	Raw []byte
-	//Timeing
+	//Timing
 	start int
 	end   int
 }
@@ -581,7 +581,6 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	trans.Http = bson_concat(trans.Http, bson.M{
 		"response": bson.M{
 			"status_code":   msg.StatusCode,
-			"Content-Length": msg.ContentLength,
 			"Headers": msg.Headers,
 		},
 	})
