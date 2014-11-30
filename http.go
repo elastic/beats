@@ -189,14 +189,11 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 			headerName := string(data[:i])
 			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
 			DEBUG("http", "Header: %s Value: %s\n", headerName, headerVal)
-			if m.Headers == nil {
-				DEBUG("http", "ACK Headers is not inialized")
-			}
-			if headerName == "Set-Cookie" {
+			if headerName == "set-cookie" {
 				cstring := strings.Split(headerVal, ";")
 				for _, cval := range cstring {
 					cookie := strings.Split(cval, "=")
-					m.Headers["Set-Cookie-"+strings.Trim(cookie[0], " ")] = cookie[1]
+					m.Headers["set-cookie-"+strings.Trim(cookie[0], " ")] = cookie[1]
 				}
 			} else {
 				if val, ok := m.Headers[headerName]; ok {
@@ -204,10 +201,10 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				} else {
 					m.Headers[headerName] = headerVal
 				}
-				if headerName == "Content-Length" {
+				if headerName == "content-length" {
 					m.ContentLength, _ = strconv.Atoi(headerVal)
 				}
-				if headerName == "Transfer-Encoding" {
+				if headerName == "transfer-encoding" {
 					m.TransferEncoding = headerVal
 				}
 			}
@@ -650,7 +647,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
 	// add body
-	contentType, ok := m.Headers["Content-Type"]
+	contentType, ok := m.Headers["content-type"]
 	if ok && (len(contentType) == 0 || shouldIncludeInBody(contentType)) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
@@ -679,7 +676,7 @@ func censorPasswords(m *HttpMessage, msg []byte) {
 	keywords := _Config.Passwords.Hide_keywords
 
 	if m.IsRequest && m.ContentLength > 0 &&
-		strings.Contains(m.Headers["ContentType"], "urlencoded") {
+		strings.Contains(m.Headers["content-type"], "urlencoded") {
 		for _, keyword := range keywords {
 			index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
 			if index > 0 {
