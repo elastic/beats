@@ -21,15 +21,14 @@ const (
 
 // Http Message
 type HttpMessage struct {
-	Ts                time.Time
-	hasContentLength  bool
-	bodyOffset        int
-	version_major     uint8
-	version_minor     uint8
-	connection        string
-	transfer_encoding string
-	chunked_length    int
-	chunked_body      []byte
+	Ts               time.Time
+	hasContentLength bool
+	bodyOffset       int
+	version_major    uint8
+	version_minor    uint8
+	connection       string
+	chunked_length   int
+	chunked_body     []byte
 
 	IsRequest    bool
 	TcpTuple     TcpTuple
@@ -42,9 +41,10 @@ type HttpMessage struct {
 	StatusCode   uint16
 	StatusPhrase string
 	// Http Headers
-	ContentLength int
-	Headers       map[string]string
-	Body          string
+	ContentLength    int
+	TransferEncoding string
+	Headers          map[string]string
+	Body             string
 	//Raw Data
 	Raw []byte
 	//Timing
@@ -207,6 +207,9 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				if headerName == "Content-Length" {
 					m.ContentLength, _ = strconv.Atoi(headerVal)
 				}
+				if headerName == "Transfer-Encoding" {
+					m.TransferEncoding = headerVal
+				}
 			}
 
 			return true, true, p + 2
@@ -227,7 +230,7 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
 		switch s.parseState {
 		case START:
 			m.start = s.parseOffset
-			i := bytes.Index(s.data, []byte("\r\n"))
+			i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
 			if i == -1 {
 				return true, false
 			}
@@ -306,7 +309,7 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
 						}
 					} else if m.connection == "close" {
 						// Connection: close -> read until FIN
-					} else if !m.hasContentLength && m.transfer_encoding == "chunked" {
+					} else if !m.hasContentLength && m.TransferEncoding == "chunked" {
 						// support for HTTP/1.1 Chunked transfer
 						s.parseState = BODY_CHUNKED_START
 						continue
