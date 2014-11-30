@@ -43,6 +43,7 @@ type HttpMessage struct {
 	// Http Headers
 	ContentLength int
 	Headers       map[string]string
+	Body		  string
 	//Raw Data
 	Raw []byte
 	//Timing
@@ -645,7 +646,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
 	// add body
-	contentType, ok := m.Headers["ContentType"];
+	contentType, ok := m.Headers["Content-Type"];
 	if ok && (len(contentType) == 0 || shouldIncludeInBody(contentType)) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
@@ -658,11 +659,13 @@ func cutMessageBody(m *HttpMessage) []byte {
 }
 
 func shouldIncludeInBody(contenttype string) bool {
-	include_body := _Config.ContentTypes.include_body
+	include_body := _Config.ContentTypes.Include_body
 	for _, include := range include_body {
-		if strings.Contains(include,contenttype) {
+		if strings.Contains(contenttype,include) {
+			DEBUG("http","Should Include Body = true Content-Type "+contenttype+" include_body "+include);
 			return true;
 		}
+		DEBUG("http","Should Include Body = false Content-Type"+contenttype+" include_body "+include);
 	}
 	return false;
 }
