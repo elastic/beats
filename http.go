@@ -193,7 +193,7 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				cstring := strings.Split(headerVal, ";")
 				for _, cval := range cstring {
 					cookie := strings.Split(cval, "=")
-					m.Headers["set-cookie-"+strings.Trim(cookie[0], " ")] = cookie[1]
+					m.Headers["set-cookie-"+strings.Trim(cookie[0], " ").ToLower] = cookie[1]
 				}
 			} else {
 				if val, ok := m.Headers[headerName]; ok {
