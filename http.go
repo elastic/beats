@@ -186,9 +186,9 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 		if len(data) > p && (data[p+1] == ' ' || data[p+1] == '\t') {
 			p = p + 2
 		} else {
-			headerName := string(data[:i])
+			headerName := strings.ToLower(string(data[:i]))
 			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
-			DEBUG("http", "Header: %s Value: %s\n", headerName, headerVal)
+			DEBUG("http", "Header: '%s' Value: '%s'\n", headerName, headerVal)
 			if headerName == "set-cookie" {
 				cstring := strings.Split(headerVal, ";")
 				for _, cval := range cstring {
