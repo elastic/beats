@@ -160,6 +160,9 @@ func parseResponseStatus(s []byte) (uint16, string, error) {
 }
 
 func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
+	if( m.Headers == nil ){
+		m.Headers = make(map[string]string)
+	}
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
 		// Expected \":\" in headers. Assuming incomplete"
@@ -199,7 +202,11 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				}else{
 					m.Headers[headerName] = headerVal;
 				}
+				if ( headerName == "Content-Length" ){
+					m.ContentLength, _ = strconv.Atoi(headerVal)
+				}
 			}
+			
 			return true, true, p + 2
 		}
 	}
@@ -436,7 +443,6 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 	if stream.message == nil {
 		stream.message = &HttpMessage{Ts: pkt.ts}
 	}
-	stream.message.Headers = make(map[string]string)
 	ok, complete := httpMessageParser(stream)
 
 	if !ok {
@@ -575,7 +581,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	trans.Http = bson_concat(trans.Http, bson.M{
 		"response": bson.M{
 			"status_code":   msg.StatusCode,
-			"content_length": msg.ContentLength,
+			"Content-Length": msg.ContentLength,
 			"Headers": msg.Headers,
 		},
 	})
