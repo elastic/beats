@@ -585,9 +585,9 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	trans.Http = bson_concat(trans.Http, bson.M{
 		"response": bson.M{
-			"status_phrase": msg.StatusPhrase,
-			"status_code":   msg.StatusCode,
-			"Headers":       msg.Headers,
+			"phrase":  msg.StatusPhrase,
+			"code":    msg.StatusCode,
+			"headers": msg.Headers,
 		},
 	})
 
@@ -624,7 +624,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 
 	event.Type = "http"
 	response := t.Http["response"].(bson.M)
-	code := response["status_code"].(uint16)
+	code := response["code"].(uint16)
 	if code < 400 {
 		event.Status = OK_STATUS
 	} else {
