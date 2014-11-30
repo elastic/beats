@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 	"time"
+	"strconv"
 	//"fmt"
 )
 
@@ -39,11 +40,11 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	if stream.message.StatusCode != 200 {
 		t.Error("Failed to parse status code: %d", stream.message.StatusCode)
 	}
-	if stream.message.ReasonPhrase != "OK" {
-		t.Error("Failed to parse response phrase: %s", stream.message.ReasonPhrase)
+	if stream.message.StatusPhrase != "OK" {
+		t.Error("Failed to parse response phrase: %s", stream.message.StatusPhrase)
 	}
 	if stream.message.ContentLength != 0 {
-		t.Error("Failed to parse Content Length: %s", stream.message.ContentLength)
+		t.Error("Failed to parse Content Length: %s", stream.message.Headers["ContentLength"])
 	}
 	if stream.message.version_major != 1 {
 		t.Error("Failed to parse version major")
@@ -94,8 +95,8 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	if stream.message.RequestUri != "/" {
 		t.Error("Failed to parse HTTP request uri: %s", stream.message.RequestUri)
 	}
-	if stream.message.Host != "www.google.ro" {
-		t.Error("Failed to parse HTTP Host header: %s", stream.message.Host)
+	if stream.message.Headers["Host"] != "www.google.ro" {
+		t.Error("Failed to parse HTTP Host header: %s", stream.message.Headers["Host"])
 	}
 	if stream.message.version_major != 1 {
 		t.Error("Failed to parse version major")
@@ -188,10 +189,10 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	if stream.message.StatusCode != 200 {
 		t.Error("Failed to parse response code")
 	}
-	if stream.message.ReasonPhrase != "OK" {
+	if stream.message.StatusPhrase != "OK" {
 		t.Error("Failed to parse response phrase")
 	}
-	if stream.message.ContentType != "text/html; charset=UTF-8" {
+	if stream.message.Headers["Content-Type"] != "text/html; charset=UTF-8" {
 		t.Error("Failed to parse content type")
 	}
 	if stream.message.version_major != 1 {
@@ -313,7 +314,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 	}
 
 	if stream.message.ContentLength != 30 {
-		t.Error("Wrong content-length")
+		t.Error("Wrong Content-Length ="+strconv.Itoa(stream.message.ContentLength))
 	}
 
 	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
