@@ -55,6 +55,7 @@ type tomlConfig struct {
 	Agent      tomlAgent
 	Logging    tomlLogging
 	Passwords  tomlPasswords
+	ContentTypes tomlContentTypes
 	Thrift     tomlThrift
 }
 
@@ -69,6 +70,9 @@ type tomlLogging struct {
 
 type tomlPasswords struct {
 	Hide_keywords []string
+}
+type tomlContentTypes struct {
+	Include_body []string
 }
 
 var _Config tomlConfig
@@ -168,7 +172,6 @@ func main() {
 		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
-
 	if len(debugSelectors) == 0 {
 		debugSelectors = _Config.Logging.Selectors
 	}
