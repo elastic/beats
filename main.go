@@ -72,7 +72,7 @@ type tomlPasswords struct {
 	Hide_keywords []string
 }
 type tomlContentTypes struct {
-	include_body []string
+	Include_body []string
 }
 
 var _Config tomlConfig
@@ -172,7 +172,6 @@ func main() {
 		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
-
 	if len(debugSelectors) == 0 {
 		debugSelectors = _Config.Logging.Selectors
 	}
