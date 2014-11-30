@@ -54,6 +54,52 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	}
 }
 
+func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
+
+	data := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"EXPIRES: -1\r\n" +
+		"cACHE-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"SERVER: gws\r\n" +
+		"content-LeNgTh: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n")
+
+	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+
+	ok, complete := httpMessageParser(stream)
+
+	if !ok {
+		t.Error("Parsing returned error")
+	}
+
+	if !complete {
+		t.Error("Expecting a complete message")
+	}
+
+	if stream.message.IsRequest {
+		t.Error("Failed to parse HTTP response")
+	}
+	if stream.message.StatusCode != 200 {
+		t.Error("Failed to parse status code: %d", stream.message.StatusCode)
+	}
+	if stream.message.StatusPhrase != "OK" {
+		t.Error("Failed to parse response phrase: %s", stream.message.StatusPhrase)
+	}
+	if stream.message.ContentLength != 0 {
+		t.Error("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
+	}
+	if stream.message.version_major != 1 {
+		t.Error("Failed to parse version major")
+	}
+	if stream.message.version_minor != 1 {
+		t.Error("Failed to parse version minor")
+	}
+}
+
 func TestHttpParser_simpleRequest(t *testing.T) {
 
 	data := []byte(
