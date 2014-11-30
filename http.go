@@ -543,8 +543,8 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		"request": bson.M{
 			"method":          msg.Method,
 			"uri":             msg.RequestUri,
-			"first_line":            msg.FirstLine,
-			"headers": msg.Headers,
+			"first_line":      msg.FirstLine,
+			"headers": 		   msg.Headers,
 		},
 	}
 
@@ -580,6 +580,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	
 	trans.Http = bson_concat(trans.Http, bson.M{
 		"response": bson.M{
+			"status_phrase": msg.StatusPhrase,
 			"status_code":   msg.StatusCode,
 			"Headers": msg.Headers,
 		},
