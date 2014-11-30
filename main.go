@@ -47,16 +47,16 @@ const (
 var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql", "thrift"}
 
 type tomlConfig struct {
-	Interfaces tomlInterfaces
-	RunOptions tomlRunOptions
-	Protocols  map[string]tomlProtocol
-	Procs      tomlProcs
-	Output     map[string]tomlMothership
-	Agent      tomlAgent
-	Logging    tomlLogging
-	Passwords  tomlPasswords
+	Interfaces   tomlInterfaces
+	RunOptions   tomlRunOptions
+	Protocols    map[string]tomlProtocol
+	Procs        tomlProcs
+	Output       map[string]tomlMothership
+	Agent        tomlAgent
+	Logging      tomlLogging
+	Passwords    tomlPasswords
 	ContentTypes tomlContentTypes
-	Thrift     tomlThrift
+	Thrift       tomlThrift
 }
 
 type tomlRunOptions struct {

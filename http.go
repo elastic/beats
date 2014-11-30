@@ -18,6 +18,7 @@ const (
 	BODY_CHUNKED_START
 	BODY_CHUNKED
 )
+
 // Http Message
 type HttpMessage struct {
 	Ts                time.Time
@@ -30,20 +31,20 @@ type HttpMessage struct {
 	chunked_length    int
 	chunked_body      []byte
 
-	IsRequest     bool
-	TcpTuple      TcpTuple
-	CmdlineTuple  *CmdlineTuple
-	Direction     uint8
+	IsRequest    bool
+	TcpTuple     TcpTuple
+	CmdlineTuple *CmdlineTuple
+	Direction    uint8
 	//Request Info
-	FirstLine     string
-	RequestUri    string
-	Method        string
-	StatusCode    uint16
-	StatusPhrase  string
+	FirstLine    string
+	RequestUri   string
+	Method       string
+	StatusCode   uint16
+	StatusPhrase string
 	// Http Headers
 	ContentLength int
 	Headers       map[string]string
-	Body		  string
+	Body          string
 	//Raw Data
 	Raw []byte
 	//Timing
@@ -161,7 +162,7 @@ func parseResponseStatus(s []byte) (uint16, string, error) {
 }
 
 func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
-	if( m.Headers == nil ){
+	if m.Headers == nil {
 		m.Headers = make(map[string]string)
 	}
 	i := bytes.Index(data, []byte(":"))
@@ -185,29 +186,29 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 		if len(data) > p && (data[p+1] == ' ' || data[p+1] == '\t') {
 			p = p + 2
 		} else {
-			headerName :=string(data[:i])
-			headerVal  := string(bytes.Trim(data[i+1:p], " \t"))
+			headerName := string(data[:i])
+			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
 			DEBUG("http", "Header: %s Value: %s\n", headerName, headerVal)
-			if (m.Headers == nil ){
-					DEBUG("http", "ACK Headers is not inialized");
+			if m.Headers == nil {
+				DEBUG("http", "ACK Headers is not inialized")
 			}
-			if ( headerName == "Set-Cookie" ){
-				cstring := strings.Split(headerVal,";")
+			if headerName == "Set-Cookie" {
+				cstring := strings.Split(headerVal, ";")
 				for _, cval := range cstring {
-					cookie := strings.Split(cval,"=");
-					m.Headers["Set-Cookie-"+strings.Trim(cookie[0]," ")] = cookie[1];
-				}				
-			}else{
-				if val, ok :=m.Headers[headerName]; ok{
-					m.Headers[headerName] = val + "|" + headerVal 
-				}else{
-					m.Headers[headerName] = headerVal;
+					cookie := strings.Split(cval, "=")
+					m.Headers["Set-Cookie-"+strings.Trim(cookie[0], " ")] = cookie[1]
 				}
-				if ( headerName == "Content-Length" ){
+			} else {
+				if val, ok := m.Headers[headerName]; ok {
+					m.Headers[headerName] = val + "|" + headerVal
+				} else {
+					m.Headers[headerName] = headerVal
+				}
+				if headerName == "Content-Length" {
 					m.ContentLength, _ = strconv.Atoi(headerVal)
 				}
 			}
-			
+
 			return true, true, p + 2
 		}
 	}
@@ -430,7 +431,7 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			data:      pkt.payload,
 			message:   &HttpMessage{Ts: pkt.ts},
 		}
-		
+
 	} else {
 		// concatenate bytes
 		tcp.httpData[dir].data = append(tcp.httpData[dir].data, pkt.payload...)
@@ -542,10 +543,10 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 	trans.Http = bson.M{
 		"request": bson.M{
-			"method":          msg.Method,
-			"uri":             msg.RequestUri,
-			"first_line":      msg.FirstLine,
-			"headers": 		   msg.Headers,
+			"method":     msg.Method,
+			"uri":        msg.RequestUri,
+			"first_line": msg.FirstLine,
+			"headers":    msg.Headers,
 		},
 	}
 
@@ -578,12 +579,12 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		WARN("Response without a known request. Ignoring.")
 		return
 	}
-	
+
 	trans.Http = bson_concat(trans.Http, bson.M{
 		"response": bson.M{
 			"status_phrase": msg.StatusPhrase,
 			"status_code":   msg.StatusCode,
-			"Headers": msg.Headers,
+			"Headers":       msg.Headers,
 		},
 	})
 
@@ -646,7 +647,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
 	// add body
-	contentType, ok := m.Headers["Content-Type"];
+	contentType, ok := m.Headers["Content-Type"]
 	if ok && (len(contentType) == 0 || shouldIncludeInBody(contentType)) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
@@ -661,13 +662,13 @@ func cutMessageBody(m *HttpMessage) []byte {
 func shouldIncludeInBody(contenttype string) bool {
 	include_body := _Config.ContentTypes.Include_body
 	for _, include := range include_body {
-		if strings.Contains(contenttype,include) {
-			DEBUG("http","Should Include Body = true Content-Type "+contenttype+" include_body "+include);
-			return true;
+		if strings.Contains(contenttype, include) {
+			DEBUG("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
+			return true
 		}
-		DEBUG("http","Should Include Body = false Content-Type"+contenttype+" include_body "+include);
+		DEBUG("http", "Should Include Body = false Content-Type"+contenttype+" include_body "+include)
 	}
-	return false;
+	return false
 }
 
 func censorPasswords(m *HttpMessage, msg []byte) {

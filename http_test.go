@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 	"time"
-	"strconv"
 	//"fmt"
 )
 
@@ -314,7 +314,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 	}
 
 	if stream.message.ContentLength != 30 {
-		t.Error("Wrong Content-Length ="+strconv.Itoa(stream.message.ContentLength))
+		t.Error("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
 	}
 
 	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
