@@ -58,6 +58,7 @@ type tomlConfig struct {
 	ContentTypes tomlContentTypes
 	Thrift       tomlThrift
 	Http         tomlHttp
+	Geoip        tomlGeoip
 }
 
 type tomlRunOptions struct {
@@ -74,6 +75,10 @@ type tomlPasswords struct {
 }
 type tomlContentTypes struct {
 	Include_body []string
+}
+
+type tomlGeoip struct {
+	Paths []string
 }
 
 var _Config tomlConfig
@@ -108,26 +113,44 @@ func debugMemStats() {
 }
 
 func loadGeoIPData() {
-	geoip_path := "/usr/share/GeoIP/GeoIP.dat"
-	fi, err := os.Lstat(geoip_path)
-	if err != nil {
-		WARN("Could not load GeoIP data: %s", err.Error())
+	geoip_paths := []string{
+		"/usr/share/GeoIP/GeoIP.dat",
+		"/usr/local/var/GeoIP/GeoIP.dat",
+	}
+	if len(_Config.Geoip.Paths) > 0 {
+		geoip_paths = _Config.Geoip.Paths
+	}
+	var geoip_path string
+	for _, path := range geoip_paths {
+		fi, err := os.Lstat(path)
+		if err != nil {
+			continue
+		}
+
+		if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+			// follow symlink
+			geoip_path, err = filepath.EvalSymlinks(path)
+			if err != nil {
+				WARN("Could not load GeoIP data: %s", err.Error())
+				return
+			}
+		}
+
+		geoip_path = path
+	}
+
+	if len(geoip_path) == 0 {
+		WARN("Couldn't load GeoIP database")
 		return
 	}
 
-	if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
-		// follow symlink
-		geoip_path, err = filepath.EvalSymlinks(geoip_path)
-		if err != nil {
-			WARN("Could not load GeoIP data: %s", err.Error())
-			return
-		}
-	}
-
+	var err error
 	_GeoLite, err = libgeo.Load(geoip_path)
 	if err != nil {
 		WARN("Could not load GeoIP data: %s", err.Error())
 	}
+
+	INFO("Loaded GeoIP data from: %s", geoip_path)
 }
 
 func main() {

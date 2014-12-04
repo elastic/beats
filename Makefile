@@ -46,7 +46,7 @@ test:
 .PHONY: testlong
 testlong:
 	go test
-	make -C tests test
+	PACKETBEAT_HAVE_GEOIP=1 make -C tests test
 
 .PHONY: cover
 cover:
