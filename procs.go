@@ -286,6 +286,8 @@ func (proc *ProcessesWatcher) UpdateMap() {
 
 		}
 	}
+
+	proc.LastMapUpdate = time.Now()
 }
 
 // Parses the /proc/net/tcp file
