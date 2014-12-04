@@ -622,13 +622,19 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	}
 
 	if http.Send_headers {
-		response["headers"] = msg.Headers
-
-		if http.Split_set_cookie {
-			hdr_val, exists := msg.Headers["set-cookie"]
-			if exists {
-				response["headers"].(bson.M)["set-cookie"] = splitCookiesHeader(hdr_val)
+		if !http.Split_set_cookie {
+			response["headers"] = msg.Headers
+		} else {
+			hdrs := bson.M{}
+			for hdr_name, hdr_val := range msg.Headers {
+				if hdr_name == "set-cookie" {
+					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
+				} else {
+					hdrs[hdr_name] = hdr_val
+				}
 			}
+
+			response["headers"] = hdrs
 		}
 	}
 
