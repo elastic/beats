@@ -59,3 +59,48 @@ class Test(TestCase):
         assert len(objs) == 1
         assert objs[0]["request_raw"] == ""
         assert objs[0]["response_raw"] == ""
+
+    def test_send_headers_options(self):
+        self.render_config_template(
+            http_ports=[8888],
+        )
+        self.run_packetbeat(pcap="wsgi_loopback.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert "headers" not in o["http"]["request"]
+        assert "headers" not in o["http"]["response"]
+
+        self.render_config_template(
+            http_ports=[8888],
+            http_send_all_headers=True,
+        )
+        self.run_packetbeat(pcap="wsgi_loopback.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert "headers" in o["http"]["request"]
+        assert "headers" in o["http"]["response"]
+        assert o["http"]["request"]["headers"]["cache-control"] == "max-age=0"
+        assert len(o["http"]["request"]["headers"]) == 9
+        assert len(o["http"]["response"]["headers"]) == 10
+
+        self.render_config_template(
+            http_ports=[8888],
+            http_send_headers=["User-Agent", "content-Type", "x-forwarded-for"],
+        )
+        self.run_packetbeat(pcap="wsgi_loopback.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert "headers" in o["http"]["request"]
+        assert "headers" in o["http"]["response"]
+        assert len(o["http"]["request"]["headers"]) == 1
+        assert len(o["http"]["response"]["headers"]) == 1
+        assert "user-agent" in o["http"]["request"]["headers"]

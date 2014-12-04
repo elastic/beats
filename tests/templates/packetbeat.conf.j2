@@ -80,6 +80,15 @@ idl_files = [
     {%- endif -%}
 ]
 
+[http]
+{% if http_send_all_headers %}send_all_headers = true{% endif %}
+{% if http_send_headers -%}
+send_headers = [{%- for hdr in http_send_headers -%}
+    "{{ hdr }}"
+    {%- if not loop.last %}, {% endif -%}
+{%- endfor -%}
+]{%- endif %}
+
 [procs]
 # Which processes to monitor and how to find them. The processes can
 # be found by searching their command line by a given string.
