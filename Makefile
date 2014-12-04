@@ -41,10 +41,12 @@ gofmt:
 .PHONY: test
 test:
 	go test -short
+	make -C tests test
 
 .PHONY: testlong
 testlong:
 	go test
+	make -C tests test
 
 .PHONY: cover
 cover:

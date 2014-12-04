@@ -1,3 +1,0 @@
-[submodule "packetbeat"]
-	path = packetbeat
-	url = https://github.com/packetbeat/packetbeat.git
