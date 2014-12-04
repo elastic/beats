@@ -57,6 +57,7 @@ type tomlConfig struct {
 	Passwords    tomlPasswords
 	ContentTypes tomlContentTypes
 	Thrift       tomlThrift
+	Http         tomlHttp
 }
 
 type tomlRunOptions struct {

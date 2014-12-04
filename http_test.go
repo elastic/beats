@@ -8,7 +8,15 @@ import (
 	//"fmt"
 )
 
+func HttpModForTests() *Http {
+	var http Http
+	http.Init(true)
+	return &http
+}
+
 func TestHttpParser_simpleResponse(t *testing.T) {
+
+	http := HttpModForTests()
 
 	data := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -24,7 +32,7 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -56,6 +64,8 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 
 func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 
+	http := HttpModForTests()
+
 	data := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"EXPIRES: -1\r\n" +
@@ -70,7 +80,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -102,6 +112,10 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 
 func TestHttpParser_simpleRequest(t *testing.T) {
 
+	http := HttpModForTests()
+	http.Send_headers = true
+	http.Send_all_headers = true
+
 	data := []byte(
 		"GET / HTTP/1.1\r\n" +
 			"Host: www.google.ro\r\n" +
@@ -119,7 +133,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -155,6 +169,8 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 
 func TestHttpParser_splitResponse(t *testing.T) {
 
+	http := HttpModForTests()
+
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
@@ -171,7 +187,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -183,7 +199,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 
 	stream.data = append(stream.data, data2...)
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -194,6 +210,9 @@ func TestHttpParser_splitResponse(t *testing.T) {
 }
 
 func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
+	http := HttpModForTests()
+	http.Send_headers = true
+	http.Send_all_headers = true
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -212,7 +231,7 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -224,7 +243,7 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 
 	stream.data = append(stream.data, data2...)
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -251,6 +270,8 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 
 func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 
+	http := HttpModForTests()
+
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
@@ -268,7 +289,7 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -280,7 +301,7 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 
 	stream.data = append(stream.data, data2...)
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -292,6 +313,7 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 
 func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 
+	http := HttpModForTests()
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
@@ -309,7 +331,7 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -321,7 +343,7 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 
 	stream.data = append(stream.data, data2...)
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -332,6 +354,7 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 }
 
 func TestHttpParser_ResponseWithBody(t *testing.T) {
+	http := HttpModForTests()
 
 	data := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -349,7 +372,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -369,6 +392,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 }
 
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
+	http := HttpModForTests()
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -389,7 +413,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -399,7 +423,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	}
 
 	stream.data = append(stream.data, data2...)
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -409,7 +433,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	}
 
 	stream.data = append(stream.data, data3...)
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 	if !ok {
 		t.Error("Parsing returned error")
 	}
@@ -429,6 +453,8 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 
 func TestHttpParser_RequestResponse(t *testing.T) {
 	LogInit(LOG_CRIT, "" /*toSyslog*/, false, []string{})
+
+	http := HttpModForTests()
 
 	data := []byte(
 		"GET / HTTP/1.1\r\n" +
@@ -457,7 +483,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: &HttpMessage{Ts: time.Now()}}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -470,7 +496,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 	stream.PrepareForNewMessage()
 	stream.message = &HttpMessage{Ts: time.Now()}
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -482,6 +508,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 }
 
 func TestHttpParser_RequestResponseBody(t *testing.T) {
+	http := HttpModForTests()
 
 	data1 := []byte(
 		"GET / HTTP/1.1\r\n" +
@@ -516,7 +543,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -537,7 +564,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 	stream.PrepareForNewMessage()
 	stream.message = &HttpMessage{Ts: time.Now()}
 
-	ok, complete = httpMessageParser(stream)
+	ok, complete = http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -549,6 +576,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 }
 
 func TestHttpParser_301_response(t *testing.T) {
+	http := HttpModForTests()
 
 	data := []byte(
 		"HTTP/1.1 301 Moved Permanently\r\n" +
@@ -572,7 +600,7 @@ func TestHttpParser_301_response(t *testing.T) {
 
 	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")

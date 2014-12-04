@@ -85,12 +85,20 @@ type HttpTransaction struct {
 
 type Http struct {
 	// config
-	Send_request  bool
-	Send_response bool
+	Send_request      bool
+	Send_response     bool
+	Send_headers      bool
+	Send_all_headers  bool
+	Headers_whitelist map[string]bool
 
 	transactionsMap map[HashableTcpTuple]*HttpTransaction
 
 	Publisher *PublisherType
+}
+
+type tomlHttp struct {
+	Send_all_headers bool
+	Send_headers     []string
 }
 
 var HttpMod Http
@@ -102,10 +110,24 @@ func (http *Http) InitDefaults() {
 
 func (http *Http) setFromConfig() (err error) {
 	if _ConfigMeta.IsDefined("protocols", "http", "send_request") {
-		http.Send_request = _Config.Protocols["thrift"].Send_request
+		http.Send_request = _Config.Protocols["http"].Send_request
 	}
 	if _ConfigMeta.IsDefined("protocols", "http", "send_response") {
-		http.Send_response = _Config.Protocols["thrift"].Send_response
+		http.Send_response = _Config.Protocols["http"].Send_response
+	}
+
+	if _Config.Http.Send_all_headers {
+		http.Send_headers = true
+		http.Send_all_headers = true
+	} else {
+		if len(_Config.Http.Send_headers) > 0 {
+			http.Send_headers = true
+
+			http.Headers_whitelist = map[string]bool{}
+			for _, hdr := range _Config.Http.Send_headers {
+				http.Headers_whitelist[strings.ToLower(hdr)] = true
+			}
+		}
 	}
 
 	return nil
@@ -161,7 +183,7 @@ func parseResponseStatus(s []byte) (uint16, string, error) {
 	return uint16(status_code), string(status_phrase), nil
 }
 
-func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
+func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 	if m.Headers == nil {
 		m.Headers = make(map[string]string)
 	}
@@ -189,24 +211,36 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 			headerName := strings.ToLower(string(data[:i]))
 			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
 			DEBUG("http", "Header: '%s' Value: '%s'\n", headerName, headerVal)
-			if headerName == "set-cookie" {
-				cstring := strings.Split(headerVal, ";")
-				for _, cval := range cstring {
-					cookie := strings.Split(cval, "=")
-					m.Headers["set-cookie-"+strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+
+			// Headers we need for parsing. Make sure we always
+			// capture their value
+			if headerName == "content-length" {
+				m.ContentLength, _ = strconv.Atoi(headerVal)
+			} else if headerName == "transfer-encoding" {
+				m.TransferEncoding = headerVal
+			}
+
+			if http.Send_headers {
+				if !http.Send_all_headers {
+					_, exists := http.Headers_whitelist[headerName]
+					if !exists {
+						continue
+					}
 				}
-			} else {
-				if val, ok := m.Headers[headerName]; ok {
-					m.Headers[headerName] = val + "|" + headerVal
+				if headerName == "set-cookie" {
+					cstring := strings.Split(headerVal, ";")
+					for _, cval := range cstring {
+						cookie := strings.Split(cval, "=")
+						m.Headers["set-cookie-"+strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+					}
 				} else {
-					m.Headers[headerName] = headerVal
+					if val, ok := m.Headers[headerName]; ok {
+						m.Headers[headerName] = val + "|" + headerVal
+					} else {
+						m.Headers[headerName] = headerVal
+					}
 				}
-				if headerName == "content-length" {
-					m.ContentLength, _ = strconv.Atoi(headerVal)
-				}
-				if headerName == "transfer-encoding" {
-					m.TransferEncoding = headerVal
-				}
+
 			}
 
 			return true, true, p + 2
@@ -216,7 +250,7 @@ func httpParseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 	return true, false, len(data)
 }
 
-func httpMessageParser(s *HttpStream) (bool, bool) {
+func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 	var cont, ok, complete bool
 	m := s.message
@@ -317,7 +351,7 @@ func httpMessageParser(s *HttpStream) (bool, bool) {
 				}
 				s.parseState = BODY
 			} else {
-				ok, hfcomplete, offset := httpParseHeader(m, s.data[s.parseOffset:])
+				ok, hfcomplete, offset := http.parseHeader(m, s.data[s.parseOffset:])
 
 				if !ok {
 					return false, false
@@ -445,7 +479,7 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 	if stream.message == nil {
 		stream.message = &HttpMessage{Ts: pkt.ts}
 	}
-	ok, complete := httpMessageParser(stream)
+	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		// drop this tcp stream. Will retry parsing with the next
@@ -541,13 +575,20 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		trans.Request_raw = string(cutMessageBody(msg))
 	}
 
+	request := bson.M{
+		"method":   msg.Method,
+		"uri":      msg.RequestUri,
+		"uri.raw":  msg.RequestUri,
+		"line":     msg.FirstLine,
+		"line.raw": msg.FirstLine,
+	}
+
+	if http.Send_headers {
+		request["headers"] = msg.Headers
+	}
+
 	trans.Http = bson.M{
-		"request": bson.M{
-			"method":     msg.Method,
-			"uri":        msg.RequestUri,
-			"first_line": msg.FirstLine,
-			"headers":    msg.Headers,
-		},
+		"request": request,
 	}
 
 	if trans.timer != nil {
@@ -580,12 +621,18 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		return
 	}
 
+	response := bson.M{
+		"phrase": msg.StatusPhrase,
+		"code":   msg.StatusCode,
+	}
+
+	if http.Send_headers {
+		response["headers"] = msg.Headers
+	}
+
 	trans.Http = bson_concat(trans.Http, bson.M{
-		"response": bson.M{
-			"phrase":  msg.StatusPhrase,
-			"code":    msg.StatusCode,
-			"headers": msg.Headers,
-		},
+		"content_length": msg.ContentLength,
+		"response":       response,
 	})
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
