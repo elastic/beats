@@ -82,6 +82,7 @@ idl_files = [
 
 [http]
 {% if http_send_all_headers %}send_all_headers = true{% endif %}
+{% if http_split_set_cookie %}split_set_cookie = true{% endif %}
 {% if http_send_headers -%}
 send_headers = [{%- for hdr in http_send_headers -%}
     "{{ hdr }}"

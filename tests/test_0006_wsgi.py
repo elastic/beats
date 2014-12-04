@@ -87,7 +87,8 @@ class Test(TestCase):
         assert "headers" in o["http"]["response"]
         assert o["http"]["request"]["headers"]["cache-control"] == "max-age=0"
         assert len(o["http"]["request"]["headers"]) == 9
-        assert len(o["http"]["response"]["headers"]) == 10
+        assert len(o["http"]["response"]["headers"]) == 7
+        assert isinstance(o["http"]["response"]["headers"]["set-cookie"], basestring)
 
         self.render_config_template(
             http_ports=[8888],
@@ -104,3 +105,20 @@ class Test(TestCase):
         assert len(o["http"]["request"]["headers"]) == 1
         assert len(o["http"]["response"]["headers"]) == 1
         assert "user-agent" in o["http"]["request"]["headers"]
+
+    def test_split_set_cookie(self):
+        self.render_config_template(
+            http_ports=[8888],
+            http_send_all_headers=True,
+            http_split_set_cookie=True,
+        )
+        self.run_packetbeat(pcap="wsgi_loopback.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert len(o["http"]["request"]["headers"]) == 9
+        assert len(o["http"]["response"]["headers"]) == 7
+        assert isinstance(o["http"]["response"]["headers"]["set-cookie"], dict)
+        assert len(o["http"]["response"]["headers"]["set-cookie"]) == 4
