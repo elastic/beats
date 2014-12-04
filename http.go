@@ -224,7 +224,7 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				if !http.Send_all_headers {
 					_, exists := http.Headers_whitelist[headerName]
 					if !exists {
-						continue
+						return true, true, p + 2
 					}
 				}
 				if headerName == "set-cookie" {
