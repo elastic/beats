@@ -40,6 +40,7 @@ type HttpMessage struct {
 	Method       string
 	StatusCode   uint16
 	StatusPhrase string
+	Real_ip      string
 	// Http Headers
 	ContentLength    int
 	TransferEncoding string
@@ -69,6 +70,7 @@ type HttpTransaction struct {
 	tuple        TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
+	Real_ip      string
 	ResponseTime int32
 	Ts           int64
 	JsTs         time.Time
@@ -91,6 +93,7 @@ type Http struct {
 	Send_all_headers  bool
 	Headers_whitelist map[string]bool
 	Split_cookie      bool
+	Real_ip_header    string
 
 	transactionsMap map[HashableTcpTuple]*HttpTransaction
 
@@ -101,6 +104,7 @@ type tomlHttp struct {
 	Send_all_headers bool
 	Send_headers     []string
 	Split_cookie     bool
+	Real_ip_header   string
 }
 
 var HttpMod Http
@@ -133,6 +137,8 @@ func (http *Http) setFromConfig() (err error) {
 	}
 
 	http.Split_cookie = _Config.Http.Split_cookie
+
+	http.Real_ip_header = strings.ToLower(_Config.Http.Real_ip_header)
 
 	return nil
 }
@@ -222,6 +228,9 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 				m.ContentLength, _ = strconv.Atoi(headerVal)
 			} else if headerName == "transfer-encoding" {
 				m.TransferEncoding = headerVal
+			}
+			if len(http.Real_ip_header) > 0 && headerName == http.Real_ip_header {
+				m.Real_ip = headerVal
 			}
 
 			if http.Send_headers {
@@ -599,6 +608,8 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		"request": request,
 	}
 
+	trans.Real_ip = msg.Real_ip
+
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
@@ -703,6 +714,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 		event.ResponseRaw = t.Response_raw
 	}
 	event.Http = t.Http
+	event.Real_ip = t.Real_ip
 
 	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 

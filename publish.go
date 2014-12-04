@@ -73,6 +73,7 @@ type Event struct {
 	Src_ip       string    `json:"src_ip"`
 	Src_port     uint16    `json:"src_port"`
 	Src_proc     string    `json:"src_proc"`
+	Real_ip      string    `json:"real_ip"`
 	Src_country  string    `json:"src_country"`
 	Src_server   string    `json:"src_server"`
 	Dst_ip       string    `json:"dst_ip"`
@@ -165,13 +166,20 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 	event.Dst_proc = dst.Proc
 	event.Tags = publisher.tags
 
-	// set src_country if no src_server is set
 	event.Src_country = ""
 	if _GeoLite != nil {
-		if len(event.Src_server) == 0 { // only for external IP addresses
-			loc := _GeoLite.GetLocationByIP(src.Ip)
+		if len(event.Real_ip) > 0 {
+			loc := _GeoLite.GetLocationByIP(event.Real_ip)
 			if loc != nil {
 				event.Src_country = loc.CountryCode
+			}
+		} else {
+			// set src_country if no src_server is set
+			if len(event.Src_server) == 0 { // only for external IP addresses
+				loc := _GeoLite.GetLocationByIP(src.Ip)
+				if loc != nil {
+					event.Src_country = loc.CountryCode
+				}
 			}
 		}
 	}
@@ -197,6 +205,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 	}
 	return nil
 }
+
 func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
 
 	event := Event{}
