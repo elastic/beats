@@ -90,6 +90,7 @@ type Http struct {
 	Send_headers      bool
 	Send_all_headers  bool
 	Headers_whitelist map[string]bool
+	Split_set_cookie  bool
 
 	transactionsMap map[HashableTcpTuple]*HttpTransaction
 
@@ -99,6 +100,7 @@ type Http struct {
 type tomlHttp struct {
 	Send_all_headers bool
 	Send_headers     []string
+	Split_set_cookie bool
 }
 
 var HttpMod Http
@@ -129,6 +131,8 @@ func (http *Http) setFromConfig() (err error) {
 			}
 		}
 	}
+
+	http.Split_set_cookie = _Config.Http.Split_set_cookie
 
 	return nil
 }
@@ -227,20 +231,11 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 						return true, true, p + 2
 					}
 				}
-				if headerName == "set-cookie" {
-					cstring := strings.Split(headerVal, ";")
-					for _, cval := range cstring {
-						cookie := strings.Split(cval, "=")
-						m.Headers["set-cookie-"+strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
-					}
+				if val, ok := m.Headers[headerName]; ok {
+					m.Headers[headerName] = val + ", " + headerVal
 				} else {
-					if val, ok := m.Headers[headerName]; ok {
-						m.Headers[headerName] = val + "|" + headerVal
-					} else {
-						m.Headers[headerName] = headerVal
-					}
+					m.Headers[headerName] = headerVal
 				}
-
 			}
 
 			return true, true, p + 2
@@ -628,6 +623,13 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	if http.Send_headers {
 		response["headers"] = msg.Headers
+
+		if http.Split_set_cookie {
+			hdr_val, exists := msg.Headers["set-cookie"]
+			if exists {
+				response["headers"].(bson.M)["set-cookie"] = splitCookiesHeader(hdr_val)
+			}
+		}
 	}
 
 	trans.Http = bson_concat(trans.Http, bson.M{
@@ -685,6 +687,18 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 
 	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 
+}
+
+func splitCookiesHeader(headerVal string) map[string]string {
+	cookies := map[string]string{}
+
+	cstring := strings.Split(headerVal, ";")
+	for _, cval := range cstring {
+		cookie := strings.Split(cval, "=")
+		cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+	}
+
+	return cookies
 }
 
 func cutMessageBody(m *HttpMessage) []byte {
