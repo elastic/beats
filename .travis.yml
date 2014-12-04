@@ -9,7 +9,7 @@ services:
 
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -qq libpcap-dev python-virtualenv
+    - sudo apt-get install -qq libpcap-dev python-virtualenv geoip-database
 
 install:
     - make deps
