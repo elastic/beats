@@ -90,7 +90,7 @@ type Http struct {
 	Send_headers      bool
 	Send_all_headers  bool
 	Headers_whitelist map[string]bool
-	Split_set_cookie  bool
+	Split_cookie      bool
 
 	transactionsMap map[HashableTcpTuple]*HttpTransaction
 
@@ -100,7 +100,7 @@ type Http struct {
 type tomlHttp struct {
 	Send_all_headers bool
 	Send_headers     []string
-	Split_set_cookie bool
+	Split_cookie     bool
 }
 
 var HttpMod Http
@@ -132,7 +132,7 @@ func (http *Http) setFromConfig() (err error) {
 		}
 	}
 
-	http.Split_set_cookie = _Config.Http.Split_set_cookie
+	http.Split_cookie = _Config.Http.Split_cookie
 
 	return nil
 }
@@ -579,7 +579,20 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	}
 
 	if http.Send_headers {
-		request["headers"] = msg.Headers
+		if !http.Split_cookie {
+			request["headers"] = msg.Headers
+		} else {
+			hdrs := bson.M{}
+			for hdr_name, hdr_val := range msg.Headers {
+				if hdr_name == "cookie" {
+					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
+				} else {
+					hdrs[hdr_name] = hdr_val
+				}
+			}
+
+			request["headers"] = hdrs
+		}
 	}
 
 	trans.Http = bson.M{
@@ -622,7 +635,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	}
 
 	if http.Send_headers {
-		if !http.Split_set_cookie {
+		if !http.Split_cookie {
 			response["headers"] = msg.Headers
 		} else {
 			hdrs := bson.M{}
