@@ -106,11 +106,11 @@ class Test(TestCase):
         assert len(o["http"]["response"]["headers"]) == 1
         assert "user-agent" in o["http"]["request"]["headers"]
 
-    def test_split_set_cookie(self):
+    def test_split_cookie(self):
         self.render_config_template(
             http_ports=[8888],
             http_send_all_headers=True,
-            http_split_set_cookie=True,
+            http_split_cookie=True,
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
@@ -120,5 +120,9 @@ class Test(TestCase):
 
         assert len(o["http"]["request"]["headers"]) == 9
         assert len(o["http"]["response"]["headers"]) == 7
+
+        assert isinstance(o["http"]["request"]["headers"]["cookie"], dict)
+        assert len(o["http"]["request"]["headers"]["cookie"]) == 6
+
         assert isinstance(o["http"]["response"]["headers"]["set-cookie"], dict)
         assert len(o["http"]["response"]["headers"]["set-cookie"]) == 4
