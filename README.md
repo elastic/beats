@@ -14,6 +14,8 @@ You can also read the [user manual](http://packetbeat.com/docs/) and the
 
 ## Bugs and feature requests
 
+[![Build Status](https://travis-ci.org/packetbeat/packetbeat.svg?branch=master)](https://travis-ci.org/packetbeat/packetbeat)
+
 Have a bug or a feature request? Please first check the list of
 [issues](https://github.com/packetbeat/packetbeat/issues).
 
