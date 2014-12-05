@@ -1,6 +1,6 @@
 # Automatic tests for Packetbeat
 
-This repository contains integration tests for the [Packetbeat](http://packetbeat.com)
+This repository contains the integration tests for the [Packetbeat](http://packetbeat.com)
 project.
 
 ## Running
@@ -12,7 +12,6 @@ Running a single test, e.g.:
         . env/bin/activate
         nosetests test_0002_thrift_basics.py:Test.test_thrift_integration
 
-## CI
+## Build status
 
-These tests are executed automatically by Travis-CI here:
-https://travis-ci.org/packetbeat/packetbeat-tests
+[![Build Status](https://travis-ci.org/packetbeat/packetbeat.svg?branch=master)](https://travis-ci.org/packetbeat/packetbeat)
