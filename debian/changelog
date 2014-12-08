@@ -1,3 +1,9 @@
+packetbeat (0.4.2-1) unstable; urgency=low
+
+    * New version.
+
+ -- Monica Sarbu <monica@packetbeat.com>  Wed, 8 Dec 2014 10:42:00 +0100
+
 packetbeat (0.4.1-1) unstable; urgency=low
 
     * New version.
