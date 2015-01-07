@@ -1,163 +1,184 @@
 _defaults:
-  _type: string
-  _required: false
+  type: string
+  required: false
 
 env:
-  _description: >
+  description: >
       These fields contain data about the environment in which the
       transaction was captured.
-  _fields:
-    - agent:
-        _description: >
+  fields:
+    - name: agent
+      description: >
           The name of the agent that captured the transaction.
-    - server:
-      _description: >
+
+    - name: server
+      description: >
         The name of the server that served the transaction.
-    - client_server:
-      _description: >
+
+    - name: client_server
+      description: >
         The name of the server that initiated the transaction.
-    - service:
-      _description: >
+
+    - name: service
+      description: >
         The name of the logical service that served the transaction.
-    - client_service:
-      _description: >
+
+    - name: client_service
+      description: >
         The name of the logical service that initiated the transaction.
-    - ip:
-      _description: >
+
+    - name: ip
+      description: >
         The IP address of the server that served the transaction.
-      _format: dotted notation.
-    - client_ip:
-      _description: >
+      format: dotted notation.
+
+    - name: client_ip
+      description: >
         The IP address of the server that initiated the transaction.
-      _format: dotted notation.
-    - proc:
-      _description: >
+      format: dotted notation.
+
+    - name: proc
+      description: >
         The name of the process that served the transaction.
-    - client_proc:
-      _description: >
+
+    - name: client_proc
+      description: >
         The name of the process that initiated the transaction.
 
 event:
-  _description: >
+  description: >
     These fields contained data about the transaction itself.
-  _fields:
-    - timestamp:
-      _type: string
-      _required: true
-      _format: YYYY-MM-DDTHH:MM:SS.micro
-      _description: >
+  fields:
+    - name: timestamp
+      type: string
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.micro
+      description: >
         The timestamp of the event, as measured either by the agent or
         by a common collector point. The precision is in microseconds.
-    - type:
-      _description: >
+
+    - name: type
+      description: >
           The type of the transaction (e.g. HTTP, MySQL, REDIS)
-      _required: true
-    - status:
-      _description: >
+      required: true
+
+    - name: status
+      description: >
         High level status of the transaction. The way to compute this
         value depends on the protocol, but the result has a meaning
         independent a meaning independent of the protocol.
-      _required: true
-      _possible_values:
+      required: true
+      possible_values:
         - OK
         - Error
         - Server Error
         - Client Error
-    - method:
-      _description: >
+
+    - name: method
+      description: >
         The command/verb/method of the transaction. For HTTP, this is the
         method name (GET, POST, PUT, etc.), for SQL this is the verb (SELECT,
         UPDATE, DELETE, etc.).
-    - resource:
-      _description: >
+
+    - name: resource
+      description: >
         The logical resource that this transaction refers to. For HTTP, this is
         the URL path up to the last /. For example, if the URL is `/users/1`,
         the resource is `/users`. For databases, the resource is typically the
         table name. The field is not filled for all transaction types.
-    - path:
-      _required: true
-      _description: >
+
+    - name: path
+      required: true
+      description: >
         The path to which the transaction refers to. For HTTP, this is the URL.
         For SQL databases, this is the table name. For key-value stores, this
         is the key.
 
-    - http:
-      _type: group
-      _description: HTTP specific event fields.
-      _fields:
-        - http_code:
-          _description: HTTP status code.
-          _example: 404
-        - http_phrase:
-          - _description: HTTP status phrase.
-          - _example: Not found.
-        - http_real_ip:
-          _description: >
+    - name: http
+      type: group
+      description: HTTP specific event fields.
+      fields:
+        - name: http_code
+          description: HTTP status code.
+          example: 404
+
+        - name: http_phrase
+          description: HTTP status phrase.
+          example: Not found.
+
+        - name: http_real_ip
+          description: >
             The IP address extracted from a configurable HTTP header. Typically
             the value of "X-Forwarded-For".
-          _format: Dotted notation.
-        - http_request_headers:
-          _description: >
+          format: Dotted notation.
+
+        - name: http_request_headers
+          description: >
             A map containing the captured header fields from the request. Which
             headers to capture is configurable. If more headers with the same
             header name are present in the message, they will be separated by
             comas.
-        - http_response_headers:
-          _description: >
+
+        - name: http_response_headers
+          description: >
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If more headers with the
             same header name are present in the message, they will be separated
             by comas.
 
-    - mysql:
-      _type: group
-      _description: MySQL specific event fields.
-      _fields:
-        - mysql_iserror:
-          _type: bool
-          _description: >
+    - name: mysql
+      type: group
+      description: MySQL specific event fields.
+      fields:
+        - name: mysql_iserror
+          type: bool
+          description: >
             In case the MySQL query returns an error, this field is set to true.
-        - mysql_affected_rows:
-          _type: int
-          _description: >
+
+        - name: mysql_affected_rows
+          type: int
+          description: >
             In case of a successful MySQL command, it contains the affected
             number of rows of the last statement.
-        - mysql_insert_id:
-          _description: >
+
+        - name: mysql_insert_id
+          description: >
             In case of a successful ``INSERT`` query, it contains the id of the
             newly inserted row.
 
 raw:
-  _type: group
-  _description: These fields contain the raw transaction data.
-  _fields:
-    - request_raw:
-      _description: >
+  description: These fields contain the raw transaction data.
+  fields:
+    - name: request_raw
+      description: >
         For text protocols, this is the request as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
-    - response_raw:
-      _description: >
+
+    - name: response_raw
+      description: >
         For text protocols, this is the response as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
 
 measurements:
-  _type: group
-  _description: >
+  description: >
     These fields contain measurements related to the transaction.
-  _fields:
-    - responsetime:
-      _description: >
+  fields:
+    - name: responsetime
+      description: >
         The wall clock time it took to for the transaction to complete.
         The precision is in microseconds.
-      _type: int
-    - cpu_time:
-      _description: The CPU time it took to complete the transaction.
-      _type: int
-    - bytes_in:
-      _description: The number of bytes of the request.
-      _type: int
-    - bytes_out:
-      _description: The number of bytes of the response.
-      _type: int
+      type: int
+
+    - name: cpu_time
+      description: The CPU time it took to complete the transaction.
+      type: int
+
+    - name: bytes_in
+      description: The number of bytes of the request.
+      type: int
+
+    - name: bytes_out
+      description: The number of bytes of the response.
+      type: int
