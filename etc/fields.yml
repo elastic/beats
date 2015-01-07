@@ -1,0 +1,87 @@
+_defaults:
+  _type: string
+  _required: false
+
+env:
+  _description: >
+      These fields contain data about the environment in which the
+      transaction was captured.
+  _fields:
+    - agent:
+        _description: >
+          The name of the agent that captured the transaction.
+    - client_server:
+      _description: >
+          The name of the server that initiated the transaction.
+    - server:
+      _description: >
+          The name of the server that served the transaction.
+    - client_ip:
+      _description: >
+          The IP address of the server that initiated the transaction.
+      _format: dotted notation.
+    - ip:
+      _description: >
+          The IP address of the server that served the transaction.
+      _format: dotted notation.
+    - client_proc:
+      _description: >
+          The name of the process that initiated the transaction.
+    - proc:
+      _description: >
+          The name of the process that served the transaction.
+
+event:
+  _description: >
+    These fields contained data about the transaction itself.
+  _fields:
+    - timestamp:
+      _type: string
+      _required: true
+      _format: YYYY-MM-DDTHH:MM:SS.micro
+      _description: >
+          The timestamp of the event, as measured either by the agent or
+          by a common collector point. The precision is in microseconds.
+    - type:
+      _description: >
+          The type of the transaction (e.g. HTTP, MySQL, REDIS)
+    - status:
+      _description: >
+        High level status of the transaction. The way to compute this
+        value depends on the protocol, but the result has a meaning
+        independent a meaning independent of the protocol.
+      _possible_values:
+        - OK
+        - Error
+        - Server Error
+        - Client Error
+
+    - http:
+      _type: group
+      _description: HTTP specific event fields.
+      _fields:
+        - code:
+          - _description: HTTP status code.
+          - _example: 404
+        - phrase:
+          - _description: HTTP status phrase.
+          - _example: Not found.
+
+measurements:
+  - _description: >
+        These fields contain measurements related to the transaction.
+  - fields:
+    - responsetime:
+      _description: >
+        The wall clock time it took to for the transaction to complete.
+        The precision is in microseconds.
+      _type: int
+    - cpu_time:
+      _description: The CPU time it took to complete the transaction.
+      _type: int
+    - bytes_in:
+      description: The number of bytes of the request.
+      _type: int
+    - bytes_out:
+      - description: The number of bytes of the response.
+      _type: int
