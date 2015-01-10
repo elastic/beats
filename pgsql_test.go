@@ -77,6 +77,78 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 
 }
 
+// Test parsing a pgsql response
+func TestPgsqlParser_response(t *testing.T) {
+
+	data := []byte(
+		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
+			"440000001b0003000000036d6561000000036d6562000000036d6563" +
+			"440000001e0003000000046d656131000000046d656231000000046d656331" +
+			"440000001e0003000000046d656132000000046d656232000000046d656332" +
+			"440000001e0003000000046d656133000000046d656233000000046d656333" +
+			"430000000d53454c454354203400" +
+			"5a0000000549")
+
+	message, err := hex.DecodeString(string(data))
+	if err != nil {
+		t.Error("Failed to decode hex string")
+	}
+
+	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+
+	ok, complete := pgsqlMessageParser(stream)
+
+	if !ok {
+		t.Error("Parsing returned error")
+	}
+	if !complete {
+		t.Error("Expecting a complete message")
+	}
+	if stream.message.IsRequest {
+		t.Error("Failed to parse postgres response")
+	}
+	if !stream.message.IsOK || stream.message.IsError {
+		t.Error("Failed to parse postgres response")
+	}
+	if stream.message.NumberOfFields != 3 {
+		t.Error("Failed to parse the number of field")
+	}
+	if stream.message.NumberOfRows != 4 {
+		t.Error("Failed to parse the number of rows")
+	}
+
+}
+
+// Test parsing an incomplete pgsql response
+func TestPgsqlParser_incomplete_response(t *testing.T) {
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"pgsql", "pgsqldetailed"})
+	}
+
+	data := []byte(
+		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
+			"440000001b0003000000036d6561000000036d6562000000036d6563" +
+			"440000001e0003000000046d656131000000046d656231000000046d656331" +
+			"440000001e0003000000046d")
+
+	message, err := hex.DecodeString(string(data))
+	if err != nil {
+		t.Error("Failed to decode hex string")
+	}
+
+	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+
+	ok, complete := pgsqlMessageParser(stream)
+
+	if !ok {
+		t.Error("Parsing returned error")
+	}
+	if complete {
+		t.Error("Expecting an incomplete message")
+	}
+
+}
+
 // Test 3 responses in a row
 func TestPgsqlParser_threeResponses(t *testing.T) {
 
