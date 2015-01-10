@@ -47,18 +47,17 @@ const (
 var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql", "thrift"}
 
 type tomlConfig struct {
-	Interfaces   tomlInterfaces
-	RunOptions   tomlRunOptions
-	Protocols    map[string]tomlProtocol
-	Procs        tomlProcs
-	Output       map[string]tomlMothership
-	Agent        tomlAgent
-	Logging      tomlLogging
-	Passwords    tomlPasswords
-	ContentTypes tomlContentTypes
-	Thrift       tomlThrift
-	Http         tomlHttp
-	Geoip        tomlGeoip
+	Interfaces tomlInterfaces
+	RunOptions tomlRunOptions
+	Protocols  map[string]tomlProtocol
+	Procs      tomlProcs
+	Output     map[string]tomlMothership
+	Agent      tomlAgent
+	Logging    tomlLogging
+	Passwords  tomlPasswords
+	Thrift     tomlThrift
+	Http       tomlHttp
+	Geoip      tomlGeoip
 }
 
 type tomlRunOptions struct {
@@ -72,9 +71,6 @@ type tomlLogging struct {
 
 type tomlPasswords struct {
 	Hide_keywords []string
-}
-type tomlContentTypes struct {
-	Include_body []string
 }
 
 type tomlGeoip struct {

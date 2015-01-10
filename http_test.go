@@ -576,6 +576,9 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 }
 
 func TestHttpParser_301_response(t *testing.T) {
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"http"})
+	}
 	http := HttpModForTests()
 
 	data := []byte(

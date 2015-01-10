@@ -105,6 +105,7 @@ type tomlHttp struct {
 	Send_headers     []string
 	Split_cookie     bool
 	Real_ip_header   string
+	Include_body_for []string
 }
 
 var HttpMod Http
@@ -226,8 +227,11 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 			// capture their value
 			if headerName == "content-length" {
 				m.ContentLength, _ = strconv.Atoi(headerVal)
+				m.hasContentLength = true
 			} else if headerName == "transfer-encoding" {
 				m.TransferEncoding = headerVal
+			} else if headerName == "connection" {
+				m.connection = headerVal
 			}
 			if len(http.Real_ip_header) > 0 && headerName == http.Real_ip_header {
 				m.Real_ip = headerVal
@@ -341,6 +345,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 							return true, true
 						} else {
 							// Read until FIN
+							DEBUG("http", "Read until FIN")
 						}
 					} else if m.connection == "close" {
 						// Connection: close -> read until FIN
@@ -382,6 +387,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			} else {
 				s.bodyReceived += (len(s.data) - s.parseOffset)
 				s.parseOffset = len(s.data)
+				DEBUG("http", "bodyReceived: %d", s.bodyReceived)
 				return true, false
 			}
 
@@ -461,7 +467,7 @@ func (stream *HttpStream) PrepareForNewMessage() {
 func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 	defer RECOVER("ParseHttp exception")
 
-	DEBUG("http", "Payload received: [%s]", pkt.payload)
+	DEBUG("httpdetailed", "Payload received: [%s]", pkt.payload)
 
 	if tcp.httpData[dir] == nil {
 		tcp.httpData[dir] = &HttpStream{
@@ -744,6 +750,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
+			DEBUG("http", "Body to include: [%s]", m.Raw[m.bodyOffset:])
 			raw_msg_cut = append(raw_msg_cut, m.Raw[m.bodyOffset:]...)
 		}
 	}
@@ -752,7 +759,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 }
 
 func shouldIncludeInBody(contenttype string) bool {
-	include_body := _Config.ContentTypes.Include_body
+	include_body := _Config.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
 			DEBUG("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)

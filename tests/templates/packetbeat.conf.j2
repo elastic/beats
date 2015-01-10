@@ -90,6 +90,12 @@ send_headers = [{%- for hdr in http_send_headers -%}
 {%- endfor -%}
 ]{%- endif %}
 {% if http_real_ip_header %}real_ip_header = "{{ http_real_ip_header }}"{% endif %}
+{% if http_include_body_for -%}
+include_body_for = [{%- for ct in http_include_body_for -%}
+    "{{ ct }}"
+    {%- if not loop.last %}, {% endif -%}
+{%- endfor -%}
+]{%- endif %}
 
 [procs]
 # Which processes to monitor and how to find them. The processes can

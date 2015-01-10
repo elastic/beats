@@ -41,7 +41,7 @@ class Test(TestCase):
         assert all([o["dst_port"] == 8888 for o in objs])
 
         assert all([o["status"] == "OK" for i, o in enumerate(objs)
-            if i != 13])
+                    if i != 13])
 
         assert objs[13]["status"] == "Error"
         assert objs[13]["http"]["request"]["uri"] == "/comment/"
@@ -59,6 +59,19 @@ class Test(TestCase):
         assert len(objs) == 1
         assert objs[0]["request_raw"] == ""
         assert objs[0]["response_raw"] == ""
+
+    def test_include_body_for(self):
+        self.render_config_template(
+            http_ports=[8888],
+            http_send_headers=["content-type"],
+            http_include_body_for=["text/html"]
+        )
+        self.run_packetbeat(pcap="wsgi_loopback.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+
+        assert len(objs[0]["response_raw"]) > 20000
 
     def test_send_headers_options(self):
         self.render_config_template(
@@ -88,11 +101,13 @@ class Test(TestCase):
         assert o["http"]["request"]["headers"]["cache-control"] == "max-age=0"
         assert len(o["http"]["request"]["headers"]) == 9
         assert len(o["http"]["response"]["headers"]) == 7
-        assert isinstance(o["http"]["response"]["headers"]["set-cookie"], basestring)
+        assert isinstance(o["http"]["response"]["headers"]["set-cookie"],
+                          basestring)
 
         self.render_config_template(
             http_ports=[8888],
-            http_send_headers=["User-Agent", "content-Type", "x-forwarded-for"],
+            http_send_headers=["User-Agent", "content-Type",
+                               "x-forwarded-for"],
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
