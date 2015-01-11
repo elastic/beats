@@ -18,7 +18,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
-	"github.com/packetbeat/gopacket/layers"
 	"github.com/packetbeat/gopacket/pcap"
 )
 
@@ -258,7 +257,7 @@ func main() {
 
 	var dumper *pcap.Dumper = nil
 	if *dumpfile != "" {
-		p, err := pcap.OpenDead(layers.LinkTypeEthernet, 65535)
+		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
 		if err != nil {
 			CRIT(err.Error())
 			return
