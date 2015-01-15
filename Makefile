@@ -19,6 +19,8 @@ deps:
 	go get
 	# the testify one we need to spell out, because it's only used in tests
 	go get github.com/stretchr/testify
+	# make sure vet is installed
+	go get golang.org/x/tools/cmd/vet
 
 .PHONY: install
 install: packetbeat go-daemon/god
@@ -45,6 +47,7 @@ test:
 
 .PHONY: testlong
 testlong:
+	go vet
 	go test
 	PACKETBEAT_HAVE_GEOIP=1 make -C tests test
 
