@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Running pre-commit hook..."
+go fmt
+go vet
+go test -short
