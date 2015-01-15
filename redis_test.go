@@ -14,7 +14,7 @@ func TestRedisParser_simpleRequest(t *testing.T) {
 
 	message, err := hex.DecodeString(string(data))
 	if err != nil {
-		t.Error("Failed to decode hex string")
+		t.Errorf("Failed to decode hex string")
 	}
 
 	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
@@ -22,16 +22,16 @@ func TestRedisParser_simpleRequest(t *testing.T) {
 	ok, complete := redisMessageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 	if !stream.message.IsRequest {
-		t.Error("Failed to parse Redis request")
+		t.Errorf("Failed to parse Redis request")
 	}
 	if stream.message.Message != "SET key1 Hello" {
-		t.Error("Failed to parse Redis request: %s", stream.message.Message)
+		t.Errorf("Failed to parse Redis request: %s", stream.message.Message)
 	}
 }
 
@@ -42,7 +42,7 @@ func TestRedisParser_PosResult(t *testing.T) {
 
 	message, err := hex.DecodeString(string(data))
 	if err != nil {
-		t.Error("Failed to decode hex string")
+		t.Errorf("Failed to decode hex string")
 	}
 
 	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
@@ -50,16 +50,16 @@ func TestRedisParser_PosResult(t *testing.T) {
 	ok, complete := redisMessageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 	if stream.message.IsRequest {
-		t.Error("Failed to parse Redis response")
+		t.Errorf("Failed to parse Redis response")
 	}
 	if stream.message.Message != "OK" {
-		t.Error("Failed to parse Redis response: %s", stream.message.Message)
+		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
 	}
 }
 
@@ -70,7 +70,7 @@ func TestRedisParser_NilResult(t *testing.T) {
 
 	message, err := hex.DecodeString(string(data))
 	if err != nil {
-		t.Error("Failed to decode hex string")
+		t.Errorf("Failed to decode hex string")
 	}
 
 	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
@@ -78,15 +78,15 @@ func TestRedisParser_NilResult(t *testing.T) {
 	ok, complete := redisMessageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 	if stream.message.IsRequest {
-		t.Error("Failed to parse Redis response")
+		t.Errorf("Failed to parse Redis response")
 	}
 	if stream.message.Message != "nil" {
-		t.Error("Failed to parse Redis response: %s", stream.message.Message)
+		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
 	}
 }

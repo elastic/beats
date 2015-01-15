@@ -35,30 +35,30 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.IsRequest {
-		t.Error("Failed to parse HTTP response")
+		t.Errorf("Failed to parse HTTP response")
 	}
 	if stream.message.StatusCode != 200 {
-		t.Error("Failed to parse status code: %d", stream.message.StatusCode)
+		t.Errorf("Failed to parse status code: %d", stream.message.StatusCode)
 	}
 	if stream.message.StatusPhrase != "OK" {
-		t.Error("Failed to parse response phrase: %s", stream.message.StatusPhrase)
+		t.Errorf("Failed to parse response phrase: %s", stream.message.StatusPhrase)
 	}
 	if stream.message.ContentLength != 0 {
-		t.Error("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
+		t.Errorf("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
 	}
 	if stream.message.version_major != 1 {
-		t.Error("Failed to parse version major")
+		t.Errorf("Failed to parse version major")
 	}
 	if stream.message.version_minor != 1 {
-		t.Error("Failed to parse version minor")
+		t.Errorf("Failed to parse version minor")
 	}
 }
 
@@ -83,30 +83,30 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.IsRequest {
-		t.Error("Failed to parse HTTP response")
+		t.Errorf("Failed to parse HTTP response")
 	}
 	if stream.message.StatusCode != 200 {
-		t.Error("Failed to parse status code: %d", stream.message.StatusCode)
+		t.Errorf("Failed to parse status code: %d", stream.message.StatusCode)
 	}
 	if stream.message.StatusPhrase != "OK" {
-		t.Error("Failed to parse response phrase: %s", stream.message.StatusPhrase)
+		t.Errorf("Failed to parse response phrase: %s", stream.message.StatusPhrase)
 	}
 	if stream.message.ContentLength != 0 {
-		t.Error("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
+		t.Errorf("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
 	}
 	if stream.message.version_major != 1 {
-		t.Error("Failed to parse version major")
+		t.Errorf("Failed to parse version major")
 	}
 	if stream.message.version_minor != 1 {
-		t.Error("Failed to parse version minor")
+		t.Errorf("Failed to parse version minor")
 	}
 }
 
@@ -136,33 +136,33 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
-		t.Error("The offset is wrong")
+		t.Errorf("The offset is wrong")
 	}
 	if !stream.message.IsRequest {
-		t.Error("Failed to parse the HTTP request")
+		t.Errorf("Failed to parse the HTTP request")
 	}
 	if stream.message.Method != "GET" {
-		t.Error("Failed to parse HTTP method: %s", stream.message.Method)
+		t.Errorf("Failed to parse HTTP method: %s", stream.message.Method)
 	}
 	if stream.message.RequestUri != "/" {
-		t.Error("Failed to parse HTTP request uri: %s", stream.message.RequestUri)
+		t.Errorf("Failed to parse HTTP request uri: %s", stream.message.RequestUri)
 	}
 	if stream.message.Headers["host"] != "www.google.ro" {
-		t.Error("Failed to parse HTTP Host header: %s", stream.message.Headers["host"])
+		t.Errorf("Failed to parse HTTP Host header: %s", stream.message.Headers["host"])
 	}
 	if stream.message.version_major != 1 {
-		t.Error("Failed to parse version major")
+		t.Errorf("Failed to parse version major")
 	}
 	if stream.message.version_minor != 1 {
-		t.Error("Failed to parse version minor")
+		t.Errorf("Failed to parse version minor")
 	}
 
 }
@@ -190,11 +190,11 @@ func TestHttpParser_splitResponse(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data2...)
@@ -202,10 +202,10 @@ func TestHttpParser_splitResponse(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 }
 
@@ -234,11 +234,11 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data2...)
@@ -246,25 +246,25 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 	if stream.message.StatusCode != 200 {
-		t.Error("Failed to parse response code")
+		t.Errorf("Failed to parse response code")
 	}
 	if stream.message.StatusPhrase != "OK" {
-		t.Error("Failed to parse response phrase")
+		t.Errorf("Failed to parse response phrase")
 	}
 	if stream.message.Headers["content-type"] != "text/html; charset=UTF-8" {
-		t.Error("Failed to parse content type")
+		t.Errorf("Failed to parse content type")
 	}
 	if stream.message.version_major != 1 {
-		t.Error("Failed to parse version major")
+		t.Errorf("Failed to parse version major")
 	}
 	if stream.message.version_minor != 1 {
-		t.Error("Failed to parse version minor")
+		t.Errorf("Failed to parse version minor")
 	}
 }
 
@@ -292,11 +292,11 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data2...)
@@ -304,10 +304,10 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 }
 
@@ -334,11 +334,11 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data2...)
@@ -346,10 +346,10 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 }
 
@@ -375,19 +375,19 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.ContentLength != 30 {
-		t.Error("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
+		t.Errorf("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
 	}
 
 	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
-		t.Error("The offset is wrong")
+		t.Errorf("The offset is wrong")
 	}
 }
 
@@ -416,38 +416,38 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data2...)
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 	if complete {
-		t.Error("Not expecting a complete message yet")
+		t.Errorf("Not expecting a complete message yet")
 	}
 
 	stream.data = append(stream.data, data3...)
 	ok, complete = http.messageParser(stream)
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.ContentLength != 30 {
-		t.Error("Wrong content-length")
+		t.Errorf("Wrong content-length")
 	}
 
 	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("")) {
-		t.Error("The offset is wrong")
+		t.Errorf("The offset is wrong")
 	}
 }
 
@@ -486,11 +486,11 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	stream.PrepareForNewMessage()
@@ -499,11 +499,11 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 }
 
@@ -546,19 +546,19 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.ContentLength != 2 {
-		t.Error("Wrong content lenght")
+		t.Errorf("Wrong content lenght")
 	}
 
 	if !bytes.Equal(stream.data[stream.message.start:stream.message.end], data1) {
-		t.Error("First message not correctly extracted")
+		t.Errorf("First message not correctly extracted")
 	}
 
 	stream.PrepareForNewMessage()
@@ -567,11 +567,11 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 	ok, complete = http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 }
 
@@ -606,15 +606,15 @@ func TestHttpParser_301_response(t *testing.T) {
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
-		t.Error("Parsing returned error")
+		t.Errorf("Parsing returned error")
 	}
 
 	if !complete {
-		t.Error("Expecting a complete message")
+		t.Errorf("Expecting a complete message")
 	}
 
 	if stream.message.ContentLength != 290 {
-		t.Error("Expecting content length 290")
+		t.Errorf("Expecting content length 290")
 	}
 }
 
@@ -637,81 +637,81 @@ func TestEatBodyChunked(t *testing.T) {
 
 	cont, ok, complete := state_body_chunked_start(stream, message)
 	if cont != false || ok != true || complete != false {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if stream.parseOffset != 0 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 
 	stream.data = append(stream.data, msgs[1]...)
 
 	cont, ok, complete = state_body_chunked_start(stream, message)
 	if cont != true {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if message.chunked_length != 3 {
-		t.Error("Wrong chunked_length")
+		t.Errorf("Wrong chunked_length")
 	}
 	if stream.parseOffset != 4 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 	if stream.parseState != BODY_CHUNKED {
-		t.Error("Wrong state")
+		t.Errorf("Wrong state")
 	}
 
 	cont, ok, complete = state_body_chunked(stream, message)
 	if cont != true {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if stream.parseState != BODY_CHUNKED_START {
-		t.Error("Wrong state")
+		t.Errorf("Wrong state")
 	}
 	if stream.parseOffset != 9 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 
 	cont, ok, complete = state_body_chunked_start(stream, message)
 	if cont != true {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if message.chunked_length != 3 {
-		t.Error("Wrong chunked_length")
+		t.Errorf("Wrong chunked_length")
 	}
 	if stream.parseOffset != 13 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 	if stream.parseState != BODY_CHUNKED {
-		t.Error("Wrong state")
+		t.Errorf("Wrong state")
 	}
 
 	cont, ok, complete = state_body_chunked(stream, message)
 	if cont != false || ok != true || complete != false {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if stream.parseState != BODY_CHUNKED {
-		t.Error("Wrong state")
+		t.Errorf("Wrong state")
 	}
 	if stream.parseOffset != 13 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 	if stream.bodyReceived != 0 {
-		t.Error("Wrong bodyReceived")
+		t.Errorf("Wrong bodyReceived")
 	}
 
 	stream.data = append(stream.data, msgs[2]...)
 	cont, ok, complete = state_body_chunked(stream, message)
 	if cont != true {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 	if stream.parseState != BODY_CHUNKED_START {
-		t.Error("Wrong state")
+		t.Errorf("Wrong state")
 	}
 	if stream.parseOffset != 18 {
-		t.Error("Wrong parseOffset")
+		t.Errorf("Wrong parseOffset")
 	}
 
 	cont, ok, complete = state_body_chunked_start(stream, message)
 	if cont != false || ok != true || complete != true {
-		t.Error("Wrong return values")
+		t.Errorf("Wrong return values")
 	}
 }

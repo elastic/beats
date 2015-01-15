@@ -53,12 +53,12 @@ func TestTopologyInRedis(t *testing.T) {
 
 	name2 := publisher3.GetServerName("10.1.0.9")
 	if name2 != "proxy2" {
-		t.Error("Failed to update proxy2 in topology: name=%s", name2)
+		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
 	}
 
 	name2 = publisher3.GetServerName("10.1.0.9")
 	if name2 != "proxy2" {
-		t.Error("Failed to update proxy2 in topology: name=%s", name2)
+		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
 	}
 
 	publisher1.PublishTopology("10.1.0.4")
@@ -67,16 +67,16 @@ func TestTopologyInRedis(t *testing.T) {
 
 	name3 := publisher3.GetServerName("192.168.1.2")
 	if name3 != "proxy3" {
-		t.Error("Failed to add a new IP")
+		t.Errorf("Failed to add a new IP")
 	}
 
 	name3 = publisher3.GetServerName("10.1.0.10")
 	if name3 != "" {
-		t.Error("Failed to delete old IP of proxy3: %s", name3)
+		t.Errorf("Failed to delete old IP of proxy3: %s", name3)
 	}
 
 	name2 = publisher3.GetServerName("fe80::4e8d:79ff:fef2:de6a")
 	if name2 != "" {
-		t.Error("Failed to delete old IP of proxy2: %s", name2)
+		t.Errorf("Failed to delete old IP of proxy2: %s", name2)
 	}
 }

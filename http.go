@@ -453,7 +453,6 @@ func state_body_chunked(s *HttpStream, m *HttpMessage) (cont bool, ok bool, comp
 		s.parseOffset = len(s.data)
 		return false, true, false
 	}
-	return true, false, false
 }
 
 func (stream *HttpStream) PrepareForNewMessage() {

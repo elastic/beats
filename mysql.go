@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"labix.org/v2/mgo/bson"
 	"strings"
 	"time"
+
+	"labix.org/v2/mgo/bson"
 )
 
 // Packet types
@@ -191,7 +192,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// wait for more
 				return true, false
 			}
-			break
 
 		case MysqlStateEatFields:
 			if len(s.data[s.parseOffset:]) < 4 {

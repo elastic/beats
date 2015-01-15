@@ -23,25 +23,25 @@ func TestThrift_thriftReadString(t *testing.T) {
 	data, _ = hex.DecodeString("0000000470696e67")
 	str, ok, complete, off = thrift.readString(data)
 	if str != "ping" || !ok || !complete || off != 8 {
-		t.Error("Bad result: %s %s %s %s", str, ok, complete, off)
+		t.Errorf("Bad result: %v %v %v %v", str, ok, complete, off)
 	}
 
 	data, _ = hex.DecodeString("0000000470696e670000")
 	str, ok, complete, off = thrift.readString(data)
 	if str != "ping" || !ok || !complete || off != 8 {
-		t.Error("Bad result: %s %s %s %s", str, ok, complete, off)
+		t.Errorf("Bad result: %v %v %v %v", str, ok, complete, off)
 	}
 
 	data, _ = hex.DecodeString("0000000470696e")
 	str, ok, complete, off = thrift.readString(data)
 	if str != "" || !ok || complete || off != 0 {
-		t.Error("Bad result: %s %s %s %s", str, ok, complete, off)
+		t.Errorf("Bad result: %v %v %v %v", str, ok, complete, off)
 	}
 
 	data, _ = hex.DecodeString("000000")
 	str, ok, complete, off = thrift.readString(data)
 	if str != "" || !ok || complete || off != 0 {
-		t.Error("Bad result: %s %s %s %s", str, ok, complete, off)
+		t.Errorf("Bad result: %v %v %v %v", str, ok, complete, off)
 	}
 }
 
@@ -64,11 +64,11 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != ThriftVersion1 {
-		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000000")
@@ -76,11 +76,11 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != ThriftVersion1 {
-		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000001")
@@ -88,11 +88,11 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 1 || m.Version != ThriftVersion1 {
-		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
 	}
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
@@ -100,7 +100,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
@@ -108,7 +108,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 
 	data, _ = hex.DecodeString("0000000470696e670100000000")
@@ -116,11 +116,11 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
-		t.Error("Bad result: %s %s", ok, complete)
+		t.Errorf("Bad result: %v %v", ok, complete)
 	}
 	if m.Method != "ping" || m.Type != ThriftMsgTypeCall ||
 		m.SeqId != 0 || m.Version != 0 {
-		t.Error("Bad values: %s %s %s %s", m.Method, m.Type, m.SeqId, m.Version)
+		t.Errorf("Bad values: %v %v %v %v", m.Method, m.Type, m.SeqId, m.Version)
 	}
 
 	data, _ = hex.DecodeString("0000000570696e670100000000")

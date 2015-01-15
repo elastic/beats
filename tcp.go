@@ -216,7 +216,7 @@ func PrintTcpMap() {
 	}
 	fmt.Printf("\n")
 
-	fmt.Printf("Streams dict: %s", tcpStreamsMap)
+	fmt.Printf("Streams dict: %v", tcpStreamsMap)
 }
 
 func configToPortsMap(config *tomlConfig) map[uint16]protocolType {

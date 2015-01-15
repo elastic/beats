@@ -52,7 +52,7 @@ func AssertIntArraysAreEqual(t *testing.T, expected []int, result []int) bool {
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %s but got %s", expected, result))
+			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
 			return false
 		}
 	}
@@ -69,7 +69,7 @@ func AssertInt64ArraysAreEqual(t *testing.T, expected []int64, result []int64) b
 			}
 		}
 		if !found {
-			t.Error(fmt.Sprintf("Expected array %s but got %s", expected, result))
+			t.Error(fmt.Sprintf("Expected array %v but got %v", expected, result))
 			return false
 		}
 	}
@@ -146,13 +146,13 @@ func TestRefreshPids(t *testing.T) {
 
 	p, err := NewProcess(&procs, "nginx", "nginx", (<-chan time.Time)(ch))
 	if err != nil {
-		t.Fatal("NewProcess: %s", err)
+		t.Fatalf("NewProcess: %s", err)
 	}
 
 	ch <- time.Now()
 	<-testSignals
 
-	t.Log("p and p.Pids: %p %s", p, p.Pids)
+	t.Logf("p and p.Pids: %p %v", p, p.Pids)
 	AssertIntArraysAreEqual(t, []int{766, 768, 769}, p.Pids)
 
 	// Add new process
@@ -197,7 +197,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 
 	inodes, err := FindSocketsOfPid(path_prefix, 766)
 	if err != nil {
-		t.Fatal("FindSocketsOfPid: %s", err)
+		t.Fatalf("FindSocketsOfPid: %s", err)
 	}
 
 	AssertInt64ArraysAreEqual(t, []int64{7619, 7620}, inodes)

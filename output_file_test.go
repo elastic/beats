@@ -16,7 +16,7 @@ func Test_Rotator(t *testing.T) {
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
 	if err != nil {
-		t.Error("Error: %s", err.Error())
+		t.Errorf("Error: %s", err.Error())
 		return
 	}
 
@@ -36,7 +36,7 @@ func Test_Rotator(t *testing.T) {
 	}
 
 	if _, err = os.Stat(filepath.Join(dir, "packetbeat")); os.IsNotExist(err) {
-		t.Error("File %s doesn't exist", filepath.Join(dir, "packetbeat"))
+		t.Errorf("File %s doesn't exist", filepath.Join(dir, "packetbeat"))
 	}
 
 	if err = rotator.WriteLine([]byte("1")); err != nil {
@@ -107,7 +107,7 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
 	if err != nil {
-		t.Error("Error: %s", err.Error())
+		t.Errorf("Error: %s", err.Error())
 		return
 	}
 
