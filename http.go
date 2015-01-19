@@ -17,6 +17,7 @@ const (
 	BODY
 	BODY_CHUNKED_START
 	BODY_CHUNKED
+	BODY_CHUNKED_WAIT_FINAL_CRLF
 )
 
 // Http Message
@@ -402,11 +403,28 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			if !cont {
 				return ok, complete
 			}
+
+		case BODY_CHUNKED_WAIT_FINAL_CRLF:
+			return state_body_chunked_wait_final_crlf(s, m)
 		}
 
 	}
 
 	return true, false
+}
+
+func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool, complete bool) {
+	if len(s.data[s.parseOffset:]) < 2 {
+		return true, false
+	} else {
+		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
+			WARN("Expected CRLF sequence at end of message")
+			return false, false
+		}
+		s.parseOffset += 2 // skip final CRLF
+		m.end = s.parseOffset
+		return true, true
+	}
 }
 
 func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool, complete bool) {
@@ -424,24 +442,34 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
 
 	s.parseOffset += i + 2 //+ \r\n
 	if m.chunked_length == 0 {
-		s.parseOffset += 2 // final \r\n
+		if len(s.data[s.parseOffset:]) < 2 {
+			s.parseState = BODY_CHUNKED_WAIT_FINAL_CRLF
+			return false, true, false
+		}
+		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
+			WARN("Expected CRLF sequence at end of message")
+			return false, false, false
+		}
+		s.parseOffset += 2 // skip final CRLF
+
 		m.end = s.parseOffset
 		return false, true, true
 	}
 	s.bodyReceived = 0
 	s.parseState = BODY_CHUNKED
 
-	return true, false, false
+	return true, true, false
 }
 
 func state_body_chunked(s *HttpStream, m *HttpMessage) (cont bool, ok bool, complete bool) {
+
 	if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived+2 /*\r\n*/ {
 		// Received more data than expected
 		m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:s.parseOffset+m.chunked_length-s.bodyReceived]...)
 		s.parseOffset += (m.chunked_length - s.bodyReceived + 2 /*\r\n*/)
 		m.ContentLength += m.chunked_length
 		s.parseState = BODY_CHUNKED_START
-		return true, false, false
+		return true, true, false
 	} else {
 		if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived {
 			// we need need to wait for the +2, else we can crash on next call

@@ -619,10 +619,15 @@ func TestHttpParser_301_response(t *testing.T) {
 }
 
 func TestEatBodyChunked(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+	}
+
 	msgs := [][]byte{
 		[]byte("03\r"),
 		[]byte("\n123\r\n03\r\n123\r"),
-		[]byte("\n0\r\n"),
+		[]byte("\n0\r\n\r\n"),
 	}
 	stream := &HttpStream{
 		data:         msgs[0],
@@ -712,6 +717,69 @@ func TestEatBodyChunked(t *testing.T) {
 
 	cont, ok, complete = state_body_chunked_start(stream, message)
 	if cont != false || ok != true || complete != true {
-		t.Errorf("Wrong return values")
+		t.Error("Wrong return values", cont, ok, complete)
+	}
+}
+
+func TestEatBodyChunkedWaitCRLF(t *testing.T) {
+
+	if testing.Verbose() {
+		LogInit(LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+	}
+
+	msgs := [][]byte{
+		[]byte("03\r\n123\r\n0\r\n\r"),
+		[]byte("\n"),
+	}
+	stream := &HttpStream{
+		data:         msgs[0],
+		parseOffset:  0,
+		bodyReceived: 0,
+		parseState:   BODY_CHUNKED_START,
+	}
+	message := &HttpMessage{
+		chunked_length: 5,
+		ContentLength:  0,
+	}
+
+	cont, ok, complete := state_body_chunked_start(stream, message)
+	if cont != true || ok != true || complete != false {
+		t.Error("Wrong return values", cont, ok, complete)
+	}
+	if stream.parseState != BODY_CHUNKED {
+		t.Error("Unexpected state", stream.parseState)
+	}
+
+	cont, ok, complete = state_body_chunked(stream, message)
+	if cont != true || ok != true || complete != false {
+		t.Error("Wrong return values", cont, ok, complete)
+	}
+	if stream.parseState != BODY_CHUNKED_START {
+		t.Error("Unexpected state", stream.parseState)
+	}
+
+	cont, ok, complete = state_body_chunked_start(stream, message)
+	if cont != false || ok != true || complete != false {
+		t.Error("Wrong return values", cont, ok, complete)
+	}
+	if stream.parseState != BODY_CHUNKED_WAIT_FINAL_CRLF {
+		t.Error("Unexpected state", stream.parseState)
+	}
+
+	DEBUG("http", "parseOffset", stream.parseOffset)
+
+	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
+	if ok != true || complete != false {
+		t.Error("Wrong return values", ok, complete)
+	}
+
+	stream.data = append(stream.data, msgs[1]...)
+
+	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
+	if ok != true || complete != true {
+		t.Error("Wrong return values", ok, complete)
+	}
+	if message.end != 14 {
+		t.Error("Wrong message end", message.end)
 	}
 }
