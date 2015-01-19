@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/packetbeat/gopacket"
 	"github.com/packetbeat/gopacket/layers"
 	"github.com/packetbeat/gopacket/pcap"
-	"os"
-	"time"
 )
 
 type SnifferSetup struct {
@@ -79,7 +80,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		}
 	}
 	if sniffer.config.Snaplen == 0 {
-		if sniffer.config.Devices[0] == "any" || sniffer.config.Devices[1] == "lo" {
+		if sniffer.config.Devices[0] == "any" || sniffer.config.Devices[0] == "lo" {
 			sniffer.config.Snaplen = 16436
 		} else {
 			sniffer.config.Snaplen = 1514
