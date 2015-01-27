@@ -21,7 +21,7 @@ import (
 	"github.com/packetbeat/gopacket/pcap"
 )
 
-const Version = "0.4.2"
+const Version = "0.4.3"
 
 // Structure grouping main components/modules
 type PacketbeatStruct struct {

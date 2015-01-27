@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=0.4.2
+VERSION?=0.4.3
 ARCH?=$(shell uname -m)
 
 
