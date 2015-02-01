@@ -336,33 +336,27 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 				// EOH
 				s.parseOffset += 2
 				m.bodyOffset = s.parseOffset
-				if m.ContentLength == 0 {
-                                        if m.IsRequest && m.hasContentLength {
-                                                // empty request body, do not read until FIN
-						m.end = s.parseOffset
-						return true, true
-                                        } else if m.version_major == 1 && m.version_minor == 0 &&
-						!m.hasContentLength {
-						if m.IsRequest {
-							// No Content-Length in a HTTP/1.0 request means
-							// there is no body
-							m.end = s.parseOffset
-							return true, true
-						} else {
-							// Read until FIN
-							DEBUG("http", "Read until FIN")
-						}
-					} else if m.connection == "close" {
-						// Connection: close -> read until FIN
-					} else if !m.hasContentLength && m.TransferEncoding == "chunked" {
-						// support for HTTP/1.1 Chunked transfer
-						s.parseState = BODY_CHUNKED_START
-						continue
-					} else {
-						m.end = s.parseOffset
-						return true, true
-					}
+				if !m.IsRequest && ((100 <= m.StatusCode && m.StatusCode < 200) || m.StatusCode == 204 || m.StatusCode == 304) {
+					//response with a 1xx, 204 , or 304 status  code is always terminated
+					// by the first empty line after the  header fields
+					DEBUG("http", "Terminate response, status code %d", m.StatusCode)
+					m.end = s.parseOffset
+					return true, true
 				}
+				if m.TransferEncoding == "chunked" {
+					// support for HTTP/1.1 Chunked transfer
+					// Transfer-Encoding overrides the Content-Length
+					DEBUG("http", "Read chunked body")
+					s.parseState = BODY_CHUNKED_START
+					continue
+				}
+				if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
+					DEBUG("http", "Empty content length, ignore body")
+					// Ignore body for request that contains a message body but not a Content-Length
+					m.end = s.parseOffset
+					return true, true
+				}
+				DEBUG("http", "Read body")
 				s.parseState = BODY
 			} else {
 				ok, hfcomplete, offset := http.parseHeader(m, s.data[s.parseOffset:])
