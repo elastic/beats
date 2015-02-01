@@ -169,29 +169,29 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
 
-        http := HttpModForTests()
-        http.Send_headers = true
-        http.Send_all_headers = true
+	http := HttpModForTests()
+	http.Send_headers = true
+	http.Send_all_headers = true
 
-        data := []byte("POST / HTTP/1.1\r\n" +
-                "user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
-                "accept: */*\r\n" +
-                "authorization: Company 1\r\n" +
-                "content-length: 0\r\n" +
-                "connection: close\r\n" +
-                "\r\n")
+	data := []byte("POST / HTTP/1.1\r\n" +
+		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
+		"accept: */*\r\n" +
+		"authorization: Company 1\r\n" +
+		"content-length: 0\r\n" +
+		"connection: close\r\n" +
+		"\r\n")
 
-        stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
 
-        ok, complete := http.messageParser(stream)
+	ok, complete := http.messageParser(stream)
 
-        if !ok {
-                t.Errorf("Parsing returned error")
-        }
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
 
-        if !complete {
-                t.Errorf("Expecting a complete message")
-        }
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
 
 }
 
