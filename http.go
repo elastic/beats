@@ -372,7 +372,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 		case BODY:
 			DEBUG("http", "eat body: %d", s.parseOffset)
-			if !m.hasContentLength && m.connection == "close" {
+			if !m.hasContentLength && (m.connection == "close" || (m.version_major == 1 && m.version_minor == 0 && m.connection != "keep-alive")) {
 				// HTTP/1.0 no content length. Add until the end of the connection
 				DEBUG("http", "close connection, %d", len(s.data)-s.parseOffset)
 				s.bodyReceived += (len(s.data) - s.parseOffset)

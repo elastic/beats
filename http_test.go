@@ -419,6 +419,35 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 	}
 }
 
+func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
+	http := HttpModForTests()
+
+	data := []byte("HTTP/1.0 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"\r\n" +
+		"test")
+
+	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if complete {
+		t.Errorf("Not expecting a complete message yet")
+	}
+
+	if stream.message.ContentLength != 4 {
+		t.Errorf("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
+	}
+
+}
+
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
 	http := HttpModForTests()
 
