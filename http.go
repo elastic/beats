@@ -337,7 +337,11 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 				s.parseOffset += 2
 				m.bodyOffset = s.parseOffset
 				if m.ContentLength == 0 {
-					if m.version_major == 1 && m.version_minor == 0 &&
+                                        if m.IsRequest && m.hasContentLength {
+                                                // empty request body, do not read until FIN
+						m.end = s.parseOffset
+						return true, true
+                                        } else if m.version_major == 1 && m.version_minor == 0 &&
 						!m.hasContentLength {
 						if m.IsRequest {
 							// No Content-Length in a HTTP/1.0 request means
