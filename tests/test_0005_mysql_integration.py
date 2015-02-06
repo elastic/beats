@@ -18,7 +18,8 @@ class Test(TestCase):
         assert len(objs) == 157
         assert all([o["dst_port"] == 13001 for o in objs])
 
-        assert len([o for o in objs if o["mysql"]["method"] == "SELECT"]) == 134
+        assert len([o for o in objs
+                    if o["mysql"]["method"] == "SELECT"]) == 134
         assert len([o for o in objs if o["mysql"]["method"] == "SHOW"]) == 10
         assert len([o for o in objs if o["mysql"]["method"] == "ALTER"]) == 4
         assert len([o for o in objs if o["mysql"]["method"] == "SET"]) == 3

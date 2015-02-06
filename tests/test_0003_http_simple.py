@@ -6,7 +6,7 @@ class Test(TestCase):
     def test_http_sample(self):
         self.render_config_template()
         self.run_packetbeat(pcap="http_minitwit.pcap",
-            debug_selectors=["http", "httpdetailed"])
+                            debug_selectors=["http", "httpdetailed"])
         objs = self.read_output()
 
         assert len(objs) == 3
