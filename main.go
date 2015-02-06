@@ -112,9 +112,15 @@ func loadGeoIPData() {
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if len(_Config.Geoip.Paths) > 0 {
+	if _ConfigMeta.IsDefined("geoip", "paths") {
 		geoip_paths = _Config.Geoip.Paths
 	}
+	if len(geoip_paths) == 0 {
+		// disabled
+		return
+	}
+
+	// look for the first existing path
 	var geoip_path string
 	for _, path := range geoip_paths {
 		fi, err := os.Lstat(path)
@@ -129,9 +135,10 @@ func loadGeoIPData() {
 				WARN("Could not load GeoIP data: %s", err.Error())
 				return
 			}
+		} else {
+			geoip_path = path
 		}
-
-		geoip_path = path
+		break
 	}
 
 	if len(geoip_path) == 0 {
