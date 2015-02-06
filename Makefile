@@ -49,7 +49,7 @@ test:
 testlong:
 	go vet
 	go test
-	PACKETBEAT_HAVE_GEOIP=1 make -C tests test
+	make -C tests test
 
 .PHONY: cover
 cover:

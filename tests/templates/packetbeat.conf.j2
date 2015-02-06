@@ -138,4 +138,15 @@ tags = [
 # sensitive information.
 #hide_keywords = ["pass=", "password=", "passwd=", "Password="]
 
+
+{% if geoip_paths is not none -%}
+[geoip]
+paths = [
+        {%- for path in geoip_paths -%}
+            "{{ pb.working_dir + '/' + path }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+]
+{%- endif %}
+
 # vim: set ft=toml:

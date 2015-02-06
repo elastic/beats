@@ -69,6 +69,3 @@ class TestCase(unittest.TestCase):
         if os.path.islink("last_run"):
             os.unlink("last_run")
         os.symlink("run/{}".format(self.id()), "last_run")
-
-    def have_geoip(self):
-        return os.environ.get("PACKETBEAT_HAVE_GEOIP") is not None
