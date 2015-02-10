@@ -54,10 +54,11 @@ event:
     - name: timestamp
       type: string
       required: true
-      format: YYYY-MM-DDTHH:MM:SS.micro
+      format: YYYY-MM-DDTHH:MM:SS.microZ
       description: >
         The timestamp of the event, as measured either by the agent or
         by a common collector point. The precision is in microseconds.
+        The timezone is UTC.
 
     - name: type
       description: >
@@ -241,3 +242,35 @@ measurements:
     - name: bytes_out
       description: The number of bytes of the response.
       type: int
+
+    - name: dnstime
+      type: int
+      description: >
+        The time it takes to query the name server for a given request.
+        This is typically used for RUM (real-user-monitoring) but can
+        also have values for server to server communication when DNS
+        is used for service discovery.
+        The precision is in microseconds.
+
+    - name: connecttime
+      type: int
+      description: >
+        The time it takes for the TCP connection to be established for
+        the given transaction.
+        The precision is in microseconds.
+
+    - name: loadtime
+      type: int
+      description: >
+        The time it takes for the content to be loaded. This is typically
+        used for RUM (real-user-monitoring) but it can make sense in other
+        cases as well.
+        The precision is in microseconds.
+
+    - name: domloadtime
+      type: int
+      description: >
+        In RUM (real-user-monitoring), the total time it takes for the
+        DOM to be loaded. In terms of W3 Navigation Timing API, this is
+        the difference between `domContentLoadedEnd` and
+        `domContentLoadedStart`.
