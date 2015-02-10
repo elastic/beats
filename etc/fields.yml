@@ -3,6 +3,7 @@ version: 1.0
 defaults:
   type: string
   required: false
+  analyzer: not_analyzed
 
 env:
   description: >
@@ -210,12 +211,14 @@ raw:
   description: These fields contain the raw transaction data.
   fields:
     - name: request_raw
+      analyzer: analyzed
       description: >
         For text protocols, this is the request as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
 
     - name: response_raw
+      analyzer: analyzed
       description: >
         For text protocols, this is the response as seen on the wire
         (application layer only). For binary protocols this is our
