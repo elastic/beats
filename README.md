@@ -25,16 +25,16 @@ issue](https://github.com/packetbeat/packetbeat/issues/new), or contact us at
 
 ## Announcement mailing list
 
-You can sign in in to the mailing list by using the form from [our
-website](http://packetbeat.com/). There will be maximum two emails per week
-with updates about new releases.
+You can sign in in to the mailing list by using the form from the footer of
+[our website](http://packetbeat.com/). There will be maximum two emails per
+week with updates about new releases.
 
 ## Authors
 
-**Monica Sarbu** (monica@packetbeat.com)
-**Tudor Golubenco** (tudor@packetbeat.com)
+Monica Sarbu (monica@packetbeat.com), Tudor Golubenco (tudor@packetbeat.com)
+and the
+[contributors](https://github.com/packetbeat/packetbeat/graphs/contributors).
 
 ## Copyright and license
 
-Copyright Packetbeat 2014. Code released under [the GNU license](LICENSE).
-
+Copyright Packetbeat 2014-2015. Code released under [the GNU license](LICENSE).
