@@ -22,4 +22,4 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["real_ip"] == "89.247.39.104"
-        assert o["src_country"] == "DE"
+        assert o["country"] == "DE"

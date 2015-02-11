@@ -11,7 +11,7 @@ class Test(TestCase):
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
         assert len(objs) == 7
-        assert all([o["dst_port"] == 3306 for o in objs])
+        assert all([o["port"] == 3306 for o in objs])
 
         assert objs[0]["mysql"]["method"] == "SET"
         assert objs[0]["mysql"]["tables"] == ""

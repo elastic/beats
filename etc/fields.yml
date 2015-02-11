@@ -40,6 +40,32 @@ env:
         The IP address of the server that initiated the transaction.
       format: dotted notation.
 
+    - name: real_ip
+      description: >
+        If the server initiating the transaction is a proxy, this field
+        contains the original client IP address.
+        For HTTP, for example, the IP address extracted from a configurable
+        HTTP header, by default `X-Forwarded-For`.
+
+        Unless this field is disabled, it always has a value and it matches
+        the `client_ip` for non proxy clients.
+      format: Dotted notation.
+
+    - name: country
+      description: >
+        The country (found via GeoIP) of the `real_ip` IP address or of the
+        `client_ip` address if the `real_ip` is disabled.
+
+    - name: client_port
+      description: >
+        The layer 4 port of the process that initiated the transaction.
+      format: dotted notation.
+
+    - name: port
+      description: >
+        The layer 4 port of the process that served the transaction.
+      format: dotted notation.
+
     - name: proc
       description: >
         The name of the process that served the transaction.
@@ -47,6 +73,16 @@ env:
     - name: client_proc
       description: >
         The name of the process that initiated the transaction.
+
+    - name: release
+      description: >
+        The software release of the service serving the transaction.
+        This can be the commit id or a semantic version.
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per agent and per transaction
+        type.
 
 event:
   description: >
@@ -63,7 +99,7 @@ event:
 
     - name: type
       description: >
-          The type of the transaction (e.g. HTTP, MySQL, REDIS)
+          The type of the transaction (e.g. HTTP, MySQL, REDIS, RUM)
       required: true
 
     - name: status
@@ -99,6 +135,7 @@ event:
         is the key.
 
     - name: query
+      description: >
         The query normalized to account for parameters. For HTTP, it will
         typically be transformed into something like `GET
         /users/_search?name=<S8>`. For MySQL, it is transformed into something
@@ -117,11 +154,6 @@ event:
           description: HTTP status phrase.
           example: Not found.
 
-        - name: http_real_ip
-          description: >
-            The IP address extracted from a configurable HTTP header. Typically
-            the value of "X-Forwarded-For".
-          format: Dotted notation.
 
         - name: http_request_headers
           description: >
@@ -204,6 +236,7 @@ event:
             of fields returned.
 
         - name: pgsql_num_rows
+          description: >
             In case of a successful ``SELECT`` query, it is set to the number
             of rows returned.
 

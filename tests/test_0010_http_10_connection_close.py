@@ -15,7 +15,7 @@ class Test(TestCase):
         assert obj["http"]["content_length"] == 11422
         assert obj["http"]["response"]["code"] == 200
         assert obj["type"] == "http"
-        assert obj["src_ip"] == "127.0.0.1"
-        assert obj["src_port"] == 37885
-        assert obj["dst_ip"] == "127.0.0.1"
-        assert obj["dst_port"] == 8000
+        assert obj["client_ip"] == "127.0.0.1"
+        assert obj["client_port"] == 37885
+        assert obj["ip"] == "127.0.0.1"
+        assert obj["port"] == 8000

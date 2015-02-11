@@ -53,7 +53,7 @@ class Test(TestCase):
         assert objs[0]["request_raw"] == "ping()"
         assert objs[11]["response_raw"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
-        assert all([o["dst_port"] == 9090 for o in objs])
+        assert all([o["port"] == 9090 for o in objs])
 
     def test_thrift_tutorial_framed(self):
         self.render_config_template(

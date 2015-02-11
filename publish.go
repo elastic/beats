@@ -67,19 +67,19 @@ const (
 var outputTypes = []string{ElasticsearchOutputName, RedisOutputName, FileOutputName}
 
 type Event struct {
-	Timestamp    time.Time `json:"@timestamp"`
+	Timestamp    time.Time `json:"timestamp"`
 	Type         string    `json:"type"`
 	Agent        string    `json:"agent"`
-	Src_ip       string    `json:"src_ip"`
-	Src_port     uint16    `json:"src_port"`
-	Src_proc     string    `json:"src_proc"`
+	Src_ip       string    `json:"client_ip"`
+	Src_port     uint16    `json:"client_port"`
+	Src_proc     string    `json:"client_proc"`
 	Real_ip      string    `json:"real_ip"`
-	Src_country  string    `json:"src_country"`
-	Src_server   string    `json:"src_server"`
-	Dst_ip       string    `json:"dst_ip"`
-	Dst_port     uint16    `json:"dst_port"`
-	Dst_proc     string    `json:"dst_proc"`
-	Dst_server   string    `json:"dst_server"`
+	Src_country  string    `json:"country"`
+	Src_server   string    `json:"client_server"`
+	Dst_ip       string    `json:"ip"`
+	Dst_port     uint16    `json:"port"`
+	Dst_proc     string    `json:"proc"`
+	Dst_server   string    `json:"server"`
 	ResponseTime int32     `json:"responsetime"`
 	Status       string    `json:"status"`
 	RequestRaw   string    `json:"request_raw"`

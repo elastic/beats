@@ -22,8 +22,7 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["real_ip"] == "89.247.39.104"
-        print o["src_country"]
-        assert o["src_country"] == ""
+        assert o["country"] == ""
 
     def test_geoip_config_from_file(self):
         self.render_config_template(
@@ -42,7 +41,7 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["real_ip"] == "89.247.39.104"
-        assert o["src_country"] == "DE"
+        assert o["country"] == "DE"
 
     def test_geoip_symlink(self):
         """
@@ -65,4 +64,4 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["real_ip"] == "89.247.39.104"
-        assert o["src_country"] == "DE"
+        assert o["country"] == "DE"
