@@ -21,6 +21,8 @@ deps:
 	go get github.com/stretchr/testify
 	# make sure vet is installed
 	go get golang.org/x/tools/cmd/vet
+	# yamlcheck is used to verify the spec
+	go get github.com/tsg/yamlcheck
 
 .PHONY: install
 install: packetbeat go-daemon/god
