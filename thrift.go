@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
-
-	"labix.org/v2/mgo/bson"
 )
 
 type ThriftMessage struct {
@@ -990,11 +988,11 @@ func (thrift *Thrift) publishTransactions() {
 			event.Status = OK_STATUS
 		}
 		event.ResponseTime = t.ResponseTime
-		event.Thrift = bson.M{}
+		event.Thrift = MapStr{}
 
 		if t.Request != nil {
-			event.Thrift = bson.M{
-				"request": bson.M{
+			event.Thrift = MapStr{
+				"request": MapStr{
 					"method": t.Request.Method,
 					"params": t.Request.Params,
 					"size":   t.Request.FrameSize,
@@ -1009,8 +1007,8 @@ func (thrift *Thrift) publishTransactions() {
 		}
 
 		if t.Reply != nil {
-			event.Thrift = bson_concat(event.Thrift, bson.M{
-				"reply": bson.M{
+			event.Thrift.Update(MapStr{
+				"reply": MapStr{
 					"returnValue": t.Reply.ReturnValue,
 					"exceptions":  t.Reply.Exceptions,
 					"size":        t.Reply.FrameSize,

@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"labix.org/v2/mgo/bson"
 )
 
 type PublisherType struct {
@@ -86,11 +84,11 @@ type Event struct {
 	ResponseRaw  string    `json:"response_raw"`
 	Tags         string    `json:"tags"`
 
-	Mysql  bson.M `json:"mysql"`
-	Http   bson.M `json:"http"`
-	Redis  bson.M `json:"redis"`
-	Pgsql  bson.M `json:"pgsql"`
-	Thrift bson.M `json:"thrift"`
+	Mysql  MapStr `json:"mysql"`
+	Http   MapStr `json:"http"`
+	Redis  MapStr `json:"redis"`
+	Pgsql  MapStr `json:"pgsql"`
+	Thrift MapStr `json:"thrift"`
 }
 
 type Topology struct {

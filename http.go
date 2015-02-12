@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"labix.org/v2/mgo/bson"
 )
 
 const (
@@ -78,7 +76,7 @@ type HttpTransaction struct {
 	ts           time.Time
 	cmdline      *CmdlineTuple
 
-	Http bson.M
+	Http MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -610,7 +608,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		trans.Request_raw = string(cutMessageBody(msg))
 	}
 
-	request := bson.M{
+	request := MapStr{
 		"method":   msg.Method,
 		"uri":      msg.RequestUri,
 		"uri.raw":  msg.RequestUri,
@@ -622,7 +620,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		if !http.Split_cookie {
 			request["headers"] = msg.Headers
 		} else {
-			hdrs := bson.M{}
+			hdrs := MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
 				if hdr_name == "cookie" {
 					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
@@ -635,7 +633,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		}
 	}
 
-	trans.Http = bson.M{
+	trans.Http = MapStr{
 		"request": request,
 	}
 
@@ -671,7 +669,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		return
 	}
 
-	response := bson.M{
+	response := MapStr{
 		"phrase": msg.StatusPhrase,
 		"code":   msg.StatusCode,
 	}
@@ -680,7 +678,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		if !http.Split_cookie {
 			response["headers"] = msg.Headers
 		} else {
-			hdrs := bson.M{}
+			hdrs := MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
 				if hdr_name == "set-cookie" {
 					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
@@ -693,7 +691,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		}
 	}
 
-	trans.Http = bson_concat(trans.Http, bson.M{
+	trans.Http.Update(MapStr{
 		"content_length": msg.ContentLength,
 		"response":       response,
 	})
@@ -730,7 +728,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	event := Event{}
 
 	event.Type = "http"
-	response := t.Http["response"].(bson.M)
+	response := t.Http["response"].(MapStr)
 	code := response["code"].(uint16)
 	if code < 400 {
 		event.Status = OK_STATUS

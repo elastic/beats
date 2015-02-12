@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"labix.org/v2/mgo/bson"
 )
 
 // Packet types
@@ -58,7 +56,7 @@ type MysqlTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 
-	Mysql bson.M
+	Mysql MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -416,7 +414,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 		method = strings.ToUpper(query)
 	}
 
-	trans.Mysql = bson.M{
+	trans.Mysql = MapStr{
 		"query":     query,
 		"query.raw": msg.Query,
 		"method":    method,
@@ -445,7 +443,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 
 	}
 	// save json details
-	trans.Mysql = bson_concat(trans.Mysql, bson.M{
+	trans.Mysql.Update(MapStr{
 		"isok":          msg.IsOK,
 		"affected_rows": msg.AffectedRows,
 		"insert_id":     msg.InsertId,

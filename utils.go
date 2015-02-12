@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"labix.org/v2/mgo/bson"
 )
 
 // bare-bone Error type, to make it easy to create
@@ -43,19 +42,6 @@ func Bytes_Ntohll(b []byte) uint64 {
 		uint64(b[2])<<40 | uint64(b[3])<<32 |
 		uint64(b[4])<<24 | uint64(b[5])<<16 |
 		uint64(b[6])<<8 | uint64(b[7])
-}
-
-func bson_concat(dict1 bson.M, dict2 bson.M) bson.M {
-	dict := bson.M{}
-
-	for k, v := range dict1 {
-		dict[k] = v
-	}
-
-	for k, v := range dict2 {
-		dict[k] = v
-	}
-	return dict
 }
 
 func Ipv4_Ntoa(ip uint32) string {

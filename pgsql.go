@@ -1,7 +1,6 @@
 package main
 
 import (
-	"labix.org/v2/mgo/bson"
 	"strings"
 	"time"
 )
@@ -44,7 +43,7 @@ type PgsqlTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 
-	Pgsql bson.M
+	Pgsql MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -697,7 +696,7 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 
-		trans.Pgsql = bson.M{
+		trans.Pgsql = MapStr{
 			"query":     query,
 			"query.raw": query,
 			"method":    getQueryMethod(query),
@@ -733,7 +732,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 		return
 	}
 
-	trans.Pgsql = bson_concat(trans.Pgsql, bson.M{
+	trans.Pgsql.Update(MapStr{
 		"isOK":           msg.IsOK,
 		"iserror":        msg.IsError,
 		"size":           msg.Size,

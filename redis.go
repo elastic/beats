@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"labix.org/v2/mgo/bson"
 )
 
 type RedisMessage struct {
@@ -44,7 +42,7 @@ type RedisTransaction struct {
 	ts           time.Time
 	cmdline      *CmdlineTuple
 
-	Redis bson.M
+	Redis MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -460,7 +458,7 @@ func receivedRedisRequest(msg *RedisMessage) {
 		redisTransactionsMap[tuple.raw] = trans
 	}
 
-	trans.Redis = bson.M{
+	trans.Redis = MapStr{
 		"request": msg.Message,
 	}
 	trans.Request_raw = msg.Message
