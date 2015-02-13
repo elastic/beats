@@ -58,6 +58,7 @@ type MysqlTransaction struct {
 	Query        string
 	Method       string
 	Path         string // for mysql, Path refers to the mysql table queried
+	Size         uint64
 
 	Mysql MapStr
 
@@ -449,12 +450,12 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 		"affected_rows": msg.AffectedRows,
 		"insert_id":     msg.InsertId,
 		"num_rows":      msg.NumberOfRows,
-		"size":          msg.Size,
 		"num_fields":    msg.NumberOfFields,
 		"iserror":       msg.IsError,
 		"error_code":    msg.ErrorCode,
 		"error_info":    msg.ErrorInfo,
 	})
+	trans.Size = msg.Size
 	trans.Path = msg.Tables
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
@@ -636,6 +637,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event.Query = t.Query
 	event.Mysql = t.Mysql
 	event.Path = t.Path
+	event.BytesOut = t.Size
 
 	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }

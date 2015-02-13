@@ -28,3 +28,4 @@ class Test(TestCase):
         assert objs[5]["method"] == "SELECT"
         assert objs[5]["path"] == "test.test"
         assert objs[5]["status"] == "OK"
+        assert objs[5]["bytes_out"] == 118
