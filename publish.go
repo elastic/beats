@@ -87,6 +87,7 @@ type Event struct {
 	ResponseRaw  string    `json:"response_raw"`
 	Tags         string    `json:"tags"`
 	BytesOut     uint64    `json:"bytes_out"`
+	BytesIn      uint64    `json:"bytes_in"`
 
 	Mysql  MapStr `json:"mysql"`
 	Http   MapStr `json:"http"`

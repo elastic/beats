@@ -42,3 +42,20 @@ class Test(TestCase):
         assert all([isinstance(o["method"], basestring) for o in objs[3:]])
         assert all([isinstance(o["path"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])
+
+    def test_byteout_bytein(self):
+        """
+        Should have non-zero byte_in and byte_out values.
+        """
+        self.render_config_template(
+            redis_ports=[6380]
+        )
+        self.run_packetbeat(pcap="redis_session.pcap")
+
+        objs = self.read_output()
+        assert all([o["type"] == "redis" for o in objs])
+
+        assert all([isinstance(o["bytes_out"], int) for o in objs])
+        assert all([isinstance(o["bytes_in"], int) for o in objs])
+        assert all([o["bytes_out"] > 0 for o in objs])
+        assert all([o["bytes_in"] > 0 for o in objs])

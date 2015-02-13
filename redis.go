@@ -372,12 +372,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			if m.NumberOfBulks == 0 {
 				// the last bulk received
 				m.Message = strings.Join(m.Bulks, " ")
-				m.Size = len(m.Message)
+				m.Size = s.parseOffset
 				return true, true
 			}
 		} else {
 			m.Message = value
-			m.Size = len(m.Message)
+			m.Size = s.parseOffset
 			if iserror {
 				m.IsError = true
 			}
@@ -491,6 +491,7 @@ func receivedRedisRequest(msg *RedisMessage) {
 	trans.Path = msg.Path
 	trans.Query = msg.Message
 	trans.Request_raw = msg.Message
+	trans.BytesIn = msg.Size
 
 	trans.cmdline = msg.CmdlineTuple
 	trans.ts = msg.Ts
@@ -545,6 +546,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 		trans.Redis["response"] = msg.Message
 	}
 
+	trans.BytesOut = msg.Size
 	trans.Response_raw = msg.Message
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
@@ -580,6 +582,8 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 	event.Method = strings.ToUpper(t.Method)
 	event.Path = t.Path
 	event.Query = t.Query
+	event.BytesIn = uint64(t.BytesIn)
+	event.BytesOut = uint64(t.BytesOut)
 
 	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
