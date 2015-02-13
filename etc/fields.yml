@@ -146,23 +146,22 @@ event:
       type: group
       description: HTTP specific event fields.
       fields:
-        - name: http_code
+        - name: http.code
           description: HTTP status code.
           example: 404
 
-        - name: http_phrase
+        - name: http.phrase
           description: HTTP status phrase.
           example: Not found.
 
-
-        - name: http_request_headers
+        - name: http.request_headers
           description: >
             A map containing the captured header fields from the request. Which
             headers to capture is configurable. If more headers with the same
             header name are present in the message, they will be separated by
             comas.
 
-        - name: http_response_headers
+        - name: http.response_headers
           description: >
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If more headers with the
@@ -173,33 +172,33 @@ event:
       type: group
       description: MySQL specific event fields.
       fields:
-        - name: mysql_iserror
+        - name: mysql.iserror
           type: bool
           description: >
             In case the MySQL query returns an error, this field is set to true.
 
-        - name: mysql_affected_rows
+        - name: mysql.affected_rows
           type: int
           description: >
             In case of a successful MySQL command, it contains the affected
             number of rows of the last statement.
 
-        - name: mysql_insert_id
+        - name: mysql.insert_id
           description: >
             In case of a successful ``INSERT`` query, it contains the id of the
             newly inserted row.
 
-        - name: mysql_num_fields
+        - name: mysql.num_fields
           description: >
             In case of a successful ``SELECT`` query, it is set to the number
             of fields returned.
 
-        - name: mysql_num_rows
+        - name: mysql.num_rows
           description: >
             In case of a successful ``SELECT`` query, it is set to the number
             of rows returned.
 
-        - name: mysql_query
+        - name: mysql.query
           description: >
             The row mysql query as read from the transaction's request.
 
@@ -207,35 +206,35 @@ event:
       type: group
       description: PostgreSQL specific event fields.
       fields:
-        - name: pgsql_query
+        - name: pgsql.query
           description: >
             The row pgsql query as read from the transaction's request.
 
-        - name: pgsql_iserror
+        - name: pgsql.iserror
           type: bool
           description: >
             In case the PgSQL query returns an error, this field is set to true.
 
-        - name: pgsql_error_code
+        - name: pgsql.error_code
           description: The PostgreSQL error code.
           type: int
 
-        - name: pgsql_error_message
+        - name: pgsql.error_message
           description: The PostgreSQL error message.
 
-        - name: pgsql_error_severity
+        - name: pgsql.error_severity
           description: The PostgreSQL error severity.
           possible_values:
             - ERROR
             - FATAL
             - PANIC
 
-        - name: pgsql_num_fields
+        - name: pgsql.num_fields
           description: >
             In case of a successful ``SELECT`` query, it is set to the number
             of fields returned.
 
-        - name: pgsql_num_rows
+        - name: pgsql.num_rows
           description: >
             In case of a successful ``SELECT`` query, it is set to the number
             of rows returned.
