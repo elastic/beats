@@ -23,13 +23,13 @@ class Test(TestCase):
         assert objs[0]["path"] == "key3"
         assert objs[0]["query"] == "set key3 me"
         assert objs[0]["status"] == "OK"
-        assert objs[0]["redis"]["response"] == "OK"
+        assert objs[0]["redis"]["return_value"] == "OK"
 
         assert objs[1]["status"] == "OK"
         assert objs[1]["method"] == "GET"
-        assert objs[1]["redis"]["response"] == "me"
+        assert objs[1]["redis"]["return_value"] == "me"
         assert objs[1]["query"] == "get key3"
-        assert objs[1]["redis"]["response"] == "me"
+        assert objs[1]["redis"]["return_value"] == "me"
 
         assert objs[2]["status"] == "Error"
         assert objs[2]["method"] == "LLEN"
@@ -38,7 +38,7 @@ class Test(TestCase):
 
         # the rest should be successful
         assert all([o["status"] == "OK" for o in objs[3:]])
-        assert all(["response" in o["redis"] for o in objs[3:]])
+        assert all(["return_value" in o["redis"] for o in objs[3:]])
         assert all([isinstance(o["method"], basestring) for o in objs[3:]])
         assert all([isinstance(o["path"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])

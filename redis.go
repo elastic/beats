@@ -543,7 +543,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 	if msg.IsError {
 		trans.Redis["error"] = msg.Message
 	} else {
-		trans.Redis["response"] = msg.Message
+		trans.Redis["return_value"] = msg.Message
 	}
 
 	trans.BytesOut = msg.Size
