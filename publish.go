@@ -68,6 +68,7 @@ type Event struct {
 	Timestamp    time.Time `json:"timestamp"`
 	Type         string    `json:"type"`
 	Method       string    `json:"method"`
+	Query        string    `json:"query"`
 	Path         string    `json:"path"`
 	Agent        string    `json:"agent"`
 	Src_ip       string    `json:"client_ip"`

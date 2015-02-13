@@ -202,6 +202,15 @@ event:
           description: >
             The row mysql query as read from the transaction's request.
 
+        - name: mysql.error_code
+          type: int
+          description: >
+            The error code returned by MySQL.
+
+        - name: mysql.error_info
+          description: >
+            The error info message returned by MySQL.
+
     - name: pgsql
       type: group
       description: PostgreSQL specific event fields.

@@ -55,6 +55,9 @@ type MysqlTransaction struct {
 	Ts           int64
 	JsTs         time.Time
 	ts           time.Time
+	Query        string
+	Method       string
+	Path         string // for mysql, Path refers to the mysql table queried
 
 	Mysql MapStr
 
@@ -414,11 +417,10 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 		method = strings.ToUpper(query)
 	}
 
-	trans.Mysql = MapStr{
-		"query":     query,
-		"query.raw": msg.Query,
-		"method":    method,
-	}
+	trans.Query = query
+	trans.Method = method
+
+	trans.Mysql = MapStr{}
 
 	// save Raw message
 	trans.Request_raw = msg.Query
@@ -437,24 +439,23 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 		return
 	}
 	// check if the request was received
-	if len(trans.Mysql) == 0 {
+	if trans.Mysql == nil {
 		WARN("Response from unknown transaction. Ignoring.")
 		return
 
 	}
 	// save json details
 	trans.Mysql.Update(MapStr{
-		"isok":          msg.IsOK,
 		"affected_rows": msg.AffectedRows,
 		"insert_id":     msg.InsertId,
-		"tables":        msg.Tables,
 		"num_rows":      msg.NumberOfRows,
 		"size":          msg.Size,
 		"num_fields":    msg.NumberOfFields,
 		"iserror":       msg.IsError,
 		"error_code":    msg.ErrorCode,
-		"error_message": msg.ErrorInfo,
+		"error_info":    msg.ErrorInfo,
 	})
+	trans.Path = msg.Tables
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -631,7 +632,10 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event.ResponseTime = t.ResponseTime
 	event.RequestRaw = t.Request_raw
 	event.ResponseRaw = t.Response_raw
+	event.Method = t.Method
+	event.Query = t.Query
 	event.Mysql = t.Mysql
+	event.Path = t.Path
 
 	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
