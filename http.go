@@ -75,6 +75,8 @@ type HttpTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 	cmdline      *CmdlineTuple
+	Method       string
+	RequestUri   string
 
 	Http MapStr
 
@@ -608,17 +610,14 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		trans.Request_raw = string(cutMessageBody(msg))
 	}
 
-	request := MapStr{
-		"method":   msg.Method,
-		"uri":      msg.RequestUri,
-		"uri.raw":  msg.RequestUri,
-		"line":     msg.FirstLine,
-		"line.raw": msg.FirstLine,
-	}
+	trans.Method = msg.Method
+	trans.RequestUri = msg.RequestUri
+
+	trans.Http = MapStr{}
 
 	if http.Send_headers {
 		if !http.Split_cookie {
-			request["headers"] = msg.Headers
+			trans.Http["request_headers"] = msg.Headers
 		} else {
 			hdrs := MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
@@ -629,12 +628,8 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 				}
 			}
 
-			request["headers"] = hdrs
+			trans.Http["request_headers"] = hdrs
 		}
-	}
-
-	trans.Http = MapStr{
-		"request": request,
 	}
 
 	trans.Real_ip = msg.Real_ip
@@ -664,19 +659,20 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		return
 	}
 
-	if len(trans.Http) == 0 {
+	if trans.Http == nil {
 		WARN("Response without a known request. Ignoring.")
 		return
 	}
 
 	response := MapStr{
-		"phrase": msg.StatusPhrase,
-		"code":   msg.StatusCode,
+		"phrase":         msg.StatusPhrase,
+		"code":           msg.StatusCode,
+		"content_length": msg.ContentLength,
 	}
 
 	if http.Send_headers {
 		if !http.Split_cookie {
-			response["headers"] = msg.Headers
+			response["response_headers"] = msg.Headers
 		} else {
 			hdrs := MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
@@ -687,14 +683,11 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 				}
 			}
 
-			response["headers"] = hdrs
+			response["response_headers"] = hdrs
 		}
 	}
 
-	trans.Http.Update(MapStr{
-		"content_length": msg.ContentLength,
-		"response":       response,
-	})
+	trans.Http.Update(response)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -709,8 +702,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		WARN("Publish failure: %s", err)
 	}
 
-	DEBUG("http", "HTTP transaction completed: %s -> %s\n", trans.Http["request"],
-		trans.Http["response"])
+	DEBUG("http", "HTTP transaction completed: %s\n", trans.Http)
 
 	// remove from map
 	delete(http.transactionsMap, trans.tuple.raw)
@@ -728,8 +720,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	event := Event{}
 
 	event.Type = "http"
-	response := t.Http["response"].(MapStr)
-	code := response["code"].(uint16)
+	code := t.Http["code"].(uint16)
 	if code < 400 {
 		event.Status = OK_STATUS
 	} else {
@@ -744,6 +735,8 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	}
 	event.Http = t.Http
 	event.Real_ip = t.Real_ip
+	event.Method = t.Method
+	event.Path = t.RequestUri
 
 	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 

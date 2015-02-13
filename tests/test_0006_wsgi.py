@@ -21,10 +21,10 @@ class Test(TestCase):
         assert o["client_port"] == 46249
         assert o["port"] == 8888
         assert o["status"] == "OK"
-        assert o["http"]["request"]["method"] == "GET"
-        assert o["http"]["request"]["uri"] == "/"
-        assert o["http"]["response"]["code"] == 200
-        assert o["http"]["response"]["phrase"] == "OK"
+        assert o["method"] == "GET"
+        assert o["path"] == "/"
+        assert o["http"]["code"] == 200
+        assert o["http"]["phrase"] == "OK"
         assert objs[0]["request_raw"] != ""
         assert objs[0]["response_raw"] != ""
 
@@ -44,8 +44,8 @@ class Test(TestCase):
                     if i != 13])
 
         assert objs[13]["status"] == "Error"
-        assert objs[13]["http"]["request"]["uri"] == "/comment/"
-        assert objs[13]["http"]["response"]["code"] == 500
+        assert objs[13]["path"] == "/comment/"
+        assert objs[13]["http"]["code"] == 500
 
     def test_send_options(self):
         self.render_config_template(
@@ -83,8 +83,8 @@ class Test(TestCase):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "headers" not in o["http"]["request"]
-        assert "headers" not in o["http"]["response"]
+        assert "request_headers" not in o["http"]
+        assert "response_headers" not in o["http"]
 
         self.render_config_template(
             http_ports=[8888],
@@ -96,12 +96,12 @@ class Test(TestCase):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "headers" in o["http"]["request"]
-        assert "headers" in o["http"]["response"]
-        assert o["http"]["request"]["headers"]["cache-control"] == "max-age=0"
-        assert len(o["http"]["request"]["headers"]) == 9
-        assert len(o["http"]["response"]["headers"]) == 7
-        assert isinstance(o["http"]["response"]["headers"]["set-cookie"],
+        assert "request_headers" in o["http"]
+        assert "response_headers" in o["http"]
+        assert o["http"]["request_headers"]["cache-control"] == "max-age=0"
+        assert len(o["http"]["request_headers"]) == 9
+        assert len(o["http"]["response_headers"]) == 7
+        assert isinstance(o["http"]["response_headers"]["set-cookie"],
                           basestring)
 
         self.render_config_template(
@@ -115,11 +115,11 @@ class Test(TestCase):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "headers" in o["http"]["request"]
-        assert "headers" in o["http"]["response"]
-        assert len(o["http"]["request"]["headers"]) == 1
-        assert len(o["http"]["response"]["headers"]) == 1
-        assert "user-agent" in o["http"]["request"]["headers"]
+        assert "request_headers" in o["http"]
+        assert "response_headers" in o["http"]
+        assert len(o["http"]["request_headers"]) == 1
+        assert len(o["http"]["response_headers"]) == 1
+        assert "user-agent" in o["http"]["request_headers"]
 
     def test_split_cookie(self):
         self.render_config_template(
@@ -133,11 +133,11 @@ class Test(TestCase):
         assert len(objs) == 1
         o = objs[0]
 
-        assert len(o["http"]["request"]["headers"]) == 9
-        assert len(o["http"]["response"]["headers"]) == 7
+        assert len(o["http"]["request_headers"]) == 9
+        assert len(o["http"]["response_headers"]) == 7
 
-        assert isinstance(o["http"]["request"]["headers"]["cookie"], dict)
-        assert len(o["http"]["request"]["headers"]["cookie"]) == 6
+        assert isinstance(o["http"]["request_headers"]["cookie"], dict)
+        assert len(o["http"]["request_headers"]["cookie"]) == 6
 
-        assert isinstance(o["http"]["response"]["headers"]["set-cookie"], dict)
-        assert len(o["http"]["response"]["headers"]["set-cookie"]) == 4
+        assert isinstance(o["http"]["response_headers"]["set-cookie"], dict)
+        assert len(o["http"]["response_headers"]["set-cookie"]) == 4

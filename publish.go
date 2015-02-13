@@ -67,6 +67,8 @@ var outputTypes = []string{ElasticsearchOutputName, RedisOutputName, FileOutputN
 type Event struct {
 	Timestamp    time.Time `json:"timestamp"`
 	Type         string    `json:"type"`
+	Method       string    `json:"method"`
+	Path         string    `json:"path"`
 	Agent        string    `json:"agent"`
 	Src_ip       string    `json:"client_ip"`
 	Src_port     uint16    `json:"client_port"`
