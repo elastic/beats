@@ -133,19 +133,6 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
-
-	event := Event{}
-	event.Type = "redis"
-	event.Status = OK_STATUS
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Redis = t.Redis
-
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
-}
-
 func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
 
 	event.Src_server = publisher.GetServerName(src.Ip)

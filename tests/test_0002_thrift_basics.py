@@ -69,7 +69,7 @@ class Test(TestCase):
 
     def test_thrift_tutorial_with_idl(self):
         self.render_config_template(
-            thrift_ports=[9091],
+            thrift_ports=[9090],
             thrift_idl_files=["tutorial.thrift", "shared.thrift"]
         )
         self.copy_files(["tutorial.thrift", "shared.thrift"])
@@ -122,7 +122,7 @@ class Test(TestCase):
         """
 
         self.render_config_template(
-            thrift_ports=[9091],
+            thrift_ports=[9090],
             thrift_idl_files=["ThriftTest.thrift"]
         )
 
@@ -158,7 +158,7 @@ class Test(TestCase):
     def test_thrift_send_request_response(self):
         # send_request=true send_response=false
         self.render_config_template(
-            thrift_ports=[9091],
+            thrift_ports=[9090],
             thrift_idl_files=["ThriftTest.thrift"],
             thrift_no_send_request=False,
             thrift_no_send_response=True,
@@ -174,7 +174,7 @@ class Test(TestCase):
 
         # send_request=false send_response=false
         self.render_config_template(
-            thrift_ports=[9091],
+            thrift_ports=[9090],
             thrift_idl_files=["ThriftTest.thrift"],
             thrift_no_send_request=True,
             thrift_no_send_response=True,

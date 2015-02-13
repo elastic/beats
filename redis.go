@@ -17,7 +17,11 @@ type RedisMessage struct {
 	Direction    uint8
 
 	IsRequest bool
+	IsError   bool
 	Message   string
+	Method    string
+	Path      string
+	Size      int
 }
 
 type RedisStream struct {
@@ -41,6 +45,12 @@ type RedisTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 	cmdline      *CmdlineTuple
+	Method       string
+	Path         string
+	Query        string
+	IsError      bool
+	BytesOut     int
+	BytesIn      int
 
 	Redis MapStr
 
@@ -217,9 +227,8 @@ var redisTransactionsMap = make(map[HashableTcpTuple]*RedisTransaction, Transact
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseOffset = 0
-	stream.message.NumberOfBulks = 0
+	stream.message = &RedisMessage{Ts: stream.message.Ts}
 	stream.message.Bulks = []string{}
-	stream.message.IsRequest = false
 }
 
 func redisMessageParser(s *RedisStream) (bool, bool) {
@@ -227,6 +236,8 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 	var err error
 	var value string
 	m := s.message
+
+	iserror := false
 
 	for s.parseOffset < len(s.data) {
 
@@ -326,6 +337,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			if !found {
 				return true, false
 			}
+			iserror = true
 
 			value = line[1:]
 			s.parseOffset = off
@@ -340,19 +352,35 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			m.Bulks = append(m.Bulks, value)
 
 			if len(m.Bulks) == 1 {
+				DEBUG("redis", "Value: %s", value)
+				// first word.
 				// check if it's a command
 				if isRedisCommand(value) {
+					DEBUG("redis", "is request")
 					m.IsRequest = true
+					m.Method = value
+				}
+			}
+
+			if len(m.Bulks) == 2 {
+				// second word. This is usually the path
+				if m.IsRequest {
+					m.Path = value
 				}
 			}
 
 			if m.NumberOfBulks == 0 {
 				// the last bulk received
 				m.Message = strings.Join(m.Bulks, " ")
+				m.Size = len(m.Message)
 				return true, true
 			}
 		} else {
 			m.Message = value
+			m.Size = len(m.Message)
+			if iserror {
+				m.IsError = true
+			}
 			return true, true
 		}
 
@@ -426,7 +454,7 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
 }
 
 func isRedisCommand(key string) bool {
-	_, exists := RedisCommands[key]
+	_, exists := RedisCommands[strings.ToUpper(key)]
 	return exists
 }
 
@@ -450,7 +478,7 @@ func receivedRedisRequest(msg *RedisMessage) {
 
 	trans := redisTransactionsMap[tuple.raw]
 	if trans != nil {
-		if len(trans.Redis) != 0 {
+		if trans.Redis != nil {
 			WARN("Two requests without a Response. Dropping old request")
 		}
 	} else {
@@ -458,9 +486,10 @@ func receivedRedisRequest(msg *RedisMessage) {
 		redisTransactionsMap[tuple.raw] = trans
 	}
 
-	trans.Redis = MapStr{
-		"request": msg.Message,
-	}
+	trans.Redis = MapStr{}
+	trans.Method = msg.Method
+	trans.Path = msg.Path
+	trans.Query = msg.Message
 	trans.Request_raw = msg.Message
 
 	trans.cmdline = msg.CmdlineTuple
@@ -503,13 +532,18 @@ func receivedRedisResponse(msg *RedisMessage) {
 		return
 	}
 	// check if the request was received
-	if len(trans.Redis) == 0 {
+	if trans.Redis == nil {
 		WARN("Response from unknown transaction. Ignoring.")
 		return
 
 	}
 
-	trans.Redis["response"] = msg.Message
+	trans.IsError = msg.IsError
+	if msg.IsError {
+		trans.Redis["error"] = msg.Message
+	} else {
+		trans.Redis["response"] = msg.Message
+	}
 
 	trans.Response_raw = msg.Message
 
@@ -528,4 +562,24 @@ func receivedRedisResponse(msg *RedisMessage) {
 		trans.timer.Stop()
 	}
 
+}
+
+func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
+
+	event := Event{}
+	event.Type = "redis"
+	if !t.IsError {
+		event.Status = OK_STATUS
+	} else {
+		event.Status = ERROR_STATUS
+	}
+	event.ResponseTime = t.ResponseTime
+	event.RequestRaw = t.Request_raw
+	event.ResponseRaw = t.Response_raw
+	event.Redis = t.Redis
+	event.Method = strings.ToUpper(t.Method)
+	event.Path = t.Path
+	event.Query = t.Query
+
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }

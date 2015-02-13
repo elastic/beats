@@ -255,6 +255,8 @@ func configToFilter(config *tomlConfig) string {
 func TcpInit() error {
 	tcpPortMap = configToPortsMap(&_Config)
 
+	DEBUG("tcp", "Port map: %v", tcpPortMap)
+
 	return nil
 }
 
