@@ -248,6 +248,44 @@ event:
             In case of a successful ``SELECT`` query, it is set to the number
             of rows returned.
 
+    - name: thrift
+      type: group
+      description: Thrift-RPC specific event fields.
+      fields:
+        - name: thrift.params
+          description: >
+            The RPC method call parameters in human readable format. If the IDL
+            files are available, the parameters are using names whenever possible.
+            Otherwise, the IDs from the message are used.
+
+        - name: thrift.service
+          description: >
+            The name of the Thrift-RPC service as defined in the IDL files.
+
+        - name: thrift.return_value
+          description: >
+            The value returned by the Thrift-RPC call. This is encoded in a human
+            readable way.
+
+        - name: thrift.exceptions
+          description: >
+            If the call resulted in exceptions, this field contains them in a human
+            readable form
+
+    - name: redis
+      type: group
+      description: Redis specific event fields.
+      fields:
+        - name: redis.return_value
+          description: >
+            The return value of the Redis command in human readable form.
+
+        - name: redis.error
+          description: >
+            If the Redis command has resulted in an error, this field contains the
+            error message as returned by the Redis server.
+
+
 raw:
   description: These fields contain the raw transaction data.
   fields:
