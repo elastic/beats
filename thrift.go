@@ -1007,10 +1007,10 @@ func (thrift *Thrift) publishTransactions() {
 		}
 
 		if t.Reply != nil {
-			event.Thrift.Update(MapStr{
-				"return_value": t.Reply.ReturnValue,
-				"exceptions":   t.Reply.Exceptions,
-			})
+			event.Thrift["return_value"] = t.Reply.ReturnValue
+			if len(t.Reply.Exceptions) > 0 {
+				event.Thrift["exceptions"] = t.Reply.Exceptions
+			}
 			event.BytesOut = uint64(t.Reply.FrameSize)
 
 			if thrift.Send_response {
