@@ -991,12 +991,12 @@ func (thrift *Thrift) publishTransactions() {
 		event.Thrift = MapStr{}
 
 		if t.Request != nil {
+			event.Method = t.Request.Method
+			event.Path = t.Request.Service
+			event.Query = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
+			event.BytesIn = uint64(t.Request.FrameSize)
 			event.Thrift = MapStr{
-				"request": MapStr{
-					"method": t.Request.Method,
-					"params": t.Request.Params,
-					"size":   t.Request.FrameSize,
-				},
+				"params":  t.Request.Params,
 				"service": t.Request.Service,
 			}
 
@@ -1008,12 +1008,10 @@ func (thrift *Thrift) publishTransactions() {
 
 		if t.Reply != nil {
 			event.Thrift.Update(MapStr{
-				"reply": MapStr{
-					"returnValue": t.Reply.ReturnValue,
-					"exceptions":  t.Reply.Exceptions,
-					"size":        t.Reply.FrameSize,
-				},
+				"return_value": t.Reply.ReturnValue,
+				"exceptions":   t.Reply.Exceptions,
 			})
+			event.BytesOut = uint64(t.Reply.FrameSize)
 
 			if thrift.Send_response {
 				if !t.Reply.HasException {
