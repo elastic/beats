@@ -86,6 +86,7 @@ type Event struct {
 	RequestRaw   string    `json:"request_raw"`
 	ResponseRaw  string    `json:"response_raw"`
 	Tags         string    `json:"tags"`
+	BytesOut     uint64    `json:"bytes_out"`
 
 	Mysql  MapStr `json:"mysql"`
 	Http   MapStr `json:"http"`
@@ -205,24 +206,6 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 		return errors.New("Fail to publish event")
 	}
 	return nil
-}
-
-func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
-
-	event := Event{}
-
-	event.Type = "pgsql"
-	if t.Pgsql["iserror"].(bool) {
-		event.Status = ERROR_STATUS
-	} else {
-		event.Status = OK_STATUS
-	}
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Pgsql = t.Pgsql
-
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {

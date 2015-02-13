@@ -42,6 +42,9 @@ type PgsqlTransaction struct {
 	Ts           int64
 	JsTs         time.Time
 	ts           time.Time
+	Query        string
+	Method       string
+	Size         uint64
 
 	Pgsql MapStr
 
@@ -696,11 +699,9 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 
-		trans.Pgsql = MapStr{
-			"query":     query,
-			"query.raw": query,
-			"method":    getQueryMethod(query),
-		}
+		trans.Pgsql = MapStr{}
+		trans.Query = query
+		trans.Method = getQueryMethod(query)
 
 		trans.Request_raw = query
 
@@ -727,21 +728,20 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 	trans := removePgsqlTransaction(tuple, 0)
 
 	// check if the request was received
-	if len(trans.Pgsql) == 0 {
+	if trans.Pgsql == nil {
 		WARN("Response from unknown transaction. Ignoring.")
 		return
 	}
 
 	trans.Pgsql.Update(MapStr{
-		"isOK":           msg.IsOK,
 		"iserror":        msg.IsError,
-		"size":           msg.Size,
 		"num_rows":       msg.NumberOfRows,
 		"num_fields":     msg.NumberOfFields,
 		"error_code":     msg.ErrorCode,
 		"error_message":  msg.ErrorInfo,
 		"error_severity": msg.ErrorSeverity,
 	})
+	trans.Size = msg.Size
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 	trans.Response_raw = dumpInCSVFormat(msg.Fields, msg.Rows)
@@ -756,6 +756,27 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
+}
+
+func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
+
+	event := Event{}
+
+	event.Type = "pgsql"
+	if t.Pgsql["iserror"].(bool) {
+		event.Status = ERROR_STATUS
+	} else {
+		event.Status = OK_STATUS
+	}
+	event.ResponseTime = t.ResponseTime
+	event.RequestRaw = t.Request_raw
+	event.ResponseRaw = t.Response_raw
+	event.Query = t.Query
+	event.Method = t.Method
+	event.BytesOut = t.Size
+	event.Pgsql = t.Pgsql
+
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }
 
 func (trans *PgsqlTransaction) Expire() {
