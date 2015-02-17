@@ -1,4 +1,4 @@
-package main
+package outputs
 
 import (
 	"testing"
@@ -11,10 +11,6 @@ func TestTopologyInRedis(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping topology tests in short mode, because they require REDIS")
 	}
-
-	var publisher1 PublisherType = PublisherType{name: "proxy1"}
-	var publisher2 PublisherType = PublisherType{name: "proxy2"}
-	var publisher3 PublisherType = PublisherType{name: "proxy3"}
 
 	var redisOutput1 = RedisOutputType{
 		Index:          "packetbeat",
@@ -43,39 +39,30 @@ func TestTopologyInRedis(t *testing.T) {
 		TopologyExpire: time.Duration(15) * time.Second,
 	}
 
-	publisher1.TopologyOutput = OutputInterface(&redisOutput1)
-	publisher2.TopologyOutput = OutputInterface(&redisOutput2)
-	publisher3.TopologyOutput = OutputInterface(&redisOutput3)
+	redisOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
+	redisOutput2.PublishIPs("proxy2", []string{"10.1.0.9", "fe80::4e8d:79ff:fef2:de6a"})
+	redisOutput3.PublishIPs("proxy3", []string{"10.1.0.10"})
 
-	publisher1.PublishTopology("10.1.0.4")
-	publisher2.PublishTopology("10.1.0.9", "fe80::4e8d:79ff:fef2:de6a")
-	publisher3.PublishTopology("10.1.0.10")
-
-	name2 := publisher3.GetServerName("10.1.0.9")
+	name2 := redisOutput3.GetNameByIP("10.1.0.9")
 	if name2 != "proxy2" {
 		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
 	}
 
-	name2 = publisher3.GetServerName("10.1.0.9")
-	if name2 != "proxy2" {
-		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
-	}
+	redisOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
+	redisOutput2.PublishIPs("proxy2", []string{"10.1.0.9"})
+	redisOutput3.PublishIPs("proxy3", []string{"192.168.1.2"})
 
-	publisher1.PublishTopology("10.1.0.4")
-	publisher2.PublishTopology("10.1.0.9")
-	publisher3.PublishTopology("192.168.1.2")
-
-	name3 := publisher3.GetServerName("192.168.1.2")
+	name3 := redisOutput3.GetNameByIP("192.168.1.2")
 	if name3 != "proxy3" {
 		t.Errorf("Failed to add a new IP")
 	}
 
-	name3 = publisher3.GetServerName("10.1.0.10")
+	name3 = redisOutput3.GetNameByIP("10.1.0.10")
 	if name3 != "" {
 		t.Errorf("Failed to delete old IP of proxy3: %s", name3)
 	}
 
-	name2 = publisher3.GetServerName("fe80::4e8d:79ff:fef2:de6a")
+	name2 = redisOutput3.GetNameByIP("fe80::4e8d:79ff:fef2:de6a")
 	if name2 != "" {
 		t.Errorf("Failed to delete old IP of proxy2: %s", name2)
 	}

@@ -1,8 +1,10 @@
-package main
+package outputs
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"packetbeat/log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -66,7 +68,7 @@ func (out *FileOutputType) PublishEvent(event *Event) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {
-		ERR("Fail to convert the event to JSON: %s", err)
+		log.ERR("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 
@@ -82,7 +84,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 	fileinfo, err := os.Stat(rotator.Path)
 	if err == nil {
 		if !fileinfo.IsDir() {
-			return MsgError("%s exists but it's not a directory", rotator.Path)
+			return fmt.Errorf("%s exists but it's not a directory", rotator.Path)
 		}
 	}
 
@@ -98,7 +100,7 @@ func (rotator *FileRotator) CreateDirectory() error {
 
 func (rotator *FileRotator) CheckIfConfigSane() error {
 	if rotator.KeepFiles < 2 || rotator.KeepFiles >= RotatorMaxFiles {
-		return MsgError("The number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
+		return fmt.Errorf("The number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
 	}
 	return nil
 }
@@ -180,7 +182,7 @@ func (rotator *FileRotator) Rotate() error {
 
 		if rotator.FileExists(file_no + 1) {
 			// next file exists, something is strange
-			return MsgError("File %s exists, when rotating would overwrite it", rotator.FilePath(file_no+1))
+			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(file_no+1))
 		}
 
 		err := os.Rename(file_path, rotator.FilePath(file_no+1))

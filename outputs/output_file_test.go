@@ -1,9 +1,10 @@
-package main
+package outputs
 
 import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"packetbeat/log"
 	"path/filepath"
 	"testing"
 )
@@ -11,7 +12,7 @@ import (
 func Test_Rotator(t *testing.T) {
 
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"rotator"})
+		log.LogInit(log.LOG_DEBUG, "", false, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
@@ -20,7 +21,7 @@ func Test_Rotator(t *testing.T) {
 		return
 	}
 
-	DEBUG("rotator", "Direcotry: %s", dir)
+	log.DEBUG("rotator", "Direcotry: %s", dir)
 
 	rotator := FileRotator{
 		Path:             dir,
@@ -102,7 +103,7 @@ func Test_Rotator(t *testing.T) {
 func Test_Rotator_By_Bytes(t *testing.T) {
 
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"rotator"})
+		log.LogInit(log.LOG_DEBUG, "", false, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
@@ -111,7 +112,7 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 		return
 	}
 
-	DEBUG("rotator", "Direcotry: %s", dir)
+	log.DEBUG("rotator", "Direcotry: %s", dir)
 
 	rotator := FileRotator{
 		Path:             dir,
