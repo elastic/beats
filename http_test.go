@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"packetbeat/logp"
 	"strconv"
 	"testing"
 	"time"
@@ -509,7 +510,9 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 }
 
 func TestHttpParser_RequestResponse(t *testing.T) {
-	LogInit(LOG_CRIT, "" /*toSyslog*/, false, []string{})
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"http", "httpdetailed"})
+	}
 
 	http := HttpModForTests()
 
@@ -634,7 +637,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 
 func TestHttpParser_301_response(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"http"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http"})
 	}
 	http := HttpModForTests()
 
@@ -678,7 +681,7 @@ func TestHttpParser_301_response(t *testing.T) {
 func TestEatBodyChunked(t *testing.T) {
 
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
 	}
 
 	msgs := [][]byte{
@@ -781,7 +784,7 @@ func TestEatBodyChunked(t *testing.T) {
 func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
 	}
 
 	msgs := [][]byte{
@@ -823,7 +826,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		t.Error("Unexpected state", stream.parseState)
 	}
 
-	DEBUG("http", "parseOffset", stream.parseOffset)
+	logp.Debug("http", "parseOffset", stream.parseOffset)
 
 	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
 	if ok != true || complete != false {

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strconv"
 	"strings"
@@ -179,7 +180,7 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 
 func parseResponseStatus(s []byte) (uint16, string, error) {
 
-	DEBUG("http", "parseResponseStatus: %s", s)
+	logp.Debug("http", "parseResponseStatus: %s", s)
 
 	p := bytes.Index(s, []byte(" "))
 	if p == -1 {
@@ -206,8 +207,8 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 		return true, false, 0
 	}
 
-	DEBUG("httpdetailed", "Data: %s", data)
-	DEBUG("httpdetailed", "Header: %s", data[:i])
+	logp.Debug("httpdetailed", "Data: %s", data)
+	logp.Debug("httpdetailed", "Header: %s", data[:i])
 
 	// skip folding line
 	for p := i + 1; p < len(data); {
@@ -217,13 +218,13 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 			return true, false, 0
 		}
 		p += q
-		DEBUG("httpdetailed", "HV: %s\n", data[i+1:p])
+		logp.Debug("httpdetailed", "HV: %s\n", data[i+1:p])
 		if len(data) > p && (data[p+1] == ' ' || data[p+1] == '\t') {
 			p = p + 2
 		} else {
 			headerName := strings.ToLower(string(data[:i]))
 			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
-			DEBUG("http", "Header: '%s' Value: '%s'\n", headerName, headerVal)
+			logp.Debug("http", "Header: '%s' Value: '%s'\n", headerName, headerVal)
 
 			// Headers we need for parsing. Make sure we always
 			// capture their value
@@ -265,7 +266,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 	var cont, ok, complete bool
 	m := s.message
 
-	DEBUG("http", "Stream state=%d", s.parseState)
+	logp.Debug("http", "Stream state=%d", s.parseState)
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
@@ -282,7 +283,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			var err error
 			fline := s.data[s.parseOffset:i]
 			if len(fline) < 8 {
-				DEBUG("http", "First line too small")
+				logp.Debug("http", "First line too small")
 				return false, false
 			}
 			if bytes.Equal(fline[0:5], []byte("HTTP/")) {
@@ -291,16 +292,16 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 				version = fline[5:8]
 				m.StatusCode, m.StatusPhrase, err = parseResponseStatus(fline[9:])
 				if err != nil {
-					WARN("Failed to understand HTTP response status: %s", fline[9:])
+					logp.Warn("Failed to understand HTTP response status: %s", fline[9:])
 					return false, false
 				}
-				DEBUG("http", "HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
+				logp.Debug("http", "HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
 
 			} else {
 				// REQUEST
 				slices := bytes.Fields(fline)
 				if len(slices) != 3 {
-					DEBUG("http", "Couldn't understand HTTP request: %s", fline)
+					logp.Debug("http", "Couldn't understand HTTP request: %s", fline)
 					return false, false
 				}
 
@@ -312,19 +313,19 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					version = slices[2][5:]
 					m.FirstLine = string(fline)
 				} else {
-					DEBUG("http", "Couldn't understand HTTP version: %s", fline)
+					logp.Debug("http", "Couldn't understand HTTP version: %s", fline)
 					return false, false
 				}
-				DEBUG("http", "HTTP Method=%s, RequestUri=%s", m.Method, m.RequestUri)
+				logp.Debug("http", "HTTP Method=%s, RequestUri=%s", m.Method, m.RequestUri)
 			}
 
 			m.version_major, m.version_minor, err = parseVersion(version)
 			if err != nil {
-				DEBUG("http", "Failed to understand HTTP version: %s", version)
+				logp.Debug("http", "Failed to understand HTTP version: %s", version)
 				m.version_major = 1
 				m.version_minor = 0
 			}
-			DEBUG("http", "HTTP version %d.%d", m.version_major, m.version_minor)
+			logp.Debug("http", "HTTP version %d.%d", m.version_major, m.version_minor)
 
 			// ok so far
 			s.parseOffset = i + 2
@@ -340,24 +341,24 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 				if !m.IsRequest && ((100 <= m.StatusCode && m.StatusCode < 200) || m.StatusCode == 204 || m.StatusCode == 304) {
 					//response with a 1xx, 204 , or 304 status  code is always terminated
 					// by the first empty line after the  header fields
-					DEBUG("http", "Terminate response, status code %d", m.StatusCode)
+					logp.Debug("http", "Terminate response, status code %d", m.StatusCode)
 					m.end = s.parseOffset
 					return true, true
 				}
 				if m.TransferEncoding == "chunked" {
 					// support for HTTP/1.1 Chunked transfer
 					// Transfer-Encoding overrides the Content-Length
-					DEBUG("http", "Read chunked body")
+					logp.Debug("http", "Read chunked body")
 					s.parseState = BODY_CHUNKED_START
 					continue
 				}
 				if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
-					DEBUG("http", "Empty content length, ignore body")
+					logp.Debug("http", "Empty content length, ignore body")
 					// Ignore body for request that contains a message body but not a Content-Length
 					m.end = s.parseOffset
 					return true, true
 				}
-				DEBUG("http", "Read body")
+				logp.Debug("http", "Read body")
 				s.parseState = BODY
 			} else {
 				ok, hfcomplete, offset := http.parseHeader(m, s.data[s.parseOffset:])
@@ -372,10 +373,10 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			}
 
 		case BODY:
-			DEBUG("http", "eat body: %d", s.parseOffset)
+			logp.Debug("http", "eat body: %d", s.parseOffset)
 			if !m.hasContentLength && (m.connection == "close" || (m.version_major == 1 && m.version_minor == 0 && m.connection != "keep-alive")) {
 				// HTTP/1.0 no content length. Add until the end of the connection
-				DEBUG("http", "close connection, %d", len(s.data)-s.parseOffset)
+				logp.Debug("http", "close connection, %d", len(s.data)-s.parseOffset)
 				s.bodyReceived += (len(s.data) - s.parseOffset)
 				m.ContentLength += (len(s.data) - s.parseOffset)
 				s.parseOffset = len(s.data)
@@ -387,7 +388,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			} else {
 				s.bodyReceived += (len(s.data) - s.parseOffset)
 				s.parseOffset = len(s.data)
-				DEBUG("http", "bodyReceived: %d", s.bodyReceived)
+				logp.Debug("http", "bodyReceived: %d", s.bodyReceived)
 				return true, false
 			}
 
@@ -417,7 +418,7 @@ func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool,
 		return true, false
 	} else {
 		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
-			WARN("Expected CRLF sequence at end of message")
+			logp.Warn("Expected CRLF sequence at end of message")
 			return false, false
 		}
 		s.parseOffset += 2 // skip final CRLF
@@ -435,7 +436,7 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
 	line := string(s.data[s.parseOffset : s.parseOffset+i])
 	_, err := fmt.Sscanf(line, "%x", &m.chunked_length)
 	if err != nil {
-		WARN("Failed to understand chunked body start line")
+		logp.Warn("Failed to understand chunked body start line")
 		return false, false, false
 	}
 
@@ -446,7 +447,7 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
 			return false, true, false
 		}
 		if s.data[s.parseOffset] != '\r' || s.data[s.parseOffset+1] != '\n' {
-			WARN("Expected CRLF sequence at end of message")
+			logp.Warn("Expected CRLF sequence at end of message")
 			return false, false, false
 		}
 		s.parseOffset += 2 // skip final CRLF
@@ -491,9 +492,9 @@ func (stream *HttpStream) PrepareForNewMessage() {
 }
 
 func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
-	defer RECOVER("ParseHttp exception")
+	defer logp.Recover("ParseHttp exception")
 
-	DEBUG("httpdetailed", "Payload received: [%s]", pkt.payload)
+	logp.Debug("httpdetailed", "Payload received: [%s]", pkt.payload)
 
 	if tcp.httpData[dir] == nil {
 		tcp.httpData[dir] = &HttpStream{
@@ -506,7 +507,7 @@ func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 		// concatenate bytes
 		tcp.httpData[dir].data = append(tcp.httpData[dir].data, pkt.payload...)
 		if len(tcp.httpData[dir].data) > TCP_MAX_DATA_IN_STREAM {
-			DEBUG("http", "Stream data too large, dropping TCP stream")
+			logp.Debug("http", "Stream data too large, dropping TCP stream")
 			tcp.httpData[dir] = nil
 			return
 		}
@@ -548,7 +549,7 @@ func (http *Http) ReceivedFin(tcp *TcpStream, dir uint8) {
 	if stream.message != nil &&
 		len(stream.data[stream.message.start:]) > 0 {
 
-		DEBUG("httpdetailed", "Publish something on connection FIN")
+		logp.Debug("httpdetailed", "Publish something on connection FIN")
 
 		msg := stream.data[stream.message.start:]
 		censorPasswords(stream.message, msg)
@@ -580,14 +581,14 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans := http.transactionsMap[msg.TcpTuple.raw]
 	if trans != nil {
 		if len(trans.Http) != 0 {
-			WARN("Two requests without a response. Dropping old request")
+			logp.Warn("Two requests without a response. Dropping old request")
 		}
 	} else {
 		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
 		http.transactionsMap[msg.TcpTuple.raw] = trans
 	}
 
-	DEBUG("http", "Received request with tuple: %s", msg.TcpTuple)
+	logp.Debug("http", "Received request with tuple: %s", msg.TcpTuple)
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
@@ -652,16 +653,16 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	// we need to search the request first.
 	tuple := msg.TcpTuple
 
-	DEBUG("http", "Received response with tuple: %s", tuple)
+	logp.Debug("http", "Received response with tuple: %s", tuple)
 
 	trans := http.transactionsMap[tuple.raw]
 	if trans == nil {
-		WARN("Response from unknown transaction. Ignoring: %v", tuple)
+		logp.Warn("Response from unknown transaction. Ignoring: %v", tuple)
 		return
 	}
 
 	if trans.Http == nil {
-		WARN("Response without a known request. Ignoring.")
+		logp.Warn("Response without a known request. Ignoring.")
 		return
 	}
 
@@ -700,10 +701,10 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	err := http.PublishTransaction(trans)
 
 	if err != nil {
-		WARN("Publish failure: %s", err)
+		logp.Warn("Publish failure: %s", err)
 	}
 
-	DEBUG("http", "HTTP transaction completed: %s\n", trans.Http)
+	logp.Debug("http", "HTTP transaction completed: %s\n", trans.Http)
 
 	// remove from map
 	delete(http.transactionsMap, trans.tuple.raw)
@@ -767,7 +768,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
-			DEBUG("http", "Body to include: [%s]", m.Raw[m.bodyOffset:])
+			logp.Debug("http", "Body to include: [%s]", m.Raw[m.bodyOffset:])
 			raw_msg_cut = append(raw_msg_cut, m.Raw[m.bodyOffset:]...)
 		}
 	}
@@ -779,10 +780,10 @@ func shouldIncludeInBody(contenttype string) bool {
 	include_body := _Config.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
-			DEBUG("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
+			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
 			return true
 		}
-		DEBUG("http", "Should Include Body = false Content-Type"+contenttype+" include_body "+include)
+		logp.Debug("http", "Should Include Body = false Content-Type"+contenttype+" include_body "+include)
 	}
 	return false
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"packetbeat/logp"
 	"time"
 
 	"github.com/packetbeat/gopacket"
@@ -61,7 +62,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 	sniffer.config = config
 
 	if file != nil && len(*file) > 0 {
-		DEBUG("sniffer", "Reading from file: %s", *file)
+		logp.Debug("sniffer", "Reading from file: %s", *file)
 		// we read file with the pcap provider
 		sniffer.config.Type = "pcap"
 		sniffer.config.File = *file
@@ -91,7 +92,7 @@ func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) 
 		sniffer.config.Type = "pcap"
 	}
 
-	DEBUG("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
+	logp.Debug("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
 
 	switch sniffer.config.Type {
 	case "pcap":

@@ -21,7 +21,7 @@ func Test_Rotator(t *testing.T) {
 		return
 	}
 
-	logp.DEBUG("rotator", "Direcotry: %s", dir)
+	logp.Debug("rotator", "Direcotry: %s", dir)
 
 	rotator := FileRotator{
 		Path:             dir,
@@ -112,7 +112,7 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 		return
 	}
 
-	logp.DEBUG("rotator", "Direcotry: %s", dir)
+	logp.Debug("rotator", "Direcotry: %s", dir)
 
 	rotator := FileRotator{
 		Path:             dir,

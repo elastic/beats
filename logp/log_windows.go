@@ -35,7 +35,7 @@ const (
 
 var _log Logger
 
-func DEBUG(selector string, format string, v ...interface{}) {
+func Debug(selector string, format string, v ...interface{}) {
 	if _log.level >= LOG_DEBUG {
 		if !_log.debug_all_selectors {
 			selected := _log.selectors[selector]
@@ -47,29 +47,29 @@ func DEBUG(selector string, format string, v ...interface{}) {
 	}
 }
 
-func IS_DEBUG(selector string) bool {
+func IsDebug(selector string) bool {
 	return _log.selectors[selector]
 }
 
-func INFO(format string, v ...interface{}) {
+func Info(format string, v ...interface{}) {
 	if _log.level >= LOG_INFO {
 		_log.logger.Output(2, fmt.Sprintf("INFO "+format, v...))
 	}
 }
 
-func WARN(format string, v ...interface{}) {
+func Warn(format string, v ...interface{}) {
 	if _log.level >= LOG_WARNING {
 		_log.logger.Output(2, fmt.Sprintf("WARN "+format, v...))
 	}
 }
 
-func ERR(format string, v ...interface{}) {
+func Error(format string, v ...interface{}) {
 	if _log.level >= LOG_ERR {
 		_log.logger.Output(2, fmt.Sprintf("ERR  "+format, v...))
 	}
 }
 
-func CRIT(format string, v ...interface{}) {
+func Critical(format string, v ...interface{}) {
 	if _log.level >= LOG_CRIT {
 		_log.logger.Output(2, fmt.Sprintf("CRIT "+format, v...))
 	}
@@ -83,10 +83,10 @@ func WTF(format string, v ...interface{}) {
 	// TODO: assert here when not in production mode
 }
 
-func RECOVER(msg string) {
+func Recover(msg string) {
 	if r := recover(); r != nil {
-		ERR("%s. Recovering, but please report this: %s.", msg, r)
-		ERR("Stacktrace: %s", debug.Stack())
+		Error("%s. Recovering, but please report this: %s.", msg, r)
+		Error("Stacktrace: %s", debug.Stack())
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"packetbeat/logp"
 	"path/filepath"
 	"testing"
 	"time"
@@ -77,7 +78,7 @@ func AssertInt64ArraysAreEqual(t *testing.T, expected []int64, result []int64) b
 }
 
 func TestFindPidsByCmdlineGrep(t *testing.T) {
-	LogInit(LOG_DEBUG, "" /*toSyslog*/, false, []string{})
+	logp.LogInit(logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{})
 	proc := []TestProcFile{
 		{Path: "/proc/1/cmdline", Contents: "/sbin/init"},
 		{Path: "/proc/1/cgroup", Contents: ""},
@@ -167,7 +168,7 @@ func TestRefreshPids(t *testing.T) {
 }
 
 func TestFindSocketsOfPid(t *testing.T) {
-	LogInit(LOG_DEBUG, "" /*toSyslog*/, false, []string{})
+	logp.LogInit(logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{})
 
 	proc := []TestProcFile{
 		{Path: "/proc/766/fd/0", IsLink: true, Contents: "/dev/null"},

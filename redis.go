@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strconv"
 	"strings"
@@ -247,7 +248,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
-				DEBUG("redis", "End of line not found, waiting for more data")
+				logp.Debug("redis", "End of line not found, waiting for more data")
 				return true, false
 			}
 
@@ -260,7 +261,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
 
 				if err != nil {
-					ERR("Failed to read number of bulk messages: %s", err)
+					logp.Err("Failed to read number of bulk messages: %s", err)
 					return false, false
 				}
 				s.parseOffset = off
@@ -275,7 +276,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
-				DEBUG("redis", "End of line not found, waiting for more data")
+				logp.Debug("redis", "End of line not found, waiting for more data")
 				s.parseOffset = old_offset
 				return true, false
 			}
@@ -287,7 +288,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			} else {
 				length, err := strconv.ParseInt(line[1:], 10, 64)
 				if err != nil {
-					ERR("Failed to read bulk message: %s", err)
+					logp.Err("Failed to read bulk message: %s", err)
 					return false, false
 				}
 
@@ -295,13 +296,13 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 				found, line, off = readLine(s.data, s.parseOffset)
 				if !found {
-					DEBUG("redis", "End of line not found, waiting for more data")
+					logp.Debug("redis", "End of line not found, waiting for more data")
 					s.parseOffset = old_offset
 					return true, false
 				}
 
 				if int64(len(line)) != length {
-					ERR("Wrong length of data: %d instead of %d", len(line), length)
+					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
 					return false, false
 				}
 				value = line
@@ -317,7 +318,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			n, err := strconv.ParseInt(line[1:], 10, 64)
 
 			if err != nil {
-				ERR("Failed to read integer reply: %s", err)
+				logp.Err("Failed to read integer reply: %s", err)
 				return false, false
 			}
 			value = strconv.Itoa(int(n))
@@ -343,7 +344,7 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			value = line[1:]
 			s.parseOffset = off
 		} else {
-			DEBUG("redis", "Unexpected message starting with %s", s.data[s.parseOffset:])
+			logp.Debug("redis", "Unexpected message starting with %s", s.data[s.parseOffset:])
 			return false, false
 		}
 
@@ -353,11 +354,11 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			m.Bulks = append(m.Bulks, value)
 
 			if len(m.Bulks) == 1 {
-				DEBUG("redis", "Value: %s", value)
+				logp.Debug("redis", "Value: %s", value)
 				// first word.
 				// check if it's a command
 				if isRedisCommand(value) {
-					DEBUG("redis", "is request")
+					logp.Debug("redis", "is request")
 					m.IsRequest = true
 					m.Method = value
 				}
@@ -399,7 +400,7 @@ func readLine(data []byte, offset int) (bool, string, int) {
 }
 
 func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
-	defer RECOVER("ParseRedis exception")
+	defer logp.Recover("ParseRedis exception")
 
 	if tcp.redisData[dir] == nil {
 		tcp.redisData[dir] = &RedisStream{
@@ -411,7 +412,7 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
 		// concatenate bytes
 		tcp.redisData[dir].data = append(tcp.redisData[dir].data, pkt.payload...)
 		if len(tcp.redisData[dir].data) > TCP_MAX_DATA_IN_STREAM {
-			DEBUG("redis", "Stream data too large, dropping TCP stream")
+			logp.Debug("redis", "Stream data too large, dropping TCP stream")
 			tcp.redisData[dir] = nil
 			return
 		}
@@ -429,16 +430,16 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			tcp.redisData[dir] = nil
-			DEBUG("redis", "Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			logp.Debug("redis", "Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
 			return
 		}
 
 		if complete {
 
 			if stream.message.IsRequest {
-				DEBUG("redis", "REDIS request message: %s", stream.message.Message)
+				logp.Debug("redis", "REDIS request message: %s", stream.message.Message)
 			} else {
-				DEBUG("redis", "REDIS response message: %s", stream.message.Message)
+				logp.Debug("redis", "REDIS response message: %s", stream.message.Message)
 			}
 
 			// all ok, go to next level
@@ -480,7 +481,7 @@ func receivedRedisRequest(msg *RedisMessage) {
 	trans := redisTransactionsMap[tuple.raw]
 	if trans != nil {
 		if trans.Redis != nil {
-			WARN("Two requests without a Response. Dropping old request")
+			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
@@ -530,12 +531,12 @@ func receivedRedisResponse(msg *RedisMessage) {
 	tuple := msg.TcpTuple
 	trans := redisTransactionsMap[tuple.raw]
 	if trans == nil {
-		WARN("Response from unknown transaction. Ignoring.")
+		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 	}
 	// check if the request was received
 	if trans.Redis == nil {
-		WARN("Response from unknown transaction. Ignoring.")
+		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 
 	}
@@ -554,10 +555,10 @@ func receivedRedisResponse(msg *RedisMessage) {
 
 	err := Publisher.PublishRedisTransaction(trans)
 	if err != nil {
-		WARN("Publish failure: %s", err)
+		logp.Warn("Publish failure: %s", err)
 	}
 
-	DEBUG("redis", "Redis transaction completed: %s", trans.Redis)
+	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
 
 	// remove from map
 	delete(redisTransactionsMap, trans.tuple.raw)

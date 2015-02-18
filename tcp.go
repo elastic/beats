@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"packetbeat/logp"
 	"strings"
 	"time"
 
@@ -136,7 +137,7 @@ func (stream *TcpStream) GapInStream(original_dir uint8) {
 
 func (stream *TcpStream) Expire() {
 
-	DEBUG("mem", "Tcp stream expired")
+	logp.Debug("mem", "Tcp stream expired")
 
 	// de-register from dict
 	delete(tcpStreamsMap, stream.tuple.raw)
@@ -168,7 +169,7 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 				// don't follow
 				return
 			}
-			DEBUG("tcp", "Stream doesn't exists, creating new")
+			logp.Debug("tcp", "Stream doesn't exists, creating new")
 
 			// create
 			stream = &TcpStream{id: GetId(), tuple: &pkt.tuple, protocol: protocol}
@@ -181,7 +182,7 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 	tcp_start_seq := tcphdr.Seq
 	tcp_seq := tcp_start_seq + uint32(len(pkt.payload))
 
-	DEBUG("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
+	logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
 		tcp_start_seq, tcp_seq, stream.lastSeq[original_dir], len(pkt.payload))
 
 	if len(pkt.payload) > 0 &&
@@ -189,13 +190,13 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 
 		if TcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
 
-			DEBUG("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+			logp.Debug("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 				tcphdr.Seq, len(pkt.payload), stream.lastSeq[original_dir])
 			return
 		}
 
 		if TcpSeqBefore(stream.lastSeq[original_dir], tcp_start_seq) {
-			DEBUG("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
+			logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
 			if !created {
 				stream.GapInStream(original_dir)
 				// drop stream
@@ -255,7 +256,7 @@ func configToFilter(config *tomlConfig) string {
 func TcpInit() error {
 	tcpPortMap = configToPortsMap(&_Config)
 
-	DEBUG("tcp", "Port map: %v", tcpPortMap)
+	logp.Debug("tcp", "Port map: %v", tcpPortMap)
 
 	return nil
 }
@@ -276,7 +277,7 @@ type DecoderStruct struct {
 func CreateDecoder(datalink layers.LinkType) (*DecoderStruct, error) {
 	var d DecoderStruct
 
-	DEBUG("pcapread", "Layer type: %s", datalink.String())
+	logp.Debug("pcapread", "Layer type: %s", datalink.String())
 
 	switch datalink {
 
@@ -312,7 +313,7 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 
 	err = decoder.Parser.DecodeLayers(data, &decoder.decoded)
 	if err != nil {
-		DEBUG("pcapread", "Decoding error: %s", err)
+		logp.Debug("pcapread", "Decoding error: %s", err)
 		return
 	}
 
@@ -321,21 +322,21 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 	for _, layerType := range decoder.decoded {
 		switch layerType {
 		case layers.LayerTypeIPv4:
-			DEBUG("ip", "IPv4 packet")
+			logp.Debug("ip", "IPv4 packet")
 
 			packet.tuple.Src_ip = decoder.ip4.SrcIP
 			packet.tuple.Dst_ip = decoder.ip4.DstIP
 			packet.tuple.ip_length = 4
 
 		case layers.LayerTypeIPv6:
-			DEBUG("ip", "IPv6 packet")
+			logp.Debug("ip", "IPv6 packet")
 
 			packet.tuple.Src_ip = decoder.ip6.SrcIP
 			packet.tuple.Dst_ip = decoder.ip6.DstIP
 			packet.tuple.ip_length = 16
 
 		case layers.LayerTypeTCP:
-			DEBUG("ip", "TCP packet")
+			logp.Debug("ip", "TCP packet")
 
 			packet.tuple.Src_port = uint16(decoder.tcp.SrcPort)
 			packet.tuple.Dst_port = uint16(decoder.tcp.DstPort)
@@ -348,13 +349,13 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 	}
 
 	if !has_tcp {
-		DEBUG("pcapread", "No TCP header found in message")
+		logp.Debug("pcapread", "No TCP header found in message")
 		return
 	}
 
 	if len(packet.payload) == 0 && !decoder.tcp.FIN {
 		// We have no use for this atm.
-		DEBUG("pcapread", "Ignore empty non-FIN packet")
+		logp.Debug("pcapread", "Ignore empty non-FIN packet")
 		return
 	}
 

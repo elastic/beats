@@ -1,6 +1,7 @@
 package main
 
 import (
+	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
 	"time"
@@ -122,7 +123,7 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 	// read field count (int16)
 	field_count := int(Bytes_Ntohs(s.data[s.parseOffset : s.parseOffset+2]))
 	s.parseOffset += 2
-	DEBUG("pgsqldetailed", "Row Description field count=%d", field_count)
+	logp.Debug("pgsqldetailed", "Row Description field count=%d", field_count)
 
 	fields := []string{}
 	fields_format := []byte{}
@@ -131,7 +132,7 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 		// read field name (null terminated string)
 		field_name, err := readString(s.data[s.parseOffset:])
 		if err != nil {
-			ERR("Fail to read the column field")
+			logp.Err("Fail to read the column field")
 		}
 		fields = append(fields, field_name)
 		m.NumberOfFields += 1
@@ -157,12 +158,12 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 		fields_format = append(fields_format, byte(format))
 		s.parseOffset += 2
 
-		DEBUG("pgsqldetailed", "Field name=%s, format=%d", field_name, format)
+		logp.Debug("pgsqldetailed", "Field name=%s, format=%d", field_name, format)
 	}
 	m.Fields = fields
 	m.FieldsFormat = fields_format
 	if m.NumberOfFields != field_count {
-		ERR("Missing fields from RowDescription. Expected %d. Received %d", field_count, m.NumberOfFields)
+		logp.Err("Missing fields from RowDescription. Expected %d. Received %d", field_count, m.NumberOfFields)
 	}
 }
 
@@ -172,7 +173,7 @@ func pgsqlRowsParser(s *PgsqlStream) {
 	// read field count (int16)
 	field_count := int(Bytes_Ntohs(s.data[s.parseOffset : s.parseOffset+2]))
 	s.parseOffset += 2
-	DEBUG("pgsqldetailed", "DataRow field count=%d", field_count)
+	logp.Debug("pgsqldetailed", "DataRow field count=%d", field_count)
 
 	row := []string{}
 
@@ -200,7 +201,7 @@ func pgsqlRowsParser(s *PgsqlStream) {
 			s.parseOffset += int(column_length)
 		}
 
-		DEBUG("pgsqldetailed", "Value %s, length=%d", string(column_value), column_length)
+		logp.Debug("pgsqldetailed", "Value %s, length=%d", string(column_value), column_length)
 
 	}
 	m.NumberOfRows += 1
@@ -223,7 +224,7 @@ func pgsqlErrorParser(s *PgsqlStream) {
 		// read field value(string)
 		field_value, err := readString(s.data[s.parseOffset:])
 		if err != nil {
-			ERR("Fail to read the column field")
+			logp.Err("Fail to read the column field")
 		}
 		s.parseOffset += len(field_value) + 1
 
@@ -236,7 +237,7 @@ func pgsqlErrorParser(s *PgsqlStream) {
 		}
 
 	}
-	DEBUG("pgsqldetailed", "%s %s %s", m.ErrorSeverity, m.ErrorCode, m.ErrorInfo)
+	logp.Debug("pgsqldetailed", "%s %s %s", m.ErrorSeverity, m.ErrorCode, m.ErrorInfo)
 }
 
 func isSpecialPgsqlCommand(data []byte) (bool, int) {
@@ -254,15 +255,15 @@ func isSpecialPgsqlCommand(data []byte) (bool, int) {
 
 	if length == 16 && code == 80877102 {
 		// Cancel Request
-		DEBUG("pgsqldetailed", "Cancel Request, length=%d", length)
+		logp.Debug("pgsqldetailed", "Cancel Request, length=%d", length)
 		return true, CancelRequest
 	} else if length == 8 && code == 80877103 {
 		// SSL Request
-		DEBUG("pgsqldetailed", "SSL Request, length=%d", length)
+		logp.Debug("pgsqldetailed", "SSL Request, length=%d", length)
 		return true, SSLRequest
 	} else if code == 196608 {
 		// Startup Message
-		DEBUG("pgsqldetailed", "Startup Message, length=%d", length)
+		logp.Debug("pgsqldetailed", "Startup Message, length=%d", length)
 		return true, StartupMessage
 	}
 	return false, 0
@@ -275,7 +276,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 		switch s.parseState {
 		case PgsqlStartState:
 			if len(s.data[s.parseOffset:]) < 5 {
-				WARN("Postgresql Message too short. %X (length=%d). Wait for more.", s.data[s.parseOffset:], len(s.data[s.parseOffset:]))
+				logp.Warn("Postgresql Message too short. %X (length=%d). Wait for more.", s.data[s.parseOffset:], len(s.data[s.parseOffset:]))
 				return true, false
 			}
 
@@ -302,7 +303,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					s.parseOffset += length
 				} else {
 					// wait for more
-					DEBUG("pgsqldetailed", "Wait for more data 1")
+					logp.Debug("pgsqldetailed", "Wait for more data 1")
 					return true, false
 				}
 
@@ -316,7 +317,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					// SSLRequest was received in the other stream
 					if typ == 'N' || typ == 'S' {
 						// one byte reply to SSLRequest
-						DEBUG("pgsqldetailed", "Reply for SSLRequest %c", typ)
+						logp.Debug("pgsqldetailed", "Reply for SSLRequest %c", typ)
 						m.start = s.parseOffset
 						s.parseOffset += 1
 						m.end = s.parseOffset
@@ -328,7 +329,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 				// read length
 				length := int(Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
 
-				DEBUG("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
+				logp.Debug("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
 
 				if typ == 'Q' {
 					// SimpleQuery
@@ -341,11 +342,11 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						m.end = s.parseOffset
 						m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
 						m.toExport = true
-						DEBUG("pgsqldetailed", "Simple Query", "%s", m.Query)
+						logp.Debug("pgsqldetailed", "Simple Query", "%s", m.Query)
 						return true, true
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more data 2")
+						logp.Debug("pgsqldetailed", "Wait for more data 2")
 						return true, false
 					}
 				} else if typ == 'T' {
@@ -361,12 +362,12 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 4 //length
 
 						pgsqlFieldsParser(s)
-						DEBUG("pgsqldetailed", "Fields: %s", m.Fields)
+						logp.Debug("pgsqldetailed", "Fields: %s", m.Fields)
 
 						s.parseState = PgsqlGetDataState
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more data 3")
+						logp.Debug("pgsqldetailed", "Wait for more data 3")
 						return true, false
 					}
 
@@ -374,7 +375,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					// EmptyQueryResponse, appears as a response for empty queries
 					// substitutes CommandComplete
 
-					DEBUG("pgsqldetailed", "EmptyQueryResponse")
+					logp.Debug("pgsqldetailed", "EmptyQueryResponse")
 					m.start = s.parseOffset
 					m.IsOK = true
 					m.IsRequest = false
@@ -388,7 +389,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 				} else if typ == 'E' {
 					// ErrorResponse
 
-					DEBUG("pgsqldetailed", "ErrorResponse")
+					logp.Debug("pgsqldetailed", "ErrorResponse")
 					m.start = s.parseOffset
 					m.IsRequest = false
 					m.IsError = true
@@ -406,7 +407,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						return true, true
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more data 4")
+						logp.Debug("pgsqldetailed", "Wait for more data 4")
 						return true, false
 					}
 				} else if typ == 'C' {
@@ -421,7 +422,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 //type
 
 						name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
-						DEBUG("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
+						logp.Debug("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
 
 						s.parseOffset += length
 						m.end = s.parseOffset
@@ -430,7 +431,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						return true, true
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more data 5")
+						logp.Debug("pgsqldetailed", "Wait for more data 5")
 						return true, false
 					}
 				} else if typ == 'Z' {
@@ -444,7 +445,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						return true, true
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more 5b")
+						logp.Debug("pgsqldetailed", "Wait for more 5b")
 						return true, false
 					}
 				} else {
@@ -455,7 +456,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += length
 					} else {
 						// wait for more
-						DEBUG("pgsqldetailed", "Wait for more data 6")
+						logp.Debug("pgsqldetailed", "Wait for more data 6")
 						return true, false
 					}
 				}
@@ -472,7 +473,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 			// ReadyForQuery
 
 			if len(s.data[s.parseOffset:]) < 5 {
-				WARN("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
+				logp.Warn("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
 				return true, false
 			}
 
@@ -495,7 +496,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 				} else {
 					// wait for more
-					DEBUG("pgsqldetailed", "Wait for more data 7")
+					logp.Debug("pgsqldetailed", "Wait for more data 7")
 					return true, false
 				}
 
@@ -508,7 +509,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					s.parseOffset += 1
 
 					name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
-					DEBUG("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
+					logp.Debug("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
 
 					s.parseOffset += length
 					m.end = s.parseOffset
@@ -517,17 +518,17 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 					s.parseState = PgsqlStartState
 
-					DEBUG("pgsqldetailed", "Rows: %s", m.Rows)
+					logp.Debug("pgsqldetailed", "Rows: %s", m.Rows)
 
 					return true, true
 				} else {
 					// wait for more
-					DEBUG("pgsqldetailed", "Wait for more data 8")
+					logp.Debug("pgsqldetailed", "Wait for more data 8")
 					return true, false
 				}
 			} else {
 				// shouldn't happen
-				DEBUG("pgsqldetailed", "Skip command of type %c", typ)
+				logp.Debug("pgsqldetailed", "Skip command of type %c", typ)
 				s.parseState = PgsqlStartState
 			}
 			break
@@ -539,7 +540,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 
-	defer RECOVER("ParsePgsql exception")
+	defer logp.Recover("ParsePgsql exception")
 
 	if tcp.pgsqlData[dir] == nil {
 		tcp.pgsqlData[dir] = &PgsqlStream{
@@ -547,13 +548,13 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			data:      pkt.payload,
 			message:   &PgsqlMessage{Ts: pkt.ts},
 		}
-		DEBUG("pgsqldetailed", "New stream created")
+		logp.Debug("pgsqldetailed", "New stream created")
 	} else {
 		// concatenate bytes
 		tcp.pgsqlData[dir].data = append(tcp.pgsqlData[dir].data, pkt.payload...)
-		DEBUG("pgsqldetailed", "Len data: %d cap data: %d", len(tcp.pgsqlData[dir].data), cap(tcp.pgsqlData[dir].data))
+		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(tcp.pgsqlData[dir].data), cap(tcp.pgsqlData[dir].data))
 		if len(tcp.pgsqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
-			DEBUG("pgsql", "Stream data too large, dropping TCP stream")
+			logp.Debug("pgsql", "Stream data too large, dropping TCP stream")
 			tcp.pgsqlData[dir] = nil
 			return
 		}
@@ -576,7 +577,7 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			tcp.pgsqlData[dir] = nil
-			DEBUG("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
+			logp.Debug("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
 			return
 		}
 
@@ -624,13 +625,13 @@ func PgsqlMessageHasEnoughData(msg *PgsqlMessage) bool {
 // Called when there's a drop packet
 func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
 
-	defer RECOVER("GapInPgsqlStream exception")
+	defer logp.Recover("GapInPgsqlStream exception")
 
 	// If enough data was received, send it to the
 	// next layer but mark it as incomplete.
 	stream := tcp.pgsqlData[dir]
 	if PgsqlMessageHasEnoughData(stream.message) {
-		DEBUG("pgsql", "Message not complete, but sending to the next layer")
+		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
 		stream.message.toExport = true
 		stream.message.end = stream.parseOffset
 		stream.message.Incomplete = true
@@ -673,7 +674,7 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 	// separated by ';'
 	queries := pgsqlQueryParser(msg.Query)
 
-	DEBUG("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
+	logp.Debug("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
 	if pgsqlTransactionsMap[tuple.raw] == nil {
 		pgsqlTransactionsMap[tuple.raw] = []*PgsqlTransaction{}
@@ -721,7 +722,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 	trans_list := pgsqlTransactionsMap[tuple.raw]
 
 	if trans_list == nil || len(trans_list) == 0 {
-		WARN("Response from unknown transaction. Ignoring.")
+		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 	}
 
@@ -730,7 +731,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	// check if the request was received
 	if trans.Pgsql == nil {
-		WARN("Response from unknown transaction. Ignoring.")
+		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 	}
 
@@ -749,10 +750,10 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	err := Publisher.PublishPgsqlTransaction(trans)
 	if err != nil {
-		WARN("Publish failure: %s", err)
+		logp.Warn("Publish failure: %s", err)
 	}
 
-	DEBUG("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
+	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
 
 	if trans.timer != nil {
 		trans.timer.Stop()

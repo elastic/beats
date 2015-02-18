@@ -3,6 +3,7 @@
 package main
 
 import (
+	"packetbeat/logp"
 	"syscall"
 )
 
@@ -18,7 +19,7 @@ func DropPrivileges() error {
 		return MsgError("GID must be specified for dropping privileges")
 	}
 
-	INFO("Switching to user: %d.%d", _Config.RunOptions.Uid, _Config.RunOptions.Gid)
+	logp.Info("Switching to user: %d.%d", _Config.RunOptions.Uid, _Config.RunOptions.Gid)
 
 	if err = syscall.Setgid(_Config.RunOptions.Gid); err != nil {
 		return MsgError("setgid: %s", err.Error())

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
 	"time"
@@ -42,9 +43,9 @@ type Topology struct {
 func PrintPublishEvent(event *outputs.Event) {
 	json, err := json.MarshalIndent(event, "", "  ")
 	if err != nil {
-		ERR("json.Marshal: %s", err)
+		logp.Err("json.Marshal: %s", err)
 	} else {
-		DEBUG("publish", "Publish: %s", string(json))
+		logp.Debug("publish", "Publish: %s", string(json))
 	}
 }
 
@@ -57,7 +58,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	// in case the IP is localhost, return current agent name
 	islocal, err := IsLoopback(ip)
 	if err != nil {
-		ERR("Parsing IP %s fails with: %s", ip, err)
+		logp.Err("Parsing IP %s fails with: %s", ip, err)
 		return ""
 	} else {
 		if islocal {
@@ -80,7 +81,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 	if _Config.Agent.Ignore_outgoing && event.Dst_server != "" &&
 		event.Dst_server != publisher.name {
 		// duplicated transaction -> ignore it
-		DEBUG("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, event.Src_server, event.Dst_server)
+		logp.Debug("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, event.Src_server, event.Dst_server)
 		return nil
 	}
 
@@ -112,7 +113,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 		}
 	}
 
-	if IS_DEBUG("publish") {
+	if logp.IsDebug("publish") {
 		PrintPublishEvent(event)
 	}
 
@@ -122,7 +123,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 		for i := 0; i < len(publisher.Output); i++ {
 			err := publisher.Output[i].PublishEvent(event)
 			if err != nil {
-				ERR("Fail to publish event type on output %s: %s", publisher.Output, err)
+				logp.Err("Fail to publish event type on output %s: %s", publisher.Output, err)
 				has_error = true
 			}
 		}
@@ -147,14 +148,14 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	if len(params) == 0 {
 		addrs, err := LocalIpAddrsAsStrings(false)
 		if err != nil {
-			ERR("Getting local IP addresses fails with: %s", err)
+			logp.Err("Getting local IP addresses fails with: %s", err)
 			return err
 		}
 		localAddrs = addrs
 	}
 
 	if publisher.TopologyOutput != nil {
-		DEBUG("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
+		logp.Debug("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
 
 		err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
 		if err != nil {
@@ -170,7 +171,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 
 	publisher.disabled = publishDisabled
 	if publisher.disabled {
-		INFO("Dry run mode. All output types except the file based one are disabled.")
+		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
 	output, exists := _Config.Output["elasticsearch"]
@@ -178,39 +179,39 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		err := publisher.ElasticsearchOutput.Init(output,
 			_Config.Agent.Topology_expire)
 		if err != nil {
-			ERR("Fail to initialize Elasticsearch as output: %s", err)
+			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
 		}
 		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.ElasticsearchOutput))
 
 		if output.Save_topology {
 			if publisher.TopologyOutput != nil {
-				ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
 				return errors.New("Multiple outputs defined to store topology")
 			}
 			publisher.TopologyOutput = outputs.OutputInterface(&publisher.ElasticsearchOutput)
-			INFO("Using Elasticsearch to store the topology")
+			logp.Info("Using Elasticsearch to store the topology")
 		}
 	}
 
 	output, exists = _Config.Output["redis"]
 	if exists && output.Enabled && !publisher.disabled {
-		DEBUG("publish", "REDIS publisher enabled")
+		logp.Debug("publish", "REDIS publisher enabled")
 		err := publisher.RedisOutput.Init(output,
 			_Config.Agent.Topology_expire)
 		if err != nil {
-			ERR("Fail to initialize Redis as output: %s", err)
+			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
 		}
 		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.RedisOutput))
 
 		if output.Save_topology {
 			if publisher.TopologyOutput != nil {
-				ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
 				return errors.New("Multiple outputs defined to store topology")
 			}
 			publisher.TopologyOutput = outputs.OutputInterface(&publisher.RedisOutput)
-			INFO("Using Redis to store the topology")
+			logp.Info("Using Redis to store the topology")
 		}
 	}
 
@@ -218,7 +219,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 	if exists && output.Enabled {
 		err := publisher.FileOutput.Init(output)
 		if err != nil {
-			ERR("Fail to initialize file output: %s", err)
+			logp.Err("Fail to initialize file output: %s", err)
 			return err
 		}
 		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.FileOutput))
@@ -228,12 +229,12 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 
 	if !publisher.disabled {
 		if len(publisher.Output) == 0 {
-			INFO("No outputs are defined. Please define one under [output]")
+			logp.Info("No outputs are defined. Please define one under [output]")
 			return errors.New("No outputs are define")
 		}
 
 		if publisher.TopologyOutput == nil {
-			WARN("No output is defined to store the topology. The server fields might not be filled.")
+			logp.Warn("No output is defined to store the topology. The server fields might not be filled.")
 		}
 	}
 
@@ -245,7 +246,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 			return err
 		}
 
-		INFO("No agent name configured, using hostname '%s'", publisher.name)
+		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
 	}
 
 	if len(_Config.Agent.Tags) > 0 {
@@ -258,12 +259,12 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 			RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
-		INFO("Topology map refreshed every %s", RefreshTopologyFreq)
+		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)
 
 		// register agent and its public IP addresses
 		err = publisher.PublishTopology()
 		if err != nil {
-			ERR("Failed to publish topology: %s", err)
+			logp.Err("Failed to publish topology: %s", err)
 			return err
 		}
 

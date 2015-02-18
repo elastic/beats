@@ -48,13 +48,13 @@ func (out *ElasticsearchOutputType) Init(config MothershipConfig, topology_expir
 
 	err := out.EnableTTL()
 	if err != nil {
-		logp.ERR("Fail to set _ttl mapping: %s", err)
+		logp.Err("Fail to set _ttl mapping: %s", err)
 		return err
 	}
 
-	logp.INFO("[ElasticsearchOutput] Using Elasticsearch %s://%s:%s%s", api.Protocol, api.Domain, api.Port, api.BasePath)
-	logp.INFO("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
-	logp.INFO("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
+	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s://%s:%s%s", api.Protocol, api.Domain, api.Port, api.BasePath)
+	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
+	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
 
 	return nil
 }
@@ -84,7 +84,7 @@ func (out *ElasticsearchOutputType) GetNameByIP(ip string) string {
 	return name
 }
 func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string) error {
-	logp.DEBUG("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
+	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	_, err := core.IndexWithParameters(
 		"packetbeat-topology", /*index*/
 		"server-ip",           /*type*/
@@ -102,7 +102,7 @@ func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string)
 		PublishedTopology{name, strings.Join(localAddrs, ",")} /* data */)
 
 	if err != nil {
-		logp.ERR("Fail to publish IP addresses: %s", err)
+		logp.Err("Fail to publish IP addresses: %s", err)
 		return err
 	}
 
@@ -122,7 +122,7 @@ func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 			var pub PublishedTopology
 			err = json.Unmarshal([]byte(*server.Source), &pub)
 			if err != nil {
-				logp.ERR("json.Unmarshal fails with: %s", err)
+				logp.Err("json.Unmarshal fails with: %s", err)
 			}
 			// add mapping
 			ipaddrs := strings.Split(pub.IPs, ",")
@@ -131,19 +131,19 @@ func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 			}
 		}
 	} else {
-		logp.ERR("Getting topology map fails with: %s", err)
+		logp.Err("Getting topology map fails with: %s", err)
 	}
 
 	// update topology map
 	out.TopologyMap = TopologyMapTmp
 
-	logp.DEBUG("output_elasticsearch", "Topology map %s", out.TopologyMap)
+	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
 }
 
 func (out *ElasticsearchOutputType) PublishEvent(event *Event) error {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, event.Timestamp.Year(), event.Timestamp.Month(), event.Timestamp.Day())
 	_, err := core.Index(index, event.Type, "", nil, event)
-	logp.DEBUG("output_elasticsearch", "Publish event")
+	logp.Debug("output_elasticsearch", "Publish event")
 	return err
 }

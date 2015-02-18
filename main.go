@@ -94,19 +94,19 @@ func Bytes_Ipv4_Ntoa(bytes []byte) string {
 func writeHeapProfile(filename string) {
 	f, err := os.Create(filename)
 	if err != nil {
-		ERR("Failed creating file %s: %s", filename, err)
+		logp.Err("Failed creating file %s: %s", filename, err)
 		return
 	}
 	pprof.WriteHeapProfile(f)
 	f.Close()
 
-	INFO("Created memory profile file %s.", filename)
+	logp.Info("Created memory profile file %s.", filename)
 }
 
 func debugMemStats() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	DEBUG("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
+	logp.Debug("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
 		m.Alloc, m.TotalAlloc, m.Sys)
 }
 
@@ -135,7 +135,7 @@ func loadGeoIPData() {
 			// follow symlink
 			geoip_path, err = filepath.EvalSymlinks(path)
 			if err != nil {
-				WARN("Could not load GeoIP data: %s", err.Error())
+				logp.Warn("Could not load GeoIP data: %s", err.Error())
 				return
 			}
 		} else {
@@ -145,17 +145,17 @@ func loadGeoIPData() {
 	}
 
 	if len(geoip_path) == 0 {
-		WARN("Couldn't load GeoIP database")
+		logp.Warn("Couldn't load GeoIP database")
 		return
 	}
 
 	var err error
 	_GeoLite, err = libgeo.Load(geoip_path)
 	if err != nil {
-		WARN("Could not load GeoIP data: %s", err.Error())
+		logp.Warn("Could not load GeoIP data: %s", err.Error())
 	}
 
-	INFO("Loaded GeoIP data from: %s", geoip_path)
+	logp.Info("Loaded GeoIP data from: %s", geoip_path)
 }
 
 func main() {
@@ -184,15 +184,15 @@ func main() {
 		return
 	}
 
-	logLevel := LOG_ERR
+	logLevel := logp.LOG_ERR
 	if *verbose {
-		logLevel = LOG_INFO
+		logLevel = logp.LOG_INFO
 	}
 
 	debugSelectors := []string{}
 	if len(*debugSelectorsStr) > 0 {
 		debugSelectors = strings.Split(*debugSelectorsStr, ",")
-		logLevel = LOG_DEBUG
+		logLevel = logp.LOG_DEBUG
 	}
 
 	var err error
@@ -204,10 +204,9 @@ func main() {
 	if len(debugSelectors) == 0 {
 		debugSelectors = _Config.Logging.Selectors
 	}
-	LogInit(logLevel, "", !*toStdout, debugSelectors)
 	logp.LogInit(logp.Priority(logLevel), "", !*toStdout, debugSelectors)
 
-	if !IS_DEBUG("stdlog") {
+	if !logp.IsDebug("stdlog") {
 		// disable standard logging by default
 		log.SetOutput(ioutil.Discard)
 	}
@@ -215,43 +214,43 @@ func main() {
 	_Config.Interfaces.Bpf_filter = configToFilter(&_Config)
 	Packetbeat.Sniffer, err = CreateSniffer(&_Config.Interfaces, file)
 	if err != nil {
-		CRIT("Error creating sniffer: %s", err)
+		logp.Critical("Error creating sniffer: %s", err)
 		return
 	}
 	sniffer := Packetbeat.Sniffer
 	Packetbeat.Decoder, err = CreateDecoder(sniffer.Datalink())
 	if err != nil {
-		CRIT("Error creating decoder: %s", err)
+		logp.Critical("Error creating decoder: %s", err)
 		return
 	}
 
 	if err = DropPrivileges(); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
 	if err = Publisher.Init(*publishDisabled); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
 	if err = procWatcher.Init(&_Config.Procs); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
 	if err = ThriftMod.Init(false); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
 	if err = HttpMod.Init(false); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
 	if err = TcpInit(); err != nil {
-		CRIT(err.Error())
+		logp.Critical(err.Error())
 		return
 	}
 
@@ -270,12 +269,12 @@ func main() {
 	if *dumpfile != "" {
 		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
 		if err != nil {
-			CRIT(err.Error())
+			logp.Critical(err.Error())
 			return
 		}
 		dumper, err = p.NewDumper(*dumpfile)
 		if err != nil {
-			CRIT(err.Error())
+			logp.Critical(err.Error())
 			return
 		}
 	}
@@ -288,7 +287,7 @@ func main() {
 	go func() {
 		<-sigc
 		live = false
-		DEBUG("signal", "Received term singal, set live to false")
+		logp.Debug("signal", "Received term singal, set live to false")
 	}()
 
 	counter := 0
@@ -303,12 +302,12 @@ func main() {
 		data, ci, err := sniffer.DataSource.ReadPacketData()
 
 		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
-			DEBUG("pcapread", "Interrupted")
+			logp.Debug("pcapread", "Interrupted")
 			continue
 		}
 
 		if err == io.EOF {
-			DEBUG("pcapread", "End of file")
+			logp.Debug("pcapread", "End of file")
 			loopCount += 1
 			if *loop > 0 && loopCount > *loop {
 				// give a bit of time to the publish goroutine
@@ -318,10 +317,10 @@ func main() {
 				continue
 			}
 
-			DEBUG("pcapread", "Reopening the file")
+			logp.Debug("pcapread", "Reopening the file")
 			err = sniffer.Reopen()
 			if err != nil {
-				CRIT("Error reopening file: %s", err)
+				logp.Critical("Error reopening file: %s", err)
 				live = false
 				continue
 			}
@@ -330,7 +329,7 @@ func main() {
 		}
 
 		if err != nil {
-			CRIT("Sniffing error: %s", err)
+			logp.Critical("Sniffing error: %s", err)
 			live = false
 			continue
 		}
@@ -346,7 +345,7 @@ func main() {
 				if sleep > 0 {
 					time.Sleep(sleep)
 				} else {
-					WARN("Time in pcap went backwards: %d", sleep)
+					logp.Warn("Time in pcap went backwards: %d", sleep)
 				}
 			}
 			_lastPktTime := ci.Timestamp
@@ -358,10 +357,10 @@ func main() {
 		if dumper != nil {
 			dumper.WritePacketData(data, ci)
 		}
-		DEBUG("pcapread", "Packet number: %d", counter)
+		logp.Debug("pcapread", "Packet number: %d", counter)
 		Packetbeat.Decoder.DecodePacketData(data, &ci)
 	}
-	INFO("Input finish. Processed %d packets. Have a nice day!", counter)
+	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire

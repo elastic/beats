@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"packetbeat/logp"
 	"testing"
 	//"fmt"
 	"time"
@@ -104,7 +105,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 }
 
 func TestMySQLParser_dataResponse(t *testing.T) {
-	//LogInit(syslog.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
+	//logp.LogInit(syslog.logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
 
 	data := []byte(
 		"0100000105" +
@@ -172,7 +173,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 }
 
 func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
-	//LogInit(syslog.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
+	//logp.LogInit(syslog.logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
 
 	data := []byte("300000010001000100000028526f7773206d6174636865643a203120204368616e6765643a203120205761726e696e67733a2030")
 
@@ -204,7 +205,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 
 func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
 
 	data1 := "300000010001000100000028526f7773206d6174636865"
@@ -269,7 +270,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 
 func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
 
 	data, err := hex.DecodeString("300000010001000100000028526f7773206d61746368" +
@@ -307,7 +308,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 // Test parsing three OK responses in the same packet
 func TestParseMySQL_threeResponses(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
 
 	data, err := hex.DecodeString(
@@ -353,7 +354,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 // Test parsing one response split in two packets
 func TestParseMySQL_splitResponse(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
 
 	data, err := hex.DecodeString(

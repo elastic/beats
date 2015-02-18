@@ -66,7 +66,7 @@ func (out *FileOutputType) PublishEvent(event *Event) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {
-		logp.ERR("Fail to convert the event to JSON: %s", err)
+		logp.Err("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 

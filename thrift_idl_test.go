@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"packetbeat/logp"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func thriftIdlForTesting(t *testing.T, content string) *ThriftIdl {
 func TestThriftIdl_thriftReadFiles(t *testing.T) {
 
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
 	}
 
 	idl := thriftIdlForTesting(t, `

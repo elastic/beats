@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"packetbeat/logp"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -78,7 +79,7 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
 	if proc.ReadFromProc {
 		if runtime.GOOS != "linux" {
 			proc.ReadFromProc = false
-			INFO("Disabled /proc/ reading because not on linux")
+			logp.Info("Disabled /proc/ reading because not on linux")
 		}
 	}
 
@@ -98,7 +99,7 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
 	var err error
 	proc.LocalAddrs, err = LocalIpAddrs()
 	if err != nil {
-		ERR("Error getting local IP addresses: %s", err)
+		logp.Err("Error getting local IP addresses: %s", err)
 		proc.LocalAddrs = []net.IP{}
 	}
 
@@ -112,7 +113,7 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
 
 			p, err := NewProcess(proc, pstr, grepper, time.Tick(proc.RefreshPidsFreq))
 			if err != nil {
-				ERR("NewProcess: %s", err)
+				logp.Err("NewProcess: %s", err)
 			} else {
 				proc.Processes = append(proc.Processes, p)
 			}
@@ -135,15 +136,15 @@ func NewProcess(proc *ProcessesWatcher, name string, grepper string,
 }
 
 func (p *Process) RefreshPids() {
-	DEBUG("procs", "In RefreshPids")
+	logp.Debug("procs", "In RefreshPids")
 	for _ = range p.RefreshPidsTimer {
-		DEBUG("procs", "In RefreshPids tick")
+		logp.Debug("procs", "In RefreshPids tick")
 		var err error
 		p.Pids, err = FindPidsByCmdlineGrep(p.proc.proc_prefix, p.Grepper)
 		if err != nil {
-			ERR("Error finding PID files for %s: %s", p.Name, err)
+			logp.Err("Error finding PID files for %s: %s", p.Name, err)
 		}
-		DEBUG("procs", "RefreshPids found pids %s for process %s", p.Pids, p.Name)
+		logp.Debug("procs", "RefreshPids found pids %s for process %s", p.Pids, p.Name)
 
 		if p.proc.TestSignals != nil {
 			*p.proc.TestSignals <- true
@@ -152,7 +153,7 @@ func (p *Process) RefreshPids() {
 }
 
 func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
-	defer RECOVER("FindPidsByCmdlineGrep exception")
+	defer logp.Recover("FindPidsByCmdlineGrep exception")
 	pids := []int{}
 
 	proc, err := os.Open(filepath.Join(prefix, "/proc"))
@@ -192,18 +193,18 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *IpPortTuple) (proc_tuple
 	}
 
 	if proc.IsLocalIp(tuple.Src_ip) {
-		DEBUG("procs", "Looking for port %d", tuple.Src_port)
+		logp.Debug("procs", "Looking for port %d", tuple.Src_port)
 		proc_tuple.Src = []byte(proc.FindProc(tuple.Src_port))
 		if len(proc_tuple.Src) > 0 {
-			DEBUG("procs", "Found device %s for port %d", proc_tuple.Src, tuple.Src_port)
+			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Src, tuple.Src_port)
 		}
 	}
 
 	if proc.IsLocalIp(tuple.Dst_ip) {
-		DEBUG("procs", "Looking for port %d", tuple.Dst_port)
+		logp.Debug("procs", "Looking for port %d", tuple.Dst_port)
 		proc_tuple.Dst = []byte(proc.FindProc(tuple.Dst_port))
 		if len(proc_tuple.Dst) > 0 {
-			DEBUG("procs", "Found device %s for port %d", proc_tuple.Dst, tuple.Dst_port)
+			logp.Debug("procs", "Found device %s for port %d", proc_tuple.Dst, tuple.Dst_port)
 		}
 	}
 
@@ -212,7 +213,7 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *IpPortTuple) (proc_tuple
 
 func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 	procname = ""
-	defer RECOVER("FindProc exception")
+	defer logp.Recover("FindProc exception")
 
 	p, exists := proc.PortProcMap[port]
 	if exists {
@@ -253,15 +254,15 @@ func hex_to_ip_port(str []byte) (uint32, uint16, error) {
 
 func (proc *ProcessesWatcher) UpdateMap() {
 
-	DEBUG("procs", "UpdateMap()")
+	logp.Debug("procs", "UpdateMap()")
 	file, err := os.Open("/proc/net/tcp")
 	if err != nil {
-		ERR("Open: %s", err)
+		logp.Err("Open: %s", err)
 		return
 	}
 	socks, err := Parse_Proc_Net_Tcp(file)
 	if err != nil {
-		ERR("Parse_Proc_Net_Tcp: %s", err)
+		logp.Err("Parse_Proc_Net_Tcp: %s", err)
 		return
 	}
 	socks_map := map[int64]*SocketInfo{}
@@ -273,7 +274,7 @@ func (proc *ProcessesWatcher) UpdateMap() {
 		for _, pid := range p.Pids {
 			inodes, err := FindSocketsOfPid(proc.proc_prefix, pid)
 			if err != nil {
-				ERR("FindSocketsOfPid: %s", err)
+				logp.Err("FindSocketsOfPid: %s", err)
 				continue
 			}
 
@@ -300,13 +301,13 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 	for err != io.EOF {
 		line, err = buf.ReadBytes('\n')
 		if err != nil && err != io.EOF {
-			ERR("Error reading /proc/net/tcp: %s", err)
+			logp.Err("Error reading /proc/net/tcp: %s", err)
 			return nil, err
 		}
 
 		words := bytes.Fields(line)
 		if len(words) < 10 || bytes.Equal(words[0], []byte("sl")) {
-			DEBUG("procs", "Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
+			logp.Debug("procs", "Less then 10 words (%d) or starting with 'sl': %s", len(words), words)
 			continue
 		}
 
@@ -315,13 +316,13 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 
 		sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1])
 		if err_ != nil {
-			DEBUG("procs", "Error parsing IP and port: %s", err_)
+			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
 		}
 
 		sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2])
 		if err_ != nil {
-			DEBUG("procs", "Error parsing IP and port: %s", err_)
+			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
 		}
 
@@ -344,7 +345,7 @@ func (proc *ProcessesWatcher) UpdateMappingEntry(port uint16, pid int, p *Proces
 	// reasonable.
 	proc.PortProcMap[port] = entry
 
-	DEBUG("procsdetailed", "UpdateMappingEntry(): port=%d pid=%d", port, p.Name)
+	logp.Debug("procsdetailed", "UpdateMappingEntry(): port=%d pid=%d", port, p.Name)
 }
 
 func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
@@ -362,14 +363,14 @@ func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			DEBUG("procs", "Readlink %s: %s", name, err)
+			logp.Debug("procs", "Readlink %s: %s", name, err)
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseInt(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				DEBUG("procs", "ParseInt: %s:", err)
+				logp.Debug("procs", "ParseInt: %s:", err)
 				continue
 			}
 

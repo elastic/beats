@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"packetbeat/logp"
 	"testing"
 	"time"
 )
@@ -122,7 +123,7 @@ func TestPgsqlParser_response(t *testing.T) {
 // Test parsing an incomplete pgsql response
 func TestPgsqlParser_incomplete_response(t *testing.T) {
 	if testing.Verbose() {
-		LogInit(LOG_DEBUG, "", false, []string{"pgsql", "pgsqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"pgsql", "pgsqldetailed"})
 	}
 
 	data := []byte(

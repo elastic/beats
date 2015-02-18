@@ -39,7 +39,7 @@ type Logger struct {
 
 var _log Logger
 
-func DEBUG(selector string, format string, v ...interface{}) {
+func Debug(selector string, format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_DEBUG {
 		if !_log.debug_all_selectors {
 			selected := _log.selectors[selector]
@@ -55,11 +55,11 @@ func DEBUG(selector string, format string, v ...interface{}) {
 	}
 }
 
-func IS_DEBUG(selector string) bool {
+func IsDebug(selector string) bool {
 	return _log.selectors[selector]
 }
 
-func INFO(format string, v ...interface{}) {
+func Info(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_INFO {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_INFO].Output(2, fmt.Sprintf(format, v...))
@@ -69,7 +69,7 @@ func INFO(format string, v ...interface{}) {
 	}
 }
 
-func WARN(format string, v ...interface{}) {
+func Warn(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_WARNING {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_WARNING].Output(2, fmt.Sprintf(format, v...))
@@ -79,7 +79,7 @@ func WARN(format string, v ...interface{}) {
 	}
 }
 
-func ERR(format string, v ...interface{}) {
+func Err(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_ERR {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_ERR].Output(2, fmt.Sprintf(format, v...))
@@ -89,7 +89,7 @@ func ERR(format string, v ...interface{}) {
 	}
 }
 
-func CRIT(format string, v ...interface{}) {
+func Critical(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_CRIT {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_CRIT].Output(2, fmt.Sprintf(format, v...))
@@ -111,10 +111,10 @@ func WTF(format string, v ...interface{}) {
 	// TODO: assert here when not in production mode
 }
 
-func RECOVER(msg string) {
+func Recover(msg string) {
 	if r := recover(); r != nil {
-		ERR("%s. Recovering, but please report this: %s.", msg, r)
-		ERR("Stacktrace: %s", debug.Stack())
+		Err("%s. Recovering, but please report this: %s.", msg, r)
+		Err("Stacktrace: %s", debug.Stack())
 	}
 }
 

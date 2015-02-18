@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"packetbeat/logp"
 
 	"github.com/samuel/go-thrift/parser"
 )
@@ -49,7 +50,7 @@ func BuildMethodsMap(thrift_files map[string]parser.Thrift) map[string]*ThriftId
 		for _, service := range thrift.Services {
 			for _, method := range service.Methods {
 				if _, exists := output[method.Name]; exists {
-					WARN("Thrift IDL: Method %s is defined in more services: %s and %s",
+					logp.Warn("Thrift IDL: Method %s is defined in more services: %s and %s",
 						output[method.Name].Service.Name, service.Name)
 				}
 				output[method.Name] = &ThriftIdlMethod{
