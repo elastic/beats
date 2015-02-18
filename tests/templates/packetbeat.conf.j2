@@ -137,6 +137,8 @@ tags = [
 # This is generally useful for avoiding storing user passwords or other
 # sensitive information.
 #hide_keywords = ["pass=", "password=", "passwd=", "Password="]
+{% if http_strip_authorization %}strip_authorization = true{% endif %}
+
 
 
 {% if geoip_paths is not none -%}
