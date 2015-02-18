@@ -11,7 +11,7 @@ const elasticsearchPort = 9200
 func createElasticsearchConnection() ElasticsearchOutputType {
 
 	var elasticsearchOutput ElasticsearchOutputType
-	elasticsearchOutput.Init(tomlMothership{
+	elasticsearchOutput.Init(MothershipConfig{
 		Enabled:       true,
 		Save_topology: true,
 		Host:          elasticsearchAddr,

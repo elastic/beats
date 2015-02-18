@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -979,7 +980,7 @@ func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
 
 func (thrift *Thrift) publishTransactions() {
 	for t := range thrift.PublishQueue {
-		event := Event{}
+		event := outputs.Event{}
 
 		event.Type = "thrift"
 		if t.Reply != nil && t.Reply.HasException {
@@ -988,14 +989,14 @@ func (thrift *Thrift) publishTransactions() {
 			event.Status = OK_STATUS
 		}
 		event.ResponseTime = t.ResponseTime
-		event.Thrift = MapStr{}
+		event.Thrift = outputs.MapStr{}
 
 		if t.Request != nil {
 			event.Method = t.Request.Method
 			event.Path = t.Request.Service
 			event.Query = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
 			event.BytesIn = uint64(t.Request.FrameSize)
-			event.Thrift = MapStr{
+			event.Thrift = outputs.MapStr{
 				"params":  t.Request.Params,
 				"service": t.Request.Service,
 			}

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"packetbeat/log"
+	"packetbeat/logp"
 	"strings"
 	"time"
 
@@ -44,9 +44,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-var RedisOutput RedisOutputType
-
-func (out *RedisOutputType) Init(config tomlMothership, topology_expire int) error {
+func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
@@ -78,7 +76,7 @@ func (out *RedisOutputType) Init(config tomlMothership, topology_expire int) err
 	if config.Flush_interval != 0 {
 		if config.Flush_interval < 0 {
 			out.flush_immediatelly = true
-			log.WARN("Flushing to REDIS on each push, performance migh be affected")
+			logp.WARN("Flushing to REDIS on each push, performance migh be affected")
 		} else {
 			out.FlushInterval = time.Duration(config.Flush_interval) * time.Millisecond
 		}
@@ -104,18 +102,18 @@ func (out *RedisOutputType) Init(config tomlMothership, topology_expire int) err
 		return errors.New("Bad Redis data type")
 	}
 
-	log.INFO("[RedisOutput] Using Redis server %s", out.Hostname)
+	logp.INFO("[RedisOutput] Using Redis server %s", out.Hostname)
 	if out.Password != "" {
-		log.INFO("[RedisOutput] Using password to connect to Redis")
+		logp.INFO("[RedisOutput] Using password to connect to Redis")
 	}
-	log.INFO("[RedisOutput] Redis connection timeout %s", out.Timeout)
-	log.INFO("[RedisOutput] Redis reconnect interval %s", out.ReconnectInterval)
-	log.INFO("[RedisOutput] Redis flushing interval %s", out.FlushInterval)
-	log.INFO("[RedisOutput] Using index pattern %s", out.Index)
-	log.INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
-	log.INFO("[RedisOutput] Using db %d for storing events", out.Db)
-	log.INFO("[RedisOutput] Using db %d for storing topology", out.DbTopology)
-	log.INFO("[RedisOutput] Using %d data type", out.DataType)
+	logp.INFO("[RedisOutput] Redis connection timeout %s", out.Timeout)
+	logp.INFO("[RedisOutput] Redis reconnect interval %s", out.ReconnectInterval)
+	logp.INFO("[RedisOutput] Redis flushing interval %s", out.FlushInterval)
+	logp.INFO("[RedisOutput] Using index pattern %s", out.Index)
+	logp.INFO("[RedisOutput] Topology expires after %s", out.TopologyExpire)
+	logp.INFO("[RedisOutput] Using db %d for storing events", out.Db)
+	logp.INFO("[RedisOutput] Using db %d for storing topology", out.DbTopology)
+	logp.INFO("[RedisOutput] Using %d data type", out.DataType)
 
 	out.sendingQueue = make(chan RedisQueueMsg, 1000)
 
@@ -184,10 +182,10 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 		case queueMsg := <-out.sendingQueue:
 
 			if !out.connected {
-				log.DEBUG("output_redis", "Droping pkt ...")
+				logp.DEBUG("output_redis", "Droping pkt ...")
 				continue
 			}
-			log.DEBUG("output_redis", "Send event to redis")
+			logp.DEBUG("output_redis", "Send event to redis")
 			command := "RPUSH"
 			if out.DataType == RedisChannelType {
 				command = "PUBLISH"
@@ -199,7 +197,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
 			}
 			if err != nil {
-				log.ERR("Fail to publish event to REDIS: %s", err)
+				logp.ERR("Fail to publish event to REDIS: %s", err)
 				out.connected = false
 				go out.Reconnect()
 			}
@@ -207,7 +205,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 			out.Conn.Flush()
 			_, err = out.Conn.Receive()
 			if err != nil {
-				log.ERR("Fail to publish event to REDIS: %s", err)
+				logp.ERR("Fail to publish event to REDIS: %s", err)
 				out.connected = false
 				go out.Reconnect()
 			}
@@ -220,7 +218,7 @@ func (out *RedisOutputType) Reconnect() {
 	for {
 		err := out.Connect()
 		if err != nil {
-			log.WARN("Error connecting to Redis (%s). Retrying in %s", err, out.ReconnectInterval)
+			logp.WARN("Error connecting to Redis (%s). Retrying in %s", err, out.ReconnectInterval)
 			time.Sleep(out.ReconnectInterval)
 		} else {
 			break
@@ -238,7 +236,7 @@ func (out *RedisOutputType) GetNameByIP(ip string) string {
 
 func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 
-	log.DEBUG("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
+	logp.DEBUG("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
 	// connect to db
 	conn, err := out.RedisConnect(out.DbTopology)
@@ -249,13 +247,13 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 
 	_, err = conn.Do("HSET", name, "ipaddrs", strings.Join(localAddrs, ","))
 	if err != nil {
-		log.ERR("[%s] Fail to set the IP addresses: %s", name, err)
+		logp.ERR("[%s] Fail to set the IP addresses: %s", name, err)
 		return err
 	}
 
 	_, err = conn.Do("EXPIRE", name, int(out.TopologyExpire.Seconds()))
 	if err != nil {
-		log.ERR("[%s] Fail to set the expiration time: %s", name, err)
+		logp.ERR("[%s] Fail to set the expiration time: %s", name, err)
 		return err
 	}
 
@@ -270,13 +268,13 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 
 	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
-		log.ERR("Fail to get the all agents from the topology map %s", err)
+		logp.ERR("Fail to get the all agents from the topology map %s", err)
 		return
 	}
 	for _, hostname := range hostnames {
 		res, err := redis.String(conn.Do("HGET", hostname, "ipaddrs"))
 		if err != nil {
-			log.ERR("[%s] Fail to get the IPs: %s", hostname, err)
+			logp.ERR("[%s] Fail to get the IPs: %s", hostname, err)
 		} else {
 			ipaddrs := strings.Split(res, ",")
 			for _, addr := range ipaddrs {
@@ -287,19 +285,19 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 
 	out.TopologyMap = TopologyMapTmp
 
-	log.DEBUG("output_redis", "Topology %s", TopologyMapTmp)
+	logp.DEBUG("output_redis", "Topology %s", TopologyMapTmp)
 }
 
 func (out *RedisOutputType) PublishEvent(event *Event) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {
-		log.ERR("Fail to convert the event to JSON: %s", err)
+		logp.ERR("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 
 	out.sendingQueue <- RedisQueueMsg{index: out.Index, msg: string(json_event)}
 
-	log.DEBUG("output_redis", "Publish event")
+	logp.DEBUG("output_redis", "Publish event")
 	return nil
 }

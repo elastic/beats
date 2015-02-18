@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"packetbeat/log"
+	"packetbeat/logp"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -28,9 +28,7 @@ type FileRotator struct {
 	current_size uint64
 }
 
-var FileOutput FileOutputType
-
-func (out *FileOutputType) Init(config tomlMothership) error {
+func (out *FileOutputType) Init(config MothershipConfig) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	out.rotator.RotateEveryBytes = uint64(config.Rotate_every_kb) * 1024
@@ -68,7 +66,7 @@ func (out *FileOutputType) PublishEvent(event *Event) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {
-		log.ERR("Fail to convert the event to JSON: %s", err)
+		logp.ERR("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 

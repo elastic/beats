@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -717,7 +718,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 		return nil
 	}
 
-	event := Event{}
+	event := outputs.Event{}
 
 	event.Type = "http"
 	code := t.Http["code"].(uint16)
@@ -733,7 +734,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	if http.Send_response {
 		event.ResponseRaw = t.Response_raw
 	}
-	event.Http = t.Http
+	event.Http = outputs.MapStr(t.Http)
 	event.Real_ip = t.Real_ip
 	event.Method = t.Method
 	event.Path = t.RequestUri

@@ -4,17 +4,21 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"packetbeat/outputs"
 	"strings"
 	"time"
 )
 
 type PublisherType struct {
-	name           string
-	tags           string
-	disabled       bool
-	Index          string
-	Output         []OutputInterface
-	TopologyOutput OutputInterface
+	name                string
+	tags                string
+	disabled            bool
+	Index               string
+	Output              []outputs.OutputInterface
+	TopologyOutput      outputs.OutputInterface
+	ElasticsearchOutput outputs.ElasticsearchOutputType
+	RedisOutput         outputs.RedisOutputType
+	FileOutput          outputs.FileOutputType
 
 	RefreshTopologyTimer <-chan time.Time
 }
@@ -30,20 +34,12 @@ type tomlAgent struct {
 	Tags                  []string
 }
 
-const (
-	ElasticsearchOutputName = "elasticsearch"
-	RedisOutputName         = "redis"
-	FileOutputName          = "file"
-)
-
-var outputTypes = []string{ElasticsearchOutputName, RedisOutputName, FileOutputName}
-
 type Topology struct {
 	Name string `json:"name"`
 	Ip   string `json:"ip"`
 }
 
-func PrintPublishEvent(event *Event) {
+func PrintPublishEvent(event *outputs.Event) {
 	json, err := json.MarshalIndent(event, "", "  ")
 	if err != nil {
 		ERR("json.Marshal: %s", err)
@@ -76,7 +72,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *Event) error {
+func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *outputs.Event) error {
 
 	event.Src_server = publisher.GetServerName(src.Ip)
 	event.Dst_server = publisher.GetServerName(dst.Ip)
@@ -177,64 +173,57 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		INFO("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	for i := 0; i < len(outputTypes); i++ {
-		output, exists := _Config.Output[outputTypes[i]]
-		if exists {
-			switch outputTypes[i] {
-			case ElasticsearchOutputName:
-				if output.Enabled && !publisher.disabled {
-					err := ElasticsearchOutput.Init(output)
-					if err != nil {
-						ERR("Fail to initialize Elasticsearch as output: %s", err)
-						return err
-					}
-					publisher.Output = append(publisher.Output, OutputInterface(&ElasticsearchOutput))
-
-					if output.Save_topology {
-						if publisher.TopologyOutput != nil {
-							ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
-							return errors.New("Multiple outputs defined to store topology")
-						}
-						publisher.TopologyOutput = OutputInterface(&ElasticsearchOutput)
-						INFO("Using Elasticsearch to store the topology")
-					}
-				}
-				break
-
-			case RedisOutputName:
-				if output.Enabled && !publisher.disabled {
-					err := RedisOutput.Init(output)
-					if err != nil {
-						ERR("Fail to initialize Redis as output: %s", err)
-						return err
-					}
-					publisher.Output = append(publisher.Output, OutputInterface(&RedisOutput))
-
-					if output.Save_topology {
-						if publisher.TopologyOutput != nil {
-							ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
-							return errors.New("Multiple outputs defined to store topology")
-						}
-						publisher.TopologyOutput = OutputInterface(&RedisOutput)
-						INFO("Using Redis to store the topology")
-					}
-				}
-				break
-
-			case FileOutputName:
-				if output.Enabled {
-					err := FileOutput.Init(output)
-					if err != nil {
-						ERR("Fail to initialize file output: %s", err)
-						return err
-					}
-					publisher.Output = append(publisher.Output, OutputInterface(&FileOutput))
-
-					// topology saving not supported by this one
-				}
-				break
-			}
+	output, exists := _Config.Output["elasticsearch"]
+	if exists && output.Enabled && !publisher.disabled {
+		err := publisher.ElasticsearchOutput.Init(output,
+			_Config.Agent.Topology_expire)
+		if err != nil {
+			ERR("Fail to initialize Elasticsearch as output: %s", err)
+			return err
 		}
+		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.ElasticsearchOutput))
+
+		if output.Save_topology {
+			if publisher.TopologyOutput != nil {
+				ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+				return errors.New("Multiple outputs defined to store topology")
+			}
+			publisher.TopologyOutput = outputs.OutputInterface(&publisher.ElasticsearchOutput)
+			INFO("Using Elasticsearch to store the topology")
+		}
+	}
+
+	output, exists = _Config.Output["redis"]
+	if exists && output.Enabled && !publisher.disabled {
+		DEBUG("publish", "REDIS publisher enabled")
+		err := publisher.RedisOutput.Init(output,
+			_Config.Agent.Topology_expire)
+		if err != nil {
+			ERR("Fail to initialize Redis as output: %s", err)
+			return err
+		}
+		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.RedisOutput))
+
+		if output.Save_topology {
+			if publisher.TopologyOutput != nil {
+				ERR("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+				return errors.New("Multiple outputs defined to store topology")
+			}
+			publisher.TopologyOutput = outputs.OutputInterface(&publisher.RedisOutput)
+			INFO("Using Redis to store the topology")
+		}
+	}
+
+	output, exists = _Config.Output["file"]
+	if exists && output.Enabled {
+		err := publisher.FileOutput.Init(output)
+		if err != nil {
+			ERR("Fail to initialize file output: %s", err)
+			return err
+		}
+		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.FileOutput))
+
+		// topology saving not supported by this one
 	}
 
 	if !publisher.disabled {

@@ -1,6 +1,6 @@
 // +build !windows
 
-package log
+package main
 
 import (
 	"fmt"

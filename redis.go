@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -568,7 +569,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
 
-	event := Event{}
+	event := outputs.Event{}
 	event.Type = "redis"
 	if !t.IsError {
 		event.Status = OK_STATUS
@@ -578,7 +579,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 	event.ResponseTime = t.ResponseTime
 	event.RequestRaw = t.Request_raw
 	event.ResponseRaw = t.Response_raw
-	event.Redis = t.Redis
+	event.Redis = outputs.MapStr(t.Redis)
 	event.Method = strings.ToUpper(t.Method)
 	event.Path = t.Path
 	event.Query = t.Query

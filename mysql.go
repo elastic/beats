@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"packetbeat/outputs"
 	"strings"
 	"time"
 )
@@ -621,7 +622,7 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
 
-	event := Event{}
+	event := outputs.Event{}
 	event.Type = "mysql"
 
 	if t.Mysql["iserror"].(bool) {
@@ -635,7 +636,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event.ResponseRaw = t.Response_raw
 	event.Method = t.Method
 	event.Query = t.Query
-	event.Mysql = t.Mysql
+	event.Mysql = outputs.MapStr(t.Mysql)
 	event.Path = t.Path
 	event.BytesOut = t.Size
 

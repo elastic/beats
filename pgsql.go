@@ -1,6 +1,7 @@
 package main
 
 import (
+	"packetbeat/outputs"
 	"strings"
 	"time"
 )
@@ -760,7 +761,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 
 func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
 
-	event := Event{}
+	event := outputs.Event{}
 
 	event.Type = "pgsql"
 	if t.Pgsql["iserror"].(bool) {
@@ -774,7 +775,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 	event.Query = t.Query
 	event.Method = t.Method
 	event.BytesOut = t.Size
-	event.Pgsql = t.Pgsql
+	event.Pgsql = outputs.MapStr(t.Pgsql)
 
 	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }

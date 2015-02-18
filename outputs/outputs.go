@@ -42,7 +42,7 @@ type Event struct {
 	Thrift MapStr `json:"thrift"`
 }
 
-type tomlMothership struct {
+type MothershipConfig struct {
 	Enabled            bool
 	Save_topology      bool
 	Host               string

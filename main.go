@@ -16,6 +16,9 @@ import (
 	"syscall"
 	"time"
 
+	"packetbeat/logp"
+	"packetbeat/outputs"
+
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
 	"github.com/packetbeat/gopacket/pcap"
@@ -50,7 +53,7 @@ type tomlConfig struct {
 	RunOptions tomlRunOptions
 	Protocols  map[string]tomlProtocol
 	Procs      tomlProcs
-	Output     map[string]tomlMothership
+	Output     map[string]outputs.MothershipConfig
 	Agent      tomlAgent
 	Logging    tomlLogging
 	Passwords  tomlPasswords
@@ -202,6 +205,7 @@ func main() {
 		debugSelectors = _Config.Logging.Selectors
 	}
 	LogInit(logLevel, "", !*toStdout, debugSelectors)
+	logp.LogInit(logp.Priority(logLevel), "", !*toStdout, debugSelectors)
 
 	if !IS_DEBUG("stdlog") {
 		// disable standard logging by default

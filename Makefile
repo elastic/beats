@@ -44,7 +44,7 @@ gofmt:
 
 .PHONY: test
 test:
-	go test -short
+	go test -short ./...
 	make -C tests test
 
 .PHONY: testlong
@@ -55,12 +55,12 @@ testlong:
 
 .PHONY: cover
 cover:
-	go test -short -coverprofile=coverage.out
+	go test -short -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 
 .PHONY: benchmark
 benchmark:
-	go test -short -bench=.
+	go test -short -bench=. ./...
 
 .PHONY: clean
 clean:
