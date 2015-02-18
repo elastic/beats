@@ -7,12 +7,10 @@ services:
     - redis-server
     - elasticsearch
 
-before_script:
-    - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/packetbeat
-
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq libpcap-dev python-virtualenv geoip-database
+    - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/packetbeat
 
 install:
     - make deps
