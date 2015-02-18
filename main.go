@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"packetbeat/inputs/sniffer"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 
@@ -28,7 +29,7 @@ const Version = "0.4.3"
 
 // Structure grouping main components/modules
 type PacketbeatStruct struct {
-	Sniffer *SnifferSetup
+	Sniffer *sniffer.SnifferSetup
 	Decoder *DecoderStruct
 }
 
@@ -49,7 +50,7 @@ const (
 var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql", "thrift"}
 
 type tomlConfig struct {
-	Interfaces tomlInterfaces
+	Interfaces sniffer.InterfacesConfig
 	RunOptions tomlRunOptions
 	Protocols  map[string]tomlProtocol
 	Procs      tomlProcs
@@ -212,7 +213,7 @@ func main() {
 	}
 
 	_Config.Interfaces.Bpf_filter = configToFilter(&_Config)
-	Packetbeat.Sniffer, err = CreateSniffer(&_Config.Interfaces, file)
+	Packetbeat.Sniffer, err = sniffer.CreateSniffer(&_Config.Interfaces, file)
 	if err != nil {
 		logp.Critical("Error creating sniffer: %s", err)
 		return

@@ -1,4 +1,4 @@
-package main
+package sniffer
 
 import (
 	"fmt"
@@ -15,12 +15,12 @@ type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
 	afpacketHandle *AfpacketHandle
 	pfringHandle   *PfringHandle
-	config         *tomlInterfaces
+	config         *InterfacesConfig
 
 	DataSource gopacket.PacketDataSource
 }
 
-type tomlInterfaces struct {
+type InterfacesConfig struct {
 	Device         string
 	Devices        []string
 	Type           string
@@ -55,7 +55,7 @@ func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
 	return frame_size, block_size, num_blocks, nil
 }
 
-func CreateSniffer(config *tomlInterfaces, file *string) (*SnifferSetup, error) {
+func CreateSniffer(config *InterfacesConfig, file *string) (*SnifferSetup, error) {
 	var sniffer SnifferSetup
 	var err error
 

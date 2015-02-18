@@ -1,6 +1,6 @@
 // +build linux,havepfring
 
-package main
+package sniffer
 
 import (
 	"fmt"
