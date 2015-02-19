@@ -1,6 +1,7 @@
 package main
 
 import (
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
@@ -48,7 +49,7 @@ type PgsqlTransaction struct {
 	Method       string
 	Size         uint64
 
-	Pgsql MapStr
+	Pgsql common.MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -701,7 +702,7 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 
-		trans.Pgsql = MapStr{}
+		trans.Pgsql = common.MapStr{}
 		trans.Query = query
 		trans.Method = getQueryMethod(query)
 
@@ -735,7 +736,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 		return
 	}
 
-	trans.Pgsql.Update(MapStr{
+	trans.Pgsql.Update(common.MapStr{
 		"iserror":        msg.IsError,
 		"num_rows":       msg.NumberOfRows,
 		"num_fields":     msg.NumberOfFields,
@@ -776,7 +777,7 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 	event.Query = t.Query
 	event.Method = t.Method
 	event.BytesOut = t.Size
-	event.Pgsql = outputs.MapStr(t.Pgsql)
+	event.Pgsql = t.Pgsql
 
 	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
 }

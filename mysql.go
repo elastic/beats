@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
@@ -62,7 +63,7 @@ type MysqlTransaction struct {
 	Path         string // for mysql, Path refers to the mysql table queried
 	Size         uint64
 
-	Mysql MapStr
+	Mysql common.MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -423,7 +424,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 	trans.Query = query
 	trans.Method = method
 
-	trans.Mysql = MapStr{}
+	trans.Mysql = common.MapStr{}
 
 	// save Raw message
 	trans.Request_raw = msg.Query
@@ -448,7 +449,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 
 	}
 	// save json details
-	trans.Mysql.Update(MapStr{
+	trans.Mysql.Update(common.MapStr{
 		"affected_rows": msg.AffectedRows,
 		"insert_id":     msg.InsertId,
 		"num_rows":      msg.NumberOfRows,
@@ -637,7 +638,7 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event.ResponseRaw = t.Response_raw
 	event.Method = t.Method
 	event.Query = t.Query
-	event.Mysql = outputs.MapStr(t.Mysql)
+	event.Mysql = t.Mysql
 	event.Path = t.Path
 	event.BytesOut = t.Size
 

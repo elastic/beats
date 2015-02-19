@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strconv"
@@ -990,14 +991,14 @@ func (thrift *Thrift) publishTransactions() {
 			event.Status = OK_STATUS
 		}
 		event.ResponseTime = t.ResponseTime
-		event.Thrift = outputs.MapStr{}
+		event.Thrift = common.MapStr{}
 
 		if t.Request != nil {
 			event.Method = t.Request.Method
 			event.Path = t.Request.Service
 			event.Query = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
 			event.BytesIn = uint64(t.Request.FrameSize)
-			event.Thrift = outputs.MapStr{
+			event.Thrift = common.MapStr{
 				"params":  t.Request.Params,
 				"service": t.Request.Service,
 			}

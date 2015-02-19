@@ -1,8 +1,9 @@
 package outputs
 
-import "time"
-
-type MapStr map[string]interface{}
+import (
+	"packetbeat/common"
+	"time"
+)
 
 type OutputInterface interface {
 	PublishIPs(name string, localAddrs []string) error
@@ -35,11 +36,11 @@ type Event struct {
 	BytesOut     uint64    `json:"bytes_out"`
 	BytesIn      uint64    `json:"bytes_in"`
 
-	Mysql  MapStr `json:"mysql"`
-	Http   MapStr `json:"http"`
-	Redis  MapStr `json:"redis"`
-	Pgsql  MapStr `json:"pgsql"`
-	Thrift MapStr `json:"thrift"`
+	Mysql  common.MapStr `json:"mysql"`
+	Http   common.MapStr `json:"http"`
+	Redis  common.MapStr `json:"redis"`
+	Pgsql  common.MapStr `json:"pgsql"`
+	Thrift common.MapStr `json:"thrift"`
 }
 
 type MothershipConfig struct {

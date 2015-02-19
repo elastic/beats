@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strconv"
@@ -80,7 +81,7 @@ type HttpTransaction struct {
 	Method       string
 	RequestUri   string
 
-	Http MapStr
+	Http common.MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -615,13 +616,13 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans.Method = msg.Method
 	trans.RequestUri = msg.RequestUri
 
-	trans.Http = MapStr{}
+	trans.Http = common.MapStr{}
 
 	if http.Send_headers {
 		if !http.Split_cookie {
 			trans.Http["request_headers"] = msg.Headers
 		} else {
-			hdrs := MapStr{}
+			hdrs := common.MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
 				if hdr_name == "cookie" {
 					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
@@ -666,7 +667,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		return
 	}
 
-	response := MapStr{
+	response := common.MapStr{
 		"phrase":         msg.StatusPhrase,
 		"code":           msg.StatusCode,
 		"content_length": msg.ContentLength,
@@ -676,7 +677,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		if !http.Split_cookie {
 			response["response_headers"] = msg.Headers
 		} else {
-			hdrs := MapStr{}
+			hdrs := common.MapStr{}
 			for hdr_name, hdr_val := range msg.Headers {
 				if hdr_name == "set-cookie" {
 					hdrs[hdr_name] = splitCookiesHeader(hdr_val)
@@ -735,7 +736,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	if http.Send_response {
 		event.ResponseRaw = t.Response_raw
 	}
-	event.Http = outputs.MapStr(t.Http)
+	event.Http = t.Http
 	event.Real_ip = t.Real_ip
 	event.Method = t.Method
 	event.Path = t.RequestUri

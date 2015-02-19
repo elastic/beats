@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strconv"
@@ -54,7 +55,7 @@ type RedisTransaction struct {
 	BytesOut     int
 	BytesIn      int
 
-	Redis MapStr
+	Redis common.MapStr
 
 	Request_raw  string
 	Response_raw string
@@ -488,7 +489,7 @@ func receivedRedisRequest(msg *RedisMessage) {
 		redisTransactionsMap[tuple.raw] = trans
 	}
 
-	trans.Redis = MapStr{}
+	trans.Redis = common.MapStr{}
 	trans.Method = msg.Method
 	trans.Path = msg.Path
 	trans.Query = msg.Message
@@ -580,7 +581,7 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 	event.ResponseTime = t.ResponseTime
 	event.RequestRaw = t.Request_raw
 	event.ResponseRaw = t.Response_raw
-	event.Redis = outputs.MapStr(t.Redis)
+	event.Redis = common.MapStr(t.Redis)
 	event.Method = strings.ToUpper(t.Method)
 	event.Path = t.Path
 	event.Query = t.Query
