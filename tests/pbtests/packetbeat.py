@@ -68,4 +68,4 @@ class TestCase(unittest.TestCase):
         # update the last_run link
         if os.path.islink("last_run"):
             os.unlink("last_run")
-        os.symlink("run/{}".format(self.id()), "last_run")
+        os.symlink("run/%d".format(self.id()), "last_run")
