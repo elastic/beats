@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const RotatorMaxFiles = 1000
@@ -62,7 +64,7 @@ func (out *FileOutputType) UpdateLocalTopologyMap() {
 	// not supported by this output type
 }
 
-func (out *FileOutputType) PublishEvent(event *Event) error {
+func (out *FileOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {

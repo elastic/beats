@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
@@ -40,7 +41,7 @@ type Topology struct {
 	Ip   string `json:"ip"`
 }
 
-func PrintPublishEvent(event *outputs.Event) {
+func PrintPublishEvent(event common.MapStr) {
 	json, err := json.MarshalIndent(event, "", "  ")
 	if err != nil {
 		logp.Err("json.Marshal: %s", err)
@@ -73,41 +74,43 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event *outputs.Event) error {
+func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event common.MapStr) error {
 
-	event.Src_server = publisher.GetServerName(src.Ip)
-	event.Dst_server = publisher.GetServerName(dst.Ip)
+	src_server := publisher.GetServerName(src.Ip)
+	dst_server := publisher.GetServerName(dst.Ip)
 
-	if _Config.Agent.Ignore_outgoing && event.Dst_server != "" &&
-		event.Dst_server != publisher.name {
+	if _Config.Agent.Ignore_outgoing && dst_server != "" &&
+		dst_server != publisher.name {
 		// duplicated transaction -> ignore it
-		logp.Debug("publish", "Ignore duplicated REDIS transaction on %s: %s -> %s", publisher.name, event.Src_server, event.Dst_server)
+		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
 		return nil
 	}
+	event["client_server"] = src_server
+	event["server"] = dst_server
 
-	event.Timestamp = ts
-	event.Agent = publisher.name
-	event.Src_ip = src.Ip
-	event.Src_port = src.Port
-	event.Src_proc = src.Proc
-	event.Dst_ip = dst.Ip
-	event.Dst_port = dst.Port
-	event.Dst_proc = dst.Proc
-	event.Tags = publisher.tags
+	event["timestamp"] = ts
+	event["agent"] = publisher.name
+	event["client_ip"] = src.Ip
+	event["client_port"] = src.Port
+	event["client_proc"] = src.Proc
+	event["ip"] = dst.Ip
+	event["port"] = dst.Port
+	event["proc"] = dst.Proc
+	event["tags"] = publisher.tags
 
-	event.Src_country = ""
+	event["country"] = ""
 	if _GeoLite != nil {
-		if len(event.Real_ip) > 0 {
-			loc := _GeoLite.GetLocationByIP(event.Real_ip)
+		real_ip, exists := event["real_ip"]
+		if exists && len(real_ip.(string)) > 0 {
+			loc := _GeoLite.GetLocationByIP(real_ip.(string))
 			if loc != nil {
-				event.Src_country = loc.CountryCode
+				event["country"] = loc.CountryCode
 			}
 		} else {
-			// set src_country if no src_server is set
-			if len(event.Src_server) == 0 { // only for external IP addresses
+			if len(src_server) == 0 { // only for external IP addresses
 				loc := _GeoLite.GetLocationByIP(src.Ip)
 				if loc != nil {
-					event.Src_country = loc.CountryCode
+					event["country"] = loc.CountryCode
 				}
 			}
 		}
@@ -121,7 +124,7 @@ func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *E
 	has_error := false
 	if !publisher.disabled {
 		for i := 0; i < len(publisher.Output); i++ {
-			err := publisher.Output[i].PublishEvent(event)
+			err := publisher.Output[i].PublishEvent(ts, event)
 			if err != nil {
 				logp.Err("Fail to publish event type on output %s: %s", publisher.Output, err)
 				has_error = true

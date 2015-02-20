@@ -3,7 +3,6 @@ package main
 import (
 	"packetbeat/common"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strings"
 	"time"
 )
@@ -763,23 +762,23 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 
 func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) error {
 
-	event := outputs.Event{}
+	event := common.MapStr{}
 
-	event.Type = "pgsql"
+	event["type"] = "pgsql"
 	if t.Pgsql["iserror"].(bool) {
-		event.Status = ERROR_STATUS
+		event["status"] = ERROR_STATUS
 	} else {
-		event.Status = OK_STATUS
+		event["status"] = OK_STATUS
 	}
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Query = t.Query
-	event.Method = t.Method
-	event.BytesOut = t.Size
-	event.Pgsql = t.Pgsql
+	event["response_time"] = t.ResponseTime
+	event["tequest_raw"] = t.Request_raw
+	event["response_raw"] = t.Response_raw
+	event["query"] = t.Query
+	event["method"] = t.Method
+	event["bytes_out"] = t.Size
+	event["pgsql"] = t.Pgsql
 
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
 }
 
 func (trans *PgsqlTransaction) Expire() {

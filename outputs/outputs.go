@@ -8,39 +8,7 @@ import (
 type OutputInterface interface {
 	PublishIPs(name string, localAddrs []string) error
 	GetNameByIP(ip string) string
-	PublishEvent(event *Event) error
-}
-
-type Event struct {
-	Timestamp    time.Time `json:"timestamp"`
-	Type         string    `json:"type"`
-	Method       string    `json:"method"`
-	Query        string    `json:"query"`
-	Path         string    `json:"path"`
-	Agent        string    `json:"agent"`
-	Src_ip       string    `json:"client_ip"`
-	Src_port     uint16    `json:"client_port"`
-	Src_proc     string    `json:"client_proc"`
-	Real_ip      string    `json:"real_ip"`
-	Src_country  string    `json:"country"`
-	Src_server   string    `json:"client_server"`
-	Dst_ip       string    `json:"ip"`
-	Dst_port     uint16    `json:"port"`
-	Dst_proc     string    `json:"proc"`
-	Dst_server   string    `json:"server"`
-	ResponseTime int32     `json:"responsetime"`
-	Status       string    `json:"status"`
-	RequestRaw   string    `json:"request_raw"`
-	ResponseRaw  string    `json:"response_raw"`
-	Tags         string    `json:"tags"`
-	BytesOut     uint64    `json:"bytes_out"`
-	BytesIn      uint64    `json:"bytes_in"`
-
-	Mysql  common.MapStr `json:"mysql"`
-	Http   common.MapStr `json:"http"`
-	Redis  common.MapStr `json:"redis"`
-	Pgsql  common.MapStr `json:"pgsql"`
-	Thrift common.MapStr `json:"thrift"`
+	PublishEvent(ts time.Time, event common.MapStr) error
 }
 
 type MothershipConfig struct {

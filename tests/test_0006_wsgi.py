@@ -57,8 +57,8 @@ class Test(TestCase):
 
         objs = self.read_output()
         assert len(objs) == 1
-        assert objs[0]["request_raw"] == ""
-        assert objs[0]["response_raw"] == ""
+        assert "request_raw" not in objs[0]
+        assert "response_raw" not in objs[0]
 
     def test_include_body_for(self):
         self.render_config_template(

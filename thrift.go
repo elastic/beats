@@ -7,7 +7,6 @@ import (
 	"math"
 	"packetbeat/common"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -982,52 +981,55 @@ func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
 
 func (thrift *Thrift) publishTransactions() {
 	for t := range thrift.PublishQueue {
-		event := outputs.Event{}
+		event := common.MapStr{}
 
-		event.Type = "thrift"
+		event["type"] = "thrift"
 		if t.Reply != nil && t.Reply.HasException {
-			event.Status = ERROR_STATUS
+			event["Status"] = ERROR_STATUS
 		} else {
-			event.Status = OK_STATUS
+			event["Status"] = OK_STATUS
 		}
-		event.ResponseTime = t.ResponseTime
-		event.Thrift = common.MapStr{}
+		event["response_time"] = t.ResponseTime
+		thriftmap := common.MapStr{}
 
 		if t.Request != nil {
-			event.Method = t.Request.Method
-			event.Path = t.Request.Service
-			event.Query = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
-			event.BytesIn = uint64(t.Request.FrameSize)
-			event.Thrift = common.MapStr{
+			event["method"] = t.Request.Method
+			event["path"] = t.Request.Service
+			event["query"] = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
+			event["bytes_in"] = uint64(t.Request.FrameSize)
+			thriftmap = common.MapStr{
 				"params":  t.Request.Params,
 				"service": t.Request.Service,
 			}
 
 			if thrift.Send_request {
-				event.RequestRaw = fmt.Sprintf("%s%s", t.Request.Method,
+				event["request_raw"] = fmt.Sprintf("%s%s", t.Request.Method,
 					t.Request.Params)
 			}
 		}
 
 		if t.Reply != nil {
-			event.Thrift["return_value"] = t.Reply.ReturnValue
+			thriftmap["return_value"] = t.Reply.ReturnValue
 			if len(t.Reply.Exceptions) > 0 {
-				event.Thrift["exceptions"] = t.Reply.Exceptions
+				thriftmap["exceptions"] = t.Reply.Exceptions
 			}
-			event.BytesOut = uint64(t.Reply.FrameSize)
+			event["bytes_out"] = uint64(t.Reply.FrameSize)
 
 			if thrift.Send_response {
 				if !t.Reply.HasException {
-					event.ResponseRaw = t.Reply.ReturnValue
+					event["response_raw"] = t.Reply.ReturnValue
 				} else {
-					event.ResponseRaw = fmt.Sprintf("Exceptions: %s",
+					event["response_raw"] = fmt.Sprintf("Exceptions: %s",
 						t.Reply.Exceptions)
 				}
 			}
+		} else {
+			event["bytes_out"] = 0
 		}
+		event["thrift"] = thriftmap
 
 		if thrift.Publisher != nil {
-			thrift.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+			thrift.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
 		}
 
 		logp.Debug("thrift", "Published event")

@@ -58,7 +58,6 @@ class Test(TestCase):
 
         # request_raw and response_raw are present by default
         assert all([len(o["request_raw"]) > 0 for o in objs])
-        assert all(["response_raw" in o for o in objs])
         assert objs[0]["request_raw"] == "ping()"
         assert objs[11]["response_raw"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
@@ -180,7 +179,7 @@ class Test(TestCase):
         objs = self.read_output()
 
         assert all([len(o["request_raw"]) > 0 for o in objs])
-        assert all([o["response_raw"] == "" for o in objs])
+        assert all(["response_raw" not in o for o in objs])
 
         # send_request=false send_response=false
         self.render_config_template(
@@ -195,8 +194,8 @@ class Test(TestCase):
 
         objs = self.read_output()
 
-        assert all([o["request_raw"] == "" for o in objs])
-        assert all([o["response_raw"] == "" for o in objs])
+        assert all(["request_raw" not in o for o in objs])
+        assert all(["response_raw" not in o for o in objs])
 
     def test_thrift_binary(self):
         self.render_config_template(

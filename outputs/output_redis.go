@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"strings"
 	"time"
@@ -288,7 +289,7 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 	logp.Debug("output_redis", "Topology %s", TopologyMapTmp)
 }
 
-func (out *RedisOutputType) PublishEvent(event *Event) error {
+func (out *RedisOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {

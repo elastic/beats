@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"packetbeat/common"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -720,28 +719,30 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 		return nil
 	}
 
-	event := outputs.Event{}
+	event := common.MapStr{}
 
-	event.Type = "http"
+	event["type"] = "http"
 	code := t.Http["code"].(uint16)
 	if code < 400 {
-		event.Status = OK_STATUS
+		event["status"] = OK_STATUS
 	} else {
-		event.Status = ERROR_STATUS
+		event["status"] = ERROR_STATUS
 	}
-	event.ResponseTime = t.ResponseTime
+	event["responsetime"] = t.ResponseTime
 	if http.Send_request {
-		event.RequestRaw = t.Request_raw
+		event["request_raw"] = t.Request_raw
 	}
 	if http.Send_response {
-		event.ResponseRaw = t.Response_raw
+		event["response_raw"] = t.Response_raw
 	}
-	event.Http = t.Http
-	event.Real_ip = t.Real_ip
-	event.Method = t.Method
-	event.Path = t.RequestUri
+	event["http"] = t.Http
+	if len(t.Real_ip) > 0 {
+		event["real_ip"] = t.Real_ip
+	}
+	event["method"] = t.Method
+	event["path"] = t.RequestUri
 
-	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
 
 }
 

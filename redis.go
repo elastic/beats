@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"packetbeat/common"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strconv"
 	"strings"
 	"time"
@@ -571,22 +570,22 @@ func receivedRedisResponse(msg *RedisMessage) {
 
 func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
 
-	event := outputs.Event{}
-	event.Type = "redis"
+	event := common.MapStr{}
+	event["type"] = "redis"
 	if !t.IsError {
-		event.Status = OK_STATUS
+		event["status"] = OK_STATUS
 	} else {
-		event.Status = ERROR_STATUS
+		event["status"] = ERROR_STATUS
 	}
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Redis = common.MapStr(t.Redis)
-	event.Method = strings.ToUpper(t.Method)
-	event.Path = t.Path
-	event.Query = t.Query
-	event.BytesIn = uint64(t.BytesIn)
-	event.BytesOut = uint64(t.BytesOut)
+	event["response_time"] = t.ResponseTime
+	event["request_raw"] = t.Request_raw
+	event["response_raw"] = t.Response_raw
+	event["redis"] = common.MapStr(t.Redis)
+	event["method"] = strings.ToUpper(t.Method)
+	event["path"] = t.Path
+	event["query"] = t.Query
+	event["bytes_in"] = uint64(t.BytesIn)
+	event["bytes_out"] = uint64(t.BytesOut)
 
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
 }

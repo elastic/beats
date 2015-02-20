@@ -3,8 +3,10 @@ package outputs
 import (
 	"encoding/json"
 	"fmt"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"strings"
+	"time"
 
 	"github.com/packetbeat/elastigo/api"
 	"github.com/packetbeat/elastigo/core"
@@ -140,10 +142,10 @@ func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
 }
 
-func (out *ElasticsearchOutputType) PublishEvent(event *Event) error {
+func (out *ElasticsearchOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, event.Timestamp.Year(), event.Timestamp.Month(), event.Timestamp.Day())
-	_, err := core.Index(index, event.Type, "", nil, event)
+	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, ts.Year(), ts.Month(), ts.Day())
+	_, err := core.Index(index, event["type"].(string), "", nil, event)
 	logp.Debug("output_elasticsearch", "Publish event")
 	return err
 }

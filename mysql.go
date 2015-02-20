@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"packetbeat/common"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strings"
 	"time"
 )
@@ -624,25 +623,25 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
 
-	event := outputs.Event{}
-	event.Type = "mysql"
+	event := common.MapStr{}
+	event["type"] = "mysql"
 
 	if t.Mysql["iserror"].(bool) {
-		event.Status = ERROR_STATUS
+		event["status"] = ERROR_STATUS
 	} else {
-		event.Status = OK_STATUS
+		event["status"] = OK_STATUS
 	}
 
-	event.ResponseTime = t.ResponseTime
-	event.RequestRaw = t.Request_raw
-	event.ResponseRaw = t.Response_raw
-	event.Method = t.Method
-	event.Query = t.Query
-	event.Mysql = t.Mysql
-	event.Path = t.Path
-	event.BytesOut = t.Size
+	event["response_time"] = t.ResponseTime
+	event["request_raw"] = t.Request_raw
+	event["response_raw"] = t.Response_raw
+	event["method"] = t.Method
+	event["query"] = t.Query
+	event["mysql"] = t.Mysql
+	event["path"] = t.Path
+	event["bytes_out"] = t.Size
 
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, &event)
+	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {
