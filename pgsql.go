@@ -31,13 +31,13 @@ type PgsqlMessage struct {
 
 	Direction    uint8
 	Incomplete   bool
-	TcpTuple     TcpTuple
+	TcpTuple     common.TcpTuple
 	CmdlineTuple *CmdlineTuple
 }
 
 type PgsqlTransaction struct {
 	Type         string
-	tuple        TcpTuple
+	tuple        common.TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
 	ResponseTime int32
@@ -80,7 +80,7 @@ const (
 	CancelRequest
 )
 
-var pgsqlTransactionsMap = make(map[HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
+var pgsqlTransactionsMap = make(map[common.HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
 
 func (stream *PgsqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
@@ -647,13 +647,13 @@ func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
 var handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = TcpTuple{
-		ip_length: tcp.tuple.ip_length,
+	m.TcpTuple = common.TcpTuple{
+		Ip_length: tcp.tuple.Ip_length,
 		Src_ip:    tcp.tuple.Src_ip,
 		Dst_ip:    tcp.tuple.Dst_ip,
 		Src_port:  tcp.tuple.Src_port,
 		Dst_port:  tcp.tuple.Dst_port,
-		stream_id: tcp.id,
+		Stream_id: tcp.id,
 	}
 	m.TcpTuple.ComputeHashebles()
 	m.Direction = dir
@@ -676,8 +676,8 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 
 	logp.Debug("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
-	if pgsqlTransactionsMap[tuple.raw] == nil {
-		pgsqlTransactionsMap[tuple.raw] = []*PgsqlTransaction{}
+	if pgsqlTransactionsMap[tuple.Hashable()] == nil {
+		pgsqlTransactionsMap[tuple.Hashable()] = []*PgsqlTransaction{}
 	}
 
 	for _, query := range queries {
@@ -712,14 +712,14 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 		}
 		trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
 
-		pgsqlTransactionsMap[tuple.raw] = append(pgsqlTransactionsMap[tuple.raw], trans)
+		pgsqlTransactionsMap[tuple.Hashable()] = append(pgsqlTransactionsMap[tuple.Hashable()], trans)
 	}
 }
 
 func receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	tuple := msg.TcpTuple
-	trans_list := pgsqlTransactionsMap[tuple.raw]
+	trans_list := pgsqlTransactionsMap[tuple.Hashable()]
 
 	if trans_list == nil || len(trans_list) == 0 {
 		logp.Warn("Response from unknown transaction. Ignoring.")
@@ -784,26 +784,26 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 func (trans *PgsqlTransaction) Expire() {
 	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
 	// remove from map
-	for i, t := range pgsqlTransactionsMap[trans.tuple.raw] {
+	for i, t := range pgsqlTransactionsMap[trans.tuple.Hashable()] {
 		if t == trans {
 			removePgsqlTransaction(trans.tuple, i)
 			break
 		}
 	}
-	if len(pgsqlTransactionsMap[trans.tuple.raw]) == 0 {
-		delete(pgsqlTransactionsMap, trans.tuple.raw)
+	if len(pgsqlTransactionsMap[trans.tuple.Hashable()]) == 0 {
+		delete(pgsqlTransactionsMap, trans.tuple.Hashable())
 	}
 }
 
-func removePgsqlTransaction(tuple TcpTuple, index int) *PgsqlTransaction {
+func removePgsqlTransaction(tuple common.TcpTuple, index int) *PgsqlTransaction {
 
-	trans_list := pgsqlTransactionsMap[tuple.raw]
+	trans_list := pgsqlTransactionsMap[tuple.Hashable()]
 	trans := trans_list[index]
 	trans_list = append(trans_list[:index], trans_list[index+1:]...)
 	if len(trans_list) == 0 {
-		delete(pgsqlTransactionsMap, trans.tuple.raw)
+		delete(pgsqlTransactionsMap, trans.tuple.Hashable())
 	} else {
-		pgsqlTransactionsMap[tuple.raw] = trans_list
+		pgsqlTransactionsMap[tuple.Hashable()] = trans_list
 	}
 
 	return trans

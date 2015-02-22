@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ const MaxIpPortTupleRawSize = 16 + 16 + 2 + 2
 type HashableIpPortTuple [MaxIpPortTupleRawSize]byte
 
 type IpPortTuple struct {
-	ip_length          int
+	Ip_length          int
 	Src_ip, Dst_ip     net.IP
 	Src_port, Dst_port uint16
 
@@ -28,7 +28,7 @@ func NewIpPortTuple(ip_length int, src_ip net.IP, src_port uint16,
 	dst_ip net.IP, dst_port uint16) IpPortTuple {
 
 	tuple := IpPortTuple{
-		ip_length: ip_length,
+		Ip_length: ip_length,
 		Src_ip:    src_ip,
 		Dst_ip:    dst_ip,
 		Src_port:  src_port,
@@ -59,27 +59,39 @@ func (t *IpPortTuple) String() string {
 		t.Dst_port)
 }
 
+// Hashable returns a hashable value that uniquely identifies
+// the IP-port tuple.
+func (t *IpPortTuple) Hashable() HashableIpPortTuple {
+	return t.raw
+}
+
+// Hashable returns a hashable value that uniquely identifies
+// the IP-port tuple after swapping the source and destination.
+func (t *IpPortTuple) RevHashable() HashableIpPortTuple {
+	return t.revRaw
+}
+
 const MaxTcpTupleRawSize = 16 + 16 + 2 + 2 + 4
 
 type HashableTcpTuple [MaxTcpTupleRawSize]byte
 
 type TcpTuple struct {
-	ip_length          int
+	Ip_length          int
 	Src_ip, Dst_ip     net.IP
 	Src_port, Dst_port uint16
-	stream_id          uint32
+	Stream_id          uint32
 
 	raw HashableTcpTuple // Src_ip:Src_port:Dst_ip:Dst_port:stream_id
 }
 
 func TcpTupleFromIpPort(t *IpPortTuple, tcp_id uint32) TcpTuple {
 	tuple := TcpTuple{
-		ip_length: t.ip_length,
+		Ip_length: t.Ip_length,
 		Src_ip:    t.Src_ip,
 		Dst_ip:    t.Dst_ip,
 		Src_port:  t.Src_port,
 		Dst_port:  t.Dst_port,
-		stream_id: tcp_id,
+		Stream_id: tcp_id,
 	}
 	tuple.ComputeHashebles()
 
@@ -91,8 +103,8 @@ func (t *TcpTuple) ComputeHashebles() {
 	copy(t.raw[16:18], []byte{byte(t.Src_port >> 8), byte(t.Src_port)})
 	copy(t.raw[18:34], t.Dst_ip)
 	copy(t.raw[34:36], []byte{byte(t.Dst_port >> 8), byte(t.Dst_port)})
-	copy(t.raw[36:40], []byte{byte(t.stream_id >> 24), byte(t.stream_id >> 16),
-		byte(t.stream_id >> 8), byte(t.stream_id)})
+	copy(t.raw[36:40], []byte{byte(t.Stream_id >> 24), byte(t.Stream_id >> 16),
+		byte(t.Stream_id >> 8), byte(t.Stream_id)})
 }
 
 func (t TcpTuple) String() string {
@@ -101,5 +113,11 @@ func (t TcpTuple) String() string {
 		t.Src_port,
 		t.Dst_ip.String(),
 		t.Dst_port,
-		t.stream_id)
+		t.Stream_id)
+}
+
+// Hashable() returns a hashable value that uniquely identifies
+// the TCP tuple.
+func (t *TcpTuple) Hashable() HashableTcpTuple {
+	return t.raw
 }

@@ -43,14 +43,14 @@ type MysqlMessage struct {
 
 	Direction    uint8
 	IsTruncated  bool
-	TcpTuple     TcpTuple
+	TcpTuple     common.TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Raw          []byte
 }
 
 type MysqlTransaction struct {
 	Type         string
-	tuple        TcpTuple
+	tuple        common.TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
 	ResponseTime int32
@@ -94,7 +94,7 @@ const (
 	MysqlStateEatRows
 )
 
-var mysqlTransactionsMap = make(map[HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
+var mysqlTransactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
 
 func (stream *MysqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
@@ -365,7 +365,7 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
 var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 	m.Raw = raw_msg
@@ -382,14 +382,14 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
-	trans := mysqlTransactionsMap[tuple.raw]
+	trans := mysqlTransactionsMap[tuple.Hashable()]
 	if trans != nil {
 		if trans.Mysql != nil {
 			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
-		mysqlTransactionsMap[tuple.raw] = trans
+		mysqlTransactionsMap[tuple.Hashable()] = trans
 	}
 
 	trans.ts = msg.Ts
@@ -436,7 +436,7 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 
 func receivedMysqlResponse(msg *MysqlMessage) {
 	tuple := msg.TcpTuple
-	trans := mysqlTransactionsMap[tuple.raw]
+	trans := mysqlTransactionsMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -478,7 +478,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 	logp.Debug("mysql", "%s", trans.Response_raw)
 
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple.raw)
+	delete(mysqlTransactionsMap, trans.tuple.Hashable())
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
@@ -487,7 +487,7 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 func (trans *MysqlTransaction) Expire() {
 	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple.raw)
+	delete(mysqlTransactionsMap, trans.tuple.Hashable())
 }
 
 func dumpInCSVFormat(fields []string, rows [][]string) string {

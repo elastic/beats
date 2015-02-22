@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"net"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"testing"
 )
@@ -573,9 +574,9 @@ func expectThriftTransaction(t *testing.T, thrift Thrift) *ThriftTransaction {
 	return nil
 }
 
-func testIpPortTuple() *IpPortTuple {
-	t := &IpPortTuple{
-		ip_length: 4,
+func testIpPortTuple() *common.IpPortTuple {
+	t := &common.IpPortTuple{
+		Ip_length: 4,
 		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
 		Src_port: 9200, Dst_port: 9201,
 	}

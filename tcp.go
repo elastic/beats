@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"strings"
 	"time"
@@ -25,13 +26,13 @@ const (
 
 type Packet struct {
 	ts      time.Time
-	tuple   IpPortTuple
+	tuple   common.IpPortTuple
 	payload []byte
 }
 
 type TcpStream struct {
 	id       uint32
-	tuple    *IpPortTuple
+	tuple    *common.IpPortTuple
 	timer    *time.Timer
 	protocol protocolType
 
@@ -66,10 +67,10 @@ type tomlProtocol struct {
 	Send_response bool
 }
 
-var tcpStreamsMap = make(map[HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
+var tcpStreamsMap = make(map[common.HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
 var tcpPortMap map[uint16]protocolType
 
-func decideProtocol(tuple *IpPortTuple) protocolType {
+func decideProtocol(tuple *common.IpPortTuple) protocolType {
 	protocol, exists := tcpPortMap[tuple.Src_port]
 	if exists {
 		return protocol
@@ -140,7 +141,7 @@ func (stream *TcpStream) Expire() {
 	logp.Debug("mem", "Tcp stream expired")
 
 	// de-register from dict
-	delete(tcpStreamsMap, stream.tuple.raw)
+	delete(tcpStreamsMap, stream.tuple.Hashable())
 
 	// nullify to help the GC
 	stream.httpData = [2]*HttpStream{nil, nil}
@@ -158,11 +159,11 @@ func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 }
 
 func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
-	stream, exists := tcpStreamsMap[pkt.tuple.raw]
+	stream, exists := tcpStreamsMap[pkt.tuple.Hashable()]
 	var original_dir uint8 = TcpDirectionOriginal
 	created := false
 	if !exists {
-		stream, exists = tcpStreamsMap[pkt.tuple.revRaw]
+		stream, exists = tcpStreamsMap[pkt.tuple.RevHashable()]
 		if !exists {
 			protocol := decideProtocol(&pkt.tuple)
 			if protocol == UnknownProtocol {
@@ -173,7 +174,7 @@ func FollowTcp(tcphdr *layers.TCP, pkt *Packet) {
 
 			// create
 			stream = &TcpStream{id: GetId(), tuple: &pkt.tuple, protocol: protocol}
-			tcpStreamsMap[pkt.tuple.raw] = stream
+			tcpStreamsMap[pkt.tuple.Hashable()] = stream
 			created = true
 		} else {
 			original_dir = TcpDirectionReverse
@@ -326,14 +327,14 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 
 			packet.tuple.Src_ip = decoder.ip4.SrcIP
 			packet.tuple.Dst_ip = decoder.ip4.DstIP
-			packet.tuple.ip_length = 4
+			packet.tuple.Ip_length = 4
 
 		case layers.LayerTypeIPv6:
 			logp.Debug("ip", "IPv6 packet")
 
 			packet.tuple.Src_ip = decoder.ip6.SrcIP
 			packet.tuple.Dst_ip = decoder.ip6.DstIP
-			packet.tuple.ip_length = 16
+			packet.tuple.Ip_length = 16
 
 		case layers.LayerTypeTCP:
 			logp.Debug("ip", "TCP packet")

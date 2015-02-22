@@ -14,7 +14,7 @@ type RedisMessage struct {
 	NumberOfBulks int64
 	Bulks         []string
 
-	TcpTuple     TcpTuple
+	TcpTuple     common.TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Direction    uint8
 
@@ -39,7 +39,7 @@ type RedisStream struct {
 
 type RedisTransaction struct {
 	Type         string
-	tuple        TcpTuple
+	tuple        common.TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
 	ResponseTime int32
@@ -224,7 +224,7 @@ var RedisCommands = map[string]struct{}{
 	"ZUNIONSTORE":      struct{}{},
 }
 
-var redisTransactionsMap = make(map[HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
+var redisTransactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
 
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
@@ -463,7 +463,7 @@ func isRedisCommand(key string) bool {
 func handleRedis(m *RedisMessage, tcp *TcpStream,
 	dir uint8) {
 
-	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 
@@ -478,14 +478,14 @@ func receivedRedisRequest(msg *RedisMessage) {
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
-	trans := redisTransactionsMap[tuple.raw]
+	trans := redisTransactionsMap[tuple.Hashable()]
 	if trans != nil {
 		if trans.Redis != nil {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
-		redisTransactionsMap[tuple.raw] = trans
+		redisTransactionsMap[tuple.Hashable()] = trans
 	}
 
 	trans.Redis = common.MapStr{}
@@ -523,13 +523,13 @@ func receivedRedisRequest(msg *RedisMessage) {
 func (trans *RedisTransaction) Expire() {
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple.raw)
+	delete(redisTransactionsMap, trans.tuple.Hashable())
 }
 
 func receivedRedisResponse(msg *RedisMessage) {
 
 	tuple := msg.TcpTuple
-	trans := redisTransactionsMap[tuple.raw]
+	trans := redisTransactionsMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -561,7 +561,7 @@ func receivedRedisResponse(msg *RedisMessage) {
 	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple.raw)
+	delete(redisTransactionsMap, trans.tuple.Hashable())
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}

@@ -16,7 +16,7 @@ import (
 type ThriftMessage struct {
 	Ts time.Time
 
-	TcpTuple     TcpTuple
+	TcpTuple     common.TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Direction    uint8
 
@@ -61,7 +61,7 @@ type ThriftStream struct {
 
 type ThriftTransaction struct {
 	Type         string
-	tuple        TcpTuple
+	tuple        common.TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
 	ResponseTime int32
@@ -141,7 +141,7 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transMap map[HashableTcpTuple]*ThriftTransaction
+	transMap map[common.HashableTcpTuple]*ThriftTransaction
 
 	PublishQueue chan *ThriftTransaction
 	Publisher    *PublisherType
@@ -238,7 +238,7 @@ func (thrift *Thrift) Init(test_mode bool) error {
 		}
 	}
 
-	thrift.transMap = make(map[HashableTcpTuple]*ThriftTransaction, TransactionsHashSize)
+	thrift.transMap = make(map[common.HashableTcpTuple]*ThriftTransaction, TransactionsHashSize)
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
@@ -864,7 +864,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			}
 
 			// all ok, go to next level
-			stream.message.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
+			stream.message.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
 			stream.message.Direction = dir
 			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 			if stream.message.FrameSize == 0 {
@@ -893,7 +893,7 @@ func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
 func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.raw]
+	trans := thrift.transMap[tuple.Hashable()]
 	if trans != nil {
 		logp.Debug("thrift", "Two requests without reply, assuming the old one is oneway")
 		thrift.PublishQueue <- trans
@@ -903,7 +903,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Type:  "thrift",
 		tuple: tuple,
 	}
-	thrift.transMap[tuple.raw] = trans
+	thrift.transMap[tuple.Hashable()] = trans
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
@@ -936,7 +936,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	// we need to search the request first.
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.raw]
+	trans := thrift.transMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Debug("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -957,21 +957,21 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	logp.Debug("thrift", "Transaction queued")
 
 	// remove from map
-	thrift.transMap[tuple.raw] = nil
+	thrift.transMap[tuple.Hashable()] = nil
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
 }
 
 func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
-	tuple := TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	tuple := common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
 
-	trans := thrift.transMap[tuple.raw]
+	trans := thrift.transMap[tuple.Hashable()]
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			logp.Debug("thrift", "FIN and had only one transaction. Assuming one way")
 			thrift.PublishQueue <- trans
-			delete(thrift.transMap, trans.tuple.raw)
+			delete(thrift.transMap, trans.tuple.Hashable())
 			if trans.timer != nil {
 				trans.timer.Stop()
 			}
@@ -1039,5 +1039,5 @@ func (thrift *Thrift) publishTransactions() {
 func (thrift *Thrift) expireTransaction(trans *ThriftTransaction) {
 	// TODO - also publish?
 	// remove from map
-	delete(thrift.transMap, trans.tuple.raw)
+	delete(thrift.transMap, trans.tuple.Hashable())
 }

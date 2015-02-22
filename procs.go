@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"packetbeat/common"
 	"packetbeat/logp"
 	"path/filepath"
 	"runtime"
@@ -185,7 +186,7 @@ func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 	return pids, nil
 }
 
-func (proc *ProcessesWatcher) FindProcessesTuple(tuple *IpPortTuple) (proc_tuple *CmdlineTuple) {
+func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IpPortTuple) (proc_tuple *CmdlineTuple) {
 	proc_tuple = &CmdlineTuple{}
 
 	if !proc.ReadFromProc {

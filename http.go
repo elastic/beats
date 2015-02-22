@@ -32,7 +32,7 @@ type HttpMessage struct {
 	chunked_body     []byte
 
 	IsRequest    bool
-	TcpTuple     TcpTuple
+	TcpTuple     common.TcpTuple
 	CmdlineTuple *CmdlineTuple
 	Direction    uint8
 	//Request Info
@@ -68,7 +68,7 @@ type HttpStream struct {
 
 type HttpTransaction struct {
 	Type         string
-	tuple        TcpTuple
+	tuple        common.TcpTuple
 	Src          Endpoint
 	Dst          Endpoint
 	Real_ip      string
@@ -98,7 +98,7 @@ type Http struct {
 	Split_cookie      bool
 	Real_ip_header    string
 
-	transactionsMap map[HashableTcpTuple]*HttpTransaction
+	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
 	Publisher *PublisherType
 }
@@ -158,7 +158,7 @@ func (http *Http) Init(test_mode bool) error {
 		}
 	}
 
-	http.transactionsMap = make(map[HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
+	http.transactionsMap = make(map[common.HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
 
 	if !test_mode {
 		http.Publisher = &Publisher
@@ -564,7 +564,7 @@ func (http *Http) ReceivedFin(tcp *TcpStream, dir uint8) {
 func (http *Http) handleHttp(m *HttpMessage, tcp *TcpStream,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
 	m.Direction = dir
 	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
 	m.Raw = raw_msg
@@ -578,14 +578,14 @@ func (http *Http) handleHttp(m *HttpMessage, tcp *TcpStream,
 
 func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
-	trans := http.transactionsMap[msg.TcpTuple.raw]
+	trans := http.transactionsMap[msg.TcpTuple.Hashable()]
 	if trans != nil {
 		if len(trans.Http) != 0 {
 			logp.Warn("Two requests without a response. Dropping old request")
 		}
 	} else {
 		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
-		http.transactionsMap[msg.TcpTuple.raw] = trans
+		http.transactionsMap[msg.TcpTuple.Hashable()] = trans
 	}
 
 	logp.Debug("http", "Received request with tuple: %s", msg.TcpTuple)
@@ -645,7 +645,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 func (http *Http) expireTransaction(trans *HttpTransaction) {
 	// remove from map
-	delete(http.transactionsMap, trans.tuple.raw)
+	delete(http.transactionsMap, trans.tuple.Hashable())
 }
 
 func (http *Http) receivedHttpResponse(msg *HttpMessage) {
@@ -655,7 +655,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	logp.Debug("http", "Received response with tuple: %s", tuple)
 
-	trans := http.transactionsMap[tuple.raw]
+	trans := http.transactionsMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -707,7 +707,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	logp.Debug("http", "HTTP transaction completed: %s\n", trans.Http)
 
 	// remove from map
-	delete(http.transactionsMap, trans.tuple.raw)
+	delete(http.transactionsMap, trans.tuple.Hashable())
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
