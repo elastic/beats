@@ -121,3 +121,8 @@ func (t TcpTuple) String() string {
 func (t *TcpTuple) Hashable() HashableTcpTuple {
 	return t.raw
 }
+
+// Source and destination process names, as found by the proc module.
+type CmdlineTuple struct {
+	Src, Dst []byte
+}

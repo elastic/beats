@@ -44,7 +44,7 @@ type MysqlMessage struct {
 	Direction    uint8
 	IsTruncated  bool
 	TcpTuple     common.TcpTuple
-	CmdlineTuple *CmdlineTuple
+	CmdlineTuple *common.CmdlineTuple
 	Raw          []byte
 }
 

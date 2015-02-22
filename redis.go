@@ -15,7 +15,7 @@ type RedisMessage struct {
 	Bulks         []string
 
 	TcpTuple     common.TcpTuple
-	CmdlineTuple *CmdlineTuple
+	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
 	IsRequest bool
@@ -46,7 +46,7 @@ type RedisTransaction struct {
 	Ts           int64
 	JsTs         time.Time
 	ts           time.Time
-	cmdline      *CmdlineTuple
+	cmdline      *common.CmdlineTuple
 	Method       string
 	Path         string
 	Query        string

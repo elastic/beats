@@ -33,7 +33,7 @@ type HttpMessage struct {
 
 	IsRequest    bool
 	TcpTuple     common.TcpTuple
-	CmdlineTuple *CmdlineTuple
+	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 	//Request Info
 	FirstLine    string
@@ -76,7 +76,7 @@ type HttpTransaction struct {
 	Ts           int64
 	JsTs         time.Time
 	ts           time.Time
-	cmdline      *CmdlineTuple
+	cmdline      *common.CmdlineTuple
 	Method       string
 	RequestUri   string
 

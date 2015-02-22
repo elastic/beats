@@ -17,7 +17,7 @@ type ThriftMessage struct {
 	Ts time.Time
 
 	TcpTuple     common.TcpTuple
-	CmdlineTuple *CmdlineTuple
+	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 
 	start int
@@ -68,7 +68,7 @@ type ThriftTransaction struct {
 	Ts           int64
 	JsTs         time.Time
 	ts           time.Time
-	cmdline      *CmdlineTuple
+	cmdline      *common.CmdlineTuple
 
 	Request *ThriftMessage
 	Reply   *ThriftMessage

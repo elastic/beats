@@ -32,7 +32,7 @@ type PgsqlMessage struct {
 	Direction    uint8
 	Incomplete   bool
 	TcpTuple     common.TcpTuple
-	CmdlineTuple *CmdlineTuple
+	CmdlineTuple *common.CmdlineTuple
 }
 
 type PgsqlTransaction struct {

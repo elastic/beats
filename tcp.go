@@ -15,10 +15,6 @@ const TCP_STREAM_EXPIRY = 10 * 1e9
 const TCP_STREAM_HASH_SIZE = 2 ^ 16
 const TCP_MAX_DATA_IN_STREAM = 10 * 1e6
 
-type CmdlineTuple struct {
-	Src, Dst []byte
-}
-
 const (
 	TcpDirectionReverse  = 0
 	TcpDirectionOriginal = 1
