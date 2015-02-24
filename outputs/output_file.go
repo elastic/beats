@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"path/filepath"
 	"strconv"
@@ -30,7 +31,7 @@ type FileRotator struct {
 	current_size uint64
 }
 
-func (out *FileOutputType) Init(config MothershipConfig) error {
+func (out *FileOutputType) Init(config config.MothershipConfig) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	out.rotator.RotateEveryBytes = uint64(config.Rotate_every_kb) * 1024

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"strings"
 	"time"
@@ -45,7 +46,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) error {
+func (out *RedisOutputType) Init(config config.MothershipConfig, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 

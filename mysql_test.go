@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/hex"
+	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/protos"
 	"testing"
 	//"fmt"
 	"time"
@@ -23,7 +25,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -51,7 +53,7 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -85,7 +87,7 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -126,7 +128,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -182,7 +184,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -217,7 +219,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &MysqlStream{tcpStream: nil, data: message, message: new(MysqlMessage)}
+	stream := &MysqlStream{data: message, message: new(MysqlMessage)}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -282,23 +284,22 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get ts")
 	}
-	pkt := Packet{
-		payload: data,
-		ts:      ts,
+	pkt := protos.Packet{
+		Payload: data,
+		Ts:      ts,
 	}
-	tcp := TcpStream{
-		mysqlData: [2]*MysqlStream{nil, nil},
-	}
+	var tuple common.TcpTuple
+	var private mysqlPrivateData
 
 	var count_handleMysql = 0
 
-	handleMysql = func(m *MysqlMessage, tcp *TcpStream,
+	handleMysql = func(m *MysqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	ParseMysql(&pkt, &tcp, 1)
+	ParseMysql(&pkt, &tuple, 1, private)
 
 	if count_handleMysql != 1 {
 		t.Errorf("handleMysql not called")
@@ -324,13 +325,12 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get ts")
 	}
-	pkt := Packet{
-		payload: data,
-		ts:      ts,
+	pkt := protos.Packet{
+		Payload: data,
+		Ts:      ts,
 	}
-	tcp := TcpStream{
-		mysqlData: [2]*MysqlStream{nil, nil},
-	}
+	var tuple common.TcpTuple
+	var private mysqlPrivateData
 
 	var count_handleMysql = 0
 
@@ -338,13 +338,13 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 	defer func() {
 		handleMysql = old_handleMysql
 	}()
-	handleMysql = func(m *MysqlMessage, tcp *TcpStream,
+	handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	ParseMysql(&pkt, &tcp, 1)
+	ParseMysql(&pkt, &tuple, 1, private)
 
 	if count_handleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
@@ -371,13 +371,12 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get ts")
 	}
-	pkt := Packet{
-		payload: data,
-		ts:      ts,
+	pkt := protos.Packet{
+		Payload: data,
+		Ts:      ts,
 	}
-	tcp := TcpStream{
-		mysqlData: [2]*MysqlStream{nil, nil},
-	}
+	var tuple common.TcpTuple
+	var private mysqlPrivateData
 
 	var count_handleMysql = 0
 
@@ -385,13 +384,13 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	defer func() {
 		handleMysql = old_handleMysql
 	}()
-	handleMysql = func(m *MysqlMessage, tcp *TcpStream,
+	handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	ParseMysql(&pkt, &tcp, 1)
+	private = ParseMysql(&pkt, &tuple, 1, private).(mysqlPrivateData)
 	if count_handleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
@@ -407,12 +406,12 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 			"2a00000b013409416e6f6e796d6f75730474657374047465737413323031332d30372d32322031383a34343a3137" +
 			"0500000cfe00002100")
 
-	pkt = Packet{
-		payload: data,
-		ts:      ts,
+	pkt = protos.Packet{
+		Payload: data,
+		Ts:      ts,
 	}
 
-	ParseMysql(&pkt, &tcp, 1)
+	ParseMysql(&pkt, &tuple, 1, private)
 	if count_handleMysql != 1 {
 		t.Errorf("handleMysql not called on the second run")
 	}

@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/hex"
+	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/protos"
 	"testing"
 	"time"
 )
@@ -18,7 +20,7 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 		t.Error("Failed to decode hex string")
 	}
 
-	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
 	ok, complete := pgsqlMessageParser(stream)
 
@@ -53,7 +55,7 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 		t.Error("Failed to decode hex string")
 	}
 
-	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
 	ok, complete := pgsqlMessageParser(stream)
 
@@ -95,7 +97,7 @@ func TestPgsqlParser_response(t *testing.T) {
 		t.Error("Failed to decode hex string")
 	}
 
-	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
 	ok, complete := pgsqlMessageParser(stream)
 
@@ -137,7 +139,7 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 		t.Error("Failed to decode hex string")
 	}
 
-	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
 	ok, complete := pgsqlMessageParser(stream)
 
@@ -163,27 +165,25 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	if err != nil {
 		t.Error("Failed to get ts")
 	}
-	pkt := Packet{
-		payload: data,
-		ts:      ts,
+	pkt := protos.Packet{
+		Payload: data,
+		Ts:      ts,
 	}
-	tcp := TcpStream{
-		pgsqlData: [2]*PgsqlStream{nil, nil},
-	}
-
+	var tuple common.TcpTuple
+	var private pgsqlPrivateData
 	var count_handlePgsql = 0
 
 	old_handlePgsql := handlePgsql
 	defer func() {
 		handlePgsql = old_handlePgsql
 	}()
-	handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
+	handlePgsql = func(m *PgsqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handlePgsql += 1
 	}
 
-	ParsePgsql(&pkt, &tcp, 1)
+	ParsePgsql(&pkt, &tuple, 1, private)
 
 	if count_handlePgsql != 3 {
 		t.Error("handlePgsql not called three times")
@@ -201,7 +201,7 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 		t.Error("Failed to decode hex string")
 	}
 
-	stream := &PgsqlStream{tcpStream: nil, data: message, message: new(PgsqlMessage)}
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
 	ok, complete := pgsqlMessageParser(stream)
 

@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 
 func HttpModForTests() *Http {
 	var http Http
-	http.Init(true)
+	http.Init(true, nil)
 	return &http
 }
 
@@ -31,7 +31,7 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -79,7 +79,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -132,7 +132,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 			"\r\n" +
 			"garbage")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -182,7 +182,7 @@ func TestHttpParser_Request_ContentLength_0(t *testing.T) {
 		"connection: close\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -214,7 +214,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 			"X-Frame-Options: SAMEORIGIN\r\n" +
 			"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -258,7 +258,7 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 			"X-Frame-Options: SAMEORIGIN\r\n" +
 			"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -316,7 +316,7 @@ func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
 			"X-Frame-Options: SAMEORIGIN\r\n" +
 			"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -358,7 +358,7 @@ func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
 			"X-Frame-Options: SAMEORIGIN\r\n" +
 			"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -399,7 +399,7 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
 		"garbage")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -431,7 +431,7 @@ func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
 		"\r\n" +
 		"test")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -469,7 +469,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 
 	data3 := []byte("xxxxxxxxxxxxxxxxxxxx")
 
-	stream := &HttpStream{tcpStream: nil, data: data1, message: new(HttpMessage)}
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -541,7 +541,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 			"X-Frame-Options: SAMEORIGIN\r\n" +
 			"\r\n")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: &HttpMessage{Ts: time.Now()}}
+	stream := &HttpStream{data: data, message: &HttpMessage{Ts: time.Now()}}
 
 	ok, complete := http.messageParser(stream)
 
@@ -601,7 +601,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 
 	data := append(data1, data2...)
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 
@@ -661,7 +661,7 @@ func TestHttpParser_301_response(t *testing.T) {
 			"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
 			"</body></html>")
 
-	stream := &HttpStream{tcpStream: nil, data: data, message: new(HttpMessage)}
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
 	ok, complete := http.messageParser(stream)
 

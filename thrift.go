@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"math"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
+	"packetbeat/procs"
+	"packetbeat/protos"
+	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
@@ -45,7 +49,7 @@ type ThriftField struct {
 }
 
 type ThriftStream struct {
-	tcpStream *TcpStream
+	tcptuple *common.TcpTuple
 
 	data []byte
 
@@ -62,8 +66,8 @@ type ThriftStream struct {
 type ThriftTransaction struct {
 	Type         string
 	tuple        common.TcpTuple
-	Src          Endpoint
-	Dst          Endpoint
+	Src          common.Endpoint
+	Dst          common.Endpoint
 	ResponseTime int32
 	Ts           int64
 	JsTs         time.Time
@@ -150,17 +154,6 @@ type Thrift struct {
 
 var ThriftMod Thrift
 
-type tomlThrift struct {
-	String_max_size            int
-	Collection_max_size        int
-	Drop_after_n_struct_fields int
-	Transport_type             string
-	Protocol_type              string
-	Capture_reply              bool
-	Obfuscate_strings          bool
-	Idl_files                  []string
-}
-
 func (thrift *Thrift) InitDefaults() {
 	// defaults
 	thrift.StringMaxSize = 200
@@ -177,51 +170,51 @@ func (thrift *Thrift) InitDefaults() {
 func (thrift *Thrift) readConfig() error {
 	var err error
 
-	if _ConfigMeta.IsDefined("thrift", "string_max_size") {
-		thrift.StringMaxSize = _Config.Thrift.String_max_size
+	if config.ConfigMeta.IsDefined("thrift", "string_max_size") {
+		thrift.StringMaxSize = config.ConfigSingleton.Thrift.String_max_size
 	}
-	if _ConfigMeta.IsDefined("thrift", "collection_max_size") {
-		thrift.CollectionMaxSize = _Config.Thrift.Collection_max_size
+	if config.ConfigMeta.IsDefined("thrift", "collection_max_size") {
+		thrift.CollectionMaxSize = config.ConfigSingleton.Thrift.Collection_max_size
 	}
-	if _ConfigMeta.IsDefined("thrift", "drop_after_n_struct_fields") {
-		thrift.DropAfterNStructFields = _Config.Thrift.Drop_after_n_struct_fields
+	if config.ConfigMeta.IsDefined("thrift", "drop_after_n_struct_fields") {
+		thrift.DropAfterNStructFields = config.ConfigSingleton.Thrift.Drop_after_n_struct_fields
 	}
-	if _ConfigMeta.IsDefined("thrift", "transport_type") {
-		switch _Config.Thrift.Transport_type {
+	if config.ConfigMeta.IsDefined("thrift", "transport_type") {
+		switch config.ConfigSingleton.Thrift.Transport_type {
 		case "socket":
 			thrift.TransportType = ThriftTSocket
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known", _Config.Thrift.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", config.ConfigSingleton.Thrift.Transport_type)
 		}
 	}
-	if _ConfigMeta.IsDefined("thrift", "protocol_type") {
-		switch _Config.Thrift.Transport_type {
+	if config.ConfigMeta.IsDefined("thrift", "protocol_type") {
+		switch config.ConfigSingleton.Thrift.Transport_type {
 		case "binary":
 			thrift.TransportType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known", _Config.Thrift.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", config.ConfigSingleton.Thrift.Protocol_type)
 		}
 	}
-	if _ConfigMeta.IsDefined("thrift", "capture_reply") {
-		thrift.CaptureReply = _Config.Thrift.Capture_reply
+	if config.ConfigMeta.IsDefined("thrift", "capture_reply") {
+		thrift.CaptureReply = config.ConfigSingleton.Thrift.Capture_reply
 	}
-	if _ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
-		thrift.ObfuscateStrings = _Config.Thrift.Obfuscate_strings
+	if config.ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
+		thrift.ObfuscateStrings = config.ConfigSingleton.Thrift.Obfuscate_strings
 	}
-	if _ConfigMeta.IsDefined("thrift", "idl_files") {
-		thrift.Idl, err = NewThriftIdl(_Config.Thrift.Idl_files)
+	if config.ConfigMeta.IsDefined("thrift", "idl_files") {
+		thrift.Idl, err = NewThriftIdl(config.ConfigSingleton.Thrift.Idl_files)
 		if err != nil {
 			return err
 		}
 	}
 
-	if _ConfigMeta.IsDefined("protocols", "thrift", "send_request") {
-		thrift.Send_request = _Config.Protocols["thrift"].Send_request
+	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_request") {
+		thrift.Send_request = config.ConfigSingleton.Protocols["thrift"].Send_request
 	}
-	if _ConfigMeta.IsDefined("protocols", "thrift", "send_response") {
-		thrift.Send_response = _Config.Protocols["thrift"].Send_response
+	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_response") {
+		thrift.Send_response = config.ConfigSingleton.Protocols["thrift"].Send_response
 	}
 
 	return nil
@@ -798,46 +791,60 @@ func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
 	stream.parseState = ThriftStartState
 }
 
-func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
+type thriftPrivateData struct {
+	Data [2]*ThriftStream
+}
+
+func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseThrift exception")
 
-	stream := tcp.thriftData[dir]
+	priv := thriftPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(thriftPrivateData)
+		if !ok {
+			priv = thriftPrivateData{}
+		}
+	}
+
+	stream := priv.Data[dir]
 
 	if stream == nil {
 		stream = &ThriftStream{
-			tcpStream: tcp,
-			data:      pkt.payload,
-			message:   &ThriftMessage{Ts: pkt.ts},
+			tcptuple: tcptuple,
+			data:     pkt.Payload,
+			message:  &ThriftMessage{Ts: pkt.Ts},
 		}
-		tcp.thriftData[dir] = stream
+		priv.Data[dir] = stream
 	} else {
 		if stream.skipInput {
 			// stream currently suspended in this direction
-			return
+			return priv
 		}
 		// concatenate bytes
-		stream.data = append(stream.data, pkt.payload...)
-		if len(stream.data) > TCP_MAX_DATA_IN_STREAM {
+		stream.data = append(stream.data, pkt.Payload...)
+		if len(stream.data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("thrift", "Stream data too large, dropping TCP stream")
-			tcp.thriftData[dir] = nil
-			return
+			priv.Data[dir] = nil
+			return priv
 		}
 	}
 
 	for len(stream.data) > 0 {
 		if stream.message == nil {
-			stream.message = &ThriftMessage{Ts: pkt.ts}
+			stream.message = &ThriftMessage{Ts: pkt.Ts}
 		}
 
-		ok, complete := thrift.messageParser(tcp.thriftData[dir])
+		ok, complete := thrift.messageParser(priv.Data[dir])
 
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			tcp.thriftData[dir] = nil
+			priv.Data[dir] = nil
 			logp.Debug("thrift", "Ignore Thrift message. Drop tcp stream. Try parsing with the next segment")
-			return
+			return priv
 		}
 
 		if complete {
@@ -847,7 +854,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 				logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
 				if !thrift.CaptureReply {
 					// enable the stream in the other direction to get the reply
-					stream_rev := tcp.thriftData[1-dir]
+					stream_rev := priv.Data[1-dir]
 					if stream_rev != nil {
 						stream_rev.skipInput = false
 					}
@@ -864,9 +871,9 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 			}
 
 			// all ok, go to next level
-			stream.message.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
+			stream.message.TcpTuple = *tcptuple
 			stream.message.Direction = dir
-			stream.message.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+			stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 			if stream.message.FrameSize == 0 {
 				stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
 			}
@@ -880,6 +887,7 @@ func (thrift *Thrift) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
 		}
 	}
 
+	return priv
 }
 
 func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
@@ -908,17 +916,17 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
-	trans.Src = Endpoint{
+	trans.Src = common.Endpoint{
 		Ip:   msg.TcpTuple.Src_ip.String(),
 		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
-	trans.Dst = Endpoint{
+	trans.Dst = common.Endpoint{
 		Ip:   msg.TcpTuple.Dst_ip.String(),
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == TcpDirectionReverse {
+	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
@@ -963,10 +971,10 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	}
 }
 
-func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
-	tuple := common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
+func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
 
-	trans := thrift.transMap[tuple.Hashable()]
+	trans := thrift.transMap[tcptuple.Hashable()]
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			logp.Debug("thrift", "FIN and had only one transaction. Assuming one way")
@@ -977,6 +985,8 @@ func (thrift *Thrift) ReceivedFin(tcp *TcpStream, dir uint8) {
 			}
 		}
 	}
+
+	return private
 }
 
 func (thrift *Thrift) publishTransactions() {
@@ -985,9 +995,9 @@ func (thrift *Thrift) publishTransactions() {
 
 		event["type"] = "thrift"
 		if t.Reply != nil && t.Reply.HasException {
-			event["Status"] = ERROR_STATUS
+			event["Status"] = common.ERROR_STATUS
 		} else {
-			event["Status"] = OK_STATUS
+			event["Status"] = common.OK_STATUS
 		}
 		event["response_time"] = t.ResponseTime
 		thriftmap := common.MapStr{}

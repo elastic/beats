@@ -5,6 +5,7 @@ import (
 	"net"
 	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/protos"
 	"testing"
 )
 
@@ -62,7 +63,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("800100010000000470696e670000000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
@@ -74,7 +75,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
@@ -86,7 +87,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000470696e6700000001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
@@ -98,7 +99,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
@@ -106,7 +107,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
@@ -114,7 +115,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0000000470696e670100000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || !complete {
@@ -126,7 +127,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0000000570696e670100000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
@@ -151,7 +152,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("08000100000001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -163,7 +164,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0600010001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -175,7 +176,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0a00010000000000000001")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -187,7 +188,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0400013ff3333333333333")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -199,7 +200,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("02000101")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -211,14 +212,14 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0b00010000000568656c6c") // incomplete string
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field != nil {
 		t.Error("Bad result:", ok, complete, field)
 	}
 
 	data, _ = hex.DecodeString("0b00010000000568656c6c6f")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -230,7 +231,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 	_old, thrift.StringMaxSize = thrift.StringMaxSize, 3
 	data, _ = hex.DecodeString("0b00010000000568656c6c6f")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -243,7 +244,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.StringMaxSize = _old
 
 	data, _ = hex.DecodeString("0f00010600000003000100020003")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -256,7 +257,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 	_old, thrift.CollectionMaxSize = thrift.CollectionMaxSize, 1
 	data, _ = hex.DecodeString("0f00010600000003000100020003")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -270,7 +271,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.CollectionMaxSize = _old
 
 	data, _ = hex.DecodeString("0e0001060000000300010002000300")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -283,7 +284,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 	_old, thrift.CollectionMaxSize = thrift.CollectionMaxSize, 2
 	data, _ = hex.DecodeString("0e00010600000003000100020003")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -297,7 +298,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.CollectionMaxSize = _old
 
 	data, _ = hex.DecodeString("0d00010b0600000003000000016100010000000163000300000001620002")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -311,7 +312,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 	_old, thrift.CollectionMaxSize = thrift.CollectionMaxSize, 2
 	data, _ = hex.DecodeString("0d00010b060000000300000001610001000000016300030000000162000200")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -324,7 +325,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.CollectionMaxSize = _old
 
 	data, _ = hex.DecodeString("0b00010000000568106c6c6f")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -335,7 +336,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0c000108000100000001080002000000000800030000000400")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -348,7 +349,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 
 	_old, thrift.CollectionMaxSize = thrift.CollectionMaxSize, 2
 	data, _ = hex.DecodeString("0c000108000100000001080002000000000800030000000400")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -361,7 +362,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	thrift.CollectionMaxSize = _old
 
 	data, _ = hex.DecodeString("0c0001080001000000010b00020000000568656c6c6f00")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -373,7 +374,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0c0001080001000000010c0002080001000000010b00020000000568656c6c6f0000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -385,7 +386,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("0c0001080001000000010e0002060000000300010002000300")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete, field = thrift.readField(&stream)
 	if !ok || complete || field == nil {
 		t.Error("Bad result:", ok, complete, field)
@@ -413,7 +414,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	thrift.InitDefaults()
 
 	data, _ = hex.DecodeString("800100010000000470696e670000000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -426,7 +427,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100010000000561646431360000000006000100010" +
 		"60002000100")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -440,7 +441,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100010000000963616c63756c617465000000000" +
 		"80001000000010c00020800010000000108000200000000080003000000040000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -453,7 +454,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("8001000200000005616464313600000000060000000200")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -467,7 +468,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100020000000b6563686f5f737472696e67000000000b00" +
 		"000000000568656c6c6f00")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -481,7 +482,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("80010002000000096563686f5f6c697374000000000f0000060" +
 		"000000300010002000300")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -495,7 +496,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("80010002000000086563686f5f6d6170000000000d00000b06000" +
 		"0000300000001610001000000016300030000000162000200")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -508,7 +509,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 	}
 
 	data, _ = hex.DecodeString("800100020000000963616c63756c617465000000000800000000000500")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -522,7 +523,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100020000000963616c63756c617465000000000c000108000100" +
 		"0000040b00020000001243616e6e6f742064697669646520627920300000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -536,7 +537,7 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100020000000b6563686f5f62696e61727900000000" +
 		"0b000000000008ab0c1d281a00000000")
-	stream = ThriftStream{tcpStream: nil, data: data, message: new(ThriftMessage)}
+	stream = ThriftStream{data: data, message: new(ThriftMessage)}
 	ok, complete = thrift.messageParser(&stream)
 	m = stream.message
 	if !ok || !complete {
@@ -551,15 +552,15 @@ func TestThrift_thriftMessageParser(t *testing.T) {
 
 // Returns a minimally filled Packet struct, only the payload
 // having value.
-func createTestPacket(t *testing.T, hexstr string) *Packet {
+func createTestPacket(t *testing.T, hexstr string) *protos.Packet {
 	data, err := hex.DecodeString(hexstr)
 	if err != nil {
 		t.Error("Failed to decode hex string")
 		return nil
 	}
 
-	return &Packet{
-		payload: data,
+	return &protos.Packet{
+		Payload: data,
 	}
 }
 
@@ -574,8 +575,8 @@ func expectThriftTransaction(t *testing.T, thrift Thrift) *ThriftTransaction {
 	return nil
 }
 
-func testIpPortTuple() *common.IpPortTuple {
-	t := &common.IpPortTuple{
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
 		Ip_length: 4,
 		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
 		Src_port: 9200, Dst_port: 9201,
@@ -595,13 +596,13 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 	req := createTestPacket(t, "800100010000000470696e670000000000")
 	repl := createTestPacket(t, "800100020000000470696e670000000000")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "ping" ||
@@ -626,15 +627,16 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -658,8 +660,7 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
 	req_half2 := createTestPacket(t, "000003616464000000000800010000000108"+
@@ -667,10 +668,11 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	repl_half1 := createTestPacket(t, "000000178001000200000003")
 	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
 
-	thrift.Parse(req_half1, &tcp, 0)
-	thrift.Parse(req_half2, &tcp, 0)
-	thrift.Parse(repl_half1, &tcp, 1)
-	thrift.Parse(repl_half2, &tcp, 1)
+	var private thriftPrivateData
+	private = thrift.Parse(req_half1, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(req_half2, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(repl_half1, tcptuple, 1, private).(thriftPrivateData)
+	thrift.Parse(repl_half2, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -694,8 +696,7 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req_half1 := createTestPacket(t, "0000001e8001000100")
 	repl_half1 := createTestPacket(t, "000000178001000200000003")
@@ -703,10 +704,11 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 		"00020000000100")
 	repl_half2 := createTestPacket(t, "616464000000000800000000000200")
 
-	thrift.Parse(req_half1, &tcp, 0)
-	thrift.Parse(req_half2, &tcp, 0)
-	thrift.Parse(repl_half1, &tcp, 1)
-	thrift.Parse(repl_half2, &tcp, 1)
+	var private thriftPrivateData
+	private = thrift.Parse(req_half1, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(req_half2, tcptuple, 0, private).(thriftPrivateData)
+	private = thrift.Parse(repl_half1, tcptuple, 1, private).(thriftPrivateData)
+	thrift.Parse(repl_half2, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -729,13 +731,13 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "0000001080010001000000037a69700000000000")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.ReceivedFin(&tcp, 0)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.ReceivedFin(tcptuple, 0, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "zip" ||
@@ -757,17 +759,17 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
-	thrift.Parse(reqzip, &tcp, 0)
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(reqzip, tcptuple, 0, private)
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "zip" ||
@@ -797,14 +799,14 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	reqzip := createTestPacket(t, "0000001080010001000000037a69700000000000")
 	repladd := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
-	thrift.Parse(reqzip, &tcp, 0)
-	thrift.Parse(repladd, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(reqzip, tcptuple, 0, private)
+	thrift.Parse(repladd, tcptuple, 1, private)
 
 	// Nothing should be received at this point
 	select {
@@ -828,15 +830,15 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -847,8 +849,8 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	}
 
 	// play it again in the same stream
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans = expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -872,16 +874,16 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "00000024800100010000000b6563686f5f737472696e670000"+
 		"00000b00010000000568656c6c6f00")
 	repl := createTestPacket(t, "00000024800100020000000b6563686f5f737472696e67000"+
 		"000000b00000000000568656c6c6f00")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "echo_string" ||
@@ -904,18 +906,18 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 	thrift.CaptureReply = false
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	data_req, _ := hex.DecodeString("0000001e8001000100000003616464000000000800010000000108" +
 		"00020000000100")
-	req := &Packet{payload: data_req}
+	req := &protos.Packet{Payload: data_req}
 	data_repl, _ := hex.DecodeString("000000178001000200000003616464000000000800000000000200")
-	repl := &Packet{payload: data_repl}
+	repl := &protos.Packet{Payload: data_repl}
 
+	var private thriftPrivateData
 	for n := 0; n < b.N; n++ {
-		thrift.Parse(req, &tcp, 0)
-		thrift.Parse(repl, &tcp, 1)
+		thrift.Parse(req, tcptuple, 0, private)
+		thrift.Parse(repl, tcptuple, 1, private)
 
 		select {
 		case trans := <-thrift.PublishQueue:
@@ -950,16 +952,16 @@ func TestThrift_Parse_Exception(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
 	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
 		"01080001000000040b00020000001243616e6e6f742064697669646520627920300000")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "calculate" ||
@@ -988,15 +990,15 @@ func TestThrift_ParametersNames(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "0000001e8001000100000003616464000000000800010000000108"+
 		"00020000000100")
 	repl := createTestPacket(t, "000000178001000200000003616464000000000800000000000200")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "add" ||
@@ -1029,16 +1031,16 @@ func TestThrift_ExceptionName(t *testing.T) {
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
-	var tcp TcpStream
-	tcp.tuple = testIpPortTuple()
+	tcptuple := testTcpTuple()
 
 	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
 		"1000000010c00020800010000000108000200000000080003000000040000")
 	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
 		"01080001000000040b00020000001243616e6e6f742064697669646520627920300000")
 
-	thrift.Parse(req, &tcp, 0)
-	thrift.Parse(repl, &tcp, 1)
+	var private thriftPrivateData
+	thrift.Parse(req, tcptuple, 0, private)
+	thrift.Parse(repl, tcptuple, 1, private)
 
 	trans := expectThriftTransaction(t, thrift)
 	if trans.Request.Method != "calculate" ||

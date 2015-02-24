@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"strings"
 	"time"
@@ -25,7 +26,7 @@ type PublishedTopology struct {
 	IPs  string
 }
 
-func (out *ElasticsearchOutputType) Init(config MothershipConfig, topology_expire int) error {
+func (out *ElasticsearchOutputType) Init(config config.MothershipConfig, topology_expire int) error {
 
 	api.Domain = config.Host
 	api.Port = fmt.Sprintf("%d", config.Port)

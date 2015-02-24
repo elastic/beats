@@ -3,6 +3,7 @@ package sniffer
 import (
 	"fmt"
 	"os"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"time"
 
@@ -15,20 +16,9 @@ type SnifferSetup struct {
 	pcapHandle     *pcap.Handle
 	afpacketHandle *AfpacketHandle
 	pfringHandle   *PfringHandle
-	config         *InterfacesConfig
+	config         *config.InterfacesConfig
 
 	DataSource gopacket.PacketDataSource
-}
-
-type InterfacesConfig struct {
-	Device         string
-	Devices        []string
-	Type           string
-	File           string
-	With_vlans     bool
-	Bpf_filter     string
-	Snaplen        int
-	Buffer_size_mb int
 }
 
 // Computes the block_size and the num_blocks in such a way that the
@@ -55,7 +45,7 @@ func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
 	return frame_size, block_size, num_blocks, nil
 }
 
-func CreateSniffer(config *InterfacesConfig, file *string) (*SnifferSetup, error) {
+func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup, error) {
 	var sniffer SnifferSetup
 	var err error
 

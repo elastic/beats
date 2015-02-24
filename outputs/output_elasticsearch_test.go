@@ -1,6 +1,7 @@
 package outputs
 
 import (
+	"packetbeat/config"
 	"testing"
 	"time"
 )
@@ -11,7 +12,7 @@ const elasticsearchPort = 9200
 func createElasticsearchConnection() ElasticsearchOutputType {
 
 	var elasticsearchOutput ElasticsearchOutputType
-	elasticsearchOutput.Init(MothershipConfig{
+	elasticsearchOutput.Init(config.MothershipConfig{
 		Enabled:       true,
 		Save_topology: true,
 		Host:          elasticsearchAddr,

@@ -3,6 +3,9 @@ package main
 import (
 	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/procs"
+	"packetbeat/protos"
+	"packetbeat/protos/tcp"
 	"strings"
 	"time"
 )
@@ -38,8 +41,8 @@ type PgsqlMessage struct {
 type PgsqlTransaction struct {
 	Type         string
 	tuple        common.TcpTuple
-	Src          Endpoint
-	Dst          Endpoint
+	Src          common.Endpoint
+	Dst          common.Endpoint
 	ResponseTime int32
 	Ts           int64
 	JsTs         time.Time
@@ -57,7 +60,7 @@ type PgsqlTransaction struct {
 }
 
 type PgsqlStream struct {
-	tcpStream *TcpStream
+	tcptuple *common.TcpTuple
 
 	data []byte
 
@@ -538,47 +541,61 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 	return true, false
 }
 
-func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
+type pgsqlPrivateData struct {
+	Data [2]*PgsqlStream
+}
+
+func ParsePgsql(pkt *protos.Packet, tcptuple *common.TcpTuple,
+	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParsePgsql exception")
 
-	if tcp.pgsqlData[dir] == nil {
-		tcp.pgsqlData[dir] = &PgsqlStream{
-			tcpStream: tcp,
-			data:      pkt.payload,
-			message:   &PgsqlMessage{Ts: pkt.ts},
+	priv := pgsqlPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(pgsqlPrivateData)
+		if !ok {
+			priv = pgsqlPrivateData{}
+		}
+	}
+
+	if priv.Data[dir] == nil {
+		priv.Data[dir] = &PgsqlStream{
+			tcptuple: tcptuple,
+			data:     pkt.Payload,
+			message:  &PgsqlMessage{Ts: pkt.Ts},
 		}
 		logp.Debug("pgsqldetailed", "New stream created")
 	} else {
 		// concatenate bytes
-		tcp.pgsqlData[dir].data = append(tcp.pgsqlData[dir].data, pkt.payload...)
-		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(tcp.pgsqlData[dir].data), cap(tcp.pgsqlData[dir].data))
-		if len(tcp.pgsqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(priv.Data[dir].data), cap(priv.Data[dir].data))
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("pgsql", "Stream data too large, dropping TCP stream")
-			tcp.pgsqlData[dir] = nil
-			return
+			priv.Data[dir] = nil
+			return priv
 		}
 	}
 
-	stream := tcp.pgsqlData[dir]
+	stream := priv.Data[dir]
 
-	if tcp.pgsqlData[1-dir] != nil && tcp.pgsqlData[1-dir].seenSSLRequest {
+	if priv.Data[1-dir] != nil && priv.Data[1-dir].seenSSLRequest {
 		stream.expectSSLResponse = true
 	}
 
 	for len(stream.data) > 0 {
 
 		if stream.message == nil {
-			stream.message = &PgsqlMessage{Ts: pkt.ts}
+			stream.message = &PgsqlMessage{Ts: pkt.Ts}
 		}
 
-		ok, complete := pgsqlMessageParser(tcp.pgsqlData[dir])
+		ok, complete := pgsqlMessageParser(priv.Data[dir])
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			tcp.pgsqlData[dir] = nil
+			priv.Data[dir] = nil
 			logp.Debug("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
-			return
+			return priv
 		}
 
 		if complete {
@@ -591,10 +608,10 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			} else if stream.message.isSSLResponse {
 				// SSL request answered
 				stream.expectSSLResponse = false
-				tcp.pgsqlData[1-dir].seenSSLRequest = false
+				priv.Data[1-dir].seenSSLRequest = false
 			} else {
 				if stream.message.toExport {
-					handlePgsql(stream.message, tcp, dir, msg)
+					handlePgsql(stream.message, tcptuple, dir, msg)
 				}
 			}
 
@@ -606,6 +623,7 @@ func ParsePgsql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			break
 		}
 	}
+	return priv
 }
 
 func PgsqlMessageHasEnoughData(msg *PgsqlMessage) bool {
@@ -623,13 +641,24 @@ func PgsqlMessageHasEnoughData(msg *PgsqlMessage) bool {
 }
 
 // Called when there's a drop packet
-func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
+func GapInPgsqlStream(tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("GapInPgsqlStream exception")
 
+	if private == nil {
+		return private
+	}
+	pgsqlData, ok := private.(pgsqlPrivateData)
+	if !ok {
+		return private
+	}
+	if pgsqlData.Data[dir] == nil {
+		return pgsqlData
+	}
+
 	// If enough data was received, send it to the
 	// next layer but mark it as incomplete.
-	stream := tcp.pgsqlData[dir]
+	stream := pgsqlData.Data[dir]
 	if PgsqlMessageHasEnoughData(stream.message) {
 		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
 		stream.message.toExport = true
@@ -637,27 +666,20 @@ func GapInPgsqlStream(tcp *TcpStream, dir uint8) {
 		stream.message.Incomplete = true
 
 		msg := stream.data[stream.message.start:stream.message.end]
-		handlePgsql(stream.message, tcp, dir, msg)
+		handlePgsql(stream.message, tcptuple, dir, msg)
 
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
+	return pgsqlData
 }
 
-var handlePgsql = func(m *PgsqlMessage, tcp *TcpStream,
+var handlePgsql = func(m *PgsqlMessage, tcptuple *common.TcpTuple,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = common.TcpTuple{
-		Ip_length: tcp.tuple.Ip_length,
-		Src_ip:    tcp.tuple.Src_ip,
-		Dst_ip:    tcp.tuple.Dst_ip,
-		Src_port:  tcp.tuple.Src_port,
-		Dst_port:  tcp.tuple.Dst_port,
-		Stream_id: tcp.id,
-	}
-	m.TcpTuple.ComputeHashebles()
+	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 
 	if m.IsRequest {
 		receivedPgsqlRequest(m)
@@ -687,17 +709,17 @@ func receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.ts = msg.Ts
 		trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 		trans.JsTs = msg.Ts
-		trans.Src = Endpoint{
+		trans.Src = common.Endpoint{
 			Ip:   msg.TcpTuple.Src_ip.String(),
 			Port: msg.TcpTuple.Src_port,
 			Proc: string(msg.CmdlineTuple.Src),
 		}
-		trans.Dst = Endpoint{
+		trans.Dst = common.Endpoint{
 			Ip:   msg.TcpTuple.Dst_ip.String(),
 			Port: msg.TcpTuple.Dst_port,
 			Proc: string(msg.CmdlineTuple.Dst),
 		}
-		if msg.Direction == TcpDirectionReverse {
+		if msg.Direction == tcp.TcpDirectionReverse {
 			trans.Src, trans.Dst = trans.Dst, trans.Src
 		}
 
@@ -766,9 +788,9 @@ func (publisher *PublisherType) PublishPgsqlTransaction(t *PgsqlTransaction) err
 
 	event["type"] = "pgsql"
 	if t.Pgsql["iserror"].(bool) {
-		event["status"] = ERROR_STATUS
+		event["status"] = common.ERROR_STATUS
 	} else {
-		event["status"] = OK_STATUS
+		event["status"] = common.OK_STATUS
 	}
 	event["response_time"] = t.ResponseTime
 	event["tequest_raw"] = t.Request_raw

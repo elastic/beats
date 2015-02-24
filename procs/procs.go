@@ -1,13 +1,16 @@
-package main
+package procs
 
 import (
 	"bufio"
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"os"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"path/filepath"
 	"runtime"
@@ -56,21 +59,9 @@ type ProcessesWatcher struct {
 	TestSignals *chan bool
 }
 
-var procWatcher ProcessesWatcher
+var ProcWatcher ProcessesWatcher
 
-// Config
-type tomlProcs struct {
-	Dont_read_from_proc bool
-	Max_proc_read_freq  int
-	Monitored           map[string]tomlProc
-	Refresh_pids_freq   int
-}
-
-type tomlProc struct {
-	Cmdline_grep string
-}
-
-func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
+func (proc *ProcessesWatcher) Init(config *config.Procs) error {
 
 	proc.proc_prefix = ""
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
@@ -98,7 +89,7 @@ func (proc *ProcessesWatcher) Init(config *tomlProcs) error {
 
 	// Read the local IP addresses
 	var err error
-	proc.LocalAddrs, err = LocalIpAddrs()
+	proc.LocalAddrs, err = common.LocalIpAddrs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
 		proc.LocalAddrs = []net.IP{}
@@ -159,12 +150,12 @@ func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 
 	proc, err := os.Open(filepath.Join(prefix, "/proc"))
 	if err != nil {
-		return pids, MsgError("Open /proc: %s", err)
+		return pids, fmt.Errorf("Open /proc: %s", err)
 	}
 
 	names, err := proc.Readdirnames(0)
 	if err != nil {
-		return pids, MsgError("Readdirnames: %s", err)
+		return pids, fmt.Errorf("Readdirnames: %s", err)
 	}
 
 	for _, name := range names {
@@ -237,7 +228,7 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 func hex_to_ip_port(str []byte) (uint32, uint16, error) {
 	words := bytes.Split(str, []byte(":"))
 	if len(words) < 2 {
-		return 0, 0, MsgError("Didn't find ':' as a separator")
+		return 0, 0, errors.New("Didn't find ':' as a separator")
 	}
 
 	ip, err := strconv.ParseInt(string(words[0]), 16, 64)
@@ -354,11 +345,11 @@ func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
 	if err != nil {
-		return []int64{}, MsgError("Open: %s", err)
+		return []int64{}, fmt.Errorf("Open: %s", err)
 	}
 	names, err := procfs.Readdirnames(0)
 	if err != nil {
-		return []int64{}, MsgError("Readdirnames: %s", err)
+		return []int64{}, fmt.Errorf("Readdirnames: %s", err)
 	}
 
 	for _, name := range names {

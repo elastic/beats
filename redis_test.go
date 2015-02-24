@@ -17,7 +17,7 @@ func TestRedisParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -45,7 +45,7 @@ func TestRedisParser_PosResult(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -73,7 +73,7 @@ func TestRedisParser_NilResult(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &RedisStream{tcpStream: nil, data: message, message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 

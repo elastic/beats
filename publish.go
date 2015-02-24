@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"strings"
@@ -27,15 +28,6 @@ type PublisherType struct {
 
 var Publisher PublisherType
 
-// Config
-type tomlAgent struct {
-	Name                  string
-	Refresh_topology_freq int
-	Ignore_outgoing       bool
-	Topology_expire       int
-	Tags                  []string
-}
-
 type Topology struct {
 	Name string `json:"name"`
 	Ip   string `json:"ip"`
@@ -50,14 +42,9 @@ func PrintPublishEvent(event common.MapStr) {
 	}
 }
 
-const (
-	OK_STATUS    = "OK"
-	ERROR_STATUS = "Error"
-)
-
 func (publisher *PublisherType) GetServerName(ip string) string {
 	// in case the IP is localhost, return current agent name
-	islocal, err := IsLoopback(ip)
+	islocal, err := common.IsLoopback(ip)
 	if err != nil {
 		logp.Err("Parsing IP %s fails with: %s", ip, err)
 		return ""
@@ -74,12 +61,12 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) PublishEvent(ts time.Time, src *Endpoint, dst *Endpoint, event common.MapStr) error {
+func (publisher *PublisherType) PublishEvent(ts time.Time, src *common.Endpoint, dst *common.Endpoint, event common.MapStr) error {
 
 	src_server := publisher.GetServerName(src.Ip)
 	dst_server := publisher.GetServerName(dst.Ip)
 
-	if _Config.Agent.Ignore_outgoing && dst_server != "" &&
+	if config.ConfigSingleton.Agent.Ignore_outgoing && dst_server != "" &&
 		dst_server != publisher.name {
 		// duplicated transaction -> ignore it
 		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
@@ -149,7 +136,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	var localAddrs []string = params
 
 	if len(params) == 0 {
-		addrs, err := LocalIpAddrsAsStrings(false)
+		addrs, err := common.LocalIpAddrsAsStrings(false)
 		if err != nil {
 			logp.Err("Getting local IP addresses fails with: %s", err)
 			return err
@@ -177,10 +164,10 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	output, exists := _Config.Output["elasticsearch"]
+	output, exists := config.ConfigSingleton.Output["elasticsearch"]
 	if exists && output.Enabled && !publisher.disabled {
 		err := publisher.ElasticsearchOutput.Init(output,
-			_Config.Agent.Topology_expire)
+			config.ConfigSingleton.Agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
@@ -197,11 +184,11 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	output, exists = _Config.Output["redis"]
+	output, exists = config.ConfigSingleton.Output["redis"]
 	if exists && output.Enabled && !publisher.disabled {
 		logp.Debug("publish", "REDIS publisher enabled")
 		err := publisher.RedisOutput.Init(output,
-			_Config.Agent.Topology_expire)
+			config.ConfigSingleton.Agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
@@ -218,7 +205,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	output, exists = _Config.Output["file"]
+	output, exists = config.ConfigSingleton.Output["file"]
 	if exists && output.Enabled {
 		err := publisher.FileOutput.Init(output)
 		if err != nil {
@@ -241,7 +228,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	publisher.name = _Config.Agent.Name
+	publisher.name = config.ConfigSingleton.Agent.Name
 	if len(publisher.name) == 0 {
 		// use the hostname
 		publisher.name, err = os.Hostname()
@@ -252,14 +239,14 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
 	}
 
-	if len(_Config.Agent.Tags) > 0 {
-		publisher.tags = strings.Join(_Config.Agent.Tags, " ")
+	if len(config.ConfigSingleton.Agent.Tags) > 0 {
+		publisher.tags = strings.Join(config.ConfigSingleton.Agent.Tags, " ")
 	}
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if _Config.Agent.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(_Config.Agent.Refresh_topology_freq) * time.Second
+		if config.ConfigSingleton.Agent.Refresh_topology_freq != 0 {
+			RefreshTopologyFreq = time.Duration(config.ConfigSingleton.Agent.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)

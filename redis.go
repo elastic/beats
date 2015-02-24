@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/procs"
+	"packetbeat/protos"
+	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +30,7 @@ type RedisMessage struct {
 }
 
 type RedisStream struct {
-	tcpStream *TcpStream
+	tcptuple *common.TcpTuple
 
 	data []byte
 
@@ -40,8 +43,8 @@ type RedisStream struct {
 type RedisTransaction struct {
 	Type         string
 	tuple        common.TcpTuple
-	Src          Endpoint
-	Dst          Endpoint
+	Src          common.Endpoint
+	Dst          common.Endpoint
 	ResponseTime int32
 	Ts           int64
 	JsTs         time.Time
@@ -399,39 +402,54 @@ func readLine(data []byte, offset int) (bool, string, int) {
 	return true, string(data[offset : offset+q]), offset + q + 2
 }
 
-func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
+type redisPrivateData struct {
+	Data [2]*RedisStream
+}
+
+func ParseRedis(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
 	defer logp.Recover("ParseRedis exception")
 
-	if tcp.redisData[dir] == nil {
-		tcp.redisData[dir] = &RedisStream{
-			tcpStream: tcp,
-			data:      pkt.payload,
-			message:   &RedisMessage{Ts: pkt.ts},
-		}
-	} else {
-		// concatenate bytes
-		tcp.redisData[dir].data = append(tcp.redisData[dir].data, pkt.payload...)
-		if len(tcp.redisData[dir].data) > TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("redis", "Stream data too large, dropping TCP stream")
-			tcp.redisData[dir] = nil
-			return
+	priv := redisPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(redisPrivateData)
+		if !ok {
+			priv = redisPrivateData{}
 		}
 	}
 
-	stream := tcp.redisData[dir]
+	if priv.Data[dir] == nil {
+		priv.Data[dir] = &RedisStream{
+			tcptuple: tcptuple,
+			data:     pkt.Payload,
+			message:  &RedisMessage{Ts: pkt.Ts},
+		}
+	} else {
+		// concatenate bytes
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			logp.Debug("redis", "Stream data too large, dropping TCP stream")
+			priv.Data[dir] = nil
+			return priv
+		}
+	}
+
+	stream := priv.Data[dir]
 	for len(stream.data) > 0 {
 		if stream.message == nil {
-			stream.message = &RedisMessage{Ts: pkt.ts}
+			stream.message = &RedisMessage{Ts: pkt.Ts}
 		}
 
-		ok, complete := redisMessageParser(tcp.redisData[dir])
+		ok, complete := redisMessageParser(priv.Data[dir])
 
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			tcp.redisData[dir] = nil
+			priv.Data[dir] = nil
 			logp.Debug("redis", "Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
-			return
+			return priv
 		}
 
 		if complete {
@@ -443,7 +461,7 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
 			}
 
 			// all ok, go to next level
-			handleRedis(stream.message, tcp, dir)
+			handleRedis(stream.message, tcptuple, dir)
 
 			// and reset message
 			stream.PrepareForNewMessage()
@@ -453,6 +471,7 @@ func ParseRedis(pkt *Packet, tcp *TcpStream, dir uint8) {
 		}
 	}
 
+	return priv
 }
 
 func isRedisCommand(key string) bool {
@@ -460,12 +479,12 @@ func isRedisCommand(key string) bool {
 	return exists
 }
 
-func handleRedis(m *RedisMessage, tcp *TcpStream,
+func handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 	dir uint8) {
 
-	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 
 	if m.IsRequest {
 		receivedRedisRequest(m)
@@ -499,17 +518,17 @@ func receivedRedisRequest(msg *RedisMessage) {
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 	trans.JsTs = msg.Ts
-	trans.Src = Endpoint{
+	trans.Src = common.Endpoint{
 		Ip:   msg.TcpTuple.Src_ip.String(),
 		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
-	trans.Dst = Endpoint{
+	trans.Dst = common.Endpoint{
 		Ip:   msg.TcpTuple.Dst_ip.String(),
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == TcpDirectionReverse {
+	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
@@ -573,9 +592,9 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 	event := common.MapStr{}
 	event["type"] = "redis"
 	if !t.IsError {
-		event["status"] = OK_STATUS
+		event["status"] = common.OK_STATUS
 	} else {
-		event["status"] = ERROR_STATUS
+		event["status"] = common.ERROR_STATUS
 	}
 	event["response_time"] = t.ResponseTime
 	event["request_raw"] = t.Request_raw

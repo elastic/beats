@@ -16,9 +16,12 @@ import (
 	"syscall"
 	"time"
 
+	"packetbeat/config"
 	"packetbeat/inputs/sniffer"
 	"packetbeat/logp"
-	"packetbeat/outputs"
+	"packetbeat/procs"
+	"packetbeat/protos/http"
+	"packetbeat/protos/tcp"
 
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
@@ -30,58 +33,12 @@ const Version = "0.4.3"
 // Structure grouping main components/modules
 type PacketbeatStruct struct {
 	Sniffer *sniffer.SnifferSetup
-	Decoder *DecoderStruct
+	Decoder *tcp.DecoderStruct
 }
 
 // Global variable containing the main values
 var Packetbeat PacketbeatStruct
 
-type protocolType uint16
-
-const (
-	UnknownProtocol protocolType = iota
-	HttpProtocol
-	MysqlProtocol
-	RedisProtocol
-	PgsqlProtocol
-	ThriftProtocol
-)
-
-var protocolNames = []string{"unknown", "http", "mysql", "redis", "pgsql", "thrift"}
-
-type tomlConfig struct {
-	Interfaces sniffer.InterfacesConfig
-	RunOptions tomlRunOptions
-	Protocols  map[string]tomlProtocol
-	Procs      tomlProcs
-	Output     map[string]outputs.MothershipConfig
-	Agent      tomlAgent
-	Logging    tomlLogging
-	Passwords  tomlPasswords
-	Thrift     tomlThrift
-	Http       tomlHttp
-	Geoip      tomlGeoip
-}
-
-type tomlRunOptions struct {
-	Uid int
-	Gid int
-}
-
-type tomlLogging struct {
-	Selectors []string
-}
-
-type tomlPasswords struct {
-	Hide_keywords []string
-}
-
-type tomlGeoip struct {
-	Paths []string
-}
-
-var _Config tomlConfig
-var _ConfigMeta toml.MetaData
 var _GeoLite *libgeo.GeoIP
 
 func Bytes_Ipv4_Ntoa(bytes []byte) string {
@@ -116,8 +73,8 @@ func loadGeoIPData() {
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if _ConfigMeta.IsDefined("geoip", "paths") {
-		geoip_paths = _Config.Geoip.Paths
+	if config.ConfigMeta.IsDefined("geoip", "paths") {
+		geoip_paths = config.ConfigSingleton.Geoip.Paths
 	}
 	if len(geoip_paths) == 0 {
 		// disabled
@@ -198,12 +155,12 @@ func main() {
 
 	var err error
 
-	if _ConfigMeta, err = toml.DecodeFile(*configfile, &_Config); err != nil {
+	if config.ConfigMeta, err = toml.DecodeFile(*configfile, &config.ConfigSingleton); err != nil {
 		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
 	if len(debugSelectors) == 0 {
-		debugSelectors = _Config.Logging.Selectors
+		debugSelectors = config.ConfigSingleton.Logging.Selectors
 	}
 	logp.LogInit(logp.Priority(logLevel), "", !*toStdout, debugSelectors)
 
@@ -212,14 +169,15 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	_Config.Interfaces.Bpf_filter = configToFilter(&_Config)
-	Packetbeat.Sniffer, err = sniffer.CreateSniffer(&_Config.Interfaces, file)
+	config.ConfigSingleton.Interfaces.Bpf_filter =
+		tcp.ConfigToFilter(config.ConfigSingleton.Protocols)
+	Packetbeat.Sniffer, err = sniffer.CreateSniffer(&config.ConfigSingleton.Interfaces, file)
 	if err != nil {
 		logp.Critical("Error creating sniffer: %s", err)
 		return
 	}
 	sniffer := Packetbeat.Sniffer
-	Packetbeat.Decoder, err = CreateDecoder(sniffer.Datalink())
+	Packetbeat.Decoder, err = tcp.CreateDecoder(sniffer.Datalink())
 	if err != nil {
 		logp.Critical("Error creating decoder: %s", err)
 		return
@@ -235,7 +193,7 @@ func main() {
 		return
 	}
 
-	if err = procWatcher.Init(&_Config.Procs); err != nil {
+	if err = procs.ProcWatcher.Init(&config.ConfigSingleton.Procs); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
@@ -245,12 +203,12 @@ func main() {
 		return
 	}
 
-	if err = HttpMod.Init(false); err != nil {
+	if err = http.HttpMod.Init(false, nil); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
 
-	if err = TcpInit(); err != nil {
+	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
@@ -365,8 +323,8 @@ func main() {
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire
-		time.Sleep(TCP_STREAM_EXPIRY * 1.2)
-		PrintTcpMap()
+		time.Sleep(tcp.TCP_STREAM_EXPIRY * 1.2)
+		tcp.PrintTcpMap()
 		runtime.GC()
 
 		writeHeapProfile(*memprofile)

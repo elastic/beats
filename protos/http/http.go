@@ -1,13 +1,20 @@
-package main
+package http
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
+	"packetbeat/procs"
+	"packetbeat/protos"
+	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
 )
 
 const (
@@ -55,7 +62,7 @@ type HttpMessage struct {
 }
 
 type HttpStream struct {
-	tcpStream *TcpStream
+	tcptuple *common.TcpTuple
 
 	data []byte
 
@@ -69,8 +76,8 @@ type HttpStream struct {
 type HttpTransaction struct {
 	Type         string
 	tuple        common.TcpTuple
-	Src          Endpoint
-	Dst          Endpoint
+	Src          common.Endpoint
+	Dst          common.Endpoint
 	Real_ip      string
 	ResponseTime int32
 	Ts           int64
@@ -100,15 +107,7 @@ type Http struct {
 
 	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
-	Publisher *PublisherType
-}
-
-type tomlHttp struct {
-	Send_all_headers bool
-	Send_headers     []string
-	Split_cookie     bool
-	Real_ip_header   string
-	Include_body_for []string
+	results chan common.MapStr
 }
 
 var HttpMod Http
@@ -118,41 +117,46 @@ func (http *Http) InitDefaults() {
 	http.Send_response = true
 }
 
-func (http *Http) setFromConfig() (err error) {
-	if _ConfigMeta.IsDefined("protocols", "http", "send_request") {
-		http.Send_request = _Config.Protocols["http"].Send_request
+func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
+	if meta.IsDefined("protocols", "http", "send_request") {
+		http.Send_request = config.Protocols["http"].Send_request
 	}
-	if _ConfigMeta.IsDefined("protocols", "http", "send_response") {
-		http.Send_response = _Config.Protocols["http"].Send_response
+	if meta.IsDefined("protocols", "http", "send_response") {
+		http.Send_response = config.Protocols["http"].Send_response
 	}
 
-	if _Config.Http.Send_all_headers {
+	if config.Http.Send_all_headers {
 		http.Send_headers = true
 		http.Send_all_headers = true
 	} else {
-		if len(_Config.Http.Send_headers) > 0 {
+		if len(config.Http.Send_headers) > 0 {
 			http.Send_headers = true
 
 			http.Headers_whitelist = map[string]bool{}
-			for _, hdr := range _Config.Http.Send_headers {
+			for _, hdr := range config.Http.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	http.Split_cookie = _Config.Http.Split_cookie
+	http.Split_cookie = config.Http.Split_cookie
 
-	http.Real_ip_header = strings.ToLower(_Config.Http.Real_ip_header)
+	http.Real_ip_header = strings.ToLower(config.Http.Real_ip_header)
 
 	return nil
 }
 
-func (http *Http) Init(test_mode bool) error {
+const (
+	TransactionsHashSize = 2 ^ 16
+	TransactionTimeout   = 10 * 1e9
+)
+
+func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 
 	http.InitDefaults()
 
 	if !test_mode {
-		err := http.setFromConfig()
+		err := http.SetFromConfig(&config.ConfigSingleton, &config.ConfigMeta)
 		if err != nil {
 			return err
 		}
@@ -160,16 +164,14 @@ func (http *Http) Init(test_mode bool) error {
 
 	http.transactionsMap = make(map[common.HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
 
-	if !test_mode {
-		http.Publisher = &Publisher
-	}
+	http.results = results
 
 	return nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
-		return 0, 0, MsgError("Invalid version")
+		return 0, 0, errors.New("Invalid version")
 	}
 
 	major, _ := strconv.Atoi(string(s[0]))
@@ -184,14 +186,14 @@ func parseResponseStatus(s []byte) (uint16, string, error) {
 
 	p := bytes.Index(s, []byte(" "))
 	if p == -1 {
-		return 0, "", MsgError("Not beeing able to identify status code")
+		return 0, "", errors.New("Not beeing able to identify status code")
 	}
 
 	status_code, _ := strconv.Atoi(string(s[0:p]))
 
 	p = bytes.LastIndex(s, []byte(" "))
 	if p == -1 {
-		return uint16(status_code), "", MsgError("Not beeing able to identify status code")
+		return uint16(status_code), "", errors.New("Not beeing able to identify status code")
 	}
 	status_phrase := s[p+1:]
 	return uint16(status_code), string(status_phrase), nil
@@ -491,58 +493,83 @@ func (stream *HttpStream) PrepareForNewMessage() {
 	stream.message = nil
 }
 
-func (http *Http) Parse(pkt *Packet, tcp *TcpStream, dir uint8) {
+type httpPrivateData struct {
+	Data [2]*HttpStream
+}
+
+func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	defer logp.Recover("ParseHttp exception")
 
-	logp.Debug("httpdetailed", "Payload received: [%s]", pkt.payload)
+	logp.Debug("httpdetailed", "Payload received: [%s]", pkt.Payload)
 
-	if tcp.httpData[dir] == nil {
-		tcp.httpData[dir] = &HttpStream{
-			tcpStream: tcp,
-			data:      pkt.payload,
-			message:   &HttpMessage{Ts: pkt.ts},
+	priv := httpPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(httpPrivateData)
+		if !ok {
+			priv = httpPrivateData{}
+		}
+	}
+
+	if priv.Data[dir] == nil {
+		priv.Data[dir] = &HttpStream{
+			tcptuple: tcptuple,
+			data:     pkt.Payload,
+			message:  &HttpMessage{Ts: pkt.Ts},
 		}
 
 	} else {
 		// concatenate bytes
-		tcp.httpData[dir].data = append(tcp.httpData[dir].data, pkt.payload...)
-		if len(tcp.httpData[dir].data) > TCP_MAX_DATA_IN_STREAM {
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("http", "Stream data too large, dropping TCP stream")
-			tcp.httpData[dir] = nil
-			return
+			priv.Data[dir] = nil
+			return priv
 		}
 	}
-	stream := tcp.httpData[dir]
+	stream := priv.Data[dir]
 	if stream.message == nil {
-		stream.message = &HttpMessage{Ts: pkt.ts}
+		stream.message = &HttpMessage{Ts: pkt.Ts}
 	}
 	ok, complete := http.messageParser(stream)
 
 	if !ok {
 		// drop this tcp stream. Will retry parsing with the next
 		// segment in it
-		tcp.httpData[dir] = nil
-		return
+		priv.Data[dir] = nil
+		return priv
 	}
 
 	if complete {
 		// all ok, ship it
 		msg := stream.data[stream.message.start:stream.message.end]
-		censorPasswords(stream.message, msg)
+		http.censorPasswords(stream.message, msg)
 
-		http.handleHttp(stream.message, tcp, dir, msg)
+		http.handleHttp(stream.message, tcptuple, dir, msg)
 
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
+
+	return priv
 }
 
-func (http *Http) ReceivedFin(tcp *TcpStream, dir uint8) {
-	if tcp.httpData[dir] == nil {
-		return
+func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	if private == nil {
+		return private
+	}
+	httpData, ok := private.(httpPrivateData)
+	if !ok {
+		return private
+	}
+	if httpData.Data[dir] == nil {
+		return httpData
 	}
 
-	stream := tcp.httpData[dir]
+	stream := httpData.Data[dir]
 
 	// send whatever data we got so far as complete. This
 	// is needed for the HTTP/1.0 without Content-Length situation.
@@ -552,21 +579,23 @@ func (http *Http) ReceivedFin(tcp *TcpStream, dir uint8) {
 		logp.Debug("httpdetailed", "Publish something on connection FIN")
 
 		msg := stream.data[stream.message.start:]
-		censorPasswords(stream.message, msg)
+		http.censorPasswords(stream.message, msg)
 
-		http.handleHttp(stream.message, tcp, dir, msg)
+		http.handleHttp(stream.message, tcptuple, dir, msg)
 
 		// and reset message. Probably not needed, just to be sure.
 		stream.PrepareForNewMessage()
 	}
+
+	return httpData
 }
 
-func (http *Http) handleHttp(m *HttpMessage, tcp *TcpStream,
+func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
 
 	if m.IsRequest {
@@ -593,23 +622,23 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
 	trans.JsTs = msg.Ts
-	trans.Src = Endpoint{
+	trans.Src = common.Endpoint{
 		Ip:   msg.TcpTuple.Src_ip.String(),
 		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
-	trans.Dst = Endpoint{
+	trans.Dst = common.Endpoint{
 		Ip:   msg.TcpTuple.Dst_ip.String(),
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == TcpDirectionReverse {
+	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
 	// save Raw message
 	if http.Send_request {
-		trans.Request_raw = string(cutMessageBody(msg))
+		trans.Request_raw = string(http.cutMessageBody(msg))
 	}
 
 	trans.Method = msg.Method
@@ -695,14 +724,10 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	// save Raw message
 	if http.Send_response {
-		trans.Response_raw = string(cutMessageBody(msg))
+		trans.Response_raw = string(http.cutMessageBody(msg))
 	}
 
-	err := http.PublishTransaction(trans)
-
-	if err != nil {
-		logp.Warn("Publish failure: %s", err)
-	}
+	http.PublishTransaction(trans)
 
 	logp.Debug("http", "HTTP transaction completed: %s\n", trans.Http)
 
@@ -713,10 +738,10 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	}
 }
 
-func (http *Http) PublishTransaction(t *HttpTransaction) error {
+func (http *Http) PublishTransaction(t *HttpTransaction) {
 
-	if http.Publisher == nil {
-		return nil
+	if http.results == nil {
+		return
 	}
 
 	event := common.MapStr{}
@@ -724,9 +749,9 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	event["type"] = "http"
 	code := t.Http["code"].(uint16)
 	if code < 400 {
-		event["status"] = OK_STATUS
+		event["status"] = common.OK_STATUS
 	} else {
-		event["status"] = ERROR_STATUS
+		event["status"] = common.ERROR_STATUS
 	}
 	event["responsetime"] = t.ResponseTime
 	if http.Send_request {
@@ -742,8 +767,11 @@ func (http *Http) PublishTransaction(t *HttpTransaction) error {
 	event["method"] = t.Method
 	event["path"] = t.RequestUri
 
-	return http.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
+	event["ts"] = t.ts
+	event["src"] = t.Src
+	event["dst"] = t.Dst
 
+	http.results <- event
 }
 
 func splitCookiesHeader(headerVal string) map[string]string {
@@ -758,7 +786,7 @@ func splitCookiesHeader(headerVal string) map[string]string {
 	return cookies
 }
 
-func cutMessageBody(m *HttpMessage) []byte {
+func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut := []byte{}
 
 	// add headers always
@@ -766,7 +794,7 @@ func cutMessageBody(m *HttpMessage) []byte {
 
 	// add body
 	contentType, ok := m.Headers["content-type"]
-	if ok && (len(contentType) == 0 || shouldIncludeInBody(contentType)) {
+	if ok && (len(contentType) == 0 || http.shouldIncludeInBody(contentType)) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
@@ -778,8 +806,8 @@ func cutMessageBody(m *HttpMessage) []byte {
 	return raw_msg_cut
 }
 
-func shouldIncludeInBody(contenttype string) bool {
-	include_body := _Config.Http.Include_body_for
+func (http *Http) shouldIncludeInBody(contenttype string) bool {
+	include_body := config.ConfigSingleton.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
 			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
@@ -790,9 +818,9 @@ func shouldIncludeInBody(contenttype string) bool {
 	return false
 }
 
-func censorPasswords(m *HttpMessage, msg []byte) {
+func (http *Http) censorPasswords(m *HttpMessage, msg []byte) {
 
-	keywords := _Config.Passwords.Hide_keywords
+	keywords := config.ConfigSingleton.Passwords.Hide_keywords
 
 	if m.IsRequest && m.ContentLength > 0 &&
 		strings.Contains(m.Headers["content-type"], "urlencoded") {

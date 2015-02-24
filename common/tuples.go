@@ -116,6 +116,13 @@ func (t TcpTuple) String() string {
 		t.Stream_id)
 }
 
+// Returns a pointer to the equivalent IpPortTuple.
+func (t TcpTuple) IpPort() *IpPortTuple {
+	ipport := NewIpPortTuple(t.Ip_length, t.Src_ip, t.Src_port,
+		t.Dst_ip, t.Dst_port)
+	return &ipport
+}
+
 // Hashable() returns a hashable value that uniquely identifies
 // the TCP tuple.
 func (t *TcpTuple) Hashable() HashableTcpTuple {

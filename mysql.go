@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"packetbeat/common"
 	"packetbeat/logp"
+	"packetbeat/procs"
+	"packetbeat/protos"
+	"packetbeat/protos/tcp"
 	"strings"
 	"time"
 )
@@ -51,8 +54,8 @@ type MysqlMessage struct {
 type MysqlTransaction struct {
 	Type         string
 	tuple        common.TcpTuple
-	Src          Endpoint
-	Dst          Endpoint
+	Src          common.Endpoint
+	Dst          common.Endpoint
 	ResponseTime int32
 	Ts           int64
 	JsTs         time.Time
@@ -71,7 +74,7 @@ type MysqlTransaction struct {
 }
 
 type MysqlStream struct {
-	tcpStream *TcpStream
+	tcptuple *common.TcpTuple
 
 	data []byte
 
@@ -310,39 +313,53 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 	return true, false
 }
 
-func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
+type mysqlPrivateData struct {
+	Data [2]*MysqlStream
+}
+
+func ParseMysql(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseMysql exception")
 
-	if tcp.mysqlData[dir] == nil {
-		tcp.mysqlData[dir] = &MysqlStream{
-			tcpStream: tcp,
-			data:      pkt.payload,
-			message:   &MysqlMessage{Ts: pkt.ts},
-		}
-	} else {
-		// concatenate bytes
-		tcp.mysqlData[dir].data = append(tcp.mysqlData[dir].data, pkt.payload...)
-		if len(tcp.mysqlData[dir].data) > TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("mysql", "Stream data too large, dropping TCP stream")
-			tcp.mysqlData[dir] = nil
-			return
+	priv := mysqlPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(mysqlPrivateData)
+		if !ok {
+			priv = mysqlPrivateData{}
 		}
 	}
 
-	stream := tcp.mysqlData[dir]
+	if priv.Data[dir] == nil {
+		priv.Data[dir] = &MysqlStream{
+			tcptuple: tcptuple,
+			data:     pkt.Payload,
+			message:  &MysqlMessage{Ts: pkt.Ts},
+		}
+	} else {
+		// concatenate bytes
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			logp.Debug("mysql", "Stream data too large, dropping TCP stream")
+			priv.Data[dir] = nil
+			return priv
+		}
+	}
+
+	stream := priv.Data[dir]
 	for len(stream.data) > 0 {
 		if stream.message == nil {
-			stream.message = &MysqlMessage{Ts: pkt.ts}
+			stream.message = &MysqlMessage{Ts: pkt.Ts}
 		}
 
-		ok, complete := mysqlMessageParser(tcp.mysqlData[dir])
+		ok, complete := mysqlMessageParser(priv.Data[dir])
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			tcp.mysqlData[dir] = nil
+			priv.Data[dir] = nil
 			logp.Debug("mysql", "Ignore MySQL message. Drop tcp stream. Try parsing with the next segment")
-			return
+			return priv
 		}
 
 		if complete {
@@ -350,7 +367,7 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			msg := stream.data[stream.message.start:stream.message.end]
 
 			if !stream.message.IgnoreMessage {
-				handleMysql(stream.message, tcp, dir, msg)
+				handleMysql(stream.message, tcptuple, dir, msg)
 			}
 
 			// and reset message
@@ -360,14 +377,15 @@ func ParseMysql(pkt *Packet, tcp *TcpStream, dir uint8) {
 			break
 		}
 	}
+	return priv
 }
 
-var handleMysql = func(m *MysqlMessage, tcp *TcpStream,
+var handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
 	dir uint8, raw_msg []byte) {
 
-	m.TcpTuple = common.TcpTupleFromIpPort(tcp.tuple, tcp.id)
+	m.TcpTuple = *tcptuple
 	m.Direction = dir
-	m.CmdlineTuple = procWatcher.FindProcessesTuple(tcp.tuple)
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
 
 	if m.IsRequest {
@@ -395,17 +413,17 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
 	trans.JsTs = msg.Ts
-	trans.Src = Endpoint{
+	trans.Src = common.Endpoint{
 		Ip:   msg.TcpTuple.Src_ip.String(),
 		Port: msg.TcpTuple.Src_port,
 		Proc: string(msg.CmdlineTuple.Src),
 	}
-	trans.Dst = Endpoint{
+	trans.Dst = common.Endpoint{
 		Ip:   msg.TcpTuple.Dst_ip.String(),
 		Port: msg.TcpTuple.Dst_port,
 		Proc: string(msg.CmdlineTuple.Dst),
 	}
-	if msg.Direction == TcpDirectionReverse {
+	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
@@ -627,9 +645,9 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event["type"] = "mysql"
 
 	if t.Mysql["iserror"].(bool) {
-		event["status"] = ERROR_STATUS
+		event["status"] = common.ERROR_STATUS
 	} else {
-		event["status"] = OK_STATUS
+		event["status"] = common.OK_STATUS
 	}
 
 	event["response_time"] = t.ResponseTime

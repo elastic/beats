@@ -1,9 +1,12 @@
-package main
+package common
 
 import (
+	"fmt"
 	"net"
 )
 
+// LocalIpAddrs finds the IP addresses of the hosts on which
+// the agent currently runs on.
 func LocalIpAddrs() ([]net.IP, error) {
 	var localAddrs = []net.IP{}
 	addrs, err := net.InterfaceAddrs()
@@ -18,6 +21,9 @@ func LocalIpAddrs() ([]net.IP, error) {
 	return localAddrs, nil
 }
 
+// LocalIpAddrs finds the IP addresses of the hosts on which
+// the agent currently runs on and returns them as an array of
+// strings.
 func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 	var localAddrsStrings = []string{}
 	var err error
@@ -33,10 +39,12 @@ func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 	return localAddrsStrings, err
 }
 
+// IsLoopback check if a particular IP notation corresponds
+// to a loopback interface.
 func IsLoopback(ip_str string) (bool, error) {
 	ip := net.ParseIP(ip_str)
 	if ip == nil {
-		return false, MsgError("Wrong IP format %s", ip_str)
+		return false, fmt.Errorf("Wrong IP format %s", ip_str)
 	}
 	return ip.IsLoopback(), nil
 }
