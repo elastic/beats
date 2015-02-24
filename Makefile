@@ -3,8 +3,8 @@ CONF_PATH?=/etc/packetbeat
 VERSION?=0.4.3
 ARCH?=$(shell uname -m)
 
-
-packetbeat: *.go
+GOFILES = $(shell find . -type f -name '*.go')
+packetbeat: $(GOFILES)
 	go build
 
 go-daemon/god: go-daemon/god.c
@@ -40,7 +40,7 @@ dist: packetbeat go-daemon/god
 
 .PHONY: gofmt
 gofmt:
-	gofmt -w *.go
+	go fmt ./...
 
 .PHONY: test
 test:
@@ -50,7 +50,7 @@ test:
 .PHONY: testlong
 testlong:
 	go vet
-	go test
+	go test ./...
 	make -C tests test
 
 .PHONY: cover
