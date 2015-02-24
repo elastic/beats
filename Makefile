@@ -51,7 +51,7 @@ test:
 testlong:
 	go vet
 	go test ./...
-	make -C tests test
+	#make -C tests test
 
 .PHONY: cover
 cover:
