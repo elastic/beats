@@ -58,7 +58,7 @@ type TcpStream struct {
 	lastSeq [2]uint32
 
 	// protocols private data
-	Data *protos.ProtocolData
+	Data protos.ProtocolData
 }
 
 func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, original_dir uint8) {
@@ -70,19 +70,23 @@ func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, origi
 	stream.timer = time.AfterFunc(TCP_STREAM_EXPIRY, func() { stream.Expire() })
 
 	mod := protos.Protos.Get(stream.protocol)
+	if mod == nil {
+		logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s", stream.protocol)
+		return
+	}
 
 	if len(pkt.Payload) > 0 {
-		(*mod).Parse(pkt, &stream.tcptuple, original_dir)
+		stream.Data = mod.Parse(pkt, &stream.tcptuple, original_dir, stream.Data)
 	}
 
 	if tcphdr.FIN {
-		(*mod).ReceivedFin(&stream.tcptuple, original_dir)
+		stream.Data = mod.ReceivedFin(&stream.tcptuple, original_dir, stream.Data)
 	}
 }
 
 func (stream *TcpStream) GapInStream(original_dir uint8) {
 	mod := protos.Protos.Get(stream.protocol)
-	(*mod).GapInStream(&stream.tcptuple, original_dir)
+	stream.Data = mod.GapInStream(&stream.tcptuple, original_dir, stream.Data)
 }
 
 func (stream *TcpStream) Expire() {

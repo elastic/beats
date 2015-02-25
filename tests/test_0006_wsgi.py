@@ -32,7 +32,8 @@ class Test(TestCase):
         self.render_config_template(
             http_ports=[8888]
         )
-        self.run_packetbeat(pcap="wsgi_drum.pcap")
+        self.run_packetbeat(pcap="wsgi_drum.pcap",
+                            debug_selectors=["tcp", "http", "protos"])
 
         objs = self.read_output()
         assert len(objs) == 16

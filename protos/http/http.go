@@ -110,8 +110,6 @@ type Http struct {
 	results chan common.MapStr
 }
 
-var HttpMod Http
-
 func (http *Http) InitDefaults() {
 	http.Send_request = true
 	http.Send_response = true
@@ -163,6 +161,8 @@ func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 	}
 
 	http.transactionsMap = make(map[common.HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
+
+	logp.Debug("http", "transactionsMap: %p http: %p", http.transactionsMap, &http)
 
 	http.results = results
 
@@ -499,6 +499,7 @@ type httpPrivateData struct {
 
 func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
+
 	defer logp.Recover("ParseHttp exception")
 
 	logp.Debug("httpdetailed", "Payload received: [%s]", pkt.Payload)
@@ -590,6 +591,12 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return httpData
 }
 
+func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	return private
+}
+
 func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
 	dir uint8, raw_msg []byte) {
 
@@ -614,6 +621,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 		}
 	} else {
 		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
+		logp.Debug("http", "transactionsMap %p http %p", http.transactionsMap, http)
 		http.transactionsMap[msg.TcpTuple.Hashable()] = trans
 	}
 
@@ -767,9 +775,9 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["method"] = t.Method
 	event["path"] = t.RequestUri
 
-	event["ts"] = t.ts
-	event["src"] = t.Src
-	event["dst"] = t.Dst
+	event["timestamp"] = t.ts
+	event["src"] = &t.Src
+	event["dst"] = &t.Dst
 
 	http.results <- event
 }
@@ -846,4 +854,10 @@ func (http *Http) censorPasswords(m *HttpMessage, msg []byte) {
 			}
 		}
 	}
+}
+
+// Create a HTTP plugin and register to the available
+// protocols.
+func NewHttp() *Http {
+	return &Http{}
 }

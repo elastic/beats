@@ -24,6 +24,7 @@ type PublisherType struct {
 	FileOutput          outputs.FileOutputType
 
 	RefreshTopologyTimer <-chan time.Time
+	Queue                chan common.MapStr
 }
 
 var Publisher PublisherType
@@ -58,6 +59,28 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 		return publisher.TopologyOutput.GetNameByIP(ip)
 	} else {
 		return ""
+	}
+}
+
+func (publisher *PublisherType) publishMapStr(event common.MapStr) error {
+	// timestamp is mandatory
+	ts, ok := event["timestamp"].(time.Time)
+	if !ok {
+		return errors.New("Missing 'timestamp' field from MapStr object")
+	}
+
+	src, _ := event["src"].(*common.Endpoint)
+	dst, _ := event["dst"].(*common.Endpoint)
+
+	return publisher.PublishEvent(ts, src, dst, event)
+}
+
+func (publisher *PublisherType) publishFromQueue() {
+	for mapstr := range publisher.Queue {
+		err := publisher.publishMapStr(mapstr)
+		if err != nil {
+			logp.Err("Publishing failed: %v", err)
+		}
 	}
 }
 
@@ -261,6 +284,9 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		// update topology periodically
 		go publisher.UpdateTopologyPeriodically()
 	}
+
+	publisher.Queue = make(chan common.MapStr, 1000)
+	go publisher.publishFromQueue()
 
 	return nil
 }

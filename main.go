@@ -20,6 +20,7 @@ import (
 	"packetbeat/inputs/sniffer"
 	"packetbeat/logp"
 	"packetbeat/procs"
+	"packetbeat/protos"
 	"packetbeat/protos/http"
 	"packetbeat/protos/tcp"
 
@@ -137,6 +138,8 @@ func main() {
 
 	cmdLine.Parse(os.Args[1:])
 
+	fmt.Println("hello")
+
 	if *printVersion {
 		fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
 		return
@@ -203,10 +206,15 @@ func main() {
 		return
 	}
 
-	if err = http.HttpMod.Init(false, nil); err != nil {
-		logp.Critical(err.Error())
+	// create HTTP module
+	httpMod := http.NewHttp()
+	err = httpMod.Init(false, Publisher.Queue)
+	if err != nil {
+		logp.Critical("Http init: %v", err)
 		return
 	}
+	logp.Debug("http", "httpMod: %p", httpMod)
+	protos.Protos.Register(protos.HttpProtocol, httpMod)
 
 	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
 		logp.Critical(err.Error())

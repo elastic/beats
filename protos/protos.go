@@ -2,6 +2,7 @@ package protos
 
 import (
 	"packetbeat/common"
+	"packetbeat/logp"
 	"time"
 )
 
@@ -18,11 +19,21 @@ type Packet struct {
 
 // Functions to be exported by a protocol plugin
 type ProtocolPlugin interface {
+	// Called to initialize the Plugin
 	Init(test_mode bool, results chan common.MapStr) error
-	SetFromConfig() error
-	Parse(pkt *Packet, tcptuple *common.TcpTuple, dir uint8)
-	ReceivedFin(tcptuple *common.TcpTuple, dir uint8)
-	GapInStream(tcptuple *common.TcpTuple, dir uint8)
+
+	// Called when payload data is available for parsing.
+	Parse(pkt *Packet, tcptuple *common.TcpTuple,
+		dir uint8, private ProtocolData) ProtocolData
+
+	// Called when the FIN flag is seen in the TCP stream.
+	ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+		private ProtocolData) ProtocolData
+
+	// Called when a packets are missing from the tcp
+	// stream.
+	GapInStream(tcptuple *common.TcpTuple, dir uint8,
+		private ProtocolData) ProtocolData
 }
 
 // Protocol identifier.
@@ -57,13 +68,13 @@ func (p Protocol) String() string {
 
 // list of protocol plugins
 type Protocols struct {
-	protos map[Protocol]*ProtocolPlugin
+	protos map[Protocol]ProtocolPlugin
 }
 
 // Singleton of Protocols type.
 var Protos Protocols
 
-func (protocols Protocols) Get(proto Protocol) *ProtocolPlugin {
+func (protocols Protocols) Get(proto Protocol) ProtocolPlugin {
 	ret, exists := protocols.protos[proto]
 	if !exists {
 		return nil
@@ -71,11 +82,12 @@ func (protocols Protocols) Get(proto Protocol) *ProtocolPlugin {
 	return ret
 }
 
-func (protos Protocols) Register(proto Protocol, plugin *ProtocolPlugin) {
+func (protos Protocols) Register(proto Protocol, plugin ProtocolPlugin) {
 	protos.protos[proto] = plugin
 }
 
-func Init() {
+func init() {
+	logp.Debug("protos", "Initializing Protos")
 	Protos = Protocols{}
-	Protos.protos = make(map[Protocol]*ProtocolPlugin)
+	Protos.protos = make(map[Protocol]ProtocolPlugin)
 }
