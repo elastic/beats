@@ -98,11 +98,11 @@ const (
 type Mysql struct {
 	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
+	results chan common.MapStr
+
 	// function pointer for mocking
 	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
-
-	results chan common.MapStr
 }
 
 func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {

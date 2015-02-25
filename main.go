@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/pprof"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -23,6 +22,7 @@ import (
 	"packetbeat/protos"
 	"packetbeat/protos/http"
 	"packetbeat/protos/mysql"
+	"packetbeat/protos/pgsql"
 	"packetbeat/protos/tcp"
 
 	"github.com/BurntSushi/toml"
@@ -42,14 +42,6 @@ type PacketbeatStruct struct {
 var Packetbeat PacketbeatStruct
 
 var _GeoLite *libgeo.GeoIP
-
-func Bytes_Ipv4_Ntoa(bytes []byte) string {
-	var strarr []string = make([]string, 4)
-	for i, b := range bytes {
-		strarr[i] = strconv.Itoa(int(b))
-	}
-	return strings.Join(strarr, ".")
-}
 
 func writeHeapProfile(filename string) {
 	f, err := os.Create(filename)
@@ -205,23 +197,20 @@ func main() {
 		return
 	}
 
-	// create HTTP module
-	modHttp := new(http.Http)
-	err = modHttp.Init(false, Publisher.Queue)
-	if err != nil {
-		logp.Critical("Http init: %v", err)
-		return
+	proto_plugins := map[protos.Protocol]protos.ProtocolPlugin{
+		protos.HttpProtocol:  new(http.Http),
+		protos.MysqlProtocol: new(mysql.Mysql),
+		protos.PgsqlProtocol: new(pgsql.Pgsql),
 	}
-	protos.Protos.Register(protos.HttpProtocol, modHttp)
 
-	// create Mysql module
-	modMysql := new(mysql.Mysql)
-	err = modMysql.Init(false, Publisher.Queue)
-	if err != nil {
-		logp.Critical("Mysql init: %v", err)
-		return
+	for proto, plugin := range proto_plugins {
+		err = plugin.Init(false, Publisher.Queue)
+		if err != nil {
+			logp.Critical("Initializing plugin %s failed: %v", proto, plugin)
+			return
+		}
+		protos.Protos.Register(proto, plugin)
 	}
-	protos.Protos.Register(protos.MysqlProtocol, modMysql)
 
 	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
 		logp.Critical(err.Error())

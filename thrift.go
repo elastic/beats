@@ -257,7 +257,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		return true, false // ok, not complete
 	}
 
-	sz := Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4])
+	sz := common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4])
 	if int32(sz) < 0 {
 		m.Version = sz & ThriftVersionMask
 		if m.Version != ThriftVersion1 {
@@ -287,7 +287,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		if len(s.data[offset:]) < 4 {
 			return true, false // ok, not complete
 		}
-		m.SeqId = Bytes_Ntohl(s.data[offset : offset+4])
+		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	} else {
 		// no version mode
@@ -312,7 +312,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 
 		m.Type = uint32(s.data[offset])
 		offset += 1
-		m.SeqId = Bytes_Ntohl(s.data[offset : offset+4])
+		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
 		s.parseOffset = offset + 4
 	}
 
@@ -336,7 +336,7 @@ func (thrift *Thrift) readString(data []byte) (value string, ok bool, complete b
 	if len(data) < 4 {
 		return "", true, false, 0 // ok, not complete
 	}
-	sz := int(Bytes_Ntohl(data[:4]))
+	sz := int(common.Bytes_Ntohl(data[:4]))
 	if int32(sz) < 0 {
 		return "", false, false, 0 // not ok
 	}
@@ -410,7 +410,7 @@ func (thrift *Thrift) readI16(data []byte) (value string, ok bool, complete bool
 	if len(data) < 2 {
 		return "", true, false, 0
 	}
-	i16 := Bytes_Ntohs(data[:2])
+	i16 := common.Bytes_Ntohs(data[:2])
 	value = strconv.Itoa(int(i16))
 
 	return value, true, true, 2
@@ -420,7 +420,7 @@ func (thrift *Thrift) readI32(data []byte) (value string, ok bool, complete bool
 	if len(data) < 4 {
 		return "", true, false, 0
 	}
-	i32 := Bytes_Ntohl(data[:4])
+	i32 := common.Bytes_Ntohl(data[:4])
 	value = strconv.Itoa(int(i32))
 
 	return value, true, true, 4
@@ -430,7 +430,7 @@ func (thrift *Thrift) readI64(data []byte) (value string, ok bool, complete bool
 	if len(data) < 8 {
 		return "", true, false, 0
 	}
-	i64 := Bytes_Ntohll(data[:8])
+	i64 := common.Bytes_Ntohll(data[:8])
 	value = strconv.FormatInt(int64(i64), 10)
 
 	return value, true, true, 8
@@ -449,7 +449,7 @@ func (thrift *Thrift) readListOrSet(data []byte) (value string, ok bool, complet
 		return "", false, false, 0
 	}
 
-	sz := int(Bytes_Ntohl(data[1:5]))
+	sz := int(common.Bytes_Ntohl(data[1:5]))
 	if sz < 0 {
 		logp.Debug("thrift", "List/Set too big: %d", sz)
 		return "", false, false, 0
@@ -513,7 +513,7 @@ func (thrift *Thrift) readMap(data []byte) (value string, ok bool, complete bool
 		return "", false, false, 0
 	}
 
-	sz := int(Bytes_Ntohl(data[2:6]))
+	sz := int(common.Bytes_Ntohl(data[2:6]))
 	if sz < 0 {
 		logp.Debug("thrift", "Map too big: %d", sz)
 		return "", false, false, 0
@@ -582,7 +582,7 @@ func (thrift *Thrift) readStruct(data []byte) (value string, ok bool, complete b
 			return "", true, false, 0 // not complete
 		}
 
-		field.Id = Bytes_Ntohs(data[offset : offset+2])
+		field.Id = common.Bytes_Ntohs(data[offset : offset+2])
 		offset += 2
 
 		funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -671,7 +671,7 @@ func (thrift *Thrift) readField(s *ThriftStream) (ok bool, complete bool, field 
 	if len(s.data[offset:]) < 2 {
 		return true, false, nil // ok, not complete
 	}
-	field.Id = Bytes_Ntohs(s.data[offset : offset+2])
+	field.Id = common.Bytes_Ntohs(s.data[offset : offset+2])
 	offset += 2
 
 	funcReader, typeFound := thrift.funcReadersByType(field.Type)
@@ -707,7 +707,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 				if len(s.data) < 4 {
 					return true, false
 				}
-				m.FrameSize = Bytes_Ntohl(s.data[:4])
+				m.FrameSize = common.Bytes_Ntohl(s.data[:4])
 				s.parseOffset = 4
 			}
 

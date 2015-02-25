@@ -1,4 +1,4 @@
-package main
+package pgsql
 
 import (
 	"encoding/hex"
@@ -8,6 +8,12 @@ import (
 	"testing"
 	"time"
 )
+
+func PgsqlModForTests() *Pgsql {
+	var pgsql Pgsql
+	pgsql.Init(true, nil)
+	return &pgsql
+}
 
 // Test parsing a request with a single query
 func TestPgsqlParser_simpleRequest(t *testing.T) {
@@ -155,6 +161,8 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 // Test 3 responses in a row
 func TestPgsqlParser_threeResponses(t *testing.T) {
 
+	pgsql := PgsqlModForTests()
+
 	data, err := hex.DecodeString(
 		"5300000017446174655374796c650049534f2c204d445900430000000853455400430000000853455400540000005700036f696400000004eefffe0000001a0004ffffffff0000656e636f64696e6700000000000000000000130040ffffffff00006461746c6173747379736f696400000004ee00090000001a0004ffffffff0000440000002000030000000531313836350000000455544638000000053131383537430000000d53454c4543542031005a0000000549")
 	if err != nil {
@@ -173,17 +181,13 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	var private pgsqlPrivateData
 	var count_handlePgsql = 0
 
-	old_handlePgsql := handlePgsql
-	defer func() {
-		handlePgsql = old_handlePgsql
-	}()
-	handlePgsql = func(m *PgsqlMessage, tcptuple *common.TcpTuple,
+	pgsql.handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handlePgsql += 1
 	}
 
-	ParsePgsql(&pkt, &tuple, 1, private)
+	pgsql.Parse(&pkt, &tuple, 1, private)
 
 	if count_handlePgsql != 3 {
 		t.Error("handlePgsql not called three times")

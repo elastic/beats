@@ -227,6 +227,11 @@ var RedisCommands = map[string]struct{}{
 	"ZUNIONSTORE":      struct{}{},
 }
 
+const (
+	TransactionsHashSize = 2 ^ 16
+	TransactionTimeout   = 10 * 1e9
+)
+
 var redisTransactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
 
 func (stream *RedisStream) PrepareForNewMessage() {
