@@ -23,6 +23,7 @@ import (
 	"packetbeat/protos/http"
 	"packetbeat/protos/mysql"
 	"packetbeat/protos/pgsql"
+	"packetbeat/protos/redis"
 	"packetbeat/protos/tcp"
 
 	"github.com/BurntSushi/toml"
@@ -31,6 +32,13 @@ import (
 )
 
 const Version = "0.4.3"
+
+var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
+	protos.HttpProtocol:  new(http.Http),
+	protos.MysqlProtocol: new(mysql.Mysql),
+	protos.PgsqlProtocol: new(pgsql.Pgsql),
+	protos.RedisProtocol: new(redis.Redis),
+}
 
 // Structure grouping main components/modules
 type PacketbeatStruct struct {
@@ -197,13 +205,8 @@ func main() {
 		return
 	}
 
-	proto_plugins := map[protos.Protocol]protos.ProtocolPlugin{
-		protos.HttpProtocol:  new(http.Http),
-		protos.MysqlProtocol: new(mysql.Mysql),
-		protos.PgsqlProtocol: new(pgsql.Pgsql),
-	}
-
-	for proto, plugin := range proto_plugins {
+	// Initializing protocol plugins
+	for proto, plugin := range EnabledProtocolPlugins {
 		err = plugin.Init(false, Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, plugin)

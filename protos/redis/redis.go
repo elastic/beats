@@ -1,4 +1,4 @@
-package main
+package redis
 
 import (
 	"bytes"
@@ -232,7 +232,18 @@ const (
 	TransactionTimeout   = 10 * 1e9
 )
 
-var redisTransactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
+type Redis struct {
+	transactionsMap map[common.HashableTcpTuple]*RedisTransaction
+
+	results chan common.MapStr
+}
+
+func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
+	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
+	redis.results = results
+
+	return nil
+}
 
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
@@ -411,7 +422,7 @@ type redisPrivateData struct {
 	Data [2]*RedisStream
 }
 
-func ParseRedis(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
+func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseRedis exception")
@@ -466,7 +477,7 @@ func ParseRedis(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
 			}
 
 			// all ok, go to next level
-			handleRedis(stream.message, tcptuple, dir)
+			redis.handleRedis(stream.message, tcptuple, dir)
 
 			// and reset message
 			stream.PrepareForNewMessage()
@@ -484,7 +495,7 @@ func isRedisCommand(key string) bool {
 	return exists
 }
 
-func handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
+func (redis *Redis) handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 	dir uint8) {
 
 	m.TcpTuple = *tcptuple
@@ -492,24 +503,24 @@ func handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 
 	if m.IsRequest {
-		receivedRedisRequest(m)
+		redis.receivedRedisRequest(m)
 	} else {
-		receivedRedisResponse(m)
+		redis.receivedRedisResponse(m)
 	}
 }
 
-func receivedRedisRequest(msg *RedisMessage) {
+func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
-	trans := redisTransactionsMap[tuple.Hashable()]
+	trans := redis.transactionsMap[tuple.Hashable()]
 	if trans != nil {
 		if trans.Redis != nil {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
-		redisTransactionsMap[tuple.Hashable()] = trans
+		redis.transactionsMap[tuple.Hashable()] = trans
 	}
 
 	trans.Redis = common.MapStr{}
@@ -540,20 +551,20 @@ func receivedRedisRequest(msg *RedisMessage) {
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+	trans.timer = time.AfterFunc(TransactionTimeout, func() { redis.expireTransaction(trans) })
 
 }
 
-func (trans *RedisTransaction) Expire() {
+func (redis *Redis) expireTransaction(trans *RedisTransaction) {
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple.Hashable())
+	delete(redis.transactionsMap, trans.tuple.Hashable())
 }
 
-func receivedRedisResponse(msg *RedisMessage) {
+func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 
 	tuple := msg.TcpTuple
-	trans := redisTransactionsMap[tuple.Hashable()]
+	trans := redis.transactionsMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -577,22 +588,38 @@ func receivedRedisResponse(msg *RedisMessage) {
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
-	err := Publisher.PublishRedisTransaction(trans)
-	if err != nil {
-		logp.Warn("Publish failure: %s", err)
-	}
+	redis.publishTransaction(trans)
 
 	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
 
 	// remove from map
-	delete(redisTransactionsMap, trans.tuple.Hashable())
+	delete(redis.transactionsMap, trans.tuple.Hashable())
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
 
 }
 
-func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) error {
+func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	// TODO
+
+	return private
+}
+
+func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	// TODO
+	return private
+}
+
+func (redis *Redis) publishTransaction(t *RedisTransaction) {
+
+	if redis.results == nil {
+		return
+	}
 
 	event := common.MapStr{}
 	event["type"] = "redis"
@@ -611,5 +638,9 @@ func (publisher *PublisherType) PublishRedisTransaction(t *RedisTransaction) err
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
 
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
+	event["timestamp"] = t.ts
+	event["src"] = &t.Src
+	event["dst"] = &t.Dst
+
+	redis.results <- event
 }

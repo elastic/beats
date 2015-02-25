@@ -81,6 +81,11 @@ type ThriftTransaction struct {
 }
 
 const (
+	TransactionsHashSize = 2 ^ 16
+	TransactionTimeout   = 10 * 1e9
+)
+
+const (
 	ThriftStartState = iota
 	ThriftFieldState
 )

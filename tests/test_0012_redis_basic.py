@@ -1,5 +1,4 @@
 from pbtests.packetbeat import TestCase
-import unittest
 
 
 class Test(TestCase):
@@ -7,7 +6,6 @@ class Test(TestCase):
     Basic REDIS tests
     """
 
-    @unittest.skip("disabled during refactoring")
     def test_redis_session(self):
         """
         Should correctly pass a simple Redis Session containing
@@ -45,7 +43,6 @@ class Test(TestCase):
         assert all([isinstance(o["path"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])
 
-    @unittest.skip("disabled during refactoring")
     def test_byteout_bytein(self):
         """
         Should have non-zero byte_in and byte_out values.

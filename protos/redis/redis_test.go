@@ -1,10 +1,8 @@
-package main
+package redis
 
 import (
 	"encoding/hex"
 	"testing"
-	//"fmt"
-	//"log/syslog"
 )
 
 func TestRedisParser_simpleRequest(t *testing.T) {
