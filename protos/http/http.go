@@ -855,9 +855,3 @@ func (http *Http) censorPasswords(m *HttpMessage, msg []byte) {
 		}
 	}
 }
-
-// Create a HTTP plugin and register to the available
-// protocols.
-func NewHttp() *Http {
-	return &Http{}
-}

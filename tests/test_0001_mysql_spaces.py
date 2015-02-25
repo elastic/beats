@@ -6,7 +6,8 @@ class Test(TestCase):
         self.render_config_template(
             mysql_ports=[3306]
         )
-        self.run_packetbeat(pcap="mysql_with_whitespaces.pcap")
+        self.run_packetbeat(pcap="mysql_with_whitespaces.pcap",
+                            debug_selectors=["mysql,tcp,publish"])
 
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])

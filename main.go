@@ -22,6 +22,7 @@ import (
 	"packetbeat/procs"
 	"packetbeat/protos"
 	"packetbeat/protos/http"
+	"packetbeat/protos/mysql"
 	"packetbeat/protos/tcp"
 
 	"github.com/BurntSushi/toml"
@@ -138,8 +139,6 @@ func main() {
 
 	cmdLine.Parse(os.Args[1:])
 
-	fmt.Println("hello")
-
 	if *printVersion {
 		fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
 		return
@@ -207,14 +206,22 @@ func main() {
 	}
 
 	// create HTTP module
-	httpMod := http.NewHttp()
-	err = httpMod.Init(false, Publisher.Queue)
+	modHttp := new(http.Http)
+	err = modHttp.Init(false, Publisher.Queue)
 	if err != nil {
 		logp.Critical("Http init: %v", err)
 		return
 	}
-	logp.Debug("http", "httpMod: %p", httpMod)
-	protos.Protos.Register(protos.HttpProtocol, httpMod)
+	protos.Protos.Register(protos.HttpProtocol, modHttp)
+
+	// create Mysql module
+	modMysql := new(mysql.Mysql)
+	err = modMysql.Init(false, Publisher.Queue)
+	if err != nil {
+		logp.Critical("Mysql init: %v", err)
+		return
+	}
+	protos.Protos.Register(protos.MysqlProtocol, modMysql)
 
 	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
 		logp.Critical(err.Error())

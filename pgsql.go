@@ -73,6 +73,11 @@ type PgsqlStream struct {
 }
 
 const (
+	TransactionsHashSize = 2 ^ 16
+	TransactionTimeout   = 10 * 1e9
+)
+
+const (
 	PgsqlStartState = iota
 	PgsqlGetDataState
 )
@@ -768,7 +773,7 @@ func receivedPgsqlResponse(msg *PgsqlMessage) {
 	trans.Size = msg.Size
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
-	trans.Response_raw = dumpInCSVFormat(msg.Fields, msg.Rows)
+	trans.Response_raw = common.DumpInCSVFormat(msg.Fields, msg.Rows)
 
 	err := Publisher.PublishPgsqlTransaction(trans)
 	if err != nil {

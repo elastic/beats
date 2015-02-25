@@ -1,8 +1,6 @@
-package main
+package mysql
 
 import (
-	"bytes"
-	"encoding/csv"
 	"fmt"
 	"packetbeat/common"
 	"packetbeat/logp"
@@ -97,7 +95,23 @@ const (
 	MysqlStateEatRows
 )
 
-var mysqlTransactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
+type Mysql struct {
+	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
+
+	// function pointer for mocking
+	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
+		dir uint8, raw_msg []byte)
+
+	results chan common.MapStr
+}
+
+func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
+	mysql.transactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
+	mysql.handleMysql = handleMysql
+	mysql.results = results
+
+	return nil
+}
 
 func (stream *MysqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
@@ -317,8 +331,8 @@ type mysqlPrivateData struct {
 	Data [2]*MysqlStream
 }
 
-func ParseMysql(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
+	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
 	defer logp.Recover("ParseMysql exception")
 
@@ -367,7 +381,7 @@ func ParseMysql(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
 			msg := stream.data[stream.message.start:stream.message.end]
 
 			if !stream.message.IgnoreMessage {
-				handleMysql(stream.message, tcptuple, dir, msg)
+				mysql.handleMysql(mysql, stream.message, tcptuple, dir, msg)
 			}
 
 			// and reset message
@@ -380,7 +394,22 @@ func ParseMysql(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
 	return priv
 }
 
-var handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
+func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	// TODO
+
+	return private
+}
+
+func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	// TODO
+	return private
+}
+
+func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 	dir uint8, raw_msg []byte) {
 
 	m.TcpTuple = *tcptuple
@@ -389,25 +418,25 @@ var handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
 	m.Raw = raw_msg
 
 	if m.IsRequest {
-		receivedMysqlRequest(m)
+		mysql.receivedMysqlRequest(m)
 	} else {
-		receivedMysqlResponse(m)
+		mysql.receivedMysqlResponse(m)
 	}
 }
 
-func receivedMysqlRequest(msg *MysqlMessage) {
+func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
-	trans := mysqlTransactionsMap[tuple.Hashable()]
+	trans := mysql.transactionsMap[tuple.Hashable()]
 	if trans != nil {
 		if trans.Mysql != nil {
 			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
-		mysqlTransactionsMap[tuple.Hashable()] = trans
+		mysql.transactionsMap[tuple.Hashable()] = trans
 	}
 
 	trans.ts = msg.Ts
@@ -449,12 +478,12 @@ func receivedMysqlRequest(msg *MysqlMessage) {
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { trans.Expire() })
+	trans.timer = time.AfterFunc(TransactionTimeout, func() { mysql.expireTransaction(trans) })
 }
 
-func receivedMysqlResponse(msg *MysqlMessage) {
+func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 	tuple := msg.TcpTuple
-	trans := mysqlTransactionsMap[tuple.Hashable()]
+	trans := mysql.transactionsMap[tuple.Hashable()]
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -484,54 +513,25 @@ func receivedMysqlResponse(msg *MysqlMessage) {
 	if len(msg.Raw) > 0 {
 		fields, rows := parseMysqlResponse(msg.Raw)
 
-		trans.Response_raw = dumpInCSVFormat(fields, rows)
+		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
 
-	err := Publisher.PublishMysqlTransaction(trans)
-	if err != nil {
-		logp.Warn("Publish failure: %s", err)
-	}
+	mysql.publishMysqlTransaction(trans)
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
 
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple.Hashable())
+	delete(mysql.transactionsMap, trans.tuple.Hashable())
 	if trans.timer != nil {
 		trans.timer.Stop()
 	}
 }
 
-func (trans *MysqlTransaction) Expire() {
+func (mysql *Mysql) expireTransaction(trans *MysqlTransaction) {
 	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
 	// remove from map
-	delete(mysqlTransactionsMap, trans.tuple.Hashable())
-}
-
-func dumpInCSVFormat(fields []string, rows [][]string) string {
-
-	var buf bytes.Buffer
-	writer := csv.NewWriter(&buf)
-
-	for i, field := range fields {
-		fields[i] = strings.Replace(field, "\n", "\\n", -1)
-	}
-	if len(fields) > 0 {
-		writer.Write(fields)
-	}
-
-	for _, row := range rows {
-		for i, field := range row {
-			field = strings.Replace(field, "\n", "\\n", -1)
-			field = strings.Replace(field, "\r", "\\r", -1)
-			row[i] = field
-		}
-		writer.Write(row)
-	}
-	writer.Flush()
-
-	csv := buf.String()
-	return csv
+	delete(mysql.transactionsMap, trans.tuple.Hashable())
 }
 
 func parseMysqlResponse(data []byte) ([]string, [][]string) {
@@ -639,7 +639,13 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 	return fields, rows
 }
 
-func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) error {
+func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
+
+	if mysql.results == nil {
+		return
+	}
+
+	logp.Debug("mysql", "mysql.results exists")
 
 	event := common.MapStr{}
 	event["type"] = "mysql"
@@ -659,7 +665,11 @@ func (publisher *PublisherType) PublishMysqlTransaction(t *MysqlTransaction) err
 	event["path"] = t.Path
 	event["bytes_out"] = t.Size
 
-	return publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
+	event["timestamp"] = t.ts
+	event["src"] = &t.Src
+	event["dst"] = &t.Dst
+
+	mysql.results <- event
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {

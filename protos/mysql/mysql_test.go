@@ -1,4 +1,4 @@
-package main
+package mysql
 
 import (
 	"encoding/hex"
@@ -6,9 +6,16 @@ import (
 	"packetbeat/logp"
 	"packetbeat/protos"
 	"testing"
+
 	//"fmt"
 	"time"
 )
+
+func MysqlModForTests() *Mysql {
+	var mysql Mysql
+	mysql.Init(true, nil)
+	return &mysql
+}
 
 func TestMySQLParser_simpleRequest(t *testing.T) {
 
@@ -275,6 +282,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
 
+	mysql := MysqlModForTests()
 	data, err := hex.DecodeString("300000010001000100000028526f7773206d61746368" +
 		"65643a203120204368616e6765643a203120205761726e696e67733a2030")
 	if err != nil {
@@ -293,13 +301,13 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 
 	var count_handleMysql = 0
 
-	handleMysql = func(m *MysqlMessage, tcp *common.TcpTuple,
+	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	ParseMysql(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, 1, private)
 
 	if count_handleMysql != 1 {
 		t.Errorf("handleMysql not called")
@@ -311,6 +319,8 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
+
+	mysql := MysqlModForTests()
 
 	data, err := hex.DecodeString(
 		"0700000100000000000000" +
@@ -334,17 +344,13 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 
 	var count_handleMysql = 0
 
-	old_handleMysql := handleMysql
-	defer func() {
-		handleMysql = old_handleMysql
-	}()
-	handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
+	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	ParseMysql(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, 1, private)
 
 	if count_handleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
@@ -356,6 +362,8 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
 	}
+
+	mysql := MysqlModForTests()
 
 	data, err := hex.DecodeString(
 		"0100000105" +
@@ -380,17 +388,13 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 
 	var count_handleMysql = 0
 
-	old_handleMysql := handleMysql
-	defer func() {
-		handleMysql = old_handleMysql
-	}()
-	handleMysql = func(m *MysqlMessage, tcptuple *common.TcpTuple,
+	mysql.handleMysql = func(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 		dir uint8, raw_msg []byte) {
 
 		count_handleMysql += 1
 	}
 
-	private = ParseMysql(&pkt, &tuple, 1, private).(mysqlPrivateData)
+	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)
 	if count_handleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
@@ -411,7 +415,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		Ts:      ts,
 	}
 
-	ParseMysql(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, 1, private)
 	if count_handleMysql != 1 {
 		t.Errorf("handleMysql not called on the second run")
 	}
