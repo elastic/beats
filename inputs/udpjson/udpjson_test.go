@@ -11,15 +11,13 @@ import (
 )
 
 func TestUdpJson(t *testing.T) {
-	//t.Skip("Skipped because it seems to hang on Travis CI")
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"udpjson"})
 	}
 
 	events := make(chan common.MapStr)
 	server, err := NewServer(Config{
-		Port:   32000,
+		Port:   0,
 		BindIp: "127.0.0.1",
 	}, 10*time.Millisecond, events)
 
