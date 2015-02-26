@@ -3,6 +3,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"packetbeat/config"
 	"packetbeat/logp"
 	"syscall"
@@ -17,17 +19,17 @@ func DropPrivileges() error {
 	}
 
 	if !config.ConfigMeta.IsDefined("runoptions", "gid") {
-		return MsgError("GID must be specified for dropping privileges")
+		return errors.New("GID must be specified for dropping privileges")
 	}
 
 	logp.Info("Switching to user: %d.%d", config.ConfigSingleton.RunOptions.Uid, config.ConfigSingleton.RunOptions.Gid)
 
 	if err = syscall.Setgid(config.ConfigSingleton.RunOptions.Gid); err != nil {
-		return MsgError("setgid: %s", err.Error())
+		return fmt.Errorf("setgid: %s", err.Error())
 	}
 
 	if err = syscall.Setuid(config.ConfigSingleton.RunOptions.Uid); err != nil {
-		return MsgError("setuid: %s", err.Error())
+		return fmt.Errorf("setuid: %s", err.Error())
 	}
 
 	return nil
