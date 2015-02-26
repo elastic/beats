@@ -62,8 +62,18 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
-func (publisher *PublisherType) publishMapStr(event common.MapStr) error {
-	// timestamp is mandatory
+func (publisher *PublisherType) publishFromQueue() {
+	for mapstr := range publisher.Queue {
+		err := publisher.publishEvent(mapstr)
+		if err != nil {
+			logp.Err("Publishing failed: %v", err)
+		}
+	}
+}
+
+func (publisher *PublisherType) publishEvent(event common.MapStr) error {
+
+	// the timestamp is mandatory
 	ts, ok := event["timestamp"].(time.Time)
 	if !ok {
 		return errors.New("Missing 'timestamp' field from MapStr object")
@@ -71,20 +81,6 @@ func (publisher *PublisherType) publishMapStr(event common.MapStr) error {
 
 	src, _ := event["src"].(*common.Endpoint)
 	dst, _ := event["dst"].(*common.Endpoint)
-
-	return publisher.PublishEvent(ts, src, dst, event)
-}
-
-func (publisher *PublisherType) publishFromQueue() {
-	for mapstr := range publisher.Queue {
-		err := publisher.publishMapStr(mapstr)
-		if err != nil {
-			logp.Err("Publishing failed: %v", err)
-		}
-	}
-}
-
-func (publisher *PublisherType) PublishEvent(ts time.Time, src *common.Endpoint, dst *common.Endpoint, event common.MapStr) error {
 
 	src_server := publisher.GetServerName(src.Ip)
 	dst_server := publisher.GetServerName(dst.Ip)
