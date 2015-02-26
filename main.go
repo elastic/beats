@@ -15,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"packetbeat/common/droppriv"
 	"packetbeat/config"
 	"packetbeat/inputs/sniffer"
 	"packetbeat/logp"
@@ -187,7 +188,7 @@ func main() {
 		return
 	}
 
-	if err = DropPrivileges(); err != nil {
+	if err = droppriv.DropPrivileges(); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
