@@ -1,4 +1,4 @@
-package main
+package thrift
 
 import (
 	"encoding/binary"
@@ -153,7 +153,7 @@ type Thrift struct {
 	transMap map[common.HashableTcpTuple]*ThriftTransaction
 
 	PublishQueue chan *ThriftTransaction
-	Publisher    *PublisherType
+	results      chan common.MapStr
 	Idl          *ThriftIdl
 }
 
@@ -225,7 +225,7 @@ func (thrift *Thrift) readConfig() error {
 	return nil
 }
 
-func (thrift *Thrift) Init(test_mode bool) error {
+func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
 
 	thrift.InitDefaults()
 
@@ -240,7 +240,7 @@ func (thrift *Thrift) Init(test_mode bool) error {
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
-		thrift.Publisher = &Publisher
+		thrift.results = results
 		go thrift.publishTransactions()
 	}
 
@@ -994,6 +994,14 @@ func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return private
 }
 
+func (thrift *Thrift) GapInStream(tcptuple *common.TcpTuple, dir uint8,
+	private protos.ProtocolData) protos.ProtocolData {
+
+	// TODO
+
+	return private
+}
+
 func (thrift *Thrift) publishTransactions() {
 	for t := range thrift.PublishQueue {
 		event := common.MapStr{}
@@ -1043,8 +1051,12 @@ func (thrift *Thrift) publishTransactions() {
 		}
 		event["thrift"] = thriftmap
 
-		if thrift.Publisher != nil {
-			thrift.Publisher.PublishEvent(t.ts, &t.Src, &t.Dst, event)
+		event["timestamp"] = t.ts
+		event["src"] = &t.Src
+		event["dst"] = &t.Dst
+
+		if thrift.results != nil {
+			thrift.results <- event
 		}
 
 		logp.Debug("thrift", "Published event")

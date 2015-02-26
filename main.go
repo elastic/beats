@@ -25,6 +25,7 @@ import (
 	"packetbeat/protos/pgsql"
 	"packetbeat/protos/redis"
 	"packetbeat/protos/tcp"
+	"packetbeat/protos/thrift"
 
 	"github.com/BurntSushi/toml"
 	"github.com/nranchev/go-libGeoIP"
@@ -34,10 +35,11 @@ import (
 const Version = "0.4.3"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
-	protos.HttpProtocol:  new(http.Http),
-	protos.MysqlProtocol: new(mysql.Mysql),
-	protos.PgsqlProtocol: new(pgsql.Pgsql),
-	protos.RedisProtocol: new(redis.Redis),
+	protos.HttpProtocol:   new(http.Http),
+	protos.MysqlProtocol:  new(mysql.Mysql),
+	protos.PgsqlProtocol:  new(pgsql.Pgsql),
+	protos.RedisProtocol:  new(redis.Redis),
+	protos.ThriftProtocol: new(thrift.Thrift),
 }
 
 // Structure grouping main components/modules
@@ -200,10 +202,7 @@ func main() {
 		return
 	}
 
-	if err = ThriftMod.Init(false); err != nil {
-		logp.Critical(err.Error())
-		return
-	}
+	loadGeoIPData()
 
 	// Initializing protocol plugins
 	for proto, plugin := range EnabledProtocolPlugins {
@@ -219,8 +218,6 @@ func main() {
 		logp.Critical(err.Error())
 		return
 	}
-
-	loadGeoIPData()
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)

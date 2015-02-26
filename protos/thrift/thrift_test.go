@@ -1,4 +1,4 @@
-package main
+package thrift
 
 import (
 	"encoding/hex"
@@ -592,7 +592,7 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
@@ -622,7 +622,7 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
@@ -655,7 +655,7 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
@@ -691,7 +691,7 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
@@ -726,7 +726,7 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
@@ -755,7 +755,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
@@ -795,7 +795,7 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
@@ -824,7 +824,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.CaptureReply = false
 
@@ -868,7 +868,7 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.ObfuscateStrings = true
 
@@ -901,7 +901,7 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 	thrift.CaptureReply = false
@@ -948,7 +948,7 @@ func TestThrift_Parse_Exception(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 
 	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
 
@@ -980,7 +980,7 @@ func TestThrift_ParametersNames(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.TransportType = ThriftTFramed
 	thrift.Idl = thriftIdlForTesting(t, `
 		service Test {
@@ -1018,7 +1018,7 @@ func TestThrift_ExceptionName(t *testing.T) {
 	}
 
 	var thrift Thrift
-	thrift.Init(true)
+	thrift.Init(true, nil)
 	thrift.Idl = thriftIdlForTesting(t, `
 		exception InvalidOperation {
 		  1: i32 what,

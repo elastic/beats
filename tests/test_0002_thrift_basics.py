@@ -1,5 +1,4 @@
 from pbtests.packetbeat import TestCase
-import unittest
 
 
 class Test(TestCase):
@@ -46,7 +45,6 @@ class Test(TestCase):
         assert objs[6]["thrift"]["params"] == "(1: \"hello\")"
         assert objs[6]["thrift"]["return_value"] == "\"hello\""
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_tutorial_socket(self):
         self.render_config_template(
             thrift_ports=[9090]
@@ -65,7 +63,6 @@ class Test(TestCase):
             "\"Cannot divide by 0\"))"
         assert all([o["port"] == 9090 for o in objs])
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_tutorial_framed(self):
         self.render_config_template(
             thrift_ports=[9090],
@@ -78,7 +75,6 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_tutorial_with_idl(self):
         self.render_config_template(
             thrift_ports=[9090],
@@ -122,7 +118,6 @@ class Test(TestCase):
         assert objs[6]["thrift"]["params"] == "(s: \"hello\")"
         assert objs[6]["thrift"]["return_value"] == "\"hello\""
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_integration(self):
         """
         Test based on the integration test suite of the Thrift
@@ -169,7 +164,6 @@ class Test(TestCase):
         assert objs[21]["thrift"]["return_value"] == '"' + \
             ("Python" * 20) + '"'
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_send_request_response(self):
         # send_request=true send_response=false
         self.render_config_template(
@@ -203,7 +197,6 @@ class Test(TestCase):
         assert all(["request_raw" not in o for o in objs])
         assert all(["response_raw" not in o for o in objs])
 
-    @unittest.skip("disabled during refactoring")
     def test_thrift_binary(self):
         self.render_config_template(
             thrift_ports=[9090],
