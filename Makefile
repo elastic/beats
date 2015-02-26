@@ -49,7 +49,7 @@ test:
 
 .PHONY: testlong
 testlong:
-	go vet
+	go vet ./...
 	go test ./...
 	make -C tests test
 
