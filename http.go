@@ -24,6 +24,7 @@ const (
 type HttpMessage struct {
 	Ts               time.Time
 	hasContentLength bool
+	headerOffset     int
 	bodyOffset       int
 	version_major    uint8
 	version_minor    uint8
@@ -327,6 +328,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 			// ok so far
 			s.parseOffset = i + 2
+			m.headerOffset = s.parseOffset
 			s.parseState = HEADERS
 
 		case HEADERS:
@@ -798,26 +800,50 @@ func shouldIncludeInBody(contenttype string) bool {
 func censorPasswords(m *HttpMessage, msg []byte) {
 
 	keywords := _Config.Passwords.Hide_keywords
+	strip_authorization := _Config.Passwords.Strip_authorization
+	
+	if m.IsRequest {
+		// byte64 != encryption, so remove it from headers in case of Basic Authentication
+		auth_text := []byte("Authorization:")
+		if strip_authorization && (m.Headers["authorization"] != "") {
+			header_len := m.bodyOffset - m.headerOffset
+			val_start_x := bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
+			val_end_x := -1
+			if val_start_x != -1 {
+				val_end_x = bytes.Index(msg[m.headerOffset+val_start_x:m.bodyOffset], []byte("\r\n"))
 
-	if m.IsRequest && m.ContentLength > 0 &&
-		strings.Contains(m.Headers["content-type"], "urlencoded") {
-		for _, keyword := range keywords {
-			index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
-			if index > 0 {
-				start_index := m.bodyOffset + index + len(keyword)
-				end_index := bytes.IndexAny(msg[m.bodyOffset+index+len(keyword):], "& \r\n")
-				if end_index > 0 {
-					end_index += m.bodyOffset + index
-					if end_index > m.end {
+				if val_end_x < 0 || val_end_x > header_len {
+					val_end_x = header_len
+				}
+				start_index := m.headerOffset + val_start_x + len(auth_text)
+				end_index := m.headerOffset + val_end_x
+
+				for i := start_index; i < end_index; i++ {
+					msg[i] = byte('*')
+				}
+			}
+			m.Headers["authorization"] = "*"
+		}
+		// passwords from POST forms in body
+		if m.ContentLength > 0 && strings.Contains(m.Headers["content-type"], "urlencoded") {
+			for _, keyword := range keywords {
+				index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
+				if index > 0 {
+					start_index := m.bodyOffset + index + len(keyword)
+					end_index := bytes.IndexAny(msg[m.bodyOffset+index+len(keyword):], "& \r\n")
+					if end_index > 0 {
+						end_index += m.bodyOffset + index
+						if end_index > m.end {
+							end_index = m.end
+						}
+					} else {
 						end_index = m.end
 					}
-				} else {
-					end_index = m.end
-				}
 
-				if end_index-start_index < 120 {
-					for i := start_index; i < end_index; i++ {
-						msg[i] = byte('*')
+					if end_index-start_index < 120 {
+						for i := start_index; i < end_index; i++ {
+							msg[i] = byte('*')
+						}
 					}
 				}
 			}

@@ -69,7 +69,8 @@ type tomlLogging struct {
 }
 
 type tomlPasswords struct {
-	Hide_keywords []string
+	Hide_keywords       []string
+	Strip_authorization bool
 }
 
 type tomlGeoip struct {
