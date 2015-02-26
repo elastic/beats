@@ -23,6 +23,8 @@ deps:
 	go get golang.org/x/tools/cmd/vet
 	# yamlcheck is used to verify the spec
 	go get github.com/tsg/yamlcheck
+	# goautotest is used from the Makefile to run tests in a loop
+	go get github.com/tsg/goautotest
 
 .PHONY: install
 install: packetbeat go-daemon/god
@@ -46,6 +48,10 @@ gofmt:
 test:
 	go test -short ./...
 	make -C tests test
+
+.PHONY: autotest
+autotest:
+	goautotest -short ./...
 
 .PHONY: testlong
 testlong:

@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"runtime"
 	"runtime/pprof"
 	"strings"
@@ -19,6 +18,7 @@ import (
 	"packetbeat/config"
 	"packetbeat/inputs/sniffer"
 	"packetbeat/logp"
+	"packetbeat/outputs"
 	"packetbeat/procs"
 	"packetbeat/protos"
 	"packetbeat/protos/http"
@@ -29,7 +29,6 @@ import (
 	"packetbeat/protos/thrift"
 
 	"github.com/BurntSushi/toml"
-	"github.com/nranchev/go-libGeoIP"
 	"github.com/packetbeat/gopacket/pcap"
 )
 
@@ -52,8 +51,6 @@ type PacketbeatStruct struct {
 // Global variable containing the main values
 var Packetbeat PacketbeatStruct
 
-var _GeoLite *libgeo.GeoIP
-
 func writeHeapProfile(filename string) {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -71,54 +68,6 @@ func debugMemStats() {
 	runtime.ReadMemStats(&m)
 	logp.Debug("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
 		m.Alloc, m.TotalAlloc, m.Sys)
-}
-
-func loadGeoIPData() {
-	geoip_paths := []string{
-		"/usr/share/GeoIP/GeoIP.dat",
-		"/usr/local/var/GeoIP/GeoIP.dat",
-	}
-	if config.ConfigMeta.IsDefined("geoip", "paths") {
-		geoip_paths = config.ConfigSingleton.Geoip.Paths
-	}
-	if len(geoip_paths) == 0 {
-		// disabled
-		return
-	}
-
-	// look for the first existing path
-	var geoip_path string
-	for _, path := range geoip_paths {
-		fi, err := os.Lstat(path)
-		if err != nil {
-			continue
-		}
-
-		if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
-			// follow symlink
-			geoip_path, err = filepath.EvalSymlinks(path)
-			if err != nil {
-				logp.Warn("Could not load GeoIP data: %s", err.Error())
-				return
-			}
-		} else {
-			geoip_path = path
-		}
-		break
-	}
-
-	if len(geoip_path) == 0 {
-		logp.Warn("Couldn't load GeoIP database")
-		return
-	}
-
-	var err error
-	_GeoLite, err = libgeo.Load(geoip_path)
-	if err != nil {
-		logp.Warn("Could not load GeoIP data: %s", err.Error())
-	}
-
-	logp.Info("Loaded GeoIP data from: %s", geoip_path)
 }
 
 func main() {
@@ -193,7 +142,7 @@ func main() {
 		return
 	}
 
-	if err = Publisher.Init(*publishDisabled); err != nil {
+	if err = outputs.Publisher.Init(*publishDisabled); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
@@ -203,11 +152,11 @@ func main() {
 		return
 	}
 
-	loadGeoIPData()
+	outputs.LoadGeoIPData()
 
 	// Initializing protocol plugins
 	for proto, plugin := range EnabledProtocolPlugins {
-		err = plugin.Init(false, Publisher.Queue)
+		err = plugin.Init(false, outputs.Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, plugin)
 			return

@@ -1,4 +1,4 @@
-package main
+package outputs
 
 import (
 	"encoding/json"
@@ -7,7 +7,6 @@ import (
 	"packetbeat/common"
 	"packetbeat/config"
 	"packetbeat/logp"
-	"packetbeat/outputs"
 	"strings"
 	"time"
 )
@@ -17,11 +16,11 @@ type PublisherType struct {
 	tags                string
 	disabled            bool
 	Index               string
-	Output              []outputs.OutputInterface
-	TopologyOutput      outputs.OutputInterface
-	ElasticsearchOutput outputs.ElasticsearchOutputType
-	RedisOutput         outputs.RedisOutputType
-	FileOutput          outputs.FileOutputType
+	Output              []OutputInterface
+	TopologyOutput      OutputInterface
+	ElasticsearchOutput ElasticsearchOutputType
+	RedisOutput         RedisOutputType
+	FileOutput          FileOutputType
 
 	RefreshTopologyTimer <-chan time.Time
 	Queue                chan common.MapStr
@@ -191,14 +190,14 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
 		}
-		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.ElasticsearchOutput))
+		publisher.Output = append(publisher.Output, OutputInterface(&publisher.ElasticsearchOutput))
 
 		if output.Save_topology {
 			if publisher.TopologyOutput != nil {
 				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
 				return errors.New("Multiple outputs defined to store topology")
 			}
-			publisher.TopologyOutput = outputs.OutputInterface(&publisher.ElasticsearchOutput)
+			publisher.TopologyOutput = OutputInterface(&publisher.ElasticsearchOutput)
 			logp.Info("Using Elasticsearch to store the topology")
 		}
 	}
@@ -212,14 +211,14 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
 		}
-		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.RedisOutput))
+		publisher.Output = append(publisher.Output, OutputInterface(&publisher.RedisOutput))
 
 		if output.Save_topology {
 			if publisher.TopologyOutput != nil {
 				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
 				return errors.New("Multiple outputs defined to store topology")
 			}
-			publisher.TopologyOutput = outputs.OutputInterface(&publisher.RedisOutput)
+			publisher.TopologyOutput = OutputInterface(&publisher.RedisOutput)
 			logp.Info("Using Redis to store the topology")
 		}
 	}
@@ -231,7 +230,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 			logp.Err("Fail to initialize file output: %s", err)
 			return err
 		}
-		publisher.Output = append(publisher.Output, outputs.OutputInterface(&publisher.FileOutput))
+		publisher.Output = append(publisher.Output, OutputInterface(&publisher.FileOutput))
 
 		// topology saving not supported by this one
 	}
