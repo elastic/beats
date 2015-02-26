@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "Running pre-commit hook..."
-go fmt
-go vet
-go test -short
+go fmt ./...
+go vet ./...
+go test -short ../...
 flake8 tests/*.py tests/pbtests/*.py
 yamlcheck etc/fields.yml
