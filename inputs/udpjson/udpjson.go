@@ -4,30 +4,31 @@ import (
 	"encoding/json"
 	"net"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"time"
 )
 
 type Config struct {
-	Port   int
-	BindIp string
+	Port    int
+	BindIp  string
+	Timeout time.Duration
 }
 
-type Server struct {
+type Udpjson struct {
 	Config
 
 	events  chan common.MapStr
 	isAlive bool
-	timeout time.Duration
 	conn    *net.UDPConn
 }
 
-func (server *Server) ReceiveForever() error {
+func (server *Udpjson) Run() error {
 
 	buf := make([]byte, 65535)
 
 	for server.isAlive {
-		err := server.conn.SetDeadline(time.Now().Add(server.timeout))
+		err := server.conn.SetDeadline(time.Now().Add(server.Config.Timeout))
 		if err != nil {
 			logp.Err("SetDeadline: %v", err)
 			return err
@@ -55,22 +56,39 @@ func (server *Server) ReceiveForever() error {
 	return nil
 }
 
-func (server *Server) Stop() {
-	server.isAlive = false
-}
+func (server *Udpjson) setFromConfig() error {
+	var cfg Config
 
-func (server *Server) Close() {
-	server.conn.Close()
-}
-
-func NewServer(config Config, timeout time.Duration, events chan common.MapStr) (*Server, error) {
-
-	server := &Server{
-		Config:  config,
-		events:  events,
-		isAlive: true,
-		timeout: timeout,
+	if len(config.ConfigSingleton.Udpjson.Bind_ip) > 0 {
+		cfg.BindIp = config.ConfigSingleton.Udpjson.Bind_ip
+	} else {
+		cfg.BindIp = "127.0.0.1"
 	}
+	if config.ConfigSingleton.Udpjson.Port > 0 {
+		cfg.Port = config.ConfigSingleton.Udpjson.Port
+	} else {
+		cfg.Port = 9712
+	}
+	if config.ConfigSingleton.Udpjson.Timeout > 0 {
+		cfg.Timeout = time.Duration(config.ConfigSingleton.Udpjson.Timeout) * time.Millisecond
+	} else {
+		cfg.Timeout = 10 * time.Millisecond
+	}
+
+	server.Config = cfg
+	return nil
+}
+
+func (server *Udpjson) Init(test_mode bool, events chan common.MapStr) error {
+
+	if !test_mode {
+		err := server.setFromConfig()
+		if err != nil {
+			return err
+		}
+	}
+
+	server.events = events
 
 	addr := net.UDPAddr{
 		Port: server.Config.Port,
@@ -80,8 +98,17 @@ func NewServer(config Config, timeout time.Duration, events chan common.MapStr) 
 	var err error
 	server.conn, err = net.ListenUDP("udp", &addr)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	server.isAlive = true
 
-	return server, nil
+	return nil
+}
+
+func (server *Udpjson) Stop() {
+	server.isAlive = false
+}
+
+func (server *Udpjson) Close() {
+	server.conn.Close()
 }

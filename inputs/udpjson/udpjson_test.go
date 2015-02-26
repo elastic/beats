@@ -16,19 +16,21 @@ func TestUdpJson(t *testing.T) {
 	}
 
 	events := make(chan common.MapStr)
-	server, err := NewServer(Config{
-		Port:   0,
-		BindIp: "127.0.0.1",
-	}, 10*time.Millisecond, events)
+	server := new(Udpjson)
 
+	server.Config = Config{
+		Port:    0,
+		BindIp:  "127.0.0.1",
+		Timeout: 10 * time.Millisecond,
+	}
+	err := server.Init(true, events)
 	assert.Nil(t, err)
-	assert.NotNil(t, server)
 
 	ready := make(chan bool)
 
 	go func() {
 		ready <- true
-		err := server.ReceiveForever()
+		err := server.Run()
 		assert.Nil(t, err, "Error: %v", err)
 	}()
 

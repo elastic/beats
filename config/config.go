@@ -14,6 +14,7 @@ type Config struct {
 	Thrift     Thrift
 	Http       Http
 	Geoip      Geoip
+	Udpjson
 }
 
 type InterfacesConfig struct {
@@ -108,6 +109,12 @@ type MothershipConfig struct {
 	Number_of_files    int
 	DataType           string
 	Flush_interval     int
+}
+
+type Udpjson struct {
+	Bind_ip string
+	Port    int
+	Timeout int
 }
 
 // Config Singleton
