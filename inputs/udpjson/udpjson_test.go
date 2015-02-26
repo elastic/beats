@@ -18,9 +18,9 @@ func TestUdpJson(t *testing.T) {
 
 	events := make(chan common.MapStr)
 	server, err := NewServer(Config{
-		Port:   0,
+		Port:   32000,
 		BindIp: "127.0.0.1",
-	}, 10, events)
+	}, 100, events)
 	defer server.Close()
 
 	assert.Nil(t, err)
