@@ -36,7 +36,7 @@ For installing, you can use our make target:
     $ make install
 
 To install the (optional) GeoIP library, you can use your package manager or,
-if you python installed, `pip`:
+if you have python installed, `pip`:
 
     $ pip install python-geoip
     $ pip install python-geoip-geolite2
