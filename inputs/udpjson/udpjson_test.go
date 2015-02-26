@@ -5,6 +5,7 @@ import (
 	"packetbeat/common"
 	"packetbeat/logp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,8 +21,7 @@ func TestUdpJson(t *testing.T) {
 	server, err := NewServer(Config{
 		Port:   32000,
 		BindIp: "127.0.0.1",
-	}, 100, events)
-	defer server.Close()
+	}, 10*time.Millisecond, events)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, server)
@@ -31,7 +31,7 @@ func TestUdpJson(t *testing.T) {
 	go func() {
 		ready <- true
 		err := server.ReceiveForever()
-		assert.Nil(t, err)
+		assert.Nil(t, err, "Error: %v", err)
 	}()
 
 	// make sure the goroutine runs first
@@ -41,7 +41,7 @@ func TestUdpJson(t *testing.T) {
 
 	// send a message
 	clientConn, err := net.Dial("udp", server.conn.LocalAddr().String())
-	assert.Nil(t, err)
+	assert.Nil(t, err, "Error: %v", err)
 
 	_, err = clientConn.Write([]byte(`{"hello": "udpserver"}`))
 	assert.Nil(t, err)
