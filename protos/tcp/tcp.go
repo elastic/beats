@@ -172,7 +172,7 @@ func PrintTcpMap() {
 	fmt.Printf("Streams dict: %v", tcpStreamsMap)
 }
 
-func configToPortsMap(protocols map[string]config.Protocol) map[uint16]protos.Protocol {
+func configToPortsMap(protocols map[string]config.Protocol) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
 	var proto protos.Protocol
@@ -180,16 +180,23 @@ func configToPortsMap(protocols map[string]config.Protocol) map[uint16]protos.Pr
 
 		protoConfig, exists := protocols[protos.ProtocolNames[proto]]
 		if !exists {
-			// skip
 			continue
 		}
 
 		for _, port := range protoConfig.Ports {
+			old_proto, exists := res[uint16(port)]
+			if exists {
+				if old_proto == proto {
+					continue
+				}
+				return nil, fmt.Errorf("Duplicate port (%d) exists in %s and %s protocols",
+					port, old_proto, proto)
+			}
 			res[uint16(port)] = proto
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 func ConfigToFilter(protocols map[string]config.Protocol) string {
@@ -206,7 +213,11 @@ func ConfigToFilter(protocols map[string]config.Protocol) string {
 }
 
 func TcpInit(protocols map[string]config.Protocol) error {
-	tcpPortMap = configToPortsMap(protocols)
+	var err error
+	tcpPortMap, err = configToPortsMap(protocols)
+	if err != nil {
+		return err
+	}
 
 	logp.Debug("tcp", "Port map: %v", tcpPortMap)
 
