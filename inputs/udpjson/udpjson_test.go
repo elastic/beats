@@ -11,7 +11,6 @@ import (
 
 func TestUdpJson(t *testing.T) {
 	t.Skip("Skipped because it seems to hang on Travis CI")
-	return
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"udpjson"})
