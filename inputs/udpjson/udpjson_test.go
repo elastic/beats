@@ -10,7 +10,7 @@ import (
 )
 
 func TestUdpJson(t *testing.T) {
-	t.Skip("Skipped because it seems to hang on Travis CI")
+	//t.Skip("Skipped because it seems to hang on Travis CI")
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"udpjson"})
@@ -30,6 +30,8 @@ func TestUdpJson(t *testing.T) {
 		err := server.ReceiveForever()
 		assert.Nil(t, err)
 	}()
+
+	logp.Debug("udpjson", server.conn.LocalAddr().String())
 
 	// send a message
 	clientConn, err := net.Dial("udp", server.conn.LocalAddr().String())

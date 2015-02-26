@@ -50,12 +50,12 @@ test:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	go test ./...
+	go test -v ./...
 	make -C tests test
 
 .PHONY: cover
 cover:
-	go test -short -coverprofile=coverage.out ./...
+	go test -short -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
 .PHONY: benchmark
