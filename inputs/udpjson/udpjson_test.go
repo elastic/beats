@@ -26,10 +26,16 @@ func TestUdpJson(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, server)
 
+	ready := make(chan bool)
+
 	go func() {
+		ready <- true
 		err := server.ReceiveForever()
 		assert.Nil(t, err)
 	}()
+
+	// make sure the goroutine runs first
+	<-ready
 
 	logp.Debug("udpjson", server.conn.LocalAddr().String())
 
