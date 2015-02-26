@@ -37,7 +37,8 @@ type Logging struct {
 }
 
 type Passwords struct {
-	Hide_keywords []string
+	Hide_keywords       []string
+	Strip_authorization bool
 }
 
 type Geoip struct {
