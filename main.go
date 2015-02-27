@@ -192,6 +192,7 @@ func main() {
 				err := plugin.Run()
 				if err != nil {
 					logp.Critical("Plugin %s main loop failed: %v", input, err)
+					return
 				}
 				over <- true
 			}(plugin)
@@ -219,7 +220,7 @@ func main() {
 
 	logp.Debug("main", "Waiting for inputs to finish")
 
-	// Wait for one of the inputs gorutines to finish
+	// Wait for one of the inputs goroutines to finish
 	for _ = range over {
 		if !inputs.Inputs.AreAllAlive() {
 			break
