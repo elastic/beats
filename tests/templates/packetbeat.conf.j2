@@ -41,10 +41,10 @@
     rotate_every_kb=1000
     #number_of_files=7
 
-{% if inputs is not none -%}
+{% if input_plugins -%}
 [inputs]
 inputs = [
-        {%- for input in inputs -%}
+        {%- for input in input_plugins -%}
             "{{ input }}"
             {%- if not loop.last %}, {% endif -%}
         {%- endfor -%}

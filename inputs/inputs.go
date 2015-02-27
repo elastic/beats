@@ -1,6 +1,11 @@
 package inputs
 
-import "packetbeat/common"
+import (
+	"errors"
+	"fmt"
+	"packetbeat/common"
+	"strings"
+)
 
 // The InputPlugin interface needs to be implemented
 // by the input plugins.
@@ -9,6 +14,7 @@ type InputPlugin interface {
 	Run() error
 	Stop() error
 	Close() error
+	IsAlive() bool
 }
 
 type Input int
@@ -68,6 +74,32 @@ func (inputs InputsList) StopAll() {
 	for _, plugin := range inputs.inputs {
 		plugin.Stop()
 	}
+}
+
+// CloseAll calls the Close methods of all registered inputs.
+// All inputs Close() methods are called even when there are
+// errors. The error messages are concatenated together.
+func (inputs InputsList) CloseAll() error {
+	errs := []string{}
+	for input, plugin := range inputs.inputs {
+		err := plugin.Close()
+		if err != nil {
+			errs = append(errs, fmt.Sprintf("Closing %s failed: %v", input, err))
+		}
+	}
+	if len(errs) > 0 {
+		return errors.New(strings.Join(errs, " "))
+	}
+	return nil
+}
+
+func (inputs InputsList) AreAllAlive() bool {
+	for _, plugin := range inputs.inputs {
+		if !plugin.IsAlive() {
+			return false
+		}
+	}
+	return true
 }
 
 func init() {

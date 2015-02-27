@@ -2,9 +2,13 @@ package sniffer
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"packetbeat/common"
 	"packetbeat/config"
 	"packetbeat/logp"
+	"packetbeat/protos/tcp"
+	"syscall"
 	"time"
 
 	"github.com/packetbeat/gopacket"
@@ -17,7 +21,10 @@ type SnifferSetup struct {
 	afpacketHandle *AfpacketHandle
 	pfringHandle   *PfringHandle
 	config         *config.InterfacesConfig
+	isAlive        bool
+	dumper         *pcap.Dumper
 
+	Decoder    *tcp.DecoderStruct
 	DataSource gopacket.PacketDataSource
 }
 
@@ -45,17 +52,15 @@ func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
 	return frame_size, block_size, num_blocks, nil
 }
 
-func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup, error) {
-	var sniffer SnifferSetup
+func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) error {
 	var err error
 
 	sniffer.config = config
 
-	if file != nil && len(*file) > 0 {
-		logp.Debug("sniffer", "Reading from file: %s", *file)
+	if len(sniffer.config.File) > 0 {
+		logp.Debug("sniffer", "Reading from file: %s", sniffer.config.File)
 		// we read file with the pcap provider
 		sniffer.config.Type = "pcap"
-		sniffer.config.File = *file
 	}
 
 	// set defaults
@@ -89,11 +94,11 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 		if len(sniffer.config.File) > 0 {
 			sniffer.pcapHandle, err = pcap.OpenOffline(sniffer.config.File)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		} else {
 			if len(sniffer.config.Devices) > 1 {
-				return nil, fmt.Errorf("Pcap sniffer only supports one device. You can use 'any' if you want")
+				return fmt.Errorf("Pcap sniffer only supports one device. You can use 'any' if you want")
 			}
 			sniffer.pcapHandle, err = pcap.OpenLive(
 				sniffer.config.Devices[0],
@@ -101,11 +106,11 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 				true,
 				500*time.Millisecond)
 			if err != nil {
-				return nil, err
+				return err
 			}
 			err = sniffer.pcapHandle.SetBPFFilter(sniffer.config.Bpf_filter)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 
@@ -117,7 +122,7 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 		}
 
 		if len(sniffer.config.Devices) > 1 {
-			return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
+			return fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
 		}
 
 		frame_size, block_size, num_blocks, err := afpacketComputeSize(
@@ -125,7 +130,7 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 			sniffer.config.Snaplen,
 			os.Getpagesize())
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		sniffer.afpacketHandle, err = NewAfpacketHandle(
@@ -135,18 +140,18 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 			num_blocks,
 			500*time.Millisecond)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.config.Bpf_filter)
 		if err != nil {
-			return nil, fmt.Errorf("SetBPFFilter failed: %s", err)
+			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
 	case "pfring":
 		if len(sniffer.config.Devices) > 1 {
-			return nil, fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
+			return fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
 		}
 
 		sniffer.pfringHandle, err = NewPfringHandle(
@@ -155,26 +160,26 @@ func CreateSniffer(config *config.InterfacesConfig, file *string) (*SnifferSetup
 			true)
 
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		err = sniffer.pfringHandle.SetBPFFilter(sniffer.config.Bpf_filter)
 		if err != nil {
-			return nil, fmt.Errorf("SetBPFFilter failed: %s", err)
+			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
 
 		err = sniffer.pfringHandle.Enable()
 		if err != nil {
-			return nil, fmt.Errorf("Enable failed: %s", err)
+			return fmt.Errorf("Enable failed: %s", err)
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pfringHandle)
 
 	default:
-		return nil, fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
+		return fmt.Errorf("Unknown sniffer type: %s", sniffer.config.Type)
 	}
 
-	return &sniffer, nil
+	return nil
 }
 
 func (sniffer *SnifferSetup) Reopen() error {
@@ -195,7 +200,131 @@ func (sniffer *SnifferSetup) Reopen() error {
 	return nil
 }
 
-func (sniffer *SnifferSetup) Close() {
+func (sniffer *SnifferSetup) Datalink() layers.LinkType {
+	if sniffer.config.Type == "pcap" {
+		return sniffer.pcapHandle.LinkType()
+	}
+	return layers.LinkTypeEthernet
+}
+
+func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr) error {
+	config.ConfigSingleton.Interfaces.Bpf_filter =
+		tcp.ConfigToFilter(config.ConfigSingleton.Protocols)
+
+	var err error
+	if !test_mode {
+		err = sniffer.setFromConfig(&config.ConfigSingleton.Interfaces)
+		if err != nil {
+			return fmt.Errorf("Error creating sniffer: %v", err)
+		}
+	}
+
+	sniffer.Decoder, err = tcp.CreateDecoder(sniffer.Datalink())
+	if err != nil {
+		return fmt.Errorf("Error creating decoder: %v", err)
+	}
+
+	if sniffer.config.Dumpfile != "" {
+		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
+		if err != nil {
+			return err
+		}
+		sniffer.dumper, err = p.NewDumper(sniffer.config.Dumpfile)
+		if err != nil {
+			return err
+		}
+	}
+
+	sniffer.isAlive = true
+
+	return nil
+}
+
+func (sniffer *SnifferSetup) Run() error {
+	counter := 0
+	loopCount := 1
+	var lastPktTime *time.Time = nil
+	var ret_error error
+
+	for sniffer.isAlive {
+		if sniffer.config.OneAtATime {
+			fmt.Println("Press enter to read packet")
+			fmt.Scanln()
+		}
+
+		data, ci, err := sniffer.DataSource.ReadPacketData()
+
+		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
+			logp.Debug("sniffer", "Interrupted")
+			continue
+		}
+
+		if err == io.EOF {
+			logp.Debug("sniffer", "End of file")
+			loopCount += 1
+			if sniffer.config.Loop > 0 && loopCount > sniffer.config.Loop {
+				// give a bit of time to the publish goroutine
+				// to flush
+				time.Sleep(300 * time.Millisecond)
+				sniffer.isAlive = false
+				continue
+			}
+
+			logp.Debug("sniffer", "Reopening the file")
+			err = sniffer.Reopen()
+			if err != nil {
+				ret_error = fmt.Errorf("Error reopening file: %s", err)
+				sniffer.isAlive = false
+				continue
+			}
+			lastPktTime = nil
+			continue
+		}
+
+		if err != nil {
+			ret_error = fmt.Errorf("Sniffing error: %s", err)
+			sniffer.isAlive = false
+			continue
+		}
+
+		if len(data) == 0 {
+			// Empty packet, probably timeout from afpacket
+			continue
+		}
+
+		if sniffer.config.File != "" {
+			if lastPktTime != nil && !sniffer.config.TopSpeed {
+				sleep := ci.Timestamp.Sub(*lastPktTime)
+				if sleep > 0 {
+					time.Sleep(sleep)
+				} else {
+					logp.Warn("Time in pcap went backwards: %d", sleep)
+				}
+			}
+			_lastPktTime := ci.Timestamp
+			lastPktTime = &_lastPktTime
+			ci.Timestamp = time.Now() // overwrite what we get from the pcap
+		}
+		counter++
+
+		if sniffer.dumper != nil {
+			sniffer.dumper.WritePacketData(data, ci)
+		}
+		logp.Debug("sniffer", "Packet number: %d", counter)
+
+		sniffer.Decoder.DecodePacketData(data, &ci)
+	}
+
+	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)
+
+	if sniffer.dumper != nil {
+		sniffer.dumper.Close()
+	}
+
+	return ret_error
+}
+
+func (sniffer *SnifferSetup) Close() error {
 	switch sniffer.config.Type {
 	case "pcap":
 		sniffer.pcapHandle.Close()
@@ -204,11 +333,14 @@ func (sniffer *SnifferSetup) Close() {
 	case "pfring":
 		sniffer.pfringHandle.Close()
 	}
+	return nil
 }
 
-func (sniffer *SnifferSetup) Datalink() layers.LinkType {
-	if sniffer.config.Type == "pcap" {
-		return sniffer.pcapHandle.LinkType()
-	}
-	return layers.LinkTypeEthernet
+func (sniffer *SnifferSetup) Stop() error {
+	sniffer.isAlive = false
+	return nil
+}
+
+func (sniffer *SnifferSetup) IsAlive() bool {
+	return sniffer.isAlive
 }

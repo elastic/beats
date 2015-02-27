@@ -113,3 +113,7 @@ func (server *Udpjson) Stop() error {
 func (server *Udpjson) Close() error {
 	return server.conn.Close()
 }
+
+func (server *Udpjson) IsAlive() bool {
+	return server.isAlive
+}

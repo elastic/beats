@@ -27,6 +27,10 @@ type InterfacesConfig struct {
 	Bpf_filter     string
 	Snaplen        int
 	Buffer_size_mb int
+	TopSpeed       bool
+	Dumpfile       string
+	OneAtATime     bool
+	Loop           int
 }
 
 type Input struct {

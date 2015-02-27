@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -31,7 +30,6 @@ import (
 	"packetbeat/protos/thrift"
 
 	"github.com/BurntSushi/toml"
-	"github.com/packetbeat/gopacket/pcap"
 )
 
 const Version = "0.4.3"
@@ -45,17 +43,9 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 }
 
 var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
+	inputs.SnifferInput: new(sniffer.SnifferSetup),
 	inputs.UdpjsonInput: new(udpjson.Udpjson),
 }
-
-// Structure grouping main components/modules
-type PacketbeatStruct struct {
-	Sniffer *sniffer.SnifferSetup
-	Decoder *tcp.DecoderStruct
-}
-
-// Global variable containing the main values
-var Packetbeat PacketbeatStruct
 
 func writeHeapProfile(filename string) {
 	f, err := os.Create(filename)
@@ -129,25 +119,26 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	config.ConfigSingleton.Interfaces.Bpf_filter =
-		tcp.ConfigToFilter(config.ConfigSingleton.Protocols)
-	Packetbeat.Sniffer, err = sniffer.CreateSniffer(&config.ConfigSingleton.Interfaces, file)
-	if err != nil {
-		logp.Critical("Error creating sniffer: %s", err)
-		return
+	// CLI flags over-riding config
+	if *topSpeed {
+		config.ConfigSingleton.Interfaces.TopSpeed = true
 	}
-	sniffer := Packetbeat.Sniffer
-	Packetbeat.Decoder, err = tcp.CreateDecoder(sniffer.Datalink())
-	if err != nil {
-		logp.Critical("Error creating decoder: %s", err)
-		return
+	if len(*file) > 0 {
+		config.ConfigSingleton.Interfaces.File = *file
+	}
+	config.ConfigSingleton.Interfaces.Loop = *loop
+	config.ConfigSingleton.Interfaces.OneAtATime = *oneAtAtime
+	if len(*dumpfile) > 0 {
+		config.ConfigSingleton.Interfaces.Dumpfile = *dumpfile
 	}
 
+	// TODO: This needs to be after the Sniffer Init but before the sniffer Run.
 	if err = droppriv.DropPrivileges(); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
 
+	logp.Debug("main", "Initializing output plugins")
 	if err = outputs.Publisher.Init(*publishDisabled); err != nil {
 		logp.Critical(err.Error())
 		return
@@ -160,7 +151,7 @@ func main() {
 
 	outputs.LoadGeoIPData()
 
-	// Initializing protocol plugins
+	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
 		err = plugin.Init(false, outputs.Publisher.Queue)
 		if err != nil {
@@ -175,10 +166,21 @@ func main() {
 		return
 	}
 
-	// Initializing input plugins
+	over := make(chan bool)
+
+	if !config.ConfigMeta.IsDefined("inputs", "inputs") {
+		config.ConfigSingleton.Input.Inputs = []string{"sniffer"}
+	}
+	if len(config.ConfigSingleton.Input.Inputs) == 0 {
+		logp.Critical("At least one input needs to be enabled")
+		return
+	}
+
+	logp.Debug("main", "Initializing input plugins")
 	for input, plugin := range EnabledInputPlugins {
 		configured_inputs := config.ConfigSingleton.Input.Inputs
 		if input.IsInList(configured_inputs) {
+			logp.Debug("main", "Input plugin %s is enabled", input)
 			err = plugin.Init(false, nil)
 			if err != nil {
 				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
@@ -186,12 +188,13 @@ func main() {
 			inputs.Inputs.Register(input, plugin)
 
 			// run the plugin in background
-			go func() {
+			go func(plugin inputs.InputPlugin) {
 				err := plugin.Run()
 				if err != nil {
-					logp.Err("Plugin %s main loop failed: %v", input, err)
+					logp.Critical("Plugin %s main loop failed: %v", input, err)
 				}
-			}()
+				over <- true
+			}(plugin)
 		}
 	}
 
@@ -204,105 +207,30 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	var dumper *pcap.Dumper = nil
-	if *dumpfile != "" {
-		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
-		if err != nil {
-			logp.Critical(err.Error())
-			return
-		}
-		dumper, err = p.NewDumper(*dumpfile)
-		if err != nil {
-			logp.Critical(err.Error())
-			return
-		}
-	}
-
-	live := true
-
-	// On ^C or SIGTERM, gracefully set live to false
+	// On ^C or SIGTERM, gracefully stop inputs
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigc
-		live = false
-		logp.Debug("signal", "Received term singal, set live to false")
+		logp.Debug("signal", "Received sigterm/sigint, stopping")
+		inputs.Inputs.StopAll()
+		over <- true
 	}()
 
-	counter := 0
-	loopCount := 1
-	var lastPktTime *time.Time = nil
-	for live {
-		if *oneAtAtime {
-			fmt.Println("Press enter to read packet")
-			fmt.Scanln()
+	logp.Debug("main", "Waiting for inputs to finish")
+
+	// Wait for one of the inputs gorutines to finish
+	for _ = range over {
+		if !inputs.Inputs.AreAllAlive() {
+			break
 		}
-
-		data, ci, err := sniffer.DataSource.ReadPacketData()
-
-		if err == pcap.NextErrorTimeoutExpired || err == syscall.EINTR {
-			logp.Debug("pcapread", "Interrupted")
-			continue
-		}
-
-		if err == io.EOF {
-			logp.Debug("pcapread", "End of file")
-			loopCount += 1
-			if *loop > 0 && loopCount > *loop {
-				// give a bit of time to the publish goroutine
-				// to flush
-				time.Sleep(300 * time.Millisecond)
-				live = false
-				continue
-			}
-
-			logp.Debug("pcapread", "Reopening the file")
-			err = sniffer.Reopen()
-			if err != nil {
-				logp.Critical("Error reopening file: %s", err)
-				live = false
-				continue
-			}
-			lastPktTime = nil
-			continue
-		}
-
-		if err != nil {
-			logp.Critical("Sniffing error: %s", err)
-			live = false
-			continue
-		}
-
-		if len(data) == 0 {
-			// Empty packet, probably timeout from afpacket
-			continue
-		}
-
-		if *file != "" {
-			if lastPktTime != nil && !*topSpeed {
-				sleep := ci.Timestamp.Sub(*lastPktTime)
-				if sleep > 0 {
-					time.Sleep(sleep)
-				} else {
-					logp.Warn("Time in pcap went backwards: %d", sleep)
-				}
-			}
-			_lastPktTime := ci.Timestamp
-			lastPktTime = &_lastPktTime
-			ci.Timestamp = time.Now() // overwrite what we get from the pcap
-		}
-		counter++
-
-		if dumper != nil {
-			dumper.WritePacketData(data, ci)
-		}
-		logp.Debug("pcapread", "Packet number: %d", counter)
-		Packetbeat.Decoder.DecodePacketData(data, &ci)
 	}
-	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)
 
-	// stop all input plugin servers
+	logp.Debug("main", "Cleanup")
+
+	// stop and close all other input plugin servers
 	inputs.Inputs.StopAll()
+	inputs.Inputs.CloseAll()
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire
@@ -313,9 +241,5 @@ func main() {
 		writeHeapProfile(*memprofile)
 
 		debugMemStats()
-	}
-
-	if dumper != nil {
-		dumper.Close()
 	}
 }

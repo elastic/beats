@@ -14,4 +14,5 @@ func TestInputNames(t *testing.T) {
 
 func TestIsInList(t *testing.T) {
 	assert.True(t, UdpjsonInput.IsInList([]string{"sniffer", "udpjson"}))
+	assert.False(t, UdpjsonInput.IsInList([]string{"sniffer"}))
 }

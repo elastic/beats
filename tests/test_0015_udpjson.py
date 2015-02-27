@@ -4,7 +4,7 @@ from pbtests.packetbeat import TestCase
 class Test(TestCase):
     def test_udpjson_config(self):
         """
-        Should start with udpjson inputs configured.
+        Should start with sniffer and udpjson inputs configured.
         """
         self.render_config_template(
             mysql_ports=[3306],
