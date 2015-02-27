@@ -12,7 +12,7 @@ import (
 
 func TestUdpJson(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"udpjson"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"udpjson"})
 	}
 
 	events := make(chan common.MapStr)

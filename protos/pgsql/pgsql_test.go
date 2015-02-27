@@ -131,7 +131,7 @@ func TestPgsqlParser_response(t *testing.T) {
 // Test parsing an incomplete pgsql response
 func TestPgsqlParser_incomplete_response(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"pgsql", "pgsqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
 
 	data := []byte(

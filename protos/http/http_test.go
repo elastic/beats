@@ -511,7 +511,7 @@ func TestHttpParser_splitResponse_midBody(t *testing.T) {
 
 func TestHttpParser_RequestResponse(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"http", "httpdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
 	http := HttpModForTests()
@@ -637,7 +637,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 
 func TestHttpParser_301_response(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http"})
 	}
 	http := HttpModForTests()
 
@@ -681,7 +681,7 @@ func TestHttpParser_301_response(t *testing.T) {
 func TestEatBodyChunked(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
 	msgs := [][]byte{
@@ -784,7 +784,7 @@ func TestEatBodyChunked(t *testing.T) {
 func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"http", "httpdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
 	msgs := [][]byte{

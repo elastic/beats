@@ -12,7 +12,7 @@ import (
 func Test_Rotator(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"rotator"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
@@ -103,7 +103,7 @@ func Test_Rotator(t *testing.T) {
 func Test_Rotator_By_Bytes(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"rotator"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")

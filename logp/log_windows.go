@@ -9,6 +9,7 @@ import (
 
 type Logger struct {
 	toSyslog            bool
+	toStderr            bool
 	level               Priority
 	selectors           map[string]bool
 	debug_all_selectors bool
@@ -90,7 +91,7 @@ func Recover(msg string) {
 	}
 }
 
-func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []string) {
+func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
 	_log.level = level
 
 	_log.selectors = make(map[string]bool)
@@ -102,4 +103,7 @@ func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []stri
 	}
 
 	_log.logger = log.New(os.Stdout, prefix, log.Lshortfile)
+}
+
+func SetToStderr(toStderr bool) {
 }

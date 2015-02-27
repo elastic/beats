@@ -12,7 +12,7 @@ import (
 func TestThrift_thriftReadString(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var data []byte
@@ -51,7 +51,7 @@ func TestThrift_thriftReadString(t *testing.T) {
 func TestThrift_readMessageBegin(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var data []byte
@@ -139,7 +139,7 @@ func TestThrift_readMessageBegin(t *testing.T) {
 func TestThrift_thriftReadField(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var data []byte
@@ -402,7 +402,7 @@ func TestThrift_thriftReadField(t *testing.T) {
 func TestThrift_thriftMessageParser(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var data []byte
@@ -588,7 +588,7 @@ func testTcpTuple() *common.TcpTuple {
 func TestThrift_ParseSimpleTBinary(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -618,7 +618,7 @@ func TestThrift_ParseSimpleTBinary(t *testing.T) {
 func TestThrift_ParseSimpleTFramed(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -651,7 +651,7 @@ func TestThrift_ParseSimpleTFramed(t *testing.T) {
 func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -687,7 +687,7 @@ func TestThrift_ParseSimpleTFramedSplit(t *testing.T) {
 func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -722,7 +722,7 @@ func TestThrift_ParseSimpleTFramedSplitInterleaved(t *testing.T) {
 func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -751,7 +751,7 @@ func TestThrift_Parse_OneWayCallWithFin(t *testing.T) {
 func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -791,7 +791,7 @@ func TestThrift_Parse_OneWayCall2Requests(t *testing.T) {
 func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -820,7 +820,7 @@ func TestThrift_Parse_RequestReplyMismatch(t *testing.T) {
 func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -864,7 +864,7 @@ func TestThrift_ParseSimpleTFramed_NoReply(t *testing.T) {
 func TestThrift_ParseObfuscateStrings(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -897,7 +897,7 @@ func TestThrift_ParseObfuscateStrings(t *testing.T) {
 func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -944,7 +944,7 @@ func BenchmarkThrift_ParseSkipReply(b *testing.B) {
 func TestThrift_Parse_Exception(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -976,7 +976,7 @@ func TestThrift_Parse_Exception(t *testing.T) {
 func TestThrift_ParametersNames(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift
@@ -1014,7 +1014,7 @@ func TestThrift_ParametersNames(t *testing.T) {
 func TestThrift_ExceptionName(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"thrift", "thriftdetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
 	}
 
 	var thrift Thrift

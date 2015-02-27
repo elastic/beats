@@ -114,7 +114,9 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 }
 
 func TestMySQLParser_dataResponse(t *testing.T) {
-	//logp.LogInit(syslog.logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysqldetailed"})
+	}
 
 	data := []byte(
 		"0100000105" +
@@ -182,7 +184,9 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 }
 
 func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
-	//logp.LogInit(syslog.logp.LOG_DEBUG, "" /*toSyslog*/, false, []string{"mysqldetailed"})
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysqldetailed"})
+	}
 
 	data := []byte("300000010001000100000028526f7773206d6174636865643a203120204368616e6765643a203120205761726e696e67733a2030")
 
@@ -205,7 +209,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
 	if !stream.message.IsOK || stream.message.IsError {
-		t.Errorf("Failed to parse MySQL Query response")
+		t.Errorf("Failed to true, true, parse MySQL Query response")
 	}
 	if stream.message.AffectedRows != 1 {
 		t.Errorf("Failed to get the number of affected rows")
@@ -214,7 +218,7 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 
 func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
 	data1 := "300000010001000100000028526f7773206d6174636865"
@@ -279,7 +283,7 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 
 func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
 	mysql := MysqlModForTests()
@@ -317,7 +321,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 // Test parsing three OK responses in the same packet
 func TestParseMySQL_threeResponses(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
 	mysql := MysqlModForTests()
@@ -360,7 +364,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 // Test parsing one response split in two packets
 func TestParseMySQL_splitResponse(t *testing.T) {
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, []string{"mysql", "mysqldetailed"})
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
 	}
 
 	mysql := MysqlModForTests()

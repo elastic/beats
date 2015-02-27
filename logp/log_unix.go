@@ -29,6 +29,7 @@ const (
 
 type Logger struct {
 	toSyslog            bool
+	toStderr            bool
 	level               syslog.Priority
 	selectors           map[string]bool
 	debug_all_selectors bool
@@ -49,7 +50,8 @@ func Debug(selector string, format string, v ...interface{}) {
 		}
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_INFO].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("DBG  "+format, v...))
 		}
 	}
@@ -63,7 +65,8 @@ func Info(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_INFO {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_INFO].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("INFO "+format, v...))
 		}
 	}
@@ -73,7 +76,8 @@ func Warn(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_WARNING {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_WARNING].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("WARN "+format, v...))
 		}
 	}
@@ -83,7 +87,8 @@ func Err(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_ERR {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_ERR].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("ERR  "+format, v...))
 		}
 	}
@@ -93,7 +98,8 @@ func Critical(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_CRIT {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_CRIT].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("CRIT "+format, v...))
 		}
 	}
@@ -103,7 +109,8 @@ func WTF(format string, v ...interface{}) {
 	if _log.level >= syslog.LOG_CRIT {
 		if _log.toSyslog {
 			_log.syslog[syslog.LOG_CRIT].Output(2, fmt.Sprintf(format, v...))
-		} else {
+		}
+		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("CRIT "+format, v...))
 		}
 	}
@@ -129,8 +136,9 @@ func openSyslog(level syslog.Priority, prefix string) *log.Logger {
 	return logger
 }
 
-func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []string) {
+func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
 	_log.toSyslog = toSyslog
+	_log.toStderr = toStderr
 	_log.level = syslog.Priority(level)
 
 	_log.selectors = make(map[string]bool)
@@ -145,7 +153,12 @@ func LogInit(level Priority, prefix string, toSyslog bool, debugSelectors []stri
 		for prio := syslog.LOG_EMERG; prio <= syslog.LOG_DEBUG; prio++ {
 			_log.syslog[prio] = openSyslog(prio, prefix)
 		}
-	} else {
+	}
+	if _log.toStderr {
 		_log.logger = log.New(os.Stdout, prefix, log.Lshortfile)
 	}
+}
+
+func SetToStderr(toStderr bool) {
+	_log.toStderr = toStderr
 }

@@ -76,7 +76,7 @@ func main() {
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
 	oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
-	toStdout := cmdLine.Bool("e", false, "Output to stdout instead of syslog")
+	toStderr := cmdLine.Bool("e", false, "Output to stdout instead of syslog")
 	topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
 	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
 	verbose := cmdLine.Bool("v", false, "Log at INFO level")
@@ -112,7 +112,7 @@ func main() {
 	if len(debugSelectors) == 0 {
 		debugSelectors = config.ConfigSingleton.Logging.Selectors
 	}
-	logp.LogInit(logp.Priority(logLevel), "", !*toStdout, debugSelectors)
+	logp.LogInit(logp.Priority(logLevel), "", !*toStderr, true, debugSelectors)
 
 	if !logp.IsDebug("stdlog") {
 		// disable standard logging by default
@@ -178,6 +178,7 @@ func main() {
 			err = plugin.Init(false, nil)
 			if err != nil {
 				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
+				return
 			}
 			inputs.Inputs.Register(input, plugin)
 		}
@@ -220,6 +221,11 @@ func main() {
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
 		inputs.Inputs.StopAll()
 	}()
+
+	if !*toStderr {
+		logp.Info("Startup successful, sending output only to syslog from now on")
+		logp.SetToStderr(false)
+	}
 
 	logp.Debug("main", "Waiting for inputs to finish")
 
