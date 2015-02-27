@@ -215,7 +215,6 @@ func main() {
 		<-sigc
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
 		inputs.Inputs.StopAll()
-		over <- true
 	}()
 
 	logp.Debug("main", "Waiting for inputs to finish")
