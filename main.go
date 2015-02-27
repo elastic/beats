@@ -202,14 +202,14 @@ func main() {
 
 	for input, plugin := range inputs.Inputs.Registered() {
 		// run the plugin in background
-		go func(plugin inputs.InputPlugin) {
+		go func(input inputs.Input, plugin inputs.InputPlugin) {
 			err := plugin.Run()
 			if err != nil {
 				logp.Critical("Plugin %s main loop failed: %v", input, err)
 				return
 			}
 			over <- true
-		}(plugin)
+		}(input, plugin)
 	}
 
 	// On ^C or SIGTERM, gracefully stop inputs
