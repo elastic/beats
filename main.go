@@ -132,12 +132,6 @@ func main() {
 		config.ConfigSingleton.Interfaces.Dumpfile = *dumpfile
 	}
 
-	// TODO: This needs to be after the Sniffer Init but before the sniffer Run.
-	if err = droppriv.DropPrivileges(); err != nil {
-		logp.Critical(err.Error())
-		return
-	}
-
 	logp.Debug("main", "Initializing output plugins")
 	if err = outputs.Publisher.Init(*publishDisabled); err != nil {
 		logp.Critical(err.Error())
@@ -186,18 +180,16 @@ func main() {
 				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
 			}
 			inputs.Inputs.Register(input, plugin)
-
-			// run the plugin in background
-			go func(plugin inputs.InputPlugin) {
-				err := plugin.Run()
-				if err != nil {
-					logp.Critical("Plugin %s main loop failed: %v", input, err)
-					return
-				}
-				over <- true
-			}(plugin)
 		}
 	}
+
+	// This needs to be after the sniffer Init but before the sniffer Run.
+	if err = droppriv.DropPrivileges(); err != nil {
+		logp.Critical(err.Error())
+		return
+	}
+
+	// Up to here was the initialization, now about running
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -206,6 +198,18 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
+	}
+
+	for input, plugin := range inputs.Inputs.Registered() {
+		// run the plugin in background
+		go func(plugin inputs.InputPlugin) {
+			err := plugin.Run()
+			if err != nil {
+				logp.Critical("Plugin %s main loop failed: %v", input, err)
+				return
+			}
+			over <- true
+		}(plugin)
 	}
 
 	// On ^C or SIGTERM, gracefully stop inputs
