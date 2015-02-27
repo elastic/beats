@@ -4,17 +4,18 @@ import "github.com/BurntSushi/toml"
 
 type Config struct {
 	Interfaces InterfacesConfig
-	RunOptions RunOptions
 	Protocols  map[string]Protocol
-	Procs      Procs
 	Output     map[string]MothershipConfig
+	Input      Input
+	RunOptions RunOptions
+	Procs      Procs
 	Agent      Agent
 	Logging    Logging
 	Passwords  Passwords
 	Thrift     Thrift
 	Http       Http
 	Geoip      Geoip
-	Udpjson
+	Udpjson    Udpjson
 }
 
 type InterfacesConfig struct {
@@ -26,6 +27,10 @@ type InterfacesConfig struct {
 	Bpf_filter     string
 	Snaplen        int
 	Buffer_size_mb int
+}
+
+type Input struct {
+	Inputs []string
 }
 
 type RunOptions struct {

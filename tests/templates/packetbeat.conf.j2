@@ -41,6 +41,16 @@
     rotate_every_kb=1000
     #number_of_files=7
 
+{% if inputs is not none -%}
+[inputs]
+inputs = [
+        {%- for input in inputs -%}
+            "{{ input }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+]
+{%- endif %}
+
 [interfaces]
 # Select on which network interfaces to sniff. You can use the "any"
 # keyword to sniff on all connected interfaces.
@@ -151,4 +161,4 @@ paths = [
 ]
 {%- endif %}
 
-# vim: set ft=toml:
+# vim: set ft=jinja:

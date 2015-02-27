@@ -105,10 +105,11 @@ func (server *Udpjson) Init(test_mode bool, events chan common.MapStr) error {
 	return nil
 }
 
-func (server *Udpjson) Stop() {
+func (server *Udpjson) Stop() error {
 	server.isAlive = false
+	return nil
 }
 
-func (server *Udpjson) Close() {
-	server.conn.Close()
+func (server *Udpjson) Close() error {
+	return server.conn.Close()
 }

@@ -16,7 +16,9 @@ import (
 
 	"packetbeat/common/droppriv"
 	"packetbeat/config"
+	"packetbeat/inputs"
 	"packetbeat/inputs/sniffer"
+	"packetbeat/inputs/udpjson"
 	"packetbeat/logp"
 	"packetbeat/outputs"
 	"packetbeat/procs"
@@ -40,6 +42,10 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.PgsqlProtocol:  new(pgsql.Pgsql),
 	protos.RedisProtocol:  new(redis.Redis),
 	protos.ThriftProtocol: new(thrift.Thrift),
+}
+
+var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
+	inputs.UdpjsonInput: new(udpjson.Udpjson),
 }
 
 // Structure grouping main components/modules
@@ -158,7 +164,7 @@ func main() {
 	for proto, plugin := range EnabledProtocolPlugins {
 		err = plugin.Init(false, outputs.Publisher.Queue)
 		if err != nil {
-			logp.Critical("Initializing plugin %s failed: %v", proto, plugin)
+			logp.Critical("Initializing plugin %s failed: %v", proto, err)
 			return
 		}
 		protos.Protos.Register(proto, plugin)
@@ -167,6 +173,26 @@ func main() {
 	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
 		logp.Critical(err.Error())
 		return
+	}
+
+	// Initializing input plugins
+	for input, plugin := range EnabledInputPlugins {
+		configured_inputs := config.ConfigSingleton.Input.Inputs
+		if input.IsInList(configured_inputs) {
+			err = plugin.Init(false, nil)
+			if err != nil {
+				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
+			}
+			inputs.Inputs.Register(input, plugin)
+
+			// run the plugin in background
+			go func() {
+				err := plugin.Run()
+				if err != nil {
+					logp.Err("Plugin %s main loop failed: %v", input, err)
+				}
+			}()
+		}
 	}
 
 	if *cpuprofile != "" {
@@ -274,6 +300,9 @@ func main() {
 		Packetbeat.Decoder.DecodePacketData(data, &ci)
 	}
 	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)
+
+	// stop all input plugin servers
+	inputs.Inputs.StopAll()
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire

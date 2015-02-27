@@ -197,7 +197,7 @@ func (thrift *Thrift) readConfig() error {
 	if config.ConfigMeta.IsDefined("thrift", "protocol_type") {
 		switch config.ConfigSingleton.Thrift.Transport_type {
 		case "binary":
-			thrift.TransportType = ThriftTBinary
+			thrift.ProtocolType = ThriftTBinary
 		default:
 			return fmt.Errorf("Protocol type `%s` not known", config.ConfigSingleton.Thrift.Protocol_type)
 		}
