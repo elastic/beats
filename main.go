@@ -162,7 +162,7 @@ func main() {
 
 	over := make(chan bool)
 
-	if !config.ConfigMeta.IsDefined("inputs", "inputs") {
+	if !config.ConfigMeta.IsDefined("input", "inputs") {
 		config.ConfigSingleton.Input.Inputs = []string{"sniffer"}
 	}
 	if len(config.ConfigSingleton.Input.Inputs) == 0 {
