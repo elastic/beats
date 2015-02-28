@@ -42,7 +42,7 @@
     #number_of_files=7
 
 {% if input_plugins -%}
-[inputs]
+[input]
 inputs = [
         {%- for input in input_plugins -%}
             "{{ input }}"

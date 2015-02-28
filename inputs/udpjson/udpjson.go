@@ -102,6 +102,8 @@ func (server *Udpjson) Init(test_mode bool, events chan common.MapStr) error {
 	}
 	server.isAlive = true
 
+	logp.Info("UDPJson plugin listening on %s:%d", addr.IP, addr.Port)
+
 	return nil
 }
 
