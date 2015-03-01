@@ -1,5 +1,10 @@
 package common
 
+import (
+	"fmt"
+	"time"
+)
+
 // Commonly used map of things, used in JSON creation and the like.
 type MapStr map[string]interface{}
 
@@ -25,4 +30,34 @@ func (m MapStr) Update(d MapStr) {
 	for k, v := range d {
 		m[k] = v
 	}
+}
+
+// Checks if a timestamp field exists and if it doesn't it adds
+// one by using the injected now() function as a time source.
+func (m MapStr) EnsureTimestampField(now func() time.Time) error {
+	ts, exists := m["timestamp"]
+	if !exists {
+		m["timestamp"] = Time(now())
+		return nil
+	}
+
+	_, is_common_time := ts.(Time)
+	if is_common_time {
+		// already perfect
+		return nil
+	}
+
+	tstime, is_time := ts.(time.Time)
+	if is_time {
+		m["timestamp"] = Time(tstime)
+		return nil
+	}
+
+	tsstr, is_string := ts.(string)
+	if is_string {
+		var err error
+		m["timestamp"], err = ParseTime(tsstr)
+		return err
+	}
+	return fmt.Errorf("Don't know how to convert %v to a Time value", ts)
 }
