@@ -665,7 +665,7 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	event["path"] = t.Path
 	event["bytes_out"] = t.Size
 
-	event["timestamp"] = t.ts
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

@@ -73,16 +73,34 @@ func (publisher *PublisherType) publishFromQueue() {
 func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 
 	// the timestamp is mandatory
-	ts, ok := event["timestamp"].(time.Time)
+	ts, ok := event["timestamp"].(common.Time)
 	if !ok {
-		return errors.New("Missing 'timestamp' field from MapStr object")
+		return errors.New("Missing 'timestamp' field from event.")
 	}
 
-	src, _ := event["src"].(*common.Endpoint)
-	dst, _ := event["dst"].(*common.Endpoint)
+	// the type is mandatory
+	_, ok = event["type"].(string)
+	if !ok {
+		return errors.New("Missing 'type' field from event.")
+	}
 
-	src_server := publisher.GetServerName(src.Ip)
-	dst_server := publisher.GetServerName(dst.Ip)
+	var src_server, dst_server string
+	src, ok := event["src"].(*common.Endpoint)
+	if ok {
+		src_server = publisher.GetServerName(src.Ip)
+		event["client_ip"] = src.Ip
+		event["client_port"] = src.Port
+		event["client_proc"] = src.Proc
+		event["client_server"] = src_server
+	}
+	dst, ok := event["dst"].(*common.Endpoint)
+	if ok {
+		dst_server = publisher.GetServerName(dst.Ip)
+		event["ip"] = dst.Ip
+		event["port"] = dst.Port
+		event["proc"] = dst.Proc
+		event["server"] = dst_server
+	}
 
 	if config.ConfigSingleton.Agent.Ignore_outgoing && dst_server != "" &&
 		dst_server != publisher.name {
@@ -90,20 +108,12 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
 		return nil
 	}
-	event["client_server"] = src_server
-	event["server"] = dst_server
 
-	event["timestamp"] = ts
 	event["agent"] = publisher.name
-	event["client_ip"] = src.Ip
-	event["client_port"] = src.Port
-	event["client_proc"] = src.Proc
-	event["ip"] = dst.Ip
-	event["port"] = dst.Port
-	event["proc"] = dst.Proc
-	event["tags"] = publisher.tags
+	if len(publisher.tags) > 0 {
+		event["tags"] = publisher.tags
+	}
 
-	event["country"] = ""
 	if _GeoLite != nil {
 		real_ip, exists := event["real_ip"]
 		if exists && len(real_ip.(string)) > 0 {
@@ -112,7 +122,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 				event["country"] = loc.CountryCode
 			}
 		} else {
-			if len(src_server) == 0 { // only for external IP addresses
+			if len(src_server) == 0 && src != nil { // only for external IP addresses
 				loc := _GeoLite.GetLocationByIP(src.Ip)
 				if loc != nil {
 					event["country"] = loc.CountryCode
@@ -129,7 +139,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 	has_error := false
 	if !publisher.disabled {
 		for i := 0; i < len(publisher.Output); i++ {
-			err := publisher.Output[i].PublishEvent(ts, event)
+			err := publisher.Output[i].PublishEvent(time.Time(ts), event)
 			if err != nil {
 				logp.Err("Fail to publish event type on output %s: %s", publisher.Output, err)
 				has_error = true

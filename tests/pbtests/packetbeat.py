@@ -138,7 +138,7 @@ class TestCase(unittest.TestCase):
             os.unlink("last_run")
         os.symlink("run/{}".format(self.id()), "last_run")
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1):
+    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
         """
         Waits until the cond function returns true,
         or until the max_timeout is reached. Calls the cond
@@ -150,8 +150,9 @@ class TestCase(unittest.TestCase):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
-                raise Exception("Timeout waiting for condition. " +
-                                "Waited {} seconds".format(max_timeout))
+                raise Exception("Timeout waiting for '{}' to be true. "
+                                .format(name) +
+                                "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
 
     def log_contains(self, msg, logfile="packetbeat.log"):
@@ -159,8 +160,33 @@ class TestCase(unittest.TestCase):
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
-        with open(os.path.join(self.working_dir, logfile), "r") as f:
-            for line in f:
-                if line.find(msg) >= 0:
-                    return True
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r") as f:
+                for line in f:
+                    if line.find(msg) >= 0:
+                        return True
+                return False
+        except IOError:
             return False
+
+    def output_has(self, lines, output_file="output/packetbeat"):
+        """
+        Returns true if the output has a given number of lines.
+        """
+        try:
+            with open(os.path.join(self.working_dir, output_file), "r") as f:
+                return len([1 for line in f]) == lines
+        except IOError:
+            return False
+
+    def all_have_mandatory_fields(self, objs):
+        """
+        Checks that the given list of output objects have
+        all the mandatory fields.
+        Raises Exception if not true.
+        """
+        fields = ["agent", "status", "type", "timestamp"]
+        for field in fields:
+            if not all([field in o for o in objs]):
+                raise Exception("Not all fields have a '{}' field"
+                                .format(field))

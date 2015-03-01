@@ -91,10 +91,11 @@ event:
     - name: timestamp
       type: string
       required: true
-      format: YYYY-MM-DDTHH:MM:SS.microZ
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
       description: >
         The timestamp of the event, as measured either by the agent or
-        by a common collector point. The precision is in microseconds.
+        by a common collector point. The precision is in milliseconds.
         The timezone is UTC.
 
     - name: type

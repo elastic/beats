@@ -175,7 +175,7 @@ func main() {
 		configured_inputs := config.ConfigSingleton.Input.Inputs
 		if input.IsInList(configured_inputs) {
 			logp.Debug("main", "Input plugin %s is enabled", input)
-			err = plugin.Init(false, nil)
+			err = plugin.Init(false, outputs.Publisher.Queue)
 			if err != nil {
 				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
 				return

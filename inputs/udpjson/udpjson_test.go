@@ -47,13 +47,17 @@ func TestUdpJson(t *testing.T) {
 	assert.Nil(t, err)
 
 	obj := <-events
-	assert.Equal(t, obj, common.MapStr{"hello": "udpserver"})
+	assert.Equal(t, obj["hello"].(string), "udpserver")
+	_, ok := obj["timestamp"].(common.Time)
+	assert.True(t, ok)
 
 	_, err = clientConn.Write([]byte(`{"obj2": 4}`))
 	assert.Nil(t, err)
+	_, ok = obj["timestamp"].(common.Time)
+	assert.True(t, ok)
 
 	obj = <-events
-	assert.Equal(t, obj, common.MapStr{"obj2": 4})
+	assert.Equal(t, obj["obj2"].(float64), 4)
 
 	server.Stop()
 }

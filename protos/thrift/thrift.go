@@ -1051,7 +1051,7 @@ func (thrift *Thrift) publishTransactions() {
 		}
 		event["thrift"] = thriftmap
 
-		event["timestamp"] = t.ts
+		event["timestamp"] = common.Time(t.ts)
 		event["src"] = &t.Src
 		event["dst"] = &t.Dst
 

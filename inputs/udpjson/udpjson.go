@@ -51,6 +51,12 @@ func (server *Udpjson) Run() error {
 			continue
 		}
 
+		err = obj.EnsureTimestampField(time.Now)
+		if err != nil {
+			logp.Err("Invalid timestamp field: %v", err)
+			continue
+		}
+
 		server.events <- obj
 	}
 	return nil

@@ -22,7 +22,7 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["real_ip"] == "89.247.39.104"
-        assert o["country"] == ""
+        assert "country" not in o
 
     def test_geoip_config_from_file(self):
         self.render_config_template(
