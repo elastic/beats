@@ -92,6 +92,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		event["client_port"] = src.Port
 		event["client_proc"] = src.Proc
 		event["client_server"] = src_server
+		delete(event, "src")
 	}
 	dst, ok := event["dst"].(*common.Endpoint)
 	if ok {
@@ -100,6 +101,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		event["port"] = dst.Port
 		event["proc"] = dst.Proc
 		event["server"] = dst_server
+		delete(event, "dst")
 	}
 
 	if config.ConfigSingleton.Agent.Ignore_outgoing && dst_server != "" &&

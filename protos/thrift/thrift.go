@@ -1008,9 +1008,9 @@ func (thrift *Thrift) publishTransactions() {
 
 		event["type"] = "thrift"
 		if t.Reply != nil && t.Reply.HasException {
-			event["Status"] = common.ERROR_STATUS
+			event["status"] = common.ERROR_STATUS
 		} else {
-			event["Status"] = common.OK_STATUS
+			event["status"] = common.OK_STATUS
 		}
 		event["response_time"] = t.ResponseTime
 		thriftmap := common.MapStr{}
@@ -1021,8 +1021,10 @@ func (thrift *Thrift) publishTransactions() {
 			event["query"] = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
 			event["bytes_in"] = uint64(t.Request.FrameSize)
 			thriftmap = common.MapStr{
-				"params":  t.Request.Params,
-				"service": t.Request.Service,
+				"params": t.Request.Params,
+			}
+			if len(t.Request.Service) > 0 {
+				thriftmap["service"] = t.Request.Service
 			}
 
 			if thrift.Send_request {

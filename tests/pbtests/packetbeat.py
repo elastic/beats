@@ -114,6 +114,7 @@ class TestCase(unittest.TestCase):
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
                 jsons.append(json.loads(line))
+        self.all_have_fields(jsons, ["timestamp", "type", "status", "agent"])
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -179,14 +180,26 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
-    def all_have_mandatory_fields(self, objs):
+    def all_have_fields(self, objs, fields):
         """
         Checks that the given list of output objects have
-        all the mandatory fields.
+        all the given fields.
         Raises Exception if not true.
         """
-        fields = ["agent", "status", "type", "timestamp"]
         for field in fields:
             if not all([field in o for o in objs]):
-                raise Exception("Not all fields have a '{}' field"
+                raise Exception("Not all objects have a '{}' field"
                                 .format(field))
+
+    def all_have_only_fields(self, objs, fields):
+        """
+        Checks if the given list of output objects have all
+        and only the given fields.
+        Raises Exception if not true.
+        """
+        self.all_have_fields(objs, fields)
+        for o in objs:
+            for key in o.keys():
+                if key not in fields:
+                    raise Exception("Unexpected key '{}' found"
+                                    .format(key))

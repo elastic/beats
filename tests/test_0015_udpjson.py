@@ -64,7 +64,8 @@ class Test(TestCase):
 
         objs = self.read_output()
 
-        self.all_have_mandatory_fields(objs)
+        expected_fields = ["agent", "status", "type", "timestamp"]
+        self.all_have_only_fields(objs, expected_fields)
 
         assert objs[0]["type"] == "http"
         assert objs[0]["status"] == "OK"
