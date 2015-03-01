@@ -43,5 +43,5 @@ class Test(TestCase):
         assert o["type"] == "pgsql"
         assert o["method"] == "INSERT"
         assert o["status"] == "Error"
-        assert o["pgsql"]["error_code"] == "23505"
-        assert o["pgsql"]["iserror"] is True
+        assert o["pgsql.error_code"] == "23505"
+        assert o["pgsql.iserror"] is True

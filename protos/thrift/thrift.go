@@ -1012,7 +1012,7 @@ func (thrift *Thrift) publishTransactions() {
 		} else {
 			event["status"] = common.OK_STATUS
 		}
-		event["response_time"] = t.ResponseTime
+		event["responsetime"] = t.ResponseTime
 		thriftmap := common.MapStr{}
 
 		if t.Request != nil {

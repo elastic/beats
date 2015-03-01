@@ -16,34 +16,34 @@ class Test(TestCase):
         assert objs[15]["bytes_out"] == 0
 
         assert objs[0]["method"] == "ping"
-        assert objs[0]["thrift"]["params"] == "()"
-        assert objs[0]["thrift"]["return_value"] == ""
+        assert objs[0]["thrift.params"] == "()"
+        assert objs[0]["thrift.return_value"] == ""
 
         assert objs[1]["method"] == "add"
-        assert objs[1]["thrift"]["params"] == "(1: 1, 2: 1)"
-        assert objs[1]["thrift"]["return_value"] == "2"
+        assert objs[1]["thrift.params"] == "(1: 1, 2: 1)"
+        assert objs[1]["thrift.return_value"] == "2"
 
         assert objs[2]["method"] == "add16"
         assert objs[2]["query"] == "add16(1: 1, 2: 1)"
-        assert objs[2]["thrift"]["params"] == "(1: 1, 2: 1)"
-        assert objs[2]["thrift"]["return_value"] == "2"
+        assert objs[2]["thrift.params"] == "(1: 1, 2: 1)"
+        assert objs[2]["thrift.return_value"] == "2"
 
         assert objs[3]["method"] == "add64"
         assert objs[3]["query"] == "add64(1: 1, 2: 1)"
-        assert objs[3]["thrift"]["params"] == "(1: 1, 2: 1)"
-        assert objs[3]["thrift"]["return_value"] == "2"
+        assert objs[3]["thrift.params"] == "(1: 1, 2: 1)"
+        assert objs[3]["thrift.return_value"] == "2"
 
         assert objs[4]["method"] == "add_doubles"
-        assert objs[4]["thrift"]["params"] == "(1: 1.2, 2: 1.3)"
-        assert objs[4]["thrift"]["return_value"] == "2.5"
+        assert objs[4]["thrift.params"] == "(1: 1.2, 2: 1.3)"
+        assert objs[4]["thrift.return_value"] == "2.5"
 
         assert objs[5]["method"] == "echo_bool"
-        assert objs[5]["thrift"]["params"] == "(1: true)"
-        assert objs[5]["thrift"]["return_value"] == "true"
+        assert objs[5]["thrift.params"] == "(1: true)"
+        assert objs[5]["thrift.return_value"] == "true"
 
         assert objs[6]["method"] == "echo_string"
-        assert objs[6]["thrift"]["params"] == "(1: \"hello\")"
-        assert objs[6]["thrift"]["return_value"] == "\"hello\""
+        assert objs[6]["thrift.params"] == "(1: \"hello\")"
+        assert objs[6]["thrift.return_value"] == "\"hello\""
 
     def test_thrift_tutorial_socket(self):
         self.render_config_template(
@@ -87,36 +87,36 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == 17
         assert all([o["type"] == "thrift" for o in objs])
-        assert all([o["thrift"]["service"] == "Calculator"])
+        assert all([o["thrift.service"] == "Calculator"])
 
         assert objs[0]["method"] == "ping"
-        assert objs[0]["thrift"]["params"] == "()"
-        assert objs[0]["thrift"]["return_value"] == ""
+        assert objs[0]["thrift.params"] == "()"
+        assert objs[0]["thrift.return_value"] == ""
 
         assert objs[1]["method"] == "add"
-        assert objs[1]["thrift"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[1]["thrift"]["return_value"] == "2"
+        assert objs[1]["thrift.params"] == "(num1: 1, num2: 1)"
+        assert objs[1]["thrift.return_value"] == "2"
 
         assert objs[2]["method"] == "add16"
-        assert objs[2]["thrift"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[2]["thrift"]["return_value"] == "2"
+        assert objs[2]["thrift.params"] == "(num1: 1, num2: 1)"
+        assert objs[2]["thrift.return_value"] == "2"
 
         assert objs[3]["method"] == "add64"
-        assert objs[3]["thrift"]["params"] == "(num1: 1, num2: 1)"
-        assert objs[3]["thrift"]["return_value"] == "2"
+        assert objs[3]["thrift.params"] == "(num1: 1, num2: 1)"
+        assert objs[3]["thrift.return_value"] == "2"
 
         assert objs[4]["method"] == "add_doubles"
-        assert objs[4]["thrift"]["params"] == \
+        assert objs[4]["thrift.params"] == \
             "(num1: 1.2, num2: 1.3)"
-        assert objs[4]["thrift"]["return_value"] == "2.5"
+        assert objs[4]["thrift.return_value"] == "2.5"
 
         assert objs[5]["method"] == "echo_bool"
-        assert objs[5]["thrift"]["params"] == "(b: true)"
-        assert objs[5]["thrift"]["return_value"] == "true"
+        assert objs[5]["thrift.params"] == "(b: true)"
+        assert objs[5]["thrift.return_value"] == "true"
 
         assert objs[6]["method"] == "echo_string"
-        assert objs[6]["thrift"]["params"] == "(s: \"hello\")"
-        assert objs[6]["thrift"]["return_value"] == "\"hello\""
+        assert objs[6]["thrift.params"] == "(s: \"hello\")"
+        assert objs[6]["thrift.return_value"] == "\"hello\""
 
     def test_thrift_integration(self):
         """
@@ -141,27 +141,27 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == 26
         assert all([o["type"] == "thrift" for o in objs])
-        assert all([o["thrift"]["service"] == "ThriftTest"])
+        assert all([o["thrift.service"] == "ThriftTest"])
 
         # check a few things
 
         assert objs[0]["method"] == "testByte"
-        assert objs[0]["thrift"]["params"] == "(thing: 63)"
-        assert objs[0]["thrift"]["return_value"] == "63"
+        assert objs[0]["thrift.params"] == "(thing: 63)"
+        assert objs[0]["thrift.return_value"] == "63"
 
         assert objs[5]["method"] == "testEnum"
-        assert objs[5]["thrift"]["params"] == "(thing: 5)"
-        assert objs[5]["thrift"]["return_value"] == "5"
+        assert objs[5]["thrift.params"] == "(thing: 5)"
+        assert objs[5]["thrift.return_value"] == "5"
 
         assert objs[17]["method"] == "testOneway"
-        assert objs[17]["thrift"]["params"] == "(secondsToSleep: 1)"
-        assert "return_value" not in objs[17]["thrift"]
+        assert objs[17]["thrift.params"] == "(secondsToSleep: 1)"
+        assert "thrift.return_value" not in objs[17]
         assert objs[17]["bytes_out"] == 0
 
         assert objs[21]["method"] == "testString"
-        assert objs[21]["thrift"]["params"] == "(thing: \"" + \
+        assert objs[21]["thrift.params"] == "(thing: \"" + \
             ("Python" * 20) + "\")"
-        assert objs[21]["thrift"]["return_value"] == '"' + \
+        assert objs[21]["thrift.return_value"] == '"' + \
             ("Python" * 20) + '"'
 
     def test_thrift_send_request_response(self):
@@ -212,4 +212,4 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["method"] == "echo_binary"
-        assert o["thrift"]["return_value"] == "ab0c1d281a000000"
+        assert o["thrift.return_value"] == "ab0c1d281a000000"

@@ -628,7 +628,7 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	} else {
 		event["status"] = common.ERROR_STATUS
 	}
-	event["response_time"] = t.ResponseTime
+	event["responsetime"] = t.ResponseTime
 	event["request_raw"] = t.Request_raw
 	event["response_raw"] = t.Response_raw
 	event["redis"] = common.MapStr(t.Redis)

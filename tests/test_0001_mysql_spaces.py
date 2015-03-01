@@ -19,11 +19,11 @@ class Test(TestCase):
         assert objs[0]["status"] == "OK"
 
         assert objs[2]["method"] == "DROP"
-        assert objs[2]["mysql"]["iserror"] is False
+        assert objs[2]["mysql.iserror"] is False
         assert objs[2]["status"] == "OK"
 
         assert objs[3]["method"] == "CREATE"
-        assert objs[3]["mysql"]["iserror"] is False
+        assert objs[3]["mysql.iserror"] is False
         assert objs[3]["status"] == "OK"
 
         assert objs[5]["method"] == "SELECT"

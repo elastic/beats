@@ -656,7 +656,7 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 		event["status"] = common.OK_STATUS
 	}
 
-	event["response_time"] = t.ResponseTime
+	event["responsetime"] = t.ResponseTime
 	event["request_raw"] = t.Request_raw
 	event["response_raw"] = t.Response_raw
 	event["method"] = t.Method

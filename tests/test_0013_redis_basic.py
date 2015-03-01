@@ -23,22 +23,22 @@ class Test(TestCase):
         assert objs[0]["path"] == "key3"
         assert objs[0]["query"] == "set key3 me"
         assert objs[0]["status"] == "OK"
-        assert objs[0]["redis"]["return_value"] == "OK"
+        assert objs[0]["redis.return_value"] == "OK"
 
         assert objs[1]["status"] == "OK"
         assert objs[1]["method"] == "GET"
-        assert objs[1]["redis"]["return_value"] == "me"
+        assert objs[1]["redis.return_value"] == "me"
         assert objs[1]["query"] == "get key3"
-        assert objs[1]["redis"]["return_value"] == "me"
+        assert objs[1]["redis.return_value"] == "me"
 
         assert objs[2]["status"] == "Error"
         assert objs[2]["method"] == "LLEN"
-        assert objs[2]["redis"]["error"] == "ERR Operation against a key " + \
+        assert objs[2]["redis.error"] == "ERR Operation against a key " + \
             "holding the wrong kind of value"
 
         # the rest should be successful
         assert all([o["status"] == "OK" for o in objs[3:]])
-        assert all(["return_value" in o["redis"] for o in objs[3:]])
+        assert all(["redis.return_value" in o for o in objs[3:]])
         assert all([isinstance(o["method"], basestring) for o in objs[3:]])
         assert all([isinstance(o["path"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])
