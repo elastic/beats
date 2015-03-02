@@ -16,6 +16,7 @@ type Config struct {
 	Http       Http
 	Geoip      Geoip
 	Udpjson    Udpjson
+	Filter     map[string]interface{}
 }
 
 type InterfacesConfig struct {

@@ -8,7 +8,7 @@ import (
 )
 
 // The InputPlugin interface needs to be implemented
-// by the input plugins.
+// by all the input plugins.
 type InputPlugin interface {
 	Init(test_mode bool, events chan common.MapStr) error
 	Run() error
