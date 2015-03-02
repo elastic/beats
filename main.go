@@ -13,8 +13,11 @@ import (
 	"syscall"
 	"time"
 
+	"packetbeat/common"
 	"packetbeat/common/droppriv"
 	"packetbeat/config"
+	"packetbeat/filters"
+	"packetbeat/filters/nop"
 	"packetbeat/inputs"
 	"packetbeat/inputs/sniffer"
 	"packetbeat/inputs/udpjson"
@@ -45,6 +48,10 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
 	inputs.SnifferInput: new(sniffer.SnifferSetup),
 	inputs.UdpjsonInput: new(udpjson.Udpjson),
+}
+
+var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{
+	filters.NopFilter: new(nop.Nop),
 }
 
 func writeHeapProfile(filename string) {
@@ -170,12 +177,39 @@ func main() {
 		return
 	}
 
+	logp.Debug("main", "Initializing filters plugins")
+	for filter, plugin := range EnabledFilterPlugins {
+		filters.Filters.Register(filter, plugin)
+	}
+	filters_plugins, err :=
+		LoadConfiguredFilters(config.ConfigSingleton.Filter)
+	if err != nil {
+		logp.Critical("Error loading filters plugins: %v", err)
+	}
+	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
+	var afterInputsQueue chan common.MapStr
+	if len(filters_plugins) > 0 {
+		runner := NewFilterRunner(outputs.Publisher.Queue, filters_plugins)
+		go func() {
+			err := runner.Run()
+			if err != nil {
+				logp.Critical("Filters runner failed: %v", err)
+				// shutting doen
+				inputs.Inputs.StopAll()
+			}
+		}()
+		afterInputsQueue = runner.FiltersQueue
+	} else {
+		// short-circuit the runner
+		afterInputsQueue = outputs.Publisher.Queue
+	}
+
 	logp.Debug("main", "Initializing input plugins")
 	for input, plugin := range EnabledInputPlugins {
 		configured_inputs := config.ConfigSingleton.Input.Inputs
 		if input.IsInList(configured_inputs) {
 			logp.Debug("main", "Input plugin %s is enabled", input)
-			err = plugin.Init(false, outputs.Publisher.Queue)
+			err = plugin.Init(false, afterInputsQueue)
 			if err != nil {
 				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
 				return

@@ -29,7 +29,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		// should find configuration by types
 		io{
 			Input: map[string]interface{}{
-				"filters": []string{"nop1", "nop2"},
+				"filters": []interface{}{"nop1", "nop2"},
 				"nop1": map[string]interface{}{
 					"type": "nop",
 				},
@@ -51,7 +51,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		// should work with implicit configuration by name
 		io{
 			Input: map[string]interface{}{
-				"filters": []string{"nop", "sample1"},
+				"filters": []interface{}{"nop", "sample1"},
 				"sample1": map[string]interface{}{
 					"type": "nop",
 				},
@@ -75,7 +75,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 
 		res_o := []o{}
 		for _, r := range res {
-			res_o = append(res_o, o{Name: r.Name(), Type: r.Type()})
+			res_o = append(res_o, o{Name: r.String(), Type: r.Type()})
 		}
 
 		assert.Equal(t, test.Output, res_o)
@@ -93,7 +93,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 	tests := []io{
 		io{
 			Input: map[string]interface{}{
-				"filters": []string{"nop1", "nop2"},
+				"filters": []interface{}{"nop1", "nop2"},
 				"nop1": map[string]interface{}{
 					"type": "nop",
 				},
@@ -102,7 +102,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		},
 		io{
 			Input: map[string]interface{}{
-				"filters": []string{"nop1", "nop"},
+				"filters": []interface{}{"nop1", "nop"},
 				"nop1": map[string]interface{}{
 					"hype": "nop",
 				},
@@ -111,7 +111,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		},
 		io{
 			Input: map[string]interface{}{
-				"filters": []string{"nop1", "nop"},
+				"filters": []interface{}{"nop1", "nop"},
 				"nop1": map[string]interface{}{
 					"type": 1,
 				},

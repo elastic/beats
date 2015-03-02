@@ -17,7 +17,7 @@ func (nop *Nop) Filter(event common.MapStr) (common.MapStr, error) {
 	return event, nil
 }
 
-func (nop *Nop) Name() string {
+func (nop *Nop) String() string {
 	return nop.name
 }
 

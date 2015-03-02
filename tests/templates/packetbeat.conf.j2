@@ -51,6 +51,25 @@ inputs = [
 ]
 {%- endif %}
 
+{% if filter_plugins -%}
+[filter]
+filters = [
+        {%- for filter in filter_plugins -%}
+            "{{ filter }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+]
+
+{%- if filter_config -%}
+    {%- for name, dict in filter_config.items() %}
+    [filter.{{name}}]
+    {%- for key, val in dict.items() %}
+    {{key}} = "{{val}}"
+    {%- endfor %}
+    {% endfor %}
+{%- endif -%}
+{%- endif %}
+
 [interfaces]
 # Select on which network interfaces to sniff. You can use the "any"
 # keyword to sniff on all connected interfaces.

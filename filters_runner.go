@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"packetbeat/common"
 	"packetbeat/filters"
@@ -28,7 +27,7 @@ func (runner *FilterRunner) Run() error {
 			var err error
 			event, err = plugin.Filter(event)
 			if err != nil {
-				logp.Err("Error executing filter %s: %v. Dropping event.", plugin.Name(), err)
+				logp.Err("Error executing filter %s: %v. Dropping event.", plugin, err)
 				break // drop event in case of errors
 			}
 		}
@@ -53,17 +52,20 @@ func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugi
 	var err error
 	plugins := []filters.FilterPlugin{}
 
-	filters_interface, exists := config["filters"]
+	filters_list, exists := config["filters"]
 	if !exists {
 		return plugins, nil
 	}
-
-	filters_list, ok := filters_interface.([]string)
+	filters_iface, ok := filters_list.([]interface{})
 	if !ok {
-		return nil, errors.New("Expected filters to be a list of strings")
+		return nil, fmt.Errorf("Expected the filters to be an array of strings")
 	}
 
-	for _, filter := range filters_list {
+	for _, filter_iface := range filters_iface {
+		filter, ok := filter_iface.(string)
+		if !ok {
+			return nil, fmt.Errorf("Expected the filters array to only contain strings")
+		}
 		cfg, exists := config[filter]
 		var plugin_type filters.Filter
 		var plugin_config map[string]interface{}

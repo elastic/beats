@@ -8,9 +8,18 @@ import (
 // The FilterPlugin interface needs to be implemented
 // by all the filtering plugins.
 type FilterPlugin interface {
+
+	// New creates a new FilterPlugin instance with the
+	// given name and configuration.
 	New(name string, config map[string]interface{}) (FilterPlugin, error)
+
+	// Filter executes the filter.
 	Filter(event common.MapStr) (common.MapStr, error)
-	Name() string
+
+	// String returns the name of the filter.
+	String() string
+
+	// Type returns the type of the filter.
 	Type() Filter
 }
 
