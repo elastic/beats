@@ -78,11 +78,7 @@ func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugi
 			if !ok {
 				return nil, fmt.Errorf("Invalid configuration for: %s", filter)
 			}
-			cfg_type, exists := plugin_config["type"]
-			if !exists {
-				return nil, fmt.Errorf("No type specified in the configuration of: %s", filter)
-			}
-			type_str, ok := cfg_type.(string)
+			type_str, ok := plugin_config["type"].(string)
 			if !ok {
 				return nil, fmt.Errorf("Couldn't get type for filter: %s", filter)
 			}

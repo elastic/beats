@@ -107,7 +107,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 					"hype": "nop",
 				},
 			},
-			Err: "No type specified in the configuration of: nop1",
+			Err: "Couldn't get type for filter: nop1",
 		},
 		io{
 			Input: map[string]interface{}{
