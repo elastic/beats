@@ -102,3 +102,45 @@ func TestEnsureTimestampFieldNegative(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 }
+
+func TestEnsureCountFiled(t *testing.T) {
+	type io struct {
+		Input  MapStr
+		Output MapStr
+	}
+	tests := []io{
+		// should add a count field if there is none
+		io{
+			Input: MapStr{
+				"a": "b",
+			},
+			Output: MapStr{
+				"a":     "b",
+				"count": 1,
+			},
+		},
+
+		// should do nothing if there is already a count
+		io{
+			Input: MapStr{
+				"count": 1,
+			},
+			Output: MapStr{
+				"count": 1,
+			},
+		},
+
+		// should add count on an empty dict
+		io{
+			Input:  MapStr{},
+			Output: MapStr{"count": 1},
+		},
+	}
+
+	for _, test := range tests {
+		m := test.Input
+		err := m.EnsureCountField()
+		assert.Nil(t, err)
+		assert.Equal(t, test.Output, m)
+	}
+}

@@ -78,6 +78,12 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		return errors.New("Missing 'timestamp' field from event.")
 	}
 
+	// the count is mandatory
+	err := event.EnsureCountField()
+	if err != nil {
+		return err
+	}
+
 	// the type is mandatory
 	_, ok = event["type"].(string)
 	if !ok {

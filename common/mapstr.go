@@ -61,3 +61,11 @@ func (m MapStr) EnsureTimestampField(now func() time.Time) error {
 	}
 	return fmt.Errorf("Don't know how to convert %v to a Time value", ts)
 }
+
+func (m MapStr) EnsureCountField() error {
+	_, exists := m["count"]
+	if !exists {
+		m["count"] = 1
+	}
+	return nil
+}
