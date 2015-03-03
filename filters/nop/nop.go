@@ -1,3 +1,5 @@
+// Package nop implements a Packetbeat filter that does
+// absolutely nothing.
 package nop
 
 import (
