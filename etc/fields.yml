@@ -102,7 +102,16 @@ event:
 
     - name: type
       description: >
-          The type of the transaction (e.g. HTTP, MySQL, REDIS, RUM)
+        The type of the transaction (e.g. HTTP, MySQL, REDIS, RUM)
+      required: true
+
+    - name: count
+      type: int
+      description: >
+        For how many transactions is this event representative. This
+        is generally the inverse of the sampling rate. For example, for
+        a sample rate of 1/10, the count is 10. The count is used by the
+        UIs to return estimated values.
       required: true
 
     - name: status
@@ -144,6 +153,11 @@ event:
         /users/_search?name=<S8>`. For MySQL, it is transformed into something
         like `SELECT id from users where name=<S8>`. This normalization makes
         grouping the related transactions together easier.
+
+    - name: params
+      descriptions: >
+        The request parameters. For HTTP, these are the POST or GET parameters.
+        For Thrift-RPC, these are the parameters from the request.
 
     - name: http
       type: group
