@@ -172,11 +172,12 @@ func (out *RedisOutputType) Close() {
 func (out *RedisOutputType) SendMessagesGoroutine() {
 
 	var err error
+	var pending int
 	flushChannel := make(<-chan time.Time)
 
 	if !out.flush_immediatelly {
-		flushTimer := time.NewTicker(out.FlushInterval)
-		flushChannel = flushTimer.C
+		flushTicker := time.NewTicker(out.FlushInterval)
+		flushChannel = flushTicker.C
 	}
 
 	for {
@@ -195,6 +196,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 
 			if !out.flush_immediatelly {
 				err = out.Conn.Send(command, queueMsg.index, queueMsg.msg)
+				pending += 1
 			} else {
 				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
 			}
@@ -204,12 +206,15 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 				go out.Reconnect()
 			}
 		case _ = <-flushChannel:
-			out.Conn.Flush()
-			_, err = out.Conn.Receive()
-			if err != nil {
-				logp.Err("Fail to publish event to REDIS: %s", err)
-				out.connected = false
-				go out.Reconnect()
+			if pending > 0 {
+				out.Conn.Flush()
+				_, err = out.Conn.Receive()
+				if err != nil {
+					logp.Err("Fail to publish event to REDIS: %s", err)
+					out.connected = false
+					go out.Reconnect()
+				}
+				logp.Debug("output_redis", "Flushed %d pending commands", pending)
 			}
 		}
 	}
