@@ -215,6 +215,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 					go out.Reconnect()
 				}
 				logp.Debug("output_redis", "Flushed %d pending commands", pending)
+				pending = 0
 			}
 		}
 	}
