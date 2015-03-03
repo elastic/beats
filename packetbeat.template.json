@@ -1,38 +1,36 @@
 {
   "template" : "packetbeat-*",
   "settings" : {
-    "index.refresh_interval" : "5s",
-    "analysis" : {
-      "analyzer" : {
-        "default" : {
-          "type" : "standard",
-          "stopwords" : "_none_"
-        }
-      }
-    }
+    "index.refresh_interval" : "1s"
   },
   "mappings" : {
     "_default_" : {
-       "_all" : {"enabled" : true},
-       "dynamic_templates" : [ {
-         "raw_fields" : {
-           "match" : "*.raw",
-           "match_mapping_type" : "string",
-           "mapping" : {
-                 "type": "string",
-                 "index" : "not_analyzed"
-           }
-         }
-       }, {
-        "server_fields": {
-           "match": "*_server",
-           "match_mapping_type" : "string",
-           "mapping" : {
-                 "type": "string",
-                 "index" : "not_analyzed"
-           }
+      "_all" : {"enabled" : false},
+      "_timestamp" : {"enabled" : false},
+      "date_detection": false,
+      "properties": {
+        "request_raw" : {
+          "type": "string",
+          "index" : "analyzed"
+        },
+        "response_raw" : {
+          "type": "string",
+          "index" : "analyzed"
+        },
+        "timestamp": {
+          "type": "date"
         }
-       }]
+      },
+      "dynamic_templates": [{
+        "template1": {
+          "match": "*",
+          "mapping": {
+            "type": "{dynamic_type}",
+            "index": "not_analyzed",
+            "doc_values": true
+          }
+        }
+      }]
     }
   }
 }
