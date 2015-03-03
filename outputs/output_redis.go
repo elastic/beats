@@ -175,7 +175,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 	flushChannel := make(<-chan time.Time)
 
 	if !out.flush_immediatelly {
-		flushTimer := time.NewTimer(out.FlushInterval)
+		flushTimer := time.NewTicker(out.FlushInterval)
 		flushChannel = flushTimer.C
 	}
 
