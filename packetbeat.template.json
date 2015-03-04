@@ -20,7 +20,7 @@
           "type": "date"
         },
         "client_location": {
-          "type": "geoip_point"
+          "type": "geo_point"
         }
       },
       "dynamic_templates": [{
