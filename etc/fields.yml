@@ -52,10 +52,13 @@ env:
         the `client_ip` for non proxy clients.
       format: Dotted notation.
 
-    - name: country
+    - name: client_location
+      type: string
+      example: "40.715, -74.011"
       description: >
-        The country (found via GeoIP) of the `real_ip` IP address or of the
-        `client_ip` address if the `real_ip` is disabled.
+        The GeoIP location of the `real_ip` IP address or of the
+        `client_ip` address if the `real_ip` is disabled. The field is a string
+        containg the latitude and longitude separated by a coma.
 
     - name: client_port
       description: >

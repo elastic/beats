@@ -18,6 +18,9 @@
         },
         "@timestamp": {
           "type": "date"
+        },
+        "client_location": {
+          "type": "geoip_point"
         }
       },
       "dynamic_templates": [{
