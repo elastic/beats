@@ -777,7 +777,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["method"] = t.Method
 	event["path"] = t.RequestUri
 
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

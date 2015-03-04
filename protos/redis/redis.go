@@ -638,7 +638,7 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
 
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

@@ -6,7 +6,6 @@
   "mappings" : {
     "_default_" : {
       "_all" : {"enabled" : false},
-      "_timestamp" : {"enabled" : false},
       "date_detection": false,
       "properties": {
         "request_raw" : {
@@ -17,7 +16,7 @@
           "type": "string",
           "index" : "analyzed"
         },
-        "timestamp": {
+        "@timestamp": {
           "type": "date"
         }
       },

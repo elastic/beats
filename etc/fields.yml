@@ -90,7 +90,7 @@ event:
   description: >
     These fields contained data about the transaction itself.
   fields:
-    - name: timestamp
+    - name: "@timestamp"
       type: string
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ
@@ -102,7 +102,7 @@ event:
 
     - name: type
       description: >
-        The type of the transaction (e.g. HTTP, MySQL, REDIS, RUM)
+        The type of the transaction (e.g. HTTP, MySQL, Redis, RUM)
       required: true
 
     - name: count

@@ -48,12 +48,12 @@ func TestUdpJson(t *testing.T) {
 
 	obj := <-events
 	assert.Equal(t, obj["hello"].(string), "udpserver")
-	_, ok := obj["timestamp"].(common.Time)
+	_, ok := obj["@timestamp"].(common.Time)
 	assert.True(t, ok)
 
 	_, err = clientConn.Write([]byte(`{"obj2": 4}`))
 	assert.Nil(t, err)
-	_, ok = obj["timestamp"].(common.Time)
+	_, ok = obj["@timestamp"].(common.Time)
 	assert.True(t, ok)
 
 	obj = <-events
