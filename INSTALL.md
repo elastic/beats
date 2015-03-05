@@ -16,12 +16,11 @@ Mercurial and Bazaar) in order to download the source dependencies.
 To build Packetbeat successfully, first you need to install all the
 dependencies:
 
-    $ go get
+    $ make deps
 
-The *go build* command is used to compile the package. It only builds the
-package, without installing it.
+and then compile it with:
 
-    $ go build
+    $ make
 
 ## Run unit tests
 
