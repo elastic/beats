@@ -20,7 +20,7 @@ class Test(TestCase):
         assert all([o["type"] == "redis" for o in objs])
 
         assert objs[0]["method"] == "SET"
-        assert objs[0]["path"] == "key3"
+        assert objs[0]["resource"] == "key3"
         assert objs[0]["query"] == "set key3 me"
         assert objs[0]["status"] == "OK"
         assert objs[0]["redis.return_value"] == "OK"
@@ -40,7 +40,7 @@ class Test(TestCase):
         assert all([o["status"] == "OK" for o in objs[3:]])
         assert all(["redis.return_value" in o for o in objs[3:]])
         assert all([isinstance(o["method"], basestring) for o in objs[3:]])
-        assert all([isinstance(o["path"], basestring) for o in objs[3:]])
+        assert all([isinstance(o["resource"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])
 
     def test_byteout_bytein(self):

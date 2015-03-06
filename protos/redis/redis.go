@@ -633,7 +633,7 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["response_raw"] = t.Response_raw
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)
-	event["path"] = t.Path
+	event["resource"] = t.Path
 	event["query"] = t.Query
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
