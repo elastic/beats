@@ -502,7 +502,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		"num_fields":    msg.NumberOfFields,
 		"iserror":       msg.IsError,
 		"error_code":    msg.ErrorCode,
-		"error_info":    msg.ErrorInfo,
+		"error_message": msg.ErrorInfo,
 	})
 	trans.Size = msg.Size
 	trans.Path = msg.Tables
