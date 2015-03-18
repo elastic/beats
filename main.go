@@ -19,6 +19,7 @@ import (
 	"packetbeat/filters"
 	"packetbeat/filters/nop"
 	"packetbeat/inputs"
+	"packetbeat/inputs/gobeacon"
 	"packetbeat/inputs/sniffer"
 	"packetbeat/inputs/udpjson"
 	"packetbeat/logp"
@@ -46,8 +47,9 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 }
 
 var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
-	inputs.SnifferInput: new(sniffer.SnifferSetup),
-	inputs.UdpjsonInput: new(udpjson.Udpjson),
+	inputs.SnifferInput:  new(sniffer.SnifferSetup),
+	inputs.UdpjsonInput:  new(udpjson.Udpjson),
+	inputs.GoBeaconInput: new(gobeacon.GoBeacon),
 }
 
 var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{

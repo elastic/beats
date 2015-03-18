@@ -16,6 +16,7 @@ type Config struct {
 	Http       Http
 	Geoip      Geoip
 	Udpjson    Udpjson
+	GoBeacon   GoBeacon
 	Filter     map[string]interface{}
 }
 
@@ -125,6 +126,11 @@ type Udpjson struct {
 	Bind_ip string
 	Port    int
 	Timeout int
+}
+
+type GoBeacon struct {
+	Listen_addr string
+	Tracker     string
 }
 
 // Config Singleton

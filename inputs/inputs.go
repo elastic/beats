@@ -22,11 +22,13 @@ type Input int
 const (
 	SnifferInput Input = iota
 	UdpjsonInput
+	GoBeaconInput
 )
 
 var InputPluginNames = []string{
 	"sniffer",
 	"udpjson",
+	"gobeacon",
 }
 
 func (input Input) String() string {
