@@ -25,6 +25,8 @@ deps:
 	go get github.com/tsg/yamlcheck
 	# goautotest is used from the Makefile to run tests in a loop
 	go get github.com/tsg/goautotest
+	# websocket is needed by the gobeacon tests
+	go get golang.org/x/net/websocket
 
 .PHONY: install
 install: packetbeat go-daemon/god
