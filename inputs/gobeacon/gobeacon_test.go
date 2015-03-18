@@ -8,11 +8,10 @@ import (
 	"reflect"
 	"testing"
 
-	"go-beacon-orig/go/codec"
-
 	"github.com/gdamore/mangos/protocol/req"
 	"github.com/gdamore/mangos/transport/all"
 	"github.com/stretchr/testify/assert"
+	"github.com/ugorji/go/codec"
 )
 
 func sendMessage(url string, message *[]byte) error {
