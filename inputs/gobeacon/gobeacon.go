@@ -1,7 +1,6 @@
 package gobeacon
 
 import (
-	"fmt"
 	"packetbeat/common"
 	"packetbeat/config"
 	"packetbeat/logp"
@@ -146,8 +145,6 @@ func (server *GoBeacon) Run() error {
 			logp.Err("Server send failed: %v", err)
 			return err
 		}
-
-		fmt.Println("Navigation timing: %s", obj)
 
 		err = obj.EnsureTimestampField(time.Now)
 		if err != nil {
