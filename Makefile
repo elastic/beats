@@ -16,9 +16,7 @@ with_pfring:
 
 .PHONY: deps
 deps:
-	go get
-	# the testify one we need to spell out, because it's only used in tests
-	go get github.com/stretchr/testify
+	go get -t
 	# make sure vet is installed
 	go get golang.org/x/tools/cmd/vet
 	# yamlcheck is used to verify the spec
