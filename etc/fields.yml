@@ -158,9 +158,14 @@ event:
         grouping the related transactions together easier.
 
     - name: params
-      descriptions: >
+      description: >
         The request parameters. For HTTP, these are the POST or GET parameters.
         For Thrift-RPC, these are the parameters from the request.
+
+    - name: notes
+      description: >
+        Messages from Packetbeat itself. This usually contains error messages for
+        interpreting the raw data which can be helpful for troubleshooting.
 
     - name: http
       type: group
