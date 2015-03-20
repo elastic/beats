@@ -17,10 +17,6 @@ with_pfring:
 .PHONY: deps
 deps:
 	go get -t
-	# make sure vet is installed
-	go get golang.org/x/tools/cmd/vet
-	# yamlcheck is used to verify the spec
-	go get github.com/tsg/yamlcheck
 	# goautotest is used from the Makefile to run tests in a loop
 	go get github.com/tsg/goautotest
 	# websocket is needed by the gobeacon tests
