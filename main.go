@@ -36,7 +36,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const Version = "0.4.3"
+const Version = "0.5.0"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:   new(http.Http),
