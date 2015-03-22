@@ -70,9 +70,9 @@ func (out *ElasticsearchOutputType) EnableTTL() error {
 	}
 
 	// Make sure the index exists, but ignore errors (probably exists already)
-	core.Index("packetbeat-topology", "", "", nil, nil)
+	core.Index(".packetbeat-topology", "", "", nil, nil)
 
-	_, err := core.Index("packetbeat-topology", "server-ip", "_mapping", nil, setting)
+	_, err := core.Index(".packetbeat-topology", "server-ip", "_mapping", nil, setting)
 	if err != nil {
 		return err
 	}
@@ -89,19 +89,19 @@ func (out *ElasticsearchOutputType) GetNameByIP(ip string) string {
 func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string) error {
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	_, err := core.IndexWithParameters(
-		"packetbeat-topology", /*index*/
-		"server-ip",           /*type*/
-		name,                  /* id */
-		"",                    /*parent id */
-		0,                     /* version */
-		"",                    /* op_type */
-		"",                    /* routing */
-		"",                    /* timestamp */
-		out.TopologyExpire,    /*ttl*/
-		"",                    /* percolate */
-		"",                    /* timeout */
-		false,                 /*refresh */
-		nil,                   /*args */
+		".packetbeat-topology", /*index*/
+		"server-ip",            /*type*/
+		name,                   /* id */
+		"",                     /*parent id */
+		0,                      /* version */
+		"",                     /* op_type */
+		"",                     /* routing */
+		"",                     /* timestamp */
+		out.TopologyExpire,     /*ttl*/
+		"",                     /* percolate */
+		"",                     /* timeout */
+		false,                  /*refresh */
+		nil,                    /*args */
 		PublishedTopology{name, strings.Join(localAddrs, ",")} /* data */)
 
 	if err != nil {
@@ -119,7 +119,7 @@ func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 	// get all agents IPs from Elasticsearch
 	TopologyMapTmp := make(map[string]string)
 
-	res, err := core.SearchUri("packetbeat-topology", "server-ip", nil)
+	res, err := core.SearchUri(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, server := range res.Hits.Hits {
 			var pub PublishedTopology
