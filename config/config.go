@@ -14,6 +14,7 @@ type Config struct {
 	Passwords  Passwords
 	Thrift     Thrift
 	Http       Http
+	Mysql      Mysql
 	Geoip      Geoip
 	Udpjson    Udpjson
 	GoBeacon   GoBeacon
@@ -69,6 +70,11 @@ type Http struct {
 	Split_cookie     bool
 	Real_ip_header   string
 	Include_body_for []string
+}
+
+type Mysql struct {
+	Max_row_length int
+	Max_rows       int
 }
 
 type Thrift struct {

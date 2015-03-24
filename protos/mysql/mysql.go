@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"packetbeat/procs"
 	"packetbeat/protos"
@@ -98,6 +99,9 @@ const (
 type Mysql struct {
 	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
+	maxStoreRows int
+	maxRowLength int
+
 	results chan common.MapStr
 
 	// function pointer for mocking
@@ -105,7 +109,31 @@ type Mysql struct {
 		dir uint8, raw_msg []byte)
 }
 
+func (mysql *Mysql) InitDefaults() {
+	mysql.maxRowLength = 1024
+	mysql.maxStoreRows = 10
+}
+
+func (mysql *Mysql) setFromConfig() error {
+	if config.ConfigSingleton.Mysql.Max_row_length > 0 {
+		mysql.maxRowLength = config.ConfigSingleton.Mysql.Max_row_length
+	}
+	if config.ConfigSingleton.Mysql.Max_rows > 0 {
+		mysql.maxStoreRows = config.ConfigSingleton.Mysql.Max_rows
+	}
+	return nil
+}
+
 func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
+
+	mysql.InitDefaults()
+	if !test_mode {
+		err := mysql.setFromConfig()
+		if err != nil {
+			return err
+		}
+	}
+
 	mysql.transactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
 	mysql.handleMysql = handleMysql
 	mysql.results = results
@@ -511,7 +539,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 
 	// save Raw message
 	if len(msg.Raw) > 0 {
-		fields, rows := parseMysqlResponse(msg.Raw)
+		fields, rows := mysql.parseMysqlResponse(msg.Raw)
 
 		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
@@ -534,7 +562,7 @@ func (mysql *Mysql) expireTransaction(trans *MysqlTransaction) {
 	delete(mysql.transactionsMap, trans.tuple.Hashable())
 }
 
-func parseMysqlResponse(data []byte) ([]string, [][]string) {
+func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 	length := read_length(data, 0)
 	if length < 1 {
@@ -601,6 +629,7 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 		// Read rows
 		for offset < len(data) {
 			var row []string
+			var row_len int
 
 			if uint8(data[offset+4]) == 0xfe {
 				// EOF
@@ -628,10 +657,19 @@ func parseMysqlResponse(data []byte) ([]string, [][]string) {
 					}
 				}
 
-				row = append(row, string(text))
+				if row_len < mysql.maxRowLength {
+					if row_len+len(text) > mysql.maxRowLength {
+						text = text[:mysql.maxRowLength-row_len]
+					}
+					row = append(row, string(text))
+					row_len += len(text)
+				}
 			}
 
 			rows = append(rows, row)
+			if len(rows) >= mysql.maxStoreRows {
+				break
+			}
 
 			offset += length + 4
 		}

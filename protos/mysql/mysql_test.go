@@ -117,6 +117,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysqldetailed"})
 	}
+	mysql := MysqlModForTests()
 
 	data := []byte(
 		"0100000105" +
@@ -174,7 +175,7 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if len(raw) == 0 {
 		t.Errorf("Empty raw data")
 	}
-	fields, rows := parseMysqlResponse(raw)
+	fields, rows := mysql.parseMysqlResponse(raw)
 	if len(fields) != stream.message.NumberOfFields {
 		t.Errorf("Failed to parse the fields")
 	}
