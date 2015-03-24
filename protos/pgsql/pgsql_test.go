@@ -17,6 +17,7 @@ func PgsqlModForTests() *Pgsql {
 
 // Test parsing a request with a single query
 func TestPgsqlParser_simpleRequest(t *testing.T) {
+	pgsql := PgsqlModForTests()
 
 	data := []byte(
 		"510000001a53454c454354202a2046524f4d20466f6f6261723b00")
@@ -28,7 +29,7 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 
 	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
-	ok, complete := pgsqlMessageParser(stream)
+	ok, complete := pgsql.pgsqlMessageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -48,6 +49,7 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 // Test parsing a response with data attached
 func TestPgsqlParser_dataResponse(t *testing.T) {
 
+	pgsql := PgsqlModForTests()
 	data := []byte(
 		"5400000033000269640000008fc40001000000170004ffffffff000076616c75650000008fc4000200000019ffffffffffff0000" +
 			"44000000130002000000013100000004746f746f" +
@@ -63,7 +65,7 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 
 	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
-	ok, complete := pgsqlMessageParser(stream)
+	ok, complete := pgsql.pgsqlMessageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -89,6 +91,7 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 // Test parsing a pgsql response
 func TestPgsqlParser_response(t *testing.T) {
 
+	pgsql := PgsqlModForTests()
 	data := []byte(
 		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
 			"440000001b0003000000036d6561000000036d6562000000036d6563" +
@@ -105,7 +108,7 @@ func TestPgsqlParser_response(t *testing.T) {
 
 	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
-	ok, complete := pgsqlMessageParser(stream)
+	ok, complete := pgsql.pgsqlMessageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -133,6 +136,7 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
 	}
+	pgsql := PgsqlModForTests()
 
 	data := []byte(
 		"54000000420003610000004009000100000413ffffffffffff0000620000004009000200000413ffffffffffff0000630000004009000300000413ffffffffffff0000" +
@@ -147,7 +151,7 @@ func TestPgsqlParser_incomplete_response(t *testing.T) {
 
 	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
-	ok, complete := pgsqlMessageParser(stream)
+	ok, complete := pgsql.pgsqlMessageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")
@@ -197,6 +201,7 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 
 // Test parsing an error response
 func TestPgsqlParser_errorResponse(t *testing.T) {
+	pgsql := PgsqlModForTests()
 	data := []byte(
 		"4500000088534552524f5200433235503032004d63757272656e74207472616e73616374696f6e2069732061626f727465642c20636f6d6d616e64732069676e6f72656420756e74696c20656e64206f66207472616e73616374696f6e20626c6f636b0046706f7374677265732e63004c3932310052657865635f73696d706c655f71756572790000")
 
@@ -207,7 +212,7 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 
 	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
 
-	ok, complete := pgsqlMessageParser(stream)
+	ok, complete := pgsql.pgsqlMessageParser(stream)
 
 	if !ok {
 		t.Error("Parsing returned error")

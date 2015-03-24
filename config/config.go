@@ -15,6 +15,7 @@ type Config struct {
 	Thrift     Thrift
 	Http       Http
 	Mysql      Mysql
+	Pgsql      Pgsql
 	Geoip      Geoip
 	Udpjson    Udpjson
 	GoBeacon   GoBeacon
@@ -73,6 +74,11 @@ type Http struct {
 }
 
 type Mysql struct {
+	Max_row_length int
+	Max_rows       int
+}
+
+type Pgsql struct {
 	Max_row_length int
 	Max_rows       int
 }

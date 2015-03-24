@@ -2,6 +2,7 @@ package pgsql
 
 import (
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"packetbeat/procs"
 	"packetbeat/protos"
@@ -92,12 +93,39 @@ type Pgsql struct {
 	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
 	results         chan common.MapStr
 
+	maxStoreRows int
+	maxRowLength int
+
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
 }
 
+func (pgsql *Pgsql) InitDefaults() {
+	pgsql.maxRowLength = 1024
+	pgsql.maxStoreRows = 10
+}
+
+func (pgsql *Pgsql) setFromConfig() error {
+	if config.ConfigSingleton.Pgsql.Max_row_length > 0 {
+		pgsql.maxRowLength = config.ConfigSingleton.Pgsql.Max_row_length
+	}
+	if config.ConfigSingleton.Pgsql.Max_rows > 0 {
+		pgsql.maxStoreRows = config.ConfigSingleton.Pgsql.Max_rows
+	}
+	return nil
+}
+
 func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
+
+	pgsql.InitDefaults()
+	if !test_mode {
+		err := pgsql.setFromConfig()
+		if err != nil {
+			return err
+		}
+	}
+
 	pgsql.transactionsMap = make(map[common.HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
 	pgsql.handlePgsql = handlePgsql
 	pgsql.results = results
@@ -190,7 +218,7 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 	}
 }
 
-func pgsqlRowsParser(s *PgsqlStream) {
+func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
 	m := s.message
 
 	// read field count (int16)
@@ -199,6 +227,7 @@ func pgsqlRowsParser(s *PgsqlStream) {
 	logp.Debug("pgsqldetailed", "DataRow field count=%d", field_count)
 
 	row := []string{}
+	var row_len int
 
 	for i := 0; i < field_count; i++ {
 
@@ -218,7 +247,13 @@ func pgsqlRowsParser(s *PgsqlStream) {
 			}
 		}
 
-		row = append(row, string(column_value))
+		if row_len < pgsql.maxRowLength {
+			if row_len+len(column_value) > pgsql.maxRowLength {
+				column_value = column_value[:pgsql.maxRowLength-row_len]
+			}
+			row = append(row, string(column_value))
+			row_len += len(column_value)
+		}
 
 		if column_length > 0 {
 			s.parseOffset += int(column_length)
@@ -228,7 +263,9 @@ func pgsqlRowsParser(s *PgsqlStream) {
 
 	}
 	m.NumberOfRows += 1
-	m.Rows = append(m.Rows, row)
+	if len(m.Rows) < pgsql.maxStoreRows {
+		m.Rows = append(m.Rows, row)
+	}
 }
 
 func pgsqlErrorParser(s *PgsqlStream) {
@@ -292,7 +329,7 @@ func isSpecialPgsqlCommand(data []byte) (bool, int) {
 	return false, 0
 }
 
-func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
+func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 	m := s.message
 	for s.parseOffset < len(s.data) {
@@ -515,7 +552,7 @@ func pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					// skip length size
 					s.parseOffset += 4
 
-					pgsqlRowsParser(s)
+					pgsql.pgsqlRowsParser(s)
 
 				} else {
 					// wait for more
@@ -609,7 +646,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 			stream.message = &PgsqlMessage{Ts: pkt.Ts}
 		}
 
-		ok, complete := pgsqlMessageParser(priv.Data[dir])
+		ok, complete := pgsql.pgsqlMessageParser(priv.Data[dir])
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it

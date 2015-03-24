@@ -130,6 +130,10 @@ include_body_for = [{%- for ct in http_include_body_for -%}
 {% if mysql_max_rows %}max_rows = {{mysql_max_rows}}{%endif %}
 {% if mysql_max_row_length %}max_row_length = {{mysql_max_row_length}}{%endif%}
 
+[pgsql]
+{% if pgsql_max_rows %}max_rows = {{pgsql_max_rows}}{%endif %}
+{% if pgsql_max_row_length %}max_row_length = {{pgsql_max_row_length}}{%endif%}
+
 [procs]
 # Which processes to monitor and how to find them. The processes can
 # be found by searching their command line by a given string.
