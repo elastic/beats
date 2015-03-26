@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"packetbeat/logp"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 	//"fmt"
@@ -841,5 +842,142 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	}
 	if message.end != 14 {
 		t.Error("Wrong message end", message.end)
+	}
+}
+
+func TestHttpParser_censorPasswordURL(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := HttpModForTests()
+	http.Hide_keywords = []string{"password", "pass"}
+	http.Send_headers = true
+	http.Send_all_headers = true
+
+	data1 := []byte(
+		"GET http://localhost:8080/test?password=secret HTTP/1.1\r\n" +
+			"Host: www.google.com\r\n" +
+			"Connection: keep-alive\r\n" +
+			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+			"Accept: */*\r\n" +
+			"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+			"Referer: http://www.google.com/\r\n" +
+			"Accept-Encoding: gzip,deflate,sdch\r\n" +
+			"Accept-Language: en-US,en;q=0.8\r\n" +
+			"Content-Type: application/x-www-form-urlencoded\r\n" +
+			"Content-Length: 23\r\n" +
+			"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+			"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+			"\r\n" +
+			"username=ME&pass=secret")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+
+	msg := stream.data[stream.message.start:stream.message.end]
+	params, err := http.paramsHideSecrets(stream.message, msg)
+	if err != nil {
+		t.Errorf("Fail to parse parameters")
+	}
+
+	if strings.Contains(params, "secret") {
+		t.Errorf("Failed to censor the password: %s", params)
+	}
+}
+
+func TestHttpParser_censorPasswordPOST(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := HttpModForTests()
+	http.Hide_keywords = []string{"password"}
+	http.Send_headers = true
+	http.Send_all_headers = true
+
+	data1 := []byte(
+		"POST /users/login HTTP/1.1\r\n" +
+			"HOST: www.example.com\r\n" +
+			"Content-Type: application/x-www-form-urlencoded\r\n" +
+			"Content-Length: 28\r\n" +
+			"\r\n" +
+			"username=ME&password=secret\r\n")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+
+	msg := stream.data[stream.message.start:stream.message.end]
+	params, err := http.paramsHideSecrets(stream.message, msg)
+	if err != nil {
+		t.Errorf("Fail to parse parameters")
+	}
+
+	if strings.Contains(params, "secret") {
+		t.Errorf("Failed to censor the password: %s", msg)
+	}
+}
+func TestHttpParser_censorPasswordGET(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
+
+	http := HttpModForTests()
+	http.Hide_keywords = []string{"password"}
+	http.Send_headers = true
+	http.Send_all_headers = true
+	http.Send_request = false
+	http.Send_response = false
+
+	data1 := []byte(
+		"GET /users/login HTTP/1.1\r\n" +
+			"HOST: www.example.com\r\n" +
+			"Content-Type: application/x-www-form-urlencoded\r\n" +
+			"Content-Length: 53\r\n" +
+			"\r\n" +
+			"password=my_secret_pass&password=my_secret_password_2\r\n")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+
+	msg := stream.data[stream.message.start:stream.message.end]
+	params, err := http.paramsHideSecrets(stream.message, msg)
+	if err != nil {
+		t.Errorf("Faile to parse parameters")
+	}
+	logp.Debug("httpdetailed", "parameters %s", params)
+
+	if strings.Contains(params, "secret") {
+		t.Errorf("Failed to censor the password: %s", msg)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"net/url"
 	"packetbeat/common"
 	"packetbeat/config"
 	"packetbeat/logp"
@@ -87,6 +88,7 @@ type HttpTransaction struct {
 	cmdline      *common.CmdlineTuple
 	Method       string
 	RequestUri   string
+	Params       string
 
 	Http common.MapStr
 
@@ -98,13 +100,15 @@ type HttpTransaction struct {
 
 type Http struct {
 	// config
-	Send_request      bool
-	Send_response     bool
-	Send_headers      bool
-	Send_all_headers  bool
-	Headers_whitelist map[string]bool
-	Split_cookie      bool
-	Real_ip_header    string
+	Send_request        bool
+	Send_response       bool
+	Send_headers        bool
+	Send_all_headers    bool
+	Headers_whitelist   map[string]bool
+	Split_cookie        bool
+	Real_ip_header      string
+	Hide_keywords       []string
+	Strip_authorization bool
 
 	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
@@ -123,6 +127,10 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 	if meta.IsDefined("protocols", "http", "send_response") {
 		http.Send_response = config.Protocols["http"].Send_response
 	}
+	if meta.IsDefined("protocols", "http", "hide_keywords") {
+		http.Hide_keywords = config.Passwords.Hide_keywords
+	}
+	http.Strip_authorization = config.Passwords.Strip_authorization
 
 	if config.Http.Send_all_headers {
 		http.Send_headers = true
@@ -547,7 +555,7 @@ func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	if complete {
 		// all ok, ship it
 		msg := stream.data[stream.message.start:stream.message.end]
-		http.censorPasswords(stream.message, msg)
+		http.hideHeaders(stream.message, msg)
 
 		http.handleHttp(stream.message, tcptuple, dir, msg)
 
@@ -582,7 +590,7 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 		logp.Debug("httpdetailed", "Publish something on connection FIN")
 
 		msg := stream.data[stream.message.start:]
-		http.censorPasswords(stream.message, msg)
+		http.hideHeaders(stream.message, msg)
 
 		http.handleHttp(stream.message, tcptuple, dir, msg)
 
@@ -674,6 +682,12 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	}
 
 	trans.Real_ip = msg.Real_ip
+
+	var err error
+	trans.Params, err = http.paramsHideSecrets(msg, msg.Raw)
+	if err != nil {
+		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
+	}
 
 	if trans.timer != nil {
 		trans.timer.Stop()
@@ -776,6 +790,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	}
 	event["method"] = t.Method
 	event["path"] = t.RequestUri
+	event["params"] = t.Params
 
 	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
@@ -828,15 +843,12 @@ func (http *Http) shouldIncludeInBody(contenttype string) bool {
 	return false
 }
 
-func (http *Http) censorPasswords(m *HttpMessage, msg []byte) {
-
-	keywords := config.ConfigSingleton.Passwords.Hide_keywords
-	strip_authorization := config.ConfigSingleton.Passwords.Strip_authorization
+func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 
 	if m.IsRequest {
 		// byte64 != encryption, so remove it from headers in case of Basic Authentication
 		auth_text := []byte("Authorization:")
-		if strip_authorization && (m.Headers["authorization"] != "") {
+		if http.Strip_authorization && (m.Headers["authorization"] != "") {
 			header_len := m.bodyOffset - m.headerOffset
 			val_start_x := bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
 			val_end_x := -1
@@ -855,29 +867,60 @@ func (http *Http) censorPasswords(m *HttpMessage, msg []byte) {
 			}
 			m.Headers["authorization"] = "*"
 		}
-		// passwords from POST forms in body
-		if m.ContentLength > 0 && strings.Contains(m.Headers["content-type"], "urlencoded") {
-			for _, keyword := range keywords {
-				index := bytes.Index(msg[m.bodyOffset:], []byte(keyword))
-				if index > 0 {
-					start_index := m.bodyOffset + index + len(keyword)
-					end_index := bytes.IndexAny(msg[m.bodyOffset+index+len(keyword):], "& \r\n")
-					if end_index > 0 {
-						end_index += m.bodyOffset + index
-						if end_index > m.end {
-							end_index = m.end
-						}
-					} else {
-						end_index = m.end
-					}
+	}
+}
 
-					if end_index-start_index < 120 {
-						for i := start_index; i < end_index; i++ {
-							msg[i] = byte('*')
-						}
-					}
-				}
+func (http *Http) hideSecrets(values url.Values) url.Values {
+
+	params := url.Values{}
+	for key, array := range values {
+		for _, value := range array {
+			if http.isSecretParameter(key) {
+				params.Add(key, "xxxxx")
+			} else {
+				params.Add(key, value)
 			}
 		}
 	}
+	return params
+}
+
+// paramsHideSecrets parses the URL and the form parameters and replaces the secrets
+// with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
+func (http *Http) paramsHideSecrets(m *HttpMessage, msg []byte) (string, error) {
+	var values url.Values
+	var err error
+
+	u, err := url.Parse(m.RequestUri)
+	if err != nil {
+		return "", err
+	}
+	values = u.Query()
+
+	params := http.hideSecrets(values)
+
+	if m.ContentLength > 0 && strings.Contains(m.Headers["content-type"], "urlencoded") {
+		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
+		if err != nil {
+			return "", err
+		}
+
+		for key, value := range http.hideSecrets(values) {
+			params[key] = value
+		}
+	}
+
+	logp.Debug("httpdetailed", "Parameters: %s", params.Encode())
+
+	return params.Encode(), nil
+}
+
+func (http *Http) isSecretParameter(key string) bool {
+
+	for _, keyword := range http.Hide_keywords {
+		if strings.ToLower(key) == keyword {
+			return true
+		}
+	}
+	return false
 }
