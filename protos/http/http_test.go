@@ -956,7 +956,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 			"Content-Type: application/x-www-form-urlencoded\r\n" +
 			"Content-Length: 53\r\n" +
 			"\r\n" +
-			"password=my_secret_pass&password=my_secret_password_2\r\n")
+			"password=my_secret_pass&Password=my_secret_password_2\r\n")
 
 	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
