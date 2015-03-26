@@ -173,9 +173,15 @@ tags = [
 # requests. The value of the parameters will be replaced with '*' characters
 # This is generally useful for avoiding storing user passwords or other
 # sensitive information.
-#hide_keywords = ["pass=", "password=", "passwd=", "Password="]
 {% if http_strip_authorization %}strip_authorization = true{% endif %}
-
+hide_keywords = [
+    {%- if http_hide_keywords -%}
+        {%- for keyword in http_hide_keywords -%}
+            "{{keyword}}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+]
 
 
 {% if geoip_paths is not none -%}

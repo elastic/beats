@@ -127,9 +127,7 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 	if meta.IsDefined("protocols", "http", "send_response") {
 		http.Send_response = config.Protocols["http"].Send_response
 	}
-	if meta.IsDefined("protocols", "http", "hide_keywords") {
-		http.Hide_keywords = config.Passwords.Hide_keywords
-	}
+	http.Hide_keywords = config.Passwords.Hide_keywords
 	http.Strip_authorization = config.Passwords.Strip_authorization
 
 	if config.Http.Send_all_headers {
