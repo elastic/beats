@@ -7,7 +7,8 @@ class Test(TestCase):
     def test_http_auth(self):
         self.render_config_template(
             http_send_all_headers=1,
-            http_strip_authorization=1
+            http_strip_authorization=1,
+            http_send_request=True
         )
         self.run_packetbeat(pcap="http_basicauth.pcap",
                             debug_selectors=["http", "httpdetailed"])

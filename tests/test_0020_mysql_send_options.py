@@ -10,7 +10,7 @@ class Test(TestCase):
 
     def test_default_settings(self):
         """
-        Should include request_raw and response_raw by
+        Should not include request_raw and response_raw by
         default.
         """
         self.render_config_template(
@@ -22,14 +22,14 @@ class Test(TestCase):
         assert len(objs) == 1
         res = objs[0]
 
-        assert "request_raw" in res
-        assert "response_raw" in res
+        assert "request_raw" not in res
+        assert "response_raw" not in res
 
     def run_with_options(self, send_request, send_response):
         self.render_config_template(
             mysql_ports=[3306],
-            mysql_no_send_request=not send_request,
-            mysql_no_send_response=not send_response,
+            mysql_send_request=send_request,
+            mysql_send_response=send_response,
         )
         self.run_packetbeat(pcap="mysql_long_result.pcap")
 

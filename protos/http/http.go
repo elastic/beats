@@ -116,8 +116,8 @@ type Http struct {
 }
 
 func (http *Http) InitDefaults() {
-	http.Send_request = true
-	http.Send_response = true
+	http.Send_request = false
+	http.Send_response = false
 }
 
 func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {

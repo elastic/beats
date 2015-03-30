@@ -14,6 +14,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             mysql_ports=[3306],
+            mysql_send_response=True
         )
         self.run_packetbeat(pcap="mysql_long_result.pcap")
 
@@ -35,7 +36,8 @@ class Test(TestCase):
         """
         self.render_config_template(
             mysql_ports=[3306],
-            mysql_max_row_length=79
+            mysql_max_row_length=79,
+            mysql_send_response=True
         )
         self.run_packetbeat(pcap="mysql_long_result.pcap",
                             debug_selectors=["mysqldetailed"])
@@ -58,7 +60,8 @@ class Test(TestCase):
         self.render_config_template(
             mysql_ports=[3306],
             mysql_max_row_length=79,
-            mysql_max_rows=5
+            mysql_max_rows=5,
+            mysql_send_response=True
         )
         self.run_packetbeat(pcap="mysql_long_result.pcap",
                             debug_selectors=["mysqldetailed"])
@@ -80,7 +83,8 @@ class Test(TestCase):
         """
         self.render_config_template(
             mysql_ports=[3306],
-            mysql_max_rows=2000
+            mysql_max_rows=2000,
+            mysql_send_response=True
         )
         self.run_packetbeat(pcap="mysql_long_result.pcap",
                             debug_selectors=["mysqldetailed"])

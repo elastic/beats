@@ -114,8 +114,8 @@ type Mysql struct {
 func (mysql *Mysql) InitDefaults() {
 	mysql.maxRowLength = 1024
 	mysql.maxStoreRows = 10
-	mysql.Send_request = true
-	mysql.Send_response = true
+	mysql.Send_request = false
+	mysql.Send_response = false
 }
 
 func (mysql *Mysql) setFromConfig() error {
