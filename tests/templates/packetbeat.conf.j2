@@ -96,6 +96,8 @@ device = "any"
 
   [protocols.redis]
   ports = [{{ redis_ports|default([6379])|join(", ") }}]
+  {% if redis_no_send_request %}send_request = false{% endif %}
+  {% if redis_no_send_response %}send_response = false{% endif %}
 
   [protocols.thrift]
   ports = [{{ thrift_ports|default([9090])|join(", ") }}]

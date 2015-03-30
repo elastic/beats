@@ -3,6 +3,7 @@ package redis
 import (
 	"bytes"
 	"packetbeat/common"
+	"packetbeat/config"
 	"packetbeat/logp"
 	"packetbeat/procs"
 	"packetbeat/protos"
@@ -233,12 +234,36 @@ const (
 )
 
 type Redis struct {
+	// config
+	Send_request  bool
+	Send_response bool
+
 	transactionsMap map[common.HashableTcpTuple]*RedisTransaction
 
 	results chan common.MapStr
 }
 
+func (redis *Redis) InitDefaults() {
+	redis.Send_request = true
+	redis.Send_response = true
+}
+
+func (redis *Redis) setFromConfig() error {
+	if config.ConfigMeta.IsDefined("protocols", "redis", "send_request") {
+		redis.Send_request = config.ConfigSingleton.Protocols["redis"].Send_request
+	}
+	if config.ConfigMeta.IsDefined("protocols", "redis", "send_response") {
+		redis.Send_response = config.ConfigSingleton.Protocols["redis"].Send_response
+	}
+	return nil
+}
+
 func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
+	redis.InitDefaults()
+	if !test_mode {
+		redis.setFromConfig()
+	}
+
 	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
 	redis.results = results
 
@@ -629,8 +654,12 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 		event["status"] = common.ERROR_STATUS
 	}
 	event["responsetime"] = t.ResponseTime
-	event["request_raw"] = t.Request_raw
-	event["response_raw"] = t.Response_raw
+	if redis.Send_request {
+		event["request_raw"] = t.Request_raw
+	}
+	if redis.Send_response {
+		event["response_raw"] = t.Response_raw
+	}
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)
 	event["resource"] = t.Path
