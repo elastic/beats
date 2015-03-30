@@ -91,6 +91,8 @@ device = "any"
 
   [protocols.pgsql]
   ports = [{{ pgsql_ports|default([5432])|join(", ") }}]
+  {% if pgsql_no_send_request %}send_request = false{% endif %}
+  {% if pgsql_no_send_response %}send_response = false{% endif %}
 
   [protocols.redis]
   ports = [{{ redis_ports|default([6379])|join(", ") }}]

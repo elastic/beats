@@ -93,8 +93,10 @@ type Pgsql struct {
 	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
 	results         chan common.MapStr
 
-	maxStoreRows int
-	maxRowLength int
+	maxStoreRows  int
+	maxRowLength  int
+	Send_request  bool
+	Send_response bool
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -104,6 +106,8 @@ type Pgsql struct {
 func (pgsql *Pgsql) InitDefaults() {
 	pgsql.maxRowLength = 1024
 	pgsql.maxStoreRows = 10
+	pgsql.Send_request = true
+	pgsql.Send_response = true
 }
 
 func (pgsql *Pgsql) setFromConfig() error {
@@ -112,6 +116,12 @@ func (pgsql *Pgsql) setFromConfig() error {
 	}
 	if config.ConfigSingleton.Pgsql.Max_rows > 0 {
 		pgsql.maxStoreRows = config.ConfigSingleton.Pgsql.Max_rows
+	}
+	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_request") {
+		pgsql.Send_request = config.ConfigSingleton.Protocols["pgsql"].Send_request
+	}
+	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_response") {
+		pgsql.Send_response = config.ConfigSingleton.Protocols["pgsql"].Send_response
 	}
 	return nil
 }
@@ -859,8 +869,12 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 		event["status"] = common.OK_STATUS
 	}
 	event["responsetime"] = t.ResponseTime
-	event["request_raw"] = t.Request_raw
-	event["response_raw"] = t.Response_raw
+	if pgsql.Send_request {
+		event["request_raw"] = t.Request_raw
+	}
+	if pgsql.Send_response {
+		event["response_raw"] = t.Response_raw
+	}
 	event["query"] = t.Query
 	event["method"] = t.Method
 	event["bytes_out"] = t.Size
