@@ -99,8 +99,10 @@ const (
 type Mysql struct {
 	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
-	maxStoreRows int
-	maxRowLength int
+	maxStoreRows  int
+	maxRowLength  int
+	Send_request  bool
+	Send_response bool
 
 	results chan common.MapStr
 
@@ -112,6 +114,8 @@ type Mysql struct {
 func (mysql *Mysql) InitDefaults() {
 	mysql.maxRowLength = 1024
 	mysql.maxStoreRows = 10
+	mysql.Send_request = true
+	mysql.Send_response = true
 }
 
 func (mysql *Mysql) setFromConfig() error {
@@ -120,6 +124,12 @@ func (mysql *Mysql) setFromConfig() error {
 	}
 	if config.ConfigSingleton.Mysql.Max_rows > 0 {
 		mysql.maxStoreRows = config.ConfigSingleton.Mysql.Max_rows
+	}
+	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_request") {
+		mysql.Send_request = config.ConfigSingleton.Protocols["mysql"].Send_request
+	}
+	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_response") {
+		mysql.Send_response = config.ConfigSingleton.Protocols["mysql"].Send_response
 	}
 	return nil
 }
@@ -695,8 +705,12 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	}
 
 	event["responsetime"] = t.ResponseTime
-	event["request_raw"] = t.Request_raw
-	event["response_raw"] = t.Response_raw
+	if mysql.Send_request {
+		event["request_raw"] = t.Request_raw
+	}
+	if mysql.Send_response {
+		event["response_raw"] = t.Response_raw
+	}
 	event["method"] = t.Method
 	event["query"] = t.Query
 	event["mysql"] = t.Mysql

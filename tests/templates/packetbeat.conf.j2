@@ -86,6 +86,8 @@ device = "any"
 
   [protocols.mysql]
   ports = [{{ mysql_ports|default([3306])|join(", ") }}]
+  {% if mysql_no_send_request %}send_request = false{% endif %}
+  {% if mysql_no_send_response %}send_response = false{% endif %}
 
   [protocols.pgsql]
   ports = [{{ pgsql_ports|default([5432])|join(", ") }}]
