@@ -158,6 +158,7 @@ event:
         grouping the related transactions together easier.
 
     - name: params
+      analyzer: analyzed
       description: >
         The request parameters. For HTTP, these are the POST or GET parameters.
         For Thrift-RPC, these are the parameters from the request.

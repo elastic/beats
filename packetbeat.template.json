@@ -16,6 +16,10 @@
           "type": "string",
           "index" : "analyzed"
         },
+        "params": {
+          "type": "string",
+          "index": "analyzed"
+        },
         "@timestamp": {
           "type": "date"
         },
