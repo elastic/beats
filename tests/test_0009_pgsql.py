@@ -4,7 +4,8 @@ from pbtests.packetbeat import TestCase
 class Test(TestCase):
     def test_select(self):
         self.render_config_template(
-            pgsql_ports=[5432]
+            pgsql_ports=[5432],
+            pgsql_send_response=True
         )
         self.run_packetbeat(pcap="pgsql_request_response.pcap")
 

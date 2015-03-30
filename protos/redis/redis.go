@@ -244,8 +244,8 @@ type Redis struct {
 }
 
 func (redis *Redis) InitDefaults() {
-	redis.Send_request = true
-	redis.Send_response = true
+	redis.Send_request = false
+	redis.Send_response = false
 }
 
 func (redis *Redis) setFromConfig() error {

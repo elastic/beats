@@ -14,6 +14,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             pgsql_ports=[5432],
+            pgsql_send_response=True
         )
         self.run_packetbeat(pcap="pgsql_long_result.pcap")
 
@@ -35,6 +36,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             pgsql_ports=[5432],
+            pgsql_send_response=True,
             pgsql_max_row_length=79
         )
         self.run_packetbeat(pcap="pgsql_long_result.pcap",
@@ -58,6 +60,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             pgsql_ports=[5432],
+            pgsql_send_response=True,
             pgsql_max_row_length=79,
             pgsql_max_rows=5
         )
@@ -78,6 +81,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             pgsql_ports=[5432],
+            pgsql_send_response=True,
             pgsql_max_rows=2000
         )
         self.run_packetbeat(pcap="pgsql_long_result.pcap",

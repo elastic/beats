@@ -106,8 +106,8 @@ type Pgsql struct {
 func (pgsql *Pgsql) InitDefaults() {
 	pgsql.maxRowLength = 1024
 	pgsql.maxStoreRows = 10
-	pgsql.Send_request = true
-	pgsql.Send_response = true
+	pgsql.Send_request = false
+	pgsql.Send_response = false
 }
 
 func (pgsql *Pgsql) setFromConfig() error {

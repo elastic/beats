@@ -91,13 +91,13 @@ device = "any"
 
   [protocols.pgsql]
   ports = [{{ pgsql_ports|default([5432])|join(", ") }}]
-  {% if pgsql_no_send_request %}send_request = false{% endif %}
-  {% if pgsql_no_send_response %}send_response = false{% endif %}
+  {% if pgsql_send_request %}send_request = true{% endif %}
+  {% if pgsql_send_response %}send_response = true{% endif %}
 
   [protocols.redis]
   ports = [{{ redis_ports|default([6379])|join(", ") }}]
-  {% if redis_no_send_request %}send_request = false{% endif %}
-  {% if redis_no_send_response %}send_response = false{% endif %}
+  {% if redis_send_request %}send_request = true{% endif %}
+  {% if redis_send_response %}send_response = true{% endif %}
 
   [protocols.thrift]
   ports = [{{ thrift_ports|default([9090])|join(", ") }}]
