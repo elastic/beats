@@ -101,8 +101,8 @@ device = "any"
 
   [protocols.thrift]
   ports = [{{ thrift_ports|default([9090])|join(", ") }}]
-  {% if thrift_no_send_request %}send_request = false{% endif %}
-  {% if thrift_no_send_response %}send_response = false{% endif %}
+  {% if thrift_send_request %}send_request = true{% endif %}
+  {% if thrift_send_response %}send_response = true{% endif %}
 
 [thrift]
 transport_type = "{{ thrift_transport_type|default('socket') }}"

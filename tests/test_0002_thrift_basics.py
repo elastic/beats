@@ -47,7 +47,9 @@ class Test(TestCase):
 
     def test_thrift_tutorial_socket(self):
         self.render_config_template(
-            thrift_ports=[9090]
+            thrift_ports=[9090],
+            thrift_send_request=True,
+            thrift_send_response=True,
         )
         self.run_packetbeat(pcap="thrift_tutorial.pcap",
                             debug_selectors=["thrift"])
@@ -56,12 +58,28 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
-        # request_raw and response_raw are present by default
         assert all([len(o["request_raw"]) > 0 for o in objs])
         assert objs[0]["request_raw"] == "ping()"
         assert objs[11]["response_raw"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
         assert all([o["port"] == 9090 for o in objs])
+
+    def test_send_options_default(self):
+        """
+            Request_raw and response_raw should be off by default.
+        """
+        self.render_config_template(
+            thrift_ports=[9090],
+        )
+        self.run_packetbeat(pcap="thrift_tutorial.pcap",
+                            debug_selectors=["thrift"])
+
+        objs = self.read_output()
+
+        self.tutorial_asserts(objs)
+
+        assert all(["request_raw" not in o for o in objs])
+        assert all(["response_raw" not in o for o in objs])
 
     def test_thrift_tutorial_framed(self):
         self.render_config_template(
@@ -169,8 +187,8 @@ class Test(TestCase):
         self.render_config_template(
             thrift_ports=[9090],
             thrift_idl_files=["ThriftTest.thrift"],
-            thrift_no_send_request=False,
-            thrift_no_send_response=True,
+            thrift_send_request=True,
+            thrift_send_response=False,
         )
         self.copy_files(["ThriftTest.thrift"])
         self.run_packetbeat(pcap="thrift_integration.pcap",
