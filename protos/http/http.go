@@ -791,6 +791,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	}
 	event["method"] = t.Method
 	event["path"] = t.RequestUri
+	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
 	event["params"] = t.Params
 
 	event["@timestamp"] = common.Time(t.ts)
