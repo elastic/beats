@@ -819,8 +819,7 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
 	// add body
-	contentType, ok := m.Headers["content-type"]
-	if ok && (len(contentType) == 0 || http.shouldIncludeInBody(contentType)) {
+	if len(m.ContentType) == 0 || http.shouldIncludeInBody(m.ContentType) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
