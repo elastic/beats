@@ -53,6 +53,7 @@ type HttpMessage struct {
 	Real_ip      string
 	// Http Headers
 	ContentLength    int
+	ContentType      string
 	TransferEncoding string
 	Headers          map[string]string
 	Body             string
@@ -240,6 +241,8 @@ func (http *Http) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
 			if headerName == "content-length" {
 				m.ContentLength, _ = strconv.Atoi(headerVal)
 				m.hasContentLength = true
+			} else if headerName == "content-type" {
+				m.ContentType = headerVal
 			} else if headerName == "transfer-encoding" {
 				m.TransferEncoding = headerVal
 			} else if headerName == "connection" {
@@ -897,7 +900,7 @@ func (http *Http) paramsHideSecrets(m *HttpMessage, msg []byte) (string, error) 
 
 	params := http.hideSecrets(values)
 
-	if m.ContentLength > 0 && strings.Contains(m.Headers["content-type"], "urlencoded") {
+	if m.ContentLength > 0 && strings.Contains(m.ContentType, "urlencoded") {
 		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
 		if err != nil {
 			return "", err

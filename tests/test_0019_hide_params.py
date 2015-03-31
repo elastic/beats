@@ -13,7 +13,6 @@ class Test(TestCase):
         a POST request.
         """
         self.render_config_template(
-            http_send_all_headers=1,
             http_hide_keywords=["pass", "password"]
         )
         self.run_packetbeat(pcap="hide_secret_POST.pcap",
@@ -31,7 +30,6 @@ class Test(TestCase):
         a GET request.
         """
         self.render_config_template(
-            http_send_all_headers=1,
             http_hide_keywords=["pass", "password"]
         )
         self.run_packetbeat(pcap="hide_secret_GET.pcap",
@@ -48,9 +46,7 @@ class Test(TestCase):
         Should be able to strip the password from
         a POST request.
         """
-        self.render_config_template(
-            http_send_all_headers=1
-        )
+        self.render_config_template()
         self.run_packetbeat(pcap="hide_secret_POST.pcap",
                             debug_selectors=["http", "httpdetailed"])
         objs = self.read_output()
