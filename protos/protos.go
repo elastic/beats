@@ -1,9 +1,10 @@
 package protos
 
 import (
-	"packetbeat/common"
-	"packetbeat/logp"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/logp"
 )
 
 // ProtocolData interface to represent an upper

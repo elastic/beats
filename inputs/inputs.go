@@ -3,8 +3,9 @@ package inputs
 import (
 	"errors"
 	"fmt"
-	"packetbeat/common"
 	"strings"
+
+	"github.com/elastic/packetbeat/common"
 )
 
 // The InputPlugin interface needs to be implemented

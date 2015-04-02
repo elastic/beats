@@ -2,12 +2,13 @@ package tcp
 
 import (
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/protos"
 	"strings"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/packetbeat/protos"
 
 	"github.com/packetbeat/gopacket"
 	"github.com/packetbeat/gopacket/layers"

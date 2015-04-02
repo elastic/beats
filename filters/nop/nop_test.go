@@ -1,8 +1,9 @@
 package nop
 
 import (
-	"packetbeat/common"
 	"testing"
+
+	"github.com/elastic/packetbeat/common"
 
 	"github.com/stretchr/testify/assert"
 )

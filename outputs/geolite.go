@@ -2,9 +2,10 @@ package outputs
 
 import (
 	"os"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"path/filepath"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 
 	"github.com/nranchev/go-libGeoIP"
 )

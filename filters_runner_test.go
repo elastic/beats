@@ -1,9 +1,10 @@
 package main
 
 import (
-	"packetbeat/filters"
-	"packetbeat/filters/nop"
 	"testing"
+
+	"github.com/elastic/packetbeat/filters"
+	"github.com/elastic/packetbeat/filters/nop"
 
 	"github.com/stretchr/testify/assert"
 )

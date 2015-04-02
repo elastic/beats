@@ -2,7 +2,8 @@ package droppriv
 
 import (
 	"errors"
-	"packetbeat/config"
+
+	"github.com/elastic/packetbeat/config"
 )
 
 func DropPrivileges() error {

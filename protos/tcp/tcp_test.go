@@ -1,9 +1,10 @@
 package tcp
 
 import (
-	"packetbeat/config"
-	"packetbeat/protos"
 	"testing"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
 )

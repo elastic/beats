@@ -5,15 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 
 	"github.com/BurntSushi/toml"
 )

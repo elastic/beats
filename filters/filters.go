@@ -2,7 +2,8 @@ package filters
 
 import (
 	"fmt"
-	"packetbeat/common"
+
+	"github.com/elastic/packetbeat/common"
 )
 
 // The FilterPlugin interface needs to be implemented

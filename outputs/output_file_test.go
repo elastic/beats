@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"packetbeat/logp"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/packetbeat/logp"
 )
 
 func Test_Rotator(t *testing.T) {

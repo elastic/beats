@@ -5,9 +5,10 @@ package droppriv
 import (
 	"errors"
 	"fmt"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"syscall"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 )
 
 func DropPrivileges() error {

@@ -1,9 +1,10 @@
 package outputs
 
 import (
-	"packetbeat/config"
 	"testing"
 	"time"
+
+	"github.com/elastic/packetbeat/config"
 )
 
 const elasticsearchAddr = "localhost"

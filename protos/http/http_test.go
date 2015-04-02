@@ -2,12 +2,12 @@ package http
 
 import (
 	"bytes"
-	"packetbeat/logp"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-	//"fmt"
+
+	"github.com/elastic/packetbeat/logp"
 )
 
 func HttpModForTests() *Http {

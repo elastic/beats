@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 )
 
 const RotatorMaxFiles = 1000

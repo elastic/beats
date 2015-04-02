@@ -3,10 +3,11 @@ package udpjson
 import (
 	"encoding/json"
 	"net"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 )
 
 type Config struct {

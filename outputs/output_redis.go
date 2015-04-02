@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"strings"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 
 	"github.com/garyburd/redigo/redis"
 )

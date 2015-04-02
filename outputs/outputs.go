@@ -1,8 +1,9 @@
 package outputs
 
 import (
-	"packetbeat/common"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
 )
 
 type OutputInterface interface {

@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"strings"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
 )
 
 type PublisherType struct {

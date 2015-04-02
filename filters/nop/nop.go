@@ -3,8 +3,8 @@
 package nop
 
 import (
-	"packetbeat/common"
-	"packetbeat/filters"
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/filters"
 )
 
 type Nop struct {

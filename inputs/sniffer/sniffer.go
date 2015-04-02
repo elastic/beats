@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/protos/tcp"
 	"syscall"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/packetbeat/protos/tcp"
 
 	"github.com/packetbeat/gopacket"
 	"github.com/packetbeat/gopacket/layers"

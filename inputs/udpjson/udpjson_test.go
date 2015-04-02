@@ -2,10 +2,11 @@ package udpjson
 
 import (
 	"net"
-	"packetbeat/common"
-	"packetbeat/logp"
 	"testing"
 	"time"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 )

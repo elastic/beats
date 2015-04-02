@@ -2,7 +2,8 @@ package thrift
 
 import (
 	"fmt"
-	"packetbeat/logp"
+
+	"github.com/elastic/packetbeat/logp"
 
 	"github.com/samuel/go-thrift/parser"
 )

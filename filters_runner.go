@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/filters"
-	"packetbeat/logp"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/filters"
+	"github.com/elastic/packetbeat/logp"
 )
 
 // Executes the filters

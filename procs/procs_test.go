@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"packetbeat/logp"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/elastic/packetbeat/logp"
 )
 
 type TestProcFile struct {

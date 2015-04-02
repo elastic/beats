@@ -3,10 +3,11 @@ package gobeacon
 import (
 	"errors"
 	"net/url"
-	"packetbeat/common"
-	"packetbeat/logp"
 	"reflect"
 	"testing"
+
+	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/packetbeat/logp"
 
 	"github.com/gdamore/mangos/protocol/req"
 	"github.com/gdamore/mangos/transport/all"
