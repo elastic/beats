@@ -6,9 +6,9 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  map[string]Protocol
 	//Output     map[string]MothershipConfig
-	Input      Input
-	RunOptions RunOptions
-	Procs      Procs
+	Input Input
+	//RunOptions RunOptions
+	Procs Procs
 	//Agent      Agent
 	Logging   Logging
 	Passwords Passwords
@@ -39,11 +39,6 @@ type InterfacesConfig struct {
 
 type Input struct {
 	Inputs []string
-}
-
-type RunOptions struct {
-	Uid int
-	Gid int
 }
 
 type Logging struct {

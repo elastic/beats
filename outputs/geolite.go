@@ -1,7 +1,6 @@
 package outputs
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -27,7 +26,7 @@ func LoadGeoIPData(cfg common.Config) error {
 
 	err := common.DecodeConfig(cfg, &config)
 	if err != nil {
-		return fmt.Errorf("Error while decoding configuration: %v", err)
+		return err
 	}
 
 	geoip_paths := []string{

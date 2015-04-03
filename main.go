@@ -233,7 +233,7 @@ func main() {
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err = droppriv.DropPrivileges(); err != nil {
+	if err = droppriv.DropPrivileges(cfg); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
