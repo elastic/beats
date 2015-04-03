@@ -19,9 +19,7 @@ import (
 	"github.com/elastic/packetbeat/filters"
 	"github.com/elastic/packetbeat/filters/nop"
 	"github.com/elastic/packetbeat/inputs"
-	"github.com/elastic/packetbeat/inputs/gobeacon"
 	"github.com/elastic/packetbeat/inputs/sniffer"
-	"github.com/elastic/packetbeat/inputs/udpjson"
 	"github.com/elastic/packetbeat/logp"
 	"github.com/elastic/packetbeat/outputs"
 	"github.com/elastic/packetbeat/procs"
@@ -44,12 +42,6 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.PgsqlProtocol:  new(pgsql.Pgsql),
 	protos.RedisProtocol:  new(redis.Redis),
 	protos.ThriftProtocol: new(thrift.Thrift),
-}
-
-var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
-	inputs.SnifferInput:  new(sniffer.SnifferSetup),
-	inputs.UdpjsonInput:  new(udpjson.Udpjson),
-	inputs.GoBeaconInput: new(gobeacon.GoBeacon),
 }
 
 var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{
@@ -218,18 +210,12 @@ func main() {
 		afterInputsQueue = outputs.Publisher.Queue
 	}
 
-	logp.Debug("main", "Initializing input plugins")
-	for input, plugin := range EnabledInputPlugins {
-		configured_inputs := config.ConfigSingleton.Input.Inputs
-		if input.IsInList(configured_inputs) {
-			logp.Debug("main", "Input plugin %s is enabled", input)
-			err = plugin.Init(false, afterInputsQueue)
-			if err != nil {
-				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
-				return
-			}
-			inputs.Inputs.Register(input, plugin)
-		}
+	logp.Debug("main", "Initializing sniffer")
+	sniff := new(sniffer.SnifferSetup)
+	err = sniff.Init(false, afterInputsQueue)
+	if err != nil {
+		logp.Critical("Ininitializing sniffer failed: %v", err)
+		return
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
@@ -249,17 +235,15 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	for input, plugin := range inputs.Inputs.Registered() {
-		// run the plugin in background
-		go func(input inputs.Input, plugin inputs.InputPlugin) {
-			err := plugin.Run()
-			if err != nil {
-				logp.Critical("Plugin %s main loop failed: %v", input, err)
-				return
-			}
-			over <- true
-		}(input, plugin)
-	}
+	// run the sniffer in background
+	go func() {
+		err := sniff.Run()
+		if err != nil {
+			logp.Critical("Sniffer main loop failed: %v", err)
+			return
+		}
+		over <- true
+	}()
 
 	// On ^C or SIGTERM, gracefully stop inputs
 	sigc := make(chan os.Signal, 1)
@@ -267,7 +251,7 @@ func main() {
 	go func() {
 		<-sigc
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
-		inputs.Inputs.StopAll()
+		sniff.Stop()
 	}()
 
 	if !*toStderr {
@@ -279,16 +263,12 @@ func main() {
 
 	// Wait for one of the inputs goroutines to finish
 	for _ = range over {
-		if !inputs.Inputs.AreAllAlive() {
+		if !sniff.IsAlive() {
 			break
 		}
 	}
 
 	logp.Debug("main", "Cleanup")
-
-	// stop and close all other input plugin servers
-	inputs.Inputs.StopAll()
-	inputs.Inputs.CloseAll()
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire
