@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/infrabeat/common"
+	"github.com/elastic/infrabeat/logp"
 
 	"github.com/nranchev/go-libGeoIP"
 )

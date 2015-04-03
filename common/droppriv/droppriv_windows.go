@@ -3,7 +3,7 @@ package droppriv
 import (
 	"errors"
 
-	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/infrabeat/common"
 )
 
 func DropPrivileges(cfg common.Config) error {
