@@ -8,8 +8,6 @@ import (
 	"github.com/elastic/packetbeat/common"
 	"github.com/elastic/packetbeat/logp"
 
-	"github.com/BurntSushi/toml"
-	"github.com/mitchellh/mapstructure"
 	"github.com/nranchev/go-libGeoIP"
 )
 
@@ -23,11 +21,11 @@ type Geoip struct {
 	Paths []string
 }
 
-func LoadGeoIPData(configM common.MapStr, configMeta toml.MetaData) error {
+func LoadGeoIPData(cfg common.Config) error {
 
 	var config GeoIPConfig
 
-	err := mapstructure.Decode(configM, &config)
+	err := common.DecodeConfig(cfg, &config)
 	if err != nil {
 		return fmt.Errorf("Error while decoding configuration: %v", err)
 	}
@@ -36,7 +34,7 @@ func LoadGeoIPData(configM common.MapStr, configMeta toml.MetaData) error {
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if configMeta.IsDefined("geoip", "paths") {
+	if cfg.Meta.IsDefined("geoip", "paths") {
 		geoip_paths = config.Geoip.Paths
 	}
 	if len(geoip_paths) == 0 {

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/mitchellh/mapstructure"
 
 	"github.com/elastic/packetbeat/common"
 	"github.com/elastic/packetbeat/logp"
@@ -233,15 +232,15 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	config common.MapStr, configMeta toml.MetaData) error {
+	config common.Config) error {
 
 	var err error
 
-	publisher.ConfigMeta = configMeta
+	publisher.ConfigMeta = config.Meta
 
-	err = mapstructure.Decode(config, &publisher.Config)
+	err = common.DecodeConfig(config, &publisher.Config)
 	if err != nil {
-		return fmt.Errorf("Error while decoding configuration: %v", err)
+		return err
 	}
 
 	publisher.disabled = publishDisabled

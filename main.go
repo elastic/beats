@@ -119,8 +119,8 @@ func main() {
 		return
 	}
 
-	var configM common.MapStr
-	if _, err = toml.DecodeFile(*configfile, &configM); err != nil {
+	var cfg common.Config
+	if cfg.Meta, err = toml.DecodeFile(*configfile, &cfg.Options); err != nil {
 		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
@@ -149,8 +149,7 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled, configM,
-		config.ConfigMeta); err != nil {
+	if err = outputs.Publisher.Init(*publishDisabled, cfg); err != nil {
 
 		logp.Critical(err.Error())
 		return
@@ -161,7 +160,7 @@ func main() {
 		return
 	}
 
-	err = outputs.LoadGeoIPData(configM, config.ConfigMeta)
+	err = outputs.LoadGeoIPData(cfg)
 	if err != nil {
 		logp.Critical(err.Error())
 		return
