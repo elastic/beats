@@ -1,28 +1,47 @@
 package outputs
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/common"
 	"github.com/elastic/packetbeat/logp"
 
+	"github.com/BurntSushi/toml"
+	"github.com/mitchellh/mapstructure"
 	"github.com/nranchev/go-libGeoIP"
 )
 
 var _GeoLite *libgeo.GeoIP
 
-func LoadGeoIPData() {
+type GeoIPConfig struct {
+	Geoip Geoip
+}
+
+type Geoip struct {
+	Paths []string
+}
+
+func LoadGeoIPData(configM common.MapStr, configMeta toml.MetaData) error {
+
+	var config GeoIPConfig
+
+	err := mapstructure.Decode(configM, &config)
+	if err != nil {
+		return fmt.Errorf("Error while decoding configuration: %v", err)
+	}
+
 	geoip_paths := []string{
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if config.ConfigMeta.IsDefined("geoip", "paths") {
-		geoip_paths = config.ConfigSingleton.Geoip.Paths
+	if configMeta.IsDefined("geoip", "paths") {
+		geoip_paths = config.Geoip.Paths
 	}
 	if len(geoip_paths) == 0 {
 		// disabled
-		return
+		return nil
 	}
 
 	// look for the first existing path
@@ -38,7 +57,7 @@ func LoadGeoIPData() {
 			geoip_path, err = filepath.EvalSymlinks(path)
 			if err != nil {
 				logp.Warn("Could not load GeoIP data: %s", err.Error())
-				return
+				return nil
 			}
 		} else {
 			geoip_path = path
@@ -48,14 +67,14 @@ func LoadGeoIPData() {
 
 	if len(geoip_path) == 0 {
 		logp.Warn("Couldn't load GeoIP database")
-		return
+		return nil
 	}
 
-	var err error
 	_GeoLite, err = libgeo.Load(geoip_path)
 	if err != nil {
 		logp.Warn("Could not load GeoIP data: %s", err.Error())
 	}
 
 	logp.Info("Loaded GeoIP data from: %s", geoip_path)
+	return nil
 }

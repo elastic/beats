@@ -118,6 +118,13 @@ func main() {
 		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
+
+	var configM common.MapStr
+	if _, err = toml.DecodeFile(*configfile, &configM); err != nil {
+		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
+		return
+	}
+
 	if len(debugSelectors) == 0 {
 		debugSelectors = config.ConfigSingleton.Logging.Selectors
 	}
@@ -142,7 +149,9 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled); err != nil {
+	if err = outputs.Publisher.Init(*publishDisabled, configM,
+		config.ConfigMeta); err != nil {
+
 		logp.Critical(err.Error())
 		return
 	}
@@ -152,7 +161,11 @@ func main() {
 		return
 	}
 
-	outputs.LoadGeoIPData()
+	err = outputs.LoadGeoIPData(configM, config.ConfigMeta)
+	if err != nil {
+		logp.Critical(err.Error())
+		return
+	}
 
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {

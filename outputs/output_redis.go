@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/logp"
 
 	"github.com/garyburd/redigo/redis"
@@ -47,7 +46,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-func (out *RedisOutputType) Init(config config.MothershipConfig, topology_expire int) error {
+func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 

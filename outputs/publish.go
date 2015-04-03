@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/logp"
 )
 
@@ -23,9 +25,45 @@ type PublisherType struct {
 	ElasticsearchOutput ElasticsearchOutputType
 	RedisOutput         RedisOutputType
 	FileOutput          FileOutputType
+	Config              OutputsConfig
+	ConfigMeta          toml.MetaData
 
 	RefreshTopologyTimer <-chan time.Time
 	Queue                chan common.MapStr
+}
+
+type OutputsConfig struct {
+	Output map[string]MothershipConfig
+	Agent  AgentConfig
+}
+
+type MothershipConfig struct {
+	Enabled            bool
+	Save_topology      bool
+	Host               string
+	Port               int
+	Protocol           string
+	Username           string
+	Password           string
+	Index              string
+	Path               string
+	Db                 int
+	Db_topology        int
+	Timeout            int
+	Reconnect_interval int
+	Filename           string
+	Rotate_every_kb    int
+	Number_of_files    int
+	DataType           string
+	Flush_interval     int
+}
+
+type AgentConfig struct {
+	Name                  string
+	Refresh_topology_freq int
+	Ignore_outgoing       bool
+	Topology_expire       int
+	Tags                  []string
 }
 
 var Publisher PublisherType
@@ -112,7 +150,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		delete(event, "dst")
 	}
 
-	if config.ConfigSingleton.Agent.Ignore_outgoing && dst_server != "" &&
+	if publisher.Config.Agent.Ignore_outgoing && dst_server != "" &&
 		dst_server != publisher.name {
 		// duplicated transaction -> ignore it
 		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
@@ -194,18 +232,27 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *PublisherType) Init(publishDisabled bool) error {
+func (publisher *PublisherType) Init(publishDisabled bool,
+	config common.MapStr, configMeta toml.MetaData) error {
+
 	var err error
+
+	publisher.ConfigMeta = configMeta
+
+	err = mapstructure.Decode(config, &publisher.Config)
+	if err != nil {
+		return fmt.Errorf("Error while decoding configuration: %v", err)
+	}
 
 	publisher.disabled = publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	output, exists := config.ConfigSingleton.Output["elasticsearch"]
+	output, exists := publisher.Config.Output["elasticsearch"]
 	if exists && output.Enabled && !publisher.disabled {
 		err := publisher.ElasticsearchOutput.Init(output,
-			config.ConfigSingleton.Agent.Topology_expire)
+			publisher.Config.Agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
@@ -222,11 +269,11 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	output, exists = config.ConfigSingleton.Output["redis"]
+	output, exists = publisher.Config.Output["redis"]
 	if exists && output.Enabled && !publisher.disabled {
 		logp.Debug("publish", "REDIS publisher enabled")
 		err := publisher.RedisOutput.Init(output,
-			config.ConfigSingleton.Agent.Topology_expire)
+			publisher.Config.Agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
@@ -243,7 +290,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	output, exists = config.ConfigSingleton.Output["file"]
+	output, exists = publisher.Config.Output["file"]
 	if exists && output.Enabled {
 		err := publisher.FileOutput.Init(output)
 		if err != nil {
@@ -266,7 +313,7 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		}
 	}
 
-	publisher.name = config.ConfigSingleton.Agent.Name
+	publisher.name = publisher.Config.Agent.Name
 	if len(publisher.name) == 0 {
 		// use the hostname
 		publisher.name, err = os.Hostname()
@@ -277,14 +324,14 @@ func (publisher *PublisherType) Init(publishDisabled bool) error {
 		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
 	}
 
-	if len(config.ConfigSingleton.Agent.Tags) > 0 {
-		publisher.tags = strings.Join(config.ConfigSingleton.Agent.Tags, " ")
+	if len(publisher.Config.Agent.Tags) > 0 {
+		publisher.tags = strings.Join(publisher.Config.Agent.Tags, " ")
 	}
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if config.ConfigSingleton.Agent.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(config.ConfigSingleton.Agent.Refresh_topology_freq) * time.Second
+		if publisher.Config.Agent.Refresh_topology_freq != 0 {
+			RefreshTopologyFreq = time.Duration(publisher.Config.Agent.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)

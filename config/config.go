@@ -5,21 +5,21 @@ import "github.com/BurntSushi/toml"
 type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  map[string]Protocol
-	Output     map[string]MothershipConfig
+	//Output     map[string]MothershipConfig
 	Input      Input
 	RunOptions RunOptions
 	Procs      Procs
-	Agent      Agent
-	Logging    Logging
-	Passwords  Passwords
-	Thrift     Thrift
-	Http       Http
-	Mysql      Mysql
-	Pgsql      Pgsql
-	Geoip      Geoip
-	Udpjson    Udpjson
-	GoBeacon   GoBeacon
-	Filter     map[string]interface{}
+	//Agent      Agent
+	Logging   Logging
+	Passwords Passwords
+	Thrift    Thrift
+	Http      Http
+	Mysql     Mysql
+	Pgsql     Pgsql
+	//Geoip     Geoip
+	Udpjson  Udpjson
+	GoBeacon GoBeacon
+	Filter   map[string]interface{}
 }
 
 type InterfacesConfig struct {
@@ -53,10 +53,6 @@ type Logging struct {
 type Passwords struct {
 	Hide_keywords       []string
 	Strip_authorization bool
-}
-
-type Geoip struct {
-	Paths []string
 }
 
 type Protocol struct {
@@ -94,14 +90,6 @@ type Thrift struct {
 	Idl_files                  []string
 }
 
-type Agent struct {
-	Name                  string
-	Refresh_topology_freq int
-	Ignore_outgoing       bool
-	Topology_expire       int
-	Tags                  []string
-}
-
 type Procs struct {
 	Dont_read_from_proc bool
 	Max_proc_read_freq  int
@@ -111,27 +99,6 @@ type Procs struct {
 
 type Proc struct {
 	Cmdline_grep string
-}
-
-type MothershipConfig struct {
-	Enabled            bool
-	Save_topology      bool
-	Host               string
-	Port               int
-	Protocol           string
-	Username           string
-	Password           string
-	Index              string
-	Path               string
-	Db                 int
-	Db_topology        int
-	Timeout            int
-	Reconnect_interval int
-	Filename           string
-	Rotate_every_kb    int
-	Number_of_files    int
-	DataType           string
-	Flush_interval     int
 }
 
 type Udpjson struct {

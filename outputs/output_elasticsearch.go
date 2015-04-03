@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/logp"
 
 	"github.com/packetbeat/elastigo/api"
@@ -27,7 +26,7 @@ type PublishedTopology struct {
 	IPs  string
 }
 
-func (out *ElasticsearchOutputType) Init(config config.MothershipConfig, topology_expire int) error {
+func (out *ElasticsearchOutputType) Init(config MothershipConfig, topology_expire int) error {
 
 	api.Domain = config.Host
 	api.Port = fmt.Sprintf("%d", config.Port)

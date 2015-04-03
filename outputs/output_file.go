@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/logp"
 )
 
@@ -32,7 +31,7 @@ type FileRotator struct {
 	current_size uint64
 }
 
-func (out *FileOutputType) Init(config config.MothershipConfig) error {
+func (out *FileOutputType) Init(config MothershipConfig) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	out.rotator.RotateEveryBytes = uint64(config.Rotate_every_kb) * 1024
