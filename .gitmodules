@@ -1,3 +1,0 @@
-[submodule "go-daemon"]
-	path = go-daemon
-	url = https://github.com/fiorix/go-daemon.git
