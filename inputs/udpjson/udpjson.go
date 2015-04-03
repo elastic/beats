@@ -5,9 +5,10 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/infrabeat/common"
+	"github.com/elastic/infrabeat/logp"
+
 	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/logp"
 )
 
 type Config struct {

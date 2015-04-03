@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/infrabeat/logp"
 )
 
 type TestProcFile struct {

@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/elastic/packetbeat/filters"
-	"github.com/elastic/packetbeat/filters/nop"
+	"github.com/elastic/infrabeat/filters"
+	"github.com/elastic/infrabeat/filters/nop"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/packetbeat/logp"
+	"github.com/elastic/infrabeat/logp"
 )
 
 func thriftIdlForTesting(t *testing.T, content string) *ThriftIdl {

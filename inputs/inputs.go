@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/packetbeat/common"
+	"github.com/elastic/infrabeat/common"
 )
 
 // The InputPlugin interface needs to be implemented
