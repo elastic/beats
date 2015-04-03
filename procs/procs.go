@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/elastic/packetbeat/common"
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/logp"
 )
 
@@ -54,21 +54,44 @@ type ProcessesWatcher struct {
 	ReadFromProc    bool
 	MaxReadFreq     time.Duration
 	RefreshPidsFreq time.Duration
+	Config          ProcsConfig
+	ConfigMeta      toml.MetaData
 
 	// test helpers
 	proc_prefix string
 	TestSignals *chan bool
 }
 
+type ProcsConfig struct {
+	Dont_read_from_proc bool
+	Max_proc_read_freq  int
+	Monitored           map[string]ProcConfig
+	Refresh_pids_freq   int
+}
+
+type ProcConfig struct {
+	Cmdline_grep string
+}
+
 var ProcWatcher ProcessesWatcher
 
-func (proc *ProcessesWatcher) Init(config *config.Procs) error {
+func (proc *ProcessesWatcher) Init(cfg common.Config) error {
+
+	proc.ConfigMeta = cfg.Meta
+	var config struct {
+		Procs ProcsConfig
+	}
+	err := common.DecodeConfig(cfg, &config)
+	if err != nil {
+		return nil
+	}
+	proc.Config = config.Procs
 
 	proc.proc_prefix = ""
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
 	proc.LastMapUpdate = time.Now()
 
-	proc.ReadFromProc = !config.Dont_read_from_proc
+	proc.ReadFromProc = !proc.Config.Dont_read_from_proc
 	if proc.ReadFromProc {
 		if runtime.GOOS != "linux" {
 			proc.ReadFromProc = false
@@ -76,20 +99,21 @@ func (proc *ProcessesWatcher) Init(config *config.Procs) error {
 		}
 	}
 
-	if config.Max_proc_read_freq == 0 {
+	if proc.Config.Max_proc_read_freq == 0 {
 		proc.MaxReadFreq = 10 * time.Millisecond
 	} else {
-		proc.MaxReadFreq = time.Duration(config.Max_proc_read_freq) * time.Millisecond
+		proc.MaxReadFreq = time.Duration(proc.Config.Max_proc_read_freq) *
+			time.Millisecond
 	}
 
-	if config.Refresh_pids_freq == 0 {
+	if proc.Config.Refresh_pids_freq == 0 {
 		proc.RefreshPidsFreq = 1 * time.Second
 	} else {
-		proc.RefreshPidsFreq = time.Duration(config.Refresh_pids_freq) * time.Millisecond
+		proc.RefreshPidsFreq = time.Duration(proc.Config.Refresh_pids_freq) *
+			time.Millisecond
 	}
 
 	// Read the local IP addresses
-	var err error
 	proc.LocalAddrs, err = common.LocalIpAddrs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
@@ -97,7 +121,7 @@ func (proc *ProcessesWatcher) Init(config *config.Procs) error {
 	}
 
 	if proc.ReadFromProc {
-		for pstr, procConfig := range config.Monitored {
+		for pstr, procConfig := range proc.Config.Monitored {
 
 			grepper := procConfig.Cmdline_grep
 			if len(grepper) == 0 {

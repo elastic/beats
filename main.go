@@ -155,7 +155,7 @@ func main() {
 		return
 	}
 
-	if err = procs.ProcWatcher.Init(&config.ConfigSingleton.Procs); err != nil {
+	if err = procs.ProcWatcher.Init(cfg); err != nil {
 		logp.Critical(err.Error())
 		return
 	}

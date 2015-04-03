@@ -8,7 +8,7 @@ type Config struct {
 	//Output     map[string]MothershipConfig
 	Input Input
 	//RunOptions RunOptions
-	Procs Procs
+	//Procs Procs
 	//Agent      Agent
 	Logging   Logging
 	Passwords Passwords
@@ -83,17 +83,6 @@ type Thrift struct {
 	Capture_reply              bool
 	Obfuscate_strings          bool
 	Idl_files                  []string
-}
-
-type Procs struct {
-	Dont_read_from_proc bool
-	Max_proc_read_freq  int
-	Monitored           map[string]Proc
-	Refresh_pids_freq   int
-}
-
-type Proc struct {
-	Cmdline_grep string
 }
 
 type Udpjson struct {
