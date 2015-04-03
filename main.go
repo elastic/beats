@@ -21,8 +21,6 @@ import (
 	"github.com/elastic/infrabeat/outputs"
 
 	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/inputs"
-	"github.com/elastic/packetbeat/inputs/sniffer"
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/http"
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/packetbeat/protos/redis"
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/thrift"
+	"github.com/elastic/packetbeat/sniffer"
 
 	"github.com/BurntSushi/toml"
 )
@@ -88,6 +87,8 @@ func main() {
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
 
 	cmdLine.Parse(os.Args[1:])
+
+	sniff := new(sniffer.SnifferSetup)
 
 	if *printVersion {
 		fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
@@ -176,14 +177,6 @@ func main() {
 
 	over := make(chan bool)
 
-	if !config.ConfigMeta.IsDefined("input", "inputs") {
-		config.ConfigSingleton.Input.Inputs = []string{"sniffer"}
-	}
-	if len(config.ConfigSingleton.Input.Inputs) == 0 {
-		logp.Critical("At least one input needs to be enabled")
-		return
-	}
-
 	logp.Debug("main", "Initializing filters plugins")
 	for filter, plugin := range EnabledFilterPlugins {
 		filters.Filters.Register(filter, plugin)
@@ -202,7 +195,7 @@ func main() {
 			if err != nil {
 				logp.Critical("Filters runner failed: %v", err)
 				// shutting doen
-				inputs.Inputs.StopAll()
+				sniff.Stop()
 			}
 		}()
 		afterInputsQueue = runner.FiltersQueue
@@ -212,7 +205,6 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing sniffer")
-	sniff := new(sniffer.SnifferSetup)
 	err = sniff.Init(false, afterInputsQueue)
 	if err != nil {
 		logp.Critical("Ininitializing sniffer failed: %v", err)
@@ -246,7 +238,7 @@ func main() {
 		over <- true
 	}()
 
-	// On ^C or SIGTERM, gracefully stop inputs
+	// On ^C or SIGTERM, gracefully stop the sniffer
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -260,9 +252,9 @@ func main() {
 		logp.SetToStderr(false)
 	}
 
-	logp.Debug("main", "Waiting for inputs to finish")
+	logp.Debug("main", "Waiting for the sniffer to finish")
 
-	// Wait for one of the inputs goroutines to finish
+	// Wait for the goroutines to finish
 	for _ = range over {
 		if !sniff.IsAlive() {
 			break
