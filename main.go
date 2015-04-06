@@ -113,12 +113,6 @@ func main() {
 		return
 	}
 
-	var cfg common.Config
-	if cfg.Meta, err = toml.DecodeFile(*configfile, &cfg.Options); err != nil {
-		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
-		return
-	}
-
 	if len(debugSelectors) == 0 {
 		debugSelectors = config.ConfigSingleton.Logging.Selectors
 	}
@@ -143,18 +137,19 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled, cfg); err != nil {
+	if err = outputs.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
+		config.ConfigSingleton.Agent); err != nil {
 
 		logp.Critical(err.Error())
 		return
 	}
 
-	if err = procs.ProcWatcher.Init(cfg); err != nil {
+	if err = procs.ProcWatcher.Init(config.ConfigSingleton.Procs); err != nil {
 		logp.Critical(err.Error())
 		return
 	}
 
-	err = outputs.LoadGeoIPData(cfg)
+	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip, config.ConfigMeta)
 	if err != nil {
 		logp.Critical(err.Error())
 		return
@@ -212,7 +207,7 @@ func main() {
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err = droppriv.DropPrivileges(cfg); err != nil {
+	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions, config.ConfigMeta); err != nil {
 		logp.Critical(err.Error())
 		return
 	}

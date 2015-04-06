@@ -1,25 +1,30 @@
 package config
 
-import "github.com/BurntSushi/toml"
+import (
+	"github.com/BurntSushi/toml"
+	"github.com/elastic/infrabeat/common/droppriv"
+	"github.com/elastic/infrabeat/outputs"
+	"github.com/elastic/packetbeat/procs"
+)
 
 type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  map[string]Protocol
-	//Output     map[string]MothershipConfig
-	Input Input
-	//RunOptions RunOptions
-	//Procs Procs
-	//Agent      Agent
-	Logging   Logging
-	Passwords Passwords
-	Thrift    Thrift
-	Http      Http
-	Mysql     Mysql
-	Pgsql     Pgsql
-	//Geoip     Geoip
-	Udpjson  Udpjson
-	GoBeacon GoBeacon
-	Filter   map[string]interface{}
+	Output     map[string]outputs.MothershipConfig
+	Agent      outputs.AgentConfig
+	Input      Input
+	Procs      procs.ProcsConfig
+	RunOptions droppriv.RunOptions
+	Logging    Logging
+	Passwords  Passwords
+	Thrift     Thrift
+	Http       Http
+	Mysql      Mysql
+	Pgsql      Pgsql
+	Geoip      outputs.Geoip
+	Udpjson    Udpjson
+	GoBeacon   GoBeacon
+	Filter     map[string]interface{}
 }
 
 type InterfacesConfig struct {

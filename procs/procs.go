@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/elastic/infrabeat/common"
 	"github.com/elastic/infrabeat/logp"
 )
@@ -54,8 +53,6 @@ type ProcessesWatcher struct {
 	ReadFromProc    bool
 	MaxReadFreq     time.Duration
 	RefreshPidsFreq time.Duration
-	Config          ProcsConfig
-	ConfigMeta      toml.MetaData
 
 	// test helpers
 	proc_prefix string
@@ -75,23 +72,13 @@ type ProcConfig struct {
 
 var ProcWatcher ProcessesWatcher
 
-func (proc *ProcessesWatcher) Init(cfg common.Config) error {
-
-	proc.ConfigMeta = cfg.Meta
-	var config struct {
-		Procs ProcsConfig
-	}
-	err := common.DecodeConfig(cfg, &config)
-	if err != nil {
-		return nil
-	}
-	proc.Config = config.Procs
+func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 
 	proc.proc_prefix = ""
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
 	proc.LastMapUpdate = time.Now()
 
-	proc.ReadFromProc = !proc.Config.Dont_read_from_proc
+	proc.ReadFromProc = !config.Dont_read_from_proc
 	if proc.ReadFromProc {
 		if runtime.GOOS != "linux" {
 			proc.ReadFromProc = false
@@ -99,21 +86,22 @@ func (proc *ProcessesWatcher) Init(cfg common.Config) error {
 		}
 	}
 
-	if proc.Config.Max_proc_read_freq == 0 {
+	if config.Max_proc_read_freq == 0 {
 		proc.MaxReadFreq = 10 * time.Millisecond
 	} else {
-		proc.MaxReadFreq = time.Duration(proc.Config.Max_proc_read_freq) *
+		proc.MaxReadFreq = time.Duration(config.Max_proc_read_freq) *
 			time.Millisecond
 	}
 
-	if proc.Config.Refresh_pids_freq == 0 {
+	if config.Refresh_pids_freq == 0 {
 		proc.RefreshPidsFreq = 1 * time.Second
 	} else {
-		proc.RefreshPidsFreq = time.Duration(proc.Config.Refresh_pids_freq) *
+		proc.RefreshPidsFreq = time.Duration(config.Refresh_pids_freq) *
 			time.Millisecond
 	}
 
 	// Read the local IP addresses
+	var err error
 	proc.LocalAddrs, err = common.LocalIpAddrs()
 	if err != nil {
 		logp.Err("Error getting local IP addresses: %s", err)
@@ -121,7 +109,7 @@ func (proc *ProcessesWatcher) Init(cfg common.Config) error {
 	}
 
 	if proc.ReadFromProc {
-		for pstr, procConfig := range proc.Config.Monitored {
+		for pstr, procConfig := range config.Monitored {
 
 			grepper := procConfig.Cmdline_grep
 			if len(grepper) == 0 {
