@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/infrabeat/common"
+	"github.com/BurntSushi/toml"
 	"github.com/elastic/infrabeat/logp"
 
 	"github.com/nranchev/go-libGeoIP"
@@ -12,29 +12,18 @@ import (
 
 var _GeoLite *libgeo.GeoIP
 
-type GeoIPConfig struct {
-	Geoip Geoip
-}
-
 type Geoip struct {
 	Paths []string
 }
 
-func LoadGeoIPData(cfg common.Config) error {
-
-	var config GeoIPConfig
-
-	err := common.DecodeConfig(cfg, &config)
-	if err != nil {
-		return err
-	}
+func LoadGeoIPData(config Geoip, configMeta toml.MetaData) error {
 
 	geoip_paths := []string{
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if cfg.Meta.IsDefined("geoip", "paths") {
-		geoip_paths = config.Geoip.Paths
+	if configMeta.IsDefined("geoip", "paths") {
+		geoip_paths = config.Paths
 	}
 	if len(geoip_paths) == 0 {
 		// disabled
@@ -67,6 +56,7 @@ func LoadGeoIPData(cfg common.Config) error {
 		return nil
 	}
 
+	var err error
 	_GeoLite, err = libgeo.Load(geoip_path)
 	if err != nil {
 		logp.Warn("Could not load GeoIP data: %s", err.Error())

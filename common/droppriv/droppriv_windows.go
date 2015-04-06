@@ -3,12 +3,17 @@ package droppriv
 import (
 	"errors"
 
-	"github.com/elastic/infrabeat/common"
+	"github.com/BurntSushi/toml"
 )
 
-func DropPrivileges(cfg common.Config) error {
+type RunOptions struct {
+	Uid int
+	Gid int
+}
 
-	if !cfg.Meta.IsDefined("runoptions", "uid") {
+func DropPrivileges(config RunOptions, configMeta toml.MetaData) error {
+
+	if !configMeta.IsDefined("runoptions", "uid") {
 		// not found, no dropping privileges but no err
 		return nil
 	}

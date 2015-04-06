@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
-
 	"github.com/elastic/infrabeat/common"
 	"github.com/elastic/infrabeat/logp"
 )
@@ -24,16 +22,10 @@ type PublisherType struct {
 	ElasticsearchOutput ElasticsearchOutputType
 	RedisOutput         RedisOutputType
 	FileOutput          FileOutputType
-	Config              OutputsConfig
-	ConfigMeta          toml.MetaData
+	IgnoreOutgoing      bool
 
 	RefreshTopologyTimer <-chan time.Time
 	Queue                chan common.MapStr
-}
-
-type OutputsConfig struct {
-	Output map[string]MothershipConfig
-	Agent  AgentConfig
 }
 
 type MothershipConfig struct {
@@ -149,7 +141,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		delete(event, "dst")
 	}
 
-	if publisher.Config.Agent.Ignore_outgoing && dst_server != "" &&
+	if publisher.IgnoreOutgoing && dst_server != "" &&
 		dst_server != publisher.name {
 		// duplicated transaction -> ignore it
 		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
@@ -232,26 +224,20 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	config common.Config) error {
+	outputs map[string]MothershipConfig, agent AgentConfig) error {
 
 	var err error
-
-	publisher.ConfigMeta = config.Meta
-
-	err = common.DecodeConfig(config, &publisher.Config)
-	if err != nil {
-		return err
-	}
+	publisher.IgnoreOutgoing = agent.Ignore_outgoing
 
 	publisher.disabled = publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	output, exists := publisher.Config.Output["elasticsearch"]
+	output, exists := outputs["elasticsearch"]
 	if exists && output.Enabled && !publisher.disabled {
 		err := publisher.ElasticsearchOutput.Init(output,
-			publisher.Config.Agent.Topology_expire)
+			agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
@@ -268,11 +254,11 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		}
 	}
 
-	output, exists = publisher.Config.Output["redis"]
+	output, exists = outputs["redis"]
 	if exists && output.Enabled && !publisher.disabled {
 		logp.Debug("publish", "REDIS publisher enabled")
 		err := publisher.RedisOutput.Init(output,
-			publisher.Config.Agent.Topology_expire)
+			agent.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
@@ -289,7 +275,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		}
 	}
 
-	output, exists = publisher.Config.Output["file"]
+	output, exists = outputs["file"]
 	if exists && output.Enabled {
 		err := publisher.FileOutput.Init(output)
 		if err != nil {
@@ -312,7 +298,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		}
 	}
 
-	publisher.name = publisher.Config.Agent.Name
+	publisher.name = agent.Name
 	if len(publisher.name) == 0 {
 		// use the hostname
 		publisher.name, err = os.Hostname()
@@ -323,14 +309,14 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
 	}
 
-	if len(publisher.Config.Agent.Tags) > 0 {
-		publisher.tags = strings.Join(publisher.Config.Agent.Tags, " ")
+	if len(agent.Tags) > 0 {
+		publisher.tags = strings.Join(agent.Tags, " ")
 	}
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if publisher.Config.Agent.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(publisher.Config.Agent.Refresh_topology_freq) * time.Second
+		if agent.Refresh_topology_freq != 0 {
+			RefreshTopologyFreq = time.Duration(agent.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)

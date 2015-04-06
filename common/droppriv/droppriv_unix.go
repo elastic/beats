@@ -7,43 +7,34 @@ import (
 	"fmt"
 	"syscall"
 
-	"github.com/elastic/infrabeat/common"
+	"github.com/BurntSushi/toml"
 	"github.com/elastic/infrabeat/logp"
 )
-
-type DropPrivConfig struct {
-	RunOptions RunOptions
-}
 
 type RunOptions struct {
 	Uid int
 	Gid int
 }
 
-func DropPrivileges(cfg common.Config) error {
-	var config DropPrivConfig
+func DropPrivileges(config RunOptions, configMeta toml.MetaData) error {
+	var err error
 
-	err := common.DecodeConfig(cfg, &config)
-	if err != nil {
-		return err
-	}
-
-	if !cfg.Meta.IsDefined("runoptions", "uid") {
+	if !configMeta.IsDefined("runoptions", "uid") {
 		// not found, no dropping privileges but no err
 		return nil
 	}
 
-	if !cfg.Meta.IsDefined("runoptions", "gid") {
+	if !configMeta.IsDefined("runoptions", "gid") {
 		return errors.New("GID must be specified for dropping privileges")
 	}
 
-	logp.Info("Switching to user: %d.%d", config.RunOptions.Uid, config.RunOptions.Gid)
+	logp.Info("Switching to user: %d.%d", config.Uid, config.Gid)
 
-	if err = syscall.Setgid(config.RunOptions.Gid); err != nil {
+	if err = syscall.Setgid(config.Gid); err != nil {
 		return fmt.Errorf("setgid: %s", err.Error())
 	}
 
-	if err = syscall.Setuid(config.RunOptions.Uid); err != nil {
+	if err = syscall.Setuid(config.Uid); err != nil {
 		return fmt.Errorf("setuid: %s", err.Error())
 	}
 
