@@ -8,72 +8,74 @@
 #
 #
 
+############################# Agent ############################################
+agent:
+
+ # The name of the agent that publishes the network data. It can be used to group 
+ # all the transactions sent by a single agent in the web interface.
+ # If this options is not defined, the hostname is used.
+ name:
+
+ # The tags of the agent are included in their own field with each
+ # transaction published. Tags make it easy to group servers by different
+ # logical properties.
+ #tags: ["service1"]
+
+ # Uncomment the following if you want to ignore transactions created
+ # by the server on which the agent is installed. This option is useful
+ # to remove duplicates if agents are installed on multiple servers.
+ # ignore_outgoing: true
+ 
 ############################# Sniffer ############################################
 
-# The name of the agent that publishes the network data. It can be used to group 
-# all the transactions sent by a single agent in the web interface.
-# If this options is not defined, the hostname is used.
-# sniffer.agent.name:
-
-
-# The tags of the agent are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-# sniffer.agent.tags: ["service1"]
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the agent is installed. This option is useful
-# to remove duplicates if agents are installed on multiple servers.
-# sniffer.agent.ignore_outgoing: true
- 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-sniffer.interfaces: ['any']
+interfaces: 
+ device: 'any'
 
 
 # Configure the processes to be monitored and how to find them. The processes can
 # be found by searching their command line by a given string.
-sniffer.procs: 
-    - process: mysqld
-      cmdline_grep: mysqld
+procs: 
+ - process: mysqld
+ cmdline_grep: mysqld
 
-    - process: pgsql
-      cmdline_grep: postgres
+ - process: pgsql
+ cmdline_grep: postgres
 
-    - process: nginx
-      cmdline_grep: nginx
+ - process: nginx
+ cmdline_grep: nginx
 
-    - process: app
-      cmdline_grep: gunicorn
+ - process: app
+ cmdline_grep: gunicorn
 
 # Configure which protocols to monitor and the ports where they are
 # running. You can disable a given protocol by commenting out its
 # configuration.
-sniffer.protocols: 
-        - protocol: http
-          ports: [80, 8080, 8000, 5000, 8002]
+protocols: 
+ - protocol: http
+ ports: [80, 8080, 8000, 5000, 8002]
 
-        - protocol: mysql
-          ports: [3306]
+ - protocol: mysql
+ ports: [3306]
 
-        - protocol: pgsql
-          ports: [5432]
+ - protocol: pgsql
+ ports: [5432]
 
-        - protocol: redis
-          ports: [6379]
+ - protocol: redis
+ ports: [6379]
 
-        - protocol: thrift
-          ports: [9090]
+ - protocol: thrift
+ ports: [9090]
 
          
 ############################# Filters ############################################
-
 # Uncomment the following to hide certain parameters in URL or forms attached 
 # to HTTP requests. The names of the parameters are case insensitive. 
 # The value of the parameters will be replaced with the 'xxxxx' string.
 # This is generally useful for avoiding storing user passwords or other
 # sensitive information.
-hide_passwords: ['pass', 'password', 'passw']
+hide_keywords: ['pass', 'password', 'passw']
 
 
 ############################# Output ############################################
@@ -82,35 +84,35 @@ hide_passwords: ['pass', 'password', 'passw']
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
   
-   # Elasticsearch as output
-   # Options:
-   # host, port: where Elasticsearch is listening on
-   # save_topology: specify if the topology is saved in Elasticsearch
-    - type: elasticsearch
-      enabled: true
-      host: localhost
-      port: 9200
-      save_topology: true
+ # Elasticsearch as output
+ # Options:
+ # host, port: where Elasticsearch is listening on
+ # save_topology: specify if the topology is saved in Elasticsearch
+ - type: elasticsearch
+   enabled: true
+   host: localhost
+   port: 9200
+   save_topology: true
 
-   # Redis as output
-   # Options:
-   # host, port: where Redis is listening on
-   # save_topology: specify if the topology is saved in Redis
-    - type: redis
-      enabled: false
-      host: localhost
-      port: 6379
-      save_topology: true
+ # Redis as output
+ # Options:
+ # host, port: where Redis is listening on
+ # save_topology: specify if the topology is saved in Redis
+ - type: redis
+   enabled: false
+   host: localhost
+   port: 6379
+   save_topology: true
 
-    # File as output
-    # Options
-    # path: where to save the files
-    # filename: name of the files
-    # rotate_every_kb: maximum size of the files in path
-    # number of files: maximum number of files in path
-    - type: file
-      enabled: false
-      path: "/tmp/packetbeat"
-      filename: packetbeat
-      rotate_every_kb: 1000
-      number_of_files: 7
+ # File as output
+ # Options
+ # path: where to save the files
+ # filename: name of the files
+ # rotate_every_kb: maximum size of the files in path
+ # number of files: maximum number of files in path
+ - type: file
+   enabled: false
+   path: "/tmp/packetbeat"
+   filename: packetbeat
+   rotate_every_kb: 1000
+   number_of_files: 7
