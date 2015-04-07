@@ -31,9 +31,20 @@
 sniffer.interfaces: ['any']
 
 
-# Select the processes to be monitored and how to find them. The processes can
+# Configure the processes to be monitored and how to find them. The processes can
 # be found by searching their command line by a given string.
-sniffer.procs: ['mysqld', 'postgres', 'nginx', 'gunicorn']
+sniffer.procs: 
+    - process: mysqld
+      cmdline_grep: mysqld
+
+    - process: pgsql
+      cmdline_grep: postgres
+
+    - process: nginx
+      cmdline_grep: nginx
+
+    - process: app
+      cmdline_grep: gunicorn
 
 # Configure which protocols to monitor and the ports where they are
 # running. You can disable a given protocol by commenting out its
