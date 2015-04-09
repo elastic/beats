@@ -1,19 +1,15 @@
 package droppriv
 
-import (
-	"errors"
-
-	"github.com/BurntSushi/toml"
-)
+import "errors"
 
 type RunOptions struct {
-	Uid int
-	Gid int
+	Uid *int
+	Gid *int
 }
 
-func DropPrivileges(config RunOptions, configMeta toml.MetaData) error {
+func DropPrivileges(config RunOptions) error {
 
-	if !configMeta.IsDefined("runoptions", "uid") {
+	if config.Uid == nil {
 		// not found, no dropping privileges but no err
 		return nil
 	}

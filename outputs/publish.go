@@ -157,13 +157,13 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		real_ip, exists := event["real_ip"]
 		if exists && len(real_ip.(string)) > 0 {
 			loc := _GeoLite.GetLocationByIP(real_ip.(string))
-			if loc != nil {
+			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 				event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 			}
 		} else {
 			if len(src_server) == 0 && src != nil { // only for external IP addresses
 				loc := _GeoLite.GetLocationByIP(src.Ip)
-				if loc != nil {
+				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 					event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 				}
 			}

@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/BurntSushi/toml"
 	"github.com/elastic/infrabeat/logp"
 
 	"github.com/nranchev/go-libGeoIP"
@@ -13,17 +12,17 @@ import (
 var _GeoLite *libgeo.GeoIP
 
 type Geoip struct {
-	Paths []string
+	Paths *[]string
 }
 
-func LoadGeoIPData(config Geoip, configMeta toml.MetaData) error {
+func LoadGeoIPData(config Geoip) error {
 
 	geoip_paths := []string{
 		"/usr/share/GeoIP/GeoIP.dat",
 		"/usr/local/var/GeoIP/GeoIP.dat",
 	}
-	if configMeta.IsDefined("geoip", "paths") {
-		geoip_paths = config.Paths
+	if config.Paths != nil {
+		geoip_paths = *config.Paths
 	}
 	if len(geoip_paths) == 0 {
 		// disabled
