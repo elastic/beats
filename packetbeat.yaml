@@ -69,14 +69,16 @@ protocols:
   thrift:
     ports: [9090]
 
-         
-############################# Filters ############################################
-# Uncomment the following to hide certain parameters in URL or forms attached 
-# to HTTP requests. The names of the parameters are case insensitive. 
-# The value of the parameters will be replaced with the 'xxxxx' string.
-# This is generally useful for avoiding storing user passwords or other
-# sensitive information.
-hide_keywords: ['pass', 'password', 'passw']
+
+############################# HTTP protocol ######################################
+http:
+  # Uncomment the following to hide certain parameters in URL or forms attached 
+  # to HTTP requests. The names of the parameters are case insensitive. 
+  # The value of the parameters will be replaced with the 'xxxxx' string.
+  # This is generally useful for avoiding storing user passwords or other
+  # sensitive information.
+  hide_keywords: ['pass', 'password', 'passw']
+
 
 
 ############################# Output ############################################
