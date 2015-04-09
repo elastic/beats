@@ -1,19 +1,11 @@
-/packetbeat
-
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a
 *.so
-*.swp
-*.swo
-*.swn
-packetbeat.test
-coverage.out
 
 # Folders
 _obj
 _test
-_output
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -28,3 +20,13 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+#*
+*~
+
+# examples binaries
+examples/synscan/synscan
+examples/pfdump/pfdump
+examples/pcapdump/pcapdump
+examples/httpassembly/httpassembly
+examples/statsassembly/statsassembly
+examples/arpscan/arpscan
