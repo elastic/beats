@@ -28,6 +28,12 @@ deps:
 savedeps: deps
 	godep save ./...
 
+.PHONY: restoredeps
+restoredeps:
+	# first make sure we have godep
+	go get github.com/tools/godep
+	godep restore ./...
+
 .PHONY: install
 install: packetbeat go-daemon/god
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
