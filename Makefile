@@ -16,11 +16,17 @@ with_pfring:
 
 .PHONY: deps
 deps:
-	go get -t
+	go get -t -u -f
 	# goautotest is used from the Makefile to run tests in a loop
-	go get github.com/tsg/goautotest
+	go get -u github.com/tsg/goautotest
 	# websocket is needed by the gobeacon tests
-	go get golang.org/x/net/websocket
+	go get -u golang.org/x/net/websocket
+	# godep is needed in this makefile
+	go get -u github.com/tools/godep
+
+.PHONY: savedeps
+savedeps: deps
+	godep save ./...
 
 .PHONY: install
 install: packetbeat go-daemon/god
