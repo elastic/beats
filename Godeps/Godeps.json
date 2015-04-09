@@ -1,0 +1,69 @@
+{
+	"ImportPath": "github.com/elastic/packetbeat",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/bitly/go-hostpool",
+			"Rev": "d0e59c22a56e8dadfed24f74f452cea5a52722d2"
+		},
+		{
+			"ImportPath": "github.com/elastic/infrabeat/common",
+			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+		},
+		{
+			"ImportPath": "github.com/elastic/infrabeat/filters",
+			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+		},
+		{
+			"ImportPath": "github.com/elastic/infrabeat/logp",
+			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+		},
+		{
+			"ImportPath": "github.com/elastic/infrabeat/outputs",
+			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+		},
+		{
+			"ImportPath": "github.com/nranchev/go-libGeoIP",
+			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
+		},
+		{
+			"ImportPath": "github.com/packetbeat/elastigo/api",
+			"Rev": "ed2d56a9bd244d2c92019f55a4415263d2bc976f"
+		},
+		{
+			"ImportPath": "github.com/packetbeat/elastigo/core",
+			"Rev": "ed2d56a9bd244d2c92019f55a4415263d2bc976f"
+		},
+		{
+			"ImportPath": "github.com/packetbeat/gopacket",
+			"Rev": "9f6f103107a8eeea93a485f4fc7880d7e663e3b9"
+		},
+		{
+			"ImportPath": "github.com/samuel/go-parser/parser",
+			"Rev": "ca8abbf65d0e61dedf061f98bd3850f250e27539"
+		},
+		{
+			"ImportPath": "github.com/samuel/go-thrift/parser",
+			"Rev": "2187045faa54fce7f5028706ffeb2f2fc342aa7e"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "e4ec8152c15fc46bd5056ce65997a07c7d415325"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "49c95bdc21843256fb6c4e0d370a05f24a0bf213"
+		}
+	]
+}
