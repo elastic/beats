@@ -251,11 +251,11 @@ func (redis *Redis) InitDefaults() {
 }
 
 func (redis *Redis) setFromConfig() error {
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_request") {
-		redis.Send_request = config.ConfigSingleton.Protocols["redis"].Send_request
+	if config.ConfigSingleton.Redis.Send_request != nil {
+		redis.Send_request = *config.ConfigSingleton.Redis.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_response") {
-		redis.Send_response = config.ConfigSingleton.Protocols["redis"].Send_response
+	if config.ConfigSingleton.Redis.Send_response != nil {
+		redis.Send_response = *config.ConfigSingleton.Redis.Send_response
 	}
 	return nil
 }

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/BurntSushi/toml"
 	"github.com/elastic/infrabeat/common/droppriv"
 	"github.com/elastic/infrabeat/outputs"
 	"github.com/elastic/packetbeat/procs"
@@ -16,11 +15,11 @@ type Config struct {
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging
-	Passwords  Passwords
 	Thrift     Thrift
 	Http       Http
 	Mysql      Mysql
 	Pgsql      Pgsql
+	Redis      Redis
 	Geoip      outputs.Geoip
 	Udpjson    Udpjson
 	GoBeacon   GoBeacon
@@ -50,44 +49,55 @@ type Logging struct {
 	Selectors []string
 }
 
-type Passwords struct {
-	Hide_keywords       []string
-	Strip_authorization bool
-}
-
 type Protocol struct {
+	Protocol      string
 	Ports         []int
 	Send_request  bool
 	Send_response bool
 }
 
 type Http struct {
-	Send_all_headers bool
-	Send_headers     []string
-	Split_cookie     bool
-	Real_ip_header   string
-	Include_body_for []string
+	Send_all_headers    *bool
+	Send_headers        []string
+	Split_cookie        *bool
+	Real_ip_header      *string
+	Include_body_for    []string
+	Hide_keywords       []string
+	Strip_authorization *bool
+	Send_request        *bool
+	Send_response       *bool
 }
 
 type Mysql struct {
-	Max_row_length int
-	Max_rows       int
+	Max_row_length *int
+	Max_rows       *int
+	Send_request   *bool
+	Send_response  *bool
 }
 
 type Pgsql struct {
-	Max_row_length int
-	Max_rows       int
+	Max_row_length *int
+	Max_rows       *int
+	Send_request   *bool
+	Send_response  *bool
 }
 
 type Thrift struct {
-	String_max_size            int
-	Collection_max_size        int
-	Drop_after_n_struct_fields int
-	Transport_type             string
-	Protocol_type              string
-	Capture_reply              bool
-	Obfuscate_strings          bool
+	String_max_size            *int
+	Collection_max_size        *int
+	Drop_after_n_struct_fields *int
+	Transport_type             *string
+	Protocol_type              *string
+	Capture_reply              *bool
+	Obfuscate_strings          *bool
 	Idl_files                  []string
+	Send_request               *bool
+	Send_response              *bool
+}
+
+type Redis struct {
+	Send_request  *bool
+	Send_response *bool
 }
 
 type Udpjson struct {
@@ -103,6 +113,3 @@ type GoBeacon struct {
 
 // Config Singleton
 var ConfigSingleton Config
-
-// Config metadata singleton
-var ConfigMeta toml.MetaData

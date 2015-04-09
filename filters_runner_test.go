@@ -31,10 +31,10 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": "nop",
 				},
-				"nop2": map[string]interface{}{
+				"nop2": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -53,7 +53,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop", "sample1"},
-				"sample1": map[string]interface{}{
+				"sample1": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -95,7 +95,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -104,7 +104,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"hype": "nop",
 				},
 			},
@@ -113,7 +113,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": 1,
 				},
 			},

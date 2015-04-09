@@ -16,8 +16,6 @@ import (
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/tcp"
-
-	"github.com/BurntSushi/toml"
 )
 
 const (
@@ -121,35 +119,42 @@ type Http struct {
 func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
+	http.Strip_authorization = false
 }
 
-func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
-	if meta.IsDefined("protocols", "http", "send_request") {
-		http.Send_request = config.Protocols["http"].Send_request
+func (http *Http) SetFromConfig() (err error) {
+	if config.ConfigSingleton.Http.Send_request != nil {
+		http.Send_request = *config.ConfigSingleton.Http.Send_request
 	}
-	if meta.IsDefined("protocols", "http", "send_response") {
-		http.Send_response = config.Protocols["http"].Send_response
+	if config.ConfigSingleton.Http.Send_response != nil {
+		http.Send_response = *config.ConfigSingleton.Http.Send_response
 	}
-	http.Hide_keywords = config.Passwords.Hide_keywords
-	http.Strip_authorization = config.Passwords.Strip_authorization
+	http.Hide_keywords = config.ConfigSingleton.Http.Hide_keywords
+	if config.ConfigSingleton.Http.Strip_authorization != nil {
+		http.Strip_authorization = *config.ConfigSingleton.Http.Strip_authorization
+	}
 
-	if config.Http.Send_all_headers {
+	if config.ConfigSingleton.Http.Send_all_headers != nil {
 		http.Send_headers = true
 		http.Send_all_headers = true
 	} else {
-		if len(config.Http.Send_headers) > 0 {
+		if len(config.ConfigSingleton.Http.Send_headers) > 0 {
 			http.Send_headers = true
 
 			http.Headers_whitelist = map[string]bool{}
-			for _, hdr := range config.Http.Send_headers {
+			for _, hdr := range config.ConfigSingleton.Http.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	http.Split_cookie = config.Http.Split_cookie
+	if config.ConfigSingleton.Http.Split_cookie != nil {
+		http.Split_cookie = *config.ConfigSingleton.Http.Split_cookie
+	}
 
-	http.Real_ip_header = strings.ToLower(config.Http.Real_ip_header)
+	if config.ConfigSingleton.Http.Real_ip_header != nil {
+		http.Real_ip_header = strings.ToLower(*config.ConfigSingleton.Http.Real_ip_header)
+	}
 
 	return nil
 }
@@ -164,7 +169,7 @@ func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 	http.InitDefaults()
 
 	if !test_mode {
-		err := http.SetFromConfig(&config.ConfigSingleton, &config.ConfigMeta)
+		err := http.SetFromConfig()
 		if err != nil {
 			return err
 		}

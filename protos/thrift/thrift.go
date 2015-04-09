@@ -177,17 +177,17 @@ func (thrift *Thrift) InitDefaults() {
 func (thrift *Thrift) readConfig() error {
 	var err error
 
-	if config.ConfigMeta.IsDefined("thrift", "string_max_size") {
-		thrift.StringMaxSize = config.ConfigSingleton.Thrift.String_max_size
+	if config.ConfigSingleton.Thrift.String_max_size != nil {
+		thrift.StringMaxSize = *config.ConfigSingleton.Thrift.String_max_size
 	}
-	if config.ConfigMeta.IsDefined("thrift", "collection_max_size") {
-		thrift.CollectionMaxSize = config.ConfigSingleton.Thrift.Collection_max_size
+	if config.ConfigSingleton.Thrift.Collection_max_size != nil {
+		thrift.CollectionMaxSize = *config.ConfigSingleton.Thrift.Collection_max_size
 	}
-	if config.ConfigMeta.IsDefined("thrift", "drop_after_n_struct_fields") {
-		thrift.DropAfterNStructFields = config.ConfigSingleton.Thrift.Drop_after_n_struct_fields
+	if config.ConfigSingleton.Thrift.Drop_after_n_struct_fields != nil {
+		thrift.DropAfterNStructFields = *config.ConfigSingleton.Thrift.Drop_after_n_struct_fields
 	}
-	if config.ConfigMeta.IsDefined("thrift", "transport_type") {
-		switch config.ConfigSingleton.Thrift.Transport_type {
+	if config.ConfigSingleton.Thrift.Transport_type != nil {
+		switch *config.ConfigSingleton.Thrift.Transport_type {
 		case "socket":
 			thrift.TransportType = ThriftTSocket
 		case "framed":
@@ -196,32 +196,32 @@ func (thrift *Thrift) readConfig() error {
 			return fmt.Errorf("Transport type `%s` not known", config.ConfigSingleton.Thrift.Transport_type)
 		}
 	}
-	if config.ConfigMeta.IsDefined("thrift", "protocol_type") {
-		switch config.ConfigSingleton.Thrift.Transport_type {
+	if config.ConfigSingleton.Thrift.Protocol_type != nil {
+		switch *config.ConfigSingleton.Thrift.Protocol_type {
 		case "binary":
 			thrift.ProtocolType = ThriftTBinary
 		default:
 			return fmt.Errorf("Protocol type `%s` not known", config.ConfigSingleton.Thrift.Protocol_type)
 		}
 	}
-	if config.ConfigMeta.IsDefined("thrift", "capture_reply") {
-		thrift.CaptureReply = config.ConfigSingleton.Thrift.Capture_reply
+	if config.ConfigSingleton.Thrift.Capture_reply != nil {
+		thrift.CaptureReply = *config.ConfigSingleton.Thrift.Capture_reply
 	}
-	if config.ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
-		thrift.ObfuscateStrings = config.ConfigSingleton.Thrift.Obfuscate_strings
+	if config.ConfigSingleton.Thrift.Obfuscate_strings != nil {
+		thrift.ObfuscateStrings = *config.ConfigSingleton.Thrift.Obfuscate_strings
 	}
-	if config.ConfigMeta.IsDefined("thrift", "idl_files") {
+	if len(config.ConfigSingleton.Thrift.Idl_files) > 0 {
 		thrift.Idl, err = NewThriftIdl(config.ConfigSingleton.Thrift.Idl_files)
 		if err != nil {
 			return err
 		}
 	}
 
-	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_request") {
-		thrift.Send_request = config.ConfigSingleton.Protocols["thrift"].Send_request
+	if config.ConfigSingleton.Thrift.Send_request != nil {
+		thrift.Send_request = *config.ConfigSingleton.Thrift.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_response") {
-		thrift.Send_response = config.ConfigSingleton.Protocols["thrift"].Send_response
+	if config.ConfigSingleton.Thrift.Send_response != nil {
+		thrift.Send_response = *config.ConfigSingleton.Thrift.Send_response
 	}
 
 	return nil

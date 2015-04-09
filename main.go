@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/infrabeat/filters/nop"
 	"github.com/elastic/infrabeat/logp"
 	"github.com/elastic/infrabeat/outputs"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -30,8 +31,6 @@ import (
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/thrift"
 	"github.com/elastic/packetbeat/sniffer"
-
-	"github.com/BurntSushi/toml"
 )
 
 const Version = "0.5.0"
@@ -72,7 +71,7 @@ func main() {
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	configfile := cmdLine.String("c", "packetbeat.conf", "Configuration file")
+	configfile := cmdLine.String("c", "packetbeat.yaml", "Configuration file")
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
@@ -108,8 +107,13 @@ func main() {
 
 	var err error
 
-	if config.ConfigMeta, err = toml.DecodeFile(*configfile, &config.ConfigSingleton); err != nil {
-		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
+	filecontent, err := ioutil.ReadFile(*configfile)
+	if err != nil {
+		fmt.Printf("Fail to read %s: %s. Exiting.\n", *configfile, err)
+		return
+	}
+	if err = yaml.Unmarshal(filecontent, &config.ConfigSingleton); err != nil {
+		fmt.Printf("YAML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
 
@@ -136,6 +140,7 @@ func main() {
 		config.ConfigSingleton.Interfaces.Dumpfile = *dumpfile
 	}
 
+	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
 	if err = outputs.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
 		config.ConfigSingleton.Agent); err != nil {
@@ -149,7 +154,7 @@ func main() {
 		return
 	}
 
-	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip, config.ConfigMeta)
+	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip)
 	if err != nil {
 		logp.Critical(err.Error())
 		return
@@ -207,7 +212,7 @@ func main() {
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions, config.ConfigMeta); err != nil {
+	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
 		logp.Critical(err.Error())
 		return
 	}

@@ -113,17 +113,17 @@ func (pgsql *Pgsql) InitDefaults() {
 }
 
 func (pgsql *Pgsql) setFromConfig() error {
-	if config.ConfigSingleton.Pgsql.Max_row_length > 0 {
-		pgsql.maxRowLength = config.ConfigSingleton.Pgsql.Max_row_length
+	if config.ConfigSingleton.Pgsql.Max_row_length != nil {
+		pgsql.maxRowLength = *config.ConfigSingleton.Pgsql.Max_row_length
 	}
-	if config.ConfigSingleton.Pgsql.Max_rows > 0 {
-		pgsql.maxStoreRows = config.ConfigSingleton.Pgsql.Max_rows
+	if config.ConfigSingleton.Pgsql.Max_rows != nil {
+		pgsql.maxStoreRows = *config.ConfigSingleton.Pgsql.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_request") {
-		pgsql.Send_request = config.ConfigSingleton.Protocols["pgsql"].Send_request
+	if config.ConfigSingleton.Pgsql.Send_request != nil {
+		pgsql.Send_request = *config.ConfigSingleton.Pgsql.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_response") {
-		pgsql.Send_response = config.ConfigSingleton.Protocols["pgsql"].Send_response
+	if config.ConfigSingleton.Pgsql.Send_response != nil {
+		pgsql.Send_response = *config.ConfigSingleton.Pgsql.Send_response
 	}
 	return nil
 }

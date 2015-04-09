@@ -121,17 +121,17 @@ func (mysql *Mysql) InitDefaults() {
 }
 
 func (mysql *Mysql) setFromConfig() error {
-	if config.ConfigSingleton.Mysql.Max_row_length > 0 {
-		mysql.maxRowLength = config.ConfigSingleton.Mysql.Max_row_length
+	if config.ConfigSingleton.Mysql.Max_row_length != nil {
+		mysql.maxRowLength = *config.ConfigSingleton.Mysql.Max_row_length
 	}
-	if config.ConfigSingleton.Mysql.Max_rows > 0 {
-		mysql.maxStoreRows = config.ConfigSingleton.Mysql.Max_rows
+	if config.ConfigSingleton.Mysql.Max_rows != nil {
+		mysql.maxStoreRows = *config.ConfigSingleton.Mysql.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_request") {
-		mysql.Send_request = config.ConfigSingleton.Protocols["mysql"].Send_request
+	if config.ConfigSingleton.Mysql.Send_request != nil {
+		mysql.Send_request = *config.ConfigSingleton.Mysql.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_response") {
-		mysql.Send_response = config.ConfigSingleton.Protocols["mysql"].Send_response
+	if config.ConfigSingleton.Mysql.Send_response != nil {
+		mysql.Send_response = *config.ConfigSingleton.Mysql.Send_response
 	}
 	return nil
 }

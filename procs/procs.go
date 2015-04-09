@@ -62,11 +62,12 @@ type ProcessesWatcher struct {
 type ProcsConfig struct {
 	Dont_read_from_proc bool
 	Max_proc_read_freq  int
-	Monitored           map[string]ProcConfig
+	Monitored           []ProcConfig
 	Refresh_pids_freq   int
 }
 
 type ProcConfig struct {
+	Process      string
 	Cmdline_grep string
 }
 
@@ -109,14 +110,14 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	}
 
 	if proc.ReadFromProc {
-		for pstr, procConfig := range config.Monitored {
+		for _, procConfig := range config.Monitored {
 
 			grepper := procConfig.Cmdline_grep
 			if len(grepper) == 0 {
-				grepper = pstr
+				grepper = procConfig.Process
 			}
 
-			p, err := NewProcess(proc, pstr, grepper, time.Tick(proc.RefreshPidsFreq))
+			p, err := NewProcess(proc, procConfig.Process, grepper, time.Tick(proc.RefreshPidsFreq))
 			if err != nil {
 				logp.Err("NewProcess: %s", err)
 			} else {
