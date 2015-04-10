@@ -50,7 +50,7 @@ class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
                        cmd="../packetbeat",
-                       config="packetbeat.yaml",
+                       config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
                        debug_selectors=[]):
@@ -80,7 +80,7 @@ class TestCase(unittest.TestCase):
 
     def start_packetbeat(self,
                          cmd="../packetbeat",
-                         config="packetbeat.yaml",
+                         config="packetbeat.yml",
                          output="packetbeat.log",
                          extra_args=[],
                          debug_selectors=[]):
@@ -102,8 +102,8 @@ class TestCase(unittest.TestCase):
         proc.start()
         return proc
 
-    def render_config_template(self, template="packetbeat.yaml.j2",
-                               output="packetbeat.yaml", **kargs):
+    def render_config_template(self, template="packetbeat.yml.j2",
+                               output="packetbeat.yml", **kargs):
         template = self.template_env.get_template(template)
         kargs["pb"] = self
         output_str = template.render(**kargs)
