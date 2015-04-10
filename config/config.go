@@ -50,10 +50,8 @@ type Logging struct {
 }
 
 type Protocol struct {
-	Protocol      string
-	Ports         []int
-	Send_request  bool
-	Send_response bool
+	Protocol string
+	Ports    []int
 }
 
 type Http struct {
