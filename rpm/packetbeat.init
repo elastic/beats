@@ -29,7 +29,7 @@ export PATH
 [ -f /etc/sysconfig/packetbeat ] && . /etc/sysconfig/packetbeat
 pidfile=${PIDFILE-/var/run/packetbeat.pid}
 agent=${PB_AGENT-/usr/bin/packetbeat}
-args="-c /etc/packetbeat/packetbeat.conf"
+args="-c /etc/packetbeat/packetbeat.yml"
 wrapper="packetbeat-god"
 wrapperopts="-r / -n -p $pidfile"
 RETVAL=0

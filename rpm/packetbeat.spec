@@ -30,7 +30,7 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 %files
 /usr/bin/*
 /etc/rc.d/init.d/packetbeat
-%config /etc/packetbeat/packetbeat.conf
+%config /etc/packetbeat/packetbeat.yml
 
 %doc debian/copyright
 
