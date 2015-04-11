@@ -16,8 +16,9 @@ Mercurial) in order to download the source dependencies.
 The location where you clone is important. Please clone under the source
 directory of your GOPATH:
 
-    $ cd $GOPATH/src
-    $ git clone https://github.com/packetbeat/packetbeat.git
+    $ mkdir -p $GOPATH/src/github.com/elastic
+    $ cd $GOPATH/src/github.com/elastic
+    $ git clone https://github.com/elastic/packetbeat.git
 
 To build Packetbeat successfully, first you need to install all the
 dependencies:
