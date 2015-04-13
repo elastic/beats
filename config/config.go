@@ -11,13 +11,10 @@ type Config struct {
 	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
 	Agent      outputs.AgentConfig
-	Input      Input
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging
 	Geoip      outputs.Geoip
-	Udpjson    Udpjson
-	GoBeacon   GoBeacon
 	Filter     map[string]interface{}
 }
 
@@ -34,10 +31,6 @@ type InterfacesConfig struct {
 	Dumpfile       string
 	OneAtATime     bool
 	Loop           int
-}
-
-type Input struct {
-	Inputs []string
 }
 
 type Logging struct {
@@ -99,17 +92,6 @@ type Redis struct {
 	Ports         []int
 	Send_request  *bool
 	Send_response *bool
-}
-
-type Udpjson struct {
-	Bind_ip string
-	Port    int
-	Timeout int
-}
-
-type GoBeacon struct {
-	Listen_addr string
-	Tracker     string
 }
 
 // Config Singleton
