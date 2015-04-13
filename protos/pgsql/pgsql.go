@@ -92,13 +92,16 @@ const (
 )
 
 type Pgsql struct {
-	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
-	results         chan common.MapStr
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
+
+	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
+	results         chan common.MapStr
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -112,27 +115,34 @@ func (pgsql *Pgsql) InitDefaults() {
 	pgsql.Send_response = false
 }
 
-func (pgsql *Pgsql) setFromConfig() error {
-	if config.ConfigSingleton.Pgsql.Max_row_length != nil {
-		pgsql.maxRowLength = *config.ConfigSingleton.Pgsql.Max_row_length
+func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
+
+	pgsql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		pgsql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Pgsql.Max_rows != nil {
-		pgsql.maxStoreRows = *config.ConfigSingleton.Pgsql.Max_rows
+	if config.Max_rows != nil {
+		pgsql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigSingleton.Pgsql.Send_request != nil {
-		pgsql.Send_request = *config.ConfigSingleton.Pgsql.Send_request
+	if config.Send_request != nil {
+		pgsql.Send_request = *config.Send_request
 	}
-	if config.ConfigSingleton.Pgsql.Send_response != nil {
-		pgsql.Send_response = *config.ConfigSingleton.Pgsql.Send_response
+	if config.Send_response != nil {
+		pgsql.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (pgsql *Pgsql) GetPorts() []int {
+	return pgsql.Ports
 }
 
 func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
-		err := pgsql.setFromConfig()
+		err := pgsql.setFromConfig(config.ConfigSingleton.Protocols.Pgsql)
 		if err != nil {
 			return err
 		}

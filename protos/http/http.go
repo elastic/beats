@@ -101,6 +101,7 @@ type HttpTransaction struct {
 
 type Http struct {
 	// config
+	Ports               []int
 	Send_request        bool
 	Send_response       bool
 	Send_headers        bool
@@ -122,41 +123,48 @@ func (http *Http) InitDefaults() {
 	http.Strip_authorization = false
 }
 
-func (http *Http) SetFromConfig() (err error) {
-	if config.ConfigSingleton.Http.Send_request != nil {
-		http.Send_request = *config.ConfigSingleton.Http.Send_request
+func (http *Http) SetFromConfig(config config.Http) (err error) {
+
+	http.Ports = config.Ports
+
+	if config.Send_request != nil {
+		http.Send_request = *config.Send_request
 	}
-	if config.ConfigSingleton.Http.Send_response != nil {
-		http.Send_response = *config.ConfigSingleton.Http.Send_response
+	if config.Send_response != nil {
+		http.Send_response = *config.Send_response
 	}
-	http.Hide_keywords = config.ConfigSingleton.Http.Hide_keywords
-	if config.ConfigSingleton.Http.Strip_authorization != nil {
-		http.Strip_authorization = *config.ConfigSingleton.Http.Strip_authorization
+	http.Hide_keywords = config.Hide_keywords
+	if config.Strip_authorization != nil {
+		http.Strip_authorization = *config.Strip_authorization
 	}
 
-	if config.ConfigSingleton.Http.Send_all_headers != nil {
+	if config.Send_all_headers != nil {
 		http.Send_headers = true
 		http.Send_all_headers = true
 	} else {
-		if len(config.ConfigSingleton.Http.Send_headers) > 0 {
+		if len(config.Send_headers) > 0 {
 			http.Send_headers = true
 
 			http.Headers_whitelist = map[string]bool{}
-			for _, hdr := range config.ConfigSingleton.Http.Send_headers {
+			for _, hdr := range config.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	if config.ConfigSingleton.Http.Split_cookie != nil {
-		http.Split_cookie = *config.ConfigSingleton.Http.Split_cookie
+	if config.Split_cookie != nil {
+		http.Split_cookie = *config.Split_cookie
 	}
 
-	if config.ConfigSingleton.Http.Real_ip_header != nil {
-		http.Real_ip_header = strings.ToLower(*config.ConfigSingleton.Http.Real_ip_header)
+	if config.Real_ip_header != nil {
+		http.Real_ip_header = strings.ToLower(*config.Real_ip_header)
 	}
 
 	return nil
+}
+
+func (http *Http) GetPorts() []int {
+	return http.Ports
 }
 
 const (
@@ -169,7 +177,7 @@ func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 	http.InitDefaults()
 
 	if !test_mode {
-		err := http.SetFromConfig()
+		err := http.SetFromConfig(config.ConfigSingleton.Protocols.Http)
 		if err != nil {
 			return err
 		}
@@ -840,7 +848,7 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	include_body := config.ConfigSingleton.Http.Include_body_for
+	include_body := config.ConfigSingleton.Protocols.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
 			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)

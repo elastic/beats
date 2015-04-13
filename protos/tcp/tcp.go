@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/infrabeat/common"
 	"github.com/elastic/infrabeat/logp"
 
-	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/protos"
 
 	"github.com/packetbeat/gopacket"
@@ -174,18 +173,12 @@ func PrintTcpMap() {
 	fmt.Printf("Streams dict: %v", tcpStreamsMap)
 }
 
-func configToPortsMap(protocols map[string]config.Protocol) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.ProtocolPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
-	var proto protos.Protocol
-	for proto = protos.UnknownProtocol + 1; int(proto) < len(protos.ProtocolNames); proto++ {
+	for proto, protoPlugin := range plugins {
 
-		protoConfig, exists := protocols[protos.ProtocolNames[proto]]
-		if !exists {
-			continue
-		}
-
-		for _, port := range protoConfig.Ports {
+		for _, port := range protoPlugin.GetPorts() {
 			old_proto, exists := res[uint16(port)]
 			if exists {
 				if old_proto == proto {
@@ -201,12 +194,12 @@ func configToPortsMap(protocols map[string]config.Protocol) (map[uint16]protos.P
 	return res, nil
 }
 
-func ConfigToFilter(protocols map[string]config.Protocol) string {
+func BpfFilter() string {
 
 	res := []string{}
 
-	for _, protoConfig := range protocols {
-		for _, port := range protoConfig.Ports {
+	for _, protoPlugin := range protos.Protos.GetAll() {
+		for _, port := range protoPlugin.GetPorts() {
 			res = append(res, fmt.Sprintf("port %d", port))
 		}
 	}
@@ -214,9 +207,9 @@ func ConfigToFilter(protocols map[string]config.Protocol) string {
 	return strings.Join(res, " or ")
 }
 
-func TcpInit(protocols map[string]config.Protocol) error {
+func TcpInit() error {
 	var err error
-	tcpPortMap, err = configToPortsMap(protocols)
+	tcpPortMap, err = buildPortsMap(protos.Protos.GetAll())
 	if err != nil {
 		return err
 	}

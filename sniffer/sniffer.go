@@ -210,8 +210,7 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 }
 
 func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr) error {
-	config.ConfigSingleton.Interfaces.Bpf_filter =
-		tcp.ConfigToFilter(config.ConfigSingleton.Protocols)
+	config.ConfigSingleton.Interfaces.Bpf_filter = tcp.BpfFilter()
 
 	var err error
 	if !test_mode {

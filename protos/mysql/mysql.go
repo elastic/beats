@@ -99,12 +99,15 @@ const (
 )
 
 type Mysql struct {
-	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
+
+	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
 	results chan common.MapStr
 
@@ -120,27 +123,34 @@ func (mysql *Mysql) InitDefaults() {
 	mysql.Send_response = false
 }
 
-func (mysql *Mysql) setFromConfig() error {
-	if config.ConfigSingleton.Mysql.Max_row_length != nil {
-		mysql.maxRowLength = *config.ConfigSingleton.Mysql.Max_row_length
+func (mysql *Mysql) setFromConfig(config config.Mysql) error {
+
+	mysql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		mysql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Mysql.Max_rows != nil {
-		mysql.maxStoreRows = *config.ConfigSingleton.Mysql.Max_rows
+	if config.Max_rows != nil {
+		mysql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigSingleton.Mysql.Send_request != nil {
-		mysql.Send_request = *config.ConfigSingleton.Mysql.Send_request
+	if config.Send_request != nil {
+		mysql.Send_request = *config.Send_request
 	}
-	if config.ConfigSingleton.Mysql.Send_response != nil {
-		mysql.Send_response = *config.ConfigSingleton.Mysql.Send_response
+	if config.Send_response != nil {
+		mysql.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (mysql *Mysql) GetPorts() []int {
+	return mysql.Ports
 }
 
 func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
 
 	mysql.InitDefaults()
 	if !test_mode {
-		err := mysql.setFromConfig()
+		err := mysql.setFromConfig(config.ConfigSingleton.Protocols.Mysql)
 		if err != nil {
 			return err
 		}

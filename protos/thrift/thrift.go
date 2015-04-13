@@ -141,6 +141,7 @@ const (
 type Thrift struct {
 
 	// config
+	Ports                  []int
 	StringMaxSize          int
 	CollectionMaxSize      int
 	DropAfterNStructFields int
@@ -174,57 +175,63 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.Send_response = false
 }
 
-func (thrift *Thrift) readConfig() error {
+func (thrift *Thrift) readConfig(config config.Thrift) error {
 	var err error
 
-	if config.ConfigSingleton.Thrift.String_max_size != nil {
-		thrift.StringMaxSize = *config.ConfigSingleton.Thrift.String_max_size
+	thrift.Ports = config.Ports
+
+	if config.String_max_size != nil {
+		thrift.StringMaxSize = *config.String_max_size
 	}
-	if config.ConfigSingleton.Thrift.Collection_max_size != nil {
-		thrift.CollectionMaxSize = *config.ConfigSingleton.Thrift.Collection_max_size
+	if config.Collection_max_size != nil {
+		thrift.CollectionMaxSize = *config.Collection_max_size
 	}
-	if config.ConfigSingleton.Thrift.Drop_after_n_struct_fields != nil {
-		thrift.DropAfterNStructFields = *config.ConfigSingleton.Thrift.Drop_after_n_struct_fields
+	if config.Drop_after_n_struct_fields != nil {
+		thrift.DropAfterNStructFields = *config.Drop_after_n_struct_fields
 	}
-	if config.ConfigSingleton.Thrift.Transport_type != nil {
-		switch *config.ConfigSingleton.Thrift.Transport_type {
+	if config.Transport_type != nil {
+		switch *config.Transport_type {
 		case "socket":
 			thrift.TransportType = ThriftTSocket
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known", config.ConfigSingleton.Thrift.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", config.Transport_type)
 		}
 	}
-	if config.ConfigSingleton.Thrift.Protocol_type != nil {
-		switch *config.ConfigSingleton.Thrift.Protocol_type {
+	if config.Protocol_type != nil {
+		switch *config.Protocol_type {
 		case "binary":
 			thrift.ProtocolType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known", config.ConfigSingleton.Thrift.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", config.Protocol_type)
 		}
 	}
-	if config.ConfigSingleton.Thrift.Capture_reply != nil {
-		thrift.CaptureReply = *config.ConfigSingleton.Thrift.Capture_reply
+	if config.Capture_reply != nil {
+		thrift.CaptureReply = *config.Capture_reply
 	}
-	if config.ConfigSingleton.Thrift.Obfuscate_strings != nil {
-		thrift.ObfuscateStrings = *config.ConfigSingleton.Thrift.Obfuscate_strings
+	if config.Obfuscate_strings != nil {
+		thrift.ObfuscateStrings = *config.Obfuscate_strings
 	}
-	if len(config.ConfigSingleton.Thrift.Idl_files) > 0 {
-		thrift.Idl, err = NewThriftIdl(config.ConfigSingleton.Thrift.Idl_files)
+	if len(config.Idl_files) > 0 {
+		thrift.Idl, err = NewThriftIdl(config.Idl_files)
 		if err != nil {
 			return err
 		}
 	}
 
-	if config.ConfigSingleton.Thrift.Send_request != nil {
-		thrift.Send_request = *config.ConfigSingleton.Thrift.Send_request
+	if config.Send_request != nil {
+		thrift.Send_request = *config.Send_request
 	}
-	if config.ConfigSingleton.Thrift.Send_response != nil {
-		thrift.Send_response = *config.ConfigSingleton.Thrift.Send_response
+	if config.Send_response != nil {
+		thrift.Send_response = *config.Send_response
 	}
 
 	return nil
+}
+
+func (thrift *Thrift) GetPorts() []int {
+	return thrift.Ports
 }
 
 func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
@@ -232,7 +239,7 @@ func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
 	thrift.InitDefaults()
 
 	if !test_mode {
-		err := thrift.readConfig()
+		err := thrift.readConfig(config.ConfigSingleton.Protocols.Thrift)
 		if err != nil {
 			return err
 		}

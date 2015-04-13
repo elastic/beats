@@ -170,7 +170,7 @@ func main() {
 		protos.Protos.Register(proto, plugin)
 	}
 
-	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
+	if err = tcp.TcpInit(); err != nil {
 		logp.Critical(err.Error())
 		return
 	}

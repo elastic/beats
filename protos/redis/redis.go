@@ -237,6 +237,7 @@ const (
 
 type Redis struct {
 	// config
+	Ports         []int
 	Send_request  bool
 	Send_response bool
 
@@ -250,20 +251,27 @@ func (redis *Redis) InitDefaults() {
 	redis.Send_response = false
 }
 
-func (redis *Redis) setFromConfig() error {
-	if config.ConfigSingleton.Redis.Send_request != nil {
-		redis.Send_request = *config.ConfigSingleton.Redis.Send_request
+func (redis *Redis) setFromConfig(config config.Redis) error {
+
+	redis.Ports = config.Ports
+
+	if config.Send_request != nil {
+		redis.Send_request = *config.Send_request
 	}
-	if config.ConfigSingleton.Redis.Send_response != nil {
-		redis.Send_response = *config.ConfigSingleton.Redis.Send_response
+	if config.Send_response != nil {
+		redis.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (redis *Redis) GetPorts() []int {
+	return redis.Ports
 }
 
 func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
 	redis.InitDefaults()
 	if !test_mode {
-		redis.setFromConfig()
+		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
 	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)

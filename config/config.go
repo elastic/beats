@@ -8,18 +8,13 @@ import (
 
 type Config struct {
 	Interfaces InterfacesConfig
-	Protocols  map[string]Protocol
+	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
 	Agent      outputs.AgentConfig
 	Input      Input
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging
-	Thrift     Thrift
-	Http       Http
-	Mysql      Mysql
-	Pgsql      Pgsql
-	Redis      Redis
 	Geoip      outputs.Geoip
 	Udpjson    Udpjson
 	GoBeacon   GoBeacon
@@ -49,12 +44,16 @@ type Logging struct {
 	Selectors []string
 }
 
-type Protocol struct {
-	Protocol string
-	Ports    []int
+type Protocols struct {
+	Http   Http
+	Mysql  Mysql
+	Pgsql  Pgsql
+	Redis  Redis
+	Thrift Thrift
 }
 
 type Http struct {
+	Ports               []int
 	Send_all_headers    *bool
 	Send_headers        []string
 	Split_cookie        *bool
@@ -67,6 +66,7 @@ type Http struct {
 }
 
 type Mysql struct {
+	Ports          []int
 	Max_row_length *int
 	Max_rows       *int
 	Send_request   *bool
@@ -74,6 +74,7 @@ type Mysql struct {
 }
 
 type Pgsql struct {
+	Ports          []int
 	Max_row_length *int
 	Max_rows       *int
 	Send_request   *bool
@@ -81,6 +82,7 @@ type Pgsql struct {
 }
 
 type Thrift struct {
+	Ports                      []int
 	String_max_size            *int
 	Collection_max_size        *int
 	Drop_after_n_struct_fields *int
@@ -94,6 +96,7 @@ type Thrift struct {
 }
 
 type Redis struct {
+	Ports         []int
 	Send_request  *bool
 	Send_response *bool
 }

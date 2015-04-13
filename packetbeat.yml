@@ -50,36 +50,44 @@ procs:
     - process: app
       cmdline_grep: gunicorn
 
-# Configure which protocols to monitor and the ports where they are
-# running. You can disable a given protocol by commenting out its
-# configuration.
-protocols: 
+############################# Protocols ######################################
+protocols:
   http:
+
+    # Configure the ports where to listen for HTTP traffic. You can disable
+    # the http protocol by commenting the list of ports.
     ports: [80, 8080, 8000, 5000, 8002]
 
+    # Uncomment the following to hide certain parameters in URL or forms attached 
+    # to HTTP requests. The names of the parameters are case insensitive. 
+    # The value of the parameters will be replaced with the 'xxxxx' string.
+    # This is generally useful for avoiding storing user passwords or other
+    # sensitive information.
+    hide_keywords: ['pass', 'password', 'passw']
+
   mysql:
+
+    # Configure the ports where to listen for MySQL traffic. You can disable
+    # MySQL protocol by commenting the list of ports.
     ports: [3306]
 
   pgsql:
+    
+    # Configure the ports where to listen for Pgsql traffic. You can disable
+    # Pgsql protocol by commenting the list of ports.
     ports: [5432]
 
   redis:
+
+    # Configure the ports where to listen for Redis traffic. You can disable
+    # Redis protocol by commenting the list of ports.
     ports: [6379]
 
   thrift:
+    
+    # Configure the ports where to listen for Redis traffic. You can disable
+    # Redis protocol by commenting the list of ports.
     ports: [9090]
-
-
-############################# HTTP protocol ######################################
-http:
-  # Uncomment the following to hide certain parameters in URL or forms attached 
-  # to HTTP requests. The names of the parameters are case insensitive. 
-  # The value of the parameters will be replaced with the 'xxxxx' string.
-  # This is generally useful for avoiding storing user passwords or other
-  # sensitive information.
-  hide_keywords: ['pass', 'password', 'passw']
-
-
 
 ############################# Output ############################################
 
@@ -108,7 +116,7 @@ output:
     save_topology: true
 
   # File as output
-  # Options
+  # Options:
   # path: where to save the files
   # filename: name of the files
   # rotate_every_kb: maximum size of the files in path
