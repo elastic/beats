@@ -13,12 +13,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/infrabeat/common"
-	"github.com/elastic/infrabeat/common/droppriv"
-	"github.com/elastic/infrabeat/filters"
-	"github.com/elastic/infrabeat/filters/nop"
-	"github.com/elastic/infrabeat/logp"
-	"github.com/elastic/infrabeat/outputs"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/common/droppriv"
+	"github.com/elastic/libbeat/filters"
+	"github.com/elastic/libbeat/filters/nop"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/packetbeat/config"

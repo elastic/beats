@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/elastic/infrabeat/common"
-	"github.com/elastic/infrabeat/filters"
-	"github.com/elastic/infrabeat/logp"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/filters"
+	"github.com/elastic/libbeat/logp"
 )
 
 // Executes the filters

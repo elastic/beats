@@ -3,8 +3,8 @@ package protos
 import (
 	"time"
 
-	"github.com/elastic/infrabeat/common"
-	"github.com/elastic/infrabeat/logp"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 )
 
 // ProtocolData interface to represent an upper

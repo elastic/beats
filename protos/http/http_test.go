@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/infrabeat/logp"
+	"github.com/elastic/libbeat/logp"
 )
 
 func HttpModForTests() *Http {

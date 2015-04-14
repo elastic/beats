@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/elastic/infrabeat/common/droppriv"
-	"github.com/elastic/infrabeat/outputs"
+	"github.com/elastic/libbeat/common/droppriv"
+	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/packetbeat/procs"
 )
 
