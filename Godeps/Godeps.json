@@ -10,20 +10,20 @@
 			"Rev": "d0e59c22a56e8dadfed24f74f452cea5a52722d2"
 		},
 		{
-			"ImportPath": "github.com/elastic/infrabeat/common",
-			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+			"ImportPath": "github.com/elastic/libbeat/common",
+			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
 		},
 		{
-			"ImportPath": "github.com/elastic/infrabeat/filters",
-			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+			"ImportPath": "github.com/elastic/libbeat/filters",
+			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
 		},
 		{
-			"ImportPath": "github.com/elastic/infrabeat/logp",
-			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+			"ImportPath": "github.com/elastic/libbeat/logp",
+			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
 		},
 		{
-			"ImportPath": "github.com/elastic/infrabeat/outputs",
-			"Rev": "b923de7944011015cc0e8155f2df8069781c9b02"
+			"ImportPath": "github.com/elastic/libbeat/outputs",
+			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",

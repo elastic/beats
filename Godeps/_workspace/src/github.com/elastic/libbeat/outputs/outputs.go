@@ -3,7 +3,7 @@ package outputs
 import (
 	"time"
 
-	"github.com/elastic/infrabeat/common"
+	"github.com/elastic/libbeat/common"
 )
 
 type OutputInterface interface {

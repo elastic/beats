@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/infrabeat/logp"
+	"github.com/elastic/libbeat/logp"
 )
 
 func Test_Rotator(t *testing.T) {
