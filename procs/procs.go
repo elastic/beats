@@ -226,7 +226,10 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 		return p.Proc.Name
 	}
 
-	if time.Now().Sub(proc.LastMapUpdate) > proc.MaxReadFreq {
+	now := time.Now()
+
+	if now.Sub(proc.LastMapUpdate) > proc.MaxReadFreq {
+		proc.LastMapUpdate = now
 		proc.UpdateMap()
 
 		// try again
@@ -294,7 +297,6 @@ func (proc *ProcessesWatcher) UpdateMap() {
 		}
 	}
 
-	proc.LastMapUpdate = time.Now()
 }
 
 // Parses the /proc/net/tcp file
