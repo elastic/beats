@@ -60,10 +60,10 @@ type ProcessesWatcher struct {
 }
 
 type ProcsConfig struct {
-	Dont_read_from_proc bool
-	Max_proc_read_freq  int
-	Monitored           []ProcConfig
-	Refresh_pids_freq   int
+	Enabled            bool
+	Max_proc_read_freq int
+	Monitored          []ProcConfig
+	Refresh_pids_freq  int
 }
 
 type ProcConfig struct {
@@ -79,11 +79,13 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
 	proc.LastMapUpdate = time.Now()
 
-	proc.ReadFromProc = !config.Dont_read_from_proc
+	proc.ReadFromProc = config.Enabled
 	if proc.ReadFromProc {
 		if runtime.GOOS != "linux" {
 			proc.ReadFromProc = false
 			logp.Info("Disabled /proc/ reading because not on linux")
+		} else {
+			logp.Info("Process matching enabled")
 		}
 	}
 

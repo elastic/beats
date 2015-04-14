@@ -1,6 +1,6 @@
 ################### Packetbeat Agent configuration Example ######################
 
-# This file contains an overview of various configuration settings. Please consult 
+# This file contains an overview of various configuration settings. Please consult
 # the guide at <http://elastic.co/guide> for more details.
 
 # Packetbeat is a distributed application monitoring that works
@@ -25,30 +25,14 @@ agent:
  # by the server on which the agent is installed. This option is useful
  # to remove duplicates if agents are installed on multiple servers.
  # ignore_outgoing: true
- 
+
 ############################# Sniffer ############################################
 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-interfaces: 
+interfaces:
  device: 'any'
 
-
-# Configure the processes to be monitored and how to find them. The processes can
-# be found by searching their command line by a given string.
-procs:
-  monitored:
-    - process: mysqld
-      cmdline_grep: mysqld
-
-    - process: pgsql
-      cmdline_grep: postgres
-
-    - process: nginx
-      cmdline_grep: nginx
-
-    - process: app
-      cmdline_grep: gunicorn
 
 ############################# Protocols ######################################
 protocols:
@@ -72,7 +56,7 @@ protocols:
     ports: [3306]
 
   pgsql:
-    
+
     # Configure the ports where to listen for Pgsql traffic. You can disable
     # Pgsql protocol by commenting the list of ports.
     ports: [5432]
@@ -84,7 +68,7 @@ protocols:
     ports: [6379]
 
   thrift:
-    
+
     # Configure the ports where to listen for Redis traffic. You can disable
     # Redis protocol by commenting the list of ports.
     ports: [9090]
@@ -94,7 +78,7 @@ protocols:
 # Configure what outputs to use when sending the data collected by packetbeat.
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
-  
+
   # Elasticsearch as output
   # Options:
   # host, port: where Elasticsearch is listening on
@@ -127,3 +111,28 @@ output:
     filename: packetbeat
     rotate_every_kb: 1000
     number_of_files: 7
+
+############################# Processes ############################################
+
+# Configure the processes to be monitored and how to find them. If a process is
+# monitored than PacketBeat attempts to use it's name to fill in the `proc` and
+# `client_proc` fields.
+# The processes can be found by searching their command line by a given string.
+#
+# Process matching is optional and can be enabled by uncommenting the following
+# lines.
+#
+#procs:
+#  enabled: false
+#  monitored:
+#    - process: mysqld
+#      cmdline_grep: mysqld
+#
+#    - process: pgsql
+#      cmdline_grep: postgres
+#
+#    - process: nginx
+#      cmdline_grep: nginx
+#
+#    - process: app
+#      cmdline_grep: gunicorn
