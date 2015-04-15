@@ -53,6 +53,23 @@ const (
 	ThriftProtocol
 )
 
+// Protocol names
+var ProtocolNames = []string{
+	"unknown",
+	"http",
+	"mysql",
+	"redis",
+	"pgsql",
+	"thrift",
+}
+
+func (p Protocol) String() string {
+	if int(p) >= len(ProtocolNames) {
+		return "impossible"
+	}
+	return ProtocolNames[p]
+}
+
 // list of protocol plugins
 type Protocols struct {
 	protos map[Protocol]ProtocolPlugin
