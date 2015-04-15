@@ -1,12 +1,11 @@
-################### Packetbeat Agent configuration Example ######################
+################### PacketBeat Agent Configuration Example ######################
 
 # This file contains an overview of various configuration settings. Please consult
-# the guide at <http://elastic.co/guide> for more details.
+# the docs at <http://packetbeat.com/docs/configuration.html> for more details.
 
-# Packetbeat is a distributed application monitoring that works
-# by sniffing the network traffic between your application components.
-#
-#
+# The PacketBeat agent works by sniffing the network traffic between your
+# application components. It inserts meta-data about each transaction into
+# Elasticsearch.
 
 ############################# Agent ############################################
 agent:
@@ -31,7 +30,7 @@ agent:
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
- device: 'any'
+ device: any
 
 
 ############################# Protocols ######################################
@@ -42,12 +41,12 @@ protocols:
     # the http protocol by commenting the list of ports.
     ports: [80, 8080, 8000, 5000, 8002]
 
-    # Uncomment the following to hide certain parameters in URL or forms attached 
-    # to HTTP requests. The names of the parameters are case insensitive. 
+    # Uncomment the following to hide certain parameters in URL or forms attached
+    # to HTTP requests. The names of the parameters are case insensitive.
     # The value of the parameters will be replaced with the 'xxxxx' string.
     # This is generally useful for avoiding storing user passwords or other
     # sensitive information.
-    hide_keywords: ['pass', 'password', 'passw']
+    hide_keywords: ['pass', 'password', 'passwd']
 
   mysql:
 
@@ -93,11 +92,11 @@ output:
   # Options:
   # host, port: where Redis is listening on
   # save_topology: specify if the topology is saved in Redis
-  redis:
-    enabled: false
-    host: localhost
-    port: 6379
-    save_topology: true
+  #redis:
+  #  enabled: true
+  #  host: localhost
+  #  port: 6379
+  #  save_topology: true
 
   # File as output
   # Options:
@@ -105,12 +104,12 @@ output:
   # filename: name of the files
   # rotate_every_kb: maximum size of the files in path
   # number of files: maximum number of files in path
-  file:
-    enabled: false
-    path: "/tmp/packetbeat"
-    filename: packetbeat
-    rotate_every_kb: 1000
-    number_of_files: 7
+  #file:
+  #  enabled: true
+  #  path: "/tmp/packetbeat"
+  #  filename: packetbeat
+  #  rotate_every_kb: 1000
+  #  number_of_files: 7
 
 ############################# Processes ############################################
 
