@@ -17,7 +17,7 @@ agent:
  name:
 
  # The tags of the agent are included in their own field with each
- # transaction published. Tags make it easy to group servers by different
+ # transaction published. Tags make it easy to group transactions by different
  # logical properties.
  #tags: ["service1"]
 
