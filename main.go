@@ -84,6 +84,7 @@ func main() {
 	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
 	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
+	testConfig := cmdLine.Bool("test", false, "Test configuration and exit.")
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -146,18 +147,18 @@ func main() {
 		config.ConfigSingleton.Agent); err != nil {
 
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	if err = procs.ProcWatcher.Init(config.ConfigSingleton.Procs); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip)
 	if err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	logp.Debug("main", "Initializing protocol plugins")
@@ -165,14 +166,14 @@ func main() {
 		err = plugin.Init(false, outputs.Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
-			return
+			os.Exit(1)
 		}
 		protos.Protos.Register(proto, plugin)
 	}
 
 	if err = tcp.TcpInit(); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	over := make(chan bool)
@@ -185,6 +186,7 @@ func main() {
 		LoadConfiguredFilters(config.ConfigSingleton.Filter)
 	if err != nil {
 		logp.Critical("Error loading filters plugins: %v", err)
+		os.Exit(1)
 	}
 	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
 	var afterInputsQueue chan common.MapStr
@@ -207,17 +209,22 @@ func main() {
 	logp.Debug("main", "Initializing sniffer")
 	err = sniff.Init(false, afterInputsQueue)
 	if err != nil {
-		logp.Critical("Ininitializing sniffer failed: %v", err)
-		return
+		logp.Critical("Initializing sniffer failed: %v", err)
+		os.Exit(1)
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
 	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	// Up to here was the initialization, now about running
+
+	if *testConfig {
+		// all good, exit with 0
+		os.Exit(0)
+	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -233,7 +240,7 @@ func main() {
 		err := sniff.Run()
 		if err != nil {
 			logp.Critical("Sniffer main loop failed: %v", err)
-			return
+			os.Exit(1)
 		}
 		over <- true
 	}()

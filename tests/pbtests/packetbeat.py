@@ -28,11 +28,11 @@ class Proc(object):
         return self.proc
 
     def wait(self):
-        self.proc.wait()
+        return self.proc.wait()
 
     def kill_and_wait(self):
         self.proc.terminate()
-        self.proc.wait()
+        return self.proc.wait()
 
     def __del__(self):
         try:
@@ -76,7 +76,7 @@ class TestCase(unittest.TestCase):
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
-            proc.wait()
+            return proc.wait()
 
     def start_packetbeat(self,
                          cmd="../packetbeat",

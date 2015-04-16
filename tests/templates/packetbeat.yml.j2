@@ -1,13 +1,3 @@
-################### Packetbeat Agent configuration Example ######################
-
-# This file contains an overview of various configuration settings. Please consult 
-# the guide at <http://elastic.co/guide> for more details.
-
-# Packetbeat is a distributed application monitoring that works
-# by sniffing the network traffic between your application components.
-#
-#
-
 ############################# Agent ############################################
 agent:
 
@@ -32,20 +22,20 @@ agent:
  # by the server on which the agent is installed. This option is useful
  # to remove duplicates if agents are installed on multiple servers.
  # ignore_outgoing: true
- 
+
 ############################# Sniffer ############################################
 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-interfaces: 
- device: 'any'
+interfaces:
+ device: {{ iface_device|default("any") }}
 
 
 
 # Configure which protocols to monitor and the ports where they are
 # running. You can disable a given protocol by commenting out its
 # configuration.
-protocols: 
+protocols:
   http:
     ports: [{{ http_ports|default([80])|join(", ") }}]
 {% if http_send_request %}    send_request: true{% endif %}
