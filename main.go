@@ -71,7 +71,7 @@ func main() {
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	configfile := cmdLine.String("c", "packetbeat.yml", "Configuration file")
+	configfile := cmdLine.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
