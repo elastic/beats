@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# packetbeat-agent   Packetbeat agent
+# packetbea          Packetbeat agent
 #
 # chkconfig: 2345 98 02
 #
@@ -9,7 +9,7 @@
 #                    filesystem. See http://packetbeat.com
 
 ### BEGIN INIT INFO
-# Provides:          packetbeat-agent
+# Provides:          packetbeat
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
@@ -30,6 +30,7 @@ export PATH
 pidfile=${PIDFILE-/var/run/packetbeat.pid}
 agent=${PB_AGENT-/usr/bin/packetbeat}
 args="-c /etc/packetbeat/packetbeat.yml"
+test_args="-e -test"
 wrapper="packetbeat-god"
 wrapperopts="-r / -n -p $pidfile"
 RETVAL=0
@@ -44,8 +45,17 @@ if status | grep -q -- '-p' 2>/dev/null; then
     pidopts="-p $pidfile"
 fi
 
+test() {
+	$agent $args $test_args
+}
+
 start() {
     echo -n $"Starting packetbeat agent: "
+	test
+	if [ $? -ne 0 ]; then
+		echo
+		return 1
+	fi
     daemon $daemonopts $wrapper $wrapperopts -- $agent $args
     RETVAL=$?
     echo
@@ -69,6 +79,10 @@ stop() {
 #}
 
 restart() {
+	test
+	if [ $? -ne 0 ]; then
+		return 1
+	fi
     stop
     start
 }
