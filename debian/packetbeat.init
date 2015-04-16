@@ -20,8 +20,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="PacketBeat agent software"
 NAME=packetbeat
-#DAEMON=/usr/bin/$NAME
-DAEMON=/home/vagrant/src/github.com/elastic/packetbeat/packetbeat
+DAEMON=/usr/bin/$NAME
 DAEMON_ARGS="-c /etc/packetbeat/packetbeat.yml"
 TEST_ARGS="-e -test"
 PIDFILE=/var/run/packetbeat.pid
