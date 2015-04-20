@@ -38,14 +38,14 @@ restoredeps:
 install: packetbeat go-daemon/god
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
 	install -D go-daemon/god $(DESTDIR)/$(BIN_PATH)/packetbeat-god
-	install -m 644 -D packetbeat.yml $(DESTDIR)/$(CONF_PATH)/packetbeat.yml
+	install -m 644 -D etc/packetbeat.yml $(DESTDIR)/$(CONF_PATH)/packetbeat.yml
 
 .PHONY: dist
 dist: packetbeat go-daemon/god
 	mkdir packetbeat-$(VERSION)
 	cp packetbeat packetbeat-$(VERSION)/
 	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
-	cp packetbeat.yml packetbeat-$(VERSION)/
+	cp etc/packetbeat.yml packetbeat-$(VERSION)/
 	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
 
 .PHONY: gofmt
