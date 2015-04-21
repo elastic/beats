@@ -6,18 +6,25 @@
   "mappings" : {
     "_default_" : {
       "date_detection": false,
+      "_all": {
+        "enabled": true,
+        "omit_norms": true
+      },
       "properties": {
         "request_raw" : {
           "type": "string",
-          "index" : "analyzed"
+          "index" : "analyzed",
+          "omit_norms": true
         },
         "response_raw" : {
           "type": "string",
-          "index" : "analyzed"
+          "index" : "analyzed",
+          "omit_norms": true
         },
         "params": {
           "type": "string",
-          "index": "analyzed"
+          "index": "analyzed",
+          "omit_norms": true
         },
         "@timestamp": {
           "type": "date"
