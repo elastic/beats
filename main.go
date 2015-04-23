@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/libbeat/publisher"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/packetbeat/config"
@@ -71,7 +71,7 @@ func main() {
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	configfile := cmdLine.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
+	configfile := cmdLine.String("c", "packetbeat.yml", "Configuration file")
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
@@ -84,7 +84,6 @@ func main() {
 	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
 	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
-	testConfig := cmdLine.Bool("test", false, "Test configuration and exit.")
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -143,37 +142,31 @@ func main() {
 
 	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
+	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
 		config.ConfigSingleton.Agent); err != nil {
 
 		logp.Critical(err.Error())
-		os.Exit(1)
+		return
 	}
 
 	if err = procs.ProcWatcher.Init(config.ConfigSingleton.Procs); err != nil {
 		logp.Critical(err.Error())
-		os.Exit(1)
-	}
-
-	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip)
-	if err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
+		return
 	}
 
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
-		err = plugin.Init(false, outputs.Publisher.Queue)
+		err = plugin.Init(false, publisher.Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
-			os.Exit(1)
+			return
 		}
 		protos.Protos.Register(proto, plugin)
 	}
 
 	if err = tcp.TcpInit(); err != nil {
 		logp.Critical(err.Error())
-		os.Exit(1)
+		return
 	}
 
 	over := make(chan bool)
@@ -186,12 +179,11 @@ func main() {
 		LoadConfiguredFilters(config.ConfigSingleton.Filter)
 	if err != nil {
 		logp.Critical("Error loading filters plugins: %v", err)
-		os.Exit(1)
 	}
 	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
 	var afterInputsQueue chan common.MapStr
 	if len(filters_plugins) > 0 {
-		runner := NewFilterRunner(outputs.Publisher.Queue, filters_plugins)
+		runner := NewFilterRunner(publisher.Publisher.Queue, filters_plugins)
 		go func() {
 			err := runner.Run()
 			if err != nil {
@@ -203,28 +195,23 @@ func main() {
 		afterInputsQueue = runner.FiltersQueue
 	} else {
 		// short-circuit the runner
-		afterInputsQueue = outputs.Publisher.Queue
+		afterInputsQueue = publisher.Publisher.Queue
 	}
 
 	logp.Debug("main", "Initializing sniffer")
 	err = sniff.Init(false, afterInputsQueue)
 	if err != nil {
-		logp.Critical("Initializing sniffer failed: %v", err)
-		os.Exit(1)
+		logp.Critical("Ininitializing sniffer failed: %v", err)
+		return
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
 	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
 		logp.Critical(err.Error())
-		os.Exit(1)
+		return
 	}
 
 	// Up to here was the initialization, now about running
-
-	if *testConfig {
-		// all good, exit with 0
-		os.Exit(0)
-	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -240,7 +227,7 @@ func main() {
 		err := sniff.Run()
 		if err != nil {
 			logp.Critical("Sniffer main loop failed: %v", err)
-			os.Exit(1)
+			return
 		}
 		over <- true
 	}()
