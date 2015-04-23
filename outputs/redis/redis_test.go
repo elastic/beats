@@ -1,4 +1,4 @@
-package outputs
+package redis
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ func TestTopologyInRedis(t *testing.T) {
 		t.Skip("Skipping topology tests in short mode, because they require REDIS")
 	}
 
-	var redisOutput1 = RedisOutputType{
+	var redisOutput1 = RedisOutput{
 		Index:          "packetbeat",
 		Hostname:       redisAddr,
 		Password:       "",
@@ -21,7 +21,7 @@ func TestTopologyInRedis(t *testing.T) {
 		TopologyExpire: time.Duration(15) * time.Second,
 	}
 
-	var redisOutput2 = RedisOutputType{
+	var redisOutput2 = RedisOutput{
 		Index:          "packetbeat",
 		Hostname:       redisAddr,
 		Password:       "",
@@ -30,7 +30,7 @@ func TestTopologyInRedis(t *testing.T) {
 		TopologyExpire: time.Duration(15) * time.Second,
 	}
 
-	var redisOutput3 = RedisOutputType{
+	var redisOutput3 = RedisOutput{
 		Index:          "packetbeat",
 		Hostname:       redisAddr,
 		Password:       "",

@@ -1,17 +1,19 @@
-package outputs
+package elasticsearch
 
 import (
 	"testing"
 	"time"
+
+	"github.com/elastic/libbeat/outputs"
 )
 
 const elasticsearchAddr = "localhost"
 const elasticsearchPort = 9200
 
-func createElasticsearchConnection() ElasticsearchOutputType {
+func createElasticsearchConnection() ElasticsearchOutput {
 
-	var elasticsearchOutput ElasticsearchOutputType
-	elasticsearchOutput.Init(MothershipConfig{
+	var elasticsearchOutput ElasticsearchOutput
+	elasticsearchOutput.Init(outputs.MothershipConfig{
 		Enabled:       true,
 		Save_topology: true,
 		Host:          elasticsearchAddr,

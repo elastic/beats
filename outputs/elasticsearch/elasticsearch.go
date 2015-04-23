@@ -1,4 +1,4 @@
-package outputs
+package elasticsearch
 
 import (
 	"encoding/json"
@@ -8,13 +8,12 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
-
+	"github.com/elastic/libbeat/outputs"
 	"github.com/packetbeat/elastigo/api"
 	"github.com/packetbeat/elastigo/core"
 )
 
-type ElasticsearchOutputType struct {
-	OutputInterface
+type ElasticsearchOutput struct {
 	Index          string
 	TopologyExpire int
 
@@ -26,7 +25,7 @@ type PublishedTopology struct {
 	IPs  string
 }
 
-func (out *ElasticsearchOutputType) Init(config MothershipConfig, topology_expire int) error {
+func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
 	api.Domain = config.Host
 	api.Port = fmt.Sprintf("%d", config.Port)
@@ -62,7 +61,7 @@ func (out *ElasticsearchOutputType) Init(config MothershipConfig, topology_expir
 	return nil
 }
 
-func (out *ElasticsearchOutputType) EnableTTL() error {
+func (out *ElasticsearchOutput) EnableTTL() error {
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
 			"_ttl": map[string]string{"enabled": "true", "default": "15000"},
@@ -79,14 +78,14 @@ func (out *ElasticsearchOutputType) EnableTTL() error {
 	return nil
 }
 
-func (out *ElasticsearchOutputType) GetNameByIP(ip string) string {
+func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 	name, exists := out.TopologyMap[ip]
 	if !exists {
 		return ""
 	}
 	return name
 }
-func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string) error {
+func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	_, err := core.IndexWithParameters(
 		".packetbeat-topology", /*index*/
@@ -114,7 +113,7 @@ func (out *ElasticsearchOutputType) PublishIPs(name string, localAddrs []string)
 	return nil
 }
 
-func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
+func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 
 	// get all agents IPs from Elasticsearch
 	TopologyMapTmp := make(map[string]string)
@@ -143,7 +142,7 @@ func (out *ElasticsearchOutputType) UpdateLocalTopologyMap() {
 	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
 }
 
-func (out *ElasticsearchOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *ElasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, ts.Year(), ts.Month(), ts.Day())
 	_, err := core.Index(index, event["type"].(string), "", nil, event)
