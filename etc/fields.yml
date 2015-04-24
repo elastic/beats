@@ -13,8 +13,7 @@ env:
   fields:
     - name: agent
       description: >
-          The name of the agent that captured the transaction. If no name is configured, 
-          `hostname` is used.
+          The name of the agent that captured the transaction.
 
     - name: server
       description: >
