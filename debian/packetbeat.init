@@ -5,7 +5,7 @@
 # Required-Stop:     $local_fs $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: PacketBeat
+# Short-Description: Packetbeat
 # Description:       Packetbeat is a troubleshooting and monitoring application
 #                    that works by sniffing the network traffic and the proc
 #                    filesystem. See http://packetbeat.com
@@ -18,7 +18,7 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="PacketBeat agent software"
+DESC="Packetbeat agent software"
 NAME=packetbeat
 DAEMON=/usr/bin/$NAME
 DAEMON_ARGS="-c /etc/packetbeat/packetbeat.yml"

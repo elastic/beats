@@ -1,9 +1,9 @@
-################### PacketBeat Agent Configuration Example ######################
+################### Packetbeat Agent Configuration Example ######################
 
 # This file contains an overview of various configuration settings. Please consult
 # the docs at <http://packetbeat.com/docs/configuration.html> for more details.
 
-# The PacketBeat agent works by sniffing the network traffic between your
+# The Packetbeat agent works by sniffing the network traffic between your
 # application components. It inserts meta-data about each transaction into
 # Elasticsearch.
 
@@ -114,7 +114,7 @@ output:
 ############################# Processes ############################################
 
 # Configure the processes to be monitored and how to find them. If a process is
-# monitored than PacketBeat attempts to use it's name to fill in the `proc` and
+# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
 # `client_proc` fields.
 # The processes can be found by searching their command line by a given string.
 #
