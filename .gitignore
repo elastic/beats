@@ -8,7 +8,8 @@
 *.swo
 *.swn
 packetbeat.test
-coverage.out
+/profile.cov
+/coverage.html
 
 # Folders
 _obj

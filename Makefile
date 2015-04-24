@@ -69,8 +69,8 @@ testlong:
 
 .PHONY: cover
 cover:
-	go test -short -coverprofile=coverage.out
-	go tool cover -html=coverage.out
+	./scripts/coverage.sh
+	go tool cover -html=profile.cov -o coverage.html
 
 .PHONY: benchmark
 benchmark:
