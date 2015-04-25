@@ -11,20 +11,26 @@
         "omit_norms": true
       },
       "properties": {
-        "request_raw" : {
+        "request" : {
           "type": "string",
           "index" : "analyzed",
-          "omit_norms": true
+          "norms": {
+            "enabled": false
+          }
         },
-        "response_raw" : {
+        "response" : {
           "type": "string",
           "index" : "analyzed",
-          "omit_norms": true
+          "norms": {
+            "enabled": false
+          }
         },
         "params": {
           "type": "string",
           "index": "analyzed",
-          "omit_norms": true
+          "norms": {
+            "enabled": false
+          }
         },
         "timestamp": {
           "type": "date"
