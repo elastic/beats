@@ -30,6 +30,14 @@ func Test_CSVDump(t *testing.T) {
 			},
 			Output: "f1,f2\n11\n21,22,23\n",
 		},
+		io{
+			Fields: []string{"f\n\n1", "f\n2"},
+			Rows: [][]string{
+				[]string{"11"},
+				[]string{"2\r\n1", "2\r\n2", "23"},
+			},
+			Output: "f\\n\\n1,f\\n2\n11\n2\\r\\n1,2\\r\\n2,23\n",
+		},
 	}
 
 	for _, test := range tests {
