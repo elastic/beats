@@ -1,7 +1,7 @@
 {
   "template" : "packetbeat-*",
   "settings" : {
-    "index.refresh_interval" : "1s"
+    "index.refresh_interval" : "5s"
   },
   "mappings" : {
     "_default_" : {
