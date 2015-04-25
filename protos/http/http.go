@@ -809,7 +809,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
 	event["params"] = t.Params
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

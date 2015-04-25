@@ -892,7 +892,7 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	event["bytes_out"] = t.Size
 	event["pgsql"] = t.Pgsql
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
