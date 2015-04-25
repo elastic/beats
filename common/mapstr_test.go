@@ -24,6 +24,23 @@ func TestMapStrUpdate(t *testing.T) {
 	assert.Equal(a, MapStr{"a": 1, "b": 3, "c": 4})
 }
 
+func TestMapStrUnion(t *testing.T) {
+	assert := assert.New(t)
+
+	a := MapStr{
+		"a": 1,
+		"b": 2,
+	}
+	b := MapStr{
+		"b": 3,
+		"c": 4,
+	}
+
+	c := MapStrUnion(a, b)
+
+	assert.Equal(c, MapStr{"a": 1, "b": 3, "c": 4})
+}
+
 func TestEnsureTimestampField(t *testing.T) {
 
 	type io struct {
