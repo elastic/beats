@@ -37,6 +37,11 @@
         },
         "client_location": {
           "type": "geo_point"
+        },
+        "tags": {
+          "type": "string",
+          "index": "analyzed",
+          "analyzer": "whitespace"
         }
       },
       "dynamic_templates": [{
