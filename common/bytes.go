@@ -36,7 +36,8 @@ func Ipv4_Ntoa(ip uint32) string {
 		byte(ip>>8), byte(ip))
 }
 
-// ReadString extracts the
+// ReadString extracts the first null terminated string from
+// a slice of bytes.
 func ReadString(s []byte) (string, error) {
 	i := bytes.IndexByte(s, 0)
 	if i < 0 {
