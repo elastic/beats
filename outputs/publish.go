@@ -103,10 +103,10 @@ func (publisher *PublisherType) publishFromQueue() {
 
 func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 
-	// the @timestamp is mandatory
-	ts, ok := event["@timestamp"].(common.Time)
+	// the timestamp is mandatory
+	ts, ok := event["timestamp"].(common.Time)
 	if !ok {
-		return errors.New("Missing '@timestamp' field from event.")
+		return errors.New("Missing 'timestamp' field from event.")
 	}
 
 	// the count is mandatory
