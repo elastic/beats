@@ -28,3 +28,9 @@ testlong:
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./...
+
+.PHONY: cover
+cover:
+	mkdir -p cover
+	./scripts/coverage.sh
+	go tool cover -html=profile.cov -o cover/coverage.html
