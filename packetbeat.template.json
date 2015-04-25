@@ -5,7 +5,6 @@
   },
   "mappings" : {
     "_default_" : {
-      "date_detection": false,
       "_all": {
         "enabled": true,
         "omit_norms": true
