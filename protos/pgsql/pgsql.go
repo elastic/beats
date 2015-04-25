@@ -882,10 +882,10 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if pgsql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if pgsql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["query"] = t.Query
 	event["method"] = t.Method

@@ -1037,7 +1037,7 @@ func (thrift *Thrift) publishTransactions() {
 			}
 
 			if thrift.Send_request {
-				event["request_raw"] = fmt.Sprintf("%s%s", t.Request.Method,
+				event["request"] = fmt.Sprintf("%s%s", t.Request.Method,
 					t.Request.Params)
 			}
 		}
@@ -1051,9 +1051,9 @@ func (thrift *Thrift) publishTransactions() {
 
 			if thrift.Send_response {
 				if !t.Reply.HasException {
-					event["response_raw"] = t.Reply.ReturnValue
+					event["response"] = t.Reply.ReturnValue
 				} else {
-					event["response_raw"] = fmt.Sprintf("Exceptions: %s",
+					event["response"] = fmt.Sprintf("Exceptions: %s",
 						t.Reply.Exceptions)
 				}
 			}

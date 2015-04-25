@@ -718,10 +718,10 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 
 	event["responsetime"] = t.ResponseTime
 	if mysql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if mysql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["method"] = t.Method
 	event["query"] = t.Query

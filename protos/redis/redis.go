@@ -665,10 +665,10 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if redis.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if redis.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)

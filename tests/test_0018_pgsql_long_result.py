@@ -23,7 +23,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["pgsql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[4:]:
@@ -47,7 +47,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["pgsql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[4:]:
@@ -72,7 +72,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["pgsql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 6    # 5 plus header
 
     def test_larger_max_rows(self):
@@ -92,5 +92,5 @@ class Test(TestCase):
         res = objs[0]
         assert res["pgsql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 16    # 15 plus header
