@@ -39,11 +39,6 @@
         "client_location": {
           "type": "geo_point"
         },
-        "tags": {
-          "type": "string",
-          "index": "analyzed",
-          "analyzer": "whitespace"
-        },
         "query": {
           "type": "string",
           "index": "not_analyzed",
