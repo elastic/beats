@@ -69,7 +69,7 @@ testlong:
 
 .PHONY: cover
 cover:
-	mkdir cover
+	mkdir -p cover
 	./scripts/coverage.sh
 	go tool cover -html=profile.cov -o cover/coverage.html
 
