@@ -117,8 +117,8 @@ type Http struct {
 }
 
 func (http *Http) InitDefaults() {
-	http.Send_request = false
-	http.Send_response = false
+	http.Send_request = true
+	http.Send_response = true
 }
 
 func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
@@ -277,8 +277,6 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 	var cont, ok, complete bool
 	m := s.message
-
-	logp.Debug("http", "Stream state=%d", s.parseState)
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
@@ -848,25 +846,28 @@ func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 
 	if m.IsRequest {
 		// byte64 != encryption, so remove it from headers in case of Basic Authentication
-		auth_text := []byte("Authorization:")
-		if http.Strip_authorization && (m.Headers["authorization"] != "") {
-			header_len := m.bodyOffset - m.headerOffset
-			val_start_x := bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
-			val_end_x := -1
-			if val_start_x != -1 {
-				val_end_x = bytes.Index(msg[m.headerOffset+val_start_x:m.bodyOffset], []byte("\r\n"))
+		auth_text := []byte("uthorization:")   // [aA]
+		if http.Strip_authorization {
 
-				if val_end_x < 0 || val_end_x > header_len {
-					val_end_x = header_len
+			authheader_start_x := m.headerOffset + bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
+			authheader_end_x := m.bodyOffset
+			
+			if authheader_start_x >= m.headerOffset {
+
+				authheader_end_x = authheader_start_x + bytes.Index(msg[authheader_start_x:m.bodyOffset], []byte("\r\n"))
+				if authheader_end_x < authheader_start_x || authheader_end_x > m.bodyOffset {
+					authheader_end_x = m.bodyOffset
 				}
-				start_index := m.headerOffset + val_start_x + len(auth_text)
-				end_index := m.headerOffset + val_end_x
+				logp.Debug("http", "Strip authorization from %d to %d", authheader_start_x, authheader_end_x)
 
-				for i := start_index; i < end_index; i++ {
+				for i := authheader_start_x + len(auth_text); i < authheader_end_x; i++ {
 					msg[i] = byte('*')
 				}
+			} 
+
+			if m.Headers["authorization"] != "" {
+				m.Headers["authorization"] = "*"
 			}
-			m.Headers["authorization"] = "*"
 		}
 	}
 }

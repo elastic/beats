@@ -832,8 +832,8 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
 	if ok != true || complete != false {
 		t.Error("Wrong return values", ok, complete)
-	}
 
+	}
 	stream.data = append(stream.data, msgs[1]...)
 
 	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
@@ -980,4 +980,84 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	if strings.Contains(params, "secret") {
 		t.Errorf("Failed to censor the password: %s", msg)
 	}
+}
+
+func TestHttpParser_StripAuthorization(t *testing.T) {
+
+	http := HttpModForTests()
+	http.Strip_authorization = true
+	http.Send_headers = true
+	http.Send_all_headers = true
+
+	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
+		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
+		"Content-Type: text/xml; charset=utf-8\r\n" +
+		"SOAPAction: \"\"\r\n" +
+		"Authorization: Basic ZHVtbXk6NmQlc1AwOC1XemZ3Cg\r\n" +
+		"Host: production.example.com\r\n" +
+		"Content-Length: 0\r\n" +
+		"Expect: 100-continue\r\n" +
+		"Accept-Encoding: gzip\r\n" +
+		"X-Forwarded-For: 10.216.89.132\r\n" +
+		"\r\n")
+
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
+
+	ok, _ := http.messageParser(stream)
+
+	msg := stream.data[stream.message.start:]
+	http.hideHeaders(stream.message, msg)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if stream.message.Headers["authorization"] != "*" {
+		t.Errorf("Failed to strip authorization header: " + stream.message.Headers["authorization"])
+	}
+
+	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*"))
+        if raw_message_obscured < 0 {
+		t.Errorf("Obscured authorization string not found: " + string(msg[:]) )
+	}
+
+}
+
+
+func TestHttpParser_StripAuthorization_raw(t *testing.T) {
+
+	http := HttpModForTests()
+	http.Strip_authorization = true
+	http.Send_headers = false
+	http.Send_all_headers = false
+	
+	data := []byte("POST / HTTP/1.1\r\n" +
+		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
+		"accept: */*\r\n" +
+		"authorization: Company 1\r\n" +
+		"content-length: 0\r\n" +
+		"connection: close\r\n" +
+		"\r\n")
+
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	msg := stream.data[stream.message.start:]
+	http.hideHeaders(stream.message, msg)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+
+	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*\r\n"))
+        if raw_message_obscured < 0 {
+		t.Errorf("Obscured authorization string not found: " + string(msg[:]) )
+	}
+
+
 }
