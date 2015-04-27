@@ -1,0 +1,13 @@
+= Packetbeat user manual
+
+== Introduction
+
+http://packetbeat.com[Packetbeat] is an distributed application monitoring
+and performance management solution. It can help you easily notice issues
+with your back-end application, like bugs or performance problems, and it makes
+troubleshooting them - and therefore fixing them - much faster.
+
+This manual covers the general architecture, installing and using Packetbeat in
+daily operations.
+
+include::./overview.asciidoc[]
