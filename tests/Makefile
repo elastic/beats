@@ -9,4 +9,4 @@ env/bin/activate: requirements.txt
 .PHONY: test
 test: env
 	make -C ..
-	. env/bin/activate; nosetests
+	. env/bin/activate; nosetests --processes=4

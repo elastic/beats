@@ -138,10 +138,15 @@ class TestCase(unittest.TestCase):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
-        # update the last_run link
-        if os.path.islink("last_run"):
-            os.unlink("last_run")
-        os.symlink("run/{}".format(self.id()), "last_run")
+        try:
+            # update the last_run link
+            if os.path.islink("last_run"):
+                os.unlink("last_run")
+            os.symlink("run/{}".format(self.id()), "last_run")
+        except:
+            # symlink is best effort and can fail when
+            # running tests in parallel
+            pass
 
         self.expected_fields, self.dict_fields = self.load_fields()
 
