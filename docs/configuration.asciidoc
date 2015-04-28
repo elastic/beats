@@ -46,8 +46,9 @@ agent:
   topology_expire: 15
 ------------------------------------------------------------------------------
 
+==== Options
 
-==== Name
+===== name
 
 The name of the Packetbeat agent. If empty, the `hostname` of the server is
 used. This information is included in each transaction (the `agent` field)
@@ -56,10 +57,18 @@ a single agent.
 
 At startup, every Packetbeat agent registers itself to the network topology by
 publishing to Elasticsearch the IP and port together with its agent name. This
-information is used to set both the ``server`` and ``client_server`` fields
+information is used to set both the `server` and `client_server` fields
 from transactions even when they are sniffed by another agent.
 
-==== Tags
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+agent:
+  name: "my-agent"
+------------------------------------------------------------------------------
+
+===== tags
 
 The tags of the agent are included in the `tags` field with each transaction
 published. Tags make it easy to group servers by different logical properties.
@@ -67,7 +76,15 @@ For example, if you have a cluster of web servers, you can add to the agents on
 each of them the tag "webservers" and then use filters and queries in the
 Kibana web interface to get visualisations for the whole group of servers.
 
-==== Ignore outgoing
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+agent:
+  tags: ["my-service", "hardware", "test"]
+------------------------------------------------------------------------------
+
+===== ignore_outgoing
 
 If the `ignore_outgoing` option is enabled, Packetbeat agent ignores all the
 transactions initiated from the server running the agent.
@@ -98,28 +115,47 @@ Published transactions (ignore outgoing is true):
  - Agent2: t1
  - Agent3: t2
 
-==== Refresh topology freq
+===== refresh_topology_freq
 
-The `refresh_topology_freq` settings controls the refreshing interval of the
-topology map in seconds. In other words, how often each agent publishes its IP
-addresses to the topology map. The default is 10 seconds.
+This setting settings controls the refreshing interval of the topology map in
+seconds. In other words, how often each agent publishes its IP addresses to the
+topology map. The default is 10 seconds.
 
-==== Topology expire
+===== topology_expire
 
-The `topology_expire` setting controls the expiration time for the topology in
-seconds. This is useful in case an agent stops publishing its IP addresses.
-The IP addresses are removed automatically from the topology map after
-expiration. The default is 15 seconds.
+This setting controls the expiration time for the topology in seconds. This is
+useful in case an agent stops publishing its IP addresses.  The IP addresses
+are removed automatically from the topology map after expiration. The default
+is 15 seconds.
 
 
 [[configuration-interfaces]]
 === Interfaces
 
-////
-TODO: add a sample configuration of the whole section.
-////
+The `interfaces` section configures the sniffer. Here is a sample
+configuration:
 
-==== Device
+[source,yaml]
+------------------------------------------------------------------------------
+# Select the network interfaces to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
+interfaces:
+  # On which devices to sniff
+  device: any
+
+  # The maximum capture size of a single packet.
+  snaplen: 1514
+
+  # The type of the sniffer to use
+  type: af_packet
+
+  # The size of the sniffing buffer
+  buffer_size_mb: 100
+------------------------------------------------------------------------------
+
+==== Options
+
+===== device
 
 Configures the network devices from which the traffic is
 captured. The configured device is set automatically in promiscuous mode,
@@ -128,7 +164,6 @@ meaning that it can capture traffic from other hosts of the same LAN.
 [source,yaml]
 ------------------------------------------------------------------------------
 interfaces:
-  # Select on which network interfaces to sniff.
   device: eth0
 ------------------------------------------------------------------------------
 
@@ -141,11 +176,11 @@ NOTE: When using the "any" device, the interfaces are not set
       in promiscuous mode.
 
 
-==== Snaplen
+===== snaplen
 
-The *snaplen* option controls the maximum size of the packets to capture. You
+The `snaplen` option controls the maximum size of the packets to capture. You
 generally want to set this to the MTU size used in your network. If the
-capturing *device* is "any" or "lo", the default value of this parameter is
+capturing device is "any" or "lo", the default value of this parameter is
 16436. Otherwise, it is 1514.
 
 [source,yaml]
@@ -155,20 +190,20 @@ interfaces:
   snaplen: 2500
 ------------------------------------------------------------------------------
 
-==== Type
+===== type
 
 Packetbeat supports three sniffer types:
 
- * **pcap** which uses the libpcap library and works on most platforms, but
+ * `pcap` which uses the libpcap library and works on most platforms, but
    it's not the fastest option.
- * **af_paket** which uses memory mapped sniffing. It is faster than libpcap
+ * `af_paket` which uses memory mapped sniffing. It is faster than libpcap
    and doesn't require a kernel module, but it's Linux specific.
- * **pf_ring** which makes use of an ntop.org
+ * `pf_ring` which makes use of an ntop.org
    http://www.ntop.org/products/pf_ring/[project]. This will get you the best
    sniffing speed but requires a kernel module and is Linux specific.
 
-The default sniffer is `pcap`. To switch between the sniffer types, add a line
-to the `interfaces` section:
+The default sniffer is `pcap`. Here is an example configuration that switches
+to the `af_packet` sniffing type:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -182,12 +217,12 @@ we recommend trying the `af_packet` and `pf_ring` options. Read this
 http://packetbeat.com/blog/sniffing-performance-and-ipv6.html[blog post]
 for some details.
 
-If you use the `af_packet` sniffer, you can tune it's behaviour with the
+If you use the `af_packet` sniffer, you can tune its behaviour with the
 following options:
 
-==== Buffer size
+===== buffer_size_mb
 
-The `buffer_size_mb` option controls the maximum size of the shared memory buffer to use
+This option controls the maximum size of the shared memory buffer to use
 between the kernel and user space. A bigger buffer usually results in lower CPU
 usage, but consumes more memory. This setting is only available for the
 `af_packet` sniffer type. The default is 30 MB.
@@ -235,9 +270,11 @@ protocols:
     ports: [9090]
 ------------------------------------------------------------------------------
 
+==== Common protocol options
+
 The following options are available for all protocols:
 
-==== Ports
+===== ports
 
 The Packetbeat agent installs a BPF filter based on the ports configured in
 this section.
@@ -245,19 +282,19 @@ If a packet doesn't match the filter, very little CPU is required to discard
 the packet. The agent also uses the ports configured here to decide which
 parser to use for each packet.
 
-==== Send request
+===== send_request
 
-If the `send_request` option is enabled, the raw message of the request
-(`request` field) is sent to Elasticsearch. The default is false. This is
-useful in case you want to index the whole request. Note that for HTTP, the
-body is not included by default, only the HTTP headers.
+If this option is enabled, the raw message of the request (`request` field) is
+sent to Elasticsearch. The default is false. This is useful in case you want to
+index the whole request. Note that for HTTP, the body is not included by
+default, only the HTTP headers.
 
-==== Send response
+===== send_response
 
-If the `send_response` option is enabled, the raw message of the response
-(`response` field) is sent to Elasticsearch. The default is false.  This is
-useful in case you want to index the whole request. Note that for HTTP, the
-body is not included by default, only the HTTP headers.
+If this option is enabled, the raw message of the response (`response` field)
+is sent to Elasticsearch. The default is false.  This is useful in case you
+want to index the whole request. Note that for HTTP, the body is not included
+by default, only the HTTP headers.
 
 
 ==== HTTP configuration
