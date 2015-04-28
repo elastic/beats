@@ -1,0 +1,80 @@
+== Troubleshooting
+
+If you suspect an issue with the Packetbeat agent itself, please read the
+following tips and send us the logs and, if possible, a traffic trace.
+You can open issues on
+https://github.com/packetbeat/packetbeat/issues?state=open[GitHub] or by
+mailto:info@packetbeat.com[emailing us].
+
+=== Running in foreground and enabling debugging
+
+By default, Packetbeat sends all its output to syslog. You can use the ``-e``
+command line flag to direct the output at stderr instead:
+
+[source,shell]
+-----------------------------------------------
+packetbeat -e -c /etc/packetbeat/packetbeat.yml
+-----------------------------------------------
+
+You can increase the verbosity by enabling one or more debug selectors. For
+example, to view which transactions are published, you can start the agent like
+this:
+
+[source,shell]
+------------------------------------------------------------
+packetbeat -e -c /etc/packetbeat/packetbeat.yml -d "publish"
+------------------------------------------------------------
+
+You can enable multiple debug selectors by separating them with comas. For
+example, if you want to also see the mysql parsing messages, run:
+
+[source,shell]
+---------------------------------------------------------------------------------
+packetbeat -e -c /etc/packetbeat/packetbeat.conf -d "publish,mysql,mysqldetailed"
+---------------------------------------------------------------------------------
+
+Here is the list of all available debug selectors:
+
+* http
+* httpdetailed
+* ip
+* mysql
+* mysqldetailed
+* pcapfilter
+* pcapread
+* pgsql
+* pgsqldetailed
+* procs
+* procsdetailed
+* publish
+* redis
+* sockets
+* tcp
+* thrift
+* thriftdetailed
+
+=== Recording a trace
+
+If you are having an issue, it is often useful to record a full network trace
+and send it to us. It will help us reproduce the issue and we can also add it to our
+automatic regression tests so that the problem never reoccurs. A trace of
+10-20 seconds is usually enough. To record it, you would typically use
+`tcpdump` like this:
+
+[source,shell]
+---------------------------------
+tcpdump -i any -s0 -w"trace.pcap"
+---------------------------------
+
+If you want to record a single protocol, it is useful to filter
+the traffic by port numbers. For example, to record only mysql traffic:
+
+[source,shell]
+---------------------------------------------
+tcpdump -i any -s0 -w"trace.pcap" "port 3306"
+---------------------------------------------
+
+Please send the trace at mailto:info@packetbeat.com[info@packetbeat.com] and
+also indicate if it's ok to include the trace in our test suite (without making
+it public).
+
