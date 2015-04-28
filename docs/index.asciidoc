@@ -11,4 +11,5 @@ This manual covers the general architecture, installing and using Packetbeat in
 daily operations.
 
 include::./overview.asciidoc[]
+include::./configuration.asciidoc[]
 include::./troubleshooting.asciidoc[]
