@@ -13,7 +13,7 @@ for dir in $(find . -maxdepth 10 -not -path './.git*' -not -path '*/_*' -type d)
 do
 if ls $dir/*.go &> /dev/null; then
     echo $dir
-    go test -short -covermode=count -coverprofile=$dir/profile.tmp $dir
+    go test -covermode=count -coverprofile=$dir/profile.tmp $dir
     if [ -f $dir/profile.tmp ]
     then
         cat $dir/profile.tmp | tail -n +2 >> profile.cov
