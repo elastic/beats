@@ -57,7 +57,7 @@ func TestUdpJson(t *testing.T) {
 	assert.True(t, ok)
 
 	obj = <-events
-	assert.Equal(t, obj["obj2"].(float64), 4)
+	assert.Equal(t, obj["obj2"].(float64), 4.0)
 
 	server.Stop()
 }
