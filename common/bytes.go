@@ -7,6 +7,7 @@ import (
 )
 
 // Byte order utilities
+
 func Bytes_Ntohs(b []byte) uint16 {
 	return uint16(b[0])<<8 | uint16(b[1])
 }
@@ -28,12 +29,15 @@ func Bytes_Ntohll(b []byte) uint64 {
 		uint64(b[6])<<8 | uint64(b[7])
 }
 
+// Ipv4_Ntoa transforms an IP4 address in it's dotted notation
 func Ipv4_Ntoa(ip uint32) string {
 	return fmt.Sprintf("%d.%d.%d.%d",
 		byte(ip>>24), byte(ip>>16),
 		byte(ip>>8), byte(ip))
 }
 
+// ReadString extracts the first null terminated string from
+// a slice of bytes.
 func ReadString(s []byte) (string, error) {
 	i := bytes.IndexByte(s, 0)
 	if i < 0 {

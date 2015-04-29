@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -19,7 +18,7 @@ import (
 
 type PublisherType struct {
 	name           string
-	tags           string
+	tags           []string
 	disabled       bool
 	Index          string
 	Output         []outputs.OutputInterface
@@ -92,10 +91,10 @@ func (publisher *PublisherType) publishFromQueue() {
 
 func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 
-	// the @timestamp is mandatory
-	ts, ok := event["@timestamp"].(common.Time)
+	// the timestamp is mandatory
+	ts, ok := event["timestamp"].(common.Time)
 	if !ok {
-		return errors.New("Missing '@timestamp' field from event.")
+		return errors.New("Missing 'timestamp' field from event.")
 	}
 
 	// the count is mandatory
@@ -269,9 +268,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
 	}
 
-	if len(agent.Tags) > 0 {
-		publisher.tags = strings.Join(agent.Tags, " ")
-	}
+	publisher.tags = agent.Tags
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
