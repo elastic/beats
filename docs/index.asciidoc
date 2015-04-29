@@ -13,4 +13,5 @@ daily operations.
 include::./overview.asciidoc[]
 include::./gettingstarted.asciidoc[]
 include::./configuration.asciidoc[]
+include::./fields.asciidoc[]
 include::./troubleshooting.asciidoc[]
