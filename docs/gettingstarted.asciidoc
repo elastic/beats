@@ -1,4 +1,6 @@
-== Getting started (Manual installation)
+
+[[packetbeat-getting-started]]
+== Getting started
 
 
 The best way to understand the value of an application monitoring system like
