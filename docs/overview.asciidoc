@@ -1,28 +1,27 @@
 == Overview
 
-The Packetbeat system consists of the following mandatory components:
+Packetbeat is a real-time wire data analyzer that can be used together
+with the ELK stack to provide an application monitoring and performance
+management system.
 
- * The Packetbeat agent
+It works by capturing the network traffic between your application servers,
+decoding the application layer protocols (HTTP, MySQL, Redis, etc.),
+correlating the requests with the responses into transactions and recording the
+interesting <<exported-fields,fields>> for each transaction.
+
+It can help you easily notice issues with your back-end application, like bugs
+or performance problems, and it makes troubleshooting them - and therefore
+fixing them - much faster.
+
+The system consists of the following mandatory components:
+
+ * Packetbeat
  * Elasticsearch
  * Kibana
 
-In addition, the following components can be used in more complex
-architectures:
-
- * Logstash
- * Redis
-
-Optionally, http://logstash.net[Logstash] can be installed side-by-side with
-Packetbeat on the applications servers for gathering the log files. The same
-Elasticsearch and Kibana instance that are used for analysing the network
-traffic gathered by Packetbeat can be used for analysing the log files gathered
-by Logstash. This way, you can have network traffic and log analysis in the
-same system.
-
-=== Packetbeat agent
 
 Packetbeat agents sniff the traffic between your servers, parse on the fly the
-application level protocols and correlates the messages into transactions.
+application level protocols and correlate the messages into transactions.
 Currently, the Packetbeat agent supports the following protocols:
 
  * HTTP
@@ -34,35 +33,30 @@ Currently, the Packetbeat agent supports the following protocols:
 The agents can insert the correlated transactions directly into Elasticsearch
 or via a central queue created with Redis and Logstash.
 
-The agents can run on the same servers as your application processes or on
-their own servers. When running on dedicated servers, they can get the traffic
-from the switches mirror ports or from tapping devices. In such a deployment,
-there is zero overhead on the monitored application!
-
-=== Elasticsearch
+Packetbeat agents can run on the same servers as your application processes or
+on their own servers. When running on dedicated servers, they can get the
+traffic from the switches mirror ports or from tapping devices. In such a
+deployment, there is zero overhead on the monitored application. See
+<<capturing-options>> for details.
 
 After decoding the Layer 7 messages, Packetbeat correlates the requests with
 the responses in what we call "transactions" and for each such transaction it
-inserts a JSON document into http://elastic.co[Elastcisearch].
-Elasticsearch is a popular search and analytics engine that is well fitted for
-storing and analysing the kind of data that the Packetbeat agents are producing.
+inserts a JSON document into Elastcisearch. See the <<exported-fields>> section
+for details about which fields are indexed.
+
+////
+TODO: fix these screenshots, they have Packetabeat in the name.
+////
 
 image:./images/packetbeat-overview.png[Packetbeat Overview]
 
+The same Elasticsearch and Kibana instance that are used for analysing the
+network traffic gathered by Packetbeat can be used for analysing the log files
+gathered by Logstash. This way, you can have network traffic and log analysis
+in the same system.
 
-=== Redis + Logstash (optional)
-
-Starting with Packetbeat version 0.3.0, the agents can also insert the transactions
-in a Redis list. This makes it possible to use Redis + Logstash as a central collector
-and queue for transactions data. See <<packetbeat-logstash>> for details.
+Packetbeat can also insert the transactions in a Redis list. This makes it
+possible to use Redis + Logstash as a central collector and queue for
+transactions data. See <<packetbeat-logstash>> for details.
 
 image:./images/packetbeat-redis-overview.png[Logstash Integration]
-
-=== Kibana
-
-The last component of the Packetbeat system is http://kibana.org[Kibana] which
-provides the user interface layer. Kibana is a flexible analytics/BI UI
-application that can display widgets like histogram charts, time series,
-trends, etc. The Packetbeat version of Kibana includes custom widgets as well
-as pre-made dashboards that are designed to make performance analysis easy.
-

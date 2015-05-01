@@ -1,3 +1,4 @@
+[[capturing-options]]
 == Traffic capturing options
 
 There are two main ways of deploying the Packetbeat agent:

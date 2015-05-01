@@ -70,6 +70,7 @@ def fields_to_asciidoc(input, output):
 This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
+[[exported-fields]]
 == Exported fields
 
 This document describes the fields that are exported by the
@@ -80,6 +81,7 @@ following categories:
 
     for doc, _ in SECTIONS:
         output.write("* <<exported-fields-{}>>\n".format(doc))
+    output.write("\n")
 
     docs = yaml.load(input)
 

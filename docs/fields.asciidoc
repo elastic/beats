@@ -3,6 +3,7 @@
 This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
+[[exported-fields]]
 == Exported fields
 
 This document describes the fields that are exported by the
@@ -18,6 +19,7 @@ following categories:
 * <<exported-fields-measurements>>
 * <<exported-fields-env>>
 * <<exported-fields-raw>>
+
 [[exported-fields-event]]
 === Event fields
 
