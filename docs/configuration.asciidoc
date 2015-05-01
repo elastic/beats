@@ -410,7 +410,7 @@ default is 10 rows in order to publish data as little as needed.
 Maximum length in bytes of a row from the SQL message to publish to
 Elasticsearch. The default is 1024 bytes.
 
-
+[[configuration-thrift]]
 ==== Thrift configuration
 
 Thrift protocol has several specific configuration options. Here is a

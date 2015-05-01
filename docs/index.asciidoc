@@ -12,6 +12,8 @@ include::./fields.asciidoc[]
 
 include::./logstash.asciidoc[]
 
+include::./thrift.asciidoc[]
+
 include::./windows.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
