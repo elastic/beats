@@ -1,3 +1,4 @@
+[[packetbeat-logstash]]
 == Using Packetbeat with Logstash
 
 Our <<packetbeat-getting-started>> guide walks you through installing the

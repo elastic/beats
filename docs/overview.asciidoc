@@ -54,7 +54,7 @@ image:./images/packetbeat-overview.png[Packetbeat Overview]
 
 Starting with Packetbeat version 0.3.0, the agents can also insert the transactions
 in a Redis list. This makes it possible to use Redis + Logstash as a central collector
-and queue for transactions data.
+and queue for transactions data. See <<packetbeat-logstash>> for details.
 
 image:./images/packetbeat-redis-overview.png[Logstash Integration]
 
