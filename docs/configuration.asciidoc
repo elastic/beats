@@ -592,6 +592,7 @@ An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
+[[redis-output]]
 ==== Redis Output
 
 ////

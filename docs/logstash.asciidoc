@@ -1,0 +1,73 @@
+== Using Packetbeat with Logstash
+
+Our <<packetbeat-getting-started>> guide walks you through installing the
+simplest architecture for the Packetbeat system. This is nice and easy to get
+started with and enough for networks with small traffic. It also uses the
+minimum amount of servers: a single machine running Elasticsearch + Kibana. The
+Packetbeat agents insert the transactions directly into the Elasticsearch
+instance.
+
+While this is easy to get started with, if your application has to support
+significant traffic, it is wise to use multiple servers (or virtual machines)
+for your monitoring system.
+
+This article explains how to use Packetbeat together with Redis and Logstash to
+provide buffering and efficient indexing.  Another important advantage is that
+you have the opportunity in Logstash to modify the data captured by Packetbeat
+any way you like.
+
+image:./images/packetbeat_logstash.png[Integration with Logstash]
+
+In this setup, the Packetbeat agents use the `RPUSH` Redis command to insert
+into a list stored in memory by Redis. Logstash reads from this key using the
+http://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis
+input plugin] and then sends the transactions to Elasticsearch using the
+http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
+output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
+indexing very efficient.
+
+Use the <<redis-output,Redis output>> in the Packetbeat configuration file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  redis:
+    # Uncomment out this option if you want to output to Redis.
+    # The default is false.
+    enabled: true
+
+    # Set the host and port where to find Redis.
+    host: "192.168.33.13"
+    port: 6379
+    save_topology: true
+------------------------------------------------------------------------------
+
+NOTE: If you want Packetbeat to monitor Redis traffic, it's better to change
+the port for the Redis instance that you use for collecting the traffic.
+Otherwise, you create a loop where the agent captures the traffic it sends.
+
+Then, configure Logstash to read from Redis and index into Elasticsearch. Here
+is a sample configuration that you can save under `/etc/logstash/conf.d/`:
+
+[source,ruby]
+------------------------------------------------------------------------------
+input {
+    redis {
+        codec => "json"
+        host => "127.0.0.1"
+        port => 6380
+        data_type => "list"
+        key => "packetbeat"
+    }
+}
+
+output {
+    elasticsearch {
+        protocol => "http"
+        host => "192.168.33.14"
+        sniffing => true
+        manage_template => false
+        index => "packetbeat-%{+YYYY.MM.dd}"
+    }
+}
+------------------------------------------------------------------------------
