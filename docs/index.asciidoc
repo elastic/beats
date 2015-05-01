@@ -16,6 +16,8 @@ include::./gettingstarted.asciidoc[]
 
 include::./configuration.asciidoc[]
 
+include::./capturing.asciidoc[]
+
 include::./fields.asciidoc[]
 
 include::./logstash.asciidoc[]
