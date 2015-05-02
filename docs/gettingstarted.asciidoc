@@ -206,13 +206,14 @@ An
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
 template file can be found
-https://github.com/packetbeat/packetbeat/blob/v$PACKETBEAT_VERSION/packetbeat.template.json[here].
+https://github.com/packetbeat/packetbeat/blob/v$PACKETBEAT_VERSION/etc/packetbeat.template.json[here].
 Grab it and load it with the following commands:
 
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O 'https://raw.githubusercontent.com/packetbeat/packetbeat/v$PB_VERSION/packetbeat.template.json'
+curl -L -O
+'https://raw.githubusercontent.com/packetbeat/packetbeat/v$PB_VERSION/etc/packetbeat.template.json'
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
