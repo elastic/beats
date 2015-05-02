@@ -1,0 +1,30 @@
+== Sample dashboards
+
+In order to make it as easy as possible to get application performance insights
+from wire network data, we provide a few sample Kibana dashboards. The
+dashboards are maintained in this
+https://github.com/elastic/packetbeat-dashboards[GitHub repository], which also
+includes instructions for loading them.
+
+image:./images/performance-dashboard.png[Application performance dashboard]
+
+The project currently contains the following dashboards:
+
+* *Performance dashboard*: contains platform wide visualizations, including the
+  map of the client locations, request per minute counts for each protocol, the
+  latency distribution diagram and the response times percentiles.
+
+* *MySQL performance*: This page demonstrates more advanced statistics like the
+  top 10 slow MySQL queries, most frequent MySQL queries, the database
+  throughput or the database response times.
+
+* *PostgreSQL performance*: Similar with MySQL Performance dashboard, but for
+  Postgres.
+
+* *Thrift-RPC performance*: This one is great for monitoring Thrift based
+  services. It includes widgets like "Top slowest Thrift-RPC methods" or "Top
+  Thrift-RPC calls with errors".
+
+These dashboards are provided as examples, we recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to your needs.
