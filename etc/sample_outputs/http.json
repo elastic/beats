@@ -1,5 +1,5 @@
 {
-  "@timestamp": "2015-04-23T08:42:15.822Z",
+  "timestamp": "2015-04-26T08:42:15.822Z",
   "agent": "vagrant",
   "client_ip": "10.0.2.15",
   "client_port": 52980,
@@ -33,11 +33,11 @@
   "port": 80,
   "proc": "",
   "query": "GET /",
-  "request_raw": "GET / HTTP/1.1\r\nUser-Agent: Wget/1.13.4 (linux-gnu)\r\nAccept: */*\r\nHost: google.com\r\nConnection: Keep-Alive\r\n\r\n",
-  "response_raw": "HTTP/1.1 302 Found\r\nCache-Control: private\r\nContent-Type: text/html; charset=UTF-8\r\nLocation: http://www.google.de/?gfe_rd=cr&ei=aLA4VcKbI-iH8QeVjoCIDg\r\nContent-Length: 258\r\nDate: Thu, 23 Apr 2015 08:42:16 GMT\r\nServer: GFE/2.0\r\nAlternate-Protocol: 80:quic,p=1\r\n\r\n",
+  "request": "GET / HTTP/1.1\r\nUser-Agent: Wget/1.13.4 (linux-gnu)\r\nAccept: */*\r\nHost: google.com\r\nConnection: Keep-Alive\r\n\r\n",
+  "response": "HTTP/1.1 302 Found\r\nCache-Control: private\r\nContent-Type: text/html; charset=UTF-8\r\nLocation: http://www.google.de/?gfe_rd=cr&ei=aLA4VcKbI-iH8QeVjoCIDg\r\nContent-Length: 258\r\nDate: Thu, 23 Apr 2015 08:42:16 GMT\r\nServer: GFE/2.0\r\nAlternate-Protocol: 80:quic,p=1\r\n\r\n",
   "responsetime": 28,
   "server": "",
   "status": "OK",
-  "tags": "service12.example.com vagrant",
+  "tags": ["service12.example.com", "vagrant"],
   "type": "http"
 }

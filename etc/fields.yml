@@ -3,7 +3,9 @@ version: 1.0
 defaults:
   type: string
   required: false
-  analyzer: not_analyzed
+  index: not_analyzed
+  doc_values: true
+  ignore_above: 1024
 
 env:
   type: group
@@ -53,7 +55,7 @@ env:
       format: Dotted notation.
 
     - name: client_location
-      type: string
+      type: geo_point
       example: "40.715, -74.011"
       description: >
         The GeoIP location of the `real_ip` IP address or of the
@@ -94,7 +96,7 @@ event:
     These fields contained data about the transaction itself.
   fields:
     - name: "timestamp"
-      type: string
+      type: date
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ
       example: 2015-01-24T14:06:05.071Z
@@ -150,15 +152,17 @@ event:
         is the key.
 
     - name: query
+      type: string
+      ignore_above: 0
+      index: not_analyzed
+      doc_values: true
       description: >
-        The query normalized to account for parameters. For HTTP, it will
-        typically be transformed into something like `GET
-        /users/_search?name=<S8>`. For MySQL, it is transformed into something
-        like `SELECT id from users where name=<S8>`. This normalization makes
-        grouping the related transactions together easier.
+        The query in a human readable form. For HTTP, it will typically be
+        something like `GET /users/_search?name=test`. For MySQL, it is
+        something like `SELECT id from users where name=test`.
 
     - name: params
-      analyzer: analyzed
+      index: analyzed
       description: >
         The request parameters. For HTTP, these are the POST or GET parameters.
         For Thrift-RPC, these are the parameters from the request.
@@ -324,14 +328,14 @@ raw:
   description: These fields contain the raw transaction data.
   fields:
     - name: request
-      analyzer: analyzed
+      index: analyzed
       description: >
         For text protocols, this is the request as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
 
     - name: response
-      analyzer: analyzed
+      index: analyzed
       description: >
         For text protocols, this is the response as seen on the wire
         (application layer only). For binary protocols this is our

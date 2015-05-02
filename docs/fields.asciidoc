@@ -29,7 +29,7 @@ These fields contained data about the transaction itself.
 
 ==== timestamp
 
-type: string
+type: date
 
 example: 2015-01-24 14:06:05.071000
 
@@ -82,7 +82,9 @@ The path to which the transaction refers to. For HTTP, this is the URL. For SQL 
 
 ==== query
 
-The query normalized to account for parameters. For HTTP, it will typically be transformed into something like `GET /users/_search?name=<S8>`. For MySQL, it is transformed into something like `SELECT id from users where name=<S8>`. This normalization makes grouping the related transactions together easier.
+type: string
+
+The query in a human readable form. For HTTP, it will typically be something like `GET /users/_search?name=test`. For MySQL, it is something like `SELECT id from users where name=test`.
 
 
 ==== params
@@ -386,7 +388,7 @@ Unless this field is disabled, it always has a value and it matches the `client_
 
 ==== client_location
 
-type: string
+type: geo_point
 
 example: 40.715, -74.011
 

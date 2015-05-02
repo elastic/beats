@@ -1,61 +1,63 @@
 {
-  "template" : "packetbeat-*",
-  "settings" : {
-    "index.refresh_interval" : "5s"
-  },
-  "mappings" : {
-    "_default_" : {
+  "mappings": {
+    "_default_": {
       "_all": {
         "enabled": true,
         "norms": {
           "enabled": false
         }
       },
+      "dynamic_templates": [
+        {
+          "template1": {
+            "mapping": {
+              "doc_values": true,
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "{dynamic_type}"
+            },
+            "match": "*"
+          }
+        }
+      ],
       "properties": {
-        "request" : {
-          "type": "string",
-          "index" : "analyzed",
-          "norms": {
-            "enabled": false
-          }
-        },
-        "response" : {
-          "type": "string",
-          "index" : "analyzed",
-          "norms": {
-            "enabled": false
-          }
-        },
-        "params": {
-          "type": "string",
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          }
-        },
-        "timestamp": {
-          "type": "date"
-        },
         "client_location": {
           "type": "geo_point"
         },
+        "params": {
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
+        },
         "query": {
-          "type": "string",
+          "doc_values": true,
           "index": "not_analyzed",
-          "doc_values": true
+          "type": "string"
+        },
+        "request": {
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
+        },
+        "response": {
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "date"
         }
-      },
-      "dynamic_templates": [{
-        "template1": {
-          "match": "*",
-          "mapping": {
-            "type": "{dynamic_type}",
-            "index": "not_analyzed",
-            "doc_values": true,
-            "ignore_above": 1024
-          }
-        }
-      }]
+      }
     }
-  }
+  },
+  "settings": {
+    "index.refresh_interval": "5s"
+  },
+  "template": "packetbeat-*"
 }
