@@ -13,7 +13,8 @@ through installing the essential components of the Packetbeat system:
  * Kibana for the UI.
 
 ////
-TODO: add a real reference to Packetbeat Deploy
+TODO: add a real reference to Packetbeat Deploy. Do we even keep this
+ reference?
 ////
 
 NOTE:  We now have Packetbeat Deploy, a project that automates the
@@ -29,7 +30,6 @@ probably also want to automate the installation process.  But for now, let's
 just do the fun part.
 
 === Elasticsearch installation
-
 
 http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
 storage, search and analytics engine. It can be used for many purposes, but one
@@ -98,6 +98,10 @@ $ curl http://127.0.0.1:9200
 Now that you have Elasticsearch running, I'm sure you are eager to put some
 data in it. For this, install the Packetbeat agents on your application
 servers:
+
+////
+TODO: Update URLs to the Elastic service.
+////
 
 deb:
 
@@ -253,67 +257,41 @@ user-friendly UI in which you can combine various widget types to create your
 own dashboards. The dashboards can be easily saved, shared and linked.
 
 For this tutorial, we recommend to install Kibana on the same server as
-Elasticsearch, but not required.
+Elasticsearch, but it is not required.
 
-There are currently two versions of Kibana in use: Kibana3 and the newly
-released Kibana4.  The Packetbeat team has extended Kibana3 to support new
-panels specialized in visualizing network data and these new panels haven't yet
-been ported to Kibana4. Until we have a good solution for Kibana4, this guide
-uses the Kibana3 fork from the
-http://github.com/packetbeat/packetbeat[Packetbeat GitHub account]:
-
+Use the following commands to download and run Kibana:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://github.com/packetbeat/kibana/releases/download/$KIBANA_VERSION.tar.gz
-$ tar -xzvf $KIBANA_DIR.tar.gz
+$ curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz
+$ cd kibana-$KIBANA_VERSION-linux-x64/
+$ ./bin/kibana
 ----------------------------------------------------------------------
 
-If you prefer using Kibana4, please follow the Kibana installation instructions
-from the https://www.elastic.co/products/kibana[Kibana Product Page].
+You can find Kibana binaries for other operating systems on the
+https://www.elastic.co/downloads/kibana[Kibana downloads page].
 
-Kibana3 is a pure Javascript application running fully in the browser. It
-doesn't have or need a sever side part like most web applications do. Instead,
-you only needed a web server to serve the Javascript files and the static
-resources. For example, you can use python to create a simple web server:
+If Kibana cannot reach the Elasticsearh server, you can adjust the settings for
+it from the `config/kibana.yml` file.
 
+Now point your browser to port 5601 and you should see the Kibana web
+interface.
 
-[source,shell]
-----------------------------------------------------------------------
-$ cd {{version["kibana_dir"]}}
-$ python -m SimpleHTTPServer
-Serving HTTP on 0.0.0.0 port 8000 ...
-----------------------------------------------------------------------
+The first think you need to do is to configure the index pattern. In
+the *Index name or pattern* field enter `packetbeat-*` and for the *Time-field
+name* select `timestamp`.
 
-Now point your browser to port 8000 and you should see the Kibana web
-interface. It will probably complain that it cannot reach Elasticsearch, like
-in the following screenshot:
+image:./images/kibana-index-pattern.png[Kibana index pattern]
 
+If after you configure the `packetbeat-*` index pattern Kibana still says
+_Unable to fetch mapping. Do you have indices matching the pattern?_, it means
+that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
+some traffic was running on your servers and that Packetbeat could see it.
 
-
-This is because 
-http://en.wikipedia.org/wiki/Cross-origin_resource_sharing[CORS] is
-disabled by default in recent versions of Elasticsearch, to respect the "secure
-by default" philosophy. You can enable it by adding the following lines at the
-end of your `/etc/elasticsearch/elasticsearch.yml` file:
-
-[source,yaml]
-----------------------------------------------------------------------
-http.cors.enabled: true
-http.cors.allow-origin: http://localhost:8000
-----------------------------------------------------------------------
+If everything goes fine, you should already see some traffic reported by
+Packetbeat.
 
 
-Make sure to replace `http://localhost:8000` with the URL under which you
-access Kibana up to the first slash. Restart Elasticsearch:
-
-[source,shell]
-----------------------------------------------------------------------
-$ sudo /etc/init.d/elasticsearch restart
-----------------------------------------------------------------------
-
-And try again to access Kibana in your browser. You should now see
-Kibana's welcoming page.
 
 === Kibana dashboards
 
