@@ -20,5 +20,7 @@ include::./windows.asciidoc[]
 
 include::./kibana3.asciidoc[]
 
+include::./filtering.asciidoc[]
+
 include::./troubleshooting.asciidoc[]
 
