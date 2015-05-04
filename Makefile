@@ -24,9 +24,9 @@ deps:
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
 
-.PHONY: savedeps
-savedeps: deps
-	godep save ./...
+.PHONY: updatedeps
+updatedeps: deps
+	godep update ...
 
 .PHONY: restoredeps
 restoredeps:
