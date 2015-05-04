@@ -1,12 +1,3 @@
-////
-
-This file is generated! Edit gettingstarted.in.asciidoc instead and then
-re-generate this file with:
-
-  ../scripts/generate_gettingstarted.sh gettingstarted.in.asciidoc gettingstarted.asciidoc
-
-////
-
 [[packetbeat-getting-started]]
 == Getting started
 
@@ -43,8 +34,8 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
-sudo dpkg -i elasticsearch-1.5.2.deb
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.deb
+sudo dpkg -i elasticsearch-$ES_VERSION.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
@@ -53,8 +44,8 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.rpm
-sudo rpm -i elasticsearch-1.5.2.rpm
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.rpm
+sudo rpm -i elasticsearch-$ES_VERSION.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
@@ -63,9 +54,9 @@ binary:
 [source,shell]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
-unzip elasticsearch-1.5.2.zip
-cd elasticsearch-1.5.2
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.zip
+unzip elasticsearch-$ES_VERSION.zip
+cd elasticsearch-$ES_VERSION
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
@@ -95,13 +86,13 @@ An
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
 template file can be found
-https://github.com/packetbeat/packetbeat/blob/v1.0.0beta1/etc/packetbeat.template.json[here].
+https://github.com/packetbeat/packetbeat/blob/v$PB_VERSION/etc/packetbeat.template.json[here].
 Grab it and load it with the following commands:
 
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v1.0.0beta1/etc/packetbeat.template.json
+curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v$PB_VERSION/etc/packetbeat.template.json
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
@@ -118,8 +109,8 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0beta1-1_amd64.deb
-sudo dpkg -i packetbeat_1.0.0beta1-1_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_$PB_VERSION-1_amd64.deb
+sudo dpkg -i packetbeat_$PB_VERSION-1_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
@@ -127,8 +118,8 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0beta1-1.el6.x86_64.rpm
-sudo rpm -vi packetbeat-1.0.0beta1-1.el6.x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-1.el6.x86_64.rpm
+sudo rpm -vi packetbeat-$PB_VERSION-1.el6.x86_64.rpm
 ----------------------------------------------------------------------
 
 
@@ -137,8 +128,8 @@ binary:
 [source,shell]
 ----------------------------------------------------------------------
 # install libpcap using your operating system package manager
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0beta1-x86_64.tar.gz
-tar xzvf packetbeat-1.0.0beta1-x86_64.tar.gz
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.tar.gz
+tar xzvf packetbeat-$PB_VERSION-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 ////
@@ -234,7 +225,7 @@ binary:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-1.0.0beta1
+cd packetbeat-$PB_VERSION
 sudo ./packetbeat -c /etc/packetbeat/packetbeat.yml
 ----------------------------------------------------------------------
 
@@ -252,9 +243,9 @@ Use the following commands to download and run Kibana:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
-tar xzvf kibana-4.0.2-linux-x64.tar.gz
-cd kibana-4.0.2-linux-x64/
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz
+tar xzvf kibana-$KIBANA_VERSION-linux-x64.tar.gz
+cd kibana-$KIBANA_VERSION-linux-x64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
@@ -300,9 +291,9 @@ TODO: Update this link.
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://github.com/elastic/packetbeat-dashboards/archive/v1.0.0beta1.tar.gz
-$ tar xzvf v1.0.0beta1.tar.gz
-$ cd dashboards-1.0.0beta1/
+$ curl -L -O https://github.com/elastic/packetbeat-dashboards/archive/v$DASHBOARDS_VERSION.tar.gz
+$ tar xzvf v$DASHBOARDS_VERSION.tar.gz
+$ cd dashboards-$DASHBOARDS_VERSION/
 $ ./load.sh
 ----------------------------------------------------------------------
 
