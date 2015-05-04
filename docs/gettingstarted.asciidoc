@@ -1,4 +1,3 @@
-
 [[packetbeat-getting-started]]
 == Getting started
 
@@ -11,16 +10,6 @@ through installing the essential components of the Packetbeat system:
    your servers so that they capture the network traffic.
  * Elasticsearch for storage and indexing.
  * Kibana for the UI.
-
-////
-TODO: add a real reference to Packetbeat Deploy. Do we even keep this
- reference?
-////
-
-NOTE:  We now have Packetbeat Deploy, a project that automates the
-installation of all these components. Using Packetbeat Deploy might be actually
-easier then following this guide, and the resulting installation will be much
-easier to maintain and scale.
 
 For now, you can just install Elasticsearch and Kibana on a single VM or even
 on your laptop. The only condition is that this machine is accessible from the
@@ -44,31 +33,31 @@ deb:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ sudo apt-get install openjdk-7-jre
-$ curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.deb
-$ sudo dpkg -i elasticsearch-$ES_VERSION.deb
-$ sudo /etc/init.d/elasticsearch start
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.deb
+sudo dpkg -i elasticsearch-$ES_VERSION.deb
+sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
 rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ sudo yum install java-1.7.0-openjdk
-$ curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.rpm
-$ sudo rpm -i elasticsearch-$ES_VERSION.rpm
-$ sudo service elasticsearch start
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.rpm
+sudo rpm -i elasticsearch-$ES_VERSION.rpm
+sudo service elasticsearch start
 ----------------------------------------------------------------------
 
 binary:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-$ curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.zip
-$ unzip elasticsearch-$ES_VERSION.zip
-$ cd elasticsearch-$ES_VERSION
-$ ./bin/elasticsearch
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.zip
+unzip elasticsearch-$ES_VERSION.zip
+cd elasticsearch-$ES_VERSION
+./bin/elasticsearch
 ----------------------------------------------------------------------
 
 
@@ -77,7 +66,7 @@ request on port 9200:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl http://127.0.0.1:9200
+curl http://127.0.0.1:9200
 {
   "status" : 200,
   "name" : "Unicorn",
@@ -93,32 +82,44 @@ $ curl http://127.0.0.1:9200
 }
 ----------------------------------------------------------------------
 
+An
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
+template file can be found
+https://github.com/packetbeat/packetbeat/blob/v$PACKETBEAT_VERSION/etc/packetbeat.template.json[here].
+Grab it and load it with the following commands:
+
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v$PB_VERSION/etc/packetbeat.template.json
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
 === Packetbeat agent
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
 data in it. For this, install the Packetbeat agents on your application
 servers:
 
-////
-TODO: Update URLs to the Elastic service.
-////
-
 deb:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ sudo apt-get install libpcap0.8
-$ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v$PB_VERSION/packetbeat_$PB_VERSION-1_amd64.deb
-$ sudo dpkg -i packetbeat_$PB_VERSION-1_amd64.deb
+sudo apt-get install libpcap0.8
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_$PB_VERSION-1_amd64.deb
+sudo dpkg -i packetbeat_$PB_VERSION-1_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ sudo yum install libpcap
-$ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v$PB_VERSION/packetbeat-$PB_VERSION-1.el6.x86_64.rpm
-$ sudo rpm -vi packetbeat-$PB_VERSION-1.el6.x86_64.rpm
+sudo yum install libpcap
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-1.el6.x86_64.rpm
+sudo rpm -vi packetbeat-$PB_VERSION-1.el6.x86_64.rpm
 ----------------------------------------------------------------------
 
 
@@ -126,49 +127,28 @@ binary:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ # install libpcap using your operating system package manager
-$ curl -L -O https://github.com/packetbeat/packetbeat/releases/download/v$PB_VERSION/packetbeat-$PB_VERSION-x86_64.tar.gz
-$ tar xzvf packetbeat-$PB_VERSION-x86_64.tar.gz
+# install libpcap using your operating system package manager
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.tar.gz
+tar xzvf packetbeat-$PB_VERSION-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 ////
-TODO: add a link to the download page.
+TODO: Check if the downloads URL is indeed /downloads/beats
 ////
-NOTE: We also provide 32bits images. You can get them from our download page.
+NOTE: We also provide 32bits images. You can get them from our
+https://www.elastic.co/downloads/beats[download page].
 
 
 Before starting the agent, edit the configuration file:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ nano /etc/packetbeat/packetbeat.conf
+sudo nano /etc/packetbeat/packetbeat.yml
 ----------------------------------------------------------------------
 
-First, set the IP address and port where the agent can find the Elasticsearch
-installation:
-
-[source,yaml]
-----------------------------------------------------------------------
-output:
-
-  elasticsearch:
-	# Uncomment out this option if you want to output to Elasticsearch. The
-	# default is false.
-    enabled: true
-
-    # Set the host and port where to find Elasticsearch.
-    host: 192.168.1.42
-    port: 9200
-
-    # Comment this option if you don't want to store the topology in
-    # Elasticsearch. The default is false.
-    save_topology: true
-----------------------------------------------------------------------
-
-Select the network interface from which to capture the traffic. Packetbeat
+First, select the network interface from which to capture the traffic. Packetbeat
 supports capturing all messages sent or received by the server on which it is
 installed. For this, use `any` as the device:
-
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -181,7 +161,6 @@ interfaces:
 In the next section, configure the ports on which Packetbeat can find each
 protocol. If you use any non-standard ports, add them here. Otherwise, the
 default values should do just fine.
-
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -205,23 +184,26 @@ protocols:
     ports: [9090]
 ----------------------------------------------------------------------
 
+Set the IP address and port where the agent can find the Elasticsearch
+installation:
 
-An
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
-template file can be found
-https://github.com/packetbeat/packetbeat/blob/v$PACKETBEAT_VERSION/etc/packetbeat.template.json[here].
-Grab it and load it with the following commands:
-
-
-[source,shell]
+[source,yaml]
 ----------------------------------------------------------------------
-curl -L -O
-'https://raw.githubusercontent.com/packetbeat/packetbeat/v$PB_VERSION/etc/packetbeat.template.json'
-curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
-----------------------------------------------------------------------
+output:
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+  elasticsearch:
+    # Uncomment out this option if you want to output to Elasticsearch. The
+    # default is false.
+    enabled: true
+
+    # Set the host and port where to find Elasticsearch.
+    host: 192.168.1.42
+    port: 9200
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    save_topology: true
+----------------------------------------------------------------------
 
 You are now ready to start the agent:
 
@@ -229,27 +211,25 @@ deb:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ /etc/init.d/packetbeat restart
+sudo /etc/init.d/packetbeat restart
 ----------------------------------------------------------------------
 
 rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ service restart packetbeat
+sudo service restart packetbeat
 ----------------------------------------------------------------------
 
 binary:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ cd packetbeat-$PB_VERSION
-$ ./packetbeat -c /etc/packetbeat/packetbeat.conf
+cd packetbeat-$PB_VERSION
+sudo ./packetbeat -c /etc/packetbeat/packetbeat.yml
 ----------------------------------------------------------------------
 
-
 === Kibana installation
-
 
 https://www.elastic.co/products/kibana[Kibana] is a visualization application
 that gets its data from Elasticsearch. It provides a customizable and
@@ -263,9 +243,10 @@ Use the following commands to download and run Kibana:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz
-$ cd kibana-$KIBANA_VERSION-linux-x64/
-$ ./bin/kibana
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz
+tar xzvf kibana-$KIBANA_VERSION-linux-x64.tar.gz
+cd kibana-$KIBANA_VERSION-linux-x64/
+./bin/kibana
 ----------------------------------------------------------------------
 
 You can find Kibana binaries for other operating systems on the
@@ -277,7 +258,7 @@ it from the `config/kibana.yml` file.
 Now point your browser to port 5601 and you should see the Kibana web
 interface.
 
-The first think you need to do is to configure the index pattern. In
+The first thing you need to do is to configure the index pattern. In
 the *Index name or pattern* field enter `packetbeat-*` and for the *Time-field
 name* select `timestamp`.
 
@@ -289,26 +270,35 @@ that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
 some traffic was running on your servers and that Packetbeat could see it.
 
 If everything goes fine, you should already see some traffic reported by
-Packetbeat.
+Packetbeat under the Discover page:
+
+image:./images/kibana-discover.png[Kibana discover page]
 
 
+=== Sample Kibana dashboards
 
-=== Kibana dashboards
+Kibana has a large set of visualization types which you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+<<sample-dashboards,sample dashboards>> to give you a good start and to
+demonstrate what is possible based on the wire data.
 
-Kibana has about a dozen widget types that you can combine into pages to create
-dashboards that are best for you.  We have created couple sample dashboards to
-give you a good start and to demonstrate what is possible.
+To load the sample pages, follow these steps:
 
-To load our sample pages, follow these steps:
+////
+TODO: Update this link.
+////
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://github.com/packetbeat/dashboards/archive/v$DASHBOARDS_VERSION.tar.gz
+$ curl -L -O https://github.com/elastic/packetbeat-dashboards/archive/v$DASHBOARDS_VERSION.tar.gz
 $ tar xzvf v$DASHBOARDS_VERSION.tar.gz
 $ cd dashboards-$DASHBOARDS_VERSION/
 $ ./load.sh
 ----------------------------------------------------------------------
 
+To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
+icon. Select *Packetbeat Dashboard* from the list. You can then switch easier
+between the dashboards by using the *Navigation* widget.
+
 Enjoy!
-
-

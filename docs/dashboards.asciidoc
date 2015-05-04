@@ -1,3 +1,4 @@
+[[sample-dashboards]]
 == Sample dashboards
 
 In order to make it as easy as possible to get application performance insights
