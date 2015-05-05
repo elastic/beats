@@ -390,14 +390,7 @@ information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
 
-==== SQL configuration
-
-////
-TODO: is this about both MySQL and PgSQL? we need an explanation and an
-example.
-////
-
-NOTE: The same options can be configured for both MySQL and PgSQL.
+==== MySQL and PgSQL configuration
 
 ===== max_rows
 
@@ -601,7 +594,7 @@ was a pull request some time ago. But that's not documented yet.
 ////
 
 Inserts the transaction in a Redis list. This output plugin is compatibile with
-the Logstash http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin],
+http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
 so Redis can be used as queue between the Packetbeat agents and Logstash.
 
 Example configuration:
@@ -686,9 +679,23 @@ Interval for reconnecting failed Redis connections. The default is 1 second.
 
 ==== File Output
 
-////
-TODO: sample configuration needed here.
-////
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  file:
+    enabled: true
+    path: "/tmp/packetbeat"
+    filename: packetbeat
+    rotate_every_kb: 1000
+    number_of_files: 7
+------------------------------------------------------------------------------
 
 Dumps the transactions in a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -704,12 +711,8 @@ Path to the directory where to save the generated files. The option is
 mandatory.
 
 ===== filename
-////
-TODO: is this option really mandatory? don't we have a default?
-////
 
-Name of the generated files. If set to `packetbeat`, the generated files would
-be: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc. This option is mandatory.
+Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
 
 ===== rotate_every_kb
 
