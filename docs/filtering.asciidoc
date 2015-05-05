@@ -1,41 +1,59 @@
-== Kibana queries vs filters
+== Kibana query and filter
 
-Filters and queries are using the same syntax but they are used for different
-purposes. They are most powerful when they are used together to create
-insightful dashboards.
+=== Kibana Query
 
-Filters restrict the view of the whole dashboards. They constrain the data
-displayed on the charts, tables and maps. The time selector from the top of the
-web page, for example, is a filter. But you can filter on any field and also
-combine multiple filters.
+The search field under the *Discover* page provides a way to query 
+a specific subset of the transactions from the selected time frame.
+The query syntax is based on the 
+http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax]. 
+It allows boolean operators, wildcards and field filtering. For example, if 
+you want to find the http redirects, you can search for
+`type: http AND http.code: 302`.
 
-Queries are searches within the filtered transactions. For example, you can use
-queries for doing a free text search among the transactions of a given type.
+image:./images/kibana-query-filtering.png[Kibana query]
 
-Kibana supports using multiple queries inside the same dashboard. Most widgets
-use the defined dashboard queries to group the transactions into series. For
-example, if you want to compare the response times of HTTP requests versus
-PgSQL requests in the same chart, you would define a query for each of them.
+==== String Query
 
-=== Filters
+A query may consists of one or more words or a phrase. A phrase is a
+group of words surrounded by double quotes such as "test search".
 
-You can use the *Filtering* menu to filter the whole dashboard by specific
-field. To do this, use field name followed by a colon ":" and the term you are
-looking for.
+To search for all http requests initiated by Mozilla Web browser version 5.0:
 
-image:./images/kibana-filters.png[Kibana filters]
+[source,yaml]
+---------------
+"Mozilla/5.0"
+--------------
+
+To search for all the transactions that contain the following message:
+
+[source,yaml]
+------------------------------------
+"Cannot change the info of a user"
+------------------------------------
+
+Note: Note that the double quotes are mandatory here to search for the exact
+string. Without any quotes, the search would match "Cannot" OR "change" OR
+"the" OR "info" OR "a" OR "user".
+
+To search for all transactions with the "chunked" encoding:
+
+[source,yaml]
+-----------------------------
+"Transfer-Encoding: chunked"
+-----------------------------
+
+==== Field based Query
 
 To only view HTTP transactions:
 
-[source,shell]
+[source,yaml]
 --------------------
 type: http
 -------------------
 
-
 To only view failed transactions:
 
-[source,shell]
+[source,yaml]
 -------------------
 status: Error
 -------------------
@@ -43,37 +61,35 @@ status: Error
 
 To only view MySQL INSERT queries:
 
-[source,shell]
+[source,yaml]
 ---------------------
 mysql.method: INSERT
 ---------------------
 
-
-==== Regexp filters
+==== Regexp Query
 
 Kibana supports regular expression for filters and expressions.  For example,
 to search for all http responses with json as returned value type: 
 
-[source,shell]
+[source,yaml]
 -------------------------
 http.content_type: *json
 -------------------------
-
 
 See
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html[Elasticsearch regexp query]
 for more details about the syntax.
 
 
-==== Range filters
+==== Range Query
 
-Range filters allow a field to have values between the lower and upper bound.
+Range queries allow a field to have values between the lower and upper bound.
 The interval can include or exclude the bounds depending on the type of
 brackets used.
 
 To search for slow transactions with a responsetime greater or equal than 10ms:
 
-[source,shell]
+[source,yaml]
 ------------------------
 responsetime: [10 TO *]
 ------------------------
@@ -81,67 +97,19 @@ responsetime: [10 TO *]
 
 To search for slow transactions with a responsetime greater than 10ms:
 
-[source,shell]
+[source,yaml]
 -------------------------
 responsetime: {10 TO *}
 -------------------------
 
-
-==== Filters from the search results
-
-Another useful trick for using filters without having to memorize their syntax
-is to use the contextual view from the transaction detailed view.
-
-image:./images/filter_from_context.png[Filter from context]
-
-You can add a filter to match the current value or a filter to NOT match the
-current value.
-
-=== Queries
-
-image:./images/kibana-query-filtering.png[Kibana query]
-
-A query may consists of one or more words or a phrase. A phrase is a
-group of words surrounded by double quotes such as "test search".
-
-To search for all http requests initiated by Mozilla Web browser version 5.0:
-
-[source,shell]
----------------
-"Mozilla/5.0"
---------------
-
-
-To search for all the transactions that contain the following message:
-
-[source,shell]
-------------------------------------
-"Cannot change the info of a user"
-------------------------------------
-
-
-**Note** that the double quotes are mandatory here to search for the exact
-string. Without any quotes, the search would match "Cannot" OR "change" OR
-"the" OR "info" OR "a" OR "user".
-
-image:./images/kibana-query-phrase.png[Kibana query phrase]
-
-To search for all transactions with the "chunked" encoding:
-
-[source,shell]
------------------------------
-"Transfer-Encoding: chunked"
------------------------------
-
-
-==== Boolean operators
+==== Bool Query 
 
 Boolean operators (AND, OR, NOT) allow combining multiple sub queries through logic operators.
-**Note** that operators such as AND, OR and NOT must be CAPITALIZED. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
+Note: Note that operators such as AND, OR and NOT must be CAPITALIZED. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
 
 To search for all transactions except MySQL transactions:
 
-[source,shell]
+[source,yaml]
 ----------------
 NOT type: mysql
 ---------------
@@ -149,7 +117,7 @@ NOT type: mysql
 
 To search for all MySQL SELECT queries with large attachments:
 
-[source,shell]
+[source,yaml]
 -------------------------------------------------
 mysql.method: SELECT AND mysql.size: [10000 TO *]
 -------------------------------------------------
@@ -159,9 +127,21 @@ Lucene also supports parentheses to group sub queries.
 
 To search for either INSERT or UPDATE MySQL queries with a responsetime greater or equal with 30ms:
 
-[source,shell]
+[source,yaml]
 ---------------------------------------------------------------------------
 (mysql.method: INSERT OR mysql.method: UPDATE) AND responsetime: [30 TO *]
 ---------------------------------------------------------------------------
 
+=== Kibana Filter
+
+In Kibana, the transactions can be filtered either by entering a search query or by clicking on
+the elements within the visualization. For example, to filter for all the http redirects that are coming from a specific
+IP and port, click on both green sections of `client_ip` and `client_port` fields from the transaction detail widget. To
+exclude the http redirects coming from the IP and port, use the red sections.
+
+image:./images/filter_from_context.png[Filter from context]
+
+The selected filters appear under the search box. 
+
+image:./images/kibana-filters.png[Kibana filters]
 
