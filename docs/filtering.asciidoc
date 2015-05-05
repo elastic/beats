@@ -31,9 +31,8 @@ To search for all the transactions that contain the following message:
 "Cannot change the info of a user"
 ------------------------------------
 
-Note: Note that the double quotes are mandatory here to search for the exact
-string. Without any quotes, the search would match "Cannot" OR "change" OR
-"the" OR "info" OR "a" OR "user".
+Note: Double quotes are mandatory here to search for the exact
+string. Without any quotes, the search would match documents containing one of the following words:"Cannot" OR "change" OR "the" OR "info" OR "a" OR "user".
 
 To search for all transactions with the "chunked" encoding:
 
@@ -77,7 +76,7 @@ http.content_type: *json
 -------------------------
 
 See
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html[Elasticsearch regexp query]
+http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html[Elasticsearch regexp query]
 for more details about the syntax.
 
 
@@ -105,7 +104,7 @@ responsetime: {10 TO *}
 ==== Bool Query 
 
 Boolean operators (AND, OR, NOT) allow combining multiple sub queries through logic operators.
-Note: Note that operators such as AND, OR and NOT must be CAPITALIZED. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
+Note: Operators such as AND, OR and NOT must be CAPITALIZED. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
 
 To search for all transactions except MySQL transactions:
 
