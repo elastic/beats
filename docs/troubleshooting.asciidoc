@@ -2,19 +2,37 @@
 
 If you suspect an issue with the Packetbeat agent itself, please read the
 following tips and send us the logs and, if possible, a traffic trace.
-You can open issues on
-https://github.com/packetbeat/packetbeat/issues?state=open[GitHub] or by
-mailto:info@packetbeat.com[emailing us].
+
+////
+TODO: Link to the deep URL for the Beats forum.
+////
+
+Please contact us on the https://discuss.elastic.co/[forums] or on the
+`#packetbeat` IRC channel on Freenode. We will help you troubleshoot the problem
+you are facing.
+
+If you are sure you found a bug, you can also open a ticket on
+https://github.com/elastic/packetbeat/issues?state=open[GitHub]. Note, however,
+that we close GitHub issues if they are questions or requests for help that
+don't indicate the presence of a bug.
 
 === Running in foreground and enabling debugging
 
-By default, Packetbeat sends all its output to syslog. You can use the ``-e``
-command line flag to direct the output at stderr instead:
+By default, Packetbeat sends all its output to syslog. You can use the `-e`
+command line flag to direct the output at standard error instead:
 
 [source,shell]
 -----------------------------------------------
-packetbeat -e -c /etc/packetbeat/packetbeat.yml
+packetbeat -e
 -----------------------------------------------
+
+The default configuration file is `/etc/packetbeat/packetbeat.yml`. You can use
+another file by using the `-c` flag:
+
+[source,shell]
+------------------------------------------------------------
+packetbeat -e -c /etc/packetbeat/packetbeat.yml
+------------------------------------------------------------
 
 You can increase the verbosity by enabling one or more debug selectors. For
 example, to view which transactions are published, you can start the agent like
@@ -22,7 +40,7 @@ this:
 
 [source,shell]
 ------------------------------------------------------------
-packetbeat -e -c /etc/packetbeat/packetbeat.yml -d "publish"
+packetbeat -e -d "publish"
 ------------------------------------------------------------
 
 You can enable multiple debug selectors by separating them with comas. For
@@ -33,7 +51,7 @@ example, if you want to also see the mysql parsing messages, run:
 packetbeat -e -c /etc/packetbeat/packetbeat.conf -d "publish,mysql,mysqldetailed"
 ---------------------------------------------------------------------------------
 
-Here is the list of all available debug selectors:
+Here is the list of commonly used debug selectors:
 
 * http
 * httpdetailed
@@ -53,28 +71,33 @@ Here is the list of all available debug selectors:
 * thrift
 * thriftdetailed
 
+If you want all the debugging output (fair warning, it is quite a lot), you can
+use `*`, like this:
+
+[source,shell]
+------------------------------------------------------------
+packetbeat -e -d "*"
+------------------------------------------------------------
+
 === Recording a trace
 
 If you are having an issue, it is often useful to record a full network trace
-and send it to us. It will help us reproduce the issue and we can also add it to our
-automatic regression tests so that the problem never reoccurs. A trace of
-10-20 seconds is usually enough. To record it, you would typically use
-`tcpdump` like this:
+and send it to us. It will help us reproduce the issue and we can also add it
+to our automatic regression tests so that the problem never reoccurs. A trace
+of 10-20 seconds is usually enough. To record it, you can use Packetbeat itself
+like this:
 
 [source,shell]
----------------------------------
-tcpdump -i any -s0 -w"trace.pcap"
----------------------------------
+------------------------------------------------------------
+packetbeat -e -dump trace.pcap
+------------------------------------------------------------
 
-If you want to record a single protocol, it is useful to filter
-the traffic by port numbers. For example, to record only mysql traffic:
+This executes Packetbeat in normal mode (all processing happens as usual) but
+at the same time records all packets in libpcap format in the `trace.pcap`
+file. If there's a particular error message you want us to investigate, please
+keep the trace running until the error shows up (it will printed on standard
+error).
 
-[source,shell]
----------------------------------------------
-tcpdump -i any -s0 -w"trace.pcap" "port 3306"
----------------------------------------------
-
-Please send the trace at mailto:info@packetbeat.com[info@packetbeat.com] and
-also indicate if it's ok to include the trace in our test suite (without making
-it public).
-
+WARNING: PCAP files can be large. Please monitor the disk usage while doing the
+dump to make sure you don't run out of disk space. Whenever possible, we
+recommend doing this on a non-production machine.
