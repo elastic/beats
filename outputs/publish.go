@@ -48,7 +48,7 @@ type MothershipConfig struct {
 	Flush_interval     int
 }
 
-type AgentConfig struct {
+type ShipperConfig struct {
 	Name                  string
 	Refresh_topology_freq int
 	Ignore_outgoing       bool
@@ -223,7 +223,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	outputs map[string]MothershipConfig, agent AgentConfig) error {
+	outputs map[string]MothershipConfig, agent ShipperConfig) error {
 
 	var err error
 	publisher.IgnoreOutgoing = agent.Ignore_outgoing
