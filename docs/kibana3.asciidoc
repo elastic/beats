@@ -1,8 +1,8 @@
-== Old topology map
+== Topology diagram
 
 We currently recommend using Kibana 4 together with Packetbeat. However, there
 is one panel type that is not yet available for Kibana 4, namely the topology
-map. This panel type is implemented in a fork of Kibana 3 that was never merged
+diagram. This panel type is implemented in a fork of Kibana 3 that was never merged
 (and never will be). When Kibana 4 will support plugins, the panel will be
 re-implemented as a plugin.
 
