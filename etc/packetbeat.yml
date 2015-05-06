@@ -3,26 +3,26 @@
 # This file contains an overview of various configuration settings. Please consult
 # the docs at <http://packetbeat.com/docs/configuration.html> for more details.
 
-# The Packetbeat agent works by sniffing the network traffic between your
+# The Packetbeat shipper works by sniffing the network traffic between your
 # application components. It inserts meta-data about each transaction into
 # Elasticsearch.
 
 ############################# Agent ############################################
-agent:
+shipper:
 
- # The name of the agent that publishes the network data. It can be used to group 
- # all the transactions sent by a single agent in the web interface.
+ # The name of the shipper that publishes the network data. It can be used to group 
+ # all the transactions sent by a single shipper in the web interface.
  # If this options is not defined, the hostname is used.
  name:
 
- # The tags of the agent are included in their own field with each
+ # The tags of the shipper are included in their own field with each
  # transaction published. Tags make it easy to group transactions by different
  # logical properties.
  #tags: ["service1"]
 
  # Uncomment the following if you want to ignore transactions created
- # by the server on which the agent is installed. This option is useful
- # to remove duplicates if agents are installed on multiple servers.
+ # by the server on which the shipper is installed. This option is useful
+ # to remove duplicates if shippers are installed on multiple servers.
  # ignore_outgoing: true
 
 ############################# Sniffer ############################################

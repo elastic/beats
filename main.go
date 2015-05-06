@@ -144,7 +144,7 @@ func main() {
 	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
 	if err = outputs.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
-		config.ConfigSingleton.Agent); err != nil {
+		config.ConfigSingleton.Shipper); err != nil {
 
 		logp.Critical(err.Error())
 		os.Exit(1)

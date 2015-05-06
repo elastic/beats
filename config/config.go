@@ -10,7 +10,7 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
-	Agent      outputs.AgentConfig
+	Shipper    outputs.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging
