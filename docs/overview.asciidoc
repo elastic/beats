@@ -44,11 +44,7 @@ the responses in what we call "transactions" and for each such transaction it
 inserts a JSON document into Elastcisearch. See the <<exported-fields>> section
 for details about which fields are indexed.
 
-////
-TODO: fix these screenshots, they have Packetabeat in the name.
-////
-
-image:./images/packetbeat-overview.png[Packetbeat Overview]
+image:./images/app-monitoring-overview.png[Application Monitoring Overview]
 
 The same Elasticsearch and Kibana instance that are used for analysing the
 network traffic gathered by Packetbeat can be used for analysing the log files
