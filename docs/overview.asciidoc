@@ -20,9 +20,9 @@ The system consists of the following mandatory components:
  * Kibana
 
 
-Packetbeat agents sniff the traffic between your servers, parse on the fly the
+Packetbeat shippers sniff the traffic between your servers, parse on the fly the
 application level protocols and correlate the messages into transactions.
-Currently, the Packetbeat agent supports the following protocols:
+Currently, the Packetbeat shipper supports the following protocols:
 
  * HTTP
  * MySQL
@@ -30,10 +30,10 @@ Currently, the Packetbeat agent supports the following protocols:
  * Redis
  * Thrift-RPC
 
-The agents can insert the correlated transactions directly into Elasticsearch
+The shippers can insert the correlated transactions directly into Elasticsearch
 or via a central queue created with Redis and Logstash.
 
-Packetbeat agents can run on the same servers as your application processes or
+Packetbeat shippers can run on the same servers as your application processes or
 on their own servers. When running on dedicated servers, they can get the
 traffic from the switches mirror ports or from tapping devices. In such a
 deployment, there is zero overhead on the monitored application. See

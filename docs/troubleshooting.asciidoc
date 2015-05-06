@@ -1,6 +1,6 @@
 == Troubleshooting
 
-If you suspect an issue with the Packetbeat agent itself, please read the
+If you suspect an issue with the Packetbeat shipper itself, please read the
 following tips and send us the logs and, if possible, a traffic trace.
 
 ////
@@ -35,7 +35,7 @@ packetbeat -e -c /etc/packetbeat/packetbeat.yml
 ------------------------------------------------------------
 
 You can increase the verbosity by enabling one or more debug selectors. For
-example, to view which transactions are published, you can start the agent like
+example, to view which transactions are published, you can start the shipper like
 this:
 
 [source,shell]

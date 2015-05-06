@@ -3,44 +3,44 @@
 The Packetbeat configuration file uses
 http://yaml.org/[YAML] for its syntax. It consists of the following sections:
 
-* <<configuration-agent>>
+* <<configuration-shipper>>
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-output>>
 * <<configuration-processes>>
 * <<configuration-run-options>>
 
-[[configuration-agent]]
-=== Agent
+[[configuration-shipper]]
+=== Shipper
 
-The agent section contains options for the Packetbeat agent itself and some
+The shipper section contains options for the Packetbeat shipper itself and some
 general settings regarding its behaviour.
 
 Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-agent:
-  # The name of the agent that publishes the network data. It can be used to group
-  # all the transactions sent by a single agent in the web interface.
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
   # If this options is not defined, the hostname is used.
   #name:
 
-  # The tags of the agent are included in their own field with each
+  # The tags of the shipper are included in their own field with each
   # transaction published. Tags make it easy to group servers by different
   # logical properties.
   tags: ["service-X", "web-tier"]
 
   # Uncomment the following if you want to ignore transactions created
-  # by the server on which the agent is installed. This option is useful
-  # to remove duplicates if agents are installed on multiple servers.
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
   ignore_outgoing: true
 
-  # How often (in seconds) agents are publishing their IPs to the topology map.
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
   # The default is 10 seconds.
   refresh_topology_freq: 10
 
-  # Expiration time (in seconds) of the IPs published by an agent to the topology map.
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
   # All the IPs will be deleted afterwards. Note, that the value must be higher than
   # refresh_topology_freq. The default is 15 seconds.
   topology_expire: 15
@@ -50,29 +50,29 @@ agent:
 
 ===== name
 
-The name of the Packetbeat agent. If empty, the `hostname` of the server is
-used. This information is included in each transaction (the `agent` field)
-published by the agent and it can be used to group all the transactions sent by
-a single agent.
+The name of the Packetbeat shipper. If empty, the `hostname` of the server is
+used. This information is included in each transaction (the `shipper` field)
+published by the shipper and it can be used to group all the transactions sent by
+a single shipper.
 
-At startup, every Packetbeat agent registers itself to the network topology by
-publishing to Elasticsearch the IP and port together with its agent name. This
+At startup, every Packetbeat shipper registers itself to the network topology by
+publishing to Elasticsearch the IP and port together with its shipper name. This
 information is used to set both the `server` and `client_server` fields
-from transactions even when they are sniffed by another agent.
+from transactions even when they are sniffed by another shipper.
 
 Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-agent:
-  name: "my-agent"
+shipper:
+  name: "my-shipper"
 ------------------------------------------------------------------------------
 
 ===== tags
 
-The tags of the agent are included in the `tags` field with each transaction
+The tags of the shipper are included in the `tags` field with each transaction
 published. Tags make it easy to group servers by different logical properties.
-For example, if you have a cluster of web servers, you can add to the agents on
+For example, if you have a cluster of web servers, you can add to the shippers on
 each of them the tag "webservers" and then use filters and queries in the
 Kibana web interface to get visualisations for the whole group of servers.
 
@@ -80,51 +80,51 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-agent:
+shipper:
   tags: ["my-service", "hardware", "test"]
 ------------------------------------------------------------------------------
 
 ===== ignore_outgoing
 
-If the `ignore_outgoing` option is enabled, Packetbeat agent ignores all the
-transactions initiated from the server running the agent.
+If the `ignore_outgoing` option is enabled, Packetbeat shipper ignores all the
+transactions initiated from the server running the shipper.
 
-This is useful when two agents publish the same transactions because one sees
+This is useful when two shippers publish the same transactions because one sees
 it in its outgoing queue and the other sees it in its incoming queue. In order
 to remove the duplications, you can enable this option on one of the servers.
 
-image:./images/option_ignore_outgoing.png[Agents Architecture]
+image:./images/option_ignore_outgoing.png[Shippers Architecture]
 
-For example, in case an agent is installed on each server from a 3 servers
+For example, in case a shipper is installed on each server from a 3 servers
 architecture, t1 is the transaction exchanged between Server1 and Server2 and
 t2 is the transaction between Server2 and Server3, then both transactions are
-indexed twice as Agent2 sees both transactions:
+indexed twice as Shipper2 sees both transactions:
 
 Published transactions (ignore outgoing is false):
 
- - Agent1: t1
- - Agent2: t1 and t2
- - Agent3: t2
+ - Shipper1: t1
+ - Shipper2: t1 and t2
+ - Shipper3: t2
 
-To avoid duplications, you can enforce your agents to send only the incoming
+To avoid duplications, you can enforce your shippers to send only the incoming
 transactions and ignore the transactions created by the local server:
 
 Published transactions (ignore outgoing is true):
 
- - Agent1: none
- - Agent2: t1
- - Agent3: t2
+ - Shipper1: none
+ - Shipper2: t1
+ - Shipper3: t2
 
 ===== refresh_topology_freq
 
 This setting settings controls the refreshing interval of the topology map in
-seconds. In other words, how often each agent publishes its IP addresses to the
+seconds. In other words, how often each shipper publishes its IP addresses to the
 topology map. The default is 10 seconds.
 
 ===== topology_expire
 
 This setting controls the expiration time for the topology in seconds. This is
-useful in case an agent stops publishing its IP addresses.  The IP addresses
+useful in case a shipper stops publishing its IP addresses.  The IP addresses
 are removed automatically from the topology map after expiration. The default
 is 15 seconds.
 
@@ -168,7 +168,7 @@ interfaces:
 ------------------------------------------------------------------------------
 
 
-Alternatively, the Packetbeat agent supports capturing of all messages sent or
+Alternatively, the Packetbeat shipper supports capturing of all messages sent or
 received by the server on which it is installed. For this, use the special
 "any" device.
 
@@ -212,7 +212,7 @@ interfaces:
   type: af_packet
 ------------------------------------------------------------------------------
 
-If you are on Linux and you are trying to optimize the CPU usage of the agent,
+If you are on Linux and you are trying to optimize the CPU usage of the shipper,
 we recommend trying the `af_packet` and `pf_ring` options. Read this
 http://packetbeat.com/blog/sniffing-performance-and-ipv6.html[blog post]
 for some details.
@@ -276,10 +276,10 @@ The following options are available for all protocols:
 
 ===== ports
 
-The Packetbeat agent installs a BPF filter based on the ports configured in
+The Packetbeat shipper installs a BPF filter based on the ports configured in
 this section.
 If a packet doesn't match the filter, very little CPU is required to discard
-the packet. The agent also uses the ports configured here to decide which
+the packet. The shipper also uses the ports configured here to decide which
 parser to use for each packet.
 
 ===== send_request
@@ -332,11 +332,11 @@ protocols:
 
 ===== hide_keywords
 
-The Packetbeat agent has the option of automatically censor certain strings
+The Packetbeat shipper has the option of automatically censor certain strings
 from the transactions it saves. This is done because while the SQL traffic
 typically only contains the hashes of the passwords, it is possible that the
 HTTP traffic contains sensitive data. In order to reduce the security risks,
-the agent can automatically avoid sending the contents of certain HTTP POST
+the shipper can automatically avoid sending the contents of certain HTTP POST
 parameters. The sensitive content associated with these keywords is replaced
 by ``xxxxx``. By default, no changes are made to the HTTP messages.
 
@@ -436,7 +436,7 @@ corresponding to the TBinary protocol, which is the default Thrift protocol.
 ===== idl_files
 
 The Thrift Interface description language (IDL) files for the service that the
-agent is monitoring. Providing the IDL files is optional, because the Thrift
+shipper is monitoring. Providing the IDL files is optional, because the Thrift
 messages contain enough information to decode them without having the IDL
 files. However, providing the IDL will additionally fill in parameter and
 exceptions names.
@@ -455,7 +455,7 @@ added at the end to mark that the collection was truncated. The default is 15.
 
 ===== capture_reply
 
-If set to false, the Packetbeat agent only decodes the method name from
+If set to false, the Packetbeat shipper only decodes the method name from
 the reply and simply skip the rest of the response message. This can be useful
 for performance, disk usage or data retention reasons. The default is true.
 
@@ -466,9 +466,9 @@ in the return code or in the exception structures with the `"*"` string.
 
 ===== drop_after_n_struct_fields
 
-If a structure has more fields than this given value, the Packetbeat agent will
+If a structure has more fields than this given value, the Packetbeat shipper will
 ignore the whole transaction. This is a memory protection mechanism (so that
-the agent's memory doesn't grow indefinitely), so you would topically set this
+the shipper's memory doesn't grow indefinitely), so you would topically set this
 to a relatively high value. The default is 500.
 
 [[configuration-output]]
@@ -493,9 +493,9 @@ network topology.
 One of the important features of Packetbeat is that it knows for each
 transaction which is the source server and is the destination server by names.
 It does this without the requirement of maintaining a central configuration.
-Instead each agent notes the hostname of the server on which it runs on, and
+Instead each shipper notes the hostname of the server on which it runs on, and
 maps that to the list of IP addresses of that server. This information is
-shared between agents by using the mechanisms provided by the output plugins.
+shared between shippers by using the mechanisms provided by the output plugins.
 
 For example, the Redis output plugin stores the topology in a dedicated Redis
 database and the Elasticsearch output plugin stores the topology in an
@@ -595,7 +595,7 @@ was a pull request some time ago. But that's not documented yet.
 
 Inserts the transaction in a Redis list. This output plugin is compatibile with
 http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
-so Redis can be used as queue between the Packetbeat agents and Logstash.
+so Redis can be used as queue between the Packetbeat shippers and Logstash.
 
 Example configuration:
 
@@ -729,24 +729,24 @@ is 7 files.
 === Processes (optional)
 
 This section is optional, but configuring the processes enables Packetbeat
-agent to not only show you between which servers the traffic is flowing, but
+shipper to not only show you between which servers the traffic is flowing, but
 also between which processes. It can even show you the traffic between two
 processes running on the same host, so this is particularly useful when you
 have more services running on the same server. By default, process matching
 is disabled.
 
-When it starts (and then periodically) the agent scans the process table for
+When it starts (and then periodically) the shipper scans the process table for
 processes matching the configuration file. For each of these processes, it
 monitors which file descriptors it has opened. When a new packet is captured,
 it reads the list of active TCP connections and matches the corresponding one
 with the list of file descriptors.
 
 On a Linux system, all this information is available via the `/proc`
-filesystem, so the Packetbeat agent doesn't need a kernel module.
+filesystem, so the Packetbeat shipper doesn't need a kernel module.
 
 
 NOTE: Process monitoring is currently only supported on
-      Linux systems. The Packetbeat agent automatically disables
+      Linux systems. The Packetbeat shipper automatically disables
       it when it detects other operating systems.
 
 Example configuration:
@@ -781,7 +781,7 @@ app" instead of "gunicorn")
 ===== cmdline_grep
 
 This option for each process is used to identify the process at
-runtime. When it starts, and then periodically, the agent scans the process table for
+runtime. When it starts, and then periodically, the shipper scans the process table for
 processes matching `cmdline_grep` option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
@@ -793,11 +793,11 @@ matches the corresponding one with the list of file descriptors.
 [[configuration-run-options]]
 === Run options (optional)
 
-The Packetbeat agent can drop privileges after creating the sniffing socket.
+The Packetbeat shipper can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket but everything else requires no
-privileges. Therefore, it is recommended to have the agent switch users after
+privileges. Therefore, it is recommended to have the shipper switch users after
 the initialization phase.  `uid` and `gid` settings set the User Id and Group
-Id under which the agent will run.
+Id under which the shipper will run.
 
 WARNING: Because on Linux Setuid doesn't change the uid of all threads, the Go
          garbage collector will continue to run as root. Also, note that process

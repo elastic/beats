@@ -7,7 +7,7 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 == Exported fields
 
 This document describes the fields that are exported by the
-Packetbeat agent for each transaction. They are grouped in the
+Packetbeat shipper for each transaction. They are grouped in the
 following categories:
 
 * <<exported-fields-event>>
@@ -37,7 +37,7 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp of the event, as measured either by the agent or by a common collector point. The precision is in milliseconds. The timezone is UTC.
+The timestamp of the event, as measured either by the shipper or by a common collector point. The precision is in milliseconds. The timezone is UTC.
 
 
 ==== type
@@ -339,9 +339,9 @@ These fields contain data about the environment in which the transaction was cap
 
 
 
-==== agent
+==== shipper
 
-The name of the agent that captured the transaction.
+The name of the shipper that captured the transaction.
 
 
 ==== server
@@ -426,7 +426,7 @@ The software release of the service serving the transaction. This can be the com
 
 ==== tags
 
-Arbitrary tags that can be set per agent and per transaction type.
+Arbitrary tags that can be set per shipper and per transaction type.
 
 
 [[exported-fields-raw]]

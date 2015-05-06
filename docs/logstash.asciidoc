@@ -5,7 +5,7 @@ Our <<packetbeat-getting-started>> guide walks you through installing the
 simplest architecture for the Packetbeat system. This is nice and easy to get
 started with and enough for networks with small traffic. It also uses the
 minimum amount of servers: a single machine running Elasticsearch + Kibana. The
-Packetbeat agents insert the transactions directly into the Elasticsearch
+Packetbeat shippers insert the transactions directly into the Elasticsearch
 instance.
 
 While this is easy to get started with, if your application has to support
@@ -19,7 +19,7 @@ any way you like.
 
 image:./images/packetbeat_logstash.png[Integration with Logstash]
 
-In this setup, the Packetbeat agents use the `RPUSH` Redis command to insert
+In this setup, the Packetbeat shippers use the `RPUSH` Redis command to insert
 into a list stored in memory by Redis. Logstash reads from this key using the
 http://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis
 input plugin] and then sends the transactions to Elasticsearch using the
@@ -45,7 +45,7 @@ output:
 
 NOTE: If you want Packetbeat to monitor Redis traffic, it's better to change
 the port for the Redis instance that you use for collecting the traffic.
-Otherwise, you create a loop where the agent captures the traffic it sends.
+Otherwise, you create a loop where the shipper captures the traffic it sends.
 
 Then, configure Logstash to read from Redis and index into Elasticsearch. Here
 is a sample configuration that you can save under `/etc/logstash/conf.d/`:

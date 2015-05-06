@@ -1,9 +1,9 @@
 
-== Windows agent
+== Windows shipper
 
-The Packetbeat agent supports running on Windows, but to get it up and running
+The Packetbeat shipper supports running on Windows, but to get it up and running
 involves a few manual steps. This article explains how to use
-http://nssm.cc/[NSSM] to run the Packetbeat agent as a Windows service.
+http://nssm.cc/[NSSM] to run the Packetbeat shipper as a Windows service.
 
 === Prerequisites
 
@@ -24,13 +24,13 @@ under `C:`.
 * Download the NSSM zip from http://nssm.cc/download[here] and extract it
   also under `C:\Packetbeat`. The zip contains both the source file and the binaries.
 
-=== Download and configure the Packetbeat agent
+=== Download and configure the Packetbeat shipper
 
 ////
 TODO: Update download page link.
 ////
 
-Now download the agent from our http://packetbeat.com/download[download page].
+Now download the shipper from our http://packetbeat.com/download[download page].
 We provide 32 bit and 64 bit binaries, so choose the one that fits your
 system. Please save it and extract it under `C:\Packetbeat` as well.
 
@@ -96,7 +96,7 @@ image:./images/nssm_install.png[NSSM install]
 
 Select the *I/O* tab, and for the *Output (stdout)* and *Error (stderr)*
 fields, select a file in a location that appropriate for the logs written by
-the Packetbeat agent.
+the Packetbeat shipper.
 
 image:./images/nssm_install_file_redirection.png[NSSM file redirection]
 

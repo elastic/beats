@@ -36,7 +36,7 @@ and protocol types]. Currently Packetbeat supports the default `TSocket`
 transport as well as the `TFramed` transport. From the protocol point of view,
 Packetbeat currently supports only the default `TBinary` protocol.
 
-The Packetbeat agent also has several configuration options allowing you to get
+The Packetbeat shipper also has several configuration options allowing you to get
 the right balance between visibility and disk usage / data protection. You can
 for example, choose to obfuscate all strings or to store the requests but not
 the responses, while still capturing the response time for each of the RPC
@@ -63,7 +63,7 @@ protocols:
 More details about the configuration options can be found in the
 <<configuration-thrift>> section.
 
-Providing the Thrift IDL files to the Packetbeat agent is optional. The binary
+Providing the Thrift IDL files to the Packetbeat shipper is optional. The binary
 Thrift messages include the called method name and enough structure information
 to decode the messages without the need of the IDL files. However, if you
 provide the IDL files, Packetbeat can also resolve the service name, the

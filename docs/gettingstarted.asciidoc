@@ -15,14 +15,14 @@ The best way to understand the value of an application monitoring system like
 Packetbeat is to try it on your own traffic. This quick tutorial will walk you
 through installing the essential components of the Packetbeat system:
 
- * Packetbeat agents. They collect the traffic. You should install these on
+ * Packetbeat shippers. They collect the traffic. You should install these on
    your servers so that they capture the network traffic.
  * Elasticsearch for storage and indexing.
  * Kibana for the UI.
 
 For now, you can just install Elasticsearch and Kibana on a single VM or even
 on your laptop. The only condition is that this machine is accessible from the
-servers you want to monitor. As you add more agents and your traffic grows, you
+servers you want to monitor. As you add more shippers and your traffic grows, you
 will want replace the single Elasticsearch instance with a cluster. You will
 probably also want to automate the installation process.  But for now, let's
 just do the fun part.
@@ -107,10 +107,10 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.j
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening on.
 
-=== Packetbeat agent
+=== Packetbeat shipper
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
-data in it. For this, install the Packetbeat agents on your application
+data in it. For this, install the Packetbeat shippers on your application
 servers:
 
 deb:
@@ -148,7 +148,7 @@ NOTE: We also provide 32bits images. You can get them from our
 https://www.elastic.co/downloads/beats[download page].
 
 
-Before starting the agent, edit the configuration file:
+Before starting the shipper, edit the configuration file:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -193,7 +193,7 @@ protocols:
     ports: [9090]
 ----------------------------------------------------------------------
 
-Set the IP address and port where the agent can find the Elasticsearch
+Set the IP address and port where the shipper can find the Elasticsearch
 installation:
 
 [source,yaml]
@@ -214,7 +214,7 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-You are now ready to start the agent:
+You are now ready to start the shipper:
 
 deb:
 
