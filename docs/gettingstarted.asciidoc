@@ -294,16 +294,12 @@ demonstrate what is possible based on the wire data.
 
 To load the sample pages, follow these steps:
 
-////
-TODO: Update this link.
-////
-
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://github.com/elastic/packetbeat-dashboards/archive/v1.0.0beta1.tar.gz
-$ tar xzvf v1.0.0beta1.tar.gz
-$ cd dashboards-1.0.0beta1/
-$ ./load.sh
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0beta1.tar.gz
+tar xzvf packetbeat-dashboards-1.0.0beta1.tar.gz
+cd packetbeat-dashboards-1.0.0beta1/
+./load.sh http://localhost:9200
 ----------------------------------------------------------------------
 
 To open the loaded dashboards, go to the *Dashboard* page and click the "Open"

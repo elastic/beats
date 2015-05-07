@@ -7,7 +7,7 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 == Exported fields
 
 This document describes the fields that are exported by the
-Packetbeat shipper for each transaction. They are grouped in the
+Packetbeat agent for each transaction. They are grouped in the
 following categories:
 
 * <<exported-fields-event>>

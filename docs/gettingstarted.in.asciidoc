@@ -291,10 +291,10 @@ TODO: Update this link.
 
 [source,shell]
 ----------------------------------------------------------------------
-$ curl -L -O https://github.com/elastic/packetbeat-dashboards/archive/v$DASHBOARDS_VERSION.tar.gz
-$ tar xzvf v$DASHBOARDS_VERSION.tar.gz
-$ cd dashboards-$DASHBOARDS_VERSION/
-$ ./load.sh
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-$DASHBOARDS_VERSION.tar.gz
+tar xzvf packetbeat-dashboards-$DASHBOARDS_VERSION.tar.gz
+cd packetbeat-dashboards-$DASHBOARDS_VERSION/
+./load.sh
 ----------------------------------------------------------------------
 
 To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
