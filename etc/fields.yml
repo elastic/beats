@@ -13,9 +13,9 @@ env:
       These fields contain data about the environment in which the
       transaction was captured.
   fields:
-    - name: agent
+    - name: shipper
       description: >
-          The name of the agent that captured the transaction.
+          The name of the shipper that captured the transaction.
 
     - name: server
       description: >
@@ -87,7 +87,7 @@ env:
 
     - name: tags
       description: >
-        Arbitrary tags that can be set per agent and per transaction
+        Arbitrary tags that can be set per shipper and per transaction
         type.
 
 event:
@@ -101,7 +101,7 @@ event:
       format: YYYY-MM-DDTHH:MM:SS.milliZ
       example: 2015-01-24T14:06:05.071Z
       description: >
-        The timestamp of the event, as measured either by the agent or
+        The timestamp of the event, as measured either by the shipper or
         by a common collector point. The precision is in milliseconds.
         The timezone is UTC.
 
