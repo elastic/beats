@@ -1,14 +1,13 @@
 from pbtests.packetbeat import TestCase
-from nose.tools import nottest
 
 
 class Test(TestCase):
 
-    def test_mysql_affected_rows(self):
+    def test_mysql_error(self):
         self.render_config_template(
             mysql_ports=[3306]
         )
-        self.run_packetbeat(pcap="mysql_affected_rows.pcap",
+        self.run_packetbeat(pcap="mysql_err_database_not_selected.pcap",
                             debug_selectors=["mysql,tcp,publish"])
 
         objs = self.read_output()
@@ -16,7 +15,8 @@ class Test(TestCase):
         assert len(objs) == 1
         assert all([o["port"] == 3306 for o in objs])
 
-        assert objs[0]["method"] == "UPDATE"
-        assert objs[0]["mysql.affected_rows"] == 316
-        assert objs[0]["status"] == "OK"
+        assert objs[0]["method"] == "SELECT"
+        assert objs[0]["status"] == "Error"
+        assert objs[0]["mysql.error_code"] == 1046
+        assert objs[0]["mysql.error_message"] == "3D000: No database selected"
         assert objs[0]["count"] == 1
