@@ -1,7 +1,10 @@
 from pbtests.packetbeat import TestCase
+from nose.tools import nottest
 
 
 class Test(TestCase):
+
+    @nottest
     def test_mysql_affected_rows(self):
         self.render_config_template(
             mysql_ports=[3306]
