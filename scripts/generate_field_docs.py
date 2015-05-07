@@ -46,8 +46,6 @@ def document_fields(output, section):
 
 def document_field(output, field):
 
-    print field["name"]
-
     output.write("==== {}\n\n".format(field["name"]))
 
     if "type" in field:
