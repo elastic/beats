@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 )
 
 func HttpModForTests() *Http {
@@ -979,5 +980,81 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 
 	if strings.Contains(params, "secret") {
 		t.Errorf("Failed to censor the password: %s", msg)
+	}
+}
+
+func Test_splitCookiesHeader(t *testing.T) {
+	type io struct {
+		Input  string
+		Output map[string]string
+	}
+
+	tests := []io{
+		io{
+			Input: "sessionToken=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"expires":      "Wed, 09 Jun 2021 10:18:14 GMT",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; invalid",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123;;;; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input: "sessionToken=\"abc123\"; multiple=\"a=d=2 \"",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2 ",
+			},
+		},
+
+		io{
+			Input: "sessionToken\t=   abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input:  ";",
+			Output: map[string]string{},
+		},
+
+		io{
+			Input:  "",
+			Output: map[string]string{},
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, splitCookiesHeader(test.Input))
 	}
 }

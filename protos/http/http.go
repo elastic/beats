@@ -816,13 +816,24 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	http.results <- event
 }
 
+func parseCookieValue(raw string) string {
+	// Strip the quotes, if present.
+	if len(raw) > 1 && raw[0] == '"' && raw[len(raw)-1] == '"' {
+		raw = raw[1 : len(raw)-1]
+	}
+	return raw
+}
+
 func splitCookiesHeader(headerVal string) map[string]string {
 	cookies := map[string]string{}
 
 	cstring := strings.Split(headerVal, ";")
 	for _, cval := range cstring {
-		cookie := strings.Split(cval, "=")
-		cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+		cookie := strings.SplitN(cval, "=", 2)
+		if len(cookie) == 2 {
+			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] =
+				parseCookieValue(strings.TrimSpace(cookie[1]))
+		}
 	}
 
 	return cookies
