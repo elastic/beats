@@ -1,8 +1,8 @@
 == Overview
 
-Packetbeat is a real-time wire data analyzer that can be used together
-with the ELK stack to provide an application monitoring and performance
-management system.
+Packetbeat is a real-time network packet analyzer that can be used together
+with Elasticsearch to provide an application monitoring and performance
+analytics system.
 
 It works by capturing the network traffic between your application servers,
 decoding the application layer protocols (HTTP, MySQL, Redis, etc.),
@@ -41,7 +41,7 @@ deployment, there is zero overhead on the monitored application. See
 
 After decoding the Layer 7 messages, Packetbeat correlates the requests with
 the responses in what we call "transactions" and for each such transaction it
-inserts a JSON document into Elastcisearch. See the <<exported-fields>> section
+inserts a JSON document into Elasticsearch. See the <<exported-fields>> section
 for details about which fields are indexed.
 
 image:./images/app-monitoring-overview.png[Application Monitoring Overview]
