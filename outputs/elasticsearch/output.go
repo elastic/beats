@@ -115,7 +115,7 @@ func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 
 func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 
-	// get all agents IPs from Elasticsearch
+	// get all shippers IPs from Elasticsearch
 	TopologyMapTmp := make(map[string]string)
 
 	res, err := core.SearchUri(".packetbeat-topology", "server-ip", nil)
