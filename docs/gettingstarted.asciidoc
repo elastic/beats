@@ -141,12 +141,8 @@ curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0b
 tar xzvf packetbeat-1.0.0beta1-x86_64.tar.gz
 ----------------------------------------------------------------------
 
-////
-TODO: Check if the downloads URL is indeed /downloads/beats
-////
 NOTE: We also provide 32bits images. You can get them from our
-https://www.elastic.co/downloads/beats[download page].
-
+https://www.elastic.co/downloads/beats/packetbeat[download page].
 
 Before starting the shipper, edit the configuration file:
 
@@ -294,12 +290,16 @@ demonstrate what is possible based on the wire data.
 
 To load the sample pages, follow these steps:
 
+////
+TODO: Update this link.
+////
+
 [source,shell]
 ----------------------------------------------------------------------
 curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0beta1.tar.gz
 tar xzvf packetbeat-dashboards-1.0.0beta1.tar.gz
 cd packetbeat-dashboards-1.0.0beta1/
-./load.sh http://localhost:9200
+./load.sh
 ----------------------------------------------------------------------
 
 To open the loaded dashboards, go to the *Dashboard* page and click the "Open"

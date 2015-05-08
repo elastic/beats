@@ -132,12 +132,8 @@ curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VE
 tar xzvf packetbeat-$PB_VERSION-x86_64.tar.gz
 ----------------------------------------------------------------------
 
-////
-TODO: Check if the downloads URL is indeed /downloads/beats
-////
 NOTE: We also provide 32bits images. You can get them from our
-https://www.elastic.co/downloads/beats[download page].
-
+https://www.elastic.co/downloads/beats/packetbeat[download page].
 
 Before starting the shipper, edit the configuration file:
 
