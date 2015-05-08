@@ -2,7 +2,7 @@
 == Getting started
 
 
-The best way to understand the value of an application monitoring system like
+The best way to understand the value of an network packet analytics system like
 Packetbeat is to try it on your own traffic. This quick tutorial will walk you
 through installing the essential components of the Packetbeat system:
 

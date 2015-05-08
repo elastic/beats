@@ -291,13 +291,9 @@ Kibana has a large set of visualization types which you can combine to create
 the perfect dashboards for your needs. But this flexibility can be a bit
 overwhelming at the beginning, so we have created a couple of
 <<sample-dashboards,sample dashboards>> to give you a good start and to
-demonstrate what is possible based on the wire data.
+demonstrate what is possible based on the packet data.
 
 To load the sample pages, follow these steps:
-
-////
-TODO: Update this link.
-////
 
 [source,shell]
 ----------------------------------------------------------------------
