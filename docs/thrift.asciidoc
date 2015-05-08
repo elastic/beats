@@ -22,10 +22,6 @@ A transaction is put into the `Error` state if it returned an exception.
 Packetbeat also indexes the  `responsetime` field so you can get performance
 analytics and find the slow RPC calls.
 
-////
-TODO: Update this screenshot to Kibana4, and a link to the live demo.
-////
-
 Here is an example performance dashboard:
 
 image:./images/thrift-dashboard.png[Thrift-RPC dashboard]
