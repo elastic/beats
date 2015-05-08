@@ -56,3 +56,6 @@ possible to use Redis + Logstash as a central collector and queue for
 transactions data. See <<packetbeat-logstash>> for details.
 
 image:./images/packetbeat-redis-overview.png[Logstash Integration]
+
+In the near future, a direct integration between Packetbeat and Logstash will
+be implemented, so the Redis instance will no longer be needed.

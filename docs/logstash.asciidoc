@@ -8,14 +8,16 @@ minimum amount of servers: a single machine running Elasticsearch + Kibana. The
 Packetbeat shippers insert the transactions directly into the Elasticsearch
 instance.
 
-While this is easy to get started with, if your application has to support
-significant traffic, it is wise to use multiple servers (or virtual machines)
-for your monitoring system.
-
 This article explains how to use Packetbeat together with Redis and Logstash to
 provide buffering and efficient indexing.  Another important advantage is that
 you have the opportunity in Logstash to modify the data captured by Packetbeat
-any way you like.
+any way you like. You can also use Logstash's many output plugins to integrate
+with other systems.
+
+WARNING: The Redis output is meant to be used only temporarily until the direct
+integration between Packetbeat and Logstash is implemented. We plan to use the
+same protocol as it is used between the
+https://github.com/elastic/logstash-forwarder[Logstash Forwarder] and Logstash.
 
 image:./images/packetbeat_logstash.png[Integration with Logstash]
 
