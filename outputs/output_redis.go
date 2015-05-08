@@ -276,7 +276,7 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 
 	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
-		logp.Err("Fail to get the all agents from the topology map %s", err)
+		logp.Err("Fail to get the all shippers from the topology map %s", err)
 		return
 	}
 	for _, hostname := range hostnames {
