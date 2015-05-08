@@ -69,6 +69,9 @@ cd elasticsearch-1.5.2
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
+You can learn more about installing, configuring and running Elasticsearch in
+http://www.elastic.co/guide/en/elasticsearch/guide/current/_installing_elasticsearch.html[Elasticsearch: The Definitive Guide].
+
 
 To test that the Elasticsearch daemon is up and running, try sending a HTTP GET
 request on port 9200:
@@ -107,7 +110,7 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.j
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening on.
 
-=== Packetbeat shipper
+=== Packetbeat installation
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
 data in it. For this, install the Packetbeat shippers on your application
@@ -279,6 +282,8 @@ Packetbeat under the Discover page:
 
 image:./images/kibana-discover.png[Kibana discover page]
 
+You can learn more about Kibana in the
+http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 
 === Sample Kibana dashboards
 
