@@ -11,19 +11,19 @@
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
+			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
+			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
+			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "b16f8c86e8be135d1d56dcf4ae75932c883905db"
+			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -59,7 +59,7 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "e4ec8152c15fc46bd5056ce65997a07c7d415325"
+			"Rev": "e22aedd37671fb115be6c0c25129c405cb575cfd"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",

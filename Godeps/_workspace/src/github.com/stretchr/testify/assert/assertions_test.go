@@ -115,10 +115,6 @@ func TestEqual(t *testing.T) {
 	if !Equal(mockT, uint64(123), uint64(123)) {
 		t.Error("Equal should return true")
 	}
-	funcA := func() int { return 42 }
-	if !Equal(mockT, funcA, funcA) {
-		t.Error("Equal should return true")
-	}
 
 }
 
@@ -406,19 +402,6 @@ func TestNotPanics(t *testing.T) {
 
 }
 
-func TestEqual_Funcs(t *testing.T) {
-
-	type f func() int
-	f1 := func() int { return 1 }
-	f2 := func() int { return 2 }
-
-	f1Copy := f1
-
-	Equal(t, f1Copy, f1, "Funcs are the same and should be considered equal")
-	NotEqual(t, f1, f2, "f1 and f2 are different")
-
-}
-
 func TestNoError(t *testing.T) {
 
 	mockT := new(testing.T)
@@ -694,6 +677,27 @@ func TestInDelta(t *testing.T) {
 	}
 }
 
+func TestInDeltaSlice(t *testing.T) {
+	mockT := new(testing.T)
+
+	True(t, InDeltaSlice(mockT,
+		[]float64{1.001, 0.999},
+		[]float64{1, 1},
+		0.1), "{1.001, 0.009} is element-wise close to {1, 1} in delta=0.1")
+
+	True(t, InDeltaSlice(mockT,
+		[]float64{1, 2},
+		[]float64{0, 3},
+		1), "{1, 2} is element-wise close to {0, 3} in delta=1")
+
+	False(t, InDeltaSlice(mockT,
+		[]float64{1, 2},
+		[]float64{0, 3},
+		0.1), "{1, 2} is not element-wise close to {0, 3} in delta=0.1")
+
+	False(t, InDeltaSlice(mockT, "", nil, 1), "Expected non numeral slices to fail")
+}
+
 func TestInEpsilon(t *testing.T) {
 	mockT := new(testing.T)
 
@@ -731,6 +735,22 @@ func TestInEpsilon(t *testing.T) {
 		False(t, InEpsilon(mockT, tc.a, tc.b, tc.epsilon, "Expected %V and %V to have a relative difference of %v", tc.a, tc.b, tc.epsilon))
 	}
 
+}
+
+func TestInEpsilonSlice(t *testing.T) {
+	mockT := new(testing.T)
+
+	True(t, InEpsilonSlice(mockT,
+		[]float64{2.2, 2.0},
+		[]float64{2.1, 2.1},
+		0.06), "{2.2, 2.0} is element-wise close to {2.1, 2.1} in espilon=0.06")
+
+	False(t, InEpsilonSlice(mockT,
+		[]float64{2.2, 2.0},
+		[]float64{2.1, 2.1},
+		0.04), "{2.2, 2.0} is not element-wise close to {2.1, 2.1} in espilon=0.04")
+
+	False(t, InEpsilonSlice(mockT, "", nil, 1), "Expected non numeral slices to fail")
 }
 
 func TestRegexp(t *testing.T) {

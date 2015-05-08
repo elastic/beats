@@ -25,8 +25,8 @@ class Test(TestCase):
         assert o["path"] == "/"
         assert o["http.code"] == 200
         assert o["http.phrase"] == "OK"
-        assert "request_raw" not in objs[0]
-        assert "response_raw" not in objs[0]
+        assert "request" not in objs[0]
+        assert "response" not in objs[0]
 
     def test_drum_interraction(self):
         self.render_config_template(
@@ -50,7 +50,7 @@ class Test(TestCase):
 
     def test_send_options(self):
         """
-        Should put request_raw and response_raw in the output
+        Should put request and response in the output
         when requested.
         """
         self.render_config_template(
@@ -62,8 +62,8 @@ class Test(TestCase):
 
         objs = self.read_output()
         assert len(objs) == 1
-        assert "request_raw" in objs[0]
-        assert "response_raw" in objs[0]
+        assert "request" in objs[0]
+        assert "response" in objs[0]
 
     def test_include_body_for(self):
         self.render_config_template(
@@ -77,7 +77,7 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == 1
 
-        assert len(objs[0]["response_raw"]) > 20000
+        assert len(objs[0]["response"]) > 20000
 
     def test_send_headers_options(self):
         self.render_config_template(

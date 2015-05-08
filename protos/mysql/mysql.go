@@ -37,10 +37,10 @@ type MysqlMessage struct {
 	Rows           [][]string
 	Tables         string
 	IsOK           bool
-	AffectedRows   int
-	InsertId       int
+	AffectedRows   uint64
+	InsertId       uint64
 	IsError        bool
-	ErrorCode      int
+	ErrorCode      uint16
 	ErrorInfo      string
 	Query          string
 	IgnoreMessage  bool
@@ -214,7 +214,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// parse response
 				m.IsRequest = false
 
-				if uint8(hdr[4]) == 0x00 {
+				if uint8(hdr[4]) == 0x00 || uint8(hdr[4]) == 0xfe {
 					logp.Debug("mysqldetailed", "Received OK response")
 					m.start = s.parseOffset
 					s.parseState = MysqlStateEatMessage
@@ -251,11 +251,36 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				if m.IsRequest {
 					m.Query = string(s.data[m.start+5 : m.end])
 				} else if m.IsOK {
-					m.AffectedRows = int(s.data[m.start+5])
-					m.InsertId = int(s.data[m.start+6])
+					// affected rows
+					affectedRows, off, complete, err := read_linteger(s.data, m.start+5)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.AffectedRows = affectedRows
+
+					// last insert id
+					insertId, off, complete, err := read_linteger(s.data, off)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.InsertId = insertId
 				} else if m.IsError {
-					m.ErrorCode = int(uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+7]))
-					m.ErrorInfo = string(s.data[m.start+9:m.start+14]) + ": " + string(s.data[m.start+15:])
+					// int<1>header (0xff)
+					// int<2>error code
+					// string[1] sql state marker
+					// string[5] sql state
+					// string<EOF> error message
+					m.ErrorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
+
+					m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 				}
 				logp.Debug("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
 				return true, true
@@ -718,10 +743,10 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 
 	event["responsetime"] = t.ResponseTime
 	if mysql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if mysql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["method"] = t.Method
 	event["query"] = t.Query
@@ -729,7 +754,7 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	event["path"] = t.Path
 	event["bytes_out"] = t.Size
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

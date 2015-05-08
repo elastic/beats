@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=0.5.0
+VERSION?=1.0.0beta1
 ARCH?=$(shell uname -m)
 
 GOFILES = $(shell find . -type f -name '*.go')
@@ -24,9 +24,9 @@ deps:
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
 
-.PHONY: savedeps
-savedeps: deps
-	godep save ./...
+.PHONY: updatedeps
+updatedeps: deps
+	godep update ...
 
 .PHONY: restoredeps
 restoredeps:
@@ -69,12 +69,19 @@ testlong:
 
 .PHONY: cover
 cover:
-	go test -short -coverprofile=coverage.out
-	go tool cover -html=coverage.out
+	mkdir -p cover
+	./scripts/coverage.sh
+	go tool cover -html=profile.cov -o cover/coverage.html
 
 .PHONY: benchmark
 benchmark:
 	go test -short -bench=. ./...
+
+.PHONY: gen
+gen:
+	./scripts/generate_gettingstarted.sh docs/gettingstarted.in.asciidoc docs/gettingstarted.asciidoc
+	python scripts/generate_template.py etc/fields.yml etc/packetbeat.template.json
+	python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
 
 .PHONY: clean
 clean:

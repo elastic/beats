@@ -11,7 +11,7 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
-	Agent      publisher.AgentConfig
+	Shipper    publisher.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging

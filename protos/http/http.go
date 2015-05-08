@@ -795,10 +795,10 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if http.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if http.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["http"] = t.Http
 	if len(t.Real_ip) > 0 {
@@ -809,7 +809,7 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
 	event["params"] = t.Params
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

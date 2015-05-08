@@ -13,13 +13,14 @@ import (
 	"syscall"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
-	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -33,7 +34,7 @@ import (
 	"github.com/elastic/packetbeat/sniffer"
 )
 
-const Version = "0.5.0"
+const Version = "1.0.0beta1"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:   new(http.Http),
@@ -144,7 +145,7 @@ func main() {
 	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
 	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
-		config.ConfigSingleton.Agent); err != nil {
+		config.ConfigSingleton.Shipper); err != nil {
 
 		logp.Critical(err.Error())
 		os.Exit(1)

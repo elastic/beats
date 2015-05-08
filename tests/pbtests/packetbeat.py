@@ -116,8 +116,8 @@ class TestCase(unittest.TestCase):
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
                                                  self.dict_fields))
-        self.all_have_fields(jsons, ["@timestamp", "type", "status",
-                                     "agent", "count"])
+        self.all_have_fields(jsons, ["timestamp", "type", "status",
+                                     "shipper", "count"])
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
@@ -138,10 +138,15 @@ class TestCase(unittest.TestCase):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
-        # update the last_run link
-        if os.path.islink("last_run"):
-            os.unlink("last_run")
-        os.symlink("run/{}".format(self.id()), "last_run")
+        try:
+            # update the last_run link
+            if os.path.islink("last_run"):
+                os.unlink("last_run")
+            os.symlink("run/{}".format(self.id()), "last_run")
+        except:
+            # symlink is best effort and can fail when
+            # running tests in parallel
+            pass
 
         self.expected_fields, self.dict_fields = self.load_fields()
 
