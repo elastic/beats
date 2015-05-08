@@ -26,11 +26,7 @@ under `C:`.
 
 === Download and configure the Packetbeat shipper
 
-////
-TODO: Update download page link.
-////
-
-Now download the shipper from our http://packetbeat.com/download[download page].
+Now download the shipper from our https://www.elastic.co/downloads/beats/packetbeat[download page].
 We provide 32 bit and 64 bit binaries, so choose the one that fits your
 system. Please save it and extract it under `C:\Packetbeat` as well.
 
