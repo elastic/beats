@@ -110,6 +110,11 @@ func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 }
 
 func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
+
+	// This Recover should catch all exceptions in
+	// protocol modules.
+	defer logp.Recover("FollowTcp exception")
+
 	stream, exists := tcpStreamsMap[pkt.Tuple.Hashable()]
 	var original_dir uint8 = TcpDirectionOriginal
 	created := false
