@@ -34,6 +34,9 @@ type FileRotator struct {
 func (out *FileOutputType) Init(config MothershipConfig) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
+	if out.rotator.Name == "" {
+		out.rotator.Name = "packetbeat"
+	}
 	out.rotator.RotateEveryBytes = uint64(config.Rotate_every_kb) * 1024
 	if out.rotator.RotateEveryBytes == 0 {
 		out.rotator.RotateEveryBytes = 10 * 1024 * 1024

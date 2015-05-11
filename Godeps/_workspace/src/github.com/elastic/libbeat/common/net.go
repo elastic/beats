@@ -6,7 +6,7 @@ import (
 )
 
 // LocalIpAddrs finds the IP addresses of the hosts on which
-// the agent currently runs on.
+// the shipper currently runs on.
 func LocalIpAddrs() ([]net.IP, error) {
 	var localAddrs = []net.IP{}
 	addrs, err := net.InterfaceAddrs()
@@ -22,7 +22,7 @@ func LocalIpAddrs() ([]net.IP, error) {
 }
 
 // LocalIpAddrs finds the IP addresses of the hosts on which
-// the agent currently runs on and returns them as an array of
+// the shipper currently runs on and returns them as an array of
 // strings.
 func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 	var localAddrsStrings = []string{}

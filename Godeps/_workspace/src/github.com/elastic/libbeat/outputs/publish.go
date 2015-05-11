@@ -48,7 +48,7 @@ type MothershipConfig struct {
 	Flush_interval     int
 }
 
-type AgentConfig struct {
+type ShipperConfig struct {
 	Name                  string
 	Refresh_topology_freq int
 	Ignore_outgoing       bool
@@ -73,7 +73,7 @@ func PrintPublishEvent(event common.MapStr) {
 }
 
 func (publisher *PublisherType) GetServerName(ip string) string {
-	// in case the IP is localhost, return current agent name
+	// in case the IP is localhost, return current shipper name
 	islocal, err := common.IsLoopback(ip)
 	if err != nil {
 		logp.Err("Parsing IP %s fails with: %s", ip, err)
@@ -83,7 +83,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 			return publisher.name
 		}
 	}
-	// find the agent with the desired IP
+	// find the shipper with the desired IP
 	if publisher.TopologyOutput != nil {
 		return publisher.TopologyOutput.GetNameByIP(ip)
 	} else {
@@ -147,7 +147,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		return nil
 	}
 
-	event["agent"] = publisher.name
+	event["shipper"] = publisher.name
 	if len(publisher.tags) > 0 {
 		event["tags"] = publisher.tags
 	}
@@ -223,10 +223,10 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	outputs map[string]MothershipConfig, agent AgentConfig) error {
+	outputs map[string]MothershipConfig, shipper ShipperConfig) error {
 
 	var err error
-	publisher.IgnoreOutgoing = agent.Ignore_outgoing
+	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
 
 	publisher.disabled = publishDisabled
 	if publisher.disabled {
@@ -236,7 +236,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 	output, exists := outputs["elasticsearch"]
 	if exists && output.Enabled && !publisher.disabled {
 		err := publisher.ElasticsearchOutput.Init(output,
-			agent.Topology_expire)
+			shipper.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
 			return err
@@ -257,7 +257,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 	if exists && output.Enabled && !publisher.disabled {
 		logp.Debug("publish", "REDIS publisher enabled")
 		err := publisher.RedisOutput.Init(output,
-			agent.Topology_expire)
+			shipper.Topology_expire)
 		if err != nil {
 			logp.Err("Fail to initialize Redis as output: %s", err)
 			return err
@@ -297,7 +297,7 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		}
 	}
 
-	publisher.name = agent.Name
+	publisher.name = shipper.Name
 	if len(publisher.name) == 0 {
 		// use the hostname
 		publisher.name, err = os.Hostname()
@@ -305,20 +305,20 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 			return err
 		}
 
-		logp.Info("No agent name configured, using hostname '%s'", publisher.name)
+		logp.Info("No shipper name configured, using hostname '%s'", publisher.name)
 	}
 
-	publisher.tags = agent.Tags
+	publisher.tags = shipper.Tags
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if agent.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(agent.Refresh_topology_freq) * time.Second
+		if shipper.Refresh_topology_freq != 0 {
+			RefreshTopologyFreq = time.Duration(shipper.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)
 
-		// register agent and its public IP addresses
+		// register shipper and its public IP addresses
 		err = publisher.PublishTopology()
 		if err != nil {
 			logp.Err("Failed to publish topology: %s", err)

@@ -11,19 +11,19 @@
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
+			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
+			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
+			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "23d8ad6a264fd676fad1bb3dae360a99aff0ca9b"
+			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -59,7 +59,7 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "e22aedd37671fb115be6c0c25129c405cb575cfd"
+			"Rev": "5ab65693f48b284b3f7a83114dd7b166b45f0193"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
