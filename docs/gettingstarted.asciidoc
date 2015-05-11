@@ -98,13 +98,13 @@ An
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
 template file can be found
-https://github.com/packetbeat/packetbeat/blob/v1.0.0beta1/etc/packetbeat.template.json[here].
+https://github.com/packetbeat/packetbeat/blob/v1.0.0.Beta1/etc/packetbeat.template.json[here].
 Grab it and load it with the following commands:
 
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v1.0.0beta1/etc/packetbeat.template.json
+curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v1.0.0.Beta1/etc/packetbeat.template.json
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
@@ -121,8 +121,8 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0beta1-1_amd64.deb
-sudo dpkg -i packetbeat_1.0.0beta1-1_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0.Beta1-1_amd64.deb
+sudo dpkg -i packetbeat_1.0.0.Beta1-1_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
@@ -130,8 +130,8 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0beta1-1.el6.x86_64.rpm
-sudo rpm -vi packetbeat-1.0.0beta1-1.el6.x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0.Beta1-1.el6.x86_64.rpm
+sudo rpm -vi packetbeat-1.0.0.Beta1-1.el6.x86_64.rpm
 ----------------------------------------------------------------------
 
 
@@ -140,8 +140,8 @@ binary:
 [source,shell]
 ----------------------------------------------------------------------
 # install libpcap using your operating system package manager
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0beta1-x86_64.tar.gz
-tar xzvf packetbeat-1.0.0beta1-x86_64.tar.gz
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0.Beta1-x86_64.tar.gz
+tar xzvf packetbeat-1.0.0.Beta1-x86_64.tar.gz
 ----------------------------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
@@ -233,7 +233,7 @@ binary:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-1.0.0beta1
+cd packetbeat-1.0.0.Beta1
 sudo ./packetbeat -c /etc/packetbeat/packetbeat.yml
 ----------------------------------------------------------------------
 

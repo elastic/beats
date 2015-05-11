@@ -1,9 +1,10 @@
-packetbeat (1.0.0beta1-1) unstable; urgency=low
+packetbeat (1.0.0.Beta1) unstable; urgency=low
 
     * New version.
 
  -- Monica Sarbu <monica@packetbeat.com>  Tue, 04 May 2015 11:24:00 +0100
-packetbeat (1.0.0beta1-1) unstable; urgency=low
+
+packetbeat (0.5.0-1) unstable; urgency=low
 
     * New version.
 
