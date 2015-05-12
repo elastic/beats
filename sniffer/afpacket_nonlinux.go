@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/packetbeat/gopacket"
+	"github.com/tsg/gopacket"
 )
 
 type AfpacketHandle struct {

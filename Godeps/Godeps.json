@@ -46,10 +46,6 @@
 			"Rev": "ed2d56a9bd244d2c92019f55a4415263d2bc976f"
 		},
 		{
-			"ImportPath": "github.com/packetbeat/gopacket",
-			"Rev": "9f6f103107a8eeea93a485f4fc7880d7e663e3b9"
-		},
-		{
 			"ImportPath": "github.com/samuel/go-parser/parser",
 			"Rev": "ca8abbf65d0e61dedf061f98bd3850f250e27539"
 		},
@@ -59,7 +55,11 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "5ab65693f48b284b3f7a83114dd7b166b45f0193"
+			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+		},
+		{
+			"ImportPath": "github.com/tsg/gopacket",
+			"Rev": "3e34b6b28c05a799db2f246a1e425f8be436b98a"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
