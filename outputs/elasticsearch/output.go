@@ -9,13 +9,12 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
-	"github.com/packetbeat/elastigo/api"
-	"github.com/packetbeat/elastigo/core"
 )
 
 type ElasticsearchOutput struct {
 	Index          string
 	TopologyExpire int
+	Conn           *Elasticsearch
 
 	TopologyMap map[string]string
 }
@@ -27,15 +26,18 @@ type PublishedTopology struct {
 
 func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
-	api.Domain = config.Host
-	api.Port = fmt.Sprintf("%d", config.Port)
-	api.Username = config.Username
-	api.Password = config.Password
-	api.BasePath = config.Path
+	url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
+	con := NewElasticsearch(url)
+	out.Conn = con
 
-	if config.Protocol != "" {
-		api.Protocol = config.Protocol
-	}
+	// TODO:
+	//api.Username = config.Username
+	//api.Password = config.Password
+	//api.BasePath = config.Path
+
+	//if config.Protocol != "" {
+	//	api.Protocol = config.Protocol
+	//}
 
 	if config.Index != "" {
 		out.Index = config.Index
@@ -54,7 +56,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		return err
 	}
 
-	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s://%s:%s%s", api.Protocol, api.Domain, api.Port, api.BasePath)
+	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", url)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
 
@@ -68,10 +70,7 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 		},
 	}
 
-	// Make sure the index exists, but ignore errors (probably exists already)
-	core.Index(".packetbeat-topology", "", "", nil, nil)
-
-	_, err := core.Index(".packetbeat-topology", "server-ip", "_mapping", nil, setting)
+	_, err := out.Conn.Index(".packetbeat-topology", "server-ip", "_mapping", nil, setting)
 	if err != nil {
 		return err
 	}
@@ -87,21 +86,16 @@ func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 }
 func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
-	_, err := core.IndexWithParameters(
+	params := map[string]string{
+		"ttl":     fmt.Sprintf("%d", out.TopologyExpire),
+		"refresh": "true",
+	}
+	_, err := out.Conn.Index(
 		".packetbeat-topology", /*index*/
 		"server-ip",            /*type*/
 		name,                   /* id */
-		"",                     /*parent id */
-		0,                      /* version */
-		"",                     /* op_type */
-		"",                     /* routing */
-		"",                     /* timestamp */
-		out.TopologyExpire,     /*ttl*/
-		"",                     /* percolate */
-		"",                     /* timeout */
-		false,                  /*refresh */
-		nil,                    /*args */
-		PublishedTopology{name, strings.Join(localAddrs, ",")} /* data */)
+		params,                 /* parameters */
+		PublishedTopology{name, strings.Join(localAddrs, ",")} /* body */)
 
 	if err != nil {
 		logp.Err("Fail to publish IP addresses: %s", err)
@@ -118,11 +112,17 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 	// get all shippers IPs from Elasticsearch
 	TopologyMapTmp := make(map[string]string)
 
-	res, err := core.SearchUri(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.SearchUri(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
-		for _, server := range res.Hits.Hits {
+		for _, obj := range res.Hits.Hits {
+			var result QueryResult
+			err = json.Unmarshal(obj, &result)
+			if err != nil {
+				return
+			}
+
 			var pub PublishedTopology
-			err = json.Unmarshal([]byte(*server.Source), &pub)
+			err = json.Unmarshal(result.Source, &pub)
 			if err != nil {
 				logp.Err("json.Unmarshal fails with: %s", err)
 			}
@@ -145,7 +145,7 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 func (out *ElasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, ts.Year(), ts.Month(), ts.Day())
-	_, err := core.Index(index, event["type"].(string), "", nil, event)
+	_, err := out.Conn.Index(index, event["type"].(string), "", nil, event)
 	logp.Debug("output_elasticsearch", "Publish event")
 	return err
 }

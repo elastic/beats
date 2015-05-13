@@ -1,11 +1,18 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
-	"strings"
+	"net/url"
+
+	"github.com/elastic/libbeat/logp"
+)
+
+const (
+	DefaultElasticsearchUrl = "http://localhost:9200"
 )
 
 type Elasticsearch struct {
@@ -14,92 +21,223 @@ type Elasticsearch struct {
 	client *http.Client
 }
 
-type ESSearchResults struct {
+type QueryResult struct {
+	Ok      bool            `json:"ok"`
+	Index   string          `json:"_index"`
+	Type    string          `json:"_type"`
+	Id      string          `json:"_id"`
+	Source  json.RawMessage `json:"_source"`
+	Version int             `json:"_version"`
+	Found   bool            `json:"found"`
+	Exists  bool            `json:"exists"`
+	Created bool            `json:"created"`
+	Matches []string        `json:"matches"`
+}
+
+type SearchResults struct {
 	Took   int                        `json:"took"`
 	Shards json.RawMessage            `json:"_shards"`
-	Hits   ESHits                     `json:"hits"`
+	Hits   Hits                       `json:"hits"`
 	Aggs   map[string]json.RawMessage `json:"aggregations"`
 }
 
-type ESHits struct {
+type Hits struct {
 	Total int
 	Hits  []json.RawMessage `json:"hits"`
 }
 
-func NewElasticsearch(url string) *Elasticsearch {
-	if len(url) == 0 {
-		url = "http://localhost:9200"
+func (r QueryResult) String() string {
+	out, err := json.Marshal(r)
+	if err != nil {
+		return "ERROR"
 	}
-	return &Elasticsearch{
-		Url:    url,
-		client: &http.Client{},
-	}
+	return string(out)
 }
 
-// Generic request method. Returns the HTTP response that we get from ES.
-// If ES returns an error HTTP code (>299), the error is non-nil and the
-// response is also non-nil.
-func (es *Elasticsearch) Request(method string, index string, path string,
-	data io.Reader) (*http.Response, error) {
+func NewElasticsearch(url string) *Elasticsearch {
+	es := Elasticsearch{
+		Url:    DefaultElasticsearchUrl,
+		client: &http.Client{},
+	}
+	if url != es.Url {
+		es.Url = url
+	}
+	return &es
+}
 
-	url := fmt.Sprintf("%s/%s/%s", es.Url, index, path)
+func UrlEncode(params map[string]string) string {
+	var values url.Values = url.Values{}
 
-	req, err := http.NewRequest(method, url, data)
+	for key, val := range params {
+		values.Add(key, string(val))
+	}
+	return values.Encode()
+}
+
+func MakePath(index string, doc_type string, id string) (string, error) {
+
+	var path string
+	if len(doc_type) > 0 {
+		if len(id) > 0 {
+			path = fmt.Sprintf("/%s/%s/%s", index, doc_type, id)
+		} else {
+			path = fmt.Sprintf("/%s/%s", index, doc_type)
+		}
+	} else {
+		if len(id) > 0 {
+			path = fmt.Sprintf("/%s/%s", index, id)
+		} else {
+			path = fmt.Sprintf("/%s", index)
+		}
+	}
+	return path, nil
+}
+
+func (es *Elasticsearch) Request(method string, url string,
+	params map[string]string, body interface{}) (*http.Response, error) {
+
+	url = es.Url + url
+	if len(params) > 0 {
+		url = url + "?" + UrlEncode(params)
+	}
+
+	var obj []byte
+	var err error
+	if body != nil {
+		obj, err = json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("Fail to JSON encode the body: %s", err)
+		}
+	} else {
+		obj = nil
+	}
+	logp.Debug("elasticsearch", "method=%s, url=%s, obj=%s", method, url, obj)
+	req, err := http.NewRequest(method, url, bytes.NewReader(obj))
 	if err != nil {
 		return nil, err
 	}
+
+	logp.Debug("elasticsearch", "Request: %s", req)
 
 	resp, err := es.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
+	logp.Debug("elasticsearch", "Response: %s", resp)
 	if resp.StatusCode > 299 {
 		return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
 	}
 
 	return resp, nil
+}
+
+// Index adds or updates a typed JSON document in a specified index, making it
+// searchable.
+//
+// Implements:
+// http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
+func (es *Elasticsearch) Index(index string, doc_type string, id string,
+	params map[string]string, body interface{}) (*QueryResult, error) {
+
+	var method string
+
+	path, err := MakePath(index, doc_type, id)
+	if err != nil {
+		return nil, err
+	}
+	if len(id) == 0 {
+		method = "POST"
+	} else {
+		method = "PUT"
+	}
+	resp, err := es.Request(method, path, params, body)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result QueryResult
+	err = json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
 // Refresh an index. Call this after doing inserts or creating/deleting
 // indexes in unit tests.
-func (es *Elasticsearch) Refresh(index string) (*http.Response, error) {
-	return es.Request("POST", index, "_refresh", nil)
+func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
+	path, err := MakePath(index, "", "_refresh")
+	if err != nil {
+		return nil, err
+	}
+	resp, err := es.Request("POST", path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result QueryResult
+	err = json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
-func (es *Elasticsearch) DeleteIndex(index string) (*http.Response, error) {
-	path := fmt.Sprintf("%s/%s", es.Url, index)
+func (es *Elasticsearch) Delete(index string, doc_type string, id string, params map[string]string) (*QueryResult, error) {
 
-	req, err := http.NewRequest("DELETE", path, nil)
+	path, err := MakePath(index, doc_type, id)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.client.Do(req)
+	resp, err := es.Request("DELETE", path, params, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result QueryResult
+	err = json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
-func (es *Elasticsearch) Search(index string, params string, reqjson string) (*http.Response, error) {
+func (es *Elasticsearch) SearchUri(index string, doc_type string, params map[string]string) (*SearchResults, error) {
 
-	path := fmt.Sprintf("%s/%s/_search%s", es.Url, index, params)
-
-	req, err := http.NewRequest("GET", path, strings.NewReader(reqjson))
+	path, err := MakePath(index, doc_type, "_search")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.client.Do(req)
+	resp, err := es.Request("GET", path, params, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	if resp.StatusCode > 299 {
-		return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
-
-	return resp, nil
+	var result SearchResults
+	err = json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }

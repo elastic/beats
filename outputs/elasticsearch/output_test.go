@@ -1,14 +1,13 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -39,6 +38,9 @@ func TestTopologyInES(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
 	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+	}
 
 	elasticsearchOutput1 := createElasticsearchConnection()
 	elasticsearchOutput2 := createElasticsearchConnection()
@@ -49,12 +51,6 @@ func TestTopologyInES(t *testing.T) {
 		"fe80::4e8d:79ff:fef2:de6a"})
 	elasticsearchOutput3.PublishIPs("proxy3", []string{"10.1.0.10"})
 
-	// give some time to Elasticsearch to add the IPs
-	// TODO: just needs _refresh=true instead?
-	time.Sleep(1 * time.Second)
-
-	elasticsearchOutput3.UpdateLocalTopologyMap()
-
 	name2 := elasticsearchOutput3.GetNameByIP("10.1.0.9")
 	if name2 != "proxy2" {
 		t.Errorf("Failed to update proxy2 in topology: name=%s", name2)
@@ -63,11 +59,6 @@ func TestTopologyInES(t *testing.T) {
 	elasticsearchOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
 	elasticsearchOutput2.PublishIPs("proxy2", []string{"10.1.0.9"})
 	elasticsearchOutput3.PublishIPs("proxy3", []string{"192.168.1.2"})
-
-	// give some time to Elasticsearch to add the IPs
-	time.Sleep(1 * time.Second)
-
-	elasticsearchOutput3.UpdateLocalTopologyMap()
 
 	name3 := elasticsearchOutput3.GetNameByIP("192.168.1.2")
 	if name3 != "proxy3" {
@@ -113,35 +104,28 @@ func TestOneEvent(t *testing.T) {
 	if es == nil {
 		t.Errorf("Failed to create Elasticsearch connection")
 	}
-	_, err := es.DeleteIndex(index)
-	if err != nil {
-		t.Errorf("Failed to delete index: %s", err)
-	}
-
-	err = elasticsearchOutput.PublishEvent(ts, event)
+	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
 
 	es.Refresh(index)
 
-	resp, err := es.Search(index, "?search?q=agent:appserver1", "{}")
+	params := map[string]string{
+		"q": "agent:appserver1",
+	}
+	resp, err := es.SearchUri(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
 	}
-	defer resp.Body.Close()
-	objresp, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf("Failed to read body from response")
-	}
-	var search_res ESSearchResults
-	err = json.Unmarshal(objresp, &search_res)
-	if err != nil {
-		t.Errorf("Failed to unmarshal response: %s", err)
-	}
-	if search_res.Hits.Total != 1 {
+	if resp.Hits.Total != 1 {
 		t.Errorf("Too many results")
+	}
+
+	_, err = es.Delete(index, "", "", nil)
+	if err != nil {
+		t.Errorf("Failed to delete index: %s", err)
 	}
 }
 
@@ -174,12 +158,7 @@ func TestEvents(t *testing.T) {
 	if es == nil {
 		t.Errorf("Failed to create Elasticsearch connection")
 	}
-	_, err := es.DeleteIndex(index)
-	if err != nil {
-		t.Errorf("Failed to delete index: %s", err)
-	}
-
-	err = elasticsearchOutput.PublishEvent(ts, event)
+	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -196,22 +175,22 @@ func TestEvents(t *testing.T) {
 
 	es.Refresh(index)
 
-	resp, err := es.Search(index, "?search?q=agent:appserver1", "{}")
+	params := map[string]string{
+		"q": "agent:appserver1",
+	}
+
+	resp, err := es.SearchUri(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
 	}
-	defer resp.Body.Close()
-	objresp, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf("Failed to read body from response")
-	}
-	var search_res ESSearchResults
-	err = json.Unmarshal(objresp, &search_res)
-	if err != nil {
-		t.Errorf("Failed to unmarshal response: %s", err)
-	}
-	if search_res.Hits.Total != 2 {
+	if resp.Hits.Total != 2 {
 		t.Errorf("Too many results")
 	}
+
+	_, err = es.Delete(index, "", "", nil)
+	if err != nil {
+		t.Errorf("Failed to delete index: %s", err)
+	}
+
 }
