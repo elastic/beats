@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	"github.com/elastic/libbeat/logp"
 )
 
 const (
@@ -54,6 +52,7 @@ func (r QueryResult) String() string {
 	return string(out)
 }
 
+// Create a connection to Elasticsearch
 func NewElasticsearch(url string) *Elasticsearch {
 	es := Elasticsearch{
 		Url:    DefaultElasticsearchUrl,
@@ -65,6 +64,7 @@ func NewElasticsearch(url string) *Elasticsearch {
 	return &es
 }
 
+// Encode parameters in url
 func UrlEncode(params map[string]string) string {
 	var values url.Values = url.Values{}
 
@@ -74,6 +74,7 @@ func UrlEncode(params map[string]string) string {
 	return values.Encode()
 }
 
+// Create path out of index, doc_type and id that is used for querying Elasticsearch
 func MakePath(index string, doc_type string, id string) (string, error) {
 
 	var path string
@@ -93,6 +94,7 @@ func MakePath(index string, doc_type string, id string) (string, error) {
 	return path, nil
 }
 
+// Create a HTTP request to Elaticsearch
 func (es *Elasticsearch) Request(method string, url string,
 	params map[string]string, body interface{}) (*http.Response, error) {
 
@@ -111,20 +113,16 @@ func (es *Elasticsearch) Request(method string, url string,
 	} else {
 		obj = nil
 	}
-	logp.Debug("elasticsearch", "method=%s, url=%s, obj=%s", method, url, obj)
 	req, err := http.NewRequest(method, url, bytes.NewReader(obj))
 	if err != nil {
 		return nil, err
 	}
-
-	logp.Debug("elasticsearch", "Request: %s", req)
 
 	resp, err := es.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Debug("elasticsearch", "Response: %s", resp)
 	if resp.StatusCode > 299 {
 		return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
 	}
@@ -133,10 +131,9 @@ func (es *Elasticsearch) Request(method string, url string,
 }
 
 // Index adds or updates a typed JSON document in a specified index, making it
-// searchable.
-//
-// Implements:
-// http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
+// searchable. In case id is empty, a new id is created over a HTTP POST request.
+// Otherwise, a HTTP PUT request is issued.
+// Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
 func (es *Elasticsearch) Index(index string, doc_type string, id string,
 	params map[string]string, body interface{}) (*QueryResult, error) {
 
@@ -193,6 +190,8 @@ func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
 	return &result, err
 }
 
+// Deletes a typed JSON document from a specific index based on its id.
+// Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
 func (es *Elasticsearch) Delete(index string, doc_type string, id string, params map[string]string) (*QueryResult, error) {
 
 	path, err := MakePath(index, doc_type, id)
@@ -218,6 +217,8 @@ func (es *Elasticsearch) Delete(index string, doc_type string, id string, params
 	return &result, err
 }
 
+// A search request can be executed purely using a URI by providing request parameters.
+// Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
 func (es *Elasticsearch) SearchUri(index string, doc_type string, params map[string]string) (*SearchResults, error) {
 
 	path, err := MakePath(index, doc_type, "_search")

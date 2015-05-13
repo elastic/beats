@@ -24,6 +24,7 @@ type PublishedTopology struct {
 	IPs  string
 }
 
+// Initialize Elasticsearch as output
 func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
 	url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
@@ -63,6 +64,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	return nil
 }
 
+// Enable using ttl as paramters in a server-ip doc type
 func (out *ElasticsearchOutput) EnableTTL() error {
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
@@ -77,6 +79,7 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 	return nil
 }
 
+// Get the name of server using a specific IP
 func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 	name, exists := out.TopologyMap[ip]
 	if !exists {
@@ -84,6 +87,8 @@ func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 	}
 	return name
 }
+
+// Each shipper publishes a list of IPs together with its name to Elasticsearch
 func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	params := map[string]string{
@@ -107,6 +112,7 @@ func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 	return nil
 }
 
+// Update local topology map
 func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 
 	// get all shippers IPs from Elasticsearch
@@ -142,6 +148,7 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
 }
 
+// Publish an event
 func (out *ElasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, ts.Year(), ts.Month(), ts.Day())
