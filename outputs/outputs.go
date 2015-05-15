@@ -24,7 +24,8 @@ type MothershipConfig struct {
 	Rotate_every_kb    int
 	Number_of_files    int
 	DataType           string
-	Flush_interval     int
+	Flush_interval     *int
+	BulkMaxSize        *int
 }
 
 // Functions to be exported by a output plugin

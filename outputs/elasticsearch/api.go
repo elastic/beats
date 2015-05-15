@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 const (
@@ -86,12 +88,31 @@ func MakePath(index string, doc_type string, id string) (string, error) {
 		}
 	} else {
 		if len(id) > 0 {
-			path = fmt.Sprintf("/%s/%s", index, id)
+			if len(index) > 0 {
+				path = fmt.Sprintf("/%s/%s", index, id)
+			} else {
+				path = fmt.Sprintf("/%s", id)
+			}
 		} else {
 			path = fmt.Sprintf("/%s", index)
 		}
 	}
 	return path, nil
+}
+
+func ReadQueryResult(resp http.Response) (*QueryResult, error) {
+
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result QueryResult
+	err = json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
 // Create a HTTP request to Elaticsearch
@@ -148,6 +169,7 @@ func (es *Elasticsearch) Index(index string, doc_type string, id string,
 	} else {
 		method = "PUT"
 	}
+	logp.Debug("output_elasticsearch", "method=%s path=%s", method, path)
 	resp, err := es.Request(method, path, params, body)
 	if err != nil {
 		return nil, err
@@ -177,17 +199,23 @@ func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
+	return ReadQueryResult(*resp)
+}
+
+// Instantiate an index
+func (es *Elasticsearch) CreateIndex(index string) (*QueryResult, error) {
+
+	path, err := MakePath(index, "", "")
 	if err != nil {
 		return nil, err
 	}
-	var result QueryResult
-	err = json.Unmarshal(obj, &result)
+
+	resp, err := es.Request("PUT", path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &result, err
+
+	return ReadQueryResult(*resp)
 }
 
 // Deletes a typed JSON document from a specific index based on its id.
@@ -204,17 +232,7 @@ func (es *Elasticsearch) Delete(index string, doc_type string, id string, params
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result QueryResult
-	err = json.Unmarshal(obj, &result)
-	if err != nil {
-		return nil, err
-	}
-	return &result, err
+	return ReadQueryResult(*resp)
 }
 
 // A search request can be executed purely using a URI by providing request parameters.

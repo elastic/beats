@@ -3,6 +3,7 @@ package elasticsearch
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -14,21 +15,22 @@ import (
 const elasticsearchAddr = "localhost"
 const elasticsearchPort = 9200
 
-func createElasticsearchConnection() ElasticsearchOutput {
+func createElasticsearchConnection(flush_interval int) ElasticsearchOutput {
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	var elasticsearchOutput ElasticsearchOutput
 	elasticsearchOutput.Init(outputs.MothershipConfig{
-		Enabled:       true,
-		Save_topology: true,
-		Host:          elasticsearchAddr,
-		Port:          elasticsearchPort,
-		Username:      "",
-		Password:      "",
-		Path:          "",
-		Index:         index,
-		Protocol:      "",
+		Enabled:        true,
+		Save_topology:  true,
+		Host:           elasticsearchAddr,
+		Port:           elasticsearchPort,
+		Username:       "",
+		Password:       "",
+		Path:           "",
+		Index:          index,
+		Protocol:       "",
+		Flush_interval: &flush_interval,
 	}, 10)
 
 	return elasticsearchOutput
@@ -42,9 +44,9 @@ func TestTopologyInES(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
 	}
 
-	elasticsearchOutput1 := createElasticsearchConnection()
-	elasticsearchOutput2 := createElasticsearchConnection()
-	elasticsearchOutput3 := createElasticsearchConnection()
+	elasticsearchOutput1 := createElasticsearchConnection(0)
+	elasticsearchOutput2 := createElasticsearchConnection(0)
+	elasticsearchOutput3 := createElasticsearchConnection(0)
 
 	elasticsearchOutput1.PublishIPs("proxy1", []string{"10.1.0.4"})
 	elasticsearchOutput2.PublishIPs("proxy2", []string{"10.1.0.9",
@@ -80,9 +82,13 @@ func TestOneEvent(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
 	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch", "output_elasticsearch"})
+	}
+
 	ts := time.Now()
 
-	elasticsearchOutput := createElasticsearchConnection()
+	elasticsearchOutput := createElasticsearchConnection(0)
 
 	event := common.MapStr{}
 	event["type"] = "redis"
@@ -92,50 +98,62 @@ func TestOneEvent(t *testing.T) {
 	event["dst_port"] = 6379
 	event["src_ip"] = "192.168.22.2"
 	event["src_port"] = 6378
-	event["agent"] = "appserver1"
+	event["shipper"] = "appserver1"
 	r := common.MapStr{}
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
+	logp.Debug("output_elasticsearch", "index = %s", index)
 
-	es := NewElasticsearch("http://localhost:9200")
-
-	if es == nil {
-		t.Errorf("Failed to create Elasticsearch connection")
-	}
 	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
 
-	es.Refresh(index)
+	// give control to the other goroutine, otherwise the refresh happens
+	// before the refresh. We should find a better solution for this.
+	time.Sleep(100 * time.Millisecond)
+
+	_, err = elasticsearchOutput.Conn.Refresh(index)
+	if err != nil {
+		t.Errorf("Failed to refresh: %s", err)
+	}
+
+	defer func() {
+		_, err = elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		if err != nil {
+			t.Errorf("Failed to delete index: %s", err)
+		}
+	}()
 
 	params := map[string]string{
-		"q": "agent:appserver1",
+		"q": "shipper:appserver1",
 	}
-	resp, err := es.SearchUri(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
 
 	if err != nil {
-		t.Errorf("Failed to query elasticsearch: %s", err)
+		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
+		return
 	}
+	logp.Debug("output_elasticsearch", "resp = %s", resp)
 	if resp.Hits.Total != 1 {
-		t.Errorf("Too many results")
+		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
 	}
 
-	_, err = es.Delete(index, "", "", nil)
-	if err != nil {
-		t.Errorf("Failed to delete index: %s", err)
-	}
 }
 
 func TestEvents(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
 	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
+	}
+
 	ts := time.Now()
 
-	elasticsearchOutput := createElasticsearchConnection()
+	elasticsearchOutput := createElasticsearchConnection(0)
 
 	event := common.MapStr{}
 	event["type"] = "redis"
@@ -145,7 +163,7 @@ func TestEvents(t *testing.T) {
 	event["dst_port"] = 6379
 	event["src_ip"] = "192.168.22.2"
 	event["src_port"] = 6378
-	event["agent"] = "appserver1"
+	event["shipper"] = "appserver1"
 	r := common.MapStr{}
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
@@ -153,11 +171,6 @@ func TestEvents(t *testing.T) {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
 
-	es := NewElasticsearch("http://localhost:9200")
-
-	if es == nil {
-		t.Errorf("Failed to create Elasticsearch connection")
-	}
 	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
@@ -173,24 +186,93 @@ func TestEvents(t *testing.T) {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
 
-	es.Refresh(index)
+	// give control to the other goroutine, otherwise the refresh happens
+	// before the refresh. We should find a better solution for this.
+	time.Sleep(100 * time.Millisecond)
+
+	elasticsearchOutput.Conn.Refresh(index)
 
 	params := map[string]string{
-		"q": "agent:appserver1",
+		"q": "shipper:appserver1",
 	}
 
-	resp, err := es.SearchUri(index, "", params)
+	defer func() {
+		_, err = elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		if err != nil {
+			t.Errorf("Failed to delete index: %s", err)
+		}
+	}()
+
+	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
 	}
 	if resp.Hits.Total != 2 {
-		t.Errorf("Too many results")
+		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
+	}
+}
+
+func TestBulkEvents(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
+	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
 	}
 
-	_, err = es.Delete(index, "", "", nil)
+	ts := time.Now()
+
+	elasticsearchOutput := createElasticsearchConnection(50)
+
+	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
+
+	for i := 0; i < 10; i++ {
+
+		event := common.MapStr{}
+		event["type"] = "redis"
+		event["status"] = "OK"
+		event["responsetime"] = 34
+		event["dst_ip"] = "192.168.21.1"
+		event["dst_port"] = 6379
+		event["src_ip"] = "192.168.22.2"
+		event["src_port"] = 6378
+		event["shipper"] = "appserver" + strconv.Itoa(i)
+		r := common.MapStr{}
+		r["request"] = "MGET key" + strconv.Itoa(i)
+		r["response"] = "value" + strconv.Itoa(i)
+		event["redis"] = r
+
+		err := elasticsearchOutput.PublishEvent(ts, event)
+		if err != nil {
+			t.Errorf("Failed to publish the event: %s", err)
+		}
+
+	}
+
+	// give control to the other goroutine, otherwise the refresh happens
+	// before the refresh. We should find a better solution for this.
+	time.Sleep(200 * time.Millisecond)
+
+	elasticsearchOutput.Conn.Refresh(index)
+
+	params := map[string]string{
+		"q": "type:redis",
+	}
+
+	defer func() {
+		_, err := elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		if err != nil {
+			t.Errorf("Failed to delete index: %s", err)
+		}
+	}()
+
+	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
+
 	if err != nil {
-		t.Errorf("Failed to delete index: %s", err)
+		t.Errorf("Failed to query elasticsearch: %s", err)
 	}
-
+	if resp.Hits.Total != 10 {
+		t.Errorf("Wrong number of results: %d", resp.Hits.Total)
+	}
 }

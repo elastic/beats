@@ -47,6 +47,22 @@ func TestMakePath(t *testing.T) {
 	if path != "/twitter/_refresh" {
 		t.Errorf("Wrong path created: %s", path)
 	}
+
+	path, err = MakePath("", "", "_bulk")
+	if err != nil {
+		t.Errorf("Fail to create path: %s", err)
+	}
+	if path != "/_bulk" {
+		t.Errorf("Wrong path created: %s", path)
+	}
+	path, err = MakePath("twitter", "", "")
+	if err != nil {
+		t.Errorf("Fail to create path: %s", err)
+	}
+	if path != "/twitter" {
+		t.Errorf("Wrong path created: %s", path)
+	}
+
 }
 
 func TestIndex(t *testing.T) {
@@ -56,7 +72,7 @@ func TestIndex(t *testing.T) {
 	}
 
 	if testing.Short() {
-		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
+		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
 	es := NewElasticsearch("http://localhost:9200")

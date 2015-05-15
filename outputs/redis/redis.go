@@ -75,12 +75,12 @@ func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire in
 	}
 
 	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != 0 {
-		if config.Flush_interval < 0 {
+	if config.Flush_interval != nil {
+		if *config.Flush_interval < 0 {
 			out.flush_immediatelly = true
 			logp.Warn("Flushing to REDIS on each push, performance migh be affected")
 		} else {
-			out.FlushInterval = time.Duration(config.Flush_interval) * time.Millisecond
+			out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
 		}
 	}
 
