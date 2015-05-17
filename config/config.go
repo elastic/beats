@@ -71,6 +71,8 @@ type Http struct {
 	Split_cookie     bool
 	Real_ip_header   string
 	Include_body_for []string
+	Exclude_body_for []string
+
 }
 
 type Mysql struct {
