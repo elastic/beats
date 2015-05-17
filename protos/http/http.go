@@ -111,7 +111,7 @@ type Http struct {
 	Hide_keywords       []string
 	Strip_authorization bool
 	Include_body_for 	[]string
-
+	Exclude_body_for    []string
 	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
 	results chan common.MapStr
@@ -121,6 +121,7 @@ func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
 	http.Include_body_for= nil
+	http.Exclude_body_for= nil
 //	http.Include_body_for =  make(map[string]bool)
 //	http.Include_body_for["all"] = false;
 }
@@ -139,6 +140,14 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 		logp.Debug("http", "ConfigSetting: http.Include_body_for \n")
 		logp.Debug("http", "ConfigSetting: http.Include_body_for Length =%d \n",len(http.Include_body_for))
 		for _, include := range http.Include_body_for {
+			logp.Debug("http", "Value: '%s'\n", include)
+		}
+	}
+	if meta.IsDefined("http", "Exclude_body_for") {
+		http.Exclude_body_for = config.Http.Exclude_body_for
+		logp.Debug("http", "ConfigSetting: http.Exclude_body_for \n")
+		logp.Debug("http", "ConfigSetting: http.Exclude_body_for Length =%d \n",len(http.Exclude_body_for))
+		for _, include := range http.Exclude_body_for {
 			logp.Debug("http", "Value: '%s'\n", include)
 		}
 	}
@@ -851,7 +860,7 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
 		} else {
-			logp.Debug("http", "Body to include: [%s]", m.Raw[m.bodyOffset:])
+			logp.Debug("httpdetailed", "Body to include: [%s]", m.Raw[m.bodyOffset:])
 			raw_msg_cut = append(raw_msg_cut, m.Raw[m.bodyOffset:]...)
 		}
 	}
@@ -861,8 +870,14 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
 	if http.Include_body_for != nil {
-		if len(http.Include_body_for) == 0{
+		if ( len(http.Include_body_for) == 0 && ( http.Exclude_body_for == nil || len(http.Exclude_body_for) == 0)) {
 			return true;
+		}
+		for _, exclude := range http.Exclude_body_for {
+			if strings.Contains(contenttype, exclude) {
+				logp.Debug("httpdetailed", "Should Exclude Body = false Content-Type"+contenttype+" http.Exclude_body_for "+exclude)
+				return false
+			}
 		}
 		for _, include := range http.Include_body_for {
 			if strings.Contains(contenttype, include) {
