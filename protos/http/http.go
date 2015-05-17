@@ -807,7 +807,9 @@ func splitCookiesHeader(headerVal string) map[string]string {
 	cstring := strings.Split(headerVal, ";")
 	for _, cval := range cstring {
 		cookie := strings.Split(cval, "=")
-		cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+      if len(cookie) == 2 {
+			cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+		}
 	}
 
 	return cookies
