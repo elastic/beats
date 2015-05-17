@@ -110,7 +110,7 @@ type Http struct {
 	Real_ip_header      string
 	Hide_keywords       []string
 	Strip_authorization bool
-	Include_body_for []string
+	Include_body_for 	[]string
 
 	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
@@ -120,6 +120,7 @@ type Http struct {
 func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
+	http.Include_body_for= nil
 //	http.Include_body_for =  make(map[string]bool)
 //	http.Include_body_for["all"] = false;
 }
@@ -136,6 +137,7 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 	if meta.IsDefined("http", "Include_body_for") {
 		http.Include_body_for = config.Http.Include_body_for
 		logp.Debug("http", "ConfigSetting: http.Include_body_for \n")
+		logp.Debug("http", "ConfigSetting: http.Include_body_for Length =%d \n",len(http.Include_body_for))
 		for _, include := range http.Include_body_for {
 			logp.Debug("http", "Value: '%s'\n", include)
 		}
@@ -858,12 +860,17 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	for _, include := range http.Include_body_for {
-		if strings.Contains(contenttype, include) {
-			logp.Debug("httpdetailed", "Should Include Body = true Content-Type "+contenttype+" http.Include_body_for "+include)
-			return true
+	if http.Include_body_for != nil {
+		if len(http.Include_body_for) == 0{
+			return true;
 		}
-		logp.Debug("httpdetailed", "Should Include Body = false Content-Type"+contenttype+" http.Include_body_for "+include)
+		for _, include := range http.Include_body_for {
+			if strings.Contains(contenttype, include) {
+				logp.Debug("httpdetailed", "Should Include Body = true Content-Type "+contenttype+" http.Include_body_for "+include)
+				return true
+			}
+			logp.Debug("httpdetailed", "Should Include Body = false Content-Type"+contenttype+" http.Include_body_for "+include)
+		}
 	}
 	return false
 }
