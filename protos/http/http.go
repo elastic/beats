@@ -135,7 +135,7 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 		http.Send_response = config.Protocols["http"].Send_response
 		logp.Debug("http", "ConfigSetting: protocol.http.Send_response Value: '%t'\n", http.Send_response)
 	}
-	if meta.IsDefined("http", "Include_body_for") {
+	if meta.IsDefined("http", "include_body_for") {
 		http.Include_body_for = config.Http.Include_body_for
 		logp.Debug("http", "ConfigSetting: http.Include_body_for \n")
 		logp.Debug("http", "ConfigSetting: http.Include_body_for Length =%d \n",len(http.Include_body_for))
@@ -143,7 +143,7 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 			logp.Debug("http", "Value: '%s'\n", include)
 		}
 	}
-	if meta.IsDefined("http", "Exclude_body_for") {
+	if meta.IsDefined("http", "exclude_body_for") {
 		http.Exclude_body_for = config.Http.Exclude_body_for
 		logp.Debug("http", "ConfigSetting: http.Exclude_body_for \n")
 		logp.Debug("http", "ConfigSetting: http.Exclude_body_for Length =%d \n",len(http.Exclude_body_for))
@@ -151,23 +151,22 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 			logp.Debug("http", "Value: '%s'\n", include)
 		}
 	}
-	if meta.IsDefined("http", "Hide_keywords") {	
+	if meta.IsDefined("passwords", "hide_keywords") {	
 		http.Hide_keywords = config.Passwords.Hide_keywords
-		logp.Debug("http", "ConfigSetting: http.Hide_keywords Value: '%t'\n", http.Hide_keywords)
+		logp.Debug("http", "ConfigSetting: passwords.hide_keywords Value: '%t'\n", http.Hide_keywords)
 	}
-	if meta.IsDefined("Passwords", "Strip_authorization") {	
+	if meta.IsDefined("passwords", "strip_authorization") {	
 		http.Strip_authorization = config.Passwords.Strip_authorization
-		logp.Debug("http", "ConfigSetting: Password.Strip_authorization Value: '%t'\n", http.Strip_authorization)
+		logp.Debug("http", "ConfigSetting: sassword.strip_authorization Value: '%t'\n", http.Strip_authorization)
 	}
-	if meta.IsDefined("Http", "Send_all_headers") {	
+	if meta.IsDefined("http", "send_all_headers") {	
 		http.Send_headers = true
 		http.Send_all_headers = true
-		http.Strip_authorization = config.Passwords.Strip_authorization
 		logp.Debug("http", "ConfigSetting: Http.Send_all_headers Value: '%t'\n", http.Send_all_headers)
 		logp.Debug("http", "ConfigSetting: Http.Send_headers Value: '%t'\n", http.Send_headers)
 
 	} 
-	if meta.IsDefined("Http", "Send_headers") {	
+	if meta.IsDefined("http", "send_headers") {	
 			http.Send_headers = true
 			logp.Debug("http", "ConfigSetting: Http.Send_headers Value: '%t'\n", http.Send_headers)
 			http.Headers_whitelist = map[string]bool{}
@@ -176,12 +175,12 @@ func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err
 				logp.Debug("http", "ConfigSetting: Http.Headers_whitelist Value: '%s'\n", hdr)
 			}
 	}
-	if meta.IsDefined("Http", "Split_cookie") {	
+	if meta.IsDefined("http", "split_cookie") {	
 		http.Split_cookie = config.Http.Split_cookie
 		logp.Debug("http", "ConfigSetting: Split_cookie Value: '%t'\n", http.Split_cookie)
 	}
-	if meta.IsDefined("Http", "Real_ip_header") {	
-		http.Real_ip_header = config.Http.Real_ip_header
+	if meta.IsDefined("http", "real_ip_header") {	
+		http.Real_ip_header =  strings.ToLower(config.Http.Real_ip_header)
 		logp.Debug("http", "ConfigSetting: Real_ip_header: '%s'\n", http.Real_ip_header)
 	}
 
