@@ -110,6 +110,7 @@ type Http struct {
 	Real_ip_header      string
 	Hide_keywords       []string
 	Strip_authorization bool
+	Include_body_for []string
 
 	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
 
@@ -119,35 +120,59 @@ type Http struct {
 func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
+//	http.Include_body_for =  make(map[string]bool)
+//	http.Include_body_for["all"] = false;
 }
 
 func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
 	if meta.IsDefined("protocols", "http", "send_request") {
 		http.Send_request = config.Protocols["http"].Send_request
+		logp.Debug("http", "ConfigSetting: protocol.http.Send_request Value: '%t'\n", http.Send_request)
 	}
 	if meta.IsDefined("protocols", "http", "send_response") {
 		http.Send_response = config.Protocols["http"].Send_response
+		logp.Debug("http", "ConfigSetting: protocol.http.Send_response Value: '%t'\n", http.Send_response)
 	}
-	http.Hide_keywords = config.Passwords.Hide_keywords
-	http.Strip_authorization = config.Passwords.Strip_authorization
-
-	if config.Http.Send_all_headers {
+	if meta.IsDefined("http", "Include_body_for") {
+		http.Include_body_for = config.Http.Include_body_for
+		logp.Debug("http", "ConfigSetting: http.Include_body_for \n")
+		for _, include := range http.Include_body_for {
+			logp.Debug("http", "Value: '%s'\n", include)
+		}
+	}
+	if meta.IsDefined("http", "Hide_keywords") {	
+		http.Hide_keywords = config.Passwords.Hide_keywords
+		logp.Debug("http", "ConfigSetting: http.Hide_keywords Value: '%t'\n", http.Hide_keywords)
+	}
+	if meta.IsDefined("Passwords", "Strip_authorization") {	
+		http.Strip_authorization = config.Passwords.Strip_authorization
+		logp.Debug("http", "ConfigSetting: Password.Strip_authorization Value: '%t'\n", http.Strip_authorization)
+	}
+	if meta.IsDefined("Http", "Send_all_headers") {	
 		http.Send_headers = true
 		http.Send_all_headers = true
-	} else {
-		if len(config.Http.Send_headers) > 0 {
-			http.Send_headers = true
+		http.Strip_authorization = config.Passwords.Strip_authorization
+		logp.Debug("http", "ConfigSetting: Http.Send_all_headers Value: '%t'\n", http.Send_all_headers)
+		logp.Debug("http", "ConfigSetting: Http.Send_headers Value: '%t'\n", http.Send_headers)
 
+	} 
+	if meta.IsDefined("Http", "Send_headers") {	
+			http.Send_headers = true
+			logp.Debug("http", "ConfigSetting: Http.Send_headers Value: '%t'\n", http.Send_headers)
 			http.Headers_whitelist = map[string]bool{}
 			for _, hdr := range config.Http.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
+				logp.Debug("http", "ConfigSetting: Http.Headers_whitelist Value: '%s'\n", hdr)
 			}
-		}
 	}
-
-	http.Split_cookie = config.Http.Split_cookie
-
-	http.Real_ip_header = strings.ToLower(config.Http.Real_ip_header)
+	if meta.IsDefined("Http", "Split_cookie") {	
+		http.Split_cookie = config.Http.Split_cookie
+		logp.Debug("http", "ConfigSetting: Split_cookie Value: '%t'\n", http.Split_cookie)
+	}
+	if meta.IsDefined("Http", "Real_ip_header") {	
+		http.Real_ip_header = config.Http.Real_ip_header
+		logp.Debug("http", "ConfigSetting: Real_ip_header: '%s'\n", http.Real_ip_header)
+	}
 
 	return nil
 }
@@ -833,13 +858,12 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	include_body := config.ConfigSingleton.Http.Include_body_for
-	for _, include := range include_body {
+	for _, include := range http.Include_body_for {
 		if strings.Contains(contenttype, include) {
-			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
+			logp.Debug("httpdetailed", "Should Include Body = true Content-Type "+contenttype+" http.Include_body_for "+include)
 			return true
 		}
-		logp.Debug("http", "Should Include Body = false Content-Type"+contenttype+" include_body "+include)
+		logp.Debug("httpdetailed", "Should Include Body = false Content-Type"+contenttype+" http.Include_body_for "+include)
 	}
 	return false
 }
