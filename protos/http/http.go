@@ -205,7 +205,6 @@ func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 	}
 
 	http.transactionsMap = make(map[common.HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
-
 	logp.Debug("http", "transactionsMap: %p http: %p", http.transactionsMap, &http)
 
 	http.results = results
@@ -401,12 +400,12 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					s.parseState = BODY_CHUNKED_START
 					continue
 				}
-				if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
-					logp.Debug("http", "Empty content length, ignore body")
-					// Ignore body for request that contains a message body but not a Content-Length
-					m.end = s.parseOffset
-					return true, true
-				}
+              if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
+                       logp.Debug("http", "Empty content length, ignore body")
+                       // Ignore body for request that contains a message body but not a Content-Length
+                       m.end = s.parseOffset
+                       return true, true	
+               }
 				logp.Debug("http", "Read body")
 				s.parseState = BODY
 			} else {
@@ -693,6 +692,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 	// save Raw message
 	if http.Send_request {
+		logp.Debug("http", "HTTP Send_resquest")
 		trans.Request_raw = string(http.cutMessageBody(msg))
 	}
 
@@ -747,7 +747,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	trans := http.transactionsMap[tuple.Hashable()]
 	if trans == nil {
-		logp.Warn("Response from unknown transaction. Ignoring: %v", tuple)
+		logp.Warn("Response from unknown transaction. Ignoring: %v ", tuple)
 		return
 	}
 
@@ -785,6 +785,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	// save Raw message
 	if http.Send_response {
+			logp.Debug("http", "HTTP Send_response")
 		trans.Response_raw = string(http.cutMessageBody(msg))
 	}
 
@@ -855,7 +856,8 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 	// add headers always
 	raw_msg_cut = m.Raw[:m.bodyOffset]
 
-	// add body
+	// add body		
+
 	if len(m.ContentType) == 0 || http.shouldIncludeInBody(m.ContentType) {
 		if len(m.chunked_body) > 0 {
 			raw_msg_cut = append(raw_msg_cut, m.chunked_body...)
@@ -869,24 +871,24 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	if http.Include_body_for != nil {
-		if ( len(http.Include_body_for) == 0 && ( http.Exclude_body_for == nil || len(http.Exclude_body_for) == 0)) {
-			return true;
-		}
+		logp.Debug("http", "In function Should Include Body %s", contenttype)
 		for _, exclude := range http.Exclude_body_for {
 			if strings.Contains(contenttype, exclude) {
-				logp.Debug("httpdetailed", "Should Exclude Body = false Content-Type"+contenttype+" http.Exclude_body_for "+exclude)
+				logp.Debug("http", "Should Exclude Body Content-Type "+contenttype+" http.Exclude_body_for "+exclude)
 				return false
 			}
 		}
+		if ( len(http.Include_body_for) == 0 ) {
+				logp.Debug("http", "Should Include Body Content-Type "+contenttype+" http.Include_body_for All ContentTypes")
+				return true;
+		}
 		for _, include := range http.Include_body_for {
 			if strings.Contains(contenttype, include) {
-				logp.Debug("httpdetailed", "Should Include Body = true Content-Type "+contenttype+" http.Include_body_for "+include)
+				logp.Debug("http", "Should Include Body Content-Type "+contenttype+" http.Include_body_for "+include)
 				return true
 			}
-			logp.Debug("httpdetailed", "Should Include Body = false Content-Type"+contenttype+" http.Include_body_for "+include)
 		}
-	}
+	logp.Debug("http", "Excluding Body Content-Type "+contenttype)
 	return false
 }
 
