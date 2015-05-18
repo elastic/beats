@@ -119,7 +119,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 		case msg := <-out.sendingQueue:
 			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
 			if out.FlushInterval > 0 {
-				logp.Debug("output_elasticsearch", "Insert bulk messages")
+				logp.Debug("output_elasticsearch", "Insert bulk messages.")
 				bulkChannel <- map[string]interface{}{
 					"index": map[string]interface{}{
 						"_index": index,

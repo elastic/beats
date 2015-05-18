@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 )
 
 type BulkMsg struct {
@@ -19,15 +20,23 @@ type BulkMsg struct {
 func (es *Elasticsearch) Bulk(index string, doc_type string,
 	params map[string]string, body chan interface{}) (*QueryResult, error) {
 
-	path, err := MakePath(index, doc_type, "_bulk")
-	if err != nil {
-		return nil, err
-	}
-
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	for obj := range body {
 		enc.Encode(obj)
+		logp.Debug("elasticsearch", "obj %s", obj)
+	}
+
+	if buf.Len() == 0 {
+		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
+		return nil, nil
+	}
+
+	logp.Debug("elasticsearch", "Insert bulk messages: %s\n", buf)
+
+	path, err := MakePath(index, doc_type, "_bulk")
+	if err != nil {
+		return nil, err
 	}
 
 	url := es.Url + path

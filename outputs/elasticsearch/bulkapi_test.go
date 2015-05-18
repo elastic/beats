@@ -62,6 +62,32 @@ func TestBulk(t *testing.T) {
 	}
 }
 
+func TestEmptyBulk(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
+	}
+	if testing.Short() {
+		t.Skip("Skipping in short mode, because it requires Elasticsearch")
+	}
+	es := NewElasticsearch("http://localhost:9200")
+	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
+
+	body := make(chan interface{}, 10)
+	close(body)
+
+	params := map[string]string{
+		"refresh": "true",
+	}
+	resp, err := es.Bulk(index, "type1", params, body)
+	if err != nil {
+		t.Errorf("Bulk() returned error: %s", err)
+	}
+	if resp != nil {
+		t.Errorf("Unexpected response: %s", resp)
+	}
+
+}
+
 func TestBulkMoreOperations(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
