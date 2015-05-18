@@ -75,7 +75,7 @@ func TestIndex(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
-	es := NewElasticsearch("http://localhost:9200")
+	es := NewElasticsearch("http://localhost:9200", "", "")
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 

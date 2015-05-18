@@ -15,7 +15,7 @@ func TestBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := NewElasticsearch("http://localhost:9200")
+	es := NewElasticsearch("http://localhost:9200", "", "")
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -69,7 +69,7 @@ func TestEmptyBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := NewElasticsearch("http://localhost:9200")
+	es := NewElasticsearch("http://localhost:9200", "", "")
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	body := make(chan interface{}, 10)
@@ -85,7 +85,6 @@ func TestEmptyBulk(t *testing.T) {
 	if resp != nil {
 		t.Errorf("Unexpected response: %s", resp)
 	}
-
 }
 
 func TestBulkMoreOperations(t *testing.T) {
@@ -95,7 +94,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := NewElasticsearch("http://localhost:9200")
+	es := NewElasticsearch("http://localhost:9200", "", "")
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{

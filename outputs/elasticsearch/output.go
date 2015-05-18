@@ -30,18 +30,14 @@ type PublishedTopology struct {
 // Initialize Elasticsearch as output
 func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
-	url := fmt.Sprintf("http://%s:%d", config.Host, config.Port)
-	con := NewElasticsearch(url)
+	if len(config.Protocol) == 0 {
+		config.Protocol = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
+
+	con := NewElasticsearch(url, config.Username, config.Password)
 	out.Conn = con
-
-	// TODO:
-	//api.Username = config.Username
-	//api.Password = config.Password
-	//api.BasePath = config.Path
-
-	//if config.Protocol != "" {
-	//	api.Protocol = config.Protocol
-	//}
 
 	if config.Index != "" {
 		out.Index = config.Index

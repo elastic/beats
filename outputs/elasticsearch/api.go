@@ -16,7 +16,9 @@ const (
 )
 
 type Elasticsearch struct {
-	Url string
+	Url      string
+	Username string
+	Password string
 
 	client *http.Client
 }
@@ -55,7 +57,7 @@ func (r QueryResult) String() string {
 }
 
 // Create a connection to Elasticsearch
-func NewElasticsearch(url string) *Elasticsearch {
+func NewElasticsearch(url string, username string, password string) *Elasticsearch {
 	es := Elasticsearch{
 		Url:    DefaultElasticsearchUrl,
 		client: &http.Client{},
@@ -63,6 +65,8 @@ func NewElasticsearch(url string) *Elasticsearch {
 	if url != es.Url {
 		es.Url = url
 	}
+	es.Username = username
+	es.Password = password
 	return &es
 }
 
@@ -137,6 +141,11 @@ func (es *Elasticsearch) Request(method string, url string,
 	req, err := http.NewRequest(method, url, bytes.NewReader(obj))
 	if err != nil {
 		return nil, err
+	}
+
+	req.Header.Add("Accept", "application/json")
+	if es.Username != "" || es.Password != "" {
+		req.SetBasicAuth(es.Username, es.Password)
 	}
 
 	resp, err := es.client.Do(req)

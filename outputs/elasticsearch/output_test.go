@@ -113,7 +113,7 @@ func TestOneEvent(t *testing.T) {
 
 	// give control to the other goroutine, otherwise the refresh happens
 	// before the refresh. We should find a better solution for this.
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
 	_, err = elasticsearchOutput.Conn.Refresh(index)
 	if err != nil {
@@ -188,7 +188,7 @@ func TestEvents(t *testing.T) {
 
 	// give control to the other goroutine, otherwise the refresh happens
 	// before the refresh. We should find a better solution for this.
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 
 	elasticsearchOutput.Conn.Refresh(index)
 
