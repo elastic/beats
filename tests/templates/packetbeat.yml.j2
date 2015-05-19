@@ -23,6 +23,17 @@ shipper:
  # to remove duplicates if shippers are installed on multiple servers.
  # ignore_outgoing: true
 
+{% if geoip_paths is not none %}
+ geoip:
+  paths: [
+        {%- for path in geoip_paths -%}
+            "{{ pb.working_dir + '/' + path }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+]
+{%- endif %}
+
+
 ############################# Sniffer ############################################
 
 # Select the network interfaces to sniff the data. You can use the "any"
@@ -125,17 +136,6 @@ filter:
   {%- endif -%}
 {%- endif %}
 
-
-############################# GeoIP ############################################
-{% if geoip_paths is not none -%}
-geoip:
-  paths: [
-        {%- for path in geoip_paths -%}
-            "{{ pb.working_dir + '/' + path }}"
-            {%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
-]
-{%- endif %}
 
 
 

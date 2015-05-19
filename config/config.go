@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/packetbeat/procs"
 )
 
@@ -10,11 +11,10 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
-	Shipper    outputs.ShipperConfig
+	Shipper    publisher.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    Logging
-	Geoip      outputs.Geoip
 	Filter     map[string]interface{}
 }
 

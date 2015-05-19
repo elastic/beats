@@ -13,13 +13,14 @@ import (
 	"syscall"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
-	"gopkg.in/yaml.v2"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -143,7 +144,7 @@ func main() {
 
 	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
+	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
 		config.ConfigSingleton.Shipper); err != nil {
 
 		logp.Critical(err.Error())
@@ -155,15 +156,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = outputs.LoadGeoIPData(config.ConfigSingleton.Geoip)
-	if err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
-	}
-
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
-		err = plugin.Init(false, outputs.Publisher.Queue)
+		err = plugin.Init(false, publisher.Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
 			os.Exit(1)
@@ -191,7 +186,7 @@ func main() {
 	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
 	var afterInputsQueue chan common.MapStr
 	if len(filters_plugins) > 0 {
-		runner := NewFilterRunner(outputs.Publisher.Queue, filters_plugins)
+		runner := NewFilterRunner(publisher.Publisher.Queue, filters_plugins)
 		go func() {
 			err := runner.Run()
 			if err != nil {
@@ -203,7 +198,7 @@ func main() {
 		afterInputsQueue = runner.FiltersQueue
 	} else {
 		// short-circuit the runner
-		afterInputsQueue = outputs.Publisher.Queue
+		afterInputsQueue = publisher.Publisher.Queue
 	}
 
 	logp.Debug("main", "Initializing sniffer")
