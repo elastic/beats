@@ -1,7 +1,7 @@
 Summary:	Packetbeat network agent
 Name:		packetbeat
 Version:	1.0.0.Beta1
-Release:	%{?dist}
+Release:	1%{dist}
 Source:		%{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
 
@@ -18,6 +18,7 @@ Requires(preun): initscripts
 Packetbeat agent.
 
 %prep
+%define _build_name_fmt %%{ARCH}/%%{NAME}-%%{VERSION}-%%{ARCH}.rpm
 %setup -n %{name}
 
 %build
