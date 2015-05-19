@@ -1,7 +1,7 @@
 Summary:	Packetbeat network agent
 Name:		packetbeat
 Version:	1.0.0.Beta1
-Release:	1%{?dist}
+Release:	%{?dist}
 Source:		%{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
 
