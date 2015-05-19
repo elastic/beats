@@ -55,8 +55,8 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
 	}
 	out.BulkMaxSize = 10000
-	if config.BulkMaxSize != nil {
-		out.BulkMaxSize = *config.BulkMaxSize
+	if config.Bulk_size != nil {
+		out.BulkMaxSize = *config.Bulk_size
 	}
 
 	err := out.EnableTTL()
@@ -72,6 +72,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
 	logp.Info("[ElasticsearchOutput] Flush interval %s", out.FlushInterval)
+	logp.Info("[ElasticsearchOutput] Bulk size %d", out.BulkMaxSize)
 
 	return nil
 }

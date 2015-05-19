@@ -25,7 +25,7 @@ type MothershipConfig struct {
 	Number_of_files    int
 	DataType           string
 	Flush_interval     *int
-	BulkMaxSize        *int
+	Bulk_size          *int
 }
 
 // Functions to be exported by a output plugin
