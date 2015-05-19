@@ -31,7 +31,7 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) Elasticsea
 		Index:          index,
 		Protocol:       "",
 		Flush_interval: &flush_interval,
-		BulkMaxSize:    &bulk_size,
+		Bulk_size:      &bulk_size,
 	}, 10)
 
 	return elasticsearchOutput
