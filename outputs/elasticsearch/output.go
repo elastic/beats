@@ -100,6 +100,16 @@ func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 	return name
 }
 
+func (out *ElasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) {
+	close(bulkChannel)
+	go func(channel chan interface{}) {
+		_, err := out.Conn.Bulk("", "", nil, channel)
+		if err != nil {
+			logp.Err("Fail to perform many index operations in a single API call: %s", err)
+		}
+	}(bulkChannel)
+}
+
 func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 	flushChannel := make(<-chan time.Time)
 
@@ -115,7 +125,12 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 		case msg := <-out.sendingQueue:
 			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
 			if out.FlushInterval > 0 {
-				logp.Debug("output_elasticsearch", "Insert bulk messages.")
+				logp.Debug("output_elasticsearch", "Insert %d bulk messages.", len(bulkChannel))
+				if len(bulkChannel)+2 > out.BulkMaxSize {
+					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
+					out.InsertBulkMessage(bulkChannel)
+					bulkChannel = make(chan interface{}, out.BulkMaxSize)
+				}
 				bulkChannel <- map[string]interface{}{
 					"index": map[string]interface{}{
 						"_index": index,
@@ -131,13 +146,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 				}
 			}
 		case _ = <-flushChannel:
-			close(bulkChannel)
-			go func(channel chan interface{}) {
-				_, err := out.Conn.Bulk("", "", nil, channel)
-				if err != nil {
-					logp.Err("Fail to perform many index operations in a single API call: %s", err)
-				}
-			}(bulkChannel)
+			out.InsertBulkMessage(bulkChannel)
 			bulkChannel = make(chan interface{}, out.BulkMaxSize)
 		}
 	}
