@@ -1,4 +1,4 @@
-package outputs
+package fileout
 
 import (
 	"bytes"

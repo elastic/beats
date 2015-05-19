@@ -6,24 +6,24 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/bitly/go-hostpool",
-			"Rev": "d0e59c22a56e8dadfed24f74f452cea5a52722d2"
-		},
-		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
+			"Rev": "32f1d61cb5f67f246132611643a4dfc3a30958b7"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
+			"Rev": "32f1d61cb5f67f246132611643a4dfc3a30958b7"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
+			"Rev": "32f1d61cb5f67f246132611643a4dfc3a30958b7"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "7cab997c965db804ca9ffbd0158278bafa88abc9"
+			"Rev": "32f1d61cb5f67f246132611643a4dfc3a30958b7"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/publisher",
+			"Rev": "32f1d61cb5f67f246132611643a4dfc3a30958b7"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -36,14 +36,6 @@
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
 			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
-		},
-		{
-			"ImportPath": "github.com/packetbeat/elastigo/api",
-			"Rev": "ed2d56a9bd244d2c92019f55a4415263d2bc976f"
-		},
-		{
-			"ImportPath": "github.com/packetbeat/elastigo/core",
-			"Rev": "ed2d56a9bd244d2c92019f55a4415263d2bc976f"
 		},
 		{
 			"ImportPath": "github.com/samuel/go-parser/parser",

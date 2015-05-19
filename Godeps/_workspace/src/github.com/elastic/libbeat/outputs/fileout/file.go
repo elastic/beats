@@ -1,4 +1,4 @@
-package outputs
+package fileout
 
 import (
 	"encoding/json"
@@ -11,13 +11,12 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs"
 )
 
 const RotatorMaxFiles = 1000
 
-type FileOutputType struct {
-	OutputInterface
-
+type FileOutput struct {
 	rotator FileRotator
 }
 
@@ -31,7 +30,7 @@ type FileRotator struct {
 	current_size uint64
 }
 
-func (out *FileOutputType) Init(config MothershipConfig) error {
+func (out *FileOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
@@ -59,16 +58,17 @@ func (out *FileOutputType) Init(config MothershipConfig) error {
 	return nil
 }
 
-func (out *FileOutputType) PublishIPs(name string, localAddrs []string) error {
+func (out *FileOutput) PublishIPs(name string, localAddrs []string) error {
 	// not supported by this output type
 	return nil
 }
 
-func (out *FileOutputType) UpdateLocalTopologyMap() {
+func (out *FileOutput) GetNameByIP(ip string) string {
 	// not supported by this output type
+	return ""
 }
 
-func (out *FileOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *FileOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {

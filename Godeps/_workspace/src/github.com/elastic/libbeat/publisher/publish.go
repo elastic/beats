@@ -1,4 +1,4 @@
-package outputs
+package publisher
 
 import (
 	"encoding/json"
@@ -9,43 +9,25 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/libbeat/outputs/elasticsearch"
+	"github.com/elastic/libbeat/outputs/fileout"
+	"github.com/elastic/libbeat/outputs/redis"
+	"github.com/nranchev/go-libGeoIP"
 )
 
 type PublisherType struct {
-	name                string
-	tags                []string
-	disabled            bool
-	Index               string
-	Output              []OutputInterface
-	TopologyOutput      OutputInterface
-	ElasticsearchOutput ElasticsearchOutputType
-	RedisOutput         RedisOutputType
-	FileOutput          FileOutputType
-	IgnoreOutgoing      bool
+	name           string
+	tags           []string
+	disabled       bool
+	Index          string
+	Output         []outputs.OutputInterface
+	TopologyOutput outputs.OutputInterface
+	IgnoreOutgoing bool
+	GeoLite        *libgeo.GeoIP
 
 	RefreshTopologyTimer <-chan time.Time
 	Queue                chan common.MapStr
-}
-
-type MothershipConfig struct {
-	Enabled            bool
-	Save_topology      bool
-	Host               string
-	Port               int
-	Protocol           string
-	Username           string
-	Password           string
-	Index              string
-	Path               string
-	Db                 int
-	Db_topology        int
-	Timeout            int
-	Reconnect_interval int
-	Filename           string
-	Rotate_every_kb    int
-	Number_of_files    int
-	DataType           string
-	Flush_interval     int
 }
 
 type ShipperConfig struct {
@@ -54,6 +36,7 @@ type ShipperConfig struct {
 	Ignore_outgoing       bool
 	Topology_expire       int
 	Tags                  []string
+	Geoip                 common.Geoip
 }
 
 var Publisher PublisherType
@@ -61,6 +44,12 @@ var Publisher PublisherType
 type Topology struct {
 	Name string `json:"name"`
 	Ip   string `json:"ip"`
+}
+
+var EnabledOutputPlugins map[outputs.OutputPlugin]outputs.OutputInterface = map[outputs.OutputPlugin]outputs.OutputInterface{
+	outputs.RedisOutput:         new(redis.RedisOutput),
+	outputs.ElasticsearchOutput: new(elasticsearch.ElasticsearchOutput),
+	outputs.FileOutput:          new(fileout.FileOutput),
 }
 
 func PrintPublishEvent(event common.MapStr) {
@@ -152,16 +141,16 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		event["tags"] = publisher.tags
 	}
 
-	if _GeoLite != nil {
+	if publisher.GeoLite != nil {
 		real_ip, exists := event["real_ip"]
 		if exists && len(real_ip.(string)) > 0 {
-			loc := _GeoLite.GetLocationByIP(real_ip.(string))
+			loc := publisher.GeoLite.GetLocationByIP(real_ip.(string))
 			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 				event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 			}
 		} else {
 			if len(src_server) == 0 && src != nil { // only for external IP addresses
-				loc := _GeoLite.GetLocationByIP(src.Ip)
+				loc := publisher.GeoLite.GetLocationByIP(src.Ip)
 				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 					event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 				}
@@ -223,8 +212,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	outputs map[string]MothershipConfig, shipper ShipperConfig) error {
-
+	outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
 	var err error
 	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
 
@@ -233,57 +221,28 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	output, exists := outputs["elasticsearch"]
-	if exists && output.Enabled && !publisher.disabled {
-		err := publisher.ElasticsearchOutput.Init(output,
-			shipper.Topology_expire)
-		if err != nil {
-			logp.Err("Fail to initialize Elasticsearch as output: %s", err)
-			return err
-		}
-		publisher.Output = append(publisher.Output, OutputInterface(&publisher.ElasticsearchOutput))
+	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
-		if output.Save_topology {
-			if publisher.TopologyOutput != nil {
-				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
-				return errors.New("Multiple outputs defined to store topology")
+	for outputId, plugin := range EnabledOutputPlugins {
+		outputName := outputId.String()
+		output, exists := outputs[outputName]
+		if exists && output.Enabled && !publisher.disabled {
+			err := plugin.Init(output, shipper.Topology_expire)
+			if err != nil {
+				logp.Err("Fail to initialize %s plugin as output: %s", outputName, err)
+				return err
 			}
-			publisher.TopologyOutput = OutputInterface(&publisher.ElasticsearchOutput)
-			logp.Info("Using Elasticsearch to store the topology")
-		}
-	}
+			publisher.Output = append(publisher.Output, plugin)
 
-	output, exists = outputs["redis"]
-	if exists && output.Enabled && !publisher.disabled {
-		logp.Debug("publish", "REDIS publisher enabled")
-		err := publisher.RedisOutput.Init(output,
-			shipper.Topology_expire)
-		if err != nil {
-			logp.Err("Fail to initialize Redis as output: %s", err)
-			return err
-		}
-		publisher.Output = append(publisher.Output, OutputInterface(&publisher.RedisOutput))
-
-		if output.Save_topology {
-			if publisher.TopologyOutput != nil {
-				logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
-				return errors.New("Multiple outputs defined to store topology")
+			if output.Save_topology {
+				if publisher.TopologyOutput != nil {
+					logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
+					return errors.New("Multiple outputs defined to store topology")
+				}
+				publisher.TopologyOutput = plugin
+				logp.Info("Using %s to store the topology", outputName)
 			}
-			publisher.TopologyOutput = OutputInterface(&publisher.RedisOutput)
-			logp.Info("Using Redis to store the topology")
 		}
-	}
-
-	output, exists = outputs["file"]
-	if exists && output.Enabled {
-		err := publisher.FileOutput.Init(output)
-		if err != nil {
-			logp.Err("Fail to initialize file output: %s", err)
-			return err
-		}
-		publisher.Output = append(publisher.Output, OutputInterface(&publisher.FileOutput))
-
-		// topology saving not supported by this one
 	}
 
 	if !publisher.disabled {

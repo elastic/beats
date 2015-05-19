@@ -1,4 +1,4 @@
-package outputs
+package redis
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs"
 
 	"github.com/garyburd/redigo/redis"
 )
@@ -20,8 +21,7 @@ const (
 	RedisChannelType
 )
 
-type RedisOutputType struct {
-	OutputInterface
+type RedisOutput struct {
 	Index string
 	Conn  redis.Conn
 
@@ -46,7 +46,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) error {
+func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
@@ -75,12 +75,12 @@ func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) e
 	}
 
 	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != 0 {
-		if config.Flush_interval < 0 {
+	if config.Flush_interval != nil {
+		if *config.Flush_interval < 0 {
 			out.flush_immediatelly = true
 			logp.Warn("Flushing to REDIS on each push, performance migh be affected")
 		} else {
-			out.FlushInterval = time.Duration(config.Flush_interval) * time.Millisecond
+			out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
 		}
 	}
 
@@ -125,7 +125,7 @@ func (out *RedisOutputType) Init(config MothershipConfig, topology_expire int) e
 	return nil
 }
 
-func (out *RedisOutputType) RedisConnect(db int) (redis.Conn, error) {
+func (out *RedisOutput) RedisConnect(db int) (redis.Conn, error) {
 	conn, err := redis.DialTimeout(
 		"tcp",
 		out.Hostname,
@@ -154,7 +154,7 @@ func (out *RedisOutputType) RedisConnect(db int) (redis.Conn, error) {
 	return conn, nil
 }
 
-func (out *RedisOutputType) Connect() error {
+func (out *RedisOutput) Connect() error {
 	var err error
 	out.Conn, err = out.RedisConnect(out.Db)
 	if err != nil {
@@ -165,11 +165,11 @@ func (out *RedisOutputType) Connect() error {
 	return nil
 }
 
-func (out *RedisOutputType) Close() {
+func (out *RedisOutput) Close() {
 	out.Conn.Close()
 }
 
-func (out *RedisOutputType) SendMessagesGoroutine() {
+func (out *RedisOutput) SendMessagesGoroutine() {
 
 	var err error
 	var pending int
@@ -221,7 +221,7 @@ func (out *RedisOutputType) SendMessagesGoroutine() {
 	}
 }
 
-func (out *RedisOutputType) Reconnect() {
+func (out *RedisOutput) Reconnect() {
 
 	for {
 		err := out.Connect()
@@ -234,7 +234,7 @@ func (out *RedisOutputType) Reconnect() {
 	}
 }
 
-func (out *RedisOutputType) GetNameByIP(ip string) string {
+func (out *RedisOutput) GetNameByIP(ip string) string {
 	name, exists := out.TopologyMap[ip]
 	if !exists {
 		return ""
@@ -242,7 +242,7 @@ func (out *RedisOutputType) GetNameByIP(ip string) string {
 	return name
 }
 
-func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
+func (out *RedisOutput) PublishIPs(name string, localAddrs []string) error {
 
 	logp.Debug("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
@@ -270,7 +270,7 @@ func (out *RedisOutputType) PublishIPs(name string, localAddrs []string) error {
 	return nil
 }
 
-func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
+func (out *RedisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 
 	TopologyMapTmp := make(map[string]string)
 
@@ -296,7 +296,7 @@ func (out *RedisOutputType) UpdateLocalTopologyMap(conn redis.Conn) {
 	logp.Debug("output_redis", "Topology %s", TopologyMapTmp)
 }
 
-func (out *RedisOutputType) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *RedisOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	json_event, err := json.Marshal(event)
 	if err != nil {

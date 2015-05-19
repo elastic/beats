@@ -1,4 +1,4 @@
-package outputs
+package common
 
 import (
 	"os"
@@ -9,13 +9,11 @@ import (
 	"github.com/nranchev/go-libGeoIP"
 )
 
-var _GeoLite *libgeo.GeoIP
-
 type Geoip struct {
 	Paths *[]string
 }
 
-func LoadGeoIPData(config Geoip) error {
+func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 
 	geoip_paths := []string{
 		"/usr/share/GeoIP/GeoIP.dat",
@@ -55,12 +53,11 @@ func LoadGeoIPData(config Geoip) error {
 		return nil
 	}
 
-	var err error
-	_GeoLite, err = libgeo.Load(geoip_path)
+	geoLite, err := libgeo.Load(geoip_path)
 	if err != nil {
 		logp.Warn("Could not load GeoIP data: %s", err.Error())
 	}
 
 	logp.Info("Loaded GeoIP data from: %s", geoip_path)
-	return nil
+	return geoLite
 }
