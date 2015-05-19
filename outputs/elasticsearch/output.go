@@ -71,8 +71,11 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", url)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
-	logp.Info("[ElasticsearchOutput] Flush interval %s", out.FlushInterval)
-	logp.Info("[ElasticsearchOutput] Bulk size %d", out.BulkMaxSize)
+	if out.FlushInterval > 0 {
+		logp.Info("[ElasticsearchOutput] Insert events in batches. Flush interval is %s. Bulk size is %d.", out.FlushInterval, out.BulkMaxSize)
+	} else {
+		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
+	}
 
 	return nil
 }
@@ -126,7 +129,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 		case msg := <-out.sendingQueue:
 			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
 			if out.FlushInterval > 0 {
-				logp.Debug("output_elasticsearch", "Insert %d bulk messages.", len(bulkChannel))
+				logp.Debug("output_elasticsearch", "Insert bulk messages in channel of size %d.", len(bulkChannel))
 				if len(bulkChannel)+2 > out.BulkMaxSize {
 					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
 					out.InsertBulkMessage(bulkChannel)

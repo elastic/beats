@@ -24,7 +24,6 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 	enc := json.NewEncoder(&buf)
 	for obj := range body {
 		enc.Encode(obj)
-		logp.Debug("elasticsearch", "obj %s", obj)
 	}
 
 	if buf.Len() == 0 {
@@ -32,7 +31,7 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 		return nil, nil
 	}
 
-	logp.Debug("elasticsearch", "Insert bulk messages: %s\n", buf)
+	logp.Debug("elasticsearch", "Insert bulk messages:\n%s\n", buf)
 
 	path, err := MakePath(index, doc_type, "_bulk")
 	if err != nil {

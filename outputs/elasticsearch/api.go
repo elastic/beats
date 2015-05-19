@@ -143,6 +143,8 @@ func (es *Elasticsearch) Request(method string, url string,
 		return nil, err
 	}
 
+	logp.Debug("elasticsearch", "Request %s", req)
+
 	req.Header.Add("Accept", "application/json")
 	if es.Username != "" || es.Password != "" {
 		req.SetBasicAuth(es.Username, es.Password)
@@ -178,7 +180,6 @@ func (es *Elasticsearch) Index(index string, doc_type string, id string,
 	} else {
 		method = "PUT"
 	}
-	logp.Debug("output_elasticsearch", "method=%s path=%s", method, path)
 	resp, err := es.Request(method, path, params, body)
 	if err != nil {
 		return nil, err
