@@ -82,6 +82,10 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 
 // Enable using ttl as paramters in a server-ip doc type
 func (out *ElasticsearchOutput) EnableTTL() error {
+
+	// make sure the .packetbeat-topology index exists
+	out.Conn.CreateIndex(".packetbeat-topology")
+
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
 			"_ttl": map[string]string{"enabled": "true", "default": "15000"},
