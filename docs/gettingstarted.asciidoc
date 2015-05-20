@@ -247,6 +247,25 @@ cd packetbeat-1.0.0.Beta1
 sudo ./packetbeat -c packetbeat.yml
 ----------------------------------------------------------------------
 
+Packetbeat is now ready to capture data from your network traffic. You can test
+that it works by creating a simple HTTP request. For example:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -i http://www.elastic.co/ > /dev/null
+----------------------------------------------------------------------
+
+Now check that the data is present in Elasticsearch with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure to replace `localhost:9200` with the address of your Elasticsearch
+instance. It should return data about the HTTP transactions you just created.
+
+
 === Kibana installation
 
 https://www.elastic.co/products/kibana[Kibana] is a visualization application
