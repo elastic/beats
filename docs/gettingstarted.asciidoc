@@ -121,8 +121,8 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0.Beta1-1_amd64.deb
-sudo dpkg -i packetbeat_1.0.0.Beta1-1_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0~Beta1_amd64.deb
+sudo dpkg -i packetbeat_1.0.0~Beta1_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
@@ -130,8 +130,8 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0.Beta1-1.el6.x86_64.rpm
-sudo rpm -vi packetbeat-1.0.0.Beta1-1.el6.x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0~Beta1-x86_64.rpm
+sudo rpm -vi packetbeat-1.0.0~Beta1-x86_64.rpm
 ----------------------------------------------------------------------
 
 
