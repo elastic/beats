@@ -64,7 +64,7 @@ func Warn(format string, v ...interface{}) {
 	}
 }
 
-func Error(format string, v ...interface{}) {
+func Err(format string, v ...interface{}) {
 	if _log.level >= LOG_ERR {
 		_log.logger.Output(2, fmt.Sprintf("ERR  "+format, v...))
 	}
@@ -86,8 +86,8 @@ func WTF(format string, v ...interface{}) {
 
 func Recover(msg string) {
 	if r := recover(); r != nil {
-		Error("%s. Recovering, but please report this: %s.", msg, r)
-		Error("Stacktrace: %s", debug.Stack())
+		Err("%s. Recovering, but please report this: %s.", msg, r)
+		Err("Stacktrace: %s", debug.Stack())
 	}
 }
 
