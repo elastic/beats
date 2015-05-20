@@ -7,7 +7,7 @@ PB_VERSION=1.0.0.Beta1
 PKG_VERSION=1.0.0~Beta1
 ES_VERSION=1.5.2
 KIBANA_VERSION=4.0.2
-DASHBOARDS_VERSION=1.0.0beta1
+DASHBOARDS_VERSION=1.0.0.Beta1
 
 usage() {
     echo "Usage: $0 etc/gettingstarted.in.asciidoc etc/gettingstarted.asciidoc"
