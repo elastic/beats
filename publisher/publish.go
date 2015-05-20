@@ -247,8 +247,8 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 
 	if !publisher.disabled {
 		if len(publisher.Output) == 0 {
-			logp.Info("No outputs are defined. Please define one under [output]")
-			return errors.New("No outputs are define")
+			logp.Info("No outputs are defined. Please define one under the shipper->output section.")
+			return errors.New("No outputs are defined. Please define one under the shipper->output section.")
 		}
 
 		if publisher.TopologyOutput == nil {
