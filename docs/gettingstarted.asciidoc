@@ -94,21 +94,6 @@ curl http://127.0.0.1:9200
 }
 ----------------------------------------------------------------------
 
-An
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template] is used to tell Elasticsearch which fields should be analyzed in which way. The recommended
-template file can be found
-https://github.com/packetbeat/packetbeat/blob/v1.0.0.Beta1/etc/packetbeat.template.json[here].
-Grab it and load it with the following commands:
-
-
-[source,shell]
-----------------------------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/packetbeat/v1.0.0.Beta1/etc/packetbeat.template.json
-curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
-----------------------------------------------------------------------
-
-where `localhost:9200` is the IP and port where Elasticsearch is listening on.
 
 === Packetbeat installation
 
@@ -213,20 +198,19 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-You are now ready to start the shipper:
+Before starting the shipper, you should also load an
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is used to tell Elasticsearch which fields should be analyzed
+in which way.
 
-deb:
+The recommended template file is installed by the Packetbeat packages. Load it with the
+following command:
+
+deb or rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-sudo /etc/init.d/packetbeat restart
-----------------------------------------------------------------------
-
-rpm:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo service restart packetbeat
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 ----------------------------------------------------------------------
 
 binary:
@@ -234,7 +218,33 @@ binary:
 [source,shell]
 ----------------------------------------------------------------------
 cd packetbeat-1.0.0.Beta1
-sudo ./packetbeat -c /etc/packetbeat/packetbeat.yml
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
+You are now ready to start the shipper:
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo service start packetbeat
+----------------------------------------------------------------------
+
+binary:
+
+[source,shell]
+----------------------------------------------------------------------
+cd packetbeat-1.0.0.Beta1
+sudo ./packetbeat -c packetbeat.yml
 ----------------------------------------------------------------------
 
 === Kibana installation

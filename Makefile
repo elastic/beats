@@ -39,6 +39,7 @@ install: packetbeat go-daemon/god
 	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
 	install -D go-daemon/god $(DESTDIR)/$(BIN_PATH)/packetbeat-god
 	install -m 644 -D etc/packetbeat.yml $(DESTDIR)/$(CONF_PATH)/packetbeat.yml
+	install -m 644 -D etc/packetbeat.template.json $(DESTDIR)/$(CONF_PATH)/packetbeat.template.json
 
 .PHONY: dist
 dist: packetbeat go-daemon/god
@@ -46,6 +47,7 @@ dist: packetbeat go-daemon/god
 	cp packetbeat packetbeat-$(VERSION)/
 	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
 	cp etc/packetbeat.yml packetbeat-$(VERSION)/
+	cp etc/packetbeat.template.json packetbeat-$(VERSION)/
 	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
 
 .PHONY: gofmt
