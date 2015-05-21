@@ -286,3 +286,27 @@ func TestBulkEvents(t *testing.T) {
 	elasticsearchOutput = createElasticsearchConnection(50, 5)
 	test_bulk_with_params(t, elasticsearchOutput)
 }
+
+func TestEnableTTL(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
+	}
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
+	}
+
+	elasticsearchOutput := createElasticsearchConnection(0, 0)
+	elasticsearchOutput.Conn.Delete(".packetbeat-topology", "", "", nil)
+
+	err := elasticsearchOutput.EnableTTL()
+	if err != nil {
+		t.Errorf("Fail to enable TTL: %s", err)
+	}
+
+	// should succeed also when index already exists
+	err = elasticsearchOutput.EnableTTL()
+	if err != nil {
+		t.Errorf("Fail to enable TTL: %s", err)
+	}
+
+}
