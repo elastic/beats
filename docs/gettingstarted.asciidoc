@@ -36,7 +36,7 @@ or decoded network packets.
 
 The binary packages of Elasticsearch have only one dependency: Java. Choose the
 tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
-binary for the others, including OS X):
+binary for the other Linux distributions):
 
 deb:
 
