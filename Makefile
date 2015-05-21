@@ -50,6 +50,16 @@ dist: packetbeat go-daemon/god
 	cp etc/packetbeat.template.json packetbeat-$(VERSION)/
 	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
 
+.PHONY: darwin_dist
+darwin_dist: packetbeat
+	mkdir packetbeat-$(VERSION)-darwin
+	cp packetbeat packetbeat-$(VERSION)-darwin
+	cp etc/packetbeat.yml packetbeat-$(VERSION)-darwin/
+	cp etc/packetbeat.template.json packetbeat-$(VERSION)-darwin/
+	sed -i .bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
+	rm packetbeat-$(VERSION)-darwin/packetbeat.yml.bk
+	tar czvf packetbeat-$(VERSION)-darwin.tgz packetbeat-$(VERSION)-darwin
+
 .PHONY: gofmt
 gofmt:
 	go fmt ./...
