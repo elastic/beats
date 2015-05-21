@@ -44,7 +44,7 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.rpm
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.noarch.rpm
 sudo rpm -i elasticsearch-$ES_VERSION.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
