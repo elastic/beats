@@ -1,4 +1,4 @@
-= Packetbeat user manual
+= Packetbeat reference
 
 include::./overview.asciidoc[]
 
