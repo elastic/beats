@@ -70,8 +70,11 @@ To load our sample Kibana 3 dashboards, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://github.com/packetbeat/dashboards/archive/v0.5.0K3.tar.gz
-tar xzvf v0.5.0K3.tar.gz
-cd dashboards-0.5.0K3/
-./load.sh
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-dashboards-k3-v1.0.0.Beta1.tar.gz
+tar xzvf packetbeat-dashboards-k3-v1.0.0.Beta1.tar.gz
+cd packetbeat-dashboards-k3-v1.0.0.Beta1/
+./load.sh localhost
 ----------------------------------------------------------------------
+
+In which you should replace `localhost` with the host of your Elasticsearch
+server.
