@@ -227,7 +227,7 @@ rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-sudo service start packetbeat
+sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
 binary:
