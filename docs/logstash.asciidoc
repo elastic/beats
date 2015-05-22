@@ -29,7 +29,8 @@ http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.ht
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
 indexing very efficient.
 
-Use the <<redis-output,Redis output>> in the Packetbeat configuration file:
+To use this setup, disable the Elasticsearch output and use instead the
+<<redis-output,Redis output>> in the Packetbeat configuration file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -40,7 +41,7 @@ output:
     enabled: true
 
     # Set the host and port where to find Redis.
-    host: "192.168.33.13"
+    host: "127.0.0.1"
     port: 6379
     save_topology: true
 ------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ input {
     redis {
         codec => "json"
         host => "127.0.0.1"
-        port => 6380
+        port => 6379
         data_type => "list"
         key => "packetbeat"
     }
@@ -67,7 +68,7 @@ input {
 output {
     elasticsearch {
         protocol => "http"
-        host => "192.168.33.14"
+        host => "127.0.0.1"
         sniffing => true
         manage_template => false
         index => "packetbeat-%{+YYYY.MM.dd}"
