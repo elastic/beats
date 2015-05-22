@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=1.0.0.Beta1
+VERSION?=1.0.0~Beta1
 ARCH?=$(shell uname -m)
 
 GOFILES = $(shell find . -type f -name '*.go')
@@ -59,6 +59,7 @@ darwin_dist: packetbeat
 	sed -i .bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
 	rm packetbeat-$(VERSION)-darwin/packetbeat.yml.bk
 	tar czvf packetbeat-$(VERSION)-darwin.tgz packetbeat-$(VERSION)-darwin
+	shasum packetbeat-$(VERSION)-darwin.tgz > packetbeat-$(VERSION)-darwin.tgz.sha1.txt
 
 .PHONY: gofmt
 gofmt:
