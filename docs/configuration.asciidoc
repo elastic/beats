@@ -340,6 +340,13 @@ the shipper can automatically avoid sending the contents of certain HTTP POST
 parameters. The sensitive content associated with these keywords is replaced
 by ``xxxxx``. By default, no changes are made to the HTTP messages.
 
+WARNING: This option replaces query parameters from GET requests and top level
+parameters from POST requests. If the sensitive data is encoded inside a
+parameter with a different name, we cannot censor it there. Also, note that if
+you enable saving the raw request and response fields (see the `send_requset`
+and the `send_response` options), the sensitive data will be present in those
+fields.
+
 ===== send_headers
 
 A list of header names to be captured and send to Elasticsearch. These

@@ -46,6 +46,7 @@ protocols:
     # The value of the parameters will be replaced with the 'xxxxx' string.
     # This is generally useful for avoiding storing user passwords or other
     # sensitive information.
+    # Only query parameters and top level form parameters are replaced.
     # hide_keywords: ['pass', 'password', 'passwd']
 
   mysql:
