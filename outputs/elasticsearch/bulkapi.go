@@ -48,6 +48,11 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 		return nil, err
 	}
 
+	req.Header.Add("Accept", "application/json")
+	if es.Username != "" || es.Password != "" {
+		req.SetBasicAuth(es.Username, es.Password)
+	}
+
 	resp, err := es.client.Do(req)
 	if err != nil {
 		return nil, err
