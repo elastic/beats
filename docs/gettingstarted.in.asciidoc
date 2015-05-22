@@ -126,9 +126,9 @@ Before starting the shipper, edit the configuration file. For rpm and deb the
 configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
 configuration file is found in the archive you just downloaded.
 
-First, select the network interface from which to capture the traffic. Packetbeat
-supports capturing all messages sent or received by the server on which it is
-installed. For this, use `any` as the device:
+First, select the network interface from which to capture the traffic. On
+Linux, Packetbeat supports capturing all messages sent or received by the
+server on which it is installed. For this, use `any` as the device:
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -137,6 +137,10 @@ interfaces:
   # keyword to sniff on all connected interfaces.
   device: any
 ----------------------------------------------------------------------
+
+Note that on OS X, capturing from the `any` device doesn't work. You would
+typically use either `lo0` or `en0` depending on which traffic you want to
+capture.
 
 In the next section, configure the ports on which Packetbeat can find each
 protocol. If you use any non-standard ports, add them here. Otherwise, the
