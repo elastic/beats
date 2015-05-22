@@ -36,7 +36,7 @@ or decoded network packets.
 
 The binary packages of Elasticsearch have only one dependency: Java. Choose the
 tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
-binary for the other Linux distributions):
+mac for OS X):
 
 deb:
 
@@ -58,7 +58,7 @@ sudo rpm -i elasticsearch-1.5.2.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -120,24 +120,20 @@ sudo rpm -vi packetbeat-1.0.0~Beta1-x86_64.rpm
 ----------------------------------------------------------------------
 
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-# install libpcap using your operating system package manager
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0.Beta1-x86_64.tar.gz
-tar xzvf packetbeat-1.0.0.Beta1-x86_64.tar.gz
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0~Beta1-darwin.tgz
+tar xzvf packetbeat-1.0.0~Beta1-darwin.tgz
 ----------------------------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
-Before starting the shipper, edit the configuration file:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo nano /etc/packetbeat/packetbeat.yml
-----------------------------------------------------------------------
+Before starting the shipper, edit the configuration file. For rpm and deb the
+configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
+configuration file is found in the archive you just downloaded.
 
 First, select the network interface from which to capture the traffic. Packetbeat
 supports capturing all messages sent or received by the server on which it is
@@ -213,11 +209,11 @@ deb or rpm:
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-1.0.0.Beta1
+cd packetbeat-1.0.0~Beta1-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
@@ -239,12 +235,11 @@ rpm:
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-1.0.0.Beta1
-sudo ./packetbeat -c packetbeat.yml
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
 Packetbeat is now ready to capture data from your network traffic. You can test
@@ -278,11 +273,23 @@ Elasticsearch, but it is not required.
 
 Use the following commands to download and run Kibana:
 
+deb or rpm:
+
 [source,shell]
 ----------------------------------------------------------------------
 curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
 tar xzvf kibana-4.0.2-linux-x64.tar.gz
 cd kibana-4.0.2-linux-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-darwin-x64.tar.gz
+tar xzvf kibana-4.0.2-darwin-x64.tar.gz
+cd kibana-4.0.2-darwin-x64/
 ./bin/kibana
 ----------------------------------------------------------------------
 

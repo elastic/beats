@@ -27,7 +27,7 @@ or decoded network packets.
 
 The binary packages of Elasticsearch have only one dependency: Java. Choose the
 tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
-binary for the other Linux distributions):
+mac for OS X):
 
 deb:
 
@@ -49,7 +49,7 @@ sudo rpm -i elasticsearch-$ES_VERSION.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -97,8 +97,8 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_$PKG_VERSION_amd64.deb
-sudo dpkg -i packetbeat_$PKG_VERSION_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_$PB_VERSION_amd64.deb
+sudo dpkg -i packetbeat_$PB_VERSION_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
@@ -106,29 +106,25 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PKG_VERSION-x86_64.rpm
-sudo rpm -vi packetbeat-$PKG_VERSION-x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.rpm
+sudo rpm -vi packetbeat-$PB_VERSION-x86_64.rpm
 ----------------------------------------------------------------------
 
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-# install libpcap using your operating system package manager
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.tar.gz
-tar xzvf packetbeat-$PB_VERSION-x86_64.tar.gz
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-darwin.tgz
+tar xzvf packetbeat-$PB_VERSION-darwin.tgz
 ----------------------------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
-Before starting the shipper, edit the configuration file:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo nano /etc/packetbeat/packetbeat.yml
-----------------------------------------------------------------------
+Before starting the shipper, edit the configuration file. For rpm and deb the
+configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
+configuration file is found in the archive you just downloaded.
 
 First, select the network interface from which to capture the traffic. Packetbeat
 supports capturing all messages sent or received by the server on which it is
@@ -204,11 +200,11 @@ deb or rpm:
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-$PB_VERSION
+cd packetbeat-$PB_VERSION-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
@@ -230,12 +226,11 @@ rpm:
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-binary:
+mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-$PB_VERSION
-sudo ./packetbeat -c packetbeat.yml
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
 Packetbeat is now ready to capture data from your network traffic. You can test
@@ -269,11 +264,23 @@ Elasticsearch, but it is not required.
 
 Use the following commands to download and run Kibana:
 
+deb or rpm:
+
 [source,shell]
 ----------------------------------------------------------------------
 curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-linux-x64.tar.gz
 tar xzvf kibana-$KIBANA_VERSION-linux-x64.tar.gz
 cd kibana-$KIBANA_VERSION-linux-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VERSION-darwin-x64.tar.gz
+tar xzvf kibana-$KIBANA_VERSION-darwin-x64.tar.gz
+cd kibana-$KIBANA_VERSION-darwin-x64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
