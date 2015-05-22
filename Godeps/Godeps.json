@@ -7,23 +7,23 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "7635b2d269d33618dc71866fc32a0290324241a8"
+			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "7635b2d269d33618dc71866fc32a0290324241a8"
+			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "7635b2d269d33618dc71866fc32a0290324241a8"
+			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "7635b2d269d33618dc71866fc32a0290324241a8"
+			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "7635b2d269d33618dc71866fc32a0290324241a8"
+			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
