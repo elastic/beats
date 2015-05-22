@@ -887,9 +887,13 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/test" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -929,9 +933,13 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -972,11 +980,15 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Faile to parse parameters")
 	}
 	logp.Debug("httpdetailed", "parameters %s", params)
+
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
+	}
 
 	if strings.Contains(params, "secret") {
 		t.Errorf("Failed to censor the password: %s", msg)

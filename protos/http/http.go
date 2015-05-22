@@ -90,6 +90,7 @@ type HttpTransaction struct {
 	Method       string
 	RequestUri   string
 	Params       string
+	Path         string
 
 	Http common.MapStr
 
@@ -700,7 +701,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans.Real_ip = msg.Real_ip
 
 	var err error
-	trans.Params, err = http.paramsHideSecrets(msg, msg.Raw)
+	trans.Path, trans.Params, err = http.extractParameters(msg, msg.Raw)
 	if err != nil {
 		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
 	}
@@ -805,8 +806,8 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 		event["real_ip"] = t.Real_ip
 	}
 	event["method"] = t.Method
-	event["path"] = t.RequestUri
-	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
+	event["path"] = t.Path
+	event["query"] = fmt.Sprintf("%s %s", t.Method, t.Path)
 	event["params"] = t.Params
 
 	event["timestamp"] = common.Time(t.ts)
@@ -912,34 +913,36 @@ func (http *Http) hideSecrets(values url.Values) url.Values {
 	return params
 }
 
-// paramsHideSecrets parses the URL and the form parameters and replaces the secrets
+// extractParameters parses the URL and the form parameters and replaces the secrets
 // with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
-func (http *Http) paramsHideSecrets(m *HttpMessage, msg []byte) (string, error) {
+// Returns the Request URI path and the (ajdusted) parameters.
+func (http *Http) extractParameters(m *HttpMessage, msg []byte) (path string, params string, err error) {
 	var values url.Values
-	var err error
 
 	u, err := url.Parse(m.RequestUri)
 	if err != nil {
-		return "", err
+		return
 	}
 	values = u.Query()
+	path = u.Path
 
-	params := http.hideSecrets(values)
+	paramsMap := http.hideSecrets(values)
 
 	if m.ContentLength > 0 && strings.Contains(m.ContentType, "urlencoded") {
 		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
 		if err != nil {
-			return "", err
+			return
 		}
 
 		for key, value := range http.hideSecrets(values) {
-			params[key] = value
+			paramsMap[key] = value
 		}
 	}
+	params = paramsMap.Encode()
 
-	logp.Debug("httpdetailed", "Parameters: %s", params.Encode())
+	logp.Debug("httpdetailed", "Parameters: %s", params)
 
-	return params.Encode(), nil
+	return
 }
 
 func (http *Http) isSecretParameter(key string) bool {

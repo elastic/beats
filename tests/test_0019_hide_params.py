@@ -23,6 +23,10 @@ class Test(TestCase):
         o = objs[0]
         assert o["type"] == "http"
         assert o["params"] == "pass=xxxxx&user=monica"
+        assert o["path"] == "/login"
+        for _, val in o.items():
+            if isinstance(val, basestring):
+                assert "secret" not in val
 
     def test_http_hide_get(self):
         """
@@ -40,11 +44,14 @@ class Test(TestCase):
         o = objs[0]
         assert o["type"] == "http"
         assert o["params"] == "pass=xxxxx&user=monica"
+        assert o["path"] == "/login"
+        for _, val in o.items():
+            if isinstance(val, basestring):
+                assert "secret" not in val
 
     def test_http_hide_post_default(self):
         """
-        Should be able to strip the password from
-        a POST request.
+        By default nothing is stripped.
         """
         self.render_config_template()
         self.run_packetbeat(pcap="hide_secret_POST.pcap",
@@ -55,3 +62,4 @@ class Test(TestCase):
         o = objs[0]
         assert o["type"] == "http"
         assert o["params"] == "pass=secret&user=monica"
+        assert o["path"] == "/login"
