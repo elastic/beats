@@ -14,8 +14,8 @@ go-daemon/god: go-daemon/god.c
 with_pfring:
 	go build --tags havepfring
 
-.PHONY: deps
-deps:
+.PHONY: getdeps
+getdeps:
 	go get -t -u -f
 	# goautotest is used from the Makefile to run tests in a loop
 	go get -u github.com/tsg/goautotest
@@ -24,15 +24,15 @@ deps:
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
 
-.PHONY: updatedeps
-updatedeps: deps
-	godep update ...
-
-.PHONY: restoredeps
-restoredeps:
+.PHONY: deps
+deps:
 	# first make sure we have godep
 	go get github.com/tools/godep
 	godep restore ./...
+
+.PHONY: updatedeps
+updatedeps: deps
+	godep update ...
 
 .PHONY: install
 install: packetbeat go-daemon/god
