@@ -28,7 +28,7 @@ getdeps:
 deps:
 	# first make sure we have godep
 	go get github.com/tools/godep
-	godep restore ./...
+	$(GOPATH)/bin/godep restore ./...
 
 .PHONY: updatedeps
 updatedeps: deps
