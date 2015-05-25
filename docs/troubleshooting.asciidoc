@@ -3,13 +3,8 @@
 If you suspect an issue with the Packetbeat shipper itself, please read the
 following tips and send us the logs and, if possible, a traffic trace.
 
-////
-TODO: Link to the deep URL for the Beats forum.
-////
-
-Please contact us on the https://discuss.elastic.co/[forums] or on the
-`#packetbeat` IRC channel on Freenode. We will help you troubleshoot the problem
-you are facing.
+Please contact us on the https://discuss.elastic.co/c/beats/packetbeat[forums].
+We will help you troubleshoot the problem you are facing.
 
 If you are sure you found a bug, you can also open a ticket on
 https://github.com/elastic/packetbeat/issues?state=open[GitHub]. Note, however,
