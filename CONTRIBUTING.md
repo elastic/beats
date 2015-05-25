@@ -1,7 +1,9 @@
 # Contributing to Packetbeat
 
 Packetbeat is an open source project and we love to receive contributions from
-our community — you! There are many ways to contribute, from writing tutorials
+our community — you!
+
+There are many ways to contribute, from writing tutorials
 or blog posts, improving the documentation, submitting bug reports and feature
 requests or writing code for implementing a whole new protocol.
 
@@ -19,9 +21,9 @@ The process for contributing to any of the Elastic repositories is similar.
 
 ## Contribution Steps
 
-1. Test your changes! Run the test suite ('make test')
+1. Test your changes! Run the test suite (`make test`)
 2. Please make sure you have signed our [Contributor License
-   Agreement](http://www.elasticsearch.org/contributor-agreement/). We are not
+   Agreement](https://www.elastic.co/contributor-agreement/). We are not
    asking you to assign copyright to us, but to give us the right to distribute
    your code without restriction. We ask this of all contributors in order to
    assure our users of the origin and continuing existence of the code. You
