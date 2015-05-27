@@ -16,13 +16,13 @@ To learn more about Packetbeat, check out <http://www.elastic.co/product/beats/p
 
 ## Getting started
 
-Please follow the [getting started](https://www.elastic.co/guide/en/packetbeat/packetbeat-getting-started.html)
+Please follow the [getting started](https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html)
 guide from the docs.
 
 ## Documentation
 
 Please visit
-[elastic.co](https://www.elastic.co/guide/en/packetbeat/index.html) for the
+[elastic.co](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html) for the
 documentation.
 
 ## Bugs and feature requests
