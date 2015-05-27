@@ -1,9 +1,10 @@
 package protos
 
 import (
-	"packetbeat/common"
-	"packetbeat/logp"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 )
 
 // ProtocolData interface to represent an upper
@@ -21,6 +22,9 @@ type Packet struct {
 type ProtocolPlugin interface {
 	// Called to initialize the Plugin
 	Init(test_mode bool, results chan common.MapStr) error
+
+	// Called to return the configured ports
+	GetPorts() []int
 
 	// Called when payload data is available for parsing.
 	Parse(pkt *Packet, tcptuple *common.TcpTuple,
@@ -80,6 +84,10 @@ func (protocols Protocols) Get(proto Protocol) ProtocolPlugin {
 		return nil
 	}
 	return ret
+}
+
+func (protocols Protocols) GetAll() map[Protocol]ProtocolPlugin {
+	return protocols.protos
 }
 
 func (protos Protocols) Register(proto Protocol, plugin ProtocolPlugin) {

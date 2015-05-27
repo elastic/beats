@@ -23,7 +23,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[3:]:
@@ -47,7 +47,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[3:]:
@@ -71,7 +71,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 6    # 5 plus header
 
         for line in lines[3:]:
@@ -94,5 +94,5 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 16    # 15 plus header

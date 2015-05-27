@@ -1,0 +1,350 @@
+////
+
+This file is generated! Edit gettingstarted.in.asciidoc instead and then
+re-generate this file with:
+
+  ../scripts/generate_gettingstarted.sh gettingstarted.in.asciidoc gettingstarted.asciidoc
+
+////
+
+[[packetbeat-getting-started]]
+== Getting started
+
+
+The best way to understand the value of an network packet analytics system like
+Packetbeat is to try it on your own traffic. This quick tutorial will walk you
+through installing the essential components of the Packetbeat system:
+
+ * Packetbeat shippers. They collect the traffic. You should install these on
+   your servers so that they capture the network traffic.
+ * Elasticsearch for storage and indexing.
+ * Kibana for the UI.
+
+For now, you can just install Elasticsearch and Kibana on a single VM or even
+on your laptop. The only condition is that this machine is accessible from the
+servers you want to monitor. As you add more shippers and your traffic grows, you
+will want replace the single Elasticsearch instance with a cluster. You will
+probably also want to automate the installation process.  But for now, let's
+just do the fun part.
+
+=== Elasticsearch installation
+
+http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
+storage, search and analytics engine. It can be used for many purposes, but one
+context where it excels is indexing streams of semi-structured data, like logs
+or decoded network packets.
+
+The binary packages of Elasticsearch have only one dependency: Java. Choose the
+tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
+mac for OS X):
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
+sudo dpkg -i elasticsearch-1.5.2.deb
+sudo /etc/init.d/elasticsearch start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
+sudo rpm -i elasticsearch-1.5.2.noarch.rpm
+sudo service elasticsearch start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
+unzip elasticsearch-1.5.2.zip
+cd elasticsearch-1.5.2
+./bin/elasticsearch
+----------------------------------------------------------------------
+
+You can learn more about installing, configuring and running Elasticsearch in
+http://www.elastic.co/guide/en/elasticsearch/guide/current/_installing_elasticsearch.html[Elasticsearch: The Definitive Guide].
+
+
+To test that the Elasticsearch daemon is up and running, try sending a HTTP GET
+request on port 9200:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://127.0.0.1:9200
+{
+  "status" : 200,
+  "name" : "Unicorn",
+  "cluster_name" : "elasticsearch",
+  "version" : {
+    "number" : "1.4.3",
+    "build_hash" : "36a29a7144cfde87a960ba039091d40856fcb9af",
+    "build_timestamp" : "2015-02-11T14:23:15Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.10.3"
+  },
+  "tagline" : "You Know, for Search"
+}
+----------------------------------------------------------------------
+
+
+=== Packetbeat installation
+
+Now that you have Elasticsearch running, I'm sure you are eager to put some
+data in it. For this, install the Packetbeat shippers on your application
+servers:
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo apt-get install libpcap0.8
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0~Beta1_amd64.deb
+sudo dpkg -i packetbeat_1.0.0~Beta1_amd64.deb
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo yum install libpcap
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0~Beta1-x86_64.rpm
+sudo rpm -vi packetbeat-1.0.0~Beta1-x86_64.rpm
+----------------------------------------------------------------------
+
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0~Beta1-darwin.tgz
+tar xzvf packetbeat-1.0.0~Beta1-darwin.tgz
+----------------------------------------------------------------------
+
+NOTE: We also provide 32bits images. You can get them from our
+https://www.elastic.co/downloads/beats/packetbeat[download page].
+
+Before starting the shipper, edit the configuration file. For rpm and deb the
+configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
+configuration file is found in the archive you just downloaded.
+
+First, select the network interface from which to capture the traffic. On
+Linux, Packetbeat supports capturing all messages sent or received by the
+server on which it is installed. For this, use `any` as the device:
+
+[source,yaml]
+----------------------------------------------------------------------
+interfaces:
+  # Select on which network interfaces to sniff. You can use the "any"
+  # keyword to sniff on all connected interfaces.
+  device: any
+----------------------------------------------------------------------
+
+Note that on OS X, capturing from the `any` device doesn't work. You would
+typically use either `lo0` or `en0` depending on which traffic you want to
+capture.
+
+In the next section, configure the ports on which Packetbeat can find each
+protocol. If you use any non-standard ports, add them here. Otherwise, the
+default values should do just fine.
+
+[source,yaml]
+----------------------------------------------------------------------
+protocols:
+  # Configure which protocols to monitor and on which ports are they
+  # running. You can disable a given protocol by commenting out its
+  # configuration.
+  http:
+    ports: [80, 8080, 8081, 5000, 8002]
+
+  mysql:
+    ports: [3306]
+
+  redis:
+    ports: [6379]
+
+  pgsql:
+    ports: [5432]
+
+  thrift:
+    ports: [9090]
+----------------------------------------------------------------------
+
+Set the IP address and port where the shipper can find the Elasticsearch
+installation:
+
+[source,yaml]
+----------------------------------------------------------------------
+output:
+
+  elasticsearch:
+    # Uncomment out this option if you want to output to Elasticsearch. The
+    # default is false.
+    enabled: true
+
+    # Set the host and port where to find Elasticsearch.
+    host: 192.168.1.42
+    port: 9200
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    save_topology: true
+----------------------------------------------------------------------
+
+Before starting the shipper, you should also load an
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is used to tell Elasticsearch which fields should be analyzed
+in which way.
+
+The recommended template file is installed by the Packetbeat packages. Load it with the
+following command:
+
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+cd packetbeat-1.0.0~Beta1-darwin
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
+You are now ready to start the shipper:
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+Packetbeat is now ready to capture data from your network traffic. You can test
+that it works by creating a simple HTTP request. For example:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://www.elastic.co/ > /dev/null
+----------------------------------------------------------------------
+
+Now check that the data is present in Elasticsearch with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure to replace `localhost:9200` with the address of your Elasticsearch
+instance. It should return data about the HTTP transaction you just created.
+
+
+=== Kibana installation
+
+https://www.elastic.co/products/kibana[Kibana] is a visualization application
+that gets its data from Elasticsearch. It provides a customizable and
+user-friendly UI in which you can combine various widget types to create your
+own dashboards. The dashboards can be easily saved, shared and linked.
+
+For this tutorial, we recommend to install Kibana on the same server as
+Elasticsearch, but it is not required.
+
+Use the following commands to download and run Kibana:
+
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
+tar xzvf kibana-4.0.2-linux-x64.tar.gz
+cd kibana-4.0.2-linux-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-darwin-x64.tar.gz
+tar xzvf kibana-4.0.2-darwin-x64.tar.gz
+cd kibana-4.0.2-darwin-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+You can find Kibana binaries for other operating systems on the
+https://www.elastic.co/downloads/kibana[Kibana downloads page].
+
+If Kibana cannot reach the Elasticsearh server, you can adjust the settings for
+it from the `config/kibana.yml` file.
+
+Now point your browser to port 5601 and you should see the Kibana web
+interface.
+
+The first thing you need to do is to configure the index pattern. In
+the *Index name or pattern* field enter `packetbeat-*` and for the *Time-field
+name* select `timestamp`.
+
+image:./images/kibana-index-pattern.png[Kibana index pattern]
+
+If after you configure the `packetbeat-*` index pattern Kibana still says
+_Unable to fetch mapping. Do you have indices matching the pattern?_, it means
+that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
+some traffic was running on your servers and that Packetbeat could see it.
+
+If everything goes fine, you should already see some traffic reported by
+Packetbeat under the Discover page:
+
+image:./images/kibana-discover.png[Kibana discover page]
+
+You can learn more about Kibana in the
+http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
+
+=== Sample Kibana dashboards
+
+Kibana has a large set of visualization types which you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+<<sample-dashboards,sample dashboards>> to give you a good start and to
+demonstrate what is possible based on the packet data.
+
+To load the sample pages, follow these steps:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0.Beta1.tar.gz
+tar xzvf packetbeat-dashboards-1.0.0.Beta1.tar.gz
+cd packetbeat-dashboards-1.0.0.Beta1/
+./load.sh
+----------------------------------------------------------------------
+
+To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
+icon. Select *Packetbeat Dashboard* from the list. You can then switch easier
+between the dashboards by using the *Navigation* widget.
+
+Enjoy!

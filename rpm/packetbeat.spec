@@ -1,7 +1,7 @@
 Summary:	Packetbeat network agent
 Name:		packetbeat
-Version:	0.5.0
-Release:	1%{?dist}
+Version:	1.0.0~Beta1
+Release:	1%{dist}
 Source:		%{name}.tar.gz
 BuildRoot: %{_tmppath}/%{name}
 
@@ -18,6 +18,7 @@ Requires(preun): initscripts
 Packetbeat agent.
 
 %prep
+%define _build_name_fmt %%{ARCH}/%%{NAME}-%%{VERSION}-%%{ARCH}.rpm
 %setup -n %{name}
 
 %build
@@ -30,7 +31,8 @@ install -D rpm/packetbeat.init %{buildroot}/etc/rc.d/init.d/packetbeat
 %files
 /usr/bin/*
 /etc/rc.d/init.d/packetbeat
-%config /etc/packetbeat/packetbeat.conf
+/etc/packetbeat/packetbeat.template.json
+%config /etc/packetbeat/packetbeat.yml
 
 %doc debian/copyright
 

@@ -5,17 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 const (
@@ -90,6 +90,7 @@ type HttpTransaction struct {
 	Method       string
 	RequestUri   string
 	Params       string
+	Path         string
 
 	Http common.MapStr
 
@@ -101,6 +102,7 @@ type HttpTransaction struct {
 
 type Http struct {
 	// config
+	Ports               []int
 	Send_request        bool
 	Send_response       bool
 	Send_headers        bool
@@ -119,37 +121,51 @@ type Http struct {
 func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
+	http.Strip_authorization = false
 }
 
-func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
-	if meta.IsDefined("protocols", "http", "send_request") {
-		http.Send_request = config.Protocols["http"].Send_request
-	}
-	if meta.IsDefined("protocols", "http", "send_response") {
-		http.Send_response = config.Protocols["http"].Send_response
-	}
-	http.Hide_keywords = config.Passwords.Hide_keywords
-	http.Strip_authorization = config.Passwords.Strip_authorization
+func (http *Http) SetFromConfig(config config.Http) (err error) {
 
-	if config.Http.Send_all_headers {
+	http.Ports = config.Ports
+
+	if config.Send_request != nil {
+		http.Send_request = *config.Send_request
+	}
+	if config.Send_response != nil {
+		http.Send_response = *config.Send_response
+	}
+	http.Hide_keywords = config.Hide_keywords
+	if config.Strip_authorization != nil {
+		http.Strip_authorization = *config.Strip_authorization
+	}
+
+	if config.Send_all_headers != nil {
 		http.Send_headers = true
 		http.Send_all_headers = true
 	} else {
-		if len(config.Http.Send_headers) > 0 {
+		if len(config.Send_headers) > 0 {
 			http.Send_headers = true
 
 			http.Headers_whitelist = map[string]bool{}
-			for _, hdr := range config.Http.Send_headers {
+			for _, hdr := range config.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	http.Split_cookie = config.Http.Split_cookie
+	if config.Split_cookie != nil {
+		http.Split_cookie = *config.Split_cookie
+	}
 
-	http.Real_ip_header = strings.ToLower(config.Http.Real_ip_header)
+	if config.Real_ip_header != nil {
+		http.Real_ip_header = strings.ToLower(*config.Real_ip_header)
+	}
 
 	return nil
+}
+
+func (http *Http) GetPorts() []int {
+	return http.Ports
 }
 
 const (
@@ -162,7 +178,7 @@ func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
 	http.InitDefaults()
 
 	if !test_mode {
-		err := http.SetFromConfig(&config.ConfigSingleton, &config.ConfigMeta)
+		err := http.SetFromConfig(config.ConfigSingleton.Protocols.Http)
 		if err != nil {
 			return err
 		}
@@ -685,7 +701,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans.Real_ip = msg.Real_ip
 
 	var err error
-	trans.Params, err = http.paramsHideSecrets(msg, msg.Raw)
+	trans.Path, trans.Params, err = http.extractParameters(msg, msg.Raw)
 	if err != nil {
 		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
 	}
@@ -780,25 +796,33 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if http.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if http.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["http"] = t.Http
 	if len(t.Real_ip) > 0 {
 		event["real_ip"] = t.Real_ip
 	}
 	event["method"] = t.Method
-	event["path"] = t.RequestUri
-	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
+	event["path"] = t.Path
+	event["query"] = fmt.Sprintf("%s %s", t.Method, t.Path)
 	event["params"] = t.Params
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
 	http.results <- event
+}
+
+func parseCookieValue(raw string) string {
+	// Strip the quotes, if present.
+	if len(raw) > 1 && raw[0] == '"' && raw[len(raw)-1] == '"' {
+		raw = raw[1 : len(raw)-1]
+	}
+	return raw
 }
 
 func splitCookiesHeader(headerVal string) map[string]string {
@@ -806,8 +830,11 @@ func splitCookiesHeader(headerVal string) map[string]string {
 
 	cstring := strings.Split(headerVal, ";")
 	for _, cval := range cstring {
-		cookie := strings.Split(cval, "=")
-		cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+		cookie := strings.SplitN(cval, "=", 2)
+		if len(cookie) == 2 {
+			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] =
+				parseCookieValue(strings.TrimSpace(cookie[1]))
+		}
 	}
 
 	return cookies
@@ -833,7 +860,7 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	include_body := config.ConfigSingleton.Http.Include_body_for
+	include_body := config.ConfigSingleton.Protocols.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
 			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
@@ -886,34 +913,36 @@ func (http *Http) hideSecrets(values url.Values) url.Values {
 	return params
 }
 
-// paramsHideSecrets parses the URL and the form parameters and replaces the secrets
+// extractParameters parses the URL and the form parameters and replaces the secrets
 // with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
-func (http *Http) paramsHideSecrets(m *HttpMessage, msg []byte) (string, error) {
+// Returns the Request URI path and the (ajdusted) parameters.
+func (http *Http) extractParameters(m *HttpMessage, msg []byte) (path string, params string, err error) {
 	var values url.Values
-	var err error
 
 	u, err := url.Parse(m.RequestUri)
 	if err != nil {
-		return "", err
+		return
 	}
 	values = u.Query()
+	path = u.Path
 
-	params := http.hideSecrets(values)
+	paramsMap := http.hideSecrets(values)
 
 	if m.ContentLength > 0 && strings.Contains(m.ContentType, "urlencoded") {
 		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
 		if err != nil {
-			return "", err
+			return
 		}
 
 		for key, value := range http.hideSecrets(values) {
-			params[key] = value
+			paramsMap[key] = value
 		}
 	}
+	params = paramsMap.Encode()
 
-	logp.Debug("httpdetailed", "Parameters: %s", params.Encode())
+	logp.Debug("httpdetailed", "Parameters: %s", params)
 
-	return params.Encode(), nil
+	return
 }
 
 func (http *Http) isSecretParameter(key string) bool {

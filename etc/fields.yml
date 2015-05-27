@@ -3,7 +3,9 @@ version: 1.0
 defaults:
   type: string
   required: false
-  analyzer: not_analyzed
+  index: not_analyzed
+  doc_values: true
+  ignore_above: 1024
 
 env:
   type: group
@@ -11,9 +13,9 @@ env:
       These fields contain data about the environment in which the
       transaction was captured.
   fields:
-    - name: agent
+    - name: shipper
       description: >
-          The name of the agent that captured the transaction.
+          The name of the shipper that captured the transaction.
 
     - name: server
       description: >
@@ -53,7 +55,7 @@ env:
       format: Dotted notation.
 
     - name: client_location
-      type: string
+      type: geo_point
       example: "40.715, -74.011"
       description: >
         The GeoIP location of the `real_ip` IP address or of the
@@ -85,7 +87,7 @@ env:
 
     - name: tags
       description: >
-        Arbitrary tags that can be set per agent and per transaction
+        Arbitrary tags that can be set per shipper and per transaction
         type.
 
 event:
@@ -93,13 +95,13 @@ event:
   description: >
     These fields contained data about the transaction itself.
   fields:
-    - name: "@timestamp"
-      type: string
+    - name: "timestamp"
+      type: date
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ
       example: 2015-01-24T14:06:05.071Z
       description: >
-        The timestamp of the event, as measured either by the agent or
+        The timestamp of the event, as measured either by the shipper or
         by a common collector point. The precision is in milliseconds.
         The timezone is UTC.
 
@@ -150,15 +152,17 @@ event:
         is the key.
 
     - name: query
+      type: string
+      ignore_above: 0
+      index: not_analyzed
+      doc_values: true
       description: >
-        The query normalized to account for parameters. For HTTP, it will
-        typically be transformed into something like `GET
-        /users/_search?name=<S8>`. For MySQL, it is transformed into something
-        like `SELECT id from users where name=<S8>`. This normalization makes
-        grouping the related transactions together easier.
+        The query in a human readable form. For HTTP, it will typically be
+        something like `GET /users/_search?name=test`. For MySQL, it is
+        something like `SELECT id from users where name=test`.
 
     - name: params
-      analyzer: analyzed
+      index: analyzed
       description: >
         The request parameters. For HTTP, these are the POST or GET parameters.
         For Thrift-RPC, these are the parameters from the request.
@@ -323,15 +327,15 @@ raw:
   type: group
   description: These fields contain the raw transaction data.
   fields:
-    - name: request_raw
-      analyzer: analyzed
+    - name: request
+      index: analyzed
       description: >
         For text protocols, this is the request as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
 
-    - name: response_raw
-      analyzer: analyzed
+    - name: response
+      index: analyzed
       description: >
         For text protocols, this is the response as seen on the wire
         (application layer only). For binary protocols this is our

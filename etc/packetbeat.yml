@@ -1,0 +1,138 @@
+################### Packetbeat Agent Configuration Example ######################
+
+# This file contains an overview of various configuration settings. Please consult
+# the docs at <http://packetbeat.com/docs/configuration.html> for more details.
+
+# The Packetbeat shipper works by sniffing the network traffic between your
+# application components. It inserts meta-data about each transaction into
+# Elasticsearch.
+
+############################# Agent ############################################
+shipper:
+
+ # The name of the shipper that publishes the network data. It can be used to group 
+ # all the transactions sent by a single shipper in the web interface.
+ # If this options is not defined, the hostname is used.
+ name:
+
+ # The tags of the shipper are included in their own field with each
+ # transaction published. Tags make it easy to group transactions by different
+ # logical properties.
+ #tags: ["service1"]
+
+ # Uncomment the following if you want to ignore transactions created
+ # by the server on which the shipper is installed. This option is useful
+ # to remove duplicates if shippers are installed on multiple servers.
+ # ignore_outgoing: true
+
+############################# Sniffer ############################################
+
+# Select the network interfaces to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
+interfaces:
+ device: any
+
+
+############################# Protocols ######################################
+protocols:
+  http:
+
+    # Configure the ports where to listen for HTTP traffic. You can disable
+    # the http protocol by commenting the list of ports.
+    ports: [80, 8080, 8000, 5000, 8002]
+
+    # Uncomment the following to hide certain parameters in URL or forms attached
+    # to HTTP requests. The names of the parameters are case insensitive.
+    # The value of the parameters will be replaced with the 'xxxxx' string.
+    # This is generally useful for avoiding storing user passwords or other
+    # sensitive information.
+    # Only query parameters and top level form parameters are replaced.
+    # hide_keywords: ['pass', 'password', 'passwd']
+
+  mysql:
+
+    # Configure the ports where to listen for MySQL traffic. You can disable
+    # MySQL protocol by commenting the list of ports.
+    ports: [3306]
+
+  pgsql:
+
+    # Configure the ports where to listen for Pgsql traffic. You can disable
+    # Pgsql protocol by commenting the list of ports.
+    ports: [5432]
+
+  redis:
+
+    # Configure the ports where to listen for Redis traffic. You can disable
+    # Redis protocol by commenting the list of ports.
+    ports: [6379]
+
+  thrift:
+
+    # Configure the ports where to listen for Redis traffic. You can disable
+    # Redis protocol by commenting the list of ports.
+    ports: [9090]
+
+############################# Output ############################################
+
+# Configure what outputs to use when sending the data collected by packetbeat.
+# You can enable one or multiple outputs by setting enabled option to true.
+output:
+
+  # Elasticsearch as output
+  # Options:
+  # host, port: where Elasticsearch is listening on
+  # save_topology: specify if the topology is saved in Elasticsearch
+  elasticsearch:
+    enabled: true
+    host: localhost
+    port: 9200
+    save_topology: true
+
+  # Redis as output
+  # Options:
+  # host, port: where Redis is listening on
+  # save_topology: specify if the topology is saved in Redis
+  #redis:
+  #  enabled: true
+  #  host: localhost
+  #  port: 6379
+  #  save_topology: true
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  #file:
+  #  enabled: true
+  #  path: "/tmp/packetbeat"
+  #  filename: packetbeat
+  #  rotate_every_kb: 1000
+  #  number_of_files: 7
+
+############################# Processes ############################################
+
+# Configure the processes to be monitored and how to find them. If a process is
+# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
+# `client_proc` fields.
+# The processes can be found by searching their command line by a given string.
+#
+# Process matching is optional and can be enabled by uncommenting the following
+# lines.
+#
+#procs:
+#  enabled: false
+#  monitored:
+#    - process: mysqld
+#      cmdline_grep: mysqld
+#
+#    - process: pgsql
+#      cmdline_grep: postgres
+#
+#    - process: nginx
+#      cmdline_grep: nginx
+#
+#    - process: app
+#      cmdline_grep: gunicorn

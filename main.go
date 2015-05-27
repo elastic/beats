@@ -13,30 +13,28 @@ import (
 	"syscall"
 	"time"
 
-	"packetbeat/common"
-	"packetbeat/common/droppriv"
-	"packetbeat/config"
-	"packetbeat/filters"
-	"packetbeat/filters/nop"
-	"packetbeat/inputs"
-	"packetbeat/inputs/gobeacon"
-	"packetbeat/inputs/sniffer"
-	"packetbeat/inputs/udpjson"
-	"packetbeat/logp"
-	"packetbeat/outputs"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/http"
-	"packetbeat/protos/mysql"
-	"packetbeat/protos/pgsql"
-	"packetbeat/protos/redis"
-	"packetbeat/protos/tcp"
-	"packetbeat/protos/thrift"
+	"gopkg.in/yaml.v2"
 
-	"github.com/BurntSushi/toml"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/common/droppriv"
+	"github.com/elastic/libbeat/filters"
+	"github.com/elastic/libbeat/filters/nop"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/http"
+	"github.com/elastic/packetbeat/protos/mysql"
+	"github.com/elastic/packetbeat/protos/pgsql"
+	"github.com/elastic/packetbeat/protos/redis"
+	"github.com/elastic/packetbeat/protos/tcp"
+	"github.com/elastic/packetbeat/protos/thrift"
+	"github.com/elastic/packetbeat/sniffer"
 )
 
-const Version = "0.5.0"
+const Version = "1.0.0.Beta1"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:   new(http.Http),
@@ -44,12 +42,6 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.PgsqlProtocol:  new(pgsql.Pgsql),
 	protos.RedisProtocol:  new(redis.Redis),
 	protos.ThriftProtocol: new(thrift.Thrift),
-}
-
-var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
-	inputs.SnifferInput:  new(sniffer.SnifferSetup),
-	inputs.UdpjsonInput:  new(udpjson.Udpjson),
-	inputs.GoBeaconInput: new(gobeacon.GoBeacon),
 }
 
 var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{
@@ -80,7 +72,7 @@ func main() {
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	configfile := cmdLine.String("c", "packetbeat.conf", "Configuration file")
+	configfile := cmdLine.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
@@ -93,8 +85,11 @@ func main() {
 	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
 	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
+	testConfig := cmdLine.Bool("test", false, "Test configuration and exit.")
 
 	cmdLine.Parse(os.Args[1:])
+
+	sniff := new(sniffer.SnifferSetup)
 
 	if *printVersion {
 		fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
@@ -114,10 +109,16 @@ func main() {
 
 	var err error
 
-	if config.ConfigMeta, err = toml.DecodeFile(*configfile, &config.ConfigSingleton); err != nil {
-		fmt.Printf("TOML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
+	filecontent, err := ioutil.ReadFile(*configfile)
+	if err != nil {
+		fmt.Printf("Fail to read %s: %s. Exiting.\n", *configfile, err)
 		return
 	}
+	if err = yaml.Unmarshal(filecontent, &config.ConfigSingleton); err != nil {
+		fmt.Printf("YAML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
+		return
+	}
+
 	if len(debugSelectors) == 0 {
 		debugSelectors = config.ConfigSingleton.Logging.Selectors
 	}
@@ -141,43 +142,36 @@ func main() {
 		config.ConfigSingleton.Interfaces.Dumpfile = *dumpfile
 	}
 
+	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
-	if err = outputs.Publisher.Init(*publishDisabled); err != nil {
+	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
+		config.ConfigSingleton.Shipper); err != nil {
+
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
-	if err = procs.ProcWatcher.Init(&config.ConfigSingleton.Procs); err != nil {
+	if err = procs.ProcWatcher.Init(config.ConfigSingleton.Procs); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
-
-	outputs.LoadGeoIPData()
 
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
-		err = plugin.Init(false, outputs.Publisher.Queue)
+		err = plugin.Init(false, publisher.Publisher.Queue)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
-			return
+			os.Exit(1)
 		}
 		protos.Protos.Register(proto, plugin)
 	}
 
-	if err = tcp.TcpInit(config.ConfigSingleton.Protocols); err != nil {
+	if err = tcp.TcpInit(); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	over := make(chan bool)
-
-	if !config.ConfigMeta.IsDefined("input", "inputs") {
-		config.ConfigSingleton.Input.Inputs = []string{"sniffer"}
-	}
-	if len(config.ConfigSingleton.Input.Inputs) == 0 {
-		logp.Critical("At least one input needs to be enabled")
-		return
-	}
 
 	logp.Debug("main", "Initializing filters plugins")
 	for filter, plugin := range EnabledFilterPlugins {
@@ -187,46 +181,45 @@ func main() {
 		LoadConfiguredFilters(config.ConfigSingleton.Filter)
 	if err != nil {
 		logp.Critical("Error loading filters plugins: %v", err)
+		os.Exit(1)
 	}
 	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
 	var afterInputsQueue chan common.MapStr
 	if len(filters_plugins) > 0 {
-		runner := NewFilterRunner(outputs.Publisher.Queue, filters_plugins)
+		runner := NewFilterRunner(publisher.Publisher.Queue, filters_plugins)
 		go func() {
 			err := runner.Run()
 			if err != nil {
 				logp.Critical("Filters runner failed: %v", err)
 				// shutting doen
-				inputs.Inputs.StopAll()
+				sniff.Stop()
 			}
 		}()
 		afterInputsQueue = runner.FiltersQueue
 	} else {
 		// short-circuit the runner
-		afterInputsQueue = outputs.Publisher.Queue
+		afterInputsQueue = publisher.Publisher.Queue
 	}
 
-	logp.Debug("main", "Initializing input plugins")
-	for input, plugin := range EnabledInputPlugins {
-		configured_inputs := config.ConfigSingleton.Input.Inputs
-		if input.IsInList(configured_inputs) {
-			logp.Debug("main", "Input plugin %s is enabled", input)
-			err = plugin.Init(false, afterInputsQueue)
-			if err != nil {
-				logp.Critical("Ininitializing plugin %s failed: %v", input, err)
-				return
-			}
-			inputs.Inputs.Register(input, plugin)
-		}
+	logp.Debug("main", "Initializing sniffer")
+	err = sniff.Init(false, afterInputsQueue)
+	if err != nil {
+		logp.Critical("Initializing sniffer failed: %v", err)
+		os.Exit(1)
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err = droppriv.DropPrivileges(); err != nil {
+	if err = droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
 		logp.Critical(err.Error())
-		return
+		os.Exit(1)
 	}
 
 	// Up to here was the initialization, now about running
+
+	if *testConfig {
+		// all good, exit with 0
+		os.Exit(0)
+	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -237,25 +230,23 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	for input, plugin := range inputs.Inputs.Registered() {
-		// run the plugin in background
-		go func(input inputs.Input, plugin inputs.InputPlugin) {
-			err := plugin.Run()
-			if err != nil {
-				logp.Critical("Plugin %s main loop failed: %v", input, err)
-				return
-			}
-			over <- true
-		}(input, plugin)
-	}
+	// run the sniffer in background
+	go func() {
+		err := sniff.Run()
+		if err != nil {
+			logp.Critical("Sniffer main loop failed: %v", err)
+			os.Exit(1)
+		}
+		over <- true
+	}()
 
-	// On ^C or SIGTERM, gracefully stop inputs
+	// On ^C or SIGTERM, gracefully stop the sniffer
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigc
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
-		inputs.Inputs.StopAll()
+		sniff.Stop()
 	}()
 
 	if !*toStderr {
@@ -263,20 +254,16 @@ func main() {
 		logp.SetToStderr(false)
 	}
 
-	logp.Debug("main", "Waiting for inputs to finish")
+	logp.Debug("main", "Waiting for the sniffer to finish")
 
-	// Wait for one of the inputs goroutines to finish
+	// Wait for the goroutines to finish
 	for _ = range over {
-		if !inputs.Inputs.AreAllAlive() {
+		if !sniff.IsAlive() {
 			break
 		}
 	}
 
 	logp.Debug("main", "Cleanup")
-
-	// stop and close all other input plugin servers
-	inputs.Inputs.StopAll()
-	inputs.Inputs.CloseAll()
 
 	if *memprofile != "" {
 		// wait for all TCP streams to expire

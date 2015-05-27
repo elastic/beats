@@ -3,8 +3,9 @@ package thrift
 import (
 	"io/ioutil"
 	"os"
-	"packetbeat/logp"
 	"testing"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 func thriftIdlForTesting(t *testing.T, content string) *ThriftIdl {

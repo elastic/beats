@@ -2,15 +2,17 @@ package redis
 
 import (
 	"bytes"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type RedisMessage struct {
@@ -235,6 +237,7 @@ const (
 
 type Redis struct {
 	// config
+	Ports         []int
 	Send_request  bool
 	Send_response bool
 
@@ -248,20 +251,27 @@ func (redis *Redis) InitDefaults() {
 	redis.Send_response = false
 }
 
-func (redis *Redis) setFromConfig() error {
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_request") {
-		redis.Send_request = config.ConfigSingleton.Protocols["redis"].Send_request
+func (redis *Redis) setFromConfig(config config.Redis) error {
+
+	redis.Ports = config.Ports
+
+	if config.Send_request != nil {
+		redis.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_response") {
-		redis.Send_response = config.ConfigSingleton.Protocols["redis"].Send_response
+	if config.Send_response != nil {
+		redis.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (redis *Redis) GetPorts() []int {
+	return redis.Ports
 }
 
 func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
 	redis.InitDefaults()
 	if !test_mode {
-		redis.setFromConfig()
+		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
 	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
@@ -655,10 +665,10 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if redis.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if redis.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)
@@ -667,7 +677,7 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

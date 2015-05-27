@@ -3,10 +3,11 @@ package thrift
 import (
 	"encoding/hex"
 	"net"
-	"packetbeat/common"
-	"packetbeat/logp"
-	"packetbeat/protos"
 	"testing"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/packetbeat/protos"
 )
 
 func TestThrift_thriftReadString(t *testing.T) {

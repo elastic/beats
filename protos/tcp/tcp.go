@@ -2,15 +2,16 @@ package tcp
 
 import (
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/protos"
 	"strings"
 	"time"
 
-	"github.com/packetbeat/gopacket"
-	"github.com/packetbeat/gopacket/layers"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/protos"
+
+	"github.com/tsg/gopacket"
+	"github.com/tsg/gopacket/layers"
 )
 
 const TCP_STREAM_EXPIRY = 10 * 1e9
@@ -109,6 +110,11 @@ func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 }
 
 func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
+
+	// This Recover should catch all exceptions in
+	// protocol modules.
+	defer logp.Recover("FollowTcp exception")
+
 	stream, exists := tcpStreamsMap[pkt.Tuple.Hashable()]
 	var original_dir uint8 = TcpDirectionOriginal
 	created := false
@@ -172,18 +178,12 @@ func PrintTcpMap() {
 	fmt.Printf("Streams dict: %v", tcpStreamsMap)
 }
 
-func configToPortsMap(protocols map[string]config.Protocol) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.ProtocolPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
-	var proto protos.Protocol
-	for proto = protos.UnknownProtocol + 1; int(proto) < len(protos.ProtocolNames); proto++ {
+	for proto, protoPlugin := range plugins {
 
-		protoConfig, exists := protocols[protos.ProtocolNames[proto]]
-		if !exists {
-			continue
-		}
-
-		for _, port := range protoConfig.Ports {
+		for _, port := range protoPlugin.GetPorts() {
 			old_proto, exists := res[uint16(port)]
 			if exists {
 				if old_proto == proto {
@@ -199,12 +199,12 @@ func configToPortsMap(protocols map[string]config.Protocol) (map[uint16]protos.P
 	return res, nil
 }
 
-func ConfigToFilter(protocols map[string]config.Protocol) string {
+func BpfFilter() string {
 
 	res := []string{}
 
-	for _, protoConfig := range protocols {
-		for _, port := range protoConfig.Ports {
+	for _, protoPlugin := range protos.Protos.GetAll() {
+		for _, port := range protoPlugin.GetPorts() {
 			res = append(res, fmt.Sprintf("port %d", port))
 		}
 	}
@@ -212,9 +212,9 @@ func ConfigToFilter(protocols map[string]config.Protocol) string {
 	return strings.Join(res, " or ")
 }
 
-func TcpInit(protocols map[string]config.Protocol) error {
+func TcpInit() error {
 	var err error
-	tcpPortMap, err = configToPortsMap(protocols)
+	tcpPortMap, err = buildPortsMap(protos.Protos.GetAll())
 	if err != nil {
 		return err
 	}

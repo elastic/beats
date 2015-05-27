@@ -2,14 +2,16 @@ package mysql
 
 import (
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 // Packet types
@@ -35,10 +37,10 @@ type MysqlMessage struct {
 	Rows           [][]string
 	Tables         string
 	IsOK           bool
-	AffectedRows   int
-	InsertId       int
+	AffectedRows   uint64
+	InsertId       uint64
 	IsError        bool
-	ErrorCode      int
+	ErrorCode      uint16
 	ErrorInfo      string
 	Query          string
 	IgnoreMessage  bool
@@ -97,12 +99,15 @@ const (
 )
 
 type Mysql struct {
-	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
+
+	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
 	results chan common.MapStr
 
@@ -118,27 +123,34 @@ func (mysql *Mysql) InitDefaults() {
 	mysql.Send_response = false
 }
 
-func (mysql *Mysql) setFromConfig() error {
-	if config.ConfigSingleton.Mysql.Max_row_length > 0 {
-		mysql.maxRowLength = config.ConfigSingleton.Mysql.Max_row_length
+func (mysql *Mysql) setFromConfig(config config.Mysql) error {
+
+	mysql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		mysql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Mysql.Max_rows > 0 {
-		mysql.maxStoreRows = config.ConfigSingleton.Mysql.Max_rows
+	if config.Max_rows != nil {
+		mysql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_request") {
-		mysql.Send_request = config.ConfigSingleton.Protocols["mysql"].Send_request
+	if config.Send_request != nil {
+		mysql.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_response") {
-		mysql.Send_response = config.ConfigSingleton.Protocols["mysql"].Send_response
+	if config.Send_response != nil {
+		mysql.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (mysql *Mysql) GetPorts() []int {
+	return mysql.Ports
 }
 
 func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
 
 	mysql.InitDefaults()
 	if !test_mode {
-		err := mysql.setFromConfig()
+		err := mysql.setFromConfig(config.ConfigSingleton.Protocols.Mysql)
 		if err != nil {
 			return err
 		}
@@ -202,7 +214,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// parse response
 				m.IsRequest = false
 
-				if uint8(hdr[4]) == 0x00 {
+				if uint8(hdr[4]) == 0x00 || uint8(hdr[4]) == 0xfe {
 					logp.Debug("mysqldetailed", "Received OK response")
 					m.start = s.parseOffset
 					s.parseState = MysqlStateEatMessage
@@ -239,11 +251,36 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				if m.IsRequest {
 					m.Query = string(s.data[m.start+5 : m.end])
 				} else if m.IsOK {
-					m.AffectedRows = int(s.data[m.start+5])
-					m.InsertId = int(s.data[m.start+6])
+					// affected rows
+					affectedRows, off, complete, err := read_linteger(s.data, m.start+5)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.AffectedRows = affectedRows
+
+					// last insert id
+					insertId, off, complete, err := read_linteger(s.data, off)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.InsertId = insertId
 				} else if m.IsError {
-					m.ErrorCode = int(uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+7]))
-					m.ErrorInfo = string(s.data[m.start+9:m.start+14]) + ": " + string(s.data[m.start+15:])
+					// int<1>header (0xff)
+					// int<2>error code
+					// string[1] sql state marker
+					// string[5] sql state
+					// string<EOF> error message
+					m.ErrorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
+
+					m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 				}
 				logp.Debug("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
 				return true, true
@@ -706,10 +743,10 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 
 	event["responsetime"] = t.ResponseTime
 	if mysql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if mysql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["method"] = t.Method
 	event["query"] = t.Query
@@ -717,7 +754,7 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	event["path"] = t.Path
 	event["bytes_out"] = t.Size
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

@@ -58,15 +58,15 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
-        assert all([len(o["request_raw"]) > 0 for o in objs])
-        assert objs[0]["request_raw"] == "ping()"
-        assert objs[11]["response_raw"] == "Exceptions: (1: (1: 4, 2: " + \
+        assert all([len(o["request"]) > 0 for o in objs])
+        assert objs[0]["request"] == "ping()"
+        assert objs[11]["response"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
         assert all([o["port"] == 9090 for o in objs])
 
     def test_send_options_default(self):
         """
-            Request_raw and response_raw should be off by default.
+            Request and response should be off by default.
         """
         self.render_config_template(
             thrift_ports=[9090],
@@ -78,8 +78,8 @@ class Test(TestCase):
 
         self.tutorial_asserts(objs)
 
-        assert all(["request_raw" not in o for o in objs])
-        assert all(["response_raw" not in o for o in objs])
+        assert all(["request" not in o for o in objs])
+        assert all(["response" not in o for o in objs])
 
     def test_thrift_tutorial_framed(self):
         self.render_config_template(
@@ -196,8 +196,8 @@ class Test(TestCase):
 
         objs = self.read_output()
 
-        assert all([len(o["request_raw"]) > 0 for o in objs])
-        assert all(["response_raw" not in o for o in objs])
+        assert all([len(o["request"]) > 0 for o in objs])
+        assert all(["response" not in o for o in objs])
 
         # send_request=false send_response=false
         self.render_config_template(
@@ -212,8 +212,8 @@ class Test(TestCase):
 
         objs = self.read_output()
 
-        assert all(["request_raw" not in o for o in objs])
-        assert all(["response_raw" not in o for o in objs])
+        assert all(["request" not in o for o in objs])
+        assert all(["response" not in o for o in objs])
 
     def test_thrift_binary(self):
         self.render_config_template(

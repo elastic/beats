@@ -2,12 +2,13 @@ package http
 
 import (
 	"bytes"
-	"packetbeat/logp"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-	//"fmt"
+
+	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 )
 
 func HttpModForTests() *Http {
@@ -886,9 +887,13 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/test" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -928,9 +933,13 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -971,13 +980,93 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Faile to parse parameters")
 	}
 	logp.Debug("httpdetailed", "parameters %s", params)
 
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
+	}
+
 	if strings.Contains(params, "secret") {
 		t.Errorf("Failed to censor the password: %s", msg)
+	}
+}
+
+func Test_splitCookiesHeader(t *testing.T) {
+	type io struct {
+		Input  string
+		Output map[string]string
+	}
+
+	tests := []io{
+		io{
+			Input: "sessionToken=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"expires":      "Wed, 09 Jun 2021 10:18:14 GMT",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; invalid",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123;;;; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input: "sessionToken=\"abc123\"; multiple=\"a=d=2 \"",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2 ",
+			},
+		},
+
+		io{
+			Input: "sessionToken\t=   abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input:  ";",
+			Output: map[string]string{},
+		},
+
+		io{
+			Input:  "",
+			Output: map[string]string{},
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, splitCookiesHeader(test.Input))
 	}
 }

@@ -9,14 +9,14 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 )
 
 type SocketInfo struct {
@@ -59,32 +59,48 @@ type ProcessesWatcher struct {
 	TestSignals *chan bool
 }
 
+type ProcsConfig struct {
+	Enabled            bool
+	Max_proc_read_freq int
+	Monitored          []ProcConfig
+	Refresh_pids_freq  int
+}
+
+type ProcConfig struct {
+	Process      string
+	Cmdline_grep string
+}
+
 var ProcWatcher ProcessesWatcher
 
-func (proc *ProcessesWatcher) Init(config *config.Procs) error {
+func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 
 	proc.proc_prefix = ""
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
 	proc.LastMapUpdate = time.Now()
 
-	proc.ReadFromProc = !config.Dont_read_from_proc
+	proc.ReadFromProc = config.Enabled
 	if proc.ReadFromProc {
 		if runtime.GOOS != "linux" {
 			proc.ReadFromProc = false
 			logp.Info("Disabled /proc/ reading because not on linux")
+		} else {
+			logp.Info("Process matching enabled")
 		}
 	}
 
 	if config.Max_proc_read_freq == 0 {
 		proc.MaxReadFreq = 10 * time.Millisecond
 	} else {
-		proc.MaxReadFreq = time.Duration(config.Max_proc_read_freq) * time.Millisecond
+		proc.MaxReadFreq = time.Duration(config.Max_proc_read_freq) *
+			time.Millisecond
 	}
 
 	if config.Refresh_pids_freq == 0 {
 		proc.RefreshPidsFreq = 1 * time.Second
 	} else {
-		proc.RefreshPidsFreq = time.Duration(config.Refresh_pids_freq) * time.Millisecond
+		proc.RefreshPidsFreq = time.Duration(config.Refresh_pids_freq) *
+			time.Millisecond
 	}
 
 	// Read the local IP addresses
@@ -96,14 +112,14 @@ func (proc *ProcessesWatcher) Init(config *config.Procs) error {
 	}
 
 	if proc.ReadFromProc {
-		for pstr, procConfig := range config.Monitored {
+		for _, procConfig := range config.Monitored {
 
 			grepper := procConfig.Cmdline_grep
 			if len(grepper) == 0 {
-				grepper = pstr
+				grepper = procConfig.Process
 			}
 
-			p, err := NewProcess(proc, pstr, grepper, time.Tick(proc.RefreshPidsFreq))
+			p, err := NewProcess(proc, procConfig.Process, grepper, time.Tick(proc.RefreshPidsFreq))
 			if err != nil {
 				logp.Err("NewProcess: %s", err)
 			} else {
@@ -212,7 +228,10 @@ func (proc *ProcessesWatcher) FindProc(port uint16) (procname string) {
 		return p.Proc.Name
 	}
 
-	if time.Now().Sub(proc.LastMapUpdate) > proc.MaxReadFreq {
+	now := time.Now()
+
+	if now.Sub(proc.LastMapUpdate) > proc.MaxReadFreq {
+		proc.LastMapUpdate = now
 		proc.UpdateMap()
 
 		// try again
@@ -280,7 +299,6 @@ func (proc *ProcessesWatcher) UpdateMap() {
 		}
 	}
 
-	proc.LastMapUpdate = time.Now()
 }
 
 // Parses the /proc/net/tcp file

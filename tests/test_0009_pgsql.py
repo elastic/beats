@@ -15,7 +15,7 @@ class Test(TestCase):
         assert o["type"] == "pgsql"
         assert o["method"] == "SELECT"
         assert o["query"] == "select * from test"
-        assert o["response_raw"] == "a,b,c\nmea,meb,mec\nmea1," + \
+        assert o["response"] == "a,b,c\nmea,meb,mec\nmea1," + \
             "meb1,mec1\nmea2,meb2,mec2\nmea3,meb3,mec3\n"
         assert o["bytes_out"] == 202
 

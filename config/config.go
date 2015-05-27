@@ -1,24 +1,20 @@
 package config
 
-import "github.com/BurntSushi/toml"
+import (
+	"github.com/elastic/libbeat/common/droppriv"
+	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/packetbeat/procs"
+)
 
 type Config struct {
 	Interfaces InterfacesConfig
-	Protocols  map[string]Protocol
-	Output     map[string]MothershipConfig
-	Input      Input
-	RunOptions RunOptions
-	Procs      Procs
-	Agent      Agent
+	Protocols  Protocols
+	Output     map[string]outputs.MothershipConfig
+	Shipper    publisher.ShipperConfig
+	Procs      procs.ProcsConfig
+	RunOptions droppriv.RunOptions
 	Logging    Logging
-	Passwords  Passwords
-	Thrift     Thrift
-	Http       Http
-	Mysql      Mysql
-	Pgsql      Pgsql
-	Geoip      Geoip
-	Udpjson    Udpjson
-	GoBeacon   GoBeacon
 	Filter     map[string]interface{}
 }
 
@@ -37,116 +33,66 @@ type InterfacesConfig struct {
 	Loop           int
 }
 
-type Input struct {
-	Inputs []string
-}
-
-type RunOptions struct {
-	Uid int
-	Gid int
-}
-
 type Logging struct {
 	Selectors []string
 }
 
-type Passwords struct {
-	Hide_keywords       []string
-	Strip_authorization bool
-}
-
-type Geoip struct {
-	Paths []string
-}
-
-type Protocol struct {
-	Ports         []int
-	Send_request  bool
-	Send_response bool
+type Protocols struct {
+	Http   Http
+	Mysql  Mysql
+	Pgsql  Pgsql
+	Redis  Redis
+	Thrift Thrift
 }
 
 type Http struct {
-	Send_all_headers bool
-	Send_headers     []string
-	Split_cookie     bool
-	Real_ip_header   string
-	Include_body_for []string
+	Ports               []int
+	Send_all_headers    *bool
+	Send_headers        []string
+	Split_cookie        *bool
+	Real_ip_header      *string
+	Include_body_for    []string
+	Hide_keywords       []string
+	Strip_authorization *bool
+	Send_request        *bool
+	Send_response       *bool
 }
 
 type Mysql struct {
-	Max_row_length int
-	Max_rows       int
+	Ports          []int
+	Max_row_length *int
+	Max_rows       *int
+	Send_request   *bool
+	Send_response  *bool
 }
 
 type Pgsql struct {
-	Max_row_length int
-	Max_rows       int
+	Ports          []int
+	Max_row_length *int
+	Max_rows       *int
+	Send_request   *bool
+	Send_response  *bool
 }
 
 type Thrift struct {
-	String_max_size            int
-	Collection_max_size        int
-	Drop_after_n_struct_fields int
-	Transport_type             string
-	Protocol_type              string
-	Capture_reply              bool
-	Obfuscate_strings          bool
+	Ports                      []int
+	String_max_size            *int
+	Collection_max_size        *int
+	Drop_after_n_struct_fields *int
+	Transport_type             *string
+	Protocol_type              *string
+	Capture_reply              *bool
+	Obfuscate_strings          *bool
 	Idl_files                  []string
+	Send_request               *bool
+	Send_response              *bool
 }
 
-type Agent struct {
-	Name                  string
-	Refresh_topology_freq int
-	Ignore_outgoing       bool
-	Topology_expire       int
-	Tags                  []string
-}
-
-type Procs struct {
-	Dont_read_from_proc bool
-	Max_proc_read_freq  int
-	Monitored           map[string]Proc
-	Refresh_pids_freq   int
-}
-
-type Proc struct {
-	Cmdline_grep string
-}
-
-type MothershipConfig struct {
-	Enabled            bool
-	Save_topology      bool
-	Host               string
-	Port               int
-	Protocol           string
-	Username           string
-	Password           string
-	Index              string
-	Path               string
-	Db                 int
-	Db_topology        int
-	Timeout            int
-	Reconnect_interval int
-	Filename           string
-	Rotate_every_kb    int
-	Number_of_files    int
-	DataType           string
-	Flush_interval     int
-}
-
-type Udpjson struct {
-	Bind_ip string
-	Port    int
-	Timeout int
-}
-
-type GoBeacon struct {
-	Listen_addr string
-	Tracker     string
+type Redis struct {
+	Ports         []int
+	Send_request  *bool
+	Send_response *bool
 }
 
 // Config Singleton
 var ConfigSingleton Config
-
-// Config metadata singleton
-var ConfigMeta toml.MetaData

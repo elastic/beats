@@ -1,15 +1,43 @@
 package main
 
 import (
-	"packetbeat/filters"
-	"packetbeat/filters/nop"
 	"testing"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/filters"
+	"github.com/elastic/libbeat/filters/nop"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func loadPlugins() {
 	filters.Filters.Register(filters.NopFilter, new(nop.Nop))
+}
+
+func TestFilterRunner(t *testing.T) {
+	loadPlugins()
+
+	output := make(chan common.MapStr, 10)
+
+	filter1, err := new(nop.Nop).New("nop1", map[string]interface{}{})
+	assert.Nil(t, err)
+
+	filter2, err := new(nop.Nop).New("nop2", map[string]interface{}{})
+	assert.Nil(t, err)
+
+	runner := NewFilterRunner(output, []filters.FilterPlugin{filter1, filter2})
+	assert.NotNil(t, runner)
+
+	go runner.Run()
+
+	runner.FiltersQueue <- common.MapStr{"hello": "world"}
+	runner.FiltersQueue <- common.MapStr{"foo": "bar"}
+
+	res := <-output
+	assert.Equal(t, common.MapStr{"hello": "world"}, res)
+
+	res = <-output
+	assert.Equal(t, common.MapStr{"foo": "bar"}, res)
 }
 
 func TestLoadConfiguredFilters(t *testing.T) {
@@ -30,10 +58,10 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": "nop",
 				},
-				"nop2": map[string]interface{}{
+				"nop2": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -52,7 +80,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop", "sample1"},
-				"sample1": map[string]interface{}{
+				"sample1": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -94,7 +122,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": "nop",
 				},
 			},
@@ -103,7 +131,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"hype": "nop",
 				},
 			},
@@ -112,7 +140,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 		io{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
-				"nop1": map[string]interface{}{
+				"nop1": map[interface{}]interface{}{
 					"type": 1,
 				},
 			},

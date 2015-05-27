@@ -2,11 +2,13 @@ package pgsql
 
 import (
 	"encoding/hex"
-	"packetbeat/common"
-	"packetbeat/logp"
-	"packetbeat/protos"
 	"testing"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/protos"
 )
 
 func PgsqlModForTests() *Pgsql {

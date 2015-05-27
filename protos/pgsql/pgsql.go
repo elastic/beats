@@ -1,14 +1,16 @@
 package pgsql
 
 import (
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type PgsqlMessage struct {
@@ -90,13 +92,16 @@ const (
 )
 
 type Pgsql struct {
-	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
-	results         chan common.MapStr
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
+
+	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
+	results         chan common.MapStr
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -110,27 +115,34 @@ func (pgsql *Pgsql) InitDefaults() {
 	pgsql.Send_response = false
 }
 
-func (pgsql *Pgsql) setFromConfig() error {
-	if config.ConfigSingleton.Pgsql.Max_row_length > 0 {
-		pgsql.maxRowLength = config.ConfigSingleton.Pgsql.Max_row_length
+func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
+
+	pgsql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		pgsql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Pgsql.Max_rows > 0 {
-		pgsql.maxStoreRows = config.ConfigSingleton.Pgsql.Max_rows
+	if config.Max_rows != nil {
+		pgsql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_request") {
-		pgsql.Send_request = config.ConfigSingleton.Protocols["pgsql"].Send_request
+	if config.Send_request != nil {
+		pgsql.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_response") {
-		pgsql.Send_response = config.ConfigSingleton.Protocols["pgsql"].Send_response
+	if config.Send_response != nil {
+		pgsql.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (pgsql *Pgsql) GetPorts() []int {
+	return pgsql.Ports
 }
 
 func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
-		err := pgsql.setFromConfig()
+		err := pgsql.setFromConfig(config.ConfigSingleton.Protocols.Pgsql)
 		if err != nil {
 			return err
 		}
@@ -870,17 +882,17 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if pgsql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if pgsql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["query"] = t.Query
 	event["method"] = t.Method
 	event["bytes_out"] = t.Size
 	event["pgsql"] = t.Pgsql
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
