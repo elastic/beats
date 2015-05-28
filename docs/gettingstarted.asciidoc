@@ -337,9 +337,9 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0.Beta1.tar.gz
-tar xzvf packetbeat-dashboards-1.0.0.Beta1.tar.gz
-cd packetbeat-dashboards-1.0.0.Beta1/
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0~Beta1.tar.gz
+tar xzvf packetbeat-dashboards-1.0.0~Beta1.tar.gz
+cd packetbeat-dashboards-1.0.0~Beta1/
 ./load.sh
 ----------------------------------------------------------------------
 
