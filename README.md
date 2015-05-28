@@ -3,7 +3,7 @@ libbeat
 
 The Beats are a collection of daemons that ship data from your servers to
 Elasticsearch. Read more about Beats on the
-[elastic.co](https://stag-www.elastic.co/products/beats) website.
+[elastic.co](https://www.elastic.co/products/beats) website.
 
 The first Beat is [Packetbeat](https://github.com/elastic/packetbeat), a tool
 that captures and decodes the traffic between your servers and inserts metadata
