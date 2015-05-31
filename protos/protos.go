@@ -51,6 +51,7 @@ const (
 	RedisProtocol
 	PgsqlProtocol
 	ThriftProtocol
+	MongodbProtocol
 )
 
 // Protocol names
@@ -61,6 +62,7 @@ var ProtocolNames = []string{
 	"redis",
 	"pgsql",
 	"thrift",
+	"mongodb",
 }
 
 func (p Protocol) String() string {

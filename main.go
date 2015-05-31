@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/http"
+	"github.com/elastic/packetbeat/protos/mongodb"
 	"github.com/elastic/packetbeat/protos/mysql"
 	"github.com/elastic/packetbeat/protos/pgsql"
 	"github.com/elastic/packetbeat/protos/redis"
@@ -37,11 +38,12 @@ import (
 const Version = "1.0.0.Beta1"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
-	protos.HttpProtocol:   new(http.Http),
-	protos.MysqlProtocol:  new(mysql.Mysql),
-	protos.PgsqlProtocol:  new(pgsql.Pgsql),
-	protos.RedisProtocol:  new(redis.Redis),
-	protos.ThriftProtocol: new(thrift.Thrift),
+	protos.HttpProtocol:    new(http.Http),
+	protos.MysqlProtocol:   new(mysql.Mysql),
+	protos.PgsqlProtocol:   new(pgsql.Pgsql),
+	protos.RedisProtocol:   new(redis.Redis),
+	protos.ThriftProtocol:  new(thrift.Thrift),
+	protos.MongodbProtocol: new(mongodb.Mongodb),
 }
 
 var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{
