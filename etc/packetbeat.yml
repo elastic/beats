@@ -69,8 +69,8 @@ protocols:
 
   thrift:
 
-    # Configure the ports where to listen for Redis traffic. You can disable
-    # Redis protocol by commenting the list of ports.
+    # Configure the ports where to listen for Thrift traffic. You can disable
+    # Thrift protocol by commenting the list of ports.
     ports: [9090]
 
 ############################# Output ############################################
