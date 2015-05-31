@@ -104,6 +104,11 @@ device = "any"
   {% if thrift_send_request %}send_request = true{% endif %}
   {% if thrift_send_response %}send_response = true{% endif %}
 
+  [protocols.mongodb]
+  ports = [{{ mongodb_ports|default([27017])|join(", ") }}]
+  {% if mongodb_send_request %}send_request = true{% endif %}
+  {% if mongodb_send_response %}send_response = true{% endif %}
+
 [thrift]
 transport_type = "{{ thrift_transport_type|default('socket') }}"
 idl_files = [

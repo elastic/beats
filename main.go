@@ -27,6 +27,7 @@ import (
 	"packetbeat/procs"
 	"packetbeat/protos"
 	"packetbeat/protos/http"
+	"packetbeat/protos/mongodb"
 	"packetbeat/protos/mysql"
 	"packetbeat/protos/pgsql"
 	"packetbeat/protos/redis"
@@ -39,11 +40,12 @@ import (
 const Version = "0.5.0"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
-	protos.HttpProtocol:   new(http.Http),
-	protos.MysqlProtocol:  new(mysql.Mysql),
-	protos.PgsqlProtocol:  new(pgsql.Pgsql),
-	protos.RedisProtocol:  new(redis.Redis),
-	protos.ThriftProtocol: new(thrift.Thrift),
+	protos.HttpProtocol:    new(http.Http),
+	protos.MysqlProtocol:   new(mysql.Mysql),
+	protos.PgsqlProtocol:   new(pgsql.Pgsql),
+	protos.RedisProtocol:   new(redis.Redis),
+	protos.ThriftProtocol:  new(thrift.Thrift),
+	protos.MongodbProtocol: new(mongodb.Mongodb),
 }
 
 var EnabledInputPlugins map[inputs.Input]inputs.InputPlugin = map[inputs.Input]inputs.InputPlugin{
