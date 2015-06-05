@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/packetbeat/protos"
 
@@ -16,6 +17,15 @@ func MysqlModForTests() *Mysql {
 	var mysql Mysql
 	mysql.Init(true, nil)
 	return &mysql
+}
+
+func Test_parseStateNames(t *testing.T) {
+	assert.Equal(t, "Start", mysqlStateStart.String())
+	assert.Equal(t, "EatMessage", mysqlStateEatMessage.String())
+	assert.Equal(t, "EatFields", mysqlStateEatFields.String())
+	assert.Equal(t, "EatRows", mysqlStateEatRows.String())
+
+	assert.NotNil(t, (MysqlStateMax - 1).String())
 }
 
 func TestMySQLParser_simpleRequest(t *testing.T) {
