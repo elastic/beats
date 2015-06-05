@@ -179,7 +179,7 @@ func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
 }
 
 func (stream *MysqlStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.message.end:]
+	stream.data = stream.data[stream.parseOffset:]
 	stream.parseState = mysqlStateStart
 	stream.parseOffset = 0
 	stream.isClient = false
@@ -458,6 +458,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		ok, complete := mysqlMessageParser(priv.Data[dir])
+		//logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%b complete=%b", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
