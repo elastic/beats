@@ -347,6 +347,10 @@ you enable saving the raw request and response fields (see the `send_requset`
 and the `send_response` options), the sensitive data will be present in those
 fields.
 
+===== strip_authorisation
+
+If enabled, this option hides the value of the `Authorization` HTTP header.
+
 ===== send_headers
 
 A list of header names to be captured and send to Elasticsearch. These
@@ -356,6 +360,23 @@ headers are placed under the `headers` dictionary in the resulting JSON.
 
 Alternatively to sending a white list of headers to Elasticsearch, you can
 send all headers by setting this option to true. The default is false.
+
+===== include_body_for
+
+The list of content types for which Packetbeat includes the full HTTP payload in
+the `response` field. Should be used together with the `send_response` option.
+
+Example configuration:
+
+[source,yml]
+------------------------------------------------------------------------------
+protocols:
+  http:
+    ports: [80, 8080]
+    send_response: true
+    include_body_for: ["text/html"]
+------------------------------------------------------------------------------
+
 
 ===== split_cookie
 
