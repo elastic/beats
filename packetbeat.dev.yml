@@ -1,4 +1,4 @@
-################### Packetbeat Agent Configuration Example ######################
+################### Packetbeat Configuration Example ######################
 
 # This file contains an overview of various configuration settings. Please consult
 # the docs at <http://packetbeat.com/docs/configuration.html> for more details.
@@ -7,7 +7,7 @@
 # application components. It inserts meta-data about each transaction into
 # Elasticsearch.
 
-############################# Agent ############################################
+############################# Shipper ############################################
 agent:
 
  # The name of the agent that publishes the network data. It can be used to group 
