@@ -239,3 +239,29 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 		t.Error("Failed to parse error message")
 	}
 }
+
+// Test parsing an error response
+func TestPgsqlParser_invalidMessage(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
+	}
+	pgsql := PgsqlModForTests()
+	data := []byte(
+		"4300000002")
+
+	message, err := hex.DecodeString(string(data))
+	if err != nil {
+		t.Error("Failed to decode hex string")
+	}
+
+	stream := &PgsqlStream{data: message, message: new(PgsqlMessage)}
+
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+
+	if ok {
+		t.Error("Parsing returned success instead of error")
+	}
+	if complete {
+		t.Error("Expecting a non complete message")
+	}
+}

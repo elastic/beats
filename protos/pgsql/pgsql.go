@@ -411,6 +411,12 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 				// read length
 				length := int(common.Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
 
+				if length < 4 {
+					// length should include the size of itself (int32)
+					logp.Debug("pgsqldetailed", "Invalid pgsql command length.")
+					return false, false
+				}
+
 				logp.Debug("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
 
 				if typ == 'Q' {
