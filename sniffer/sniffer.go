@@ -300,7 +300,9 @@ func (sniffer *SnifferSetup) Run() error {
 			}
 			_lastPktTime := ci.Timestamp
 			lastPktTime = &_lastPktTime
-			ci.Timestamp = time.Now() // overwrite what we get from the pcap
+			if !sniffer.config.TopSpeed {
+				ci.Timestamp = time.Now() // overwrite what we get from the pcap
+			}
 		}
 		counter++
 
