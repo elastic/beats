@@ -178,16 +178,17 @@ NOTE: When using the "any" device, the interfaces are not set
 
 ===== snaplen
 
-The `snaplen` option controls the maximum size of the packets to capture. You
-generally want to set this to the MTU size used in your network. If the
-capturing device is "any" or "lo", the default value of this parameter is
-16436. Otherwise, it is 1514.
+The *snaplen* option controls the maximum size of the packets to capture. The
+default is 65535 which is large enough for almost all networks and interfaces
+types. If you sniff on a physical network interface, you can optimize this by
+setting it to the MTU size. On virtual interfaces, however, it's safer to leave
+this to the default value.
 
 [source,yaml]
 ------------------------------------------------------------------------------
 interfaces:
-  device: any
-  snaplen: 2500
+  device: eth0
+  snaplen: 1514
 ------------------------------------------------------------------------------
 
 ===== type

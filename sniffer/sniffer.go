@@ -78,11 +78,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		}
 	}
 	if sniffer.config.Snaplen == 0 {
-		if sniffer.config.Devices[0] == "any" || sniffer.config.Devices[0] == "lo" {
-			sniffer.config.Snaplen = 16436
-		} else {
-			sniffer.config.Snaplen = 1514
-		}
+		sniffer.config.Snaplen = 65535
 	}
 
 	if sniffer.config.Type == "autodetect" || sniffer.config.Type == "" {
