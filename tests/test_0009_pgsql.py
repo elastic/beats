@@ -46,3 +46,19 @@ class Test(TestCase):
         assert o["status"] == "Error"
         assert o["pgsql.error_code"] == "23505"
         assert o["pgsql.iserror"] is True
+
+    def test_login_rt(self):
+        """
+        Response time for a query happing shortly after a command type we don't
+        understand shouldn't have it's rt affected. Regression test for #
+        """
+        self.render_config_template(
+            pgsql_ports=[5432]
+        )
+        self.run_packetbeat(pcap="pgsql_rt.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+        assert o["method"] == "SELECT"
+        assert o["responsetime"] == 38

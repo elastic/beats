@@ -430,7 +430,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						m.end = s.parseOffset
 						m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
 						m.toExport = true
-						logp.Debug("pgsqldetailed", "Simple Query", "%s", m.Query)
+						logp.Debug("pgsqldetailed", "Simple Query: %s", m.Query)
 						return true, true
 					} else {
 						// wait for more
@@ -542,6 +542,11 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					if len(s.data[s.parseOffset:]) >= length+1 {
 						s.parseOffset += 1 //type
 						s.parseOffset += length
+						m.end = s.parseOffset
+
+						// ok and complete, but ignore
+						m.toExport = false
+						return true, true
 					} else {
 						// wait for more
 						logp.Debug("pgsqldetailed", "Wait for more data 6")
@@ -675,6 +680,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		ok, complete := pgsql.pgsqlMessageParser(priv.Data[dir])
+		//logp.Debug("pgsqldetailed", "MessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
