@@ -403,7 +403,10 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 		case BODY:
 			logp.Debug("http", "eat body: %d", s.parseOffset)
-			if !m.hasContentLength && (m.connection == "close" || (m.version_major == 1 && m.version_minor == 0 && m.connection != "keep-alive")) {
+			if !m.hasContentLength && (m.connection == "close" ||
+				(m.version_major == 1 && m.version_minor == 0 &&
+					m.connection != "keep-alive")) {
+
 				// HTTP/1.0 no content length. Add until the end of the connection
 				logp.Debug("http", "close connection, %d", len(s.data)-s.parseOffset)
 				s.bodyReceived += (len(s.data) - s.parseOffset)
@@ -440,6 +443,38 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 	}
 
 	return true, false
+}
+
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Decides if we can ignore the gap or it's a parser error
+// and we need to drop the stream.
+func (http *Http) messageGap(s *HttpStream, nbytes int) (ok bool, complete bool) {
+
+	m := s.message
+	switch s.parseState {
+	case START, HEADERS:
+		// we know we cannot recover from these
+		return false, false
+	case BODY:
+		logp.Debug("http", "gap in body: %d", nbytes)
+		if !m.hasContentLength && (m.connection == "close" ||
+			(m.version_major == 1 && m.version_minor == 0 &&
+				m.connection != "keep-alive")) {
+
+			s.bodyReceived += nbytes
+			m.ContentLength += nbytes
+			return true, false
+		} else if len(s.data[s.parseOffset:])+nbytes >= m.ContentLength-s.bodyReceived {
+			// we're done, but the last portion of the data is gone
+			m.end = s.parseOffset
+			return true, true
+		} else {
+			s.bodyReceived += nbytes
+			return true, false
+		}
+	}
+	// assume we cannot recover
+	return false, false
 }
 
 func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool, complete bool) {
@@ -524,6 +559,18 @@ type httpPrivateData struct {
 	Data [2]*HttpStream
 }
 
+// Called when the parser has identified the boundary
+// of a message.
+func (http *Http) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *HttpStream) {
+	msg := stream.data[stream.message.start:stream.message.end]
+	http.hideHeaders(stream.message, msg)
+
+	http.handleHttp(stream.message, tcptuple, dir, msg)
+
+	// and reset message
+	stream.PrepareForNewMessage()
+}
+
 func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
@@ -571,13 +618,7 @@ func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 
 	if complete {
 		// all ok, ship it
-		msg := stream.data[stream.message.start:stream.message.end]
-		http.hideHeaders(stream.message, msg)
-
-		http.handleHttp(stream.message, tcptuple, dir, msg)
-
-		// and reset message
-		stream.PrepareForNewMessage()
+		http.messageComplete(tcptuple, dir, stream)
 	}
 
 	return priv
@@ -619,9 +660,35 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 }
 
 func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	return private
+	if private == nil {
+		return private, false
+	}
+	httpData, ok := private.(httpPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := httpData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	ok, complete := http.messageGap(stream, nbytes)
+	logp.Debug("httpdetailed", "messageGap returned ok=%v complete=%v", ok, complete)
+	if !ok {
+		// drop stream
+		httpData.Data[dir] = nil
+		return httpData, true
+	}
+
+	if complete {
+		// we need to publish from here
+		http.messageComplete(tcptuple, dir, stream)
+	}
+
+	return private, false
 }
 
 func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,

@@ -1004,11 +1004,11 @@ func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 }
 
 func (thrift *Thrift) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	// TODO
 
-	return private
+	return private, false
 }
 
 func (thrift *Thrift) publishTransactions() {

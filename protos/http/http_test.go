@@ -2,18 +2,22 @@ package http
 
 import (
 	"bytes"
+	"net"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/packetbeat/protos"
 	"github.com/stretchr/testify/assert"
 )
 
 func HttpModForTests() *Http {
 	var http Http
-	http.Init(true, nil)
+	results := make(chan common.MapStr, 10)
+	http.Init(true, results)
 	return &http
 }
 
@@ -1069,4 +1073,152 @@ func Test_splitCookiesHeader(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.Output, splitCookiesHeader(test.Input))
 	}
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// headers, drop the stream.
+func Test_gap_in_headers(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 5)
+	assert.Equal(t, false, ok)
+	assert.Equal(t, false, complete)
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// parts of the body, it's ok.
+func Test_gap_in_body(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 40\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, true, complete)
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// parts of the body, it's ok.
+func Test_gap_in_body_http1dot0(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.0 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+}
+
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
+		Ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: 6512, Dst_port: 80,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
+// Helper function to read from the Publisher Queue
+func expectTransaction(t *testing.T, http *Http) common.MapStr {
+	select {
+	case trans := <-http.results:
+		return trans
+	default:
+		t.Error("No transaction")
+	}
+	return nil
+}
+
+func Test_gap_in_body_http1dot0_fin(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http",
+			"httpdetailed"})
+	}
+	http := HttpModForTests()
+
+	data1 := []byte("GET / HTTP/1.0\r\n\r\n")
+
+	data2 := []byte("HTTP/1.0 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	tcptuple := testTcpTuple()
+	req := protos.Packet{Payload: data1}
+	resp := protos.Packet{Payload: data2}
+
+	private := protos.ProtocolData(new(httpPrivateData))
+
+	private = http.Parse(&req, tcptuple, 0, private)
+	private = http.ReceivedFin(tcptuple, 0, private)
+
+	private = http.Parse(&resp, tcptuple, 1, private)
+
+	logp.Debug("http", "Now sending gap..")
+
+	private, drop := http.GapInStream(tcptuple, 1, 10, private)
+	assert.Equal(t, false, drop)
+
+	private = http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, http)
+	assert.NotNil(t, trans)
 }

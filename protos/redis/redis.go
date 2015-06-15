@@ -636,11 +636,11 @@ func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	// TODO
 
-	return private
+	return private, true
 }
 
 func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,

@@ -733,19 +733,19 @@ func messageHasEnoughData(msg *PgsqlMessage) bool {
 
 // Called when there's a drop packet
 func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInPgsqlStream exception")
 
 	if private == nil {
-		return private
+		return private, false
 	}
 	pgsqlData, ok := private.(pgsqlPrivateData)
 	if !ok {
-		return private
+		return private, false
 	}
 	if pgsqlData.Data[dir] == nil {
-		return pgsqlData
+		return pgsqlData, false
 	}
 
 	// If enough data was received, send it to the
@@ -763,7 +763,7 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
-	return pgsqlData
+	return pgsqlData, true
 }
 
 func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,

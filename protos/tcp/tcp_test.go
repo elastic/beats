@@ -32,8 +32,8 @@ func (proto *TestProtocol) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 }
 
 func (proto *TestProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-	return private
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+	return private, true
 }
 
 func Test_configToPortsMap(t *testing.T) {
