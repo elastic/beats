@@ -19,12 +19,28 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) Elasticsea
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
+	var es_port int
+	var err error
+
+	// read the Elasticsearch port from the ES_PORT env variable
+	port := os.Getenv("ES_PORT")
+	if len(port) > 0 {
+		es_port, err = strconv.Atoi(port)
+		if err != nil {
+			// error occurred, use the default
+			es_port = elasticsearchPort
+		}
+	} else {
+		// empty variable
+		es_port = elasticsearchPort
+	}
+
 	var elasticsearchOutput ElasticsearchOutput
 	elasticsearchOutput.Init(outputs.MothershipConfig{
 		Enabled:        true,
 		Save_topology:  true,
 		Host:           elasticsearchAddr,
-		Port:           elasticsearchPort,
+		Port:           es_port,
 		Username:       "",
 		Password:       "",
 		Path:           "",
