@@ -536,7 +536,7 @@ func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	// we always drop the TCP stream. Because it's binary and len based,
 	// there are too few cases in which we could recover the stream (maybe
 	// for very large blobs, leaving that as TODO)
-	return private, false
+	return private, true
 }
 
 func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
