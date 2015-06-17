@@ -662,6 +662,8 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
+	defer logp.Recover("GapInStream(http) exception")
+
 	if private == nil {
 		return private, false
 	}
