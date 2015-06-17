@@ -38,7 +38,9 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 		return nil, err
 	}
 
-	url := es.Url + path
+	conn := es.connectionPool.GetConnection()
+
+	url := conn.Url + path
 	if len(params) > 0 {
 		url = url + "?" + UrlEncode(params)
 	}
@@ -49,8 +51,8 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 	}
 
 	req.Header.Add("Accept", "application/json")
-	if es.Username != "" || es.Password != "" {
-		req.SetBasicAuth(es.Username, es.Password)
+	if conn.Username != "" || conn.Password != "" {
+		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
 	resp, err := es.client.Do(req)

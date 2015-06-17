@@ -11,16 +11,9 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-const (
-	DefaultElasticsearchUrl = "http://localhost:9200"
-)
-
 type Elasticsearch struct {
-	Url      string
-	Username string
-	Password string
-
-	client *http.Client
+	connectionPool ConnectionPool
+	client         *http.Client
 }
 
 type QueryResult struct {
@@ -57,16 +50,15 @@ func (r QueryResult) String() string {
 }
 
 // Create a connection to Elasticsearch
-func NewElasticsearch(url string, username string, password string) *Elasticsearch {
+func NewElasticsearch(urls []string, username string, password string) *Elasticsearch {
+
+	var connection_pool ConnectionPool
+	connection_pool.SetConnections(urls, username, password)
+
 	es := Elasticsearch{
-		Url:    DefaultElasticsearchUrl,
-		client: &http.Client{},
+		connectionPool: connection_pool,
+		client:         &http.Client{},
 	}
-	if url != es.Url {
-		es.Url = url
-	}
-	es.Username = username
-	es.Password = password
 	return &es
 }
 
@@ -123,7 +115,9 @@ func ReadQueryResult(resp http.Response) (*QueryResult, error) {
 func (es *Elasticsearch) Request(method string, url string,
 	params map[string]string, body interface{}) (*http.Response, error) {
 
-	url = es.Url + url
+	conn := es.connectionPool.GetConnection()
+
+	url = conn.Url + url
 	if len(params) > 0 {
 		url = url + "?" + UrlEncode(params)
 	}
@@ -143,11 +137,11 @@ func (es *Elasticsearch) Request(method string, url string,
 		return nil, err
 	}
 
-	logp.Debug("elasticsearch", "Request %s", req)
+	logp.Debug("elasticsearch", "Send request to %s", url)
 
 	req.Header.Add("Accept", "application/json")
-	if es.Username != "" || es.Password != "" {
-		req.SetBasicAuth(es.Username, es.Password)
+	if conn.Username != "" || conn.Password != "" {
+		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
 	resp, err := es.client.Do(req)
@@ -156,8 +150,12 @@ func (es *Elasticsearch) Request(method string, url string,
 	}
 
 	if resp.StatusCode > 299 {
+		// request fails
+		es.connectionPool.MarkDead(conn)
 		return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
 	}
+	// request with success
+	es.connectionPool.MarkLive(conn)
 
 	return resp, nil
 }

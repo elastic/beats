@@ -34,9 +34,21 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		config.Protocol = "http"
 	}
 
-	url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
+	var urls []string
 
-	con := NewElasticsearch(url, config.Username, config.Password)
+	if len(config.Hosts) > 0 {
+		// use hosts setting
+		for _, host := range config.Hosts {
+			url := fmt.Sprintf("%s://%s%s", config.Protocol, host, config.Path)
+			urls = append(urls, url)
+		}
+	} else {
+		// use host and port settings
+		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
+		urls = append(urls, url)
+	}
+
+	con := NewElasticsearch(urls, config.Username, config.Password)
 	out.Conn = con
 
 	if config.Index != "" {
@@ -68,7 +80,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	out.sendingQueue = make(chan BulkMsg, 1000)
 	go out.SendMessagesGoroutine()
 
-	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", url)
+	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", urls)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
 	if out.FlushInterval > 0 {

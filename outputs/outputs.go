@@ -11,6 +11,7 @@ type MothershipConfig struct {
 	Save_topology      bool
 	Host               string
 	Port               int
+	Hosts              []string
 	Protocol           string
 	Username           string
 	Password           string
