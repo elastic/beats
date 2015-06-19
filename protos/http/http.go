@@ -59,6 +59,9 @@ type HttpMessage struct {
 	Body             string
 	//Raw Data
 	Raw []byte
+
+	Notes []string
+
 	//Timing
 	start int
 	end   int
@@ -91,6 +94,7 @@ type HttpTransaction struct {
 	RequestUri   string
 	Params       string
 	Path         string
+	Notes        []string
 
 	Http common.MapStr
 
@@ -457,6 +461,11 @@ func (http *Http) messageGap(s *HttpStream, nbytes int) (ok bool, complete bool)
 		return false, false
 	case BODY:
 		logp.Debug("http", "gap in body: %d", nbytes)
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
 		if !m.hasContentLength && (m.connection == "close" ||
 			(m.version_major == 1 && m.version_minor == 0 &&
 				m.connection != "keep-alive")) {
@@ -747,6 +756,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 	trans.Method = msg.Method
 	trans.RequestUri = msg.RequestUri
+	trans.Notes = msg.Notes
 
 	trans.Http = common.MapStr{}
 
@@ -829,6 +839,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	}
 
 	trans.Http.Update(response)
+	trans.Notes = append(trans.Notes, msg.Notes...)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -882,6 +893,10 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
+
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
 
 	http.results <- event
 }

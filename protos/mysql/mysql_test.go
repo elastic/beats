@@ -510,6 +510,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	trans := expectTransaction(t, mysql)
 	assert.NotNil(t, trans)
+	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
 }
 
 // Test that loss of data during the request doesn't result in a

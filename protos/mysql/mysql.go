@@ -50,6 +50,7 @@ type MysqlMessage struct {
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Raw          []byte
+	Notes        []string
 }
 
 type MysqlTransaction struct {
@@ -65,6 +66,7 @@ type MysqlTransaction struct {
 	Method       string
 	Path         string // for mysql, Path refers to the mysql table queried
 	Size         uint64
+	Notes        []string
 
 	Mysql common.MapStr
 
@@ -429,8 +431,13 @@ func (mysql *Mysql) messageGap(s *MysqlStream, nbytes int) (complete bool) {
 		// not enough data yet to be useful
 		return false
 	case mysqlStateEatFields, mysqlStateEatRows:
-		m.end = s.parseOffset
 		// enough data here
+		m.end = s.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
 		return true
 	}
 
@@ -610,6 +617,8 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 
 	trans.Mysql = common.MapStr{}
 
+	trans.Notes = msg.Notes
+
 	// save Raw message
 	trans.Request_raw = msg.Query
 
@@ -654,10 +663,14 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
 
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
 	mysql.publishMysqlTransaction(trans)
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
+
+	trans.Notes = append(trans.Notes, msg.Notes...)
 
 	// remove from map
 	delete(mysql.transactionsMap, trans.tuple.Hashable())
@@ -818,6 +831,10 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	event["mysql"] = t.Mysql
 	event["path"] = t.Path
 	event["bytes_out"] = t.Size
+
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
 
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src

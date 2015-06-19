@@ -34,9 +34,9 @@ type PgsqlMessage struct {
 	ErrorInfo      string
 	ErrorCode      string
 	ErrorSeverity  string
+	Notes          []string
 
 	Direction    uint8
-	Incomplete   bool
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 }
@@ -53,6 +53,7 @@ type PgsqlTransaction struct {
 	Query        string
 	Method       string
 	Size         uint64
+	Notes        []string
 
 	Pgsql common.MapStr
 
@@ -753,9 +754,14 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	stream := pgsqlData.Data[dir]
 	if messageHasEnoughData(stream.message) {
 		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
-		stream.message.toExport = true
-		stream.message.end = stream.parseOffset
-		stream.message.Incomplete = true
+		m := stream.message
+		m.toExport = true
+		m.end = stream.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
 
 		msg := stream.data[stream.message.start:stream.message.end]
 		pgsql.handlePgsql(pgsql, stream.message, tcptuple, dir, msg)
@@ -826,6 +832,8 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Query = query
 		trans.Method = getQueryMethod(query)
 
+		trans.Notes = msg.Notes
+
 		trans.Request_raw = query
 
 		if trans.timer != nil {
@@ -869,6 +877,8 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 	trans.Response_raw = common.DumpInCSVFormat(msg.Fields, msg.Rows)
 
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
 	pgsql.publishTransaction(trans)
 
 	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
@@ -907,6 +917,10 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
+
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
 
 	pgsql.results <- event
 }

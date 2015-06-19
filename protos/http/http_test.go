@@ -1221,4 +1221,5 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 
 	trans := expectTransaction(t, http)
 	assert.NotNil(t, trans)
+	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
 }
