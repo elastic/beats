@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-
 func TestRoundRobin(t *testing.T) {
 
 	var pool ConnectionPool
@@ -63,8 +62,8 @@ func TestMarkDead(t *testing.T) {
 	pool.MarkDead(conn)
 
 	conn = pool.GetConnection()
-	if conn != nil {
-		t.Errorf("No connection returned %s")
+	if conn.Url != "localhost:9201" && conn.Url != "localhost:9200" {
+		t.Errorf("No connection returned: %s", conn)
 	}
 
 }
@@ -74,7 +73,6 @@ func TestDeadTimeout(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
 	}
-
 
 	var pool ConnectionPool
 
@@ -134,5 +132,3 @@ func TestMarkLive(t *testing.T) {
 	}
 
 }
-
-

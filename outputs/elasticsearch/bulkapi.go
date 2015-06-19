@@ -55,40 +55,29 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 
 		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
-		req.Header.Add("Accept", "application/json")
-		if conn.Username != "" || conn.Password != "" {
-			req.SetBasicAuth(conn.Username, conn.Password)
-		}
-
-		resp, err := es.client.Do(req)
+		resp, err := es.SendRequest(conn, req)
 		if err != nil {
-			// request fails
-			logp.Warn("Request fails: %s", err)
-			es.connectionPool.MarkDead(conn)
-			return nil, err
+			// retry
+			continue
 		}
 
 		defer resp.Body.Close()
 		obj, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			logp.Warn("Fail to read the response from Elasticsearch")
+			es.connectionPool.MarkDead(conn)
+			continue //retry
 		}
 		var result QueryResult
 		err = json.Unmarshal(obj, &result)
 		if err != nil {
+			logp.Warn("Fail to unmarshal the response from Elasticsearch")
 			return nil, err
 		}
 
-		if resp.StatusCode > 499 {
-			// request fails
-			es.connectionPool.MarkDead(conn)
-			return &result, fmt.Errorf("ES returned an error: %s", resp.Status)
-		}
-		// request with success
-		es.connectionPool.MarkLive(conn)
-
-		return &result, err
+		return &result, nil
 	}
 
+	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
 	return nil, fmt.Errorf("Request fails to be send after %d retries", es.MaxRetries)
 }
