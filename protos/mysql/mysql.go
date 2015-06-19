@@ -542,7 +542,8 @@ func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	// TODO
+	// TODO: check if we have data pending and either drop it to free
+	// memory or send it up the stack.
 	return private
 }
 

@@ -299,6 +299,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		logp.Debug("thriftdetailed", "offset = %d", offset)
 
 		if len(s.data[offset:]) < 4 {
+			logp.Debug("thriftdetailed", "Less then 4 bytes remaining")
 			return true, false // ok, not complete
 		}
 		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
@@ -712,6 +713,9 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var m = s.message
 
+	logp.Debug("thriftdetailed", "messageParser called parseState=%v offset=%v",
+		s.parseState, s.parseOffset)
+
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
 		case ThriftStartState:
@@ -726,6 +730,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			}
 
 			ok, complete = thrift.readMessageBegin(s)
+			logp.Debug("thriftdetailed", "readMessageBegin returned: %v %v", ok, complete)
 			if !ok {
 				return false, false
 			}
@@ -743,6 +748,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			s.parseState = ThriftFieldState
 		case ThriftFieldState:
 			ok, complete, field := thrift.readField(s)
+			logp.Debug("thriftdetailed", "readField returned: %v %v", ok, complete)
 			if !ok {
 				return false, false
 			}
@@ -793,13 +799,32 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	return true, false
 }
 
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Returns true if there is already enough data in the message
+// read so far that we can use it further in the stack.
+func (thrift *Thrift) messageGap(s *ThriftStream, nbytes int) (complete bool) {
+	m := s.message
+	switch s.parseState {
+	case ThriftStartState:
+		// not enough data yet to be useful
+		return false
+	case ThriftFieldState:
+		if !m.IsRequest {
+			// large response case, can tolerate loss
+			return true
+		}
+	}
+
+	return false
+}
+
 func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
 	if flush {
 		stream.data = []byte{}
 	} else {
 		stream.data = stream.data[stream.parseOffset:]
 	}
-	logp.Debug("thrift", "remaining data: [%s]", stream.data)
+	//logp.Debug("thrift", "remaining data: [%s]", stream.data)
 	stream.parseOffset = 0
 	stream.message = nil
 	stream.parseState = ThriftStartState
@@ -807,6 +832,45 @@ func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
 
 type thriftPrivateData struct {
 	Data [2]*ThriftStream
+}
+
+func (thrift *Thrift) messageComplete(tcptuple *common.TcpTuple, dir uint8,
+	stream *ThriftStream, priv *thriftPrivateData) {
+
+	var flush bool = false
+
+	if stream.message.IsRequest {
+		logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
+		if !thrift.CaptureReply {
+			// enable the stream in the other direction to get the reply
+			stream_rev := priv.Data[1-dir]
+			if stream_rev != nil {
+				stream_rev.skipInput = false
+			}
+		}
+	} else {
+		logp.Debug("thrift", "Thrift response message: %s", stream.message.Method)
+		if !thrift.CaptureReply {
+			// disable stream in this direction
+			stream.skipInput = true
+
+			// and flush current data
+			flush = true
+		}
+	}
+
+	// all ok, go to next level
+	stream.message.TcpTuple = *tcptuple
+	stream.message.Direction = dir
+	stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	if stream.message.FrameSize == 0 {
+		stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
+	}
+	thrift.handleThrift(stream.message)
+
+	// and reset message
+	stream.PrepareForNewMessage(flush)
+
 }
 
 func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
@@ -852,6 +916,7 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir u
 		}
 
 		ok, complete := thrift.messageParser(priv.Data[dir])
+		logp.Debug("thriftdetailed", "messageParser returned %v %v", ok, complete)
 
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
@@ -862,44 +927,14 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir u
 		}
 
 		if complete {
-			var flush bool = false
-
-			if stream.message.IsRequest {
-				logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
-				if !thrift.CaptureReply {
-					// enable the stream in the other direction to get the reply
-					stream_rev := priv.Data[1-dir]
-					if stream_rev != nil {
-						stream_rev.skipInput = false
-					}
-				}
-			} else {
-				logp.Debug("thrift", "Thrift response message: %s", stream.message.Method)
-				if !thrift.CaptureReply {
-					// disable stream in this direction
-					stream.skipInput = true
-
-					// and flush current data
-					flush = true
-				}
-			}
-
-			// all ok, go to next level
-			stream.message.TcpTuple = *tcptuple
-			stream.message.Direction = dir
-			stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
-			if stream.message.FrameSize == 0 {
-				stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
-			}
-			thrift.handleThrift(stream.message)
-
-			// and reset message
-			stream.PrepareForNewMessage(flush)
+			thrift.messageComplete(tcptuple, dir, stream, &priv)
 		} else {
 			// wait for more data
 			break
 		}
 	}
+
+	logp.Debug("thriftdetailed", "Out")
 
 	return priv
 }
@@ -1006,9 +1041,31 @@ func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 func (thrift *Thrift) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	defer logp.Recover("GapInStream(thrift) exception")
+	logp.Debug("thriftdetailed", "GapInStream called")
 
-	return private, false
+	if private == nil {
+		return private, false
+	}
+	thriftData, ok := private.(thriftPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := thriftData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	if thrift.messageGap(stream, nbytes) {
+		// we need to publish from here
+		thrift.messageComplete(tcptuple, dir, stream, &thriftData)
+	}
+
+	// we always drop the TCP stream. Because it's binary and len based,
+	// there are too few cases in which we could recover the stream (maybe
+	// for very large blobs, leaving that as TODO)
+	return private, true
 }
 
 func (thrift *Thrift) publishTransactions() {
