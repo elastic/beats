@@ -638,7 +638,8 @@ func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	// tsg: being packet loss tolerant is probably not very useful for Redis,
+	// because most requests/response tend to fit in a single packet.
 
 	return private, true
 }
@@ -646,7 +647,8 @@ func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	// TODO
+	// TODO: check if we have pending data that we can send up the stack
+
 	return private
 }
 
