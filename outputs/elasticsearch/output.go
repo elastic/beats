@@ -48,8 +48,8 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		urls = append(urls, url)
 	}
 
-	con := NewElasticsearch(urls, config.Username, config.Password)
-	out.Conn = con
+	es := NewElasticsearch(urls, config.Username, config.Password)
+	out.Conn = es
 
 	if config.Index != "" {
 		out.Index = config.Index
@@ -71,14 +71,9 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		out.BulkMaxSize = *config.Bulk_size
 	}
 
-	err := out.EnableTTL()
-	if err != nil {
-		logp.Err("Fail to set _ttl mapping: %s", err)
-		return err
+	if config.Max_retries != nil {
+		out.Conn.SetMaxRetries(*config.Max_retries)
 	}
-
-	out.sendingQueue = make(chan BulkMsg, 1000)
-	go out.SendMessagesGoroutine()
 
 	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", urls)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
@@ -88,6 +83,15 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	} else {
 		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
 	}
+
+	err := out.EnableTTL()
+	if err != nil {
+		logp.Err("Fail to set _ttl mapping: %s", err)
+		return err
+	}
+
+	out.sendingQueue = make(chan BulkMsg, 1000)
+	go out.SendMessagesGoroutine()
 
 	return nil
 }
@@ -162,7 +166,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 				logp.Debug("output_elasticsearch", "Insert a single event")
 				_, err := out.Conn.Index(index, msg.Event["type"].(string), "", nil, msg.Event)
 				if err != nil {
-					logp.Err("Fail to index or update: %s", err)
+					logp.Err("Fail to insert a single event: %s", err)
 				}
 			}
 		case _ = <-flushChannel:

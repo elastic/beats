@@ -12,6 +12,7 @@ import (
 )
 
 type Elasticsearch struct {
+	MaxRetries int
 	connectionPool ConnectionPool
 	client         *http.Client
 }
@@ -49,6 +50,10 @@ func (r QueryResult) String() string {
 	return string(out)
 }
 
+const (
+	default_max_retries = 3
+)
+
 // Create a connection to Elasticsearch
 func NewElasticsearch(urls []string, username string, password string) *Elasticsearch {
 
@@ -58,6 +63,7 @@ func NewElasticsearch(urls []string, username string, password string) *Elastics
 	es := Elasticsearch{
 		connectionPool: connection_pool,
 		client:         &http.Client{},
+		MaxRetries: default_max_retries,
 	}
 	return &es
 }
@@ -111,53 +117,68 @@ func ReadQueryResult(resp http.Response) (*QueryResult, error) {
 	return &result, err
 }
 
+func (es *Elasticsearch) SetMaxRetries(max_retries int) {
+	es.MaxRetries = max_retries
+}
+
 // Create a HTTP request to Elaticsearch
 func (es *Elasticsearch) Request(method string, url string,
 	params map[string]string, body interface{}) (*http.Response, error) {
 
-	conn := es.connectionPool.GetConnection()
+	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
-	url = conn.Url + url
-	if len(params) > 0 {
-		url = url + "?" + UrlEncode(params)
-	}
+		conn := es.connectionPool.GetConnection()
+		logp.Debug("elasticsearch", "Use connection %s", conn.Url)
 
-	var obj []byte
-	var err error
-	if body != nil {
-		obj, err = json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("Fail to JSON encode the body: %s", err)
+		url = conn.Url + url
+		if len(params) > 0 {
+			url = url + "?" + UrlEncode(params)
 		}
-	} else {
-		obj = nil
-	}
-	req, err := http.NewRequest(method, url, bytes.NewReader(obj))
-	if err != nil {
-		return nil, err
+
+		var obj []byte
+		var err error
+		if body != nil {
+			obj, err = json.Marshal(body)
+			if err != nil {
+				return nil, fmt.Errorf("Fail to JSON encode the body: %s", err)
+			}
+		} else {
+			obj = nil
+		}
+		req, err := http.NewRequest(method, url, bytes.NewReader(obj))
+		if err != nil {
+			return nil, err
+		}
+
+		logp.Debug("elasticsearch", "Sending request to %s", url)
+
+		req.Header.Add("Accept", "application/json")
+		if conn.Username != "" || conn.Password != "" {
+			req.SetBasicAuth(conn.Username, conn.Password)
+		}
+
+		resp, err := es.client.Do(req)
+		if err != nil {
+			// request fails
+			logp.Warn("Request fails: %s", err)
+			es.connectionPool.MarkDead(conn)
+			return nil, err
+		}
+
+		if resp.StatusCode > 499 {
+			// request fails
+			es.connectionPool.MarkDead(conn)
+			return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
+		}
+
+		// request with success
+		es.connectionPool.MarkLive(conn)
+
+		return resp, nil
+
 	}
 
-	logp.Debug("elasticsearch", "Send request to %s", url)
-
-	req.Header.Add("Accept", "application/json")
-	if conn.Username != "" || conn.Password != "" {
-		req.SetBasicAuth(conn.Username, conn.Password)
-	}
-
-	resp, err := es.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode > 299 {
-		// request fails
-		es.connectionPool.MarkDead(conn)
-		return resp, fmt.Errorf("ES returned an error: %s", resp.Status)
-	}
-	// request with success
-	es.connectionPool.MarkLive(conn)
-
-	return resp, nil
+	return nil, fmt.Errorf("Request fails to be sent after %d retries", es.MaxRetries)
 }
 
 // Index adds or updates a typed JSON document in a specified index, making it
