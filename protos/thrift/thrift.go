@@ -41,6 +41,7 @@ type ThriftMessage struct {
 	Exceptions   string
 	FrameSize    uint32
 	Service      string
+	Notes        []string
 }
 
 type ThriftField struct {
@@ -811,6 +812,7 @@ func (thrift *Thrift) messageGap(s *ThriftStream, nbytes int) (complete bool) {
 	case ThriftFieldState:
 		if !m.IsRequest {
 			// large response case, can tolerate loss
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
 			return true
 		}
 	}
@@ -1113,6 +1115,9 @@ func (thrift *Thrift) publishTransactions() {
 					event["response"] = fmt.Sprintf("Exceptions: %s",
 						t.Reply.Exceptions)
 				}
+			}
+			if len(t.Reply.Notes) > 0 {
+				event["notes"] = t.Reply.Notes
 			}
 		} else {
 			event["bytes_out"] = 0

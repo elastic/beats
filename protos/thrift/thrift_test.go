@@ -1100,7 +1100,8 @@ func TestThrift_GapInStream_response(t *testing.T) {
 		trans.Reply.ReturnValue != "" ||
 		trans.Reply.Exceptions != `` ||
 		trans.Reply.HasException ||
-		trans.Request.Service != "Test" {
+		trans.Request.Service != "Test" ||
+		trans.Reply.Notes[0] != "Packet loss while capturing the response" {
 
 		t.Error("trans.Reply.Exceptions", trans.Reply.Exceptions)
 		t.Error("trans.Reply.HasException", trans.Reply.HasException)
