@@ -63,7 +63,7 @@ func TestMarkDead(t *testing.T) {
 
 	conn = pool.GetConnection()
 	if conn.Url != "localhost:9201" && conn.Url != "localhost:9200" {
-		t.Errorf("No connection returned: %s", conn)
+		t.Errorf("No expected connection returned")
 	}
 
 }
