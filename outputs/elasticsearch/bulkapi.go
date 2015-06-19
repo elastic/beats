@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -17,8 +16,10 @@ type BulkMsg struct {
 	Event common.MapStr
 }
 
-func (es *Elasticsearch) Bulk(index string, doc_type string,
-	params map[string]string, body chan interface{}) (*QueryResult, error) {
+// Create a HTTP request containing a bunch of operations and send them to Elasticsearch.
+// The request is retransmitted up to max_retries before returning an error.
+func (es *Elasticsearch) BulkRequest(method string, path string,
+	params map[string]string, body chan interface{}) ([]byte, error) {
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
@@ -33,11 +34,6 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 
 	logp.Debug("elasticsearch", "Insert bulk messages:\n%s\n", buf)
 
-	path, err := MakePath(index, doc_type, "_bulk")
-	if err != nil {
-		return nil, err
-	}
-
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
@@ -48,36 +44,39 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 			url = url + "?" + UrlEncode(params)
 		}
 
-		req, err := http.NewRequest("POST", url, &buf)
+		req, err := http.NewRequest(method, url, &buf)
 		if err != nil {
 			return nil, err
 		}
 
 		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
-		resp, err := es.SendRequest(conn, req)
+		resp, err := es.PerformRequest(conn, req)
 		if err != nil {
 			// retry
 			continue
 		}
-
-		defer resp.Body.Close()
-		obj, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			logp.Warn("Fail to read the response from Elasticsearch")
-			es.connectionPool.MarkDead(conn)
-			continue //retry
-		}
-		var result QueryResult
-		err = json.Unmarshal(obj, &result)
-		if err != nil {
-			logp.Warn("Fail to unmarshal the response from Elasticsearch")
-			return nil, err
-		}
-
-		return &result, nil
+		return resp, nil
 	}
 
 	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
 	return nil, fmt.Errorf("Request fails to be send after %d retries", es.MaxRetries)
+}
+
+// Perform many index/delete operations in a single API call.
+// Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
+func (es *Elasticsearch) Bulk(index string, doc_type string, 
+	params map[string]string, body chan interface{}) (*QueryResult, error) {
+
+	path, err := MakePath(index, doc_type, "_bulk")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := es.BulkRequest("POST", path, params, body)
+	if err != nil {
+		return nil, err
+	}
+
+	return ReadQueryResult(resp)
 }

@@ -102,15 +102,20 @@ func MakePath(index string, doc_type string, id string) (string, error) {
 	return path, nil
 }
 
-func ReadQueryResult(resp http.Response) (*QueryResult, error) {
+func ReadQueryResult(obj []byte) (*QueryResult, error) {
 
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
+	var result QueryResult
+	err := json.Unmarshal(obj, &result)
 	if err != nil {
 		return nil, err
 	}
-	var result QueryResult
-	err = json.Unmarshal(obj, &result)
+	return &result, err
+}
+
+func ReadSearchResult(obj []byte) (*SearchResults, error) {
+
+	var result SearchResults
+	err := json.Unmarshal(obj, &result)
 	if err != nil {
 		return nil, err
 	}
@@ -121,9 +126,9 @@ func (es *Elasticsearch) SetMaxRetries(max_retries int) {
 	es.MaxRetries = max_retries
 }
 
-// Send a HTTP Request to Elasticsearch. If it fails, mark the node as dead.
-// If it succeeds, mark it as alive and return the response.
-func (es *Elasticsearch) SendRequest(conn *Connection, req *http.Request) (*http.Response, error) {
+// Perform the actual request. If the operation was successful, mark it as live and return the response.
+// If it fails, mark it as dead for a period of time.
+func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]byte, error) {
 
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
@@ -144,17 +149,25 @@ func (es *Elasticsearch) SendRequest(conn *Connection, req *http.Request) (*http
 		return nil, fmt.Errorf("%d response from Elasticsearch", resp.StatusCode)
 	}
 
+	defer resp.Body.Close()
+	obj, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logp.Warn("Fail to read the response from Elasticsearch")
+		es.connectionPool.MarkDead(conn)
+		return nil, err
+	}
+
 	// request with success
 	es.connectionPool.MarkLive(conn)
 
-	return resp, nil
+	return obj, nil
 
 }
 
 // Create an HTTP request and send it to Elasticsearch. The request is retransmitted max_retries
 // before returning an error.
 func (es *Elasticsearch) Request(method string, url string,
-	params map[string]string, body interface{}) (*http.Response, error) {
+	params map[string]string, body interface{}) ([]byte, error) {
 
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
@@ -183,7 +196,7 @@ func (es *Elasticsearch) Request(method string, url string,
 
 		logp.Debug("elasticsearch", "Sending request to %s", url)
 
-		resp, err := es.SendRequest(conn, req)
+		resp, err := es.PerformRequest(conn, req)
 		if err != nil {
 			// retry
 			continue
@@ -219,17 +232,7 @@ func (es *Elasticsearch) Index(index string, doc_type string, id string,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result QueryResult
-	err = json.Unmarshal(obj, &result)
-	if err != nil {
-		return nil, err
-	}
-	return &result, err
+	return ReadQueryResult(resp)
 }
 
 // Refresh an index. Call this after doing inserts or creating/deleting
@@ -244,7 +247,7 @@ func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
 		return nil, err
 	}
 
-	return ReadQueryResult(*resp)
+	return ReadQueryResult(resp)
 }
 
 // Instantiate an index
@@ -260,7 +263,7 @@ func (es *Elasticsearch) CreateIndex(index string) (*QueryResult, error) {
 		return nil, err
 	}
 
-	return ReadQueryResult(*resp)
+	return ReadQueryResult(resp)
 }
 
 // Deletes a typed JSON document from a specific index based on its id.
@@ -277,7 +280,7 @@ func (es *Elasticsearch) Delete(index string, doc_type string, id string, params
 		return nil, err
 	}
 
-	return ReadQueryResult(*resp)
+	return ReadQueryResult(resp)
 }
 
 // A search request can be executed purely using a URI by providing request parameters.
@@ -293,15 +296,5 @@ func (es *Elasticsearch) SearchUri(index string, doc_type string, params map[str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result SearchResults
-	err = json.Unmarshal(obj, &result)
-	if err != nil {
-		return nil, err
-	}
-	return &result, err
+	return ReadSearchResult(resp)
 }
