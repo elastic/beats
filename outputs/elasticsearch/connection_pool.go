@@ -26,6 +26,9 @@ const (
 type ConnectionPool struct {
 	Connections []*Connection
 	rr          int //round robin
+
+	// options
+	Dead_timeout time.Duration
 }
 
 func (pool *ConnectionPool) SetConnections(urls []string, username string, password string) error {
@@ -44,7 +47,12 @@ func (pool *ConnectionPool) SetConnections(urls []string, username string, passw
 	}
 	pool.Connections = connections
 	pool.rr = -1
+	pool.Dead_timeout = default_dead_timeout
 	return nil
+}
+
+func (pool *ConnectionPool) SetDeadTimeout(timeout int) {
+	pool.Dead_timeout = time.Duration(timeout)
 }
 
 func (pool *ConnectionPool) SelectRoundRobin() *Connection {
@@ -82,7 +90,7 @@ func (pool *ConnectionPool) MarkDead(conn *Connection) error {
 	logp.Debug("elasticsearch", "Mark dead %s", conn.Url)
 	conn.dead = true
 	conn.dead_count = conn.dead_count + 1
-	conn.timeout = time.Duration(default_dead_timeout * math.Pow(2, float64(conn.dead_count)-1))
+	conn.timeout = pool.Dead_timeout * time.Duration(math.Pow(2, float64(conn.dead_count)-1))
 	conn.timer = time.AfterFunc(conn.timeout*time.Second, func() {
 		// timeout expires
 		conn.dead = false
