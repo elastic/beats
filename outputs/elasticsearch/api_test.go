@@ -20,7 +20,7 @@ func GetTestingElasticsearch() *Elasticsearch {
 		es_url = "http://localhost:9200"
 	}
 
-	return NewElasticsearch(es_url, "", "")
+	return NewElasticsearch([]string{es_url}, "", "")
 }
 
 func TestUrlEncode(t *testing.T) {
