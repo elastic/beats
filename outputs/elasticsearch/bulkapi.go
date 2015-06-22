@@ -32,8 +32,6 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 		return nil, nil
 	}
 
-	logp.Debug("elasticsearch", "Insert bulk messages:\n%s\n", buf)
-
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
@@ -43,13 +41,12 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 		if len(params) > 0 {
 			url = url + "?" + UrlEncode(params)
 		}
+		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
 		req, err := http.NewRequest(method, url, &buf)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
-
-		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
 		resp, err := es.PerformRequest(conn, req)
 		if err != nil {
@@ -60,6 +57,7 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 	}
 
 	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
+
 	return nil, fmt.Errorf("Request fails to be send after %d retries", es.MaxRetries)
 }
 

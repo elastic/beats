@@ -105,6 +105,9 @@ func MakePath(index string, doc_type string, id string) (string, error) {
 func ReadQueryResult(obj []byte) (*QueryResult, error) {
 
 	var result QueryResult
+	if obj == nil {
+		return nil, nil
+	}
 	err := json.Unmarshal(obj, &result)
 	if err != nil {
 		return nil, err
@@ -115,6 +118,9 @@ func ReadQueryResult(obj []byte) (*QueryResult, error) {
 func ReadSearchResult(obj []byte) (*SearchResults, error) {
 
 	var result SearchResults
+	if obj == nil {
+		return nil, nil
+	}
 	err := json.Unmarshal(obj, &result)
 	if err != nil {
 		return nil, err
@@ -138,23 +144,21 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 	resp, err := es.client.Do(req)
 	if err != nil {
 		// request fails
-		logp.Warn("Fail to send the request to Elasticsearch: %s", err)
 		es.connectionPool.MarkDead(conn)
-		return nil, err
+		return nil, fmt.Errorf("Sending the request fails: %s", err)
 	}
 
 	if resp.StatusCode > 499 {
 		// request fails
 		es.connectionPool.MarkDead(conn)
-		return nil, fmt.Errorf("%d response from Elasticsearch", resp.StatusCode)
+		return nil, fmt.Errorf("Received %d response", resp.StatusCode)
 	}
 
 	defer resp.Body.Close()
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logp.Warn("Fail to read the response from Elasticsearch")
 		es.connectionPool.MarkDead(conn)
-		return nil, err
+		return nil, fmt.Errorf("Reading the response fails: %s", err)
 	}
 
 	// request with success
@@ -179,6 +183,8 @@ func (es *Elasticsearch) Request(method string, url string,
 			url = url + "?" + UrlEncode(params)
 		}
 
+		logp.Debug("elasticsearch", "Sending request to %s", url)
+
 		var obj []byte
 		var err error
 		if body != nil {
@@ -191,10 +197,8 @@ func (es *Elasticsearch) Request(method string, url string,
 		}
 		req, err := http.NewRequest(method, url, bytes.NewReader(obj))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
-
-		logp.Debug("elasticsearch", "Sending request to %s", url)
 
 		resp, err := es.PerformRequest(conn, req)
 		if err != nil {
@@ -250,7 +254,8 @@ func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
 	return ReadQueryResult(resp)
 }
 
-// Instantiate an index
+// Adds a typed JSON document in a specific index, making it searchable.
+// Implements: <http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html>
 func (es *Elasticsearch) CreateIndex(index string) (*QueryResult, error) {
 
 	path, err := MakePath(index, "", "")
