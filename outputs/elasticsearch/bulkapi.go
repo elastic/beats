@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-type BulkMsg struct {
+type EventMsg struct {
 	Ts    time.Time
 	Event common.MapStr
 }
