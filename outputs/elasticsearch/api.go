@@ -177,7 +177,7 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 
 // Create an HTTP request and send it to Elasticsearch. The request is retransmitted max_retries
 // before returning an error.
-func (es *Elasticsearch) Request(method string, url string,
+func (es *Elasticsearch) Request(method string, path string,
 	params map[string]string, body interface{}) ([]byte, error) {
 
 	var errors []error
@@ -187,7 +187,7 @@ func (es *Elasticsearch) Request(method string, url string,
 		conn := es.connectionPool.GetConnection()
 		logp.Debug("elasticsearch", "Use connection %s", conn.Url)
 
-		url = conn.Url + url
+		url := conn.Url + path
 		if len(params) > 0 {
 			url = url + "?" + UrlEncode(params)
 		}

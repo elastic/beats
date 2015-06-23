@@ -115,3 +115,36 @@ func TestOneHost503Resp(t *testing.T) {
 		t.Errorf("Should return <Request fails after 3 retries. Errors: > instead of %v", err)
 	}
 }
+
+func TestMultipleHosts(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
+	}
+
+	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
+	body := map[string]interface{}{
+		"user":      "test",
+		"post_date": "2009-11-15T14:12:12",
+		"message":   "trying out",
+	}
+	expected_resp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", Id: "1", Version: 1, Created: true})
+
+	server1 := ElasticsearchMock(503, []byte("Something went wrong"))
+	server2 := ElasticsearchMock(200, expected_resp)
+
+	logp.Debug("elasticsearch", "%s, %s", server1.URL, server2.URL)
+	es := NewElasticsearch([]string{server1.URL, server2.URL}, "", "")
+
+	params := map[string]string{
+		"refresh": "true",
+	}
+	resp, err := es.Index(index, "test", "1", params, body)
+	if err != nil {
+		t.Errorf("Index() returns error: %s", err)
+	}
+	if !resp.Created {
+		t.Errorf("Index() fails: %s", resp)
+	}
+
+}
