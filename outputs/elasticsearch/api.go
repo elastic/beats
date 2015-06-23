@@ -134,7 +134,8 @@ func (es *Elasticsearch) SetMaxRetries(max_retries int) {
 
 // Perform the actual request. If the operation was successful, mark it as live and return the response.
 // If it fails, mark it as dead for a period of time.
-func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]byte, error) {
+// It returns the response, if it should retry sending the request and the error
+func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]byte, bool, error) {
 
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
@@ -145,26 +146,32 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 	if err != nil {
 		// request fails
 		es.connectionPool.MarkDead(conn)
-		return nil, fmt.Errorf("Sending the request fails: %s", err)
+		return nil, true, fmt.Errorf("Sending the request fails: %s", err)
 	}
 
 	if resp.StatusCode > 499 {
 		// request fails
-		es.connectionPool.MarkDead(conn)
-		return nil, fmt.Errorf("Received %d response", resp.StatusCode)
+		if resp.StatusCode == http.StatusServiceUnavailable ||
+			resp.StatusCode == http.StatusGatewayTimeout {
+			// status code in {503, 504}
+			es.connectionPool.MarkDead(conn)
+			return nil, true, fmt.Errorf("Received %v", resp.Status)
+		} else {
+			return nil, false, fmt.Errorf("Received %v", resp.Status)
+		}
 	}
 
 	defer resp.Body.Close()
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		es.connectionPool.MarkDead(conn)
-		return nil, fmt.Errorf("Reading the response fails: %s", err)
+		return nil, true, fmt.Errorf("Reading the response fails: %s", err)
 	}
 
 	// request with success
 	es.connectionPool.MarkLive(conn)
 
-	return obj, nil
+	return obj, false, nil
 
 }
 
@@ -172,6 +179,8 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 // before returning an error.
 func (es *Elasticsearch) Request(method string, url string,
 	params map[string]string, body interface{}) ([]byte, error) {
+
+	var errors []error
 
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
@@ -183,7 +192,7 @@ func (es *Elasticsearch) Request(method string, url string,
 			url = url + "?" + UrlEncode(params)
 		}
 
-		logp.Debug("elasticsearch", "Sending request to %s", url)
+		logp.Debug("elasticsearch", "%s %s %s", method, url, body)
 
 		var obj []byte
 		var err error
@@ -200,10 +209,16 @@ func (es *Elasticsearch) Request(method string, url string,
 			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
 
-		resp, err := es.PerformRequest(conn, req)
-		if err != nil {
+		resp, retry, err := es.PerformRequest(conn, req)
+		if retry == true {
 			// retry
+			if err != nil {
+				errors = append(errors, err)
+			}
 			continue
+		}
+		if err != nil {
+			return nil, err
 		}
 		return resp, nil
 
@@ -211,7 +226,7 @@ func (es *Elasticsearch) Request(method string, url string,
 
 	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
 
-	return nil, fmt.Errorf("Request fails to be sent after %d retries", es.MaxRetries)
+	return nil, fmt.Errorf("Request fails after %d retries. Errors: %v", es.MaxRetries, errors)
 }
 
 // Index adds or updates a typed JSON document in a specified index, making it
@@ -225,7 +240,7 @@ func (es *Elasticsearch) Index(index string, doc_type string, id string,
 
 	path, err := MakePath(index, doc_type, id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("MakePath fails: %s", err)
 	}
 	if len(id) == 0 {
 		method = "POST"

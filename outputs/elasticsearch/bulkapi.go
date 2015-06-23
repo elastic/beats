@@ -32,6 +32,8 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 		return nil, nil
 	}
 
+	var errors []error
+
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
@@ -48,22 +50,28 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
 
-		resp, err := es.PerformRequest(conn, req)
-		if err != nil {
+		resp, retry, err := es.PerformRequest(conn, req)
+		if retry == true {
 			// retry
+			if err != nil {
+				errors = append(errors, err)
+			}
 			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("PerformRequest fails: %s", err)
 		}
 		return resp, nil
 	}
 
 	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
 
-	return nil, fmt.Errorf("Request fails to be send after %d retries", es.MaxRetries)
+	return nil, fmt.Errorf("Request fails after %d retries. Errors: %v", es.MaxRetries, errors)
 }
 
 // Perform many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
-func (es *Elasticsearch) Bulk(index string, doc_type string, 
+func (es *Elasticsearch) Bulk(index string, doc_type string,
 	params map[string]string, body chan interface{}) (*QueryResult, error) {
 
 	path, err := MakePath(index, doc_type, "_bulk")
