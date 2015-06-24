@@ -3,9 +3,10 @@ package mongodb
 import (
 	"encoding/json"
 	"errors"
-	"packetbeat/common"
-	"packetbeat/logp"
 	"strings"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 
 	"labix.org/v2/mgo/bson"
 )

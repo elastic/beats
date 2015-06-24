@@ -1,17 +1,19 @@
 package mongodb
 
 import (
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type Mongodb struct {
 	// config
+	Ports         []int
 	Send_request  bool
 	Send_response bool
 
@@ -25,14 +27,20 @@ func (mongodb *Mongodb) InitDefaults() {
 	mongodb.Send_response = false
 }
 
-func (mongodb *Mongodb) setFromConfig() error {
-	if config.ConfigMeta.IsDefined("protocols", "mongodb", "send_request") {
-		mongodb.Send_request = config.ConfigSingleton.Protocols["mongodb"].Send_request
+func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
+	mongodb.Ports = config.Ports
+
+	if config.Send_request != nil {
+		mongodb.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mongodb", "send_response") {
-		mongodb.Send_response = config.ConfigSingleton.Protocols["mongodb"].Send_response
+	if config.Send_response != nil {
+		mongodb.Send_response = *config.Send_response
 	}
 	return nil
+}
+
+func (mongodb *Mongodb) GetPorts() []int {
+	return mongodb.Ports
 }
 
 func (mongodb *Mongodb) Init(test_mode bool, results chan common.MapStr) error {
@@ -40,7 +48,10 @@ func (mongodb *Mongodb) Init(test_mode bool, results chan common.MapStr) error {
 
 	mongodb.InitDefaults()
 	if !test_mode {
-		mongodb.setFromConfig()
+		err := mongodb.setFromConfig(config.ConfigSingleton.Protocols.Mongodb)
+		if err != nil {
+			return err
+		}
 	}
 
 	mongodb.transactionsMap = make(map[common.HashableTcpTuple]*MongodbTransaction, TransactionsHashSize)
@@ -257,7 +268,7 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	event["responsetime"] = t.ResponseTime
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

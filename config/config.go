@@ -38,11 +38,12 @@ type Logging struct {
 }
 
 type Protocols struct {
-	Http   Http
-	Mysql  Mysql
-	Pgsql  Pgsql
-	Redis  Redis
-	Thrift Thrift
+	Http    Http
+	Mysql   Mysql
+	Mongodb Mongodb
+	Pgsql   Pgsql
+	Redis   Redis
+	Thrift  Thrift
 }
 
 type Http struct {
@@ -64,6 +65,12 @@ type Mysql struct {
 	Max_rows       *int
 	Send_request   *bool
 	Send_response  *bool
+}
+
+type Mongodb struct {
+	Ports         []int
+	Send_request  *bool
+	Send_response *bool
 }
 
 type Pgsql struct {

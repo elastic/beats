@@ -114,6 +114,11 @@ protocols:
 {% if thrift_send_request %}    send_request: true{% endif %}
 {% if thrift_send_response %}    send_response: true{% endif %}
 
+  mongodb:
+    ports: [{{ mongodb_ports|default([27017])|join(", ") }}]
+{% if mongodb_send_request %}    send_request: true{% endif %}
+{% if mongodb_send_response %}    send_response: true{% endif %}
+
 
 ############################# Filters ############################################
 

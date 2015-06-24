@@ -2,8 +2,9 @@ package mongodb
 
 // Represent a mongodb message being parsed
 import (
-	"packetbeat/common"
 	"time"
+
+	"github.com/elastic/libbeat/common"
 )
 
 type MongodbMessage struct {
