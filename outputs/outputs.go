@@ -11,6 +11,7 @@ type MothershipConfig struct {
 	Save_topology      bool
 	Host               string
 	Port               int
+	Hosts              []string
 	Protocol           string
 	Username           string
 	Password           string
@@ -26,6 +27,7 @@ type MothershipConfig struct {
 	DataType           string
 	Flush_interval     *int
 	Bulk_size          *int
+	Max_retries        *int
 }
 
 // Functions to be exported by a output plugin
