@@ -8,6 +8,21 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+func GetTestingElasticsearch() *Elasticsearch {
+	var es_url string
+
+	// read the Elasticsearch port from the ES_PORT env variable
+	port := os.Getenv("ES_PORT")
+	if len(port) > 0 {
+		es_url = "http://localhost:" + port
+	} else {
+		// empty variable
+		es_url = "http://localhost:9200"
+	}
+
+	return NewElasticsearch(es_url, "", "")
+}
+
 func TestUrlEncode(t *testing.T) {
 
 	params := map[string]string{
@@ -75,7 +90,7 @@ func TestIndex(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
-	es := NewElasticsearch("http://localhost:9200", "", "")
+	es := GetTestingElasticsearch()
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 

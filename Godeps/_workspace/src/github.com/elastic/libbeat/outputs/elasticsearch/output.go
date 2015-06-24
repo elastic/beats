@@ -88,7 +88,7 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
-			"_ttl": map[string]string{"enabled": "true", "default": "15000"},
+			"_ttl": map[string]string{"enabled": "true", "default": "15s"},
 		},
 	}
 
@@ -164,7 +164,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	params := map[string]string{
-		"ttl":     fmt.Sprintf("%d", out.TopologyExpire),
+		"ttl":     fmt.Sprintf("%dms", out.TopologyExpire),
 		"refresh": "true",
 	}
 	_, err := out.Conn.Index(

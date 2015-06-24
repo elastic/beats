@@ -7,23 +7,23 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
+			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
+			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
+			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
+			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "08435d37ffccd04ac169a322bd6d1b0ca551a843"
+			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -56,6 +56,11 @@
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
 			"Rev": "49c95bdc21843256fb6c4e0d370a05f24a0bf213"
+		},
+		{
+			"ImportPath": "labix.org/v2/mgo/bson",
+			"Comment": "238",
+			"Rev": "gustavo@niemeyer.net-20130722041249-5v5syfwrb8gq243v"
 		}
 	]
 }
