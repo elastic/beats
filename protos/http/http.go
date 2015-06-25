@@ -57,6 +57,7 @@ type HttpMessage struct {
 	TransferEncoding string
 	Headers          map[string]string
 	Body             string
+	Size             uint64
 	//Raw Data
 	Raw []byte
 	//Timing
@@ -91,6 +92,8 @@ type HttpTransaction struct {
 	RequestUri   string
 	Params       string
 	Path         string
+	BytesOut     uint64
+	BytesIn      uint64
 
 	Http common.MapStr
 
@@ -631,6 +634,7 @@ func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
+	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		http.receivedHttpRequest(m)
@@ -678,6 +682,7 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 	trans.Method = msg.Method
 	trans.RequestUri = msg.RequestUri
+	trans.BytesIn = msg.Size
 
 	trans.Http = common.MapStr{}
 
@@ -759,6 +764,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		}
 	}
 
+	trans.BytesOut = msg.Size
 	trans.Http.Update(response)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
@@ -768,7 +774,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		trans.Response_raw = string(http.cutMessageBody(msg))
 	}
 
-	http.PublishTransaction(trans)
+	http.publishTransaction(trans)
 
 	logp.Debug("http", "HTTP transaction completed: %s\n", trans.Http)
 
@@ -779,7 +785,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 	}
 }
 
-func (http *Http) PublishTransaction(t *HttpTransaction) {
+func (http *Http) publishTransaction(t *HttpTransaction) {
 
 	if http.results == nil {
 		return
@@ -810,6 +816,8 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	event["query"] = fmt.Sprintf("%s %s", t.Method, t.Path)
 	event["params"] = t.Params
 
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst

@@ -391,7 +391,6 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					} else {
 						m.IsTruncated = true
 					}
-					m.Size = uint64(s.parseOffset - m.start)
 					if !m.IsError {
 						// in case the response was sent successfully
 						m.IsOK = true
@@ -508,6 +507,7 @@ func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
+	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		mysql.receivedMysqlRequest(m)

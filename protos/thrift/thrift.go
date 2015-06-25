@@ -75,6 +75,8 @@ type ThriftTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 	cmdline      *common.CmdlineTuple
+	BytesIn      uint64
+	BytesOut     uint64
 
 	Request *ThriftMessage
 	Reply   *ThriftMessage
@@ -945,6 +947,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	}
 
 	trans.Request = msg
+	trans.BytesIn = uint64(msg.FrameSize)
 
 	if trans.timer != nil {
 		trans.timer.Stop()
@@ -971,6 +974,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	}
 
 	trans.Reply = msg
+	trans.BytesOut = uint64(msg.FrameSize)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -1028,7 +1032,8 @@ func (thrift *Thrift) publishTransactions() {
 			event["method"] = t.Request.Method
 			event["path"] = t.Request.Service
 			event["query"] = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
-			event["bytes_in"] = uint64(t.Request.FrameSize)
+			event["bytes_in"] = t.BytesIn
+			event["bytes_out"] = t.BytesOut
 			thriftmap = common.MapStr{
 				"params": t.Request.Params,
 			}

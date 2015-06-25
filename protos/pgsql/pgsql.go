@@ -52,7 +52,8 @@ type PgsqlTransaction struct {
 	ts           time.Time
 	Query        string
 	Method       string
-	Size         uint64
+	BytesOut     uint64
+	BytesIn      uint64
 
 	Pgsql common.MapStr
 
@@ -470,7 +471,6 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					m.toExport = true
 					s.parseOffset += 5 // type + length
 					m.end = s.parseOffset
-					m.Size = uint64(m.end - m.start)
 
 					return true, true
 
@@ -490,7 +490,6 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						pgsqlErrorParser(s)
 
 						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -514,7 +513,6 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 						s.parseOffset += length
 						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -606,8 +604,6 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 					s.parseOffset += length
 					m.end = s.parseOffset
-
-					m.Size = uint64(m.end - m.start)
 
 					s.parseState = PgsqlStartState
 
@@ -779,6 +775,7 @@ var handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TcpTuple,
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		pgsql.receivedPgsqlRequest(m)
@@ -825,6 +822,7 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Pgsql = common.MapStr{}
 		trans.Query = query
 		trans.Method = getQueryMethod(query)
+		trans.BytesIn = msg.Size
 
 		trans.Request_raw = query
 
@@ -864,7 +862,7 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 		"error_message":  msg.ErrorInfo,
 		"error_severity": msg.ErrorSeverity,
 	})
-	trans.Size = msg.Size
+	trans.BytesOut = msg.Size
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 	trans.Response_raw = common.DumpInCSVFormat(msg.Fields, msg.Rows)
@@ -901,7 +899,8 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	}
 	event["query"] = t.Query
 	event["method"] = t.Method
-	event["bytes_out"] = t.Size
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
 	event["pgsql"] = t.Pgsql
 
 	event["timestamp"] = common.Time(t.ts)
