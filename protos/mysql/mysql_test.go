@@ -165,9 +165,6 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if !stream.message.IsOK || stream.message.IsError {
 		t.Errorf("Failed to parse MySQL Query response")
 	}
-	if stream.message.Size != 528 {
-		t.Errorf("Failed to get the size of the message")
-	}
 	if stream.message.Tables != "minitwit.post" {
 		t.Errorf("Failed to get table name: %s", stream.message.Tables)
 	}
@@ -176,9 +173,6 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	}
 	if stream.message.NumberOfRows != 4 {
 		t.Errorf("Failed to get the number of rows")
-	}
-	if stream.message.Size != 528 {
-		t.Errorf("failed to get the size of the response")
 	}
 
 	// parse fields and rows
