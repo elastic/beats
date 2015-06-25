@@ -64,7 +64,8 @@ type MysqlTransaction struct {
 	Query        string
 	Method       string
 	Path         string // for mysql, Path refers to the mysql table queried
-	Size         uint64
+	BytesOut     uint64
+	BytesIn      uint64
 
 	Mysql common.MapStr
 
@@ -563,8 +564,8 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 
 	trans.Mysql = common.MapStr{}
 
-	// save Raw message
 	trans.Request_raw = msg.Query
+	trans.BytesIn = msg.Size
 
 	if trans.timer != nil {
 		trans.timer.Stop()
@@ -595,7 +596,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		"error_code":    msg.ErrorCode,
 		"error_message": msg.ErrorInfo,
 	})
-	trans.Size = msg.Size
+	trans.BytesOut = msg.Size
 	trans.Path = msg.Tables
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
@@ -607,7 +608,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
 
-	mysql.publishMysqlTransaction(trans)
+	mysql.publishTransaction(trans)
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
@@ -742,7 +743,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	return fields, rows
 }
 
-func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
+func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 
 	if mysql.results == nil {
 		return
@@ -770,7 +771,8 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 	event["query"] = t.Query
 	event["mysql"] = t.Mysql
 	event["path"] = t.Path
-	event["bytes_out"] = t.Size
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
 
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
