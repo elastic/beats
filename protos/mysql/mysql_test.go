@@ -60,6 +60,9 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to parse query")
 	}
 
+	if stream.message.Size != 115 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 func TestMySQLParser_OKResponse(t *testing.T) {
 
@@ -93,6 +96,9 @@ func TestMySQLParser_OKResponse(t *testing.T) {
 	if stream.message.InsertId != 4 {
 		t.Errorf("Failed to parse last INSERT id")
 	}
+	if stream.message.Size != 11 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 func TestMySQLParser_errorResponse(t *testing.T) {
@@ -122,6 +128,9 @@ func TestMySQLParser_errorResponse(t *testing.T) {
 		t.Errorf("Failed to parse MySQL error esponse")
 	}
 
+	if stream.message.Size != 50 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 func TestMySQLParser_dataResponse(t *testing.T) {
@@ -187,6 +196,9 @@ func TestMySQLParser_dataResponse(t *testing.T) {
 	if len(rows) != stream.message.NumberOfRows {
 		t.Errorf("Failed to parse the rows")
 	}
+	if stream.message.Size != 528 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
@@ -219,6 +231,9 @@ func TestMySQLParser_simpleUpdateResponse(t *testing.T) {
 	}
 	if stream.message.AffectedRows != 1 {
 		t.Errorf("Failed to get the number of affected rows")
+	}
+	if stream.message.Size != 52 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 }
 
@@ -284,6 +299,9 @@ func TestMySQLParser_simpleUpdateResponseSplit(t *testing.T) {
 	}
 	if stream.message.AffectedRows != 1 {
 		t.Errorf("Failed to get the number of affected rows")
+	}
+	if stream.message.Size != 52 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 }
 

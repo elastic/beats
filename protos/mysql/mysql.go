@@ -298,6 +298,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
 					m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 				}
+				m.Size = uint64(m.end - m.start)
 				logp.Debug("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
 				return true, true
 			} else {
@@ -395,6 +396,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 						// in case the response was sent successfully
 						m.IsOK = true
 					}
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				} else {
 					s.parseOffset += int(m.PacketLength)
@@ -507,7 +509,6 @@ func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
-	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		mysql.receivedMysqlRequest(m)

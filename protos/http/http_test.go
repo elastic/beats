@@ -63,6 +63,9 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
 	}
+	if stream.message.Size != 262 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
@@ -110,6 +113,9 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 	}
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
+	}
+	if stream.message.Size != 262 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 }
 
@@ -166,6 +172,9 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	}
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
+	}
+	if stream.message.Size != 669 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 
 }

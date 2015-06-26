@@ -45,7 +45,9 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 	if stream.message.Query != "SELECT * FROM Foobar;" {
 		t.Error("Failed to parse query")
 	}
-
+	if stream.message.Size != 27 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 // Test parsing a response with data attached
@@ -88,6 +90,9 @@ func TestPgsqlParser_dataResponse(t *testing.T) {
 		t.Error("Failed to parse the number of rows")
 	}
 
+	if stream.message.Size != 126 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 // Test parsing a pgsql response
@@ -131,6 +136,9 @@ func TestPgsqlParser_response(t *testing.T) {
 		t.Error("Failed to parse the number of rows")
 	}
 
+	if stream.message.Size != 202 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 // Test parsing an incomplete pgsql response
@@ -237,6 +245,9 @@ func TestPgsqlParser_errorResponse(t *testing.T) {
 	}
 	if stream.message.ErrorInfo != "current transaction is aborted, commands ignored until end of transaction block" {
 		t.Error("Failed to parse error message")
+	}
+	if stream.message.Size != 137 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 }
 
