@@ -43,6 +43,9 @@ class Test(TestCase):
         assert all([isinstance(o["resource"], basestring) for o in objs[3:]])
         assert all([isinstance(o["query"], basestring) for o in objs[3:]])
 
+        assert all(["bytes_in" in o for o in objs])
+        assert all(["bytes_out" in o for o in objs])
+
     def test_byteout_bytein(self):
         """
         Should have non-zero byte_in and byte_out values.
