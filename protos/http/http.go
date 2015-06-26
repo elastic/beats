@@ -668,6 +668,8 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return httpData
 }
 
+// Called when a gap of nbytes bytes is found in the stream (due to
+// packet loss).
 func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
@@ -689,16 +691,17 @@ func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	ok, complete := http.messageGap(stream, nbytes)
 	logp.Debug("httpdetailed", "messageGap returned ok=%v complete=%v", ok, complete)
 	if !ok {
-		// drop stream
+		// on errors, drop stream
 		httpData.Data[dir] = nil
 		return httpData, true
 	}
 
 	if complete {
-		// we need to publish from here
+		// Current message is complete, we need to publish from here
 		http.messageComplete(tcptuple, dir, stream)
 	}
 
+	// don't drop the stream, we can ignore the gap
 	return private, false
 }
 
