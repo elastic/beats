@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"encoding/hex"
+	"net"
 	"testing"
 
 	"github.com/elastic/libbeat/common"
@@ -15,7 +16,8 @@ import (
 
 func MysqlModForTests() *Mysql {
 	var mysql Mysql
-	mysql.Init(true, nil)
+	results := make(chan common.MapStr, 10)
+	mysql.Init(true, results)
 	return &mysql
 }
 
@@ -429,4 +431,103 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 	if count_handleMysql != 1 {
 		t.Errorf("handleMysql not called on the second run")
 	}
+}
+
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
+		Ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: 6512, Dst_port: 3306,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
+// Helper function to read from the Publisher Queue
+func expectTransaction(t *testing.T, mysql *Mysql) common.MapStr {
+	select {
+	case trans := <-mysql.results:
+		return trans
+	default:
+		t.Error("No transaction")
+	}
+	return nil
+}
+
+// Test that loss of data during the response (but not at the beginning)
+// don't cause the whole transaction to be dropped.
+func Test_gap_in_response(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
+	}
+
+	mysql := MysqlModForTests()
+
+	// request and response from tests/pcaps/mysql_result_long.pcap
+	// select * from test
+	req_data, err := hex.DecodeString(
+		"130000000373656c656374202a20" +
+			"66726f6d2074657374")
+	assert.Nil(t, err)
+	resp_data, err := hex.DecodeString(
+		"0100000103240000020364656604" +
+			"74657374047465737404746573740161" +
+			"01610c3f000b00000003000000000024" +
+			"00000303646566047465737404746573" +
+			"740474657374016201620c3f000b0000" +
+			"00030000000000240000040364656604" +
+			"74657374047465737404746573740163" +
+			"01630c2100fd020000fd000000000005" +
+			"000005fe000022000a00000601310131" +
+			"0548656c6c6f0a000007013201320548" +
+			"656c6c6f0601000801330133fcff004c" +
+			"6f72656d20497073756d206973207369" +
+			"6d706c792064756d6d79207465787420" +
+			"6f6620746865207072696e74696e6720" +
+			"616e64207479706573657474696e6720" +
+			"696e6475737472792e204c6f72656d20")
+	assert.Nil(t, err)
+
+	tcptuple := testTcpTuple()
+	req := protos.Packet{Payload: req_data}
+	resp := protos.Packet{Payload: resp_data}
+
+	private := protos.ProtocolData(new(mysqlPrivateData))
+
+	private = mysql.Parse(&req, tcptuple, 0, private)
+	private = mysql.Parse(&resp, tcptuple, 1, private)
+
+	logp.Debug("mysql", "Now sending gap..")
+
+	private, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	assert.Equal(t, true, drop)
+
+	trans := expectTransaction(t, mysql)
+	assert.NotNil(t, trans)
+	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+}
+
+// Test that loss of data during the request doesn't result in a
+// published transaction.
+func Test_gap_in_eat_message(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mysql", "mysqldetailed"})
+	}
+
+	mysql := MysqlModForTests()
+
+	// request from tests/pcaps/mysql_result_long.pcap
+	// "select * from test". Last byte missing.
+	req_data, err := hex.DecodeString(
+		"130000000373656c656374202a20" +
+			"66726f6d20746573")
+	assert.Nil(t, err)
+
+	stream := &MysqlStream{data: req_data, message: new(MysqlMessage)}
+	ok, complete := mysqlMessageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	complete = mysql.messageGap(stream, 10)
+	assert.Equal(t, false, complete)
 }

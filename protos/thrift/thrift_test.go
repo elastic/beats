@@ -1054,3 +1054,102 @@ func TestThrift_ExceptionName(t *testing.T) {
 		t.Error("Bad result:", trans)
 	}
 }
+
+func TestThrift_GapInStream_response(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init(true, nil)
+	thrift.Idl = thriftIdlForTesting(t, `
+		exception InvalidOperation {
+		  1: i32 what,
+		  2: string why
+		}
+		service Test {
+		   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),
+		}
+		`)
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	tcptuple := testTcpTuple()
+
+	req := createTestPacket(t, "800100010000000963616c63756c6174650000000008000"+
+		"1000000010c00020800010000000108000200000000080003000000040000")
+	// missing last few bytes
+	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
+		"01080001000000040b00020000001243616e6e6f742064697669646520")
+
+	private := protos.ProtocolData(new(thriftPrivateData))
+	private = thrift.Parse(req, tcptuple, 0, private)
+	private = thrift.Parse(repl, tcptuple, 1, private)
+	private, drop := thrift.GapInStream(tcptuple, 1, 5, private)
+
+	if drop == false {
+		t.Error("GapInStream returned drop=false")
+	}
+
+	trans := expectThriftTransaction(t, thrift)
+	// The exception is not captured, but otherwise the values from the request
+	// are correct
+	if trans.Request.Method != "calculate" ||
+		trans.Request.Params != "(logid: 1, w: (1: 1, 2: 0, 3: 4))" ||
+		trans.Reply.ReturnValue != "" ||
+		trans.Reply.Exceptions != `` ||
+		trans.Reply.HasException ||
+		trans.Request.Service != "Test" ||
+		trans.Reply.Notes[0] != "Packet loss while capturing the response" {
+
+		t.Error("trans.Reply.Exceptions", trans.Reply.Exceptions)
+		t.Error("trans.Reply.HasException", trans.Reply.HasException)
+	}
+}
+
+func TestThrift_GapInStream_request(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"thrift", "thriftdetailed"})
+	}
+
+	var thrift Thrift
+	thrift.Init(true, nil)
+	thrift.Idl = thriftIdlForTesting(t, `
+		exception InvalidOperation {
+		  1: i32 what,
+		  2: string why
+		}
+		service Test {
+		   i32 calculate(1:i32 logid, 2:Work w) throws (1:InvalidOperation ouch),
+		}
+		`)
+
+	thrift.PublishQueue = make(chan *ThriftTransaction, 10)
+
+	tcptuple := testTcpTuple()
+
+	// missing bytes from the request
+	req := createTestPacket(t, "800100010000000963616c63756c6174")
+	repl := createTestPacket(t, "800100020000000963616c63756c617465000000000c00"+
+		"01080001000000040b00020000001243616e6e6f742064697669646520627920300000")
+
+	private := protos.ProtocolData(new(thriftPrivateData))
+	private = thrift.Parse(req, tcptuple, 0, private)
+	private, drop := thrift.GapInStream(tcptuple, 0, 5, private)
+
+	private = thrift.Parse(repl, tcptuple, 1, private)
+
+	if drop == false {
+		t.Error("GapInStream returned drop=false")
+	}
+
+	// packet loss in requests should result in no transaction
+	select {
+	case trans := <-thrift.PublishQueue:
+		t.Error("Expected no transaction but got one:", trans)
+	default:
+		// ok
+	}
+}
