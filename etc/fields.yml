@@ -326,9 +326,6 @@ event:
       type: group
       description: MongoDB specific event fields.
       fields:
-        - name: mongodb.documents
-          description: >
-            Returned documents in the case of a query or command
         - name: mongodb.error
           description: >
             If the MongoDB request has resulted in an error, this field contains the

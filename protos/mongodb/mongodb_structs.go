@@ -27,8 +27,9 @@ type MongodbMessage struct {
 	// deduced from content. Either an operation from the original wire protocol or the name of a command (passed through a query)
 	// List of commands: http://docs.mongodb.org/manual/reference/command/
 	// List of original protocol operations: http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#request-opcodes
-	method string
-	error  string
+	method    string
+	error     string
+	documents []interface{}
 
 	// Other fields vary very much depending on operation type
 	// lets just put them in a map
@@ -77,9 +78,10 @@ type MongodbTransaction struct {
 
 	Mongodb common.MapStr
 
-	event  common.MapStr
-	method string
-	error  string
+	event     common.MapStr
+	method    string
+	error     string
+	documents []interface{}
 }
 
 const (

@@ -90,7 +90,7 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 
 	logp.Debug("mongodb", "Prepare to read %i document from reply", m.event["numberReturned"])
 
-	documents := make([]string, numberReturned)
+	documents := make([]interface{}, numberReturned)
 	for i := 0; i < numberReturned; i++ {
 		var document bson.M
 		document, err = d.readDocument()
@@ -102,9 +102,9 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 			}
 		}
 
-		documents[i], err = doc2str(document)
+		documents[i] = document
 	}
-	m.event["documents"] = documents
+	m.documents = documents
 
 	if err != nil {
 		logp.Err("An error occured while parsing OP_REPLY message: %s", err)

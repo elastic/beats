@@ -119,6 +119,8 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	}
 
 	mongodb := MongodbModForTests()
+	mongodb.Send_request = true
+	mongodb.Send_response = true
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	req_data, err := hex.DecodeString(

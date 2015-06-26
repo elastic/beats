@@ -76,6 +76,8 @@ protocols:
     # Configure the ports where to listen for Mongodb traffic. You can disable
     # the Mongodb protocol by commenting out the list of ports.
     ports: [27017]
+    send_request: true
+    send_response: true
 
 ############################# Output ############################################
 

@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -217,6 +218,7 @@ func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 	}
 
 	trans.error = msg.error
+	trans.documents = msg.documents
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -271,6 +273,25 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
+
+	if mongodb.Send_request {
+		event["request"] = event["query"]
+	}
+	if mongodb.Send_response {
+		if len(t.documents) > 0 {
+			// response field needs to be a string
+			docs := make([]string, 0, len(t.documents))
+			for _, doc := range t.documents {
+				str, err := doc2str(doc)
+				if err != nil {
+					logp.Warn("Failed to JSON marshal document from Mongo: %v (error: %v)", doc, err)
+				} else {
+					docs = append(docs, str)
+				}
+			}
+			event["response"] = strings.Join(docs, "\n")
+		}
+	}
 
 	mongodb.results <- event
 }
