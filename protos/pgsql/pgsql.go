@@ -382,6 +382,8 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += length
 						m.end = s.parseOffset
 						m.isSSLRequest = true
+						m.Size = uint64(m.end - m.start)
+
 						return true, true
 					}
 					s.parseOffset += length
@@ -406,6 +408,8 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1
 						m.end = s.parseOffset
 						m.isSSLResponse = true
+						m.Size = uint64(m.end - m.start)
+
 						return true, true
 					}
 				}
@@ -430,7 +434,10 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 //type
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
+
 						m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
+
 						m.toExport = true
 						logp.Debug("pgsqldetailed", "Simple Query: %s", m.Query)
 						return true, true
@@ -472,6 +479,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					m.toExport = true
 					s.parseOffset += 5 // type + length
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 
 					return true, true
 
@@ -491,6 +499,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						pgsqlErrorParser(s)
 
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -514,6 +523,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -528,6 +538,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 // type
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -542,6 +553,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 //type
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
 
 						// ok and complete, but ignore
 						m.toExport = false
@@ -605,6 +617,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 					s.parseOffset += length
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 
 					s.parseState = PgsqlStartState
 
@@ -781,7 +794,6 @@ var handlePgsql = func(pgsql *Pgsql, m *PgsqlMessage, tcptuple *common.TcpTuple,
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
-	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		pgsql.receivedPgsqlRequest(m)

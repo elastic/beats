@@ -19,3 +19,6 @@ class Test(TestCase):
         assert objs[0]["status"] == "OK"
         assert objs[1]["status"] == "OK"
         assert objs[2]["status"] == "Error"
+
+        assert all(["bytes_in" in o for o in objs])
+        assert all(["bytes_out" in o for o in objs])

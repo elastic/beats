@@ -379,6 +379,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					// by the first empty line after the  header fields
 					logp.Debug("http", "Terminate response, status code %d", m.StatusCode)
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				}
 				if m.TransferEncoding == "chunked" {
@@ -392,6 +393,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					logp.Debug("http", "Empty content length, ignore body")
 					// Ignore body for request that contains a message body but not a Content-Length
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				}
 				logp.Debug("http", "Read body")
@@ -423,6 +425,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			} else if len(s.data[s.parseOffset:]) >= m.ContentLength-s.bodyReceived {
 				s.parseOffset += (m.ContentLength - s.bodyReceived)
 				m.end = s.parseOffset
+				m.Size = uint64(m.end - m.start)
 				return true, true
 			} else {
 				s.bodyReceived += (len(s.data) - s.parseOffset)
@@ -715,7 +718,6 @@ func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 	m.Raw = raw_msg
-	m.Size = uint64(m.end - m.start)
 
 	if m.IsRequest {
 		http.receivedHttpRequest(m)

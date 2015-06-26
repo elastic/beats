@@ -15,6 +15,12 @@ import (
 	"github.com/elastic/packetbeat/protos/tcp"
 )
 
+const (
+	START = iota
+	BULK_ARRAY
+	SIMPLE_MESSAGE
+)
+
 type RedisMessage struct {
 	Ts            time.Time
 	NumberOfBulks int64
@@ -30,6 +36,10 @@ type RedisMessage struct {
 	Method    string
 	Path      string
 	Size      int
+
+	parseState int
+	start      int
+	end        int
 }
 
 type RedisStream struct {
@@ -298,18 +308,27 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 	for s.parseOffset < len(s.data) {
 
 		if s.data[s.parseOffset] == '*' {
-			//Multi Bulk Message
+			//Arrays
+
+			m.parseState = BULK_ARRAY
+			m.start = s.parseOffset
+			logp.Debug("redis", "start %d", m.start)
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				logp.Debug("redis", "End of line not found, waiting for more data")
 				return true, false
 			}
+			logp.Debug("redis", "line %s: %d", line, off)
 
 			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				//NULL Multi Bulk
+				//Null array
 				s.parseOffset = off
 				value = "nil"
+			} else if len(line) == 2 && line[1] == '0' {
+				// Empty array
+				s.parseOffset = off
+				value = "[]"
 			} else {
 
 				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
@@ -325,15 +344,20 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			}
 
 		} else if s.data[s.parseOffset] == '$' {
-			old_offset := s.parseOffset
-			// Bulk Reply
+			// Bulk Strings
+			if m.parseState == START {
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
+			starting_offset := s.parseOffset
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				logp.Debug("redis", "End of line not found, waiting for more data")
-				s.parseOffset = old_offset
+				s.parseOffset = starting_offset
 				return true, false
 			}
+			logp.Debug("redis", "line %s: %d", line, off)
 
 			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
 				// NULL Bulk Reply
@@ -351,9 +375,10 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 				found, line, off = readLine(s.data, s.parseOffset)
 				if !found {
 					logp.Debug("redis", "End of line not found, waiting for more data")
-					s.parseOffset = old_offset
+					s.parseOffset = starting_offset
 					return true, false
 				}
+				logp.Debug("redis", "line %s: %d", line, off)
 
 				if int64(len(line)) != length {
 					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
@@ -364,7 +389,13 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			}
 
 		} else if s.data[s.parseOffset] == ':' {
-			// Integer reply
+			// Integers
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
+
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -379,7 +410,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			s.parseOffset = off
 
 		} else if s.data[s.parseOffset] == '+' {
-			// Status Reply
+			// Simple Strings
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -388,7 +424,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			value = line[1:]
 			s.parseOffset = off
 		} else if s.data[s.parseOffset] == '-' {
-			// Error Reply
+			// Errors
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -427,13 +468,19 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 			if m.NumberOfBulks == 0 {
 				// the last bulk received
-				m.Message = strings.Join(m.Bulks, " ")
-				m.Size = s.parseOffset
+				if m.IsRequest {
+					m.Message = strings.Join(m.Bulks, " ")
+				} else {
+					m.Message = "[" + strings.Join(m.Bulks, ", ") + "]"
+				}
+				m.end = s.parseOffset
+				m.Size = m.end - m.start
 				return true, true
 			}
 		} else {
 			m.Message = value
-			m.Size = s.parseOffset
+			m.end = s.parseOffset
+			m.Size = m.end - m.start
 			if iserror {
 				m.IsError = true
 			}

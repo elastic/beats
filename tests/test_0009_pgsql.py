@@ -31,6 +31,7 @@ class Test(TestCase):
         assert o["type"] == "pgsql"
         assert o["method"] == "INSERT"
         assert o["bytes_out"] == 16
+        assert o["bytes_in"] == 63
 
     def test_insert_error(self):
         self.render_config_template(
