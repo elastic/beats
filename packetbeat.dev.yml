@@ -39,7 +39,7 @@ protocols:
   http:
 
     # Configure the ports where to listen for HTTP traffic. You can disable
-    # the http protocol by commenting the list of ports.
+    # the HTTP protocol by commenting out the list of ports.
     ports: [80, 8080, 8000, 5000, 8002]
 
     # Uncomment the following to hide certain parameters in URL or forms attached
@@ -52,26 +52,30 @@ protocols:
   mysql:
 
     # Configure the ports where to listen for MySQL traffic. You can disable
-    # MySQL protocol by commenting the list of ports.
+    # the MySQL protocol by commenting out the list of ports.
     ports: [3306]
 
   pgsql:
 
     # Configure the ports where to listen for Pgsql traffic. You can disable
-    # Pgsql protocol by commenting the list of ports.
+    # the Pgsql protocol by commenting out the list of ports.
     ports: [5432]
 
   redis:
 
     # Configure the ports where to listen for Redis traffic. You can disable
-    # Redis protocol by commenting the list of ports.
+    # the Redis protocol by commenting out the list of ports.
     ports: [6379]
 
   thrift:
-
-    # Configure the ports where to listen for Redis traffic. You can disable
-    # Redis protocol by commenting the list of ports.
+    # Configure the ports where to listen for Thrift-RPC traffic. You can disable
+    # the Thrift-RPC protocol by commenting out the list of ports.
     ports: [9090]
+
+  mongodb:
+    # Configure the ports where to listen for Mongodb traffic. You can disable
+    # the Mongodb protocol by commenting out the list of ports.
+    ports: [27017]
 
 ############################# Output ############################################
 

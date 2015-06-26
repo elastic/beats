@@ -292,11 +292,11 @@ func (d *decoder) readDocument() (bson.M, error) {
 
 	documentMap := bson.M{}
 
-	logp.Debug("mongodb", "Parse %s bytes document from remaining %s bytes", documentLength, len(d.in)-start)
+	logp.Debug("mongodb", "Parse %d bytes document from remaining %d bytes", documentLength, len(d.in)-start)
 	err = bson.Unmarshal(d.in[start:d.i], documentMap)
 
 	if err != nil {
-		logp.Debug("mongodb", "Unmarshall error %s", err)
+		logp.Debug("mongodb", "Unmarshall error %v", err)
 		return nil, err
 	}
 

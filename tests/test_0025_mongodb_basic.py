@@ -11,10 +11,10 @@ class Test(TestCase):
         Should correctly pass a MongoDB database access query
         """
         self.render_config_template(
-         mongodb_ports=[27017]
+            mongodb_ports=[27017]
         )
         self.run_packetbeat(pcap="mongodb_use_db.pcap",
-                         debug_selectors=["mongodb", "sniffer"])
+                            debug_selectors=["mongodb", "sniffer"])
 
         objs = self.read_output()
         o = objs[0]
@@ -25,10 +25,10 @@ class Test(TestCase):
         Should correctly pass a create collection MongoDB database query
         """
         self.render_config_template(
-         mongodb_ports=[27017]
+            mongodb_ports=[27017]
         )
         self.run_packetbeat(pcap="mongodb_create_collection.pcap",
-                         debug_selectors=["mongodb"])
+                            debug_selectors=["mongodb"])
 
         objs = self.read_output()
         o = objs[0]
@@ -42,6 +42,22 @@ class Test(TestCase):
             mongodb_ports=[27017]
         )
         self.run_packetbeat(pcap="mongodb_find.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        o = objs[0]
+        assert o["type"] == "mongodb"
+        assert o["method"] == "find"
+        assert len(o["mongodb.documents"]) == 1
+
+    def test_mongodb_find_one(self):
+        """
+        Should correctly pass a simple MongoDB find query
+        """
+        self.render_config_template(
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongo_one_row.pcap",
                             debug_selectors=["mongodb"])
 
         objs = self.read_output()
