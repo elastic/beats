@@ -4,10 +4,15 @@ import "testing"
 
 func TestRedisParser_ArrayRequest(t *testing.T) {
 
-	var message string
-	message = "*3\r\n$3\r\nSET\r\n$4\r\nkey1\r\n$5\r\nHello\r\n"
+	message := []byte("*3\r\n" +
+		"$3\r\n" +
+		"SET\r\n" +
+		"$4\r\n" +
+		"key1\r\n" +
+		"$5\r\n" +
+		"Hello\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -30,10 +35,15 @@ func TestRedisParser_ArrayRequest(t *testing.T) {
 
 func TestRedisParser_ArrayResponse(t *testing.T) {
 
-	var message string
-	message = "*4\r\n$3\r\nfoo\r\n$-1\r\n$3\r\nbar\r\n:23\r\n"
+	message := []byte("*4\r\n" +
+		"$3\r\n" +
+		"foo\r\n" +
+		"$-1\r\n" +
+		"$3\r\n" +
+		"bar\r\n" +
+		":23\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -56,10 +66,9 @@ func TestRedisParser_ArrayResponse(t *testing.T) {
 
 func TestRedisParser_SimpleString(t *testing.T) {
 
-	var message string
-	message = "+OK\r\n"
+	message := []byte("+OK\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -82,10 +91,9 @@ func TestRedisParser_SimpleString(t *testing.T) {
 
 func TestRedisParser_NilString(t *testing.T) {
 
-	var message string
-	message = "$-1\r\n"
+	message := []byte("$-1\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -108,10 +116,9 @@ func TestRedisParser_NilString(t *testing.T) {
 
 func TestRedisParser_EmptyString(t *testing.T) {
 
-	var message string
-	message = "$0\r\n\r\n"
+	message := []byte("$0\r\n\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -134,10 +141,9 @@ func TestRedisParser_EmptyString(t *testing.T) {
 
 func TestRedisParser_EmptyArray(t *testing.T) {
 
-	var message string
-	message = "*0\r\n"
+	message := []byte("*0\r\n")
 
-	stream := &RedisStream{data: []byte(message), message: new(RedisMessage)}
+	stream := &RedisStream{data: message, message: new(RedisMessage)}
 
 	ok, complete := redisMessageParser(stream)
 
@@ -156,5 +162,4 @@ func TestRedisParser_EmptyArray(t *testing.T) {
 	if stream.message.Size != 4 {
 		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
-
 }
