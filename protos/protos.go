@@ -36,8 +36,8 @@ type ProtocolPlugin interface {
 
 	// Called when a packets are missing from the tcp
 	// stream.
-	GapInStream(tcptuple *common.TcpTuple, dir uint8,
-		private ProtocolData) ProtocolData
+	GapInStream(tcptuple *common.TcpTuple, dir uint8, nbytes int,
+		private ProtocolData) (priv ProtocolData, drop bool)
 }
 
 // Protocol identifier.

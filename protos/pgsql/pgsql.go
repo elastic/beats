@@ -34,9 +34,9 @@ type PgsqlMessage struct {
 	ErrorInfo      string
 	ErrorCode      string
 	ErrorSeverity  string
+	Notes          []string
 
 	Direction    uint8
-	Incomplete   bool
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 }
@@ -54,6 +54,7 @@ type PgsqlTransaction struct {
 	Method       string
 	BytesOut     uint64
 	BytesIn      uint64
+	Notes        []string
 
 	Pgsql common.MapStr
 
@@ -742,19 +743,19 @@ func messageHasEnoughData(msg *PgsqlMessage) bool {
 
 // Called when there's a drop packet
 func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInPgsqlStream exception")
 
 	if private == nil {
-		return private
+		return private, false
 	}
 	pgsqlData, ok := private.(pgsqlPrivateData)
 	if !ok {
-		return private
+		return private, false
 	}
 	if pgsqlData.Data[dir] == nil {
-		return pgsqlData
+		return pgsqlData, false
 	}
 
 	// If enough data was received, send it to the
@@ -762,9 +763,14 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	stream := pgsqlData.Data[dir]
 	if messageHasEnoughData(stream.message) {
 		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
-		stream.message.toExport = true
-		stream.message.end = stream.parseOffset
-		stream.message.Incomplete = true
+		m := stream.message
+		m.toExport = true
+		m.end = stream.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
 
 		msg := stream.data[stream.message.start:stream.message.end]
 		pgsql.handlePgsql(pgsql, stream.message, tcptuple, dir, msg)
@@ -772,7 +778,7 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
-	return pgsqlData
+	return pgsqlData, true
 }
 
 func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
@@ -836,6 +842,8 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Method = getQueryMethod(query)
 		trans.BytesIn = msg.Size
 
+		trans.Notes = msg.Notes
+
 		trans.Request_raw = query
 
 		if trans.timer != nil {
@@ -879,6 +887,8 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 	trans.Response_raw = common.DumpInCSVFormat(msg.Fields, msg.Rows)
 
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
 	pgsql.publishTransaction(trans)
 
 	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
@@ -918,6 +928,10 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
+
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
 
 	pgsql.results <- event
 }

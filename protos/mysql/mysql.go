@@ -50,6 +50,7 @@ type MysqlMessage struct {
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Raw          []byte
+	Notes        []string
 }
 
 type MysqlTransaction struct {
@@ -66,6 +67,7 @@ type MysqlTransaction struct {
 	Path         string // for mysql, Path refers to the mysql table queried
 	BytesOut     uint64
 	BytesIn      uint64
+	Notes        []string
 
 	Mysql common.MapStr
 
@@ -311,6 +313,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// wait for more
 				return true, false
 			}
+
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
 			m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
 			m.Seq = uint8(hdr[3])
@@ -419,8 +422,45 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 	return true, false
 }
 
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Returns true if there is already enough data in the message
+// read so far that we can use it further in the stack.
+func (mysql *Mysql) messageGap(s *MysqlStream, nbytes int) (complete bool) {
+
+	m := s.message
+	switch s.parseState {
+	case mysqlStateStart, mysqlStateEatMessage:
+		// not enough data yet to be useful
+		return false
+	case mysqlStateEatFields, mysqlStateEatRows:
+		// enough data here
+		m.end = s.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
+		return true
+	}
+
+	return true
+}
+
 type mysqlPrivateData struct {
 	Data [2]*MysqlStream
+}
+
+// Called when the parser has identified a full message.
+func (mysql *Mysql) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *MysqlStream) {
+	// all ok, ship it
+	msg := stream.data[stream.message.start:stream.message.end]
+
+	if !stream.message.IgnoreMessage {
+		mysql.handleMysql(mysql, stream.message, tcptuple, dir, msg)
+	}
+
+	// and reset message
+	stream.PrepareForNewMessage()
 }
 
 func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
@@ -470,15 +510,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		if complete {
-			// all ok, ship it
-			msg := stream.data[stream.message.start:stream.message.end]
-
-			if !stream.message.IgnoreMessage {
-				mysql.handleMysql(mysql, stream.message, tcptuple, dir, msg)
-			}
-
-			// and reset message
-			stream.PrepareForNewMessage()
+			mysql.messageComplete(tcptuple, dir, stream)
 		} else {
 			// wait for more data
 			break
@@ -488,17 +520,39 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 }
 
 func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	defer logp.Recover("GapInStream(mysql) exception")
 
-	return private
+	if private == nil {
+		return private, false
+	}
+	mysqlData, ok := private.(mysqlPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := mysqlData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	if mysql.messageGap(stream, nbytes) {
+		// we need to publish from here
+		mysql.messageComplete(tcptuple, dir, stream)
+	}
+
+	// we always drop the TCP stream. Because it's binary and len based,
+	// there are too few cases in which we could recover the stream (maybe
+	// for very large blobs, leaving that as TODO)
+	return private, true
 }
 
 func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	// TODO
+	// TODO: check if we have data pending and either drop it to free
+	// memory or send it up the stack.
 	return private
 }
 
@@ -565,6 +619,9 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 
 	trans.Mysql = common.MapStr{}
 
+	trans.Notes = msg.Notes
+
+	// save Raw message
 	trans.Request_raw = msg.Query
 	trans.BytesIn = msg.Size
 
@@ -609,10 +666,14 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
 
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
 	mysql.publishTransaction(trans)
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
+
+	trans.Notes = append(trans.Notes, msg.Notes...)
 
 	// remove from map
 	delete(mysql.transactionsMap, trans.tuple.Hashable())
@@ -774,6 +835,10 @@ func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 	event["path"] = t.Path
 	event["bytes_out"] = t.BytesOut
 	event["bytes_in"] = t.BytesIn
+
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
 
 	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src

@@ -85,9 +85,10 @@ func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, origi
 	}
 }
 
-func (stream *TcpStream) GapInStream(original_dir uint8) {
+func (stream *TcpStream) GapInStream(original_dir uint8, nbytes int) (drop bool) {
 	mod := protos.Protos.Get(stream.protocol)
-	stream.Data = mod.GapInStream(&stream.tcptuple, original_dir, stream.Data)
+	stream.Data, drop = mod.GapInStream(&stream.tcptuple, original_dir, nbytes, stream.Data)
+	return drop
 }
 
 func (stream *TcpStream) Expire() {
@@ -154,12 +155,14 @@ func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
 		}
 
 		if TcpSeqBefore(stream.lastSeq[original_dir], tcp_start_seq) {
-			logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
 			if !created {
-				stream.GapInStream(original_dir)
-				// drop stream
-				stream.Expire()
-				return
+				logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
+				drop := stream.GapInStream(original_dir,
+					int(tcp_start_seq-stream.lastSeq[original_dir]))
+				if drop {
+					logp.Debug("tcp", "Dropping stream because of gap")
+					stream.Expire()
+				}
 			}
 		}
 	}

@@ -2,18 +2,21 @@ package pgsql
 
 import (
 	"encoding/hex"
+	"net"
 	"testing"
 	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/packetbeat/protos"
 )
 
 func PgsqlModForTests() *Pgsql {
 	var pgsql Pgsql
-	pgsql.Init(true, nil)
+	results := make(chan common.MapStr, 10)
+	pgsql.Init(true, results)
 	return &pgsql
 }
 
@@ -275,4 +278,73 @@ func TestPgsqlParser_invalidMessage(t *testing.T) {
 	if complete {
 		t.Error("Expecting a non complete message")
 	}
+}
+
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
+		Ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: 6512, Dst_port: 5432,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
+// Helper function to read from the Publisher Queue
+func expectTransaction(t *testing.T, pgsql *Pgsql) common.MapStr {
+	select {
+	case trans := <-pgsql.results:
+		return trans
+	default:
+		t.Error("No transaction")
+	}
+	return nil
+}
+
+// Test that loss of data during the response (but not at the beginning)
+// don't cause the whole transaction to be dropped.
+func Test_gap_in_response(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
+	}
+
+	pgsql := PgsqlModForTests()
+
+	// request and response from tests/pcaps/pgsql_request_response.pcap
+	// select * from test
+	req_data, err := hex.DecodeString(
+		"510000001873656c656374202a20" +
+			"66726f6d20746573743b00")
+	assert.Nil(t, err)
+
+	// response is incomplete
+	resp_data, err := hex.DecodeString(
+		"5400000042000361000000410900" +
+			"0100000413ffffffffffff0000620000" +
+			"004009000200000413ffffffffffff00" +
+			"00630000004009000300000413ffffff" +
+			"ffffff0000440000001b000300000003" +
+			"6d6561000000036d6562000000036d65" +
+			"63440000001e0003000000046d656131" +
+			"000000046d656231000000046d656331" +
+			"440000001e0003000000046d65613200")
+	assert.Nil(t, err)
+
+	tcptuple := testTcpTuple()
+	req := protos.Packet{Payload: req_data}
+	resp := protos.Packet{Payload: resp_data}
+
+	private := protos.ProtocolData(new(pgsqlPrivateData))
+
+	private = pgsql.Parse(&req, tcptuple, 0, private)
+	private = pgsql.Parse(&resp, tcptuple, 1, private)
+
+	logp.Debug("pgsql", "Now sending gap..")
+
+	private, drop := pgsql.GapInStream(tcptuple, 1, 10, private)
+	assert.Equal(t, true, drop)
+
+	trans := expectTransaction(t, pgsql)
+	assert.NotNil(t, trans)
+	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
 }
