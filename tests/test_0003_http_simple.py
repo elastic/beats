@@ -23,15 +23,11 @@ class Test(TestCase):
         assert all(["bytes_in" in o for o in objs])
         assert all(["bytes_out" in o for o in objs])
 
-        print objs[0]
-
         assert objs[0]["bytes_in"] == 364
         assert objs[0]["bytes_out"] == 1000
 
-        print objs[1]
         assert objs[1]["bytes_in"] == 471
         assert objs[1]["bytes_out"] == 234
 
-        print objs[2]
         assert objs[2]["bytes_in"] == 289
         assert objs[2]["bytes_out"] == 396
