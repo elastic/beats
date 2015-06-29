@@ -123,3 +123,21 @@ class Test(TestCase):
         o = objs[1]
         assert o["type"] == "mongodb"
         assert o["method"] == "insert"
+
+    def test_session(self):
+        """
+        Should work for a longer mongodb 3.0 session
+        and correctly identify the methods involved.
+        """
+        self.render_config_template(
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongo_3.0_session.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        print len(objs)
+        assert len([o for o in objs if o["method"] == "insert"]) == 2
+        assert len([o for o in objs if o["method"] == "update"]) == 1
+        assert len([o for o in objs if o["method"] == "findandmodify"]) == 1
+        assert len([o for o in objs if o["method"] == "listCollections"]) == 5

@@ -1,6 +1,10 @@
 package mongodb
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestMongodbParser_messageNotEvenStarted(t *testing.T) {
 	var data []byte
@@ -82,4 +86,67 @@ func addCStr(in []byte, v string) []byte {
 func addInt32(in []byte, v int32) []byte {
 	u := uint32(v)
 	return append(in, byte(u), byte(u>>8), byte(u>>16), byte(u>>24))
+}
+
+func Test_extract_documents(t *testing.T) {
+	type io struct {
+		Input  map[string]interface{}
+		Output []interface{}
+	}
+	tests := []io{
+		io{
+			Input: map[string]interface{}{
+				"a":         1,
+				"documents": []interface{}{"a", "b", "c"},
+			},
+			Output: []interface{}{"a", "b", "c"},
+		},
+		io{
+			Input: map[string]interface{}{
+				"a": 1,
+			},
+			Output: []interface{}{},
+		},
+		io{
+			Input: map[string]interface{}{
+				"a":         1,
+				"documents": 1,
+			},
+			Output: []interface{}{},
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, extract_documents(test.Input))
+	}
+}
+
+func Test_isDatabaseCommand(t *testing.T) {
+	type io struct {
+		Key   string
+		Value interface{}
+
+		Output bool
+	}
+	tests := []io{
+		io{
+			Key:    "listCollections",
+			Value:  float64(1),
+			Output: true,
+		},
+		io{
+			Key:    "listcollections",
+			Value:  float64(1),
+			Output: true,
+		},
+		io{
+			Key:    "findandmodify",
+			Value:  "restaurants",
+			Output: true,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, isDatabaseCommand(test.Key, test.Value))
+	}
 }

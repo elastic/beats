@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -183,6 +184,8 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
+	trans.params = msg.params
+	trans.resource = msg.resource
 
 	if trans.timer != nil {
 		trans.timer.Stop()
@@ -248,6 +251,53 @@ func (mongodb *Mongodb) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return private
 }
 
+func copy_map_without_key(d map[string]interface{}, key string) map[string]interface{} {
+	res := map[string]interface{}{}
+	for k, v := range d {
+		if k != key {
+			res[k] = v
+		}
+	}
+	return res
+}
+
+func reconstructQuery(t *MongodbTransaction, full bool) (query string) {
+	query = t.resource + "." + t.method + "("
+	if len(t.params) > 0 {
+		var err error
+		var params string
+		if !full {
+			// remove the actual data.
+			// TODO: review if we need to add other commands here
+			if t.method == "insert" {
+				params, err = doc2str(copy_map_without_key(t.params, "documents"))
+			} else if t.method == "update" {
+				params, err = doc2str(copy_map_without_key(t.params, "updates"))
+			} else if t.method == "findandmodify" {
+				params, err = doc2str(copy_map_without_key(t.params, "update"))
+			}
+		} else {
+			params, err = doc2str(t.params)
+		}
+		if err != nil {
+			logp.Debug("mongodb", "Error marshaling params: %v", err)
+		} else {
+			query += params
+		}
+	}
+	query += ")"
+	skip, _ := t.event["numberToSkip"].(int)
+	if skip > 0 {
+		query += fmt.Sprintf(".skip(%d)", skip)
+	}
+
+	limit, _ := t.event["numberToReturn"].(int)
+	if limit > 0 && limit < 0x7fffffff {
+		query += fmt.Sprintf(".limit(%d)", limit)
+	}
+	return
+}
+
 func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 
 	if mongodb.results == nil {
@@ -265,8 +315,8 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	}
 	event["mongodb"] = t.event
 	event["method"] = t.method
-	fullCollectioName, _ := t.event["fullCollectionName"].(string)
-	event["query"] = t.method + " " + fullCollectioName
+	event["resource"] = t.resource
+	event["query"] = reconstructQuery(t, false)
 	event["responsetime"] = t.ResponseTime
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
@@ -275,7 +325,7 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	event["dst"] = &t.Dst
 
 	if mongodb.Send_request {
-		event["request"] = event["query"]
+		event["request"] = reconstructQuery(t, true)
 	}
 	if mongodb.Send_response {
 		if len(t.documents) > 0 {

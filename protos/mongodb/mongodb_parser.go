@@ -155,6 +155,41 @@ func opInsertParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
+func extract_documents(query map[string]interface{}) []interface{} {
+	docs_vi, present := query["documents"]
+	if !present {
+		return []interface{}{}
+	}
+
+	docs, ok := docs_vi.([]interface{})
+	if !ok {
+		return []interface{}{}
+	}
+	return docs
+}
+
+// Try to guess whether this key:value pair found in
+// the query represents a command.
+func isDatabaseCommand(key string, val interface{}) bool {
+	nameExists := false
+	for _, cmd := range DatabaseCommands {
+		if strings.EqualFold(cmd, key) {
+			nameExists = true
+			break
+		}
+	}
+	if !nameExists {
+		return false
+	}
+	// value should be either a string or the value 1
+	_, ok := val.(string)
+	num, _ := val.(float64)
+	if ok || num == 1 {
+		return true
+	}
+	return false
+}
+
 func opQueryParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
 	fullCollectionName, err := d.readCStr()
@@ -171,16 +206,26 @@ func opQueryParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	// Actual method is either a 'find' or a command passing through a query
 	if strings.HasSuffix(fullCollectionName, ".$cmd") {
 		m.method = "otherCommand"
-		for _, command := range UserCommands {
-			if _, present := query[command]; present {
-				m.method = command
+		m.resource = fullCollectionName
+		for key, val := range query {
+			logp.Debug("mongodb", "key=%v val=%s", key, val)
+			if isDatabaseCommand(key, val) {
+				logp.Debug("mongodb", "is db command")
+				col, ok := val.(string)
+				if ok {
+					// replace $cmd with the actual collection name
+					m.resource = fullCollectionName[:len(fullCollectionName)-4] + col
+				}
+				delete(query, key)
+				m.method = key
 			}
 		}
 	} else {
 		m.method = "find"
+		m.resource = fullCollectionName
 	}
 
-	m.event["query"], err = doc2str(query)
+	m.params = query
 
 	if err != nil {
 		logp.Err("An error occured while parsing OP_QUERY message: %s", err)

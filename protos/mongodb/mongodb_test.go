@@ -193,3 +193,55 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 
 	logp.Debug("mongodb", "Trans: %v", trans)
 }
+
+func TestReconstructQuery(t *testing.T) {
+	type io struct {
+		Input  MongodbTransaction
+		Full   bool
+		Output string
+	}
+	tests := []io{
+		io{
+			Input: MongodbTransaction{
+				resource: "test.col",
+				method:   "find",
+				event: map[string]interface{}{
+					"numberToSkip":   3,
+					"numberToReturn": 2,
+				},
+				params: map[string]interface{}{
+					"me": "you",
+				},
+			},
+			Full:   true,
+			Output: `test.col.find({"me":"you"}).skip(3).limit(2)`,
+		},
+		io{
+			Input: MongodbTransaction{
+				resource: "test.col",
+				method:   "insert",
+				params: map[string]interface{}{
+					"documents": "you",
+				},
+			},
+			Full:   true,
+			Output: `test.col.insert({"documents":"you"})`,
+		},
+		io{
+			Input: MongodbTransaction{
+				resource: "test.col",
+				method:   "insert",
+				params: map[string]interface{}{
+					"documents": "you",
+				},
+			},
+			Full:   false,
+			Output: `test.col.insert({})`,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output,
+			reconstructQuery(&test.Input, test.Full))
+	}
+}
