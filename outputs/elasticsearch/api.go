@@ -149,16 +149,14 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 		return nil, true, fmt.Errorf("Sending the request fails: %s", err)
 	}
 
-	if resp.StatusCode > 499 {
+	if resp.StatusCode > 299 {
 		// request fails
 		if resp.StatusCode == http.StatusServiceUnavailable ||
 			resp.StatusCode == http.StatusGatewayTimeout {
 			// status code in {503, 504}
 			es.connectionPool.MarkDead(conn)
-			return nil, true, fmt.Errorf("Received %v", resp.Status)
-		} else {
-			return nil, false, fmt.Errorf("Received %v", resp.Status)
 		}
+		return nil, false, fmt.Errorf("%v", resp.Status)
 	}
 
 	defer resp.Body.Close()
