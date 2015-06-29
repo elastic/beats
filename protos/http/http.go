@@ -458,6 +458,7 @@ func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool,
 		}
 		s.parseOffset += 2 // skip final CRLF
 		m.end = s.parseOffset
+		m.Size = uint64(m.end - m.start)
 		return true, true
 	}
 }
@@ -488,6 +489,7 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
 		s.parseOffset += 2 // skip final CRLF
 
 		m.end = s.parseOffset
+		m.Size = uint64(m.end - m.start)
 		return false, true, true
 	}
 	s.bodyReceived = 0
