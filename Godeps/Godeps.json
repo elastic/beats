@@ -7,23 +7,23 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
+			"Rev": "e7530540dea52815e4f206665202e63deca291ae"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
+			"Rev": "e7530540dea52815e4f206665202e63deca291ae"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
+			"Rev": "e7530540dea52815e4f206665202e63deca291ae"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
+			"Rev": "e7530540dea52815e4f206665202e63deca291ae"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "11d21e5deef16da5454cc412dae87263e3b1fcd0"
+			"Rev": "e7530540dea52815e4f206665202e63deca291ae"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
@@ -59,7 +59,7 @@
 		},
 		{
 			"ImportPath": "labix.org/v2/mgo/bson",
-			"Comment": "238",
+			"Comment": "287",
 			"Rev": "gustavo@niemeyer.net-20130722041249-5v5syfwrb8gq243v"
 		}
 	]

@@ -31,7 +31,7 @@ deps:
 	$(GOPATH)/bin/godep restore ./...
 
 .PHONY: updatedeps
-updatedeps: deps
+updatedeps:
 	godep update ...
 
 .PHONY: install

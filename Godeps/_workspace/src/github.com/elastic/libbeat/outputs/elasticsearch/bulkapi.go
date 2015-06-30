@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -12,13 +11,15 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-type BulkMsg struct {
+type EventMsg struct {
 	Ts    time.Time
 	Event common.MapStr
 }
 
-func (es *Elasticsearch) Bulk(index string, doc_type string,
-	params map[string]string, body chan interface{}) (*QueryResult, error) {
+// Create a HTTP request containing a bunch of operations and send them to Elasticsearch.
+// The request is retransmitted up to max_retries before returning an error.
+func (es *Elasticsearch) BulkRequest(method string, path string,
+	params map[string]string, body chan interface{}) ([]byte, error) {
 
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
@@ -31,46 +32,57 @@ func (es *Elasticsearch) Bulk(index string, doc_type string,
 		return nil, nil
 	}
 
-	logp.Debug("elasticsearch", "Insert bulk messages:\n%s\n", buf)
+	var errors []error
+
+	for attempt := 0; attempt < es.MaxRetries; attempt++ {
+
+		conn := es.connectionPool.GetConnection()
+		logp.Debug("elasticsearch", "Use connection %s", conn.Url)
+
+		url := conn.Url + path
+		if len(params) > 0 {
+			url = url + "?" + UrlEncode(params)
+		}
+		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
+
+		req, err := http.NewRequest(method, url, &buf)
+		if err != nil {
+			return nil, fmt.Errorf("NewRequest fails: %s", err)
+		}
+
+		resp, retry, err := es.PerformRequest(conn, req)
+		if retry == true {
+			// retry
+			if err != nil {
+				errors = append(errors, err)
+			}
+			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("PerformRequest fails: %s", err)
+		}
+		return resp, nil
+	}
+
+	logp.Warn("Request fails to be send after %d retries", es.MaxRetries)
+
+	return nil, fmt.Errorf("Request fails after %d retries. Errors: %v", es.MaxRetries, errors)
+}
+
+// Perform many index/delete operations in a single API call.
+// Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
+func (es *Elasticsearch) Bulk(index string, doc_type string,
+	params map[string]string, body chan interface{}) (*QueryResult, error) {
 
 	path, err := MakePath(index, doc_type, "_bulk")
 	if err != nil {
 		return nil, err
 	}
 
-	url := es.Url + path
-	if len(params) > 0 {
-		url = url + "?" + UrlEncode(params)
-	}
-
-	req, err := http.NewRequest("POST", url, &buf)
+	resp, err := es.BulkRequest("POST", path, params, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("Accept", "application/json")
-	if es.Username != "" || es.Password != "" {
-		req.SetBasicAuth(es.Username, es.Password)
-	}
-
-	resp, err := es.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	obj, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result QueryResult
-	err = json.Unmarshal(obj, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode > 299 {
-		return &result, fmt.Errorf("ES returned an error: %s", resp.Status)
-	}
-	return &result, err
+	return ReadQueryResult(resp)
 }
