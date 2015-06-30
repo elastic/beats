@@ -247,11 +247,11 @@ func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 }
 
 func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	// TODO
 
-	return private
+	return private, true
 }
 
 func (mongodb *Mongodb) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
