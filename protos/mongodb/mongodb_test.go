@@ -245,3 +245,86 @@ func TestReconstructQuery(t *testing.T) {
 			reconstructQuery(&test.Input, test.Full))
 	}
 }
+
+// max_docs option should be respected
+func TestMaxDocs(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
+	}
+
+	// more docs than configured
+	trans := MongodbTransaction{
+		documents: []interface{}{
+			1, 2, 3, 4, 5, 6, 7, 8,
+		},
+	}
+
+	mongodb := MongodbModForTests()
+	mongodb.Send_response = true
+	mongodb.Max_docs = 3
+
+	mongodb.publishTransaction(&trans)
+
+	res := expectTransaction(t, mongodb)
+
+	assert.Equal(t, "1\n2\n3\n[...]", res["response"])
+
+	// exactly the same number of docs
+	trans = MongodbTransaction{
+		documents: []interface{}{
+			1, 2, 3,
+		},
+	}
+
+	mongodb.publishTransaction(&trans)
+	res = expectTransaction(t, mongodb)
+	assert.Equal(t, "1\n2\n3", res["response"])
+
+	// less docs
+	trans = MongodbTransaction{
+		documents: []interface{}{
+			1, 2,
+		},
+	}
+
+	mongodb.publishTransaction(&trans)
+	res = expectTransaction(t, mongodb)
+	assert.Equal(t, "1\n2", res["response"])
+
+	// unlimited
+	trans = MongodbTransaction{
+		documents: []interface{}{
+			1, 2, 3, 4,
+		},
+	}
+	mongodb.Max_docs = 0
+	mongodb.publishTransaction(&trans)
+	res = expectTransaction(t, mongodb)
+	assert.Equal(t, "1\n2\n3\n4", res["response"])
+}
+
+func TestMaxDocSize(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"mongodb", "mongodbdetailed"})
+	}
+
+	// more docs than configured
+	trans := MongodbTransaction{
+		documents: []interface{}{
+			"1234567",
+			"123",
+			"12",
+		},
+	}
+
+	mongodb := MongodbModForTests()
+	mongodb.Send_response = true
+	mongodb.Max_doc_length = 5
+
+	mongodb.publishTransaction(&trans)
+
+	res := expectTransaction(t, mongodb)
+
+	assert.Equal(t, "\"1234 ...\n\"123\"\n\"12\"", res["response"])
+}

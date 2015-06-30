@@ -68,9 +68,11 @@ type Mysql struct {
 }
 
 type Mongodb struct {
-	Ports         []int
-	Send_request  *bool
-	Send_response *bool
+	Ports          []int
+	Max_doc_length *int
+	Max_docs       *int
+	Send_request   *bool
+	Send_response  *bool
 }
 
 type Pgsql struct {

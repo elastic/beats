@@ -97,6 +97,7 @@ class Test(TestCase):
         self.render_config_template(
             mongodb_send_request=True,
             mongodb_send_response=True,
+            mongodb_max_docs=0,
             mongodb_ports=[27017]
         )
         self.run_packetbeat(pcap="mongodb_more_rows.pcap",
@@ -108,6 +109,47 @@ class Test(TestCase):
         assert "request" in o
         assert "response" in o
         assert len(o["response"].splitlines()) == 101
+
+    def test_max_docs_setting(self):
+        """
+        max_docs setting should be respected.
+        """
+        self.render_config_template(
+            mongodb_send_request=True,
+            mongodb_send_response=True,
+            mongodb_max_docs=10,
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongodb_more_rows.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+        assert "request" in o
+        assert "response" in o
+        assert len(o["response"].splitlines()) == 11
+
+    def test_max_doc_length_setting(self):
+        """
+        max_doc_length setting should be respected.
+        """
+        self.render_config_template(
+            mongodb_send_request=True,
+            mongodb_send_response=True,
+            mongodb_max_doc_length=10,
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongodb_more_rows.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+        assert "request" in o
+        assert "response" in o
+        # limit lines to 10 chars, but add dots at the end
+        assert all([len(l) < 15 for l in o["response"].splitlines()])
 
     def test_mongodb_inserts(self):
         """

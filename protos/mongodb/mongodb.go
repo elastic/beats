@@ -15,9 +15,11 @@ import (
 
 type Mongodb struct {
 	// config
-	Ports         []int
-	Send_request  bool
-	Send_response bool
+	Ports          []int
+	Send_request   bool
+	Send_response  bool
+	Max_docs       int
+	Max_doc_length int
 
 	transactionsMap map[common.HashableTcpTuple]*MongodbTransaction
 
@@ -27,6 +29,8 @@ type Mongodb struct {
 func (mongodb *Mongodb) InitDefaults() {
 	mongodb.Send_request = false
 	mongodb.Send_response = false
+	mongodb.Max_docs = 10
+	mongodb.Max_doc_length = 5000
 }
 
 func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
@@ -37,6 +41,12 @@ func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
 	}
 	if config.Send_response != nil {
 		mongodb.Send_response = *config.Send_response
+	}
+	if config.Max_docs != nil {
+		mongodb.Max_docs = *config.Max_docs
+	}
+	if config.Max_doc_length != nil {
+		mongodb.Max_doc_length = *config.Max_doc_length
 	}
 	return nil
 }
@@ -331,11 +341,18 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 		if len(t.documents) > 0 {
 			// response field needs to be a string
 			docs := make([]string, 0, len(t.documents))
-			for _, doc := range t.documents {
+			for i, doc := range t.documents {
+				if mongodb.Max_docs > 0 && i >= mongodb.Max_docs {
+					docs = append(docs, "[...]")
+					break
+				}
 				str, err := doc2str(doc)
 				if err != nil {
 					logp.Warn("Failed to JSON marshal document from Mongo: %v (error: %v)", doc, err)
 				} else {
+					if mongodb.Max_doc_length > 0 && len(str) > mongodb.Max_doc_length {
+						str = str[:mongodb.Max_doc_length] + " ..."
+					}
 					docs = append(docs, str)
 				}
 			}

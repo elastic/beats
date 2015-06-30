@@ -118,6 +118,8 @@ protocols:
     ports: [{{ mongodb_ports|default([27017])|join(", ") }}]
 {% if mongodb_send_request %}    send_request: true{% endif %}
 {% if mongodb_send_response %}    send_response: true{% endif %}
+{% if mongodb_max_docs is not none %}    max_docs: {{mongodb_max_docs}}{%endif %}
+{% if mongodb_max_doc_length is not none %}    max_doc_length: {{mongodb_max_doc_length}}{%endif%}
 
 
 ############################# Filters ############################################
