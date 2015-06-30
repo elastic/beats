@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/packetbeat/sniffer"
 )
 
-const Version = "1.0.0.Beta1"
+const Version = "1.0.0-beta2"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:    new(http.Http),

@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=1.0.0~Beta1
+VERSION?=1.0.0~beta2
 ARCH?=$(shell uname -m)
 
 GOFILES = $(shell find . -type f -name '*.go')
