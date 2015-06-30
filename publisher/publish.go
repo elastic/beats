@@ -168,7 +168,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		for i := 0; i < len(publisher.Output); i++ {
 			err := publisher.Output[i].PublishEvent(time.Time(ts), event)
 			if err != nil {
-				logp.Err("Fail to publish event type on output %s: %s", publisher.Output, err)
+				logp.Err("Fail to publish event type on output %s: %v", publisher.Output[i], err)
 				has_error = true
 			}
 		}
