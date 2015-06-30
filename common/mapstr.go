@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -68,4 +69,13 @@ func (m MapStr) EnsureCountField() error {
 		m["count"] = 1
 	}
 	return nil
+}
+
+// Prints the dict as a json
+func (m MapStr) String() string {
+	bytes, err := json.Marshal(m)
+	if err != nil {
+		return fmt.Sprintf("Not valid json: %v", err)
+	}
+	return string(bytes)
 }

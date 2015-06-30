@@ -161,3 +161,27 @@ func TestEnsureCountFiled(t *testing.T) {
 		assert.Equal(t, test.Output, m)
 	}
 }
+
+func TestString(t *testing.T) {
+	type io struct {
+		Input  MapStr
+		Output string
+	}
+	tests := []io{
+		io{
+			Input: MapStr{
+				"a": "b",
+			},
+			Output: `{"a":"b"}`,
+		},
+		io{
+			Input: MapStr{
+				"a": []int{1, 2, 3},
+			},
+			Output: `{"a":[1,2,3]}`,
+		},
+	}
+	for _, test := range tests {
+		assert.Equal(t, test.Output, test.Input.String())
+	}
+}
