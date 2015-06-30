@@ -29,6 +29,7 @@ Currently, the Packetbeat shipper supports the following protocols:
  * PostgreSQL
  * Redis
  * Thrift-RPC
+ * Mongodb
 
 The shippers can insert the correlated transactions directly into Elasticsearch
 or via a central queue created with Redis and Logstash.

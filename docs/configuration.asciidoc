@@ -249,6 +249,7 @@ Currently, Packetbeat supports the following protocols:
  - PostgreSQL
  - Redis
  - Thrift-RPC
+ - MongoDB
 
 Example configuration:
 
@@ -440,15 +441,15 @@ sample configuration section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-thrift:
-  transport_type: socket
-  protocol_type: binary
-  idl_files: ["tutorial.thrift", "shared.thrift"]
-  string_max_size: 200
-  collection_max_size: 20
-  capture_reply: true
-  obfuscate_strings: true
-  drop_after_n_struct_fields: 100
+  thrift:
+    transport_type: socket
+    protocol_type: binary
+    idl_files: ["tutorial.thrift", "shared.thrift"]
+    string_max_size: 200
+    collection_max_size: 20
+    capture_reply: true
+    obfuscate_strings: true
+    drop_after_n_struct_fields: 100
 ------------------------------------------------------------------------------
 
 ===== transport_type
@@ -499,6 +500,45 @@ If a structure has more fields than this given value, the Packetbeat shipper wil
 ignore the whole transaction. This is a memory protection mechanism (so that
 the shipper's memory doesn't grow indefinitely), so you would topically set this
 to a relatively high value. The default is 500.
+
+
+[[configuration-mongodb]]
+==== MongoDB configuration
+
+The following settings are specific to the MongoDB protocol. Here is a sample
+configuration section:
+
+[source,yaml]
+------------------------------------------------------------------------------
+  mongodb:
+    send_request: true
+    send_response: true
+    max_docs: 0
+    max_doc_length: 0
+------------------------------------------------------------------------------
+
+The following two settings are useful for limiting the amount of data
+Packetbeat indexes in the `response` fields.
+
+===== max_docs
+
+Maximum number of docs from the response to index in the `response` field. The
+default is 10. You can set this to 0 to index an unlimited number of documents.
+
+A `[...]` line is added automatically at the end to signify that there were
+more documents but they weren't saved because of this setting.
+
+===== max_doc_length
+
+Maximum number of characters in a single document indexed in the `resposne`
+field. The default is 5000. You can set this to 0 to index an unlimited number
+of characters per document.
+
+If the document is trimmed because of this setting, the string ` ...` is added
+at the end of it.
+
+Note that limiting documents this way means that they are no longer correctly
+formatted JSON objects.
 
 [[configuration-output]]
 === Outputs

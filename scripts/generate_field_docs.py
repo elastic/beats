@@ -16,6 +16,7 @@ SECTIONS = [
     ("pgsql", "PostgreSQL"),
     ("thrift", "Thrift-RPC"),
     ("redis", "Redis"),
+    ("mongodb", "MongoDb"),
     ("measurements", "Measurements"),
     ("env", "Environmental"),
     ("raw", "Raw")]
