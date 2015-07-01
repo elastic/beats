@@ -8,6 +8,8 @@ include::./configuration.asciidoc[]
 
 include::./capturing.asciidoc[]
 
+include::./https.asciidoc[]
+
 include::./fields.asciidoc[]
 
 include::./logstash.asciidoc[]
