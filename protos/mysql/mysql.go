@@ -778,7 +778,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 					var err error
 					var complete bool
 					text, off, complete, err = read_lstring(data, off)
-					if err != nil {
+					if err != nil || !complete {
 						logp.Debug("mysql", "Error parsing rows: %s %b", err, complete)
 						// nevertheless, return what we have so far
 						return fields, rows
