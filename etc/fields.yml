@@ -411,11 +411,17 @@ measurements:
       type: int
 
     - name: bytes_in
-      description: The number of bytes of the request.
+      description: >
+        The number of bytes of the request. Note that this size is
+        the application layer message length, without the length of IP or
+        TCP headers.
       type: int
 
     - name: bytes_out
-      description: The number of bytes of the response.
+      description: >
+        The number of bytes of the response. Note that this size is
+        the application layer message length, without the length of IP or
+        TCP headers.
       type: int
 
     - name: dnstime
