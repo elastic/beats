@@ -291,7 +291,7 @@ cd kibana-$KIBANA_VERSION-darwin-x64/
 You can find Kibana binaries for other operating systems on the
 https://www.elastic.co/downloads/kibana[Kibana downloads page].
 
-If Kibana cannot reach the Elasticsearh server, you can adjust the settings for
+If Kibana cannot reach the Elasticsearch server, you can adjust the settings for
 it from the `config/kibana.yml` file.
 
 Now point your browser to port 5601 and you should see the Kibana web
