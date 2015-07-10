@@ -88,6 +88,8 @@ class Test(TestCase):
         assert "request" in o
         assert "response" in o
         assert len(o["response"].splitlines()) == 1
+        assert o["bytes_in"] == 50
+        assert o["bytes_out"] == 514
 
     def test_mongodb_send_response_more_rows(self):
         """

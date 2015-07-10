@@ -196,6 +196,7 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	}
 	trans.params = msg.params
 	trans.resource = msg.resource
+	trans.BytesIn = msg.messageLength
 
 	if trans.timer != nil {
 		trans.timer.Stop()
@@ -234,6 +235,7 @@ func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 	trans.documents = msg.documents
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.BytesOut = msg.messageLength
 
 	mongodb.publishTransaction(trans)
 
