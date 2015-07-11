@@ -114,11 +114,11 @@ func main() {
 	filecontent, err := ioutil.ReadFile(*configfile)
 	if err != nil {
 		fmt.Printf("Fail to read %s: %s. Exiting.\n", *configfile, err)
-		return
+		os.Exit(1)
 	}
 	if err = yaml.Unmarshal(filecontent, &config.ConfigSingleton); err != nil {
 		fmt.Printf("YAML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
-		return
+		os.Exit(1)
 	}
 
 	if len(debugSelectors) == 0 {
@@ -193,7 +193,7 @@ func main() {
 			err := runner.Run()
 			if err != nil {
 				logp.Critical("Filters runner failed: %v", err)
-				// shutting doen
+				// shutting down
 				sniff.Stop()
 			}
 		}()
