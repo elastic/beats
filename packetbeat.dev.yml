@@ -91,8 +91,7 @@ output:
   # save_topology: specify if the topology is saved in Elasticsearch
   elasticsearch:
     enabled: true
-    host: localhost
-    port: 9200
+    hosts: ["localhost:9200"]
     save_topology: true
 
   # Redis as output
