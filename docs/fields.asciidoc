@@ -365,13 +365,15 @@ The CPU time it took to complete the transaction.
 
 type: int
 
-The number of bytes of the request.
+The number of bytes of the request. Note that this size is the application layer message length, without the length of IP or TCP headers.
+
 
 ==== bytes_out
 
 type: int
 
-The number of bytes of the response.
+The number of bytes of the response. Note that this size is the application layer message length, without the length of IP or TCP headers.
+
 
 ==== dnstime
 
