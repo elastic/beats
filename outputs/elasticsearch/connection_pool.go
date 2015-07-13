@@ -16,7 +16,6 @@ type Connection struct {
 	dead       bool
 	dead_count int
 	timer      *time.Timer
-	timeout    time.Duration
 }
 
 const (
@@ -87,15 +86,17 @@ func (pool *ConnectionPool) GetConnection() *Connection {
 // returned to the live pool
 func (pool *ConnectionPool) MarkDead(conn *Connection) error {
 
-	logp.Debug("elasticsearch", "Mark dead %s", conn.Url)
-	conn.dead = true
-	conn.dead_count = conn.dead_count + 1
-	conn.timeout = pool.Dead_timeout * time.Duration(math.Pow(2, float64(conn.dead_count)-1))
-	conn.timer = time.AfterFunc(conn.timeout*time.Second, func() {
-		// timeout expires
-		conn.dead = false
-		logp.Debug("elasticsearch", "Timeout expired. Mark it as alive: %s", conn.Url)
-	})
+	if !conn.dead {
+		logp.Debug("elasticsearch", "Mark dead %s", conn.Url)
+		conn.dead = true
+		conn.dead_count = conn.dead_count + 1
+		timeout := pool.Dead_timeout * time.Duration(math.Pow(2, float64(conn.dead_count)-1))
+		conn.timer = time.AfterFunc(timeout*time.Second, func() {
+			// timeout expires
+			conn.dead = false
+			logp.Debug("elasticsearch", "Timeout expired. Mark it as alive: %s", conn.Url)
+		})
+	}
 
 	return nil
 }
