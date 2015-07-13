@@ -591,8 +591,7 @@ output:
     enabled: true
 
     # Set the host and port where to find Elasticsearch.
-    host: "localhost"
-    port: 9200
+    hosts: ["localhost:9200"]
 
     # Optional protocol and basic auth credentials
     # protocol: "https"
@@ -616,13 +615,21 @@ output:
 
 Boolean option that enables Elasticsearch as output. The default is true.
 
+===== hosts
+
+The list of Elasticsearch nodes to which to connect. The events are distributed to
+these nodes in round robin order. If one node becomes unreachable, the event is
+automatically sent to another node.
+
 ===== host
 
-The host of the Elasticsearch server.
+The host of the Elasticsearch server. This option is deprecated and only used if
+the `hosts` option is not present.
 
 ===== port
 
-The port of the Elasticsearch server.
+The port of the Elasticsearch server. This option is deprecated and only used if
+the `hosts` option is not present.
 
 ===== protocol
 
@@ -637,22 +644,44 @@ Basic authentication username for connecting to Elasticsearch.
 
 Basic authentication password for connecting to Elasticsearch.
 
-===== save_topology
-
-Boolean that sets if the topology is kept in Elasticsearch. The default is
-false. See <<maintaining-topology>>.
 
 ===== index
 
 The index root name where to write events to. The default is `packetbeat` and
 generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
 
+==== max_retries
+
+The number of times a particular Elasticsearch index operation is attempted. If
+the indexing operation doesn't succeed after this many retries, the events are
+dropped. The default is 3.
+
+==== bulk_max_size
+
+The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+The default is 10000.
+
+==== flush_interval
+
+The number of seconds to wait for new events between two bulk API index requests.
+If `bulk_max_size` is reached before this interval expires, addition bulk index
+requests are made.
 
 ===== path
 
 An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
+
+===== save_topology
+
+Boolean that sets if the topology is kept in Elasticsearch. The default is
+false. See <<maintaining-topology>>.
+
+==== topology_expire
+
+The time to live in seconds for the topology information that is stored in
+Elasticsearch. The default is 15 seconds.
 
 [[redis-output]]
 ==== Redis Output
