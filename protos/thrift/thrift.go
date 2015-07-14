@@ -199,7 +199,7 @@ func (thrift *Thrift) readConfig(config config.Thrift) error {
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known", config.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", *config.Transport_type)
 		}
 	}
 	if config.Protocol_type != nil {
@@ -207,7 +207,7 @@ func (thrift *Thrift) readConfig(config config.Thrift) error {
 		case "binary":
 			thrift.ProtocolType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known", config.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", *config.Protocol_type)
 		}
 	}
 	if config.Capture_reply != nil {
