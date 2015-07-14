@@ -3,21 +3,28 @@ language: go
 go:
     - 1.4
 
+sudo: false
+
 services:
     - redis-server
     - elasticsearch
 
+addons:
+  apt:
+    packages:
+      - libpcap-dev
+      - python-virtualenv
+      - geoip-database
+
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq libpcap-dev python-virtualenv geoip-database
     - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/packetbeat
 
 install:
-    - make deps
     - make
 
 script: make testlong
 
 notifications:
     email:
-        - dev@packetbeat.com
+        - tudor@elastic.co
+        - monica@elastic.co
