@@ -69,7 +69,7 @@ gofmt:
 
 .PHONY: test
 test:
-	go test -short ./...
+	$(GOPATH)/bin/godep go test -short ./...
 	make -C tests test
 
 .PHONY: autotest
@@ -79,18 +79,18 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	go test ./...
+	$(GOPATH)/bin/godep go test ./...
 	make -C tests test
 
 .PHONY: cover
 cover:
 	mkdir -p cover
 	./scripts/coverage.sh
-	go tool cover -html=profile.cov -o cover/coverage.html
+	$(GOPATH)/bin/godep go tool cover -html=profile.cov -o cover/coverage.html
 
 .PHONY: benchmark
 benchmark:
-	go test -short -bench=. ./...
+	$(GOPATH)/bin/godep go test -short -bench=. ./...
 
 .PHONY: gen
 gen:
