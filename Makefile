@@ -5,7 +5,9 @@ ARCH?=$(shell uname -m)
 
 GOFILES = $(shell find . -type f -name '*.go')
 packetbeat: $(GOFILES)
-	go build
+	# first make sure we have godep
+	go get github.com/tools/godep
+	$(GOPATH)/bin/godep go build
 
 go-daemon/god: go-daemon/god.c
 	make -C go-daemon
@@ -26,9 +28,9 @@ getdeps:
 
 .PHONY: deps
 deps:
-	# first make sure we have godep
-	go get github.com/tools/godep
-	$(GOPATH)/bin/godep restore ./...
+	# no longer needed
+	true
+
 
 .PHONY: updatedeps
 updatedeps:
