@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/libbeat/service"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -231,8 +232,13 @@ func main() {
 	go func() {
 		<-sigc
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
-		sniff.Stop()
 	}()
+
+	// Handle the Windows service events
+	go service.ProcessWindowsControlEvents(func() {
+		logp.Debug("signal", "Received svc stop/shutdown request")
+		sniff.Stop()
+	})
 
 	// Startup successful, disable stderr logging if requested by
 	// cmdline flag
