@@ -54,7 +54,7 @@ func Debug(selector string, format string, v ...interface{}) {
 			_log.logger.Output(2, fmt.Sprintf("DBG  "+format, v...))
 		}
 		if _log.toFile {
-			_log.rotator.WriteLine([]byte(fmt.Sprintf("DBG  "+format+"\n", v...)))
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("DBG  "+format, v...)))
 		}
 	}
 }
@@ -72,7 +72,7 @@ func msg(level Priority, prefix string, format string, v ...interface{}) {
 			_log.logger.Output(2, fmt.Sprintf(prefix+format, v...))
 		}
 		if _log.toFile {
-			_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format+"\n", v...)))
+			_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
 		}
 	}
 }

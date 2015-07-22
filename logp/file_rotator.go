@@ -15,8 +15,8 @@ const DefaultRotateEveryBytes = 10 * 1024 * 1024
 type FileRotator struct {
 	Path             string
 	Name             string
-	RotateEveryBytes uint64
-	KeepFiles        int
+	RotateEveryBytes *uint64
+	KeepFiles        *int
 
 	current      *os.File
 	current_size uint64
@@ -44,7 +44,16 @@ func (rotator *FileRotator) CheckIfConfigSane() error {
 	if len(rotator.Name) == 0 {
 		return fmt.Errorf("File logging requires a name for the file names")
 	}
-	if rotator.KeepFiles < 2 || rotator.KeepFiles >= RotatorMaxFiles {
+	if rotator.KeepFiles == nil {
+		rotator.KeepFiles = new(int)
+		*rotator.KeepFiles = DefaultKeepFiles
+	}
+	if rotator.RotateEveryBytes == nil {
+		rotator.RotateEveryBytes = new(uint64)
+		*rotator.RotateEveryBytes = DefaultRotateEveryBytes
+	}
+
+	if *rotator.KeepFiles < 2 || *rotator.KeepFiles >= RotatorMaxFiles {
 		return fmt.Errorf("The number of files to keep should be between 2 and %d", RotatorMaxFiles-1)
 	}
 	return nil
@@ -75,7 +84,7 @@ func (rotator *FileRotator) shouldRotate() bool {
 		return true
 	}
 
-	if rotator.current_size >= rotator.RotateEveryBytes {
+	if rotator.current_size >= *rotator.RotateEveryBytes {
 		return true
 	}
 
@@ -108,7 +117,7 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// delete any extra files, normally we shouldn't have any
-	for file_no := rotator.KeepFiles; file_no < RotatorMaxFiles; file_no++ {
+	for file_no := *rotator.KeepFiles; file_no < RotatorMaxFiles; file_no++ {
 		if rotator.FileExists(file_no) {
 			perr := os.Remove(rotator.FilePath(file_no))
 			if perr != nil {
@@ -118,7 +127,7 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// shift all files from last to first
-	for file_no := rotator.KeepFiles - 1; file_no >= 0; file_no-- {
+	for file_no := *rotator.KeepFiles - 1; file_no >= 0; file_no-- {
 		if !rotator.FileExists(file_no) {
 			// file doesn't exist, don't rotate
 			continue
@@ -146,7 +155,7 @@ func (rotator *FileRotator) Rotate() error {
 	rotator.current_size = 0
 
 	// delete the extra file, ignore errors here
-	file_path = rotator.FilePath(rotator.KeepFiles)
+	file_path = rotator.FilePath(*rotator.KeepFiles)
 	os.Remove(file_path)
 
 	return nil
