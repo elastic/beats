@@ -15,6 +15,8 @@ var debugSelectorsStr *string
 type Logging struct {
 	Selectors []string
 	Files     *FileRotator
+	ToSyslog  *bool
+	ToFiles   *bool
 }
 
 // Init combines the configuration from config with the command line
