@@ -1,4 +1,4 @@
-package fileout
+package logp
 
 import (
 	"bytes"
@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Rotator(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"rotator"})
+		LogInit(LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
@@ -22,13 +22,16 @@ func Test_Rotator(t *testing.T) {
 		return
 	}
 
-	logp.Debug("rotator", "Direcotry: %s", dir)
+	Debug("rotator", "Direcotry: %s", dir)
+
+	rotateeverybytes := uint64(1000)
+	keepfiles := 3
 
 	rotator := FileRotator{
 		Path:             dir,
 		Name:             "packetbeat",
-		RotateEveryBytes: 1000,
-		KeepFiles:        3,
+		RotateEveryBytes: &rotateeverybytes,
+		KeepFiles:        &keepfiles,
 	}
 
 	err = rotator.Rotate()
@@ -104,7 +107,7 @@ func Test_Rotator(t *testing.T) {
 func Test_Rotator_By_Bytes(t *testing.T) {
 
 	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"rotator"})
+		LogInit(LOG_DEBUG, "", false, true, []string{"rotator"})
 	}
 
 	dir, err := ioutil.TempDir("", "test_rotator_")
@@ -113,16 +116,46 @@ func Test_Rotator_By_Bytes(t *testing.T) {
 		return
 	}
 
-	logp.Debug("rotator", "Direcotry: %s", dir)
+	Debug("rotator", "Direcotry: %s", dir)
+
+	rotateeverybytes := uint64(100)
+	keepfiles := 3
 
 	rotator := FileRotator{
 		Path:             dir,
 		Name:             "packetbeat",
-		RotateEveryBytes: 100,
-		KeepFiles:        7,
+		RotateEveryBytes: &rotateeverybytes,
+		KeepFiles:        &keepfiles,
 	}
 
 	for i := 0; i < 300; i++ {
 		rotator.WriteLine([]byte("01234567890"))
 	}
+}
+
+func TestConfigSane(t *testing.T) {
+	rotator := FileRotator{
+		Name: "test",
+	}
+	assert.Nil(t, rotator.CheckIfConfigSane())
+
+	keepfiles := 1023
+	rotator = FileRotator{
+		Name:      "test",
+		KeepFiles: &keepfiles,
+	}
+	assert.Nil(t, rotator.CheckIfConfigSane())
+
+	keepfiles = 10000
+	rotator = FileRotator{
+		Name:      "test",
+		KeepFiles: &keepfiles,
+	}
+	assert.NotNil(t, rotator.CheckIfConfigSane())
+
+	rotator = FileRotator{
+		Name: "",
+	}
+	assert.NotNil(t, rotator.CheckIfConfigSane())
+
 }
