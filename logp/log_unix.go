@@ -30,12 +30,14 @@ const (
 type Logger struct {
 	toSyslog            bool
 	toStderr            bool
+	toFile              bool
 	level               syslog.Priority
 	selectors           map[string]bool
 	debug_all_selectors bool
 
-	logger *log.Logger
-	syslog [syslog.LOG_DEBUG + 1]*log.Logger
+	logger  *log.Logger
+	syslog  [syslog.LOG_DEBUG + 1]*log.Logger
+	rotator *FileRotator
 }
 
 var _log Logger
@@ -54,6 +56,9 @@ func Debug(selector string, format string, v ...interface{}) {
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("DBG  "+format, v...))
 		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("DBG  "+format+"\n", v...)))
+		}
 	}
 }
 
@@ -69,6 +74,9 @@ func Info(format string, v ...interface{}) {
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("INFO "+format, v...))
 		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("INFO  "+format+"\n", v...)))
+		}
 	}
 }
 
@@ -79,6 +87,9 @@ func Warn(format string, v ...interface{}) {
 		}
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("WARN "+format, v...))
+		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("WARN  "+format+"\n", v...)))
 		}
 	}
 }
@@ -91,6 +102,9 @@ func Err(format string, v ...interface{}) {
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("ERR  "+format, v...))
 		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("ERR  "+format+"\n", v...)))
+		}
 	}
 }
 
@@ -102,6 +116,9 @@ func Critical(format string, v ...interface{}) {
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("CRIT "+format, v...))
 		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("CRIT  "+format+"\n", v...)))
+		}
 	}
 }
 
@@ -112,6 +129,9 @@ func WTF(format string, v ...interface{}) {
 		}
 		if _log.toStderr {
 			_log.logger.Output(2, fmt.Sprintf("CRIT "+format, v...))
+		}
+		if _log.toFile {
+			_log.rotator.WriteLine([]byte(fmt.Sprintf("CRIT  "+format+"\n", v...)))
 		}
 	}
 
@@ -136,6 +156,7 @@ func openSyslog(level syslog.Priority, prefix string) *log.Logger {
 	return logger
 }
 
+// TODO: remove toSyslog and toStderr from the init function
 func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
 	_log.toSyslog = toSyslog
 	_log.toStderr = toStderr
@@ -159,6 +180,35 @@ func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugS
 	}
 }
 
-func SetToStderr(toStderr bool) {
+func SetToStderr(toStderr bool, prefix string) {
 	_log.toStderr = toStderr
+	if _log.toStderr {
+		_log.logger = log.New(os.Stdout, prefix, log.Lshortfile)
+	}
+}
+
+func SetToSyslog(toSyslog bool, prefix string) {
+	_log.toSyslog = toSyslog
+	if _log.toSyslog {
+		for prio := syslog.LOG_EMERG; prio <= syslog.LOG_DEBUG; prio++ {
+			_log.syslog[prio] = openSyslog(prio, prefix)
+		}
+	}
+}
+
+func SetToFile(toFile bool, rotator *FileRotator) error {
+	_log.toFile = toFile
+	if _log.toFile {
+		_log.rotator = rotator
+
+		err := rotator.CreateDirectory()
+		if err != nil {
+			return err
+		}
+		err = rotator.CheckIfConfigSane()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
