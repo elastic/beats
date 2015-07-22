@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/elastic/libbeat/logp"
 )
@@ -132,8 +133,17 @@ func (es *Elasticsearch) SetMaxRetries(max_retries int) {
 	es.MaxRetries = max_retries
 }
 
+func isConnTimeout(err error) bool {
+	return strings.Contains(err.Error(), "i/o timeout")
+}
+
+func isConnRefused(err error) bool {
+	return strings.Contains(err.Error(), "connection refused")
+}
+
 // Perform the actual request. If the operation was successful, mark it as live and return the response.
-// If it fails, mark it as dead for a period of time.
+// Mark the Elasticsearch node as dead for a period of time in the case the http request fails with Connection
+// Timeout, Connection Refused or returns one of the 503,504 Error Replies.
 // It returns the response, if it should retry sending the request and the error
 func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]byte, bool, error) {
 
@@ -145,18 +155,24 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 	resp, err := es.client.Do(req)
 	if err != nil {
 		// request fails
-		es.connectionPool.MarkDead(conn)
-		return nil, true, fmt.Errorf("Sending the request fails: %s", err)
+		do_retry := false
+		if isConnTimeout(err) || isConnRefused(err) {
+			es.connectionPool.MarkDead(conn)
+			do_retry = true
+		}
+		return nil, do_retry, fmt.Errorf("Sending the request fails: %s", err)
 	}
 
 	if resp.StatusCode > 299 {
 		// request fails
+		do_retry := false
 		if resp.StatusCode == http.StatusServiceUnavailable ||
 			resp.StatusCode == http.StatusGatewayTimeout {
 			// status code in {503, 504}
 			es.connectionPool.MarkDead(conn)
+			do_retry = true
 		}
-		return nil, false, fmt.Errorf("%v", resp.Status)
+		return nil, do_retry, fmt.Errorf("%v", resp.Status)
 	}
 
 	defer resp.Body.Close()
