@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"runtime"
 	"runtime/pprof"
-	"strings"
 	"syscall"
 	"time"
 
@@ -35,7 +34,9 @@ import (
 	"github.com/elastic/packetbeat/sniffer"
 )
 
-const Version = "1.0.0-beta2"
+// You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
+var Version = "1.0.0-beta2"
+var Name = "packetbeat"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:    new(http.Http),
@@ -77,17 +78,17 @@ func main() {
 	configfile := cmdLine.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
-	debugSelectorsStr := cmdLine.String("d", "", "Enable certain debug selectors")
 	oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
-	toStderr := cmdLine.Bool("e", false, "Output to stdout instead of syslog")
 	topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
 	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
-	verbose := cmdLine.Bool("v", false, "Log at INFO level")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
 	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
 	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
 	testConfig := cmdLine.Bool("test", false, "Test configuration and exit.")
+
+	// Adds logging specific flags
+	logp.CmdLineFlags(cmdLine)
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -98,19 +99,9 @@ func main() {
 		return
 	}
 
-	logLevel := logp.LOG_ERR
-	if *verbose {
-		logLevel = logp.LOG_INFO
-	}
-
-	debugSelectors := []string{}
-	if len(*debugSelectorsStr) > 0 {
-		debugSelectors = strings.Split(*debugSelectorsStr, ",")
-		logLevel = logp.LOG_DEBUG
-	}
-
 	var err error
 
+	// configuration file
 	filecontent, err := ioutil.ReadFile(*configfile)
 	if err != nil {
 		fmt.Printf("Fail to read %s: %s. Exiting.\n", *configfile, err)
@@ -121,15 +112,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if len(debugSelectors) == 0 {
-		debugSelectors = config.ConfigSingleton.Logging.Selectors
-	}
-	logp.LogInit(logp.Priority(logLevel), "", !*toStderr, true, debugSelectors)
-
-	if !logp.IsDebug("stdlog") {
-		// disable standard logging by default
-		log.SetOutput(ioutil.Discard)
-	}
+	logp.Init(Name, &config.ConfigSingleton.Logging)
 
 	// CLI flags over-riding config
 	if *topSpeed {
@@ -251,10 +234,9 @@ func main() {
 		sniff.Stop()
 	}()
 
-	if !*toStderr {
-		logp.Info("Startup successful, sending output only to syslog from now on")
-		logp.SetToStderr(false)
-	}
+	// Startup successful, disable stderr logging if requested by
+	// cmdline flag
+	logp.SetStderr()
 
 	logp.Debug("main", "Waiting for the sniffer to finish")
 
