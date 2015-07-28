@@ -64,10 +64,10 @@ func IsDebug(selector string) bool {
 func msg(level Priority, prefix string, format string, v ...interface{}) {
 	if _log.level >= level {
 		if _log.toSyslog {
-			_log.syslog[level].Output(2, fmt.Sprintf(format, v...))
+			_log.syslog[level].Output(3, fmt.Sprintf(format, v...))
 		}
 		if _log.toStderr {
-			_log.logger.Output(2, fmt.Sprintf(prefix+format, v...))
+			_log.logger.Output(3, fmt.Sprintf(prefix+format, v...))
 		}
 		if _log.toFile {
 			_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
