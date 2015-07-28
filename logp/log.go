@@ -76,19 +76,19 @@ func msg(level Priority, prefix string, format string, v ...interface{}) {
 }
 
 func Info(format string, v ...interface{}) {
-	msg(LOG_INFO, "INFO ", format, v)
+	msg(LOG_INFO, "INFO ", format, v...)
 }
 
 func Warn(format string, v ...interface{}) {
-	msg(LOG_WARNING, "WARN ", format, v)
+	msg(LOG_WARNING, "WARN ", format, v...)
 }
 
 func Err(format string, v ...interface{}) {
-	msg(LOG_ERR, "ERR ", format, v)
+	msg(LOG_ERR, "ERR ", format, v...)
 }
 
 func Critical(format string, v ...interface{}) {
-	msg(LOG_CRIT, "CRIT ", format, v)
+	msg(LOG_CRIT, "CRIT ", format, v...)
 }
 
 // WTF prints the message at CRIT level and panics immediately with the same
