@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -690,7 +691,11 @@ func (mysql *Mysql) expireTransaction(trans *MysqlTransaction) {
 
 func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
-	length := read_length(data, 0)
+	length, err := read_length(data, 0)
+	if err != nil {
+		logp.Warn("Invalid response: %v", err)
+		return []string{}, [][]string{}
+	}
 	if length < 1 {
 		logp.Warn("Warning: Skipping empty Response")
 		return []string{}, [][]string{}
@@ -698,6 +703,11 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 	fields := []string{}
 	rows := [][]string{}
+
+	if len(data) < 5 {
+		logp.Warn("Invalid response: data less than 4 bytes")
+		return []string{}, [][]string{}
+	}
 
 	if uint8(data[4]) == 0x00 {
 		// OK response
@@ -710,7 +720,16 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 		// Read fields
 		for {
-			length = read_length(data, offset)
+			length, err = read_length(data, offset)
+			if err != nil {
+				logp.Warn("Invalid response: %v", err)
+				return []string{}, [][]string{}
+			}
+
+			if len(data[offset:]) < 5 {
+				logp.Warn("Invalid response.")
+				return []string{}, [][]string{}
+			}
 
 			if uint8(data[offset+4]) == 0xfe {
 				// EOF
@@ -720,38 +739,42 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 			_ /* catalog */, off, complete, err := read_lstring(data, offset+4)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*database*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*table*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*org table*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			name, off, complete, err := read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /* org name */, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 
 			fields = append(fields, string(name))
 
 			offset += length + 4
+			if len(data) < offset {
+				logp.Warn("Invalid response.")
+				return []string{}, [][]string{}
+			}
 		}
 
 		// Read rows
@@ -759,13 +782,22 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 			var row []string
 			var row_len int
 
+			if len(data[offset:]) < 5 {
+				logp.Warn("Invalid response.")
+				break
+			}
+
 			if uint8(data[offset+4]) == 0xfe {
 				// EOF
 				offset += length + 4
 				break
 			}
 
-			length = read_length(data, offset)
+			length, err = read_length(data, offset)
+			if err != nil {
+				logp.Warn("Invalid response: %v", err)
+				break
+			}
 			off := offset + 4 // skip length + packet number
 			start := off
 			for off < start+length {
@@ -793,6 +825,8 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 					row_len += len(text)
 				}
 			}
+
+			logp.Debug("mysqldetailed", "Append row: %v", row)
 
 			rows = append(rows, row)
 			if len(rows) >= mysql.maxStoreRows {
@@ -859,7 +893,7 @@ func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {
 	return data[off : off+int(length)], off + int(length), true, nil
 }
 func read_linteger(data []byte, offset int) (uint64, int, bool, error) {
-	if len(data) == 0 {
+	if len(data) < offset+1 {
 		return 0, 0, false, nil
 	}
 	switch uint8(data[offset]) {
@@ -892,9 +926,13 @@ func read_linteger(data []byte, offset int) (uint64, int, bool, error) {
 	return uint64(data[offset]), offset + 1, true, nil
 }
 
-func read_length(data []byte, offset int) int {
+// Read a mysql length field (3 bytes LE)
+func read_length(data []byte, offset int) (int, error) {
+	if len(data[offset:]) < 3 {
+		return 0, errors.New("Data too small to contain a valid length")
+	}
 	length := uint32(data[offset]) |
 		uint32(data[offset+1])<<8 |
 		uint32(data[offset+2])<<16
-	return int(length)
+	return int(length), nil
 }
