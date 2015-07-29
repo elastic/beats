@@ -13,6 +13,7 @@ addonsbefore_install:
     - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
 
 install:
+    - make deps
     - make
 
 script: make testlong
