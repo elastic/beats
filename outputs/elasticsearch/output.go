@@ -114,7 +114,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 func (out *ElasticsearchOutput) EnableTTL() error {
 
 	// make sure the .packetbeat-topology index exists
-	out.Conn.CreateIndex(".packetbeat-topology")
+	out.Conn.CreateIndex(".packetbeat-topology", nil)
 
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
