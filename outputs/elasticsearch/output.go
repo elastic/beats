@@ -20,6 +20,8 @@ type ElasticsearchOutput struct {
 
 	TopologyMap  map[string]string
 	sendingQueue chan EventMsg
+
+	ttlEnabled bool
 }
 
 type PublishedTopology struct {
@@ -84,10 +86,22 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
 	}
 
-	err := out.EnableTTL()
-	if err != nil {
-		logp.Err("Fail to set _ttl mapping: %s", err)
-		return err
+	if config.Save_topology {
+		err := out.EnableTTL()
+		if err != nil {
+			logp.Err("Fail to set _ttl mapping: %s", err)
+			// keep trying in the background
+			go func() {
+				for {
+					err := out.EnableTTL()
+					if err == nil {
+						break
+					}
+					logp.Err("Fail to set _ttl mapping: %s", err)
+					time.Sleep(5 * time.Second)
+				}
+			}()
+		}
 	}
 
 	out.sendingQueue = make(chan EventMsg, 1000)
@@ -112,6 +126,9 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 	if err != nil {
 		return err
 	}
+
+	out.ttlEnabled = true
+
 	return nil
 }
 
@@ -181,6 +198,11 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 
 // Each shipper publishes a list of IPs together with its name to Elasticsearch
 func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
+	if !out.ttlEnabled {
+		logp.Debug("output_elasticsearch", "Not publishing IPs because TTL was not yet confirmed to be enabled")
+		return nil
+	}
+
 	logp.Debug("output_elasticsearch", "Publish IPs %s with expiration time %d", localAddrs, out.TopologyExpire)
 	params := map[string]string{
 		"ttl":     fmt.Sprintf("%dms", out.TopologyExpire),
