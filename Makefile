@@ -2,12 +2,13 @@ BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
 VERSION?=1.0.0-beta2
 ARCH?=$(shell uname -m)
+GODEP=$(GOPATH)/bin/godep
 
 GOFILES = $(shell find . -type f -name '*.go')
 packetbeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
-	$(GOPATH)/bin/godep go build
+	$(GODEP) go build
 
 go-daemon/god: go-daemon/god.c
 	make -C go-daemon
@@ -34,7 +35,7 @@ deps:
 
 .PHONY: updatedeps
 updatedeps:
-	godep update ...
+	$(GODEP) update ...
 
 .PHONY: install
 install: packetbeat go-daemon/god
@@ -69,7 +70,7 @@ gofmt:
 
 .PHONY: test
 test:
-	$(GOPATH)/bin/godep go test -short ./...
+	$(GODEP) go test -short ./...
 	make -C tests test
 
 .PHONY: autotest
@@ -79,18 +80,18 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	$(GOPATH)/bin/godep go test ./...
+	$(GODEP) go test ./...
 	make -C tests test
 
 .PHONY: cover
 cover:
 	mkdir -p cover
-	./scripts/coverage.sh
-	$(GOPATH)/bin/godep go tool cover -html=profile.cov -o cover/coverage.html
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) ./scripts/coverage.sh
+	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
 
 .PHONY: benchmark
 benchmark:
-	$(GOPATH)/bin/godep go test -short -bench=. ./...
+	$(GODEP) go test -short -bench=. ./...
 
 .PHONY: gen
 gen:
