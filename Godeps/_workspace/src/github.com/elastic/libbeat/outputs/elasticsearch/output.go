@@ -86,20 +86,22 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
 	}
 
-	err := out.EnableTTL()
-	if err != nil {
-		logp.Err("Fail to set _ttl mapping: %s", err)
-		// keep trying in the background
-		go func() {
-			for {
-				err := out.EnableTTL()
-				if err == nil {
-					break
+	if config.Save_topology {
+		err := out.EnableTTL()
+		if err != nil {
+			logp.Err("Fail to set _ttl mapping: %s", err)
+			// keep trying in the background
+			go func() {
+				for {
+					err := out.EnableTTL()
+					if err == nil {
+						break
+					}
+					logp.Err("Fail to set _ttl mapping: %s", err)
+					time.Sleep(5 * time.Second)
 				}
-				logp.Err("Fail to set _ttl mapping: %s", err)
-				time.Sleep(5 * time.Second)
-			}
-		}()
+			}()
+		}
 	}
 
 	out.sendingQueue = make(chan EventMsg, 1000)
@@ -112,7 +114,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 func (out *ElasticsearchOutput) EnableTTL() error {
 
 	// make sure the .packetbeat-topology index exists
-	out.Conn.CreateIndex(".packetbeat-topology")
+	out.Conn.CreateIndex(".packetbeat-topology", nil)
 
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{

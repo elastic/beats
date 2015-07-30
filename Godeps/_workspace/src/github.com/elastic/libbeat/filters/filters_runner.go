@@ -1,10 +1,9 @@
-package main
+package filters
 
 import (
 	"fmt"
 
 	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/logp"
 )
 
@@ -16,12 +15,12 @@ type FilterRunner struct {
 	// The order in which the plugins are
 	// executed. A filter plugin can be loaded
 	// more than once.
-	order []filters.FilterPlugin
+	order []FilterPlugin
 }
 
 // Goroutine that reads the objects from the FiltersQueue,
 // executes all filters on them and writes the modified objects
-// int he results channel.
+// in the results channel.
 func (runner *FilterRunner) Run() error {
 	for event := range runner.FiltersQueue {
 		for _, plugin := range runner.order {
@@ -39,7 +38,7 @@ func (runner *FilterRunner) Run() error {
 }
 
 // Create a new FilterRunner
-func NewFilterRunner(results chan common.MapStr, order []filters.FilterPlugin) *FilterRunner {
+func NewFilterRunner(results chan common.MapStr, order []FilterPlugin) *FilterRunner {
 	runner := new(FilterRunner)
 	runner.results = results
 	runner.order = order
@@ -49,9 +48,9 @@ func NewFilterRunner(results chan common.MapStr, order []filters.FilterPlugin) *
 
 // LoadConfiguredFilters interprets the [filters] configuration, loads the configured
 // plugins and returns the order in which they need to be executed.
-func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugin, error) {
+func LoadConfiguredFilters(config map[string]interface{}) ([]FilterPlugin, error) {
 	var err error
-	plugins := []filters.FilterPlugin{}
+	plugins := []FilterPlugin{}
 
 	filters_list, exists := config["filters"]
 	if !exists {
@@ -68,11 +67,11 @@ func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugi
 			return nil, fmt.Errorf("Expected the filters array to only contain strings")
 		}
 		cfg, exists := config[filter]
-		var plugin_type filters.Filter
+		var plugin_type Filter
 		var plugin_config map[string]interface{}
 		if !exists {
 			// Maybe default configuration by name
-			plugin_type, err = filters.FilterFromName(filter)
+			plugin_type, err = FilterFromName(filter)
 			if err != nil {
 				return nil, fmt.Errorf("No such filter type and no corresponding configuration: %s", filter)
 			}
@@ -86,13 +85,13 @@ func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugi
 			if !ok {
 				return nil, fmt.Errorf("Couldn't get type for filter: %s", filter)
 			}
-			plugin_type, err = filters.FilterFromName(type_str)
+			plugin_type, err = FilterFromName(type_str)
 			if err != nil {
 				return nil, fmt.Errorf("No such filter type: %s", type_str)
 			}
 		}
 
-		filter_plugin := filters.Filters.Get(plugin_type)
+		filter_plugin := Filters.Get(plugin_type)
 		if filter_plugin == nil {
 			return nil, fmt.Errorf("No plugin loaded for %s", plugin_type)
 		}
@@ -106,4 +105,37 @@ func LoadConfiguredFilters(config map[string]interface{}) ([]filters.FilterPlugi
 	}
 
 	return plugins, nil
+}
+
+func FiltersRun(config common.MapStr, plugins map[Filter]FilterPlugin,
+	next chan common.MapStr, stopCb func()) (input chan common.MapStr, err error) {
+
+	logp.Debug("filters", "Initializing filters plugins")
+
+	for filter, plugin := range plugins {
+		Filters.Register(filter, plugin)
+	}
+	filters_plugins, err :=
+		LoadConfiguredFilters(config)
+	if err != nil {
+		return nil, fmt.Errorf("Error loading filters plugins: %v", err)
+	}
+	logp.Debug("filters", "Filters plugins order: %v", filters_plugins)
+
+	if len(filters_plugins) > 0 {
+		runner := NewFilterRunner(next, filters_plugins)
+		go func() {
+			err := runner.Run()
+			if err != nil {
+				logp.Critical("Filters runner failed: %v", err)
+				// shutting down
+				stopCb()
+			}
+		}()
+		input = runner.FiltersQueue
+	} else {
+		input = next
+	}
+
+	return input, nil
 }

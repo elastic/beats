@@ -283,16 +283,18 @@ func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
 	return ReadQueryResult(resp)
 }
 
-// Adds a typed JSON document in a specific index, making it searchable.
-// Implements: <http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html>
-func (es *Elasticsearch) CreateIndex(index string) (*QueryResult, error) {
+// Creates a new index, optionally with settings and mappings passed in
+// the body.
+// Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
+//
+func (es *Elasticsearch) CreateIndex(index string, body interface{}) (*QueryResult, error) {
 
 	path, err := MakePath(index, "", "")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.Request("PUT", path, nil, nil)
+	resp, err := es.Request("PUT", path, nil, body)
 	if err != nil {
 		return nil, err
 	}

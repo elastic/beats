@@ -13,7 +13,7 @@ class Test(TestCase):
         )
 
         self.run_packetbeat(pcap="mysql_with_whitespaces.pcap",
-                            debug_selectors=["main"])
+                            debug_selectors=["main", "filters"])
 
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
