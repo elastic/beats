@@ -232,6 +232,7 @@ func main() {
 	go func() {
 		<-sigc
 		logp.Debug("signal", "Received sigterm/sigint, stopping")
+		sniff.Stop()
 	}()
 
 	// Handle the Windows service events
