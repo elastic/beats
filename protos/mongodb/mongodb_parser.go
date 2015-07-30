@@ -88,7 +88,7 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	numberReturned, err := d.readInt32()
 	m.event["numberReturned"] = numberReturned
 
-	logp.Debug("mongodb", "Prepare to read %i document from reply", m.event["numberReturned"])
+	logp.Debug("mongodb", "Prepare to read %d document from reply", m.event["numberReturned"])
 
 	documents := make([]interface{}, numberReturned)
 	for i := 0; i < numberReturned; i++ {
@@ -99,6 +99,10 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 		if i == 0 {
 			if mongoError, present := document["$err"]; present {
 				m.error, err = doc2str(mongoError)
+			}
+
+			if writeErrors, present := document["writeErrors"]; present {
+				m.error, err = doc2str(writeErrors)
 			}
 		}
 
