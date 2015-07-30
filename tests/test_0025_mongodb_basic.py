@@ -185,3 +185,20 @@ class Test(TestCase):
         assert len([o for o in objs if o["method"] == "update"]) == 1
         assert len([o for o in objs if o["method"] == "findandmodify"]) == 1
         assert len([o for o in objs if o["method"] == "listCollections"]) == 5
+
+    def test_write_errors(self):
+        """
+        Should set status=Error on a bulk write that returns errors.
+        """
+        self.render_config_template(
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongodb_insert_duplicate_key.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        o = objs[0]
+        assert o["type"] == "mongodb"
+        assert o["method"] == "insert"
+        assert o["status"] == "Error"
+        assert len(o["mongodb.error"]) > 0
