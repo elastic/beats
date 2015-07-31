@@ -31,7 +31,10 @@ agent:
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
- device: any
+ device: lo0
+
+filter:
+  filters: ["nop"]
 
 
 ############################# Protocols ######################################

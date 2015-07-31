@@ -3,18 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
-	"os/signal"
 	"runtime"
-	"runtime/pprof"
-	"syscall"
 	"time"
 
-	"gopkg.in/yaml.v2"
-
-	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
@@ -52,44 +45,22 @@ var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.F
 	filters.NopFilter: new(nop.Nop),
 }
 
-func writeHeapProfile(filename string) {
-	f, err := os.Create(filename)
-	if err != nil {
-		logp.Err("Failed creating file %s: %s", filename, err)
-		return
-	}
-	pprof.WriteHeapProfile(f)
-	f.Close()
-
-	logp.Info("Created memory profile file %s.", filename)
-}
-
-func debugMemStats() {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	logp.Debug("mem", "Memory stats: In use: %d Total (even if freed): %d System: %d",
-		m.Alloc, m.TotalAlloc, m.Sys)
-}
-
 func main() {
 
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	configfile := cmdLine.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
+	cfgfile.CmdLineFlags(cmdLine)
+	logp.CmdLineFlags(cmdLine)
+	service.CmdLineFlags(cmdLine)
+
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
 	topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
 	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
-	memprofile := cmdLine.String("memprofile", "", "Write memory profile to this file")
-	cpuprofile := cmdLine.String("cpuprofile", "", "Write cpu profile to file")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
-	testConfig := cmdLine.Bool("test", false, "Test configuration and exit.")
-
-	// Adds logging specific flags
-	logp.CmdLineFlags(cmdLine)
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -100,18 +71,7 @@ func main() {
 		return
 	}
 
-	var err error
-
-	// configuration file
-	filecontent, err := ioutil.ReadFile(*configfile)
-	if err != nil {
-		fmt.Printf("Fail to read %s: %s. Exiting.\n", *configfile, err)
-		os.Exit(1)
-	}
-	if err = yaml.Unmarshal(filecontent, &config.ConfigSingleton); err != nil {
-		fmt.Printf("YAML config parsing failed on %s: %s. Exiting.\n", *configfile, err)
-		os.Exit(1)
-	}
+	err := cfgfile.Read(&config.ConfigSingleton)
 
 	logp.Init(Name, &config.ConfigSingleton.Logging)
 
@@ -128,7 +88,6 @@ func main() {
 		config.ConfigSingleton.Interfaces.Dumpfile = *dumpfile
 	}
 
-	logp.Debug("main", "Configuration %s", config.ConfigSingleton)
 	logp.Debug("main", "Initializing output plugins")
 	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
 		config.ConfigSingleton.Shipper); err != nil {
@@ -159,32 +118,19 @@ func main() {
 
 	over := make(chan bool)
 
-	logp.Debug("main", "Initializing filters plugins")
-	for filter, plugin := range EnabledFilterPlugins {
-		filters.Filters.Register(filter, plugin)
+	stopCb := func() {
+		sniff.Stop()
 	}
-	filters_plugins, err :=
-		LoadConfiguredFilters(config.ConfigSingleton.Filter)
+
+	logp.Debug("main", "Initializing filters")
+	afterInputsQueue, err := filters.FiltersRun(
+		config.ConfigSingleton.Filter,
+		EnabledFilterPlugins,
+		publisher.Publisher.Queue,
+		stopCb)
 	if err != nil {
-		logp.Critical("Error loading filters plugins: %v", err)
+		logp.Critical("%v", err)
 		os.Exit(1)
-	}
-	logp.Debug("main", "Filters plugins order: %v", filters_plugins)
-	var afterInputsQueue chan common.MapStr
-	if len(filters_plugins) > 0 {
-		runner := NewFilterRunner(publisher.Publisher.Queue, filters_plugins)
-		go func() {
-			err := runner.Run()
-			if err != nil {
-				logp.Critical("Filters runner failed: %v", err)
-				// shutting down
-				sniff.Stop()
-			}
-		}()
-		afterInputsQueue = runner.FiltersQueue
-	} else {
-		// short-circuit the runner
-		afterInputsQueue = publisher.Publisher.Queue
 	}
 
 	logp.Debug("main", "Initializing sniffer")
@@ -202,19 +148,11 @@ func main() {
 
 	// Up to here was the initialization, now about running
 
-	if *testConfig {
+	if cfgfile.IsTestConfig() {
 		// all good, exit with 0
 		os.Exit(0)
 	}
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
+	service.BeforeRun()
 
 	// run the sniffer in background
 	go func() {
@@ -226,20 +164,7 @@ func main() {
 		over <- true
 	}()
 
-	// On ^C or SIGTERM, gracefully stop the sniffer
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigc
-		logp.Debug("signal", "Received sigterm/sigint, stopping")
-		sniff.Stop()
-	}()
-
-	// Handle the Windows service events
-	go service.ProcessWindowsControlEvents(func() {
-		logp.Debug("signal", "Received svc stop/shutdown request")
-		sniff.Stop()
-	})
+	service.HandleSignals(stopCb)
 
 	// Startup successful, disable stderr logging if requested by
 	// cmdline flag
@@ -256,14 +181,10 @@ func main() {
 
 	logp.Debug("main", "Cleanup")
 
-	if *memprofile != "" {
+	if service.WithMemProfile() {
 		// wait for all TCP streams to expire
 		time.Sleep(tcp.TCP_STREAM_EXPIRY * 1.2)
 		tcp.PrintTcpMap()
-		runtime.GC()
-
-		writeHeapProfile(*memprofile)
-
-		debugMemStats()
 	}
+	service.Cleanup()
 }

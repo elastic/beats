@@ -1,17 +1,36 @@
-package main
+package filters
 
 import (
 	"testing"
 
 	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/filters"
-	"github.com/elastic/libbeat/filters/nop"
 
 	"github.com/stretchr/testify/assert"
 )
 
+// Nop filter for testing purposes
+type Nop struct {
+	name string
+}
+
+func (nop *Nop) New(name string, config map[string]interface{}) (FilterPlugin, error) {
+	return &Nop{name: name}, nil
+}
+
+func (nop *Nop) Filter(event common.MapStr) (common.MapStr, error) {
+	return event, nil
+}
+
+func (nop *Nop) String() string {
+	return nop.name
+}
+
+func (nop *Nop) Type() Filter {
+	return NopFilter
+}
+
 func loadPlugins() {
-	filters.Filters.Register(filters.NopFilter, new(nop.Nop))
+	Filters.Register(NopFilter, new(Nop))
 }
 
 func TestFilterRunner(t *testing.T) {
@@ -19,13 +38,13 @@ func TestFilterRunner(t *testing.T) {
 
 	output := make(chan common.MapStr, 10)
 
-	filter1, err := new(nop.Nop).New("nop1", map[string]interface{}{})
+	filter1, err := new(Nop).New("nop1", map[string]interface{}{})
 	assert.Nil(t, err)
 
-	filter2, err := new(nop.Nop).New("nop2", map[string]interface{}{})
+	filter2, err := new(Nop).New("nop2", map[string]interface{}{})
 	assert.Nil(t, err)
 
-	runner := NewFilterRunner(output, []filters.FilterPlugin{filter1, filter2})
+	runner := NewFilterRunner(output, []FilterPlugin{filter1, filter2})
 	assert.NotNil(t, runner)
 
 	go runner.Run()
@@ -45,7 +64,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 
 	type o struct {
 		Name string
-		Type filters.Filter
+		Type Filter
 	}
 
 	type io struct {
@@ -68,11 +87,11 @@ func TestLoadConfiguredFilters(t *testing.T) {
 			Output: []o{
 				o{
 					Name: "nop1",
-					Type: filters.NopFilter,
+					Type: NopFilter,
 				},
 				o{
 					Name: "nop2",
-					Type: filters.NopFilter,
+					Type: NopFilter,
 				},
 			},
 		},
@@ -87,11 +106,11 @@ func TestLoadConfiguredFilters(t *testing.T) {
 			Output: []o{
 				o{
 					Name: "nop",
-					Type: filters.NopFilter,
+					Type: NopFilter,
 				},
 				o{
 					Name: "sample1",
-					Type: filters.NopFilter,
+					Type: NopFilter,
 				},
 			},
 		},
