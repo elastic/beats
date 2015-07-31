@@ -1,8 +1,8 @@
 libbeat
 =======
 
-[![Build
-Status](https://travis-ci.org/elastic/libbeat.svg?branch=master)](https://travis-ci.org/elastic/libbeat)
+[![Jenkins Build
+Status](http://build-eu-00.elastic.co/job/libbeat/badge/icon)](http://build-eu-00.elastic.co/job/libbeat/) [![Travis Build Status](https://travis-ci.org/elastic/libbeat.svg?branch=master)](https://travis-ci.org/elastic/libbeat)
 
 The Beats are a collection of daemons that ship data from your servers to
 Elasticsearch. Read more about Beats on the
