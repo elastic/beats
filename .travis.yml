@@ -13,7 +13,7 @@ addonsbefore_install:
     - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
 
 before_script:
-    - sleep 10 
+    - sleep 10
 
 install:
     - make deps

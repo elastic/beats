@@ -187,6 +187,12 @@ func TestEvents(t *testing.T) {
 	event["redis"] = r
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
+	elasticsearchOutput.Conn.CreateIndex(index, common.MapStr{
+		"settings": common.MapStr{
+			"number_of_shards":   1,
+			"number_of_replicas": 0,
+		},
+	})
 
 	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
