@@ -24,9 +24,21 @@ var Name = "topbeat"
 
 type Topbeat struct {
 	isAlive bool
-	period  int // seconds
+	period  time.Duration
 
 	events chan common.MapStr
+}
+
+func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
+
+	if config.Period != nil {
+		t.period = time.Duration(*config.Period) * time.Second
+	} else {
+		t.period = 1 * time.Second
+	}
+	logp.Debug("topbeat", "Period %v\n", t.period)
+	t.events = events
+	return nil
 }
 
 func (t *Topbeat) Run() error {
@@ -89,17 +101,6 @@ func (t *Topbeat) Stop() {
 func (t *Topbeat) IsAlive() bool {
 
 	return t.isAlive
-}
-
-func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
-
-	if config.Period != nil {
-		t.period = *config.Period
-	} else {
-		t.period = 1
-	}
-	t.events = events
-	return nil
 }
 
 func main() {

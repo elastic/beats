@@ -7,7 +7,7 @@ import (
 )
 
 type TopConfig struct {
-	Period *int
+	Period *int64
 }
 
 type ConfigSettings struct {
