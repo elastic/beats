@@ -14,7 +14,11 @@ know about before implementing the change.
 
 We enjoy working with contributors to get their code accepted. There are many
 approaches to fixing a problem and it is important to find the best approach
-before writing too much code.
+before writing too much code. In particular, we are very likely to reject pull
+requests that add a new output type (libbeat output for kafka, riemann, etc.).
+The reason is that maintaining all these outputs would involve a significant
+effort which is already spent in Logstash. You can use Logstash as a gateway
+to lots of already supported systems.
 
 The process for contributing to any of the Elastic projects is similar.
 
