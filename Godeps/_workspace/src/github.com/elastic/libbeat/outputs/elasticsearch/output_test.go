@@ -122,6 +122,12 @@ func TestOneEvent(t *testing.T) {
 
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
 	logp.Debug("output_elasticsearch", "index = %s", index)
+	elasticsearchOutput.Conn.CreateIndex(index, common.MapStr{
+		"settings": common.MapStr{
+			"number_of_shards":   1,
+			"number_of_replicas": 0,
+		},
+	})
 
 	err := elasticsearchOutput.PublishEvent(ts, event)
 	if err != nil {
