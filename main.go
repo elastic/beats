@@ -13,9 +13,6 @@ import (
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
 	"github.com/monicasarbu/gotop/cpu"
-	"github.com/monicasarbu/gotop/load"
-	"github.com/monicasarbu/gotop/mem"
-	"github.com/monicasarbu/gotop/proc"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
@@ -49,35 +46,46 @@ func (t *Topbeat) Run() error {
 	for t.isAlive {
 		time.Sleep(1 * time.Second)
 
-		load_stat, err := load.Load()
+		load_stat, err := GetSystemLoad()
 		if err != nil {
-			logp.Err("Error reading load statistics: %v", err)
+			logp.Err("Fail to get load statistics: %v", err)
+			continue
+		}
+		cpu_stat, err := GetCpuTimes()
+		if err != nil {
+			logp.Err("Fail to get cpu times: %v", err)
 			continue
 		}
 
-		cpu_stat, err := cpu.Cpu_times_percent(0)
+		mem_stat, err := GetMemory()
 		if err != nil {
-			logp.Err("Error reading cpu times: %v", err)
+			logp.Err("Fail to get memory details: %v", err)
 			continue
 		}
-
-		mem_stat, err := mem.Virtual_memory()
+		swap_stat, err := GetSwap()
 		if err != nil {
-			logp.Err("Error reading memory statistics: %v", err)
-			continue
+			logp.Err("Fail to get swap details: %v", err)
 		}
 
-		pids := proc.Pids()
-		procs := []proc.Process{}
+		pids, err := Pids()
+		if err != nil {
+			logp.Err("Fail to get the list of pids: %v", err)
+		}
+		procs := []Process{}
+		procs_ignored := 0
 
 		for _, pid := range pids {
-			process, err := proc.GetProcess(pid)
+			process, err := GetProcess(pid)
 			if err != nil {
 				logp.Err("Error geting the process %d: %v", pid, err)
+				procs_ignored += 1
 				continue
 			}
 			procs = append(procs, *process)
+			logp.Debug("topbeat", "Process: %s", process)
 		}
+
+		logp.Debug("topbeat", "Processes %d, ignored %d", len(pids), procs_ignored)
 
 		event := common.MapStr{
 			"timestamp": common.Time(time.Now()),
@@ -85,6 +93,7 @@ func (t *Topbeat) Run() error {
 			"load":      load_stat,
 			"cpu":       cpu_stat,
 			"mem":       mem_stat,
+			"swap":      swap_stat,
 			"procs":     procs,
 		}
 
