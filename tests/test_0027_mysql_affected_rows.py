@@ -1,5 +1,4 @@
 from pbtests.packetbeat import TestCase
-from nose.tools import nottest
 
 
 class Test(TestCase):
