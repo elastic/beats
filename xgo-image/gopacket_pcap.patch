@@ -1,0 +1,22 @@
+diff --git a/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go b/Godeps/_workspace/src/github.
+index d2465bb..7b23b84 100644
+--- a/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go
++++ b/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go
+@@ -8,12 +8,13 @@
+ package pcap
+
+ /*
+-#cgo linux LDFLAGS: -lpcap
++#cgo linux,386 LDFLAGS: /libpcap/i386/usr/lib/i386-linux-gnu/libpcap.a
++#cgo linux,amd64 LDFLAGS: /libpcap/amd64/usr/lib/x86_64-linux-gnu/libpcap.a
+ #cgo freebsd LDFLAGS: -lpcap
+ #cgo darwin LDFLAGS: -lpcap
+-#cgo windows CFLAGS: -I C:/WpdPack/Include
+-#cgo windows,386 LDFLAGS: -L C:/WpdPack/Lib -lwpcap
+-#cgo windows,amd64 LDFLAGS: -L C:/WpdPack/Lib/x64 -lwpcap
++#cgo windows CFLAGS: -I /libpcap/win/WpdPack/Include
++#cgo windows,386 LDFLAGS: -L /libpcap/win/WpdPack/Lib -lwpcap
++#cgo windows,amd64 LDFLAGS: -L /libpcap/win/WpdPack/Lib/x64 -lwpcap
+ #include <stdlib.h>
+ #include <pcap.h>
+
