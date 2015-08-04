@@ -2,7 +2,6 @@ package tcp
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/elastic/packetbeat/protos"
 
-	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
 )
 
@@ -23,25 +21,29 @@ const (
 	TcpDirectionOriginal = 1
 )
 
-var __id uint32 = 0
-
-func GetId() uint32 {
-	__id += 1
-	return __id
+type Tcp struct {
+	id         uint32
+	streamsMap map[common.HashableIpPortTuple]*TcpStream
+	portMap    map[uint16]protos.Protocol
+	protocols  protos.Protocols
 }
 
-// Config
+type Processor interface {
+	Process(tcphdr *layers.TCP, pkt *protos.Packet)
+}
 
-var tcpStreamsMap = make(map[common.HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
-var tcpPortMap map[uint16]protos.Protocol
+func (tcp *Tcp) getId() uint32 {
+	tcp.id += 1
+	return tcp.id
+}
 
-func decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
-	protocol, exists := tcpPortMap[tuple.Src_port]
+func (tcp *Tcp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
+	protocol, exists := tcp.portMap[tuple.Src_port]
 	if exists {
 		return protocol
 	}
 
-	protocol, exists = tcpPortMap[tuple.Dst_port]
+	protocol, exists = tcp.portMap[tuple.Dst_port]
 	if exists {
 		return protocol
 	}
@@ -55,6 +57,7 @@ type TcpStream struct {
 	timer    *time.Timer
 	protocol protos.Protocol
 	tcptuple common.TcpTuple
+	tcp      *Tcp
 
 	lastSeq [2]uint32
 
@@ -70,7 +73,7 @@ func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, origi
 	}
 	stream.timer = time.AfterFunc(TCP_STREAM_EXPIRY, func() { stream.Expire() })
 
-	mod := protos.Protos.Get(stream.protocol)
+	mod := stream.tcp.protocols.GetTcp(stream.protocol)
 	if mod == nil {
 		logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s", stream.protocol)
 		return
@@ -86,7 +89,7 @@ func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, origi
 }
 
 func (stream *TcpStream) GapInStream(original_dir uint8, nbytes int) (drop bool) {
-	mod := protos.Protos.Get(stream.protocol)
+	mod := stream.tcp.protocols.GetTcp(stream.protocol)
 	stream.Data, drop = mod.GapInStream(&stream.tcptuple, original_dir, nbytes, stream.Data)
 	return drop
 }
@@ -96,7 +99,7 @@ func (stream *TcpStream) Expire() {
 	logp.Debug("mem", "Tcp stream expired")
 
 	// de-register from dict
-	delete(tcpStreamsMap, stream.tuple.Hashable())
+	delete(stream.tcp.streamsMap, stream.tuple.Hashable())
 
 	// nullify to help the GC
 	stream.Data = nil
@@ -110,19 +113,19 @@ func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) <= 0
 }
 
-func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
+func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 
 	// This Recover should catch all exceptions in
 	// protocol modules.
 	defer logp.Recover("FollowTcp exception")
 
-	stream, exists := tcpStreamsMap[pkt.Tuple.Hashable()]
+	stream, exists := tcp.streamsMap[pkt.Tuple.Hashable()]
 	var original_dir uint8 = TcpDirectionOriginal
 	created := false
 	if !exists {
-		stream, exists = tcpStreamsMap[pkt.Tuple.RevHashable()]
+		stream, exists = tcp.streamsMap[pkt.Tuple.RevHashable()]
 		if !exists {
-			protocol := decideProtocol(&pkt.Tuple)
+			protocol := tcp.decideProtocol(&pkt.Tuple)
 			if protocol == protos.UnknownProtocol {
 				// don't follow
 				return
@@ -130,9 +133,9 @@ func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
 			logp.Debug("tcp", "Stream doesn't exists, creating new")
 
 			// create
-			stream = &TcpStream{id: GetId(), tuple: &pkt.Tuple, protocol: protocol}
+			stream = &TcpStream{id: tcp.getId(), tuple: &pkt.Tuple, protocol: protocol, tcp: tcp}
 			stream.tcptuple = common.TcpTupleFromIpPort(stream.tuple, stream.id)
-			tcpStreamsMap[pkt.Tuple.Hashable()] = stream
+			tcp.streamsMap[pkt.Tuple.Hashable()] = stream
 			created = true
 		} else {
 			original_dir = TcpDirectionReverse
@@ -171,21 +174,20 @@ func FollowTcp(tcphdr *layers.TCP, pkt *protos.Packet) {
 	stream.AddPacket(pkt, tcphdr, original_dir)
 }
 
-func PrintTcpMap() {
+func (tcp *Tcp) PrintTcpMap() {
 	fmt.Printf("Streams in memory:")
-	for _, stream := range tcpStreamsMap {
+	for _, stream := range tcp.streamsMap {
 		fmt.Printf(" %d", stream.id)
 	}
 	fmt.Printf("\n")
 
-	fmt.Printf("Streams dict: %v", tcpStreamsMap)
+	fmt.Printf("Streams dict: %v", tcp.streamsMap)
 }
 
-func buildPortsMap(plugins map[protos.Protocol]protos.ProtocolPlugin) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.TcpProtocolPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
 	for proto, protoPlugin := range plugins {
-
 		for _, port := range protoPlugin.GetPorts() {
 			old_proto, exists := res[uint16(port)]
 			if exists {
@@ -202,147 +204,16 @@ func buildPortsMap(plugins map[protos.Protocol]protos.ProtocolPlugin) (map[uint1
 	return res, nil
 }
 
-func portsToBpfFilter(ports []int, with_vlans bool) string {
-	res := []string{}
-	for _, port := range ports {
-		res = append(res, fmt.Sprintf("port %d", port))
-	}
-
-	filter := strings.Join(res, " or ")
-	if with_vlans {
-		filter = fmt.Sprintf("%s or (vlan and (%s))", filter, filter)
-	}
-
-	return filter
-}
-
-func BpfFilter(with_vlans bool) string {
-
-	ports := []int{}
-
-	for _, protoPlugin := range protos.Protos.GetAll() {
-		for _, port := range protoPlugin.GetPorts() {
-			ports = append(ports, port)
-		}
-	}
-
-	return portsToBpfFilter(ports, with_vlans)
-
-}
-
-func TcpInit() error {
-	var err error
-	tcpPortMap, err = buildPortsMap(protos.Protos.GetAll())
+// Creates and returns a new Tcp.
+func NewTcp(p protos.Protocols) (*Tcp, error) {
+	portMap, err := buildPortsMap(p.GetAllTcp())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	logp.Debug("tcp", "Port map: %v", tcpPortMap)
+	tcp := &Tcp{protocols: p, portMap: portMap}
+	tcp.streamsMap = make(map[common.HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
+	logp.Debug("tcp", "Port map: %v", portMap)
 
-	return nil
-}
-
-type DecoderStruct struct {
-	Parser *gopacket.DecodingLayerParser
-
-	sll     layers.LinuxSLL
-	d1q     layers.Dot1Q
-	lo      layers.Loopback
-	eth     layers.Ethernet
-	ip4     layers.IPv4
-	ip6     layers.IPv6
-	tcp     layers.TCP
-	payload gopacket.Payload
-	decoded []gopacket.LayerType
-}
-
-func CreateDecoder(datalink layers.LinkType) (*DecoderStruct, error) {
-	var d DecoderStruct
-
-	logp.Debug("pcapread", "Layer type: %s", datalink.String())
-
-	switch datalink {
-
-	case layers.LinkTypeLinuxSLL:
-		d.Parser = gopacket.NewDecodingLayerParser(
-			layers.LayerTypeLinuxSLL,
-			&d.sll, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
-
-	case layers.LinkTypeEthernet:
-		d.Parser = gopacket.NewDecodingLayerParser(
-			layers.LayerTypeEthernet,
-			&d.eth, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
-
-	case layers.LinkTypeNull: // loopback on OSx
-		d.Parser = gopacket.NewDecodingLayerParser(
-			layers.LayerTypeLoopback,
-			&d.lo, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
-
-	default:
-		return nil, fmt.Errorf("Unsuported link type: %s", datalink.String())
-
-	}
-
-	d.decoded = []gopacket.LayerType{}
-
-	return &d, nil
-}
-
-func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) {
-
-	var err error
-	var packet protos.Packet
-
-	err = decoder.Parser.DecodeLayers(data, &decoder.decoded)
-	if err != nil {
-		logp.Debug("pcapread", "Decoding error: %s", err)
-		return
-	}
-
-	has_tcp := false
-
-	for _, layerType := range decoder.decoded {
-		switch layerType {
-		case layers.LayerTypeIPv4:
-			logp.Debug("ip", "IPv4 packet")
-
-			packet.Tuple.Src_ip = decoder.ip4.SrcIP
-			packet.Tuple.Dst_ip = decoder.ip4.DstIP
-			packet.Tuple.Ip_length = 4
-
-		case layers.LayerTypeIPv6:
-			logp.Debug("ip", "IPv6 packet")
-
-			packet.Tuple.Src_ip = decoder.ip6.SrcIP
-			packet.Tuple.Dst_ip = decoder.ip6.DstIP
-			packet.Tuple.Ip_length = 16
-
-		case layers.LayerTypeTCP:
-			logp.Debug("ip", "TCP packet")
-
-			packet.Tuple.Src_port = uint16(decoder.tcp.SrcPort)
-			packet.Tuple.Dst_port = uint16(decoder.tcp.DstPort)
-
-			has_tcp = true
-
-		case gopacket.LayerTypePayload:
-			packet.Payload = decoder.payload
-		}
-	}
-
-	if !has_tcp {
-		logp.Debug("pcapread", "No TCP header found in message")
-		return
-	}
-
-	if len(packet.Payload) == 0 && !decoder.tcp.FIN {
-		// We have no use for this atm.
-		logp.Debug("pcapread", "Ignore empty non-FIN packet")
-		return
-	}
-
-	packet.Ts = ci.Timestamp
-
-	packet.Tuple.ComputeHashebles()
-	FollowTcp(&decoder.tcp, &packet)
+	return tcp, nil
 }

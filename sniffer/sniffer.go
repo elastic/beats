@@ -11,7 +11,10 @@ import (
 	"github.com/elastic/libbeat/logp"
 
 	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/decoder"
+	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/tcp"
+	"github.com/elastic/packetbeat/protos/udp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -26,7 +29,7 @@ type SnifferSetup struct {
 	isAlive        bool
 	dumper         *pcap.Dumper
 
-	Decoder    *tcp.DecoderStruct
+	Decoder    *decoder.DecoderStruct
 	DataSource gopacket.PacketDataSource
 }
 
@@ -205,11 +208,13 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr) error {
+func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr,
+	tcp tcp.Processor, udp udp.Processor) error {
 	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
 		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
-		config.ConfigSingleton.Interfaces.Bpf_filter = tcp.BpfFilter(with_vlans)
+		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans)
 	}
+	logp.Debug("sniffer", "BPF filter: %s", config.ConfigSingleton.Interfaces.Bpf_filter)
 
 	var err error
 	if !test_mode {
@@ -219,7 +224,7 @@ func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr) err
 		}
 	}
 
-	sniffer.Decoder, err = tcp.CreateDecoder(sniffer.Datalink())
+	sniffer.Decoder, err = decoder.NewDecoder(sniffer.Datalink(), tcp, udp)
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}
