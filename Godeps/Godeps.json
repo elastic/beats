@@ -6,24 +6,32 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/elastic/libbeat/cfgfile",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "8986787287397318e2897f8068adab875a8127ba"
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "8986787287397318e2897f8068adab875a8127ba"
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "8986787287397318e2897f8068adab875a8127ba"
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "8986787287397318e2897f8068adab875a8127ba"
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "8986787287397318e2897f8068adab875a8127ba"
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/service",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",

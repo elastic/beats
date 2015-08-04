@@ -12,8 +12,8 @@ import (
 var configfile *string
 var testConfig *bool
 
-func CmdLineFlags(flags *flag.FlagSet) {
-	configfile = flags.String("c", "/etc/packetbeat/packetbeat.yml", "Configuration file")
+func CmdLineFlags(flags *flag.FlagSet, name string) {
+	configfile = flags.String("c", fmt.Sprintf("/etc/%s/%s.yml", name, name), "Configuration file")
 	testConfig = flags.Bool("test", false, "Test configuration and exit.")
 }
 

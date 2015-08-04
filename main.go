@@ -50,7 +50,7 @@ func main() {
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	cfgfile.CmdLineFlags(cmdLine)
+	cfgfile.CmdLineFlags(cmdLine, Name)
 	logp.CmdLineFlags(cmdLine)
 	service.CmdLineFlags(cmdLine)
 
