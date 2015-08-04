@@ -1,0 +1,4 @@
+# Beats Packer
+
+Tools, scripts and docker images for cross-compiling and packaging the Elastic
+[Beats](https://www.elastic.co/products/beats).
