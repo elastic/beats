@@ -133,11 +133,11 @@ func GetMemory() (*MemStat, error) {
 		return nil, err
 	}
 	return &MemStat{
-		Total:      mem.Total,
-		Used:       mem.Used,
-		Free:       mem.Free,
-		ActualFree: mem.ActualFree,
-		ActualUsed: mem.ActualUsed,
+		Total:      mem.Total / 1024,
+		Used:       mem.Used / 1024,
+		Free:       mem.Free / 1024,
+		ActualFree: mem.ActualFree / 1024,
+		ActualUsed: mem.ActualUsed / 1024,
 	}, nil
 }
 

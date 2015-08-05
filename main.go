@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
-	"github.com/monicasarbu/gotop/cpu"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
@@ -22,6 +22,7 @@ var Name = "topbeat"
 type Topbeat struct {
 	isAlive bool
 	period  time.Duration
+	procs   []string
 
 	events chan common.MapStr
 }
@@ -33,14 +34,32 @@ func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
 	} else {
 		t.period = 1 * time.Second
 	}
+	if config.Procs != nil {
+		t.procs = *config.Procs
+	} else {
+		t.procs = []string{".*"} //all processes
+	}
+
+	logp.Debug("topbeat", "Init toppbeat")
+	logp.Debug("topbeat", "Follow processes %q\n", t.procs)
 	logp.Debug("topbeat", "Period %v\n", t.period)
 	t.events = events
 	return nil
 }
 
+func (t *Topbeat) MatchProcess(name string) bool {
+
+	for _, reg := range t.procs {
+		matched, _ := regexp.MatchString(reg, name)
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
 func (t *Topbeat) Run() error {
 
-	_, _ = cpu.Cpu_times_percent(0)
 	t.isAlive = true
 
 	for t.isAlive {
@@ -48,53 +67,62 @@ func (t *Topbeat) Run() error {
 
 		load_stat, err := GetSystemLoad()
 		if err != nil {
-			logp.Err("Fail to get load statistics: %v", err)
+			logp.Warn("Getting load statistics: %v", err)
 			continue
 		}
 		cpu_stat, err := GetCpuTimes()
 		if err != nil {
-			logp.Err("Fail to get cpu times: %v", err)
+			logp.Warn("Getting cpu times: %v", err)
 			continue
 		}
 
 		mem_stat, err := GetMemory()
 		if err != nil {
-			logp.Err("Fail to get memory details: %v", err)
+			logp.Warn("Getting memory details: %v", err)
 			continue
 		}
 		swap_stat, err := GetSwap()
 		if err != nil {
-			logp.Err("Fail to get swap details: %v", err)
+			logp.Warn("Getting swap details: %v", err)
 		}
 
 		pids, err := Pids()
 		if err != nil {
-			logp.Err("Fail to get the list of pids: %v", err)
+			logp.Warn("Getting the list of pids: %v", err)
 		}
-		procs := []Process{}
-		procs_ignored := 0
 
 		for _, pid := range pids {
 			process, err := GetProcess(pid)
 			if err != nil {
-				logp.Err("Error geting the process %d: %v", pid, err)
-				procs_ignored += 1
+				logp.Debug("topbeat", "Skip process %d: %v", pid, err)
 				continue
 			}
-			procs = append(procs, *process)
-			logp.Debug("topbeat", "Process: %s", process)
-		}
 
-		logp.Debug("topbeat", "Processes %d, ignored %d", len(pids), procs_ignored)
+			if t.MatchProcess(process.Name) {
+
+				logp.Debug("topbeat", "Process: %s", process)
+
+				event := common.MapStr{
+					"timestamp":  common.Time(time.Now()),
+					"type":       "proc",
+					"proc.pid":   process.Pid,
+					"proc.ppid":  process.Ppid,
+					"proc.name":  process.Name,
+					"proc.state": process.State,
+					"proc.mem":   process.Mem,
+					"proc.cpu":   process.Cpu,
+				}
+				t.events <- event
+			}
+		}
 
 		event := common.MapStr{
 			"timestamp": common.Time(time.Now()),
-			"type":      "top",
+			"type":      "system",
 			"load":      load_stat,
 			"cpu":       cpu_stat,
 			"mem":       mem_stat,
 			"swap":      swap_stat,
-			"procs":     procs,
 		}
 
 		t.events <- event

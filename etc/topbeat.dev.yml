@@ -4,6 +4,9 @@
 input:
  period: 1
 
+ procs: [".*"]
+
+
 ############################# Shipper ############################################
 shipper:
 
@@ -28,9 +31,10 @@ output:
   # host, port: where Elasticsearch is listening on
   # save_topology: specify if the topology is saved in Elasticsearch
   elasticsearch:
-    enabled: false
+    enabled: true
     hosts: ["localhost:9200"]
     save_topology: false
+    index: "topbeat"
 
   # Redis as output
   # Options:
@@ -48,10 +52,10 @@ output:
   # filename: name of the files
   # rotate_every_kb: maximum size of the files in path
   # number of files: maximum number of files in path
-  file:
-    enabled: true
-    path: "/tmp/topbeat"
-    filename: topbeat
-    rotate_every_kb: 1000
-    number_of_files: 7
+  #file:
+  #  enabled: true
+  #  path: "/tmp/topbeat"
+  #  filename: topbeat
+  #  rotate_every_kb: 1000
+  #  number_of_files: 7
 
