@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cloudfoundry/gosigar"
 	"github.com/elastic/libbeat/logp"
@@ -39,19 +40,21 @@ type ProcMemStat struct {
 }
 
 type ProcCpuTime struct {
-	User   uint64 `json:"user"`
-	System uint64 `json:"system"`
-	Total  uint64 `json:"total"`
-	Start  string `json:"start_time"`
+	User   uint64  `json:"user"`
+	User_p float64 `json:"user_p"`
+	System uint64  `json:"system"`
+	Total  uint64  `json:"total"`
+	Start  string  `json:"start_time"`
 }
 
 type Process struct {
-	Pid   int         `json:"pid"`
-	Ppid  int         `json:"ppid"`
-	Name  string      `json:"name"`
-	State string      `json:"state"`
-	Mem   ProcMemStat `json:"mem"`
-	Cpu   ProcCpuTime `json:"cpu"`
+	Pid         int         `json:"pid"`
+	Ppid        int         `json:"ppid"`
+	Name        string      `json:"name"`
+	State       string      `json:"state"`
+	Mem         ProcMemStat `json:"mem"`
+	Cpu         ProcCpuTime `json:"cpu"`
+	lastCPUTime time.Time
 }
 
 func (p *Process) String() string {
@@ -66,7 +69,7 @@ func (m *ProcMemStat) String() string {
 }
 
 func (t *ProcCpuTime) String() string {
-	return fmt.Sprintf("started at %s, %d total, %d us, %d sys", t.Start, t.Total, t.User, t.System)
+	return fmt.Sprintf("started at %s, %d total, %d us (%.2f), %d sys", t.Start, t.Total, t.User, t.User_p, t.System)
 
 }
 
@@ -187,7 +190,7 @@ func GetProcess(pid int) (*Process, error) {
 
 	state := sigar.ProcState{}
 	mem := sigar.ProcMem{}
-	time := sigar.ProcTime{}
+	cpu := sigar.ProcTime{}
 
 	err := state.Get(pid)
 	if err != nil {
@@ -199,12 +202,12 @@ func GetProcess(pid int) (*Process, error) {
 		return nil, err
 	}
 
-	err = time.Get(pid)
+	err = cpu.Get(pid)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Process{
+	proc := Process{
 		Pid:   pid,
 		Ppid:  state.Ppid,
 		Name:  state.Name,
@@ -215,10 +218,13 @@ func GetProcess(pid int) (*Process, error) {
 			Share:    mem.Share / 1024,
 		},
 		Cpu: ProcCpuTime{
-			Start:  time.FormatStartTime(),
-			Total:  time.Total,
-			User:   time.User,
-			System: time.Sys,
+			Start:  cpu.FormatStartTime(),
+			Total:  cpu.Total,
+			User:   cpu.User,
+			System: cpu.Sys,
 		},
-	}, nil
+	}
+
+	proc.lastCPUTime = time.Now()
+	return &proc, nil
 }

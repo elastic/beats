@@ -19,10 +19,13 @@ import (
 var Version = "1.0.0-beta2"
 var Name = "topbeat"
 
+type ProcsMap map[int]*Process
+
 type Topbeat struct {
-	isAlive bool
-	period  time.Duration
-	procs   []string
+	isAlive  bool
+	period   time.Duration
+	procs    []string
+	procsMap ProcsMap
 
 	events chan common.MapStr
 }
@@ -58,74 +61,132 @@ func (t *Topbeat) MatchProcess(name string) bool {
 	return false
 }
 
+func (t *Topbeat) initProcStats() {
+
+	t.procsMap = make(ProcsMap)
+
+	pids, err := Pids()
+	if err != nil {
+		logp.Warn("Getting the list of pids: %v", err)
+	}
+
+	for _, pid := range pids {
+		process, err := GetProcess(pid)
+		if err != nil {
+			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			continue
+		}
+		t.procsMap[process.Pid] = process
+	}
+}
+
+func (t *Topbeat) exportProcStats() error {
+
+	pids, err := Pids()
+	if err != nil {
+		logp.Warn("Getting the list of pids: %v", err)
+		return err
+	}
+
+	for _, pid := range pids {
+		process, err := GetProcess(pid)
+		if err != nil {
+			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			continue
+		}
+
+		if t.MatchProcess(process.Name) {
+
+			process.Cpu.User_p = t.getCpuPercent(process)
+
+			t.procsMap[process.Pid] = process
+
+			logp.Debug("topbeat", "Process: %s", process)
+
+			event := common.MapStr{
+				"timestamp":  common.Time(time.Now()),
+				"type":       "proc",
+				"proc.pid":   process.Pid,
+				"proc.ppid":  process.Ppid,
+				"proc.name":  process.Name,
+				"proc.state": process.State,
+				"proc.mem":   process.Mem,
+				"proc.cpu":   process.Cpu,
+			}
+			t.events <- event
+		}
+	}
+	return nil
+}
+
+func (t *Topbeat) exportSystemStats() error {
+
+	load_stat, err := GetSystemLoad()
+	if err != nil {
+		logp.Warn("Getting load statistics: %v", err)
+		return err
+	}
+	cpu_stat, err := GetCpuTimes()
+	if err != nil {
+		logp.Warn("Getting cpu times: %v", err)
+		return err
+	}
+
+	mem_stat, err := GetMemory()
+	if err != nil {
+		logp.Warn("Getting memory details: %v", err)
+		return err
+	}
+	swap_stat, err := GetSwap()
+	if err != nil {
+		logp.Warn("Getting swap details: %v", err)
+		return err
+	}
+
+	event := common.MapStr{
+		"timestamp": common.Time(time.Now()),
+		"type":      "system",
+		"load":      load_stat,
+		"cpu":       cpu_stat,
+		"mem":       mem_stat,
+		"swap":      swap_stat,
+	}
+
+	t.events <- event
+
+	return nil
+}
+
+func (t *Topbeat) getCpuPercent(proc *Process) float64 {
+
+	oproc, ok := t.procsMap[proc.Pid]
+	if ok {
+
+		elapsed := proc.lastCPUTime.Sub(oproc.lastCPUTime).Seconds()
+		if elapsed <= 0 {
+			elapsed = 1
+		}
+		ret := float64(proc.Cpu.User-oproc.Cpu.User) / float64(elapsed)
+		if ret < 0.0001 {
+			ret = 0
+		}
+
+		return ret
+	}
+	return 0
+}
+
 func (t *Topbeat) Run() error {
 
 	t.isAlive = true
 
+	t.initProcStats()
+
 	for t.isAlive {
 		time.Sleep(1 * time.Second)
 
-		load_stat, err := GetSystemLoad()
-		if err != nil {
-			logp.Warn("Getting load statistics: %v", err)
-			continue
-		}
-		cpu_stat, err := GetCpuTimes()
-		if err != nil {
-			logp.Warn("Getting cpu times: %v", err)
-			continue
-		}
-
-		mem_stat, err := GetMemory()
-		if err != nil {
-			logp.Warn("Getting memory details: %v", err)
-			continue
-		}
-		swap_stat, err := GetSwap()
-		if err != nil {
-			logp.Warn("Getting swap details: %v", err)
-		}
-
-		pids, err := Pids()
-		if err != nil {
-			logp.Warn("Getting the list of pids: %v", err)
-		}
-
-		for _, pid := range pids {
-			process, err := GetProcess(pid)
-			if err != nil {
-				logp.Debug("topbeat", "Skip process %d: %v", pid, err)
-				continue
-			}
-
-			if t.MatchProcess(process.Name) {
-
-				logp.Debug("topbeat", "Process: %s", process)
-
-				event := common.MapStr{
-					"timestamp":  common.Time(time.Now()),
-					"type":       "proc",
-					"proc.pid":   process.Pid,
-					"proc.ppid":  process.Ppid,
-					"proc.name":  process.Name,
-					"proc.state": process.State,
-					"proc.mem":   process.Mem,
-					"proc.cpu":   process.Cpu,
-				}
-				t.events <- event
-			}
-		}
-
-		event := common.MapStr{
-			"timestamp": common.Time(time.Now()),
-			"type":      "system",
-			"load":      load_stat,
-			"cpu":       cpu_stat,
-			"mem":       mem_stat,
-			"swap":      swap_stat,
-		}
-
-		t.events <- event
+		t.exportSystemStats()
+		t.exportProcStats()
 	}
 	return nil
 }
