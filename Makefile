@@ -71,10 +71,10 @@ install_cfg:
 	cp etc/packetbeat.template.json $(PREFIX)/packetbeat.template.json
 	# darwin
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
-	sed -i .bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
+	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
 	# win
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-win.yml
-	sed -i .bk 's/device: any/device: 1/' $(PREFIX)/packetbeat-win.yml
+	sed -i.bk 's/device: any/device: 1/' $(PREFIX)/packetbeat-win.yml
 
 
 .PHONY: gofmt
