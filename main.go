@@ -97,7 +97,7 @@ func (t *Topbeat) exportProcStats() error {
 
 		if t.MatchProcess(process.Name) {
 
-			process.Cpu.User_p = t.getCpuPercent(process)
+			process.Cpu.Percent = t.getCpuPercent(process)
 
 			t.procsMap[process.Pid] = process
 
@@ -162,12 +162,12 @@ func (t *Topbeat) getCpuPercent(proc *Process) float64 {
 	oproc, ok := t.procsMap[proc.Pid]
 	if ok {
 
-		elapsed := proc.lastCPUTime.Sub(oproc.lastCPUTime).Seconds()
+		elapsed := proc.lastCPUTime.Sub(oproc.lastCPUTime).Nanoseconds() / 1e6 //in milliseconds
 		if elapsed <= 0 {
 			elapsed = 1
 		}
-		ret := float64(proc.Cpu.User-oproc.Cpu.User) / float64(elapsed)
-		if ret < 0.0001 {
+		ret := float64(proc.Cpu.Total-oproc.Cpu.Total) * 100 / float64(elapsed)
+		if ret < 0.01 {
 			ret = 0
 		}
 
