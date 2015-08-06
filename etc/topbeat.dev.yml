@@ -1,0 +1,61 @@
+################### Topbeat Configuration Example #########################
+
+############################# Input ############################################
+input:
+ period: 1
+
+ procs: [".*"]
+
+
+############################# Shipper ############################################
+shipper:
+
+ # The name of the shipper that publishes the network data. It can be used to group
+ # all the transactions sent by a single shipper in the web interface.
+ # If this options is not defined, the hostname is used.
+ name:
+
+ # The tags of the shipper are included in their own field with each
+ # transaction published. Tags make it easy to group transactions by different
+ # logical properties.
+ #tags: ["service1"]
+
+############################# Output ############################################
+
+# Configure what outputs to use when sending the data collected by topbeat.
+# You can enable one or multiple outputs by setting enabled option to true.
+output:
+
+  # Elasticsearch as output
+  # Options:
+  # host, port: where Elasticsearch is listening on
+  # save_topology: specify if the topology is saved in Elasticsearch
+  elasticsearch:
+    enabled: true
+    hosts: ["localhost:9200"]
+    save_topology: false
+    index: "topbeat"
+
+  # Redis as output
+  # Options:
+  # host, port: where Redis is listening on
+  # save_topology: specify if the topology is saved in Redis
+  #redis:
+  #  enabled: true
+  #  host: localhost
+  #  port: 6379
+  #  save_topology: true
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  #file:
+  #  enabled: true
+  #  path: "/tmp/topbeat"
+  #  filename: topbeat
+  #  rotate_every_kb: 1000
+  #  number_of_files: 7
+
