@@ -1,0 +1,3 @@
+arch: '386'
+deb_arch: i386
+rpm_arch: i686
