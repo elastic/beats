@@ -11,11 +11,11 @@ packetbeat topbeat: image build
 		-branch $(RELEASE) \
 		github.com/elastic/$@
 
-%/deb: %
+%/deb: % build/god-linux-386 build/god-linux-amd64
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 
-%/rpm: %
+%/rpm: % build/god-linux-386 build/god-linux-amd64
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 
@@ -23,9 +23,16 @@ packetbeat topbeat: image build
 deps:
 	go get github.com/tsg/xgo
 
-.PHONY: image
-image:
+.PHONY: xgo-image
+xgo-image:
 	docker build -t tudorg/beats-builder xgo-image/
+
+.PHONY: go-daemon-image
+go-daemon-image:
+	docker build -t tudorg/go-daemon go-daemon/
+
+build/god-linux-386 build/god-linux-amd64: go-daemon-image
+	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
 
 build:
 	mkdir -p build
