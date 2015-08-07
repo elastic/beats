@@ -2,38 +2,45 @@ RELEASE?=master
 BUILDID?=$(shell date +%y%m%d%H%M%S)
 
 .PHONY: all
-all: packetbeat/deb packetbeat/rpm packetbeat/darwin
+all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win
 
 
 .PHONY: packetbeat topbeat
-packetbeat topbeat: image build
+packetbeat topbeat: xgo-image build
 	cd build && xgo -image=tudorg/beats-builder -static \
 		-before-build=../xgo-scripts/before_build.sh \
 		-branch $(RELEASE) \
 		github.com/elastic/$@
 
-%/deb: % build/god-linux-386 build/god-linux-amd64
+%/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 
-%/rpm: % build/god-linux-386 build/god-linux-amd64
+%/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 
-%/darwin: %
+%/darwin: % fpm-image
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/darwin/build.sh
 
-.PHONY: deps image
+%/win: % fpm-image
+	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
+
+.PHONY: deps xgo-image
 deps:
 	go get github.com/tsg/xgo
 
 .PHONY: xgo-image
 xgo-image:
-	docker build -t tudorg/beats-builder xgo-image/
+	docker build -t tudorg/beats-builder docker/xgo-image/
+
+.PHONY: fpm-image
+fpm-image:
+	docker build -t tudorg/fpm docker/fpm-image/
 
 .PHONY: go-daemon-image
 go-daemon-image:
-	docker build -t tudorg/go-daemon go-daemon/
+	docker build -t tudorg/go-daemon docker/go-daemon/
 
 build/god-linux-386 build/god-linux-amd64: go-daemon-image
 	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
