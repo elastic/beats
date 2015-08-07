@@ -67,6 +67,7 @@ const (
 	ThriftProtocol
 	MongodbProtocol
 	DnsProtocol
+	MemcacheProtocol
 )
 
 // Protocol names
@@ -79,6 +80,7 @@ var ProtocolNames = []string{
 	"thrift",
 	"mongodb",
 	"dns",
+	"memcache",
 }
 
 func (p Protocol) String() string {
