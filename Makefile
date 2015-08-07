@@ -2,7 +2,7 @@ RELEASE?=master
 BUILDID?=$(shell date +%y%m%d%H%M%S)
 
 .PHONY: all
-all: packetbeat/deb packetbeat/rpm
+all: packetbeat/deb packetbeat/rpm packetbeat/darwin
 
 
 .PHONY: packetbeat topbeat
@@ -19,6 +19,9 @@ packetbeat topbeat: image build
 %/rpm: % build/god-linux-386 build/god-linux-amd64
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
+
+%/darwin: %
+	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/darwin/build.sh
 
 .PHONY: deps image
 deps:
