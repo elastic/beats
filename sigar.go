@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cloudfoundry/gosigar"
+	"github.com/elastic/gosigar"
 	"github.com/elastic/libbeat/logp"
 )
 

@@ -65,6 +65,10 @@ func (t *Topbeat) initProcStats() {
 
 	t.procsMap = make(ProcsMap)
 
+	if len(t.procs) == 0 {
+		return
+	}
+
 	pids, err := Pids()
 	if err != nil {
 		logp.Warn("Getting the list of pids: %v", err)
@@ -81,6 +85,10 @@ func (t *Topbeat) initProcStats() {
 }
 
 func (t *Topbeat) exportProcStats() error {
+
+	if len(t.procs) == 0 {
+		return nil
+	}
 
 	pids, err := Pids()
 	if err != nil {
