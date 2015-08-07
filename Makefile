@@ -4,6 +4,7 @@ BUILDID?=$(shell date +%y%m%d%H%M%S)
 .PHONY: all
 all: packetbeat/deb packetbeat/rpm
 
+
 .PHONY: packetbeat topbeat
 packetbeat topbeat: image build
 	cd build && xgo -image=tudorg/beats-builder -static \

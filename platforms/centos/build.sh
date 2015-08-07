@@ -6,6 +6,7 @@ set -e
 runid=centos-$BEAT-$RELEASE-$ARCH
 cat beats/$BEAT.yml archs/$ARCH.yml releases/$RELEASE.yml > build/settings-$runid.yml
 j2 --format yaml platforms/centos/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
+j2 --format yaml platforms/centos/init.j2 < build/settings-$runid.yml > build/$runid.init
 chmod +x build/run-$runid.sh
-docker run -v `pwd`/build:/build -e BUILDID=$BUILDID tudorg/fpm /build/run-$runid.sh
+docker run -v `pwd`/build:/build -e BUILDID=$BUILDID -e RUNID=$runid tudorg/fpm /build/run-$runid.sh
 rm build/settings-$runid.yml build/run-$runid.sh
