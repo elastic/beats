@@ -12,7 +12,7 @@ There are two types of documents exported:
  
 Example documents:
 
-{
+    {
         count":1,
         "proc.cpu":{
           "user":20,
@@ -33,10 +33,10 @@ Example documents:
         "shipper":"vagrant-ubuntu-trusty-64",
         "timestamp":"2015-08-06T20:20:34.089Z",
         "type":"proc"
-}
+    }
 
 
-{
+    {
         "count":1,
         "cpu":{
           "user":33030,
@@ -70,4 +70,4 @@ Example documents:
         },
         "timestamp":"2015-08-06T20:20:33.062Z",
         "type":"system"
-}
+    }
