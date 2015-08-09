@@ -45,3 +45,18 @@ a future.
 Building all Beats for all platforms:
 
      make clean && make -j2
+
+Which currently produces the following:
+
+        build/packetbeat-1.0.0-nightly.150809100849-darwin.tgz
+        build/packetbeat-1.0.0-nightly.150809100849-darwin.tgz.sha1
+        build/packetbeat-1.0.0-nightly.150809100849-i686.rpm
+        build/packetbeat-1.0.0-nightly.150809100849-i686.rpm.sha1
+        build/packetbeat-1.0.0-nightly.150809100849-x86_64.rpm
+        build/packetbeat-1.0.0-nightly.150809100849-x86_64.rpm.sha1
+        build/packetbeat-1.0.0-nightly.150809100857-windows.zip
+        build/packetbeat-1.0.0-nightly.150809100857-windows.zip.sha1
+        build/packetbeat_1.0.0-nightly.150809100849_amd64.deb
+        build/packetbeat_1.0.0-nightly.150809100849_amd64.deb.sha1
+        build/packetbeat_1.0.0-nightly.150809100849_i386.deb
+        build/packetbeat_1.0.0-nightly.150809100849_i386.deb.sha1
