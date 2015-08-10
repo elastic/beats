@@ -114,3 +114,36 @@ func Test_configToPortsMap_negative(t *testing.T) {
 		assert.Contains(t, err.Error(), test.Err)
 	}
 }
+
+func Test_portsToBpfFilter(t *testing.T) {
+	type io struct {
+		Ports     []int
+		WithVlans bool
+		Output    string
+	}
+
+	tests := []io{
+		io{
+			Ports:  []int{2, 3, 4},
+			Output: "port 2 or port 3 or port 4",
+		},
+		io{
+			Ports:  []int{80, 8080},
+			Output: "port 80 or port 8080",
+		},
+		io{
+			Ports:     []int{2, 3, 4},
+			WithVlans: true,
+			Output:    "port 2 or port 3 or port 4 or (vlan and (port 2 or port 3 or port 4))",
+		},
+		io{
+			Ports:     []int{80, 8080},
+			WithVlans: true,
+			Output:    "port 80 or port 8080 or (vlan and (port 80 or port 8080))",
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, portsToBpfFilter(test.Ports, test.WithVlans))
+	}
+}
