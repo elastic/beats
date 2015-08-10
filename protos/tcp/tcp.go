@@ -202,17 +202,32 @@ func buildPortsMap(plugins map[protos.Protocol]protos.ProtocolPlugin) (map[uint1
 	return res, nil
 }
 
-func BpfFilter() string {
-
+func portsToBpfFilter(ports []int, with_vlans bool) string {
 	res := []string{}
+	for _, port := range ports {
+		res = append(res, fmt.Sprintf("port %d", port))
+	}
+
+	filter := strings.Join(res, " or ")
+	if with_vlans {
+		filter = fmt.Sprintf("%s or (vlan and (%s))", filter, filter)
+	}
+
+	return filter
+}
+
+func BpfFilter(with_vlans bool) string {
+
+	ports := []int{}
 
 	for _, protoPlugin := range protos.Protos.GetAll() {
 		for _, port := range protoPlugin.GetPorts() {
-			res = append(res, fmt.Sprintf("port %d", port))
+			ports = append(ports, port)
 		}
 	}
 
-	return strings.Join(res, " or ")
+	return portsToBpfFilter(ports, with_vlans)
+
 }
 
 func TcpInit() error {

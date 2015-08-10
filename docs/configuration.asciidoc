@@ -236,6 +236,41 @@ interfaces:
   buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
+==== with_vlans
+
+Packetbeat automatically generates a
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on the ports on which the known protocols are expected to be found.
+For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
+Packetbeat will generate the following BPF filter: `"port 80 or port 3306"`.
+
+However, if the traffic contains https://en.wikipedia.org/wiki/IEEE_802.1Q[VLAN]
+tags, the above filter is ineffective because the offset used are moved with
+four bytes. To fix this, you can enabled the `with_vlans` option, which will
+generate a BPF filter looking like this: `"port 80 or port 3306 and (vlan or (port 80 or port 3306))"`.
+
+==== bpf_filter
+
+Packetbeat automatically generates a
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on the ports on which the known protocols are expected to be found.
+For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
+Packetbeat will generate the following BPF filter: `"port 80 or port 3306"`.
+
+With this setting, you can overwrite the generated BPF filter. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+  bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+------------------------------------------------------------------------------
+
+Note that this setting disables the automatic generation of the BPF filter so if
+you use it, it is your responsibility to keep the BPF filters in sync with the
+ports defined in the protocols sections.
+
+
 [[configuration-protocols]]
 === Protocols
 

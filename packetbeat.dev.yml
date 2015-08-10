@@ -31,7 +31,8 @@ agent:
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
- device: lo0
+ device: en0
+ bpf_filter: "net 192.168.239.0/24 and port 80"
 
 filter:
   filters: ["nop"]
