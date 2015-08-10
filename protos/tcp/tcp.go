@@ -231,6 +231,7 @@ type DecoderStruct struct {
 	Parser *gopacket.DecodingLayerParser
 
 	sll     layers.LinuxSLL
+	d1q     layers.Dot1Q
 	lo      layers.Loopback
 	eth     layers.Ethernet
 	ip4     layers.IPv4
@@ -250,17 +251,17 @@ func CreateDecoder(datalink layers.LinkType) (*DecoderStruct, error) {
 	case layers.LinkTypeLinuxSLL:
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeLinuxSLL,
-			&d.sll, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+			&d.sll, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
 
 	case layers.LinkTypeEthernet:
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeEthernet,
-			&d.eth, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+			&d.eth, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
 
 	case layers.LinkTypeNull: // loopback on OSx
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeLoopback,
-			&d.lo, &d.ip4, &d.ip6, &d.tcp, &d.payload)
+			&d.lo, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.payload)
 
 	default:
 		return nil, fmt.Errorf("Unsuported link type: %s", datalink.String())
