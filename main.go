@@ -191,7 +191,7 @@ func (t *Topbeat) Run() error {
 	t.initProcStats()
 
 	for t.isAlive {
-		time.Sleep(1 * time.Second)
+		time.Sleep(t.period)
 
 		t.exportSystemStats()
 		t.exportProcStats()
