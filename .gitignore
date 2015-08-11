@@ -30,3 +30,6 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+# IDE files / folders
+.idea
