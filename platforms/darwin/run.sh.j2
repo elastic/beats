@@ -4,13 +4,13 @@
 set -e
 cd /build
 
-mkdir /{{beat_name}}-{{version}}-darwin
-cp {{beat_name}}-darwin-amd64 /{{beat_name}}-{{version}}-darwin/{{beat_name}}
-cp {{beat_name}}-darwin.yml /{{beat_name}}-{{version}}-darwin/{{beat_name}}.yml
-cp {{beat_name}}.template.json /{{beat_name}}-{{version}}-darwin/
+mkdir /{{.beat_name}}-{{.version}}-darwin
+cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}
+cp {{.beat_name}}-darwin.yml /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-darwin/
 
-tar czvf {{beat_name}}-{{version}}-darwin.tgz /{{beat_name}}-{{version}}-darwin
-echo "Created {{beat_name}}-{{version}}-darwin.tgz"
+tar czvf {{.beat_name}}-{{.version}}-darwin.tgz /{{.beat_name}}-{{.version}}-darwin
+echo "Created {{.beat_name}}-{{.version}}-darwin.tgz"
 
-sha1sum {{beat_name}}-{{version}}-darwin.tgz > {{beat_name}}-{{version}}-darwin.tgz.sha1
-echo "Created {{beat_name}}-{{version}}-darwin.tgz.sha1"
+sha1sum {{.beat_name}}-{{.version}}-darwin.tgz > {{.beat_name}}-{{.version}}-darwin.tgz.sha1
+echo "Created {{.beat_name}}-{{.version}}-darwin.tgz.sha1"

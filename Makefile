@@ -29,6 +29,7 @@ packetbeat topbeat: xgo-image build
 .PHONY: deps xgo-image
 deps:
 	go get github.com/tsg/xgo
+	go get github.com/tsg/gotpl
 
 .PHONY: xgo-image
 xgo-image:

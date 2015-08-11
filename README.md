@@ -5,12 +5,9 @@ Tools, scripts and docker images for cross-compiling and packaging the Elastic
 
 ## Prepare
 
-You need Go, python and docker installed. Prepare the rest with:
+You need Go and docker installed. Prepare the rest with:
 
      make deps
-
-Python is only used for the [j2cli](https://github.com/kolypto/j2cli) tool,
-which we might replace with a Go implementation.
 
 ## Cross-compile
 
