@@ -247,7 +247,7 @@ Packetbeat will generate the following BPF filter: `"port 80 or port 3306"`.
 However, if the traffic contains https://en.wikipedia.org/wiki/IEEE_802.1Q[VLAN]
 tags, the above filter is ineffective because the offset used are moved with
 four bytes. To fix this, you can enabled the `with_vlans` option, which will
-generate a BPF filter looking like this: `"port 80 or port 3306 and (vlan or (port 80 or port 3306))"`.
+generate a BPF filter looking like this: `"port 80 or port 3306 or (vlan and (port 80 or port 3306))"`.
 
 ==== bpf_filter
 
