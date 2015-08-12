@@ -1,13 +1,13 @@
 language: go
 
 go:
-    - 1.4
+  - 1.4
 
 sudo: false
 
 services:
-    - redis-server
-    - elasticsearch
+  - redis-server
+  - elasticsearch
 
 addons:
   apt:
@@ -17,14 +17,24 @@ addons:
       - geoip-database
 
 before_install:
-    - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/packetbeat
+  # Redo the travis setup but with the elastic/packetbeat path. This is needed so the package path is correct
+  - mkdir -p $HOME/gopath/src/github.com/elastic/packetbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/packetbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/packetbeat
+  - cd $HOME/gopath/src/github.com/elastic/packetbeat
 
 install:
-    - make
+  - make
 
-script: make testlong
+script:
+  - make testlong
 
 notifications:
     email:
         - tudor@elastic.co
         - monica@elastic.co
+
+after_success:
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - cp profile.cov coverage.txt
+  - bash <(curl -s https://codecov.io/bash)
