@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/packetbeat/protos/redis"
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/thrift"
+	"github.com/elastic/packetbeat/protos/udp"
 	"github.com/elastic/packetbeat/sniffer"
 )
 
@@ -111,7 +112,13 @@ func main() {
 		protos.Protos.Register(proto, plugin)
 	}
 
-	if err = tcp.TcpInit(); err != nil {
+	tcpProc, err := tcp.NewTcp(&protos.Protos)
+	if err != nil {
+		logp.Critical(err.Error())
+		os.Exit(1)
+	}
+	udpProc, err := udp.NewUdp(&protos.Protos)
+	if err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
@@ -134,7 +141,7 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing sniffer")
-	err = sniff.Init(false, afterInputsQueue)
+	err = sniff.Init(false, afterInputsQueue, tcpProc, udpProc)
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)
 		os.Exit(1)
@@ -184,7 +191,7 @@ func main() {
 	if service.WithMemProfile() {
 		// wait for all TCP streams to expire
 		time.Sleep(tcp.TCP_STREAM_EXPIRY * 1.2)
-		tcp.PrintTcpMap()
+		tcpProc.PrintTcpMap()
 	}
 	service.Cleanup()
 }

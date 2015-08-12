@@ -39,13 +39,13 @@ func (proto *TestProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 func Test_configToPortsMap(t *testing.T) {
 
 	type configTest struct {
-		Input  map[protos.Protocol]protos.ProtocolPlugin
+		Input  map[protos.Protocol]protos.TcpProtocolPlugin
 		Output map[uint16]protos.Protocol
 	}
 
 	config_tests := []configTest{
 		configTest{
-			Input: map[protos.Protocol]protos.ProtocolPlugin{
+			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
 			Output: map[uint16]protos.Protocol{
@@ -54,7 +54,7 @@ func Test_configToPortsMap(t *testing.T) {
 			},
 		},
 		configTest{
-			Input: map[protos.Protocol]protos.ProtocolPlugin{
+			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
@@ -70,7 +70,7 @@ func Test_configToPortsMap(t *testing.T) {
 
 		// should ignore duplicate ports in the same protocol
 		configTest{
-			Input: map[protos.Protocol]protos.ProtocolPlugin{
+			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 			},
@@ -92,14 +92,14 @@ func Test_configToPortsMap(t *testing.T) {
 func Test_configToPortsMap_negative(t *testing.T) {
 
 	type errTest struct {
-		Input map[protos.Protocol]protos.ProtocolPlugin
+		Input map[protos.Protocol]protos.TcpProtocolPlugin
 		Err   string
 	}
 
 	tests := []errTest{
 		errTest{
 			// should raise error on duplicate port
-			Input: map[protos.Protocol]protos.ProtocolPlugin{
+			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
@@ -112,38 +112,5 @@ func Test_configToPortsMap_negative(t *testing.T) {
 		_, err := buildPortsMap(test.Input)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), test.Err)
-	}
-}
-
-func Test_portsToBpfFilter(t *testing.T) {
-	type io struct {
-		Ports     []int
-		WithVlans bool
-		Output    string
-	}
-
-	tests := []io{
-		io{
-			Ports:  []int{2, 3, 4},
-			Output: "port 2 or port 3 or port 4",
-		},
-		io{
-			Ports:  []int{80, 8080},
-			Output: "port 80 or port 8080",
-		},
-		io{
-			Ports:     []int{2, 3, 4},
-			WithVlans: true,
-			Output:    "port 2 or port 3 or port 4 or (vlan and (port 2 or port 3 or port 4))",
-		},
-		io{
-			Ports:     []int{80, 8080},
-			WithVlans: true,
-			Output:    "port 80 or port 8080 or (vlan and (port 80 or port 8080))",
-		},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test.Output, portsToBpfFilter(test.Ports, test.WithVlans))
 	}
 }
