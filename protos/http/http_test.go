@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1231,4 +1232,59 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	trans := expectTransaction(t, http)
 	assert.NotNil(t, trans)
 	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+}
+
+
+func TestHttp_configsSettingAll(t *testing.T) {
+
+	http := HttpModForTests()
+	config := new(config.Http)
+
+	// Assign config vars
+	config.Ports = []int{80, 8080}
+	
+	trueVar := true
+	config.Send_request = &trueVar
+	config.Send_response = &trueVar
+	config.Hide_keywords = []string{"a", "b"}
+	config.Strip_authorization = &trueVar
+	config.Send_all_headers = &trueVar
+	config.Split_cookie = &trueVar
+	realIpHeader := "X-Forwarded-For"
+	config.Real_ip_header = &realIpHeader
+
+	// Set config
+	http.SetFromConfig(*config)
+
+	// Check if http config is set correctly
+	assert.Equal(t, config.Ports, http.Ports)
+	assert.Equal(t, config.Ports, http.GetPorts())
+	assert.Equal(t, *config.Send_request, http.Send_request)
+	assert.Equal(t, *config.Send_response, http.Send_response)
+	assert.Equal(t, config.Hide_keywords, http.Hide_keywords)
+	assert.Equal(t, *config.Strip_authorization, http.Strip_authorization)
+	assert.True(t, http.Send_headers)
+	assert.True(t, http.Send_all_headers)
+	assert.Equal(t, *config.Split_cookie, http.Split_cookie)
+	assert.Equal(t, strings.ToLower(*config.Real_ip_header), http.Real_ip_header)
+}
+
+func TestHttp_configsSettingHeaders(t *testing.T) {
+
+	http := HttpModForTests()
+	config := new(config.Http)
+
+	// Assign config vars
+	config.Send_headers = []string{"a", "b", "c"}
+
+	// Set config
+	http.SetFromConfig(*config)
+
+	// Check if http config is set correctly
+	assert.True(t, http.Send_headers)
+	assert.Equal(t, len(config.Send_headers), len(http.Headers_whitelist))
+
+	for _, val := range http.Headers_whitelist {
+		assert.True(t, val)
+	}
 }
