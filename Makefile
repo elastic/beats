@@ -2,13 +2,14 @@ RELEASE?=master
 BUILDID?=$(shell date +%y%m%d%H%M%S)
 
 .PHONY: all
-all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win
+all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win \
+	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win
 
 
 .PHONY: packetbeat topbeat
 packetbeat topbeat: xgo-image build
 	cd build && xgo -image=tudorg/beats-builder -static \
-		-before-build=../xgo-scripts/before_build.sh \
+		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
 		github.com/elastic/$@
 
