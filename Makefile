@@ -9,8 +9,6 @@ GOFILES = $(shell find . -type f -name '*.go')
 packetbeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
-	# gotestcover is needed to fetch coverage for multiple packages
-	go get github.com/pierrre/gotestcover
 	$(GODEP) go build
 
 go-daemon/god: go-daemon/god.c
@@ -100,6 +98,8 @@ testlong:
 
 .PHONY: cover
 cover:
+	# gotestcover is needed to fetch coverage for multiple packages
+	go get github.com/pierrre/gotestcover
 	GOPATH=$(shell $(GODEP) path):$(GOPATH) gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
 	mkdir -p cover
 	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
