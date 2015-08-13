@@ -100,7 +100,7 @@ testlong:
 cover:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
 	mkdir -p cover
 	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
 
