@@ -21,8 +21,10 @@ fpm --force -s dir -t rpm \
 
 # rename so that the filename respects semver rules
 mv {{.beat_name}}-{{.rpm_version}}-1.{{.rpm_arch}}.rpm {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm
+echo "{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm" >> artifacts
 echo "Created {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm"
 
 # create sha1 file
 sha1sum {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm > {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1
 echo "Created {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1"
+echo "{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm" >> artifacts

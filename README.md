@@ -45,15 +45,27 @@ Building all Beats for all platforms:
 
 Which currently produces the following:
 
-        build/packetbeat-1.0.0-nightly.150809100849-darwin.tgz
-        build/packetbeat-1.0.0-nightly.150809100849-darwin.tgz.sha1
-        build/packetbeat-1.0.0-nightly.150809100849-i686.rpm
-        build/packetbeat-1.0.0-nightly.150809100849-i686.rpm.sha1
-        build/packetbeat-1.0.0-nightly.150809100849-x86_64.rpm
-        build/packetbeat-1.0.0-nightly.150809100849-x86_64.rpm.sha1
-        build/packetbeat-1.0.0-nightly.150809100857-windows.zip
-        build/packetbeat-1.0.0-nightly.150809100857-windows.zip.sha1
-        build/packetbeat_1.0.0-nightly.150809100849_amd64.deb
-        build/packetbeat_1.0.0-nightly.150809100849_amd64.deb.sha1
-        build/packetbeat_1.0.0-nightly.150809100849_i386.deb
-        build/packetbeat_1.0.0-nightly.150809100849_i386.deb.sha1
+        topbeat-1.0.0-nightly.150813173034-darwin.tgz
+        topbeat-1.0.0-nightly.150813173034-darwin.tgz.sha1
+        topbeat_1.0.0-nightly.150813173034_i386.deb
+        topbeat_1.0.0-nightly.150813173034_i386.deb.sha1
+        topbeat-1.0.0-nightly.150813173034-windows.zip
+        topbeat-1.0.0-nightly.150813173034-windows.zip.sha1
+        topbeat-1.0.0-nightly.150813173034-i686.rpm
+        topbeat-1.0.0-nightly.150813173034-i686.rpm
+        topbeat_1.0.0-nightly.150813173034_amd64.deb
+        topbeat_1.0.0-nightly.150813173034_amd64.deb.sha1
+        topbeat-1.0.0-nightly.150813173034-x86_64.rpm
+        topbeat-1.0.0-nightly.150813173034-x86_64.rpm
+        packetbeat-1.0.0-nightly.150813173058-windows.zip
+        packetbeat-1.0.0-nightly.150813173058-windows.zip.sha1
+        packetbeat-1.0.0-nightly.150813173058-darwin.tgz
+        packetbeat-1.0.0-nightly.150813173058-darwin.tgz.sha1
+        packetbeat_1.0.0-nightly.150813173058_i386.deb
+        packetbeat_1.0.0-nightly.150813173058_i386.deb.sha1
+        packetbeat-1.0.0-nightly.150813173058-i686.rpm
+        packetbeat-1.0.0-nightly.150813173058-i686.rpm
+        packetbeat_1.0.0-nightly.150813173058_amd64.deb
+        packetbeat_1.0.0-nightly.150813173058_amd64.deb.sha1
+        packetbeat-1.0.0-nightly.150813173058-x86_64.rpm
+        packetbeat-1.0.0-nightly.150813173058-x86_64.rpm

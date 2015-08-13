@@ -11,6 +11,8 @@ cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-windows/
 
 zip -r {{.beat_name}}-{{.version}}-windows.zip /{{.beat_name}}-{{.version}}-windows
 echo "Created {{.beat_name}}-{{.version}}-windows.zip"
+echo "{{.beat_name}}-{{.version}}-windows.zip" >> artifacts
 
 sha1sum {{.beat_name}}-{{.version}}-windows.zip > {{.beat_name}}-{{.version}}-windows.zip.sha1
 echo "Created {{.beat_name}}-{{.version}}-windows.zip.sha1"
+echo "{{.beat_name}}-{{.version}}-windows.zip.sha1" >> artifacts

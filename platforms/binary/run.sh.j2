@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+mkdir /{{.beat_name}}-{{.version}}-linux
+cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}
+cp {{.beat_name}}-linux.yml /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-{{.bin_arch}}/
+
+tar czvf {{.beat_name}}-{{.version}}-{{.bin_arch}}.tgz /{{.beat_name}}-{{.version}}-{{.bin_arch}}
+echo "Created {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz"
+echo "{{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz" >> artifacts
+
+sha1sum {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz > {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz.sha1
+echo "Created {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz.sha1"
+echo "{{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz.sha1" >> artifacts

@@ -27,6 +27,10 @@ packetbeat topbeat: xgo-image build
 %/win: % fpm-image
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
 
+%/bin: % fpm-image
+	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
+	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
+
 .PHONY: deps xgo-image
 deps:
 	go get github.com/tsg/xgo

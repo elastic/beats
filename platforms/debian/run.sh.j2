@@ -22,7 +22,9 @@ fpm --force -s dir -t deb \
 # rename so that the filename respects semver rules
 mv {{.beat_name}}_{{.deb_version}}_{{.deb_arch}}.deb {{.beat_name}}_{{.version}}_{{.deb_arch}}.deb
 echo "Created {{.beat_name}}_{{.version}}_{{.deb_arch}}.deb"
+echo "{{.beat_name}}_{{.version}}_{{.deb_arch}}.deb" >> artifacts
 
 # create sha1 file
 sha1sum {{.beat_name}}_{{.version}}_{{.deb_arch}}.deb > {{.beat_name}}_{{.version}}_{{.deb_arch}}.deb.sha1
 echo "Created {{.beat_name}}_{{.version}}_{{.deb_arch}}.deb.sha1"
+echo "{{.beat_name}}_{{.version}}_{{.deb_arch}}.deb.sha1" >> artifacts
