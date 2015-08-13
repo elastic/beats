@@ -93,14 +93,17 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	$(GODEP) go test ./...
+	make cover
 	make -C tests test
 
 .PHONY: cover
 cover:
+	# gotestcover is needed to fetch coverage for multiple packages
+	go get github.com/pierrre/gotestcover
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
 	mkdir -p cover
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) ./scripts/coverage.sh
 	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
+
 
 .PHONY: benchmark
 benchmark:
