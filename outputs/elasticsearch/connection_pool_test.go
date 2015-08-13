@@ -7,6 +7,8 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+const NO_TIMEOUT = 0
+
 func TestRoundRobin(t *testing.T) {
 
 	var pool ConnectionPool
@@ -68,6 +70,12 @@ func TestMarkDead(t *testing.T) {
 
 }
 
+func assertExpectedConnectionURL(t *testing.T, returned, expected string) {
+	if returned != expected {
+		t.Errorf("Wrong connection returned: %s, expecting: %s", returned, expected)
+	}
+}
+
 func TestDeadTimeout(t *testing.T) {
 
 	if testing.Verbose() {
@@ -82,25 +90,16 @@ func TestDeadTimeout(t *testing.T) {
 	if err != nil {
 		t.Errorf("Fail to set the connections: %s", err)
 	}
-	pool.SetDeadTimeout(10)
+	pool.SetDeadTimeout(0)
 
 	conn := pool.GetConnection()
+	assertExpectedConnectionURL(t, conn.URL, "localhost:9200")
 
-	if conn.URL != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.URL)
-	}
 	pool.MarkDead(conn)
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Millisecond)
 
-	conn = pool.GetConnection()
-	if conn.URL != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.URL)
-	}
-
-	conn = pool.GetConnection()
-	if conn.URL != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.URL)
-	}
+	assertExpectedConnectionURL(t, pool.GetConnection().URL, "localhost:9201")
+	assertExpectedConnectionURL(t, pool.GetConnection().URL, "localhost:9200")
 }
 
 func TestMarkLive(t *testing.T) {
