@@ -5,10 +5,6 @@ go:
 
 sudo: false
 
-services:
-  - redis-server
-  - elasticsearch
-
 addons:
   apt:
     packages:
