@@ -10,3 +10,8 @@ env/bin/activate: requirements.txt
 test: env
 	make -C ..
 	. env/bin/activate; nosetests --processes=4
+
+clean:
+	-rm last_run
+	-rm -r run
+	-rm -r env

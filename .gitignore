@@ -11,6 +11,7 @@ packetbeat.test
 /profile.cov
 /cover/coverage.html
 /docs/html_docs
+last_run
 
 # Folders
 _obj

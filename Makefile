@@ -117,5 +117,20 @@ gen:
 
 .PHONY: clean
 clean:
-	rm packetbeat || true
-	rm -r packetbeat-$(VERSION) || true
+	-rm packetbeat
+	-rm -r packetbeat-$(VERSION)
+	-rm profile.cov cover/coverage.html
+	-rm -r docs/html_docs
+
+build-image:
+	# Clean up local environment before creating image -> remove files not needed
+	make clean
+	make -C tests/ clean
+	-docker rm -f ruflin/packetbeat-dev
+	docker build -t ruflin/packetbeat-dev .
+
+dev-shell: build-image
+	docker run -it -v $(shell pwd):/go/src/github.com/elastic/packetbeat ruflin/packetbeat-dev /bin/bash
+
+testsuite: build-image
+	docker run ruflin/packetbeat-dev make testlong
