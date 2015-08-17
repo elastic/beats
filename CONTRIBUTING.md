@@ -21,6 +21,8 @@ The process for contributing to any of the Elastic repositories is similar.
 
 ## Contribution Steps
 
+*Prereq:* libpcap-dev (deb) || libpcap-devel (rpm) should be present in your system.
+
 1. Test your changes! Run the test suite (`make test`)
 2. Please make sure you have signed our [Contributor License
    Agreement](https://www.elastic.co/contributor-agreement/). We are not
