@@ -204,14 +204,7 @@ func (t *Topbeat) Stop() {
 	t.isAlive = false
 }
 
-func (t *Topbeat) IsAlive() bool {
-
-	return t.isAlive
-}
-
 func main() {
-
-	over := make(chan bool)
 
 	// Use our own FlagSet, because some libraries pollute the global one
 	var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
@@ -243,7 +236,6 @@ func main() {
 	}
 
 	topbeat := &Topbeat{}
-
 	if err = topbeat.Init(Config.Input, publisher.Publisher.Queue); err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
@@ -257,16 +249,6 @@ func main() {
 	}
 	service.BeforeRun()
 
-	// run the Beat code in background
-	go func() {
-		err := topbeat.Run()
-		if err != nil {
-			logp.Critical("Sniffer main loop failed: %v", err)
-			os.Exit(1)
-		}
-		over <- true
-	}()
-
 	service.HandleSignals(topbeat.Stop)
 
 	// Startup successful, disable stderr logging if requested by
@@ -275,11 +257,10 @@ func main() {
 
 	logp.Debug("main", "Starting topbeat")
 
-	// Wait for the goroutines to finish
-	for _ = range over {
-		if !topbeat.IsAlive() {
-			break
-		}
+	err = topbeat.Run()
+	if err != nil {
+		logp.Critical("Sniffer main loop failed: %v", err)
+		os.Exit(1)
 	}
 
 	logp.Debug("main", "Cleanup")
