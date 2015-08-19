@@ -1,0 +1,54 @@
+{
+	"ImportPath": "github.com/elastic/topbeat",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/elastic/gosigar",
+			"Comment": "scotty_09012012-30-gf3eae4a",
+			"Rev": "f3eae4adb3b39677a8d543cfdb001a96d5644377"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/cfgfile",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/common",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/logp",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/outputs",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/publisher",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/service",
+			"Rev": "30ce409977812c2017dcc9ff956485ba6ebd14bb"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/nranchev/go-libGeoIP",
+			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
+		}
+	]
+}
