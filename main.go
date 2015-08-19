@@ -74,6 +74,8 @@ func (t *Topbeat) initProcStats() {
 		logp.Warn("Getting the list of pids: %v", err)
 	}
 
+	logp.Debug("topbeat", "Pids: %v\n", pids)
+
 	for _, pid := range pids {
 		process, err := GetProcess(pid)
 		if err != nil {
@@ -108,8 +110,6 @@ func (t *Topbeat) exportProcStats() error {
 			process.Cpu.Percent = t.getCpuPercent(process)
 
 			t.procsMap[process.Pid] = process
-
-			logp.Debug("topbeat", "Process: %s", process)
 
 			event := common.MapStr{
 				"timestamp":  common.Time(time.Now()),

@@ -183,7 +183,7 @@ func getProcState(b byte) string {
 	case 'Z':
 		return "zombie"
 	}
-	return "<unknown>"
+	return "unknown"
 }
 
 func GetProcess(pid int) (*Process, error) {
