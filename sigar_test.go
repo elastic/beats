@@ -10,7 +10,20 @@ func TestGetSystemLoad(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, load)
-	assert.True(t, (0 < load.Load1))
-	assert.True(t, (0 < load.Load5))
-	assert.True(t, (0 < load.Load15))
+	assert.True(t, (load.Load1 > 0))
+	assert.True(t, (load.Load5 > 0))
+	assert.True(t, (load.Load15 > 0))
+}
+
+func TestGetMemory(t *testing.T) {
+	mem, err := GetMemory()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, mem)
+
+	assert.True(t, (mem.Total > 0))
+	assert.True(t, (mem.Used > 0))
+	assert.True(t, (mem.Free >= 0))
+	assert.True(t, (mem.ActualFree >= 0))
+	assert.True(t, (mem.ActualUsed > 0))
 }
