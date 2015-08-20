@@ -43,6 +43,7 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 	err := svc.Run(os.Args[0], &beatService{})
 	if err != nil {
 		logp.Err("Error: %v", err)
+	} else {
+		stopCallback()
 	}
-	stopCallback()
 }

@@ -417,7 +417,9 @@ func (c *conn) Do(cmd string, args ...interface{}) (interface{}, error) {
 	}
 
 	if cmd != "" {
-		c.writeCommand(cmd, args)
+		if err := c.writeCommand(cmd, args); err != nil {
+			return nil, c.fatal(err)
+		}
 	}
 
 	if err := c.bw.Flush(); err != nil {
