@@ -7,40 +7,40 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/gosigar",
-			"Comment": "scotty_09012012-32-gf47632d",
-			"Rev": "f47632d46ef1dcf8020ae3caf38ffb5ffe8f9ab3"
+			"Comment": "scotty_09012012-30-gf3eae4a",
+			"Rev": "f3eae4adb3b39677a8d543cfdb001a96d5644377"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "e28936915d5dc13cdfde9ce42801a2e46ec0735b"
+			"Rev": "fae9cf861b58f09cf578245e45415899f4151d32"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
@@ -48,7 +48,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "49c95bdc21843256fb6c4e0d370a05f24a0bf213"
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
 		}
 	]
 }
