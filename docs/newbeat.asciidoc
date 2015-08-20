@@ -1,0 +1,219 @@
+= Developer guide: create a new Beat
+
+This guide walks you through the steps for creating a new Elastic Beat.
+The Beats are a collection of lightweight daemons that collection
+operational data from your servers and ship it to Logstash or Elasticsearch.
+The common parts from all Beats are placed in the libbeat library, which
+contains packages for sending data to Elasticsearch and Logstash, for
+configuration file handling, for signal handling, for logging and so on. By
+using this common framework, we can ensure that all Beats are behaving the same
+and they are easy to package and run with common tools.
+
+== Getting ready
+
+Libbeat and all Beats are written in http://golang.org/[Go], so having it
+installed and knowing its basics is a prerequisite for understanding this guide.
+However, don't worry if you are not a Go expert, it is a sufficiently new
+language that very few people can consider themselves experts.  In fact, several
+people learned Go by contributing to Packetbeat & libbeat, including the
+original Packetbeat authors.
+
+To exemplify this guide with a working example, we will follow
+https://github.com/elastic/topbeat[Topbeat] source code. Topbeat is similar to
+the `top` command line tool but instead of printing the statistics to the screen
+it ships them to Elasticsearch for storage.
+
+A simple way of getting the source code for topbeat and libeat and compiling
+them at the same time is to do:
+
+[source,shell]
+----------------------------------------------------------------------
+go get github.com/elastic/topbeat
+----------------------------------------------------------------------
+
+== Overview
+
+At the high level, a simple Beat like Topbeat has two main components: one that
+collects the actual data and the Publisher. They communicate via a Go channel,
+over which *events* are sent. The Publisher is implemented in libbeat, so you
+typically only have to worry about the logic specific to your Beat. Besides the
+Publisher, libbeat offers common services like configuration management,
+logging, daemonizing/windows service handling and in the future it will offer
+data processing modules like filtering or sampling.
+
+image:./images/beat_overview.png[Beat overview architecture]
+
+An event is JSON like object (Golang type `map[string]interface{}`) that
+contains the collected data and which is indexed into Elasticsearch. The only
+rules are that it must contain a `timestamp` field and a `type` field. Beyond
+that, it doesn't matter what these events contain or how often they are created.
+Here is an example Topbeat event:
+
+[source,json]
+----------------------------------------------------------------------
+{
+  count":1,
+  "proc.cpu":{
+    "user":20,
+    "percent":0.983284169124877,
+    "system":0,
+    "total":20,
+    "start_time":"20:20"
+  },
+  "proc.mem":{
+    "size":333772,
+    "rss":6316,
+    "share":2996
+  },
+  "proc.name":"topbeat",
+  "proc.pid":13954,
+  "proc.ppid":10027,
+  "proc.state":"sleeping",
+  "shipper":"vagrant-ubuntu-trusty-64",
+  "timestamp":"2015-08-06T20:20:34.089Z",
+  "type":"proc"
+}
+----------------------------------------------------------------------
+
+Now that you have the big picture, lets dig into the code.
+
+== Beat specific code
+
+For Topbeat, the Beat specific logic is contained in a type called Topbeat.
+There's more code in it, but here are the relevant portions for this guide:
+
+
+[source,go]
+----------------------------------------------------------------------
+type Topbeat struct {
+    isAlive  bool
+    [ ... other fields ...]
+
+    events chan common.MapStr <1>
+}
+
+func (t *Topbeat) Run() error {
+    t.isAlive = true
+    t.initProcStats()
+
+    for t.isAlive { <2>
+        time.Sleep(t.period)
+        t.exportSystemStats()
+        t.exportProcStats()
+    }
+    return nil
+}
+
+func (t *Topbeat) Stop() {
+    t.isAlive = false
+}
+----------------------------------------------------------------------
+
+<1> The events channel is the channel through which the events are sent to the
+publisher. The `common.MapStr` type is essentially a `map[string][interface{}`
+with a few more
+https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods] added.
+
+<2> The main loop
+
+The type has two methods, the `Run` method, which contains the main
+loop of the application and the `Stop` method which simply provides a way of
+breaking the loop.
+
+Inside the loop, Topbeat sleeps for a configured period of time and then
+captures the required data and sends it to the publisher via the `events`
+channel.
+
+The actual sending is done inside the `exportSystemStats()` and
+`exportProcStats()` functions, here is an example code snippet:
+
+[source,go]
+----------------------------------------------------------------------
+  event := common.MapStr{
+      "timestamp": common.Time(time.Now()), <1>
+      "type":      "system",
+      "load":      load_stat,
+      "cpu":       cpu_stat,
+      "mem":       mem_stat,
+      "swap":      swap_stat,
+  }
+
+  t.events <- event
+----------------------------------------------------------------------
+
+<1> The `timestamp` fields needs to be of time `common.Time`.
+
+== The main function
+
+If you follow the Topbeat model and put your Beat specific code in it's own type
+that implements the `Run` and `Stop` methods, the `main` routing becomes a bit
+of copy-pastable boiler plate:
+
+[source,go]
+----------------------------------------------------------------------
+func main() {
+
+    // Use our own FlagSet, because some libraries pollute the global one
+    var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+    cfgfile.CmdLineFlags(cmdLine, Name) <1>
+    logp.CmdLineFlags(cmdLine)
+    service.CmdLineFlags(cmdLine)
+    publisher.CmdLineFlags(cmdLine)
+
+    printVersion := cmdLine.Bool("version", false, "Print version and exit") <2>
+
+    cmdLine.Parse(os.Args[1:])
+
+    if *printVersion {
+        fmt.Printf("%s version %s (%s)\n", Name, Version, runtime.GOARCH)
+        return
+    }
+
+    err := cfgfile.Read(&Config)
+
+    logp.Init(Name, &Config.Logging)
+
+    logp.Debug("main", "Initializing output plugins")
+    if err = publisher.Publisher.Init(Config.Output, Config.Shipper); err != nil
+    { <3>
+        logp.Critical(err.Error())
+        os.Exit(1)
+    }
+
+    topbeat := &Topbeat{}
+    if err = topbeat.Init(Config.Input, publisher.Publisher.Queue); err != nil {
+    <4>
+        logp.Critical(err.Error())
+        os.Exit(1)
+    }
+
+    // Up to here was the initialization
+    if cfgfile.IsTestConfig() { <5>
+        // all good, exit with 0
+        os.Exit(0)
+    }
+    service.BeforeRun()
+
+    service.HandleSignals(topbeat.Stop) <6>
+
+    // Startup successful, disable stderr logging if requested by
+    // cmdline flag
+    logp.SetStderr()
+
+    logp.Debug("main", "Starting topbeat")
+
+    err = topbeat.Run() <7>
+    if err != nil {
+        logp.Critical("Sniffer main loop failed: %v", err)
+        os.Exit(1)
+    }
+
+    logp.Debug("main", "Cleanup")
+    service.Cleanup()
+}
+----------------------------------------------------------------------
+
+<1> libbeat modules can provide their own command line flags.
+
+

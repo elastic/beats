@@ -15,6 +15,7 @@ cover/coverage.html
 _obj
 _test
 _output
+/docs/html_docs
 
 # Architecture specific extensions/prefixes
 *.[568vq]
