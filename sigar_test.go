@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGetSystemLoad(t *testing.T) {
@@ -48,4 +49,33 @@ func TestPids(t *testing.T) {
 
 	// Assuming at least 2 processes are running
 	assert.True(t, (len(pids) > 1))
+}
+
+func TestGetProcess(t *testing.T) {
+	pids, err := Pids()
+
+	assert.Nil(t, err)
+
+	process, err := GetProcess(pids[0])
+
+	assert.NotNil(t, process)
+	assert.Nil(t, err)
+
+	assert.True(t, (process.Pid > 0))
+	assert.True(t, (process.Ppid > 0))
+	assert.True(t, (len(process.Name) > 0))
+	assert.NotEqual(t, "unknown", process.State)
+
+	// Memory Checks
+	assert.True(t, (process.Mem.Size >= 0))
+	assert.True(t, (process.Mem.Resident >= 0))
+	assert.True(t, (process.Mem.Share >= 0))
+
+	// CPU Checks
+	assert.True(t, (len(process.Cpu.Start) > 0))
+	assert.True(t, (process.Cpu.Total >= 0))
+	assert.True(t, (process.Cpu.User >= 0))
+	assert.True(t, (process.Cpu.System >= 0))
+
+	assert.True(t, (process.lastCPUTime.Unix() <= time.Now().Unix()))
 }
