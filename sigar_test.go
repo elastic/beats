@@ -1,12 +1,19 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
+	"runtime"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetSystemLoad(t *testing.T) {
+
+	if runtime.GOOS == "windows" {
+		return //no load data on windows
+	}
+
 	load, err := GetSystemLoad()
 
 	assert.NotNil(t, load)
@@ -31,6 +38,11 @@ func TestGetMemory(t *testing.T) {
 }
 
 func TestGetSwap(t *testing.T) {
+
+	if runtime.GOOS == "windows" {
+		return //no load data on windows
+	}
+
 	swap, err := GetSwap()
 
 	assert.NotNil(t, swap)
@@ -56,7 +68,7 @@ func TestGetProcess(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	process, err := GetProcess(pids[0])
+	process, err := GetProcess(pids[len(pids)-1])
 
 	assert.NotNil(t, process)
 	assert.Nil(t, err)
