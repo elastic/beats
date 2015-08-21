@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -57,6 +58,28 @@ func afpacketComputeSize(target_size_mb int, snaplen int, page_size int) (
 	return frame_size, block_size, num_blocks, nil
 }
 
+func deviceNameFromIndex(index int, devices []string) (string, error) {
+	if index >= len(devices) {
+		return "", fmt.Errorf("Looking for device index %d, but there are only %d devices",
+			index, len(devices))
+	}
+
+	return devices[index], nil
+}
+
+func ListDeviceNames() ([]string, error) {
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		return []string{}, err
+	}
+
+	ret := []string{}
+	for _, dev := range devices {
+		ret = append(ret, dev.Name)
+	}
+	return ret, nil
+}
+
 func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) error {
 	var err error
 
@@ -71,6 +94,18 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 	// set defaults
 	if len(sniffer.config.Device) == 0 {
 		sniffer.config.Device = "any"
+	}
+
+	if index, err := strconv.Atoi(sniffer.config.Device); err == nil { // Device is numeric
+		devices, err := ListDeviceNames()
+		if err != nil {
+			return fmt.Errorf("Error getting devices list: %v", err)
+		}
+		sniffer.config.Device, err = deviceNameFromIndex(index, devices)
+		if err != nil {
+			return fmt.Errorf("Couldn't understand device index %d: %v", index, err)
+		}
+		logp.Info("Resolved device index %d to device: %s", index, sniffer.config.Device)
 	}
 
 	if sniffer.config.Snaplen == 0 {

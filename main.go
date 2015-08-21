@@ -61,7 +61,8 @@ func main() {
 	oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
 	topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
-	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
+	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file")
+	printDevices := cmdLine.Bool("devices", false, "Print the list of devices and exit")
 
 	cmdLine.Parse(os.Args[1:])
 
@@ -70,6 +71,18 @@ func main() {
 	if *printVersion {
 		fmt.Printf("Packetbeat version %s (%s)\n", Version, runtime.GOARCH)
 		return
+	}
+
+	if *printDevices {
+		devs, err := sniffer.ListDeviceNames()
+		if err != nil {
+			fmt.Printf("Error getting devices list: %v\n", err)
+			os.Exit(1)
+		}
+		for i, dev := range devs {
+			fmt.Printf("%d: %s\n", i, dev)
+		}
+		os.Exit(0)
 	}
 
 	err := cfgfile.Read(&config.ConfigSingleton)

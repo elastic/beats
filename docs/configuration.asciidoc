@@ -140,7 +140,7 @@ configuration:
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
-  # On which devices to sniff
+  # On which device to sniff
   device: any
 
   # The maximum capture size of a single packet.
@@ -167,13 +167,24 @@ interfaces:
   device: eth0
 ------------------------------------------------------------------------------
 
-
-Alternatively, the Packetbeat shipper supports capturing of all messages sent or
-received by the server on which it is installed. For this, use the special
-"any" device.
+Alternatively, on Linux the Packetbeat shipper supports capturing of all
+messages sent or received by the server on which it is installed. For this, use
+the special "any" device.
 
 NOTE: When using the "any" device, the interfaces are not set
       in promiscuous mode.
+
+This option also accepts specifying the device by its index in the list of
+devices available for sniffing. To obtain the list of available devices, you can
+use run Packetbeat like this: `packetbeat -devices`. This is especially useful
+on Windows where device names are long. The following example will setup
+sniffing on the first interface available:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: 0
+------------------------------------------------------------------------------
 
 
 ===== snaplen
