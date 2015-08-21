@@ -73,13 +73,6 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		sniffer.config.Device = "any"
 	}
 
-	if len(sniffer.config.Devices) == 0 {
-		// 'devices' not set but 'device' is set. For backwards compatibility,
-		// use the one configured device
-		if len(sniffer.config.Device) > 0 {
-			sniffer.config.Devices = []string{sniffer.config.Device}
-		}
-	}
 	if sniffer.config.Snaplen == 0 {
 		sniffer.config.Snaplen = 65535
 	}
@@ -88,7 +81,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		sniffer.config.Type = "pcap"
 	}
 
-	logp.Debug("sniffer", "Sniffer type: %s devices: %s", sniffer.config.Type, sniffer.config.Devices)
+	logp.Debug("sniffer", "Sniffer type: %s device: %s", sniffer.config.Type, sniffer.config.Device)
 
 	switch sniffer.config.Type {
 	case "pcap":
@@ -98,11 +91,8 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 				return err
 			}
 		} else {
-			if len(sniffer.config.Devices) > 1 {
-				return fmt.Errorf("Pcap sniffer only supports one device. You can use 'any' if you want")
-			}
 			sniffer.pcapHandle, err = pcap.OpenLive(
-				sniffer.config.Devices[0],
+				sniffer.config.Device,
 				int32(sniffer.config.Snaplen),
 				true,
 				500*time.Millisecond)
@@ -122,10 +112,6 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			sniffer.config.Buffer_size_mb = 24
 		}
 
-		if len(sniffer.config.Devices) > 1 {
-			return fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
-		}
-
 		frame_size, block_size, num_blocks, err := afpacketComputeSize(
 			sniffer.config.Buffer_size_mb,
 			sniffer.config.Snaplen,
@@ -135,7 +121,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		}
 
 		sniffer.afpacketHandle, err = NewAfpacketHandle(
-			sniffer.config.Devices[0],
+			sniffer.config.Device,
 			frame_size,
 			block_size,
 			num_blocks,
@@ -151,12 +137,8 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
 	case "pfring":
-		if len(sniffer.config.Devices) > 1 {
-			return fmt.Errorf("Afpacket sniffer only supports one device. You can use 'any' if you want")
-		}
-
 		sniffer.pfringHandle, err = NewPfringHandle(
-			sniffer.config.Devices[0],
+			sniffer.config.Device,
 			sniffer.config.Snaplen,
 			true)
 

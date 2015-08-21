@@ -21,7 +21,6 @@ type Config struct {
 
 type InterfacesConfig struct {
 	Device         string
-	Devices        []string
 	Type           string
 	File           string
 	With_vlans     bool
