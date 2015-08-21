@@ -1,0 +1,29 @@
+language: go
+
+go:
+  - 1.4
+
+sudo: false
+
+before_install:
+  # Redo the travis setup but with the elastic/topbeat path. This is needed so the package path is correct
+  - mkdir -p $HOME/gopath/src/github.com/elastic/topbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/topbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/topbeat
+  - cd $HOME/gopath/src/github.com/elastic/topbeat
+
+install:
+  - make
+
+script:
+  - make cover
+
+notifications:
+  email:
+    - tudor@elastic.co
+    - monica@elastic.co
+
+after_success:
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - cp profile.cov coverage.txt
+  - bash <(curl -s https://codecov.io/bash)

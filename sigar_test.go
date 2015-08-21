@@ -62,7 +62,7 @@ func TestGetProcess(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.True(t, (process.Pid > 0))
-	assert.True(t, (process.Ppid > 0))
+	assert.True(t, (process.Ppid >= 0))
 	assert.True(t, (len(process.Name) > 0))
 	assert.NotEqual(t, "unknown", process.State)
 
