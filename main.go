@@ -54,12 +54,12 @@ func main() {
 	cfgfile.CmdLineFlags(cmdLine, Name)
 	logp.CmdLineFlags(cmdLine)
 	service.CmdLineFlags(cmdLine)
+	publisher.CmdLineFlags(cmdLine)
 
 	file := cmdLine.String("I", "", "file")
 	loop := cmdLine.Int("l", 1, "Loop file. 0 - loop forever")
 	oneAtAtime := cmdLine.Bool("O", false, "Read packets one at a time (press Enter)")
 	topSpeed := cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping")
-	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
 	dumpfile := cmdLine.String("dump", "", "Write all captured packets to this libpcap file.")
 
@@ -90,8 +90,7 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = publisher.Publisher.Init(*publishDisabled, config.ConfigSingleton.Output,
-		config.ConfigSingleton.Shipper); err != nil {
+	if err = publisher.Publisher.Init(config.ConfigSingleton.Output, config.ConfigSingleton.Shipper); err != nil {
 
 		logp.Critical(err.Error())
 		os.Exit(1)

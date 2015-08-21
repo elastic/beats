@@ -10,8 +10,8 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/protos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1234,7 +1234,6 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
 }
 
-
 func TestHttp_configsSettingAll(t *testing.T) {
 
 	http := HttpModForTests()
@@ -1242,7 +1241,7 @@ func TestHttp_configsSettingAll(t *testing.T) {
 
 	// Assign config vars
 	config.Ports = []int{80, 8080}
-	
+
 	trueVar := true
 	config.Send_request = &trueVar
 	config.Send_response = &trueVar
