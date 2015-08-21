@@ -194,17 +194,17 @@ func GetProcess(pid int) (*Process, error) {
 
 	err := state.Get(pid)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error getting state info: %v", err)
 	}
 
 	err = mem.Get(pid)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error getting mem info: %v", err)
 	}
 
 	err = cpu.Get(pid)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error getting cpu info: %v", err)
 	}
 
 	proc := Process{

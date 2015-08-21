@@ -68,26 +68,34 @@ func TestGetProcess(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	process, err := GetProcess(pids[len(pids)-1])
+	for _, pid := range pids {
 
-	assert.NotNil(t, process)
-	assert.Nil(t, err)
+		process, err := GetProcess(pid)
 
-	assert.True(t, (process.Pid > 0))
-	assert.True(t, (process.Ppid >= 0))
-	assert.True(t, (len(process.Name) > 0))
-	assert.NotEqual(t, "unknown", process.State)
+		if err != nil {
+			continue
+		}
+		assert.NotNil(t, process)
 
-	// Memory Checks
-	assert.True(t, (process.Mem.Size >= 0))
-	assert.True(t, (process.Mem.Resident >= 0))
-	assert.True(t, (process.Mem.Share >= 0))
+		assert.True(t, (process.Pid > 0))
+		assert.True(t, (process.Ppid >= 0))
+		assert.True(t, (len(process.Name) > 0))
+		assert.NotEqual(t, "unknown", process.State)
 
-	// CPU Checks
-	assert.True(t, (len(process.Cpu.Start) > 0))
-	assert.True(t, (process.Cpu.Total >= 0))
-	assert.True(t, (process.Cpu.User >= 0))
-	assert.True(t, (process.Cpu.System >= 0))
+		// Memory Checks
+		assert.True(t, (process.Mem.Size >= 0))
+		assert.True(t, (process.Mem.Resident >= 0))
+		assert.True(t, (process.Mem.Share >= 0))
 
-	assert.True(t, (process.lastCPUTime.Unix() <= time.Now().Unix()))
+		// CPU Checks
+		assert.True(t, (len(process.Cpu.Start) > 0))
+		assert.True(t, (process.Cpu.Total >= 0))
+		assert.True(t, (process.Cpu.User >= 0))
+		assert.True(t, (process.Cpu.System >= 0))
+
+		assert.True(t, (process.lastCPUTime.Unix() <= time.Now().Unix()))
+
+		// it's enough to get valid data for a single process
+		break
+	}
 }
