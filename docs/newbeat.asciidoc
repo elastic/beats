@@ -1,4 +1,4 @@
-= Developer guide: create a new Beat
+= Developer guide: creating a new Beat
 
 This guide walks you through the steps for creating a new Elastic Beat.
 The Beats are a collection of lightweight daemons that collection
@@ -170,32 +170,32 @@ func main() {
         return
     }
 
-    err := cfgfile.Read(&Config)
+    err := cfgfile.Read(&Config) <3>
 
     logp.Init(Name, &Config.Logging)
 
     logp.Debug("main", "Initializing output plugins")
     if err = publisher.Publisher.Init(Config.Output, Config.Shipper); err != nil
-    { <3>
+    { <4>
         logp.Critical(err.Error())
         os.Exit(1)
     }
 
     topbeat := &Topbeat{}
     if err = topbeat.Init(Config.Input, publisher.Publisher.Queue); err != nil {
-    <4>
+    <5>
         logp.Critical(err.Error())
         os.Exit(1)
     }
 
     // Up to here was the initialization
-    if cfgfile.IsTestConfig() { <5>
+    if cfgfile.IsTestConfig() { <6>
         // all good, exit with 0
         os.Exit(0)
     }
     service.BeforeRun()
 
-    service.HandleSignals(topbeat.Stop) <6>
+    service.HandleSignals(topbeat.Stop) <7>
 
     // Startup successful, disable stderr logging if requested by
     // cmdline flag
@@ -203,7 +203,7 @@ func main() {
 
     logp.Debug("main", "Starting topbeat")
 
-    err = topbeat.Run() <7>
+    err = topbeat.Run() <8>
     if err != nil {
         logp.Critical("Sniffer main loop failed: %v", err)
         os.Exit(1)
@@ -214,6 +214,49 @@ func main() {
 }
 ----------------------------------------------------------------------
 
-<1> libbeat modules can provide their own command line flags.
+<1> libbeat modules can provide their own command line flags. `Name` is a
+global constant and it represents the name of the Beat.
+
+<2> The Beat can also define its own custom CLI flags. In this case,
+`-version` is the only custom flag.
+
+<3> Read the configuration file, see the next section for details.
+
+<4> Publisher initialization, receiving the relevant configuration sections.
+
+<5> The Topbeat module initialization, receiving the relevant configuration
+section and the channel to the Publisher as paramters.
+
+<6> The Beats have a test config mode, this is handled here.
+
+<7> Unix signals and Windows control service commands are handled here.
+
+<8> Run the main loop.
+
+== Configuration
 
 
+[source,go]
+----------------------------------------------------------------------
+package main
+
+import (
+    "github.com/elastic/libbeat/logp"
+    "github.com/elastic/libbeat/outputs"
+    "github.com/elastic/libbeat/publisher"
+)
+
+type TopConfig struct {
+    Period *int64
+    Procs  *[]string
+}
+
+type ConfigSettings struct {
+    Input   TopConfig <1>
+    Output  map[string]outputs.MothershipConfig <2>
+    Logging logp.Logging
+    Shipper publisher.ShipperConfig
+}
+
+var Config ConfigSettings
+----------------------------------------------------------------------
