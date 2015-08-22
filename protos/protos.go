@@ -66,6 +66,7 @@ const (
 	PgsqlProtocol
 	ThriftProtocol
 	MongodbProtocol
+	DnsProtocol
 )
 
 // Protocol names
@@ -77,6 +78,7 @@ var ProtocolNames = []string{
 	"pgsql",
 	"thrift",
 	"mongodb",
+	"dns",
 }
 
 func (p Protocol) String() string {

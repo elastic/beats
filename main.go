@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/dns"
 	"github.com/elastic/packetbeat/protos/http"
 	"github.com/elastic/packetbeat/protos/mongodb"
 	"github.com/elastic/packetbeat/protos/mysql"
@@ -40,6 +41,7 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.RedisProtocol:   new(redis.Redis),
 	protos.ThriftProtocol:  new(thrift.Thrift),
 	protos.MongodbProtocol: new(mongodb.Mongodb),
+	protos.DnsProtocol:     new(dns.Dns),
 }
 
 var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{

@@ -11,6 +11,7 @@ import yaml
 
 SECTIONS = [
     ("event", "Event"),
+    ("dns", "DNS"),
     ("http", "Http"),
     ("mysql", "Mysql"),
     ("pgsql", "PostgreSQL"),
