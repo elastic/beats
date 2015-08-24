@@ -369,7 +369,7 @@ func BenchmarkUdpSophosTxt(b *testing.B) { benchmarkUdp(b, sophosTxt) }
 
 // Benchmark that runs with parallelism to help find concurrency related
 // issues. To run with parallelism, the 'go test' cpu flag must be set
-// greater than 1, otherwise it just run concurrently but on in parallel.
+// greater than 1, otherwise it just runs concurrently but not in parallel.
 func BenchmarkParallelParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messages)
@@ -401,9 +401,7 @@ func BenchmarkParallelParse(b *testing.B) {
 		}
 	})
 
-	defer func() {
-		close(dns.results)
-	}()
+	defer close(dns.results)
 }
 
 // parseUdpRequestResponse parses a request then a response packet and validates
