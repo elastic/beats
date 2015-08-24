@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/elastic/gosigar"
@@ -15,22 +16,24 @@ type SystemLoad struct {
 }
 
 type CpuTimes struct {
-	User    uint64 `json:"user"`
-	Nice    uint64 `json:"nice"`
-	System  uint64 `json:"system"`
-	Idle    uint64 `json:"idle"`
-	IOWait  uint64 `json:"iowait"`
-	Irq     uint64 `json:"irq"`
-	SoftIrq uint64 `json:"softirq"`
-	Steal   uint64 `json:"steal"`
+	User        uint64  `json:"user"`
+	UserPercent float64 `json:"user_p"`
+	Nice        uint64  `json:"nice"`
+	System      uint64  `json:"system"`
+	Idle        uint64  `json:"idle"`
+	IOWait      uint64  `json:"iowait"`
+	Irq         uint64  `json:"irq"`
+	SoftIrq     uint64  `json:"softirq"`
+	Steal       uint64  `json:"steal"`
 }
 
 type MemStat struct {
-	Total      uint64 `json:"total"`
-	Used       uint64 `json:"used"`
-	Free       uint64 `json:"free"`
-	ActualUsed uint64 `json:"actual_used"`
-	ActualFree uint64 `json:"actual_free"`
+	Total       uint64  `json:"total"`
+	Used        uint64  `json:"used"`
+	Free        uint64  `json:"free"`
+	UsedPercent float64 `json:"used_p"`
+	ActualUsed  uint64  `json:"actual_used"`
+	ActualFree  uint64  `json:"actual_free"`
 }
 
 type ProcMemStat struct {
@@ -88,6 +91,29 @@ func (t *CpuTimes) String() string {
 
 	return fmt.Sprintf("%d user, %d system, %d nice, %d iddle, %d iowait, %d irq, %d softirq, %d steal",
 		t.User, t.System, t.Nice, t.Idle, t.IOWait, t.Irq, t.SoftIrq, t.Steal)
+
+}
+func Round(val float64, roundOn float64, places int) (newVal float64) {
+	var round float64
+	pow := math.Pow(10, float64(places))
+	digit := pow * val
+	_, div := math.Modf(digit)
+	if div >= roundOn {
+		round = math.Ceil(digit)
+	} else {
+		round = math.Floor(digit)
+	}
+	newVal = round / pow
+	return
+}
+
+func mem_usage_percent(used uint64, total uint64) float64 {
+
+	if total == 0 {
+		return float64(0)
+	}
+	perc := float64(100*used) / float64(total)
+	return Round(perc, .5, 2)
 }
 
 func GetSystemLoad() (*SystemLoad, error) {
@@ -135,12 +161,15 @@ func GetMemory() (*MemStat, error) {
 	if err != nil {
 		return nil, err
 	}
+	percent := mem_usage_percent(mem.Used, mem.Total)
+
 	return &MemStat{
-		Total:      mem.Total / 1024,
-		Used:       mem.Used / 1024,
-		Free:       mem.Free / 1024,
-		ActualFree: mem.ActualFree / 1024,
-		ActualUsed: mem.ActualUsed / 1024,
+		Total:       mem.Total / 1024,
+		Used:        mem.Used / 1024,
+		UsedPercent: percent,
+		Free:        mem.Free / 1024,
+		ActualFree:  mem.ActualFree / 1024,
+		ActualUsed:  mem.ActualUsed / 1024,
 	}, nil
 }
 
@@ -151,10 +180,13 @@ func GetSwap() (*MemStat, error) {
 	if err != nil {
 		return nil, err
 	}
+	percent := mem_usage_percent(swap.Used, swap.Total)
+
 	return &MemStat{
-		Total: swap.Total,
-		Used:  swap.Used,
-		Free:  swap.Free,
+		Total:       swap.Total,
+		Used:        swap.Used,
+		Free:        swap.Free,
+		UsedPercent: percent,
 	}, nil
 
 }

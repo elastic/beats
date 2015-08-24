@@ -32,6 +32,7 @@ func TestGetMemory(t *testing.T) {
 
 	assert.True(t, (mem.Total > 0))
 	assert.True(t, (mem.Used > 0))
+	assert.True(t, (mem.UsedPercent > 0))
 	assert.True(t, (mem.Free >= 0))
 	assert.True(t, (mem.ActualFree >= 0))
 	assert.True(t, (mem.ActualUsed > 0))
@@ -48,9 +49,10 @@ func TestGetSwap(t *testing.T) {
 	assert.NotNil(t, swap)
 	assert.Nil(t, err)
 
-	assert.True(t, (swap.Total >= 0))
-	assert.True(t, (swap.Used >= 0))
-	assert.True(t, (swap.Total >= 0))
+	assert.True(t, (swap.Total > 0))
+	assert.True(t, (swap.Used > 0))
+	assert.True(t, (swap.UsedPercent > 0))
+	assert.True(t, (swap.Free >= 0))
 }
 
 func TestPids(t *testing.T) {

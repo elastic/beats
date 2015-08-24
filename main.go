@@ -22,10 +22,11 @@ var Name = "topbeat"
 type ProcsMap map[int]*Process
 
 type Topbeat struct {
-	isAlive  bool
-	period   time.Duration
-	procs    []string
-	procsMap ProcsMap
+	isAlive      bool
+	period       time.Duration
+	procs        []string
+	procsMap     ProcsMap
+	lastCpuTimes *CpuTimes
 
 	events chan common.MapStr
 }
@@ -127,6 +128,20 @@ func (t *Topbeat) exportProcStats() error {
 	return nil
 }
 
+func (t *CpuTimes) sum() uint64 {
+
+	return t.User + t.Nice + t.System + t.Idle + t.IOWait + t.Irq + t.SoftIrq + t.Steal
+}
+
+func cpu_user_percentage(t1 *CpuTimes, t2 *CpuTimes) float64 {
+
+	all_delta := t2.sum() - t1.sum()
+	user_delta := t2.User - t1.User
+
+	perc := float64(100*user_delta) / float64(all_delta)
+	return Round(perc, .5, 2)
+}
+
 func (t *Topbeat) exportSystemStats() error {
 
 	load_stat, err := GetSystemLoad()
@@ -139,6 +154,12 @@ func (t *Topbeat) exportSystemStats() error {
 		logp.Warn("Getting cpu times: %v", err)
 		return err
 	}
+	if t.lastCpuTimes != nil {
+		// CPU usage percent
+		cpu_stat.UserPercent = cpu_user_percentage(t.lastCpuTimes, cpu_stat)
+	}
+
+	t.lastCpuTimes = cpu_stat
 
 	mem_stat, err := GetMemory()
 	if err != nil {
