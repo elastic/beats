@@ -1,5 +1,6 @@
 RELEASE?=master
-BUILDID?=$(shell date +%y%m%d%H%M%S)
+DATE:=$(shell date +%y%m%d%H%M%S)
+BUILDID?=$(DATE)
 
 .PHONY: all
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win \
@@ -54,6 +55,10 @@ build/god-linux-386 build/god-linux-amd64: go-daemon-image
 build:
 	mkdir -p build
 
+.PHONY: s3-nightlies-upload
+s3-nightlies-upload: all
+	echo $(BUILDID) > build/upload/build_id.txt
+	aws s3 sync --acl public-read build/upload s3://beats-nightlies
 
 .PHONY: run-interactive
 run-interactive:
