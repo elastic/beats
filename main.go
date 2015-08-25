@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"runtime"
@@ -31,6 +32,74 @@ type Topbeat struct {
 	events chan common.MapStr
 }
 
+func (t *Topbeat) MatchProcess(name string) bool {
+
+	for _, reg := range t.procs {
+		matched, _ := regexp.MatchString(reg, name)
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Topbeat) getUsedMemPercent(m *MemStat) float64 {
+
+	if m.Total == 0 {
+		return 0.0
+	}
+
+	perc := float64(100*m.Used) / float64(m.Total)
+	return Round(perc, .5, 2)
+}
+
+func (t *Topbeat) getRssPercent(m *ProcMemStat) float64 {
+
+	mem_stat, err := GetMemory()
+	if err != nil {
+		logp.Warn("Getting memory details: %v", err)
+		return 0.0
+	}
+	total_phymem := mem_stat.Total
+
+	perc := (float64(m.Rss) / float64(total_phymem)) * 100
+
+	return Round(perc, .5, 2)
+}
+
+func (t *Topbeat) getCpuPercentage(t2 *CpuTimes) float64 {
+
+	t1 := t.lastCpuTimes
+
+	perc := 0.0
+
+	if t1 != nil {
+		all_delta := t2.sum() - t1.sum()
+		user_delta := t2.User - t1.User
+
+		perc = float64(100*user_delta) / float64(all_delta)
+	}
+	t.lastCpuTimes = t2
+
+	return Round(perc, .5, 2)
+}
+
+func (t *Topbeat) getProcCpuPercentage(proc *Process) float64 {
+
+	oproc, ok := t.procsMap[proc.Pid]
+	if ok {
+
+		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
+		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
+		perc := (float64(delta_proc) / float64(delta_time) * 100) * float64(runtime.NumCPU())
+
+		t.procsMap[proc.Pid] = proc
+
+		return Round(perc, .5, 2)
+	}
+	return 0
+}
+
 func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
 
 	if config.Period != nil {
@@ -49,17 +118,6 @@ func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
 	logp.Debug("topbeat", "Period %v\n", t.period)
 	t.events = events
 	return nil
-}
-
-func (t *Topbeat) MatchProcess(name string) bool {
-
-	for _, reg := range t.procs {
-		matched, _ := regexp.MatchString(reg, name)
-		if matched {
-			return true
-		}
-	}
-	return false
 }
 
 func (t *Topbeat) initProcStats() {
@@ -108,7 +166,8 @@ func (t *Topbeat) exportProcStats() error {
 
 		if t.MatchProcess(process.Name) {
 
-			process.Cpu.Percent = t.getCpuPercent(process)
+			process.Cpu.UserPercent = t.getProcCpuPercentage(process)
+			process.Mem.RssPercent = t.getRssPercent(&process.Mem)
 
 			t.procsMap[process.Pid] = process
 
@@ -128,20 +187,6 @@ func (t *Topbeat) exportProcStats() error {
 	return nil
 }
 
-func (t *CpuTimes) sum() uint64 {
-
-	return t.User + t.Nice + t.System + t.Idle + t.IOWait + t.Irq + t.SoftIrq + t.Steal
-}
-
-func cpu_user_percentage(t1 *CpuTimes, t2 *CpuTimes) float64 {
-
-	all_delta := t2.sum() - t1.sum()
-	user_delta := t2.User - t1.User
-
-	perc := float64(100*user_delta) / float64(all_delta)
-	return Round(perc, .5, 2)
-}
-
 func (t *Topbeat) exportSystemStats() error {
 
 	load_stat, err := GetSystemLoad()
@@ -154,23 +199,23 @@ func (t *Topbeat) exportSystemStats() error {
 		logp.Warn("Getting cpu times: %v", err)
 		return err
 	}
-	if t.lastCpuTimes != nil {
-		// CPU usage percent
-		cpu_stat.UserPercent = cpu_user_percentage(t.lastCpuTimes, cpu_stat)
-	}
 
-	t.lastCpuTimes = cpu_stat
+	cpu_stat.UserPercent = t.getCpuPercentage(cpu_stat)
 
 	mem_stat, err := GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
 		return err
 	}
+	mem_stat.UsedPercent = t.getUsedMemPercent(mem_stat)
+
 	swap_stat, err := GetSwap()
 	if err != nil {
 		logp.Warn("Getting swap details: %v", err)
 		return err
 	}
+	// calculate swap usage in percent
+	swap_stat.UsedPercent = t.getUsedMemPercent(swap_stat)
 
 	event := common.MapStr{
 		"timestamp": common.Time(time.Now()),
@@ -186,21 +231,18 @@ func (t *Topbeat) exportSystemStats() error {
 	return nil
 }
 
-func (t *Topbeat) getCpuPercent(proc *Process) float64 {
+func (t *Topbeat) procCpuPercent(proc *Process) float64 {
 
 	oproc, ok := t.procsMap[proc.Pid]
 	if ok {
 
-		elapsed := proc.lastCPUTime.Sub(oproc.lastCPUTime).Nanoseconds() / 1e6 //in milliseconds
-		if elapsed <= 0 {
-			elapsed = 1
-		}
-		ret := float64(proc.Cpu.Total-oproc.Cpu.Total) * 100 / float64(elapsed)
-		if ret < 0.01 {
-			ret = 0
-		}
+		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
+		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
+		perc := (float64(delta_proc) / float64(delta_time) * 100) * float64(runtime.NumCPU())
 
-		return ret
+		t.procsMap[proc.Pid] = proc
+
+		return Round(perc, .5, 2)
 	}
 	return 0
 }
@@ -286,4 +328,22 @@ func main() {
 
 	logp.Debug("main", "Cleanup")
 	service.Cleanup()
+}
+
+func Round(val float64, roundOn float64, places int) (newVal float64) {
+	var round float64
+	pow := math.Pow(10, float64(places))
+	digit := pow * val
+	_, div := math.Modf(digit)
+	if div >= roundOn {
+		round = math.Ceil(digit)
+	} else {
+		round = math.Floor(digit)
+	}
+	newVal = round / pow
+	return
+}
+func (t *CpuTimes) sum() uint64 {
+
+	return t.User + t.Nice + t.System + t.Idle + t.IOWait + t.Irq + t.SoftIrq + t.Steal
 }

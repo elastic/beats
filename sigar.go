@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/elastic/gosigar"
@@ -37,27 +36,28 @@ type MemStat struct {
 }
 
 type ProcMemStat struct {
-	Size     uint64 `json:"size"`
-	Resident uint64 `json:"rss"`
-	Share    uint64 `json:"share"`
+	Size       uint64  `json:"size"`
+	Rss        uint64  `json:"rss"`
+	RssPercent float64 `json:"rss_p"`
+	Share      uint64  `json:"share"`
 }
 
 type ProcCpuTime struct {
-	User    uint64  `json:"user"`
-	Percent float64 `json:"percent"`
-	System  uint64  `json:"system"`
-	Total   uint64  `json:"total"`
-	Start   string  `json:"start_time"`
+	User        uint64  `json:"user"`
+	UserPercent float64 `json:"user_p"`
+	System      uint64  `json:"system"`
+	Total       uint64  `json:"total"`
+	Start       string  `json:"start_time"`
 }
 
 type Process struct {
-	Pid         int         `json:"pid"`
-	Ppid        int         `json:"ppid"`
-	Name        string      `json:"name"`
-	State       string      `json:"state"`
-	Mem         ProcMemStat `json:"mem"`
-	Cpu         ProcCpuTime `json:"cpu"`
-	lastCPUTime time.Time
+	Pid   int         `json:"pid"`
+	Ppid  int         `json:"ppid"`
+	Name  string      `json:"name"`
+	State string      `json:"state"`
+	Mem   ProcMemStat `json:"mem"`
+	Cpu   ProcCpuTime `json:"cpu"`
+	ctime time.Time
 }
 
 func (p *Process) String() string {
@@ -68,11 +68,11 @@ func (p *Process) String() string {
 
 func (m *ProcMemStat) String() string {
 
-	return fmt.Sprintf("%d size, %d rss, %d share", m.Size, m.Resident, m.Share)
+	return fmt.Sprintf("%d size, %d rss, %d share", m.Size, m.Rss, m.Share)
 }
 
 func (t *ProcCpuTime) String() string {
-	return fmt.Sprintf("started at %s, %d total %.2f%%CPU, %d us, %d sys", t.Start, t.Total, t.Percent, t.User, t.System)
+	return fmt.Sprintf("started at %s, %d total %.2f%%CPU, %d us, %d sys", t.Start, t.Total, t.UserPercent, t.User, t.System)
 
 }
 
@@ -93,29 +93,6 @@ func (t *CpuTimes) String() string {
 		t.User, t.System, t.Nice, t.Idle, t.IOWait, t.Irq, t.SoftIrq, t.Steal)
 
 }
-func Round(val float64, roundOn float64, places int) (newVal float64) {
-	var round float64
-	pow := math.Pow(10, float64(places))
-	digit := pow * val
-	_, div := math.Modf(digit)
-	if div >= roundOn {
-		round = math.Ceil(digit)
-	} else {
-		round = math.Floor(digit)
-	}
-	newVal = round / pow
-	return
-}
-
-func mem_usage_percent(used uint64, total uint64) float64 {
-
-	if total == 0 {
-		return float64(0)
-	}
-	perc := float64(100*used) / float64(total)
-	return Round(perc, .5, 2)
-}
-
 func GetSystemLoad() (*SystemLoad, error) {
 
 	concreteSigar := sigar.ConcreteSigar{}
@@ -161,15 +138,13 @@ func GetMemory() (*MemStat, error) {
 	if err != nil {
 		return nil, err
 	}
-	percent := mem_usage_percent(mem.Used, mem.Total)
 
 	return &MemStat{
-		Total:       mem.Total / 1024,
-		Used:        mem.Used / 1024,
-		UsedPercent: percent,
-		Free:        mem.Free / 1024,
-		ActualFree:  mem.ActualFree / 1024,
-		ActualUsed:  mem.ActualUsed / 1024,
+		Total:      mem.Total / 1024,
+		Used:       mem.Used / 1024,
+		Free:       mem.Free / 1024,
+		ActualFree: mem.ActualFree / 1024,
+		ActualUsed: mem.ActualUsed / 1024,
 	}, nil
 }
 
@@ -180,13 +155,11 @@ func GetSwap() (*MemStat, error) {
 	if err != nil {
 		return nil, err
 	}
-	percent := mem_usage_percent(swap.Used, swap.Total)
 
 	return &MemStat{
-		Total:       swap.Total,
-		Used:        swap.Used,
-		Free:        swap.Free,
-		UsedPercent: percent,
+		Total: swap.Total,
+		Used:  swap.Used,
+		Free:  swap.Free,
 	}, nil
 
 }
@@ -245,9 +218,9 @@ func GetProcess(pid int) (*Process, error) {
 		Name:  state.Name,
 		State: getProcState(byte(state.State)),
 		Mem: ProcMemStat{
-			Size:     mem.Size / 1024,
-			Resident: mem.Resident / 1024,
-			Share:    mem.Share / 1024,
+			Size:  mem.Size / 1024,
+			Rss:   mem.Resident / 1024,
+			Share: mem.Share / 1024,
 		},
 		Cpu: ProcCpuTime{
 			Start:  cpu.FormatStartTime(),
@@ -256,7 +229,7 @@ func GetProcess(pid int) (*Process, error) {
 			System: cpu.Sys,
 		},
 	}
+	proc.ctime = time.Now()
 
-	proc.lastCPUTime = time.Now()
 	return &proc, nil
 }

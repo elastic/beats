@@ -32,7 +32,7 @@ func TestGetMemory(t *testing.T) {
 
 	assert.True(t, (mem.Total > 0))
 	assert.True(t, (mem.Used > 0))
-	assert.True(t, (mem.UsedPercent > 0))
+	assert.True(t, (mem.UsedPercent >= 0))
 	assert.True(t, (mem.Free >= 0))
 	assert.True(t, (mem.ActualFree >= 0))
 	assert.True(t, (mem.ActualUsed > 0))
@@ -51,7 +51,7 @@ func TestGetSwap(t *testing.T) {
 
 	assert.True(t, (swap.Total > 0))
 	assert.True(t, (swap.Used > 0))
-	assert.True(t, (swap.UsedPercent > 0))
+	assert.True(t, (swap.UsedPercent >= 0))
 	assert.True(t, (swap.Free >= 0))
 }
 
@@ -86,16 +86,18 @@ func TestGetProcess(t *testing.T) {
 
 		// Memory Checks
 		assert.True(t, (process.Mem.Size >= 0))
-		assert.True(t, (process.Mem.Resident >= 0))
+		assert.True(t, (process.Mem.Rss >= 0))
+		assert.True(t, (process.Mem.RssPercent >= 0))
 		assert.True(t, (process.Mem.Share >= 0))
 
 		// CPU Checks
 		assert.True(t, (len(process.Cpu.Start) > 0))
 		assert.True(t, (process.Cpu.Total >= 0))
 		assert.True(t, (process.Cpu.User >= 0))
+		assert.True(t, (process.Cpu.UserPercent >= 0))
 		assert.True(t, (process.Cpu.System >= 0))
 
-		assert.True(t, (process.lastCPUTime.Unix() <= time.Now().Unix()))
+		assert.True(t, (process.ctime.Unix() <= time.Now().Unix()))
 
 		// it's enough to get valid data for a single process
 		break
