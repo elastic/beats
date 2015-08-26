@@ -5,7 +5,7 @@ set -e
 cd /build
 
 mkdir /{{.beat_name}}-{{.version}}-windows
-cp {{.beat_name}}-windows-386.exe /{{.beat_name}}-{{.version}}-windows/{{.beat_name}}
+cp {{.beat_name}}-windows-386.exe /{{.beat_name}}-{{.version}}-windows/{{.beat_name}}.exe
 cp {{.beat_name}}-win.yml /{{.beat_name}}-{{.version}}-windows/{{.beat_name}}.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-windows/
 
