@@ -2,6 +2,8 @@ package sniffer
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSniffer_afpacketComputeSize(t *testing.T) {
@@ -48,4 +50,23 @@ func TestSniffer_afpacketComputeSize(t *testing.T) {
 	if frame_size != 4096*5 || block_size != 4096*5*128 || num_blocks != 1 {
 		t.Error("Bad result", frame_size, block_size, num_blocks)
 	}
+}
+
+func Test_deviceNameFromIndex(t *testing.T) {
+	devs := []string{"lo", "eth0", "eth1"}
+
+	name, err := deviceNameFromIndex(0, devs)
+	assert.Equal(t, "lo", name)
+	assert.NoError(t, err)
+
+	name, err = deviceNameFromIndex(1, devs)
+	assert.Equal(t, "eth0", name)
+	assert.NoError(t, err)
+
+	name, err = deviceNameFromIndex(2, devs)
+	assert.Equal(t, "eth1", name)
+	assert.NoError(t, err)
+
+	_, err = deviceNameFromIndex(3, devs)
+	assert.Error(t, err)
 }
