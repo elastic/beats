@@ -19,7 +19,12 @@
             "match": "*"
           }
         }
-      ]
+      ],
+      "properties": {
+        "timestamp": {
+          "type": "date"
+        }
+      }
     }
   },
   "settings": {
