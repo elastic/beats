@@ -70,8 +70,44 @@ protocols:
     # Only query parameters and top level form parameters are replaced.
     # hide_keywords: ['pass', 'password', 'passwd']
 
-  mysql:
+  memcache:
+    # Configure the ports where to listen for memcache traffic. You can disable
+    # the memcache protocol by commenting out the list of ports.
+    ports: [11211]
 
+    # Uncomment the parseunknown option to force the memcache text protocol parse
+    # to parse unknown commands.
+    # Default: false
+    # Note: All unknown commands MUST not contain any data parts!
+    # parseunknown: true
+
+
+    # Update the maxvalue option to store the values - base64 encoded - in the
+    # json output.
+    # possible values:
+    #    maxvalue: -1  # store all values (text based protocol multi-get)
+    #    maxvalue: 0   # store no values at all (default)
+    #    maxvalue: N   # store up to N values
+    # maxvalues: 0
+
+    # Use maxbytespervalue to limit the number of bytes to be copied per value element.
+    # Notes: values will be base64 encoded, so actual size in json document
+    #        will be 4 times maxbytespervalue
+    #
+    # Default: unlimited
+    # maxbytespervalue: 100
+
+    # Udp transaction timeout in milliseconds.
+    # Default: 200
+    # Note: Quiet messages in UDP binary protocol will get response only in error case.
+    #       The memcached analyzer will wait for udptransactiontimeout
+    #       milliseconds before publishing quiet messages.
+    #       Non quiet messages or quiet requests with error response will not
+    #       have to wait for the timeout
+    # udptransactiontimeout: 200
+
+
+  mysql:
     # Configure the ports where to listen for MySQL traffic. You can disable
     # the MySQL protocol by commenting out the list of ports.
     ports: [3306]
