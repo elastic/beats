@@ -15,15 +15,16 @@ type SystemLoad struct {
 }
 
 type CpuTimes struct {
-	User        uint64  `json:"user"`
-	UserPercent float64 `json:"user_p"`
-	Nice        uint64  `json:"nice"`
-	System      uint64  `json:"system"`
-	Idle        uint64  `json:"idle"`
-	IOWait      uint64  `json:"iowait"`
-	Irq         uint64  `json:"irq"`
-	SoftIrq     uint64  `json:"softirq"`
-	Steal       uint64  `json:"steal"`
+	User          uint64  `json:"user"`
+	UserPercent   float64 `json:"user_p"`
+	Nice          uint64  `json:"nice"`
+	System        uint64  `json:"system"`
+	SystemPercent float64 `json:"system_p"`
+	Idle          uint64  `json:"idle"`
+	IOWait        uint64  `json:"iowait"`
+	Irq           uint64  `json:"irq"`
+	SoftIrq       uint64  `json:"softirq"`
+	Steal         uint64  `json:"steal"`
 }
 
 type MemStat struct {
@@ -51,12 +52,12 @@ type ProcCpuTime struct {
 }
 
 type Process struct {
-	Pid   int         `json:"pid"`
-	Ppid  int         `json:"ppid"`
-	Name  string      `json:"name"`
-	State string      `json:"state"`
-	Mem   ProcMemStat `json:"mem"`
-	Cpu   ProcCpuTime `json:"cpu"`
+	Pid   int          `json:"pid"`
+	Ppid  int          `json:"ppid"`
+	Name  string       `json:"name"`
+	State string       `json:"state"`
+	Mem   *ProcMemStat `json:"mem"`
+	Cpu   *ProcCpuTime `json:"cpu"`
 	ctime time.Time
 }
 
@@ -217,12 +218,12 @@ func GetProcess(pid int) (*Process, error) {
 		Ppid:  state.Ppid,
 		Name:  state.Name,
 		State: getProcState(byte(state.State)),
-		Mem: ProcMemStat{
+		Mem: &ProcMemStat{
 			Size:  mem.Size / 1024,
 			Rss:   mem.Resident / 1024,
 			Share: mem.Share / 1024,
 		},
-		Cpu: ProcCpuTime{
+		Cpu: &ProcCpuTime{
 			Start:  cpu.FormatStartTime(),
 			Total:  cpu.Total,
 			User:   cpu.User,

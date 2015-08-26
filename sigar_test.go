@@ -24,6 +24,20 @@ func TestGetSystemLoad(t *testing.T) {
 	assert.True(t, (load.Load15 > 0))
 }
 
+func TestGetCpuTimes(t *testing.T) {
+
+	cpu_stat, err := GetCpuTimes()
+
+	assert.NotNil(t, cpu_stat)
+	assert.Nil(t, err)
+
+	assert.True(t, (cpu_stat.User > 0))
+	assert.True(t, (cpu_stat.UserPercent >= 0))
+	assert.True(t, (cpu_stat.System > 0))
+	assert.True(t, (cpu_stat.SystemPercent >= 0))
+
+}
+
 func TestGetMemory(t *testing.T) {
 	mem, err := GetMemory()
 
