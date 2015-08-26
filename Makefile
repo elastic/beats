@@ -3,8 +3,8 @@ DATE:=$(shell date +%y%m%d%H%M%S)
 BUILDID?=$(DATE)
 
 .PHONY: all
-all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win \
-	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win
+all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
+	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin
 
 
 .PHONY: packetbeat topbeat
