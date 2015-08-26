@@ -1,0 +1,6 @@
+To execute burn application:
+GOMAXPROCS=4 go run burn.go -cpus 4
+
+To apply topbeat template:
+curl -XPUT 'http://localhost:9200/_template/topbeat' -d@etc/topbeat.template.json
+
