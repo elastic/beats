@@ -155,6 +155,9 @@ protocols:
   http:
     ports: [80, 8080, 8081, 5000, 8002]
 
+  memcache:
+    ports: [11211]
+
   mysql:
     ports: [3306]
 
