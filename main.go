@@ -32,80 +32,6 @@ type Topbeat struct {
 	events chan common.MapStr
 }
 
-func (t *Topbeat) MatchProcess(name string) bool {
-
-	for _, reg := range t.procs {
-		matched, _ := regexp.MatchString(reg, name)
-		if matched {
-			return true
-		}
-	}
-	return false
-}
-
-func (t *Topbeat) addMemPercentage(m *MemStat) {
-
-	if m.Total == 0 {
-		return
-	}
-
-	perc := float64(100*m.Used) / float64(m.Total)
-	m.UsedPercent = Round(perc, .5, 2)
-}
-
-func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
-
-	t1 := t.lastCpuTimes
-
-	if t1 != nil && t2 != nil {
-		all_delta := t2.sum() - t1.sum()
-
-		calculate := func(field2 uint64, field1 uint64) float64 {
-
-			perc := 0.0
-			delta := field2 - field1
-			perc = float64(100*delta) / float64(all_delta)
-			return Round(perc, .5, 2)
-		}
-
-		t2.UserPercent = calculate(t2.User, t1.User)
-		t2.SystemPercent = calculate(t2.System, t1.System)
-	}
-
-	t.lastCpuTimes = t2
-
-}
-
-func (t *Topbeat) addProcMemPercentage(proc *Process) {
-
-	mem_stat, err := GetMemory()
-	if err != nil {
-		logp.Warn("Getting memory details: %v", err)
-		return
-	}
-	total_phymem := mem_stat.Total
-
-	perc := (float64(proc.Mem.Rss) / float64(total_phymem)) * 100
-
-	proc.Mem.RssPercent = Round(perc, .5, 2)
-}
-
-func (t *Topbeat) addProcCpuPercentage(proc *Process) {
-
-	oproc, ok := t.procsMap[proc.Pid]
-	if ok {
-
-		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
-		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
-		perc := float64(delta_proc) / float64(delta_time) * 100
-
-		t.procsMap[proc.Pid] = proc
-
-		proc.Cpu.UserPercent = Round(perc, .5, 2)
-
-	}
-}
-
 func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
 
 	if config.Period != nil {
@@ -173,7 +99,7 @@ func (t *Topbeat) exportProcStats() error {
 		if t.MatchProcess(process.Name) {
 
 			t.addProcCpuPercentage(process)
-			t.addProcMemPercentage(process)
+			t.addProcMemPercentage(process, 0 /*read total mem usage */)
 
 			t.procsMap[process.Pid] = process
 
@@ -234,22 +160,6 @@ func (t *Topbeat) exportSystemStats() error {
 	t.events <- event
 
 	return nil
-}
-
-func (t *Topbeat) procCpuPercent(proc *Process) float64 {
-
-	oproc, ok := t.procsMap[proc.Pid]
-	if ok {
-
-		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
-		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
-		perc := (float64(delta_proc) / float64(delta_time) * 100) * float64(runtime.NumCPU())
-
-		t.procsMap[proc.Pid] = proc
-
-		return Round(perc, .5, 2)
-	}
-	return 0
 }
 
 func (t *Topbeat) Run() error {
@@ -333,6 +243,84 @@ func main() {
 
 	logp.Debug("main", "Cleanup")
 	service.Cleanup()
+}
+
+func (t *Topbeat) MatchProcess(name string) bool {
+
+	for _, reg := range t.procs {
+		matched, _ := regexp.MatchString(reg, name)
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Topbeat) addMemPercentage(m *MemStat) {
+
+	if m.Total == 0 {
+		return
+	}
+
+	perc := float64(100*m.Used) / float64(m.Total)
+	m.UsedPercent = Round(perc, .5, 2)
+}
+
+func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
+
+	t1 := t.lastCpuTimes
+
+	if t1 != nil && t2 != nil {
+		all_delta := t2.sum() - t1.sum()
+
+		calculate := func(field2 uint64, field1 uint64) float64 {
+
+			perc := 0.0
+			delta := field2 - field1
+			perc = float64(100*delta) / float64(all_delta)
+			return Round(perc, .5, 2)
+		}
+
+		t2.UserPercent = calculate(t2.User, t1.User)
+		t2.SystemPercent = calculate(t2.System, t1.System)
+	}
+
+	t.lastCpuTimes = t2
+
+}
+
+func (t *Topbeat) addProcMemPercentage(proc *Process, total_phymem uint64) {
+
+	// total_phymem is set to a value greater than zero in tests
+
+	if total_phymem == 0 {
+		mem_stat, err := GetMemory()
+		if err != nil {
+			logp.Warn("Getting memory details: %v", err)
+			return
+		}
+		total_phymem = mem_stat.Total
+	}
+
+	perc := (float64(proc.Mem.Rss) / float64(total_phymem)) * 100
+
+	proc.Mem.RssPercent = Round(perc, .5, 2)
+}
+
+func (t *Topbeat) addProcCpuPercentage(proc *Process) {
+
+	oproc, ok := t.procsMap[proc.Pid]
+	if ok {
+
+		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
+		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
+		perc := float64(delta_proc) / float64(delta_time) * 100
+
+		t.procsMap[proc.Pid] = proc
+
+		proc.Cpu.UserPercent = Round(perc, .5, 2)
+
+	}
 }
 
 func Round(val float64, roundOn float64, places int) (newVal float64) {

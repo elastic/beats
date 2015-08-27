@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/elastic/gosigar"
-	"github.com/elastic/libbeat/logp"
 )
 
 type SystemLoad struct {
@@ -101,7 +100,6 @@ func GetSystemLoad() (*SystemLoad, error) {
 	if err != nil {
 		return nil, err
 	}
-	logp.Debug("topbeat", "load %v\n", avg)
 
 	return &SystemLoad{
 		Load1:  avg.One,
@@ -117,8 +115,6 @@ func GetCpuTimes() (*CpuTimes, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	logp.Debug("topbeat", "cpu times %v\n", cpu)
 
 	return &CpuTimes{
 		User:    cpu.User,

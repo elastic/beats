@@ -111,3 +111,13 @@ func TestGetProcess(t *testing.T) {
 		break
 	}
 }
+
+func TestProcState(t *testing.T) {
+
+	assert.Equal(t, getProcState('R'), "running")
+	assert.Equal(t, getProcState('S'), "sleeping")
+	assert.Equal(t, getProcState('s'), "unknown")
+	assert.Equal(t, getProcState('D'), "idle")
+	assert.Equal(t, getProcState('T'), "stopped")
+	assert.Equal(t, getProcState('Z'), "zombie")
+}
