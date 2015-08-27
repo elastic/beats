@@ -254,8 +254,8 @@ func (publisher *PublisherType) Init(outputs map[string]outputs.MothershipConfig
 
 	if !publisher.disabled {
 		if len(publisher.Output) == 0 {
-			logp.Info("No outputs are defined. Please define one under the shipper->output section.")
-			return errors.New("No outputs are defined. Please define one under the shipper->output section.")
+			logp.Info("No outputs are defined. Please define one under the output section.")
+			return errors.New("No outputs are defined. Please define one under the output section.")
 		}
 
 		if publisher.TopologyOutput == nil {
