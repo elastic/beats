@@ -3,6 +3,7 @@ package publisher
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -15,6 +16,9 @@ import (
 	"github.com/elastic/libbeat/outputs/redis"
 	"github.com/nranchev/go-libGeoIP"
 )
+
+// command line flags
+var publishDisabled *bool
 
 type PublisherType struct {
 	name           string
@@ -50,6 +54,10 @@ var EnabledOutputPlugins map[outputs.OutputPlugin]outputs.OutputInterface = map[
 	outputs.RedisOutput:         new(redis.RedisOutput),
 	outputs.ElasticsearchOutput: new(elasticsearch.ElasticsearchOutput),
 	outputs.FileOutput:          new(fileout.FileOutput),
+}
+
+func CmdLineFlags(flags *flag.FlagSet) {
+	publishDisabled = flags.Bool("N", false, "Disable actual publishing for testing")
 }
 
 func PrintPublishEvent(event common.MapStr) {
@@ -211,12 +219,11 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *PublisherType) Init(publishDisabled bool,
-	outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
+func (publisher *PublisherType) Init(outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
 	var err error
 	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
 
-	publisher.disabled = publishDisabled
+	publisher.disabled = *publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}

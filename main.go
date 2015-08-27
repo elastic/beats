@@ -190,8 +190,8 @@ func main() {
 	cfgfile.CmdLineFlags(cmdLine, Name)
 	logp.CmdLineFlags(cmdLine)
 	service.CmdLineFlags(cmdLine)
+	publisher.CmdLineFlags(cmdLine)
 
-	publishDisabled := cmdLine.Bool("N", false, "Disable actual publishing for testing")
 	printVersion := cmdLine.Bool("version", false, "Print version and exit")
 
 	cmdLine.Parse(os.Args[1:])
@@ -206,9 +206,7 @@ func main() {
 	logp.Init(Name, &Config.Logging)
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = publisher.Publisher.Init(*publishDisabled, Config.Output,
-		Config.Shipper); err != nil {
-
+	if err = publisher.Publisher.Init(Config.Output, Config.Shipper); err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
@@ -219,8 +217,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Up to here was the initialization, now about running
-
+	// Up to here was the initialization
 	if cfgfile.IsTestConfig() {
 		// all good, exit with 0
 		os.Exit(0)
