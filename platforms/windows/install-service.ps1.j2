@@ -1,0 +1,1 @@
+New-Service -name {{.beat_name}} -displayName {{.beat_name}} -binaryPathName "$(Resolve-Path {{.beat_name}}.exe) -e -c $(Resolve-Path {{.beat_name}}.yml)"
