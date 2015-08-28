@@ -103,7 +103,7 @@ func main() {
 	}
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = publisher.Publisher.Init(config.ConfigSingleton.Output, config.ConfigSingleton.Shipper); err != nil {
+	if err = publisher.Publisher.Init(Name, config.ConfigSingleton.Output, config.ConfigSingleton.Shipper); err != nil {
 
 		logp.Critical(err.Error())
 		os.Exit(1)

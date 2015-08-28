@@ -33,7 +33,7 @@ type MothershipConfig struct {
 // Functions to be exported by a output plugin
 type OutputInterface interface {
 	// Initialize the output plugin
-	Init(config MothershipConfig, topology_expire int) error
+	Init(beat string, config MothershipConfig, topology_expire int) error
 
 	// Register the agent name and its IPs to the topology map
 	PublishIPs(name string, localAddrs []string) error
