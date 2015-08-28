@@ -36,19 +36,20 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) Elasticsea
 	}
 
 	var elasticsearchOutput ElasticsearchOutput
-	elasticsearchOutput.Init(outputs.MothershipConfig{
-		Enabled:        true,
-		Save_topology:  true,
-		Host:           elasticsearchAddr,
-		Port:           es_port,
-		Username:       "",
-		Password:       "",
-		Path:           "",
-		Index:          index,
-		Protocol:       "",
-		Flush_interval: &flush_interval,
-		Bulk_size:      &bulk_size,
-	}, 10)
+	elasticsearchOutput.Init("packetbeat",
+		outputs.MothershipConfig{
+			Enabled:        true,
+			Save_topology:  true,
+			Host:           elasticsearchAddr,
+			Port:           es_port,
+			Username:       "",
+			Password:       "",
+			Path:           "",
+			Index:          index,
+			Protocol:       "",
+			Flush_interval: &flush_interval,
+			Bulk_size:      &bulk_size,
+		}, 10)
 
 	return elasticsearchOutput
 }
