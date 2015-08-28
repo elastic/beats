@@ -13,11 +13,11 @@ type FileOutput struct {
 	rotator logp.FileRotator
 }
 
-func (out *FileOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *FileOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
-		out.rotator.Name = "packetbeat"
+		out.rotator.Name = beat
 	}
 
 	rotateeverybytes := uint64(config.Rotate_every_kb) * 1024

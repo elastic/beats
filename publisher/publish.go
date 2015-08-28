@@ -219,7 +219,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *PublisherType) Init(outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
+func (publisher *PublisherType) Init(beat string, outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
 	var err error
 	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
 
@@ -234,7 +234,7 @@ func (publisher *PublisherType) Init(outputs map[string]outputs.MothershipConfig
 		outputName := outputId.String()
 		output, exists := outputs[outputName]
 		if exists && output.Enabled && !publisher.disabled {
-			err := plugin.Init(output, shipper.Topology_expire)
+			err := plugin.Init(beat, output, shipper.Topology_expire)
 			if err != nil {
 				logp.Err("Fail to initialize %s plugin as output: %s", outputName, err)
 				return err

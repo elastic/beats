@@ -46,7 +46,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *RedisOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
@@ -71,7 +71,7 @@ func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire in
 	if config.Index != "" {
 		out.Index = config.Index
 	} else {
-		out.Index = "packetbeat"
+		out.Index = beat
 	}
 
 	out.FlushInterval = 1000 * time.Millisecond

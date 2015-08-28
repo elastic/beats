@@ -30,7 +30,7 @@ type PublishedTopology struct {
 }
 
 // Initialize Elasticsearch as output
-func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *ElasticsearchOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
 
 	if len(config.Protocol) == 0 {
 		config.Protocol = "http"
@@ -56,7 +56,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	if config.Index != "" {
 		out.Index = config.Index
 	} else {
-		out.Index = "packetbeat"
+		out.Index = beat
 	}
 
 	out.TopologyExpire = 15000
