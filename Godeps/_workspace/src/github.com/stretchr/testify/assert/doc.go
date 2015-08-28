@@ -17,7 +17,7 @@
 //
 //    }
 //
-// if you assert many times, use the format below:
+// if you assert many times, use the below:
 //
 //    import (
 //      "testing"

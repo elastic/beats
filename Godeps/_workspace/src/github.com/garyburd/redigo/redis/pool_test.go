@@ -35,7 +35,7 @@ type poolTestConn struct {
 func (c *poolTestConn) Close() error { c.d.open -= 1; return nil }
 func (c *poolTestConn) Err() error   { return c.err }
 
-func (c *poolTestConn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+func (c *poolTestConn) Do(commandName string, args ...interface{}) (interface{}, error) {
 	if commandName == "ERR" {
 		c.err = args[0].(error)
 		commandName = "PING"
