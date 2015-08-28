@@ -11,6 +11,10 @@ topbeat: $(GOFILES)
 getdeps:
 	go get -t -u -f
 
+.PHONY: test
+test:
+	$(GODEP) go test ./...
+
 
 .PHONY: install_cfg
 install_cfg:
