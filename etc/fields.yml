@@ -269,6 +269,12 @@ event:
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
 
+        - name: dns.authorities
+          type: dict
+          description: >
+            An array containing a dictionary for each authority section from the
+            answer.
+
         - name: dns.authorities_count
           type: int
           description: >
@@ -288,6 +294,12 @@ event:
           description: Class of DNS data contained in this resource record.
           example: IN
 
+        - name: dns.answers
+          type: dict
+          description: >
+            An array containing a dictionary about each answer section returned by
+            the server.
+
         - name: dns.answers.ttl
           description: >
             Time interval in seconds that this resource record may be cached
@@ -299,6 +311,12 @@ event:
           description: >
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
+
+        - name: dns.additionals
+          type: dict
+          description: >
+            An array containing a dictionary for each additional section from the
+            answer.
 
         - name: dns.additionals_count
           type: int
