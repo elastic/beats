@@ -206,7 +206,7 @@ func main() {
 	logp.Init(Name, &Config.Logging)
 
 	logp.Debug("main", "Initializing output plugins")
-	if err = publisher.Publisher.Init(Config.Output, Config.Shipper); err != nil {
+	if err = publisher.Publisher.Init(Name, Config.Output, Config.Shipper); err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
