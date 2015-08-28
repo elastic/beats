@@ -42,19 +42,19 @@ protocols:
     ports: [53]
 
     # include_authorities controls whether or not the dns.authorities field
-    # (authority resource records) is added to messages. The default is no.
-    include_authorities: yes
+    # (authority resource records) is added to messages. The default is false.
+    include_authorities: true
     # include_additionals controls whether or not the dns.additionals field
-    # (additional resource records) is added to messages. The default is no.
-    include_additionals: yes
+    # (additional resource records) is added to messages. The default is false.
+    include_additionals: true
 
     # send_request and send_response control whether or not the stringified DNS
-    # request and response message are added to the result. The default is no.
+    # request and response message are added to the result. The default is false.
     # Nearly all data about the request/response is available in the dns.*
     # fields, but this can be useful if you need visibility specifically
     # into the request or the response.
-    #send_request:  yes
-    #send_response: yes
+    #send_request:  true
+    #send_response: true
 
   http:
 

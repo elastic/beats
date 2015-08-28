@@ -312,6 +312,8 @@ func (dns *Dns) GetPorts() []int {
 }
 
 func (dns *Dns) ParseUdp(pkt *protos.Packet) {
+	defer logp.Recover("Dns ParseUdp")
+
 	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
