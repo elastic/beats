@@ -61,7 +61,7 @@ type Process struct {
 }
 
 type FileSystemStat struct {
-	FileSystem  string    `json:"filesystem"`
+	DevName     string    `json:"device_name"`
 	Total       uint64    `json:"total"`
 	Used        uint64    `json:"used"`
 	UsedPercent float64   `json:"used_p"`
@@ -75,8 +75,8 @@ type FileSystemStat struct {
 
 func (f *FileSystemStat) String() string {
 
-	return fmt.Sprintf("filesystem: %s, total: %d, used %d, used pct %.2f, free: %d, avail: %d, files: %d, free files: %d, mount: %s",
-		f.FileSystem, f.Total, f.Used, f.UsedPercent, f.Free, f.Avail, f.Files, f.FreeFiles, f.Mount)
+	return fmt.Sprintf("device name: %s, total: %d, used %d, used pct %.2f, free: %d, avail: %d, files: %d, free files: %d, mount: %s",
+		f.DevName, f.Total, f.Used, f.UsedPercent, f.Free, f.Avail, f.Files, f.FreeFiles, f.Mount)
 }
 
 func (p *Process) String() string {
@@ -272,7 +272,7 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 	}
 
 	filesystem := FileSystemStat{
-		FileSystem: fs.DevName,
+		DevName:    fs.DevName,
 		Total:      usage.Total,
 		Used:       usage.Used,
 		Avail:      usage.Avail,
