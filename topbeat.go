@@ -168,16 +168,9 @@ func (t *Topbeat) exportFileSystemStats() error {
 		t.addFileSystemUsedPercentage(fs_stat)
 
 		event := common.MapStr{
-			"timestamp":    common.Time(time.Now()),
-			"type":         "filesystem",
-			"fs.total":     fs_stat.Total,
-			"fs.available": fs_stat.Avail,
-			"fs.used":      fs_stat.Used,
-			"fs.used_p":    fs_stat.UsedPercent,
-			"fs.files":     fs_stat.Files,
-			"fs.ffiles":    fs_stat.FreeFiles,
-			"fs.mount":     fs_stat.Mount,
-			"fs.ctime":     fs_stat.ctime,
+			"timestamp":      common.Time(time.Now()),
+			"type":           "filesystem",
+			"fs":             fs_stat,
 		}
 		t.events <- event
 	}
