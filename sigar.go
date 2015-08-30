@@ -60,6 +60,25 @@ type Process struct {
 	ctime time.Time
 }
 
+type FileSystemStat struct {
+	FileSystem  string    `json:"filesystem"`
+	Total       uint64    `json:"total"`
+	Used        uint64    `json:"used"`
+	UsedPercent float64   `json:"used_p"`
+	Free        uint64    `json:"free"`
+	Avail       uint64    `json:"avail"`
+	Files       uint64    `json:"files"`
+	FreeFiles   uint64    `json:"free_files"`
+	Mount       string    `json:"mount_point"`
+	ctime       time.Time
+}
+
+func (f *FileSystemStat) String() string {
+
+	return fmt.Sprintf("filesystem: %s, total: %d, used %d, used pct %.2f, free: %d, avail: %d, files: %d, free files: %d, mount: %s",
+		f.FileSystem, f.Total, f.Used, f.UsedPercent, f.Free, f.Avail, f.Files, f.FreeFiles, f.Mount)
+}
+
 func (p *Process) String() string {
 
 	return fmt.Sprintf("pid: %d, ppid: %d, name: %s, state: %s, mem: %s, cpu: %s",
@@ -229,4 +248,39 @@ func GetProcess(pid int) (*Process, error) {
 	proc.ctime = time.Now()
 
 	return &proc, nil
+}
+
+func GetFileSystemList() ([]sigar.FileSystem, error) {
+
+	fss := sigar.FileSystemList{}
+	err := fss.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	return fss.List, nil
+}
+
+func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
+
+	dir := fs.DirName
+
+	usage := sigar.FileSystemUsage{}
+	err := usage.Get(dir)
+	if err != nil {
+		return nil, fmt.Errorf("Error getting filsystem usage: %v", err)
+	}
+
+	filesystem := FileSystemStat{
+		FileSystem: fs.DevName,
+		Total:      usage.Total,
+		Used:       usage.Used,
+		Avail:      usage.Avail,
+		Files:      usage.Files,
+		FreeFiles:  usage.FreeFiles,
+		Mount:      dir,
+		ctime:      time.Now(),
+	}
+
+	return &filesystem, nil
 }
