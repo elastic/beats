@@ -312,6 +312,63 @@ to the same transactions. Therefore most protocol implementations we have in
 Packatbeat use a map with `tcptuple` maps for correlating the requests with the
 responses.
 
+==== Send the result
+
+After the correlation step, you should have an JSON like object that can be sent
+to Elasticsearch for indexing. The way you do that is by putting it through the
+`results` channel, which is received by the `Init` function. The channel accepts
+structures of type `common.MapStr`, which is essentially  a `map[string][interface{}`
+with a few more convenience
+https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods] added.
+
+As an example, here is the relevant code from the REDIS module:
+
+[source,go]
+----------------------------------------------------------------------
+	event := common.MapStr{}
+	event["type"] = "redis"
+	if !t.IsError {
+		event["status"] = common.OK_STATUS
+	} else {
+		event["status"] = common.ERROR_STATUS
+	}
+	event["responsetime"] = t.ResponseTime
+	if redis.Send_request {
+		event["request"] = t.Request_raw
+	}
+	if redis.Send_response {
+		event["response"] = t.Response_raw
+	}
+	event["redis"] = common.MapStr(t.Redis)
+	event["method"] = strings.ToUpper(t.Method)
+	event["resource"] = t.Path
+	event["query"] = t.Query
+	event["bytes_in"] = uint64(t.BytesIn)
+	event["bytes_out"] = uint64(t.BytesOut)
+
+	event["timestamp"] = common.Time(t.ts)
+	event["src"] = &t.Src
+	event["dst"] = &t.Dst
+
+	redis.results <- event
+----------------------------------------------------------------------
+
+The following fields are required and their presence will be checked by
+integration tests:
+
+ * `timestamp`. Set this to the timestamp of the first packet from the message
+   and cast it to `common.Time` like in the example above.
+ * `type`. Set this to the protocol name.
+ * `count`. This is reserved for future sampling support. Set it to 1.
+ * `status`. The status of the transactions, use either `common.OK_STATUS` or
+   `common.ERROR_STATUS`. If the protocol doesn't have responses or a meaning of
+   status code, use OK.
+ * `path`. This should represent what is requested, with the exact meaning
+   depending on the protocol. For HTTP, this is the URL.  For SQL databases,
+   this is the table name. For key-value stores, this is the key. If nothing
+   seems to make sense to put in this field, use the empty string.
+
+
 === Testing
 
 ==== Unit tests
