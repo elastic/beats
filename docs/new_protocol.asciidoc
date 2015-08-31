@@ -309,8 +309,11 @@ or for a full SIP dialog, which can have more than two messages.
 
 The TCP stream or UDP ports are usually good indicators that two messages belong
 to the same transactions. Therefore most protocol implementations we have in
-Packatbeat use a map with `tcptuple` maps for correlating the requests with the
-responses.
+Packetbeat use a map with `tcptuple` maps for correlating the requests with the
+responses. One thing you should be careful about is to expire and remove from
+this map incomplete transactions. For example, we might see the request that has
+created an entry in the map, but if we never see the reply, we need to remove
+the request from memory on a timer, otherwise we risk leaking memory.
 
 ==== Send the result
 
