@@ -13,7 +13,7 @@ and they are easy to package and run with common tools.
 
 Libbeat and all Beats are written in http://golang.org/[Go], so having it
 installed and knowing its basics is a prerequisite for understanding this guide.
-However, don't worry if you are not a Go expert, it is a sufficiently new
+However, don't worry if you are not yet a Go expert, it is a sufficiently new
 language that very few people can consider themselves experts.  In fact, several
 people learned Go by contributing to Packetbeat & libbeat, including the
 original Packetbeat authors.
@@ -23,8 +23,10 @@ https://github.com/elastic/topbeat[Topbeat] source code. Topbeat is similar to
 the `top` command line tool but instead of printing the statistics to the screen
 it ships them to Elasticsearch for storage.
 
-A simple way of getting the source code for topbeat and libeat and compiling
-them at the same time is to do:
+After having https://golang.org/doc/install[installed Go] and having setup the
+https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
+your preferred workspace location, a simple way of getting the source code for
+topbeat and libeat and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -111,7 +113,7 @@ func (t *Topbeat) Stop() {
 
 <1> The events channel is the channel through which the events are sent to the
 publisher. The `common.MapStr` type is essentially a `map[string][interface{}`
-with a few more
+with a few more convenience
 https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods] added.
 
 <2> The main loop
@@ -233,8 +235,15 @@ section and the channel to the Publisher as paramters.
 
 <8> Run the main loop.
 
+
 == Configuration
 
+The recommended way of handling the configuration is to create a
+`ConfigSettings` type that contains the options that are custom to your Beat but
+also the configuration sections that are the same for all Beats and defined in
+libbeat.
+
+Here is the entire configuration handling in Topbeat:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -246,11 +255,6 @@ import (
     "github.com/elastic/libbeat/publisher"
 )
 
-type TopConfig struct {
-    Period *int64
-    Procs  *[]string
-}
-
 type ConfigSettings struct {
     Input   TopConfig <1>
     Output  map[string]outputs.MothershipConfig <2>
@@ -258,5 +262,22 @@ type ConfigSettings struct {
     Shipper publisher.ShipperConfig
 }
 
-var Config ConfigSettings
+type TopConfig struct {
+    Period *int64 <3>
+    Procs  *[]string
+}
+
+var Config ConfigSettings <4>
 ----------------------------------------------------------------------
+
+<1> The configuration options that are specific to Topbeat are grouped in the
+`TopConfig` structure.
+
+<2> The configuration settings for the output plugins, logging and the shipper
+are defined in libbeat and only included here.
+
+<3> If you need to separate between the default zero value and the option not
+being present at all in the configuration, use a pointer. If it's nil, the
+option was not present at all.
+
+<4> `Config` is a global variable containing all configuration options.
