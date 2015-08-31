@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"syscall"
 
 	"github.com/elastic/gosigar"
 )
@@ -265,21 +266,22 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 
 	dir := fs.DirName
 
-	usage := sigar.FileSystemUsage{}
-	err := usage.Get(dir)
+	stat := syscall.Statfs_t{}
+	err := syscall.Statfs(dir, &stat)
 	if err != nil {
 		return nil, fmt.Errorf("Error getting filsystem usage: %v", err)
 	}
 
+	// Convert to bytes using blocksize as reported by Statfs
 	filesystem := FileSystemStat{
 		DevName:    fs.DevName,
-		Total:      usage.Total,
-		Used:       usage.Used,
-		Avail:      usage.Avail,
-		Files:      usage.Files,
-		FreeFiles:  usage.FreeFiles,
+		Total:      (uint64(stat.Blocks) * uint64(stat.Bsize)),
+		Free:       (uint64(stat.Bfree) * uint64(stat.Bsize)),
+		Avail:      (uint64(stat.Bavail) * uint64(stat.Bsize)),
+		Used:       (uint64(stat.Blocks) * uint64(stat.Bsize)) - (uint64(stat.Bfree) * uint64(stat.Bsize)),
+		Files:      stat.Files,
+		FreeFiles:  stat.Ffree,
 		Mount:      dir,
-		ctime:      time.Now(),
 	}
 
 	return &filesystem, nil
