@@ -34,12 +34,21 @@ type InterfacesConfig struct {
 }
 
 type Protocols struct {
+	Dns     Dns
 	Http    Http
 	Mysql   Mysql
 	Mongodb Mongodb
 	Pgsql   Pgsql
 	Redis   Redis
 	Thrift  Thrift
+}
+
+type Dns struct {
+	Ports               []int
+	Send_request        *bool
+	Send_response       *bool
+	Include_authorities *bool
+	Include_additionals *bool
 }
 
 type Http struct {

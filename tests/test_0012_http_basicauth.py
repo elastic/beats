@@ -6,6 +6,8 @@ class Test(TestCase):
 
     def test_http_auth(self):
         self.render_config_template(
+            dns_ports=[],       # disable dns because the pcap
+                                # contains the DNS query
             http_send_all_headers=1,
             http_strip_authorization=1,
             http_send_request=True

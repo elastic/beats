@@ -60,7 +60,7 @@ env:
       description: >
         The GeoIP location of the `real_ip` IP address or of the
         `client_ip` address if the `real_ip` is disabled. The field is a string
-        containg the latitude and longitude separated by a coma.
+        containing the latitude and longitude separated by a comma.
 
     - name: client_port
       description: >
@@ -89,6 +89,12 @@ env:
       description: >
         Arbitrary tags that can be set per shipper and per transaction
         type.
+
+    - name: transport
+      description: >
+        Transport protocol used for the transaction. If not specified then
+        assume tcp.
+      example: udp
 
 event:
   type: group
@@ -172,6 +178,177 @@ event:
         Messages from Packetbeat itself. This usually contains error messages for
         interpreting the raw data which can be helpful for troubleshooting.
 
+    - name: dns
+      type: group
+      description: DNS specific event fields.
+      fields:
+        - name: dns.id
+          type: int
+          description: >
+            DNS packet identifier assigned by the program that generated the
+            query. The identifier is copied to the response.
+
+        - name: dns.op_code
+          description: >
+            DNS operation code that specifies the kind of query in the message.
+            This value is set by the originator of a query and copied into the
+            response.
+          example: QUERY
+
+        - name: dns.flags.authoritative
+          type: bool
+          description: >
+            DNS flag specifying that the responding server is an authority for
+            the domain name used in the question.
+
+        - name: dns.flags.recursion_allowed
+          type: bool
+          description: >
+            DNS flag specifying if recursive query support is available in the
+            name server.
+
+        - name: dns.flags.recursion_desired
+          type: bool
+          description: >
+            DNS flag specifying that the client directs the server to pursue a
+            query recursively. Recursive query support is optional.
+
+        - name: dns.flags.truncated_response
+          type: bool
+          description: >
+            DNS flag specifying that only the first 512 bytes of the reply were
+            returned.
+
+        - name: dns.response_code
+          description: DNS status code.
+          example: NOERROR
+
+        - name: dns.question.name
+          description: >
+            The domain name being queried. If the name field contains non-printable
+            characters (below 32 or above 126) then those characters are represented
+            as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
+            Tabs, carriage returns, and line feeds will be converted to \t, \r, and
+            \n respectively.
+          example: www.google.com
+
+        - name: dns.question.type
+          description: The type of records being queried.
+          example: AAAA
+
+        - name: dns.question.class
+          description: The class of of records being queried.
+          example: IN
+
+        - name: dns.answers_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.answers field.
+
+        - name: dns.answers.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.answers.type
+          description: Type of data contained in this resource record.
+          example: MX
+
+        - name: dns.answers.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.answers.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: dns.authorities
+          type: dict
+          description: >
+            An array containing a dictionary for each authority section from the
+            answer.
+
+        - name: dns.authorities_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.authorities field.
+            The dns.authorities field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: dns.authorities.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.authorities.type
+          description: Type of data contained in this resource record.
+          example: NS
+
+        - name: dns.authorities.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.answers
+          type: dict
+          description: >
+            An array containing a dictionary about each answer section returned by
+            the server.
+
+        - name: dns.answers.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: dns.additionals
+          type: dict
+          description: >
+            An array containing a dictionary for each additional section from the
+            answer.
+
+        - name: dns.additionals_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.additionals field.
+            The dns.additionals field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: dns.additionals.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.additionals.type
+          description: Type of data contained in this resource record.
+          example: NS
+
+        - name: dns.additionals.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.additionals.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.additionals.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
     - name: http
       type: group
       description: HTTP specific event fields.
@@ -190,7 +367,7 @@ event:
             A map containing the captured header fields from the request. Which
             headers to capture is configurable. If more headers with the same
             header name are present in the message, they will be separated by
-            comas.
+            commas.
 
         - name: http.response_headers
           type: dict
@@ -198,7 +375,7 @@ event:
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If more headers with the
             same header name are present in the message, they will be separated
-            by comas.
+            by commas.
 
         - name: http.content_length
           type: int
@@ -403,7 +580,7 @@ measurements:
     - name: responsetime
       description: >
         The wall clock time it took to for the transaction to complete.
-        The precision is in microseconds.
+        The precision is in milliseconds.
       type: int
 
     - name: cpu_time

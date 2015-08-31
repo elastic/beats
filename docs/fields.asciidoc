@@ -11,6 +11,7 @@ Packetbeat shipper for each transaction. They are grouped in the
 following categories:
 
 * <<exported-fields-event>>
+* <<exported-fields-dns>>
 * <<exported-fields-http>>
 * <<exported-fields-mysql>>
 * <<exported-fields-pgsql>>
@@ -98,6 +99,190 @@ The request parameters. For HTTP, these are the POST or GET parameters. For Thri
 Messages from Packetbeat itself. This usually contains error messages for interpreting the raw data which can be helpful for troubleshooting.
 
 
+[[exported-fields-dns]]
+=== DNS fields
+
+DNS specific event fields.
+
+
+==== dns.id
+
+type: int
+
+DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+
+==== dns.op_code
+
+example: QUERY
+
+DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+
+==== dns.flags.authoritative
+
+type: bool
+
+DNS flag specifying that the responding server is an authority for the domain name used in the question.
+
+
+==== dns.flags.recursion_allowed
+
+type: bool
+
+DNS flag specifying if recursive query support is available in the name server.
+
+
+==== dns.flags.recursion_desired
+
+type: bool
+
+DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
+
+
+==== dns.flags.truncated_response
+
+type: bool
+
+DNS flag specifying that only the first 512 bytes of the reply were returned.
+
+
+==== dns.response_code
+
+example: NOERROR
+
+DNS status code.
+
+==== dns.question.name
+
+example: www.google.com
+
+The domain name being queried. If the name field contains non-printable characters (below 32 or above 126) then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds will be converted to \t, \r, and \n respectively.
+
+
+==== dns.question.type
+
+example: AAAA
+
+The type of records being queried.
+
+==== dns.question.class
+
+example: IN
+
+The class of of records being queried.
+
+==== dns.answers_count
+
+type: int
+
+The number of resource records contained in the dns.answers field.
+
+
+==== dns.answers.name
+
+example: example.com
+
+Domain name to which this resource record pertains.
+
+==== dns.answers.type
+
+example: MX
+
+Type of data contained in this resource record.
+
+==== dns.answers.class
+
+example: IN
+
+Class of DNS data contained in this resource record.
+
+==== dns.answers.ttl
+
+type: int
+
+Time interval in seconds that this resource record may be cached becore it should be discarded. Zero values mean that the data not be cached.
+
+
+==== dns.answers.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.authorities_count
+
+type: int
+
+The number of resource records contained in the dns.authorities field. The dns.authorities field may or may not be included depending on the configuration of Packetbeat.
+
+
+==== dns.authorities.name
+
+example: example.com
+
+Domain name to which this resource record pertains.
+
+==== dns.authorities.type
+
+example: NS
+
+Type of data contained in this resource record.
+
+==== dns.authorities.class
+
+example: IN
+
+Class of DNS data contained in this resource record.
+
+==== dns.answers.ttl
+
+type: int
+
+Time interval in seconds that this resource record may be cached becore it should be discarded. Zero values mean that the data not be cached.
+
+
+==== dns.answers.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.additionals_count
+
+type: int
+
+The number of resource records contained in the dns.additionals field. The dns.additionals field may or may not be included depending on the configuration of Packetbeat.
+
+
+==== dns.additionals.name
+
+example: example.com
+
+Domain name to which this resource record pertains.
+
+==== dns.additionals.type
+
+example: NS
+
+Type of data contained in this resource record.
+
+==== dns.additionals.class
+
+example: IN
+
+Class of DNS data contained in this resource record.
+
+==== dns.additionals.ttl
+
+type: int
+
+Time interval in seconds that this resource record may be cached becore it should be discarded. Zero values mean that the data not be cached.
+
+
+==== dns.additionals.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
 [[exported-fields-http]]
 === Http fields
 
@@ -120,14 +305,14 @@ HTTP status phrase.
 
 type: dict
 
-A map containing the captured header fields from the request. Which headers to capture is configurable. If more headers with the same header name are present in the message, they will be separated by comas.
+A map containing the captured header fields from the request. Which headers to capture is configurable. If more headers with the same header name are present in the message, they will be separated by commas.
 
 
 ==== http.response_headers
 
 type: dict
 
-A map containing the captured header fields from the response. Which headers to capture is configurable. If more headers with the same header name are present in the message, they will be separated by comas.
+A map containing the captured header fields from the response. Which headers to capture is configurable. If more headers with the same header name are present in the message, they will be separated by commas.
 
 
 ==== http.content_length
@@ -352,7 +537,7 @@ These fields contain measurements related to the transaction.
 
 type: int
 
-The wall clock time it took to for the transaction to complete. The precision is in microseconds.
+The wall clock time it took to for the transaction to complete. The precision is in milliseconds.
 
 
 ==== cpu_time
@@ -463,7 +648,7 @@ type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containg the latitude and longitude separated by a coma.
+The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma.
 
 
 ==== client_port
@@ -498,6 +683,13 @@ The software release of the service serving the transaction. This can be the com
 ==== tags
 
 Arbitrary tags that can be set per shipper and per transaction type.
+
+
+==== transport
+
+example: udp
+
+Transport protocol used for the transaction. If not specified then assume tcp.
 
 
 [[exported-fields-raw]]
