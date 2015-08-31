@@ -151,6 +151,34 @@ func (t *Topbeat) exportSystemStats() error {
 	return nil
 }
 
+func (t *Topbeat) exportFileSystemStats() error {
+
+	fss, err := GetFileSystemList()
+	if err != nil {
+		logp.Warn("Getting filesystem list: %v", err)
+		return err
+	}
+
+	for _, fs := range fss {
+		fs_stat, err := GetFileSystemStat(fs)
+		if err != nil {
+			logp.Debug("topbeat", "Skip filesystem %d: %v", fs_stat, err)
+			continue
+		}
+		t.addFileSystemUsedPercentage(fs_stat)
+
+		event := common.MapStr{
+			"timestamp":      common.Time(time.Now()),
+			"type":           "filesystem",
+			"fs":             fs_stat,
+		}
+		t.events <- event
+	}
+
+	return nil
+}
+
+
 func (t *Topbeat) Run() error {
 
 	t.isAlive = true
@@ -162,6 +190,7 @@ func (t *Topbeat) Run() error {
 
 		t.exportSystemStats()
 		t.exportProcStats()
+		t.exportFileSystemStats()
 	}
 	return nil
 }
@@ -190,6 +219,16 @@ func (t *Topbeat) addMemPercentage(m *MemStat) {
 
 	perc := float64(100*m.Used) / float64(m.Total)
 	m.UsedPercent = Round(perc, .5, 2)
+}
+
+func (t *Topbeat) addFileSystemUsedPercentage(f *FileSystemStat) {
+
+	if f.Total == 0 {
+		return
+	}
+
+	perc := float64(100*f.Used) / float64(f.Total)
+	f.UsedPercent = Round(perc, .5, 2)
 }
 
 func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {

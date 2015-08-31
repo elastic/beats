@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"syscall"
 
 	"github.com/elastic/gosigar"
 )
@@ -58,6 +59,25 @@ type Process struct {
 	Mem   *ProcMemStat `json:"mem"`
 	Cpu   *ProcCpuTime `json:"cpu"`
 	ctime time.Time
+}
+
+type FileSystemStat struct {
+	DevName     string    `json:"device_name"`
+	Total       uint64    `json:"total"`
+	Used        uint64    `json:"used"`
+	UsedPercent float64   `json:"used_p"`
+	Free        uint64    `json:"free"`
+	Avail       uint64    `json:"avail"`
+	Files       uint64    `json:"files"`
+	FreeFiles   uint64    `json:"free_files"`
+	Mount       string    `json:"mount_point"`
+	ctime       time.Time
+}
+
+func (f *FileSystemStat) String() string {
+
+	return fmt.Sprintf("device name: %s, total: %d, used %d, used pct %.2f, free: %d, avail: %d, files: %d, free files: %d, mount: %s",
+		f.DevName, f.Total, f.Used, f.UsedPercent, f.Free, f.Avail, f.Files, f.FreeFiles, f.Mount)
 }
 
 func (p *Process) String() string {
@@ -229,4 +249,40 @@ func GetProcess(pid int) (*Process, error) {
 	proc.ctime = time.Now()
 
 	return &proc, nil
+}
+
+func GetFileSystemList() ([]sigar.FileSystem, error) {
+
+	fss := sigar.FileSystemList{}
+	err := fss.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	return fss.List, nil
+}
+
+func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
+
+	dir := fs.DirName
+
+	stat := syscall.Statfs_t{}
+	err := syscall.Statfs(dir, &stat)
+	if err != nil {
+		return nil, fmt.Errorf("Error getting filsystem usage: %v", err)
+	}
+
+	// Convert to bytes using blocksize as reported by Statfs
+	filesystem := FileSystemStat{
+		DevName:    fs.DevName,
+		Total:      (uint64(stat.Blocks) * uint64(stat.Bsize)),
+		Free:       (uint64(stat.Bfree) * uint64(stat.Bsize)),
+		Avail:      (uint64(stat.Bavail) * uint64(stat.Bsize)),
+		Used:       (uint64(stat.Blocks) * uint64(stat.Bsize)) - (uint64(stat.Bfree) * uint64(stat.Bsize)),
+		Files:      stat.Files,
+		FreeFiles:  stat.Ffree,
+		Mount:      dir,
+	}
+
+	return &filesystem, nil
 }
