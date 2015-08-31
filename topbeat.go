@@ -160,6 +160,7 @@ func (t *Topbeat) exportFileSystemStats() error {
 	}
 
 	for _, fs := range fss {
+		logp.Debug("topbeat", "File system %v", fs)
 		fs_stat, err := GetFileSystemStat(fs)
 		if err != nil {
 			logp.Debug("topbeat", "Skip filesystem %d: %v", fs_stat, err)
@@ -168,16 +169,15 @@ func (t *Topbeat) exportFileSystemStats() error {
 		t.addFileSystemUsedPercentage(fs_stat)
 
 		event := common.MapStr{
-			"timestamp":      common.Time(time.Now()),
-			"type":           "filesystem",
-			"fs":             fs_stat,
+			"timestamp": common.Time(time.Now()),
+			"type":      "filesystem",
+			"fs":        fs_stat,
 		}
 		t.events <- event
 	}
 
 	return nil
 }
-
 
 func (t *Topbeat) Run() error {
 

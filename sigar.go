@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"time"
-	"syscall"
 
 	"github.com/elastic/gosigar"
 )
@@ -62,15 +61,15 @@ type Process struct {
 }
 
 type FileSystemStat struct {
-	DevName     string    `json:"device_name"`
-	Total       uint64    `json:"total"`
-	Used        uint64    `json:"used"`
-	UsedPercent float64   `json:"used_p"`
-	Free        uint64    `json:"free"`
-	Avail       uint64    `json:"avail"`
-	Files       uint64    `json:"files"`
-	FreeFiles   uint64    `json:"free_files"`
-	Mount       string    `json:"mount_point"`
+	DevName     string  `json:"device_name"`
+	Total       uint64  `json:"total"`
+	Used        uint64  `json:"used"`
+	UsedPercent float64 `json:"used_p"`
+	Free        uint64  `json:"free"`
+	Avail       uint64  `json:"avail"`
+	Files       uint64  `json:"files"`
+	FreeFiles   uint64  `json:"free_files"`
+	Mount       string  `json:"mount_point"`
 	ctime       time.Time
 }
 
@@ -264,24 +263,22 @@ func GetFileSystemList() ([]sigar.FileSystem, error) {
 
 func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 
-	dir := fs.DirName
-
-	stat := syscall.Statfs_t{}
-	err := syscall.Statfs(dir, &stat)
+	stat := sigar.FileSystemUsage{}
+	err := stat.Get(fs.DirName)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting filsystem usage: %v", err)
+		return nil, err
 	}
 
 	// Convert to bytes using blocksize as reported by Statfs
 	filesystem := FileSystemStat{
-		DevName:    fs.DevName,
-		Total:      (uint64(stat.Blocks) * uint64(stat.Bsize)),
-		Free:       (uint64(stat.Bfree) * uint64(stat.Bsize)),
-		Avail:      (uint64(stat.Bavail) * uint64(stat.Bsize)),
-		Used:       (uint64(stat.Blocks) * uint64(stat.Bsize)) - (uint64(stat.Bfree) * uint64(stat.Bsize)),
-		Files:      stat.Files,
-		FreeFiles:  stat.Ffree,
-		Mount:      dir,
+		DevName:   fs.DevName,
+		Total:     stat.Total,
+		Free:      stat.Free,
+		Avail:     stat.Avail,
+		Used:      stat.Used,
+		Files:     stat.Files,
+		FreeFiles: stat.FreeFiles,
+		Mount:     fs.DirName,
 	}
 
 	return &filesystem, nil

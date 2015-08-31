@@ -121,3 +121,22 @@ func TestProcState(t *testing.T) {
 	assert.Equal(t, getProcState('T'), "stopped")
 	assert.Equal(t, getProcState('Z'), "zombie")
 }
+
+func TestFileSystemList(t *testing.T) {
+
+	fss, err := GetFileSystemList()
+
+	assert.Nil(t, err)
+	assert.True(t, (len(fss) > 0))
+
+	for _, fs := range fss {
+
+		stat, err := GetFileSystemStat(fs)
+		assert.Nil(t, err)
+
+		assert.True(t, (stat.Total >= 0))
+		assert.True(t, (stat.Free >= 0))
+		assert.True(t, (stat.Avail >= 0))
+		assert.True(t, (stat.Used >= 0))
+	}
+}
