@@ -9,6 +9,12 @@ import (
 // Commonly used map of things, used in JSON creation and the like.
 type MapStr map[string]interface{}
 
+// Eventer defines a type its ability to fill a MapStr.
+type Eventer interface {
+	// Add fields to MapStr.
+	Event(event MapStr) error
+}
+
 // MapStrUnion creates a new MapStr containing the union of the
 // key-value pairs of the two maps. If the same key is present in
 // both, the key-value pairs from dict2 overwrite the ones from dict1.
