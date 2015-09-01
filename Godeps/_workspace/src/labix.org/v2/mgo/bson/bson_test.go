@@ -1,18 +1,18 @@
 // BSON library for Go
-// 
+//
 // Copyright (c) 2010-2012 - Gustavo Niemeyer <gustavo@niemeyer.net>
-// 
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
-// 
+// modification, are permitted provided that the following conditions are met:
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
-// 
+//    and/or other materials provided with the distribution.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,8 +31,8 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	. "launchpad.net/gocheck"
 	"labix.org/v2/mgo/bson"
+	. "launchpad.net/gocheck"
 	"net/url"
 	"reflect"
 	"testing"
@@ -360,7 +360,7 @@ func (s *S) Test64bitInt(c *C) {
 		c.Assert(err, IsNil)
 		c.Assert(string(data), Equals, wrapInDoc("\x12i\x00\x00\x00\x00\x80\x00\x00\x00\x00"))
 
-		var result struct { I int }
+		var result struct{ I int }
 		err = bson.Unmarshal(data, &result)
 		c.Assert(err, IsNil)
 		c.Assert(int64(result.I), Equals, i)
@@ -832,7 +832,6 @@ func (s *S) TestUnmarshalSetterSetZero(c *C) {
 	c.Assert(value, IsNil)
 }
 
-
 // --------------------------------------------------------------------------
 // Getter test cases.
 
@@ -1245,7 +1244,10 @@ func (s *S) TestObjectIdHex(c *C) {
 }
 
 func (s *S) TestIsObjectIdHex(c *C) {
-	test := []struct{ id string; valid bool }{
+	test := []struct {
+		id    string
+		valid bool
+	}{
 		{"4d88e15b60f486e428412dc9", true},
 		{"4d88e15b60f486e428412dc", false},
 		{"4d88e15b60f486e428412dc9e", false},
