@@ -81,53 +81,141 @@ Now that you have the big picture, lets dig into the code.
 
 == Beat specific code
 
-For Topbeat, the Beat specific logic is contained in a type called Topbeat.
-There's more code in it, but here are the relevant portions for this guide:
+The Beat specific code should implement the `Beater` interface which is found in
+libbeat. This means your Beat should implement 5 methods:
+
+[source,go]
+----------------------------------------------------------------------
+type Beater interface {
+	Config(*Beat) error
+	Setup(*Beat) error
+	Run(*Beat) error
+	Cleanup(*Beat) error
+	Stop()
+}
+----------------------------------------------------------------------
+
+The `Beat` parameter received by most of these methods contains data about the
+Beat, things like the name, version and common configuration options.
+
+Let's go through each of these methods and look at a sample implementation.
+
+
+== Configuration
+
+The `Config` method deals with the configuration file and optionally with
+custom CLI flags.
+
+The recommended way of handling the configuration is to create a
+`ConfigSettings` type that matches the structure of the expected configuration
+file. Here is an example configuration section for Topbeat:
+
+[source,yaml]
+----------------------------------------------------------------------
+input:
+  period: 1
+
+  procs: [".*"]
+----------------------------------------------------------------------
+
+And here are the corresponding Go structures:
+
+[source,go]
+----------------------------------------------------------------------
+type TopConfig struct {
+	Period *int64
+	Procs  *[]string
+}
+
+type ConfigSettings struct {
+	Input TopConfig
+}
+----------------------------------------------------------------------
+
+Pointers are used to separate between the case when the setting is completely
+missing from the configuration file and when it has a values that matches the
+type default.
+
+With these structures defined, the `Config` function looks like this:
 
 
 [source,go]
 ----------------------------------------------------------------------
-type Topbeat struct {
-    isAlive  bool
-    [ ... other fields ...]
+func (tb *Topbeat) Config(b *beat.Beat) error {
 
-    events chan common.MapStr <1>
-}
+	err := cfgfile.Read(&tb.TbConfig) <1>
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return err
+	}
 
-func (t *Topbeat) Run() error {
-    t.isAlive = true
-    t.initProcStats()
+	if tb.TbConfig.Input.Period != nil { <2>
+		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
+	} else {
+		tb.period = 1 * time.Second
+	}
 
-    for t.isAlive { <2>
-        time.Sleep(t.period)
-        t.exportSystemStats()
-        t.exportProcStats()
-    }
-    return nil
-}
+	[...]
 
-func (t *Topbeat) Stop() {
-    t.isAlive = false
+	return nil
 }
 ----------------------------------------------------------------------
 
-<1> The events channel is the channel through which the events are sent to the
-publisher. The `common.MapStr` type is essentially a `map[string][interface{}`
-with a few more convenience
-https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods] added.
+<1> Read the configuration.
+<2> Set default values for options that are not present in the configuration
+    file.
 
-<2> The main loop
+=== Setup
 
-The type has two methods, the `Run` method, which contains the main
-loop of the application and the `Stop` method which simply provides a way of
-breaking the loop.
+The `Setup` method gives you the opportunity to execute things before the main
+loop, usually for initialization. In the case of Topbeat, it only links the
+`events` channel with the publisher queue. This is the event channel mentioned
+in the Overview section.
+
+[source,go]
+----------------------------------------------------------------------
+func (tb *Topbeat) Setup(b *beat.Beat) error {
+
+	tb.events = publisher.Publisher.Queue
+	return nil
+}
+----------------------------------------------------------------------
+
+=== Run
+
+The `Run` method should contain your main application loop. For Topbeat it looks
+like this:
+
+[source,go]
+----------------------------------------------------------------------
+func (t *Topbeat) Run(b *beat.Beat) error {
+
+	t.isAlive = true
+
+	t.initProcStats()
+
+	var err error
+
+	for t.isAlive {
+		time.Sleep(t.period)
+
+		err = t.exportSystemStats()
+		if err != nil {
+			logp.Err("Error reading system stats: %v", err)
+		}
+		[...]
+	}
+
+	return err
+}
+----------------------------------------------------------------------
 
 Inside the loop, Topbeat sleeps for a configured period of time and then
 captures the required data and sends it to the publisher via the `events`
 channel.
 
-The actual sending is done inside the `exportSystemStats()` and
-`exportProcStats()` functions, here is an example code snippet:
+The actual sending is done inside the `exportSystemStats()` function, here is an
+example code snippet:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -145,139 +233,55 @@ The actual sending is done inside the `exportSystemStats()` and
 
 <1> The `timestamp` fields needs to be of time `common.Time`.
 
+=== Cleanup
+
+The `Cleanup` method is executed after the main loop finishes or is interrupted
+and gives you the opportunity to release any resources you might use. For
+Topbeat, it's completely empty:
+
+[source,go]
+----------------------------------------------------------------------
+func (tb *Topbeat) Cleanup(b *beat.Beat) error {
+	return nil
+}
+----------------------------------------------------------------------
+
+=== Stop
+
+Finally, the `Stop` method is called when the Beat is signalled to stop, for
+example via the SIGTERM signal on Unix systems or via the service control
+interface on Windows. In the case of Topbeat, it simply sets `isAlive` to
+`false` which breaks the main loop.
+
+[source,go]
+----------------------------------------------------------------------
+func (t *Topbeat) Stop() {
+	t.isAlive = false
+}
+----------------------------------------------------------------------
+
 == The main function
 
 If you follow the Topbeat model and put your Beat specific code in it's own type
-that implements the `Run` and `Stop` methods, the `main` routing becomes a bit
-of copy-pastable boiler plate:
+that implements the `Beater` interface, the code from your main package becomes
+very simple:
 
 [source,go]
 ----------------------------------------------------------------------
 func main() {
 
-    // Use our own FlagSet, because some libraries pollute the global one
-    var cmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	tb := &Topbeat{}
 
-    cfgfile.CmdLineFlags(cmdLine, Name) <1>
-    logp.CmdLineFlags(cmdLine)
-    service.CmdLineFlags(cmdLine)
-    publisher.CmdLineFlags(cmdLine)
+	b := beat.NewBeat(Name, Version, tb)
 
-    printVersion := cmdLine.Bool("version", false, "Print version and exit") <2>
+	b.CommandLineSetup()
 
-    cmdLine.Parse(os.Args[1:])
+	b.LoadConfig()
 
-    if *printVersion {
-        fmt.Printf("%s version %s (%s)\n", Name, Version, runtime.GOARCH)
-        return
-    }
+	tb.Config(b)
 
-    err := cfgfile.Read(&Config) <3>
+	b.Run()
 
-    logp.Init(Name, &Config.Logging)
-
-    logp.Debug("main", "Initializing output plugins")
-    if err = publisher.Publisher.Init(Config.Output, Config.Shipper); err != nil
-    { <4>
-        logp.Critical(err.Error())
-        os.Exit(1)
-    }
-
-    topbeat := &Topbeat{}
-    if err = topbeat.Init(Config.Input, publisher.Publisher.Queue); err != nil {
-    <5>
-        logp.Critical(err.Error())
-        os.Exit(1)
-    }
-
-    // Up to here was the initialization
-    if cfgfile.IsTestConfig() { <6>
-        // all good, exit with 0
-        os.Exit(0)
-    }
-    service.BeforeRun()
-
-    service.HandleSignals(topbeat.Stop) <7>
-
-    // Startup successful, disable stderr logging if requested by
-    // cmdline flag
-    logp.SetStderr()
-
-    logp.Debug("main", "Starting topbeat")
-
-    err = topbeat.Run() <8>
-    if err != nil {
-        logp.Critical("Sniffer main loop failed: %v", err)
-        os.Exit(1)
-    }
-
-    logp.Debug("main", "Cleanup")
-    service.Cleanup()
 }
 ----------------------------------------------------------------------
 
-<1> libbeat modules can provide their own command line flags. `Name` is a
-global constant and it represents the name of the Beat.
-
-<2> The Beat can also define its own custom CLI flags. In this case,
-`-version` is the only custom flag.
-
-<3> Read the configuration file, see the next section for details.
-
-<4> Publisher initialization, receiving the relevant configuration sections.
-
-<5> The Topbeat module initialization, receiving the relevant configuration
-section and the channel to the Publisher as paramters.
-
-<6> The Beats have a test config mode, this is handled here.
-
-<7> Unix signals and Windows control service commands are handled here.
-
-<8> Run the main loop.
-
-
-== Configuration
-
-The recommended way of handling the configuration is to create a
-`ConfigSettings` type that contains the options that are custom to your Beat but
-also the configuration sections that are the same for all Beats and defined in
-libbeat.
-
-Here is the entire configuration handling in Topbeat:
-
-[source,go]
-----------------------------------------------------------------------
-package main
-
-import (
-    "github.com/elastic/libbeat/logp"
-    "github.com/elastic/libbeat/outputs"
-    "github.com/elastic/libbeat/publisher"
-)
-
-type ConfigSettings struct {
-    Input   TopConfig <1>
-    Output  map[string]outputs.MothershipConfig <2>
-    Logging logp.Logging
-    Shipper publisher.ShipperConfig
-}
-
-type TopConfig struct {
-    Period *int64 <3>
-    Procs  *[]string
-}
-
-var Config ConfigSettings <4>
-----------------------------------------------------------------------
-
-<1> The configuration options that are specific to Topbeat are grouped in the
-`TopConfig` structure.
-
-<2> The configuration settings for the output plugins, logging and the shipper
-are defined in libbeat and only included here.
-
-<3> If you need to separate between the default zero value and the option not
-being present at all in the configuration, use a pointer. If it's nil, the
-option was not present at all.
-
-<4> `Config` is a global variable containing all configuration options.
