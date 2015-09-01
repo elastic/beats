@@ -60,8 +60,8 @@ func TestGetSwap(t *testing.T) {
 	assert.NotNil(t, swap)
 	assert.Nil(t, err)
 
-	assert.True(t, (swap.Total > 0))
-	assert.True(t, (swap.Used > 0))
+	assert.True(t, (swap.Total >= 0))
+	assert.True(t, (swap.Used >= 0))
 	assert.True(t, (swap.Free >= 0))
 }
 
