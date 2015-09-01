@@ -92,13 +92,8 @@ Packetbeat uses https://github.com/tools/godep[Godep] for vendoring its
 dependencies. The way Godep works is that it copies the source code of all
 dependencies in the `Godep/_workspace` folder.
 
-If you add a new dependency, you can use `go get` normally, and then run the
-following command to add the new dependency to `Godep`.
-
-[source,shell]
-----------------------------------------------------------------------
-godep update ...
-----------------------------------------------------------------------
+If you add a new dependency, you can use `godep get` to add it to the vendored
+folder.
 
 === Protocol modules
 
