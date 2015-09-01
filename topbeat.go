@@ -5,8 +5,6 @@ import (
 	"regexp"
 	"time"
 
-	"os"
-
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
@@ -77,11 +75,6 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 		if err != nil {
 			logp.Err("Error reading fs stats: %v", err)
 		}
-	}
-
-	if err != nil {
-		logp.Critical("Sniffer main loop failed: %v", err)
-		os.Exit(1)
 	}
 
 	return err
