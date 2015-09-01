@@ -7,7 +7,7 @@ import (
 func main() {
 
 	// Create Beater object
-	pb := &PacketBeat{}
+	pb := &Packetbeat{}
 
 	// Initi beat objectefile
 	b := beat.NewBeat(Name, Version, pb)

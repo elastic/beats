@@ -47,7 +47,7 @@ var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.F
 }
 
 // Beater object. Contains all objects needed to run the beat
-type PacketBeat struct {
+type Packetbeat struct {
 	PbConfig    config.Config
 	CmdLineArgs CmdLineArgs
 	Sniff       *sniffer.SnifferSetup
@@ -79,7 +79,7 @@ func fetchAdditionalCmdLineArgs(cmdLine *flag.FlagSet) CmdLineArgs {
 }
 
 // Loads the beat specific config and overwrites params based on cmd line
-func (pb *PacketBeat) Config(b *beat.Beat) error {
+func (pb *Packetbeat) Config(b *beat.Beat) error {
 	// Read beat implementation config as needed for setup
 	err := cfgfile.Read(&pb.PbConfig)
 
@@ -119,7 +119,7 @@ func (pb *PacketBeat) Config(b *beat.Beat) error {
 }
 
 // Setup packetbeat
-func (pb *PacketBeat) Setup(b *beat.Beat) error {
+func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	if err := procs.ProcWatcher.Init(pb.PbConfig.Procs); err != nil {
 		logp.Critical(err.Error())
@@ -181,7 +181,7 @@ func (pb *PacketBeat) Setup(b *beat.Beat) error {
 	return err
 }
 
-func (pb *PacketBeat) Run(b *beat.Beat) error {
+func (pb *Packetbeat) Run(b *beat.Beat) error {
 
 	// run the sniffer in background
 	go func() {
@@ -209,7 +209,7 @@ func (pb *PacketBeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (pb *PacketBeat) Cleanup(b *beat.Beat) error {
+func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
 
 	if service.WithMemProfile() {
 		// wait for all TCP streams to expire
@@ -220,6 +220,6 @@ func (pb *PacketBeat) Cleanup(b *beat.Beat) error {
 }
 
 // Called by the Beat stop function
-func (pb *PacketBeat) Stop() {
+func (pb *Packetbeat) Stop() {
 	pb.Sniff.Stop()
 }
