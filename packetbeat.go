@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
+
 	"github.com/elastic/packetbeat/beat"
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -65,6 +66,7 @@ type CmdLineArgs struct {
 	TopSpeed     *bool
 	Dumpfile     *string
 	PrintDevices *bool
+	WaitShutdown *int
 }
 
 func fetchAdditionalCmdLineArgs(cmdLine *flag.FlagSet) CmdLineArgs {
@@ -76,6 +78,7 @@ func fetchAdditionalCmdLineArgs(cmdLine *flag.FlagSet) CmdLineArgs {
 		TopSpeed:     cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping"),
 		Dumpfile:     cmdLine.String("dump", "", "Write all captured packets to this libpcap file"),
 		PrintDevices: cmdLine.Bool("devices", false, "Print the list of devices and exit"),
+		WaitShutdown: cmdLine.Int("waitstop", 0, "Additional seconds to wait befor shutting down"),
 	}
 
 	return args
@@ -212,6 +215,11 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		if !pb.Sniff.IsAlive() {
 			break
 		}
+	}
+
+	waitShutdown := pb.CmdLineArgs.WaitShutdown
+	if waitShutdown != nil && *waitShutdown > 0 {
+		time.Sleep(time.Duration(*waitShutdown) * time.Second)
 	}
 
 	return nil
