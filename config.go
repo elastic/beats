@@ -1,7 +1,5 @@
 package main
 
-import ()
-
 type TopConfig struct {
 	Period *int64
 	Procs  *[]string
@@ -10,5 +8,3 @@ type TopConfig struct {
 type ConfigSettings struct {
 	Input TopConfig
 }
-
-var Config ConfigSettings
