@@ -36,3 +36,4 @@ cover:
 .PHONY: clean
 clean:
 	rm topbeat || true
+	-rm -r cover

@@ -27,3 +27,5 @@ _testmain.go
 
 cover/
 profile.cov
+.idea
+.DS_Store
