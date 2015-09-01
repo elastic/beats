@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/elastic/topbeat.svg?branch=master)](https://travis-ci.org/elastic/topbeat)
+[![codecov.io](http://codecov.io/github/elastic/topbeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/topbeat?branch=master)
+
 # topbeat
 
 Topbeat is the [Beat](https://www.elastic.co/products/beats) used for
