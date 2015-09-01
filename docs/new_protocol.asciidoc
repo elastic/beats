@@ -368,13 +368,15 @@ integration tests:
 
 ==== Helpers
 
-In libbeat some helpers exist to implement parsers for binary and text based
-protocols. The Bytes_Ntoh... functions being the most low level helpers for
-binary protocols using network byte order can be found in the libbeat/common
-module. In addition to these very low level helpers a stream buffer for parsing
-tcp based streams, or simply udp packets with integrated error handling is provided by
-libbeat/common/streambuf. This demonstrates it's usage for parsing the memcached
-protocols udp header:
+===== Parsing helpers
+
+In libbeat you also find some helpers for implementing parsers for binary and
+text based protocols. The `Bytes_*` functions being the most low level helpers
+for binary protocols using network byte order can be found in the
+`libbeat/common` module. In addition to these very low level helpers a stream
+buffer for parsing TCP based streams, or simply UDP packets with integrated
+error handling is provided by `libbeat/common/streambuf`. This demonstrates its
+usage for parsing the Memcache protocol UDP header:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -389,7 +391,7 @@ func parseUdpHeader(buf *streambuf.Buffer) (mcUdpHeader, error) {
 ----------------------------------------------------------------------
 
 The stream buffer is also used to implement the binary and text based protocols
-for memcache. 
+for memcache.
 
 [source,go]
 ----------------------------------------------------------------------
@@ -444,12 +446,14 @@ for memcache.
 
 It also implements a number of interfaces defined in the standard "io" package
 and can easily be used to serialize some packets for testing parsers (see
-protos/memcache/binary_test.go).
+`protos/memcache/binary_test.go`).
 
-In addition packetbeat provides the module packetbeat/protos/applayer with
+===== Module helpers
+
+Packetbeat provides the module `packetbeat/protos/applayer` with
 common definitions among all application layer protocols. For example using the
-Transaction type from applayer guarantees the final document to have all common
-required fields defined. Just embedd the applayer.Transaction with you own
+Transaction type from `applayer` guarantees the final document to have all common
+required fields defined. Just embed the `applayer.Transaction` with you own
 application layer transaction type to make use of it (from memcache protocol):
 
 [source,go]
@@ -479,8 +483,8 @@ application layer transaction type to make use of it (from memcache protocol):
 	}
 ----------------------------------------------------------------------
 
-Use applayer.Message in conjunction with applayer.Transaction for creating the
-transaction and applayer.Stream to manage your stream buffers for parsing.
+Use `applayer.Message` in conjunction with `applayer.Transaction` for creating the
+transaction and `applayer.Stream` to manage your stream buffers for parsing.
 
 
 === Testing
@@ -631,4 +635,3 @@ cd tests
 . env/bin/activate
 nosetests test_0025_mongodb_basic.py:Test.test_write_errors
 ----------------------------------------------------------------------
-
