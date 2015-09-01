@@ -5,8 +5,12 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/topbeat/beat"
+	"github.com/elastic/libbeat/publisher"
+	"os"
 )
 
 type ProcsMap map[int]*Process
@@ -17,28 +21,69 @@ type Topbeat struct {
 	procs        []string
 	procsMap     ProcsMap
 	lastCpuTimes *CpuTimes
-
-	events chan common.MapStr
+	TbConfig     TopConfig
+	events       chan common.MapStr
 }
 
-func (t *Topbeat) Init(config TopConfig, events chan common.MapStr) error {
+func (tb *Topbeat) Config(b *beat.Beat) error {
 
-	if config.Period != nil {
-		t.period = time.Duration(*config.Period) * time.Second
+	err := cfgfile.Read(&tb.TbConfig)
+
+	if tb.TbConfig.Period != nil {
+		tb.period = time.Duration(*tb.TbConfig.Period) * time.Second
 	} else {
-		t.period = 1 * time.Second
+		tb.period = 1 * time.Second
 	}
-	if config.Procs != nil {
-		t.procs = *config.Procs
+	if tb.TbConfig.Procs != nil {
+		tb.procs = *tb.TbConfig.Procs
 	} else {
-		t.procs = []string{".*"} //all processes
+		tb.procs = []string{".*"} //all processes
 	}
 
 	logp.Debug("topbeat", "Init toppbeat")
-	logp.Debug("topbeat", "Follow processes %q\n", t.procs)
-	logp.Debug("topbeat", "Period %v\n", t.period)
-	t.events = events
+	logp.Debug("topbeat", "Follow processes %q\n", tb.procs)
+	logp.Debug("topbeat", "Period %v\n", tb.period)
+	tb.events = publisher.Publisher.Queue
+
+	return err
+}
+
+func (tb *Topbeat) Setup(b *beat.Beat) error {
+
 	return nil
+}
+
+func (t *Topbeat) Run(b *beat.Beat) error {
+
+	t.isAlive = true
+
+	t.initProcStats()
+
+	var err error
+
+	for t.isAlive {
+		time.Sleep(t.period)
+
+		err = t.exportSystemStats()
+		err = t.exportProcStats()
+		err = t.exportFileSystemStats()
+	}
+
+	if err != nil {
+		logp.Critical("Sniffer main loop failed: %v", err)
+		os.Exit(1)
+	}
+
+	return err
+}
+
+func (tb *Topbeat) Cleanup(b *beat.Beat) error {
+	return nil
+}
+
+func (t *Topbeat) Stop() {
+
+	t.isAlive = false
 }
 
 func (t *Topbeat) initProcStats() {
@@ -179,27 +224,6 @@ func (t *Topbeat) exportFileSystemStats() error {
 	return nil
 }
 
-func (t *Topbeat) Run() error {
-
-	t.isAlive = true
-
-	t.initProcStats()
-
-	for t.isAlive {
-		time.Sleep(t.period)
-
-		t.exportSystemStats()
-		t.exportProcStats()
-		t.exportFileSystemStats()
-	}
-	return nil
-}
-
-func (t *Topbeat) Stop() {
-
-	t.isAlive = false
-}
-
 func (t *Topbeat) MatchProcess(name string) bool {
 
 	for _, reg := range t.procs {
@@ -301,7 +325,7 @@ func Round(val float64, roundOn float64, places int) (newVal float64) {
 	newVal = round / pow
 	return
 }
-func (t *CpuTimes) sum() uint64 {
 
+func (t *CpuTimes) sum() uint64 {
 	return t.User + t.Nice + t.System + t.Idle + t.IOWait + t.Irq + t.SoftIrq + t.Steal
 }
