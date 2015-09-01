@@ -17,6 +17,7 @@ func main() {
 	b.CommandLineSetup()
 
 	b.LoadConfig()
+	tb.Config(b)
 
 	b.Run()
 

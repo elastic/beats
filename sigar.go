@@ -269,7 +269,6 @@ func GetFileSystemStat(fs sigar.FileSystem) (*FileSystemStat, error) {
 		return nil, err
 	}
 
-	// Convert to bytes using blocksize as reported by Statfs
 	filesystem := FileSystemStat{
 		DevName:   fs.DevName,
 		Total:     stat.Total,

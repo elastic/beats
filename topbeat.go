@@ -8,9 +8,8 @@ import (
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/topbeat/beat"
 	"github.com/elastic/libbeat/publisher"
-	"os"
+	"github.com/elastic/topbeat/beat"
 )
 
 type ProcsMap map[int]*Process
@@ -21,7 +20,7 @@ type Topbeat struct {
 	procs        []string
 	procsMap     ProcsMap
 	lastCpuTimes *CpuTimes
-	TbConfig     TopConfig
+	TbConfig     ConfigSettings
 	events       chan common.MapStr
 }
 
@@ -29,13 +28,13 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 
 	err := cfgfile.Read(&tb.TbConfig)
 
-	if tb.TbConfig.Period != nil {
-		tb.period = time.Duration(*tb.TbConfig.Period) * time.Second
+	if tb.TbConfig.Input.Period != nil {
+		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
 	} else {
 		tb.period = 1 * time.Second
 	}
-	if tb.TbConfig.Procs != nil {
-		tb.procs = *tb.TbConfig.Procs
+	if tb.TbConfig.Input.Procs != nil {
+		tb.procs = *tb.TbConfig.Input.Procs
 	} else {
 		tb.procs = []string{".*"} //all processes
 	}
@@ -65,13 +64,17 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 		time.Sleep(t.period)
 
 		err = t.exportSystemStats()
+		if err != nil {
+			logp.Err("Error reading system stats: %v", err)
+		}
 		err = t.exportProcStats()
+		if err != nil {
+			logp.Err("Error reading proc stats: %v", err)
+		}
 		err = t.exportFileSystemStats()
-	}
-
-	if err != nil {
-		logp.Critical("Sniffer main loop failed: %v", err)
-		os.Exit(1)
+		if err != nil {
+			logp.Err("Error reading fs stats: %v", err)
+		}
 	}
 
 	return err
