@@ -2,9 +2,9 @@
 
 ############################# Input ############################################
 input:
- period: 1
+  period: 1
 
- procs: [".*"]
+  procs: [".*"]
 
 
 ############################# Shipper ############################################
@@ -33,7 +33,6 @@ output:
   elasticsearch:
     enabled: true
     hosts: ["localhost:9200"]
-    save_topology: false
     index: "topbeat"
 
   # Redis as output
