@@ -3,13 +3,14 @@ package beat
 import (
 	"flag"
 	"fmt"
+	"os"
+	"runtime"
+
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
-	"os"
-	"runtime"
 )
 
 // Beater interface that every beat must use
@@ -63,8 +64,9 @@ func (beat *Beat) CommandLineSetup() {
 	beat.CmdLine.Parse(os.Args[1:])
 
 	if *printVersion {
+		// using Printf because logging not yet initialized
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
-		return
+		os.Exit(0)
 	}
 }
 
@@ -75,7 +77,9 @@ func (b *Beat) LoadConfig() {
 	err := cfgfile.Read(&b.Config)
 
 	if err != nil {
-		logp.Debug("Log read error", "Error %v\n", err)
+		// using Printf because logging not yet initialized
+		fmt.Printf("Error %v\n", err)
+		os.Exit(1)
 	}
 
 	logp.Init(b.Name, &b.Config.Logging)
