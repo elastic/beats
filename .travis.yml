@@ -1,27 +1,39 @@
 language: go
 
 go:
-    - 1.4
+  - 1.4
 
 sudo: false
 
 services:
-    - redis-server
-    - elasticsearch
+  - redis-server
+  - elasticsearch
+
+before_install:
+  # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
+  - mkdir -p $HOME/gopath/src/github.com/elastic/libbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/libbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/libbeat
+  - cd $HOME/gopath/src/github.com/elastic/libbeat
 
 addonsbefore_install:
-    - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
+  - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
 
 before_script:
-    - sleep 10
+  - sleep 10
 
 install:
-    - make deps
-    - make
+  - make deps
+  - make
 
 script: make testlong
 
 notifications:
-    email:
-        - tudor@elastic.co
-        - monica@elastic.co
+  email:
+    - tudor@elastic.co
+    - monica@elastic.co
+
+after_success:
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - cp profile.cov coverage.txt
+  - bash <(curl -s https://codecov.io/bash)
