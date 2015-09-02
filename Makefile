@@ -25,7 +25,7 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	go test ./...
+	make cover
 
 .PHONY: benchmark
 benchmark:
@@ -33,6 +33,14 @@ benchmark:
 
 .PHONY: cover
 cover:
+	# gotestcover is needed to fetch coverage for multiple packages
+	go get github.com/pierrre/gotestcover
+	$(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/libbeat/...
 	mkdir -p cover
-	./scripts/coverage.sh
 	go tool cover -html=profile.cov -o cover/coverage.html
+
+.PHONY: clean
+clean:
+	gofmt -w .
+	-rm profile.cov
+	-rm -r cover
