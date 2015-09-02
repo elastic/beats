@@ -6,9 +6,7 @@ import (
 	"errors"
 )
 
-// TODO: move some to libbeat?
 var (
-	ErrInvalidPort    = errors.New("port number out of range")
 	ErrNotImplemented = errors.New("not implemented")
 )
 

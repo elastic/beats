@@ -11,12 +11,13 @@ import (
 	"github.com/elastic/libbeat/logp"
 
 	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/applayer"
 )
 
 // memcache types
 type Memcache struct {
-	Ports   PortsConfig
+	Ports   protos.PortsConfig
 	results chan common.MapStr
 	config  parserConfig
 
@@ -96,34 +97,7 @@ type memcacheStat struct {
 	Value memcacheString `json:"value"`
 }
 
-// Ports configuration
-// TODO: move to libbeat?
-type PortsConfig struct {
-	Ports []int
-}
-
 var debug = logp.MakeDebug("memcache")
-
-func (p *PortsConfig) Init(ports ...int) error {
-	return p.Set(ports)
-}
-
-func (p *PortsConfig) Set(ports []int) error {
-	if err := validatePorts(ports); err != nil {
-		return err
-	}
-	p.Ports = ports
-	return nil
-}
-
-func validatePorts(ports []int) error {
-	for port := range ports {
-		if port < 0 || port > 65535 {
-			return ErrInvalidPort
-		}
-	}
-	return nil
-}
 
 // Called to initialize the Plugin
 func (mc *Memcache) Init(testMode bool, results chan common.MapStr) error {
