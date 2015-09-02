@@ -27,6 +27,10 @@ type Topbeat struct {
 func (tb *Topbeat) Config(b *beat.Beat) error {
 
 	err := cfgfile.Read(&tb.TbConfig)
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return err
+	}
 
 	if tb.TbConfig.Input.Period != nil {
 		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
@@ -42,13 +46,13 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	logp.Debug("topbeat", "Init toppbeat")
 	logp.Debug("topbeat", "Follow processes %q\n", tb.procs)
 	logp.Debug("topbeat", "Period %v\n", tb.period)
-	tb.events = publisher.Publisher.Queue
 
-	return err
+	return nil
 }
 
 func (tb *Topbeat) Setup(b *beat.Beat) error {
 
+	tb.events = publisher.Publisher.Queue
 	return nil
 }
 
