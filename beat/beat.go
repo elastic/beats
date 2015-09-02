@@ -3,13 +3,14 @@ package beat
 import (
 	"flag"
 	"fmt"
+	"os"
+	"runtime"
+
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
-	"os"
-	"runtime"
 )
 
 // Beater interface that every beat must use
@@ -103,11 +104,12 @@ func (b *Beat) Run() {
 	}
 	service.BeforeRun()
 
+	// Callback is called if the processes is asked to stop
+	service.HandleSignals(b.BT.Stop)
+
 	// Run beater specific stuff
 	b.BT.Run(b)
 
-	// Function called in case of beater stop
-	service.HandleSignals(b.BT.Stop)
 	service.Cleanup()
 
 	logp.Debug("main", "Cleanup")
