@@ -1,13 +1,13 @@
 = Developer guide: creating a new Beat
 
-This guide walks you through the steps for creating a new Elastic Beat.
-The Beats are a collection of lightweight daemons that collection
-operational data from your servers and ship it to Logstash or Elasticsearch.
-The common parts from all Beats are placed in the libbeat library, which
-contains packages for sending data to Elasticsearch and Logstash, for
-configuration file handling, for signal handling, for logging and so on. By
-using this common framework, we can ensure that all Beats are behaving the same
-and they are easy to package and run with common tools.
+This guide walks you through the steps for creating a new Elastic Beat.  The
+Beats are a collection of lightweight daemons that collect operational data from
+your servers and ship it to Logstash or Elasticsearch.  The common parts from
+all Beats are placed in the libbeat library, which contains packages for sending
+data to Elasticsearch and Logstash, for configuration file handling, for signal
+handling, for logging and so on. By using this common framework, we can ensure
+that all Beats are behaving the same and they are easy to package and run with
+common tools.
 
 == Getting ready
 
@@ -18,15 +18,15 @@ language that very few people can consider themselves experts.  In fact, several
 people learned Go by contributing to Packetbeat & libbeat, including the
 original Packetbeat authors.
 
-To exemplify this guide with a working example, we will follow
+To exemplify this guide with a working example, we will follow the
 https://github.com/elastic/topbeat[Topbeat] source code. Topbeat is similar to
 the `top` command line tool but instead of printing the statistics to the screen
-it ships them to Elasticsearch for storage.
+it periodically ships them to Elasticsearch for storage.
 
 After having https://golang.org/doc/install[installed Go] and having setup the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your preferred workspace location, a simple way of getting the source code for
-topbeat and libeat and compiling them at the same time is to do:
+Topbeat and libeat and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -37,19 +37,19 @@ go get github.com/elastic/topbeat
 
 At the high level, a simple Beat like Topbeat has two main components: one that
 collects the actual data and the Publisher. They communicate via a Go channel,
-over which *events* are sent. The Publisher is implemented in libbeat, so you
+over which **events** are sent. The Publisher is implemented in libbeat, so you
 typically only have to worry about the logic specific to your Beat. Besides the
 Publisher, libbeat offers common services like configuration management,
-logging, daemonizing/windows service handling and in the future it will offer
+logging, daemonizing/Windows service handling and in the future it will offer
 data processing modules like filtering or sampling.
 
 image:./images/beat_overview.png[Beat overview architecture]
 
-An event is JSON like object (Golang type `map[string]interface{}`) that
+An event is a JSON like object (Golang type `map[string]interface{}`) that
 contains the collected data and which is indexed into Elasticsearch. The only
 rules are that it must contain a `timestamp` field and a `type` field. Beyond
-that, it doesn't matter what these events contain or how often they are created.
-Here is an example Topbeat event:
+that, these events can contain anything and they can be created as often as
+needed.
 
 [source,json]
 ----------------------------------------------------------------------
@@ -77,7 +77,7 @@ Here is an example Topbeat event:
 }
 ----------------------------------------------------------------------
 
-Now that you have the big picture, lets dig into the code.
+Now that you have the big picture, let's dig into the code.
 
 == Beat specific code
 
@@ -118,7 +118,7 @@ input:
   procs: [".*"]
 ----------------------------------------------------------------------
 
-And here are the corresponding Go structures:
+And here are the corresponding Go structures, found in `config.go`:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -214,24 +214,39 @@ Inside the loop, Topbeat sleeps for a configured period of time and then
 captures the required data and sends it to the publisher via the `events`
 channel.
 
-The actual sending is done inside the `exportSystemStats()` function, here is an
-example code snippet:
+The actual sending is done inside the `exportSystemStats()`:
 
 [source,go]
 ----------------------------------------------------------------------
-  event := common.MapStr{
-      "timestamp": common.Time(time.Now()), <1>
-      "type":      "system",
-      "load":      load_stat,
-      "cpu":       cpu_stat,
-      "mem":       mem_stat,
-      "swap":      swap_stat,
-  }
 
-  t.events <- event
+func (t *Topbeat) exportSystemStats() error {
+
+	load_stat, err := GetSystemLoad()
+	if err != nil {
+		logp.Warn("Getting load statistics: %v", err)
+		return err
+	}
+
+	[...]
+
+	event := common.MapStr{ <1>
+		"timestamp": common.Time(time.Now()), <2>
+		"type":      "system",
+		"load":      load_stat,
+		"cpu":       cpu_stat,
+		"mem":       mem_stat,
+		"swap":      swap_stat,
+	}
+
+	t.events <- event <3>
+
+	return nil
+}
 ----------------------------------------------------------------------
 
-<1> The `timestamp` fields needs to be of time `common.Time`.
+<1> Creating the event object.
+<2> The `timestamp` fields needs to be of time `common.Time`.
+<3> Sending the event.
 
 === Cleanup
 
