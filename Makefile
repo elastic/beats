@@ -1,6 +1,9 @@
+GODEP=$(GOPATH)/bin/godep
+
 .PHONY: build
 build: 
-	go build ./...
+	go get github.com/tools/godep
+	#$(GODEP) go build
 
 .PHONY: deps
 deps:
@@ -16,7 +19,7 @@ gofmt:
 
 .PHONY: test
 test:
-	go test -short ./...
+	$(GODEP) go test -short ./...
 
 .PHONY: autotest
 autotest:
@@ -25,7 +28,7 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	go test ./...
+	make cover
 
 .PHONY: benchmark
 benchmark:
@@ -33,6 +36,14 @@ benchmark:
 
 .PHONY: cover
 cover:
+	# gotestcover is needed to fetch coverage for multiple packages
+	go get github.com/pierrre/gotestcover
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/libbeat/...
 	mkdir -p cover
-	./scripts/coverage.sh
-	go tool cover -html=profile.cov -o cover/coverage.html
+	$(GODEP)  go tool cover -html=profile.cov -o cover/coverage.html
+
+.PHONY: clean
+clean:
+	make gofmt
+	-rm profile.cov
+	-rm -r cover
