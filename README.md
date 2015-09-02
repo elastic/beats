@@ -1,6 +1,9 @@
+[![Jenkins Build Status](http://build-eu-00.elastic.co/job/packetbeat/badge/icon)](http://build-eu-00.elastic.co/job/packetbeat/)
+[![Travis Build Status](https://travis-ci.org/elastic/packetbeat.svg?branch=master)](https://travis-ci.org/elastic/packetbeat)
+[![codecov.io](http://codecov.io/github/elastic/packetbeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/packetbeat?branch=master)
+
 # Packetbeat
 
-[![Jenkins Build Status](http://build-eu-00.elastic.co/job/packetbeat/badge/icon)](http://build-eu-00.elastic.co/job/packetbeat/) [![Travis Build Status](https://travis-ci.org/elastic/packetbeat.svg?branch=master)](https://travis-ci.org/elastic/packetbeat)
 
 Packetbeat is an open source network packet analyzer that ships the data to
 Elasticsearch. Think of it like a distributed real-time Wireshark with a lot
