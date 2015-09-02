@@ -64,21 +64,21 @@ We recommend the following work flow for contributing to Packetbeat:
 
 [source,shell]
 ----------------------------------------------------------------------
-git remote add tsg git@github.com:tsg/packetbeat.git
+$ git remote add tsg git@github.com:tsg/packetbeat.git
 ----------------------------------------------------------------------
 
 * Create a new branch for your work:
 
 [source,shell]
 ----------------------------------------------------------------------
-git checkout -b cool_new_protocol
+$ git checkout -b cool_new_protocol
 ----------------------------------------------------------------------
 
 * Commit as often as you like, push to your private fork with:
 
 [source,shell]
 ----------------------------------------------------------------------
-git push --set-upstream tsg cool_new_protocol
+$ git push --set-upstream tsg cool_new_protocol
 ----------------------------------------------------------------------
 
 * When you are ready to submit your PR, simply do so from the GitHub web
@@ -417,7 +417,7 @@ for memcache.
 	keyLen, _ := header.ReadNetUint16At(2)
 	totalLen, _ := header.ReadNetUint32At(8)
 
-  ...
+    [...]
 
 	if extraLen > 0 {
 		tmp, _ := buf.Collect(int(extraLen))
@@ -453,7 +453,7 @@ and can easily be used to serialize some packets for testing parsers (see
 Packetbeat provides the module `packetbeat/protos/applayer` with
 common definitions among all application layer protocols. For example using the
 Transaction type from `applayer` guarantees the final document to have all common
-required fields defined. Just embed the `applayer.Transaction` with you own
+required fields defined. Just embed the `applayer.Transaction` with your own
 application layer transaction type to make use of it (from memcache protocol):
 
 [source,go]
@@ -467,8 +467,7 @@ application layer transaction type to make use of it (from memcache protocol):
 		response *message
 	}
 
-	func (t *transaction) Event(event common.MapStr) error {
-    // use applayer.Transaction to write common required fields
+	func (t *transaction) Event(event common.MapStr) error { // use applayer.Transaction to write common required fields
 		if err := t.Transaction.Event(event); err != nil {
 			logp.Warn("error filling generic transaction fields: %v", err)
 			return err
@@ -477,7 +476,7 @@ application layer transaction type to make use of it (from memcache protocol):
 		mc := common.MapStr{}
 		event["memcache"] = mc
 
-    ...
+        [...]
 
 		return nil
 	}
@@ -609,7 +608,10 @@ from the MognoDB suite:
 your protocol plugin has options in the configuration file, you should add them
 to the template.
 
-<2> The `run_packetbeat` function receives the PCAP file to run.
+<2> The `run_packetbeat` function receives the PCAP file to run. It looks for
+the PCAP file in the `tests/pcaps` folder. The `debug_selectors` array controls
+which log lines to be included. You can use `debug_selectors=["*"]` to enable
+all debug messages.
 
 <3> After the run, the test reads the output files and checks the result.
 
@@ -621,7 +623,7 @@ To run the whole test suite, use:
 
 [source,shell]
 ----------------------------------------------------------------------
-make test
+$ make test
 ----------------------------------------------------------------------
 
 This requires you to have python and virtualenv installed, but it automatically
@@ -631,7 +633,18 @@ To run an individual test, use the following steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd tests
-. env/bin/activate
-nosetests test_0025_mongodb_basic.py:Test.test_write_errors
+$ cd tests
+$ . env/bin/activate
+$ nosetests test_0025_mongodb_basic.py:Test.test_write_errors
+----------------------------------------------------------------------
+
+After running the individual test, you can check the logs, the output and
+configuration file manually by looking into the folder pointed by the `last_run`
+symlink:
+
+[source,shell]
+----------------------------------------------------------------------
+$ cd last_run
+$ ls
+output packetbeat.log packetbeat.yml
 ----------------------------------------------------------------------
