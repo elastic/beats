@@ -13,6 +13,7 @@ following categories:
 * <<exported-fields-event>>
 * <<exported-fields-dns>>
 * <<exported-fields-http>>
+* <<exported-fields-memcache>>
 * <<exported-fields-mysql>>
 * <<exported-fields-pgsql>>
 * <<exported-fields-thrift>>
@@ -209,6 +210,13 @@ Time interval in seconds that this resource record may be cached becore it shoul
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
+==== dns.authorities
+
+type: dict
+
+An array containing a dictionary for each authority section from the answer.
+
+
 ==== dns.authorities_count
 
 type: int
@@ -234,6 +242,13 @@ example: IN
 
 Class of DNS data contained in this resource record.
 
+==== dns.answers
+
+type: dict
+
+An array containing a dictionary about each answer section returned by the server.
+
+
 ==== dns.answers.ttl
 
 type: int
@@ -244,6 +259,13 @@ Time interval in seconds that this resource record may be cached becore it shoul
 ==== dns.answers.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.additionals
+
+type: dict
+
+An array containing a dictionary for each additional section from the answer.
 
 
 ==== dns.additionals_count
@@ -320,6 +342,306 @@ A map containing the captured header fields from the response. Which headers to 
 type: int
 
 The value of the Content-Length header if present.
+
+
+[[exported-fields-memcache]]
+=== Memcache fields
+
+Memcached specific event fields
+
+
+==== memcache.protocol_type
+
+type: string
+
+Memcache protocol implementation. One of "binary", "text" or "unknown" for binary based, text based or unknown memcache protocol type.
+
+
+==== memcache.request.line
+
+type: string
+
+Raw command line for unknown commands ONLY.
+
+
+==== memcache.request.command
+
+type: string
+
+The memcache command being requested in the memcache text protocol. For example "set" or "get". The binary protocol opcodes are translated into memcache text protocol commands.
+
+
+==== memcache.response.command
+
+type: string
+
+Either the text based protocol response message type or the name the originating request if binary protocol is used.
+
+
+==== memcache.request.type
+
+type: string
+
+The memcache command classification. One of "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail" or "Auth".
+
+
+==== memcache.response.type
+
+type: string
+
+The memcache command classification. One of "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail" or "Auth". The text based protocol will employ any any of these, whereas the binary based protocol will mirror the request commands only (see memcache.response.status for binary protocol).
+
+
+==== memcache.response.error_msg
+
+type: string
+
+Optional error message in memcache response (text based protocol only).
+
+
+==== memcache.request.opcode
+
+type: string
+
+The binary protocol message opcode its name.
+
+
+==== memcache.response.opcode
+
+type: string
+
+The binary protocol message opcode its name.
+
+
+==== memcache.request.opcode_value
+
+type: int
+
+The binary protocol message opcode value.
+
+
+==== memcache.response.opcode_value
+
+type: int
+
+The binary protocol message opcode value.
+
+
+==== memcache.request.opaque
+
+type: int
+
+The binary protocol opaque header value used for correlating request with response messages.
+
+
+==== memcache.response.opaque
+
+type: int
+
+The binary protocol opaque header value used for correlating request with response messages.
+
+
+==== memcache.request.vbucket
+
+type: int
+
+The vbucket index send in binary message.
+
+
+==== memcache.response.status
+
+type: string
+
+Textual representation of response error code (binary protocol only).
+
+
+==== memcache.response.status_code
+
+type: int
+
+Status code valued returned in response (binary protocol only).
+
+
+==== memcache.request.keys
+
+type: list
+
+List of keys send in store or load commands.
+
+
+==== memcache.response.keys
+
+type: list
+
+List of keys returned for load command (if present).
+
+
+==== memcache.request.count_values
+
+type: int
+
+Number of values found in memcache request message. If command does not send any data, this field is missing.
+
+
+==== memcache.response.count_values
+
+type: int
+
+Number of values found in memcache response message. If command does not send any data, this field is missing.
+
+
+==== memcache.request.values
+
+type: list
+
+List of base64 encoded values send with request (If present).
+
+
+==== memcache.response.values
+
+type: list
+
+List of base64 encoded values send with response (If present).
+
+
+==== memcache.request.bytes
+
+type: int
+
+Byte count of values being transfered.
+
+
+==== memcache.response.bytes
+
+type: int
+
+Byte count of values being transfered.
+
+
+==== memcache.request.delta
+
+type: int
+
+Counter increment/decrement delta value
+
+
+==== memcache.request.initial
+
+type: int
+
+Counter increment/decrement initial value parameter (binary protocol only).
+
+
+==== memcache.request.verbosity
+
+type: int
+
+Value of memcache "verbosity" command.
+
+
+==== memcache.request.raw_args
+
+type: string
+
+Text protocol raw arguments for "stats ..." and "lru crawl ..." commands.
+
+
+==== memcache.request.source_class
+
+type: int
+
+The source class id in 'slab reassign' command.
+
+
+==== memcache.request.dest_class
+
+type: int
+
+The destination class id in 'slab reassign' command.
+
+
+==== memcache.request.automove
+
+type: string
+
+The automove mode in 'slab automove' command as string. One of "standby"(=0), "slow"(=1), "aggressive"(=2) or raw value if value is unknown.
+
+
+==== memcache.request.flags
+
+type: int
+
+Memcache command flags send in request (If present).
+
+
+==== memcache.response.flags
+
+type: int
+
+Memcache message flags send in response (If present).
+
+
+==== memcache.request.exptime
+
+type: int
+
+The data expiry time in seconds send with memcache command (If present). If value is <30 days, the expiry time is relative to "now", else it is a absolute unix time in seconds (32bit)
+
+
+==== memcache.request.sleep_us
+
+type: int
+
+Sleep setting in us for 'lru_crawler sleep' command.
+
+
+==== memcache.response.value
+
+type: int
+
+General numeric value if present. For example counter operation responses.
+
+
+==== memcache.request.noreply
+
+type: bool
+
+Set to true if noreply was set in request. The memcache.response field will be missing
+
+
+==== memcache.request.quiet
+
+type: bool
+
+True if binary protocol message is to be treated as quiet message.
+
+
+==== memcache.request.cas_unique
+
+type: int
+
+CAS (compare-and-swap) identifier if present.
+
+
+==== memcache.response.cas_unique
+
+type: int
+
+CAS (compare-and-swap) identifier to be used with CAS based updates (If present).
+
+
+==== memcache.response.stats
+
+type: list
+
+List of statistic values returned. Each entry is a dictionary with fields "name" and "value"
+
+
+==== memcache.response.version
+
+type: string
+
+Returned memcache version string.
 
 
 [[exported-fields-mysql]]
@@ -656,6 +978,13 @@ The GeoIP location of the `real_ip` IP address or of the `client_ip` address if 
 format: dotted notation.
 
 The layer 4 port of the process that initiated the transaction.
+
+
+==== transport
+
+example: udp
+
+Transport protocol used for the transaction. If not specified then assume tcp.
 
 
 ==== port

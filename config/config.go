@@ -34,13 +34,14 @@ type InterfacesConfig struct {
 }
 
 type Protocols struct {
-	Dns     Dns
-	Http    Http
-	Mysql   Mysql
-	Mongodb Mongodb
-	Pgsql   Pgsql
-	Redis   Redis
-	Thrift  Thrift
+	Dns      Dns
+	Http     Http
+	Memcache Memcache
+	Mysql    Mysql
+	Mongodb  Mongodb
+	Pgsql    Pgsql
+	Redis    Redis
+	Thrift   Thrift
 }
 
 type Dns struct {
@@ -62,6 +63,15 @@ type Http struct {
 	Strip_authorization *bool
 	Send_request        *bool
 	Send_response       *bool
+}
+
+type Memcache struct {
+	Ports                 []int
+	MaxValues             int
+	MaxBytesPerValue      int
+	UdpTransactionTimeout uint
+	TcpTransactionTimeout uint
+	ParseUnknown          bool
 }
 
 type Mysql struct {

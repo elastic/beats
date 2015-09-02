@@ -296,6 +296,7 @@ Currently, Packetbeat supports the following protocols:
  - Redis
  - Thrift-RPC
  - MongoDB
+ - Memcache
 
 Example configuration:
 
@@ -304,6 +305,9 @@ Example configuration:
 protocols:
   http:
     ports: [80, 8080, 8000, 5000, 8002]
+
+  memcache:
+    ports: [11211]
 
   mysql:
     ports: [3306]
@@ -465,6 +469,60 @@ capturing behind a reverse proxy and still wanting to get the geo-location
 information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
+
+==== Memcache configuration
+
+[source,yaml]
+------------------------------------------------------------------------------
+  memcache:
+    ports: [11211]
+    parseunknown: false
+    maxvalues: 0
+    maxbytespervalue: 100
+    udptransactiontimeout: 200
+    tcptransactiontimeout: 200
+------------------------------------------------------------------------------
+
+===== parseunknown
+
+Force memcache text protocol parser to accept unknown commands.
+Note: All unknown commands MUST NOT contain a data part.
+
+===== maxvalues
+
+Maximum number of values to store in message (multi-get).
+All values will be base64 encoded.
+
+possible values:
+  maxvalue: -1  - store all values (text based protocol multi-get)
+  maxvalue: 0   - store no values at all (default)
+  maxvalue: N   - store up to N values
+
+===== maxbytespervalue
+
+Limit the number of bytes to be copied per value element.
+
+Note:
+values will be base64 encoded, so actual size in json document will be 4 times
+maxbytespervalue.
+
+===== udptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Note:
+Quiet messages in UDP binary protocol will get response only in error case.
+The memcache protocol analyzer will wait for udptransactiontimeout milliseconds
+before publishing quiet messages. Non quiet messages or quiet requests with
+error response will not have to wait for the timeout
+
+===== tcptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Time until all unfinished tcp based transactions will be published if there is
+no activity on the TCP stream.
+
 
 ==== MySQL and PgSQL configuration
 

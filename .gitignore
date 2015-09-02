@@ -33,3 +33,7 @@ _testmain.go
 
 # IDE files / folders
 .idea
+
+last_run
+
+*.test

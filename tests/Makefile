@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+PROCESSES ?= 1
 
 env: env/bin/activate
 env/bin/activate: requirements.txt
@@ -9,4 +10,4 @@ env/bin/activate: requirements.txt
 .PHONY: test
 test: env
 	make -C ..
-	. env/bin/activate; nosetests --processes=4
+	. env/bin/activate; nosetests --processes=${PROCESSES}
