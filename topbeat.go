@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/topbeat/beat"
+	"github.com/elastic/libbeat/beat"
 )
 
 type ProcsMap map[int]*Process

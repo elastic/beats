@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/elastic/topbeat/beat"
+	"github.com/elastic/libbeat/beat"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
