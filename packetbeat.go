@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
@@ -24,12 +27,10 @@ import (
 	"github.com/elastic/packetbeat/protos/thrift"
 	"github.com/elastic/packetbeat/protos/udp"
 	"github.com/elastic/packetbeat/sniffer"
-	"os"
-	"time"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
-var Version = "1.0.0-beta2"
+var Version = "1.0.0-beta3"
 var Name = "packetbeat"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
