@@ -212,7 +212,6 @@ func (t *Topbeat) exportFileSystemStats() error {
 	}
 
 	for _, fs := range fss {
-		logp.Debug("topbeat", "File system %v", fs)
 		fs_stat, err := GetFileSystemStat(fs)
 		if err != nil {
 			logp.Debug("topbeat", "Skip filesystem %d: %v", fs_stat, err)
