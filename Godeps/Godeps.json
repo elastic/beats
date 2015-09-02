@@ -7,39 +7,39 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "4c63259e6cb4ce956d45e5dea30aa8a19ab6a3e9"
+			"Rev": "5a01dc4b540a235965db7c19cbc48cbc6c78a9d3"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "9d4db5d1dbeff473d50e1bb82f5405c8cca0f0ac"
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "9d4db5d1dbeff473d50e1bb82f5405c8cca0f0ac"
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
