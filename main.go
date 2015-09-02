@@ -14,7 +14,12 @@ func main() {
 
 	// Additional command line args are used to overwrite config options
 	pb.CmdLineArgs = fetchAdditionalCmdLineArgs(b.CmdLine)
+
+	// Base CLI flags
 	b.CommandLineSetup()
+
+	// Beat CLI flags
+	pb.CliFlags(b)
 
 	// Loads base config
 	b.LoadConfig()

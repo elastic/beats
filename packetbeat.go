@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
@@ -24,8 +27,6 @@ import (
 	"github.com/elastic/packetbeat/protos/thrift"
 	"github.com/elastic/packetbeat/protos/udp"
 	"github.com/elastic/packetbeat/sniffer"
-	"os"
-	"time"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
@@ -78,8 +79,25 @@ func fetchAdditionalCmdLineArgs(cmdLine *flag.FlagSet) CmdLineArgs {
 	return args
 }
 
+// Handle custom command line flags
+func (pb *Packetbeat) CliFlags(b *beat.Beat) {
+	// -devices CLI flag
+	if *pb.CmdLineArgs.PrintDevices {
+		devs, err := sniffer.ListDeviceNames()
+		if err != nil {
+			fmt.Printf("Error getting devices list: %v\n", err)
+			os.Exit(1)
+		}
+		for i, dev := range devs {
+			fmt.Printf("%d: %s\n", i, dev)
+		}
+		os.Exit(0)
+	}
+}
+
 // Loads the beat specific config and overwrites params based on cmd line
 func (pb *Packetbeat) Config(b *beat.Beat) error {
+
 	// Read beat implementation config as needed for setup
 	err := cfgfile.Read(&pb.PbConfig)
 
@@ -97,18 +115,6 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 
 	if len(*pb.CmdLineArgs.Dumpfile) > 0 {
 		pb.PbConfig.Interfaces.Dumpfile = *pb.CmdLineArgs.Dumpfile
-	}
-
-	if *pb.CmdLineArgs.PrintDevices {
-		devs, err := sniffer.ListDeviceNames()
-		if err != nil {
-			fmt.Printf("Error getting devices list: %v\n", err)
-			os.Exit(1)
-		}
-		for i, dev := range devs {
-			fmt.Printf("%d: %s\n", i, dev)
-		}
-		os.Exit(0)
 	}
 
 	// assign global singleton as it is used in protocols
