@@ -209,6 +209,13 @@ Time interval in seconds that this resource record may be cached becore it shoul
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
+==== dns.authorities
+
+type: dict
+
+An array containing a dictionary for each authority section from the answer.
+
+
 ==== dns.authorities_count
 
 type: int
@@ -234,6 +241,13 @@ example: IN
 
 Class of DNS data contained in this resource record.
 
+==== dns.answers
+
+type: dict
+
+An array containing a dictionary about each answer section returned by the server.
+
+
 ==== dns.answers.ttl
 
 type: int
@@ -244,6 +258,13 @@ Time interval in seconds that this resource record may be cached becore it shoul
 ==== dns.answers.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.additionals
+
+type: dict
+
+An array containing a dictionary for each additional section from the answer.
 
 
 ==== dns.additionals_count

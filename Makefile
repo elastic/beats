@@ -1,6 +1,6 @@
 BIN_PATH?=/usr/bin
 CONF_PATH?=/etc/packetbeat
-VERSION?=1.0.0-beta2
+VERSION?=1.0.0-beta3
 ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
 PREFIX?=/build
