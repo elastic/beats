@@ -6,6 +6,10 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/elastic/libbeat/beat",
+			"Rev": "e4ee23a5fd6489dac5107a714d9d5b9b03effce1"
+		},
+		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
 			"Rev": "e4ee23a5fd6489dac5107a714d9d5b9b03effce1"
 		},
