@@ -275,9 +275,6 @@ func Strings(reply interface{}, err error) ([]string, error) {
 // err is not equal to nil, then Ints returns nil, err.
 func Ints(reply interface{}, err error) ([]int, error) {
 	var ints []int
-	if reply == nil {
-		return ints, ErrNil
-	}
 	values, err := Values(reply, err)
 	if err != nil {
 		return ints, err

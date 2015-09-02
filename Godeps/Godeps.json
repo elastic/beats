@@ -7,40 +7,44 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/gosigar",
-			"Comment": "scotty_09012012-35-gb16b1e1",
-			"Rev": "b16b1e13df4489c725b53b2e13d9660d53d9396d"
+			"Comment": "scotty_09012012-32-gf47632d",
+			"Rev": "f47632d46ef1dcf8020ae3caf38ffb5ffe8f9ab3"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/beat",
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "4a99fd9eb6ac013e90c56164cbf37dea6f559154"
+			"Rev": "e9172cef5d0b8787a12c2a38c53e7f5e192af263"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "9d4db5d1dbeff473d50e1bb82f5405c8cca0f0ac"
+			"Rev": "d8dbe4d94f15fe89232e0402c6e8a0ddf21af3ab"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "9d4db5d1dbeff473d50e1bb82f5405c8cca0f0ac"
+			"Rev": "d8dbe4d94f15fe89232e0402c6e8a0ddf21af3ab"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
@@ -48,7 +52,8 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+			"Comment": "v1.0-21-gf552045",
+			"Rev": "f5520455607c0233cb6d7b056f71b22c1d265ef1"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
