@@ -460,7 +460,7 @@ func task_info(pid int, info *C.struct_proc_taskallinfo) error {
 
 	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
 	if n != size {
-		return syscall.ENOMEM
+		return fmt.Errorf("Could not read process info for pid %d", pid)
 	}
 
 	return nil
