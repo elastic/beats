@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
-	//"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
 
 	"github.com/elastic/packetbeat/config"
