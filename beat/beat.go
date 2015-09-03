@@ -65,7 +65,7 @@ func (beat *Beat) CommandLineSetup() {
 
 	if *printVersion {
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
-		return
+		os.Exit(0)
 	}
 }
 
