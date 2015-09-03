@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/elastic/packetbeat/beat"
+	"github.com/elastic/libbeat/beat"
 )
 
 func main() {

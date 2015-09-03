@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common/droppriv"
 	"github.com/elastic/libbeat/filters"
@@ -14,7 +15,6 @@ import (
 	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
 
-	"github.com/elastic/packetbeat/beat"
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
