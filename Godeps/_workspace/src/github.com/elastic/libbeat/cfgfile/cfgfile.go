@@ -23,7 +23,7 @@ func Read(out interface{}) error {
 		return fmt.Errorf("Fail to read %s: %v. Exiting.", *configfile, err)
 	}
 	if err = yaml.Unmarshal(filecontent, out); err != nil {
-		fmt.Errorf("YAML config parsing failed on %s: %v. Exiting.", *configfile, err)
+		return fmt.Errorf("YAML config parsing failed on %s: %v. Exiting.", *configfile, err)
 	}
 
 	return nil
