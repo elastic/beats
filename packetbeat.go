@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/libbeat/filters"
 	"github.com/elastic/libbeat/filters/nop"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
+	//"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/libbeat/service"
 
 	"github.com/elastic/packetbeat/config"
@@ -141,7 +141,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
-		err := plugin.Init(false, publisher.Publisher.Queue)
+		err := plugin.Init(false, b.Events)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
 			os.Exit(1)
@@ -168,7 +168,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	afterInputsQueue, err := filters.FiltersRun(
 		config.ConfigSingleton.Filter,
 		EnabledFilterPlugins,
-		publisher.Publisher.Queue,
+		b.Events,
 		b.Stop)
 
 	if err != nil {
