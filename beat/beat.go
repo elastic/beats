@@ -104,7 +104,9 @@ func (b *Beat) Run() {
 	}
 	service.BeforeRun()
 
-	// Callback is called if the processes is asked to stop
+	// Callback is called if the processes is asked to stop.
+	// This needs to be called before the main loop is started so that
+	// it can register the signals that stop or query (on Windows) the loop.
 	service.HandleSignals(b.BT.Stop)
 
 	// Run beater specific stuff
