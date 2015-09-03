@@ -48,7 +48,6 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 	}
 
-	b.Events = publisher.Publisher.Queue
 	b.CmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	return &b
 }
@@ -90,6 +89,8 @@ func (b *Beat) LoadConfig() {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
+
+	b.Events = publisher.Publisher.Queue
 
 	logp.Debug(b.Name, "Init %s", b.Name)
 }
