@@ -5,11 +5,11 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/libbeat/beat"
 )
 
 type ProcsMap map[int]*Process
@@ -105,8 +105,6 @@ func (t *Topbeat) initProcStats() {
 	if err != nil {
 		logp.Warn("Getting the list of pids: %v", err)
 	}
-
-	logp.Debug("topbeat", "Pids: %v\n", pids)
 
 	for _, pid := range pids {
 		process, err := GetProcess(pid)
@@ -286,7 +284,7 @@ func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
 
 func (t *Topbeat) addProcMemPercentage(proc *Process, total_phymem uint64) {
 
-	// total_phymem is set to a value greater than zero in tests
+	// in unit tests, total_phymem is set to a value greater than zero
 
 	if total_phymem == 0 {
 		mem_stat, err := GetMemory()
