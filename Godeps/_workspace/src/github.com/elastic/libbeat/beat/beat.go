@@ -64,7 +64,6 @@ func (beat *Beat) CommandLineSetup() {
 	beat.CmdLine.Parse(os.Args[1:])
 
 	if *printVersion {
-		// using Printf because logging not yet initialized
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
 		os.Exit(0)
 	}
@@ -77,9 +76,7 @@ func (b *Beat) LoadConfig() {
 	err := cfgfile.Read(&b.Config)
 
 	if err != nil {
-		// using Printf because logging not yet initialized
-		fmt.Printf("Error %v\n", err)
-		os.Exit(1)
+		logp.Debug("Log read error", "Error %v\n", err)
 	}
 
 	logp.Init(b.Name, &b.Config.Logging)
@@ -107,11 +104,14 @@ func (b *Beat) Run() {
 	}
 	service.BeforeRun()
 
+	// Callback is called if the processes is asked to stop.
+	// This needs to be called before the main loop is started so that
+	// it can register the signals that stop or query (on Windows) the loop.
+	service.HandleSignals(b.BT.Stop)
+
 	// Run beater specific stuff
 	b.BT.Run(b)
 
-	// Function called in case of beater stop
-	service.HandleSignals(b.BT.Stop)
 	service.Cleanup()
 
 	logp.Debug("main", "Cleanup")
