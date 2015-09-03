@@ -1,22 +1,26 @@
 == Overview
 
-Topbeat together with Elasticsearch and Kibana offers a complete open source 
-server monitoring solution. Topbeat is a lightweight shipper that installed on
-your servers, reads periodically system wide and per process CPU and memory statistics 
-and indexes them in Elasticsearch.
+Topbeat is a lightweight shipper that installed on your servers, reads periodically 
+system wide and per process CPU and memory statistics and indexes them in Elasticsearch.
 
-Topbeat collects the following metrics:
+Topbeat helps you monitor your servers by collecting metrics like:
 
- * System load: in the last second, in the last 5 seconds and in the last 15 seconds
- * System wide CPU usage: user (and percentage), system, idle, IOWait, etc
- * System wide Memory usage: total, used (and percentage), free, etc
- * System wide Swap usage: total, used (and percentage), free, etc
- * Process name
- * Process parent pid
- * Process state
- * Process pid
- * Process CPU usage: user (and percentage), system, total, start time
- * Process Memory usage: virtual memory, resident memory (and percentage), shared memory
+ * System wide statistics:
+    * System load: in the last minute, in the last 5 minutes and in the last 15 minutes
+    * System wide CPU usage: user (and percentage), system, idle, IOWait, etc
+    * System wide Memory usage: total, used (and percentage), free, etc
+    * System wide Swap usage: total, used (and percentage), free, etc
+ * Per process statistics:
+    * Process name
+    * Process parent pid
+    * Process state
+    * Process pid
+    * Process CPU usage: user (and percentage), system, total, start time
+    * Process Memory usage: virtual memory, resident memory (and percentage), shared memory
+ * File system statistics:
+    * List of the available disks
+    * For each disk, exports name, type, where is mounted
+    * For each disk, exports total, used (and percentage), free, available space
 
 
 The shippers can insert the collected metrics directly into Elasticsearch

@@ -2,7 +2,7 @@
 
 include::./overview.asciidoc[]
 
-// include::./gettingstarted.asciidoc[]
+include::./gettingstarted.asciidoc[]
 
 // include::./configuration.asciidoc[]
 
