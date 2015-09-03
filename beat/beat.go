@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/libbeat/cfgfile"
+	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
@@ -27,8 +28,9 @@ type Beat struct {
 	Name    string
 	Version string
 	CmdLine *flag.FlagSet
-	Config  BeatConfig
+	Config  *BeatConfig
 	BT      Beater
+	Events  chan common.MapStr
 }
 
 // Basic configuration of every beat
@@ -46,6 +48,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 	}
 
+	b.Events = publisher.Publisher.Queue
 	b.CmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	return &b
 }
