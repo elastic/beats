@@ -44,3 +44,33 @@ Start in a new repository and use libbeat packages as you would use any other
 Go library. Have a look at the way
 [Packetbeat](https://github.com/elastic/packetbeat) makes use of these packages
 for an example.
+
+
+## Dependency Management
+
+Beats are using [godeps](https://github.com/tools/godep) for dependency management. 
+This means all dependencies are part of the repository. For updating dependencies we
+have the following strategy:
+
+* If possible use the most recent release
+* If no release tag exist, try to stay as close as possible to master
+
+
+### Update Dependencies
+
+Godeps allows to update all dependencies at once. We DON'T do that. If a dependency 
+is updated, the newest dependency must be loaded into the `$GOPATH` through either
+using 
+
+`go get your-go-package-path` 
+
+or by having the package already in the `$GOPATH`with the correct version / tag.
+To then save the most recent packages into Godep, run 
+
+`godep update your-go-package-path`
+
+Never use `godep save ./...` or `godep update ...` as this will update all packages at
+once and in case of issues it will be hard to track which one cause the issue.
+
+After you updated the package, open a pull request where you state which package
+you updated.
