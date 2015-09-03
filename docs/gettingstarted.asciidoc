@@ -18,8 +18,8 @@ deb:
 
 [source,shell]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat_$TB_VERSION_amd64.deb
-sudo dpkg -i topbeat_$TB_VERSION_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat_1.0.0-beta3_amd64.deb
+sudo dpkg -i topbeat_1.0.0-beta3_amd64.deb
 ------------------------------------------------
 
 
@@ -28,8 +28,8 @@ rpm:
 
 [source,shell]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-$TB_VERSION-x86_64.rpm
-sudo rpm -vi topbeat-$TB_VERSION-x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-1.0.0-beta3-x86_64.rpm
+sudo rpm -vi topbeat-1.0.0-beta3-x86_64.rpm
 ------------------------------------------------
 
 
@@ -37,8 +37,8 @@ mac:
 
 [source,shell]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-$TB_VERSION-darwin.tgz
-tar xzvf topbeat-$TB_VERSION-darwin.tgz
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-1.0.0-beta3-darwin.tgz
+tar xzvf topbeat-1.0.0-beta3-darwin.tgz
 ------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
