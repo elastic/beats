@@ -49,7 +49,7 @@ described in the next chapter.
 
 === Topbeat configuration
 
-[sourcel,shell]
+[source, shell]
 -------------------------------------
 input:
 	period: 10
@@ -61,7 +61,7 @@ By default, it's set to 10 seconds.
 
 `procs` defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
 
-If you are not interested in monitoring any processes, then you can use:
+If you are not interested in monitoring your processes, then you can use:
 
 [source, shell]
 -------------------------------------
@@ -89,7 +89,7 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-$PB_VERSION-darwin
+cd topbeat-$PB_VERSION-darwin
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 ----------------------------------------------------------------------
 
@@ -141,16 +141,20 @@ First, you need to configure the index pattern under the `Settings`. In the *Ind
 
 image:./images/kibana-topbeat-index-pattern.png[Topbeat index patern in Kibana]
 
-If after you configure the `topbeat-*` index pattern Kibana still says
+If after you configured the `topbeat-*` index pattern Kibana still says
 _Unable to fetch mapping. Do you have indices matching the pattern?_, it means
-that Topbeat hasn't yet written any data into Elasticsearch. Make sure that
-some traffic was running on your servers and that Topbeat could see it.
+that Topbeat hasn't yet written any data into Elasticsearch. Make sure
+Topbeat is exporting some statistics.
 
-If everything goes fine, you should already see some traffic reported by
+If everything goes fine, you should already see in real-time statistics reported by
 Topbeat under the Discover page:
 
 image:./images/kibana-topbeat-discover.png[Topbeat Discover page in Kibana]
 
+
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
+
+
+
 
