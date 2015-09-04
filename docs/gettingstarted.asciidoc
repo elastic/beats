@@ -147,10 +147,20 @@ that Topbeat hasn't yet written any data into Elasticsearch. Make sure
 Topbeat is exporting some statistics.
 
 If everything goes fine, you should already see in real-time statistics reported by
-Topbeat under the Discover page:
+Topbeat under the *Discover* page:
 
 image:./images/kibana-topbeat-discover.png[Topbeat Discover page in Kibana]
 
+You can configure the *Dashboard* page to show the statistics that you are interested in for all the servers or for a
+subset of them.
+An example of a dashboard page can consist of CPU usage and memory consumption for the top 10 CPU consuming processes
+running on different servers, free and used disk space for all servers, the CPU usage per processes, memory consumption per processes.
+
+image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
+
+To display the statistics coming from a single server, a search query *shipper: precise32* should be used:
+
+image:./images/topbeat-dashboard-1shipper.png[Topbeat Dashboard page in Kibana for one server]
 
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
