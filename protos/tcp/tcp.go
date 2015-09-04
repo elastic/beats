@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/packetbeat/protos"
 
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 )
 
 const TCP_STREAM_EXPIRY = 10 * 1e9

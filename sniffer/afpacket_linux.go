@@ -5,8 +5,8 @@ package sniffer
 import (
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/afpacket"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/afpacket"
 )
 
 type AfpacketHandle struct {

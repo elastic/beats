@@ -46,6 +46,11 @@
 			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
 		},
 		{
+			"ImportPath": "github.com/google/gopacket",
+			"Comment": "v1.1.10-133-g384a6a3",
+			"Rev": "384a6a36396f24e9b7267c258f5e3af17e72769b"
+		},
+		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
 			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
 		},
@@ -60,10 +65,6 @@
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
 			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
-		},
-		{
-			"ImportPath": "github.com/tsg/gopacket",
-			"Rev": "3e34b6b28c05a799db2f246a1e425f8be436b98a"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",

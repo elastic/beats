@@ -8,8 +8,8 @@ import (
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/udp"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 type DecoderStruct struct {

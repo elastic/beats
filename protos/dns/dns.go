@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 const (
