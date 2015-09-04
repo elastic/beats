@@ -57,13 +57,14 @@ build-image:
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
-.PHONY: run-environment
-run-environment: build-image
-	docker-compose run -d
+.PHONY: start-environment
+start-environment: build-image
+	docker-compose up -d
 	
 .PHONY: stop-environment
 stop-environment:
 	docker-compose stop
+	docker-compose rm -f
 
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
