@@ -48,7 +48,7 @@ for an example.
 
 ## Dependency Management
 
-Beats are using [godeps](https://github.com/tools/godep) for dependency management. 
+Beats are using [godep](https://github.com/tools/godep) for dependency management. 
 This means all dependencies are part of the repository. For updating dependencies we
 have the following strategy:
 
@@ -58,7 +58,7 @@ have the following strategy:
 
 ### Update Dependencies
 
-Godeps allows to update all dependencies at once. We DON'T do that. If a dependency 
+Godep allows to update all dependencies at once. We DON'T do that. If a dependency 
 is updated, the newest dependency must be loaded into the `$GOPATH` through either
 using 
 
