@@ -139,7 +139,7 @@ the Kibana web interface to get it started.
 First, you need to configure the index pattern under the `Settings`. In the *Index name or pattern* field enter
 `topbeat-*` and for the *Time-field name* select `timestamp`.
 
-image:./images/kibana-topbeat-index-pattern.png[Topbeat index patern in Kibana]
+image:./images/kibana-topbeat-index-pattern.png[Topbeat index pattern in Kibana]
 
 If after you configured the `topbeat-*` index pattern Kibana still says
 _Unable to fetch mapping. Do you have indices matching the pattern?_, it means
