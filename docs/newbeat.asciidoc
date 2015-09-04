@@ -168,15 +168,14 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 === Setup
 
 The `Setup` method gives you the opportunity to execute things before the main
-loop, usually for initialization. In the case of Topbeat, it only links the
-`events` channel with the publisher queue. This is the event channel mentioned
-in the Overview section.
+loop, usually for initialization. In the case of Topbeat, it only assigns the Beat
+object to the Topbeat object, so it doesn't have to be passed to all sub functions.
 
 [source,go]
 ----------------------------------------------------------------------
 func (tb *Topbeat) Setup(b *beat.Beat) error {
 
-	tb.events = publisher.Publisher.Queue
+	tb.Beat = b
 	return nil
 }
 ----------------------------------------------------------------------
@@ -212,7 +211,8 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 
 Inside the loop, Topbeat sleeps for a configured period of time and then
 captures the required data and sends it to the publisher via the `events`
-channel.
+channel. The events channel is available as part of the Beat object
+through the `Beat.Events` variable.
 
 The actual sending is done inside the `exportSystemStats()`:
 
@@ -238,7 +238,7 @@ func (t *Topbeat) exportSystemStats() error {
 		"swap":      swap_stat,
 	}
 
-	t.events <- event <3>
+	t.Beat.Events <- event <3>
 
 	return nil
 }
