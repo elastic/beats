@@ -11,6 +11,7 @@ statistics together with disk space overview. This quick tutorial walks you thro
 The installation guides for Elasticsearch and Kibana are available
 https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html[here]. 
 
+[[topbeat-installation]]
 === Topbeat installation
 
 
@@ -47,6 +48,7 @@ https://www.elastic.co/downloads/beats/topbeat[download page].
 Before starting topbeat, have a look at the configuration options from `/etc/topbeat/topbeat.yml`, 
 described in the next chapter.
 
+[[topbeat-configuration]]
 === Topbeat configuration
 
 [source, shell]
