@@ -16,22 +16,48 @@ package afpacket
 import (
 	"errors"
 	"fmt"
-	"github.com/google/gopacket"
 	"net"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 /*
+#cgo linux LDFLAGS: -lpcap
 #include <linux/if_packet.h>  // AF_PACKET, sockaddr_ll
 #include <linux/if_ether.h>  // ETH_P_ALL
+#include <linux/sockios.h> // SIOCGIFHWADDR
+#include <net/if_arp.h>  // ARPHRD_...
+#include <net/if.h>  // ARPHRD_...
 #include <sys/socket.h>  // socket()
 #include <unistd.h>  // close()
 #include <arpa/inet.h>  // htons()
 #include <sys/mman.h>  // mmap(), munmap()
 #include <poll.h>  // poll()
+#include <string.h> // strncpy()
+#include <stdlib.h> // free()
+#include <pcap.h> // pcap_compile_nopcap
+
+// helpers for accessing struct ifreq union fields:
+static inline struct ifreq makeIfreq() {
+    struct ifreq i;
+    memset(&i, 0, sizeof(i));
+    return i;
+}
+
+static inline char* ifreq_name(struct ifreq *ifreq) {
+    return ifreq->ifr_name;
+}
+
+static inline short ifreq_hwaddr_family(struct ifreq *ifreq) {
+    return ifreq->ifr_hwaddr.sa_family;
+}
+
 */
 import "C"
 
@@ -201,6 +227,61 @@ errlbl:
 	return nil, err
 }
 
+// LinkType returns the interface its link type.
+func (h *TPacket) LinkType() layers.LinkType {
+	ifr := C.makeIfreq()
+
+	iface_name := C.CString(h.opts.iface)
+	defer C.free(unsafe.Pointer(iface_name))
+	C.strncpy(C.ifreq_name(&ifr), iface_name, C.IFNAMSIZ)
+
+	_, _, errnop := syscall.Syscall(
+		syscall.SYS_IOCTL,
+		uintptr(h.fd),
+		uintptr(C.SIOCGIFHWADDR),
+		uintptr(unsafe.Pointer(&ifr)))
+	errno := int(errnop)
+	if errno != 0 {
+		return layers.LinkType(0)
+	}
+
+	sa_family := C.ifreq_hwaddr_family(&ifr)
+	switch sa_family {
+	case C.ARPHRD_LOOPBACK:
+		return layers.LinkTypeEthernet
+	case C.ARPHRD_PPP:
+		return layers.LinkTypeRaw
+	default:
+		return layers.LinkType(sa_family)
+	}
+}
+
+// SetBPFFilter compiles and sets a BPF filter.
+func (h *TPacket) SetBPFFilter(expr string) (err error) {
+	cexpr := C.CString(expr)
+	defer C.free(unsafe.Pointer(cexpr))
+
+	snaplen := C.int(h.opts.frameSize)
+	linkType := C.int(h.LinkType())
+	optimize := C.int(1)
+	mask := C.bpf_u_int32(C.PCAP_NETMASK_UNKNOWN)
+
+	var bpf _Ctype_struct_bpf_program
+	rc := C.pcap_compile_nopcap(snaplen, linkType, &bpf, cexpr, optimize, mask)
+	if rc != 0 {
+		return errors.New("failed to compile pcap filter")
+	}
+
+	program := bpf.bf_insns
+	_, err = C.setsockopt(h.fd, C.SOL_SOCKET, C.SO_ATTACH_FILTER,
+		unsafe.Pointer(&program), C.socklen_t(unsafe.Sizeof(program)))
+	if err != nil {
+		return fmt.Errorf("setsockopt: %s", err)
+	}
+
+	return nil
+}
+
 func (h *TPacket) releaseCurrentPacket() error {
 	h.current.clearStatus()
 	h.offset++
@@ -307,7 +388,8 @@ func (h *TPacket) pollForFirstPacket(hdr header) error {
 		h.pollset.fd = h.fd
 		h.pollset.events = C.POLLIN
 		h.pollset.revents = 0
-		_, err := C.poll(&h.pollset, 1, -1)
+		timeout := C.int(h.opts.timeout / time.Millisecond)
+		_, err := C.poll(&h.pollset, 1, timeout)
 		h.stats.Polls++
 		if err != nil {
 			return err

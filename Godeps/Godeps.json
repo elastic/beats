@@ -47,8 +47,8 @@
 		},
 		{
 			"ImportPath": "github.com/google/gopacket",
-			"Comment": "v1.1.10-133-g384a6a3",
-			"Rev": "384a6a36396f24e9b7267c258f5e3af17e72769b"
+			"Comment": "v1.1.10-137-g75daeda",
+			"Rev": "75daedad47387900d7ef4573fa9c51ec6ee3963f"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",

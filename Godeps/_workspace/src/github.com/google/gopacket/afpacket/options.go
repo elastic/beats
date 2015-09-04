@@ -86,11 +86,19 @@ type OptNumBlocks int
 // It can be passed into NewTPacket.
 type OptBlockTimeout time.Duration
 
+// OptPollTimeout is the maximum amount of time to wait in the poll system call.
+// Note that an empty packet will be returned in most cases when a timeout happens.
+// Setting this to BlockForever disables the timeout.
+type OptPollTimeout time.Duration
+
+const BlockForever = -time.Millisecond
+
 const (
 	DefaultFrameSize    = 4096                   // Default value for OptFrameSize.
 	DefaultBlockSize    = DefaultFrameSize * 128 // Default value for OptBlockSize.
 	DefaultNumBlocks    = 128                    // Default value for OptNumBlocks.
 	DefaultBlockTimeout = 64 * time.Millisecond  // Default value for OptBlockTimeout.
+	DefaultPollTimeout  = BlockForever           // Default value for OptPollTimeout.
 )
 
 type options struct {
@@ -102,6 +110,7 @@ type options struct {
 	version        OptTPacketVersion
 	socktype       OptSocketType
 	iface          string
+	timeout        time.Duration
 }
 
 var defaultOpts = options{
@@ -111,6 +120,7 @@ var defaultOpts = options{
 	blockTimeout: DefaultBlockTimeout,
 	version:      TPacketVersionHighestAvailable,
 	socktype:     SocketRaw,
+	timeout:      DefaultPollTimeout,
 }
 
 func parseOptions(opts ...interface{}) (ret options, err error) {
@@ -131,6 +141,8 @@ func parseOptions(opts ...interface{}) (ret options, err error) {
 			ret.iface = string(v)
 		case OptSocketType:
 			ret.socktype = v
+		case OptPollTimeout:
+			ret.timeout = time.Duration(v)
 		default:
 			err = fmt.Errorf("unknown type in options")
 			return
@@ -142,6 +154,7 @@ func parseOptions(opts ...interface{}) (ret options, err error) {
 	ret.framesPerBlock = ret.blockSize / ret.frameSize
 	return
 }
+
 func (o options) check() error {
 	switch {
 	case o.blockSize%pageSize != 0:
