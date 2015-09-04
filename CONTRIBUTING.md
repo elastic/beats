@@ -69,7 +69,7 @@ To then save the most recent packages into Godep, run
 
 `godep update your-go-package-path`
 
-Never use `godep save ./...` or `godep update ...` as this will update all packages at
+Avoid using `godep save ./...` or `godep update ...` as this will update all packages at
 once and in case of issues it will be hard to track which one cause the issue.
 
 After you updated the package, open a pull request where you state which package
