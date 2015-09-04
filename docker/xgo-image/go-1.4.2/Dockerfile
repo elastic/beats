@@ -5,7 +5,7 @@
 
 FROM tudorg/xgo-base
 
-MAINTAINER Péter Szilágyi <peterke@gmail.com>
+MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
 # Configure the Go packages and bootstrap them
 RUN \
