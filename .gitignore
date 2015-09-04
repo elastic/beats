@@ -37,3 +37,4 @@ _testmain.go
 last_run
 
 *.test
+.DS_Store
