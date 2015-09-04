@@ -9,7 +9,7 @@ http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
 a driver to enable packet capturing.
 
 Then download the Packetbeat Windows zip file from the
-https://www.elastic.co/downloads/beats/packetbeat[downloads page] and extract
+https://www.elastic.co/downloads/beats/packetbeat[downloads page] and unzip
 it on your computer. The location where it is extracted is not important, but
 remember that you shouldn't delete this repository after the installation is
 finished. The exe file and the configuration file will continue to live there.
