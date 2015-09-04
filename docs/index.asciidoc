@@ -6,4 +6,6 @@ include::./gettingstarted.asciidoc[]
 
 // include::./configuration.asciidoc[]
 
+include::./windows.asciidoc[]
+
 // include::./troubleshooting.asciidoc[]
