@@ -52,8 +52,8 @@ described in the next chapter.
 [source, shell]
 -------------------------------------
 input:
-	period: 10
-	procs: [".*"]
+  period: 10
+  procs: [".*"]
 -------------------------------------
 
 `period` defines how often to read system wide and per process statistics from your servers. The interval is in seconds. 
@@ -66,8 +66,8 @@ If you are not interested in monitoring your processes, then you can use:
 [source, shell]
 -------------------------------------
 input:
-	period: 10
-	procs: ["^$"]
+  period: 10
+  procs: ["^$"]
 -------------------------------------
 
 Before starting topbeat, you need to load the
