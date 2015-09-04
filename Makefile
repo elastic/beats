@@ -60,14 +60,17 @@ build-image:
 .PHONY: run-environment
 run-environment: build-image
 	docker-compose run -d
+	
+.PHONY: stop-environment
+stop-environment:
+	docker-compose stop
 
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
 testsuite: build-image
 	docker-compose run libbeat make testlong
-	docker ps -a
 	# Copy coverage file back to host
 	mkdir -p cover
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/profile.cov $(shell pwd)/profile.cov
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/cover/coverage.html $(shell pwd)/cover/coverage.html
-	docker-compose stop
+	make stop-environment
