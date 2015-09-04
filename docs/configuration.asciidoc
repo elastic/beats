@@ -1,3 +1,4 @@
+[[configuration]]
 == Configuration
 
 The Packetbeat configuration file uses

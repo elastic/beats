@@ -1,119 +1,61 @@
 
-== Windows shipper
+== Windows support
 
-The Packetbeat shipper supports running on Windows, but to get it up and running
-involves a few manual steps. This article explains how to use
-http://nssm.cc/[NSSM] to run the Packetbeat shipper as a Windows service.
+This page walks you through the steps required for running Packetbeat on
+Windows. It assumes your Windows system has Powershell installed.
 
-=== Prerequisites
+Start by downloading and installing WinPcap from this
+http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
+a driver to enable packet capturing.
 
-Start by creating a `C:\Packetbeat` folder as your main workspace. You can put
-this folder anywhere you like, but to keep things clear we'll assume it's directly
-under `C:`.
+Then download the Packetbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/packetbeat[downloads page] and unzip
+it on your computer. The location where it is extracted is not important, but
+remember that you shouldn't delete this repository after the installation is
+finished. The exe file and the configuration file will continue to live there.
 
-* Download and install WinPcap from this
-  http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that
-  uses a driver to enable packet capturing from the connected network devices.
-  This is the same library that http://wireshark.org[Wireshark] uses.
+Then start an Administrator Powershell session (right click the Powershell icon
+and select *Run as Administrator*), and navigate to where you uncompressed the
+zip file.
 
-* Download WinDump.exe from this
-  http://www.winpcap.org/windump/install/default.htm[page] and simply save it
-  in the `C:\Packetbeat` folder. We'll only use WinDump to find the available
-  network devices names.
-
-* Download the NSSM zip from http://nssm.cc/download[here] and extract it
-  also under `C:\Packetbeat`. The zip contains both the source file and the binaries.
-
-=== Download and configure the Packetbeat shipper
-
-Now download the shipper from our https://www.elastic.co/downloads/beats/packetbeat[download page].
-We provide 32 bit and 64 bit binaries, so choose the one that fits your
-system. Please save it and extract it under `C:\Packetbeat` as well.
-
-We'll do the rest from the Command Prompt, and we need administrator rights for
-some of the actions. You can start the Command Prompt with administrator privileges
-like this:
-
-1. Click *Start*, click *All Programs*, and then click *Accessories*.
-2. Right-click *Command prompt*, and then click *Run as administrator*.
-3. If the *User Account Control* dialog box appears, confirm that the action it
-   displays is what you want, and then click *Continue*.
-
-Go to the Packetbeat folder and execute WinDump like this to list the available
-devices:
+Use the following command to list the available network interfaces:
 
 [source,shell]
------------------------------------------------
-C:\Windows\system32> cd C:\Packetbeat
-C:\Packetbeat> WinDump.exe -D
------------------------------------------------
+----------------------------------------------------------------------
+PS > .\packetbeat.exe -devices
 
-The above will print the available network devices. On my system, the name is
-this: `\Device\NPF_{C83D2DB0-8C89-4CFB-B526-B4E1A5B9D0F3}`. Now open the
-`packetbeat.yml` file from the Packetbeat folder. You can edit it with
-Notepad or any other editor. Look for the `device: "any"` line and replace
-the string with the one printed by WinDump. Note that you have to escape the
-backslashes, so you should have something like this:
+0: \Device\NPF_{113535AD-934A-452E-8D5F-3004797DE286}
+----------------------------------------------------------------------
 
-[source,yaml]
------------------------------------------------
+In this example, there is only one network card installed on the system. If
+there are more of them, remember the index of the device you want to use for
+capturing the traffic.
+
+Then edit the `packetbeat.yml` file and modify the `device` line to point to the
+index that you just found:
+
+[source,yml]
+----------------------------------------------------------------------
 interfaces:
-  device: "\\Device\\NPF_{C83D2DB0-8C89-4CFB-B526-B4E1A5B9D0F3}"
------------------------------------------------
+  device: 0
+----------------------------------------------------------------------
 
-You might need to change more settings in this configuration file, please
-refer to our <<packetbeat-getting-started,Getting Started>> guide.
+You might want to change other settings in the `packetbeat.yml` file, see the
+ <<configuration>> documentation for details.
 
-Save the file and return to the Command Prompt.
-
-=== Create the service
-
-Now go to the NSSM directory. Use the `Win32` folder if you are on 32 bits and
-the `Win64` folder if you are on 64 bits:
+Then you can install Packetbeat as a Windows service by using the following
+Powershell script:
 
 [source,shell]
------------------------------------------------
-C:\Packetbeat> cd nssm-2.22\win32
------------------------------------------------
+----------------------------------------------------------------------
+PS > .\install-service-packetbeat.ps1
+----------------------------------------------------------------------
 
-Create the new service:
-
-[source,shell]
------------------------------------------------
-C:\Packetbeat\nssm-2.22\win32> nssm.exe install packetbeat
------------------------------------------------
-
-A graphical interface will be started. In the *Path* input, select the
-`packetbeat.exe` file. In the *Arguments* line, type: `-c packetbeat.yml`. If
-you used the paths suggested above, the configuration should look something like
-this:
-
-image:./images/nssm_install.png[NSSM install]
-
-Select the *I/O* tab, and for the *Output (stdout)* and *Error (stderr)*
-fields, select a file in a location that appropriate for the logs written by
-the Packetbeat shipper.
-
-image:./images/nssm_install_file_redirection.png[NSSM file redirection]
-
-Finally, switch to the *File rotation* tab and check the *Rotate files* and
-the *Rotate while service is running* checkboxes.
-
-image:./images/nssm_install_file_rotation.png)[NSSM file rotation]
-
-Click the *Install service* button. If things go well, you'll get a success
-notification. Click *OK* and return to the Command Prompt.
-
-Now you can start the service:
+And then start it with:
 
 [source,shell]
------------------------------------------------
-C:\Packetbeat\nssm-2.22\win32> nssm.exe start packetbeat
------------------------------------------------
+----------------------------------------------------------------------
+PS > Start-Service packetbeat
+----------------------------------------------------------------------
 
-If everything goes fine, it should print that the operation was successful and
-the `log.txt` should be now created.
-
-That's it! If you have Elasticsearch and Kibana installed, you should now see
-the transactions in the web interface.
-
+By default the log files can be found under `C:\ProgramData\packetbeat\Logs`.
