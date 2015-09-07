@@ -56,11 +56,11 @@ xgo-image:
 
 .PHONY: fpm-image
 fpm-image:
-	docker build -t tudorg/fpm docker/fpm-image/
+	docker build --rm=true -t tudorg/fpm docker/fpm-image/
 
 .PHONY: go-daemon-image
 go-daemon-image:
-	docker build -t tudorg/go-daemon docker/go-daemon/
+	docker build --rm=true -t tudorg/go-daemon docker/go-daemon/
 
 build/god-linux-386 build/god-linux-amd64: go-daemon-image
 	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
