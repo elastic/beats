@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
-func createElasticsearchConnection(flush_interval int, bulk_size int) ElasticsearchOutput {
+func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsearchOutput {
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -22,7 +22,7 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) Elasticsea
 		logp.Err("Invalid port. Cannot be converted to in: %s", GetEsPort())
 	}
 
-	var elasticsearchOutput ElasticsearchOutput
+	var elasticsearchOutput elasticsearchOutput
 
 	elasticsearchOutput.Init("packetbeat", outputs.MothershipConfig{
 		Enabled:        true,
@@ -231,7 +231,7 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func test_bulk_with_params(t *testing.T, elasticsearchOutput ElasticsearchOutput) {
+func test_bulk_with_params(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 	ts := time.Now()
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
 
