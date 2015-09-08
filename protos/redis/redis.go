@@ -293,7 +293,7 @@ func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseOffset = 0
-	stream.message = &RedisMessage{Ts: stream.message.Ts}
+	stream.message = nil
 	stream.message.Bulks = []string{}
 }
 

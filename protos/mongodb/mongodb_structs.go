@@ -44,16 +44,13 @@ type MongodbStream struct {
 
 	data []byte
 
-	parseOffset   int
-	bytesReceived int
-
 	message *MongodbMessage
 }
 
 // Parser moves to next message in stream
 func (stream *MongodbStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.messageLength:]
-	stream.message = &MongodbMessage{Ts: stream.message.Ts}
+	stream.message = nil
 }
 
 // The private data of a parser instance
