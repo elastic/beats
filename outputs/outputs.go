@@ -58,6 +58,12 @@ type OutputInterface interface {
 	TopologyOutputer
 }
 
+type OutputPlugin struct {
+	Name   string
+	Config MothershipConfig
+	Output Outputer
+}
+
 var enabledOutputPlugins = make(map[string]OutputBuilder)
 
 func RegisterOutputPlugin(name string, builder OutputBuilder) {
@@ -67,29 +73,23 @@ func RegisterOutputPlugin(name string, builder OutputBuilder) {
 func InitOutputs(
 	beat string,
 	configs map[string]MothershipConfig,
-	topology_expire int,
-	fn func(string, MothershipConfig, Outputer) error,
-) ([]Outputer, error) {
-	var outputs []Outputer = nil
+	topologyExpire int,
+) ([]OutputPlugin, error) {
+	var plugins []OutputPlugin = nil
 	for name, plugin := range enabledOutputPlugins {
 		config, exists := configs[name]
 		if !exists || !config.Enabled {
 			continue
 		}
 
-		output, err := plugin.NewOutput(beat, config, topology_expire)
+		output, err := plugin.NewOutput(beat, config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err
 		}
 
-		if fn != nil {
-			if err := fn(name, config, output); err != nil {
-				return nil, err
-			}
-		}
-
-		outputs = append(outputs, output)
+		plugin := OutputPlugin{Name: name, Config: config, Output: output}
+		plugins = append(plugins, plugin)
 	}
-	return outputs, nil
+	return plugins, nil
 }

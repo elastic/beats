@@ -232,33 +232,40 @@ func (publisher *PublisherType) Init(
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
 	if !publisher.disabled {
-		setTopology := func(
-			name string, config outputs.MothershipConfig,
-			output outputs.Outputer,
-		) error {
-			if config.Save_topology {
-				topo, ok := output.(outputs.TopologyOutputer)
-				if !ok {
-					logp.Err("Output type %s does not support topology logging", name)
-					return errors.New("Topology output not supported")
-				}
-
-				if publisher.TopologyOutput != nil {
-					logp.Err("Multiple outputs defined to store topology. " +
-						"Please add save_topology = true option only for one output.")
-					return errors.New("Multiple outputs defined to store topology")
-				}
-				publisher.TopologyOutput = topo
-				logp.Info("Using %s to store the topology", name)
-			}
-			return nil
-		}
-
-		publisher.Output, err = outputs.InitOutputs(
-			beat, configs, shipper.Topology_expire, setTopology)
+		plugins, err := outputs.InitOutputs(beat, configs, shipper.Topology_expire)
 		if err != nil {
 			return err
 		}
+
+		var outputers []outputs.Outputer = nil
+		var topoOutput outputs.TopologyOutputer = nil
+		for _, plugin := range plugins {
+			output := plugin.Output
+			config := plugin.Config
+			outputers = append(outputers, output)
+
+			if !config.Save_topology {
+				continue
+			}
+
+			topo, ok := output.(outputs.TopologyOutputer)
+			if !ok {
+				logp.Err("Output type %s does not support topology logging",
+					plugin.Name)
+				return errors.New("Topology output not supported")
+			}
+
+			if topoOutput != nil {
+				logp.Err("Multiple outputs defined to store topology. " +
+					"Please add save_topology = true option only for one output.")
+				return errors.New("Multiple outputs defined to store topology")
+			}
+
+			topoOutput = topo
+			logp.Info("Using %s to store the topology", plugin.Name)
+		}
+		Publisher.Output = outputers
+		Publisher.TopologyOutput = topoOutput
 	}
 
 	if !publisher.disabled {
