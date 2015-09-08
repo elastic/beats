@@ -1,5 +1,6 @@
 SHELL := /bin/bash
-PROCESSES ?= 1
+PROCESSES ?= 4
+TIMEOUT ?= 30
 
 env: env/bin/activate
 env/bin/activate: requirements.txt
@@ -10,4 +11,4 @@ env/bin/activate: requirements.txt
 .PHONY: test
 test: env
 	make -C ..
-	. env/bin/activate; nosetests --processes=${PROCESSES}
+	. env/bin/activate; nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
