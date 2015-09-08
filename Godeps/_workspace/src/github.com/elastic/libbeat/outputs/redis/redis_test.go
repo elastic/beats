@@ -1,11 +1,29 @@
 package redis
 
 import (
+	"os"
 	"testing"
 	"time"
 )
 
-const redisAddr = ":6379"
+const RedisDefaultHost = "localhost"
+const RedisDefaultPort = "6379"
+
+func GetRedisAddr() string {
+
+	port := os.Getenv("REDIS_PORT")
+	host := os.Getenv("REDIS_HOST")
+
+	if len(port) == 0 {
+		port = RedisDefaultPort
+	}
+
+	if len(host) == 0 {
+		host = RedisDefaultHost
+	}
+
+	return host + ":" + port
+}
 
 func TestTopologyInRedis(t *testing.T) {
 	if testing.Short() {
@@ -14,7 +32,7 @@ func TestTopologyInRedis(t *testing.T) {
 
 	var redisOutput1 = RedisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
@@ -23,7 +41,7 @@ func TestTopologyInRedis(t *testing.T) {
 
 	var redisOutput2 = RedisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
@@ -32,7 +50,7 @@ func TestTopologyInRedis(t *testing.T) {
 
 	var redisOutput3 = RedisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
