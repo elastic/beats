@@ -11,10 +11,13 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
-	"github.com/elastic/libbeat/outputs/elasticsearch"
-	"github.com/elastic/libbeat/outputs/fileout"
-	"github.com/elastic/libbeat/outputs/redis"
 	"github.com/nranchev/go-libGeoIP"
+
+	// load supported output plugins
+	_ "github.com/elastic/libbeat/outputs/elasticsearch"
+	_ "github.com/elastic/libbeat/outputs/fileout"
+	_ "github.com/elastic/libbeat/outputs/lumberjack"
+	_ "github.com/elastic/libbeat/outputs/redis"
 )
 
 // command line flags
@@ -25,8 +28,8 @@ type PublisherType struct {
 	tags           []string
 	disabled       bool
 	Index          string
-	Output         []outputs.OutputInterface
-	TopologyOutput outputs.OutputInterface
+	Output         []outputs.Outputer
+	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
 
@@ -48,12 +51,6 @@ var Publisher PublisherType
 type Topology struct {
 	Name string `json:"name"`
 	Ip   string `json:"ip"`
-}
-
-var EnabledOutputPlugins map[outputs.OutputPlugin]outputs.OutputInterface = map[outputs.OutputPlugin]outputs.OutputInterface{
-	outputs.RedisOutput:         new(redis.RedisOutput),
-	outputs.ElasticsearchOutput: new(elasticsearch.ElasticsearchOutput),
-	outputs.FileOutput:          new(fileout.FileOutput),
 }
 
 func CmdLineFlags(flags *flag.FlagSet) {
@@ -219,7 +216,11 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *PublisherType) Init(beat string, outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
+func (publisher *PublisherType) Init(
+	beat string,
+	configs map[string]outputs.MothershipConfig,
+	shipper ShipperConfig,
+) error {
 	var err error
 	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
 
@@ -230,26 +231,41 @@ func (publisher *PublisherType) Init(beat string, outputs map[string]outputs.Mot
 
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
-	for outputId, plugin := range EnabledOutputPlugins {
-		outputName := outputId.String()
-		output, exists := outputs[outputName]
-		if exists && output.Enabled && !publisher.disabled {
-			err := plugin.Init(beat, output, shipper.Topology_expire)
-			if err != nil {
-				logp.Err("Fail to initialize %s plugin as output: %s", outputName, err)
-				return err
-			}
-			publisher.Output = append(publisher.Output, plugin)
-
-			if output.Save_topology {
-				if publisher.TopologyOutput != nil {
-					logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
-					return errors.New("Multiple outputs defined to store topology")
-				}
-				publisher.TopologyOutput = plugin
-				logp.Info("Using %s to store the topology", outputName)
-			}
+	if !publisher.disabled {
+		plugins, err := outputs.InitOutputs(beat, configs, shipper.Topology_expire)
+		if err != nil {
+			return err
 		}
+
+		var outputers []outputs.Outputer = nil
+		var topoOutput outputs.TopologyOutputer = nil
+		for _, plugin := range plugins {
+			output := plugin.Output
+			config := plugin.Config
+			outputers = append(outputers, output)
+
+			if !config.Save_topology {
+				continue
+			}
+
+			topo, ok := output.(outputs.TopologyOutputer)
+			if !ok {
+				logp.Err("Output type %s does not support topology logging",
+					plugin.Name)
+				return errors.New("Topology output not supported")
+			}
+
+			if topoOutput != nil {
+				logp.Err("Multiple outputs defined to store topology. " +
+					"Please add save_topology = true option only for one output.")
+				return errors.New("Multiple outputs defined to store topology")
+			}
+
+			topoOutput = topo
+			logp.Info("Using %s to store the topology", plugin.Name)
+		}
+		Publisher.Output = outputers
+		Publisher.TopologyOutput = topoOutput
 	}
 
 	if !publisher.disabled {
