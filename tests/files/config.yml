@@ -1,4 +1,4 @@
 server:
   elasticsearch:
     port: 9200
-    host: "localhost"
+    host: localhost
