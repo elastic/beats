@@ -36,3 +36,4 @@ _testmain.go
 # IDE / OS specific files
 .DS_Store
 .idea
+.jenkins

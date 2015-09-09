@@ -1,4 +1,6 @@
 GODEP=$(GOPATH)/bin/godep
+# Hidden directory to install dependencies for jenkins
+export PATH := .jenkins:$(PATH)
 
 .PHONY: build
 build:
@@ -75,3 +77,11 @@ testsuite: build-image
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/profile.cov $(shell pwd)/profile.cov
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/cover/coverage.html $(shell pwd)/cover/coverage.html
 	make stop-environment
+
+# Sets up docker-compose locally for jenkins so no global installation is needed
+.PHONY: testsuite
+docker-compose-setup:
+	mkdir -p .jenkins
+	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > .jenkins/docker-compose
+	chmod +x .jenkins/docker-compose
+	
