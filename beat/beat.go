@@ -75,7 +75,7 @@ func (beat *Beat) CommandLineSetup() {
 // This is Output, Logging and Shipper config params
 func (b *Beat) LoadConfig() {
 
-	err := cfgfile.Read(&b.Config)
+	err := cfgfile.Read(&b.Config, "")
 
 	if err != nil {
 		logp.Debug("Log read error", "Error %v\n", err)

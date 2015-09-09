@@ -143,7 +143,7 @@ With these structures defined, the `Config` function looks like this:
 ----------------------------------------------------------------------
 func (tb *Topbeat) Config(b *beat.Beat) error {
 
-	err := cfgfile.Read(&tb.TbConfig) <1>
+	err := cfgfile.Read(&tb.TbConfig, "") <1>
 	if err != nil {
 		logp.Err("Error reading configuration file: %v", err)
 		return err
