@@ -1,6 +1,6 @@
 GODEP=$(GOPATH)/bin/godep
 # Hidden directory to install dependencies for jenkins
-export PATH := .jenkins:$(PATH)
+export PATH := ./bin:$(PATH)
 
 .PHONY: build
 build:
@@ -81,7 +81,7 @@ testsuite: build-image
 # Sets up docker-compose locally for jenkins so no global installation is needed
 .PHONY: testsuite
 docker-compose-setup:
-	mkdir -p .jenkins
-	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > .jenkins/docker-compose
-	chmod +x .jenkins/docker-compose
+	mkdir -p bin
+	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > bin/docker-compose
+	chmod +x bin/docker-compose
 	
