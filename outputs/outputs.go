@@ -29,6 +29,10 @@ type MothershipConfig struct {
 	Flush_interval     *int
 	Bulk_size          *int
 	Max_retries        *int
+	TLS                *bool
+	Certificate        string
+	CertificateKey     string
+	CAs                []string
 }
 
 type Outputer interface {
