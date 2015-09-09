@@ -17,7 +17,7 @@ func CmdLineFlags(flags *flag.FlagSet, name string) {
 	testConfig = flags.Bool("test", false, "Test configuration and exit.")
 }
 
-// Reads config from yaml file into the given interface structure.
+// Read reads the configuration from a yaml file into the given interface structure.
 // In case path is not set this method reads from the default configuration file for the beat.
 func Read(out interface{}, path string) error {
 
