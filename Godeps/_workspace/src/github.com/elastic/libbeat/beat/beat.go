@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/libbeat/cfgfile"
+	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
@@ -26,9 +27,9 @@ type Beater interface {
 type Beat struct {
 	Name    string
 	Version string
-	CmdLine *flag.FlagSet
-	Config  BeatConfig
+	Config  *BeatConfig
 	BT      Beater
+	Events  chan common.MapStr
 }
 
 // Basic configuration of every beat
@@ -36,6 +37,12 @@ type BeatConfig struct {
 	Output  map[string]outputs.MothershipConfig
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
+}
+
+var printVersion *bool
+
+func init() {
+	printVersion = flag.Bool("version", false, "Print version and exit")
 }
 
 // Initiates a new beat object
@@ -46,7 +53,6 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 	}
 
-	b.CmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	return &b
 }
 
@@ -54,14 +60,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 // To set additional cmd line args use the beat.CmdLine type before calling the function
 func (beat *Beat) CommandLineSetup() {
 
-	cfgfile.CmdLineFlags(beat.CmdLine, beat.Name)
-	logp.CmdLineFlags(beat.CmdLine)
-	service.CmdLineFlags(beat.CmdLine)
-	publisher.CmdLineFlags(beat.CmdLine)
-
-	printVersion := beat.CmdLine.Bool("version", false, "Print version and exit")
-
-	beat.CmdLine.Parse(os.Args[1:])
+	flag.Parse()
 
 	if *printVersion {
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
@@ -73,7 +72,7 @@ func (beat *Beat) CommandLineSetup() {
 // This is Output, Logging and Shipper config params
 func (b *Beat) LoadConfig() {
 
-	err := cfgfile.Read(&b.Config)
+	err := cfgfile.Read(&b.Config, "")
 
 	if err != nil {
 		logp.Debug("Log read error", "Error %v\n", err)
@@ -87,6 +86,8 @@ func (b *Beat) LoadConfig() {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
+
+	b.Events = publisher.Publisher.Queue
 
 	logp.Debug(b.Name, "Init %s", b.Name)
 }

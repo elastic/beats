@@ -1,38 +1,56 @@
 package redis
 
 import (
+	"os"
 	"testing"
 	"time"
 )
 
-const redisAddr = ":6379"
+const RedisDefaultHost = "localhost"
+const RedisDefaultPort = "6379"
+
+func GetRedisAddr() string {
+
+	port := os.Getenv("REDIS_PORT")
+	host := os.Getenv("REDIS_HOST")
+
+	if len(port) == 0 {
+		port = RedisDefaultPort
+	}
+
+	if len(host) == 0 {
+		host = RedisDefaultHost
+	}
+
+	return host + ":" + port
+}
 
 func TestTopologyInRedis(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping topology tests in short mode, because they require REDIS")
 	}
 
-	var redisOutput1 = RedisOutput{
+	var redisOutput1 = redisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
 		TopologyExpire: time.Duration(15) * time.Second,
 	}
 
-	var redisOutput2 = RedisOutput{
+	var redisOutput2 = redisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
 		TopologyExpire: time.Duration(15) * time.Second,
 	}
 
-	var redisOutput3 = RedisOutput{
+	var redisOutput3 = redisOutput{
 		Index:          "packetbeat",
-		Hostname:       redisAddr,
+		Hostname:       GetRedisAddr(),
 		Password:       "",
 		DbTopology:     1,
 		Timeout:        time.Duration(5) * time.Second,
