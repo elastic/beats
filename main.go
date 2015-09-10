@@ -13,7 +13,7 @@ func main() {
 	b := beat.NewBeat(Name, Version, pb)
 
 	// Additional command line args are used to overwrite config options
-	pb.CmdLineArgs = fetchAdditionalCmdLineArgs(b.CmdLine)
+	pb.CmdLineArgs = fetchAdditionalCmdLineArgs()
 
 	// Base CLI flags
 	b.CommandLineSetup()

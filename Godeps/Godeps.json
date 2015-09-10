@@ -7,35 +7,43 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "40135b29aa7d243dbb8a012d4219956331b65ca9"
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",

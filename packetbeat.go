@@ -68,19 +68,23 @@ type CmdLineArgs struct {
 	WaitShutdown *int
 }
 
-func fetchAdditionalCmdLineArgs(cmdLine *flag.FlagSet) CmdLineArgs {
+var cmdLineArgs CmdLineArgs
 
-	args := CmdLineArgs{
-		File:         cmdLine.String("I", "", "file"),
-		Loop:         cmdLine.Int("l", 1, "Loop file. 0 - loop forever"),
-		OneAtAtime:   cmdLine.Bool("O", false, "Read packets one at a time (press Enter)"),
-		TopSpeed:     cmdLine.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-		Dumpfile:     cmdLine.String("dump", "", "Write all captured packets to this libpcap file"),
-		PrintDevices: cmdLine.Bool("devices", false, "Print the list of devices and exit"),
-		WaitShutdown: cmdLine.Int("waitstop", 0, "Additional seconds to wait befor shutting down"),
+func init() {
+	cmdLineArgs = CmdLineArgs{
+		File:         flag.String("I", "", "file"),
+		Loop:         flag.Int("l", 1, "Loop file. 0 - loop forever"),
+		OneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
+		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
+		Dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
+		PrintDevices: flag.Bool("devices", false, "Print the list of devices and exit"),
+		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait befor shutting down"),
 	}
+}
 
-	return args
+func fetchAdditionalCmdLineArgs() CmdLineArgs {
+
+	return cmdLineArgs
 }
 
 // Handle custom command line flags
@@ -103,7 +107,7 @@ func (pb *Packetbeat) CliFlags(b *beat.Beat) {
 func (pb *Packetbeat) Config(b *beat.Beat) error {
 
 	// Read beat implementation config as needed for setup
-	err := cfgfile.Read(&pb.PbConfig)
+	err := cfgfile.Read(&pb.PbConfig, "")
 
 	// CLI flags over-riding config
 	if *pb.CmdLineArgs.TopSpeed {

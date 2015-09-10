@@ -11,7 +11,26 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
-type ElasticsearchOutput struct {
+func init() {
+	outputs.RegisterOutputPlugin("elasticsearch", ElasticsearchOutputPlugin{})
+}
+
+func (f ElasticsearchOutputPlugin) NewOutput(
+	beat string,
+	config outputs.MothershipConfig,
+	topology_expire int,
+) (outputs.Outputer, error) {
+	output := &elasticsearchOutput{}
+	err := output.Init(beat, config, topology_expire)
+	if err != nil {
+		return nil, err
+	}
+	return output, nil
+}
+
+type ElasticsearchOutputPlugin struct{}
+
+type elasticsearchOutput struct {
 	Index          string
 	TopologyExpire int
 	Conn           *Elasticsearch
@@ -30,7 +49,7 @@ type PublishedTopology struct {
 }
 
 // Initialize Elasticsearch as output
-func (out *ElasticsearchOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
+func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
 
 	if len(config.Protocol) == 0 {
 		config.Protocol = "http"
@@ -111,7 +130,7 @@ func (out *ElasticsearchOutput) Init(beat string, config outputs.MothershipConfi
 }
 
 // Enable using ttl as paramters in a server-ip doc type
-func (out *ElasticsearchOutput) EnableTTL() error {
+func (out *elasticsearchOutput) EnableTTL() error {
 
 	// make sure the .packetbeat-topology index exists
 	out.Conn.CreateIndex(".packetbeat-topology", nil)
@@ -133,7 +152,7 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 }
 
 // Get the name of a shipper by its IP address from the local topology map
-func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
+func (out *elasticsearchOutput) GetNameByIP(ip string) string {
 	name, exists := out.TopologyMap[ip]
 	if !exists {
 		return ""
@@ -142,7 +161,7 @@ func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
 }
 
 // Insert a list of events in the bulkChannel
-func (out *ElasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) {
+func (out *elasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) {
 	close(bulkChannel)
 	go func(channel chan interface{}) {
 		_, err := out.Conn.Bulk("", "", nil, channel)
@@ -154,7 +173,7 @@ func (out *ElasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) 
 
 // Goroutine that sends one or multiple events to Elasticsearch.
 // If the flush_interval > 0, then the events are sent in batches. Otherwise, one by one.
-func (out *ElasticsearchOutput) SendMessagesGoroutine() {
+func (out *elasticsearchOutput) SendMessagesGoroutine() {
 	flushChannel := make(<-chan time.Time)
 
 	if out.FlushInterval > 0 {
@@ -197,7 +216,7 @@ func (out *ElasticsearchOutput) SendMessagesGoroutine() {
 }
 
 // Each shipper publishes a list of IPs together with its name to Elasticsearch
-func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
+func (out *elasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	if !out.ttlEnabled {
 		logp.Debug("output_elasticsearch", "Not publishing IPs because TTL was not yet confirmed to be enabled")
 		return nil
@@ -226,7 +245,7 @@ func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 }
 
 // Update the local topology map
-func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
+func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 
 	// get all shippers IPs from Elasticsearch
 	TopologyMapTmp := make(map[string]string)
@@ -262,7 +281,7 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 }
 
 // Publish an event by adding it to the queue of events.
-func (out *ElasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *elasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
 
 	out.sendingQueue <- EventMsg{Ts: ts, Event: event}
 

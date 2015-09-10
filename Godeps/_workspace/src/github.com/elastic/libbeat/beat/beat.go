@@ -27,7 +27,6 @@ type Beater interface {
 type Beat struct {
 	Name    string
 	Version string
-	CmdLine *flag.FlagSet
 	Config  *BeatConfig
 	BT      Beater
 	Events  chan common.MapStr
@@ -40,6 +39,12 @@ type BeatConfig struct {
 	Shipper publisher.ShipperConfig
 }
 
+var printVersion *bool
+
+func init() {
+	printVersion = flag.Bool("version", false, "Print version and exit")
+}
+
 // Initiates a new beat object
 func NewBeat(name string, version string, bt Beater) *Beat {
 	b := Beat{
@@ -48,7 +53,6 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 	}
 
-	b.CmdLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	return &b
 }
 
@@ -56,14 +60,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 // To set additional cmd line args use the beat.CmdLine type before calling the function
 func (beat *Beat) CommandLineSetup() {
 
-	cfgfile.CmdLineFlags(beat.CmdLine, beat.Name)
-	logp.CmdLineFlags(beat.CmdLine)
-	service.CmdLineFlags(beat.CmdLine)
-	publisher.CmdLineFlags(beat.CmdLine)
-
-	printVersion := beat.CmdLine.Bool("version", false, "Print version and exit")
-
-	beat.CmdLine.Parse(os.Args[1:])
+	flag.Parse()
 
 	if *printVersion {
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
@@ -75,7 +72,7 @@ func (beat *Beat) CommandLineSetup() {
 // This is Output, Logging and Shipper config params
 func (b *Beat) LoadConfig() {
 
-	err := cfgfile.Read(&b.Config)
+	err := cfgfile.Read(&b.Config, "")
 
 	if err != nil {
 		logp.Debug("Log read error", "Error %v\n", err)
