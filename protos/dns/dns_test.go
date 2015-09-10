@@ -268,7 +268,7 @@ func TestParseUdp_emptyPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	packet := newPacket(forward, []byte{})
 	dns.ParseUdp(packet)
-	assert.Empty(t, dns.transactionsMap, "There should be no transactions.")
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 	close(dns.results)
 	assert.Nil(t, <-dns.results, "No result should have been published.")
 }
@@ -279,7 +279,7 @@ func TestParseUdp_malformedPacket(t *testing.T) {
 	garbage := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
 	packet := newPacket(forward, garbage)
 	dns.ParseUdp(packet)
-	assert.Empty(t, dns.transactionsMap, "There should be no transactions.")
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	// As a future addition, a malformed message should publish a result.
 }
@@ -289,7 +289,7 @@ func TestParseUdp_requestPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	packet := newPacket(forward, elasticA.request)
 	dns.ParseUdp(packet)
-	assert.Len(t, dns.transactionsMap, 1, "There should be one transaction.")
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	close(dns.results)
 	assert.Nil(t, <-dns.results, "No result should have been published.")
 }
@@ -320,10 +320,10 @@ func TestParseUdp_duplicateRequests(t *testing.T) {
 	q := elasticA
 	packet := newPacket(forward, q.request)
 	dns.ParseUdp(packet)
-	assert.Len(t, dns.transactionsMap, 1, "There should be one transaction.")
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(forward, q.request)
 	dns.ParseUdp(packet)
-	assert.Len(t, dns.transactionsMap, 1, "There should be one transaction.")
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)
 	assert.Equal(t, "udp", mapValue(t, m, "transport"))
@@ -411,7 +411,7 @@ func parseUdpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 	dns.ParseUdp(packet)
 	packet = newPacket(reverse, q.response)
 	dns.ParseUdp(packet)
-	assert.Empty(t, dns.transactionsMap, "There should be no transactions.")
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, dns)
 	assert.Equal(t, "udp", mapValue(t, m, "transport"))

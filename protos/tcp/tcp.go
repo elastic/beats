@@ -2,7 +2,6 @@ package tcp
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
@@ -12,8 +11,6 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
-const TCP_STREAM_EXPIRY = 10 * 1e9
-const TCP_STREAM_HASH_SIZE = 2 ^ 16
 const TCP_MAX_DATA_IN_STREAM = 10 * 1e6
 
 const (
@@ -22,10 +19,10 @@ const (
 )
 
 type Tcp struct {
-	id         uint32
-	streamsMap map[common.HashableIpPortTuple]*TcpStream
-	portMap    map[uint16]protos.Protocol
-	protocols  protos.Protocols
+	id        uint32
+	streams   *common.Cache
+	portMap   map[uint16]protos.Protocol
+	protocols protos.Protocols
 }
 
 type Processor interface {
@@ -51,10 +48,17 @@ func (tcp *Tcp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
 	return protos.UnknownProtocol
 }
 
+func (tcp *Tcp) getStream(k common.HashableIpPortTuple) *TcpStream {
+	v := tcp.streams.Get(k)
+	if v != nil {
+		return v.(*TcpStream)
+	}
+	return nil
+}
+
 type TcpStream struct {
 	id       uint32
 	tuple    *common.IpPortTuple
-	timer    *time.Timer
 	protocol protos.Protocol
 	tcptuple common.TcpTuple
 	tcp      *Tcp
@@ -62,54 +66,42 @@ type TcpStream struct {
 	lastSeq [2]uint32
 
 	// protocols private data
-	Data protos.ProtocolData
+	data protos.ProtocolData
 }
 
-func (stream *TcpStream) AddPacket(pkt *protos.Packet, tcphdr *layers.TCP, original_dir uint8) {
+func (stream *TcpStream) String() string {
+	return fmt.Sprintf("TcpStream id[%d] tuple[%s] protocol[%s] lastSeq[%d %d]",
+		stream.id, stream.tuple, stream.protocol, stream.lastSeq[0], stream.lastSeq[1])
+}
 
-	// create/reset timer
-	if stream.timer != nil {
-		stream.timer.Stop()
-	}
-	stream.timer = time.AfterFunc(TCP_STREAM_EXPIRY, func() { stream.Expire() })
-
+func (stream *TcpStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP, original_dir uint8) {
 	mod := stream.tcp.protocols.GetTcp(stream.protocol)
 	if mod == nil {
-		logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s", stream.protocol)
+		logp.Debug("tcp", "Ignoring protocol for which we have no module "+
+			"loaded: %s", stream.protocol)
 		return
 	}
 
 	if len(pkt.Payload) > 0 {
-		stream.Data = mod.Parse(pkt, &stream.tcptuple, original_dir, stream.Data)
+		stream.data = mod.Parse(pkt, &stream.tcptuple, original_dir, stream.data)
 	}
 
 	if tcphdr.FIN {
-		stream.Data = mod.ReceivedFin(&stream.tcptuple, original_dir, stream.Data)
+		stream.data = mod.ReceivedFin(&stream.tcptuple, original_dir, stream.data)
 	}
 }
 
-func (stream *TcpStream) GapInStream(original_dir uint8, nbytes int) (drop bool) {
+func (stream *TcpStream) gapInStream(original_dir uint8, nbytes int) (drop bool) {
 	mod := stream.tcp.protocols.GetTcp(stream.protocol)
-	stream.Data, drop = mod.GapInStream(&stream.tcptuple, original_dir, nbytes, stream.Data)
+	stream.data, drop = mod.GapInStream(&stream.tcptuple, original_dir, nbytes, stream.data)
 	return drop
 }
 
-func (stream *TcpStream) Expire() {
-
-	logp.Debug("mem", "Tcp stream expired")
-
-	// de-register from dict
-	delete(stream.tcp.streamsMap, stream.tuple.Hashable())
-
-	// nullify to help the GC
-	stream.Data = nil
-}
-
-func TcpSeqBefore(seq1 uint32, seq2 uint32) bool {
+func tcpSeqBefore(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) < 0
 }
 
-func TcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
+func tcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) <= 0
 }
 
@@ -119,12 +111,12 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 	// protocol modules.
 	defer logp.Recover("Process tcp exception")
 
-	stream, exists := tcp.streamsMap[pkt.Tuple.Hashable()]
+	stream := tcp.getStream(pkt.Tuple.Hashable())
 	var original_dir uint8 = TcpDirectionOriginal
 	created := false
-	if !exists {
-		stream, exists = tcp.streamsMap[pkt.Tuple.RevHashable()]
-		if !exists {
+	if stream == nil {
+		stream = tcp.getStream(pkt.Tuple.RevHashable())
+		if stream == nil {
 			protocol := tcp.decideProtocol(&pkt.Tuple)
 			if protocol == protos.UnknownProtocol {
 				// don't follow
@@ -135,7 +127,7 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 			// create
 			stream = &TcpStream{id: tcp.getId(), tuple: &pkt.Tuple, protocol: protocol, tcp: tcp}
 			stream.tcptuple = common.TcpTupleFromIpPort(stream.tuple, stream.id)
-			tcp.streamsMap[pkt.Tuple.Hashable()] = stream
+			tcp.streams.Put(pkt.Tuple.Hashable(), stream)
 			created = true
 		} else {
 			original_dir = TcpDirectionReverse
@@ -150,38 +142,28 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 	if len(pkt.Payload) > 0 &&
 		stream.lastSeq[original_dir] != 0 {
 
-		if TcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
+		if tcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
 
 			logp.Debug("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 				tcphdr.Seq, len(pkt.Payload), stream.lastSeq[original_dir])
 			return
 		}
 
-		if TcpSeqBefore(stream.lastSeq[original_dir], tcp_start_seq) {
+		if tcpSeqBefore(stream.lastSeq[original_dir], tcp_start_seq) {
 			if !created {
 				logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
-				drop := stream.GapInStream(original_dir,
+				drop := stream.gapInStream(original_dir,
 					int(tcp_start_seq-stream.lastSeq[original_dir]))
 				if drop {
 					logp.Debug("tcp", "Dropping stream because of gap")
-					stream.Expire()
+					tcp.streams.Delete(stream.tuple.Hashable())
 				}
 			}
 		}
 	}
 	stream.lastSeq[original_dir] = tcp_seq
 
-	stream.AddPacket(pkt, tcphdr, original_dir)
-}
-
-func (tcp *Tcp) PrintTcpMap() {
-	fmt.Printf("Streams in memory:")
-	for _, stream := range tcp.streamsMap {
-		fmt.Printf(" %d", stream.id)
-	}
-	fmt.Printf("\n")
-
-	fmt.Printf("Streams dict: %v", tcp.streamsMap)
+	stream.addPacket(pkt, tcphdr, original_dir)
 }
 
 func buildPortsMap(plugins map[protos.Protocol]protos.TcpProtocolPlugin) (map[uint16]protos.Protocol, error) {
@@ -211,8 +193,13 @@ func NewTcp(p protos.Protocols) (*Tcp, error) {
 		return nil, err
 	}
 
-	tcp := &Tcp{protocols: p, portMap: portMap}
-	tcp.streamsMap = make(map[common.HashableIpPortTuple]*TcpStream, TCP_STREAM_HASH_SIZE)
+	tcp := &Tcp{
+		protocols: p,
+		portMap:   portMap,
+		streams: common.NewCache(protos.DefaultTransactionExpiration,
+			protos.DefaultTransactionHashSize),
+	}
+	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
 	logp.Debug("tcp", "Port map: %v", portMap)
 
 	return tcp, nil

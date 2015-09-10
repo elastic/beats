@@ -60,8 +60,6 @@ type PgsqlTransaction struct {
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 type PgsqlStream struct {
@@ -76,11 +74,6 @@ type PgsqlStream struct {
 
 	message *PgsqlMessage
 }
-
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
 
 const (
 	PgsqlStartState = iota
@@ -102,12 +95,20 @@ type Pgsql struct {
 	Send_request  bool
 	Send_response bool
 
-	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
-	results         chan common.MapStr
+	transactions *common.Cache
+	results      chan common.MapStr
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
+}
+
+func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {
+	v := pgsql.transactions.Get(k)
+	if v != nil {
+		return v.([]*PgsqlTransaction)
+	}
+	return nil
 }
 
 func (pgsql *Pgsql) InitDefaults() {
@@ -150,7 +151,9 @@ func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
 		}
 	}
 
-	pgsql.transactionsMap = make(map[common.HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
+	pgsql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	pgsql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	pgsql.handlePgsql = handlePgsql
 	pgsql.results = results
 
@@ -812,8 +815,9 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 
 	logp.Debug("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
-	if pgsql.transactionsMap[tuple.Hashable()] == nil {
-		pgsql.transactionsMap[tuple.Hashable()] = []*PgsqlTransaction{}
+	transList := pgsql.getTransaction(tuple.Hashable())
+	if transList == nil {
+		transList = []*PgsqlTransaction{}
 	}
 
 	for _, query := range queries {
@@ -846,27 +850,22 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 
 		trans.Request_raw = query
 
-		if trans.timer != nil {
-			trans.timer.Stop()
-		}
-		trans.timer = time.AfterFunc(TransactionTimeout, func() { pgsql.expireTransaction(trans) })
-
-		pgsql.transactionsMap[tuple.Hashable()] = append(pgsql.transactionsMap[tuple.Hashable()], trans)
+		transList = append(transList, trans)
 	}
+	pgsql.transactions.Put(tuple.Hashable(), transList)
 }
 
 func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	tuple := msg.TcpTuple
-	trans_list := pgsql.transactionsMap[tuple.Hashable()]
-
-	if trans_list == nil || len(trans_list) == 0 {
+	transList := pgsql.getTransaction(tuple.Hashable())
+	if transList == nil || len(transList) == 0 {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 	}
 
 	// extract the first transaction from the array
-	trans := pgsql.removeTransaction(tuple, 0)
+	trans := pgsql.removeTransaction(transList, tuple, 0)
 
 	// check if the request was received
 	if trans.Pgsql == nil {
@@ -892,10 +891,6 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 	pgsql.publishTransaction(trans)
 
 	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
 func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
@@ -936,29 +931,15 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	pgsql.results <- event
 }
 
-func (pgsql *Pgsql) expireTransaction(trans *PgsqlTransaction) {
-	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
-	// remove from map
-	for i, t := range pgsql.transactionsMap[trans.tuple.Hashable()] {
-		if t == trans {
-			pgsql.removeTransaction(trans.tuple, i)
-			break
-		}
-	}
-	if len(pgsql.transactionsMap[trans.tuple.Hashable()]) == 0 {
-		delete(pgsql.transactionsMap, trans.tuple.Hashable())
-	}
-}
+func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,
+	tuple common.TcpTuple, index int) *PgsqlTransaction {
 
-func (pgsql *Pgsql) removeTransaction(tuple common.TcpTuple, index int) *PgsqlTransaction {
-
-	trans_list := pgsql.transactionsMap[tuple.Hashable()]
-	trans := trans_list[index]
-	trans_list = append(trans_list[:index], trans_list[index+1:]...)
-	if len(trans_list) == 0 {
-		delete(pgsql.transactionsMap, trans.tuple.Hashable())
+	trans := transList[index]
+	transList = append(transList[:index], transList[index+1:]...)
+	if len(transList) == 0 {
+		pgsql.transactions.Delete(trans.tuple.Hashable())
 	} else {
-		pgsql.transactionsMap[tuple.Hashable()] = trans_list
+		pgsql.transactions.Put(tuple.Hashable(), transList)
 	}
 
 	return trans

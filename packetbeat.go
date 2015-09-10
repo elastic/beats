@@ -55,7 +55,6 @@ type Packetbeat struct {
 	CmdLineArgs CmdLineArgs
 	Sniff       *sniffer.SnifferSetup
 	over        chan bool
-	tcpProc     *tcp.Tcp
 }
 
 type CmdLineArgs struct {
@@ -154,7 +153,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	var err error
 
-	pb.tcpProc, err = tcp.NewTcp(&protos.Protos)
+	tcpProc, err := tcp.NewTcp(&protos.Protos)
 	if err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
@@ -180,7 +179,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	}
 
 	logp.Debug("main", "Initializing sniffer")
-	err = pb.Sniff.Init(false, afterInputsQueue, pb.tcpProc, udpProc)
+	err = pb.Sniff.Init(false, afterInputsQueue, tcpProc, udpProc)
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)
 		os.Exit(1)
@@ -231,9 +230,9 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
 
 	if service.WithMemProfile() {
-		// wait for all TCP streams to expire
-		time.Sleep(tcp.TCP_STREAM_EXPIRY * 1.2)
-		pb.tcpProc.PrintTcpMap()
+		logp.Debug("main", "Waiting for streams and transactions to expire...")
+		time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
+		logp.Debug("main", "Streams and transactions should all be expired now.")
 	}
 	return nil
 }

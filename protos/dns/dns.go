@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -35,11 +34,7 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
-const (
-	TransactionsHashSize    = 2 ^ 16
-	TransactionTimeoutNanos = 10 * 1e9
-	MaxDnsTupleRawSize      = 16 + 16 + 2 + 2 + 4 + 1
-)
+const MaxDnsTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
 
 // Constants used to associate the DNS QR flag with a meaningful value.
 const (
@@ -197,8 +192,6 @@ type DnsTransaction struct {
 
 	Request  *DnsMessage
 	Response *DnsMessage
-
-	timer *time.Timer
 }
 
 func newTransaction(ts time.Time, tuple DnsTuple, cmd common.CmdlineTuple) *DnsTransaction {
@@ -228,43 +221,33 @@ type Dns struct {
 	Include_authorities bool
 	Include_additionals bool
 
-	// Map of active DNS transactions. The map key is the HashableDnsTuple
-	// associated with the request. Use the put, lookup, and deleteTransaction
-	// methods to make map access concurrency-safe.
-	transactionsMap   map[HashableDnsTuple]*DnsTransaction
-	transactionsMutex sync.Mutex
+	// Cache of active DNS transactions. The map key is the HashableDnsTuple
+	// associated with the request.
+	transactions *common.Cache
 
 	results chan common.MapStr // Channel where results are pushed.
 }
 
-// putTransaction puts a transaction into the transaction map. If the
-// key already exists then the exiting entry will be overridden. The
-// key should be the HashableDnsTuple associated with the request (src
-// is the requestor).
-func (dns *Dns) putTransaction(h HashableDnsTuple, trans *DnsTransaction) {
-	dns.transactionsMutex.Lock()
-	defer dns.transactionsMutex.Unlock()
-	dns.transactionsMap[h] = trans
-}
-
-// lookupTransaction returns the transaction associated with the given
+// getTransaction returns the transaction associated with the given
 // HashableDnsTuple. The lookup key should be the HashableDnsTuple associated
 // with the request (src is the requestor). Nil is returned if the entry
 // does not exist.
-func (dns *Dns) lookupTransaction(h HashableDnsTuple) *DnsTransaction {
-	dns.transactionsMutex.Lock()
-	defer dns.transactionsMutex.Unlock()
-	return dns.transactionsMap[h]
+func (dns *Dns) getTransaction(k HashableDnsTuple) *DnsTransaction {
+	v := dns.transactions.Get(k)
+	if v != nil {
+		return v.(*DnsTransaction)
+	}
+	return nil
 }
 
 // deleteTransaction deletes an entry from the transaction map and returns
 // the deleted element. If the key does not exist then nil is returned.
-func (dns *Dns) deleteTransaction(h HashableDnsTuple) *DnsTransaction {
-	dns.transactionsMutex.Lock()
-	defer dns.transactionsMutex.Unlock()
-	t := dns.transactionsMap[h]
-	delete(dns.transactionsMap, h)
-	return t
+func (dns *Dns) deleteTransaction(k HashableDnsTuple) *DnsTransaction {
+	v := dns.transactions.Delete(k)
+	if v != nil {
+		return v.(*DnsTransaction)
+	}
+	return nil
 }
 
 func (dns *Dns) initDefaults() {
@@ -299,8 +282,9 @@ func (dns *Dns) Init(test_mode bool, results chan common.MapStr) error {
 		dns.setFromConfig(config.ConfigSingleton.Protocols.Dns)
 	}
 
-	dns.transactionsMap = make(map[HashableDnsTuple]*DnsTransaction, TransactionsHashSize)
-	dns.transactionsMutex = sync.Mutex{}
+	dns.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	dns.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 
 	dns.results = results
 
@@ -356,17 +340,14 @@ func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
 	}
 
 	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
-	dns.putTransaction(tuple.Hashable(), trans)
+	dns.transactions.Put(tuple.Hashable(), trans)
 	trans.Request = msg
-
-	trans.timer = time.AfterFunc(TransactionTimeoutNanos,
-		func() { dns.expireTransaction(trans) })
 }
 
 func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 	logp.Debug("dns", "Processing response. %s", tuple)
 
-	trans := dns.lookupTransaction(tuple.RevHashable())
+	trans := dns.getTransaction(tuple.RevHashable())
 	if trans == nil {
 		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
@@ -378,10 +359,6 @@ func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 	dns.publishTransaction(trans)
 }
 
-func (dns *Dns) expireTransaction(t *DnsTransaction) {
-	dns.deleteTransaction(t.tuple.Hashable())
-}
-
 func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	if dns.results == nil {
 		return
@@ -389,10 +366,6 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 
 	logp.Debug("dns", "Publishing transaction. %s", t.tuple.String())
 	dns.deleteTransaction(t.tuple.Hashable())
-
-	if t.timer != nil {
-		t.timer.Stop()
-	}
 
 	event := common.MapStr{}
 	event["timestamp"] = common.Time(t.ts)
@@ -642,26 +615,18 @@ func dnsToString(dns *layers.DNS) string {
 	}
 
 	if len(dns.Answers) > 0 {
-		t = []string{}
-		for _, rr := range dns.Answers {
-			t = append(t, dnsResourceRecordToString(&rr))
-		}
-		a = append(a, fmt.Sprintf("ANSWER %s", strings.Join(t, "; ")))
+		a = append(a, fmt.Sprintf("ANSWER %s",
+			dnsResourceRecordsToString(dns.Answers)))
 	}
 
 	if len(dns.Authorities) > 0 {
-		t = []string{}
-		for _, rr := range dns.Authorities {
-			t = append(t, dnsResourceRecordToString(&rr))
-		}
-		a = append(a, fmt.Sprintf("AUTHORITY %s", strings.Join(t, "; ")))
+		a = append(a, fmt.Sprintf("AUTHORITY %s",
+			dnsResourceRecordsToString(dns.Authorities)))
 	}
 
 	if len(dns.Additionals) > 0 {
-		for _, rr := range dns.Additionals {
-			t = append(t, dnsResourceRecordToString(&rr))
-		}
-		a = append(a, fmt.Sprintf("ADDITIONAL %s", strings.Join(t, "; ")))
+		a = append(a, fmt.Sprintf("ADDITIONAL %s",
+			dnsResourceRecordsToString(dns.Additionals)))
 	}
 
 	return strings.Join(a, "; ")

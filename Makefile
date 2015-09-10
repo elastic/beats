@@ -107,7 +107,7 @@ coverage:
 
 .PHONY: benchmark
 benchmark:
-	$(GODEP) go test -short -bench=. ./...
+	$(GODEP) go test -short -bench=. ./... -cpu=2
 
 .PHONY: env
 env: env/bin/activate
