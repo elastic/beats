@@ -29,7 +29,7 @@ type Beat struct {
 	Version string
 	Config  *BeatConfig
 	BT      Beater
-	Events  chan common.MapStr
+	Events  publisher.EventPublisher
 }
 
 // Basic configuration of every beat
@@ -92,7 +92,7 @@ func (b *Beat) LoadConfig() {
 		os.Exit(1)
 	}
 
-	b.Events = publisher.Publisher.Queue
+	b.Events = publisher.Publisher.Client()
 
 	logp.Debug("beat", "Init %s", b.Name)
 }

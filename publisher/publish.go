@@ -23,18 +23,27 @@ import (
 // command line flags
 var publishDisabled *bool
 
+type EventPublisher interface {
+	Publish(event common.MapStr)
+	PublishAll(events []common.MapStr)
+}
+
 type PublisherType struct {
 	name           string
 	tags           []string
 	disabled       bool
 	Index          string
-	Output         []outputs.Outputer
+	Output         []outputs.BulkOutputer
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
 
 	RefreshTopologyTimer <-chan time.Time
-	Queue                chan common.MapStr
+	queue                chan []common.MapStr
+}
+
+type publisherClient struct {
+	queue chan []common.MapStr
 }
 
 type ShipperConfig struct {
@@ -85,11 +94,17 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	}
 }
 
+func (p *PublisherType) Client() EventPublisher {
+	return &publisherClient{p.queue}
+}
+
 func (publisher *PublisherType) publishFromQueue() {
-	for mapstr := range publisher.Queue {
-		err := publisher.publishEvent(mapstr)
-		if err != nil {
-			logp.Err("Publishing failed: %v", err)
+	for events := range publisher.queue {
+		for _, event := range events {
+			err := publisher.publishEvent(event)
+			if err != nil {
+				logp.Err("Publishing failed: %v", err)
+			}
 		}
 	}
 }
@@ -237,12 +252,12 @@ func (publisher *PublisherType) Init(
 			return err
 		}
 
-		var outputers []outputs.Outputer = nil
+		var outputers []outputs.BulkOutputer = nil
 		var topoOutput outputs.TopologyOutputer = nil
 		for _, plugin := range plugins {
 			output := plugin.Output
 			config := plugin.Config
-			outputers = append(outputers, output)
+			outputers = append(outputers, outputs.CastBulkOutputer(output))
 
 			if !config.Save_topology {
 				continue
@@ -311,8 +326,16 @@ func (publisher *PublisherType) Init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.Queue = make(chan common.MapStr, 1000)
+	publisher.queue = make(chan []common.MapStr, 1000)
 	go publisher.publishFromQueue()
 
 	return nil
+}
+
+func (c *publisherClient) Publish(event common.MapStr) {
+	c.PublishAll([]common.MapStr{event})
+}
+
+func (c *publisherClient) PublishAll(events []common.MapStr) {
+	c.queue <- events
 }
