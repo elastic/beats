@@ -1,0 +1,6 @@
+filebeat:
+  files:
+    -
+      paths:
+        - /var/log/*.log
+      input: log
