@@ -1,0 +1,29 @@
+language: go
+
+go:
+  - 1.5
+
+sudo: false
+
+before_install:
+  # Redo the travis setup but with the elastic/filebeat path. This is needed so the package path is correct
+  - mkdir -p $HOME/gopath/src/github.com/elastic/filebeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/filebeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/filebeat
+  - cd $HOME/gopath/src/github.com/elastic/filebeat
+
+install:
+  - make
+
+script:
+  - make check
+  - make cover
+
+notifications:
+  email:
+    - ruflin@elastic.co
+
+after_success:
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - cp profile.cov coverage.txt
+  - bash <(curl -s https://codecov.io/bash)

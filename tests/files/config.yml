@@ -1,0 +1,37 @@
+filebeat:
+  files:
+    -
+      # Paths that should be crawled and fetched
+      paths:
+        - /var/log/app*.log
+        - /var/log/s*.log
+      # Input: This must be either log or stdin
+      input: log
+      # Optional additional fields
+      fields:
+        level: debug
+        review: 1
+        type: log
+      deadtime: 24h
+    -
+      fields:
+      paths:
+        - /var/log/test.log
+      input: log
+    -
+      fields:
+      input: stdin
+      # Paths is not required
+  spoolSize:
+  harvesterBufferSize:
+  cpuProfileFile:
+  idleTimeout:
+  tailOnRotate:
+  quiet:
+
+
+# Additional stuff we should be ignore
+output:
+  elasticsearch:
+    enabled: true
+    hosts: ["192.168.99.100:9200"]

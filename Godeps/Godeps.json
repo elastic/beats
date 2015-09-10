@@ -1,0 +1,64 @@
+{
+	"ImportPath": "github.com/elastic/filebeat",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/elastic/libbeat/beat",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/cfgfile",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/common",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/logp",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/outputs",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/publisher",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/service",
+			"Comment": "v1.0.0-beta3-27-gd886a90",
+			"Rev": "d886a902b6a93dd6c7b205013c9e36342c3eb2f9"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/nranchev/go-libGeoIP",
+			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
+		}
+	]
+}
