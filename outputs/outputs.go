@@ -70,6 +70,10 @@ func RegisterOutputPlugin(name string, builder OutputBuilder) {
 	enabledOutputPlugins[name] = builder
 }
 
+func FindOutputPlugin(name string) OutputBuilder {
+	return enabledOutputPlugins[name]
+}
+
 func InitOutputs(
 	beat string,
 	configs map[string]MothershipConfig,
