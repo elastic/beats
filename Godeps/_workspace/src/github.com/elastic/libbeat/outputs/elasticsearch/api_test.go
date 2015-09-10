@@ -8,17 +8,33 @@ import (
 	"testing"
 )
 
-func GetTestingElasticsearch() *Elasticsearch {
-	var es_url string
+const ElasticsearchDefaultHost = "localhost"
+const ElasticsearchDefaultPort = "9200"
 
-	// read the Elasticsearch port from the ES_PORT env variable
+func GetEsPort() string {
 	port := os.Getenv("ES_PORT")
-	if len(port) > 0 {
-		es_url = "http://localhost:" + port
-	} else {
-		// empty variable
-		es_url = "http://localhost:9200"
+
+	if len(port) == 0 {
+		port = ElasticsearchDefaultPort
 	}
+	return port
+}
+
+// Returns
+func GetEsHost() string {
+
+	host := os.Getenv("ES_HOST")
+
+	if len(host) == 0 {
+		host = ElasticsearchDefaultHost
+	}
+
+	return host
+}
+
+func GetTestingElasticsearch() *Elasticsearch {
+
+	var es_url = "http://" + GetEsHost() + ":" + GetEsPort()
 
 	return NewElasticsearch([]string{es_url}, "", "")
 }

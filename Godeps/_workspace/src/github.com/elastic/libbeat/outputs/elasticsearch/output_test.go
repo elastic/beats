@@ -12,49 +12,37 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
-const elasticsearchAddr = "localhost"
-const elasticsearchPort = 9200
-
-func createElasticsearchConnection(flush_interval int, bulk_size int) ElasticsearchOutput {
+func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsearchOutput {
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	var es_port int
-	var err error
+	esPort, err := strconv.Atoi(GetEsPort())
 
-	// read the Elasticsearch port from the ES_PORT env variable
-	port := os.Getenv("ES_PORT")
-	if len(port) > 0 {
-		es_port, err = strconv.Atoi(port)
-		if err != nil {
-			// error occurred, use the default
-			es_port = elasticsearchPort
-		}
-	} else {
-		// empty variable
-		es_port = elasticsearchPort
+	if err != nil {
+		logp.Err("Invalid port. Cannot be converted to in: %s", GetEsPort())
 	}
 
-	var elasticsearchOutput ElasticsearchOutput
-	elasticsearchOutput.Init("packetbeat",
-		outputs.MothershipConfig{
-			Enabled:        true,
-			Save_topology:  true,
-			Host:           elasticsearchAddr,
-			Port:           es_port,
-			Username:       "",
-			Password:       "",
-			Path:           "",
-			Index:          index,
-			Protocol:       "",
-			Flush_interval: &flush_interval,
-			Bulk_size:      &bulk_size,
-		}, 10)
+	var elasticsearchOutput elasticsearchOutput
+
+	elasticsearchOutput.Init("packetbeat", outputs.MothershipConfig{
+		Enabled:        true,
+		Save_topology:  true,
+		Host:           GetEsHost(),
+		Port:           esPort,
+		Username:       "",
+		Password:       "",
+		Path:           "",
+		Index:          index,
+		Protocol:       "",
+		Flush_interval: &flush_interval,
+		Bulk_size:      &bulk_size,
+	}, 10)
 
 	return elasticsearchOutput
 }
 
 func TestTopologyInES(t *testing.T) {
+
 	if testing.Short() {
 		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
 	}
@@ -243,7 +231,7 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func test_bulk_with_params(t *testing.T, elasticsearchOutput ElasticsearchOutput) {
+func test_bulk_with_params(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 	ts := time.Now()
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
 
