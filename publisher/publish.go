@@ -53,8 +53,8 @@ type Topology struct {
 	Ip   string `json:"ip"`
 }
 
-func CmdLineFlags(flags *flag.FlagSet) {
-	publishDisabled = flags.Bool("N", false, "Disable actual publishing for testing")
+func init() {
+	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
 }
 
 func PrintPublishEvent(event common.MapStr) {

@@ -12,9 +12,10 @@ import (
 var configfile *string
 var testConfig *bool
 
-func CmdLineFlags(flags *flag.FlagSet, name string) {
-	configfile = flags.String("c", fmt.Sprintf("/etc/%s/%s.yml", name, name), "Configuration file")
-	testConfig = flags.Bool("test", false, "Test configuration and exit.")
+func init() {
+	// The default config cannot include the beat name as it is not initialised when this function is called
+	configfile = flag.String("c", "/etc/beat/beat.yml", "Configuration file")
+	testConfig = flag.Bool("test", false, "Test configuration and exit.")
 }
 
 // Read reads the configuration from a yaml file into the given interface structure.

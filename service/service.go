@@ -35,9 +35,9 @@ func HandleSignals(stopFunction func()) {
 // cmdline flags
 var memprofile, cpuprofile *string
 
-func CmdLineFlags(flags *flag.FlagSet) {
-	memprofile = flags.String("memprofile", "", "Write memory profile to this file")
-	cpuprofile = flags.String("cpuprofile", "", "Write cpu profile to file")
+func init() {
+	memprofile = flag.String("memprofile", "", "Write memory profile to this file")
+	cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
 }
 
 func WithMemProfile() bool {
