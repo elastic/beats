@@ -62,6 +62,7 @@ type redisOutput struct {
 }
 
 type message struct {
+	trans outputs.Transactioner
 	index string
 	msg   string
 }
@@ -190,9 +191,9 @@ func (out *redisOutput) Close() {
 }
 
 func (out *redisOutput) SendMessagesGoroutine() {
-
 	var err error
 	var pending int
+	var pendingTrans []outputs.Transactioner
 	flushChannel := make(<-chan time.Time)
 
 	if !out.flush_immediatelly {
@@ -216,11 +217,18 @@ func (out *redisOutput) SendMessagesGoroutine() {
 
 			if !out.flush_immediatelly {
 				err = out.Conn.Send(command, queueMsg.index, queueMsg.msg)
-				pending += 1
+				if queueMsg.trans != nil {
+					pendingTrans = append(pendingTrans, queueMsg.trans)
+				}
+				pending++
 			} else {
 				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
+				outputs.FinishTransaction(queueMsg.trans, err)
 			}
 			if err != nil {
+				outputs.FinishTransactions(pendingTrans, err)
+				pendingTrans = pendingTrans[:0]
+
 				logp.Err("Fail to publish event to REDIS: %s", err)
 				out.connected = false
 				go out.Reconnect()
@@ -229,13 +237,16 @@ func (out *redisOutput) SendMessagesGoroutine() {
 			if pending > 0 {
 				out.Conn.Flush()
 				_, err = out.Conn.Receive()
+				outputs.FinishTransactions(pendingTrans, err)
+				pendingTrans = pendingTrans[:0]
+				pending = 0
+
 				if err != nil {
 					logp.Err("Fail to publish event to REDIS: %s", err)
 					out.connected = false
 					go out.Reconnect()
 				}
 				logp.Debug("output_redis", "Flushed %d pending commands", pending)
-				pending = 0
 			}
 		}
 	}
@@ -319,15 +330,20 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 	logp.Debug("output_redis", "Topology %s", topologyMapTmp)
 }
 
-func (out *redisOutput) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *redisOutput) PublishEvent(
+	trans outputs.Transactioner,
+	ts time.Time,
+	event common.MapStr,
+) error {
 
-	json_event, err := json.Marshal(event)
+	jsonEvent, err := json.Marshal(event)
 	if err != nil {
 		logp.Err("Fail to convert the event to JSON: %s", err)
+		outputs.CompleteTransaction(trans)
 		return err
 	}
 
-	out.sendingQueue <- message{index: out.Index, msg: string(json_event)}
+	out.sendingQueue <- message{trans: trans, index: out.Index, msg: string(jsonEvent)}
 
 	logp.Debug("output_redis", "Publish event")
 	return nil

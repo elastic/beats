@@ -29,6 +29,10 @@ type EventPublisher interface {
 	PublishAll(events []common.MapStr)
 }
 
+type TransactionalEventPublisher interface {
+	PublishTransaction(transaction outputs.Transactioner, events []common.MapStr)
+}
+
 type PublisherType struct {
 	name           string
 	tags           []string
@@ -40,11 +44,16 @@ type PublisherType struct {
 	GeoLite        *libgeo.GeoIP
 
 	RefreshTopologyTimer <-chan time.Time
-	queue                chan []common.MapStr
+	queue                chan message
+}
+
+type message struct {
+	transaction outputs.Transactioner
+	events      []common.MapStr
 }
 
 type publisherClient struct {
-	queue chan []common.MapStr
+	queue chan message
 }
 
 type ShipperConfig struct {
@@ -100,12 +109,15 @@ func (p *PublisherType) Client() EventPublisher {
 }
 
 func (publisher *PublisherType) publishFromQueue() {
-	for events := range publisher.queue {
-		publisher.publishEvents(events)
+	for msg := range publisher.queue {
+		publisher.publishEvents(msg.transaction, msg.events)
 	}
 }
 
-func (publisher *PublisherType) publishEvents(events []common.MapStr) {
+func (publisher *PublisherType) publishEvents(
+	transaction outputs.Transactioner,
+	events []common.MapStr,
+) {
 	var ignore []int // indices of events to be removed from events
 	for i, event := range events {
 		// validate some required field
@@ -136,6 +148,9 @@ func (publisher *PublisherType) publishEvents(events []common.MapStr) {
 
 	// return if no event is left
 	if len(ignore) == len(events) {
+		if transaction != nil {
+			transaction.Completed()
+		}
 		return
 	}
 
@@ -155,10 +170,26 @@ func (publisher *PublisherType) publishEvents(events []common.MapStr) {
 
 	// add transaction
 	if !publisher.disabled {
-		for _, out := range publisher.Output {
-			err := out.BulkPublish(time.Time(ts), events)
+		switch len(publisher.Output) {
+		case 0:
+			break
+		case 1:
+			out := publisher.Output[0]
+			err := out.BulkPublish(transaction, time.Time(ts), events)
 			if err != nil {
-				logp.Err("Fail to publish event type on output %s: %v", out, err)
+				logp.Err("Failed to publish event type on output %s: %v", out, err)
+			}
+		default:
+			transaction = outputs.NewMultiOutputTransaction(
+				transaction, len(publisher.Output))
+			for _, out := range publisher.Output {
+				err := out.PublishAllEvents(transaction, time.Time(ts), events)
+				if err != nil {
+					if transaction != nil {
+						transaction.Completed()
+					}
+					logp.Err("Fail to publish event type on output %s: %v", out, err)
+				}
 			}
 		}
 	}
@@ -366,7 +397,7 @@ func (publisher *PublisherType) Init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.queue = make(chan []common.MapStr, 1000)
+	publisher.queue = make(chan message, 1000)
 	go publisher.publishFromQueue()
 
 	return nil
@@ -377,5 +408,12 @@ func (c *publisherClient) Publish(event common.MapStr) {
 }
 
 func (c *publisherClient) PublishAll(events []common.MapStr) {
-	c.queue <- events
+	c.queue <- message{events: events}
+}
+
+func (c *publisherClient) PublishTransaction(
+	transaction outputs.Transactioner,
+	events []common.MapStr,
+) {
+	c.queue <- message{transaction: transaction, events: events}
 }

@@ -1,6 +1,7 @@
 package outputs
 
 import (
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -37,7 +38,7 @@ type MothershipConfig struct {
 
 type Outputer interface {
 	// Publish event
-	PublishEvent(ts time.Time, event common.MapStr) error
+	PublishEvent(trans Transactioner, ts time.Time, event common.MapStr) error
 }
 
 type TopologyOutputer interface {
@@ -52,7 +53,7 @@ type TopologyOutputer interface {
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	BulkPublish(ts time.Time, event []common.MapStr) error
+	BulkPublish(trans Transactioner, ts time.Time, event []common.MapStr) error
 }
 
 type OutputBuilder interface {
@@ -69,10 +70,31 @@ type OutputInterface interface {
 	TopologyOutputer
 }
 
+type Transactioner interface {
+	// Completed is called by publish/output plugin when all events have been
+	// send
+	Completed()
+	Failed()
+}
+
 type OutputPlugin struct {
 	Name   string
 	Config MothershipConfig
 	Output Outputer
+}
+
+// MultiOutputTransaction guards one transaction from multiple calls
+// by using a simple reference counting scheme. If one Transactioner consumer
+// reports a Failed event, the Failed event will be send to the guarded Transactioner
+// once the reference count becomes zero.
+//
+// Example use cases:
+//   - Push transaction to multiple outputers
+//   - split data to be send into smaller transactions
+type MultiOutputTransaction struct {
+	count       int32
+	failed      bool
+	transaction Transactioner
 }
 
 type bulkOutputAdapter struct {
@@ -124,14 +146,95 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 }
 
 func (b *bulkOutputAdapter) BulkPublish(
+	trans Transactioner,
 	ts time.Time,
 	events []common.MapStr,
 ) error {
+	trans = NewMultiOutputTransaction(trans, len(events))
 	for _, evt := range events {
-		err := b.PublishEvent(ts, evt)
+		err := b.PublishEvent(trans, ts, evt)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// NewMultiOutputTransaction create a new MultiOutputTransaction if trans is not nil.
+// If trans is nil, nil will be returned. The count is the number of events to be
+// received before publishing the final event to the guarded Transactioner.
+func NewMultiOutputTransaction(
+	trans Transactioner,
+	count int,
+) *MultiOutputTransaction {
+	if trans == nil {
+		return nil
+	}
+
+	return &MultiOutputTransaction{
+		count:       int32(count),
+		transaction: trans,
+	}
+}
+
+// Completed signals a Completed event to m.
+func (m *MultiOutputTransaction) Completed() {
+	m.onEvent()
+}
+
+// Failed signals a Failed event to m.
+func (m *MultiOutputTransaction) Failed() {
+	m.failed = true
+	m.onEvent()
+}
+
+func (m *MultiOutputTransaction) onEvent() {
+	res := atomic.AddInt32(&m.count, -1)
+	if res == 0 {
+		if m.failed {
+			m.transaction.Failed()
+		} else {
+			m.transaction.Completed()
+		}
+	}
+}
+
+// CompleteTransaction sends the Completed event to trans if trans is not nil.
+func CompleteTransaction(trans Transactioner) {
+	if trans != nil {
+		trans.Completed()
+	}
+}
+
+// FailTransaction sends the Failed event to trans if trans is not nil
+func FailTransaction(trans Transactioner) {
+	if trans != nil {
+		trans.Failed()
+	}
+}
+
+// FinishTransaction will send the Completed or Failed event to trans depending
+// on err being set if trans is not nil.
+func FinishTransaction(trans Transactioner, err error) {
+	if trans != nil {
+		if err == nil {
+			trans.Completed()
+		} else {
+			trans.Failed()
+		}
+	}
+}
+
+// FinishTransactions send the Completed or Failed event to all given transactions
+// depending on err being set.
+func FinishTransactions(transactions []Transactioner, err error) {
+	if err == nil {
+		for _, t := range transactions {
+			t.Completed()
+		}
+	} else {
+		for _, t := range transactions {
+			t.Failed()
+		}
+	}
 }

@@ -130,13 +130,21 @@ func makeClients(
 // TODO: update Outputer interface to support multiple events for batch-like
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.
-func (lj *lumberjack) PublishEvent(ts time.Time, event common.MapStr) error {
+func (lj *lumberjack) PublishEvent(
+	trans outputs.Transactioner,
+	ts time.Time,
+	event common.MapStr,
+) error {
 	events := []common.MapStr{event}
-	return lj.mode.PublishEvents(events)
+	return lj.mode.PublishEvents(trans, events)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
 // via lumberjack.
-func (lj *lumberjack) BulkPublish(ts time.Time, events []common.MapStr) error {
-	return lj.mode.PublishEvents(events)
+func (lj *lumberjack) BulkPublish(
+	trans outputs.Transactioner,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	return lj.mode.PublishEvents(trans, events)
 }

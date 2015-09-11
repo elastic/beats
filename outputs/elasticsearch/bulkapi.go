@@ -9,9 +9,11 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs"
 )
 
 type EventMsg struct {
+	Trans outputs.Transactioner
 	Ts    time.Time
 	Event common.MapStr
 }

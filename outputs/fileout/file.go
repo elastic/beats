@@ -64,18 +64,21 @@ func (out *fileOutput) init(beat string, config outputs.MothershipConfig, topolo
 	return nil
 }
 
-func (out *fileOutput) PublishEvent(ts time.Time, event common.MapStr) error {
-
-	json_event, err := json.Marshal(event)
+func (out *fileOutput) PublishEvent(
+	trans outputs.Transactioner,
+	ts time.Time,
+	event common.MapStr,
+) error {
+	jsonEvent, err := json.Marshal(event)
 	if err != nil {
+		// mark as success so event is not send again.
+		outputs.CompleteTransaction(trans)
+
 		logp.Err("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 
-	err = out.rotator.WriteLine(json_event)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = out.rotator.WriteLine(jsonEvent)
+	outputs.FinishTransaction(trans, err)
+	return err
 }

@@ -165,14 +165,18 @@ func (out *elasticsearchOutput) GetNameByIP(ip string) string {
 }
 
 // Insert a list of events in the bulkChannel
-func (out *elasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) {
+func (out *elasticsearchOutput) InsertBulkMessage(
+	pendingTrans []outputs.Transactioner,
+	bulkChannel chan interface{},
+) {
 	close(bulkChannel)
-	go func(channel chan interface{}) {
+	go func(transactions []outputs.Transactioner, channel chan interface{}) {
 		_, err := out.Conn.Bulk("", "", nil, channel)
+		outputs.FinishTransactions(pendingTrans, err)
 		if err != nil {
 			logp.Err("Fail to perform many index operations in a single API call: %s", err)
 		}
-	}(bulkChannel)
+	}(pendingTrans, bulkChannel)
 }
 
 // Goroutine that sends one or multiple events to Elasticsearch.
@@ -186,6 +190,7 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 	}
 
 	bulkChannel := make(chan interface{}, out.BulkMaxSize)
+	var pendingTrans []outputs.Transactioner
 
 	for {
 		select {
@@ -195,7 +200,8 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 				// insert the events in batches
 				if len(bulkChannel)+2 > out.BulkMaxSize {
 					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
-					out.InsertBulkMessage(bulkChannel)
+					out.InsertBulkMessage(pendingTrans, bulkChannel)
+					pendingTrans = nil
 					bulkChannel = make(chan interface{}, out.BulkMaxSize)
 				}
 				bulkChannel <- map[string]interface{}{
@@ -205,15 +211,20 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 					},
 				}
 				bulkChannel <- msg.Event
+				if msg.Trans != nil {
+					pendingTrans = append(pendingTrans, msg.Trans)
+				}
 			} else {
 				// insert the events one by one
 				_, err := out.Conn.Index(index, msg.Event["type"].(string), "", nil, msg.Event)
+				outputs.FinishTransaction(msg.Trans, err)
 				if err != nil {
 					logp.Err("Fail to insert a single event: %s", err)
 				}
 			}
 		case _ = <-flushChannel:
-			out.InsertBulkMessage(bulkChannel)
+			out.InsertBulkMessage(pendingTrans, bulkChannel)
+			pendingTrans = pendingTrans[:0]
 			bulkChannel = make(chan interface{}, out.BulkMaxSize)
 		}
 	}
@@ -285,9 +296,13 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 }
 
 // Publish an event by adding it to the queue of events.
-func (out *elasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *elasticsearchOutput) PublishEvent(
+	trans outputs.Transactioner,
+	ts time.Time,
+	event common.MapStr,
+) error {
 
-	out.sendingQueue <- EventMsg{Ts: ts, Event: event}
+	out.sendingQueue <- EventMsg{Trans: trans, Ts: ts, Event: event}
 
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 	return nil

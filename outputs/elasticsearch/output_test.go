@@ -118,7 +118,7 @@ func TestOneEvent(t *testing.T) {
 		},
 	})
 
-	err := elasticsearchOutput.PublishEvent(ts, event)
+	err := elasticsearchOutput.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -189,7 +189,7 @@ func TestEvents(t *testing.T) {
 		},
 	})
 
-	err := elasticsearchOutput.PublishEvent(ts, event)
+	err := elasticsearchOutput.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -199,7 +199,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = 0
 	event["redis"] = r
 
-	err = elasticsearchOutput.PublishEvent(ts, event)
+	err = elasticsearchOutput.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -258,7 +258,7 @@ func test_bulk_with_params(t *testing.T, elasticsearchOutput elasticsearchOutput
 		r["response"] = "value" + strconv.Itoa(i)
 		event["redis"] = r
 
-		err := elasticsearchOutput.PublishEvent(ts, event)
+		err := elasticsearchOutput.PublishEvent(nil, ts, event)
 		if err != nil {
 			t.Errorf("Failed to publish the event: %s", err)
 		}
