@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"

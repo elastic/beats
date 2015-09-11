@@ -100,35 +100,92 @@ func (p *PublisherType) Client() EventPublisher {
 
 func (publisher *PublisherType) publishFromQueue() {
 	for events := range publisher.queue {
-		for _, event := range events {
-			err := publisher.publishEvent(event)
+		publisher.publishEvents(events)
+	}
+}
+
+func (publisher *PublisherType) publishEvents(events []common.MapStr) {
+	// filter invalid events
+	var ignore []int // indexes in reverse order
+	for i, event := range events {
+		// validate some required field
+		if err := filterEvent(event); err != nil {
+			logp.Err("Publishing event failed: %v", err)
+			ignore = append(ignore, i)
+			continue
+		}
+
+		// update address and geo-ip information. Ignore event
+		// if address is invalid or event is found to be a duplicate
+		ok := updateEventAddresses(publisher, event)
+		if !ok {
+			ignore = append(ignore, i)
+			continue
+		}
+
+		// add additional meta data
+		event["shipper"] = publisher.name
+		if len(publisher.tags) > 0 {
+			event["tags"] = publisher.tags
+		}
+
+		if logp.IsDebug("publish") {
+			PrintPublishEvent(event)
+		}
+	}
+
+	// return if no event is left
+	if len(ignore) == len(events) {
+		return
+	}
+
+	// remove invalid events
+	for i := len(ignore) - 1; i >= 0; i-- {
+		idx := ignore[i]
+		events = append(events[:idx], events[idx+1:]...)
+	}
+
+	// get timestamp of first event for outputer
+	ts := events[0]["timestamp"].(common.Time)
+
+	// add transaction
+	if !publisher.disabled {
+		for _, out := range publisher.Output {
+			err := out.PublishAllEvents(time.Time(ts), events)
 			if err != nil {
-				logp.Err("Publishing failed: %v", err)
+				logp.Err("Fail to publish event type on output %s: %v", out, err)
 			}
 		}
 	}
 }
 
-func (publisher *PublisherType) publishEvent(event common.MapStr) error {
-
-	// the timestamp is mandatory
-	ts, ok := event["timestamp"].(common.Time)
+// filterEvent validates an event for common required fields with types.
+// If event is to be filtered out the reason is returned as error.
+func filterEvent(event common.MapStr) error {
+	_, ok := event["timestamp"].(common.Time)
 	if !ok {
-		return errors.New("Missing 'timestamp' field from event.")
+		return errors.New("Missing 'timestamp' field from event")
 	}
 
-	// the count is mandatory
 	err := event.EnsureCountField()
 	if err != nil {
 		return err
 	}
 
-	// the type is mandatory
-	_, ok = event["type"].(string)
+	t, ok := event["type"]
 	if !ok {
 		return errors.New("Missing 'type' field from event.")
 	}
 
+	_, ok = t.(string)
+	if !ok {
+		return errors.New("Invalid 'type' field from event.")
+	}
+
+	return nil
+}
+
+func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 	var src_server, dst_server string
 	src, ok := event["src"].(*common.Endpoint)
 	if ok {
@@ -153,12 +210,7 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		dst_server != publisher.name {
 		// duplicated transaction -> ignore it
 		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-		return nil
-	}
-
-	event["shipper"] = publisher.name
-	if len(publisher.tags) > 0 {
-		event["tags"] = publisher.tags
+		return false
 	}
 
 	if publisher.GeoLite != nil {
@@ -166,38 +218,21 @@ func (publisher *PublisherType) publishEvent(event common.MapStr) error {
 		if exists && len(real_ip.(string)) > 0 {
 			loc := publisher.GeoLite.GetLocationByIP(real_ip.(string))
 			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-				event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
+				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
+				event["client_location"] = loc
 			}
 		} else {
 			if len(src_server) == 0 && src != nil { // only for external IP addresses
 				loc := publisher.GeoLite.GetLocationByIP(src.Ip)
 				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-					event["client_location"] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
+					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
+					event["client_location"] = loc
 				}
 			}
 		}
 	}
 
-	if logp.IsDebug("publish") {
-		PrintPublishEvent(event)
-	}
-
-	// add transaction
-	has_error := false
-	if !publisher.disabled {
-		for i := 0; i < len(publisher.Output); i++ {
-			err := publisher.Output[i].PublishEvent(time.Time(ts), event)
-			if err != nil {
-				logp.Err("Fail to publish event type on output %s: %v", publisher.Output[i], err)
-				has_error = true
-			}
-		}
-	}
-
-	if has_error {
-		return errors.New("Fail to publish event")
-	}
-	return nil
+	return true
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
