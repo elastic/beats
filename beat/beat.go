@@ -75,12 +75,13 @@ func (b *Beat) LoadConfig() {
 	err := cfgfile.Read(&b.Config, "")
 
 	if err != nil {
-		logp.Debug("Log read error", "Error %v\n", err)
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
 	}
 
 	logp.Init(b.Name, &b.Config.Logging)
 
-	logp.Debug("main", "Initializing output plugins")
+	logp.Debug("beat", "Initializing output plugins")
 
 	if err := publisher.Publisher.Init(b.Name, b.Config.Output, b.Config.Shipper); err != nil {
 		logp.Critical(err.Error())
@@ -89,7 +90,7 @@ func (b *Beat) LoadConfig() {
 
 	b.Events = publisher.Publisher.Queue
 
-	logp.Debug(b.Name, "Init %s", b.Name)
+	logp.Debug("beat", "Init %s", b.Name)
 }
 
 // internal libbeat function that calls beater Run method
@@ -115,7 +116,7 @@ func (b *Beat) Run() {
 
 	service.Cleanup()
 
-	logp.Debug("main", "Cleanup")
+	logp.Debug("beat", "Cleanup")
 
 	// Call beater cleanup function
 	b.BT.Cleanup(b)
