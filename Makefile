@@ -24,6 +24,11 @@ clean:
 run: build
 	./filebeat -c etc/filebeat.yml -config etc/filebeat.yml -e -v
 
+.PHONY: test
+test:
+	$(GODEP) go test -short ./...
+	make -C tests test
+
 .PHONY: cover
 cover:
 	# gotestcover is needed to fetch coverage for multiple packages
@@ -31,3 +36,8 @@ cover:
 	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/filebeat/...
 	mkdir -p cover
 	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
+
+# Command used by CI Systems
+.PHONE: testsuite
+testsuite: build
+	make cover

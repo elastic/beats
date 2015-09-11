@@ -1,57 +1,29 @@
-# Contributing to logstash-forwarder
+# Contributing to Filebeat
 
-All contributions are welcome: ideas, patches, documentation, bug reports,
-complaints, etc!
+Filebeat is an open source project and we love to receive contributions from
+our community — you!
 
-Programming is not a required skill, and there are many ways to help out!
-It is more important to us that you are able to contribute.
-
-That said, some basic guidelines, which you are free to ignore :)
-
-## Want to learn?
-
-Want to lurk about and see what others are doing with logstash and lumberjack? 
-
-* The irc channel (#logstash on irc.freenode.org) is a good place for this
-* The [mailing list](http://groups.google.com/group/logstash-users) is also
-  great for learning from others.
-
-## Got Questions?
-
-Have a problem or a question?
- 
-* You can email the [mailing list](http://groups.google.com/group/logstash-users)
-* alternately, you are welcome to join the IRC channel #logstash on
-irc.freenode.org and ask for help there!
-
-## Have an Idea or Feature Request?
-
-* File a ticket on [github](https://github.com/elasticsearch/logstash-forwarder), or email the
-  [mailing list](http://groups.google.com/group/logstash-users), or email
-  me personally (jls@semicomplete.com) if that is more comfortable.
-
-## Something Not Working? Found a Bug?
-
-If you think you found a bug, it probably is a bug.
-
-* File it on [github](https://github.com/elasticsearch/logstash-forwarder)
-* or the [mailing list](http://groups.google.com/group/logstash-users).
-
-# Contributing Documentation and Code Changes
+There are many ways to contribute, from writing tutorials
+or blog posts, improving the documentation, submitting bug reports and feature
+requests or writing code for implementing a whole new protocol.
 
 If you have a bugfix or new feature that you would like to contribute to
-logstash, and you think it will take more than a few minutes to produce the fix
-(ie; write code), it is worth discussing the change with the logstash users and
-developers first! You can reach us via
-[github](https://github.com/elasticsearch/logstash-forwarder), the [mailing
-list](http://groups.google.com/group/logstash-users), or via IRC (#logstash on
-freenode irc)
+Filebeat, please start by opening a topic on the
+[forums](https://discuss.elastic.co/c/beats/filebeat). It may be that
+somebody is already working on it, or that there are particular issues that you
+should know about before implementing the change.
 
-## Code and Docs Contribution Steps
+We enjoy working with contributors to get their code accepted. There are many
+approaches to fixing a problem and it is important to find the best approach
+before writing too much code.
 
-1. Test your changes! Run the test suite ('go test' and 'rspec') 
+The process for contributing to any of the Elastic repositories is similar.
+
+## Contribution Steps
+
+1. Test your changes! Run the test suite (`make test`)
 2. Please make sure you have signed our [Contributor License
-   Agreement](http://www.elasticsearch.org/contributor-agreement/). We are not
+   Agreement](https://www.elastic.co/contributor-agreement/). We are not
    asking you to assign copyright to us, but to give us the right to distribute
    your code without restriction. We ask this of all contributors in order to
    assure our users of the origin and continuing existence of the code. You
@@ -59,7 +31,26 @@ freenode irc)
 3. Send a pull request! Push your changes to your fork of the repository and
    [submit a pull
    request](https://help.github.com/articles/using-pull-requests). In the pull
-   request, describe what your changes do and mention any open issues related
+   request, describe what your changes do and mention any bugs/issues related
    to the pull request.
 
 
+## Compiling Filebeat
+
+Filebeat is a Go program, so install [golang](http://golang.org/) if you
+don't have it already.
+
+The location where you clone is important. Please clone under the source
+directory of your `GOPATH`. If you don't have `GOPATH` already set, you can
+simply set it to your home directory (`export GOPATH=$HOME`).
+
+    $ mkdir -p $GOPATH/src/github.com/elastic
+    $ cd $GOPATH/src/github.com/elastic
+    $ git clone https://github.com/elastic/filebeat.git
+
+and then compile it with:
+
+    $ cd filebeat
+    $ make
+
+Before you open a pull request, run `make clean` go apply gofmt.
