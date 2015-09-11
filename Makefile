@@ -24,6 +24,11 @@ clean:
 run: build
 	./filebeat -c etc/filebeat.yml -config etc/filebeat.yml -e -v
 
+.PHONY: test
+test:
+	$(GODEP) go test -short ./...
+	make -C tests test
+
 .PHONY: cover
 cover:
 	# gotestcover is needed to fetch coverage for multiple packages
