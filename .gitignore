@@ -8,8 +8,8 @@
 *.swo
 *.swn
 packetbeat.test
-/profile.cov
-/cover/coverage.html
+
+/coverage/
 /docs/html_docs
 
 # Folders

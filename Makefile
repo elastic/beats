@@ -93,16 +93,16 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	make cover
+	make coverage
 	make -C tests test
 
-.PHONY: cover
-cover:
+.PHONY: coverage
+coverage:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
-	mkdir -p cover
-	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
+	mkdir -p coverage
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=./coverage/unit.cov -covermode=count github.com/elastic/packetbeat/...
+	$(GODEP) go tool cover -html=./coverage/unit.cov -o coverage/unit.html
 
 
 .PHONY: benchmark
@@ -117,5 +117,20 @@ gen:
 
 .PHONY: clean
 clean:
-	rm packetbeat || true
-	rm -r packetbeat-$(VERSION) || true
+	-rm packetbeat
+	-rm packetbeat.test
+	-rm -r packetbeat-$(VERSION)
+	-rm -r coverage
+
+# Generates packetbeat.test coverage testing binary
+test-binary:
+	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
+
+full-coverage:
+	#make coverage
+	make -C ./tests coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ./coverage/full.cov
+	# Collects all integration coverage files and skipts top line with mode
+	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
+	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
