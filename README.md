@@ -1,3 +1,4 @@
+[![Jenkins Build Status](http://build-eu-00.elastic.co/job/topbeat/badge/icon)](http://build-eu-00.elastic.co/job/topbeat/)
 [![Build Status](https://travis-ci.org/elastic/topbeat.svg?branch=master)](https://travis-ci.org/elastic/topbeat)
 [![codecov.io](http://codecov.io/github/elastic/topbeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/topbeat?branch=master)
 
