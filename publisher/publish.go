@@ -106,8 +106,7 @@ func (publisher *PublisherType) publishFromQueue() {
 }
 
 func (publisher *PublisherType) publishEvents(events []common.MapStr) {
-	// filter invalid events
-	var ignore []int // indexes in reverse order
+	var ignore []int // indices of events to be removed from events
 	for i, event := range events {
 		// validate some required field
 		if err := filterEvent(event); err != nil {
@@ -140,7 +139,12 @@ func (publisher *PublisherType) publishEvents(events []common.MapStr) {
 		return
 	}
 
-	// remove invalid events
+	// remove invalid events.
+	// TODO: is order important? Removal can be turned into O(len(ignore)) by
+	//       copying last element into idx and doing
+	//       events=events[:len(events)-len(ignore)] afterwards
+	// Alternatively filtering could be implemented like:
+	//   https://github.com/golang/go/wiki/SliceTricks#filtering-without-allocating
 	for i := len(ignore) - 1; i >= 0; i-- {
 		idx := ignore[i]
 		events = append(events[:idx], events[idx+1:]...)
