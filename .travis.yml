@@ -31,6 +31,4 @@ notifications:
         - monica@elastic.co
 
 after_success:
-  # Copy profile.cov to coverage.txt because codecov.io requires this file
-  - cp coverage/full.cov coverage.txt
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
