@@ -22,7 +22,7 @@ clean:
 
 .PHONY: run
 run: build
-	./filebeat -c etc/filebeat.yml -config etc/filebeat.yml -e -v
+	./filebeat -c etc/filebeat.yml -e -v
 
 .PHONY: test
 test:

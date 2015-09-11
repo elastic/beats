@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 	"os"
 	"time"
+	"github.com/elastic/libbeat/cfgfile"
 )
 
 var exitStat = struct {
@@ -21,12 +22,11 @@ var exitStat = struct {
 	faulted:    2,
 }
 
-var configPath string
+var configDirPath string
 
 // Init config path flag
-// TODO: This should be merged with the beat config
 func init() {
-	flag.StringVar(&configPath, "config", configPath, "path to logstash-forwarder configuration file or directory")
+	flag.StringVar(&configDirPath, "configDir", "", "path to additional filebeat configuration directory with .yml files")
 }
 
 // Beater object. Contains all objects needed to run the beat
@@ -40,15 +40,21 @@ type Filebeat struct {
 
 // Config setups up the filebeat configuration by fetch all additional config files
 func (fb *Filebeat) Config(b *beat.Beat) error {
-	// Check if config set
-	if configPath == "" {
-		fmt.Println("fatal: config file must be defined")
-		os.Exit(exitStat.usageError)
-	}
 
 	emitOptions()
 
-	fb.FbConfig = cfg.FetchConfigs(configPath)
+	// Load Base config
+	err := cfgfile.Read(&fb.FbConfig, "")
+
+	if err != nil {
+		logp.Warn("Error reading config file:", err)
+	}
+
+	// This is optiona
+	if configDirPath != "" {
+		logp.Info("Additional config files are fetched from:", configDirPath)
+		fb.FbConfig.FetchConfigs(configDirPath)
+	}
 
 	return nil
 }
@@ -106,7 +112,7 @@ func (fb *Filebeat) Stop() {
 // emitOptions prints out the set config options
 func emitOptions() {
 	logp.Info("filebeat", "\t--- options -------")
-	logp.Info("filebeat", "\tconfig-arg:          %s", configPath)
+	logp.Info("filebeat", "\tconfig-arg:          %s", configDirPath)
 	logp.Info("filebeat", "\tidle-timeout:        %v", cfg.CmdlineOptions.IdleTimeout)
 	logp.Info("filebeat", "\tspool-size:          %d", cfg.CmdlineOptions.SpoolSize)
 	logp.Info("filebeat", "\tharvester-buff-size: %d", cfg.CmdlineOptions.HarvesterBufferSize)
