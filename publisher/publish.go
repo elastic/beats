@@ -23,6 +23,7 @@ import (
 // command line flags
 var publishDisabled *bool
 
+// EventPublisher provides the interface for beats to publish events.
 type EventPublisher interface {
 	Publish(event common.MapStr)
 	PublishAll(events []common.MapStr)
