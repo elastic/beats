@@ -104,14 +104,12 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 }
 
 // Fetches and merges all config files given by Options.configArgs. All are put into one config object
-func FetchConfigs(path string) *Config {
-
-	config := &Config{}
+func (config *Config) FetchConfigs(path string)  {
 
 	configFiles, err := getConfigFiles(path)
 
 	if err != nil {
-		log.Fatal("Could not use -config of ", path, err)
+		log.Fatal("Could not use -configDir of ", path, err)
 	}
 
 	err = mergeConfigFiles(configFiles, config)
@@ -124,5 +122,4 @@ func FetchConfigs(path string) *Config {
 		log.Fatalf("No paths given. What files do you want me to watch?")
 	}
 
-	return config
 }
