@@ -1,0 +1,294 @@
+version: 1.0
+
+defaults:
+  type: string
+  required: false
+  index: not_analyzed
+  doc_values: true
+  ignore_above: 1024
+
+system:
+  type: group
+  description: >
+    Contains fields defining system wide statistics.
+  fields:
+    - name: timestamp
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The timestamp when the measurements were taken. The precision is in milliseconds.
+        The timezone is UTC.
+
+    - name: type
+      description: >
+        Set to "system" to specify that are system wide statistics.
+      required: true
+
+    - name: count
+      type: int
+      description: >
+        For how many transactions is this event representative. This
+        is generally the inverse of the sampling rate. For example, for
+        a sample rate of 1/10, the count is 10. The count is used by the
+        UIs to return estimated values. Reserved for future usage.
+      required: true
+ 
+    - name: shipper
+      type: string
+      description: >
+        Name of the shipper sending the statistics
+
+    - name: load
+      type: group
+      description: > 
+        System load average. The load average is the average number 
+        of jobs in the run queue.
+      fields:
+        - name: load.load1
+          type: float
+          description: >
+            Load average over 1 minute. 
+
+        - name: load.load5
+          type: float
+          description: >
+            Load average over 5 minutes.
+
+        - name: load.load15
+          type: float
+          description: >
+            Load average over 15 minutes. 
+
+    - name: cpu
+      type: group
+      description: CPU specific statistics
+      fields:
+        - name: cpu.user
+          type: int
+          description: >
+            CPU time spent in user space 
+
+        - name: cpu.user_p
+          type: float
+          description: >
+            CPU time spent in user space, in percentage
+
+        - name: cpu.nice
+          type: int
+          description: >
+            CPU time spent on low priority processes
+
+
+        - name: cpu.system
+          type: int
+          description: >
+            CPU time spent in kernel space
+
+        - name: cpu.system_p
+          type: float
+          description: >
+            CPU time spent in kernel space, in percentage
+
+        - name: cpu.idle
+          type: int
+          description: >
+            CPU time spent idle
+
+        - name: cpu.iowait
+          type: int
+          description: >
+            CPU time spent in wait (on disk)
+
+        - name: cpu.irq
+          type: int
+          description: >
+            CPU time spent servicing/handling hardware interrupts
+
+        - name: cpu.softirq
+          type: int
+          description:
+            CPU time spent servicing/handling software interrupts
+
+        - name: cpu.steal
+          type: int
+          description:
+            CPU time in involuntary wait by virtual cpu while hypervisor 
+            is servicing another processor CPU time stolen from a virtual machine.
+            Available only on Unix.
+
+
+    - name: mem
+      type: group
+      description: Memory specific statistics
+      fields:
+        - name: total
+          type: int
+          description: >
+            Total memory
+
+        - name: used
+          type: int
+          description: >
+            Used memory
+
+        - name: free
+          type: int
+          description: >
+            Available memory
+
+        - name: used_p
+          type: int
+          description: >
+            Used memory, in percentage
+
+        - name: actual_used
+          type: int
+          description: >
+            Actual used memory. Available only on Unix.
+
+        - name: actual_free
+          type: int
+          description: >
+            Actual available memory. Available only on Unix.
+
+    - name: swap
+      type: group
+      description: Memory specific statistics
+      fields:
+        - name: total
+          type: int
+          description: >
+            Total swap memory
+
+        - name: used
+          type: int
+          description: >
+            Used swap memory
+
+        - name: free
+          type: int
+          description: >
+            Available swap memory
+
+        - name: used_p
+          type: int
+          description: >
+            Used swap memory, in percentage
+
+        - name: actual_used
+          type: int
+          description: >
+            Actual used swap memory. Available only on Unix.
+
+        - name: actual_free
+          type: int
+          description: >
+            Actual available swap memory. Available only on Unix.
+
+proc:
+  type: group
+  description: >
+    Contains fields defining per process statistics
+  fields:
+    - name: timestamp
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The timestamp when the measurements were taken. The precision is in milliseconds.
+        The timezone is UTC.
+
+    - name: type
+      description: >
+        Set to "proc" to specify that are per process statistics.
+      required: true
+
+    - name: count
+      type: int
+      description: >
+        For how many transactions is this event representative. This
+        is generally the inverse of the sampling rate. For example, for
+        a sample rate of 1/10, the count is 10. The count is used by the
+        UIs to return estimated values. Reserved for future usage.
+      required: true
+ 
+    - name: shipper
+      type: string
+      description: >
+        Name of the shipper sending the statistics
+
+    - name: proc.name
+      type: string
+      description: >
+        Process name.
+
+    - name: proc.state
+      type: string
+      description: >
+        Process state.
+
+    - name: proc.pid
+      type: int
+      description: >
+        Process pid.
+
+    - name: proc.ppid
+      type: int
+      description: >
+        Process parent pid.
+
+    - name: proc.cpu
+      type: group
+      description: CPU specific statistics per process.
+      fields:
+        - name: proc.cpu.user
+          type: int
+          description: >
+            CPU time spent in user space by the process.
+
+        - name: proc.cpu.user_p
+          type: float
+          description: >
+            CPU time spent in user space by the process, in percentage.
+
+        - name: proc.cpu.system
+          type: int
+          description: >
+            CPU time spent in kernel space by the process.
+
+        - name: proc.cpu.total
+          type: int
+          description: >
+            Total CPU time spent by the process.
+
+        - name: proc.cpu.start_time
+          type: string
+          description: >
+            Time when the process was started.
+
+    - name: proc.mem
+      type: group
+      description: Memory specific statistics per process.
+      fields:
+        - name: proc.mem.size
+          type: int
+          description: >
+            Virtual memory the process has in total.
+
+        - name: proc.mem.rss
+          type: int
+          description: >
+            Resident Set Size. Memory occupied by the process in main memory(RAM).
+
+        - name: proc.mem.rss_p
+          type: int
+          description: >
+            Memory occupied by the process in main memory(RAM), in percentage.
+
+        - name: proc.mem.share
+          type: int
+          description: >
+            Shared memory the process uses.
