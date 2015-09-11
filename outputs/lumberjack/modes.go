@@ -166,6 +166,9 @@ func (f *failOverConnectionMode) Connect(active int) error {
 			next = 1 - active
 		default:
 			for {
+				// Connect to random server to potentially spread the
+				// load when large number of beats with same set of sinks
+				// are started up at about the same time.
 				next = rand.Int() % len(f.conns)
 				if next != active {
 					break
