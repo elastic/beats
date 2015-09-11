@@ -245,7 +245,7 @@ func (t *Topbeat) addMemPercentage(m *MemStat) {
 		return
 	}
 
-	perc := float64(100*m.Used) / float64(m.Total)
+	perc := float64(m.Used) / float64(m.Total)
 	m.UsedPercent = Round(perc, .5, 2)
 }
 
@@ -255,7 +255,7 @@ func (t *Topbeat) addFileSystemUsedPercentage(f *FileSystemStat) {
 		return
 	}
 
-	perc := float64(100*f.Used) / float64(f.Total)
+	perc := float64(f.Used) / float64(f.Total)
 	f.UsedPercent = Round(perc, .5, 2)
 }
 
@@ -270,7 +270,7 @@ func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
 
 			perc := 0.0
 			delta := field2 - field1
-			perc = float64(100*delta) / float64(all_delta)
+			perc = float64(delta) / float64(all_delta)
 			return Round(perc, .5, 2)
 		}
 
@@ -295,7 +295,7 @@ func (t *Topbeat) addProcMemPercentage(proc *Process, total_phymem uint64) {
 		total_phymem = mem_stat.Total
 	}
 
-	perc := (float64(proc.Mem.Rss) / float64(total_phymem)) * 100
+	perc := (float64(proc.Mem.Rss) / float64(total_phymem))
 
 	proc.Mem.RssPercent = Round(perc, .5, 2)
 }
@@ -307,7 +307,7 @@ func (t *Topbeat) addProcCpuPercentage(proc *Process) {
 
 		delta_proc := (proc.Cpu.User - oproc.Cpu.User) + (proc.Cpu.System - oproc.Cpu.System)
 		delta_time := proc.ctime.Sub(oproc.ctime).Nanoseconds() / 1e6 // in milliseconds
-		perc := float64(delta_proc) / float64(delta_time) * 100
+		perc := float64(delta_proc) / float64(delta_time)
 
 		t.procsMap[proc.Pid] = proc
 
