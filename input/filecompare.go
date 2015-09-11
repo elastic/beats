@@ -3,9 +3,10 @@
 package input
 
 import (
-	"github.com/elastic/libbeat/logp"
 	"os"
 	"syscall"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 func IsSameFile(path string, info os.FileInfo, state *FileState) bool {

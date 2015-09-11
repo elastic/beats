@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	cfg "github.com/elastic/filebeat/config"
-	. "github.com/elastic/filebeat/input"
-	"github.com/elastic/libbeat/logp"
 	"io"
 	"os"
 	"time"
+
+	cfg "github.com/elastic/filebeat/config"
+	. "github.com/elastic/filebeat/input"
+	"github.com/elastic/libbeat/logp"
 )
 
 type Harvester struct {
@@ -53,18 +54,18 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 				// Check to see if the file was truncated
 				info, _ := h.file.Stat()
 				if info.Size() < h.Offset {
-					logp.Info("harvester", "File truncated, seeking to beginning: %s", h.Path)
+					logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
 					h.file.Seek(0, os.SEEK_SET)
 					h.Offset = 0
 				} else if age := time.Since(last_read_time); age > h.FileConfig.DeadtimeSpan {
 					// if last_read_time was more than dead time, this file is probably
 					// dead. Stop watching it.
-					logp.Info("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
+					logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
 					return
 				}
 				continue
 			} else {
-				logp.Info("harvester", "Unexpected state reading from %s; error: %s", h.Path, err)
+				logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
 				return
 			}
 		}
@@ -91,11 +92,11 @@ func (h *Harvester) initOffset() {
 	offset, _ := h.file.Seek(0, os.SEEK_CUR)
 
 	if h.Offset > 0 {
-		logp.Info("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
+		logp.Debug("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
 	} else if cfg.CmdlineOptions.TailOnRotate {
-		logp.Info("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
+		logp.Debug("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
 	} else {
-		logp.Info("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
+		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
 	}
 
 	h.Offset = offset
@@ -126,7 +127,7 @@ func (h *Harvester) open() *os.File {
 
 		if err != nil {
 			// retry on failure.
-			logp.Info("harvester", "Failed opening %s: %s", h.Path, err)
+			logp.Err("Failed opening %s: %s", h.Path, err)
 			time.Sleep(5 * time.Second)
 		} else {
 			break
@@ -181,7 +182,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 				}
 				continue
 			} else {
-				logp.Info("harvester", "error: Harvester.readLine: %s", err.Error())
+				logp.Err("Harvester.readLine: %s", err.Error())
 				return nil, 0, err // TODO(sissel): don't do this?
 			}
 		}
