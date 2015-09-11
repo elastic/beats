@@ -36,3 +36,8 @@ cover:
 	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/filebeat/...
 	mkdir -p cover
 	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
+
+# Command used by CI Systems
+.PHONE: testsuite
+testsuite: build
+	make cover
