@@ -2,6 +2,8 @@
 filebeat
 .DS_Store
 .filebeat
+*.swp
+*.swo
 
 cover
 profile.cov

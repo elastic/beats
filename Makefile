@@ -27,7 +27,6 @@ run: build
 .PHONY: test
 test:
 	$(GODEP) go test -short ./...
-	make -C tests test
 
 .PHONY: cover
 cover:

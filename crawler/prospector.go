@@ -2,12 +2,13 @@ package crawler
 
 import (
 	"encoding/json"
-	cfg "github.com/elastic/filebeat/config"
-	. "github.com/elastic/filebeat/input"
-	"github.com/elastic/libbeat/logp"
 	"os"
 	"path/filepath"
 	"time"
+
+	cfg "github.com/elastic/filebeat/config"
+	. "github.com/elastic/filebeat/input"
+	"github.com/elastic/libbeat/logp"
 )
 
 // Last reading state of the prospector
@@ -42,9 +43,9 @@ func (restart *ProspectorResume) LoadState() {
 		defer existing.Close()
 		wd := ""
 		if wd, e = os.Getwd(); e != nil {
-			logp.Info("filebeat", "WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
+			logp.Warn("WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
 		}
-		logp.Info("filebeat", "Loading registrar data from %s/.filebeat", wd)
+		logp.Info("Loading registrar data from %s/.filebeat", wd)
 
 		decoder := json.NewDecoder(existing)
 		decoder.Decode(&restart.Files)
@@ -64,7 +65,7 @@ func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string
 
 	// Now determine which states we need to persist by pulling the events from the prospectors
 	// When we hit a nil source a prospector had finished so we decrease the expected events
-	logp.Info("filebeat", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
+	logp.Debug("prospector", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
 
 	for event := range restart.Persist {
 		if event.Source == nil {
@@ -75,10 +76,10 @@ func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string
 			continue
 		}
 		persist[*event.Source] = event
-		logp.Info("filebeat", "Registrar will re-save state for %s", *event.Source)
+		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
 	}
 
-	logp.Info("filebeat", "All prospectors initialised with %d states to persist", len(persist))
+	logp.Info("All prospectors initialised with %d states to persist", len(persist))
 
 }
 
@@ -137,11 +138,11 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 func (p *Prospector) scan(path string, output chan *FileEvent, resume *ProspectorResume) {
 
-	logp.Info("prospector", "scan path %s", path)
+	logp.Debug("prospector", "scan path %s", path)
 	// Evaluate the path as a wildcards/shell glob
 	matches, err := filepath.Glob(path)
 	if err != nil {
-		logp.Info("prospector", "glob(%s) failed: %v", path, err)
+		logp.Debug("prospector", "glob(%s) failed: %v", path, err)
 		return
 	}
 
@@ -150,7 +151,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 
 	// Check any matched files to see if we need to start a harvester
 	for _, file := range matches {
-		logp.Info("prospector", "Check file for harvesting: %s", file)
+		logp.Debug("prospector", "Check file for harvesting: %s", file)
 		// Stat the file, following any symlinks.
 		fileinfo, err := os.Stat(file)
 
@@ -160,12 +161,12 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 
 		// TODO(sissel): check err
 		if err != nil {
-			logp.Info("prospector", "stat(%s) failed: %s", file, err)
+			logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 			continue
 		}
 
 		if newFile.FileInfo.IsDir() {
-			logp.Info("prospector", "Skipping directory: %s", file)
+			logp.Debug("prospector", "Skipping directory: %s", file)
 			continue
 		}
 
@@ -182,7 +183,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 		// - file path hasn't been seen before
 		// - mathe file's inode or device changed
 		if !is_known {
-			logp.Info("prospector", "Start harvesting unkown file:", file)
+			logp.Debug("prospector", "Start harvesting unkown file:", file)
 			// Create a new prospector info with the stat info for comparison
 			newinfo = ProspectorInfo{Fileinfo: newFile.FileInfo, Harvester: make(chan int64, 1), Last_seen: p.iteration}
 
@@ -201,17 +202,17 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 				// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
 				// Once we detect changes again we can resume another harvester again - this keeps number of go routines to a minimum
 				if is_resuming {
-					logp.Info("prospector", "Resuming harvester on a previously harvested file: %s", file)
+					logp.Debug("prospector", "Resuming harvester on a previously harvested file: %s", file)
 					harvester := &Harvester{Path: file, FileConfig: p.FileConfig, Offset: offset, FinishChan: newinfo.Harvester}
 					go harvester.Harvest(output)
 				} else {
 					// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-					logp.Info("prospector", "Skipping file (older than dead time of %v): %s", p.FileConfig.DeadtimeSpan, file)
+					logp.Debug("prospector", "Skipping file (older than dead time of %v): %s", p.FileConfig.DeadtimeSpan, file)
 					newinfo.Harvester <- newFile.FileInfo.Size()
 				}
 			} else if previous := p.isFileRenamed(file, newFile.FileInfo, missinginfo); previous != "" {
 				// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
-				logp.Info("prospector", "File rename was detected: %s -> %s", previous, file)
+				logp.Debug("prospector", "File rename was detected: %s -> %s", previous, file)
 
 				newinfo.Harvester = p.prospectorinfo[previous].Harvester
 			} else {
@@ -225,9 +226,9 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 
 				// Are we resuming a file or is this a completely new file?
 				if is_resuming {
-					logp.Info("prospector", "Resuming harvester on a previously harvested file: %s", file)
+					logp.Debug("prospector", "Resuming harvester on a previously harvested file: %s", file)
 				} else {
-					logp.Info("prospector", "Launching harvester on new file: %s", file)
+					logp.Debug("prospector", "Launching harvester on new file: %s", file)
 				}
 
 				// Launch the harvester
@@ -236,7 +237,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 			}
 		} else {
 
-			logp.Info("prospector", "Update existing file for harvesting:", file)
+			logp.Debug("prospector", "Update existing file for harvesting:", file)
 			// Update the fileinfo information used for future comparisons, and the last_seen counter
 			newinfo.Fileinfo = newFile.FileInfo
 			newinfo.Last_seen = p.iteration
@@ -244,13 +245,13 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 			if !oldFile.IsSameFile(&newFile) {
 				if previous := p.isFileRenamed(file, newFile.FileInfo, missinginfo); previous != "" {
 					// This file was renamed from another file we know - link the same harvester channel as the old file
-					logp.Info("prospector", "File rename was detected: %s -> %s", previous, file)
-					logp.Info("prospector", "Launching harvester on renamed file: %s", file)
+					logp.Debug("prospector", "File rename was detected: %s -> %s", previous, file)
+					logp.Debug("prospector", "Launching harvester on renamed file: %s", file)
 
 					newinfo.Harvester = p.prospectorinfo[previous].Harvester
 				} else {
 					// File is not the same file we saw previously, it must have rotated and is a new file
-					logp.Info("prospector", "Launching harvester on rotated file: %s", file)
+					logp.Debug("prospector", "Launching harvester on rotated file: %s", file)
 
 					// Forget about the previous harvester and let it continue on the old file - so start a new channel to use with the new harvester
 					newinfo.Harvester = make(chan int64, 1)
@@ -265,14 +266,14 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 				missinginfo[file] = oldFile.FileInfo
 			} else if len(newinfo.Harvester) != 0 && oldFile.FileInfo.ModTime() != newFile.FileInfo.ModTime() {
 				// Resume harvesting of an old file we've stopped harvesting from
-				logp.Info("prospector", "Resuming harvester on an old file that was just modified: %s", file)
+				logp.Debug("prospector", "Resuming harvester on an old file that was just modified: %s", file)
 
 				// Start a harvester on the path; an old file was just modified and it doesn't have a harvester
 				// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
 				harvester := &Harvester{Path: file, FileConfig: p.FileConfig, Offset: <-newinfo.Harvester, FinishChan: newinfo.Harvester}
 				go harvester.Harvest(output)
 			} else {
-				logp.Info("prospector", "Not harvesting, harvester probably still busy: ", file)
+				logp.Debug("prospector", "Not harvesting, harvester probably still busy: ", file)
 			}
 		}
 
@@ -296,7 +297,7 @@ func (p *Prospector) calculateResume(file string, fileinfo os.FileInfo, resume *
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		logp.Info("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, file)
+		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, file)
 		last_state := resume.Files[previous]
 		last_state.Source = &file
 		resume.Persist <- last_state
@@ -304,7 +305,7 @@ func (p *Prospector) calculateResume(file string, fileinfo os.FileInfo, resume *
 	}
 
 	if is_found {
-		logp.Info("prospector", "Not resuming rotated file: %s", file)
+		logp.Debug("prospector", "Not resuming rotated file: %s", file)
 	}
 
 	// New file so just start from an automatic position

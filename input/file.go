@@ -1,8 +1,9 @@
 package input
 
 import (
-	"github.com/elastic/libbeat/logp"
 	"os"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 type FileEvent struct {
@@ -49,18 +50,18 @@ func (f *FileEvent) GetState() *FileState {
 // Check that the file isn't a symlink, mode is regular or file is nil
 func (f *File) IsRegularFile() bool {
 	if f.File == nil {
-		logp.Info("Harvester: BUG: f arg is nil")
+		logp.Critical("Harvester: BUG: f arg is nil")
 		return false
 	}
 
 	info, e := f.File.Stat()
 	if e != nil {
-		logp.Info("File check fault: stat error: %s", e.Error())
+		logp.Err("File check fault: stat error: %s", e.Error())
 		return false
 	}
 
 	if !info.Mode().IsRegular() {
-		logp.Info("Harvester: not a regular file: %q %s", info.Mode(), info.Name())
+		logp.Warn("Harvester: not a regular file: %q %s", info.Mode(), info.Name())
 		return false
 	}
 	return true
