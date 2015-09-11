@@ -4,9 +4,19 @@ package main
 
 import (
 	"testing"
+	"flag"
 )
+
+var integration *bool
+
+func init() {
+	integration = flag.Bool("integration", false, "Set to true when running integration tests")
+}
 
 // Test started when the test binary is started. Only calls main.
 func TestIntegration(t *testing.T) {
-	main()
+
+	if *integration {
+		main()
+	}
 }

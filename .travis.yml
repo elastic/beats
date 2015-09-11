@@ -23,7 +23,7 @@ install:
   - make
 
 script:
-  - make testlong
+  - make full-coverage
 
 notifications:
     email:
@@ -32,5 +32,5 @@ notifications:
 
 after_success:
   # Copy profile.cov to coverage.txt because codecov.io requires this file
-  - cp profile.cov coverage.txt
+  - cp coverage/full.cov coverage.txt
   - bash <(curl -s https://codecov.io/bash)

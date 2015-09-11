@@ -127,7 +127,7 @@ test-binary:
 	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
 
 full-coverage:
-	#make coverage
+	make coverage
 	make -C ./tests coverage
 	# Writes count mode on top of file
 	echo 'mode: count' > ./coverage/full.cov
