@@ -7,7 +7,7 @@ defaults:
   doc_values: true
   ignore_above: 1024
 
-system:
+env:
   type: group
   description: >
     Contains fields defining system wide statistics.
@@ -40,23 +40,29 @@ system:
       description: >
         Name of the shipper sending the statistics
 
+
+system:
+  type: group
+  description: >
+    Contains fields defining system wide statistics.
+  fields:
     - name: load
       type: group
       description: > 
         System load average. The load average is the average number 
         of jobs in the run queue.
       fields:
-        - name: load.load1
+        - name: load1
           type: float
           description: >
             Load average over 1 minute. 
 
-        - name: load.load5
+        - name: load5
           type: float
           description: >
             Load average over 5 minutes.
 
-        - name: load.load15
+        - name: load15
           type: float
           description: >
             Load average over 15 minutes. 
@@ -65,53 +71,53 @@ system:
       type: group
       description: CPU specific statistics
       fields:
-        - name: cpu.user
+        - name: user
           type: int
           description: >
             CPU time spent in user space 
 
-        - name: cpu.user_p
+        - name: user_p
           type: float
           description: >
             CPU time spent in user space, in percentage
 
-        - name: cpu.nice
+        - name: nice
           type: int
           description: >
             CPU time spent on low priority processes
 
 
-        - name: cpu.system
+        - name: system
           type: int
           description: >
             CPU time spent in kernel space
 
-        - name: cpu.system_p
+        - name: system_p
           type: float
           description: >
             CPU time spent in kernel space, in percentage
 
-        - name: cpu.idle
+        - name: idle
           type: int
           description: >
             CPU time spent idle
 
-        - name: cpu.iowait
+        - name: iowait
           type: int
           description: >
             CPU time spent in wait (on disk)
 
-        - name: cpu.irq
+        - name: irq
           type: int
           description: >
             CPU time spent servicing/handling hardware interrupts
 
-        - name: cpu.softirq
+        - name: softirq
           type: int
           description:
             CPU time spent servicing/handling software interrupts
 
-        - name: cpu.steal
+        - name: steal
           type: int
           description:
             CPU time in involuntary wait by virtual cpu while hypervisor 
@@ -139,7 +145,7 @@ system:
             Available memory
 
         - name: used_p
-          type: int
+          type: float
           description: >
             Used memory, in percentage
 
@@ -173,7 +179,7 @@ system:
             Available swap memory
 
         - name: used_p
-          type: int
+          type: float
           description: >
             Used swap memory, in percentage
 
@@ -190,36 +196,8 @@ system:
 proc:
   type: group
   description: >
-    Contains fields defining per process statistics
+    Contains fields defining per process statistics.
   fields:
-    - name: timestamp
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp when the measurements were taken. The precision is in milliseconds.
-        The timezone is UTC.
-
-    - name: type
-      description: >
-        Set to "proc" to specify that are per process statistics.
-      required: true
-
-    - name: count
-      type: int
-      description: >
-        For how many transactions is this event representative. This
-        is generally the inverse of the sampling rate. For example, for
-        a sample rate of 1/10, the count is 10. The count is used by the
-        UIs to return estimated values. Reserved for future usage.
-      required: true
- 
-    - name: shipper
-      type: string
-      description: >
-        Name of the shipper sending the statistics
-
     - name: proc.name
       type: string
       description: >
@@ -244,27 +222,27 @@ proc:
       type: group
       description: CPU specific statistics per process.
       fields:
-        - name: proc.cpu.user
+        - name: user
           type: int
           description: >
             CPU time spent in user space by the process.
 
-        - name: proc.cpu.user_p
+        - name: user_p
           type: float
           description: >
             CPU time spent in user space by the process, in percentage.
 
-        - name: proc.cpu.system
+        - name: system
           type: int
           description: >
             CPU time spent in kernel space by the process.
 
-        - name: proc.cpu.total
+        - name: total
           type: int
           description: >
             Total CPU time spent by the process.
 
-        - name: proc.cpu.start_time
+        - name: start_time
           type: string
           description: >
             Time when the process was started.
@@ -273,22 +251,72 @@ proc:
       type: group
       description: Memory specific statistics per process.
       fields:
-        - name: proc.mem.size
+        - name: size
           type: int
           description: >
             Virtual memory the process has in total.
 
-        - name: proc.mem.rss
+        - name: rss
           type: int
           description: >
             Resident Set Size. Memory occupied by the process in main memory(RAM).
 
-        - name: proc.mem.rss_p
-          type: int
+        - name: rss_p
+          type: float
           description: >
             Memory occupied by the process in main memory(RAM), in percentage.
 
-        - name: proc.mem.share
+        - name: share
           type: int
           description: >
             Shared memory the process uses.
+
+filesystem:
+  type: group
+  description: >
+    Contains fields defining filesystem status.
+  fields:
+    - name: fs
+      type: group
+      description: >
+        Filesystem statistics
+      fields:
+        - name: avail
+          type: int
+          description: >
+            Available disk space
+        
+        - name: device_name
+          type: string
+          description: >
+            Disk name
+
+        - name: mount_point
+          type: string
+          description: >
+            Mounting point
+
+        - name: files
+          type: int
+          description: >
+            Total file nodes in filesystem.
+
+        - name: free_files
+          type: int
+          description: >
+            Free file nodes in filesystem.
+
+        - name: total
+          type: int
+          description: >
+            Total disk space
+
+        - name: used
+          type: int
+          description: >
+            Used disk space
+
+        - name: used_p
+          type: float
+          description: >
+            Used disk space, in percentage
