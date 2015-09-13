@@ -10,7 +10,7 @@ env/bin/activate: requirements.txt
 
 .PHONY: test
 test: env
-	make -C .. test-binary
+	make -C .. packetbeat.test
 	. env/bin/activate; nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
 
 .PHONY: coverage
@@ -18,9 +18,9 @@ coverage: test
 	mkdir -p ../coverage
 	# Writes count mode on top of file
 	echo 'mode: count' > ../coverage/integration.cov
-	# Collects all integration coverage files and skipts top line with mode
+	# Collects all integration coverage files and skips top line with mode
 	tail -q -n +2 ./run/**/*.cov >> ../coverage/integration.cov
-	# Generats HTML output
+	# Generates HTML output
 	go tool cover -html=../coverage/integration.cov -o ../coverage/integration.html
 
 .PHONY: clean

@@ -123,7 +123,7 @@ clean:
 	-rm -r coverage
 
 # Generates packetbeat.test coverage testing binary
-test-binary:
+packetbeat.test: $(GOFILES)
 	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
 
 full-coverage:
