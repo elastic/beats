@@ -59,7 +59,7 @@ protocols:
   http:
 
     # Configure the ports where to listen for HTTP traffic. You can disable
-    # the http protocol by commenting the list of ports.
+    # the http protocol by commenting out the list of ports.
     ports: [80, 8080, 8000, 5000, 8002]
 
     # Uncomment the following to hide certain parameters in URL or forms attached
