@@ -4,6 +4,7 @@ import (
 	"github.com/elastic/libbeat/beat"
 )
 
+// Setups and Runs Packetbeat
 func main() {
 
 	// Create Beater object
