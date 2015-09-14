@@ -17,12 +17,13 @@ check:
 clean:
 	gofmt -w .
 	-rm filebeat
+	-rm .filebeat
 	-rm profile.cov
 	-rm -r cover
 
 .PHONY: run
 run: filebeat
-	./filebeat -c etc/filebeat.dev.yml -e -v
+	./filebeat -c etc/filebeat.dev.yml -e -v -d "*"
 
 .PHONY: test
 test:

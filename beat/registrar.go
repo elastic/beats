@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
+	cfg "github.com/elastic/filebeat/config"
 	. "github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
 )
@@ -15,7 +16,7 @@ type Registrar struct {
 func (r *Registrar) Init() {
 	// Set to default in case it is not set
 	if r.registryFile == "" {
-		r.registryFile = ".filebeat"
+		r.registryFile = cfg.DefaultRegistryFile
 	}
 
 	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)

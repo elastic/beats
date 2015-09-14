@@ -4,9 +4,16 @@ import (
 	"flag"
 	"github.com/elastic/libbeat/cfgfile"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
+)
+
+// Defaults for config variables which are not set
+const (
+	DefaultRegistryFile        = ".filebeat"
+	DefaultIgnoreOlderDuration = math.MaxInt64
 )
 
 type Config struct {
@@ -25,11 +32,11 @@ type FilebeatConfig struct {
 }
 
 type FileConfig struct {
-	Paths        []string
-	Fields       map[string]string
-	DeadTime     string
-	Input        string
-	DeadtimeSpan time.Duration
+	Paths               []string
+	Fields              map[string]string
+	Input               string
+	IgnoreOlder         string
+	IgnoreOlderDuration time.Duration
 }
 
 // TODO: Log is only used here now. Do we need it?
