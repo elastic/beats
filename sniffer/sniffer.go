@@ -75,7 +75,11 @@ func ListDeviceNames() ([]string, error) {
 
 	ret := []string{}
 	for _, dev := range devices {
-		ret = append(ret, dev.Name)
+		desc := "No description available"
+		if len(dev.Description) > 0 {
+			desc = dev.Description
+		}
+		ret = append(ret, fmt.Sprintf("%s (%s)", dev.Name, desc))
 	}
 	return ret, nil
 }
