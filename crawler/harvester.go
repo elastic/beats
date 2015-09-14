@@ -25,6 +25,7 @@ type Harvester struct {
 func (h *Harvester) Harvest(output chan *FileEvent) {
 	h.open()
 	info, e := h.file.Stat()
+
 	if e != nil {
 		panic(fmt.Sprintf("Harvest: unexpected error: %s", e.Error()))
 	}
@@ -43,33 +44,22 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 	reader := bufio.NewReaderSize(h.file, cfg.CmdlineOptions.HarvesterBufferSize) // 16kb buffer by default
 	buffer := new(bytes.Buffer)
 
-	var read_timeout = 10 * time.Second
-	last_read_time := time.Now()
+	var readTimeout = 10 * time.Second
+	lastReadTime := time.Now()
 	for {
-		text, bytesread, err := h.readline(reader, buffer, read_timeout)
+		text, bytesread, err := h.readline(reader, buffer, readTimeout)
 
 		if err != nil {
-			if err == io.EOF {
-				// timed out waiting for data, got eof.
-				// Check to see if the file was truncated
-				info, _ := h.file.Stat()
-				if info.Size() < h.Offset {
-					logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
-					h.file.Seek(0, os.SEEK_SET)
-					h.Offset = 0
-				} else if age := time.Since(last_read_time); age > h.FileConfig.DeadtimeSpan {
-					// if last_read_time was more than dead time, this file is probably
-					// dead. Stop watching it.
-					logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
-					return
-				}
-				continue
-			} else {
-				logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
+			err = h.handleReadlineError(lastReadTime, err)
+
+			if err != nil {
 				return
+			} else {
+				continue
 			}
 		}
-		last_read_time = time.Now()
+
+		lastReadTime = time.Now()
 
 		line++
 		event := &FileEvent{
@@ -83,7 +73,30 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 		h.Offset += int64(bytesread)
 
 		output <- event // ship the new event downstream
-	} /* forever */
+	}
+}
+
+// Handles eror durint reading file. If EOF and nothing special, exit without errors
+func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
+	if err == io.EOF {
+		// timed out waiting for data, got eof.
+		// Check to see if the file was truncated
+		info, _ := h.file.Stat()
+		if info.Size() < h.Offset {
+			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
+			h.file.Seek(0, os.SEEK_SET)
+			h.Offset = 0
+		} else if age := time.Since(lastTimeRead); age > h.FileConfig.DeadtimeSpan {
+			// if lastTimeRead was more than dead time, this file is probably
+			// dead. Stop watching it.
+			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
+			return err
+		}
+	} else {
+		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
+		return err
+	}
+	return nil
 }
 
 // initOffset finds the current offset of the file and sets it in the harvester as position
@@ -111,7 +124,6 @@ func (h *Harvester) setFileOffset() {
 	} else {
 		h.file.Seek(0, os.SEEK_SET)
 	}
-
 }
 
 func (h *Harvester) open() *os.File {
@@ -126,6 +138,7 @@ func (h *Harvester) open() *os.File {
 		h.file, err = os.Open(h.Path)
 
 		if err != nil {
+			// TODO: This is currently end endless retry, should be set to a max?
 			// retry on failure.
 			logp.Err("Failed opening %s: %s", h.Path, err)
 			time.Sleep(5 * time.Second)
@@ -149,7 +162,7 @@ func (h *Harvester) open() *os.File {
 }
 
 func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_timeout time.Duration) (*string, int, error) {
-	var is_partial bool = true
+	var isPartial bool = true
 	var newline_length int = 1
 	start_time := time.Now()
 
@@ -159,7 +172,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 		if segment != nil && len(segment) > 0 {
 			if segment[len(segment)-1] == '\n' {
 				// Found a complete line
-				is_partial = false
+				isPartial = false
 
 				// Check if also a CR present
 				if len(segment) > 1 && segment[len(segment)-2] == '\r' {
@@ -172,7 +185,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 		}
 
 		if err != nil {
-			if err == io.EOF && is_partial {
+			if err == io.EOF && isPartial {
 				time.Sleep(1 * time.Second) // TODO(sissel): Implement backoff
 
 				// Give up waiting for data after a certain amount of time.
@@ -188,7 +201,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 		}
 
 		// If we got a full line, return the whole line without the EOL chars (CRLF or LF)
-		if !is_partial {
+		if !isPartial {
 			// Get the str length with the EOL chars (LF or CRLF)
 			bufferSize := buffer.Len()
 			str := new(string)
