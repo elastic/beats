@@ -16,7 +16,7 @@ type Registrar struct {
 func (r *Registrar) Init() {
 	// Set to default in case it is not set
 	if r.registryFile == "" {
-		r.registryFile = cfg.RegistryFile
+		r.registryFile = cfg.DefaultRegistryFile
 	}
 
 	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)

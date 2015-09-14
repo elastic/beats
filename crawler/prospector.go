@@ -86,13 +86,16 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 	if p.FileConfig.IgnoreOlder != "" {
 
 		var err error
-
 		// Default ignore time time
 		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
 
 		if err != nil {
 			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
 		}
+	} else {
+		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
+		// Set it to default
+		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
 
 	// Now let's do one quick scan to pick up new files
@@ -184,7 +187,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 
 			// Check for unmodified time, but only if the file modification time is before the last scan started
 			// This ensures we don't skip genuine creations with dead times less than 10s
-			if newFile.FileInfo.ModTime().Before(p.lastscan) && p.FileConfig.IgnoreOlder != "" && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
+			if newFile.FileInfo.ModTime().Before(p.lastscan) && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
 				var offset int64 = 0
 				var is_resuming bool = false
 

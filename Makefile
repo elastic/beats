@@ -17,6 +17,7 @@ check:
 clean:
 	gofmt -w .
 	-rm filebeat
+	-rm .filebeat
 	-rm profile.cov
 	-rm -r cover
 

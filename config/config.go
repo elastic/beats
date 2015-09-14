@@ -11,8 +11,8 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	RegistryFile = ".filebeat"
-	IgnoreOlder  = ""
+	DefaultRegistryFile        = ".filebeat"
+	DefaultIgnoreOlderDuration = 1<<63 - 1
 )
 
 type Config struct {

@@ -91,7 +91,7 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
 			h.file.Seek(0, os.SEEK_SET)
 			h.Offset = 0
-		} else if age := time.Since(lastTimeRead); h.FileConfig.IgnoreOlder != "" && age > h.FileConfig.IgnoreOlderDuration {
+		} else if age := time.Since(lastTimeRead); age > h.FileConfig.IgnoreOlderDuration {
 			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
 			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
 			return err
