@@ -10,18 +10,10 @@ import sys
 import yaml
 
 SECTIONS = [
-    ("event", "Event"),
-    ("dns", "DNS"),
-    ("http", "Http"),
-    ("memcache", "Memcache"),
-    ("mysql", "Mysql"),
-    ("pgsql", "PostgreSQL"),
-    ("thrift", "Thrift-RPC"),
-    ("redis", "Redis"),
-    ("mongodb", "MongoDb"),
-    ("measurements", "Measurements"),
-    ("env", "Environmental"),
-    ("raw", "Raw")]
+    ("env", "Common fields"),
+    ("system", "System wide statistics"),
+    ("proc", "Per process statistics"),
+    ("filesystem", "File system statistics")]
 
 
 def document_fields(output, section):
@@ -98,7 +90,7 @@ following categories:
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Usage: %s file.yml file.md" % sys.argv[0]
+        print "Usage: %s file.yml file.asciidoc" % sys.argv[0]
         sys.exit(1)
 
     input = open(sys.argv[1], 'r')

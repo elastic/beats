@@ -62,7 +62,6 @@ def fields_to_es_template(input, output):
     for doc, section in docs.items():
         if doc not in ["version", "defaults"]:
             prop = fill_section_properties(section, defaults)
-            print(prop)
             properties.update(prop)
 
     template["mappings"]["_default_"]["properties"] = properties

@@ -10,7 +10,7 @@ defaults:
 env:
   type: group
   description: >
-    Contains fields defining system wide statistics.
+    Contains common fields available in all event types.
   fields:
     - name: timestamp
       type: date
@@ -44,7 +44,7 @@ env:
 system:
   type: group
   description: >
-    Contains fields defining system wide statistics.
+    Contains system wide statistics. Details that you can get by running the *top* command on Unix systems.
   fields:
     - name: load
       type: group
@@ -196,7 +196,8 @@ system:
 proc:
   type: group
   description: >
-    Contains fields defining per process statistics.
+    Contains per process statistics. Details that you can get by running the *top* command 
+    or by *ps" command on Unix systems.
   fields:
     - name: proc.name
       type: string
@@ -206,7 +207,7 @@ proc:
     - name: proc.state
       type: string
       description: >
-        Process state.
+        Process state. Example: "running"
 
     - name: proc.pid
       type: int
@@ -245,7 +246,7 @@ proc:
         - name: start_time
           type: string
           description: >
-            Time when the process was started.
+            Time when the process was started. Example: "17:45".
 
     - name: proc.mem
       type: group
@@ -274,49 +275,50 @@ proc:
 filesystem:
   type: group
   description: >
-    Contains fields defining filesystem status.
+    Contains file system related statistics.
   fields:
     - name: fs
       type: group
       description: >
-        Filesystem statistics
+        The fields from this group define information about the disk usage. It contains 
+        details that you can easily get by using the command *df* on Unix systems.
       fields:
         - name: avail
           type: int
           description: >
-            Available disk space
-        
+            Available disk space in bytes.
+  
         - name: device_name
           type: string
           description: >
-            Disk name
+            Disk name. Example: /dev/disk1
 
         - name: mount_point
           type: string
           description: >
-            Mounting point
+            Mounting point. Example: /
 
         - name: files
           type: int
           description: >
-            Total file nodes in filesystem.
+            Total file nodes in the file system. 
 
         - name: free_files
           type: int
           description: >
-            Free file nodes in filesystem.
+            Free file nodes in the file system.
 
         - name: total
           type: int
           description: >
-            Total disk space
+            Total disk space in bytes.
 
         - name: used
           type: int
           description: >
-            Used disk space
+            Used disk space in bytes.
 
         - name: used_p
           type: float
           description: >
-            Used disk space, in percentage
+            Used disk space in percentage

@@ -6,6 +6,9 @@ topbeat
 *.swp
 *.swo
 
+
+*.dev.yml
+
 # Folders
 _obj
 _test
