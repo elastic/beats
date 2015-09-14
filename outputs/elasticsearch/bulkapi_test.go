@@ -31,11 +31,10 @@ func TestBulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -72,8 +71,7 @@ func TestEmptyBulk(t *testing.T) {
 	es := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	body := make(chan interface{}, 10)
-	close(body)
+	body := make([]interface{}, 0, 10)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -139,11 +137,10 @@ func TestBulkMoreOperations(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	params := map[string]string{
 		"refresh": "true",

@@ -167,16 +167,15 @@ func (out *elasticsearchOutput) GetNameByIP(ip string) string {
 // Insert a list of events in the bulkChannel
 func (out *elasticsearchOutput) InsertBulkMessage(
 	pendingTrans []outputs.Signaler,
-	bulkChannel chan interface{},
+	batch []interface{},
 ) {
-	close(bulkChannel)
-	go func(transactions []outputs.Signaler, channel chan interface{}) {
-		_, err := out.Conn.Bulk("", "", nil, channel)
+	go func(transactions []outputs.Signaler, data []interface{}) {
+		_, err := out.Conn.Bulk("", "", nil, data)
 		outputs.SignalAll(pendingTrans, err)
 		if err != nil {
 			logp.Err("Fail to perform many index operations in a single API call: %s", err)
 		}
-	}(pendingTrans, bulkChannel)
+	}(pendingTrans, batch)
 }
 
 // Goroutine that sends one or multiple events to Elasticsearch.
@@ -189,7 +188,7 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 		flushChannel = flushTicker.C
 	}
 
-	bulkChannel := make(chan interface{}, out.BulkMaxSize)
+	batch := make([]interface{}, 0, out.BulkMaxSize)
 	var pendingTrans []outputs.Signaler
 
 	for {
@@ -198,19 +197,20 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
 			if out.FlushInterval > 0 {
 				// insert the events in batches
-				if len(bulkChannel)+2 > out.BulkMaxSize {
+				if len(batch)+2 > out.BulkMaxSize {
 					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
-					out.InsertBulkMessage(pendingTrans, bulkChannel)
+					out.InsertBulkMessage(pendingTrans, batch)
 					pendingTrans = nil
-					bulkChannel = make(chan interface{}, out.BulkMaxSize)
+					batch = make([]interface{}, 0, out.BulkMaxSize)
 				}
-				bulkChannel <- map[string]interface{}{
+
+				meta := map[string]interface{}{
 					"index": map[string]interface{}{
 						"_index": index,
 						"_type":  msg.Event["type"].(string),
 					},
 				}
-				bulkChannel <- msg.Event
+				batch = append(batch, meta, msg.Event)
 				if msg.Trans != nil {
 					pendingTrans = append(pendingTrans, msg.Trans)
 				}
@@ -223,9 +223,9 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 				}
 			}
 		case _ = <-flushChannel:
-			out.InsertBulkMessage(pendingTrans, bulkChannel)
+			out.InsertBulkMessage(pendingTrans, batch)
 			pendingTrans = pendingTrans[:0]
-			bulkChannel = make(chan interface{}, out.BulkMaxSize)
+			batch = make([]interface{}, 0, out.BulkMaxSize)
 		}
 	}
 }
@@ -301,9 +301,51 @@ func (out *elasticsearchOutput) PublishEvent(
 	ts time.Time,
 	event common.MapStr,
 ) error {
-
 	out.sendingQueue <- EventMsg{Trans: trans, Ts: ts, Event: event}
 
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
+	return nil
+}
+
+type eventsMetaBuilder struct {
+	index string
+}
+
+func (out *elasticsearchOutput) BulkPublish(
+	trans outputs.Signaler,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	go func() {
+		request, err := out.Conn.startBulkRequest("", "", nil)
+		if err != nil {
+			logp.Err("Fail to perform many index operations in a single API call: %s", err)
+			outputs.Signal(trans, err)
+			return
+		}
+
+		for _, event := range events {
+			ts := event["ts"].(time.Time)
+			index := fmt.Sprintf("%s-%d.%02d.%02d",
+				out.Index, ts.Year(), ts.Month(), ts.Day())
+			meta := common.MapStr{
+				"index": map[string]interface{}{
+					"_index": index,
+					"_type":  event["type"].(string),
+				},
+			}
+			err := request.Send(meta, event)
+			if err != nil {
+				logp.Err("Fail to encode event: %s", err)
+			}
+		}
+
+		_, err = request.Flush()
+		outputs.Signal(trans, err)
+		if err != nil {
+			logp.Err("Fail to perform many index operations in a single API call: %s",
+				err)
+		}
+	}()
 	return nil
 }

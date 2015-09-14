@@ -18,24 +18,20 @@ type EventMsg struct {
 	Event common.MapStr
 }
 
-// Create a HTTP request containing a bunch of operations and send them to Elasticsearch.
+// MetaBuilder creates meta data for bulk requests
+type MetaBuilder interface {
+	Meta(interface{}) interface{}
+}
+
 // The request is retransmitted up to max_retries before returning an error.
-func (es *Elasticsearch) BulkRequest(method string, path string,
-	params map[string]string, body chan interface{}) ([]byte, error) {
-
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	for obj := range body {
-		enc.Encode(obj)
-	}
-
-	if buf.Len() == 0 {
-		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
-		return nil, nil
-	}
+func (es *Elasticsearch) sendBulkRequest(
+	method string,
+	path string,
+	params map[string]string,
+	buf *bytes.Buffer,
+) ([]byte, error) {
 
 	var errors []error
-
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
@@ -47,7 +43,7 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 		}
 		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
-		req, err := http.NewRequest(method, url, &buf)
+		req, err := http.NewRequest(method, url, buf)
 		if err != nil {
 			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
@@ -71,20 +67,111 @@ func (es *Elasticsearch) BulkRequest(method string, path string,
 	return nil, fmt.Errorf("Request fails after %d retries. Errors: %v", es.MaxRetries, errors)
 }
 
+type bulkRequest struct {
+	es     *Elasticsearch
+	buf    bytes.Buffer
+	enc    *json.Encoder
+	path   string
+	params map[string]string
+}
+
+func (es *Elasticsearch) startBulkRequest(
+	index string,
+	docType string,
+	params map[string]string,
+) (*bulkRequest, error) {
+	path, err := MakePath(index, docType, "_bulk")
+	if err != nil {
+		return nil, err
+	}
+
+	r := &bulkRequest{
+		es:     es,
+		path:   path,
+		params: params,
+	}
+	r.enc = json.NewEncoder(&r.buf)
+	return r, nil
+}
+
+func (r *bulkRequest) Send(meta, obj interface{}) error {
+	var err error
+
+	pos := r.buf.Len()
+	if err = r.enc.Encode(meta); err != nil {
+		return err
+	}
+	if err = r.enc.Encode(obj); err != nil {
+		r.buf.Truncate(pos) // remove meta object from buffer
+	}
+	return err
+}
+
+func (r *bulkRequest) Flush() (*QueryResult, error) {
+	if r.buf.Len() == 0 {
+		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
+		return nil, nil
+	}
+
+	resp, err := r.es.sendBulkRequest("POST", r.path, r.params, &r.buf)
+	if err != nil {
+		return nil, err
+	}
+	r.buf.Truncate(0)
+
+	return ReadQueryResult(resp)
+}
+
 // Perform many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
-func (es *Elasticsearch) Bulk(index string, doc_type string,
-	params map[string]string, body chan interface{}) (*QueryResult, error) {
+func (es *Elasticsearch) Bulk(index string, docType string,
+	params map[string]string, body []interface{}) (*QueryResult, error) {
 
-	path, err := MakePath(index, doc_type, "_bulk")
+	return es.BulkWith(index, docType, params, nil, body)
+}
+
+// BulkWith creates a HTTP request containing a bunch of operations and send
+// them to Elasticsearch. The request is retransmitted up to max_retries before
+// returning an error.
+func (es *Elasticsearch) BulkWith(
+	index string,
+	docType string,
+	params map[string]string,
+	metaBuilder MetaBuilder,
+	body []interface{},
+) (*QueryResult, error) {
+	if len(body) == 0 {
+		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
+		return nil, nil
+	}
+
+	path, err := MakePath(index, docType, "_bulk")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.BulkRequest("POST", path, params, body)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	if metaBuilder == nil {
+		for _, obj := range body {
+			enc.Encode(obj)
+		}
+	} else {
+		for _, obj := range body {
+			meta := metaBuilder.Meta(obj)
+			enc.Encode(meta)
+			enc.Encode(obj)
+		}
+	}
+
+	if buf.Len() == 0 {
+		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
+		return nil, nil
+	}
+
+	resp, err := es.sendBulkRequest("POST", path, params, &buf)
 	if err != nil {
 		return nil, err
 	}
-
 	return ReadQueryResult(resp)
 }

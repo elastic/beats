@@ -33,11 +33,10 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	server := ElasticsearchMock(200, expected_resp)
 
@@ -75,11 +74,10 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
@@ -118,11 +116,10 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
@@ -163,11 +160,10 @@ func TestMultipleHost_Bulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	server1 := ElasticsearchMock(503, []byte("Somehting went wrong"))
 	server2 := ElasticsearchMock(200, expected_resp)
