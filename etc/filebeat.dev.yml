@@ -6,8 +6,7 @@ filebeat:
     -
       # Paths that should be crawled and fetched
       paths:
-        #- /var/log/app*.log
-        - /var/log/*
+        - /var/log/system.log
       # Type of the files. Annotated in every documented
       type: syslog
       # Optional additional fields
@@ -15,18 +14,18 @@ filebeat:
         level: debug
         review: 1
       deadtime: 24h
-    -
-      fields:
-      paths:
-        - /var/log/test.log
-      type: apache
-      # Regexp log line filter (not implemented yet)
-      filter: "regexp"
-    -
-      fields:
-      type: stdin
-      paths:
-        - "-"
+    #-
+    #  fields:
+    #  paths:
+    #    - /var/log/test.log
+    #  type: apache
+    #  # Regexp log line filter (not implemented yet)
+    #  filter: "regexp"
+    #-
+    #  fields:
+    #  type: stdin
+    #  paths:
+    #    - "-"
   spoolsize:
   harvesterbuffersize:
   cpuprofilefile:

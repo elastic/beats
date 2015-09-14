@@ -35,6 +35,8 @@ func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
 
+		logp.Debug("prospector", "File Config:", fileconfig)
+
 		prospector := &Prospector{FileConfig: fileconfig}
 		go prospector.Prospect(restart, eventChan)
 		pendingProspectorCnt++
@@ -65,6 +67,9 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 	// Handle any "-" (stdin) paths
 	for i, path := range p.FileConfig.Paths {
+
+		logp.Debug("prospector", "Harvest path: %s", path)
+
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
 			harvester := Harvester{Path: path, FileConfig: p.FileConfig}
@@ -77,6 +82,21 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 	// Seed last scan time
 	p.lastscan = time.Now()
+
+	// In case dead time is not set, set it to 24h
+	if p.FileConfig.DeadTime == "" {
+		// Default dead time
+		p.FileConfig.DeadTime = "24h"
+	}
+
+	var err error
+
+	p.FileConfig.DeadtimeSpan, err = time.ParseDuration(p.FileConfig.DeadTime)
+
+	if err != nil {
+		logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.DeadTime, err)
+	}
+
 
 	// Now let's do one quick scan to pick up new files
 	for _, path := range p.FileConfig.Paths {
@@ -129,17 +149,18 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 	// Check any matched files to see if we need to start a harvester
 	for _, file := range matches {
 		logp.Debug("prospector", "Check file for harvesting: %s", file)
+
 		// Stat the file, following any symlinks.
 		fileinfo, err := os.Stat(file)
-
-		newFile := File{
-			FileInfo: fileinfo,
-		}
 
 		// TODO(sissel): check err
 		if err != nil {
 			logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 			continue
+		}
+
+		newFile := File{
+			FileInfo: fileinfo,
 		}
 
 		if newFile.FileInfo.IsDir() {
