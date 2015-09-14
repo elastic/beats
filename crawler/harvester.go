@@ -158,6 +158,7 @@ func (h *Harvester) open() *os.File {
 
 	// Check we are not following a rabbit hole (symlinks, etc.)
 	if !file.IsRegularFile() {
+		// TODO: This should be replaced by a normal error
 		panic(fmt.Errorf("Harvester file error"))
 	}
 
