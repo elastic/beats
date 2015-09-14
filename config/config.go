@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+// Defaults for config variables which are not set
+const (
+	RegistryFile = ".filebeat"
+	IgnoreOlder  = ""
+)
+
 type Config struct {
 	Filebeat FilebeatConfig
 }
@@ -25,11 +31,11 @@ type FilebeatConfig struct {
 }
 
 type FileConfig struct {
-	Paths        []string
-	Fields       map[string]string
-	DeadTime     string
-	Input        string
-	DeadtimeSpan time.Duration
+	Paths               []string
+	Fields              map[string]string
+	Input               string
+	IgnoreOlder         string
+	IgnoreOlderDuration time.Duration
 }
 
 // TODO: Log is only used here now. Do we need it?

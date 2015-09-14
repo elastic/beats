@@ -83,20 +83,17 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 	// Seed last scan time
 	p.lastscan = time.Now()
 
-	// In case dead time is not set, set it to 24h
-	if p.FileConfig.DeadTime == "" {
-		// Default dead time
-		p.FileConfig.DeadTime = "24h"
+	if p.FileConfig.IgnoreOlder != "" {
+
+		var err error
+
+		// Default ignore time time
+		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
+
+		if err != nil {
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+		}
 	}
-
-	var err error
-
-	p.FileConfig.DeadtimeSpan, err = time.ParseDuration(p.FileConfig.DeadTime)
-
-	if err != nil {
-		logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.DeadTime, err)
-	}
-
 
 	// Now let's do one quick scan to pick up new files
 	for _, path := range p.FileConfig.Paths {
@@ -185,9 +182,9 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 			// Create a new prospector info with the stat info for comparison
 			newinfo = ProspectorInfo{Fileinfo: newFile.FileInfo, Harvester: make(chan int64, 1), Last_seen: p.iteration}
 
-			// Check for dead time, but only if the file modification time is before the last scan started
+			// Check for unmodified time, but only if the file modification time is before the last scan started
 			// This ensures we don't skip genuine creations with dead times less than 10s
-			if newFile.FileInfo.ModTime().Before(p.lastscan) && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.DeadtimeSpan {
+			if newFile.FileInfo.ModTime().Before(p.lastscan) && p.FileConfig.IgnoreOlder != "" && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
 				var offset int64 = 0
 				var is_resuming bool = false
 
@@ -205,7 +202,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 					go harvester.Harvest(output)
 				} else {
 					// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-					logp.Debug("prospector", "Skipping file (older than dead time of %v): %s", p.FileConfig.DeadtimeSpan, file)
+					logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.FileConfig.IgnoreOlderDuration, file)
 					newinfo.Harvester <- newFile.FileInfo.Size()
 				}
 			} else if previous := p.isFileRenamed(file, newFile.FileInfo, missinginfo); previous != "" {
