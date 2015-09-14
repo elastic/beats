@@ -25,5 +25,4 @@ notifications:
 
 after_success:
   # Copy profile.cov to coverage.txt because codecov.io requires this file
-  - cp profile.cov coverage.txt
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -f coverage/full.cov

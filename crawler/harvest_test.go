@@ -7,11 +7,10 @@ import (
 func TestOpen(t *testing.T) {
 
 	h := Harvester{
-		Path: "/var/log/",
+		Path:   "/var/log/",
 		Offset: 0,
 	}
 
 	h.open()
-
 
 }

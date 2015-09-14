@@ -83,7 +83,6 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 		// Check to see if the file was truncated
 		info, _ := h.file.Stat()
 
-
 		if h.FileConfig.IgnoreOlder != "" {
 			logp.Debug("harvester", "Ignore Unmodified After: %s", h.FileConfig.IgnoreOlder)
 		}
