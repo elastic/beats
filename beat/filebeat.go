@@ -115,6 +115,11 @@ func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 
 func (fb *Filebeat) Stop() {
 
+	// Stop harvesters
+	// Stop prospectors
+	// Flush what is in spooler
+	// Write state
+
 	// FIXME: Improve to first write state and then close channels
 	close(fb.SpoolChan)
 	close(fb.publisherChan)

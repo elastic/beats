@@ -26,7 +26,7 @@ class Test(TestCase):
         proc = self.start_filebeat()
 
         # TODO: Find better solution when filebeat did crawl the file
-        time.sleep(10)
+        time.sleep(30)
         proc.kill_and_wait()
 
         i = 0
@@ -66,8 +66,10 @@ class Test(TestCase):
         proc = self.start_filebeat()
 
         # TODO: Find better solution when filebeat did crawl the file
-        time.sleep(10)
-        proc.kill_and_wait()
+        time.sleep(30)
+        response = proc.kill_and_wait()
+
+        print response
 
         i = 0
 

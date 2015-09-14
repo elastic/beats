@@ -17,7 +17,7 @@ install:
 
 script:
   - make check
-  - make cover
+  - make coverage
 
 notifications:
   email:

@@ -105,8 +105,6 @@ class TestCase(unittest.TestCase):
         if debug_selectors:
             args.extend(["-d", ",".join(debug_selectors)])
 
-        #print args
-
         proc = Proc(args, os.path.join(self.working_dir, output))
         proc.start()
         return proc
