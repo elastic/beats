@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -37,7 +38,7 @@ type elasticsearchOutput struct {
 	FlushInterval  time.Duration
 	BulkMaxSize    int
 
-	TopologyMap  map[string]string
+	TopologyMap  atomic.Value // Value holds a map[string][string]
 	sendingQueue chan EventMsg
 
 	ttlEnabled bool
@@ -153,11 +154,14 @@ func (out *elasticsearchOutput) EnableTTL() error {
 
 // Get the name of a shipper by its IP address from the local topology map
 func (out *elasticsearchOutput) GetNameByIP(ip string) string {
-	name, exists := out.TopologyMap[ip]
-	if !exists {
-		return ""
+	topologyMap, ok := out.TopologyMap.Load().(map[string]string)
+	if ok {
+		name, exists := topologyMap[ip]
+		if exists {
+			return name
+		}
 	}
-	return name
+	return ""
 }
 
 // Insert a list of events in the bulkChannel
@@ -248,7 +252,7 @@ func (out *elasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 
 	// get all shippers IPs from Elasticsearch
-	TopologyMapTmp := make(map[string]string)
+	topologyMapTmp := make(map[string]string)
 
 	res, err := out.Conn.SearchUri(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
@@ -267,7 +271,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 			// add mapping
 			ipaddrs := strings.Split(pub.IPs, ",")
 			for _, addr := range ipaddrs {
-				TopologyMapTmp[addr] = pub.Name
+				topologyMapTmp[addr] = pub.Name
 			}
 		}
 	} else {
@@ -275,9 +279,9 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 	}
 
 	// update topology map
-	out.TopologyMap = TopologyMapTmp
+	out.TopologyMap.Store(topologyMapTmp)
 
-	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
+	logp.Debug("output_elasticsearch", "Topology map %s", topologyMapTmp)
 }
 
 // Publish an event by adding it to the queue of events.
