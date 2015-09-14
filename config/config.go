@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/elastic/libbeat/cfgfile"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,7 +13,7 @@ import (
 // Defaults for config variables which are not set
 const (
 	DefaultRegistryFile        = ".filebeat"
-	DefaultIgnoreOlderDuration = 1<<63 - 1
+	DefaultIgnoreOlderDuration = math.MaxInt64
 )
 
 type Config struct {
