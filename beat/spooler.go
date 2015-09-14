@@ -64,4 +64,3 @@ func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
 func (fb *Filebeat) stopSpooler() {
 
 }
-
