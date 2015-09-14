@@ -7,7 +7,7 @@ filebeat:
       # Paths that should be crawled and fetched
       paths:
         #- /var/log/app*.log
-        - /var/log/*.log
+        - /var/log/*
       # Type of the files. Annotated in every documented
       type: syslog
       # Optional additional fields
@@ -27,12 +27,13 @@ filebeat:
       type: stdin
       paths:
         - "-"
-  spoolSize:
-  harvesterBufferSize:
-  cpuProfileFile:
-  idleTimeout:
-  tailOnRotate:
+  spoolsize:
+  harvesterbuffersize:
+  cpuprofilefile:
+  idletimeout:
+  tailonRotate:
   quiet:
+  registryfile: .filebeat
 
 ############################# Shipper ############################################
 shipper:

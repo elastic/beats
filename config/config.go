@@ -21,6 +21,7 @@ type FilebeatConfig struct {
 	IdleTimeout         time.Duration
 	TailOnRotate        bool
 	Quiet               bool
+	RegistryFile        string
 }
 
 type FileConfig struct {
@@ -104,7 +105,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 }
 
 // Fetches and merges all config files given by Options.configArgs. All are put into one config object
-func (config *Config) FetchConfigs(path string)  {
+func (config *Config) FetchConfigs(path string) {
 
 	configFiles, err := getConfigFiles(path)
 

@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"time"
@@ -28,28 +27,6 @@ type ProspectorInfo struct {
 	Fileinfo  os.FileInfo /* the file info */
 	Harvester chan int64  /* the harvester will send an event with its offset when it closes */
 	Last_seen uint32      /* int number of the last iterations in which we saw this file */
-}
-
-// loadState fetches the previes reading state from the .filebeat file
-// The .filebeat file is stored in the same path as the binary is running
-func (restart *ProspectorResume) LoadState() {
-	restart.Persist = make(chan *FileState)
-
-	// Load the previous log file locations now, for use in prospector
-	restart.Files = make(map[string]*FileState)
-
-	// TODO: Should the location and path of .filebeat be configurable?
-	if existing, e := os.Open(".filebeat"); e == nil {
-		defer existing.Close()
-		wd := ""
-		if wd, e = os.Getwd(); e != nil {
-			logp.Warn("WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
-		}
-		logp.Info("Loading registrar data from %s/.filebeat", wd)
-
-		decoder := json.NewDecoder(existing)
-		decoder.Decode(&restart.Files)
-	}
 }
 
 func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string]*FileState, eventChan chan *FileEvent) {

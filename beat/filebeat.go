@@ -80,10 +80,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.SpoolChan = make(chan *FileEvent, 16)
 	fb.publisherChan = make(chan []*FileEvent, 1)
 	fb.RegistrarChan = make(chan []*FileEvent, 1)
+
 	persist := make(map[string]*FileState)
 
-	restart := &ProspectorResume{}
-	restart.LoadState()
+	registrar := &Registrar{
+		registryFile: fb.FbConfig.Filebeat.RegistryFile,
+	}
+	registrar.Init()
+
+	restart := &ProspectorResume{
+		Persist: make(chan *FileState),
+		// Load the previous log file locations now, for use in prospector
+		Files: make(map[string]*FileState),
+	}
+
+	registrar.LoadState(restart.Files)
 	restart.Scan(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
 
 	// Start spooler: Harvesters dump events into the spooler.
@@ -93,7 +104,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	go Publish(b, fb)
 
 	// registrar records last acknowledged positions in all files.
-	Registrar(persist, fb.RegistrarChan)
+	registrar.WriteState(persist, fb.RegistrarChan)
 
 	return nil
 }
