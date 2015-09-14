@@ -1,8 +1,8 @@
 ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
+GOFILES = $(shell find . -type f -name '*.go')
 
-.PHONY: build
-build:
+packetbeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
 	$(GODEP) go build
@@ -21,7 +21,7 @@ clean:
 	-rm -r cover
 
 .PHONY: run
-run: build
+run: packetbeat
 	./filebeat -c etc/filebeat.yml -e -v
 
 .PHONY: test
@@ -38,5 +38,8 @@ cover:
 
 # Command used by CI Systems
 .PHONE: testsuite
-testsuite: build
+testsuite: packetbeat
 	make cover
+
+filebeat.test: $(GOFILES)
+	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...

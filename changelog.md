@@ -57,6 +57,7 @@ var defaultConfig = &struct {
 * Getting config from env was removed. I think a better method like getting it from es should be used: https://github.com/elastic/logstash-forwarder/pull/435
 * What should we do about multiple configs? Just provide some docs? https://github.com/elastic/logstash-forwarder/issues/136 currently working with -c for beat -config for dirs
 * Command line config option -config was renamed to configDir. Should also be introduced as config file param in case we want to keep it
+* Rethink dead-time: https://github.com/elastic/logstash-forwarder/issues/460
 
 Notes:
 * Should every config entry have a name -> make it possible to know from which config entry something comes.
