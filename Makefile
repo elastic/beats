@@ -44,3 +44,12 @@ testsuite: filebeat
 
 filebeat.test: $(GOFILES)
 	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
+
+full-coverage:
+	make coverage
+	make -C ./tests/integration coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ./coverage/full.cov
+	# Collects all integration coverage files and skips top line with mode
+	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
+	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
