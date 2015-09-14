@@ -65,19 +65,23 @@
             }
           }
         },
-        "proc.cpu": {
+        "proc": {
           "properties": {
-            "user_p": {
-              "doc_values": "true",
-              "type": "float"
-            }
-          }
-        },
-        "proc.mem": {
-          "properties": {
-            "rss_p": {
-              "doc_values": "true",
-              "type": "float"
+            "cpu": {
+              "properties": {
+                "user_p": {
+                  "doc_values": "true",
+                  "type": "float"
+                }
+              }
+            },
+            "mem": {
+              "properties": {
+                "rss_p": {
+                  "doc_values": "true",
+                  "type": "float"
+                }
+              }
             }
           }
         },

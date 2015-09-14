@@ -12,7 +12,7 @@ import yaml
 SECTIONS = [
     ("env", "Common fields"),
     ("system", "System wide statistics"),
-    ("proc", "Per process statistics"),
+    ("process", "Per process statistics"),
     ("filesystem", "File system statistics")]
 
 
@@ -41,7 +41,10 @@ def document_fields(output, section):
 
 def document_field(output, field):
 
-    output.write("==== {}\n\n".format(field["name"]))
+    if "path" not in field:
+        field["path"] = field["name"]
+
+    output.write("==== {}\n\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -67,7 +70,7 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 == Exported fields
 
 This document describes the fields that are exported by the
-Packetbeat shipper for each transaction. They are grouped in the
+topbeat. They are grouped in the
 following categories:
 
 """)
