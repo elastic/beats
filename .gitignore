@@ -1,3 +1,4 @@
+/etc/filebeat.dev.yml
 .idea
 filebeat
 .DS_Store

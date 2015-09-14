@@ -12,21 +12,11 @@ Questions:
  * How well did the Windows integration work?
  * Config file: Type is required and moved out of fields. Fields can optional for additional information
  * Deadtime was used in the code but I couldn't find an example in any config? I added it now to the config
+ ** DeadTime was renamed to ignoreOlder
  * Config: input field was introduced with option "stdin" or "log". Default is "log". Idea is that in the future
    also full files could be read (fsriver) (InputBeat). Fifoin or streams could be also added. (see also https://github.com/elastic/logstash-forwarder/issues/525)
  ** All config files must end with .yml. In case a directory is passed as config path, all .yml files in this directory
      will be interpreted as config files and merged
- * Check exact deadtime behaviour and where it should be applied
- * Default config must be introduced again:
-
-```
-var defaultConfig = &struct {
-   	fileDeadtime string
-   }{
-   	fileDeadtime: "24h",
-   }
-```
-
 * Profiler option was removed as part of libbeat. Currently the profiler stopped after 60s. Should this be added to libbeat?
   Profiler options were also removed.
 ```

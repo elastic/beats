@@ -30,7 +30,7 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, "log", files[0].Input)
 	assert.Equal(t, 3, len(files[0].Fields))
 	assert.Equal(t, 1, len(files[0].Fields["review"]))
-	assert.Equal(t, "24h", files[0].DeadTime)
+	assert.Equal(t, "24h", files[0].IgnoreOlder)
 
 	assert.Equal(t, "stdin", files[2].Input)
 	assert.Equal(t, 0, len(files[2].Paths))

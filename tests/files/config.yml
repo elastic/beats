@@ -12,7 +12,7 @@ filebeat:
         level: debug
         review: 1
         type: log
-      deadtime: 24h
+      ignoreolder: 24h
     -
       fields:
       paths:

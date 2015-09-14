@@ -4,9 +4,16 @@ import (
 	"flag"
 	"github.com/elastic/libbeat/cfgfile"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
+)
+
+// Defaults for config variables which are not set
+const (
+	DefaultRegistryFile        = ".filebeat"
+	DefaultIgnoreOlderDuration = math.MaxInt64
 )
 
 type Config struct {
@@ -21,14 +28,15 @@ type FilebeatConfig struct {
 	IdleTimeout         time.Duration
 	TailOnRotate        bool
 	Quiet               bool
+	RegistryFile        string
 }
 
 type FileConfig struct {
-	Paths        []string
-	Fields       map[string]string
-	DeadTime     string
-	Input        string
-	DeadtimeSpan time.Duration
+	Paths               []string
+	Fields              map[string]string
+	Input               string
+	IgnoreOlder         string
+	IgnoreOlderDuration time.Duration
 }
 
 // TODO: Log is only used here now. Do we need it?
@@ -104,7 +112,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 }
 
 // Fetches and merges all config files given by Options.configArgs. All are put into one config object
-func (config *Config) FetchConfigs(path string)  {
+func (config *Config) FetchConfigs(path string) {
 
 	configFiles, err := getConfigFiles(path)
 

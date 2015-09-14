@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"time"
@@ -30,33 +29,13 @@ type ProspectorInfo struct {
 	Last_seen uint32      /* int number of the last iterations in which we saw this file */
 }
 
-// loadState fetches the previes reading state from the .filebeat file
-// The .filebeat file is stored in the same path as the binary is running
-func (restart *ProspectorResume) LoadState() {
-	restart.Persist = make(chan *FileState)
-
-	// Load the previous log file locations now, for use in prospector
-	restart.Files = make(map[string]*FileState)
-
-	// TODO: Should the location and path of .filebeat be configurable?
-	if existing, e := os.Open(".filebeat"); e == nil {
-		defer existing.Close()
-		wd := ""
-		if wd, e = os.Getwd(); e != nil {
-			logp.Warn("WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
-		}
-		logp.Info("Loading registrar data from %s/.filebeat", wd)
-
-		decoder := json.NewDecoder(existing)
-		decoder.Decode(&restart.Files)
-	}
-}
-
 func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string]*FileState, eventChan chan *FileEvent) {
 	pendingProspectorCnt := 0
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
+
+		logp.Debug("prospector", "File Config:", fileconfig)
 
 		prospector := &Prospector{FileConfig: fileconfig}
 		go prospector.Prospect(restart, eventChan)
@@ -88,6 +67,9 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 	// Handle any "-" (stdin) paths
 	for i, path := range p.FileConfig.Paths {
+
+		logp.Debug("prospector", "Harvest path: %s", path)
+
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
 			harvester := Harvester{Path: path, FileConfig: p.FileConfig}
@@ -100,6 +82,21 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 	// Seed last scan time
 	p.lastscan = time.Now()
+
+	if p.FileConfig.IgnoreOlder != "" {
+
+		var err error
+		// Default ignore time time
+		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
+
+		if err != nil {
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+		}
+	} else {
+		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
+		// Set it to default
+		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
+	}
 
 	// Now let's do one quick scan to pick up new files
 	for _, path := range p.FileConfig.Paths {
@@ -152,17 +149,18 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 	// Check any matched files to see if we need to start a harvester
 	for _, file := range matches {
 		logp.Debug("prospector", "Check file for harvesting: %s", file)
+
 		// Stat the file, following any symlinks.
 		fileinfo, err := os.Stat(file)
-
-		newFile := File{
-			FileInfo: fileinfo,
-		}
 
 		// TODO(sissel): check err
 		if err != nil {
 			logp.Debug("prospector", "stat(%s) failed: %s", file, err)
 			continue
+		}
+
+		newFile := File{
+			FileInfo: fileinfo,
 		}
 
 		if newFile.FileInfo.IsDir() {
@@ -187,9 +185,9 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 			// Create a new prospector info with the stat info for comparison
 			newinfo = ProspectorInfo{Fileinfo: newFile.FileInfo, Harvester: make(chan int64, 1), Last_seen: p.iteration}
 
-			// Check for dead time, but only if the file modification time is before the last scan started
+			// Check for unmodified time, but only if the file modification time is before the last scan started
 			// This ensures we don't skip genuine creations with dead times less than 10s
-			if newFile.FileInfo.ModTime().Before(p.lastscan) && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.DeadtimeSpan {
+			if newFile.FileInfo.ModTime().Before(p.lastscan) && time.Since(newFile.FileInfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
 				var offset int64 = 0
 				var is_resuming bool = false
 
@@ -207,7 +205,7 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 					go harvester.Harvest(output)
 				} else {
 					// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-					logp.Debug("prospector", "Skipping file (older than dead time of %v): %s", p.FileConfig.DeadtimeSpan, file)
+					logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.FileConfig.IgnoreOlderDuration, file)
 					newinfo.Harvester <- newFile.FileInfo.Size()
 				}
 			} else if previous := p.isFileRenamed(file, newFile.FileInfo, missinginfo); previous != "" {

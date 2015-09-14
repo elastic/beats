@@ -3,8 +3,8 @@ package main
 // This file is mandatory as otherwise the packetbeat.test binary is not generated correctly. Reason???
 
 import (
-	"testing"
 	"flag"
+	"testing"
 )
 
 var integration *bool

@@ -82,13 +82,19 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 		// timed out waiting for data, got eof.
 		// Check to see if the file was truncated
 		info, _ := h.file.Stat()
+
+
+		if h.FileConfig.IgnoreOlder != "" {
+			logp.Debug("harvester", "Ignore Unmodified After: %s", h.FileConfig.IgnoreOlder)
+		}
+
 		if info.Size() < h.Offset {
 			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
 			h.file.Seek(0, os.SEEK_SET)
 			h.Offset = 0
-		} else if age := time.Since(lastTimeRead); age > h.FileConfig.DeadtimeSpan {
-			// if lastTimeRead was more than dead time, this file is probably
-			// dead. Stop watching it.
+
+		} else if age := time.Since(lastTimeRead); age > h.FileConfig.IgnoreOlderDuration {
+			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
 			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
 			return err
 		}

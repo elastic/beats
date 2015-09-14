@@ -2,7 +2,12 @@ ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
 GOFILES = $(shell find . -type f -name '*.go')
 
+<<<<<<< HEAD
 packetbeat: $(GOFILES)
+=======
+
+filebeat: $(GOFILES)
+>>>>>>> master
 	# first make sure we have godep
 	go get github.com/tools/godep
 	$(GODEP) go build
@@ -17,12 +22,13 @@ check:
 clean:
 	gofmt -w .
 	-rm filebeat
+	-rm .filebeat
 	-rm profile.cov
 	-rm -r cover
 
 .PHONY: run
-run: packetbeat
-	./filebeat -c etc/filebeat.yml -e -v
+run: filebeat
+	./filebeat -c etc/filebeat.dev.yml -e -v -d "*"
 
 .PHONY: test
 test:
@@ -38,7 +44,7 @@ cover:
 
 # Command used by CI Systems
 .PHONE: testsuite
-testsuite: packetbeat
+testsuite: filebeat
 	make cover
 
 filebeat.test: $(GOFILES)
