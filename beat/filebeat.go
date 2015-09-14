@@ -88,14 +88,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	registrar.Init()
 
-	restart := &ProspectorResume{
+	crawler := &Crawler{
 		Persist: make(chan *FileState),
 		// Load the previous log file locations now, for use in prospector
 		Files: make(map[string]*FileState),
 	}
 
-	registrar.LoadState(restart.Files)
-	restart.Scan(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
+	registrar.LoadState(crawler.Files)
+	crawler.Start(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
 
 	// Start spooler: Harvesters dump events into the spooler.
 	go fb.startSpooler(cfg.CmdlineOptions)

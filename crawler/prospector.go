@@ -10,17 +10,12 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-// Last reading state of the prospector
-type ProspectorResume struct {
-	Files   map[string]*FileState
-	Persist chan *FileState
-}
-
 type Prospector struct {
 	FileConfig     cfg.FileConfig
 	prospectorinfo map[string]ProspectorInfo
 	iteration      uint32
 	lastscan       time.Time
+	crawler        *Crawler
 }
 
 type ProspectorInfo struct {
@@ -29,40 +24,7 @@ type ProspectorInfo struct {
 	Last_seen uint32      /* int number of the last iterations in which we saw this file */
 }
 
-func (restart *ProspectorResume) Scan(files []cfg.FileConfig, persist map[string]*FileState, eventChan chan *FileEvent) {
-	pendingProspectorCnt := 0
-
-	// Prospect the globs/paths given on the command line and launch harvesters
-	for _, fileconfig := range files {
-
-		logp.Debug("prospector", "File Config:", fileconfig)
-
-		prospector := &Prospector{FileConfig: fileconfig}
-		go prospector.Prospect(restart, eventChan)
-		pendingProspectorCnt++
-	}
-
-	// Now determine which states we need to persist by pulling the events from the prospectors
-	// When we hit a nil source a prospector had finished so we decrease the expected events
-	logp.Debug("prospector", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
-
-	for event := range restart.Persist {
-		if event.Source == nil {
-			pendingProspectorCnt--
-			if pendingProspectorCnt == 0 {
-				break
-			}
-			continue
-		}
-		persist[*event.Source] = event
-		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
-	}
-
-	logp.Info("All prospectors initialised with %d states to persist", len(persist))
-
-}
-
-func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) {
+func (p *Prospector) Prospect(output chan *FileEvent) {
 	p.prospectorinfo = make(map[string]ProspectorInfo)
 
 	// Handle any "-" (stdin) paths
@@ -100,14 +62,14 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 
 	// Now let's do one quick scan to pick up new files
 	for _, path := range p.FileConfig.Paths {
-		p.scan(path, output, resume)
+		p.scan(path, output, p.crawler)
 	}
 
 	// This signals we finished considering the previous state
 	event := &FileState{
 		Source: nil,
 	}
-	resume.Persist <- event
+	p.crawler.Persist <- event
 
 	for {
 		newlastscan := time.Now()
@@ -133,7 +95,7 @@ func (p *Prospector) Prospect(resume *ProspectorResume, output chan *FileEvent) 
 	}
 }
 
-func (p *Prospector) scan(path string, output chan *FileEvent, resume *ProspectorResume) {
+func (p *Prospector) scan(path string, output chan *FileEvent, crawler *Crawler) {
 
 	logp.Debug("prospector", "scan path %s", path)
 	// Evaluate the path as a wildcards/shell glob
@@ -191,9 +153,9 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 				var offset int64 = 0
 				var is_resuming bool = false
 
-				if resume != nil {
+				if crawler != nil {
 					// Call the calculator - it will process resume state if there is one
-					offset, is_resuming = p.calculateResume(file, newFile.FileInfo, resume)
+					offset, is_resuming = p.calculateResume(file, newFile.FileInfo, crawler)
 				}
 
 				// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
@@ -217,9 +179,9 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 				var offset int64 = 0
 				var is_resuming bool = false
 
-				if resume != nil {
+				if crawler != nil {
 					// Call the calculator - it will process resume state if there is one
-					offset, is_resuming = p.calculateResume(file, newFile.FileInfo, resume)
+					offset, is_resuming = p.calculateResume(file, newFile.FileInfo, crawler)
 				}
 
 				// Are we resuming a file or is this a completely new file?
@@ -281,24 +243,24 @@ func (p *Prospector) scan(path string, output chan *FileEvent, resume *Prospecto
 	} // for each file matched by the glob
 }
 
-func (p *Prospector) calculateResume(file string, fileinfo os.FileInfo, resume *ProspectorResume) (int64, bool) {
-	last_state, is_found := resume.Files[file]
+func (p *Prospector) calculateResume(file string, fileinfo os.FileInfo, crawler *Crawler) (int64, bool) {
+	last_state, is_found := crawler.Files[file]
 
 	if is_found && IsSameFile(file, fileinfo, last_state) {
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		resume.Persist <- last_state
+		crawler.Persist <- last_state
 		return last_state.Offset, true
 	}
 
-	if previous := p.isFileRenamedResumelist(file, fileinfo, resume.Files); previous != "" {
+	if previous := p.isFileRenamedResumelist(file, fileinfo, crawler.Files); previous != "" {
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, file)
-		last_state := resume.Files[previous]
+		last_state := crawler.Files[previous]
 		last_state.Source = &file
-		resume.Persist <- last_state
+		crawler.Persist <- last_state
 		return last_state.Offset, true
 	}
 
