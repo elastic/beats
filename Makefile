@@ -2,7 +2,7 @@ ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
 
 
-filebeat:
+filebeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
 	$(GODEP) go build

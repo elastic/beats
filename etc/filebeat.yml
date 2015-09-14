@@ -33,6 +33,8 @@ filebeat:
   idleTimeout:
   tailOnRotate:
   quiet:
+  registryfile: .filebeat
+
 
 ############################# Shipper ############################################
 shipper:
