@@ -2,12 +2,7 @@ ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
 GOFILES = $(shell find . -type f -name '*.go')
 
-<<<<<<< HEAD
-packetbeat: $(GOFILES)
-=======
-
 filebeat: $(GOFILES)
->>>>>>> master
 	# first make sure we have godep
 	go get github.com/tools/godep
 	$(GODEP) go build
