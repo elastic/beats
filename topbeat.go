@@ -143,14 +143,16 @@ func (t *Topbeat) exportProcStats() error {
 			t.procsMap[process.Pid] = process
 
 			event := common.MapStr{
-				"timestamp":  common.Time(time.Now()),
-				"type":       "proc",
-				"proc.pid":   process.Pid,
-				"proc.ppid":  process.Ppid,
-				"proc.name":  process.Name,
-				"proc.state": process.State,
-				"proc.mem":   process.Mem,
-				"proc.cpu":   process.Cpu,
+				"timestamp": common.Time(time.Now()),
+				"type":      "proc",
+				"proc": common.MapStr{
+					"pid":   process.Pid,
+					"ppid":  process.Ppid,
+					"name":  process.Name,
+					"state": process.State,
+					"mem":   process.Mem,
+					"cpu":   process.Cpu,
+				},
 			}
 			t.events <- event
 		}
