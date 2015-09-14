@@ -62,7 +62,7 @@ type redisOutput struct {
 }
 
 type message struct {
-	trans outputs.Transactioner
+	trans outputs.Signaler
 	index string
 	msg   string
 }
@@ -193,7 +193,7 @@ func (out *redisOutput) Close() {
 func (out *redisOutput) SendMessagesGoroutine() {
 	var err error
 	var pending int
-	var pendingTrans []outputs.Transactioner
+	var pendingTrans []outputs.Signaler
 	flushChannel := make(<-chan time.Time)
 
 	if !out.flush_immediatelly {
@@ -223,10 +223,10 @@ func (out *redisOutput) SendMessagesGoroutine() {
 				pending++
 			} else {
 				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
-				outputs.FinishTransaction(queueMsg.trans, err)
+				outputs.Signal(queueMsg.trans, err)
 			}
 			if err != nil {
-				outputs.FinishTransactions(pendingTrans, err)
+				outputs.SignalAll(pendingTrans, err)
 				pendingTrans = pendingTrans[:0]
 
 				logp.Err("Fail to publish event to REDIS: %s", err)
@@ -237,7 +237,7 @@ func (out *redisOutput) SendMessagesGoroutine() {
 			if pending > 0 {
 				out.Conn.Flush()
 				_, err = out.Conn.Receive()
-				outputs.FinishTransactions(pendingTrans, err)
+				outputs.SignalAll(pendingTrans, err)
 				pendingTrans = pendingTrans[:0]
 				pending = 0
 
@@ -331,7 +331,7 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 }
 
 func (out *redisOutput) PublishEvent(
-	trans outputs.Transactioner,
+	trans outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {
@@ -339,7 +339,7 @@ func (out *redisOutput) PublishEvent(
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
 		logp.Err("Fail to convert the event to JSON: %s", err)
-		outputs.CompleteTransaction(trans)
+		outputs.SignalCompleted(trans)
 		return err
 	}
 

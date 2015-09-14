@@ -166,13 +166,13 @@ func (out *elasticsearchOutput) GetNameByIP(ip string) string {
 
 // Insert a list of events in the bulkChannel
 func (out *elasticsearchOutput) InsertBulkMessage(
-	pendingTrans []outputs.Transactioner,
+	pendingTrans []outputs.Signaler,
 	bulkChannel chan interface{},
 ) {
 	close(bulkChannel)
-	go func(transactions []outputs.Transactioner, channel chan interface{}) {
+	go func(transactions []outputs.Signaler, channel chan interface{}) {
 		_, err := out.Conn.Bulk("", "", nil, channel)
-		outputs.FinishTransactions(pendingTrans, err)
+		outputs.SignalAll(pendingTrans, err)
 		if err != nil {
 			logp.Err("Fail to perform many index operations in a single API call: %s", err)
 		}
@@ -190,7 +190,7 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 	}
 
 	bulkChannel := make(chan interface{}, out.BulkMaxSize)
-	var pendingTrans []outputs.Transactioner
+	var pendingTrans []outputs.Signaler
 
 	for {
 		select {
@@ -217,7 +217,7 @@ func (out *elasticsearchOutput) SendMessagesGoroutine() {
 			} else {
 				// insert the events one by one
 				_, err := out.Conn.Index(index, msg.Event["type"].(string), "", nil, msg.Event)
-				outputs.FinishTransaction(msg.Trans, err)
+				outputs.Signal(msg.Trans, err)
 				if err != nil {
 					logp.Err("Fail to insert a single event: %s", err)
 				}
@@ -297,7 +297,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 
 // Publish an event by adding it to the queue of events.
 func (out *elasticsearchOutput) PublishEvent(
-	trans outputs.Transactioner,
+	trans outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {

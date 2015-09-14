@@ -25,12 +25,12 @@ var publishDisabled *bool
 
 // EventPublisher provides the interface for beats to publish events.
 type EventPublisher interface {
-	Publish(event common.MapStr)
-	PublishAll(events []common.MapStr)
+	PublishEvent(event common.MapStr)
+	PublishEvents(events []common.MapStr)
 }
 
 type TransactionalEventPublisher interface {
-	PublishTransaction(transaction outputs.Transactioner, events []common.MapStr)
+	PublishTransaction(transaction outputs.Signaler, events []common.MapStr)
 }
 
 type PublisherType struct {
@@ -48,7 +48,7 @@ type PublisherType struct {
 }
 
 type message struct {
-	transaction outputs.Transactioner
+	transaction outputs.Signaler
 	events      []common.MapStr
 }
 
@@ -115,7 +115,7 @@ func (publisher *PublisherType) publishFromQueue() {
 }
 
 func (publisher *PublisherType) publishEvents(
-	transaction outputs.Transactioner,
+	transaction outputs.Signaler,
 	events []common.MapStr,
 ) {
 	var ignore []int // indices of events to be removed from events
@@ -180,10 +180,10 @@ func (publisher *PublisherType) publishEvents(
 				logp.Err("Failed to publish event type on output %s: %v", out, err)
 			}
 		default:
-			transaction = outputs.NewMultiOutputTransaction(
+			transaction = outputs.NewSplitSignaler(
 				transaction, len(publisher.Output))
 			for _, out := range publisher.Output {
-				err := out.PublishAllEvents(transaction, time.Time(ts), events)
+				err := out.BulkPublish(transaction, time.Time(ts), events)
 				if err != nil {
 					if transaction != nil {
 						transaction.Completed()
@@ -323,8 +323,8 @@ func (publisher *PublisherType) Init(
 			return err
 		}
 
-		var outputers []outputs.BulkOutputer = nil
-		var topoOutput outputs.TopologyOutputer = nil
+		var outputers []outputs.BulkOutputer
+		var topoOutput outputs.TopologyOutputer
 		for _, plugin := range plugins {
 			output := plugin.Output
 			config := plugin.Config
@@ -403,16 +403,16 @@ func (publisher *PublisherType) Init(
 	return nil
 }
 
-func (c *publisherClient) Publish(event common.MapStr) {
-	c.PublishAll([]common.MapStr{event})
+func (c *publisherClient) PublishEvent(event common.MapStr) {
+	c.PublishEvents([]common.MapStr{event})
 }
 
-func (c *publisherClient) PublishAll(events []common.MapStr) {
+func (c *publisherClient) PublishEvents(events []common.MapStr) {
 	c.queue <- message{events: events}
 }
 
 func (c *publisherClient) PublishTransaction(
-	transaction outputs.Transactioner,
+	transaction outputs.Signaler,
 	events []common.MapStr,
 ) {
 	c.queue <- message{transaction: transaction, events: events}

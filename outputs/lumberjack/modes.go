@@ -53,7 +53,7 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(trans outputs.Transactioner, events []common.MapStr) error
+	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
 }
 
 type singleConnectionMode struct {
@@ -107,7 +107,7 @@ func (s *singleConnectionMode) Close() error {
 }
 
 func (s *singleConnectionMode) PublishEvents(
-	trans outputs.Transactioner,
+	trans outputs.Signaler,
 	events []common.MapStr,
 ) error {
 	published := 0
@@ -127,12 +127,12 @@ func (s *singleConnectionMode) PublishEvents(
 		}
 
 		if published == len(events) {
-			outputs.CompleteTransaction(trans)
+			outputs.SignalCompleted(trans)
 			return nil
 		}
 	}
 
-	outputs.FailTransaction(trans)
+	outputs.SignalFailed(trans)
 	return nil
 }
 
@@ -206,7 +206,7 @@ func (f *failOverConnectionMode) Connect(active int) error {
 }
 
 func (f *failOverConnectionMode) PublishEvents(
-	trans outputs.Transactioner,
+	trans outputs.Signaler,
 	events []common.MapStr,
 ) error {
 	published := 0
@@ -233,11 +233,11 @@ func (f *failOverConnectionMode) PublishEvents(
 		}
 
 		if published == len(events) {
-			outputs.CompleteTransaction(trans)
+			outputs.SignalCompleted(trans)
 			return nil
 		}
 	}
 
-	outputs.FailTransaction(trans)
+	outputs.SignalFailed(trans)
 	return nil
 }

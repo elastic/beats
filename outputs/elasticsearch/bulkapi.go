@@ -13,7 +13,7 @@ import (
 )
 
 type EventMsg struct {
-	Trans outputs.Transactioner
+	Trans outputs.Signaler
 	Ts    time.Time
 	Event common.MapStr
 }
