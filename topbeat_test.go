@@ -32,7 +32,7 @@ func TestMemPercentage(t *testing.T) {
 		Free:  2,
 	}
 	beat.addMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 71.43)
+	assert.Equal(t, m.UsedPercent, 0.71)
 
 	m = MemStat{
 		Total: 0,
@@ -74,8 +74,8 @@ func TestCpuPercentage(t *testing.T) {
 
 	beat.addCpuPercentage(&cpu2)
 
-	assert.Equal(t, cpu2.UserPercent, 95.02)
-	assert.Equal(t, cpu2.SystemPercent, 4.48)
+	assert.Equal(t, cpu2.UserPercent, 0.95)
+	assert.Equal(t, cpu2.SystemPercent, 0.04)
 }
 
 func TestProcMemPercentage(t *testing.T) {
@@ -94,7 +94,7 @@ func TestProcMemPercentage(t *testing.T) {
 	beat.procsMap[p.Pid] = &p
 
 	beat.addProcMemPercentage(&p, 10000)
-	assert.Equal(t, p.Mem.RssPercent, 14.16)
+	assert.Equal(t, p.Mem.RssPercent, 0.14)
 }
 
 func TestProcCpuPercentage(t *testing.T) {
@@ -127,5 +127,5 @@ func TestProcCpuPercentage(t *testing.T) {
 	beat.procsMap[p1.Pid] = &p1
 
 	beat.addProcCpuPercentage(&p2)
-	assert.Equal(t, p2.Cpu.UserPercent, 345.9)
+	assert.Equal(t, p2.Cpu.UserPercent, 3.46)
 }
