@@ -1,8 +1,8 @@
 package crawler
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 // Most harvester tests need real files to tes that can be modified. These tests are implemented with
