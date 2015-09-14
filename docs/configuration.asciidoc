@@ -389,7 +389,7 @@ possible values:
 Limit the number of bytes to be copied per value element.
 
 Note:
-values will be base64 encoded, so actual size in json document will be 4 times
+Values will be base64 encoded, so actual size in json document will be 4 times
 maxbytespervalue.
 
 ===== udptransactiontimeout
@@ -400,7 +400,7 @@ Note:
 Quiet messages in UDP binary protocol will get response only in error case.
 The memcache protocol analyzer will wait for udptransactiontimeout milliseconds
 before publishing quiet messages. Non quiet messages or quiet requests with
-error response will not have to wait for the timeout
+error response will not have to wait for the timeout.
 
 ===== tcptransactiontimeout
 
