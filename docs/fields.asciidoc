@@ -356,14 +356,14 @@ Virtual memory the process has in total.
 
 type: int
 
-Resident Set Size. Memory occupied by the process in main memory(RAM).
+Resident Set Size. Memory occupied by the process in main memory (RAM).
 
 
 ==== proc.mem.rss_p
 
 type: float
 
-Memory occupied by the process in main memory(RAM), in percentage.
+Memory occupied by the process in main memory (RAM), in percentage.
 
 
 ==== proc.mem.share

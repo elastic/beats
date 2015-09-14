@@ -299,13 +299,13 @@ process:
               path: proc.mem.rss
               type: int
               description: >
-                Resident Set Size. Memory occupied by the process in main memory(RAM).
+                Resident Set Size. Memory occupied by the process in main memory (RAM).
 
             - name: rss_p
               path: proc.mem.rss_p
               type: float
               description: >
-                Memory occupied by the process in main memory(RAM), in percentage.
+                Memory occupied by the process in main memory (RAM), in percentage.
 
             - name: share
               path: proc.mem.share
