@@ -21,6 +21,13 @@ type Logging struct {
 	To_files  *bool
 }
 
+func init() {
+	// Adds logging specific flags: -v, -e and -d.
+	verbose = flag.Bool("v", false, "Log at INFO level")
+	toStderr = flag.Bool("e", false, "Output to stdout and disable syslog/file output")
+	debugSelectorsStr = flag.String("d", "", "Enable certain debug selectors")
+}
+
 // Init combines the configuration from config with the command line
 // flags to initialize the Logging systems. After calling this function,
 // standard output is always enabled. You can make it respect the command
@@ -103,12 +110,4 @@ func SetStderr() {
 		Info("Startup successful, disable stdout logging")
 		SetToStderr(false, "")
 	}
-}
-
-// Adds logging specific flags to the flag set. The taken flags are
-// -v, -e and -d.
-func CmdLineFlags(flags *flag.FlagSet) {
-	verbose = flags.Bool("v", false, "Log at INFO level")
-	toStderr = flags.Bool("e", false, "Output to stdout and disable syslog/file output")
-	debugSelectorsStr = flags.String("d", "", "Enable certain debug selectors")
 }

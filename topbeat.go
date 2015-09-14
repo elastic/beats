@@ -26,7 +26,7 @@ type Topbeat struct {
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
 
-	err := cfgfile.Read(&tb.TbConfig)
+	err := cfgfile.Read(&tb.TbConfig, "")
 	if err != nil {
 		logp.Err("Error reading configuration file: %v", err)
 		return err
