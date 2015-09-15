@@ -5,6 +5,7 @@ import (
 
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/icmp"
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/udp"
 
@@ -21,18 +22,22 @@ type DecoderStruct struct {
 	eth     layers.Ethernet
 	ip4     layers.IPv4
 	ip6     layers.IPv6
+	icmp4   layers.ICMPv4
+	icmp6   layers.ICMPv6
 	tcp     layers.TCP
 	udp     layers.UDP
 	payload gopacket.Payload
 	decoded []gopacket.LayerType
 
-	tcpProc tcp.Processor
-	udpProc udp.Processor
+	icmp4Proc icmp.ICMPv4Processor
+	icmp6Proc icmp.ICMPv6Processor
+	tcpProc   tcp.Processor
+	udpProc   udp.Processor
 }
 
 // Creates and returns a new DecoderStruct.
-func NewDecoder(datalink layers.LinkType, tcp tcp.Processor, udp udp.Processor) (*DecoderStruct, error) {
-	d := DecoderStruct{tcpProc: tcp, udpProc: udp}
+func NewDecoder(datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, icmp6 icmp.ICMPv6Processor, tcp tcp.Processor, udp udp.Processor) (*DecoderStruct, error) {
+	d := DecoderStruct{icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp}
 
 	logp.Debug("pcapread", "Layer type: %s", datalink.String())
 
@@ -41,17 +46,17 @@ func NewDecoder(datalink layers.LinkType, tcp tcp.Processor, udp udp.Processor) 
 	case layers.LinkTypeLinuxSLL:
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeLinuxSLL,
-			&d.sll, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.udp, &d.payload)
+			&d.sll, &d.d1q, &d.ip4, &d.ip6, &d.icmp4, &d.icmp6, &d.tcp, &d.udp, &d.payload)
 
 	case layers.LinkTypeEthernet:
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeEthernet,
-			&d.eth, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.udp, &d.payload)
+			&d.eth, &d.d1q, &d.ip4, &d.ip6, &d.icmp4, &d.icmp6, &d.tcp, &d.udp, &d.payload)
 
 	case layers.LinkTypeNull: // loopback on OSx
 		d.Parser = gopacket.NewDecodingLayerParser(
 			layers.LayerTypeLoopback,
-			&d.lo, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.udp, &d.payload)
+			&d.lo, &d.d1q, &d.ip4, &d.ip6, &d.icmp4, &d.icmp6, &d.tcp, &d.udp, &d.payload)
 
 	default:
 		return nil, fmt.Errorf("Unsupported link type: %s", datalink.String())
@@ -80,6 +85,8 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 		}
 	}
 
+	has_icmp4 := false
+	has_icmp6 := false
 	has_tcp := false
 	has_udp := false
 
@@ -98,6 +105,16 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 			packet.Tuple.Src_ip = decoder.ip6.SrcIP
 			packet.Tuple.Dst_ip = decoder.ip6.DstIP
 			packet.Tuple.Ip_length = 16
+
+		case layers.LayerTypeICMPv4:
+			logp.Debug("ip", "ICMPv4 packet")
+
+			has_icmp4 = true
+
+		case layers.LayerTypeICMPv6:
+			logp.Debug("ip", "ICMPv6 packet")
+
+			has_icmp6 = true
 
 		case layers.LayerTypeTCP:
 			logp.Debug("ip", "TCP packet")
@@ -134,5 +151,9 @@ func (decoder *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.Capture
 		}
 
 		decoder.tcpProc.Process(&decoder.tcp, &packet)
+	} else if has_icmp4 {
+		decoder.icmp4Proc.ProcessICMPv4(&decoder.icmp4, &packet)
+	} else if has_icmp6 {
+		decoder.icmp6Proc.ProcessICMPv6(&decoder.icmp6, &packet)
 	}
 }

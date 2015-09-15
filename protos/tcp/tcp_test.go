@@ -141,7 +141,7 @@ type protocols struct {
 // Verify protocols implements the protos.Protocols interface.
 var _ protos.Protocols = &protocols{}
 
-func (p protocols) BpfFilter(with_vlans bool) string                             { return "" }
+func (p protocols) BpfFilter(with_vlans bool, with_icmp bool) string             { return "" }
 func (p protocols) GetTcp(proto protos.Protocol) protos.TcpProtocolPlugin        { return p.tcp[proto] }
 func (p protocols) GetUdp(proto protos.Protocol) protos.UdpProtocolPlugin        { return nil }
 func (p protocols) GetAll() map[protos.Protocol]protos.ProtocolPlugin            { return nil }

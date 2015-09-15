@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/decoder"
 	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/icmp"
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/udp"
 
@@ -237,12 +238,15 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 
 func (sniffer *SnifferSetup) Init(
 	test_mode bool,
+	icmp4 icmp.ICMPv4Processor,
+	icmp6 icmp.ICMPv6Processor,
 	tcp tcp.Processor,
 	udp udp.Processor,
 ) error {
 	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
 		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
-		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans)
+		with_icmp := config.ConfigSingleton.Protocols.Icmp.Enabled
+		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans, with_icmp)
 	}
 	logp.Debug("sniffer", "BPF filter: %s", config.ConfigSingleton.Interfaces.Bpf_filter)
 
@@ -254,7 +258,7 @@ func (sniffer *SnifferSetup) Init(
 		}
 	}
 
-	sniffer.Decoder, err = decoder.NewDecoder(sniffer.Datalink(), tcp, udp)
+	sniffer.Decoder, err = decoder.NewDecoder(sniffer.Datalink(), icmp4, icmp6, tcp, udp)
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}

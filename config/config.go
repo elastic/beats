@@ -34,6 +34,7 @@ type InterfacesConfig struct {
 }
 
 type Protocols struct {
+	Icmp     Icmp
 	Dns      Dns
 	Http     Http
 	Memcache Memcache
@@ -46,6 +47,13 @@ type Protocols struct {
 
 type ProtocolCommon struct {
 	Ports              []int `yaml:"ports"`
+	SendRequest        *bool `yaml:"send_request"`
+	SendResponse       *bool `yaml:"send_response"`
+	TransactionTimeout *int  `yaml:"transaction_timeout"`
+}
+
+type Icmp struct {
+	Enabled            bool
 	SendRequest        *bool `yaml:"send_request"`
 	SendResponse       *bool `yaml:"send_response"`
 	TransactionTimeout *int  `yaml:"transaction_timeout"`

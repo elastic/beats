@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/dns"
 	"github.com/elastic/packetbeat/protos/http"
+	"github.com/elastic/packetbeat/protos/icmp"
 	"github.com/elastic/packetbeat/protos/memcache"
 	"github.com/elastic/packetbeat/protos/mongodb"
 	"github.com/elastic/packetbeat/protos/mysql"
@@ -161,11 +162,18 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	var err error
 
+	icmpProc, err := icmp.NewIcmp(false, b.Events)
+	if err != nil {
+		logp.Critical(err.Error())
+		os.Exit(1)
+	}
+
 	tcpProc, err := tcp.NewTcp(&protos.Protos)
 	if err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
+
 	udpProc, err := udp.NewUdp(&protos.Protos)
 	if err != nil {
 		logp.Critical(err.Error())
@@ -189,7 +197,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	*/
 
 	logp.Debug("main", "Initializing sniffer")
-	err = pb.Sniff.Init(false, tcpProc, udpProc)
+	err = pb.Sniff.Init(false, icmpProc, icmpProc, tcpProc, udpProc)
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)
 		os.Exit(1)

@@ -11,6 +11,7 @@ Packetbeat for each transaction. They are grouped in the
 following categories:
 
 * <<exported-fields-event>>
+* <<exported-fields-icmp>>
 * <<exported-fields-dns>>
 * <<exported-fields-http>>
 * <<exported-fields-memcache>>
@@ -106,6 +107,40 @@ The request parameters. For HTTP, these are the POST or GET parameters. For Thri
 
 Messages from Packetbeat itself. This field usually contains error messages for interpreting the raw data. This information can be helpful for troubleshooting.
 
+
+[[exported-fields-icmp]]
+=== ICMP fields
+
+ICMP specific event fields.
+
+
+==== icmp.version
+
+The version of the ICMP protocol.
+
+==== icmp.request.type
+
+type: int
+
+The request type.
+
+==== icmp.request.code
+
+type: int
+
+The request code.
+
+==== icmp.response.type
+
+type: int
+
+The response type.
+
+==== icmp.response.code
+
+type: int
+
+The response code.
 
 [[exported-fields-dns]]
 === DNS Fields

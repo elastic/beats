@@ -194,6 +194,40 @@ event:
         Messages from Packetbeat itself. This field usually contains error messages for
         interpreting the raw data. This information can be helpful for troubleshooting.
 
+    - name: icmp
+      type: group
+      description: ICMP specific event fields.
+      fields:
+        - name: icmp.version
+          description: The version of the ICMP protocol.
+          possible_values:
+            - 4
+            - 6
+
+        - name: icmp.request.message
+          type: string
+          description: A human readable form of the request.
+
+        - name: icmp.request.type
+          type: int
+          description: The request type.
+
+        - name: icmp.request.code
+          type: int
+          description: The request code.
+
+        - name: icmp.response.message
+          type: string
+          description: A human readable form of the response.
+
+        - name: icmp.response.type
+          type: int
+          description: The response type.
+
+        - name: icmp.response.code
+          type: int
+          description: The response code.
+
     - name: dns
       type: group
       description: DNS-specific event fields.
