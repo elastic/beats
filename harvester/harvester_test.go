@@ -1,4 +1,4 @@
-package crawler
+package harvester
 
 import (
 	"github.com/stretchr/testify/assert"
