@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -55,7 +56,7 @@ type redisOutput struct {
 	FlushInterval      time.Duration
 	flush_immediatelly bool
 
-	TopologyMap  map[string]string
+	TopologyMap  atomic.Value // Value holds a map[string][string]
 	sendingQueue chan message
 	connected    bool
 }
@@ -254,11 +255,14 @@ func (out *redisOutput) Reconnect() {
 }
 
 func (out *redisOutput) GetNameByIP(ip string) string {
-	name, exists := out.TopologyMap[ip]
-	if !exists {
-		return ""
+	topologyMap, ok := out.TopologyMap.Load().(map[string]string)
+	if ok {
+		name, exists := topologyMap[ip]
+		if exists {
+			return name
+		}
 	}
-	return name
+	return ""
 }
 
 func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
@@ -291,7 +295,7 @@ func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
 
 func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 
-	TopologyMapTmp := make(map[string]string)
+	topologyMapTmp := make(map[string]string)
 
 	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
@@ -305,14 +309,14 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 		} else {
 			ipaddrs := strings.Split(res, ",")
 			for _, addr := range ipaddrs {
-				TopologyMapTmp[addr] = hostname
+				topologyMapTmp[addr] = hostname
 			}
 		}
 	}
 
-	out.TopologyMap = TopologyMapTmp
+	out.TopologyMap.Store(topologyMapTmp)
 
-	logp.Debug("output_redis", "Topology %s", TopologyMapTmp)
+	logp.Debug("output_redis", "Topology %s", topologyMapTmp)
 }
 
 func (out *redisOutput) PublishEvent(ts time.Time, event common.MapStr) error {

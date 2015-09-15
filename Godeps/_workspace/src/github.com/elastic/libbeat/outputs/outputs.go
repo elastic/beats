@@ -29,6 +29,10 @@ type MothershipConfig struct {
 	Flush_interval     *int
 	Bulk_size          *int
 	Max_retries        *int
+	TLS                *bool
+	Certificate        string
+	CertificateKey     string
+	CAs                []string
 }
 
 type Outputer interface {
@@ -68,6 +72,10 @@ var enabledOutputPlugins = make(map[string]OutputBuilder)
 
 func RegisterOutputPlugin(name string, builder OutputBuilder) {
 	enabledOutputPlugins[name] = builder
+}
+
+func FindOutputPlugin(name string) OutputBuilder {
+	return enabledOutputPlugins[name]
 }
 
 func InitOutputs(
