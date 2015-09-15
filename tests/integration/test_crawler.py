@@ -41,7 +41,7 @@ class Test(TestCase):
 
 
 
-    def test_unifished_line(self):
+    def test_unfinished_line(self):
         self.render_config_template(
             #path="/var/log/*"
             path=os.path.abspath(self.working_dir) + "/log/*"
