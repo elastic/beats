@@ -5,6 +5,13 @@ go:
 
 sudo: false
 
+addons:
+  apt:
+    packages:
+      - libpcap-dev
+      - python-virtualenv
+      - geoip-database
+
 before_install:
   # Redo the travis setup but with the elastic/filebeat path. This is needed so the package path is correct
   - mkdir -p $HOME/gopath/src/github.com/elastic/filebeat
