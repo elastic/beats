@@ -1014,13 +1014,6 @@ The software release of the service serving the transaction. This can be the com
 Arbitrary tags that can be set per shipper and per transaction type.
 
 
-==== transport
-
-example: udp
-
-Transport protocol used for the transaction. If not specified then assume tcp.
-
-
 [[exported-fields-raw]]
 === Raw fields
 

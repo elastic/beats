@@ -96,12 +96,6 @@ env:
         Arbitrary tags that can be set per shipper and per transaction
         type.
 
-    - name: transport
-      description: >
-        Transport protocol used for the transaction. If not specified then
-        assume tcp.
-      example: udp
-
 event:
   type: group
   description: >
