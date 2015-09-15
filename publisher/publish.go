@@ -156,7 +156,7 @@ func (publisher *PublisherType) publishEvents(events []common.MapStr) {
 	// add transaction
 	if !publisher.disabled {
 		for _, out := range publisher.Output {
-			err := out.PublishAllEvents(time.Time(ts), events)
+			err := out.BulkPublish(time.Time(ts), events)
 			if err != nil {
 				logp.Err("Fail to publish event type on output %s: %v", out, err)
 			}

@@ -135,8 +135,8 @@ func (lj *lumberjack) PublishEvent(ts time.Time, event common.MapStr) error {
 	return lj.mode.PublishEvents(events)
 }
 
-// PublishEvents implements the BulkOutputer interface pushing a bulk of events
+// BulkPublish implements the BulkOutputer interface pushing a bulk of events
 // via lumberjack.
-func (lj *lumberjack) PublishAllEvents(ts time.Time, events []common.MapStr) error {
+func (lj *lumberjack) BulkPublish(ts time.Time, events []common.MapStr) error {
 	return lj.mode.PublishEvents(events)
 }

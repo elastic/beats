@@ -48,11 +48,11 @@ type TopologyOutputer interface {
 	GetNameByIP(ip string) string
 }
 
-// BulkOutputer adds PublishAllEvents to publish batches of events without looping.
+// BulkOutputer adds BulkPublish to publish batches of events without looping.
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	PublishAllEvents(ts time.Time, event []common.MapStr) error
+	BulkPublish(ts time.Time, event []common.MapStr) error
 }
 
 type OutputBuilder interface {
@@ -123,7 +123,7 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 	return &bulkOutputAdapter{out}
 }
 
-func (b *bulkOutputAdapter) PublishAllEvents(
+func (b *bulkOutputAdapter) BulkPublish(
 	ts time.Time,
 	events []common.MapStr,
 ) error {
