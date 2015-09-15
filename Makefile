@@ -75,6 +75,7 @@ testsuite: build-image
 	docker-compose run libbeat make testlong
 	# Copy coverage file back to host
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/profile.cov $(shell pwd)/
+	mkdir -p coverage
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/coverage.html $(shell pwd)/coverage/
 
 # Sets up docker-compose locally for jenkins so no global installation is needed
