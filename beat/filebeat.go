@@ -48,7 +48,7 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 	err := cfgfile.Read(&fb.FbConfig, "")
 
 	if err != nil {
-		logp.Warn("Error reading config file:", err)
+		return fmt.Errorf("Error reading config file: %v", err)
 	}
 
 	// This is optiona
