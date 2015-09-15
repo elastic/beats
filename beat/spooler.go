@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var stopSpooler = false
+
 // startSpooler Starts up the spooler and starts listening on the spool channel from the harvester
 // Sends then bulk updates to the publisher channel
 func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
@@ -58,9 +60,13 @@ func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
 				}
 			}
 		}
-	}
+
+		if (stopSpooler) {
+			break
+		}
+ 	}
 }
 
 func (fb *Filebeat) stopSpooler() {
-
+	stopSpooler = true
 }

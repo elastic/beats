@@ -120,6 +120,9 @@ func (fb *Filebeat) Stop() {
 	// Flush what is in spooler
 	// Write state
 
+	fb.stopSpooler()
+
+
 	// FIXME: Improve to first write state and then close channels
 	close(fb.SpoolChan)
 	close(fb.publisherChan)
