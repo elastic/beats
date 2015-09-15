@@ -36,7 +36,6 @@ coverage:
 	go get github.com/pierrre/gotestcover
 	mkdir -p coverage
 	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=coverage/unit.cov -covermode=count github.com/elastic/filebeat/...
-	mkdir -p coverage
 	$(GODEP) go tool cover -html=coverage/unit.cov -o coverage/unit.html
 
 # Command used by CI Systems
