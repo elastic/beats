@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
@@ -29,7 +28,7 @@ type Beat struct {
 	Version string
 	Config  *BeatConfig
 	BT      Beater
-	Events  chan common.MapStr
+	Events  publisher.EventPublisher
 }
 
 // Basic configuration of every beat
@@ -92,7 +91,7 @@ func (b *Beat) LoadConfig() {
 		os.Exit(1)
 	}
 
-	b.Events = publisher.Publisher.Queue
+	b.Events = publisher.Publisher.Client()
 
 	logp.Debug("beat", "Init %s", b.Name)
 }
