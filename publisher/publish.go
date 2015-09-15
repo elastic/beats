@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -23,10 +22,12 @@ import (
 // command line flags
 var publishDisabled *bool
 
+var debug = logp.MakeDebug("publish")
+
 // EventPublisher provides the interface for beats to publish events.
 type EventPublisher interface {
-	PublishEvent(event common.MapStr)
-	PublishEvents(events []common.MapStr)
+	PublishEvent(event common.MapStr) bool
+	PublishEvents(events []common.MapStr) bool
 }
 
 type TransactionalEventPublisher interface {
@@ -38,22 +39,17 @@ type PublisherType struct {
 	tags           []string
 	disabled       bool
 	Index          string
-	Output         []outputs.BulkOutputer
+	Output         []*outputWorker
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
 
 	RefreshTopologyTimer <-chan time.Time
-	queue                chan message
-}
 
-type message struct {
-	transaction outputs.Signaler
-	events      []common.MapStr
-}
+	wsOutput    workerSignal
+	wsPublisher workerSignal
 
-type publisherClient struct {
-	queue chan message
+	syncPublisher *syncPublisher
 }
 
 type ShipperConfig struct {
@@ -81,7 +77,7 @@ func PrintPublishEvent(event common.MapStr) {
 	if err != nil {
 		logp.Err("json.Marshal: %s", err)
 	} else {
-		logp.Debug("publish", "Publish: %s", string(json))
+		debug("Publish: %s", string(json))
 	}
 }
 
@@ -105,170 +101,11 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 }
 
 func (p *PublisherType) Client() EventPublisher {
-	return &publisherClient{p.queue}
+	return p.syncPublisher.client()
 }
 
-func (publisher *PublisherType) publishFromQueue() {
-	for msg := range publisher.queue {
-		publisher.publishEvents(msg.transaction, msg.events)
-	}
-}
-
-func (publisher *PublisherType) publishEvents(
-	transaction outputs.Signaler,
-	events []common.MapStr,
-) {
-	var ignore []int // indices of events to be removed from events
-	for i, event := range events {
-		// validate some required field
-		if err := filterEvent(event); err != nil {
-			logp.Err("Publishing event failed: %v", err)
-			ignore = append(ignore, i)
-			continue
-		}
-
-		// update address and geo-ip information. Ignore event
-		// if address is invalid or event is found to be a duplicate
-		ok := updateEventAddresses(publisher, event)
-		if !ok {
-			ignore = append(ignore, i)
-			continue
-		}
-
-		// add additional meta data
-		event["shipper"] = publisher.name
-		if len(publisher.tags) > 0 {
-			event["tags"] = publisher.tags
-		}
-
-		if logp.IsDebug("publish") {
-			PrintPublishEvent(event)
-		}
-	}
-
-	// return if no event is left
-	if len(ignore) == len(events) {
-		if transaction != nil {
-			transaction.Completed()
-		}
-		return
-	}
-
-	// remove invalid events.
-	// TODO: is order important? Removal can be turned into O(len(ignore)) by
-	//       copying last element into idx and doing
-	//       events=events[:len(events)-len(ignore)] afterwards
-	// Alternatively filtering could be implemented like:
-	//   https://github.com/golang/go/wiki/SliceTricks#filtering-without-allocating
-	for i := len(ignore) - 1; i >= 0; i-- {
-		idx := ignore[i]
-		events = append(events[:idx], events[idx+1:]...)
-	}
-
-	// get timestamp of first event for outputer
-	ts := events[0]["timestamp"].(common.Time)
-
-	// add transaction
-	if !publisher.disabled {
-		switch len(publisher.Output) {
-		case 0:
-			break
-		case 1:
-			out := publisher.Output[0]
-			err := out.BulkPublish(transaction, time.Time(ts), events)
-			if err != nil {
-				logp.Err("Failed to publish event type on output %s: %v", out, err)
-			}
-		default:
-			transaction = outputs.NewSplitSignaler(
-				transaction, len(publisher.Output))
-			for _, out := range publisher.Output {
-				err := out.BulkPublish(transaction, time.Time(ts), events)
-				if err != nil {
-					if transaction != nil {
-						transaction.Completed()
-					}
-					logp.Err("Fail to publish event type on output %s: %v", out, err)
-				}
-			}
-		}
-	}
-}
-
-// filterEvent validates an event for common required fields with types.
-// If event is to be filtered out the reason is returned as error.
-func filterEvent(event common.MapStr) error {
-	_, ok := event["timestamp"].(common.Time)
-	if !ok {
-		return errors.New("Missing 'timestamp' field from event")
-	}
-
-	err := event.EnsureCountField()
-	if err != nil {
-		return err
-	}
-
-	t, ok := event["type"]
-	if !ok {
-		return errors.New("Missing 'type' field from event.")
-	}
-
-	_, ok = t.(string)
-	if !ok {
-		return errors.New("Invalid 'type' field from event.")
-	}
-
-	return nil
-}
-
-func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
-	var src_server, dst_server string
-	src, ok := event["src"].(*common.Endpoint)
-	if ok {
-		src_server = publisher.GetServerName(src.Ip)
-		event["client_ip"] = src.Ip
-		event["client_port"] = src.Port
-		event["client_proc"] = src.Proc
-		event["client_server"] = src_server
-		delete(event, "src")
-	}
-	dst, ok := event["dst"].(*common.Endpoint)
-	if ok {
-		dst_server = publisher.GetServerName(dst.Ip)
-		event["ip"] = dst.Ip
-		event["port"] = dst.Port
-		event["proc"] = dst.Proc
-		event["server"] = dst_server
-		delete(event, "dst")
-	}
-
-	if publisher.IgnoreOutgoing && dst_server != "" &&
-		dst_server != publisher.name {
-		// duplicated transaction -> ignore it
-		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-		return false
-	}
-
-	if publisher.GeoLite != nil {
-		real_ip, exists := event["real_ip"]
-		if exists && len(real_ip.(string)) > 0 {
-			loc := publisher.GeoLite.GetLocationByIP(real_ip.(string))
-			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-				event["client_location"] = loc
-			}
-		} else {
-			if len(src_server) == 0 && src != nil { // only for external IP addresses
-				loc := publisher.GeoLite.GetLocationByIP(src.Ip)
-				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-					event["client_location"] = loc
-				}
-			}
-		}
-	}
-
-	return true
+func (p *PublisherType) SyncClient() EventPublisher {
+	return p.syncPublisher.client()
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
@@ -291,7 +128,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	}
 
 	if publisher.TopologyOutput != nil {
-		logp.Debug("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
+		debug("Add topology entry for %s: %s", publisher.name, localAddrs)
 
 		err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
 		if err != nil {
@@ -317,18 +154,25 @@ func (publisher *PublisherType) Init(
 
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
+	publisher.wsOutput.Init()
+	publisher.wsPublisher.Init()
+
 	if !publisher.disabled {
 		plugins, err := outputs.InitOutputs(beat, configs, shipper.Topology_expire)
 		if err != nil {
 			return err
 		}
 
-		var outputers []outputs.BulkOutputer
+		var outputers []*outputWorker
 		var topoOutput outputs.TopologyOutputer
 		for _, plugin := range plugins {
 			output := plugin.Output
 			config := plugin.Config
-			outputers = append(outputers, outputs.CastBulkOutputer(output))
+
+			debug("create output worker: %p, %p", config.Flush_interval, config.Bulk_size)
+
+			outputers = append(outputers,
+				newOutputWorker(config, output, &publisher.wsOutput, 1000))
 
 			if !config.Save_topology {
 				continue
@@ -350,6 +194,7 @@ func (publisher *PublisherType) Init(
 			topoOutput = topo
 			logp.Info("Using %s to store the topology", plugin.Name)
 		}
+
 		Publisher.Output = outputers
 		Publisher.TopologyOutput = topoOutput
 	}
@@ -397,23 +242,7 @@ func (publisher *PublisherType) Init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.queue = make(chan message, 1000)
-	go publisher.publishFromQueue()
+	publisher.syncPublisher = newSyncPublisher(publisher)
 
 	return nil
-}
-
-func (c *publisherClient) PublishEvent(event common.MapStr) {
-	c.PublishEvents([]common.MapStr{event})
-}
-
-func (c *publisherClient) PublishEvents(events []common.MapStr) {
-	c.queue <- message{events: events}
-}
-
-func (c *publisherClient) PublishTransaction(
-	transaction outputs.Signaler,
-	events []common.MapStr,
-) {
-	c.queue <- message{transaction: transaction, events: events}
 }
