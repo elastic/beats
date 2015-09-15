@@ -2,8 +2,6 @@ package crawler
 
 import (
 	"os"
-
-	"github.com/elastic/filebeat/input"
 )
 
 // TODO: Implement
