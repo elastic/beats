@@ -283,3 +283,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 		logp.Debug("prospector", "Not harvesting, file didn't change: ", file)
 	}
 }
+
+func (p *Prospector) Stop() {
+
+}
