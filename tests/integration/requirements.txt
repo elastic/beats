@@ -1,0 +1,3 @@
+nose
+jinja2
+PyYAML

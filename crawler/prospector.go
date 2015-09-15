@@ -309,3 +309,7 @@ func (p *Prospector) calculateResume(file string, fileinfo os.FileInfo, resume *
 	// New file so just start from an automatic position
 	return 0, false
 }
+
+func (p *Prospector) Stop() {
+
+}
