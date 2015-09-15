@@ -9,10 +9,20 @@ RUN go get \
 	golang.org/x/tools/cmd/cover \
 	golang.org/x/tools/cmd/vet
 
-WORKDIR /go/src/github.com/elastic/libbeat
-# Setup work environment
-RUN mkdir -p /go/src/github.com/elastic/libbeat
+COPY docker-entrypoint.sh /entrypoint.sh
 
+# Setup work environment
+ENV LIBBEAT_PATH /go/src/github.com/elastic/libbeat
+RUN mkdir -p $LIBBEAT_PATH
+WORKDIR $LIBBEAT_PATH
+
+# Create a copy of the respository inside the container.
 COPY . /go/src/github.com/elastic/libbeat
 
+# It is expected that libbeat from the host is mounted
+# within the container at the WORKDIR location.
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Build libbeat inside of the container so that it is ready
+# for testing.
 RUN make
