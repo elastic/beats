@@ -13,7 +13,7 @@ func (p *Prospector) isFileRenamed(file string, info os.FileInfo, missingfiles m
 	return ""
 }
 
-func (p *Prospector) isFileRenamedResumelist(file string, info os.FileInfo, initial map[string]*input.FileState) string {
+func (c *Crawler) isFileRenamedResumelist(file string, info os.FileInfo, initial map[string]*input.FileState) string {
 	// Can we detect if a file was renamed on Windows?
 	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool?
 	return ""

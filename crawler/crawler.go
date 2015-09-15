@@ -1,10 +1,10 @@
 package crawler
 
 import (
-	"github.com/elastic/filebeat/input"
-
 	cfg "github.com/elastic/filebeat/config"
+	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
+	"os"
 )
 
 /*
@@ -13,13 +13,14 @@ import (
  Crawler: Filebeat has one crawler. The crawler is the single point of control and stores the state. The state is written through the registrar
  Prospector: For every FileConfig the crawler starts a prospector
  Harvestor: For every file found inside the FileConfig, the Prospector starts a Harvestor
- 		The harvestor send their events to the spooler
+ 		The harvester send their events to the spooler
  		The spooler sends the event to the publisher
  		The publisher writes the state down with the registrar
 */
 
 // Last reading state of the prospector
 type Crawler struct {
+	// List of all files which were crawled with the state
 	Files   map[string]*input.FileState
 	Persist chan *input.FileState
 }
@@ -36,7 +37,10 @@ func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.
 			FileConfig: fileconfig,
 			crawler:    crawler,
 		}
-		go prospector.Prospect(eventChan)
+
+		prospector.Init()
+
+		go prospector.Start(eventChan)
 		pendingProspectorCnt++
 	}
 
@@ -59,6 +63,38 @@ func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.
 	logp.Info("All prospectors initialised with %d states to persist", len(persist))
 }
 
-func (crawler *Cralwer) Stop() {
+func (crawler *Crawler) Stop() {
 	// TODO: To be implemented for proper shutdown
+}
+
+func (crawler *Crawler) fetchState(file string, fileinfo os.FileInfo) (int64, bool) {
+
+	// Check if there is a state for this file
+	lastState, isFound := crawler.Files[file]
+
+	if isFound && input.IsSameFile(file, fileinfo, lastState) {
+		// We're resuming - throw the last state back downstream so we resave it
+		// And return the offset - also force harvest in case the file is old and we're about to skip it
+		crawler.Persist <- lastState
+		return lastState.Offset, true
+	}
+
+	if previous := crawler.isFileRenamedResumelist(file, fileinfo); previous != "" {
+		// File has rotated between shutdown and startup
+		// We return last state downstream, with a modified event source with the new file name
+		// And return the offset - also force harvest in case the file is old and we're about to skip it
+		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, file)
+
+		lastState := crawler.Files[previous]
+		lastState.Source = &file
+		crawler.Persist <- lastState
+		return lastState.Offset, true
+	}
+
+	if isFound {
+		logp.Debug("prospector", "Not resuming rotated file: %s", file)
+	}
+
+	// New file so just start from an automatic position
+	return 0, false
 }

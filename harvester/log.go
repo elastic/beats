@@ -1,4 +1,4 @@
-package crawler
+package harvester
 
 import (
 	"bufio"
@@ -8,21 +8,15 @@ import (
 	"os"
 	"time"
 
-	cfg "github.com/elastic/filebeat/config"
-	. "github.com/elastic/filebeat/input"
+	"github.com/elastic/filebeat/config"
+	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
 )
 
-type Harvester struct {
-	Path       string /* the file path to harvest */
-	FileConfig cfg.FileConfig
-	Offset     int64
-	FinishChan chan int64
+// Log harvester reads files line by line and sends events to logstash
+// Multiline log support is required
 
-	file *os.File /* the file being watched */
-}
-
-func (h *Harvester) Harvest(output chan *FileEvent) {
+func (h *Harvester) Harvest() {
 	h.open()
 	info, e := h.file.Stat()
 
@@ -41,7 +35,7 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 
 	h.initOffset()
 
-	reader := bufio.NewReaderSize(h.file, cfg.CmdlineOptions.HarvesterBufferSize) // 16kb buffer by default
+	reader := bufio.NewReaderSize(h.file, config.CmdlineOptions.HarvesterBufferSize) // 16kb buffer by default
 	buffer := new(bytes.Buffer)
 
 	var readTimeout = 10 * time.Second
@@ -62,7 +56,7 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 		lastReadTime = time.Now()
 
 		line++
-		event := &FileEvent{
+		event := &input.FileEvent{
 			Source:   &h.Path,
 			Offset:   h.Offset,
 			Line:     line,
@@ -72,35 +66,8 @@ func (h *Harvester) Harvest(output chan *FileEvent) {
 		}
 		h.Offset += int64(bytesread)
 
-		output <- event // ship the new event downstream
+		h.SpoolerChan <- event // ship the new event downstream
 	}
-}
-
-// Handles eror durint reading file. If EOF and nothing special, exit without errors
-func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
-	if err == io.EOF {
-		// timed out waiting for data, got eof.
-		// Check to see if the file was truncated
-		info, _ := h.file.Stat()
-
-		if h.FileConfig.IgnoreOlder != "" {
-			logp.Debug("harvester", "Ignore Unmodified After: %s", h.FileConfig.IgnoreOlder)
-		}
-
-		if info.Size() < h.Offset {
-			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
-			h.file.Seek(0, os.SEEK_SET)
-			h.Offset = 0
-		} else if age := time.Since(lastTimeRead); age > h.FileConfig.IgnoreOlderDuration {
-			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
-			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
-			return err
-		}
-	} else {
-		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
-		return err
-	}
-	return nil
 }
 
 // initOffset finds the current offset of the file and sets it in the harvester as position
@@ -110,7 +77,7 @@ func (h *Harvester) initOffset() {
 
 	if h.Offset > 0 {
 		logp.Debug("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-	} else if cfg.CmdlineOptions.TailOnRotate {
+	} else if config.CmdlineOptions.TailOnRotate {
 		logp.Debug("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
 	} else {
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
@@ -123,7 +90,7 @@ func (h *Harvester) initOffset() {
 func (h *Harvester) setFileOffset() {
 	if h.Offset > 0 {
 		h.file.Seek(h.Offset, os.SEEK_SET)
-	} else if cfg.CmdlineOptions.TailOnRotate {
+	} else if config.CmdlineOptions.TailOnRotate {
 		h.file.Seek(0, os.SEEK_END)
 	} else {
 		h.file.Seek(0, os.SEEK_SET)
@@ -151,7 +118,7 @@ func (h *Harvester) open() *os.File {
 		}
 	}
 
-	file := &File{
+	file := &input.File{
 		File: h.file,
 	}
 
@@ -166,6 +133,7 @@ func (h *Harvester) open() *os.File {
 }
 
 func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_timeout time.Duration) (*string, int, error) {
+	// TODO: Read line should be improved in a way so it can also read multi lines or even full files when required. See "type" in config file
 	var isPartial bool = true
 	var newline_length int = 1
 	start_time := time.Now()
@@ -215,4 +183,31 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 			return str, bufferSize, nil
 		}
 	}
+}
+
+// Handles eror during reading file. If EOF and nothing special, exit without errors
+func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
+	if err == io.EOF {
+		// timed out waiting for data, got eof.
+		// Check to see if the file was truncated
+		info, _ := h.file.Stat()
+
+		if h.FileConfig.IgnoreOlder != "" {
+			logp.Debug("harvester", "Ignore Unmodified After: %s", h.FileConfig.IgnoreOlder)
+		}
+
+		if info.Size() < h.Offset {
+			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
+			h.file.Seek(0, os.SEEK_SET)
+			h.Offset = 0
+		} else if age := time.Since(lastTimeRead); age > h.FileConfig.IgnoreOlderDuration {
+			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
+			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
+			return err
+		}
+	} else {
+		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
+		return err
+	}
+	return nil
 }
