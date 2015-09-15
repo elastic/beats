@@ -170,7 +170,7 @@ func (out *redisOutput) Connect() error {
 }
 
 func (out *redisOutput) Close() {
-	out.Conn.Close()
+	_ = out.Conn.Close()
 }
 
 func (out *redisOutput) Reconnect() {
@@ -205,7 +205,7 @@ func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	_, err = conn.Do("HSET", name, "ipaddrs", strings.Join(localAddrs, ","))
 	if err != nil {
@@ -299,7 +299,11 @@ func (out *redisOutput) BulkPublish(
 			return err
 		}
 	}
-	out.Conn.Flush()
+	if err := out.Conn.Flush(); err != nil {
+		outputs.Signal(signal, err)
+		out.onFail(err)
+		return err
+	}
 	_, err := out.Conn.Receive()
 	outputs.Signal(signal, err)
 	out.onFail(err)

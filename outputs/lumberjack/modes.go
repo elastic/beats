@@ -90,7 +90,7 @@ func newSingleConnectionMode(
 		conn:    client,
 	}
 
-	s.Connect() // try to connect, but ignore errors for now
+	_ = s.Connect() // try to connect, but ignore errors for now
 	return s, nil
 }
 
@@ -146,7 +146,10 @@ func newFailOverConnectionMode(
 		timeout:   timeout,
 		waitRetry: waitRetry,
 	}
-	f.Connect(-1)
+
+	// Try to connect preliminary, but ignore errors for now.
+	// Main publisher loop is responsible to ensure an available connection.
+	_ = f.Connect(-1)
 	return f, nil
 }
 
@@ -155,7 +158,7 @@ func (f *failOverConnectionMode) Close() error {
 		f.closed = true
 		for _, conn := range f.conns {
 			if conn.IsConnected() {
-				conn.Close()
+				_ = conn.Close()
 			}
 		}
 	}

@@ -154,13 +154,24 @@ func (es *Elasticsearch) BulkWith(
 	enc := json.NewEncoder(&buf)
 	if metaBuilder == nil {
 		for _, obj := range body {
-			enc.Encode(obj)
+			pos := buf.Len()
+			if err := enc.Encode(obj); err != nil {
+				debug("Failed to encode message: %s", err)
+				buf.Truncate(pos)
+			}
 		}
 	} else {
 		for _, obj := range body {
+			pos := buf.Len()
 			meta := metaBuilder.Meta(obj)
-			enc.Encode(meta)
-			enc.Encode(obj)
+			err := enc.Encode(meta)
+			if err == nil {
+				err = enc.Encode(obj)
+			}
+			if err != nil {
+				debug("Failed to encode message: %s", err)
+				buf.Truncate(pos)
+			}
 		}
 	}
 

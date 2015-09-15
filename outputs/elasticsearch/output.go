@@ -12,6 +12,8 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
+var debug = logp.MakeDebug("elasticsearch")
+
 func init() {
 	outputs.RegisterOutputPlugin("elasticsearch", ElasticsearchOutputPlugin{})
 }
@@ -134,7 +136,10 @@ func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfi
 func (out *elasticsearchOutput) EnableTTL() error {
 
 	// make sure the .packetbeat-topology index exists
-	out.Conn.CreateIndex(".packetbeat-topology", nil)
+	// Ignore error here, as CreateIndex will error (400 Bad Request) if index
+	// already exists. If index could not be created, next api call to index will
+	// fail anyway.
+	_, _ = out.Conn.CreateIndex(".packetbeat-topology", nil)
 
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
@@ -319,7 +324,7 @@ func (out *elasticsearchOutput) BulkPublish(
 	go func() {
 		request, err := out.Conn.startBulkRequest("", "", nil)
 		if err != nil {
-			logp.Err("Fail to perform many index operations in a single API call: %s", err)
+			logp.Err("Failed to perform many index operations in a single API call: %s", err)
 			outputs.Signal(trans, err)
 			return
 		}
@@ -343,7 +348,7 @@ func (out *elasticsearchOutput) BulkPublish(
 		_, err = request.Flush()
 		outputs.Signal(trans, err)
 		if err != nil {
-			logp.Err("Fail to perform many index operations in a single API call: %s",
+			logp.Err("Failed to perform many index operations in a single API call: %s",
 				err)
 		}
 	}()

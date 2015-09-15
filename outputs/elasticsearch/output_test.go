@@ -42,7 +42,6 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsea
 }
 
 func TestTopologyInES(t *testing.T) {
-
 	if testing.Short() {
 		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
 	}

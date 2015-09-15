@@ -84,7 +84,7 @@ func (pool *ConnectionPool) GetConnection() *Connection {
 // timeout = default_timeout * 2 ** (fail_count - 1)
 // When the timeout is over, the connection will be resurrected and
 // returned to the live pool
-func (pool *ConnectionPool) MarkDead(conn *Connection) error {
+func (pool *ConnectionPool) MarkDead(conn *Connection) {
 
 	if !conn.dead {
 		logp.Debug("elasticsearch", "Mark dead %s", conn.Url)
@@ -97,18 +97,15 @@ func (pool *ConnectionPool) MarkDead(conn *Connection) error {
 			logp.Debug("elasticsearch", "Timeout expired. Mark it as alive: %s", conn.Url)
 		})
 	}
-
-	return nil
 }
 
 // A connection that has been previously marked as dead and succeeds will be marked
 // as live and the dead_count is set to zero
-func (pool *ConnectionPool) MarkLive(conn *Connection) error {
+func (pool *ConnectionPool) MarkLive(conn *Connection) {
 	if conn.dead {
 		logp.Debug("elasticsearch", "Mark live %s", conn.Url)
 		conn.dead = false
 		conn.dead_count = 0
 		conn.timer.Stop()
 	}
-	return nil
 }

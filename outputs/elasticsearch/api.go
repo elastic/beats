@@ -59,7 +59,7 @@ const (
 func NewElasticsearch(urls []string, username string, password string) *Elasticsearch {
 
 	var connection_pool ConnectionPool
-	connection_pool.SetConnections(urls, username, password)
+	_ = connection_pool.SetConnections(urls, username, password) // never errors
 
 	es := Elasticsearch{
 		connectionPool: connection_pool,
@@ -175,7 +175,7 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 		return nil, do_retry, fmt.Errorf("%v", resp.Status)
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		es.connectionPool.MarkDead(conn)

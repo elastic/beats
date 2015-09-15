@@ -8,8 +8,11 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
+
+var debug = logp.MakeDebug("lumberjack")
 
 func init() {
 	outputs.RegisterOutputPlugin("lumberjack", lumberjackOutputPlugin{})
@@ -108,7 +111,7 @@ func makeClients(
 			transp, err := newTransp(host)
 			if err != nil {
 				for _, client := range clients {
-					client.Close()
+					_ = client.Close() // ignore error
 				}
 				return nil, err
 			}
