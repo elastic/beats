@@ -21,6 +21,78 @@
         }
       ],
       "properties": {
+        "cpu": {
+          "properties": {
+            "system_p": {
+              "doc_values": "true",
+              "type": "float"
+            },
+            "user_p": {
+              "doc_values": "true",
+              "type": "float"
+            }
+          }
+        },
+        "fs": {
+          "properties": {
+            "used_p": {
+              "doc_values": "true",
+              "type": "float"
+            }
+          }
+        },
+        "load": {
+          "properties": {
+            "load1": {
+              "doc_values": "true",
+              "type": "float"
+            },
+            "load15": {
+              "doc_values": "true",
+              "type": "float"
+            },
+            "load5": {
+              "doc_values": "true",
+              "type": "float"
+            }
+          }
+        },
+        "mem": {
+          "properties": {
+            "used_p": {
+              "doc_values": "true",
+              "type": "float"
+            }
+          }
+        },
+        "proc": {
+          "properties": {
+            "cpu": {
+              "properties": {
+                "user_p": {
+                  "doc_values": "true",
+                  "type": "float"
+                }
+              }
+            },
+            "mem": {
+              "properties": {
+                "rss_p": {
+                  "doc_values": "true",
+                  "type": "float"
+                }
+              }
+            }
+          }
+        },
+        "swap": {
+          "properties": {
+            "used_p": {
+              "doc_values": "true",
+              "type": "float"
+            }
+          }
+        },
         "timestamp": {
           "type": "date"
         }

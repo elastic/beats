@@ -1,0 +1,444 @@
+
+////
+This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+== Exported fields
+
+This document describes the fields that are exported by the
+topbeat. They are grouped in the
+following categories:
+
+* <<exported-fields-env>>
+* <<exported-fields-system>>
+* <<exported-fields-process>>
+* <<exported-fields-filesystem>>
+
+[[exported-fields-env]]
+=== Common fields fields
+
+Contains common fields available in all event types.
+
+
+
+==== timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the measurements were taken. The precision is in milliseconds. The timezone is UTC.
+
+
+==== type
+
+required: True
+
+Set to "system" to specify that are system wide statistics.
+
+
+==== count
+
+type: int
+
+required: True
+
+For how many transactions is this event representative. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values. Reserved for future usage.
+
+
+==== shipper
+
+type: string
+
+Name of the shipper sending the statistics
+
+
+[[exported-fields-system]]
+=== System wide statistics fields
+
+Contains system wide statistics. Details that you can get by running the *top* command on Unix systems.
+
+
+
+=== load fields
+
+System load average. The load average is the average number  of jobs in the run queue.
+
+
+
+==== load1
+
+type: float
+
+Load average over 1 minute. 
+
+
+==== load5
+
+type: float
+
+Load average over 5 minutes.
+
+
+==== load15
+
+type: float
+
+Load average over 15 minutes. 
+
+
+=== cpu fields
+
+This group contains statistics related to the CPU usage.
+
+
+==== cpu.user
+
+type: int
+
+CPU time spent in user space 
+
+
+==== cpu.user_p
+
+type: float
+
+CPU time spent in user space, in percentage. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the cpu.user_p will be 180%.
+
+
+==== cpu.nice
+
+type: int
+
+CPU time spent on low priority processes
+
+
+==== cpu.system
+
+type: int
+
+CPU time spent in kernel space
+
+
+==== cpu.system_p
+
+type: float
+
+CPU time spent in kernel space, in percentage.
+
+
+==== cpu.idle
+
+type: int
+
+CPU time spent idle
+
+
+==== cpu.iowait
+
+type: int
+
+CPU time spent in wait (on disk)
+
+
+==== cpu.irq
+
+type: int
+
+CPU time spent servicing/handling hardware interrupts
+
+
+==== cpu.softirq
+
+type: int
+
+CPU time spent servicing/handling software interrupts
+
+==== cpu.steal
+
+type: int
+
+CPU time in involuntary wait by virtual cpu while hypervisor is servicing another processor CPU time stolen from a virtual machine. Available only on Unix.
+
+=== mem fields
+
+This group contains statistics related to the memory usage on the system.
+
+
+==== mem.total
+
+type: int
+
+Total memory
+
+
+==== mem.used
+
+type: int
+
+Used memory
+
+
+==== mem.free
+
+type: int
+
+Available memory
+
+
+==== mem.used_p
+
+type: float
+
+Used memory, in percentage
+
+
+==== mem.actual_used
+
+type: int
+
+Actual used memory. Available only on Unix.
+
+
+==== mem.actual_free
+
+type: int
+
+Actual available memory. Available only on Unix.
+
+
+=== swap fields
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+==== swap.total
+
+type: int
+
+Total swap memory
+
+
+==== swap.used
+
+type: int
+
+Used swap memory
+
+
+==== swap.free
+
+type: int
+
+Available swap memory
+
+
+==== swap.used_p
+
+type: float
+
+Used swap memory, in percentage
+
+
+==== swap.actual_used
+
+type: int
+
+Actual used swap memory. Available only on Unix.
+
+
+==== swap.actual_free
+
+type: int
+
+Actual available swap memory. Available only on Unix.
+
+
+[[exported-fields-process]]
+=== Per process statistics fields
+
+Per process statistics that you can get by running the *top* or *ps* command on Unix systems.
+
+
+
+=== proc fields
+
+Contains per process statistics like memory usage, CPU usage and details about each process like state, name, pid, ppid.
+
+
+
+==== proc.name
+
+type: string
+
+Process name.
+
+
+==== proc.state
+
+type: string
+
+Process state. Example: "running"
+
+
+==== proc.pid
+
+type: int
+
+Process pid.
+
+
+==== proc.ppid
+
+type: int
+
+Process parent pid.
+
+
+=== cpu fields
+
+CPU specific statistics per process.
+
+
+==== proc.cpu.user
+
+type: int
+
+CPU time spent in user space by the process.
+
+
+==== proc.cpu.user_p
+
+type: float
+
+CPU time spent in user space by the process, in percentage.
+
+
+==== proc.cpu.system
+
+type: int
+
+CPU time spent in kernel space by the process.
+
+
+==== proc.cpu.total
+
+type: int
+
+Total CPU time spent by the process.
+
+
+==== proc.cpu.start_time
+
+type: string
+
+Time when the process was started. Example: "17:45".
+
+
+=== mem fields
+
+Memory specific statistics per process.
+
+
+==== proc.mem.size
+
+type: int
+
+Virtual memory the process has in total.
+
+
+==== proc.mem.rss
+
+type: int
+
+Resident Set Size. Memory occupied by the process in main memory (RAM).
+
+
+==== proc.mem.rss_p
+
+type: float
+
+Memory occupied by the process in main memory (RAM), in percentage.
+
+
+==== proc.mem.share
+
+type: int
+
+Shared memory the process uses.
+
+
+[[exported-fields-filesystem]]
+=== File system statistics fields
+
+File system related statistics that you can get by using the *df* command on Unix systems.
+
+
+
+=== fs fields
+
+Contains details about the mounted disks like the total or used disk space and details about each disk like device name and the mounting place.
+
+
+
+==== fs.avail
+
+type: int
+
+Available disk space in bytes.
+
+
+==== fs.device_name
+
+type: string
+
+Disk name. Example: /dev/disk1
+
+
+==== fs.mount_point
+
+type: string
+
+Mounting point. Example: /
+
+
+==== fs.files
+
+type: int
+
+Total file nodes in the file system. 
+
+
+==== fs.free_files
+
+type: int
+
+Free file nodes in the file system.
+
+
+==== fs.total
+
+type: int
+
+Total disk space in bytes.
+
+
+==== fs.used
+
+type: int
+
+Used disk space in bytes.
+
+
+==== fs.used_p
+
+type: float
+
+Used disk space in percentage
+
+

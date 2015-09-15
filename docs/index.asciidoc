@@ -4,6 +4,8 @@ include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
+include::./fields.asciidoc[]
+
 // include::./configuration.asciidoc[]
 
 include::./windows.asciidoc[]
