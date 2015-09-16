@@ -22,7 +22,7 @@ func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	return s
 }
 
-func (p *syncPublisher) client() EventPublisher {
+func (p *syncPublisher) client() eventPublisher {
 	return syncClient(p.send)
 }
 

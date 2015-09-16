@@ -25,7 +25,7 @@ var publishDisabled *bool
 var debug = logp.MakeDebug("publish")
 
 // EventPublisher provides the interface for beats to publish events.
-type EventPublisher interface {
+type eventPublisher interface {
 	PublishEvent(event common.MapStr) bool
 	PublishEvents(events []common.MapStr) bool
 }
@@ -107,12 +107,8 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	return ""
 }
 
-func (publisher *PublisherType) Client() EventPublisher {
-	return publisher.asyncPublisher.client()
-}
-
-func (publisher *PublisherType) SyncClient() EventPublisher {
-	return publisher.syncPublisher.client()
+func (publisher *PublisherType) Client() Client {
+	return &client{publisher}
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {

@@ -55,7 +55,7 @@ func (p *asyncPublisher) onMessage(m message) {
 	}
 }
 
-func (p *asyncPublisher) client() EventPublisher {
+func (p *asyncPublisher) client() eventPublisher {
 	return asyncClient(p.send)
 }
 

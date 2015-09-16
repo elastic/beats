@@ -28,7 +28,7 @@ type Beat struct {
 	Version string
 	Config  *BeatConfig
 	BT      Beater
-	Events  publisher.EventPublisher
+	Events  publisher.Client
 }
 
 // Basic configuration of every beat
