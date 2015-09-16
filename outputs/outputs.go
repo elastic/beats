@@ -59,8 +59,8 @@ type OutputBuilder interface {
 	// Create and initialize the output plugin
 	NewOutput(
 		beat string,
-		config MothershipConfig,
-		topology_expire int) (Outputer, error)
+		config *MothershipConfig,
+		topologyExpire int) (Outputer, error)
 }
 
 // Functions to be exported by a output plugin
@@ -101,7 +101,7 @@ func InitOutputs(
 			continue
 		}
 
-		output, err := plugin.NewOutput(beat, config, topologyExpire)
+		output, err := plugin.NewOutput(beat, &config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err

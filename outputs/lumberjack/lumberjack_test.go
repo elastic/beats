@@ -32,7 +32,7 @@ func newTestLumberjackOutput(
 		t.Fatalf("No lumberjack output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", config, 0)
+	output, err := plugin.NewOutput("test", &config, 0)
 	if err != nil {
 		t.Fatalf("init lumberjack output plugin failed: %v", err)
 	}

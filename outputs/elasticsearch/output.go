@@ -23,11 +23,11 @@ type elasticsearchOutputPlugin struct{}
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
 func (f elasticsearchOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	TopologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &elasticsearchOutput{}
-	err := output.Init(beat, config, TopologyExpire)
+	err := output.Init(beat, *config, TopologyExpire)
 	if err != nil {
 		return nil, err
 	}

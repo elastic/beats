@@ -22,11 +22,11 @@ type lumberjackOutputPlugin struct{}
 
 func (p lumberjackOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &lumberjack{}
-	err := output.init(beat, config, topologyExpire)
+	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
 		return nil, err
 	}

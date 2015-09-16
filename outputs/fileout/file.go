@@ -17,7 +17,7 @@ type FileOutputPlugin struct{}
 
 func (f FileOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	topology_expire int,
 ) (outputs.Outputer, error) {
 	output := &fileOutput{}
@@ -32,12 +32,17 @@ type fileOutput struct {
 	rotator logp.FileRotator
 }
 
-func (out *fileOutput) init(beat string, config outputs.MothershipConfig, topology_expire int) error {
+func (out *fileOutput) init(beat string, config *outputs.MothershipConfig, topology_expire int) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
 		out.rotator.Name = beat
 	}
+
+	// disable bulk support
+	configDisableInt := -1
+	config.Flush_interval = &configDisableInt
+	config.Bulk_size = &configDisableInt
 
 	rotateeverybytes := uint64(config.Rotate_every_kb) * 1024
 	if rotateeverybytes == 0 {

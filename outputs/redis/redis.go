@@ -23,11 +23,11 @@ type RedisOutputPlugin struct{}
 
 func (f RedisOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	topology_expire int,
 ) (outputs.Outputer, error) {
 	output := &redisOutput{}
-	err := output.Init(beat, config, topology_expire)
+	err := output.Init(beat, *config, topology_expire)
 	if err != nil {
 		return nil, err
 	}
