@@ -8,8 +8,14 @@ filebeat:
       paths:
         #- /var/log/app*.log
         - /var/log/*.log
-      # Type of the files. Annotated in every documented
-      type: syslog
+      # Type of the files. Based on this the way the file is read is decided. The different types cannot be mixed.
+      #
+      # Possible options are:
+      # * log: Reads every line of the log file (default)
+      # * file: Sends the full file on change. This replaces fsRiver
+      # * meta: Reads new meta information on file change
+      # * stdin: Reads the standard in
+      type: log
       # Optional additional fields
       fields:
         level: debug
@@ -20,7 +26,7 @@ filebeat:
       fields:
       paths:
         - /var/log/test.log
-      type: apache
+      type: log
       # Regexp log line filter (not implemented yet)
       filter: "regexp"
       ignoreolder: 24h
