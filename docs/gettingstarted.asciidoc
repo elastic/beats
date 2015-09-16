@@ -309,15 +309,17 @@ it from the `config/kibana.yml` file.
 Now point your browser to port 5601 and you should see the Kibana web
 interface.
 
-The first thing you need to do is to configure the index pattern. Select *Use event times to create index names*, in
-the *Index name or pattern* field enter `[packetbeat-]YYYY.MM.DD` and for the *Time-field
-name* select `timestamp`.
+The first thing you need to do is to configure the index pattern. 
+Enable `Use event times to create index names` in order to create the index based
+on the events already available in Elasticsearch. 
+The index pattern for Packetbeat contains a date format as an index is created daily: 
+`[packetbeat-]YYYY.MM.DD`
 
 image:./images/kibana-index-pattern.png[Kibana index pattern]
 
-If after you selected *Use event times to create index names* and configured the `[packetbeat-]YYYY.MM.DD` index pattern Kibana still says
-_Unable to fetch mapping. Do you have indices matching the pattern?_, it means
-that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
+If an error like `_Unable to fetch mapping` persists even after you configure the 
+`[packetbeat-]YYYY.MMDD` index pattern check if you have indices matching the pattern. 
+If not, it means that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
 some traffic was running on your servers and that Packetbeat could see it.
 
 If everything goes fine, you should already see some traffic reported by
@@ -340,14 +342,24 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta2.tar.gz
-tar xzvf packetbeat-dashboards-1.0.0-beta2.tar.gz
-cd packetbeat-dashboards-1.0.0-beta2/
+curl -L -O https://download.elastic.co/beats/packetbeat/beats-dashboards-1.0.0-beta2.tar.gz
+tar xzvf beats-dashboards-1.0.0-beta2.tar.gz
+cd beats-dashboards-1.0.0-beta2/
 ./load.sh
 ----------------------------------------------------------------------
 
-To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
-icon. Select *Packetbeat Dashboard* from the list. You can then switch easier
-between the dashboards by using the *Navigation* widget.
+NOTE: In case the Elasticsearch is not running on `127.0.0.1:9200`, you need to specify the Elasticsearch location
+as argument of the load.sh command line:
+
+[source,shell]
+-------------------------------------------------------------------------
+./load.sh http://192.168.33.60:9200
+-------------------------------------------------------------------------
+
+To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
+icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
+between the dashboards by using the `Navigation` widget.
+
+image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
 
 Enjoy!
