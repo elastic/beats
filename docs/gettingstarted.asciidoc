@@ -138,29 +138,45 @@ After installing Kibana by following the
 https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html[getting started guide], open
 the Kibana web interface to get it started.
 
-First, you need to configure the index pattern under the `Settings`. In the *Index name or pattern* field enter
-`topbeat-*` and for the *Time-field name* select `timestamp`.
+The first thing you need to do is to configure the index pattern. There are two ways you can 
+configure the index patterns in Kibana:
 
-image:./images/kibana-topbeat-index-pattern.png[Topbeat index pattern in Kibana]
+ - Automatically by loading dashboards, visualizations, seacrhes and index patterns. The steps 
+    are described in the next chapter.
 
-If after you configured the `topbeat-*` index pattern Kibana still says
-_Unable to fetch mapping. Do you have indices matching the pattern?_, it means
-that Topbeat hasn't yet written any data into Elasticsearch. Make sure
-Topbeat is exporting some statistics.
+ - Manually by configuring the [packetbeat-]YYYY.MM.DD index pattern under the `Settings`->`Indices` page.
+
+==== Configure manually index pattern in Kibana
+
+Enable `Use event times to create index names` in order to create the index based
+on the events already available in Elasticsearch. 
+The index pattern for Packetbeat contains a date format as an index is created daily: 
+`[topbeat-]YYYY.MM.DD`
+
+image:./images/kibana-topbeat-index-pattern.png[Kibana index pattern]
+
+If an error like `_Unable to fetch mapping` persists even after you configure the 
+`[topbeat-]YYYY.MMDD` index pattern check if you have indices matching the pattern. 
+If not, it means that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
+some traffic was running on your servers and that Packetbeat could see it.
 
 If everything goes fine, you should already see in real-time statistics reported by
-Topbeat under the *Discover* page:
+Topbeat under the `Discover` page:
 
 image:./images/kibana-topbeat-discover.png[Topbeat Discover page in Kibana]
 
-You can configure the *Dashboard* page to show the statistics that you are interested in for all the servers or for a
+==== System wide overview
+
+You can configure the `Dashboard` page to show the statistics that you are interested in for all the servers or for a
 subset of them.
 An example of a dashboard page can consist of CPU usage and memory consumption for the top 10 CPU consuming processes
 running on different servers, free and used disk space for all servers, the CPU usage per processes, memory consumption per processes.
 
 image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
 
-To display the statistics coming from a single server, a search query *shipper: precise32* should be used:
+==== Per server overview
+
+To display the statistics coming from a single server, a search query like *shipper: precise32* can be used:
 
 image:./images/topbeat-dashboard-1shipper.png[Topbeat Dashboard page in Kibana for one server]
 
@@ -168,5 +184,17 @@ You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 
 
+=== Sample Kibana dashboards
 
+Kibana has a large set of visualization types which you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+<<sample-dashboards,sample dashboards>> to give you a good start and to
+demonstrate what is possible based on the packet data.
+
+To load the dashboards, visualizations, searches and create the index patterns follow the steps from the 
+https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html#_sample_kibana_dashboards[Load
+Dashboards Section]
+
+Enjoy!
 

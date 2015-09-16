@@ -10,4 +10,6 @@ include::./fields.asciidoc[]
 
 include::./windows.asciidoc[]
 
+include::./dashboards.asciidoc[]
+
 // include::./troubleshooting.asciidoc[]
