@@ -5,9 +5,10 @@ import time
 
 
 class Test(TestCase):
-    def test_crawler(self):
+    def test_fetched_lines(self):
+        # Checks if all lines are read from the log file
+
         self.render_config_template(
-            #path="/var/log/*"
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -41,8 +42,9 @@ class Test(TestCase):
         assert iterations == i
 
 
-
     def test_unfinished_line(self):
+        # Checks that if a line does not have a line ending, is is not read yet
+
         self.render_config_template(
             #path="/var/log/*"
             path=os.path.abspath(self.working_dir) + "/log/*"
