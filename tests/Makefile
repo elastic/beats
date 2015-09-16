@@ -2,16 +2,11 @@ SHELL := /bin/bash
 PROCESSES ?= 4
 TIMEOUT ?= 30
 
-env: env/bin/activate
-env/bin/activate: requirements.txt
-	test -d env || virtualenv env > /dev/null
-	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
-	touch env/bin/activate
-
 .PHONY: test
-test: env
+test:
 	make -C .. packetbeat.test
-	. env/bin/activate; nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
+	make -C .. env
+	. ../env/bin/activate && nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
 
 .PHONY: coverage
 coverage: test
@@ -25,6 +20,5 @@ coverage: test
 
 .PHONY: clean
 clean:
-	-rm -r env
 	-rm -r run
 	-rm last_run
