@@ -46,10 +46,16 @@ type PublisherType struct {
 
 	RefreshTopologyTimer <-chan time.Time
 
+	// wsOutput and wsPublisher should be used for proper shutdown of publisher
+	// (not implemented yet). On shutdown the publisher should be finished first
+	// and the outputers next, so no publisher will attempt to send messages on
+	// closed channels.
+	// Note: beat data producers must be shutdown before the publisher plugin
 	wsOutput    workerSignal
 	wsPublisher workerSignal
 
-	syncPublisher *syncPublisher
+	syncPublisher  *syncPublisher
+	asyncPublisher *asyncPublisher
 }
 
 type ShipperConfig struct {
@@ -87,37 +93,37 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	if err != nil {
 		logp.Err("Parsing IP %s fails with: %s", ip, err)
 		return ""
-	} else {
-		if islocal {
-			return publisher.name
-		}
 	}
+
+	if islocal {
+		return publisher.name
+	}
+
 	// find the shipper with the desired IP
 	if publisher.TopologyOutput != nil {
 		return publisher.TopologyOutput.GetNameByIP(ip)
-	} else {
-		return ""
 	}
+
+	return ""
 }
 
-func (p *PublisherType) Client() EventPublisher {
-	return p.syncPublisher.client()
+func (publisher *PublisherType) Client() EventPublisher {
+	return publisher.asyncPublisher.client()
 }
 
-func (p *PublisherType) SyncClient() EventPublisher {
-	return p.syncPublisher.client()
+func (publisher *PublisherType) SyncClient() EventPublisher {
+	return publisher.syncPublisher.client()
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
 	for _ = range publisher.RefreshTopologyTimer {
-		publisher.PublishTopology()
+		_ = publisher.PublishTopology() // ignore errors
 	}
 }
 
 func (publisher *PublisherType) PublishTopology(params ...string) error {
 
-	var localAddrs []string = params
-
+	localAddrs := params
 	if len(params) == 0 {
 		addrs, err := common.LocalIpAddrsAsStrings(false)
 		if err != nil {
@@ -242,6 +248,7 @@ func (publisher *PublisherType) Init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
+	publisher.asyncPublisher = newAsyncPublisher(publisher)
 	publisher.syncPublisher = newSyncPublisher(publisher)
 
 	return nil
