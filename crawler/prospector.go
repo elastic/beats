@@ -117,9 +117,8 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 		p.lastscan = newlastscan
 
-		// Defer next scan for a bit.
-		// TODO: Implement config variable or find algorithm when to rescan https://github.com/elastic/filebeat/issues/19
-		time.Sleep(10 * time.Second) // Make this tunable
+		// Defer next scan for the defined scanFrequency
+		time.Sleep(p.FileConfig.ScanFrequencyDuration)
 		logp.Debug("prospector", "Start next scan")
 
 		// Clear out files that disappeared and we've stopped harvesting
