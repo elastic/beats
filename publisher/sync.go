@@ -26,11 +26,13 @@ func (p *syncPublisher) client() EventPublisher {
 	return syncClient(p.send)
 }
 
+func (p *syncPublisher) onStop() {}
+
 func (p *syncPublisher) onMessage(m message) {
 	signal := outputs.NewSplitSignaler(m.signal, len(p.pub.Output))
 	m.signal = signal
 	for _, o := range p.pub.Output {
-		o.publish(m)
+		o.send(m)
 	}
 }
 

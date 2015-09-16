@@ -7,6 +7,10 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
+type worker interface {
+	send(m message)
+}
+
 type messageWorker struct {
 	queue   chan message
 	ws      *workerSignal
@@ -26,6 +30,7 @@ type workerSignal struct {
 
 type messageHandler interface {
 	onMessage(m message)
+	onStop()
 }
 
 func newMessageWorker(ws *workerSignal, hwm int, h messageHandler) *messageWorker {
@@ -43,22 +48,21 @@ func (p *messageWorker) init(ws *workerSignal, hwm int, h messageHandler) {
 }
 
 func (p *messageWorker) run() {
-	defer func() {
-		close(p.queue)
-		for msg := range p.queue { // clear queue
-			outputs.SignalFailed(msg.signal)
-		}
-		p.ws.wg.Done()
-	}()
-
+	defer p.shutdown()
 	for {
 		select {
-		case m := <-p.queue:
-			p.handler.onMessage(m)
 		case <-p.ws.done:
 			return
+		case m := <-p.queue:
+			p.handler.onMessage(m)
 		}
 	}
+}
+
+func (p *messageWorker) shutdown() {
+	stopQueue(p.queue)
+	p.ws.wg.Done()
+	p.handler.onStop()
 }
 
 func (p *messageWorker) send(m message) {
@@ -72,4 +76,11 @@ func (ws *workerSignal) stop() {
 
 func (ws *workerSignal) Init() {
 	ws.done = make(chan struct{})
+}
+
+func stopQueue(qu chan message) {
+	close(qu)
+	for msg := range qu { // clear queue and send fail signal
+		outputs.SignalFailed(msg.signal)
+	}
 }

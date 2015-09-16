@@ -21,6 +21,8 @@ func newPreprocessor(p *PublisherType, h messageHandler) *preprocessor {
 	}
 }
 
+func (p *preprocessor) onStop() { p.handler.onStop() }
+
 func (p *preprocessor) onMessage(m message) {
 	publisher := p.pub
 	single := false
