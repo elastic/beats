@@ -1,4 +1,4 @@
-package crawler
+package config
 
 import (
 	"github.com/elastic/libbeat/cfgfile"
