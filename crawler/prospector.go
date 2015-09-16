@@ -28,7 +28,8 @@ type ProspectorFileStat struct {
 }
 
 // Init sets up default config for prospector
-func (p *Prospector) Init() {
+func (p *Prospector) Init() error {
+
 	if p.FileConfig.IgnoreOlder != "" {
 
 		var err error
@@ -37,6 +38,7 @@ func (p *Prospector) Init() {
 
 		if err != nil {
 			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			return err
 		}
 	} else {
 		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
@@ -44,7 +46,26 @@ func (p *Prospector) Init() {
 		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
 
+	if p.FileConfig.ScanFrequency != "" {
+
+		var err error
+		// Default ignore time time
+		p.FileConfig.ScanFrequencyDuration, err = time.ParseDuration(p.FileConfig.ScanFrequency)
+
+		if err != nil {
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			return err
+		}
+	} else {
+		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
+		// Set it to default
+		p.FileConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
+	}
+
+	// Init list
 	p.prospectorList = make(map[string]ProspectorFileStat)
+
+	return nil
 
 }
 

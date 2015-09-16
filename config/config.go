@@ -12,8 +12,9 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile        = ".filebeat"
-	DefaultIgnoreOlderDuration = math.MaxInt64
+	DefaultRegistryFile                      = ".filebeat"
+	DefaultIgnoreOlderDuration time.Duration = math.MaxInt64
+	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
 )
 
 type Config struct {
@@ -32,11 +33,13 @@ type FilebeatConfig struct {
 }
 
 type FileConfig struct {
-	Paths               []string
-	Fields              map[string]string
-	Input               string
-	IgnoreOlder         string
-	IgnoreOlderDuration time.Duration
+	Paths                 []string
+	Fields                map[string]string
+	Input                 string
+	IgnoreOlder           string
+	IgnoreOlderDuration   time.Duration
+	ScanFrequency         string
+	ScanFrequencyDuration time.Duration
 }
 
 // TODO: Log is only used here now. Do we need it?
