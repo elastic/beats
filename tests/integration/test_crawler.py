@@ -3,11 +3,13 @@ from filebeat import TestCase
 import os
 import time
 
-
+# Additional tests to be added:
+# * Check what happens when file renamed -> no recrawling should happen
 class Test(TestCase):
-    def test_crawler(self):
+    def test_fetched_lines(self):
+        # Checks if all lines are read from the log file
+
         self.render_config_template(
-            #path="/var/log/*"
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -41,10 +43,10 @@ class Test(TestCase):
         assert iterations == i
 
 
-
     def test_unfinished_line(self):
+        # Checks that if a line does not have a line ending, is is not read yet
+
         self.render_config_template(
-            #path="/var/log/*"
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -68,9 +70,7 @@ class Test(TestCase):
 
         # TODO: Find better solution when filebeat did crawl the file
         time.sleep(10)
-        response = proc.kill_and_wait()
-
-        print response
+        proc.kill_and_wait()
 
         i = 0
 
@@ -82,4 +82,56 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == i
 
+
+    def test_file_renaming(self):
+        # Makes sure that when a file is renamed, the content is not read again.
+        # Checks that if a line does not have a line ending, is is not read yet
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 =  self.working_dir + "/log/test-old.log"
+        file = open(testfile1, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("old file")
+            file.write("\n")
+
+        file.close()
+
+        proc = self.start_filebeat()
+
+        # Let it read the file
+        time.sleep(5)
+
+        # Rename the file (no new file created)
+        testfile2 = self.working_dir + "/log/test-new.log"
+        os.rename(testfile1, testfile2)
+        file = open(testfile2, 'a')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("new file")
+            file.write("\n")
+
+        file.close()
+
+
+        # let it read the new file
+        time.sleep(20)
+
+        proc.kill_and_wait()
+
+        i = 0
+
+        # Count lines of filebeat generated file
+        with open(self.working_dir + "/output/filebeat") as f:
+            for i, l in enumerate(f, 1):
+                pass
+
+        # Make sure all 10 lines were read
+        assert i == 10
 
