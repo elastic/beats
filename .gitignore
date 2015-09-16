@@ -9,11 +9,9 @@
 *.swn
 packetbeat.test
 *.dev.yml
-*.cov
 
 /coverage/
 /docs/html_docs
-cover/
 
 # Folders
 _obj
