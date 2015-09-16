@@ -2,10 +2,11 @@ package elasticsearch
 
 import (
 	"fmt"
-	"github.com/elastic/libbeat/logp"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/elastic/libbeat/logp"
+	"github.com/stretchr/testify/assert"
 )
 
 const ElasticsearchDefaultHost = "localhost"
@@ -34,9 +35,9 @@ func GetEsHost() string {
 
 func GetTestingElasticsearch() *Elasticsearch {
 
-	var es_url = "http://" + GetEsHost() + ":" + GetEsPort()
+	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 
-	return NewElasticsearch([]string{es_url}, "", "")
+	return NewElasticsearch([]string{address}, "", "")
 }
 
 func GetValidQueryResult() QueryResult {
@@ -44,7 +45,7 @@ func GetValidQueryResult() QueryResult {
 		Ok:    true,
 		Index: "testIndex",
 		Type:  "testType",
-		Id:    "12",
+		ID:    "12",
 		Source: []byte(`{
 			"ok": true,
 			"_type":"testType",
@@ -93,7 +94,7 @@ func TestUrlEncode(t *testing.T) {
 	params := map[string]string{
 		"q": "agent:appserver1",
 	}
-	url := UrlEncode(params)
+	url := urlEncode(params)
 
 	if url != "q=agent%3Aappserver1" {
 		t.Errorf("Fail to encode params: %s", url)
@@ -104,7 +105,7 @@ func TestUrlEncode(t *testing.T) {
 		"husband": "joe",
 	}
 
-	url = UrlEncode(params)
+	url = urlEncode(params)
 
 	if url != "husband=joe&wife=sarah" {
 		t.Errorf("Fail to encode params: %s", url)
@@ -112,7 +113,7 @@ func TestUrlEncode(t *testing.T) {
 }
 
 func TestMakePath(t *testing.T) {
-	path, err := MakePath("twitter", "tweet", "1")
+	path, err := makePath("twitter", "tweet", "1")
 	if err != nil {
 		t.Errorf("Fail to create path: %s", err)
 	}
@@ -120,7 +121,7 @@ func TestMakePath(t *testing.T) {
 		t.Errorf("Wrong path created: %s", path)
 	}
 
-	path, err = MakePath("twitter", "", "_refresh")
+	path, err = makePath("twitter", "", "_refresh")
 	if err != nil {
 		t.Errorf("Fail to create path: %s", err)
 	}
@@ -128,14 +129,14 @@ func TestMakePath(t *testing.T) {
 		t.Errorf("Wrong path created: %s", path)
 	}
 
-	path, err = MakePath("", "", "_bulk")
+	path, err = makePath("", "", "_bulk")
 	if err != nil {
 		t.Errorf("Fail to create path: %s", err)
 	}
 	if path != "/_bulk" {
 		t.Errorf("Wrong path created: %s", path)
 	}
-	path, err = MakePath("twitter", "", "")
+	path, err = makePath("twitter", "", "")
 	if err != nil {
 		t.Errorf("Fail to create path: %s", err)
 	}
@@ -178,7 +179,7 @@ func TestIndex(t *testing.T) {
 	params = map[string]string{
 		"q": "user:test",
 	}
-	result, err := es.SearchUri(index, "test", params)
+	result, err := es.searchURI(index, "test", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -197,13 +198,13 @@ func TestReadQueryResult(t *testing.T) {
 	queryResult := GetValidQueryResult()
 
 	json := queryResult.Source
-	result, err := ReadQueryResult(json)
+	result, err := readQueryResult(json)
 
 	assert.Nil(t, err)
 	assert.Equal(t, queryResult.Ok, result.Ok)
 	assert.Equal(t, queryResult.Index, result.Index)
 	assert.Equal(t, queryResult.Type, result.Type)
-	assert.Equal(t, queryResult.Id, result.Id)
+	assert.Equal(t, queryResult.ID, result.ID)
 	assert.Equal(t, queryResult.Version, result.Version)
 	assert.Equal(t, queryResult.Found, result.Found)
 	assert.Equal(t, queryResult.Exists, result.Exists)
@@ -212,7 +213,7 @@ func TestReadQueryResult(t *testing.T) {
 
 // Check empty query result object
 func TestReadQueryResult_empty(t *testing.T) {
-	result, err := ReadQueryResult(nil)
+	result, err := readQueryResult(nil)
 	assert.Nil(t, result)
 	assert.Nil(t, err)
 }
@@ -223,7 +224,7 @@ func TestReadQueryResult_invalid(t *testing.T) {
 	// Invalid json string
 	json := []byte(`{"name":"ruflin","234"}`)
 
-	result, err := ReadQueryResult(json)
+	result, err := readQueryResult(json)
 	assert.Nil(t, result)
 	assert.Error(t, err)
 }
@@ -242,7 +243,7 @@ func TestReadSearchResult(t *testing.T) {
   		"aggs" : {}
   	}`)
 
-	results, err := ReadSearchResult(json)
+	results, err := readSearchResult(json)
 
 	assert.Nil(t, err)
 	assert.Equal(t, resultsObject.Took, results.Took)
@@ -252,7 +253,7 @@ func TestReadSearchResult(t *testing.T) {
 }
 
 func TestReadSearchResult_empty(t *testing.T) {
-	results, err := ReadSearchResult(nil)
+	results, err := readSearchResult(nil)
 	assert.Nil(t, results)
 	assert.Nil(t, err)
 }
@@ -262,7 +263,7 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	// Invalid json string
 	json := []byte(`{"took":"19","234"}`)
 
-	results, err := ReadSearchResult(json)
+	results, err := readSearchResult(json)
 	assert.Nil(t, results)
 	assert.Error(t, err)
 }

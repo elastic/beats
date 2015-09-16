@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
-func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsearchOutput {
+func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -22,9 +22,8 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsea
 		logp.Err("Invalid port. Cannot be converted to in: %s", GetEsPort())
 	}
 
-	var elasticsearchOutput elasticsearchOutput
-
-	elasticsearchOutput.Init("packetbeat", outputs.MothershipConfig{
+	var output elasticsearchOutput
+	output.Init("packetbeat", outputs.MothershipConfig{
 		Enabled:        true,
 		Save_topology:  true,
 		Host:           GetEsHost(),
@@ -34,11 +33,11 @@ func createElasticsearchConnection(flush_interval int, bulk_size int) elasticsea
 		Path:           "",
 		Index:          index,
 		Protocol:       "",
-		Flush_interval: &flush_interval,
-		Bulk_size:      &bulk_size,
+		Flush_interval: &flushInterval,
+		Bulk_size:      &bulkSize,
 	}, 10)
 
-	return elasticsearchOutput
+	return output
 }
 
 func TestTopologyInES(t *testing.T) {
@@ -141,7 +140,7 @@ func TestOneEvent(t *testing.T) {
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
-	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
+	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
@@ -220,7 +219,7 @@ func TestEvents(t *testing.T) {
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
+	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -230,7 +229,7 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func test_bulk_with_params(t *testing.T, elasticsearchOutput elasticsearchOutput) {
+func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 	ts := time.Now()
 	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
 
@@ -281,7 +280,7 @@ func test_bulk_with_params(t *testing.T, elasticsearchOutput elasticsearchOutput
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.SearchUri(index, "", params)
+	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -301,13 +300,13 @@ func TestBulkEvents(t *testing.T) {
 	}
 
 	elasticsearchOutput := createElasticsearchConnection(50, 2)
-	test_bulk_with_params(t, elasticsearchOutput)
+	testBulkWithParams(t, elasticsearchOutput)
 
 	elasticsearchOutput = createElasticsearchConnection(50, 1000)
-	test_bulk_with_params(t, elasticsearchOutput)
+	testBulkWithParams(t, elasticsearchOutput)
 
 	elasticsearchOutput = createElasticsearchConnection(50, 5)
-	test_bulk_with_params(t, elasticsearchOutput)
+	testBulkWithParams(t, elasticsearchOutput)
 }
 
 func TestEnableTTL(t *testing.T) {

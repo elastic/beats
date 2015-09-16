@@ -15,44 +15,45 @@ import (
 var debug = logp.MakeDebug("elasticsearch")
 
 func init() {
-	outputs.RegisterOutputPlugin("elasticsearch", ElasticsearchOutputPlugin{})
+	outputs.RegisterOutputPlugin("elasticsearch", elasticsearchOutputPlugin{})
 }
 
-func (f ElasticsearchOutputPlugin) NewOutput(
+type elasticsearchOutputPlugin struct{}
+
+// NewOutput instantiates a new output plugin instance publishing to elasticsearch.
+func (f elasticsearchOutputPlugin) NewOutput(
 	beat string,
 	config outputs.MothershipConfig,
-	topology_expire int,
+	TopologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &elasticsearchOutput{}
-	err := output.Init(beat, config, topology_expire)
+	err := output.Init(beat, config, TopologyExpire)
 	if err != nil {
 		return nil, err
 	}
 	return output, nil
 }
 
-type ElasticsearchOutputPlugin struct{}
-
 type elasticsearchOutput struct {
-	Index          string
+	Index string
+	Conn  *Elasticsearch
+
 	TopologyExpire int
-	Conn           *Elasticsearch
-	FlushInterval  time.Duration
-	BulkMaxSize    int
-
-	TopologyMap  atomic.Value // Value holds a map[string][string]
-	sendingQueue chan EventMsg
-
-	ttlEnabled bool
+	TopologyMap    atomic.Value // Value holds a map[string][string]
+	ttlEnabled     bool
 }
 
-type PublishedTopology struct {
+type publishedTopology struct {
 	Name string
 	IPs  string
 }
 
 // Initialize Elasticsearch as output
-func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
+func (out *elasticsearchOutput) Init(
+	beat string,
+	config outputs.MothershipConfig,
+	topologyExpire int,
+) error {
 
 	if len(config.Protocol) == 0 {
 		config.Protocol = "http"
@@ -82,17 +83,8 @@ func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfi
 	}
 
 	out.TopologyExpire = 15000
-	if topology_expire != 0 {
-		out.TopologyExpire = topology_expire /*sec*/ * 1000 // millisec
-	}
-
-	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != nil {
-		out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
-	}
-	out.BulkMaxSize = 10000
-	if config.Bulk_size != nil {
-		out.BulkMaxSize = *config.Bulk_size
+	if topologyExpire != 0 {
+		out.TopologyExpire = topologyExpire /*sec*/ * 1000 // millisec
 	}
 
 	if config.Max_retries != nil {
@@ -102,11 +94,6 @@ func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfi
 	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", urls)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
-	if out.FlushInterval > 0 {
-		logp.Info("[ElasticsearchOutput] Insert events in batches. Flush interval is %s. Bulk size is %d.", out.FlushInterval, out.BulkMaxSize)
-	} else {
-		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
-	}
 
 	if config.Save_topology {
 		err := out.EnableTTL()
@@ -125,9 +112,6 @@ func (out *elasticsearchOutput) Init(beat string, config outputs.MothershipConfi
 			}()
 		}
 	}
-
-	out.sendingQueue = make(chan EventMsg, 1000)
-	go out.SendMessagesGoroutine()
 
 	return nil
 }
@@ -169,72 +153,6 @@ func (out *elasticsearchOutput) GetNameByIP(ip string) string {
 	return ""
 }
 
-// Insert a list of events in the bulkChannel
-func (out *elasticsearchOutput) InsertBulkMessage(
-	pendingTrans []outputs.Signaler,
-	batch []interface{},
-) {
-	go func(transactions []outputs.Signaler, data []interface{}) {
-		_, err := out.Conn.Bulk("", "", nil, data)
-		outputs.SignalAll(pendingTrans, err)
-		if err != nil {
-			logp.Err("Fail to perform many index operations in a single API call: %s", err)
-		}
-	}(pendingTrans, batch)
-}
-
-// Goroutine that sends one or multiple events to Elasticsearch.
-// If the flush_interval > 0, then the events are sent in batches. Otherwise, one by one.
-func (out *elasticsearchOutput) SendMessagesGoroutine() {
-	flushChannel := make(<-chan time.Time)
-
-	if out.FlushInterval > 0 {
-		flushTicker := time.NewTicker(out.FlushInterval)
-		flushChannel = flushTicker.C
-	}
-
-	batch := make([]interface{}, 0, out.BulkMaxSize)
-	var pendingTrans []outputs.Signaler
-
-	for {
-		select {
-		case msg := <-out.sendingQueue:
-			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
-			if out.FlushInterval > 0 {
-				// insert the events in batches
-				if len(batch)+2 > out.BulkMaxSize {
-					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
-					out.InsertBulkMessage(pendingTrans, batch)
-					pendingTrans = nil
-					batch = make([]interface{}, 0, out.BulkMaxSize)
-				}
-
-				meta := map[string]interface{}{
-					"index": map[string]interface{}{
-						"_index": index,
-						"_type":  msg.Event["type"].(string),
-					},
-				}
-				batch = append(batch, meta, msg.Event)
-				if msg.Trans != nil {
-					pendingTrans = append(pendingTrans, msg.Trans)
-				}
-			} else {
-				// insert the events one by one
-				_, err := out.Conn.Index(index, msg.Event["type"].(string), "", nil, msg.Event)
-				outputs.Signal(msg.Trans, err)
-				if err != nil {
-					logp.Err("Fail to insert a single event: %s", err)
-				}
-			}
-		case _ = <-flushChannel:
-			out.InsertBulkMessage(pendingTrans, batch)
-			pendingTrans = pendingTrans[:0]
-			batch = make([]interface{}, 0, out.BulkMaxSize)
-		}
-	}
-}
-
 // Each shipper publishes a list of IPs together with its name to Elasticsearch
 func (out *elasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	if !out.ttlEnabled {
@@ -252,7 +170,7 @@ func (out *elasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 		"server-ip",            /*type*/
 		name,                   /* id */
 		params,                 /* parameters */
-		PublishedTopology{name, strings.Join(localAddrs, ",")} /* body */)
+		publishedTopology{name, strings.Join(localAddrs, ",")} /* body */)
 
 	if err != nil {
 		logp.Err("Fail to publish IP addresses: %s", err)
@@ -270,7 +188,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 	// get all shippers IPs from Elasticsearch
 	topologyMapTmp := make(map[string]string)
 
-	res, err := out.Conn.SearchUri(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.searchURI(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, obj := range res.Hits.Hits {
 			var result QueryResult
@@ -279,7 +197,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 				return
 			}
 
-			var pub PublishedTopology
+			var pub publishedTopology
 			err = json.Unmarshal(result.Source, &pub)
 			if err != nil {
 				logp.Err("json.Unmarshal fails with: %s", err)
@@ -302,18 +220,23 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 
 // Publish an event by adding it to the queue of events.
 func (out *elasticsearchOutput) PublishEvent(
-	trans outputs.Signaler,
+	signaler outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	out.sendingQueue <- EventMsg{Trans: trans, Ts: ts, Event: event}
+	index := fmt.Sprintf("%s-%d.%02d.%02d",
+		out.Index, ts.Year(), ts.Month(), ts.Day())
 
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
-	return nil
-}
 
-type eventsMetaBuilder struct {
-	index string
+	// insert the events one by one
+	_, err := out.Conn.Index(index, event["type"].(string), "", nil, event)
+	outputs.Signal(signaler, err)
+	if err != nil {
+		logp.Err("Fail to insert a single event: %s", err)
+	}
+
+	return nil
 }
 
 func (out *elasticsearchOutput) BulkPublish(

@@ -47,7 +47,7 @@ func TestBulk(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value1",
 	}
-	result, err := es.SearchUri(index, "type1", params)
+	result, err := es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -154,7 +154,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value3",
 	}
-	result, err := es.SearchUri(index, "type1", params)
+	result, err := es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -165,7 +165,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field2:value2",
 	}
-	result, err = es.SearchUri(index, "type1", params)
+	result, err = es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}

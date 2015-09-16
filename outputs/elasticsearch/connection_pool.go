@@ -9,17 +9,17 @@ import (
 )
 
 type Connection struct {
-	Url      string
+	URL      string
 	Username string
 	Password string
 
-	dead       bool
-	dead_count int
-	timer      *time.Timer
+	dead      bool
+	deadCount int
+	timer     *time.Timer
 }
 
 const (
-	default_dead_timeout = 60 //seconds
+	defaultDeadTimeout = 60 //seconds
 )
 
 type ConnectionPool struct {
@@ -27,7 +27,7 @@ type ConnectionPool struct {
 	rr          int //round robin
 
 	// options
-	Dead_timeout time.Duration
+	DeadTimeout time.Duration
 }
 
 func (pool *ConnectionPool) SetConnections(urls []string, username string, password string) error {
@@ -36,29 +36,29 @@ func (pool *ConnectionPool) SetConnections(urls []string, username string, passw
 
 	for _, url := range urls {
 		conn := Connection{
-			Url:      url,
+			URL:      url,
 			Username: username,
 			Password: password,
 		}
 		// set default settings
-		conn.dead_count = 0
+		conn.deadCount = 0
 		connections = append(connections, &conn)
 	}
 	pool.Connections = connections
 	pool.rr = -1
-	pool.Dead_timeout = default_dead_timeout
+	pool.DeadTimeout = defaultDeadTimeout
 	return nil
 }
 
 func (pool *ConnectionPool) SetDeadTimeout(timeout int) {
-	pool.Dead_timeout = time.Duration(timeout)
+	pool.DeadTimeout = time.Duration(timeout)
 }
 
-func (pool *ConnectionPool) SelectRoundRobin() *Connection {
+func (pool *ConnectionPool) selectRoundRobin() *Connection {
 
 	for count := 0; count < len(pool.Connections); count++ {
 
-		pool.rr += 1
+		pool.rr++
 		pool.rr = pool.rr % len(pool.Connections)
 		conn := pool.Connections[pool.rr]
 		if conn.dead == false {
@@ -71,41 +71,44 @@ func (pool *ConnectionPool) SelectRoundRobin() *Connection {
 	return pool.Connections[pool.rr]
 }
 
+// GetConnection finds a live connection.
 func (pool *ConnectionPool) GetConnection() *Connection {
 
 	if len(pool.Connections) > 1 {
-		return pool.SelectRoundRobin()
+		return pool.selectRoundRobin()
 	}
+
 	// only one connection, no need to select one connection
+	// TODO(urso): we want to return nil if connection is not live?
 	return pool.Connections[0]
 }
 
-// If a connection fails, it will be marked as dead and put on timeout.
+// MarkDead marks a failed connection as dead and put on timeout.
 // timeout = default_timeout * 2 ** (fail_count - 1)
 // When the timeout is over, the connection will be resurrected and
 // returned to the live pool
 func (pool *ConnectionPool) MarkDead(conn *Connection) {
 
 	if !conn.dead {
-		logp.Debug("elasticsearch", "Mark dead %s", conn.Url)
+		logp.Debug("elasticsearch", "Mark dead %s", conn.URL)
 		conn.dead = true
-		conn.dead_count = conn.dead_count + 1
-		timeout := pool.Dead_timeout * time.Duration(math.Pow(2, float64(conn.dead_count)-1))
+		conn.deadCount = conn.deadCount + 1
+		timeout := pool.DeadTimeout * time.Duration(math.Pow(2, float64(conn.deadCount)-1))
 		conn.timer = time.AfterFunc(timeout*time.Second, func() {
 			// timeout expires
 			conn.dead = false
-			logp.Debug("elasticsearch", "Timeout expired. Mark it as alive: %s", conn.Url)
+			logp.Debug("elasticsearch", "Timeout expired. Mark it as alive: %s", conn.URL)
 		})
 	}
 }
 
-// A connection that has been previously marked as dead and succeeds will be marked
-// as live and the dead_count is set to zero
+// MarkLive marks a connection as live if the connection has been previously
+// marked as dead and succeeds.
 func (pool *ConnectionPool) MarkLive(conn *Connection) {
 	if conn.dead {
-		logp.Debug("elasticsearch", "Mark live %s", conn.Url)
+		logp.Debug("elasticsearch", "Mark live %s", conn.URL)
 		conn.dead = false
-		conn.dead_count = 0
+		conn.deadCount = 0
 		conn.timer.Stop()
 	}
 }

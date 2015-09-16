@@ -5,18 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
 )
-
-type EventMsg struct {
-	Trans outputs.Signaler
-	Ts    time.Time
-	Event common.MapStr
-}
 
 // MetaBuilder creates meta data for bulk requests
 type MetaBuilder interface {
@@ -35,11 +26,11 @@ func (es *Elasticsearch) sendBulkRequest(
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
-		logp.Debug("elasticsearch", "Use connection %s", conn.Url)
+		logp.Debug("elasticsearch", "Use connection %s", conn.URL)
 
-		url := conn.Url + path
+		url := conn.URL + path
 		if len(params) > 0 {
-			url = url + "?" + UrlEncode(params)
+			url = url + "?" + urlEncode(params)
 		}
 		logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 
@@ -48,7 +39,7 @@ func (es *Elasticsearch) sendBulkRequest(
 			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
 
-		resp, retry, err := es.PerformRequest(conn, req)
+		resp, retry, err := es.performRequest(conn, req)
 		if retry == true {
 			// retry
 			if err != nil {
@@ -80,7 +71,7 @@ func (es *Elasticsearch) startBulkRequest(
 	docType string,
 	params map[string]string,
 ) (*bulkRequest, error) {
-	path, err := MakePath(index, docType, "_bulk")
+	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
 		return nil, err
 	}
@@ -119,10 +110,10 @@ func (r *bulkRequest) Flush() (*QueryResult, error) {
 	}
 	r.buf.Truncate(0)
 
-	return ReadQueryResult(resp)
+	return readQueryResult(resp)
 }
 
-// Perform many index/delete operations in a single API call.
+// Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 func (es *Elasticsearch) Bulk(index string, docType string,
 	params map[string]string, body []interface{}) (*QueryResult, error) {
@@ -145,11 +136,25 @@ func (es *Elasticsearch) BulkWith(
 		return nil, nil
 	}
 
-	path, err := MakePath(index, docType, "_bulk")
+	path, err := makePath(index, docType, "_bulk")
 	if err != nil {
 		return nil, err
 	}
 
+	buf := bulkEncode(metaBuilder, body)
+	if buf.Len() == 0 {
+		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
+		return nil, nil
+	}
+
+	resp, err := es.sendBulkRequest("POST", path, params, &buf)
+	if err != nil {
+		return nil, err
+	}
+	return readQueryResult(resp)
+}
+
+func bulkEncode(metaBuilder MetaBuilder, body []interface{}) bytes.Buffer {
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	if metaBuilder == nil {
@@ -174,15 +179,5 @@ func (es *Elasticsearch) BulkWith(
 			}
 		}
 	}
-
-	if buf.Len() == 0 {
-		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
-		return nil, nil
-	}
-
-	resp, err := es.sendBulkRequest("POST", path, params, &buf)
-	if err != nil {
-		return nil, err
-	}
-	return ReadQueryResult(resp)
+	return buf
 }

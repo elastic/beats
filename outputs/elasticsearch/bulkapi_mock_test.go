@@ -18,7 +18,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	}
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	expected_resp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", Id: "1", Version: 1, Created: true})
+	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", ID: "1", Version: 1, Created: true})
 
 	ops := []map[string]interface{}{
 		map[string]interface{}{
@@ -38,7 +38,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 		body = append(body, op)
 	}
 
-	server := ElasticsearchMock(200, expected_resp)
+	server := ElasticsearchMock(200, expectedResp)
 
 	es := NewElasticsearch([]string{server.URL}, "", "")
 
@@ -145,7 +145,7 @@ func TestMultipleHost_Bulk(t *testing.T) {
 	}
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-	expected_resp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", Id: "1", Version: 1, Created: true})
+	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "type1", ID: "1", Version: 1, Created: true})
 
 	ops := []map[string]interface{}{
 		map[string]interface{}{
@@ -166,7 +166,7 @@ func TestMultipleHost_Bulk(t *testing.T) {
 	}
 
 	server1 := ElasticsearchMock(503, []byte("Somehting went wrong"))
-	server2 := ElasticsearchMock(200, expected_resp)
+	server2 := ElasticsearchMock(200, expectedResp)
 
 	es := NewElasticsearch([]string{server1.URL, server2.URL}, "", "")
 
