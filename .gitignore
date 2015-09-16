@@ -8,10 +8,12 @@
 *.swo
 *.swn
 packetbeat.test
- *.dev.yml
+*.dev.yml
+*.cov
 
 /coverage/
 /docs/html_docs
+cover/
 
 # Folders
 _obj
