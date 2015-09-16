@@ -186,7 +186,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 	}
 }
 
-// Handles eror during reading file. If EOF and nothing special, exit without errors
+// Handles error during reading file. If EOF and nothing special, exit without errors
 func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
 	if err == io.EOF {
 		// timed out waiting for data, got eof.

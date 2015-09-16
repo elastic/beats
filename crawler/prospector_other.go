@@ -7,7 +7,9 @@ import (
 	"syscall"
 )
 
-// Checks if the given file was renamed. Returns the previous file on success, otherwise ""
+// Check if the given file was renamed. If file is known but with different path,
+// renamed will be set true and previous will be set to the previously known file path.
+// Otherwise renamed will be false.
 func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
 	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
 	stat := info.Sys().(*syscall.Stat_t)
@@ -23,7 +25,7 @@ func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
 	}
 
 	// Now check the missingfiles
-	for kf, ki := range *p.missingFiles {
+	for kf, ki := range p.missingFiles {
 		ks := ki.Sys().(*syscall.Stat_t)
 		if stat.Dev == ks.Dev && stat.Ino == ks.Ino {
 			return kf
@@ -34,7 +36,7 @@ func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
 	return ""
 }
 
-func (c *Crawler) isFileRenamedResumelist(file string, info os.FileInfo) string {
+func (c *Crawler) isFileRenamed(file string, info os.FileInfo) string {
 	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
 	stat := info.Sys().(*syscall.Stat_t)
 

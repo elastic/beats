@@ -10,7 +10,8 @@ import (
 /*
  The hierarchy for the crawler objects is explained as following
 
- Crawler: Filebeat has one crawler. The crawler is the single point of control and stores the state. The state is written through the registrar
+ Crawler: Filebeat has one crawler. The crawler is the single point of control
+ 	and stores the state. The state is written through the registrar
  Prospector: For every FileConfig the crawler starts a prospector
  Harvestor: For every file found inside the FileConfig, the Prospector starts a Harvestor
  		The harvester send their events to the spooler
@@ -21,11 +22,14 @@ import (
 // Last reading state of the prospector
 type Crawler struct {
 	// List of all files which were crawled with the state
-	Files   map[string]*input.FileState
+	Files map[string]*input.FileState
+	// TODO: Better explanation and potential renaming needed here for what this variable is.
 	Persist chan *input.FileState
 }
 
-func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.FileState, eventChan chan *input.FileEvent) {
+func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.FileState,
+	eventChan chan *input.FileEvent) {
+
 	pendingProspectorCnt := 0
 
 	// Prospect the globs/paths given on the command line and launch harvesters
@@ -40,7 +44,7 @@ func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.
 
 		prospector.Init()
 
-		go prospector.Start(eventChan)
+		go prospector.Run(eventChan)
 		pendingProspectorCnt++
 	}
 
@@ -79,7 +83,7 @@ func (crawler *Crawler) fetchState(file string, fileinfo os.FileInfo) (int64, bo
 		return lastState.Offset, true
 	}
 
-	if previous := crawler.isFileRenamedResumelist(file, fileinfo); previous != "" {
+	if previous := crawler.isFileRenamed(file, fileinfo); previous != "" {
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it

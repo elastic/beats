@@ -17,7 +17,7 @@ type Prospector struct {
 	iteration      uint32
 	lastscan       time.Time
 	crawler        *Crawler
-	missingFiles   *map[string]os.FileInfo
+	missingFiles   map[string]os.FileInfo
 }
 
 // Contains statistic about file when it was last seend by the prospector
@@ -43,12 +43,13 @@ func (p *Prospector) Init() {
 		// Set it to default
 		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
+
+	p.prospectorList = make(map[string]ProspectorFileStat)
+
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Start(spoolChan chan *input.FileEvent) {
-
-	p.prospectorList = make(map[string]ProspectorFileStat)
+func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 	// Handle any "-" (stdin) paths
 	for i, path := range p.FileConfig.Paths {
@@ -58,8 +59,9 @@ func (p *Prospector) Start(spoolChan chan *input.FileEvent) {
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
 			h := harvester.Harvester{
-				Path:        path,
-				FileConfig:  p.FileConfig,
+				Path:       path,
+				FileConfig: p.FileConfig,
+				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
 				SpoolerChan: spoolChan,
 			}
 
@@ -110,6 +112,7 @@ func (p *Prospector) Start(spoolChan chan *input.FileEvent) {
 }
 
 // Scans the specific path which can be a glob (/**/**/*.log)
+// For all found files it is checked if a harvester should be started
 func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 
 	logp.Debug("prospector", "scan path %s", path)
@@ -120,7 +123,7 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 		return
 	}
 
-	p.missingFiles = &map[string]os.FileInfo{}
+	p.missingFiles = map[string]os.FileInfo{}
 
 	// Check any matched files to see if we need to start a harvester
 	for _, file := range matches {
@@ -189,7 +192,8 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 
 	// Check for unmodified time, but only if the file modification time is before the last scan started
 	// This ensures we don't skip genuine creations with dead times less than 10s
-	if newinfo.Fileinfo.ModTime().Before(p.lastscan) && time.Since(newinfo.Fileinfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
+	if newinfo.Fileinfo.ModTime().Before(p.lastscan) &&
+		time.Since(newinfo.Fileinfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
 
 		// Call crawler if there if there exists a state for the given file
 		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
@@ -269,7 +273,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
 		// We only need to keep it for the remainder of this iteration then we can assume it was deleted and forget about it
-		(*p.missingFiles)[file] = oldFile.FileInfo
+		p.missingFiles[file] = oldFile.FileInfo
 
 	} else if len(newinfo.Harvester) != 0 && oldFile.FileInfo.ModTime() != newinfo.Fileinfo.ModTime() {
 		// Resume harvesting of an old file we've stopped harvesting from
