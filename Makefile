@@ -109,11 +109,18 @@ coverage:
 benchmark:
 	$(GODEP) go test -short -bench=. ./...
 
+.PHONY: env
+env: env/bin/activate
+env/bin/activate: requirements.txt
+	test -d env || virtualenv env > /dev/null
+	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
+	touch env/bin/activate
+
 .PHONY: gen
-gen:
+gen: env
 	./scripts/generate_gettingstarted.sh docs/gettingstarted.in.asciidoc docs/gettingstarted.asciidoc
-	python scripts/generate_template.py etc/fields.yml etc/packetbeat.template.json
-	python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
+	. env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
+	. env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
 
 .PHONY: clean
 clean:
@@ -121,6 +128,7 @@ clean:
 	-rm packetbeat.test
 	-rm -r packetbeat-$(VERSION)
 	-rm -r coverage
+	-rm -r env
 
 # Generates packetbeat.test coverage testing binary
 packetbeat.test: $(GOFILES)

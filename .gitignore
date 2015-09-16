@@ -39,3 +39,5 @@ last_run
 
 *.test
 .DS_Store
+
+env
