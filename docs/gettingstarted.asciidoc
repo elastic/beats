@@ -356,10 +356,24 @@ as argument of the load.sh command line:
 ./load.sh http://192.168.33.60:9200
 -------------------------------------------------------------------------
 
+The load command uploads the example dashboards and the visualization, searches that are used.
+Additionally, the index patterns for Packetbeat and Topbeat are created:
+
+   - [packetbeat-]YYYY.MM.DD
+   - [topbeat-]YYYY.MM.DD
+
+After loading the dashboards, Kibana rises the following error 
+`No default index pattern. You must select or create one to continue.` that can be solved
+by setting one index pattern as favorite.
+
+image:./images/kibana-created-indexes.png[Kibana configured indexes]
+
+
 To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
 icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
 between the dashboards by using the `Navigation` widget.
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
 
 Enjoy!
