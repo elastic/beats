@@ -5,13 +5,14 @@ import time
 import json
 
 # Additional tests: to be implemented
-# * Check if registrar file can bo configured, set config param
+# * Check if registrar file can be configured, set config param
 # * Check "updating" of registrar file
 # * Check what happens when registrar file is deleted
 
 class Test(TestCase):
-    def test_registrar_file(self):
-        # Check if registrar file is created correctly
+
+    def test_registrar_file_content(self):
+        # Check if registrar file is created correctly and content is as expected
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"
@@ -61,4 +62,45 @@ class Test(TestCase):
         # Check that no additional info is in the file
         assert len(data) == 1
         assert len(data[logFileAbs]) == 4
+
+
+    def test_registrar_files(self):
+        # Check that multiple files are put into registrar file
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 =  self.working_dir + "/log/test1.log"
+        testfile2 =  self.working_dir + "/log/test2.log"
+        file1 = open(testfile1, 'w')
+        file2 = open(testfile2, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file1.write("hello world") # 11 chars
+            file1.write("\n") # 1 char
+            file2.write("goodbye world") # 11 chars
+            file2.write("\n") # 1 char
+
+
+        file1.close()
+        file2.close()
+
+        proc = self.start_filebeat()
+
+        time.sleep(10)
+        proc.kill_and_wait()
+
+        # Check that file exist
+        dotFilebeat = self.working_dir + '/.filebeat'
+        assert os.path.isfile(dotFilebeat) == True
+
+        with open(dotFilebeat) as file:
+            data = json.load(file)
+
+        # Check that 2 files are port of the registrar file
+        assert len(data) == 2
+
 

@@ -66,7 +66,8 @@ class TestCase(unittest.TestCase):
                      "-c", os.path.join(self.working_dir, config),
                      "-t",
                      "-integration",
-                     "-v"
+                     "-v",
+                     "-d", "*",
                      "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                      ])
         if extra_args:
@@ -97,6 +98,7 @@ class TestCase(unittest.TestCase):
                 "-c", os.path.join(self.working_dir, config),
                 "-integration",
                 "-v",
+                "-d", "*",
                 "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                 ]
         if extra_args:
