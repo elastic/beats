@@ -41,7 +41,7 @@ func (h *Harvester) Harvest() {
 	var readTimeout = 10 * time.Second
 	lastReadTime := time.Now()
 	for {
-		text, bytesread, err := h.readline(reader, buffer, readTimeout)
+		text, bytesread, err := h.readLine(reader, buffer, readTimeout)
 
 		if err != nil {
 			err = h.handleReadlineError(lastReadTime, err)
@@ -133,24 +133,20 @@ func (h *Harvester) open() *os.File {
 	return h.file
 }
 
-func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_timeout time.Duration) (*string, int, error) {
+// TODO: It seems like this function does not depend at all on harvester
+func (h *Harvester) readLine(reader *bufio.Reader, buffer *bytes.Buffer, eofTimeout time.Duration) (*string, int, error) {
 	// TODO: Read line should be improved in a way so it can also read multi lines or even full files when required. See "type" in config file
-	var isPartial bool = true
-	var newline_length int = 1
-	start_time := time.Now()
+
+	isPartial := true
+	startTime := time.Now()
 
 	for {
 		segment, err := reader.ReadBytes('\n')
 
+		fmt.Println(segment)
 		if segment != nil && len(segment) > 0 {
-			if segment[len(segment)-1] == '\n' {
-				// Found a complete line
+			if isLine(segment) {
 				isPartial = false
-
-				// Check if also a CR present
-				if len(segment) > 1 && segment[len(segment)-2] == '\r' {
-					newline_length++
-				}
 			}
 
 			// TODO(sissel): if buffer exceeds a certain length, maybe report an error condition? chop it?
@@ -163,7 +159,7 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 
 				// Give up waiting for data after a certain amount of time.
 				// If we time out, return the error (eof)
-				if time.Since(start_time) > eof_timeout {
+				if time.Since(startTime) >= eofTimeout {
 					return nil, 0, err
 				}
 				continue
@@ -178,12 +174,41 @@ func (h *Harvester) readline(reader *bufio.Reader, buffer *bytes.Buffer, eof_tim
 			// Get the str length with the EOL chars (LF or CRLF)
 			bufferSize := buffer.Len()
 			str := new(string)
-			*str = buffer.String()[:bufferSize-newline_length]
+			*str = buffer.String()[:bufferSize-lineEndingChars(segment)]
 			// Reset the buffer for the next line
 			buffer.Reset()
 			return str, bufferSize, nil
 		}
 	}
+}
+
+// isLine checks if the given byte array is a line, means has a line ending \n
+func isLine(line []byte) bool {
+	if line == nil || len(line) == 0 {
+		return false
+	}
+
+	if line[len(line)-1] != '\n' {
+		return false
+	}
+	return true
+}
+
+// lineEndingChars returns the number of line ending chars the given by array has
+// In case of Unix/Linux files, it is -1, in case of Windows mostly -2
+func lineEndingChars(line []byte) int {
+	if !isLine(line) {
+		return 0
+	}
+
+	if line[len(line)-1] == '\n' {
+		if len(line) > 1 && line[len(line)-2] == '\r' {
+			return 2
+		}
+
+		return 1
+	}
+	return 0
 }
 
 // Handles error during reading file. If EOF and nothing special, exit without errors
