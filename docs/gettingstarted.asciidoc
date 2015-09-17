@@ -309,7 +309,16 @@ it from the `config/kibana.yml` file.
 Now point your browser to port 5601 and you should see the Kibana web
 interface.
 
-The first thing you need to do is to configure the index pattern. 
+The first thing you need to do is to configure the index pattern. There are two ways you can 
+configure the index patterns in Kibana:
+
+ - Automatically by loading dashboards, visualizations, seacrhes and index patterns. The steps 
+    are described in the next chapter.
+
+ - Manually by configuring the [packetbeat-]YYYY.MM.DD index pattern under the `Settings`->`Indices` page.
+
+==== Configure manually index pattern in Kibana
+
 Enable `Use event times to create index names` in order to create the index based
 on the events already available in Elasticsearch. 
 The index pattern for Packetbeat contains a date format as an index is created daily: 
@@ -321,6 +330,7 @@ If an error like `_Unable to fetch mapping` persists even after you configure th
 `[packetbeat-]YYYY.MMDD` index pattern check if you have indices matching the pattern. 
 If not, it means that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
 some traffic was running on your servers and that Packetbeat could see it.
+
 
 If everything goes fine, you should already see some traffic reported by
 Packetbeat under the Discover page:
@@ -356,10 +366,24 @@ as argument of the load.sh command line:
 ./load.sh http://192.168.33.60:9200
 -------------------------------------------------------------------------
 
+The load command uploads the example dashboards with the visualizations and searches that can be used.
+Additionally, the index patterns for Packetbeat and Topbeat are created:
+
+   - [packetbeat-]YYYY.MM.DD
+   - [topbeat-]YYYY.MM.DD
+
+After loading the dashboards, Kibana rises the following error 
+`No default index pattern. You must select or create one to continue.` that can be solved
+by setting one index pattern as favorite.
+
+image:./images/kibana-created-indexes.png[Kibana configured indexes]
+
+
 To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
 icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
 between the dashboards by using the `Navigation` widget.
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
 
 Enjoy!
