@@ -13,6 +13,7 @@ filebeat:
         review: 1
         type: log
       ignoreolder: 24h
+      scanfrequency: 10s
     -
       fields:
       paths:
