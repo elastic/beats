@@ -134,6 +134,7 @@ func (h *Harvester) open() *os.File {
 }
 
 // TODO: It seems like this function does not depend at all on harvester
+// To could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
 func (h *Harvester) readLine(reader *bufio.Reader, buffer *bytes.Buffer, eofTimeout time.Duration) (*string, int, error) {
 	// TODO: Read line should be improved in a way so it can also read multi lines or even full files when required. See "type" in config file
 
@@ -143,7 +144,6 @@ func (h *Harvester) readLine(reader *bufio.Reader, buffer *bytes.Buffer, eofTime
 	for {
 		segment, err := reader.ReadBytes('\n')
 
-		fmt.Println(segment)
 		if segment != nil && len(segment) > 0 {
 			if isLine(segment) {
 				isPartial = false

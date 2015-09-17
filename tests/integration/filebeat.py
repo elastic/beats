@@ -5,7 +5,7 @@ import os
 import shutil
 import json
 import time
-import yaml
+import json
 import sys
 from datetime import datetime, timedelta
 
@@ -241,3 +241,31 @@ class TestCase(unittest.TestCase):
             else:
                 result[prefix + key] = value
         return result
+
+    def get_dot_filebeat(self):
+        # Returns content of the .filebeat file
+        dotFilebeat = self.working_dir + '/.filebeat'
+        assert os.path.isfile(dotFilebeat) == True
+
+        with open(dotFilebeat) as file:
+            data = json.load(file)
+
+        return data
+
+    def get_filebeat_output(self):
+        # Returns content of the filebeat output file as json array
+        outputFile = self.working_dir + '/output/filebeat'
+        assert os.path.isfile(outputFile) == True
+
+        data = []
+        file = open(outputFile)
+
+        while True:
+            line = file.readline()
+            if not line: break
+
+            data.append(json.loads(line))
+
+        file.close()
+
+        return data

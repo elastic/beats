@@ -36,13 +36,7 @@ class Test(TestCase):
         proc.kill_and_wait()
 
         # Check that file exist
-        dotFilebeat = self.working_dir + '/.filebeat'
-        assert os.path.isfile(dotFilebeat) == True
-
-        with open(dotFilebeat) as file:
-            data = json.load(file)
-
-        print data
+        data = self.get_dot_filebeat()
 
         # Check that offset is set correctly
         logFileAbs = os.path.abspath(testfile)
@@ -94,11 +88,7 @@ class Test(TestCase):
         proc.kill_and_wait()
 
         # Check that file exist
-        dotFilebeat = self.working_dir + '/.filebeat'
-        assert os.path.isfile(dotFilebeat) == True
-
-        with open(dotFilebeat) as file:
-            data = json.load(file)
+        data = self.get_dot_filebeat()
 
         # Check that 2 files are port of the registrar file
         assert len(data) == 2

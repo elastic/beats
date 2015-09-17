@@ -5,6 +5,7 @@ import time
 
 # Additional tests to be added:
 # * Check what happens when file renamed -> no recrawling should happen
+# * Check if file descriptor is "closed" when file disappears
 class Test(TestCase):
     def test_fetched_lines(self):
         # Checks if all lines are read from the log file
@@ -62,7 +63,6 @@ class Test(TestCase):
         # An additional line is written to the log file. This line should not be read
         # as there is no finishing \n or \r
         file.write("unfinished line")
-
 
         file.close()
 
@@ -134,4 +134,104 @@ class Test(TestCase):
 
         # Make sure all 10 lines were read
         assert i == 10
+
+    def test_file_disappear(self):
+        # Checks that filebeat keeps running in case a log files is deleted
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile =  self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("disappearing file")
+            file.write("\n")
+
+        file.close()
+
+        proc = self.start_filebeat()
+
+        # Let it read the file
+        time.sleep(5)
+        os.remove(testfile)
+        time.sleep(5)
+
+        # Create new file to check if new file is picked up
+        testfile2 =  self.working_dir + "/log/test2.log"
+        file = open(testfile2, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("new file")
+            file.write("\n")
+
+        file.close()
+
+        time.sleep(5)
+
+        proc.kill_and_wait()
+
+        data = self.get_dot_filebeat()
+
+        # Make sure new file was picked up, old file should stay in
+        assert len(data) == 2
+
+        # Make sure output has 10 entries
+        output = self.get_filebeat_output()
+
+        assert len(output) == 2 * 5
+
+
+    def test_file_disappear_appear(self):
+        # Checks that filebeat keeps running in case a log files is deleted
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile =  self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("disappearing file")
+            file.write("\n")
+
+        file.close()
+
+        proc = self.start_filebeat()
+
+        # Let it read the file
+        time.sleep(5)
+        os.remove(testfile)
+        time.sleep(5)
+
+        # Create new file with same to see if it is picked up
+        file = open(testfile, 'w')
+
+        iterations = 5
+        for n in range(0, iterations):
+            file.write("new file")
+            file.write("\n")
+
+        file.close()
+
+        time.sleep(5)
+
+        proc.kill_and_wait()
+
+        data = self.get_dot_filebeat()
+
+        # Make sure new file was picked up. As it has the same file name, only one entry exists
+        assert len(data) == 1
+
+        # Make sure output has 10 entries, the new file was started from scratch
+        output = self.get_filebeat_output()
+        assert len(output) == 2 * 5
+
 
