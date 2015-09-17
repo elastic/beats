@@ -28,7 +28,7 @@ run: filebeat
 
 .PHONY: unit
 unit:
-	$(GODEP) go test -short ./...
+	$(GODEP) go test ./...
 
 .PHONY: test
 test: unit
