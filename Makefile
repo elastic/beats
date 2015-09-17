@@ -20,7 +20,7 @@ with_pfring:
 
 .PHONY: getdeps
 getdeps:
-	go get -t -u -f
+	go get -t -u -f ./...
 	# goautotest is used from the Makefile to run tests in a loop
 	go get -u github.com/tsg/goautotest
 	# websocket is needed by the gobeacon tests
