@@ -248,9 +248,7 @@ class TestCase(unittest.TestCase):
         assert os.path.isfile(dotFilebeat) == True
 
         with open(dotFilebeat) as file:
-            data = json.load(file)
-
-        return data
+            return json.load(file)
 
     def get_filebeat_output(self):
         # Returns content of the filebeat output file as json array
@@ -258,14 +256,12 @@ class TestCase(unittest.TestCase):
         assert os.path.isfile(outputFile) == True
 
         data = []
-        file = open(outputFile)
 
-        while True:
-            line = file.readline()
-            if not line: break
+        with open(outputFile) as file:
+            while True:
+                line = file.readline()
+                if not line: break
 
-            data.append(json.loads(line))
+                data.append(json.loads(line))
+            return data
 
-        file.close()
-
-        return data

@@ -26,12 +26,12 @@ class Test(TestCase):
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and crawl and then finishes
         time.sleep(10)
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         i = 0
 
@@ -66,11 +66,11 @@ class Test(TestCase):
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         # TODO: Find better solution when filebeat did crawl the file
         time.sleep(10)
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         i = 0
 
@@ -102,7 +102,7 @@ class Test(TestCase):
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         # Let it read the file
         time.sleep(5)
@@ -123,7 +123,7 @@ class Test(TestCase):
         # let it read the new file
         time.sleep(20)
 
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         i = 0
 
@@ -153,7 +153,7 @@ class Test(TestCase):
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         # Let it read the file
         time.sleep(5)
@@ -173,7 +173,7 @@ class Test(TestCase):
 
         time.sleep(5)
 
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         data = self.get_dot_filebeat()
 
@@ -204,7 +204,7 @@ class Test(TestCase):
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         # Let it read the file
         time.sleep(5)
@@ -223,7 +223,7 @@ class Test(TestCase):
 
         time.sleep(5)
 
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         data = self.get_dot_filebeat()
 

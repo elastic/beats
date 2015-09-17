@@ -21,6 +21,10 @@ func TestReadLine(t *testing.T) {
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
+	if err != nil {
+		t.Fatalf("Error creating the absolute path: %s", absPath)
+	}
+
 	file, err := os.Create(logFile)
 	defer file.Close()
 	defer os.Remove(logFile)
