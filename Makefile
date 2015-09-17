@@ -26,9 +26,13 @@ clean:
 run: filebeat
 	./filebeat -c etc/filebeat.dev.yml -e -v -d "*"
 
+.PHONY: unit
+unit:
+	$(GODEP) go test ./...
+
 .PHONY: test
-test:
-	$(GODEP) go test -short ./...
+test: unit
+	make -C ./tests/integration test
 
 .PHONY: coverage
 coverage:
