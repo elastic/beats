@@ -1,7 +1,8 @@
 package crawler
 
 import (
-	cfg "github.com/elastic/filebeat/config"
+	"fmt"
+	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
 	"os"
@@ -27,7 +28,7 @@ type Crawler struct {
 	Persist chan *input.FileState
 }
 
-func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.FileState,
+func (crawler *Crawler) Start(files []config.FileConfig, persist map[string]*input.FileState,
 	eventChan chan *input.FileEvent) {
 
 	pendingProspectorCnt := 0
@@ -42,7 +43,12 @@ func (crawler *Crawler) Start(files []cfg.FileConfig, persist map[string]*input.
 			crawler:    crawler,
 		}
 
-		prospector.Init()
+		err := prospector.Init()
+		if err != nil {
+			logp.Critical("Error in initing propsecptor: %s", err)
+			fmt.Printf("Error in initing propsecptor: %s", err)
+			os.Exit(1)
+		}
 
 		go prospector.Run(eventChan)
 		pendingProspectorCnt++

@@ -31,10 +31,11 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, 3, len(files[0].Fields))
 	assert.Equal(t, 1, len(files[0].Fields["review"]))
 	assert.Equal(t, "24h", files[0].IgnoreOlder)
+	assert.Equal(t, "10s", files[0].ScanFrequency)
 
 	assert.Equal(t, "stdin", files[2].Input)
 	assert.Equal(t, 0, len(files[2].Paths))
-
+	assert.Equal(t, "", files[1].ScanFrequency)
 }
 
 func TestGetConfigFiles_File(t *testing.T) {

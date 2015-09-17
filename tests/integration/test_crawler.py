@@ -85,7 +85,6 @@ class Test(TestCase):
 
     def test_file_renaming(self):
         # Makes sure that when a file is renamed, the content is not read again.
-        # Checks that if a line does not have a line ending, is is not read yet
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"

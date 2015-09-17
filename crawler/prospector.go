@@ -28,15 +28,17 @@ type ProspectorFileStat struct {
 }
 
 // Init sets up default config for prospector
-func (p *Prospector) Init() {
+func (p *Prospector) Init() error {
+
 	if p.FileConfig.IgnoreOlder != "" {
 
 		var err error
-		// Default ignore time time
+
 		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
 
 		if err != nil {
 			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			return err
 		}
 	} else {
 		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
@@ -44,7 +46,26 @@ func (p *Prospector) Init() {
 		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
 
+	if p.FileConfig.ScanFrequency != "" {
+
+		var err error
+
+		p.FileConfig.ScanFrequencyDuration, err = time.ParseDuration(p.FileConfig.ScanFrequency)
+
+		if err != nil {
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			return err
+		}
+	} else {
+		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
+		// Set it to default
+		p.FileConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
+	}
+
+	// Init list
 	p.prospectorList = make(map[string]ProspectorFileStat)
+
+	return nil
 
 }
 
@@ -96,9 +117,8 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 		p.lastscan = newlastscan
 
-		// Defer next scan for a bit.
-		// TODO: Implement config variable or find algorithm when to rescan https://github.com/elastic/filebeat/issues/19
-		time.Sleep(10 * time.Second) // Make this tunable
+		// Defer next scan for the defined scanFrequency
+		time.Sleep(p.FileConfig.ScanFrequencyDuration)
 		logp.Debug("prospector", "Start next scan")
 
 		// Clear out files that disappeared and we've stopped harvesting
