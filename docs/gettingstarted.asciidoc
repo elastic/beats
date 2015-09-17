@@ -315,7 +315,7 @@ configure the index patterns in Kibana:
  - Automatically by loading dashboards, visualizations, seacrhes and index patterns. The steps 
     are described in the next chapter.
 
- - Manually by configuring [packetbeat-]YYYY.MM.DD index pattern under the `Settings`->`Indices` page.
+ - Manually by configuring the [packetbeat-]YYYY.MM.DD index pattern under the `Settings`->`Indices` page.
 
 ==== Configure manually index pattern in Kibana
 
@@ -366,7 +366,7 @@ as argument of the load.sh command line:
 ./load.sh http://192.168.33.60:9200
 -------------------------------------------------------------------------
 
-The load command uploads the example dashboards and the visualization, searches that are used.
+The load command uploads the example dashboards with the visualizations and searches that can be used.
 Additionally, the index patterns for Packetbeat and Topbeat are created:
 
    - [packetbeat-]YYYY.MM.DD

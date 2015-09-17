@@ -357,7 +357,7 @@ as argument of the load.sh command line:
 ./load.sh http://192.168.33.60:9200
 -------------------------------------------------------------------------
 
-The load command uploads the example dashboards and the visualization, searches that are used.
+The load command uploads the example dashboards with the visualizations and searches that can be used.
 Additionally, the index patterns for Packetbeat and Topbeat are created:
 
    - [packetbeat-]YYYY.MM.DD
