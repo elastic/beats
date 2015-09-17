@@ -6,7 +6,11 @@ filebeat:
       paths:
         - "{{ path }}"
       # Type of the files. Annotated in every documented
-      type: log
+      input: log
+      fields:
+        level: debug
+      scanfrequency: 1s
+      ignoreolder: "{{ignoreolder}}"
   spoolSize:
   harvesterBufferSize:
   cpuProfileFile:

@@ -103,4 +103,3 @@ class Test(TestCase):
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
 
-
