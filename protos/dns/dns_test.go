@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -235,7 +236,7 @@ func newDns(verbose bool) *Dns {
 	}
 
 	dns := &Dns{}
-	err := dns.Init(true, make(chan common.MapStr, 100))
+	err := dns.Init(true, publisher.ChanClient{make(chan common.MapStr, 100)})
 	if err != nil {
 		return nil
 	}
@@ -269,8 +270,9 @@ func TestParseUdp_emptyPacket(t *testing.T) {
 	packet := newPacket(forward, []byte{})
 	dns.ParseUdp(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
-	close(dns.results)
-	assert.Nil(t, <-dns.results, "No result should have been published.")
+	client := dns.results.(publisher.ChanClient)
+	close(client.Channel)
+	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
 
 // Verify that a malformed packet is safely handled (no panics).
@@ -290,8 +292,9 @@ func TestParseUdp_requestPacket(t *testing.T) {
 	packet := newPacket(forward, elasticA.request)
 	dns.ParseUdp(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
-	close(dns.results)
-	assert.Nil(t, <-dns.results, "No result should have been published.")
+	client := dns.results.(publisher.ChanClient)
+	close(client.Channel)
+	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
 
 // Verify that the lone response packet is parsed and that an error
@@ -357,7 +360,9 @@ func benchmarkUdp(b *testing.B, q DnsTestMessage) {
 		dns.ParseUdp(packet)
 		packet = newPacket(reverse, q.response)
 		dns.ParseUdp(packet)
-		<-dns.results
+
+		client := dns.results.(publisher.ChanClient)
+		<-client.Channel
 	}
 }
 
@@ -374,11 +379,12 @@ func BenchmarkParallelParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messages)
 	dns := newDns(false)
+	client := dns.results.(publisher.ChanClient)
 
 	// Drain the results channal while the test is running.
 	go func() {
 		totalMessages := 0
-		for r := range dns.results {
+		for r := range client.Channel {
 			_ = r
 			totalMessages++
 		}
@@ -401,7 +407,7 @@ func BenchmarkParallelParse(b *testing.B) {
 		}
 	})
 
-	defer close(dns.results)
+	defer close(client.Channel)
 }
 
 // parseUdpRequestResponse parses a request then a response packet and validates
@@ -432,8 +438,9 @@ func parseUdpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
 func expectResult(t testing.TB, dns *Dns) common.MapStr {
+	client := dns.results.(publisher.ChanClient)
 	select {
-	case result := <-dns.results:
+	case result := <-client.Channel:
 		return result
 	default:
 		t.Error("Expected a result to be published.")

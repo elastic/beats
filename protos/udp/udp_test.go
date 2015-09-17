@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
@@ -55,7 +56,7 @@ type TestProtocol struct {
 	pkt   *protos.Packet // UDP packet that the plugin was called to process.
 }
 
-func (proto *TestProtocol) Init(test_mode bool, results chan common.MapStr) error {
+func (proto *TestProtocol) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 

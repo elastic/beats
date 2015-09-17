@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -246,7 +247,7 @@ type Redis struct {
 
 	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
 }
 
 func (redis *Redis) getTransaction(k common.HashableTcpTuple) *RedisTransaction {
@@ -279,7 +280,7 @@ func (redis *Redis) GetPorts() []int {
 	return redis.Ports
 }
 
-func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
+func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	redis.InitDefaults()
 	if !test_mode {
 		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
@@ -712,5 +713,5 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	redis.results <- event
+	redis.results.PublishEvent(event)
 }

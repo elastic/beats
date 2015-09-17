@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -152,7 +153,7 @@ type Thrift struct {
 	transactions *common.Cache
 
 	PublishQueue chan *ThriftTransaction
-	results      chan common.MapStr
+	results      publisher.Client
 	Idl          *ThriftIdl
 }
 
@@ -238,7 +239,7 @@ func (thrift *Thrift) GetPorts() []int {
 	return thrift.Ports
 }
 
-func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
+func (thrift *Thrift) Init(test_mode bool, results publisher.Client) error {
 
 	thrift.InitDefaults()
 
@@ -1123,7 +1124,7 @@ func (thrift *Thrift) publishTransactions() {
 		event["dst"] = &t.Dst
 
 		if thrift.results != nil {
-			thrift.results <- event
+			thrift.results.PublishEvent(event)
 		}
 
 		logp.Debug("thrift", "Published event")
