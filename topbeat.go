@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/elastic/gosigar"
+
 	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
@@ -21,7 +23,7 @@ type Topbeat struct {
 	procsMap     ProcsMap
 	lastCpuTimes *CpuTimes
 	TbConfig     ConfigSettings
-	events       chan common.MapStr
+	events       publisher.Client
 }
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
@@ -51,8 +53,7 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 }
 
 func (tb *Topbeat) Setup(b *beat.Beat) error {
-
-	tb.events = publisher.Publisher.Queue
+	tb.events = b.Events
 	return nil
 }
 
@@ -154,7 +155,7 @@ func (t *Topbeat) exportProcStats() error {
 					"cpu":   process.Cpu,
 				},
 			}
-			t.events <- event
+			t.events.PublishEvent(event)
 		}
 	}
 	return nil
@@ -198,36 +199,40 @@ func (t *Topbeat) exportSystemStats() error {
 		"swap":      swap_stat,
 	}
 
-	t.events <- event
+	t.events.PublishEvent(event)
 
 	return nil
 }
 
 func (t *Topbeat) exportFileSystemStats() error {
-
 	fss, err := GetFileSystemList()
 	if err != nil {
 		logp.Warn("Getting filesystem list: %v", err)
 		return err
 	}
 
+	t.events.PublishEvents(collectFileSystemStats(fss))
+	return nil
+}
+
+func collectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
+	events := make([]common.MapStr, 0, len(fss))
 	for _, fs := range fss {
-		fs_stat, err := GetFileSystemStat(fs)
+		fsStat, err := GetFileSystemStat(fs)
 		if err != nil {
-			logp.Debug("topbeat", "Skip filesystem %d: %v", fs_stat, err)
+			logp.Debug("topbeat", "Skip filesystem %d: %v", fsStat, err)
 			continue
 		}
-		t.addFileSystemUsedPercentage(fs_stat)
+		addFileSystemUsedPercentage(fsStat)
 
 		event := common.MapStr{
 			"timestamp": common.Time(time.Now()),
 			"type":      "filesystem",
-			"fs":        fs_stat,
+			"fs":        fsStat,
 		}
-		t.events <- event
+		events = append(events, event)
 	}
-
-	return nil
+	return events
 }
 
 func (t *Topbeat) MatchProcess(name string) bool {
@@ -251,8 +256,7 @@ func (t *Topbeat) addMemPercentage(m *MemStat) {
 	m.UsedPercent = Round(perc, .5, 2)
 }
 
-func (t *Topbeat) addFileSystemUsedPercentage(f *FileSystemStat) {
-
+func addFileSystemUsedPercentage(f *FileSystemStat) {
 	if f.Total == 0 {
 		return
 	}
