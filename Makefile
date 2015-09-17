@@ -60,7 +60,7 @@ darwin_dist: packetbeat
 	cp packetbeat packetbeat-$(VERSION)-darwin
 	cp etc/packetbeat.yml packetbeat-$(VERSION)-darwin/
 	cp etc/packetbeat.template.json packetbeat-$(VERSION)-darwin/
-	sed -i .bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
+	sed -i.bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
 	rm packetbeat-$(VERSION)-darwin/packetbeat.yml.bk
 	tar czvf packetbeat-$(VERSION)-darwin.tgz packetbeat-$(VERSION)-darwin
 	shasum packetbeat-$(VERSION)-darwin.tgz > packetbeat-$(VERSION)-darwin.tgz.sha1.txt
@@ -72,10 +72,11 @@ install_cfg:
 	# darwin
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
 	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
+	rm $(PREFIX)/packetbeat-darwin.yml.bk
 	# win
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-win.yml
 	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
-
+	rm $(PREFIX)/packetbeat-win.yml.bk
 
 .PHONY: gofmt
 gofmt:
@@ -103,7 +104,6 @@ coverage:
 	mkdir -p coverage
 	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=./coverage/unit.cov -covermode=count github.com/elastic/packetbeat/...
 	$(GODEP) go tool cover -html=./coverage/unit.cov -o coverage/unit.html
-
 
 .PHONY: benchmark
 benchmark:
