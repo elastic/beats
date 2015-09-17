@@ -12,6 +12,7 @@ packetbeat.test
 
 /coverage/
 /docs/html_docs
+/build/
 
 # Folders
 _obj
