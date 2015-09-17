@@ -22,7 +22,7 @@ func TestProspectorInit(t *testing.T) {
 
 	prospector.Init()
 
-	// Default values expected
+	// Predefined values expected
 	assert.Equal(t, 100*time.Minute, prospector.FileConfig.IgnoreOlderDuration)
 	assert.Equal(t, 15*time.Second, prospector.FileConfig.ScanFrequencyDuration)
 }

@@ -33,7 +33,7 @@ func (p *Prospector) Init() error {
 	if p.FileConfig.IgnoreOlder != "" {
 
 		var err error
-		// Default ignore time time
+
 		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
 
 		if err != nil {
@@ -49,7 +49,7 @@ func (p *Prospector) Init() error {
 	if p.FileConfig.ScanFrequency != "" {
 
 		var err error
-		// Default ignore time time
+
 		p.FileConfig.ScanFrequencyDuration, err = time.ParseDuration(p.FileConfig.ScanFrequency)
 
 		if err != nil {

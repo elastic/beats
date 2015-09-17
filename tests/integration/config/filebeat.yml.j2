@@ -7,13 +7,13 @@ filebeat:
         - "{{ path }}"
       # Type of the files. Annotated in every documented
       type: log
+      scanfrequency: 1s
   spoolSize:
   harvesterBufferSize:
   cpuProfileFile:
   idleTimeout:
   tailOnRotate:
   quiet:
-  scanfrequency: 1s
   registryfile: {{ fb.working_dir + '/' }}.filebeat
 
 
