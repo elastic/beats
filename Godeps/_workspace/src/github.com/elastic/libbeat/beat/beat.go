@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 	"github.com/elastic/libbeat/publisher"
@@ -29,7 +28,7 @@ type Beat struct {
 	Version string
 	Config  *BeatConfig
 	BT      Beater
-	Events  chan common.MapStr
+	Events  publisher.Client
 }
 
 // Basic configuration of every beat
@@ -68,35 +67,45 @@ func (beat *Beat) CommandLineSetup() {
 	}
 }
 
-// Inits the config file and reads the default config information into Beat.Config
-// This is Output, Logging and Shipper config params
+// LoadConfig inits the config file and reads the default config information
+// into Beat.Config. It exists the processes in case of errors.
 func (b *Beat) LoadConfig() {
 
 	err := cfgfile.Read(&b.Config, "")
-
 	if err != nil {
-		logp.Debug("Log read error", "Error %v\n", err)
+		// logging not yet initialized, so using fmt.Printf
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
 	}
 
-	logp.Init(b.Name, &b.Config.Logging)
+	err = logp.Init(b.Name, &b.Config.Logging)
+	if err != nil {
+		fmt.Printf("Error initializing logging: %v\n", err)
+		os.Exit(1)
+	}
 
-	logp.Debug("main", "Initializing output plugins")
+	logp.Debug("beat", "Initializing output plugins")
 
 	if err := publisher.Publisher.Init(b.Name, b.Config.Output, b.Config.Shipper); err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
 
-	b.Events = publisher.Publisher.Queue
+	b.Events = publisher.Publisher.Client()
 
-	logp.Debug(b.Name, "Init %s", b.Name)
+	logp.Debug("beat", "Init %s", b.Name)
 }
 
-// internal libbeat function that calls beater Run method
+// Run calls the beater Setup and Run methods. In case of errors
+// during the setup phase, it exits the process.
 func (b *Beat) Run() {
 
 	// Setup beater object
-	b.BT.Setup(b)
+	err := b.BT.Setup(b)
+	if err != nil {
+		logp.Critical("Setup returned an error: %v", err)
+		os.Exit(1)
+	}
 
 	// Up to here was the initialization, now about running
 	if cfgfile.IsTestConfig() {
@@ -111,17 +120,23 @@ func (b *Beat) Run() {
 	service.HandleSignals(b.BT.Stop)
 
 	// Run beater specific stuff
-	b.BT.Run(b)
+	err = b.BT.Run(b)
+	if err != nil {
+		logp.Critical("Run returned an error: %v", err)
+	}
 
 	service.Cleanup()
 
-	logp.Debug("main", "Cleanup")
+	logp.Debug("beat", "Cleanup")
 
 	// Call beater cleanup function
-	b.BT.Cleanup(b)
+	err = b.BT.Cleanup(b)
+	if err != nil {
+		logp.Err("Cleanup returned an error: %v", err)
+	}
 }
 
-// Stops the beat and calls the beater Stop action
+// Stop calls the beater Stop action.
 func (beat *Beat) Stop() {
 	beat.BT.Stop()
 }
