@@ -36,9 +36,9 @@ type FileConfig struct {
 	Paths                 []string
 	Fields                map[string]string
 	Input                 string
-	IgnoreOlder           string
+	IgnoreOlder           string `yaml:"ignoreOlder"`
 	IgnoreOlderDuration   time.Duration
-	ScanFrequency         string
+	ScanFrequency         string `yaml:"scanFrequency"`
 	ScanFrequencyDuration time.Duration
 }
 

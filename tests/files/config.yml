@@ -12,8 +12,8 @@ filebeat:
         level: debug
         review: 1
         type: log
-      ignoreolder: 24h
-      scanfrequency: 10s
+      ignoreOlder: 24h
+      scanFrequency: 10s
     -
       fields:
       paths:

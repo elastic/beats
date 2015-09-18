@@ -21,11 +21,11 @@ filebeat:
         level: debug
         review: 1
       # Ignore files which were modified more then the defined timespan in the past
-      ignoreolder:
+      ignoreOlder:
       # Scan frequency in seconds.
       # How often these files should be checked for changes. In case it is set
       # to 0s, it is done as often as possible. Default: 10s
-      scanfrequency: 10s
+      scanFrequency: 10s
     -
       fields:
       paths:
@@ -33,7 +33,7 @@ filebeat:
       type: log
       # Regexp log line filter (not implemented yet)
       filter: "regexp"
-      ignoreolder: 24h
+      ignoreOlder: 24h
     -
       fields:
       type: stdin
