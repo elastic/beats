@@ -12,8 +12,8 @@ type Harvester struct {
 	Offset      int64
 	FinishChan  chan int64
 	SpoolerChan chan *input.FileEvent
-
-	file *os.File /* the file being watched */
+	BufferSize  int
+	file        *os.File /* the file being watched */
 }
 
 // Interface for the different harvester types

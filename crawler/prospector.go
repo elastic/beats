@@ -62,6 +62,10 @@ func (p *Prospector) Init() error {
 		p.FileConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
 
+	if p.FileConfig.HarvesterBufferSize == 0 {
+		p.FileConfig.HarvesterBufferSize = cfg.DefaultHarvesterBufferSize
+	}
+
 	// Init list
 	p.prospectorList = make(map[string]ProspectorFileStat)
 
@@ -84,6 +88,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 				FileConfig: p.FileConfig,
 				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
 				SpoolerChan: spoolChan,
+				BufferSize:  p.FileConfig.HarvesterBufferSize,
 			}
 
 			h.Start()

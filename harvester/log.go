@@ -35,7 +35,7 @@ func (h *Harvester) Harvest() {
 
 	h.initOffset()
 
-	reader := bufio.NewReaderSize(h.file, config.CmdlineOptions.HarvesterBufferSize) // 16kb buffer by default
+	reader := bufio.NewReaderSize(h.file, h.BufferSize)
 	buffer := new(bytes.Buffer)
 
 	var readTimeout = 10 * time.Second

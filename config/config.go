@@ -17,6 +17,7 @@ const (
 	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
 	DefaultSpoolSize           uint64        = 1024
 	DefaultIdleTimeout         time.Duration = time.Second * 5
+	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
 )
 
 type Config struct {
@@ -26,7 +27,6 @@ type Config struct {
 type FilebeatConfig struct {
 	Files               []FileConfig
 	SpoolSize           uint64 `yaml:"spoolSize"`
-	HarvesterBufferSize int
 	CpuProfileFile      string
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
@@ -43,6 +43,7 @@ type FileConfig struct {
 	IgnoreOlderDuration   time.Duration
 	ScanFrequency         string `yaml:"scanFrequency"`
 	ScanFrequencyDuration time.Duration
+	HarvesterBufferSize   int
 }
 
 // TODO: Log is only used here now. Do we need it?
@@ -53,14 +54,9 @@ func init() {
 }
 
 // TODO: Default options should be set as part of default config otherwise it always overwrites
-var CmdlineOptions = &FilebeatConfig{
-	HarvesterBufferSize: 16 << 10, // 16384
-}
+var CmdlineOptions = &FilebeatConfig{}
 
 func init() {
-	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "harvest-buffer-size", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
-	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "hb", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
-
 	flag.BoolVar(&CmdlineOptions.TailOnRotate, "tail", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
 	flag.BoolVar(&CmdlineOptions.TailOnRotate, "t", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
 

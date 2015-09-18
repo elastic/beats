@@ -14,6 +14,8 @@ filebeat:
         type: log
       ignoreOlder: 24h
       scanFrequency: 10s
+      harvesterBufferSize: 5000
+
     -
       fields:
       paths:
@@ -24,7 +26,6 @@ filebeat:
       input: stdin
       # Paths is not required
   spoolSize: 1024
-  harvesterBufferSize:
   cpuProfileFile:
   idleTimeout: 5s
   tailOnRotate:
