@@ -117,7 +117,7 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 
 	// This Recover should catch all exceptions in
 	// protocol modules.
-	defer logp.Recover("FollowTcp exception")
+	defer logp.Recover("Process tcp exception")
 
 	stream, exists := tcp.streamsMap[pkt.Tuple.Hashable()]
 	var original_dir uint8 = TcpDirectionOriginal

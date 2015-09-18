@@ -1,3 +1,4 @@
+[[configuration]]
 == Configuration
 
 The Packetbeat configuration file uses
@@ -140,7 +141,7 @@ configuration:
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
-  # On which devices to sniff
+  # On which device to sniff
   device: any
 
   # The maximum capture size of a single packet.
@@ -167,13 +168,24 @@ interfaces:
   device: eth0
 ------------------------------------------------------------------------------
 
-
-Alternatively, the Packetbeat shipper supports capturing of all messages sent or
-received by the server on which it is installed. For this, use the special
-"any" device.
+Alternatively, on Linux the Packetbeat shipper supports capturing of all
+messages sent or received by the server on which it is installed. For this, use
+the special "any" device.
 
 NOTE: When using the "any" device, the interfaces are not set
       in promiscuous mode.
+
+This option also accepts specifying the device by its index in the list of
+devices available for sniffing. To obtain the list of available devices, you can
+use run Packetbeat like this: `packetbeat -devices`. This is especially useful
+on Windows where device names are long. The following example will setup
+sniffing on the first interface available:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: 0
+------------------------------------------------------------------------------
 
 
 ===== snaplen
@@ -285,6 +297,7 @@ Currently, Packetbeat supports the following protocols:
  - Redis
  - Thrift-RPC
  - MongoDB
+ - Memcache
 
 Example configuration:
 
@@ -293,6 +306,9 @@ Example configuration:
 protocols:
   http:
     ports: [80, 8080, 8000, 5000, 8002]
+
+  memcache:
+    ports: [11211]
 
   mysql:
     ports: [3306]
@@ -454,6 +470,60 @@ capturing behind a reverse proxy and still wanting to get the geo-location
 information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
+
+==== Memcache configuration
+
+[source,yaml]
+------------------------------------------------------------------------------
+  memcache:
+    ports: [11211]
+    parseunknown: false
+    maxvalues: 0
+    maxbytespervalue: 100
+    udptransactiontimeout: 200
+    tcptransactiontimeout: 200
+------------------------------------------------------------------------------
+
+===== parseunknown
+
+Force memcache text protocol parser to accept unknown commands.
+Note: All unknown commands MUST NOT contain a data part.
+
+===== maxvalues
+
+Maximum number of values to store in message (multi-get).
+All values will be base64 encoded.
+
+possible values:
+  maxvalue: -1  - store all values (text based protocol multi-get)
+  maxvalue: 0   - store no values at all (default)
+  maxvalue: N   - store up to N values
+
+===== maxbytespervalue
+
+Limit the number of bytes to be copied per value element.
+
+Note:
+values will be base64 encoded, so actual size in json document will be 4 times
+maxbytespervalue.
+
+===== udptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Note:
+Quiet messages in UDP binary protocol will get response only in error case.
+The memcache protocol analyzer will wait for udptransactiontimeout milliseconds
+before publishing quiet messages. Non quiet messages or quiet requests with
+error response will not have to wait for the timeout
+
+===== tcptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Time until all unfinished tcp based transactions will be published if there is
+no activity on the TCP stream.
+
 
 ==== MySQL and PgSQL configuration
 

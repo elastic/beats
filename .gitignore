@@ -8,9 +8,11 @@
 *.swo
 *.swn
 packetbeat.test
-/profile.cov
-/cover/coverage.html
+*.dev.yml
+
+/coverage/
 /docs/html_docs
+/build/
 
 # Folders
 _obj
@@ -33,3 +35,10 @@ _testmain.go
 
 # IDE files / folders
 .idea
+
+last_run
+
+*.test
+.DS_Store
+
+env

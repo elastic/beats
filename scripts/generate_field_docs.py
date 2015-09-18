@@ -11,7 +11,9 @@ import yaml
 
 SECTIONS = [
     ("event", "Event"),
+    ("dns", "DNS"),
     ("http", "Http"),
+    ("memcache", "Memcache"),
     ("mysql", "Mysql"),
     ("pgsql", "PostgreSQL"),
     ("thrift", "Thrift-RPC"),

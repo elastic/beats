@@ -1,6 +1,7 @@
 package protos
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -19,6 +20,34 @@ type Packet struct {
 	Ts      time.Time
 	Tuple   common.IpPortTuple
 	Payload []byte
+}
+
+var ErrInvalidPort = errors.New("port number out of range")
+
+// Protocol Plugin Port configuration with validation on init
+type PortsConfig struct {
+	Ports []int
+}
+
+func (p *PortsConfig) Init(ports ...int) error {
+	return p.Set(ports)
+}
+
+func (p *PortsConfig) Set(ports []int) error {
+	if err := validatePorts(ports); err != nil {
+		return err
+	}
+	p.Ports = ports
+	return nil
+}
+
+func validatePorts(ports []int) error {
+	for port := range ports {
+		if port < 0 || port > 65535 {
+			return ErrInvalidPort
+		}
+	}
+	return nil
 }
 
 // Functions to be exported by a protocol plugin
@@ -66,6 +95,8 @@ const (
 	PgsqlProtocol
 	ThriftProtocol
 	MongodbProtocol
+	DnsProtocol
+	MemcacheProtocol
 )
 
 // Protocol names
@@ -77,6 +108,8 @@ var ProtocolNames = []string{
 	"pgsql",
 	"thrift",
 	"mongodb",
+	"dns",
+	"memcache",
 }
 
 func (p Protocol) String() string {

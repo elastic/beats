@@ -114,7 +114,7 @@ func TestBpfFilter_withoutVlan(t *testing.T) {
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53", filter)
 }
 
-func TestBpfFilter_withtVlan(t *testing.T) {
+func TestBpfFilter_withVlan(t *testing.T) {
 	p := newProtocols()
 	filter := p.BpfFilter(true)
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or (vlan and "+

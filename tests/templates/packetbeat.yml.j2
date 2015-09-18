@@ -121,6 +121,21 @@ protocols:
 {% if mongodb_max_docs is not none %}    max_docs: {{mongodb_max_docs}}{%endif %}
 {% if mongodb_max_doc_length is not none %}    max_doc_length: {{mongodb_max_doc_length}}{%endif%}
 
+  dns:
+    ports: [{{ dns_ports|default([53])|join(", ") }}]
+{% if dns_include_authorities %}    include_authorities: true{% endif %}
+{% if dns_include_additionals %}    include_additionals: true{% endif %}
+{% if dns_send_request %}    send_request: true{% endif %}
+{% if dns_send_response %}    send_response: true{% endif %}
+
+  memcache:
+    ports: [{{ memcache_ports|default([11211])|join(", ") }}]
+{% if memcache_send_request %}    send_request: true{% endif %}
+{% if memcache_send_response %}    send_response: true{% endif %}
+{% if memcache_parse_unknown %}    parseunknown: true{% endif %}
+{% if memcache_max_values %}    maxvalues: {{ memcache_max_values }}{% endif %}
+{% if memcache_udp_transaction_timeout %}    udptransactiontimeout: {{ memcache_udp_transaction_timeout}}{% endif %}
+
 
 ############################# Filters ############################################
 
@@ -189,7 +204,7 @@ output:
 
 {% if procs_enabled %}
 # Configure the processes to be monitored and how to find them. If a process is
-# monitored than PacketBeat attempts to use it's name to fill in the `proc` and
+# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
 # `client_proc` fields.
 # The processes can be found by searching their command line by a given string.
 #
@@ -210,6 +225,9 @@ procs:
 
     - process: app
       cmdline_grep: gunicorn
+
+    - process: memcache
+      cmdline_grep: memcached
 {% endif %}
 
 # vim: set ft=jinja:

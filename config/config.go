@@ -21,7 +21,6 @@ type Config struct {
 
 type InterfacesConfig struct {
 	Device         string
-	Devices        []string
 	Type           string
 	File           string
 	With_vlans     bool
@@ -35,12 +34,22 @@ type InterfacesConfig struct {
 }
 
 type Protocols struct {
-	Http    Http
-	Mysql   Mysql
-	Mongodb Mongodb
-	Pgsql   Pgsql
-	Redis   Redis
-	Thrift  Thrift
+	Dns      Dns
+	Http     Http
+	Memcache Memcache
+	Mysql    Mysql
+	Mongodb  Mongodb
+	Pgsql    Pgsql
+	Redis    Redis
+	Thrift   Thrift
+}
+
+type Dns struct {
+	Ports               []int
+	Send_request        *bool
+	Send_response       *bool
+	Include_authorities *bool
+	Include_additionals *bool
 }
 
 type Http struct {
@@ -54,6 +63,15 @@ type Http struct {
 	Strip_authorization *bool
 	Send_request        *bool
 	Send_response       *bool
+}
+
+type Memcache struct {
+	Ports                 []int
+	MaxValues             int
+	MaxBytesPerValue      int
+	UdpTransactionTimeout uint
+	TcpTransactionTimeout uint
+	ParseUnknown          bool
 }
 
 type Mysql struct {

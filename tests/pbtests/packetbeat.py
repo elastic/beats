@@ -49,7 +49,7 @@ class Proc(object):
 class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
-                       cmd="../packetbeat",
+                       cmd="../packetbeat.test",
                        config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
@@ -65,7 +65,10 @@ class TestCase(unittest.TestCase):
         args.extend(["-e",
                      "-I", os.path.join("pcaps", pcap),
                      "-c", os.path.join(self.working_dir, config),
-                     "-t"])
+                     "-t",
+                     "-integration",
+                     "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                     ])
         if extra_args:
             args.extend(extra_args)
 
@@ -79,7 +82,7 @@ class TestCase(unittest.TestCase):
             return proc.wait()
 
     def start_packetbeat(self,
-                         cmd="../packetbeat",
+                         cmd="../packetbeat.test",
                          config="packetbeat.yml",
                          output="packetbeat.log",
                          extra_args=[],
@@ -91,7 +94,10 @@ class TestCase(unittest.TestCase):
         """
         args = [cmd,
                 "-e",
-                "-c", os.path.join(self.working_dir, config)]
+                "-c", os.path.join(self.working_dir, config),
+                "-integration",
+                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                ]
         if extra_args:
             args.extend(extra_args)
 

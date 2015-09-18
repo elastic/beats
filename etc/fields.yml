@@ -60,12 +60,18 @@ env:
       description: >
         The GeoIP location of the `real_ip` IP address or of the
         `client_ip` address if the `real_ip` is disabled. The field is a string
-        containg the latitude and longitude separated by a coma.
+        containing the latitude and longitude separated by a comma.
 
     - name: client_port
       description: >
         The layer 4 port of the process that initiated the transaction.
       format: dotted notation.
+
+    - name: transport
+      description: >
+        Transport protocol used for the transaction. If not specified then
+        assume tcp.
+      example: udp
 
     - name: port
       description: >
@@ -172,6 +178,177 @@ event:
         Messages from Packetbeat itself. This usually contains error messages for
         interpreting the raw data which can be helpful for troubleshooting.
 
+    - name: dns
+      type: group
+      description: DNS specific event fields.
+      fields:
+        - name: dns.id
+          type: int
+          description: >
+            DNS packet identifier assigned by the program that generated the
+            query. The identifier is copied to the response.
+
+        - name: dns.op_code
+          description: >
+            DNS operation code that specifies the kind of query in the message.
+            This value is set by the originator of a query and copied into the
+            response.
+          example: QUERY
+
+        - name: dns.flags.authoritative
+          type: bool
+          description: >
+            DNS flag specifying that the responding server is an authority for
+            the domain name used in the question.
+
+        - name: dns.flags.recursion_allowed
+          type: bool
+          description: >
+            DNS flag specifying if recursive query support is available in the
+            name server.
+
+        - name: dns.flags.recursion_desired
+          type: bool
+          description: >
+            DNS flag specifying that the client directs the server to pursue a
+            query recursively. Recursive query support is optional.
+
+        - name: dns.flags.truncated_response
+          type: bool
+          description: >
+            DNS flag specifying that only the first 512 bytes of the reply were
+            returned.
+
+        - name: dns.response_code
+          description: DNS status code.
+          example: NOERROR
+
+        - name: dns.question.name
+          description: >
+            The domain name being queried. If the name field contains non-printable
+            characters (below 32 or above 126) then those characters are represented
+            as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
+            Tabs, carriage returns, and line feeds will be converted to \t, \r, and
+            \n respectively.
+          example: www.google.com
+
+        - name: dns.question.type
+          description: The type of records being queried.
+          example: AAAA
+
+        - name: dns.question.class
+          description: The class of of records being queried.
+          example: IN
+
+        - name: dns.answers_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.answers field.
+
+        - name: dns.answers.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.answers.type
+          description: Type of data contained in this resource record.
+          example: MX
+
+        - name: dns.answers.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.answers.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: dns.authorities
+          type: dict
+          description: >
+            An array containing a dictionary for each authority section from the
+            answer.
+
+        - name: dns.authorities_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.authorities field.
+            The dns.authorities field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: dns.authorities.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.authorities.type
+          description: Type of data contained in this resource record.
+          example: NS
+
+        - name: dns.authorities.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.answers
+          type: dict
+          description: >
+            An array containing a dictionary about each answer section returned by
+            the server.
+
+        - name: dns.answers.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.answers.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
+        - name: dns.additionals
+          type: dict
+          description: >
+            An array containing a dictionary for each additional section from the
+            answer.
+
+        - name: dns.additionals_count
+          type: int
+          description: >
+            The number of resource records contained in the dns.additionals field.
+            The dns.additionals field may or may not be included depending on the
+            configuration of Packetbeat.
+
+        - name: dns.additionals.name
+          description: Domain name to which this resource record pertains.
+          example: example.com
+
+        - name: dns.additionals.type
+          description: Type of data contained in this resource record.
+          example: NS
+
+        - name: dns.additionals.class
+          description: Class of DNS data contained in this resource record.
+          example: IN
+
+        - name: dns.additionals.ttl
+          description: >
+            Time interval in seconds that this resource record may be cached
+            becore it should be discarded. Zero values mean that the data
+            not be cached.
+          type: int
+
+        - name: dns.additionals.data
+          description: >
+            The data describing the resource. The meaning of this data depends
+            on the type and class of the resource record.
+
     - name: http
       type: group
       description: HTTP specific event fields.
@@ -190,7 +367,7 @@ event:
             A map containing the captured header fields from the request. Which
             headers to capture is configurable. If more headers with the same
             header name are present in the message, they will be separated by
-            comas.
+            commas.
 
         - name: http.response_headers
           type: dict
@@ -198,12 +375,251 @@ event:
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If more headers with the
             same header name are present in the message, they will be separated
-            by comas.
+            by commas.
 
         - name: http.content_length
           type: int
           description: >
             The value of the Content-Length header if present.
+
+    - name: memcache
+      type: group
+      description: Memcached specific event fields
+      fields:
+        - name: memcache.protocol_type
+          type: string
+          description: >
+            Memcache protocol implementation. One of "binary", "text" or "unknown" for
+            binary based, text based or unknown memcache protocol type.
+
+        - name: memcache.request.line
+          type: string
+          description: >
+            Raw command line for unknown commands ONLY.
+
+        - name: memcache.request.command
+          type: string
+          description: >
+            The memcache command being requested in the memcache text protocol.
+            For example "set" or "get".
+            The binary protocol opcodes are translated into memcache text protocol
+            commands.
+
+        - name: memcache.response.command
+          type: string
+          description: >
+            Either the text based protocol response message type
+            or the name the originating request if binary protocol is used.
+
+        - name: memcache.request.type
+          type: string
+          description: >
+            The memcache command classification. One of "UNKNOWN", "Load",
+            "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
+            "Stats", "Success", "Fail" or "Auth".
+
+        - name: memcache.response.type
+          type: string
+          description: >
+            The memcache command classification. One of "UNKNOWN", "Load",
+            "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
+            "Stats", "Success", "Fail" or "Auth".
+            The text based protocol will employ any any of these, whereas the
+            binary based protocol will mirror the request commands only (see
+            memcache.response.status for binary protocol).
+
+        - name: memcache.response.error_msg
+          type: string
+          description: >
+            Optional error message in memcache response (text based protocol only).
+
+        - name: memcache.request.opcode
+          type: string
+          description: >
+            The binary protocol message opcode its name.
+
+        - name: memcache.response.opcode
+          type: string
+          description: >
+            The binary protocol message opcode its name.
+
+        - name: memcache.request.opcode_value
+          type: int
+          description: >
+            The binary protocol message opcode value.
+
+        - name: memcache.response.opcode_value
+          type: int
+          description: >
+            The binary protocol message opcode value.
+
+        - name: memcache.request.opaque
+          type: int
+          description: >
+            The binary protocol opaque header value used for correlating request
+            with response messages.
+
+        - name: memcache.response.opaque
+          type: int
+          description: >
+            The binary protocol opaque header value used for correlating request
+            with response messages.
+
+        - name: memcache.request.vbucket
+          type: int
+          description: >
+            The vbucket index send in binary message.
+
+        - name: memcache.response.status
+          type: string
+          description: >
+            Textual representation of response error code
+            (binary protocol only).
+
+        - name: memcache.response.status_code
+          type: int
+          description: >
+            Status code valued returned in response (binary protocol only).
+
+        - name: memcache.request.keys
+          type: list
+          description: >
+            List of keys send in store or load commands.
+
+        - name: memcache.response.keys
+          type: list
+          description: >
+            List of keys returned for load command (if present).
+
+        - name: memcache.request.count_values
+          type: int
+          description: >
+            Number of values found in memcache request message.
+            If command does not send any data, this field is missing.
+
+        - name: memcache.response.count_values
+          type: int
+          description: >
+            Number of values found in memcache response message.
+            If command does not send any data, this field is missing.
+
+        - name: memcache.request.values
+          type: list
+          description: >
+            List of base64 encoded values send with request (If present).
+
+        - name: memcache.response.values
+          type: list
+          description: >
+            List of base64 encoded values send with response (If present).
+
+        - name: memcache.request.bytes
+          type: int
+          description: >
+            Byte count of values being transfered.
+
+        - name: memcache.response.bytes
+          type: int
+          description: >
+            Byte count of values being transfered.
+
+        - name: memcache.request.delta
+          type: int
+          description: >
+            Counter increment/decrement delta value
+
+        - name: memcache.request.initial
+          type: int
+          description: >
+            Counter increment/decrement initial value parameter (binary protocol only).
+
+        - name: memcache.request.verbosity
+          type: int
+          description: >
+            Value of memcache "verbosity" command.
+
+        - name: memcache.request.raw_args
+          type: string
+          description: >
+            Text protocol raw arguments for "stats ..." and "lru crawl ..." commands.
+
+        - name: memcache.request.source_class
+          type: int
+          description: >
+            The source class id in 'slab reassign' command.
+
+        - name: memcache.request.dest_class
+          type: int
+          description: >
+            The destination class id in 'slab reassign' command.
+
+        - name: memcache.request.automove
+          type: string
+          description: >
+              The automove mode in 'slab automove' command as string.
+              One of "standby"(=0), "slow"(=1), "aggressive"(=2) or raw value if
+              value is unknown.
+
+        - name: memcache.request.flags
+          type: int
+          description: >
+            Memcache command flags send in request (If present).
+
+        - name: memcache.response.flags
+          type: int
+          description: >
+            Memcache message flags send in response (If present).
+
+        - name: memcache.request.exptime
+          type: int
+          description: >
+            The data expiry time in seconds send with memcache command (If present).
+            If value is <30 days, the expiry time is relative to "now", else it
+            is a absolute unix time in seconds (32bit)
+
+        - name: memcache.request.sleep_us
+          type: int
+          description: >
+            Sleep setting in us for 'lru_crawler sleep' command.
+
+        - name: memcache.response.value
+          type: int
+          description: >
+            General numeric value if present. For example counter operation responses.
+
+        - name: memcache.request.noreply
+          type: bool
+          description: >
+            Set to true if noreply was set in request.
+            The memcache.response field will be missing
+
+        - name: memcache.request.quiet
+          type: bool
+          description: >
+            True if binary protocol message is to be treated as quiet message.
+
+        - name: memcache.request.cas_unique
+          type: int
+          description: >
+            CAS (compare-and-swap) identifier if present.
+
+        - name: memcache.response.cas_unique
+          type: int
+          description: >
+            CAS (compare-and-swap) identifier to be used with CAS based updates
+            (If present).
+
+        - name: memcache.response.stats
+          type: list
+          description: >
+            List of statistic values returned. Each entry is a dictionary with
+            fields "name" and "value"
+
+        - name: memcache.response.version
+          type: string
+          description: >
+            Returned memcache version string.
+
 
     - name: mysql
       type: group
@@ -403,7 +819,7 @@ measurements:
     - name: responsetime
       description: >
         The wall clock time it took to for the transaction to complete.
-        The precision is in microseconds.
+        The precision is in milliseconds.
       type: int
 
     - name: cpu_time
