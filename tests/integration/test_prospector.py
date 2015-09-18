@@ -9,7 +9,7 @@ Tests for the prospector functionality.
 
 class Test(TestCase):
 
-    def test_ingore_old_files(self):
+    def test_ignore_old_files(self):
         """
         Should ignore files there were not modified for longer then
         the `ignoreolder` setting.

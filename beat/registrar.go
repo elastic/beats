@@ -64,7 +64,7 @@ func (r *Registrar) WriteState(state map[string]*FileState, input chan []*FileEv
 
 // writeRegistry Writes the new json registry file  to disk
 func (r *Registrar) writeRegistry(state map[string]*FileState) error {
-	logp.Debug("registrar", "Write registry file:", r.registryFile)
+	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
 	tempfile := r.registryFile + ".new"
 	file, e := os.Create(tempfile)

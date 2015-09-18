@@ -2,10 +2,11 @@ package crawler
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
-	"os"
 )
 
 /*
@@ -36,7 +37,7 @@ func (crawler *Crawler) Start(files []config.FileConfig, persist map[string]*inp
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
 
-		logp.Debug("prospector", "File Config:", fileconfig)
+		logp.Debug("prospector", "File Config: %v", fileconfig)
 
 		prospector := &Prospector{
 			FileConfig: fileconfig,
