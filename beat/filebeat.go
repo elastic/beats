@@ -163,7 +163,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 			beat.Events <- bEvent
 		}
 
-		logp.Debug("filebeat", "Events sent:", len(events))
+		logp.Debug("filebeat", "Events sent: %d", len(events))
 
 		// Tell the registrar that we've successfully sent these events
 		fb.RegistrarChan <- events

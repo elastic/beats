@@ -201,7 +201,7 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 // For a new file the following options exist:
 func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, output chan *input.FileEvent) {
 
-	logp.Debug("prospector", "Start harvesting unkown file:", file)
+	logp.Debug("prospector", "Start harvesting unkown file: %s", file)
 
 	// Init harvester with info
 	h := &harvester.Harvester{
@@ -264,7 +264,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 // ** Renamed file has a state, continue there
 func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *input.File, oldFile *input.File, file string, output chan *input.FileEvent) {
 
-	logp.Debug("prospector", "Update existing file for harvesting:", file)
+	logp.Debug("prospector", "Update existing file for harvesting: %s", file)
 
 	h := &harvester.Harvester{
 		Path:        file,
@@ -305,7 +305,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 		h.Offset = <-newinfo.Harvester
 		h.Start()
 	} else {
-		logp.Debug("prospector", "Not harvesting, file didn't change: ", file)
+		logp.Debug("prospector", "Not harvesting, file didn't change: %s", file)
 	}
 }
 
