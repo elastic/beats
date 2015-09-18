@@ -74,8 +74,6 @@ type MysqlTransaction struct {
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 type MysqlStream struct {
@@ -89,11 +87,6 @@ type MysqlStream struct {
 
 	message *MysqlMessage
 }
-
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
 
 type parseState int
 
@@ -126,13 +119,21 @@ type Mysql struct {
 	Send_request  bool
 	Send_response bool
 
-	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
+	transactions *common.Cache
 
 	results chan common.MapStr
 
 	// function pointer for mocking
 	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
+}
+
+func (mysql *Mysql) getTransaction(k common.HashableTcpTuple) *MysqlTransaction {
+	v := mysql.transactions.Get(k)
+	if v != nil {
+		return v.(*MysqlTransaction)
+	}
+	return nil
 }
 
 func (mysql *Mysql) InitDefaults() {
@@ -175,7 +176,9 @@ func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
 		}
 	}
 
-	mysql.transactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
+	mysql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	mysql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	mysql.handleMysql = handleMysql
 	mysql.results = results
 
@@ -573,18 +576,15 @@ func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 }
 
 func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
-
-	// Add it to the HT
 	tuple := msg.TcpTuple
-
-	trans := mysql.transactionsMap[tuple.Hashable()]
+	trans := mysql.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.Mysql != nil {
 			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
-		mysql.transactionsMap[tuple.Hashable()] = trans
+		mysql.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.ts = msg.Ts
@@ -625,16 +625,10 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 	// save Raw message
 	trans.Request_raw = msg.Query
 	trans.BytesIn = msg.Size
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { mysql.expireTransaction(trans) })
 }
 
 func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
-	tuple := msg.TcpTuple
-	trans := mysql.transactionsMap[tuple.Hashable()]
+	trans := mysql.getTransaction(msg.TcpTuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -670,23 +664,10 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 	trans.Notes = append(trans.Notes, msg.Notes...)
 
 	mysql.publishTransaction(trans)
+	mysql.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
-
-	trans.Notes = append(trans.Notes, msg.Notes...)
-
-	// remove from map
-	delete(mysql.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-}
-
-func (mysql *Mysql) expireTransaction(trans *MysqlTransaction) {
-	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
-	// remove from map
-	delete(mysql.transactionsMap, trans.tuple.Hashable())
 }
 
 func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {

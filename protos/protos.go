@@ -11,6 +11,11 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+const (
+	DefaultTransactionHashSize                 = 2 ^ 16
+	DefaultTransactionExpiration time.Duration = 10 * time.Second
+)
+
 // ProtocolData interface to represent an upper
 // protocol private data. Used with types like
 // HttpStream, MysqlStream, etc.

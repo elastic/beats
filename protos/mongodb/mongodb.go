@@ -3,7 +3,6 @@ package mongodb
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
@@ -21,9 +20,17 @@ type Mongodb struct {
 	Max_docs       int
 	Max_doc_length int
 
-	transactionsMap map[common.HashableTcpTuple]*MongodbTransaction
+	transactions *common.Cache
 
 	results chan common.MapStr
+}
+
+func (mongodb *Mongodb) getTransaction(k common.HashableTcpTuple) *MongodbTransaction {
+	v := mongodb.transactions.Get(k)
+	if v != nil {
+		return v.(*MongodbTransaction)
+	}
+	return nil
 }
 
 func (mongodb *Mongodb) InitDefaults() {
@@ -66,7 +73,9 @@ func (mongodb *Mongodb) Init(test_mode bool, results chan common.MapStr) error {
 		}
 	}
 
-	mongodb.transactionsMap = make(map[common.HashableTcpTuple]*MongodbTransaction, TransactionsHashSize)
+	mongodb.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	mongodb.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	mongodb.results = results
 
 	return nil
@@ -160,7 +169,7 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
-	trans := mongodb.transactionsMap[tuple.Hashable()]
+	trans := mongodb.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.Mongodb != nil {
 			logp.Warn("Two requests without a Response. Dropping old request")
@@ -168,7 +177,7 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	} else {
 		logp.Debug("mongodb", "Initialize new transaction from request")
 		trans = &MongodbTransaction{Type: "mongodb", tuple: tuple}
-		mongodb.transactionsMap[tuple.Hashable()] = trans
+		mongodb.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.Mongodb = common.MapStr{}
@@ -197,24 +206,11 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	trans.params = msg.params
 	trans.resource = msg.resource
 	trans.BytesIn = msg.messageLength
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { mongodb.expireTransaction(trans) })
-
-}
-
-func (mongodb *Mongodb) expireTransaction(trans *MongodbTransaction) {
-	logp.Debug("mongodb", "Expire transaction")
-	// remove from map
-	delete(mongodb.transactionsMap, trans.tuple.Hashable())
 }
 
 func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 
-	tuple := msg.TcpTuple
-	trans := mongodb.transactionsMap[tuple.Hashable()]
+	trans := mongodb.getTransaction(msg.TcpTuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -238,14 +234,9 @@ func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 	trans.BytesOut = msg.messageLength
 
 	mongodb.publishTransaction(trans)
+	mongodb.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("mongodb", "Mongodb transaction completed: %s", trans.Mongodb)
-
-	// remove from map
-	delete(mongodb.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
 func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
