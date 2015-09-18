@@ -40,15 +40,10 @@ class Test(TestCase):
         # crawl and then finishes
         filebeat.kill_and_wait()
 
-        i = 0
-
-        # Count lines of filebeat generated file
-        with open(self.working_dir + "/output/filebeat") as f:
-            for i, l in enumerate(f, 1):
-                pass
+        output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert iterations == i
+        assert iterations == len(output)
 
     def test_unfinished_line(self):
         """
@@ -85,15 +80,10 @@ class Test(TestCase):
         time.sleep(2)
         filebeat.kill_and_wait()
 
-        i = 0
-
-        # Count lines of filebeat generated file
-        with open(self.working_dir + "/output/filebeat") as f:
-            for i, l in enumerate(f, 1):
-                pass
+        output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert iterations == i
+        assert iterations == len(output)
 
     def test_file_renaming(self):
         """
@@ -144,15 +134,10 @@ class Test(TestCase):
 
         filebeat.kill_and_wait()
 
-        i = 0
+        output = self.read_output()
 
-        # Count lines of filebeat generated file
-        with open(self.working_dir + "/output/filebeat") as f:
-            for i, l in enumerate(f, 1):
-                pass
-
-        # Make sure all 10 lines were read
-        assert i == 11
+        # Make sure all 11 lines were read
+        assert len(output) == 11
 
     def test_file_disappear(self):
         """
@@ -208,7 +193,7 @@ class Test(TestCase):
         assert len(data) == 2
 
         # Make sure output has 10 entries
-        output = self.get_filebeat_output()
+        output = self.read_output()
 
         assert len(output) == 5 + 6
 
@@ -268,5 +253,5 @@ class Test(TestCase):
 
         # Make sure output has 11 entries, the new file was started
         # from scratch
-        output = self.get_filebeat_output()
+        output = self.read_output()
         assert len(output) == 5 + 6

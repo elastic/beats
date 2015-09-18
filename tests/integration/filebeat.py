@@ -127,8 +127,6 @@ class TestCase(unittest.TestCase):
                                                  []))
         self.all_have_fields(jsons, ["timestamp", "type",
                                      "shipper", "count"])
-        # TODO: add the list of expected fields
-        # self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -249,19 +247,3 @@ class TestCase(unittest.TestCase):
 
         with open(dotFilebeat) as file:
             return json.load(file)
-
-    def get_filebeat_output(self):
-        # Returns content of the filebeat output file as json array
-        outputFile = self.working_dir + '/output/filebeat'
-        assert os.path.isfile(outputFile) is True
-
-        data = []
-
-        with open(outputFile) as file:
-            while True:
-                line = file.readline()
-                if not line:
-                    break
-
-                data.append(json.loads(line))
-            return data
