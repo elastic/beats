@@ -16,7 +16,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="1s"
+            ignoreOlder="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -49,7 +49,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="15s"
+            ignoreOlder="15s"
         )
 
         os.mkdir(self.working_dir + "/log/")
