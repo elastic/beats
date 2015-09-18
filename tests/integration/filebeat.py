@@ -5,8 +5,6 @@ import os
 import shutil
 import json
 import time
-import json
-import sys
 from datetime import datetime, timedelta
 
 
@@ -50,10 +48,10 @@ class Proc(object):
 class TestCase(unittest.TestCase):
 
     def run_filebeat(self, cmd="../../filebeat.test",
-                       config="filebeat.yml",
-                       output="filebeat.log",
-                       extra_args=[],
-                       debug_selectors=[]):
+                     config="filebeat.yml",
+                     output="filebeat.log",
+                     extra_args=[],
+                     debug_selectors=[]):
         """
         Executes filebeat
         Waits for the process to finish before returning to
@@ -68,7 +66,8 @@ class TestCase(unittest.TestCase):
                      "-integration",
                      "-v",
                      "-d", "*",
-                     "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                     "-test.coverprofile",
+                     os.path.join(self.working_dir, "coverage.cov")
                      ])
         if extra_args:
             args.extend(extra_args)
@@ -83,11 +82,11 @@ class TestCase(unittest.TestCase):
             return proc.wait()
 
     def start_filebeat(self,
-                         cmd="../../filebeat.test",
-                         config="filebeat.yml",
-                         output="filebeat.log",
-                         extra_args=[],
-                         debug_selectors=[]):
+                       cmd="../../filebeat.test",
+                       config="filebeat.yml",
+                       output="filebeat.log",
+                       extra_args=[],
+                       debug_selectors=[]):
         """
         Starts filebeat and returns the process handle. The
         caller is responsible for stopping / waiting for the
@@ -99,7 +98,8 @@ class TestCase(unittest.TestCase):
                 "-integration",
                 "-v",
                 "-d", "*",
-                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                "-test.coverprofile",
+                os.path.join(self.working_dir, "coverage.cov")
                 ]
         if extra_args:
             args.extend(extra_args)
@@ -245,7 +245,7 @@ class TestCase(unittest.TestCase):
     def get_dot_filebeat(self):
         # Returns content of the .filebeat file
         dotFilebeat = self.working_dir + '/.filebeat'
-        assert os.path.isfile(dotFilebeat) == True
+        assert os.path.isfile(dotFilebeat) is True
 
         with open(dotFilebeat) as file:
             return json.load(file)
@@ -253,15 +253,15 @@ class TestCase(unittest.TestCase):
     def get_filebeat_output(self):
         # Returns content of the filebeat output file as json array
         outputFile = self.working_dir + '/output/filebeat'
-        assert os.path.isfile(outputFile) == True
+        assert os.path.isfile(outputFile) is True
 
         data = []
 
         with open(outputFile) as file:
             while True:
                 line = file.readline()
-                if not line: break
+                if not line:
+                    break
 
                 data.append(json.loads(line))
             return data
-
