@@ -38,7 +38,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Skipping file (older than ignore older of 1s):"),
-            max_timeout=3)
+            max_timeout=10)
 
         proc.kill_and_wait()
 
@@ -67,7 +67,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=5)
+            max_timeout=10)
 
         proc.kill_and_wait()
 
