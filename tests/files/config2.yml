@@ -4,3 +4,5 @@ filebeat:
       paths:
         - /var/log/*.log
       input: log
+
+  spoolSize:

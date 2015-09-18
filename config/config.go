@@ -15,6 +15,7 @@ const (
 	DefaultRegistryFile                      = ".filebeat"
 	DefaultIgnoreOlderDuration time.Duration = math.MaxInt64
 	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
+	DefaultSpoolSize           uint64        = 1024
 )
 
 type Config struct {
@@ -23,7 +24,7 @@ type Config struct {
 
 type FilebeatConfig struct {
 	Files               []FileConfig
-	SpoolSize           uint64
+	SpoolSize           uint64 `yaml:"spoolSize"`
 	HarvesterBufferSize int
 	CpuProfileFile      string
 	IdleTimeout         time.Duration
@@ -51,16 +52,11 @@ func init() {
 
 // TODO: Default options should be set as part of default config otherwise it always overwrites
 var CmdlineOptions = &FilebeatConfig{
-	SpoolSize:           1024,
 	HarvesterBufferSize: 16 << 10, // 16384
 	IdleTimeout:         time.Second * 5,
 }
 
 func init() {
-
-	flag.Uint64Var(&CmdlineOptions.SpoolSize, "spool-size", CmdlineOptions.SpoolSize, "event count spool threshold - forces network flush")
-	flag.Uint64Var(&CmdlineOptions.SpoolSize, "sv", CmdlineOptions.SpoolSize, "event count spool threshold - forces network flush")
-
 	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "harvest-buffer-size", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
 	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "hb", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
 

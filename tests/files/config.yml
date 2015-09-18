@@ -23,7 +23,7 @@ filebeat:
       fields:
       input: stdin
       # Paths is not required
-  spoolSize:
+  spoolSize: 1024
   harvesterBufferSize:
   cpuProfileFile:
   idleTimeout:

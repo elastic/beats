@@ -39,7 +39,8 @@ filebeat:
       type: stdin
       paths:
         - "-"
-  spoolSize:
+  # Event count spool threshold - forces network flush if exceeded
+  spoolSize: 1024
   harvesterBufferSize:
   cpuProfileFile:
   idleTimeout:

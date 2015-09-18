@@ -48,6 +48,7 @@ Questions:
 * What should we do about multiple configs? Just provide some docs? https://github.com/elastic/logstash-forwarder/issues/136 currently working with -c for beat -config for dirs
 * Command line config option -config was renamed to configDir. Should also be introduced as config file param in case we want to keep it
 * Rethink dead-time: https://github.com/elastic/logstash-forwarder/issues/460
+* spoolSize as cmd line option removed
 
 Notes:
 * Should every config entry have a name -> make it possible to know from which config entry something comes.

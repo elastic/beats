@@ -19,6 +19,8 @@ func TestReadConfig(t *testing.T) {
 
 	assert.Nil(t, err)
 
+	assert.Equal(t, uint64(1024), config.Filebeat.SpoolSize)
+
 	files := config.Filebeat.Files
 
 	// Check if multiple paths were read in
@@ -36,6 +38,22 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, "stdin", files[2].Input)
 	assert.Equal(t, 0, len(files[2].Paths))
 	assert.Equal(t, "", files[1].ScanFrequency)
+}
+
+func TestReadConfig2(t *testing.T) {
+	// Tests with different params from config file
+	absPath, err := filepath.Abs("../tests/files/")
+
+	assert.NotNil(t, absPath)
+	assert.Nil(t, err)
+
+	config := &Config{}
+
+	// Reads second config file
+	err = cfgfile.Read(config, absPath+"/config2.yml")
+	assert.Nil(t, err)
+
+	assert.Equal(t, uint64(0), config.Filebeat.SpoolSize)
 }
 
 func TestGetConfigFiles_File(t *testing.T) {

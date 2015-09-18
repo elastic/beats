@@ -37,6 +37,7 @@ type Filebeat struct {
 	SpoolChan     chan *FileEvent
 	publisherChan chan []*FileEvent
 	RegistrarChan chan []*FileEvent
+	Spooler       *Spooler
 }
 
 // Config setups up the filebeat configuration by fetch all additional config files
@@ -98,7 +99,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	crawler.Start(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
 
 	// Start spooler: Harvesters dump events into the spooler.
-	go fb.startSpooler(cfg.CmdlineOptions)
+	spooler := NewSpooler(fb)
+	fb.Spooler = spooler
+
+	go spooler.Start()
 
 	// Publishes event to output
 	go Publish(b, fb)
@@ -120,7 +124,7 @@ func (fb *Filebeat) Stop() {
 	// Flush what is in spooler
 	// Write state
 
-	fb.stopSpooler()
+	fb.Spooler.Stop()
 
 	// FIXME: Improve to first write state and then close channels
 	close(fb.SpoolChan)
@@ -133,7 +137,6 @@ func emitOptions() {
 	logp.Info("\t--- options -------")
 	logp.Info("\tconfig-arg:          %s", configDirPath)
 	logp.Info("\tidle-timeout:        %v", cfg.CmdlineOptions.IdleTimeout)
-	logp.Info("\tspool-size:          %d", cfg.CmdlineOptions.SpoolSize)
 	logp.Info("\tharvester-buff-size: %d", cfg.CmdlineOptions.HarvesterBufferSize)
 	logp.Info("\t--- flags ---------")
 	logp.Info("\ttail (on-rotation):  %t", cfg.CmdlineOptions.TailOnRotate)
