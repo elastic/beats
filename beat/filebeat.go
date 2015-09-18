@@ -103,7 +103,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err := spooler.Init()
 
 	if err != nil {
-		fmt.Print("Could not init spooler: %s", err)
+		logp.Err("Could not init spooler: %v", err)
 	}
 
 	fb.Spooler = spooler
