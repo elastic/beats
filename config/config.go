@@ -16,6 +16,7 @@ const (
 	DefaultIgnoreOlderDuration time.Duration = math.MaxInt64
 	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
 	DefaultSpoolSize           uint64        = 1024
+	DefaultIdleTimeout         time.Duration = time.Second * 5
 )
 
 type Config struct {
@@ -27,7 +28,8 @@ type FilebeatConfig struct {
 	SpoolSize           uint64 `yaml:"spoolSize"`
 	HarvesterBufferSize int
 	CpuProfileFile      string
-	IdleTimeout         time.Duration
+	IdleTimeout         string `yaml:"idleTimeout"`
+	IdleTimeoutDuration         time.Duration
 	TailOnRotate        bool
 	Quiet               bool
 	RegistryFile        string
@@ -53,7 +55,6 @@ func init() {
 // TODO: Default options should be set as part of default config otherwise it always overwrites
 var CmdlineOptions = &FilebeatConfig{
 	HarvesterBufferSize: 16 << 10, // 16384
-	IdleTimeout:         time.Second * 5,
 }
 
 func init() {

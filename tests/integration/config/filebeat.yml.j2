@@ -12,7 +12,7 @@ filebeat:
   spoolSize:
   harvesterBufferSize:
   cpuProfileFile:
-  idleTimeout:
+  idleTimeout: 5s
   tailOnRotate:
   quiet:
   registryfile: {{ fb.working_dir + '/' }}.filebeat

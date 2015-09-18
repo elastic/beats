@@ -1,9 +1,10 @@
 package beat
 
 import (
-	"github.com/elastic/filebeat/input"
 	cfg "github.com/elastic/filebeat/config"
+	"github.com/elastic/filebeat/input"
 	"time"
+"github.com/elastic/libbeat/logp"
 )
 
 type Spooler struct {
@@ -12,17 +13,38 @@ type Spooler struct {
 }
 
 func NewSpooler(filebeat *Filebeat) *Spooler {
-	spooler := &Spooler{
+	return &Spooler{
 		Filebeat: filebeat,
 		running:  true,
 	}
+}
+
+func (spooler *Spooler) Init() error {
+	config := &spooler.Filebeat.FbConfig.Filebeat
 
 	// Set default pool size is set to 0
-	if (spooler.Filebeat.FbConfig.Filebeat.SpoolSize == 0) {
-		spooler.Filebeat.FbConfig.Filebeat.SpoolSize = cfg.DefaultSpoolSize
+	if config.SpoolSize == 0 {
+		config.SpoolSize = cfg.DefaultSpoolSize
 	}
 
-	return spooler
+	if spooler.Filebeat.FbConfig.Filebeat.IdleTimeout != "" {
+
+		var err error
+
+		config.IdleTimeoutDuration, err = time.ParseDuration(config.IdleTimeout)
+
+		if err != nil {
+			logp.Warn("Failed to parse idle timeout duration '%s'. Error was: %s\n", config.IdleTimeout, err)
+			return err
+		}
+	} else {
+		logp.Debug("spooler", "Set idleTimeoutDuration to %s", cfg.DefaultIdleTimeout)
+		// Set it to default
+		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
+	}
+
+
+	return nil
 }
 
 func (s *Spooler) Start() {
@@ -32,7 +54,7 @@ func (s *Spooler) Start() {
 
 	config := &s.Filebeat.FbConfig.Filebeat
 
-	ticker := time.NewTicker(config.IdleTimeout / 2)
+	ticker := time.NewTicker(config.IdleTimeoutDuration / 2)
 
 	// slice for spooling into
 	// TODO(sissel): use container.Ring?
@@ -41,7 +63,7 @@ func (s *Spooler) Start() {
 	// Current write position in the spool
 	var spool_i int = 0
 
-	next_flush_time := time.Now().Add(config.IdleTimeout)
+	next_flush_time := time.Now().Add(config.IdleTimeoutDuration)
 	for {
 		select {
 		case event := <-s.Filebeat.SpoolChan:
@@ -57,7 +79,7 @@ func (s *Spooler) Start() {
 
 				// Send events to publisher
 				s.Filebeat.publisherChan <- spoolcopy
-				next_flush_time = time.Now().Add(config.IdleTimeout)
+				next_flush_time = time.Now().Add(config.IdleTimeoutDuration)
 
 				spool_i = 0
 			}
@@ -72,7 +94,7 @@ func (s *Spooler) Start() {
 					var spoolcopy []*input.FileEvent
 					spoolcopy = append(spoolcopy, spool[0:spool_i]...)
 					s.Filebeat.publisherChan <- spoolcopy
-					next_flush_time = now.Add(config.IdleTimeout)
+					next_flush_time = now.Add(config.IdleTimeoutDuration)
 					spool_i = 0
 				}
 			}

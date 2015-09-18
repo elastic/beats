@@ -98,8 +98,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrar.LoadState(crawler.Files)
 	crawler.Start(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
 
-	// Start spooler: Harvesters dump events into the spooler.
+	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler := NewSpooler(fb)
+	err := spooler.Init()
+
+	if (err != nil) {
+		fmt.Print("Could not init spooler: %s", err)
+	}
+
 	fb.Spooler = spooler
 
 	go spooler.Start()
@@ -136,7 +142,6 @@ func (fb *Filebeat) Stop() {
 func emitOptions() {
 	logp.Info("\t--- options -------")
 	logp.Info("\tconfig-arg:          %s", configDirPath)
-	logp.Info("\tidle-timeout:        %v", cfg.CmdlineOptions.IdleTimeout)
 	logp.Info("\tharvester-buff-size: %d", cfg.CmdlineOptions.HarvesterBufferSize)
 	logp.Info("\t--- flags ---------")
 	logp.Info("\ttail (on-rotation):  %t", cfg.CmdlineOptions.TailOnRotate)

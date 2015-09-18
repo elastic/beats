@@ -41,9 +41,9 @@ filebeat:
         - "-"
   # Event count spool threshold - forces network flush if exceeded
   spoolSize: 1024
+  idleTimeout: 5s
   harvesterBufferSize:
   cpuProfileFile:
-  idleTimeout:
   tailOnRotate:
   quiet:
   registryfile: .filebeat
