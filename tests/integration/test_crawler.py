@@ -33,7 +33,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 80 events"),
-            max_timeout=10)
+            max_timeout=15)
 
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
@@ -79,7 +79,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 80 events"),
-            max_timeout=10)
+            max_timeout=15)
 
         # Give it more time to make sure it doesn't read the unfinished line
         time.sleep(2)
@@ -120,7 +120,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=10)
+            max_timeout=15)
 
         # Rename the file (no new file created)
         testfile2 = self.working_dir + "/log/test-new.log"
@@ -180,7 +180,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=10)
+            max_timeout=15)
         os.remove(testfile)
 
         # Create new file to check if new file is picked up
@@ -198,7 +198,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 6 events"),
-            max_timeout=10)
+            max_timeout=15)
 
         filebeat.kill_and_wait()
 
@@ -238,7 +238,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=10)
+            max_timeout=15)
         os.remove(testfile)
         time.sleep(5)
 
@@ -256,7 +256,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 6 events"),
-            max_timeout=10)
+            max_timeout=15)
 
         filebeat.kill_and_wait()
 

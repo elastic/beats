@@ -33,7 +33,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=10)
+            max_timeout=15)
         filebeat.kill_and_wait()
 
         # Check that file exist
@@ -89,7 +89,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 10 events"),
-            max_timeout=10)
+            max_timeout=15)
         filebeat.kill_and_wait()
 
         # Check that file exist
