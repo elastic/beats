@@ -31,7 +31,6 @@ type FilebeatConfig struct {
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
 	TailOnRotate        bool
-	Quiet               bool
 	RegistryFile        string
 }
 
@@ -59,8 +58,6 @@ var CmdlineOptions = &FilebeatConfig{}
 func init() {
 	flag.BoolVar(&CmdlineOptions.TailOnRotate, "tail", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
 	flag.BoolVar(&CmdlineOptions.TailOnRotate, "t", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
-
-	flag.BoolVar(&CmdlineOptions.Quiet, "quiet", CmdlineOptions.Quiet, "operate in quiet mode - only emit errors to log")
 }
 
 // getConfigFiles returns list of config files.

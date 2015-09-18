@@ -29,7 +29,6 @@ filebeat:
   cpuProfileFile:
   idleTimeout: 5s
   tailOnRotate:
-  quiet:
 
 
 # Additional stuff we should be ignore

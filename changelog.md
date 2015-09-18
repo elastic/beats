@@ -58,6 +58,7 @@ Notes:
 * We need general concept / code that command line args overwrite config options
 * All command line options must be available as config options for the beats
 * On debug we should print out all config options on startup -> any good idea how to do this recursively?
+* Quiet option remove as logging is part of libbeat
 
 Next with priority
 * Multi line support

@@ -140,11 +140,8 @@ func (fb *Filebeat) Stop() {
 
 // emitOptions prints out the set config options
 func emitOptions() {
-	logp.Info("\t--- options -------")
-	logp.Info("\tconfig-arg:          %s", configDirPath)
 	logp.Info("\t--- flags ---------")
 	logp.Info("\ttail (on-rotation):  %t", cfg.CmdlineOptions.TailOnRotate)
-	logp.Info("\tquiet:             %t", cfg.CmdlineOptions.Quiet)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {

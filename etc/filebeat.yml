@@ -50,7 +50,6 @@ filebeat:
   idleTimeout: 5s
   cpuProfileFile:
   tailOnRotate:
-  quiet:
   registryfile: .filebeat
 
 
