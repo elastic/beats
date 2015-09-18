@@ -124,10 +124,11 @@ class TestCase(unittest.TestCase):
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
-                                                 self.dict_fields))
-        self.all_have_fields(jsons, ["timestamp", "type", "status",
+                                                 []))
+        self.all_have_fields(jsons, ["timestamp", "type",
                                      "shipper", "count"])
-        self.all_fields_are_expected(jsons, self.expected_fields)
+        # TODO: add the list of expected fields
+        # self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -156,7 +157,6 @@ class TestCase(unittest.TestCase):
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
-
 
     def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
         """
