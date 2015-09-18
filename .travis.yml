@@ -26,9 +26,9 @@ script:
   - make full-coverage
 
 notifications:
-    email:
-        - tudor@elastic.co
-        - monica@elastic.co
+  hipchat:
+    rooms:
+      secure: NSmM7x2n9KdasEzZJ2BZZdXNUqBG3MFnwmvHN7kVRAbdmygD6YDaIBhbjNhTxrYQw2JPJxxa6ehr9xsMDzoCdGygBoKsa1U5kGK942JgoCbJrtbR0K7r8toWPuOg+wPGS0muOVwqRW5iO9AkTQiPcvIP+a1E80vuNH/ZKWPg5JA=
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
