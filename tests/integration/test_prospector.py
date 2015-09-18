@@ -16,8 +16,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="1s",
-            debug_selectors=["ignoreolder", "publish"]
+            ignoreolder="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -39,7 +38,7 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.log_contains(
                 "Skipping file (older than ignore older of 1s):"),
-            max_timeout=3)
+            max_timeout=10)
 
         proc.kill_and_wait()
 
@@ -50,8 +49,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="15s",
-            debug_selectors=["ignoreolder", "registrar"]
+            ignoreolder="15s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -66,11 +64,10 @@ class Test(TestCase):
 
         proc = self.start_filebeat()
 
-        # wait for the "Skipping file" log message
         self.wait_until(
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
-            max_timeout=5)
+            max_timeout=10)
 
         proc.kill_and_wait()
 
