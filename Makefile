@@ -43,13 +43,14 @@ coverage:
 	$(GODEP) go tool cover -html=coverage/unit.cov -o coverage/unit.html
 
 # Command used by CI Systems
-.PHONE: testsuite
+.PHONY: testsuite
 testsuite: filebeat
 	make coverage
 
 filebeat.test: $(GOFILES)
 	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
 
+.PHONY: full-coverage
 full-coverage:
 	make coverage
 	make -C ./tests/integration coverage
