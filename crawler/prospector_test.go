@@ -13,6 +13,7 @@ func TestProspectorInit(t *testing.T) {
 		ScanFrequency:       "15s",
 		IgnoreOlder:         "100m",
 		HarvesterBufferSize: 100,
+		TailOnRotate:        true,
 	}
 
 	prospector := Prospector{
@@ -27,6 +28,7 @@ func TestProspectorInit(t *testing.T) {
 	assert.Equal(t, 100*time.Minute, prospector.FileConfig.IgnoreOlderDuration)
 	assert.Equal(t, 15*time.Second, prospector.FileConfig.ScanFrequencyDuration)
 	assert.Equal(t, 100, prospector.FileConfig.HarvesterBufferSize)
+	assert.Equal(t, true, prospector.FileConfig.TailOnRotate)
 }
 
 func TestProspectorInitEmpty(t *testing.T) {
@@ -63,6 +65,7 @@ func TestProspectorInitNotSet(t *testing.T) {
 	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.FileConfig.IgnoreOlderDuration)
 	assert.Equal(t, config.DefaultScanFrequency, prospector.FileConfig.ScanFrequencyDuration)
 	assert.Equal(t, config.DefaultHarvesterBufferSize, prospector.FileConfig.HarvesterBufferSize)
+	assert.Equal(t, config.DefaultTailOnRotate, prospector.FileConfig.TailOnRotate)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {

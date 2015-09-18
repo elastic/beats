@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
 )
@@ -77,7 +76,7 @@ func (h *Harvester) initOffset() {
 
 	if h.Offset > 0 {
 		logp.Debug("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-	} else if config.CmdlineOptions.TailOnRotate {
+	} else if h.TailOnRotate {
 		logp.Debug("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
 	} else {
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
@@ -90,7 +89,7 @@ func (h *Harvester) initOffset() {
 func (h *Harvester) setFileOffset() {
 	if h.Offset > 0 {
 		h.file.Seek(h.Offset, os.SEEK_SET)
-	} else if config.CmdlineOptions.TailOnRotate {
+	} else if h.TailOnRotate {
 		h.file.Seek(0, os.SEEK_END)
 	} else {
 		h.file.Seek(0, os.SEEK_SET)

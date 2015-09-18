@@ -32,6 +32,10 @@ filebeat:
 
       # Defines the buffer size every harvester uses when fetching the file
       harvesterBufferSize: 16384
+
+      # Always tail on log rotation. Disabled by default
+      # Note: This may skip entries
+      tailOnRotate: false
     -
       fields:
       paths:
@@ -49,7 +53,6 @@ filebeat:
   spoolSize: 1024
   idleTimeout: 5s
   cpuProfileFile:
-  tailOnRotate:
   registryfile: .filebeat
 
 

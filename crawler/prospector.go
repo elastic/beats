@@ -87,8 +87,9 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 				Path:       path,
 				FileConfig: p.FileConfig,
 				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
-				SpoolerChan: spoolChan,
-				BufferSize:  p.FileConfig.HarvesterBufferSize,
+				SpoolerChan:  spoolChan,
+				BufferSize:   p.FileConfig.HarvesterBufferSize,
+				TailOnRotate: p.FileConfig.TailOnRotate,
 			}
 
 			h.Start()

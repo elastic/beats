@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"github.com/elastic/libbeat/cfgfile"
 	"log"
 	"math"
@@ -18,6 +17,7 @@ const (
 	DefaultSpoolSize           uint64        = 1024
 	DefaultIdleTimeout         time.Duration = time.Second * 5
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
+	DefaultTailOnRotate                      = false
 )
 
 type Config struct {
@@ -30,7 +30,6 @@ type FilebeatConfig struct {
 	CpuProfileFile      string
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
-	TailOnRotate        bool
 	RegistryFile        string
 }
 
@@ -42,22 +41,8 @@ type FileConfig struct {
 	IgnoreOlderDuration   time.Duration
 	ScanFrequency         string `yaml:"scanFrequency"`
 	ScanFrequencyDuration time.Duration
-	HarvesterBufferSize   int
-}
-
-// TODO: Log is only used here now. Do we need it?
-const logflags = log.Ldate | log.Ltime | log.Lmicroseconds
-
-func init() {
-	log.SetFlags(logflags)
-}
-
-// TODO: Default options should be set as part of default config otherwise it always overwrites
-var CmdlineOptions = &FilebeatConfig{}
-
-func init() {
-	flag.BoolVar(&CmdlineOptions.TailOnRotate, "tail", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
-	flag.BoolVar(&CmdlineOptions.TailOnRotate, "t", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
+	HarvesterBufferSize   int  `yaml:"harvesterBufferSize"`
+	TailOnRotate          bool `yaml:"tailOnRotate"`
 }
 
 // getConfigFiles returns list of config files.

@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+// TODO: Cleanup if possible
 var exitStat = struct {
 	ok, usageError, faulted int
 }{
@@ -42,8 +43,6 @@ type Filebeat struct {
 
 // Config setups up the filebeat configuration by fetch all additional config files
 func (fb *Filebeat) Config(b *beat.Beat) error {
-
-	emitOptions()
 
 	// Load Base config
 	err := cfgfile.Read(&fb.FbConfig, "")
@@ -136,12 +135,6 @@ func (fb *Filebeat) Stop() {
 	close(fb.SpoolChan)
 	close(fb.publisherChan)
 	close(fb.RegistrarChan)
-}
-
-// emitOptions prints out the set config options
-func emitOptions() {
-	logp.Info("\t--- flags ---------")
-	logp.Info("\ttail (on-rotation):  %t", cfg.CmdlineOptions.TailOnRotate)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {
