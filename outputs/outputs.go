@@ -37,7 +37,7 @@ type MothershipConfig struct {
 
 type Outputer interface {
 	// Publish event
-	PublishEvent(ts time.Time, event common.MapStr) error
+	PublishEvent(trans Signaler, ts time.Time, event common.MapStr) error
 }
 
 type TopologyOutputer interface {
@@ -52,15 +52,15 @@ type TopologyOutputer interface {
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	BulkPublish(ts time.Time, event []common.MapStr) error
+	BulkPublish(trans Signaler, ts time.Time, event []common.MapStr) error
 }
 
 type OutputBuilder interface {
 	// Create and initialize the output plugin
 	NewOutput(
 		beat string,
-		config MothershipConfig,
-		topology_expire int) (Outputer, error)
+		config *MothershipConfig,
+		topologyExpire int) (Outputer, error)
 }
 
 // Functions to be exported by a output plugin
@@ -101,7 +101,7 @@ func InitOutputs(
 			continue
 		}
 
-		output, err := plugin.NewOutput(beat, config, topologyExpire)
+		output, err := plugin.NewOutput(beat, &config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err
@@ -124,11 +124,13 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 }
 
 func (b *bulkOutputAdapter) BulkPublish(
+	signal Signaler,
 	ts time.Time,
 	events []common.MapStr,
 ) error {
+	signal = NewSplitSignaler(signal, len(events))
 	for _, evt := range events {
-		err := b.PublishEvent(ts, evt)
+		err := b.PublishEvent(signal, ts, evt)
 		if err != nil {
 			return err
 		}

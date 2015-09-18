@@ -97,7 +97,7 @@ func TestSingleSend(t *testing.T) {
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(events)
+	err := mode.PublishEvents(nil, events)
 	mode.Close()
 
 	assert.Nil(t, err)
@@ -120,7 +120,7 @@ func TestSingleConnectFailConnect(t *testing.T) {
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(events)
+	err := mode.PublishEvents(nil, events)
 	mode.Close()
 
 	assert.Nil(t, err)
@@ -151,7 +151,7 @@ func TestFailoverSingleSend(t *testing.T) {
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
 
-	err := mode.PublishEvents(events)
+	err := mode.PublishEvents(nil, events)
 	mode.Close()
 
 	assert.Nil(t, err)
@@ -183,7 +183,7 @@ func TestFailoverFlakyConnections(t *testing.T) {
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
 	for i := 0; i < 10; i++ {
-		mode.PublishEvents(events)
+		mode.PublishEvents(nil, events)
 	}
 
 	mode.Close()

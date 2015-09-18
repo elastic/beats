@@ -32,7 +32,7 @@ func newTestLumberjackOutput(
 		t.Fatalf("No lumberjack output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", config, 0)
+	output, err := plugin.NewOutput("test", &config, 0)
 	if err != nil {
 		t.Fatalf("init lumberjack output plugin failed: %v", err)
 	}
@@ -208,7 +208,7 @@ func TestLumberjackTCP(t *testing.T) {
 
 	// send event to server
 	event := common.MapStr{"name": "me", "line": 10}
-	output.PublishEvent(time.Now(), event)
+	output.PublishEvent(nil, time.Now(), event)
 
 	wg.Wait()
 	listener.Close()
@@ -316,7 +316,7 @@ func TestLumberjackTLS(t *testing.T) {
 		output := newTestLumberjackOutput(t, config)
 
 		event := common.MapStr{"name": "me", "line": 10}
-		output.PublishEvent(time.Now(), event)
+		output.PublishEvent(nil, time.Now(), event)
 	}()
 
 	wg.Wait()

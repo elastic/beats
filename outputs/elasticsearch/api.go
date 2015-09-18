@@ -22,7 +22,7 @@ type QueryResult struct {
 	Ok      bool            `json:"ok"`
 	Index   string          `json:"_index"`
 	Type    string          `json:"_type"`
-	Id      string          `json:"_id"`
+	ID      string          `json:"_id"`
 	Source  json.RawMessage `json:"_source"`
 	Version int             `json:"_version"`
 	Found   bool            `json:"found"`
@@ -52,26 +52,26 @@ func (r QueryResult) String() string {
 }
 
 const (
-	default_max_retries = 3
+	defaultMaxRetries = 3
 )
 
-// Create a connection to Elasticsearch
+// NewElasticsearch creates a connection to Elasticsearch.
 func NewElasticsearch(urls []string, username string, password string) *Elasticsearch {
 
-	var connection_pool ConnectionPool
-	connection_pool.SetConnections(urls, username, password)
+	var pool ConnectionPool
+	_ = pool.SetConnections(urls, username, password) // never errors
 
 	es := Elasticsearch{
-		connectionPool: connection_pool,
+		connectionPool: pool,
 		client:         &http.Client{},
-		MaxRetries:     default_max_retries,
+		MaxRetries:     defaultMaxRetries,
 	}
 	return &es
 }
 
 // Encode parameters in url
-func UrlEncode(params map[string]string) string {
-	var values url.Values = url.Values{}
+func urlEncode(params map[string]string) string {
+	values := url.Values{}
 
 	for key, val := range params {
 		values.Add(key, string(val))
@@ -79,15 +79,15 @@ func UrlEncode(params map[string]string) string {
 	return values.Encode()
 }
 
-// Create path out of index, doc_type and id that is used for querying Elasticsearch
-func MakePath(index string, doc_type string, id string) (string, error) {
+// Create path out of index, docType and id that is used for querying Elasticsearch
+func makePath(index string, docType string, id string) (string, error) {
 
 	var path string
-	if len(doc_type) > 0 {
+	if len(docType) > 0 {
 		if len(id) > 0 {
-			path = fmt.Sprintf("/%s/%s/%s", index, doc_type, id)
+			path = fmt.Sprintf("/%s/%s/%s", index, docType, id)
 		} else {
-			path = fmt.Sprintf("/%s/%s", index, doc_type)
+			path = fmt.Sprintf("/%s/%s", index, docType)
 		}
 	} else {
 		if len(id) > 0 {
@@ -103,7 +103,7 @@ func MakePath(index string, doc_type string, id string) (string, error) {
 	return path, nil
 }
 
-func ReadQueryResult(obj []byte) (*QueryResult, error) {
+func readQueryResult(obj []byte) (*QueryResult, error) {
 
 	var result QueryResult
 	if obj == nil {
@@ -116,7 +116,7 @@ func ReadQueryResult(obj []byte) (*QueryResult, error) {
 	return &result, err
 }
 
-func ReadSearchResult(obj []byte) (*SearchResults, error) {
+func readSearchResult(obj []byte) (*SearchResults, error) {
 
 	var result SearchResults
 	if obj == nil {
@@ -129,8 +129,8 @@ func ReadSearchResult(obj []byte) (*SearchResults, error) {
 	return &result, err
 }
 
-func (es *Elasticsearch) SetMaxRetries(max_retries int) {
-	es.MaxRetries = max_retries
+func (es *Elasticsearch) SetMaxRetries(maxRetries int) {
+	es.MaxRetries = maxRetries
 }
 
 func isConnTimeout(err error) bool {
@@ -145,7 +145,7 @@ func isConnRefused(err error) bool {
 // Mark the Elasticsearch node as dead for a period of time in the case the http request fails with Connection
 // Timeout, Connection Refused or returns one of the 503,504 Error Replies.
 // It returns the response, if it should retry sending the request and the error
-func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]byte, bool, error) {
+func (es *Elasticsearch) performRequest(conn *Connection, req *http.Request) ([]byte, bool, error) {
 
 	req.Header.Add("Accept", "application/json")
 	if conn.Username != "" || conn.Password != "" {
@@ -155,27 +155,27 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 	resp, err := es.client.Do(req)
 	if err != nil {
 		// request fails
-		do_retry := false
+		doRetry := false
 		if isConnTimeout(err) || isConnRefused(err) {
 			es.connectionPool.MarkDead(conn)
-			do_retry = true
+			doRetry = true
 		}
-		return nil, do_retry, fmt.Errorf("Sending the request fails: %s", err)
+		return nil, doRetry, fmt.Errorf("Sending the request fails: %s", err)
 	}
 
 	if resp.StatusCode > 299 {
 		// request fails
-		do_retry := false
+		doRetry := false
 		if resp.StatusCode == http.StatusServiceUnavailable ||
 			resp.StatusCode == http.StatusGatewayTimeout {
 			// status code in {503, 504}
 			es.connectionPool.MarkDead(conn)
-			do_retry = true
+			doRetry = true
 		}
-		return nil, do_retry, fmt.Errorf("%v", resp.Status)
+		return nil, doRetry, fmt.Errorf("%v", resp.Status)
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		es.connectionPool.MarkDead(conn)
@@ -189,9 +189,9 @@ func (es *Elasticsearch) PerformRequest(conn *Connection, req *http.Request) ([]
 
 }
 
-// Create an HTTP request and send it to Elasticsearch. The request is retransmitted max_retries
+// Create an HTTP request and send it to Elasticsearch. The request is retransmitted maxRetries
 // before returning an error.
-func (es *Elasticsearch) Request(method string, path string,
+func (es *Elasticsearch) request(method string, path string,
 	params map[string]string, body interface{}) ([]byte, error) {
 
 	var errors []error
@@ -199,11 +199,11 @@ func (es *Elasticsearch) Request(method string, path string,
 	for attempt := 0; attempt < es.MaxRetries; attempt++ {
 
 		conn := es.connectionPool.GetConnection()
-		logp.Debug("elasticsearch", "Use connection %s", conn.Url)
+		logp.Debug("elasticsearch", "Use connection %s", conn.URL)
 
-		url := conn.Url + path
+		url := conn.URL + path
 		if len(params) > 0 {
-			url = url + "?" + UrlEncode(params)
+			url = url + "?" + urlEncode(params)
 		}
 
 		logp.Debug("elasticsearch", "%s %s %s", method, url, body)
@@ -223,7 +223,7 @@ func (es *Elasticsearch) Request(method string, path string,
 			return nil, fmt.Errorf("NewRequest fails: %s", err)
 		}
 
-		resp, retry, err := es.PerformRequest(conn, req)
+		resp, retry, err := es.performRequest(conn, req)
 		if retry == true {
 			// retry
 			if err != nil {
@@ -247,12 +247,12 @@ func (es *Elasticsearch) Request(method string, path string,
 // searchable. In case id is empty, a new id is created over a HTTP POST request.
 // Otherwise, a HTTP PUT request is issued.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-func (es *Elasticsearch) Index(index string, doc_type string, id string,
+func (es *Elasticsearch) Index(index string, docType string, id string,
 	params map[string]string, body interface{}) (*QueryResult, error) {
 
 	var method string
 
-	path, err := MakePath(index, doc_type, id)
+	path, err := makePath(index, docType, id)
 	if err != nil {
 		return nil, fmt.Errorf("MakePath fails: %s", err)
 	}
@@ -261,76 +261,76 @@ func (es *Elasticsearch) Index(index string, doc_type string, id string,
 	} else {
 		method = "PUT"
 	}
-	resp, err := es.Request(method, path, params, body)
+	resp, err := es.request(method, path, params, body)
 	if err != nil {
 		return nil, err
 	}
-	return ReadQueryResult(resp)
+	return readQueryResult(resp)
 }
 
 // Refresh an index. Call this after doing inserts or creating/deleting
 // indexes in unit tests.
 func (es *Elasticsearch) Refresh(index string) (*QueryResult, error) {
-	path, err := MakePath(index, "", "_refresh")
+	path, err := makePath(index, "", "_refresh")
 	if err != nil {
 		return nil, err
 	}
-	resp, err := es.Request("POST", path, nil, nil)
+	resp, err := es.request("POST", path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ReadQueryResult(resp)
+	return readQueryResult(resp)
 }
 
-// Creates a new index, optionally with settings and mappings passed in
+// CreateIndex creates a new index, optionally with settings and mappings passed in
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
 //
 func (es *Elasticsearch) CreateIndex(index string, body interface{}) (*QueryResult, error) {
 
-	path, err := MakePath(index, "", "")
+	path, err := makePath(index, "", "")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.Request("PUT", path, nil, body)
+	resp, err := es.request("PUT", path, nil, body)
 	if err != nil {
 		return nil, err
 	}
 
-	return ReadQueryResult(resp)
+	return readQueryResult(resp)
 }
 
-// Deletes a typed JSON document from a specific index based on its id.
+// Delete deletes a typed JSON document from a specific index based on its id.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
-func (es *Elasticsearch) Delete(index string, doc_type string, id string, params map[string]string) (*QueryResult, error) {
+func (es *Elasticsearch) Delete(index string, docType string, id string, params map[string]string) (*QueryResult, error) {
 
-	path, err := MakePath(index, doc_type, id)
+	path, err := makePath(index, docType, id)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.Request("DELETE", path, params, nil)
+	resp, err := es.request("DELETE", path, params, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ReadQueryResult(resp)
+	return readQueryResult(resp)
 }
 
 // A search request can be executed purely using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
-func (es *Elasticsearch) SearchUri(index string, doc_type string, params map[string]string) (*SearchResults, error) {
+func (es *Elasticsearch) searchURI(index string, docType string, params map[string]string) (*SearchResults, error) {
 
-	path, err := MakePath(index, doc_type, "_search")
+	path, err := makePath(index, docType, "_search")
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := es.Request("GET", path, params, nil)
+	resp, err := es.request("GET", path, params, nil)
 	if err != nil {
 		return nil, err
 	}
-	return ReadSearchResult(resp)
+	return readSearchResult(resp)
 }

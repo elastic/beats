@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 
@@ -23,10 +22,16 @@ import (
 // command line flags
 var publishDisabled *bool
 
+var debug = logp.MakeDebug("publish")
+
 // EventPublisher provides the interface for beats to publish events.
-type EventPublisher interface {
-	Publish(event common.MapStr)
-	PublishAll(events []common.MapStr)
+type eventPublisher interface {
+	PublishEvent(event common.MapStr) bool
+	PublishEvents(events []common.MapStr) bool
+}
+
+type TransactionalEventPublisher interface {
+	PublishTransaction(transaction outputs.Signaler, events []common.MapStr)
 }
 
 type PublisherType struct {
@@ -34,17 +39,23 @@ type PublisherType struct {
 	tags           []string
 	disabled       bool
 	Index          string
-	Output         []outputs.BulkOutputer
+	Output         []*outputWorker
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
 
 	RefreshTopologyTimer <-chan time.Time
-	queue                chan []common.MapStr
-}
 
-type publisherClient struct {
-	queue chan []common.MapStr
+	// wsOutput and wsPublisher should be used for proper shutdown of publisher
+	// (not implemented yet). On shutdown the publisher should be finished first
+	// and the outputers next, so no publisher will attempt to send messages on
+	// closed channels.
+	// Note: beat data producers must be shutdown before the publisher plugin
+	wsOutput    workerSignal
+	wsPublisher workerSignal
+
+	syncPublisher  *syncPublisher
+	asyncPublisher *asyncPublisher
 }
 
 type ShipperConfig struct {
@@ -72,7 +83,7 @@ func PrintPublishEvent(event common.MapStr) {
 	if err != nil {
 		logp.Err("json.Marshal: %s", err)
 	} else {
-		logp.Debug("publish", "Publish: %s", string(json))
+		debug("Publish: %s", string(json))
 	}
 }
 
@@ -82,174 +93,33 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	if err != nil {
 		logp.Err("Parsing IP %s fails with: %s", ip, err)
 		return ""
-	} else {
-		if islocal {
-			return publisher.name
-		}
 	}
+
+	if islocal {
+		return publisher.name
+	}
+
 	// find the shipper with the desired IP
 	if publisher.TopologyOutput != nil {
 		return publisher.TopologyOutput.GetNameByIP(ip)
-	} else {
-		return ""
 	}
+
+	return ""
 }
 
-func (p *PublisherType) Client() EventPublisher {
-	return &publisherClient{p.queue}
-}
-
-func (publisher *PublisherType) publishFromQueue() {
-	for events := range publisher.queue {
-		publisher.publishEvents(events)
-	}
-}
-
-func (publisher *PublisherType) publishEvents(events []common.MapStr) {
-	var ignore []int // indices of events to be removed from events
-	for i, event := range events {
-		// validate some required field
-		if err := filterEvent(event); err != nil {
-			logp.Err("Publishing event failed: %v", err)
-			ignore = append(ignore, i)
-			continue
-		}
-
-		// update address and geo-ip information. Ignore event
-		// if address is invalid or event is found to be a duplicate
-		ok := updateEventAddresses(publisher, event)
-		if !ok {
-			ignore = append(ignore, i)
-			continue
-		}
-
-		// add additional meta data
-		event["shipper"] = publisher.name
-		if len(publisher.tags) > 0 {
-			event["tags"] = publisher.tags
-		}
-
-		if logp.IsDebug("publish") {
-			PrintPublishEvent(event)
-		}
-	}
-
-	// return if no event is left
-	if len(ignore) == len(events) {
-		return
-	}
-
-	// remove invalid events.
-	// TODO: is order important? Removal can be turned into O(len(ignore)) by
-	//       copying last element into idx and doing
-	//       events=events[:len(events)-len(ignore)] afterwards
-	// Alternatively filtering could be implemented like:
-	//   https://github.com/golang/go/wiki/SliceTricks#filtering-without-allocating
-	for i := len(ignore) - 1; i >= 0; i-- {
-		idx := ignore[i]
-		events = append(events[:idx], events[idx+1:]...)
-	}
-
-	// get timestamp of first event for outputer
-	ts := events[0]["timestamp"].(common.Time)
-
-	// add transaction
-	if !publisher.disabled {
-		for _, out := range publisher.Output {
-			err := out.BulkPublish(time.Time(ts), events)
-			if err != nil {
-				logp.Err("Fail to publish event type on output %s: %v", out, err)
-			}
-		}
-	}
-}
-
-// filterEvent validates an event for common required fields with types.
-// If event is to be filtered out the reason is returned as error.
-func filterEvent(event common.MapStr) error {
-	_, ok := event["timestamp"].(common.Time)
-	if !ok {
-		return errors.New("Missing 'timestamp' field from event")
-	}
-
-	err := event.EnsureCountField()
-	if err != nil {
-		return err
-	}
-
-	t, ok := event["type"]
-	if !ok {
-		return errors.New("Missing 'type' field from event.")
-	}
-
-	_, ok = t.(string)
-	if !ok {
-		return errors.New("Invalid 'type' field from event.")
-	}
-
-	return nil
-}
-
-func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
-	var src_server, dst_server string
-	src, ok := event["src"].(*common.Endpoint)
-	if ok {
-		src_server = publisher.GetServerName(src.Ip)
-		event["client_ip"] = src.Ip
-		event["client_port"] = src.Port
-		event["client_proc"] = src.Proc
-		event["client_server"] = src_server
-		delete(event, "src")
-	}
-	dst, ok := event["dst"].(*common.Endpoint)
-	if ok {
-		dst_server = publisher.GetServerName(dst.Ip)
-		event["ip"] = dst.Ip
-		event["port"] = dst.Port
-		event["proc"] = dst.Proc
-		event["server"] = dst_server
-		delete(event, "dst")
-	}
-
-	if publisher.IgnoreOutgoing && dst_server != "" &&
-		dst_server != publisher.name {
-		// duplicated transaction -> ignore it
-		logp.Debug("publish", "Ignore duplicated transaction on %s: %s -> %s", publisher.name, src_server, dst_server)
-		return false
-	}
-
-	if publisher.GeoLite != nil {
-		real_ip, exists := event["real_ip"]
-		if exists && len(real_ip.(string)) > 0 {
-			loc := publisher.GeoLite.GetLocationByIP(real_ip.(string))
-			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-				event["client_location"] = loc
-			}
-		} else {
-			if len(src_server) == 0 && src != nil { // only for external IP addresses
-				loc := publisher.GeoLite.GetLocationByIP(src.Ip)
-				if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
-					loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
-					event["client_location"] = loc
-				}
-			}
-		}
-	}
-
-	return true
+func (publisher *PublisherType) Client() Client {
+	return &client{publisher}
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
 	for _ = range publisher.RefreshTopologyTimer {
-		publisher.PublishTopology()
+		_ = publisher.PublishTopology() // ignore errors
 	}
 }
 
 func (publisher *PublisherType) PublishTopology(params ...string) error {
 
-	var localAddrs []string = params
-
+	localAddrs := params
 	if len(params) == 0 {
 		addrs, err := common.LocalIpAddrsAsStrings(false)
 		if err != nil {
@@ -260,7 +130,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	}
 
 	if publisher.TopologyOutput != nil {
-		logp.Debug("publish", "Add topology entry for %s: %s", publisher.name, localAddrs)
+		debug("Add topology entry for %s: %s", publisher.name, localAddrs)
 
 		err := publisher.TopologyOutput.PublishIPs(publisher.name, localAddrs)
 		if err != nil {
@@ -286,18 +156,25 @@ func (publisher *PublisherType) Init(
 
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
+	publisher.wsOutput.Init()
+	publisher.wsPublisher.Init()
+
 	if !publisher.disabled {
 		plugins, err := outputs.InitOutputs(beat, configs, shipper.Topology_expire)
 		if err != nil {
 			return err
 		}
 
-		var outputers []outputs.BulkOutputer = nil
-		var topoOutput outputs.TopologyOutputer = nil
+		var outputers []*outputWorker
+		var topoOutput outputs.TopologyOutputer
 		for _, plugin := range plugins {
 			output := plugin.Output
 			config := plugin.Config
-			outputers = append(outputers, outputs.CastBulkOutputer(output))
+
+			debug("create output worker: %p, %p", config.Flush_interval, config.Bulk_size)
+
+			outputers = append(outputers,
+				newOutputWorker(config, output, &publisher.wsOutput, 1000))
 
 			if !config.Save_topology {
 				continue
@@ -319,6 +196,7 @@ func (publisher *PublisherType) Init(
 			topoOutput = topo
 			logp.Info("Using %s to store the topology", plugin.Name)
 		}
+
 		Publisher.Output = outputers
 		Publisher.TopologyOutput = topoOutput
 	}
@@ -366,16 +244,8 @@ func (publisher *PublisherType) Init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.queue = make(chan []common.MapStr, 1000)
-	go publisher.publishFromQueue()
+	publisher.asyncPublisher = newAsyncPublisher(publisher)
+	publisher.syncPublisher = newSyncPublisher(publisher)
 
 	return nil
-}
-
-func (c *publisherClient) Publish(event common.MapStr) {
-	c.PublishAll([]common.MapStr{event})
-}
-
-func (c *publisherClient) PublishAll(events []common.MapStr) {
-	c.queue <- events
 }

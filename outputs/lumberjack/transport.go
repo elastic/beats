@@ -72,7 +72,7 @@ func newTCPClient(host string) (*tcpClient, error) {
 
 func (c *tcpClient) Connect(timeout time.Duration) error {
 	if c.IsConnected() {
-		c.Close()
+		_ = c.Close()
 	}
 
 	host, port, err := net.SplitHostPort(c.hostport)
@@ -204,16 +204,22 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 	}
 
 	socket := tls.Client(c.Conn, &tlsconfig)
-	socket.SetDeadline(time.Now().Add(timeout))
-	err = socket.Handshake()
-	if err != nil {
-		socket.Close()
-		c.Conn = nil
-		c.connected = false
-		return err
+	if err := socket.SetDeadline(time.Now().Add(timeout)); err != nil {
+		_ = socket.Close()
+		return c.onFail(err)
+	}
+	if err := socket.Handshake(); err != nil {
+		_ = socket.Close()
+		return c.onFail(err)
 	}
 
 	c.Conn = socket
 	c.connected = true
 	return nil
+}
+
+func (c *tlsClient) onFail(err error) error {
+	c.Conn = nil
+	c.connected = false
+	return err
 }
