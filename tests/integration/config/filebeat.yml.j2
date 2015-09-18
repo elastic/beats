@@ -7,8 +7,6 @@ filebeat:
         - "{{ path }}"
       # Type of the files. Annotated in every documented
       input: log
-      fields:
-        level: debug
       scanfrequency: 1s
       ignoreolder: "{{ignoreolder}}"
   spoolSize:

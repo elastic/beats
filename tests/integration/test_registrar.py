@@ -22,27 +22,19 @@ class Test(TestCase):
         testfile =  self.working_dir + "/log/test.log"
         file = open(testfile, 'w')
 
-        iterations = 5
-        for n in range(0, iterations):
-            file.write("hello world") # 11 chars
-            file.write("\n") # 1 char
 
+        iterations = 5
+        file.write(iterations * "hello world\n")
 
         file.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         time.sleep(10)
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         # Check that file exist
-        dotFilebeat = self.working_dir + '/.filebeat'
-        assert os.path.isfile(dotFilebeat) == True
-
-        with open(dotFilebeat) as file:
-            data = json.load(file)
-
-        print data
+        data = self.get_dot_filebeat()
 
         # Check that offset is set correctly
         logFileAbs = os.path.abspath(testfile)
@@ -88,17 +80,13 @@ class Test(TestCase):
         file1.close()
         file2.close()
 
-        proc = self.start_filebeat()
+        filebeat = self.start_filebeat()
 
         time.sleep(10)
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
         # Check that file exist
-        dotFilebeat = self.working_dir + '/.filebeat'
-        assert os.path.isfile(dotFilebeat) == True
-
-        with open(dotFilebeat) as file:
-            data = json.load(file)
+        data = self.get_dot_filebeat()
 
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
