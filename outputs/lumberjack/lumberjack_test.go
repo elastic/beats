@@ -219,8 +219,8 @@ func TestLumberjackTCP(t *testing.T) {
 	assert.NotNil(t, data)
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
-	assert.Equal(t, "\"me\"", data.kv["name"])
-	assert.Equal(t, "10", data.kv["line"])
+	assert.Equal(t, "me", data.doc["name"])
+	assert.Equal(t, 10.0, data.doc["line"])
 }
 
 func TestLumberjackTLS(t *testing.T) {
@@ -329,8 +329,7 @@ func TestLumberjackTLS(t *testing.T) {
 	if data != nil {
 		assert.Equal(t, 1, len(data.events))
 		data = data.events[0]
-		assert.Equal(t, "\"me\"", data.kv["name"])
-		assert.Equal(t, "10", data.kv["line"])
+		assert.Equal(t, "me", data.doc["name"])
+		assert.Equal(t, 10.0, data.doc["line"])
 	}
-
 }
