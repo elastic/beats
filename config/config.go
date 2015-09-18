@@ -29,7 +29,7 @@ type FilebeatConfig struct {
 	HarvesterBufferSize int
 	CpuProfileFile      string
 	IdleTimeout         string `yaml:"idleTimeout"`
-	IdleTimeoutDuration         time.Duration
+	IdleTimeoutDuration time.Duration
 	TailOnRotate        bool
 	Quiet               bool
 	RegistryFile        string

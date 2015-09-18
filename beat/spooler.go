@@ -3,8 +3,8 @@ package beat
 import (
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
+	"github.com/elastic/libbeat/logp"
 	"time"
-"github.com/elastic/libbeat/logp"
 )
 
 type Spooler struct {
@@ -42,7 +42,6 @@ func (spooler *Spooler) Init() error {
 		// Set it to default
 		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
 	}
-
 
 	return nil
 }
