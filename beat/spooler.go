@@ -22,25 +22,25 @@ func NewSpooler(filebeat *Filebeat) *Spooler {
 func (spooler *Spooler) Init() error {
 	config := &spooler.Filebeat.FbConfig.Filebeat
 
-	// Set default pool size is set to 0
+	// Set default pool size if value not set
 	if config.SpoolSize == 0 {
 		config.SpoolSize = cfg.DefaultSpoolSize
 	}
 
-	if spooler.Filebeat.FbConfig.Filebeat.IdleTimeout != "" {
-
+	// Set default idle timeout if not set
+	if config.IdleTimeout == "" {
+		logp.Debug("spooler", "Set idleTimeoutDuration to %s", cfg.DefaultIdleTimeout)
+		// Set it to default
+		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
+	} else {
 		var err error
 
 		config.IdleTimeoutDuration, err = time.ParseDuration(config.IdleTimeout)
 
 		if err != nil {
-			logp.Warn("Failed to parse idle timeout duration '%s'. Error was: %s\n", config.IdleTimeout, err)
+			logp.Warn("Failed to parse idle timeout duration '%s'. Error was: %v", config.IdleTimeout, err)
 			return err
 		}
-	} else {
-		logp.Debug("spooler", "Set idleTimeoutDuration to %s", cfg.DefaultIdleTimeout)
-		// Set it to default
-		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
 	}
 
 	return nil

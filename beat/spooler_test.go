@@ -4,11 +4,14 @@ import (
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"gopkg.in/yaml.v2"
 )
 
 func TestNewSpoolerDefaultConfig(t *testing.T) {
 
-	config := cfg.FilebeatConfig{}
+	var config cfg.FilebeatConfig
+	// Read from empty yaml config
+	yaml.Unmarshal([]byte(""), &config)
 	fbConfig := &cfg.Config{Filebeat: config}
 
 	fb := &Filebeat{FbConfig: fbConfig}
@@ -16,6 +19,7 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 	spooler.Init()
 
 	assert.Equal(t, cfg.DefaultSpoolSize, fb.FbConfig.Filebeat.SpoolSize)
+	assert.Equal(t, cfg.DefaultIdleTimeout, fb.FbConfig.Filebeat.IdleTimeoutDuration)
 }
 
 func TestNewSpoolerSpoolSize(t *testing.T) {
