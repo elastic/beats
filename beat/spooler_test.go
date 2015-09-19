@@ -3,8 +3,8 @@ package beat
 import (
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"gopkg.in/yaml.v2"
+	"testing"
 )
 
 func TestNewSpoolerDefaultConfig(t *testing.T) {
