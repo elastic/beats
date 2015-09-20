@@ -1,6 +1,7 @@
 ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
 GOFILES = $(shell find . -type f -name '*.go')
+SHELL=/bin/bash
 
 filebeat: $(GOFILES)
 	# first make sure we have godep
@@ -16,11 +17,7 @@ check:
 .PHONY: clean
 clean:
 	gofmt -w .
-	-rm filebeat
-	-rm filebeat.test
-	-rm .filebeat
-	-rm profile.cov
-	-rm -r coverage
+	-rm -rf filebeat filebeat.test .filebeat profile.cov coverage bin
 
 .PHONY: run
 run: filebeat
@@ -59,3 +56,11 @@ full-coverage:
 	# Collects all integration coverage files and skips top line with mode
 	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
 	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
+
+# Cross-compile filebeat for the OS and architectures listed in
+# crosscompile.bash. The binaries are placed in the ./bin dir.
+.PHONY: crosscompile
+crosscompile: $(GOFILES)
+	go get github.com/tools/godep
+	mkdir -p bin
+	source crosscompile.bash; OUT='bin' go-build-all

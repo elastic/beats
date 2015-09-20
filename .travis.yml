@@ -8,7 +8,6 @@ sudo: false
 addons:
   apt:
     packages:
-      - libpcap-dev
       - python-virtualenv
       - geoip-database
 
@@ -25,6 +24,7 @@ install:
 script:
   - make check
   - make full-coverage
+  - make crosscompile
 
 notifications:
   email:
