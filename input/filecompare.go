@@ -17,10 +17,7 @@ func IsSameFile(path string, info os.FileInfo, state *FileState) bool {
 
 // Checks if the two files are the same.
 func (f1 *File) IsSameFile(f2 *File) bool {
-	f1Stat := f1.FileInfo.Sys().(*syscall.Stat_t)
-	f2Stat := f2.FileInfo.Sys().(*syscall.Stat_t)
-
-	return compareFileStats(f1Stat, f2Stat)
+	return os.SameFile(f1.FileInfo, f2.FileInfo)
 }
 
 // Compare file stats. Inode id and device are compared
