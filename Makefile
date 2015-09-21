@@ -1,8 +1,6 @@
-BIN_PATH?=/usr/bin
-CONF_PATH?=/etc/packetbeat
-VERSION?=1.0.0-beta3
-ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
+
+# default install target used by the beats-packer
 PREFIX?=/build
 
 GOFILES = $(shell find . -type f -name '*.go')
@@ -10,9 +8,6 @@ packetbeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
 	$(GODEP) go build
-
-go-daemon/god: go-daemon/god.c
-	make -C go-daemon
 
 .PHONY: with_pfring
 with_pfring:
@@ -28,43 +23,11 @@ getdeps:
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
 
-.PHONY: deps
-deps:
-	# no longer needed
-	true
-
-
 .PHONY: updatedeps
 updatedeps:
 	$(GODEP) update ...
 
-.PHONY: install
-install: packetbeat go-daemon/god
-	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
-	install -D go-daemon/god $(DESTDIR)/$(BIN_PATH)/packetbeat-god
-	install -m 644 -D etc/packetbeat.yml $(DESTDIR)/$(CONF_PATH)/packetbeat.yml
-	install -m 644 -D etc/packetbeat.template.json $(DESTDIR)/$(CONF_PATH)/packetbeat.template.json
-
-.PHONY: dist
-dist: packetbeat go-daemon/god
-	mkdir packetbeat-$(VERSION)
-	cp packetbeat packetbeat-$(VERSION)/
-	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
-	cp etc/packetbeat.yml packetbeat-$(VERSION)/
-	cp etc/packetbeat.template.json packetbeat-$(VERSION)/
-	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
-
-.PHONY: darwin_dist
-darwin_dist: packetbeat
-	mkdir packetbeat-$(VERSION)-darwin
-	cp packetbeat packetbeat-$(VERSION)-darwin
-	cp etc/packetbeat.yml packetbeat-$(VERSION)-darwin/
-	cp etc/packetbeat.template.json packetbeat-$(VERSION)-darwin/
-	sed -i.bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
-	rm packetbeat-$(VERSION)-darwin/packetbeat.yml.bk
-	tar czvf packetbeat-$(VERSION)-darwin.tgz packetbeat-$(VERSION)-darwin
-	shasum packetbeat-$(VERSION)-darwin.tgz > packetbeat-$(VERSION)-darwin.tgz.sha1.txt
-
+# This is called by the beats-packer to obtain the configuration file
 .PHONY: install_cfg
 install_cfg:
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
@@ -126,7 +89,6 @@ gen: env
 clean:
 	-rm packetbeat
 	-rm packetbeat.test
-	-rm -r packetbeat-$(VERSION)
 	-rm -r coverage
 	-rm -r env
 
