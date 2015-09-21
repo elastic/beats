@@ -65,7 +65,7 @@ func IsSameFile(path string, info os.FileInfo) bool {
 	fileInfo, err := os.Stat(path)
 
 	if err != nil {
-		logp.Info("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
+		logp.Err("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
 		return false
 	}
 
