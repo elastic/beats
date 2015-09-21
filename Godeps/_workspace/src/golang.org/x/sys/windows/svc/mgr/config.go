@@ -11,7 +11,7 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows"
+	"golang.org/x/sys/windows"
 )
 
 const (

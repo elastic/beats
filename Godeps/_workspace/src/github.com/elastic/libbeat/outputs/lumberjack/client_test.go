@@ -7,9 +7,11 @@ package lumberjack
 
 import (
 	"compress/zlib"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -180,7 +182,18 @@ type message struct {
 	size   uint32
 	seq    uint32
 	events []*message
-	kv     map[string]string
+	doc    document
+}
+
+type document map[string]interface{}
+
+func (d document) get(path string) interface{} {
+	doc := d
+	elems := strings.Split(path, ".")
+	for i := 0; i < len(elems)-1; i++ {
+		doc = doc[elems[i]].(map[string]interface{})
+	}
+	return doc[elems[len(elems)-1]]
 }
 
 func readMessage(buf *streambuf.Buffer) (*message, error) {
@@ -236,22 +249,25 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 			}
 
 			code, _ := dataBuf.ReadNetUint8()
-			if code != 'D' {
-				return nil, errors.New("expected data frame")
+			if code != 'J' {
+				return nil, errors.New("expected json data frame")
 			}
 
 			seq, _ := dataBuf.ReadNetUint32()
-			pairCount, _ := dataBuf.ReadNetUint32()
-			kv := make(map[string]string)
-			for i := 0; i < int(pairCount); i++ {
-				keyLen, _ := dataBuf.ReadNetUint32()
-				keyRaw, _ := dataBuf.Collect(int(keyLen))
-				valLen, _ := dataBuf.ReadNetUint32()
-				valRaw, _ := dataBuf.Collect(int(valLen))
-				kv[string(keyRaw)] = string(valRaw)
+			payloadLen, _ := dataBuf.ReadNetUint32()
+			jsonRaw, _ := dataBuf.Collect(int(payloadLen))
+
+			var doc interface{}
+			err = json.Unmarshal(jsonRaw, &doc)
+			if err != nil {
+				return nil, err
 			}
 
-			events = append(events, &message{code: code, seq: seq, kv: kv})
+			events = append(events, &message{
+				code: code,
+				seq:  seq,
+				doc:  doc.(map[string]interface{}),
+			})
 		}
 		return &message{code: 'C', events: events}, nil
 	default:
@@ -320,8 +336,8 @@ func TestSimpleEvent(t *testing.T) {
 	assert.NotNil(t, msg)
 	assert.Equal(t, 1, len(msg.events))
 	msg = msg.events[0]
-	assert.Equal(t, "\"me\"", msg.kv["name"])
-	assert.Equal(t, "10", msg.kv["line"])
+	assert.Equal(t, "me", msg.doc["name"])
+	assert.Equal(t, 10.0, msg.doc["line"])
 }
 
 func TestStructuredEvent(t *testing.T) {
@@ -364,10 +380,8 @@ func TestStructuredEvent(t *testing.T) {
 	assert.NotNil(t, msg)
 	assert.Equal(t, 1, len(msg.events))
 	msg = msg.events[0]
-	assert.Equal(t, "\"test\"", msg.kv["name"])
-	assert.Equal(t, "1", msg.kv["struct.field1"])
-	assert.Equal(t, "true", msg.kv["struct.field2"])
-	assert.Equal(t, "[1,2,3]", msg.kv["struct.field3"])
-	assert.Equal(t, "[1,\"test\",{\"sub\":\"field\"}]", msg.kv["struct.field4"])
-	assert.Equal(t, "2", msg.kv["struct.field5.sub1"])
+	assert.Equal(t, "test", msg.doc["name"])
+	assert.Equal(t, 1.0, msg.doc.get("struct.field1"))
+	assert.Equal(t, true, msg.doc.get("struct.field2"))
+	assert.Equal(t, 2.0, msg.doc.get("struct.field5.sub1"))
 }

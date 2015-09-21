@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc"
 )
 
 // Run executes service name by calling appropriate handler function.

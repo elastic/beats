@@ -31,11 +31,10 @@ func TestBulk(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -48,7 +47,7 @@ func TestBulk(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value1",
 	}
-	result, err := es.SearchUri(index, "type1", params)
+	result, err := es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -72,8 +71,7 @@ func TestEmptyBulk(t *testing.T) {
 	es := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
-	body := make(chan interface{}, 10)
-	close(body)
+	body := make([]interface{}, 0, 10)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -139,11 +137,10 @@ func TestBulkMoreOperations(t *testing.T) {
 		},
 	}
 
-	body := make(chan interface{}, 10)
+	body := make([]interface{}, 0, 10)
 	for _, op := range ops {
-		body <- op
+		body = append(body, op)
 	}
-	close(body)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -157,7 +154,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value3",
 	}
-	result, err := es.SearchUri(index, "type1", params)
+	result, err := es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -168,7 +165,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field2:value2",
 	}
-	result, err = es.SearchUri(index, "type1", params)
+	result, err = es.searchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}

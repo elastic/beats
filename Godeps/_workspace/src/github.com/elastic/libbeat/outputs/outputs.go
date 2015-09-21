@@ -37,7 +37,7 @@ type MothershipConfig struct {
 
 type Outputer interface {
 	// Publish event
-	PublishEvent(ts time.Time, event common.MapStr) error
+	PublishEvent(trans Signaler, ts time.Time, event common.MapStr) error
 }
 
 type TopologyOutputer interface {
@@ -48,12 +48,19 @@ type TopologyOutputer interface {
 	GetNameByIP(ip string) string
 }
 
+// BulkOutputer adds BulkPublish to publish batches of events without looping.
+// Outputers still might loop on events or use more efficient bulk-apis if present.
+type BulkOutputer interface {
+	Outputer
+	BulkPublish(trans Signaler, ts time.Time, event []common.MapStr) error
+}
+
 type OutputBuilder interface {
 	// Create and initialize the output plugin
 	NewOutput(
 		beat string,
-		config MothershipConfig,
-		topology_expire int) (Outputer, error)
+		config *MothershipConfig,
+		topologyExpire int) (Outputer, error)
 }
 
 // Functions to be exported by a output plugin
@@ -66,6 +73,10 @@ type OutputPlugin struct {
 	Name   string
 	Config MothershipConfig
 	Output Outputer
+}
+
+type bulkOutputAdapter struct {
+	Outputer
 }
 
 var enabledOutputPlugins = make(map[string]OutputBuilder)
@@ -90,7 +101,7 @@ func InitOutputs(
 			continue
 		}
 
-		output, err := plugin.NewOutput(beat, config, topologyExpire)
+		output, err := plugin.NewOutput(beat, &config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err
@@ -100,4 +111,29 @@ func InitOutputs(
 		plugins = append(plugins, plugin)
 	}
 	return plugins, nil
+}
+
+// CastBulkOutputer casts out into a BulkOutputer if out implements
+// the BulkOutputer interface. If out does not implement the interface an outputer
+// wrapper implementing the BulkOutputer interface is returned.
+func CastBulkOutputer(out Outputer) BulkOutputer {
+	if bo, ok := out.(BulkOutputer); ok {
+		return bo
+	}
+	return &bulkOutputAdapter{out}
+}
+
+func (b *bulkOutputAdapter) BulkPublish(
+	signal Signaler,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	signal = NewSplitSignaler(signal, len(events))
+	for _, evt := range events {
+		err := b.PublishEvent(signal, ts, evt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

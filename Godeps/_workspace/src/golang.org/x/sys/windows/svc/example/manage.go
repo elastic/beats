@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc"
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc/mgr"
+	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/mgr"
 )
 
 func startService(name string) error {

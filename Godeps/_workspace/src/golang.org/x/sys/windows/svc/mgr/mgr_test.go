@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc/mgr"
+	"golang.org/x/sys/windows/svc/mgr"
 )
 
 func TestOpenLanManServer(t *testing.T) {

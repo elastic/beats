@@ -12,7 +12,7 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows"
+	"golang.org/x/sys/windows"
 )
 
 // Log provides access to the system log.

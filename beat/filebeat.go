@@ -6,13 +6,15 @@ import (
 	"os"
 	"time"
 
-	cfg "github.com/elastic/filebeat/config"
-	. "github.com/elastic/filebeat/crawler"
-	. "github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	cfg "github.com/elastic/filebeat/config"
+	. "github.com/elastic/filebeat/crawler"
+	. "github.com/elastic/filebeat/input"
 )
 
 // TODO: Cleanup if possible
@@ -145,25 +147,34 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 
 		logp.Debug("filebeat", "Send events to output")
 		for _, event := range events {
-
-			bEvent := common.MapStr{
-				"timestamp": common.Time(time.Now()),
-				"source":    event.Source,
-				"offset":    event.Offset,
-				"line":      event.Line,
-				"text":      event.Text,
-				"fields":    event.Fields,
-				"fileinfo":  event.Fileinfo,
-				"type":      "log",
-			}
-
-			// Sends event to beat (outputs)
-			beat.Events <- bEvent
+			publishEvent(beat.Events, event)
 		}
 
 		logp.Debug("filebeat", "Events sent: %d", len(events))
 
 		// Tell the registrar that we've successfully sent these events
 		fb.RegistrarChan <- events
+	}
+}
+
+func publishEvent(client publisher.Client, event *FileEvent) {
+	bEvent := common.MapStr{
+		"timestamp": common.Time(time.Now()),
+		"source":    event.Source,
+		"offset":    event.Offset,
+		"line":      event.Line,
+		"text":      event.Text,
+		"fields":    event.Fields,
+		"fileinfo":  event.Fileinfo,
+		"type":      "log",
+	}
+
+	// Sends event to beat (outputs).
+	// Wait/Repeat until event was published for sure
+	for {
+		ok := client.PublishEvent(bEvent, publisher.Confirm)
+		if ok {
+			break
+		}
 	}
 }
