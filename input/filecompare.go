@@ -3,14 +3,14 @@
 package input
 
 import (
-	"os"
 	"github.com/elastic/libbeat/logp"
+	"os"
 )
 
 // SafeFileRotate safely rotates an existing file under path and replaces it with the tempfile
 func SafeFileRotate(path, tempfile string) error {
 	if e := os.Rename(tempfile, path); e != nil {
-		logp.Info("registry rotate: rename of %s to %s - %s", tempfile, path, e)
+		logp.Info("Registry rotate error: rename of %s to %s - Error: %s", tempfile, path, e)
 		return e
 	}
 	return nil
