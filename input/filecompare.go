@@ -4,8 +4,6 @@ package input
 
 import (
 	"os"
-	"syscall"
-
 	"github.com/elastic/libbeat/logp"
 )
 

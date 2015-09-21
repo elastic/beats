@@ -60,7 +60,6 @@ func (f *File) IsRegularFile() bool {
 	return true
 }
 
-
 // IsSameFile checks if the given File path corresponds with the FileInfo given
 func IsSameFile(path string, info os.FileInfo) bool {
 	fileInfo, err := os.Stat(path)
