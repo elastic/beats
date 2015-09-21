@@ -78,32 +78,32 @@ func (crawler *Crawler) Stop() {
 	// TODO: To be implemented for proper shutdown
 }
 
-func (crawler *Crawler) fetchState(file string, fileinfo os.FileInfo) (int64, bool) {
+func (crawler *Crawler) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
 
 	// Check if there is a state for this file
-	lastState, isFound := crawler.Files[file]
+	lastState, isFound := crawler.Files[filePath]
 
-	if isFound && input.IsSameFile(file, fileinfo, lastState) {
+	if isFound && input.IsSameFile(filePath, fileInfo) {
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		crawler.Persist <- lastState
 		return lastState.Offset, true
 	}
 
-	if previous := crawler.isFileRenamed(file, fileinfo); previous != "" {
+	if previous := crawler.isFileRenamed(filePath, fileInfo); previous != "" {
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, file)
+		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState := crawler.Files[previous]
-		lastState.Source = &file
+		lastState.Source = &filePath
 		crawler.Persist <- lastState
 		return lastState.Offset, true
 	}
 
 	if isFound {
-		logp.Debug("prospector", "Not resuming rotated file: %s", file)
+		logp.Debug("prospector", "Not resuming rotated file: %s", filePath)
 	}
 
 	// New file so just start from an automatic position

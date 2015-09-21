@@ -5,17 +5,6 @@ import (
 	"os"
 )
 
-func IsSameFile(path string, info os.FileInfo, state *FileState) bool {
-	// Do we have any other way to validate a file is the same file
-	// under windows?
-	return path == *state.Source
-}
-
-func (f1 *File) IsSameFile(f2 *File) bool {
-	// TODO: Anything meaningful to compare on file infos?
-	return true
-}
-
 func fileIds(info *os.FileInfo) (uint64, uint64) {
 	// No dev and inode numbers on windows, right?
 	return 0, 0
