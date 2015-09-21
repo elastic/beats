@@ -4,6 +4,7 @@ package lumberjack
 // output plugins
 
 import (
+	"crypto/tls"
 	"errors"
 	"time"
 
@@ -62,18 +63,15 @@ func (lj *lumberjack) init(
 	var clients []ProtocolClient
 	var err error
 	if useTLS {
-		var tlsConfig *tlsConfig
-		tlsConfig, err = loadTLSConfig(&TLSConfig{
-			Certificate: config.Certificate,
-			Key:         config.CertificateKey,
-			CAs:         config.CAs})
+		var tlsConfig *tls.Config
+		tlsConfig, err = outputs.LoadTLSConfig(config)
 		if err != nil {
 			return err
 		}
 
 		clients, err = makeClients(config, timeout,
 			func(host string) (TransportClient, error) {
-				return newTLSClient(host, *tlsConfig)
+				return newTLSClient(host, tlsConfig)
 			})
 	} else {
 		clients, err = makeClients(config, timeout,

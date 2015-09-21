@@ -40,7 +40,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -81,7 +81,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -123,7 +123,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -168,7 +168,7 @@ func TestMultipleHost_Bulk(t *testing.T) {
 	server1 := ElasticsearchMock(503, []byte("Somehting went wrong"))
 	server2 := ElasticsearchMock(200, expectedResp)
 
-	es := NewElasticsearch([]string{server1.URL, server2.URL}, "", "")
+	es := NewElasticsearch([]string{server1.URL, server2.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
