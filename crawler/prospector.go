@@ -111,7 +111,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 	event := &input.FileState{
 		Source: nil,
 	}
-	p.crawler.Persist <- event
+	p.crawler.Registrar.Persist <- event
 
 	for {
 		newlastscan := time.Now()
@@ -223,7 +223,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
+		offset, resuming := p.crawler.Registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
 		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
@@ -246,7 +246,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 	} else {
 
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
+		offset, resuming := p.crawler.Registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a file or is this a completely new file?
 		if resuming {

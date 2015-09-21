@@ -7,12 +7,14 @@ import (
 	cfg "github.com/elastic/filebeat/config"
 	. "github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/filebeat/input"
 )
 
 type Registrar struct {
 	RegistryFile string
 	// Map with all file paths inside and the corresponding state
 	State map[string]*FileState
+	Persist   chan *input.FileState
 }
 
 func NewRegistrar() (r *Registrar) {
@@ -22,13 +24,15 @@ func NewRegistrar() (r *Registrar) {
 }
 
 func (r *Registrar) Init() {
+	// Init state
+	r.Persist = make(chan *FileState)
+	r.State = make(map[string]*FileState)
+
 	// Set to default in case it is not set
 	if r.RegistryFile == "" {
 		r.RegistryFile = cfg.DefaultRegistryFile
 	}
 
-	// Init state
-	r.State = make(map[string]*FileState)
 	logp.Debug("registrar", "Registry file set to: %s", r.RegistryFile)
 }
 
@@ -92,4 +96,37 @@ func (r *Registrar) writeRegistry() error {
 	encoder.Encode(r.State)
 
 	return SafeFileRotate(r.RegistryFile, tempfile)
+}
+
+
+func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
+
+	// Check if there is a state for this file
+	lastState, isFound := r.GetFileState(filePath)
+
+	if isFound && input.IsSameFile(filePath, fileInfo) {
+		// We're resuming - throw the last state back downstream so we resave it
+		// And return the offset - also force harvest in case the file is old and we're about to skip it
+		r.Persist <- lastState
+		return lastState.Offset, true
+	}
+
+	if previous := r.isFileRenamed(filePath, fileInfo); previous != "" {
+		// File has rotated between shutdown and startup
+		// We return last state downstream, with a modified event source with the new file name
+		// And return the offset - also force harvest in case the file is old and we're about to skip it
+		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, filePath)
+
+		lastState, _ := r.GetFileState(previous)
+		lastState.Source = &filePath
+		r.Persist <- lastState
+		return lastState.Offset, true
+	}
+
+	if isFound {
+		logp.Debug("prospector", "Not resuming rotated file: %s", filePath)
+	}
+
+	// New file so just start from an automatic position
+	return 0, false
 }

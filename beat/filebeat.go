@@ -89,7 +89,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrar.Init()
 
 	crawl := &Crawler{
-		Persist: make(chan *FileState),
 		// Load the previous log file locations now, for use in prospector
 		Registrar: registrar,
 	}
