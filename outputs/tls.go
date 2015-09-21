@@ -63,13 +63,19 @@ func LoadTLSConfig(config MothershipConfig) (*tls.Config, error) {
 		}
 	}
 
+	insecureSkipVerify := false
+	if config.TLSInsecure != nil {
+		insecureSkipVerify = *config.TLSInsecure
+	}
+
 	// Support minimal TLS 1.0.
 	// TODO: check supported JRuby versions for logstash supported
 	//       TLS 1.1 and switch
 	tlsConfig := tls.Config{
-		MinVersion:   tls.VersionTLS10,
-		Certificates: certs,
-		RootCAs:      roots,
+		MinVersion:         tls.VersionTLS10,
+		Certificates:       certs,
+		RootCAs:            roots,
+		InsecureSkipVerify: insecureSkipVerify,
 	}
 	return &tlsConfig, nil
 }
