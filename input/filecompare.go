@@ -9,10 +9,16 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-func IsSameFile(path string, info os.FileInfo, state *FileState) bool {
-	fstat := info.Sys().(*syscall.Stat_t)
+// IsSameFile checks if the given File path corresponds with the FileInfo given
+func IsSameFile(path string, info os.FileInfo) bool {
+	fileInfo, err := os.Stat(path)
 
-	return (fstat.Ino == state.Inode && fstat.Dev == state.Device)
+	if err != nil {
+		logp.Info("Error during file comparison: %s with %s", path, info.Name())
+		return false
+	}
+
+	return os.SameFile(fileInfo, info)
 }
 
 // Checks if the two files are the same.

@@ -23,13 +23,6 @@ type File struct {
 	FileState *FileState
 }
 
-type Filer interface {
-	GetState() *FileState
-	IsSame()
-	IsSameFile()
-	IsRenamed()
-}
-
 // Builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
 
