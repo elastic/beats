@@ -25,7 +25,7 @@ type Config struct {
 }
 
 type FilebeatConfig struct {
-	Files               []FileConfig
+	Prospectors         []ProspectorConfig
 	SpoolSize           uint64 `yaml:"spoolSize"`
 	CpuProfileFile      string // TODO: Still needed?
 	IdleTimeout         string `yaml:"idleTimeout"`
@@ -33,7 +33,7 @@ type FilebeatConfig struct {
 	RegistryFile        string
 }
 
-type FileConfig struct {
+type ProspectorConfig struct {
 	Paths                 []string
 	Fields                map[string]string
 	Input                 string
@@ -83,7 +83,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		tmpConfig := &Config{}
 		cfgfile.Read(tmpConfig, file)
 
-		config.Filebeat.Files = append(config.Filebeat.Files, tmpConfig.Filebeat.Files...)
+		config.Filebeat.Prospectors = append(config.Filebeat.Prospectors, tmpConfig.Filebeat.Prospectors...)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (config *Config) FetchConfigs(path string) {
 		log.Fatal("Error merging config files: ", err)
 	}
 
-	if len(config.Filebeat.Files) == 0 {
+	if len(config.Filebeat.Prospectors) == 0 {
 		log.Fatalf("No paths given. What files do you want me to watch?")
 	}
 

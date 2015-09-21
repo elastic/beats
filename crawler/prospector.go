@@ -12,12 +12,12 @@ import (
 )
 
 type Prospector struct {
-	FileConfig     cfg.FileConfig
-	prospectorList map[string]ProspectorFileStat
-	iteration      uint32
-	lastscan       time.Time
-	crawler        *Crawler
-	missingFiles   map[string]os.FileInfo
+	ProspectorConfig cfg.ProspectorConfig
+	prospectorList   map[string]ProspectorFileStat
+	iteration        uint32
+	lastscan         time.Time
+	crawler          *Crawler
+	missingFiles     map[string]os.FileInfo
 }
 
 // Contains statistic about file when it was last seend by the prospector
@@ -30,40 +30,40 @@ type ProspectorFileStat struct {
 // Init sets up default config for prospector
 func (p *Prospector) Init() error {
 
-	if p.FileConfig.IgnoreOlder != "" {
+	if p.ProspectorConfig.IgnoreOlder != "" {
 
 		var err error
 
-		p.FileConfig.IgnoreOlderDuration, err = time.ParseDuration(p.FileConfig.IgnoreOlder)
+		p.ProspectorConfig.IgnoreOlderDuration, err = time.ParseDuration(p.ProspectorConfig.IgnoreOlder)
 
 		if err != nil {
-			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder, err)
 			return err
 		}
 	} else {
 		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
 		// Set it to default
-		p.FileConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
+		p.ProspectorConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
 
-	if p.FileConfig.ScanFrequency != "" {
+	if p.ProspectorConfig.ScanFrequency != "" {
 
 		var err error
 
-		p.FileConfig.ScanFrequencyDuration, err = time.ParseDuration(p.FileConfig.ScanFrequency)
+		p.ProspectorConfig.ScanFrequencyDuration, err = time.ParseDuration(p.ProspectorConfig.ScanFrequency)
 
 		if err != nil {
-			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.FileConfig.IgnoreOlder, err)
+			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder, err)
 			return err
 		}
 	} else {
 		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
 		// Set it to default
-		p.FileConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
+		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
 
-	if p.FileConfig.HarvesterBufferSize == 0 {
-		p.FileConfig.HarvesterBufferSize = cfg.DefaultHarvesterBufferSize
+	if p.ProspectorConfig.HarvesterBufferSize == 0 {
+		p.ProspectorConfig.HarvesterBufferSize = cfg.DefaultHarvesterBufferSize
 	}
 
 	// Init list
@@ -77,25 +77,25 @@ func (p *Prospector) Init() error {
 func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 	// Handle any "-" (stdin) paths
-	for i, path := range p.FileConfig.Paths {
+	for i, path := range p.ProspectorConfig.Paths {
 
 		logp.Debug("prospector", "Harvest path: %s", path)
 
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
 			h := harvester.Harvester{
-				Path:       path,
-				FileConfig: p.FileConfig,
+				Path:             path,
+				ProspectorConfig: p.ProspectorConfig,
 				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
 				SpoolerChan:  spoolChan,
-				BufferSize:   p.FileConfig.HarvesterBufferSize,
-				TailOnRotate: p.FileConfig.TailOnRotate,
+				BufferSize:   p.ProspectorConfig.HarvesterBufferSize,
+				TailOnRotate: p.ProspectorConfig.TailOnRotate,
 			}
 
 			h.Start()
 
 			// Remove it from the file list
-			p.FileConfig.Paths = append(p.FileConfig.Paths[:i], p.FileConfig.Paths[i+1:]...)
+			p.ProspectorConfig.Paths = append(p.ProspectorConfig.Paths[:i], p.ProspectorConfig.Paths[i+1:]...)
 		}
 	}
 
@@ -103,7 +103,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 	p.lastscan = time.Now()
 
 	// Now let's do one quick scan to pick up new files
-	for _, path := range p.FileConfig.Paths {
+	for _, path := range p.ProspectorConfig.Paths {
 		p.scan(path, spoolChan)
 	}
 
@@ -116,7 +116,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 	for {
 		newlastscan := time.Now()
 
-		for _, path := range p.FileConfig.Paths {
+		for _, path := range p.ProspectorConfig.Paths {
 			// Scan - flag false so new files always start at beginning TODO: is this still working as expected?
 			p.scan(path, spoolChan)
 		}
@@ -124,7 +124,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		p.lastscan = newlastscan
 
 		// Defer next scan for the defined scanFrequency
-		time.Sleep(p.FileConfig.ScanFrequencyDuration)
+		time.Sleep(p.ProspectorConfig.ScanFrequencyDuration)
 		logp.Debug("prospector", "Start next scan")
 
 		// Clear out files that disappeared and we've stopped harvesting
@@ -211,16 +211,16 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 
 	// Init harvester with info
 	h := &harvester.Harvester{
-		Path:        file,
-		FileConfig:  p.FileConfig,
-		FinishChan:  newinfo.Harvester,
-		SpoolerChan: output,
+		Path:             file,
+		ProspectorConfig: p.ProspectorConfig,
+		FinishChan:       newinfo.Harvester,
+		SpoolerChan:      output,
 	}
 
 	// Check for unmodified time, but only if the file modification time is before the last scan started
 	// This ensures we don't skip genuine creations with dead times less than 10s
 	if newinfo.Fileinfo.ModTime().Before(p.lastscan) &&
-		time.Since(newinfo.Fileinfo.ModTime()) > p.FileConfig.IgnoreOlderDuration {
+		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
 		// Call crawler if there if there exists a state for the given file
 		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
@@ -235,7 +235,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 			h.Start()
 		} else {
 			// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.FileConfig.IgnoreOlderDuration, file)
+			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.ProspectorConfig.IgnoreOlderDuration, file)
 			newinfo.Harvester <- newinfo.Fileinfo.Size()
 		}
 	} else if previousFile := p.isFileRenamed(file, newinfo.Fileinfo); previousFile != "" {
@@ -273,10 +273,10 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 	logp.Debug("prospector", "Update existing file for harvesting: %s", file)
 
 	h := &harvester.Harvester{
-		Path:        file,
-		FileConfig:  p.FileConfig,
-		FinishChan:  newinfo.Harvester,
-		SpoolerChan: output,
+		Path:             file,
+		ProspectorConfig: p.ProspectorConfig,
+		FinishChan:       newinfo.Harvester,
+		SpoolerChan:      output,
 	}
 
 	if !oldFile.IsSameFile(newFile) {

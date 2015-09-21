@@ -48,6 +48,7 @@ Questions:
 * What should we do about multiple configs? Just provide some docs? https://github.com/elastic/logstash-forwarder/issues/136 currently working with -c for beat -config for dirs
 * Command line config option -config was renamed to configDir. Should also be introduced as config file param in case we want to keep it
 * Rethink dead-time: https://github.com/elastic/logstash-forwarder/issues/460
+* files config was renamed to prospectors as this makes more sense
 * spoolSize and idleTimeout as cmd line option removed
 * HarvesterBufferSize removed as cmd line option and moved it into the prospector config
 

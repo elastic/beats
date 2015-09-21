@@ -21,23 +21,23 @@ func TestReadConfig(t *testing.T) {
 
 	assert.Equal(t, uint64(1024), config.Filebeat.SpoolSize)
 
-	files := config.Filebeat.Files
+	prospectors := config.Filebeat.Prospectors
 
 	// Check if multiple paths were read in
-	assert.Equal(t, 3, len(files))
+	assert.Equal(t, 3, len(prospectors))
 
 	// Check if full array can be read. Assumed that are ordered same as in config file
-	assert.Equal(t, 2, len(files[0].Paths))
-	assert.Equal(t, "/var/log/s*.log", files[0].Paths[1])
-	assert.Equal(t, "log", files[0].Input)
-	assert.Equal(t, 3, len(files[0].Fields))
-	assert.Equal(t, 1, len(files[0].Fields["review"]))
-	assert.Equal(t, "24h", files[0].IgnoreOlder)
-	assert.Equal(t, "10s", files[0].ScanFrequency)
+	assert.Equal(t, 2, len(prospectors[0].Paths))
+	assert.Equal(t, "/var/log/s*.log", prospectors[0].Paths[1])
+	assert.Equal(t, "log", prospectors[0].Input)
+	assert.Equal(t, 3, len(prospectors[0].Fields))
+	assert.Equal(t, 1, len(prospectors[0].Fields["review"]))
+	assert.Equal(t, "24h", prospectors[0].IgnoreOlder)
+	assert.Equal(t, "10s", prospectors[0].ScanFrequency)
 
-	assert.Equal(t, "stdin", files[2].Input)
-	assert.Equal(t, 0, len(files[2].Paths))
-	assert.Equal(t, "", files[1].ScanFrequency)
+	assert.Equal(t, "stdin", prospectors[2].Input)
+	assert.Equal(t, 0, len(prospectors[2].Paths))
+	assert.Equal(t, "", prospectors[1].ScanFrequency)
 }
 
 func TestReadConfig2(t *testing.T) {
@@ -124,5 +124,5 @@ func TestMergeConfigFiles(t *testing.T) {
 	config := &Config{}
 	mergeConfigFiles(files, config)
 
-	assert.Equal(t, 4, len(config.Filebeat.Files))
+	assert.Equal(t, 4, len(config.Filebeat.Prospectors))
 }

@@ -29,7 +29,7 @@ type Crawler struct {
 	Persist chan *input.FileState
 }
 
-func (crawler *Crawler) Start(files []config.FileConfig, persist map[string]*input.FileState,
+func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[string]*input.FileState,
 	eventChan chan *input.FileEvent) {
 
 	pendingProspectorCnt := 0
@@ -40,8 +40,8 @@ func (crawler *Crawler) Start(files []config.FileConfig, persist map[string]*inp
 		logp.Debug("prospector", "File Config: %v", fileconfig)
 
 		prospector := &Prospector{
-			FileConfig: fileconfig,
-			crawler:    crawler,
+			ProspectorConfig: fileconfig,
+			crawler:          crawler,
 		}
 
 		err := prospector.Init()
