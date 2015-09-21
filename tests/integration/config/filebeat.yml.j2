@@ -4,7 +4,7 @@ filebeat:
     -
       # Paths that should be crawled and fetched
       paths:
-        - "{{ path }}"
+        - {{ path }}
       # Type of the files. Annotated in every documented
       input: log
       scanfrequency: 1s
@@ -79,7 +79,7 @@ output:
   # number of files: maximum number of files in path
   file:
     enabled: true
-    path: "{{ output_file_path|default(fb.working_dir + "/output") }}"
+    path: {{ output_file_path|default(fb.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("filebeat") }}"
     rotate_every_kb: 1000
     #number_of_files: 7

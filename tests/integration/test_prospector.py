@@ -42,7 +42,7 @@ class Test(TestCase):
 
         proc.kill_and_wait()
 
-    def test_not_ingore_old_files(self):
+    def test_not_ignore_old_files(self):
         """
         Should not ignore files there were modified more recent than
         the ignoreOlder settings.
