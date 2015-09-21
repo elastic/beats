@@ -83,16 +83,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.publisherChan = make(chan []*FileEvent, 1)
 	fb.RegistrarChan = make(chan []*FileEvent, 1)
 
-	registrar := &Registrar{
-		RegistryFile: fb.FbConfig.Filebeat.RegistryFile,
-	}
-	registrar.Init()
+	// Setup registrar to persist state
+	registrar := NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
 
 	crawl := &Crawler{
-		// Load the previous log file locations now, for use in prospector
 		Registrar: registrar,
 	}
 
+	// Load the previous log file locations now, for use in prospector
 	registrar.LoadState()
 	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.SpoolChan)
 
@@ -107,6 +105,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	fb.Spooler = spooler
 
+	// TODO: Check if spooler shouldn't start earlier?
 	go spooler.Start()
 
 	// Publishes event to output

@@ -22,9 +22,7 @@ import (
 */
 
 type Crawler struct {
-	// List of all files which were crawled with the state
-	//Files map[string]*input.FileState
-	// TODO: Better explanation and potential renaming needed here for what this variable is.
+	// Registrar object to persist the state
 	Registrar *Registrar
 }
 
@@ -39,7 +37,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 
 		prospector := &Prospector{
 			ProspectorConfig: fileconfig,
-			crawler:          crawler,
+			registrar:        crawler.Registrar,
 		}
 
 		err := prospector.Init()

@@ -5,19 +5,25 @@ import (
 	"os"
 
 	cfg "github.com/elastic/filebeat/config"
+	"github.com/elastic/filebeat/input"
 	. "github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/filebeat/input"
 )
 
 type Registrar struct {
-	RegistryFile string
+	// Path to the Registry File
+	registryFile string
 	// Map with all file paths inside and the corresponding state
 	State map[string]*FileState
-	Persist   chan *input.FileState
+	// Channel used by the prospector and crawler to send FileStates to be persisted
+	Persist chan *input.FileState
 }
 
-func NewRegistrar() (r *Registrar) {
+func NewRegistrar(registryFile string) *Registrar {
+
+	r := &Registrar{
+		registryFile: registryFile,
+	}
 	r.Init()
 
 	return r
@@ -29,24 +35,24 @@ func (r *Registrar) Init() {
 	r.State = make(map[string]*FileState)
 
 	// Set to default in case it is not set
-	if r.RegistryFile == "" {
-		r.RegistryFile = cfg.DefaultRegistryFile
+	if r.registryFile == "" {
+		r.registryFile = cfg.DefaultRegistryFile
 	}
 
-	logp.Debug("registrar", "Registry file set to: %s", r.RegistryFile)
+	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)
 }
 
 // loadState fetches the previous reading state from the configure RegistryFile file
 // The default file is .filebeat file which is stored in the same path as the binary is running
 func (r *Registrar) LoadState() {
 
-	if existing, e := os.Open(r.RegistryFile); e == nil {
+	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()
 		wd := ""
 		if wd, e = os.Getwd(); e != nil {
 			logp.Warn("WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
 		}
-		logp.Info("Loading registrar data from %s/%s", wd, r.RegistryFile)
+		logp.Info("Loading registrar data from %s/%s", wd, r.registryFile)
 
 		decoder := json.NewDecoder(existing)
 		decoder.Decode(&r.State)
@@ -82,9 +88,9 @@ func (r *Registrar) GetFileState(path string) (*FileState, bool) {
 
 // writeRegistry Writes the new json registry file  to disk
 func (r *Registrar) writeRegistry() error {
-	logp.Debug("registrar", "Write registry file: %s", r.RegistryFile)
+	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
-	tempfile := r.RegistryFile + ".new"
+	tempfile := r.registryFile + ".new"
 	file, e := os.Create(tempfile)
 	if e != nil {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, e)
@@ -95,9 +101,8 @@ func (r *Registrar) writeRegistry() error {
 	encoder := json.NewEncoder(file)
 	encoder.Encode(r.State)
 
-	return SafeFileRotate(r.RegistryFile, tempfile)
+	return SafeFileRotate(r.registryFile, tempfile)
 }
-
 
 func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
 
