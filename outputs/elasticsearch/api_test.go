@@ -37,7 +37,7 @@ func GetTestingElasticsearch() *Elasticsearch {
 
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
 
-	return NewElasticsearch([]string{address}, "", "")
+	return NewElasticsearch([]string{address}, nil, "", "")
 }
 
 func GetValidQueryResult() QueryResult {

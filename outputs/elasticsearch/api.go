@@ -66,21 +66,21 @@ func NewElasticsearch(
 	var pool ConnectionPool
 	_ = pool.SetConnections(urls, username, password) // never errors
 
-	var transp *http.Transport
 	if tls != nil {
-		transp = &http.Transport{
-			TLSClientConfig: tls,
+		return &Elasticsearch{
+			connectionPool: pool,
+			client: &http.Client{
+				Transport: &http.Transport{TLSClientConfig: tls},
+			},
+			MaxRetries: defaultMaxRetries,
 		}
 	}
 
-	es := Elasticsearch{
+	return &Elasticsearch{
 		connectionPool: pool,
-		client: &http.Client{
-			Transport: transp,
-		},
-		MaxRetries: defaultMaxRetries,
+		client:         &http.Client{},
+		MaxRetries:     defaultMaxRetries,
 	}
-	return &es
 }
 
 // Encode parameters in url
