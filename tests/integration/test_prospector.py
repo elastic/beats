@@ -12,11 +12,11 @@ class Test(TestCase):
     def test_ignore_old_files(self):
         """
         Should ignore files there were not modified for longer then
-        the `ignoreolder` setting.
+        the `ignoreOlder` setting.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="1s"
+            ignoreOlder="1s"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -45,11 +45,11 @@ class Test(TestCase):
     def test_not_ingore_old_files(self):
         """
         Should not ignore files there were modified more recent than
-        the ignoreolder settings.
+        the ignoreOlder settings.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreolder="15s"
+            ignoreOlder="15s"
         )
 
         os.mkdir(self.working_dir + "/log/")

@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+// TODO: Cleanup if possible
 var exitStat = struct {
 	ok, usageError, faulted int
 }{
@@ -37,12 +38,11 @@ type Filebeat struct {
 	SpoolChan     chan *FileEvent
 	publisherChan chan []*FileEvent
 	RegistrarChan chan []*FileEvent
+	Spooler       *Spooler
 }
 
 // Config setups up the filebeat configuration by fetch all additional config files
 func (fb *Filebeat) Config(b *beat.Beat) error {
-
-	emitOptions()
 
 	// Load Base config
 	err := cfgfile.Read(&fb.FbConfig, "")
@@ -97,8 +97,18 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	registrar.LoadState(crawler.Files)
 	crawler.Start(fb.FbConfig.Filebeat.Prospectors, persist, fb.SpoolChan)
 
-	// Start spooler: Harvesters dump events into the spooler.
-	go fb.startSpooler(cfg.CmdlineOptions)
+	// Init and Start spooler: Harvesters dump events into the spooler.
+	spooler := NewSpooler(fb)
+	err := spooler.Init()
+
+	if err != nil {
+		logp.Err("Could not init spooler: %v", err)
+		return err
+	}
+
+	fb.Spooler = spooler
+
+	go spooler.Start()
 
 	// Publishes event to output
 	go Publish(b, fb)
@@ -120,24 +130,12 @@ func (fb *Filebeat) Stop() {
 	// Flush what is in spooler
 	// Write state
 
-	fb.stopSpooler()
+	fb.Spooler.Stop()
 
 	// FIXME: Improve to first write state and then close channels
 	close(fb.SpoolChan)
 	close(fb.publisherChan)
 	close(fb.RegistrarChan)
-}
-
-// emitOptions prints out the set config options
-func emitOptions() {
-	logp.Info("\t--- options -------")
-	logp.Info("\tconfig-arg:          %s", configDirPath)
-	logp.Info("\tidle-timeout:        %v", cfg.CmdlineOptions.IdleTimeout)
-	logp.Info("\tspool-size:          %d", cfg.CmdlineOptions.SpoolSize)
-	logp.Info("\tharvester-buff-size: %d", cfg.CmdlineOptions.HarvesterBufferSize)
-	logp.Info("\t--- flags ---------")
-	logp.Info("\ttail (on-rotation):  %t", cfg.CmdlineOptions.TailOnRotate)
-	logp.Info("\tquiet:             %t", cfg.CmdlineOptions.Quiet)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {

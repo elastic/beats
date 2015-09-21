@@ -23,13 +23,6 @@ type File struct {
 	FileState *FileState
 }
 
-type Filer interface {
-	GetState() *FileState
-	IsSame()
-	IsSameFile()
-	IsRenamed()
-}
-
 // Builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
 
@@ -65,4 +58,21 @@ func (f *File) IsRegularFile() bool {
 		return false
 	}
 	return true
+}
+
+// IsSameFile checks if the given File path corresponds with the FileInfo given
+func IsSameFile(path string, info os.FileInfo) bool {
+	fileInfo, err := os.Stat(path)
+
+	if err != nil {
+		logp.Err("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
+		return false
+	}
+
+	return os.SameFile(fileInfo, info)
+}
+
+// Checks if the two files are the same.
+func (f1 *File) IsSameFile(f2 *File) bool {
+	return os.SameFile(f1.FileInfo, f2.FileInfo)
 }

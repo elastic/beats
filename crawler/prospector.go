@@ -12,12 +12,12 @@ import (
 )
 
 type Prospector struct {
-	ProspectorConfig     cfg.ProspectorConfig
-	prospectorList map[string]ProspectorFileStat
-	iteration      uint32
-	lastscan       time.Time
-	crawler        *Crawler
-	missingFiles   map[string]os.FileInfo
+	ProspectorConfig cfg.ProspectorConfig
+	prospectorList   map[string]ProspectorFileStat
+	iteration        uint32
+	lastscan         time.Time
+	crawler          *Crawler
+	missingFiles     map[string]os.FileInfo
 }
 
 // Contains statistic about file when it was last seend by the prospector
@@ -62,6 +62,10 @@ func (p *Prospector) Init() error {
 		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
 
+	if p.ProspectorConfig.HarvesterBufferSize == 0 {
+		p.ProspectorConfig.HarvesterBufferSize = cfg.DefaultHarvesterBufferSize
+	}
+
 	// Init list
 	p.prospectorList = make(map[string]ProspectorFileStat)
 
@@ -80,10 +84,12 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
 			h := harvester.Harvester{
-				Path:       path,
+				Path:             path,
 				ProspectorConfig: p.ProspectorConfig,
 				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
-				SpoolerChan: spoolChan,
+				SpoolerChan:  spoolChan,
+				BufferSize:   p.ProspectorConfig.HarvesterBufferSize,
+				TailOnRotate: p.ProspectorConfig.TailOnRotate,
 			}
 
 			h.Start()
@@ -205,10 +211,10 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 
 	// Init harvester with info
 	h := &harvester.Harvester{
-		Path:        file,
-		ProspectorConfig:  p.ProspectorConfig,
-		FinishChan:  newinfo.Harvester,
-		SpoolerChan: output,
+		Path:             file,
+		ProspectorConfig: p.ProspectorConfig,
+		FinishChan:       newinfo.Harvester,
+		SpoolerChan:      output,
 	}
 
 	// Check for unmodified time, but only if the file modification time is before the last scan started
@@ -267,10 +273,10 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 	logp.Debug("prospector", "Update existing file for harvesting: %s", file)
 
 	h := &harvester.Harvester{
-		Path:        file,
-		ProspectorConfig:  p.ProspectorConfig,
-		FinishChan:  newinfo.Harvester,
-		SpoolerChan: output,
+		Path:             file,
+		ProspectorConfig: p.ProspectorConfig,
+		FinishChan:       newinfo.Harvester,
+		SpoolerChan:      output,
 	}
 
 	if !oldFile.IsSameFile(newFile) {

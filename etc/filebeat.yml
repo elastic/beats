@@ -7,8 +7,8 @@ filebeat:
     -
       # Paths that should be crawled and fetched
       paths:
-        #- /var/log/app*.log
         - /var/log/*.log
+
       # Type of the files. Based on this the way the file is read is decided. The different types cannot be mixed.
       #
       # Possible options are:
@@ -17,16 +17,26 @@ filebeat:
       # * meta: Reads new meta information on file change
       # * stdin: Reads the standard in
       type: log
+
       # Optional additional fields
       fields:
         level: debug
         review: 1
+
       # Ignore files which were modified more then the defined timespan in the past
-      ignoreolder:
+      ignoreOlder:
+
       # Scan frequency in seconds.
       # How often these files should be checked for changes. In case it is set
       # to 0s, it is done as often as possible. Default: 10s
-      scanfrequency: 10s
+      scanFrequency: 10s
+
+      # Defines the buffer size every harvester uses when fetching the file
+      harvesterBufferSize: 16384
+
+      # Always tail on log rotation. Disabled by default
+      # Note: This may skip entries
+      tailOnRotate: false
     -
       fields:
       paths:
@@ -34,18 +44,16 @@ filebeat:
       type: log
       # Regexp log line filter (not implemented yet)
       filter: "regexp"
-      ignoreolder: 24h
+      ignoreOlder: 24h
     -
       fields:
       type: stdin
       paths:
         - "-"
-  spoolSize:
-  harvesterBufferSize:
+  # Event count spool threshold - forces network flush if exceeded
+  spoolSize: 1024
+  idleTimeout: 5s
   cpuProfileFile:
-  idleTimeout:
-  tailOnRotate:
-  quiet:
   registryfile: .filebeat
 
 

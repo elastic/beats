@@ -3,31 +3,69 @@ package beat
 import (
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
+	"github.com/elastic/libbeat/logp"
 	"time"
 )
 
-var stopSpooler = false
+type Spooler struct {
+	Filebeat *Filebeat
+	running  bool
+}
 
-// startSpooler Starts up the spooler and starts listening on the spool channel from the harvester
-// Sends then bulk updates to the publisher channel
-func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
+func NewSpooler(filebeat *Filebeat) *Spooler {
+	return &Spooler{
+		Filebeat: filebeat,
+		running:  true,
+	}
+}
+
+func (spooler *Spooler) Init() error {
+	config := &spooler.Filebeat.FbConfig.Filebeat
+
+	// Set default pool size if value not set
+	if config.SpoolSize == 0 {
+		config.SpoolSize = cfg.DefaultSpoolSize
+	}
+
+	// Set default idle timeout if not set
+	if config.IdleTimeout == "" {
+		logp.Debug("spooler", "Set idleTimeoutDuration to %s", cfg.DefaultIdleTimeout)
+		// Set it to default
+		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
+	} else {
+		var err error
+
+		config.IdleTimeoutDuration, err = time.ParseDuration(config.IdleTimeout)
+
+		if err != nil {
+			logp.Warn("Failed to parse idle timeout duration '%s'. Error was: %v", config.IdleTimeout, err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *Spooler) Start() {
 	// heartbeat periodically. If the last flush was longer than
 	// 'idle_timeout' time ago, then we'll force a flush to prevent us from
 	// holding on to spooled events for too long.
 
-	ticker := time.NewTicker(options.IdleTimeout / 2)
+	config := &s.Filebeat.FbConfig.Filebeat
+
+	ticker := time.NewTicker(config.IdleTimeoutDuration / 2)
 
 	// slice for spooling into
 	// TODO(sissel): use container.Ring?
-	spool := make([]*input.FileEvent, options.SpoolSize)
+	spool := make([]*input.FileEvent, config.SpoolSize)
 
 	// Current write position in the spool
 	var spool_i int = 0
 
-	next_flush_time := time.Now().Add(options.IdleTimeout)
+	next_flush_time := time.Now().Add(config.IdleTimeoutDuration)
 	for {
 		select {
-		case event := <-fb.SpoolChan:
+		case event := <-s.Filebeat.SpoolChan:
 			spool[spool_i] = event
 			spool_i++
 
@@ -39,8 +77,8 @@ func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
 				spoolcopy = append(spoolcopy, spool[:]...)
 
 				// Send events to publisher
-				fb.publisherChan <- spoolcopy
-				next_flush_time = time.Now().Add(options.IdleTimeout)
+				s.Filebeat.publisherChan <- spoolcopy
+				next_flush_time = time.Now().Add(config.IdleTimeoutDuration)
 
 				spool_i = 0
 			}
@@ -54,19 +92,19 @@ func (fb *Filebeat) startSpooler(options *cfg.FilebeatConfig) {
 				if spool_i > 0 {
 					var spoolcopy []*input.FileEvent
 					spoolcopy = append(spoolcopy, spool[0:spool_i]...)
-					fb.publisherChan <- spoolcopy
-					next_flush_time = now.Add(options.IdleTimeout)
+					s.Filebeat.publisherChan <- spoolcopy
+					next_flush_time = now.Add(config.IdleTimeoutDuration)
 					spool_i = 0
 				}
 			}
 		}
 
-		if stopSpooler {
+		if !s.running {
 			break
 		}
 	}
 }
 
-func (fb *Filebeat) stopSpooler() {
-	stopSpooler = true
+func (s *Spooler) Stop() {
+	s.running = false
 }

@@ -49,6 +49,8 @@ Questions:
 * Command line config option -config was renamed to configDir. Should also be introduced as config file param in case we want to keep it
 * Rethink dead-time: https://github.com/elastic/logstash-forwarder/issues/460
 * files config was renamed to prospectors as this makes more sense
+* spoolSize and idleTimeout as cmd line option removed
+* HarvesterBufferSize removed as cmd line option and moved it into the prospector config
 
 Notes:
 * Should every config entry have a name -> make it possible to know from which config entry something comes.
@@ -56,6 +58,9 @@ Notes:
 * All beats should "namespace" the config file, otherwise would could have overlaps. Means also for packetbeat, everything should be under "packetbeat"
 * We need general concept / code that command line args overwrite config options
 * All command line options must be available as config options for the beats
+* On debug we should print out all config options on startup -> any good idea how to do this recursively?
+* Quiet option remove as logging is part of libbeat
+* TailOnRate config option implemented and removed from command line
 
 Next with priority
 * Multi line support

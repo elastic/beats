@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"github.com/elastic/libbeat/cfgfile"
 	"log"
 	"math"
@@ -15,6 +14,10 @@ const (
 	DefaultRegistryFile                      = ".filebeat"
 	DefaultIgnoreOlderDuration time.Duration = math.MaxInt64
 	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
+	DefaultSpoolSize           uint64        = 1024
+	DefaultIdleTimeout         time.Duration = time.Second * 5
+	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
+	DefaultTailOnRotate                      = false
 )
 
 type Config struct {
@@ -22,12 +25,11 @@ type Config struct {
 }
 
 type FilebeatConfig struct {
-	Prospectors               []ProspectorConfig
-	SpoolSize           uint64
-	HarvesterBufferSize int
-	CpuProfileFile      string
-	IdleTimeout         time.Duration
-	TailOnRotate        bool
+	Prospectors         []ProspectorConfig
+	SpoolSize           uint64 `yaml:"spoolSize"`
+	CpuProfileFile      string // TODO: Still needed?
+	IdleTimeout         string `yaml:"idleTimeout"`
+	IdleTimeoutDuration time.Duration
 	Quiet               bool
 	RegistryFile        string
 }
@@ -36,38 +38,12 @@ type ProspectorConfig struct {
 	Paths                 []string
 	Fields                map[string]string
 	Input                 string
-	IgnoreOlder           string
+	IgnoreOlder           string `yaml:"ignoreOlder"`
 	IgnoreOlderDuration   time.Duration
-	ScanFrequency         string
+	ScanFrequency         string `yaml:"scanFrequency"`
 	ScanFrequencyDuration time.Duration
-}
-
-// TODO: Log is only used here now. Do we need it?
-const logflags = log.Ldate | log.Ltime | log.Lmicroseconds
-
-func init() {
-	log.SetFlags(logflags)
-}
-
-// TODO: Default options should be set as part of default config otherwise it always overwrites
-var CmdlineOptions = &FilebeatConfig{
-	SpoolSize:           1024,
-	HarvesterBufferSize: 16 << 10, // 16384
-	IdleTimeout:         time.Second * 5,
-}
-
-func init() {
-
-	flag.Uint64Var(&CmdlineOptions.SpoolSize, "spool-size", CmdlineOptions.SpoolSize, "event count spool threshold - forces network flush")
-	flag.Uint64Var(&CmdlineOptions.SpoolSize, "sv", CmdlineOptions.SpoolSize, "event count spool threshold - forces network flush")
-
-	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "harvest-buffer-size", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
-	flag.IntVar(&CmdlineOptions.HarvesterBufferSize, "hb", CmdlineOptions.HarvesterBufferSize, "harvester reader buffer size")
-
-	flag.BoolVar(&CmdlineOptions.TailOnRotate, "tail", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
-	flag.BoolVar(&CmdlineOptions.TailOnRotate, "t", CmdlineOptions.TailOnRotate, "always tail on log rotation -note: may skip entries ")
-
-	flag.BoolVar(&CmdlineOptions.Quiet, "quiet", CmdlineOptions.Quiet, "operate in quiet mode - only emit errors to log")
+	HarvesterBufferSize   int  `yaml:"harvesterBufferSize"`
+	TailOnRotate          bool `yaml:"tailOnRotate"`
 }
 
 // getConfigFiles returns list of config files.
