@@ -6,6 +6,8 @@ import (
 )
 
 func fileIds(info *os.FileInfo) (uint64, uint64) {
+	// TODO File id and device seem to exist: https://github.com/golang/go/blob/master/src/os/stat_windows.go#L43
+	//https://github.com/golang/go/blob/master/src/os/types_windows.go#L14
 	// No dev and inode numbers on windows, right?
 	return 0, 0
 }

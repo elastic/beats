@@ -41,10 +41,14 @@ func (c *Crawler) isFileRenamed(file string, info os.FileInfo) string {
 	stat := info.Sys().(*syscall.Stat_t)
 
 	for kf, ki := range c.Files {
+
 		if kf == file {
 			continue
 		}
-		if stat.Dev == ki.Device && stat.Ino == ki.Inode {
+
+		// Convert device values to uint64 to make sure to have same values across all platforms
+		// openbsd and darwin have int32
+		if uint64(stat.Dev) == ki.Device && stat.Ino == ki.Inode {
 			return kf
 		}
 	}

@@ -6,6 +6,13 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
+type File struct {
+	File      *os.File
+	FileInfo  os.FileInfo
+	Path      string
+	FileState *FileState
+}
+
 type FileEvent struct {
 	Source *string
 	Offset int64
@@ -16,12 +23,13 @@ type FileEvent struct {
 	Fileinfo *os.FileInfo
 }
 
-type File struct {
-	File      *os.File
-	FileInfo  os.FileInfo
-	Path      string
-	FileState *FileState
+type FileState struct {
+	Source *string `json:"source,omitempty"`
+	Offset int64   `json:"offset,omitempty"`
+	Inode  uint64  `json:"inode,omitempty"`
+	Device uint64  `json:"device,omitempty"`
 }
+
 
 // Builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
