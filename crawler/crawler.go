@@ -24,20 +24,20 @@ import (
 // Last reading state of the prospector
 type Crawler struct {
 	// List of all files which were crawled with the state
-	Files map[string]*input.FileState
+	//Files map[string]*input.FileState
 	// TODO: Better explanation and potential renaming needed here for what this variable is.
-	Persist chan *input.FileState
+	Persist   chan *input.FileState
+	Registrar *Registrar
 }
 
-func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[string]*input.FileState,
-	eventChan chan *input.FileEvent) {
+func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *input.FileEvent) {
 
 	pendingProspectorCnt := 0
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
 
-		logp.Debug("prospector", "File Config: %v", fileconfig)
+		logp.Debug("prospector", "File Configs: %v", fileconfig.Paths)
 
 		prospector := &Prospector{
 			ProspectorConfig: fileconfig,
@@ -67,11 +67,11 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[strin
 			}
 			continue
 		}
-		persist[*event.Source] = event
+		crawler.Registrar.State[*event.Source] = event
 		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
 	}
 
-	logp.Info("All prospectors initialised with %d states to persist", len(persist))
+	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
 }
 
 func (crawler *Crawler) Stop() {
@@ -81,7 +81,7 @@ func (crawler *Crawler) Stop() {
 func (crawler *Crawler) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
 
 	// Check if there is a state for this file
-	lastState, isFound := crawler.Files[filePath]
+	lastState, isFound := crawler.Registrar.GetFileState(filePath)
 
 	if isFound && input.IsSameFile(filePath, fileInfo) {
 		// We're resuming - throw the last state back downstream so we resave it
@@ -96,7 +96,7 @@ func (crawler *Crawler) fetchState(filePath string, fileInfo os.FileInfo) (int64
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
-		lastState := crawler.Files[previous]
+		lastState, _ := crawler.Registrar.GetFileState(previous)
 		lastState.Source = &filePath
 		crawler.Persist <- lastState
 		return lastState.Offset, true

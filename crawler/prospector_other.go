@@ -40,7 +40,7 @@ func (c *Crawler) isFileRenamed(file string, info os.FileInfo) string {
 	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
 	stat := info.Sys().(*syscall.Stat_t)
 
-	for kf, ki := range c.Files {
+	for kf, ki := range c.Registrar.State {
 		if kf == file {
 			continue
 		}
