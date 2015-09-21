@@ -30,7 +30,6 @@ type FilebeatConfig struct {
 	CpuProfileFile      string // TODO: Still needed?
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
-	Quiet               bool
 	RegistryFile        string
 }
 
