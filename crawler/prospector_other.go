@@ -3,6 +3,7 @@
 package crawler
 
 import (
+	"github.com/elastic/filebeat/input"
 	"os"
 	"syscall"
 )
@@ -36,16 +37,23 @@ func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
 	return ""
 }
 
-func (r *Registrar) isFileRenamed(file string, info os.FileInfo) string {
-	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
-	stat := info.Sys().(*syscall.Stat_t)
+// getPreviousFile checks in the registrar if there is the newFile already exist with a different name
+// In case an old file is found, the path to the file is returned
+func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) string {
 
-	for kf, ki := range r.State {
-		if kf == file {
+	// As the state of the old file cannot be fetched anymore based on the path, IsSameFile does not work
+	newState := newFileInfo.Sys().(*syscall.Stat_t)
+
+	for oldFilePath, oldState := range r.State {
+
+		// Skipping when path the same
+		if oldFilePath == newFilePath {
 			continue
 		}
-		if stat.Dev == ki.Device && stat.Ino == ki.Inode {
-			return kf
+
+		// Compare Inode and device
+		if newState.Dev == oldState.Device && newState.Ino == oldState.Inode {
+			return oldFilePath
 		}
 	}
 

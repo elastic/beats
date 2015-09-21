@@ -116,7 +116,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		return lastState.Offset, true
 	}
 
-	if previous := r.isFileRenamed(filePath, fileInfo); previous != "" {
+	if previous := r.getPreviousFile(filePath, fileInfo); previous != "" {
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
