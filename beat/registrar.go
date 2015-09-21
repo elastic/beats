@@ -72,10 +72,11 @@ func (r *Registrar) writeRegistry(state map[string]*FileState) error {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, e)
 		return e
 	}
-	defer file.Close()
 
 	encoder := json.NewEncoder(file)
 	encoder.Encode(state)
+
+	file.Close()
 
 	return SafeFileRotate(r.registryFile, tempfile)
 }

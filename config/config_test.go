@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/libbeat/cfgfile"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestReadConfig(t *testing.T) {
@@ -81,8 +82,8 @@ func TestGetConfigFiles_Dir(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(files))
 
-	assert.Equal(t, absPath+"/config.yml", files[0])
-	assert.Equal(t, absPath+"/config2.yml", files[1])
+	assert.Equal(t, filepath.Join(absPath, "/config.yml"), files[0])
+	assert.Equal(t, filepath.Join(absPath, "/config2.yml"), files[1])
 }
 
 func TestGetConfigFiles_EmptyDir(t *testing.T) {
