@@ -19,7 +19,7 @@ func TestReadConfig(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	files := config.Filebeat.Files
+	files := config.Filebeat.Prospectors
 
 	// Check if multiple paths were read in
 	assert.Equal(t, 3, len(files))
@@ -106,5 +106,5 @@ func TestMergeConfigFiles(t *testing.T) {
 	config := &Config{}
 	mergeConfigFiles(files, config)
 
-	assert.Equal(t, 4, len(config.Filebeat.Files))
+	assert.Equal(t, 4, len(config.Filebeat.Prospectors))
 }

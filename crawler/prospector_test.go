@@ -9,13 +9,13 @@ import (
 
 func TestProspectorInit(t *testing.T) {
 
-	fileConfig := config.FileConfig{
+	prospectorConfig := config.ProspectorConfig{
 		ScanFrequency: "15s",
 		IgnoreOlder:   "100m",
 	}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	assert.NotNil(t, prospector)
@@ -23,68 +23,68 @@ func TestProspectorInit(t *testing.T) {
 	prospector.Init()
 
 	// Predefined values expected
-	assert.Equal(t, 100*time.Minute, prospector.FileConfig.IgnoreOlderDuration)
-	assert.Equal(t, 15*time.Second, prospector.FileConfig.ScanFrequencyDuration)
+	assert.Equal(t, 100*time.Minute, prospector.ProspectorConfig.IgnoreOlderDuration)
+	assert.Equal(t, 15*time.Second, prospector.ProspectorConfig.ScanFrequencyDuration)
 }
 
 func TestProspectorInitEmpty(t *testing.T) {
 
-	fileConfig := config.FileConfig{
+	prospectorConfig := config.ProspectorConfig{
 		ScanFrequency: "",
 		IgnoreOlder:   "",
 	}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	prospector.Init()
 
 	// Default values expected
-	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.FileConfig.IgnoreOlderDuration)
-	assert.Equal(t, config.DefaultScanFrequency, prospector.FileConfig.ScanFrequencyDuration)
+	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.ProspectorConfig.IgnoreOlderDuration)
+	assert.Equal(t, config.DefaultScanFrequency, prospector.ProspectorConfig.ScanFrequencyDuration)
 }
 
 func TestProspectorInitNotSet(t *testing.T) {
 
-	fileConfig := config.FileConfig{}
+	prospectorConfig := config.ProspectorConfig{}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	prospector.Init()
 
 	// Default values expected
-	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.FileConfig.IgnoreOlderDuration)
-	assert.Equal(t, config.DefaultScanFrequency, prospector.FileConfig.ScanFrequencyDuration)
+	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.ProspectorConfig.IgnoreOlderDuration)
+	assert.Equal(t, config.DefaultScanFrequency, prospector.ProspectorConfig.ScanFrequencyDuration)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {
 
-	fileConfig := config.FileConfig{
+	prospectorConfig := config.ProspectorConfig{
 		ScanFrequency: "0s",
 	}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	prospector.Init()
 
 	var zero time.Duration = 0
 	// 0 expected
-	assert.Equal(t, zero, prospector.FileConfig.ScanFrequencyDuration)
+	assert.Equal(t, zero, prospector.ProspectorConfig.ScanFrequencyDuration)
 }
 
 func TestProspectorInitInvalidScanFrequency(t *testing.T) {
 
-	fileConfig := config.FileConfig{
+	prospectorConfig := config.ProspectorConfig{
 		ScanFrequency: "abc",
 	}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	err := prospector.Init()
@@ -93,12 +93,12 @@ func TestProspectorInitInvalidScanFrequency(t *testing.T) {
 
 func TestProspectorInitInvalidIgnoreOlder(t *testing.T) {
 
-	fileConfig := config.FileConfig{
+	prospectorConfig := config.ProspectorConfig{
 		IgnoreOlder: "abc",
 	}
 
 	prospector := Prospector{
-		FileConfig: fileConfig,
+		ProspectorConfig: prospectorConfig,
 	}
 
 	err := prospector.Init()

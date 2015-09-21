@@ -95,7 +95,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	registrar.LoadState(crawler.Files)
-	crawler.Start(fb.FbConfig.Filebeat.Files, persist, fb.SpoolChan)
+	crawler.Start(fb.FbConfig.Filebeat.Prospectors, persist, fb.SpoolChan)
 
 	// Start spooler: Harvesters dump events into the spooler.
 	go fb.startSpooler(cfg.CmdlineOptions)

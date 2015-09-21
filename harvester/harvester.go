@@ -8,7 +8,7 @@ import (
 
 type Harvester struct {
 	Path        string /* the file path to harvest */
-	FileConfig  config.FileConfig
+	ProspectorConfig  config.ProspectorConfig
 	Offset      int64
 	FinishChan  chan int64
 	SpoolerChan chan *input.FileEvent
