@@ -12,8 +12,10 @@ filebeat:
         level: debug
         review: 1
         type: log
-      ignoreolder: 24h
-      scanfrequency: 10s
+      ignoreOlder: 24h
+      scanFrequency: 10s
+      harvesterBufferSize: 5000
+
     -
       fields:
       paths:
@@ -23,12 +25,10 @@ filebeat:
       fields:
       input: stdin
       # Paths is not required
-  spoolSize:
-  harvesterBufferSize:
+  spoolSize: 1024
   cpuProfileFile:
-  idleTimeout:
+  idleTimeout: 5s
   tailOnRotate:
-  quiet:
 
 
 # Additional stuff we should be ignore
