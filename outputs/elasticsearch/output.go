@@ -73,7 +73,12 @@ func (out *elasticsearchOutput) Init(
 		urls = append(urls, url)
 	}
 
-	es := NewElasticsearch(urls, config.Username, config.Password)
+	tlsConfig, err := outputs.LoadTLSConfig(config)
+	if err != nil {
+		return err
+	}
+
+	es := NewElasticsearch(urls, tlsConfig, config.Username, config.Password)
 	out.Conn = es
 
 	if config.Index != "" {

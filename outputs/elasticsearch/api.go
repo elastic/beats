@@ -2,6 +2,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -56,15 +57,28 @@ const (
 )
 
 // NewElasticsearch creates a connection to Elasticsearch.
-func NewElasticsearch(urls []string, username string, password string) *Elasticsearch {
+func NewElasticsearch(
+	urls []string,
+	tls *tls.Config,
+	username, password string,
+) *Elasticsearch {
 
 	var pool ConnectionPool
 	_ = pool.SetConnections(urls, username, password) // never errors
 
+	var transp *http.Transport
+	if tls != nil {
+		transp = &http.Transport{
+			TLSClientConfig: tls,
+		}
+	}
+
 	es := Elasticsearch{
 		connectionPool: pool,
-		client:         &http.Client{},
-		MaxRetries:     defaultMaxRetries,
+		client: &http.Client{
+			Transport: transp,
+		},
+		MaxRetries: defaultMaxRetries,
 	}
 	return &es
 }
