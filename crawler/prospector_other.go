@@ -3,7 +3,6 @@
 package crawler
 
 import (
-	"github.com/elastic/filebeat/input"
 	"os"
 	"syscall"
 )
