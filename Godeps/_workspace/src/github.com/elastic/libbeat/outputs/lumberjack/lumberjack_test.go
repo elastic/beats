@@ -32,7 +32,7 @@ func newTestLumberjackOutput(
 		t.Fatalf("No lumberjack output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", config, 0)
+	output, err := plugin.NewOutput("test", &config, 0)
 	if err != nil {
 		t.Fatalf("init lumberjack output plugin failed: %v", err)
 	}
@@ -208,7 +208,7 @@ func TestLumberjackTCP(t *testing.T) {
 
 	// send event to server
 	event := common.MapStr{"name": "me", "line": 10}
-	output.PublishEvent(time.Now(), event)
+	output.PublishEvent(nil, time.Now(), event)
 
 	wg.Wait()
 	listener.Close()
@@ -219,8 +219,8 @@ func TestLumberjackTCP(t *testing.T) {
 	assert.NotNil(t, data)
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
-	assert.Equal(t, "\"me\"", data.kv["name"])
-	assert.Equal(t, "10", data.kv["line"])
+	assert.Equal(t, "me", data.doc["name"])
+	assert.Equal(t, 10.0, data.doc["line"])
 }
 
 func TestLumberjackTLS(t *testing.T) {
@@ -316,7 +316,7 @@ func TestLumberjackTLS(t *testing.T) {
 		output := newTestLumberjackOutput(t, config)
 
 		event := common.MapStr{"name": "me", "line": 10}
-		output.PublishEvent(time.Now(), event)
+		output.PublishEvent(nil, time.Now(), event)
 	}()
 
 	wg.Wait()
@@ -329,8 +329,7 @@ func TestLumberjackTLS(t *testing.T) {
 	if data != nil {
 		assert.Equal(t, 1, len(data.events))
 		data = data.events[0]
-		assert.Equal(t, "\"me\"", data.kv["name"])
-		assert.Equal(t, "10", data.kv["line"])
+		assert.Equal(t, "me", data.doc["name"])
+		assert.Equal(t, 10.0, data.doc["line"])
 	}
-
 }

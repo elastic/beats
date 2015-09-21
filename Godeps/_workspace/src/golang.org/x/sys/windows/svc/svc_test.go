@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc"
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows/svc/mgr"
+	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/mgr"
 )
 
 func getState(t *testing.T, s *mgr.Service) svc.State {

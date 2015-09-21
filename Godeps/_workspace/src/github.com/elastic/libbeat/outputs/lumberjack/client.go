@@ -45,9 +45,9 @@ var (
 )
 
 var (
-	codeWindowSize = []byte("1W")
-	codeDataFrame  = []byte("1D")
-	codeCompressed = []byte("1C")
+	codeWindowSize    = []byte("1W")
+	codeJSONDataFrame = []byte("1J")
+	codeCompressed    = []byte("1C")
 )
 
 func newLumberjackClient(conn TransportClient, timeout time.Duration) *lumberjackClient {
@@ -70,9 +70,15 @@ func (l *lumberjackClient) PublishEvents(events []common.MapStr) (int, error) {
 	// Abort if sending request takes longer than the configured
 	// network timeout.
 	conn := l.TransportClient
-	conn.SetDeadline(time.Now().Add(l.timeout))
+	if err := conn.SetDeadline(time.Now().Add(l.timeout)); err != nil {
+		return l.onFail(0, err)
+	}
 
-	count, payload := l.compressEvents(events)
+	count, payload, err := l.compressEvents(events)
+	if err != nil {
+		return 0, err
+	}
+
 	if count == 0 {
 		// encoding of all events failed. Let's stop here and report all events
 		// as exported so no one tries to send/encode the same events once again
@@ -82,7 +88,6 @@ func (l *lumberjackClient) PublishEvents(events []common.MapStr) (int, error) {
 	}
 
 	// send window size:
-	var err error
 	if err = l.sendWindowSize(count); err != nil {
 		return l.onFail(0, err)
 	}
@@ -97,7 +102,9 @@ func (l *lumberjackClient) PublishEvents(events []common.MapStr) (int, error) {
 	var ackSeq uint32
 	for ackSeq < count {
 		// read until all acks
-		conn.SetDeadline(time.Now().Add(l.timeout))
+		if err := conn.SetDeadline(time.Now().Add(l.timeout)); err != nil {
+			return l.onFail(ackSeq, err)
+		}
 
 		ackSeq, err = l.readACK()
 		if err != nil {
@@ -132,14 +139,14 @@ func (l *lumberjackClient) onFail(ackSeq uint32, err error) (int, error) {
 	nerr, ok := err.(net.Error)
 	if !ok || !nerr.Timeout() {
 		// no timeout error, close connection and return error
-		l.Close()
+		_ = l.Close()
 		return int(ackSeq), err
 	}
 
 	// if we've seen 3 consecutive timeout errors, close connection
 	l.countTimeoutErr++
 	if l.countTimeoutErr == maxAllowedTimeoutErr {
-		l.Close()
+		_ = l.Close()
 		return int(ackSeq), err
 	}
 
@@ -153,7 +160,9 @@ func (l *lumberjackClient) onFail(ackSeq uint32, err error) (int, error) {
 	return int(ackSeq), nil
 }
 
-func (l *lumberjackClient) compressEvents(events []common.MapStr) (uint32, []byte) {
+func (l *lumberjackClient) compressEvents(
+	events []common.MapStr,
+) (uint32, []byte, error) {
 	buf := bytes.NewBuffer(nil)
 
 	// compress events
@@ -167,11 +176,13 @@ func (l *lumberjackClient) compressEvents(events []common.MapStr) (uint32, []byt
 			sequence-- //forget this last broken event and continue
 		}
 	}
-	compressor.Flush()
-	compressor.Close()
+	if err := compressor.Close(); err != nil {
+		debug("Finalizing zlib compression failed with: %s", err)
+		return 0, nil, err
+	}
 	payload := buf.Bytes()
 
-	return sequence, payload
+	return sequence, payload, nil
 }
 
 func (l *lumberjackClient) readACK() (uint32, error) {
@@ -217,69 +228,35 @@ func (l *lumberjackClient) writeDataFrame(
 	seq uint32,
 	out io.Writer,
 ) error {
-	// This makes me sad: marshal -> unmarshal -> flatten into map[string]string -> encode
+	// Write JSON Data Frame:
+	// version: uint8 = '1'
+	// code: uint8 = 'J'
+	// seq: uint32
+	// payloadLen (bytes): uint32
+	// payload: JSON document
 
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
-		logp.Err("Fail to convert the event to JSON: %s", err)
+		debug("Fail to convert the event to JSON: %s", err)
 		return err
 	}
 
-	var root interface{}
-	json.Unmarshal(jsonEvent, &root)
-
-	fields := make(map[string]string)
-	flattenInto(fields, "", root.(map[string]interface{}))
-
-	// Write Data Frame:
-	// version: uint8
-	// code: uint8 = 'D'
-	// seq: uint32
-	// numFields: uint32
-	// fields: [numFields]{
-	//     lenKey: uint32
-	//     key: [lenKey]byte
-	//     lenValue: uint32
-	//     value: [lenValue]byte
-	// }
-	out.Write(codeDataFrame) // version + code
-	writeUint32(out, seq)
-	writeUint32(out, uint32(len(fields)))
-
-	for k, v := range fields {
-		writeKV(out, k, v)
+	if _, err := out.Write(codeJSONDataFrame); err != nil { // version + code
+		return err
+	}
+	if err := writeUint32(out, seq); err != nil {
+		return err
+	}
+	if err := writeUint32(out, uint32(len(jsonEvent))); err != nil {
+		return err
+	}
+	if _, err := out.Write(jsonEvent); err != nil {
+		return err
 	}
 
 	return nil
-}
-
-func flattenInto(to map[string]string, baseKey string, event map[string]interface{}) {
-	for k, v := range event {
-		var key string
-		if baseKey != "" {
-			key = baseKey + "." + k
-		} else {
-			key = k
-		}
-
-		switch t := v.(type) {
-		case map[string]interface{}:
-			flattenInto(to, key, t)
-		default:
-			bytes, _ := json.Marshal(t)
-			to[key] = string(bytes)
-		}
-	}
 }
 
 func writeUint32(out io.Writer, v uint32) error {
 	return binary.Write(out, binary.BigEndian, v)
-}
-
-func writeKV(out io.Writer, k string, v string) error {
-	writeUint32(out, uint32(len(k)))
-	out.Write([]byte(k))
-	writeUint32(out, uint32(len(v)))
-	out.Write([]byte(v))
-	return nil
 }

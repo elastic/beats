@@ -8,8 +8,11 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
+
+var debug = logp.MakeDebug("lumberjack")
 
 func init() {
 	outputs.RegisterOutputPlugin("lumberjack", lumberjackOutputPlugin{})
@@ -19,11 +22,11 @@ type lumberjackOutputPlugin struct{}
 
 func (p lumberjackOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &lumberjack{}
-	err := output.init(beat, config, topologyExpire)
+	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +111,7 @@ func makeClients(
 			transp, err := newTransp(host)
 			if err != nil {
 				for _, client := range clients {
-					client.Close()
+					_ = client.Close() // ignore error
 				}
 				return nil, err
 			}
@@ -130,7 +133,21 @@ func makeClients(
 // TODO: update Outputer interface to support multiple events for batch-like
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.
-func (lj *lumberjack) PublishEvent(ts time.Time, event common.MapStr) error {
+func (lj *lumberjack) PublishEvent(
+	trans outputs.Signaler,
+	ts time.Time,
+	event common.MapStr,
+) error {
 	events := []common.MapStr{event}
-	return lj.mode.PublishEvents(events)
+	return lj.mode.PublishEvents(trans, events)
+}
+
+// BulkPublish implements the BulkOutputer interface pushing a bulk of events
+// via lumberjack.
+func (lj *lumberjack) BulkPublish(
+	trans outputs.Signaler,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	return lj.mode.PublishEvents(trans, events)
 }

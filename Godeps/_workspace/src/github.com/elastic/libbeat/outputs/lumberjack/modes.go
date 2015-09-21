@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/outputs"
 )
 
 // ProtocolClient interface is a output plugin specific client implementation
@@ -52,7 +53,7 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(events []common.MapStr) error
+	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
 }
 
 type singleConnectionMode struct {
@@ -89,7 +90,7 @@ func newSingleConnectionMode(
 		conn:    client,
 	}
 
-	s.Connect() // try to connect, but ignore errors for now
+	_ = s.Connect() // try to connect, but ignore errors for now
 	return s, nil
 }
 
@@ -105,22 +106,33 @@ func (s *singleConnectionMode) Close() error {
 	return s.conn.Close()
 }
 
-func (s *singleConnectionMode) PublishEvents(events []common.MapStr) error {
+func (s *singleConnectionMode) PublishEvents(
+	trans outputs.Signaler,
+	events []common.MapStr,
+) error {
+	published := 0
 	for !s.closed {
 		if err := s.Connect(); err != nil {
 			time.Sleep(s.waitRetry)
 			continue
 		}
 
-		for published := 0; published < len(events); {
+		for published < len(events) {
 			n, err := s.conn.PublishEvents(events[published:])
 			if err != nil {
-				continue
+				break
 			}
+
 			published += n
 		}
-		break
+
+		if published == len(events) {
+			outputs.SignalCompleted(trans)
+			return nil
+		}
 	}
+
+	outputs.SignalFailed(trans)
 	return nil
 }
 
@@ -134,7 +146,10 @@ func newFailOverConnectionMode(
 		timeout:   timeout,
 		waitRetry: waitRetry,
 	}
-	f.Connect(-1)
+
+	// Try to connect preliminary, but ignore errors for now.
+	// Main publisher loop is responsible to ensure an available connection.
+	_ = f.Connect(-1)
 	return f, nil
 }
 
@@ -143,7 +158,7 @@ func (f *failOverConnectionMode) Close() error {
 		f.closed = true
 		for _, conn := range f.conns {
 			if conn.IsConnected() {
-				conn.Close()
+				_ = conn.Close()
 			}
 		}
 	}
@@ -193,14 +208,18 @@ func (f *failOverConnectionMode) Connect(active int) error {
 	return errNoActiveConnection
 }
 
-func (f *failOverConnectionMode) PublishEvents(events []common.MapStr) error {
+func (f *failOverConnectionMode) PublishEvents(
+	trans outputs.Signaler,
+	events []common.MapStr,
+) error {
+	published := 0
 	for !f.closed {
 		if err := f.Connect(f.active); err != nil {
 			continue
 		}
 
 		// loop until all events have been send in case client supports partial sends
-		for published := 0; published < len(events); {
+		for published < len(events) {
 			conn := f.conns[f.active]
 			n, err := conn.PublishEvents(events[published:])
 			if err != nil {
@@ -215,8 +234,13 @@ func (f *failOverConnectionMode) PublishEvents(events []common.MapStr) error {
 			}
 			published += n
 		}
-		break
+
+		if published == len(events) {
+			outputs.SignalCompleted(trans)
+			return nil
+		}
 	}
 
+	outputs.SignalFailed(trans)
 	return nil
 }

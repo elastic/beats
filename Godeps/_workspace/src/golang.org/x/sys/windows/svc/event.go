@@ -9,7 +9,7 @@ package svc
 import (
 	"errors"
 
-	"github.com/elastic/filebeat/Godeps/_workspace/src/golang.org/x/sys/windows"
+	"golang.org/x/sys/windows"
 )
 
 // event represents auto-reset, initially non-signaled Windows event.
