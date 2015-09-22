@@ -713,6 +713,16 @@ output:
 
     # Optional HTTP Path
     path: "/elasticsearch"
+
+    # List of root certificates for HTTPS server verifications
+    cas: ["/etc/pki/root/ca.pem"]
+
+    # Certificate for TLS client authentication
+    certificate: "/etc/pki/client/cert.pem"
+
+    # Client Certificate Key
+    certificatekey: "/etc/pki/client/cert.key"
+
 ------------------------------------------------------------------------------
 
 
@@ -755,18 +765,18 @@ Basic authentication password for connecting to Elasticsearch.
 The index root name where to write events to. The default is `packetbeat` and
 generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
 
-==== max_retries
+===== max_retries
 
 The number of times a particular Elasticsearch index operation is attempted. If
 the indexing operation doesn't succeed after this many retries, the events are
 dropped. The default is 3.
 
-==== bulk_max_size
+===== bulk_max_size
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request.
 The default is 10000.
 
-==== flush_interval
+===== flush_interval
 
 The number of seconds to wait for new events between two bulk API index requests.
 If `bulk_max_size` is reached before this interval expires, addition bulk index
@@ -783,10 +793,27 @@ the API under a custom prefix.
 Boolean that sets if the topology is kept in Elasticsearch. The default is
 false. See <<maintaining-topology>>.
 
-==== topology_expire
+===== topology_expire
 
 The time to live in seconds for the topology information that is stored in
 Elasticsearch. The default is 15 seconds.
+
+===== cas
+List of root certificates for HTTPS server verifications. If cas is empty or not
+set, the trusted certificate authorities of the host system will be employed.
+
+===== certificate: "/etc/pki/client/cert.pem"
+Certificate for TLS client authentication. Both certificate and certificatekey are required.
+
+===== certificatekey: "/etc/pki/client/cert.key"
+Client certificate key. Both certificate and certificatekey are required.
+
+===== tlsinsecure
+Controls whether the client verifies server certificates and host name.
+If tlsinsecure is set to true, all server host names and certificates will be
+accepted. In this mode TLS based connections are susceptible to
+man-in-the-middle attacks. Use only for testing.
+
 
 [[redis-output]]
 ==== Redis Output
