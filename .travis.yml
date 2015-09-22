@@ -7,6 +7,16 @@ os:
 go:
   - 1.5.1
 
+env:
+  - TARGETS="check full-coverage"
+  - TARGETS="crosscompile"
+
+# Only execute the crosscompile target one time during the build.
+matrix:
+  exclude:
+    - os: osx
+      env: TARGETS="crosscompile"
+
 sudo: false
 
 addons:
@@ -26,9 +36,7 @@ install:
   - make
 
 script:
-  - make check
-  - make full-coverage
-  - make crosscompile
+  - make $TARGETS
 
 notifications:
   email:
@@ -39,4 +47,4 @@ notifications:
 
 after_success:
   # Copy profile.cov to coverage.txt because codecov.io requires this file
-  - bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
+  - test -f coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
