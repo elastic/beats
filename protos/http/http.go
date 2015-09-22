@@ -182,11 +182,6 @@ func (http *Http) GetPorts() []int {
 	return http.Ports
 }
 
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
-
 func (http *Http) Init(test_mode bool, results publisher.Client) error {
 	http.InitDefaults()
 
