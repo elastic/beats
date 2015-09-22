@@ -1,8 +1,9 @@
 package input
 
 import (
-	"github.com/elastic/libbeat/logp"
 	"os"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 func fileIds(info *os.FileInfo) (uint64, uint64) {
@@ -15,13 +16,21 @@ func SafeFileRotate(path, tempfile string) error {
 	old := path + ".old"
 	var e error
 
+	// In Windows, one cannot rename a file if the destination already exists, at least
+	// not with using the os.Rename function that Golang offers.
+	// This tries to move the existing file into an old file first and only do the
+	// move after that.
+	if e = os.Remove(old); e != nil {
+		logp.Debug("filecompare", "delete old: %v", e)
+		// ignore error in case old doesn't exit yet
+	}
 	if e = os.Rename(path, old); e != nil {
-		logp.Info("rotate: rename of %s to %s - %s", path, old, e)
-		return e
+		logp.Debug("filecompare", "rotate to old: %v", e)
+		// ignore error in case path doesn't exist
 	}
 
 	if e = os.Rename(tempfile, path); e != nil {
-		logp.Info("rotate: rename of %s to %s - %s", tempfile, path, e)
+		logp.Err("rotate: %v", e)
 		return e
 	}
 	return nil

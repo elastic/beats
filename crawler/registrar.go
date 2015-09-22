@@ -75,7 +75,7 @@ func (r *Registrar) WriteState(input chan []*FileEvent) {
 
 		if e := r.writeRegistry(); e != nil {
 			// REVU: but we should panic, or something, right?
-			logp.Warn("WARNING: (continuing) update of registry returned error: %s", e)
+			logp.Err("Update of registry returned error: %v. Continuing..", e)
 		}
 	}
 	logp.Debug("registrar", "Ending Registrar")
