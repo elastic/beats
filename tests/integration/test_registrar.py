@@ -55,17 +55,22 @@ class Test(TestCase):
         # Check that right source field is inside
         assert data[logFileAbs]['source'] == logFileAbs
 
+
+        # WARNING: These asserts will only pass on non windows machines
+
         # Check that inode is set correctly
         inode = os.stat(logFileAbs).st_ino
-        assert os.name == "nt" or data[logFileAbs]['inode'] == inode
+
+        assert os.name == "nt" or data[logFileAbs]['FileStateOS']['inode'] == inode
 
         # Check that device is set correctly
         device = os.stat(logFileAbs).st_dev
-        assert os.name == "nt" or data[logFileAbs]['device'] == device
+        assert os.name == "nt" or data[logFileAbs]['FileStateOS']['device'] == device
 
         # Check that no additional info is in the file
         assert len(data) == 1
-        assert len(data[logFileAbs]) <= 4
+        assert len(data[logFileAbs]) <= 3
+        assert len(data[logFileAbs]['FileStateOS']) <= 2
 
     def test_registrar_files(self):
         """

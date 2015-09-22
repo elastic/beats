@@ -238,7 +238,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.ProspectorConfig.IgnoreOlderDuration, file)
 			newinfo.Harvester <- newinfo.Fileinfo.Size()
 		}
-	} else if previousFile := p.isFileRenamed(file, newinfo.Fileinfo); previousFile != "" {
+	} else if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 		newinfo.Harvester = p.prospectorList[previousFile].Harvester
@@ -281,7 +281,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 	if !oldFile.IsSameFile(newFile) {
 
-		if previousFile := p.isFileRenamed(file, newinfo.Fileinfo); previousFile != "" {
+		if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
 			// This file was renamed from another file we know - link the same harvester channel as the old file
 			logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 			logp.Debug("prospector", "Launching harvester on renamed file: %s", file)

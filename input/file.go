@@ -6,16 +6,6 @@ import (
 	"github.com/elastic/libbeat/logp"
 )
 
-type FileEvent struct {
-	Source *string
-	Offset int64
-	Line   uint64
-	Text   *string
-	Fields *map[string]string
-
-	Fileinfo *os.FileInfo
-}
-
 type File struct {
 	File      *os.File
 	FileInfo  os.FileInfo
@@ -23,18 +13,32 @@ type File struct {
 	FileState *FileState
 }
 
+// FileEvent is sent to the output and must contain all relevant information
+type FileEvent struct {
+	Source   *string
+	Offset   int64
+	Line     uint64
+	Text     *string
+	Fields   *map[string]string
+	Fileinfo *os.FileInfo
+}
+
+type FileState struct {
+	Source      *string `json:"source,omitempty"`
+	Offset      int64   `json:"offset,omitempty"`
+	FileStateOS *FileStateOS
+}
+
 // Builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
 
-	ino, dev := fileIds(f.Fileinfo)
 	state := &FileState{
 		Source: f.Source,
 		// take the offset + length of the line + newline char and
 		// save it as the new starting offset.
 		// This issues a problem, if the EOL is a CRLF! Then on start it read the LF again and generates a event with an empty line
-		Offset: f.Offset + int64(len(*f.Text)) + 1, // REVU: this is begging for BUGs
-		Inode:  ino,
-		Device: dev,
+		Offset:      f.Offset + int64(len(*f.Text)) + 1, // REVU: this is begging for BUGs
+		FileStateOS: GetOSFileState(f.Fileinfo),
 	}
 
 	return state
