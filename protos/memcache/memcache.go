@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/protos"
@@ -18,7 +19,7 @@ import (
 // memcache types
 type Memcache struct {
 	Ports   protos.PortsConfig
-	results chan common.MapStr
+	results publisher.Client
 	config  parserConfig
 
 	udpMemcache
@@ -100,7 +101,7 @@ type memcacheStat struct {
 var debug = logp.MakeDebug("memcache")
 
 // Called to initialize the Plugin
-func (mc *Memcache) Init(testMode bool, results chan common.MapStr) error {
+func (mc *Memcache) Init(testMode bool, results publisher.Client) error {
 	debug("init memcache plugin")
 	return mc.InitWithConfig(
 		config.ConfigSingleton.Protocols.Memcache,
@@ -119,7 +120,7 @@ func (mc *Memcache) InitDefaults() {
 func (mc *Memcache) InitWithConfig(
 	config config.Memcache,
 	testMode bool,
-	results chan common.MapStr,
+	results publisher.Client,
 ) error {
 	mc.InitDefaults()
 	if !testMode {
@@ -174,7 +175,7 @@ func (mc *Memcache) onTransaction(t *transaction) {
 	event := common.MapStr{}
 	t.Event(event)
 	debug("publish event: %s", event)
-	mc.results <- event
+	mc.results.PublishEvent(event)
 }
 
 func newMessage(ts time.Time) *message {

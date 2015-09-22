@@ -166,20 +166,22 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	pb.over = make(chan bool)
 
-	logp.Debug("main", "Initializing filters")
-	afterInputsQueue, err := filters.FiltersRun(
-		config.ConfigSingleton.Filter,
-		EnabledFilterPlugins,
-		b.Events,
-		b.Stop)
+	/*
+		logp.Debug("main", "Initializing filters")
+		_, err = filters.FiltersRun(
+			config.ConfigSingleton.Filter,
+			EnabledFilterPlugins,
+			b.Events,
+			b.Stop)
 
-	if err != nil {
-		logp.Critical("%v", err)
-		os.Exit(1)
-	}
+		if err != nil {
+			logp.Critical("%v", err)
+			os.Exit(1)
+		}
+	*/
 
 	logp.Debug("main", "Initializing sniffer")
-	err = pb.Sniff.Init(false, afterInputsQueue, tcpProc, udpProc)
+	err = pb.Sniff.Init(false, tcpProc, udpProc)
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)
 		os.Exit(1)

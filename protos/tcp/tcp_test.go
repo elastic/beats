@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ type TestProtocol struct {
 
 var _ protos.ProtocolPlugin = &TestProtocol{}
 
-func (proto TestProtocol) Init(test_mode bool, results chan common.MapStr) error {
+func (proto *TestProtocol) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 
@@ -151,7 +152,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 	rand.Seed(18)
 	p := protocols{}
 	p.tcp = make(map[protos.Protocol]protos.TcpProtocolPlugin)
-	p.tcp[1] = TestProtocol{Ports: []int{ServerPort}}
+	p.tcp[1] = &TestProtocol{Ports: []int{ServerPort}}
 	tcp, _ := NewTcp(p)
 
 	b.ResetTimer()

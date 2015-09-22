@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -225,7 +226,7 @@ type Dns struct {
 	// associated with the request.
 	transactions *common.Cache
 
-	results chan common.MapStr // Channel where results are pushed.
+	results publisher.Client // Channel where results are pushed.
 }
 
 // getTransaction returns the transaction associated with the given
@@ -276,7 +277,7 @@ func (dns *Dns) setFromConfig(config config.Dns) error {
 	return nil
 }
 
-func (dns *Dns) Init(test_mode bool, results chan common.MapStr) error {
+func (dns *Dns) Init(test_mode bool, results publisher.Client) error {
 	dns.initDefaults()
 	if !test_mode {
 		dns.setFromConfig(config.ConfigSingleton.Protocols.Dns)
@@ -426,7 +427,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 		}
 	}
 
-	dns.results <- event
+	dns.results.PublishEvent(event)
 }
 
 // Adds the DNS message data to the supplied MapStr.

@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -96,7 +97,7 @@ type Pgsql struct {
 	Send_response bool
 
 	transactions *common.Cache
-	results      chan common.MapStr
+	results      publisher.Client
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -141,7 +142,7 @@ func (pgsql *Pgsql) GetPorts() []int {
 	return pgsql.Ports
 }
 
-func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
+func (pgsql *Pgsql) Init(test_mode bool, results publisher.Client) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
@@ -928,7 +929,7 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 		event["notes"] = t.Notes
 	}
 
-	pgsql.results <- event
+	pgsql.results.PublishEvent(event)
 }
 
 func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,

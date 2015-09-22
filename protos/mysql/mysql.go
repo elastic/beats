@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -121,7 +122,7 @@ type Mysql struct {
 
 	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
 
 	// function pointer for mocking
 	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
@@ -166,7 +167,7 @@ func (mysql *Mysql) GetPorts() []int {
 	return mysql.Ports
 }
 
-func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
+func (mysql *Mysql) Init(test_mode bool, results publisher.Client) error {
 
 	mysql.InitDefaults()
 	if !test_mode {
@@ -859,7 +860,7 @@ func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	mysql.results <- event
+	mysql.results.PublishEvent(event)
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {

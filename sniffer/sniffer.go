@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 
 	"github.com/elastic/packetbeat/config"
@@ -229,8 +228,11 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(test_mode bool, events chan common.MapStr,
-	tcp tcp.Processor, udp udp.Processor) error {
+func (sniffer *SnifferSetup) Init(
+	test_mode bool,
+	tcp tcp.Processor,
+	udp udp.Processor,
+) error {
 	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
 		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
 		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans)

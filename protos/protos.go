@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 )
 
 const (
@@ -58,7 +59,7 @@ func validatePorts(ports []int) error {
 // Functions to be exported by a protocol plugin
 type ProtocolPlugin interface {
 	// Called to initialize the Plugin
-	Init(test_mode bool, results chan common.MapStr) error
+	Init(test_mode bool, results publisher.Client) error
 
 	// Called to return the configured ports
 	GetPorts() []int

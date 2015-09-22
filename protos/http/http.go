@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -120,7 +121,7 @@ type Http struct {
 
 	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
 }
 
 func (http *Http) getTransaction(k common.HashableTcpTuple) *HttpTransaction {
@@ -181,8 +182,7 @@ func (http *Http) GetPorts() []int {
 	return http.Ports
 }
 
-func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
-
+func (http *Http) Init(test_mode bool, results publisher.Client) error {
 	http.InitDefaults()
 
 	if !test_mode {
@@ -896,7 +896,7 @@ func (http *Http) publishTransaction(t *HttpTransaction) {
 		event["notes"] = t.Notes
 	}
 
-	http.results <- event
+	http.results.PublishEvent(event)
 }
 
 func parseCookieValue(raw string) string {

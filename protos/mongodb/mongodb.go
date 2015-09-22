@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
@@ -22,7 +23,7 @@ type Mongodb struct {
 
 	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
 }
 
 func (mongodb *Mongodb) getTransaction(k common.HashableTcpTuple) *MongodbTransaction {
@@ -62,7 +63,7 @@ func (mongodb *Mongodb) GetPorts() []int {
 	return mongodb.Ports
 }
 
-func (mongodb *Mongodb) Init(test_mode bool, results chan common.MapStr) error {
+func (mongodb *Mongodb) Init(test_mode bool, results publisher.Client) error {
 	logp.Debug("mongodb", "Init a MongoDB protocol parser")
 
 	mongodb.InitDefaults()
@@ -353,5 +354,5 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 		}
 	}
 
-	mongodb.results <- event
+	mongodb.results.PublishEvent(event)
 }

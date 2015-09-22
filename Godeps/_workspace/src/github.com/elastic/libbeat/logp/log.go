@@ -63,7 +63,7 @@ func Debug(selector string, format string, v ...interface{}) {
 
 func MakeDebug(selector string) func(string, ...interface{}) {
 	return func(msg string, v ...interface{}) {
-		debugMessage(4, selector, msg, v...)
+		debugMessage(3, selector, msg, v...)
 	}
 }
 
