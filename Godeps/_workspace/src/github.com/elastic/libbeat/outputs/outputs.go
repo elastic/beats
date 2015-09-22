@@ -33,6 +33,7 @@ type MothershipConfig struct {
 	Certificate        string
 	CertificateKey     string
 	CAs                []string
+	TLSInsecure        *bool
 }
 
 type Outputer interface {

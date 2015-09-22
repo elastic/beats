@@ -111,7 +111,7 @@ func (b *bulkWorker) onEvents(signal outputs.Signaler, events []common.MapStr) {
 }
 
 func (b *bulkWorker) publish() {
-	b.send(message{
+	b.output.send(message{
 		signal: outputs.NewCompositeSignaler(b.pending...),
 		events: b.events,
 	})
