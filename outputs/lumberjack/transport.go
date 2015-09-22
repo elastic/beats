@@ -105,7 +105,7 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 	tlsconfig.ServerName = host
 
 	if err := c.tcpClient.Connect(timeout); err != nil {
-		return err
+		return c.onFail(err)
 	}
 
 	socket := tls.Client(c.Conn, &tlsconfig)
@@ -124,6 +124,7 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 }
 
 func (c *tlsClient) onFail(err error) error {
+	logp.Err("SSL client failed to connect with: %v", err)
 	c.Conn = nil
 	c.connected = false
 	return err
