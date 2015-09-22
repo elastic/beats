@@ -11,6 +11,8 @@ packetbeat.test
 /profile.cov
 /cover/coverage.html
 /docs/html_docs
+.DS_Store
+*.dev.yml
 
 # Folders
 _obj
