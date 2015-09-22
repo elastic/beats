@@ -1,9 +1,10 @@
 package input
 
 import (
-	"github.com/elastic/libbeat/logp"
 	"os"
 	"reflect"
+
+	"github.com/elastic/libbeat/logp"
 )
 
 type FileStateOS struct {
@@ -17,7 +18,7 @@ func GetOSFileState(info *os.FileInfo) *FileStateOS {
 
 	// Gathering fileStat (which is fileInfo) through reflection as otherwise not accessible
 	// See https://github.com/golang/go/blob/90c668d1afcb9a17ab9810bce9578eebade4db56/src/os/stat_windows.go#L33
-	fileStat := reflect.ValueOf(info).Elem()
+	fileStat := reflect.ValueOf(*info).Elem()
 
 	// Get the three fields required to uniquely identify file und windows
 	// More details can be found here: https://msdn.microsoft.com/en-us/library/aa363788(v=vs.85).aspx
