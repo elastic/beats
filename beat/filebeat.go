@@ -141,7 +141,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 	// Receives events from spool during flush
 	for events := range fb.publisherChan {
 
-		eventsSlice := make([]common.MapStr, len(events))
+		pubEvents := make([]common.MapStr, 0, len(events))
 
 		logp.Debug("filebeat", "Send events to output")
 		for _, event := range events {
@@ -156,10 +156,10 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 				"type":      "log",
 			}
 
-			eventsSlice = append(eventsSlice, bEvent)
+			pubEvents = append(pubEvents, bEvent)
 		}
 
-		publishEvents(beat.Events, eventsSlice)
+		publishEvents(beat.Events, pubEvents)
 
 		logp.Debug("filebeat", "Events sent: %d", len(events))
 
