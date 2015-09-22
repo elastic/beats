@@ -59,12 +59,14 @@ func (c *client) getClient(opts []ClientOption) eventPublisher {
 }
 
 // PublishEvent will publish the event on the channel. Options will be ignored.
+// Always returns true.
 func (c ChanClient) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	c.Channel <- event
 	return true
 }
 
 // PublishEvents publishes all event on the configured channel. Options will be ignored.
+// Always returns true.
 func (c ChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
 	for _, event := range events {
 		c.Channel <- event
