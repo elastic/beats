@@ -15,7 +15,7 @@ type Spooler struct {
 func NewSpooler(filebeat *Filebeat) *Spooler {
 	return &Spooler{
 		Filebeat: filebeat,
-		running:  true,
+		running:  false,
 	}
 }
 
@@ -52,6 +52,9 @@ func (s *Spooler) Start() {
 	// holding on to spooled events for too long.
 
 	config := &s.Filebeat.FbConfig.Filebeat
+
+	// Enable running
+	s.running = true
 
 	ticker := time.NewTicker(config.IdleTimeoutDuration / 2)
 
