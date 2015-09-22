@@ -138,7 +138,6 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	return 0, false
 }
 
-
 // getPreviousFile checks in the registrar if there is the newFile already exist with a different name
 // In case an old file is found, the path to the file is returned
 func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) string {

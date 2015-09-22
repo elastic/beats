@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 // TODO: Tests to be implemented
 // * Check file renaming
 // * Check file ids for moved files (windows)
