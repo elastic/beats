@@ -19,7 +19,7 @@ func NewSpooler(filebeat *Filebeat) *Spooler {
 	}
 }
 
-func (spooler *Spooler) Init() error {
+func (spooler *Spooler) Config() error {
 	config := &spooler.Filebeat.FbConfig.Filebeat
 
 	// Set default pool size if value not set

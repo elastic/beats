@@ -101,7 +101,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler := NewSpooler(fb)
-	err := spooler.Init()
+	err := spooler.Config()
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
