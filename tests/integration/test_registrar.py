@@ -60,6 +60,7 @@ class Test(TestCase):
 
         # Check that inode is set correctly
         inode = os.stat(logFileAbs).st_ino
+
         assert os.name == "nt" or data[logFileAbs]['FileStateOS']['inode'] == inode
 
         # Check that device is set correctly
