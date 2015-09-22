@@ -27,7 +27,6 @@ type Config struct {
 type FilebeatConfig struct {
 	Prospectors         []ProspectorConfig
 	SpoolSize           uint64 `yaml:"spoolSize"`
-	CpuProfileFile      string // TODO: Still needed?
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
 	RegistryFile        string

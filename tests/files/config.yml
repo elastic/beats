@@ -26,7 +26,6 @@ filebeat:
       input: stdin
       # Paths is not required
   spoolSize: 1024
-  cpuProfileFile:
   idleTimeout: 5s
   tailOnRotate:
 

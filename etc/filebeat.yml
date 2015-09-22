@@ -2,59 +2,74 @@
 
 ############################# Filbeat ######################################
 filebeat:
-  # List of prospectors to fetch data
+  # List of prospectors to fetch data.
   prospectors:
+    # Each - is a prospector. Below are the prospector specific configurations
     -
-      # Paths that should be crawled and fetched
+      # Paths that should be crawled and fetched. Glob based paths.
+      # For each file found under this path, a harvester is started.
       paths:
         - /var/log/*.log
 
-      # Type of the files. Based on this the way the file is read is decided. The different types cannot be mixed.
+      # Type of the files. Based on this the way the file is read is decided.
+      # The different types cannot be mixed in one prospector
       #
       # Possible options are:
       # * log: Reads every line of the log file (default)
-      # * file: Sends the full file on change. This replaces fsRiver
-      # * meta: Reads new meta information on file change
       # * stdin: Reads the standard in
       type: log
 
-      # Optional additional fields
-      fields:
-        level: debug
-        review: 1
+      # Optional additional fields. These field can be freely picked
+      # to add additional information to the crawled log files for filtering
+      #fields:
+      #  level: debug
+      #  review: 1
 
       # Ignore files which were modified more then the defined timespan in the past
-      ignoreOlder:
+      # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+      #ignoreOlder:
 
       # Scan frequency in seconds.
       # How often these files should be checked for changes. In case it is set
       # to 0s, it is done as often as possible. Default: 10s
-      scanFrequency: 10s
+      #scanFrequency: 10s
 
       # Defines the buffer size every harvester uses when fetching the file
-      harvesterBufferSize: 16384
+      #harvesterBufferSize: 16384
 
       # Always tail on log rotation. Disabled by default
       # Note: This may skip entries
-      tailOnRotate: false
-    -
-      fields:
-      paths:
-        - /var/log/test.log
-      type: log
-      # Regexp log line filter (not implemented yet)
-      filter: "regexp"
-      ignoreOlder: 24h
-    -
-      fields:
-      type: stdin
-      paths:
-        - "-"
+      #tailOnRotate: false
+
+    #-
+    #  paths:
+    #    - /var/log/apache/*.log
+    #  type: log
+    #
+    #  # Ignore files which are older then 24 hours
+    #  ignoreOlder: 24h
+    #
+    #  # Additional fields which can be freely defined
+    #  fields:
+    #    type: apache
+    #    server: localhost
+    #-
+    #  type: stdin
+    #  paths:
+    #    - "-"
+  # General filebeat configuration options
+  #
   # Event count spool threshold - forces network flush if exceeded
-  spoolSize: 1024
-  idleTimeout: 5s
-  cpuProfileFile:
-  registryfile: .filebeat
+  #spoolSize: 1024
+
+  # Defines how often the spooler is flushed. After idleTimeout the spooler is
+  # Flush even though spoolSize is not reached.
+  #idleTimeout: 5s
+
+  # Name of the registry file. Per default it is put in the same directory as
+  # the executable binary. In case this is changed after running filebeat,
+  # indexing starts from the beginning again.
+  #registryfile: .filebeat
 
 
 ############################# Shipper ############################################
