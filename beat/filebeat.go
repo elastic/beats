@@ -141,10 +141,25 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 	// Receives events from spool during flush
 	for events := range fb.publisherChan {
 
+		eventsSlice := make([]common.MapStr, len(events))
+
 		logp.Debug("filebeat", "Send events to output")
 		for _, event := range events {
-			publishEvent(beat.Events, event)
+			bEvent := common.MapStr{
+				"timestamp": common.Time(time.Now()),
+				"source":    event.Source,
+				"offset":    event.Offset,
+				"line":      event.Line,
+				"text":      event.Text,
+				"fields":    event.Fields,
+				"fileinfo":  event.Fileinfo,
+				"type":      "log",
+			}
+
+			eventsSlice = append(eventsSlice, bEvent)
 		}
+
+		publishEvents(beat.Events, eventsSlice)
 
 		logp.Debug("filebeat", "Events sent: %d", len(events))
 
@@ -153,22 +168,12 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 	}
 }
 
-func publishEvent(client publisher.Client, event *FileEvent) {
-	bEvent := common.MapStr{
-		"timestamp": common.Time(time.Now()),
-		"source":    event.Source,
-		"offset":    event.Offset,
-		"line":      event.Line,
-		"text":      event.Text,
-		"fields":    event.Fields,
-		"fileinfo":  event.Fileinfo,
-		"type":      "log",
-	}
+func publishEvents(client publisher.Client, events []common.MapStr) {
 
 	// Sends event to beat (outputs).
-	// Wait/Repeat until event was published for sure
+	// Wait/Repeat until all events are published
 	for {
-		ok := client.PublishEvent(bEvent, publisher.Confirm)
+		ok := client.PublishEvents(events, publisher.Confirm)
 		if ok {
 			break
 		}
