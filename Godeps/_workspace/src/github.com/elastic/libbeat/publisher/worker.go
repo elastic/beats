@@ -74,6 +74,12 @@ func (ws *workerSignal) stop() {
 	ws.wg.Wait()
 }
 
+func newWorkerSignal() *workerSignal {
+	w := &workerSignal{}
+	w.Init()
+	return w
+}
+
 func (ws *workerSignal) Init() {
 	ws.done = make(chan struct{})
 }

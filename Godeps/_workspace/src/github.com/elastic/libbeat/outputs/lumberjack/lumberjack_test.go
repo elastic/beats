@@ -232,38 +232,29 @@ func TestLumberjackTLS(t *testing.T) {
 
 	genCertsIfMIssing(t, pem, key)
 
-	tlsFiles, err := loadTLSConfig(&TLSConfig{
-		Certificate: pem,
-		Key:         key,
-		CAs:         []string{pem},
-	})
-	if err != nil {
-		t.Fatalf("failed to load certificates")
-	}
-
-	var tlsconfig tls.Config
-	tlsconfig.MinVersion = tls.VersionTLS10
-	tlsconfig.RootCAs = tlsFiles.RootCAs
-	tlsconfig.Certificates = tlsFiles.Certificates
-	tlsconfig.ServerName = "localhost"
-
 	tcpListener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to generate TCP listener")
 	}
-
-	listener := tls.NewListener(tcpListener, &tlsconfig)
 
 	// create lumberjack output client
 	useTLS := true
 	config := outputs.MothershipConfig{
 		TLS:            &useTLS,
 		Timeout:        5,
-		Hosts:          []string{listener.Addr().String()},
+		Hosts:          []string{tcpListener.Addr().String()},
 		Certificate:    pem,
 		CertificateKey: key,
 		CAs:            []string{pem},
 	}
+
+	tlsConfig, err := outputs.LoadTLSConfig(config)
+	if err != nil {
+		tcpListener.Close()
+		t.Fatalf("failed to load certificates")
+	}
+
+	listener := tls.NewListener(tcpListener, tlsConfig)
 
 	// start server
 	var wg sync.WaitGroup

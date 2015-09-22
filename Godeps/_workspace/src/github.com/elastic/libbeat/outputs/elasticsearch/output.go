@@ -73,7 +73,12 @@ func (out *elasticsearchOutput) Init(
 		urls = append(urls, url)
 	}
 
-	es := NewElasticsearch(urls, config.Username, config.Password)
+	tlsConfig, err := outputs.LoadTLSConfig(config)
+	if err != nil {
+		return err
+	}
+
+	es := NewElasticsearch(urls, tlsConfig, config.Username, config.Password)
 	out.Conn = es
 
 	if config.Index != "" {
@@ -253,7 +258,7 @@ func (out *elasticsearchOutput) BulkPublish(
 		}
 
 		for _, event := range events {
-			ts := event["ts"].(time.Time)
+			ts := time.Time(event["timestamp"].(common.Time))
 			index := fmt.Sprintf("%s-%d.%02d.%02d",
 				out.Index, ts.Year(), ts.Month(), ts.Day())
 			meta := common.MapStr{

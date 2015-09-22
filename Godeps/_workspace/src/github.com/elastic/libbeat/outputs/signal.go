@@ -1,6 +1,8 @@
 package outputs
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
 // Signaler signals the completion of potentially asynchronous output operation.
 // Completed is send by output plugin when all events have been send. On failure or
@@ -37,7 +39,7 @@ type CompositeSignal struct {
 func NewSplitSignaler(
 	s Signaler,
 	count int,
-) *SplitSignal {
+) Signaler {
 	if s == nil {
 		return nil
 	}
@@ -71,7 +73,7 @@ func (s *SplitSignal) onEvent() {
 }
 
 // NewCompositeSignaler creates a new composite signaler.
-func NewCompositeSignaler(signalers ...Signaler) *CompositeSignal {
+func NewCompositeSignaler(signalers ...Signaler) Signaler {
 	if len(signalers) == 0 {
 		return nil
 	}
@@ -82,7 +84,7 @@ func NewCompositeSignaler(signalers ...Signaler) *CompositeSignal {
 func (cs *CompositeSignal) Completed() {
 	for _, s := range cs.signalers {
 		if s != nil {
-			cs.Completed()
+			s.Completed()
 		}
 	}
 }
@@ -91,7 +93,7 @@ func (cs *CompositeSignal) Completed() {
 func (cs *CompositeSignal) Failed() {
 	for _, s := range cs.signalers {
 		if s != nil {
-			cs.Failed()
+			s.Failed()
 		}
 	}
 }
