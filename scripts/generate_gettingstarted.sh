@@ -6,7 +6,7 @@ OUTPUT=$2
 PB_VERSION=1.0.0-beta3
 ES_VERSION=1.5.2
 KIBANA_VERSION=4.0.2
-DASHBOARDS_VERSION=1.0.0-beta2
+DASHBOARDS_VERSION=1.0.0-beta3
 
 usage() {
     echo "Usage: $0 etc/gettingstarted.in.asciidoc etc/gettingstarted.asciidoc"

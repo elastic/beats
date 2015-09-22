@@ -309,13 +309,13 @@ it from the `config/kibana.yml` file.
 Now point your browser to port 5601 and you should see the Kibana web
 interface.
 
-The first thing you need to do is to configure the index pattern. In
-the *Index name or pattern* field enter `packetbeat-*` and for the *Time-field
-name* select `timestamp`.
+The first thing you need to do is to configure the index pattern. Select _Use event times to create index names_.
+In the _Index name or pattern_ field enter `[packetbeat-]YYYY.MM.DD` and for the _Time-field
+name_ select `timestamp`.
 
 image:./images/kibana-index-pattern.png[Kibana index pattern]
 
-If after you configure the `packetbeat-*` index pattern Kibana still says
+If after you configure the `[packetbeat-]YYYY.MM.DD` index pattern Kibana still says
 _Unable to fetch mapping. Do you have indices matching the pattern?_, it means
 that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
 some traffic was running on your servers and that Packetbeat could see it.
@@ -340,14 +340,16 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta2.tar.gz
-tar xzvf packetbeat-dashboards-1.0.0-beta2.tar.gz
-cd packetbeat-dashboards-1.0.0-beta2/
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta3.tar.gz
+tar xzvf packetbeat-dashboards-1.0.0-beta3.tar.gz
+cd packetbeat-dashboards-1.0.0-beta3/
 ./load.sh
 ----------------------------------------------------------------------
 
-To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
-icon. Select *Packetbeat Dashboard* from the list. You can then switch easier
-between the dashboards by using the *Navigation* widget.
+To open the loaded dashboards, go to the _Dashboard_ page and click the "Open"
+icon. Select _Packetbeat Dashboard_ from the list. You can then switch easier
+between the dashboards by using the _Navigation_ widget.
+
+image:./images/packetbeat-dashboard.png[Packetbeat statistics dashboard]
 
 Enjoy!
