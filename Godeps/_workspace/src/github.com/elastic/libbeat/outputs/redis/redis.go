@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -22,11 +23,11 @@ type RedisOutputPlugin struct{}
 
 func (f RedisOutputPlugin) NewOutput(
 	beat string,
-	config outputs.MothershipConfig,
+	config *outputs.MothershipConfig,
 	topology_expire int,
 ) (outputs.Outputer, error) {
 	output := &redisOutput{}
-	err := output.Init(beat, config, topology_expire)
+	err := output.Init(beat, *config, topology_expire)
 	if err != nil {
 		return nil, err
 	}
@@ -44,23 +45,21 @@ type redisOutput struct {
 	Index string
 	Conn  redis.Conn
 
-	TopologyExpire     time.Duration
-	ReconnectInterval  time.Duration
-	Hostname           string
-	Password           string
-	Db                 int
-	DbTopology         int
-	Timeout            time.Duration
-	DataType           redisDataType
-	FlushInterval      time.Duration
-	flush_immediatelly bool
+	TopologyExpire    time.Duration
+	ReconnectInterval time.Duration
+	Hostname          string
+	Password          string
+	Db                int
+	DbTopology        int
+	Timeout           time.Duration
+	DataType          redisDataType
 
-	TopologyMap  map[string]string
-	sendingQueue chan message
-	connected    bool
+	TopologyMap atomic.Value // Value holds a map[string][string]
+	connected   bool
 }
 
 type message struct {
+	trans outputs.Signaler
 	index string
 	msg   string
 }
@@ -93,26 +92,16 @@ func (out *redisOutput) Init(beat string, config outputs.MothershipConfig, topol
 		out.Index = beat
 	}
 
-	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != nil {
-		if *config.Flush_interval < 0 {
-			out.flush_immediatelly = true
-			logp.Warn("Flushing to REDIS on each push, performance migh be affected")
-		} else {
-			out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
-		}
-	}
-
 	out.ReconnectInterval = time.Duration(1) * time.Second
 	if config.Reconnect_interval != 0 {
 		out.ReconnectInterval = time.Duration(config.Reconnect_interval) * time.Second
 	}
 
-	exp_sec := 15
+	expSec := 15
 	if topology_expire != 0 {
-		exp_sec = topology_expire
+		expSec = topology_expire
 	}
-	out.TopologyExpire = time.Duration(exp_sec) * time.Second
+	out.TopologyExpire = time.Duration(expSec) * time.Second
 
 	switch config.DataType {
 	case "", "list":
@@ -129,17 +118,13 @@ func (out *redisOutput) Init(beat string, config outputs.MothershipConfig, topol
 	}
 	logp.Info("[RedisOutput] Redis connection timeout %s", out.Timeout)
 	logp.Info("[RedisOutput] Redis reconnect interval %s", out.ReconnectInterval)
-	logp.Info("[RedisOutput] Redis flushing interval %s", out.FlushInterval)
 	logp.Info("[RedisOutput] Using index pattern %s", out.Index)
 	logp.Info("[RedisOutput] Topology expires after %s", out.TopologyExpire)
 	logp.Info("[RedisOutput] Using db %d for storing events", out.Db)
 	logp.Info("[RedisOutput] Using db %d for storing topology", out.DbTopology)
 	logp.Info("[RedisOutput] Using %d data type", out.DataType)
 
-	out.sendingQueue = make(chan message, 1000)
-
 	out.Reconnect()
-	go out.SendMessagesGoroutine()
 
 	return nil
 }
@@ -185,59 +170,7 @@ func (out *redisOutput) Connect() error {
 }
 
 func (out *redisOutput) Close() {
-	out.Conn.Close()
-}
-
-func (out *redisOutput) SendMessagesGoroutine() {
-
-	var err error
-	var pending int
-	flushChannel := make(<-chan time.Time)
-
-	if !out.flush_immediatelly {
-		flushTicker := time.NewTicker(out.FlushInterval)
-		flushChannel = flushTicker.C
-	}
-
-	for {
-		select {
-		case queueMsg := <-out.sendingQueue:
-
-			if !out.connected {
-				logp.Debug("output_redis", "Droping pkt ...")
-				continue
-			}
-			logp.Debug("output_redis", "Send event to redis")
-			command := "RPUSH"
-			if out.DataType == RedisChannelType {
-				command = "PUBLISH"
-			}
-
-			if !out.flush_immediatelly {
-				err = out.Conn.Send(command, queueMsg.index, queueMsg.msg)
-				pending += 1
-			} else {
-				_, err = out.Conn.Do(command, queueMsg.index, queueMsg.msg)
-			}
-			if err != nil {
-				logp.Err("Fail to publish event to REDIS: %s", err)
-				out.connected = false
-				go out.Reconnect()
-			}
-		case _ = <-flushChannel:
-			if pending > 0 {
-				out.Conn.Flush()
-				_, err = out.Conn.Receive()
-				if err != nil {
-					logp.Err("Fail to publish event to REDIS: %s", err)
-					out.connected = false
-					go out.Reconnect()
-				}
-				logp.Debug("output_redis", "Flushed %d pending commands", pending)
-				pending = 0
-			}
-		}
-	}
+	_ = out.Conn.Close()
 }
 
 func (out *redisOutput) Reconnect() {
@@ -254,15 +187,17 @@ func (out *redisOutput) Reconnect() {
 }
 
 func (out *redisOutput) GetNameByIP(ip string) string {
-	name, exists := out.TopologyMap[ip]
-	if !exists {
-		return ""
+	topologyMap, ok := out.TopologyMap.Load().(map[string]string)
+	if ok {
+		name, exists := topologyMap[ip]
+		if exists {
+			return name
+		}
 	}
-	return name
+	return ""
 }
 
 func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
-
 	logp.Debug("output_redis", "[%s] Publish the IPs %s", name, localAddrs)
 
 	// connect to db
@@ -270,7 +205,7 @@ func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	_, err = conn.Do("HSET", name, "ipaddrs", strings.Join(localAddrs, ","))
 	if err != nil {
@@ -290,9 +225,7 @@ func (out *redisOutput) PublishIPs(name string, localAddrs []string) error {
 }
 
 func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
-
-	TopologyMapTmp := make(map[string]string)
-
+	topologyMapTmp := make(map[string]string)
 	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
 		logp.Err("Fail to get the all shippers from the topology map %s", err)
@@ -305,26 +238,82 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 		} else {
 			ipaddrs := strings.Split(res, ",")
 			for _, addr := range ipaddrs {
-				TopologyMapTmp[addr] = hostname
+				topologyMapTmp[addr] = hostname
 			}
 		}
 	}
 
-	out.TopologyMap = TopologyMapTmp
+	out.TopologyMap.Store(topologyMapTmp)
 
-	logp.Debug("output_redis", "Topology %s", TopologyMapTmp)
+	logp.Debug("output_redis", "Topology %s", topologyMapTmp)
 }
 
-func (out *redisOutput) PublishEvent(ts time.Time, event common.MapStr) error {
+func (out *redisOutput) PublishEvent(
+	signal outputs.Signaler,
+	ts time.Time,
+	event common.MapStr,
+) error {
+	return out.BulkPublish(signal, ts, []common.MapStr{event})
+}
 
-	json_event, err := json.Marshal(event)
-	if err != nil {
-		logp.Err("Fail to convert the event to JSON: %s", err)
+func (out *redisOutput) BulkPublish(
+	signal outputs.Signaler,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	if !out.connected {
+		logp.Debug("output_redis", "Droping pkt ...")
+		return errors.New("Not connected")
+	}
+
+	command := "RPUSH"
+	if out.DataType == RedisChannelType {
+		command = "PUBLISH"
+	}
+
+	if len(events) == 1 { // single event
+		event := events[0]
+		jsonEvent, err := json.Marshal(event)
+		if err != nil {
+			logp.Err("Fail to convert the event to JSON: %s", err)
+			outputs.SignalCompleted(signal)
+			return err
+		}
+
+		_, err = out.Conn.Do(command, out.Index, string(jsonEvent))
+		outputs.Signal(signal, err)
+		out.onFail(err)
 		return err
 	}
 
-	out.sendingQueue <- message{index: out.Index, msg: string(json_event)}
+	for _, event := range events {
+		jsonEvent, err := json.Marshal(event)
+		if err != nil {
+			logp.Err("Fail to convert the event to JSON: %s", err)
+			continue
+		}
+		err = out.Conn.Send(command, out.Index, string(jsonEvent))
+		if err != nil {
+			outputs.SignalFailed(signal)
+			out.onFail(err)
+			return err
+		}
+	}
+	if err := out.Conn.Flush(); err != nil {
+		outputs.Signal(signal, err)
+		out.onFail(err)
+		return err
+	}
+	_, err := out.Conn.Receive()
+	outputs.Signal(signal, err)
+	out.onFail(err)
+	return err
+}
 
-	logp.Debug("output_redis", "Publish event")
-	return nil
+func (out *redisOutput) onFail(err error) {
+	if err != nil {
+		logp.Err("Fail to publish event to REDIS: %s", err)
+		out.connected = false
+		go out.Reconnect()
+	}
 }
