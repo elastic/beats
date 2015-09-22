@@ -16,7 +16,8 @@ func TestNewSpoolerDefaultConfig(t *testing.T) {
 
 	fb := &Filebeat{FbConfig: fbConfig}
 	spooler := NewSpooler(fb)
-	spooler.Init()
+	err := spooler.Config()
+	assert.Nil(t, err)
 
 	assert.Equal(t, cfg.DefaultSpoolSize, fb.FbConfig.Filebeat.SpoolSize)
 	assert.Equal(t, cfg.DefaultIdleTimeout, fb.FbConfig.Filebeat.IdleTimeoutDuration)
@@ -31,7 +32,8 @@ func TestNewSpoolerSpoolSize(t *testing.T) {
 
 	fb := &Filebeat{FbConfig: fbConfig}
 	spooler := NewSpooler(fb)
-	spooler.Init()
+	err := spooler.Config()
+	assert.Nil(t, err)
 
 	assert.Equal(t, spoolSize, fb.FbConfig.Filebeat.SpoolSize)
 }
@@ -45,7 +47,8 @@ func TestNewSpoolerIdleTimeout(t *testing.T) {
 
 	fb := &Filebeat{FbConfig: fbConfig}
 	spooler := NewSpooler(fb)
-	spooler.Init()
+	err := spooler.Config()
+	assert.Nil(t, err)
 
 	assert.Equal(t, idleTimoeout, fb.FbConfig.Filebeat.IdleTimeout)
 }

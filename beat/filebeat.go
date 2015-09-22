@@ -83,25 +83,20 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.publisherChan = make(chan []*FileEvent, 1)
 	fb.RegistrarChan = make(chan []*FileEvent, 1)
 
-	persist := make(map[string]*FileState)
+	// Setup registrar to persist state
+	registrar := NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
 
-	registrar := &Registrar{
-		registryFile: fb.FbConfig.Filebeat.RegistryFile,
-	}
-	registrar.Init()
-
-	crawler := &Crawler{
-		Persist: make(chan *FileState),
-		// Load the previous log file locations now, for use in prospector
-		Files: make(map[string]*FileState),
+	crawl := &Crawler{
+		Registrar: registrar,
 	}
 
-	registrar.LoadState(crawler.Files)
-	crawler.Start(fb.FbConfig.Filebeat.Prospectors, persist, fb.SpoolChan)
+	// Load the previous log file locations now, for use in prospector
+	registrar.LoadState()
+	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.SpoolChan)
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	spooler := NewSpooler(fb)
-	err := spooler.Init()
+	err := spooler.Config()
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
@@ -110,13 +105,14 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	fb.Spooler = spooler
 
+	// TODO: Check if spooler shouldn't start earlier?
 	go spooler.Start()
 
 	// Publishes event to output
 	go Publish(b, fb)
 
 	// registrar records last acknowledged positions in all files.
-	registrar.WriteState(persist, fb.RegistrarChan)
+	registrar.WriteState(fb.RegistrarChan)
 
 	return nil
 }

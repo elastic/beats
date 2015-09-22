@@ -16,7 +16,7 @@ type Prospector struct {
 	prospectorList   map[string]ProspectorFileStat
 	iteration        uint32
 	lastscan         time.Time
-	crawler          *Crawler
+	registrar        *Registrar
 	missingFiles     map[string]os.FileInfo
 }
 
@@ -111,7 +111,7 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 	event := &input.FileState{
 		Source: nil,
 	}
-	p.crawler.Persist <- event
+	p.registrar.Persist <- event
 
 	for {
 		newlastscan := time.Now()
@@ -223,7 +223,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
+		offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
 		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
@@ -238,7 +238,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.ProspectorConfig.IgnoreOlderDuration, file)
 			newinfo.Harvester <- newinfo.Fileinfo.Size()
 		}
-	} else if previousFile := p.isFileRenamed(file, newinfo.Fileinfo); previousFile != "" {
+	} else if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 		newinfo.Harvester = p.prospectorList[previousFile].Harvester
@@ -246,7 +246,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 	} else {
 
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.crawler.fetchState(file, newinfo.Fileinfo)
+		offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a file or is this a completely new file?
 		if resuming {
@@ -281,7 +281,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 	if !oldFile.IsSameFile(newFile) {
 
-		if previousFile := p.isFileRenamed(file, newinfo.Fileinfo); previousFile != "" {
+		if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
 			// This file was renamed from another file we know - link the same harvester channel as the old file
 			logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 			logp.Debug("prospector", "Launching harvester on renamed file: %s", file)

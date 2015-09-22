@@ -10,8 +10,9 @@ import (
 // Check if the given file was renamed. If file is known but with different path,
 // renamed will be set true and previous will be set to the previously known file path.
 // Otherwise renamed will be false.
-func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
-	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
+func (p *Prospector) getPreviousFile(file string, info os.FileInfo) string {
+	// TODO: To implement this properly the file state of the previous file is required.
+	// For more details see how crawler implements it
 	stat := info.Sys().(*syscall.Stat_t)
 
 	for kf, ki := range p.prospectorList {
@@ -33,25 +34,5 @@ func (p *Prospector) isFileRenamed(file string, info os.FileInfo) string {
 	}
 
 	// NOTE(ruflin): should instead an error be returned if not previous file?
-	return ""
-}
-
-func (c *Crawler) isFileRenamed(file string, info os.FileInfo) string {
-	// NOTE(driskell): What about using golang's func os.SameFile(fi1, fi2 FileInfo) bool instead?
-	stat := info.Sys().(*syscall.Stat_t)
-
-	for kf, ki := range c.Files {
-
-		if kf == file {
-			continue
-		}
-
-		// Convert device values to uint64 to make sure to have same values across all platforms
-		// openbsd and darwin have int32
-		if uint64(stat.Dev) == ki.Device && stat.Ino == ki.Inode {
-			return kf
-		}
-	}
-
 	return ""
 }

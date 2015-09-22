@@ -21,27 +21,23 @@ import (
  		The publisher writes the state down with the registrar
 */
 
-// Last reading state of the prospector
 type Crawler struct {
-	// List of all files which were crawled with the state
-	Files map[string]*input.FileState
-	// TODO: Better explanation and potential renaming needed here for what this variable is.
-	Persist chan *input.FileState
+	// Registrar object to persist the state
+	Registrar *Registrar
 }
 
-func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[string]*input.FileState,
-	eventChan chan *input.FileEvent) {
+func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *input.FileEvent) {
 
 	pendingProspectorCnt := 0
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
 
-		logp.Debug("prospector", "File Config: %v", fileconfig)
+		logp.Debug("prospector", "File Configs: %v", fileconfig.Paths)
 
 		prospector := &Prospector{
 			ProspectorConfig: fileconfig,
-			crawler:          crawler,
+			registrar:        crawler.Registrar,
 		}
 
 		err := prospector.Init()
@@ -59,7 +55,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[strin
 	// When we hit a nil source a prospector had finished so we decrease the expected events
 	logp.Debug("prospector", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
 
-	for event := range crawler.Persist {
+	for event := range crawler.Registrar.Persist {
 		if event.Source == nil {
 			pendingProspectorCnt--
 			if pendingProspectorCnt == 0 {
@@ -67,45 +63,13 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, persist map[strin
 			}
 			continue
 		}
-		persist[*event.Source] = event
+		crawler.Registrar.State[*event.Source] = event
 		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
 	}
 
-	logp.Info("All prospectors initialised with %d states to persist", len(persist))
+	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
 }
 
 func (crawler *Crawler) Stop() {
 	// TODO: To be implemented for proper shutdown
-}
-
-func (crawler *Crawler) fetchState(filePath string, fileInfo os.FileInfo) (int64, bool) {
-
-	// Check if there is a state for this file
-	lastState, isFound := crawler.Files[filePath]
-
-	if isFound && input.IsSameFile(filePath, fileInfo) {
-		// We're resuming - throw the last state back downstream so we resave it
-		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		crawler.Persist <- lastState
-		return lastState.Offset, true
-	}
-
-	if previous := crawler.isFileRenamed(filePath, fileInfo); previous != "" {
-		// File has rotated between shutdown and startup
-		// We return last state downstream, with a modified event source with the new file name
-		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, filePath)
-
-		lastState := crawler.Files[previous]
-		lastState.Source = &filePath
-		crawler.Persist <- lastState
-		return lastState.Offset, true
-	}
-
-	if isFound {
-		logp.Debug("prospector", "Not resuming rotated file: %s", filePath)
-	}
-
-	// New file so just start from an automatic position
-	return 0, false
 }
