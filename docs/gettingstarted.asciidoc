@@ -340,14 +340,16 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta2.tar.gz
-tar xzvf packetbeat-dashboards-1.0.0-beta2.tar.gz
-cd packetbeat-dashboards-1.0.0-beta2/
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta3.tar.gz
+tar xzvf packetbeat-dashboards-1.0.0-beta3.tar.gz
+cd packetbeat-dashboards-1.0.0-beta3/
 ./load.sh
 ----------------------------------------------------------------------
 
-To open the loaded dashboards, go to the *Dashboard* page and click the "Open"
-icon. Select *Packetbeat Dashboard* from the list. You can then switch easier
-between the dashboards by using the *Navigation* widget.
+To open the loaded dashboards, go to the _Dashboard_ page and click the "Open"
+icon. Select _Packetbeat Dashboard_ from the list. You can then switch easier
+between the dashboards by using the _Navigation_ widget.
+
+image:./images/packetbeat-dashboard.png[Packetbeat statistics dashboard]
 
 Enjoy!
