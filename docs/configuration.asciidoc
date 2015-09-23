@@ -1,0 +1,416 @@
+[[configuration]]
+== Configuration
+
+The Beat configuration file uses
+http://yaml.org/[YAML] for its syntax. It consists of the following sections:
+
+* <<configuration-shipper>>
+* <<configuration-output>>
+* <<configuration-run-options>>
+
+[[configuration-shipper]]
+=== Shipper
+
+The shipper section contains options for the Beat shipper itself and some
+general settings regarding its behaviour.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  tags: ["service-X", "web-tier"]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  ignore_outgoing: true
+
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # The default is 10 seconds.
+  refresh_topology_freq: 10
+
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # All the IPs will be deleted afterwards. Note, that the value must be higher than
+  # refresh_topology_freq. The default is 15 seconds.
+  topology_expire: 15
+------------------------------------------------------------------------------
+
+==== Options
+
+===== name
+
+The name of the Beat shipper. If empty, the `hostname` of the server is
+used. This information is included in each transaction (the `shipper` field)
+published by the shipper and it can be used to group all the transactions sent by
+a single shipper.
+
+At startup, every Beat shipper registers itself to the network topology by
+publishing to Elasticsearch the IP and port together with its shipper name. This
+information is used to set both the `server` and `client_server` fields
+from transactions even when they are sniffed by another shipper.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  name: "my-shipper"
+------------------------------------------------------------------------------
+
+===== tags
+
+The tags of the shipper are included in the `tags` field with each transaction
+published. Tags make it easy to group servers by different logical properties.
+For example, if you have a cluster of web servers, you can add to the shippers on
+each of them the tag "webservers" and then use filters and queries in the
+Kibana web interface to get visualisations for the whole group of servers.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  tags: ["my-service", "hardware", "test"]
+------------------------------------------------------------------------------
+
+===== ignore_outgoing
+
+If the `ignore_outgoing` option is enabled, Beat shipper ignores all the
+transactions initiated from the server running the shipper.
+
+This is useful when two shippers publish the same transactions because one sees
+it in its outgoing queue and the other sees it in its incoming queue. In order
+to remove the duplications, you can enable this option on one of the servers.
+
+image:./images/option_ignore_outgoing.png[Shippers Architecture]
+
+For example, in case a shipper is installed on each server from a 3 servers
+architecture, t1 is the transaction exchanged between Server1 and Server2 and
+t2 is the transaction between Server2 and Server3, then both transactions are
+indexed twice as Shipper2 sees both transactions:
+
+Published transactions (ignore outgoing is false):
+
+ - Shipper1: t1
+ - Shipper2: t1 and t2
+ - Shipper3: t2
+
+To avoid duplications, you can enforce your shippers to send only the incoming
+transactions and ignore the transactions created by the local server:
+
+Published transactions (ignore outgoing is true):
+
+ - Shipper1: none
+ - Shipper2: t1
+ - Shipper3: t2
+
+===== refresh_topology_freq
+
+This setting settings controls the refreshing interval of the topology map in
+seconds. In other words, how often each shipper publishes its IP addresses to the
+topology map. The default is 10 seconds.
+
+===== topology_expire
+
+This setting controls the expiration time for the topology in seconds. This is
+useful in case a shipper stops publishing its IP addresses.  The IP addresses
+are removed automatically from the topology map after expiration. The default
+is 15 seconds.
+
+
+[[configuration-output]]
+=== Outputs
+
+Starting with Beat version 0.3.0, multiple outputs can be configured for
+exporting the correlated transactions. Currently the following output types are
+supported:
+
+* Elasticsearch
+* Redis
+* File
+
+One or multiple outputs can be enabled at a time. The output plugins are
+responsible for sending the transaction data in JSON format to the next step in
+the pipeline. In addition, they are also responsible for maintaining the
+network topology.
+
+==== Elasticsearch Output
+
+Sends the transactions directly to Elasticsearch by using the Elasticsearch
+HTTP API.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    # Uncomment out this option if you want to output to Elasticsearch. The
+    # default is false.
+    enabled: true
+
+    # Set the host and port where to find Elasticsearch.
+    hosts: ["localhost:9200"]
+
+    # Optional protocol and basic auth credentials
+    # protocol: "https"
+    # username: "admin"
+    # password: "s3cr3t"
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # Optional index name. The default is packetbeat and generates
+    # [packetbeat-]YYYY.MM.DD keys.
+    index: "packetbeat"
+
+    # Optional HTTP Path
+    path: "/elasticsearch"
+------------------------------------------------------------------------------
+
+
+===== enabled
+
+Boolean option that enables Elasticsearch as output. The default is true.
+
+===== hosts
+
+The list of Elasticsearch nodes to which to connect. The events are distributed to
+these nodes in round robin order. If one node becomes unreachable, the event is
+automatically sent to another node.
+
+===== host
+
+The host of the Elasticsearch server. This option is deprecated and only used if
+the `hosts` option is not present.
+
+===== port
+
+The port of the Elasticsearch server. This option is deprecated and only used if
+the `hosts` option is not present.
+
+===== protocol
+
+The name of the protocol Elasticsearch is reachable on. The options are:
+`http` or `https`. The default is `http`.
+
+===== username
+
+Basic authentication username for connecting to Elasticsearch.
+
+===== password
+
+Basic authentication password for connecting to Elasticsearch.
+
+
+===== index
+
+The index root name where to write events to. The default is `packetbeat` and
+generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
+
+==== max_retries
+
+The number of times a particular Elasticsearch index operation is attempted. If
+the indexing operation doesn't succeed after this many retries, the events are
+dropped. The default is 3.
+
+==== bulk_max_size
+
+The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+The default is 10000.
+
+==== flush_interval
+
+The number of seconds to wait for new events between two bulk API index requests.
+If `bulk_max_size` is reached before this interval expires, addition bulk index
+requests are made.
+
+===== path
+
+An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
+the API under a custom prefix.
+
+===== save_topology
+
+Boolean that sets if the topology is kept in Elasticsearch. The default is
+false. This option makes sense only for Packetbeat.
+
+==== topology_expire
+
+The time to live in seconds for the topology information that is stored in
+Elasticsearch. The default is 15 seconds.
+
+[[redis-output]]
+==== Redis Output
+
+////
+TODO: I think besides the list option, PUB-SUB is also supported here (there
+was a pull request some time ago. But that's not documented yet.
+////
+
+Inserts the transaction in a Redis list. This output plugin is compatibile with
+http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
+so Redis can be used as queue between the Beat shippers and Logstash.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+
+  redis:
+    # Uncomment out this option if you want to output to Redis. The default is false.
+    enabled: true
+
+    # Set the host and port where to find Redis.
+    host: "localhost"
+    port: 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # The default is false.
+    save_topology: true
+
+    # Optional index name. The default is packetbeat and generates packetbeat keys.
+    index: "packetbeat"
+
+    # Optional Redis database number where the events are stored
+    # The default is 0.
+    db: 0
+
+    # Optional Redis database number where the topology is stored
+    # The default is 1. It must have a different value than db.
+    db_topology: 1
+
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    # password: ""
+
+    # Optional Redis initial connection timeout in seconds.
+    # The default is 5 seconds.
+    timeout: 5
+
+    # Optional interval for reconnecting to failed Redis connections.
+    # The default is 1 second.
+    reconnect_interval: 1
+------------------------------------------------------------------------------
+
+
+===== enabled
+
+Boolean option that enables Redis as output. The default is false.
+
+===== host
+
+Host of the Redis server.
+
+===== port
+
+Port of the Redis server.
+
+===== db
+
+Redis database number where the events are published. The default is 0.
+
+===== db_topology
+
+Redis database number where the topology information is stored. The default is 1.
+
+===== index
+
+Name of the Redis list where the events are published. The default is
+`packetbeat`.
+
+===== password
+
+Password to authenticate with. The default is no authentication.
+
+===== timeout
+
+Redis initial connection timeout in seconds. The default is 5 seconds.
+
+===== reconnect_interval
+
+Interval for reconnecting failed Redis connections. The default is 1 second.
+
+==== File Output
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  file:
+    enabled: true
+    path: "/tmp/packetbeat"
+    filename: packetbeat
+    rotate_every_kb: 1000
+    number_of_files: 7
+------------------------------------------------------------------------------
+
+Dumps the transactions in a file where each transaction is in a JSON format.
+Currently, this output is used for testing, but it can be used as input for
+Logstash.
+
+===== enabled
+
+Boolean option that enables File as output. The default is false.
+
+===== path
+
+Path to the directory where to save the generated files. The option is
+mandatory.
+
+===== filename
+
+Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
+
+===== rotate_every_kb
+
+Maximum size in kilobytes of each file. When this size is reached, the files are
+rotated. The default value is 10 MB.
+
+===== number_of_files
+
+Maximum number of files under path. When this number of files is reached, the
+oldest file is deleted and the rest are shifted from last to first. The default
+is 7 files.
+
+[[configuration-run-options]]
+=== Run options (optional)
+
+The Beat shipper can drop privileges after creating the sniffing socket.
+Root access is required for opening the socket but everything else requires no
+privileges. Therefore, it is recommended to have the shipper switch users after
+the initialization phase.  `uid` and `gid` settings set the User Id and Group
+Id under which the shipper will run.
+
+WARNING: Because on Linux Setuid doesn't change the uid of all threads, the Go
+         garbage collector will continue to run as root. Also, note that process
+         monitoring only works when running as root.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+runoptions:
+  uid=501
+  gid=501
+------------------------------------------------------------------------------
+
