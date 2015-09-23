@@ -60,7 +60,11 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 func (beat *Beat) CommandLineSetup() {
 
 	// The -c flag is treated separately because it needs the Beat name
-	cfgfile.AddConfigCliFlag(beat.Name)
+	err := cfgfile.ChangeDefaultCfgfileFlag(beat.Name)
+	if err != nil {
+		fmt.Printf("Failed to fix the -c flag: %v\n", err)
+		os.Exit(0)
+	}
 
 	flag.Parse()
 
