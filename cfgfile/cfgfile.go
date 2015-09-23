@@ -14,8 +14,14 @@ var testConfig *bool
 
 func init() {
 	// The default config cannot include the beat name as it is not initialised when this function is called
-	configfile = flag.String("c", "/etc/beat/beat.yml", "Configuration file")
 	testConfig = flag.Bool("test", false, "Test configuration and exit.")
+}
+
+// AddConfigCliFlag adds the `-c` command line parameter with the default
+// set depending on the beat name. Needs to be called before parsing the flags.
+func AddConfigCliFlag(beatName string) {
+	configfile = flag.String("c", fmt.Sprintf("/etc/%s/%s.yml", beatName, beatName),
+		"Configuration file")
 }
 
 // Read reads the configuration from a yaml file into the given interface structure.
