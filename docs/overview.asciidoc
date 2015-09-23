@@ -1,8 +1,8 @@
 == Overview
 
 Packetbeat is a real-time network packet analyzer that can be used together
-with Elasticsearch to provide an application monitoring and performance
-analytics system.
+with Elasticsearch to provide an _application monitoring and performance
+analytics system_.
 
 It works by capturing the network traffic between your application servers,
 decoding the application layer protocols (HTTP, MySQL, Redis, etc.),
@@ -12,13 +12,6 @@ interesting <<exported-fields,fields>> for each transaction.
 It can help you easily notice issues with your back-end application, like bugs
 or performance problems, and it makes troubleshooting them - and therefore
 fixing them - much faster.
-
-The system consists of the following mandatory components:
-
- * Packetbeat
- * Elasticsearch
- * Kibana
-
 
 Packetbeat shippers sniff the traffic between your servers, parse on the fly the
 application level protocols and correlate the messages into transactions.
@@ -30,6 +23,8 @@ Currently, the Packetbeat shipper supports the following protocols:
  * Redis
  * Thrift-RPC
  * Mongodb
+ * DNS
+ * Memcache
 
 The shippers can insert the correlated transactions directly into Elasticsearch
 or via a central queue created with Redis and Logstash.
@@ -45,18 +40,10 @@ the responses in what we call "transactions" and for each such transaction it
 inserts a JSON document into Elasticsearch. See the <<exported-fields>> section
 for details about which fields are indexed.
 
-image:./images/app-monitoring-overview.png[Application Monitoring Overview]
-
 The same Elasticsearch and Kibana instance that are used for analysing the
 network traffic gathered by Packetbeat can be used for analysing the log files
 gathered by Logstash. This way, you can have network traffic and log analysis
 in the same system.
 
-Packetbeat can also insert the transactions in a Redis list. This makes it
-possible to use Redis + Logstash as a central collector and queue for
-transactions data. See <<packetbeat-logstash>> for details.
+See more details about TODO[Beats].
 
-image:./images/packetbeat-redis-overview.png[Logstash Integration]
-
-In the near future, a direct integration between Packetbeat and Logstash will
-be implemented, so the Redis instance will no longer be needed.

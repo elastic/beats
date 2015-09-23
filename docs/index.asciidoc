@@ -12,10 +12,6 @@ include::./https.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::./logstash.asciidoc[]
-
-include::./dashboards.asciidoc[]
-
 include::./thrift.asciidoc[]
 
 include::./windows.asciidoc[]
