@@ -41,7 +41,7 @@ build_script:
   - go build
   - go test ./...
   - go test -c -cover -covermode=count -coverpkg ./...
-  - ps: cd tests/integration
+  - ps: cd tests/system
   - nosetests
 
 # to disable automatic tests

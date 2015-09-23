@@ -29,7 +29,7 @@ unit:
 
 .PHONY: test
 test: unit
-	make -C ./tests/integration test
+	make -C ./tests/system test
 
 .PHONY: coverage
 coverage:
@@ -45,15 +45,15 @@ testsuite: filebeat
 	make coverage
 
 filebeat.test: $(GOFILES)
-	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
+	$(GODEP) go test -c -covermode=count -coverpkg ./...
 
 .PHONY: full-coverage
 full-coverage:
 	make coverage
-	make -C ./tests/integration coverage
+	make -C ./tests/system coverage
 	# Writes count mode on top of file
 	echo 'mode: count' > ./coverage/full.cov
-	# Collects all integration coverage files and skips top line with mode
+	# Collects all coverage files and skips top line with mode
 	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
 	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
 
