@@ -1,0 +1,353 @@
+[[beats-getting-started]]
+== Getting started
+
+
+The _Beats platform_ together with Elasticsearch and Kibana form an _open source 
+application monitoring solution_.
+
+ * _Beats shippers_ to collect the data. You should install these on
+   your servers so that they capture the data.
+ * _Elasticsearch_ for storage and indexing.
+ * _Kibana_ for the UI.
+
+For now, you can just install Elasticsearch and Kibana on a single VM or even
+on your laptop. The only condition is that this machine is accessible from the
+servers you want to monitor. As you add more shippers and your traffic grows, you
+will want replace the single Elasticsearch instance with a cluster. You will
+probably also want to automate the installation process.  But for now, let's
+just do the fun part.
+
+=== Elasticsearch installation
+
+http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
+storage, search and analytics engine. It can be used for many purposes, but one
+context where it excels is indexing streams of semi-structured data, like logs
+or decoded network packets.
+
+The binary packages of Elasticsearch have only one dependency: Java. Choose the
+tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
+mac for OS X):
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
+sudo dpkg -i elasticsearch-1.5.2.deb
+sudo /etc/init.d/elasticsearch start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
+sudo rpm -i elasticsearch-1.5.2.noarch.rpm
+sudo service elasticsearch start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
+unzip elasticsearch-1.5.2.zip
+cd elasticsearch-1.5.2
+./bin/elasticsearch
+----------------------------------------------------------------------
+
+You can learn more about installing, configuring and running Elasticsearch in
+http://www.elastic.co/guide/en/elasticsearch/guide/current/_installing_elasticsearch.html[Elasticsearch: The Definitive Guide].
+
+
+To test that the Elasticsearch daemon is up and running, try sending a HTTP GET
+request on port 9200:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://127.0.0.1:9200
+{
+  "status" : 200,
+  "name" : "Unicorn",
+  "cluster_name" : "elasticsearch",
+  "version" : {
+    "number" : "1.4.3",
+    "build_hash" : "36a29a7144cfde87a960ba039091d40856fcb9af",
+    "build_timestamp" : "2015-02-11T14:23:15Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.10.3"
+  },
+  "tagline" : "You Know, for Search"
+}
+----------------------------------------------------------------------
+
+=== Beat configuration
+
+Set the IP address and port where the shipper can find the Elasticsearch
+installation:
+
+[source,yaml]
+----------------------------------------------------------------------
+output:
+
+  elasticsearch:
+    # Uncomment out this option if you want to output to Elasticsearch. The
+    # default is false.
+    enabled: true
+
+    # Set the host and port where to find Elasticsearch.
+    host: 192.168.1.42
+    port: 9200
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false. 
+    # This option makes sense only for Packetbeat
+    save_topology: true
+----------------------------------------------------------------------
+
+Before starting the shipper, you should also load an
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is different for every Beat.
+
+The recommended template file is installed by the Beats Platform packages. Load it with the
+following command:
+
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+cd beats-1.0.0-beta3-darwin
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on
+Replace `packetbeat` with the beat name that you are running.
+
+
+[[logstash]]
+=== Using Logstash
+
+The simplest architecture for the Beat platform setup consists of the Beats shippers, Elasticsearch and Kibana.
+This is nice and easy to get started with and enough for networks with small traffic. It also uses the
+minimum amount of servers: a single machine running Elasticsearch + Kibana. The
+Beat shippers insert the transactions directly into the Elasticsearch
+instance.
+
+This article explains how to use the Beat together with Redis and Logstash to
+provide buffering and efficient indexing.  Another important advantage is that
+you have the opportunity in Logstash to modify the data captured by Beat
+any way you like. You can also use Logstash's many output plugins to integrate
+with other systems.
+
+WARNING: The Redis output is meant to be used only temporarily until the direct
+integration between the Beat and Logstash is implemented. We plan to use the
+same protocol as it is used between the
+https://github.com/elastic/logstash-forwarder[Logstash Forwarder] and Logstash.
+
+image:./images/packetbeat_logstash.png[Integration with Logstash]
+
+In this setup, the Beat shippers use the `RPUSH` Redis command to insert
+into a list stored in memory by Redis. Logstash reads from this key using the
+http://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis
+input plugin] and then sends the transactions to Elasticsearch using the
+http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
+output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
+indexing very efficient.
+
+To use this setup, disable the Elasticsearch output and use instead the
+<<redis-output,Redis output>> in the Beat configuration file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  redis:
+    # Uncomment out this option if you want to output to Redis.
+    # The default is false.
+    enabled: true
+
+    # Set the host and port where to find Redis.
+    host: "127.0.0.1"
+    port: 6379
+
+    # This option makes sense only for Packetbeat
+    save_topology: true
+------------------------------------------------------------------------------
+
+NOTE: If you want the Beat to monitor Redis traffic, it's better to change
+the port for the Redis instance that you use for collecting the traffic.
+Otherwise, you create a loop where the shipper captures the traffic it sends.
+
+Then, configure Logstash to read from Redis and index into Elasticsearch. Here
+is a sample configuration that you can save under `/etc/logstash/conf.d/`:
+
+[source,ruby]
+------------------------------------------------------------------------------
+input {
+    redis {
+        codec => "json"
+        host => "127.0.0.1"
+        port => 6379
+        data_type => "list"
+        key => "packetbeat"
+    }
+}
+
+output {
+    elasticsearch {
+        protocol => "http"
+        host => "127.0.0.1"
+        sniffing => true
+        manage_template => false
+        index => "packetbeat-%{+YYYY.MM.dd}"
+    }
+}
+------------------------------------------------------------------------------
+
+
+=== Starting the Beat shipper
+
+
+There is an _init.d_ script for each Beat that can be used for starting and stopping the Beat. 
+In the following examples, packetbeat is used as an example, but it can be any Beat.
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+Packetbeat is now ready to capture data from your network traffic. You can test
+that it works by creating a simple HTTP request. For example:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://www.elastic.co/ > /dev/null
+----------------------------------------------------------------------
+
+Now check that the data is present in Elasticsearch with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure to replace `localhost:9200` with the address of your Elasticsearch
+instance. It should return data about the HTTP transaction you just created.
+
+
+=== Kibana installation
+
+https://www.elastic.co/products/kibana[Kibana] is a visualization application
+that gets its data from Elasticsearch. It provides a customizable and
+user-friendly UI in which you can combine various widget types to create your
+own dashboards. The dashboards can be easily saved, shared and linked.
+
+For this tutorial, we recommend to install Kibana on the same server as
+Elasticsearch, but it is not required.
+
+Use the following commands to download and run Kibana:
+
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
+tar xzvf kibana-4.0.2-linux-x64.tar.gz
+cd kibana-4.0.2-linux-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-darwin-x64.tar.gz
+tar xzvf kibana-4.0.2-darwin-x64.tar.gz
+cd kibana-4.0.2-darwin-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+You can find Kibana binaries for other operating systems on the
+https://www.elastic.co/downloads/kibana[Kibana downloads page].
+
+If Kibana cannot reach the Elasticsearch server, you can adjust the settings for
+it from the `config/kibana.yml` file.
+
+Now point your browser to port 5601 and you should see the Kibana web
+interface.
+
+You can learn more about Kibana in the
+http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
+
+=== Load Kibana dashboards
+
+Kibana has a large set of visualization types which you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+https://github.com/elastic/beats-dashboards[Sample Dashboards] to give you a good start and to
+demonstrate what is possible based on the packet data.
+
+To load the sample pages, follow these steps:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/beats/packetbeat/beats-dashboards-1.0.0-beta2.tar.gz
+tar xzvf beats-dashboards-1.0.0-beta2.tar.gz
+cd beats-dashboards-1.0.0-beta2/
+./load.sh
+----------------------------------------------------------------------
+
+NOTE: In case the Elasticsearch is not running on `127.0.0.1:9200`, you need to specify the Elasticsearch location
+as argument of the load.sh command line:
+
+[source,shell]
+-------------------------------------------------------------------------
+./load.sh http://192.168.33.60:9200
+-------------------------------------------------------------------------
+
+The load command uploads the example dashboards with the visualizations and searches that can be used.
+Additionally, the index patterns for Packetbeat and Topbeat are created:
+
+   - [packetbeat-]YYYY.MM.DD
+   - [topbeat-]YYYY.MM.DD
+   - [filebeat-]YYYY.MM.DD
+
+After loading the dashboards, Kibana rises the following error 
+`No default index pattern. You must select or create one to continue.` that can be solved
+by setting one index pattern as favorite.
+
+image:./images/kibana-created-indexes.png[Kibana configured indexes]
+
+To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
+icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
+between the dashboards by using the `Navigation` widget.
+
+image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
+
+Enjoy!
