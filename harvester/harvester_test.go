@@ -6,7 +6,7 @@ import (
 )
 
 // Most harvester tests need real files to tes that can be modified. These tests are implemented with
-// integration tests
+// system tests
 
 func TestExampleTest(t *testing.T) {
 
