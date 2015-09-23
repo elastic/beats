@@ -11,17 +11,18 @@ re-generate this file with:
 == Getting started
 
 The best way to understand the value of an network packet analytics system like
-Packetbeat is to try it on your own traffic. This quick tutorial will walk you
-through installing the essential components of the Packetbeat system:
+Packetbeat is to try it on your own traffic. 
 
- * Packetbeat shippers. They collect the traffic. You should install these on
-   your servers so that they capture the network traffic.
- * Elasticsearch for storage and indexing
- * Kibana for the UI
+Follow the steps to get started with your own Packetbeat setup:
 
-Check the TODO[Getting started] guide to see how to get started with Elasticsearch, Kibana
-and optionally Logstash.
+ * Install the Packetbeat shippers on your servers so that they capture the network traffic. <<packetbeat-installation>>
+ * Install Elasticsearch for storage and indexing the data. TODO[More details]
+ * Install Kibana for the UI. TODO[More details]
+ * Install optionally Logstash. TODO[More details]
+ * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
+
+[[packetbeat-installation]]
 === Packetbeat installation
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
@@ -131,7 +132,7 @@ output:
 Before starting the shipper, you need to load the `packetbeat.template.json` template
 as described TODO[here].
 
-More details about starting and stopping packetbeat you can find TODO[here].
+More details about getting started with your Beat are TODO[here].
 
 
 Enjoy!
