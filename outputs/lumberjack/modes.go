@@ -73,6 +73,22 @@ type failOverConnectionMode struct {
 	closed    bool
 }
 
+type loadBalancerMode struct {
+	conns       []ProtocolClient
+	sendRetries int
+	timeout     time.Duration
+	closed      bool
+
+	work    chan eventsMessage
+	retries chan eventsMessage
+}
+
+type eventsMessage struct {
+	retriesLeft int
+	signaler    outputs.Signaler
+	events      []common.MapStr
+}
+
 var (
 	// ErrNoConnectionConfigured indicates no configured connections for publishing.
 	ErrNoConnectionConfigured = errors.New("No connection configured")
@@ -243,4 +259,23 @@ func (f *failOverConnectionMode) PublishEvents(
 
 	outputs.SignalFailed(trans)
 	return nil
+}
+
+func newLoadBalancerMode(
+	clients []ProtocolClient,
+	sendRetries int,
+	timeout time.Duration,
+) (*loadBalancerMode, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (m *loadBalancerMode) Close() error {
+	return errors.New("not implemented")
+}
+
+func (m *loadBalancerMode) PublishEvents(
+	signaler outputs.Signaler,
+	events []common.MapStr,
+) error {
+	return errors.New("not implemented")
 }
