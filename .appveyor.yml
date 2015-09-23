@@ -49,3 +49,9 @@ test: off
 
 # to disable deployment
 deploy: off
+
+notifications:
+  - provider: HipChat
+    auth_token:
+      secure: fyUjfVqKUW41SO10S1D3/dV3SRTojt5TFy6ToXpZ/GQ=
+    room: beats
