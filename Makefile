@@ -8,19 +8,19 @@ all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/b
 
 
 .PHONY: packetbeat topbeat
-packetbeat topbeat: xgo-image build
+packetbeat topbeat: build
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
 		github.com/elastic/$@
 
 .PHONY: packetbeat-linux topbeat-linux
-packetbeat-linux: xgo-image build
+packetbeat-linux: build
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
 		-before-build=../xgo-scripts/packetbeat_before_build.sh \
 		-branch $(RELEASE) \
 		github.com/elastic/packetbeat
-topbeat-linux: xgo-image build
+topbeat-linux: build
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
 		-before-build=../xgo-scripts/topbeat_before_build.sh \
 		-branch $(RELEASE) \
@@ -34,17 +34,17 @@ topbeat-linux: xgo-image build
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 
-%/darwin: % fpm-image
+%/darwin: %
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/darwin/build.sh
 
-%/win: % fpm-image
+%/win: %
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
 
-%/bin: %-linux fpm-image
+%/bin: %-linux
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
 
-.PHONY: deps xgo-image
+.PHONY: deps
 deps:
 	go get github.com/tsg/xgo
 	go get github.com/tsg/gotpl
@@ -62,7 +62,7 @@ fpm-image:
 go-daemon-image:
 	docker build --rm=true -t tudorg/go-daemon docker/go-daemon/
 
-build/god-linux-386 build/god-linux-amd64: go-daemon-image
+build/god-linux-386 build/god-linux-amd64:
 	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
 
 build:
@@ -82,6 +82,24 @@ run-interactive:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
 		--entrypoint=bash tudorg/beats-builder-deb6
+
+.PHONY: images
+images: xgo-image fpm-image go-daemon-image
+
+.PHONY: push-images
+push-images:
+	docker push tudorg/beats-builder
+	docker push tudorg/beats-builder-deb6
+	docker push tudorg/fpm
+	docker push tudorg/go-daemon
+
+.PHONY: pull-images
+pull-images:
+	docker pull tudorg/beats-builder
+	docker pull tudorg/beats-builder-deb6
+	docker pull tudorg/fpm
+	docker pull tudorg/go-daemon
+
 .PHONY: clean
 clean:
 	rm -rf build/ || true

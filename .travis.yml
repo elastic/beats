@@ -1,0 +1,31 @@
+sudo: required
+services:
+  - docker
+
+language: go
+
+go:
+  - 1.5.1
+
+before_install:
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+
+script:
+  - make pull-images
+  # uncomment to build fresh images
+  # - make images
+  # - make push-images
+  - make deps
+  - make
+
+deploy:
+  provider: s3
+  access_key_id: AKIAIAXUU3N2C6EHT5GQ
+  secret_access_key:
+    secure: VG6DjUxIf4A1Im2XEXNpzDYxCtQxFCdWs7loKmrXl3r6W/EGiBV0CaZ8f2qqh6sV/jRYegc3J8Qq0R6T4aVDoGznArxmLYOXa1stTuO5l5K0y79CYCypkv7XlYi0cUG9iHmTRi8X+Im4P1FZl8n8q1s8YhHguLIRvhvCGjHGYm/OqdM6RVAEMwjDNTT2SdAaILnmJWdjz6TVjHU9dwuses+0gQww2kYSyWm6c86TiDjwTLcLJWhh2QJXbUcaNeu646Y/imcjdQ0UZuxmz63cO7cdeOs2jejwuFGq0ABfZPtUF7Rm1k9e/HxCzGc5m5XYutnHm8+1gh8UMBojNR/kQkPcO8YpERIGy85ndEnmWxSKXWLF6aH23EtWVDGQrWue92eXrCwkrHqNrJFoB87f7xL/sSgf/u08nC6DCZhQE22RJrKaw9cw9lUqg6ExtVmAM5TKrt1KuVD2ehI+3Ml8GN6HCIZxSmLfze6nuYwaXTKC4gCYL+QQYhbPOvpyMH6Mumh4m7Z2EwXW/LGje/dMWYO/YFQ+TjUYnfElAMvAgKmMzmUP2aZcKHR6o1urftW16iYys8GRpbr3lG+Gnvzpl8qMA8Px8c8xXPgoRxJJzRnITBIJndx2LknpNN8VD4nbGPqXFirFG1kwVd87osa0Ogg2kxlwkxJqXyuZWjgIuGA=
+  bucket: beats-nightlies
+  local-dir: build/upload
+  acl: public_read
+  on:
+    repo: tsg/beats-packer
+    branch: travis_build
