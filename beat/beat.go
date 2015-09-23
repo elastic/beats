@@ -63,7 +63,7 @@ func (beat *Beat) CommandLineSetup() {
 	err := cfgfile.ChangeDefaultCfgfileFlag(beat.Name)
 	if err != nil {
 		fmt.Printf("Failed to fix the -c flag: %v\n", err)
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	flag.Parse()
