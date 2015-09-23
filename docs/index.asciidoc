@@ -1,4 +1,4 @@
-= Beats Platform
+= Beats Platform Reference
 
 include::./overview.asciidoc[]
 
