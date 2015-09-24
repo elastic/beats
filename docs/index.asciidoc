@@ -1,5 +1,6 @@
 = Packetbeat reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:version: 1.0.0-beta3
 
 include::./overview.asciidoc[]
 
