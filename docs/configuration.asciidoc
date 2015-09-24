@@ -2,15 +2,18 @@
 == Configuration
 
 The Packetbeat configuration file uses http://yaml.org/[YAML] as any other Beat. 
-The common configuration options to all Beats are described TODO[here].
+It consists of the following sections:
 
-The Packetbeat specific configuration options are:
 
+* <<beats-configuration.html#configuration-shipper>>
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
-* <<maintaining-topology>>
 * <<configuration-processes>>
+* <<beats-configuration.html#configuration-output>>
+* <<beats-configuration.html#configuration-run-options>>
 
+NOTE: Packetbeat maintains in real-time a topology map with all the servers from your network. 
+Check <<maintaining-topology>> for more details.
 
 [[configuration-interfaces]]
 === Interfaces
@@ -529,7 +532,7 @@ formatted JSON objects.
 
 
 [[maintaining-topology]]
-==== Maintaining the real-time state of the network topology
+=== Maintaining the real-time state of the network topology
 
 One of the important features of Packetbeat is that it knows for each
 transaction which is the source server and is the destination server by names.
@@ -547,7 +550,7 @@ can be used for sharing the topology. If you have both Redis and Elasticsearch
 enabled as outputs, we suggest using Redis for saving the topology. This can be
 controlled from the `save_topology` configuration option.
 
-More details about the Beats outputs are available TODO[here].
+
 
 [[configuration-processes]]
 === Processes (optional)
