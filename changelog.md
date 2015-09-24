@@ -9,7 +9,6 @@ Questions:
  * .logstash-forwarder: Should we have a script that renames / rewrites the file to .filebeat on upgrade?
  * File comaprison for windows is not really implemented yet, see filecompare_windows.go
  * File size limit for config file was removed. In case this is required, it must be handled by libbeat
- * How well did the Windows integration work?
  * Config file: Type is required and moved out of fields. Fields can optional for additional information
  * Deadtime was used in the code but I couldn't find an example in any config? I added it now to the config
  ** DeadTime was renamed to ignoreOlder

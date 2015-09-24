@@ -1,0 +1,57 @@
+# version format
+version: "{build}"
+
+# Operating system (build VM template)
+os: Windows Server 2012 R2
+
+
+# environment variables
+environment:
+  GOPATH: c:\gopath
+
+# custom clone folder
+clone_folder: c:\gopath\src\github.com\elastic\filebeat
+
+# uninstall provided golang
+init:
+- ps: >-
+    $app = Get-WmiObject -Class Win32_Product -Filter "Vendor = 'http://golang.org'"
+
+    if ($app) {
+      $app.Uninstall()
+    }
+
+# scripts that run after cloning repository
+install:
+  - set PATH=%LOCALAPPDATA%\atom\bin;%GOPATH%\bin;c:\go\bin;%PATH%
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go1.5.1.windows-amd64.msi
+  - msiexec /i go1.5.1.windows-amd64.msi /q
+  - set GOPATH=%GOPATH%;%GOPATH%\src\github.com\elastic\filebeat\Godeps\_workspace
+  - go version
+  - go env
+  - python --version
+  - appveyor DownloadFile https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py
+  - python get-pip.py
+  - set PATH=%PATH%;C:\Python27\Scripts
+  - pip install jinja2 nose
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  - go build
+  - go test ./...
+  - go test -c -cover -covermode=count -coverpkg ./...
+  - ps: cd tests/system
+  - nosetests
+
+# to disable automatic tests
+test: off
+
+# to disable deployment
+deploy: off
+
+notifications:
+  - provider: HipChat
+    auth_token:
+      secure: TcnoWoYmHc653RjOdbK+bb/9NI1gFUHXp+1jjhK8k0M=
+    room: beats

@@ -1,22 +1,22 @@
 package main
 
-// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly. Reason???
+// This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
 
 import (
 	"flag"
 	"testing"
 )
 
-var integration *bool
+var systemTest *bool
 
 func init() {
-	integration = flag.Bool("integration", false, "Set to true when running integration tests")
+	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 }
 
 // Test started when the test binary is started. Only calls main.
-func TestIntegration(t *testing.T) {
+func TestSystem(t *testing.T) {
 
-	if *integration {
+	if *systemTest {
 		main()
 	}
 }
