@@ -4,14 +4,13 @@
 Topbeat helps you monitor the availability of your website or service by providing system wide and per process
 statistics together with disk space overview.
 
-The simplest Topbeat setup includes Topbeat, Elasticsearch, Kibana and optionally Logstash. To get started follow the
-following steps:
+Follow the steps to get started with your own Topbeat setup:
 
- * Install Topbeat on your servers to capture system wide and per process statistics
- * TODO[Install Elasticsearch] for storing the data.
- * TODO[Install Kibana] for visualizing the statistics from your servers
-
-More details about the sample Kibana dashboards are available TODO[here].
+ * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
+ * Install Elasticsearch for storing the data. TODO[More details]
+ * Install Kibana for visualizing the statistics from your servers. TODO[More details]
+ * Install optionally Logstash. TODO[More details]
+ * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
 
 [[topbeat-installation]]
