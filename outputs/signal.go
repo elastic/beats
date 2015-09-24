@@ -54,7 +54,7 @@ func (c *ChanSignal) Failed() { c.ch <- false }
 
 // NewSyncSignal create a new SyncSignal signaler. Use Wait() method to wait for
 // a signal from the publisher
-func NewSyncSignal() *SyncSignal { return &SyncSignal{make(chan bool)} }
+func NewSyncSignal() *SyncSignal { return &SyncSignal{make(chan bool, 1)} }
 
 // Wait blocks waiting for a signal from the outputer. Wait return true if
 // Completed was signaled and false if a Failed signal was received
