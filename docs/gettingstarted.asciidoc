@@ -7,9 +7,9 @@ Packetbeat is to try it on your own traffic.
 Follow the steps to get started with your own Packetbeat setup:
 
  * Install the Packetbeat shippers on your servers so that they capture the network traffic. <<packetbeat-installation>>
- * Install Elasticsearch for storage and indexing the data. {libbeat}getting-started.html#elasticsearch-installation[More details]
+ * Install Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
  * Install Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Install optionally Logstash. {libbeat}/getting-started.html#logstash[More details]
+ * Install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
  * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
 

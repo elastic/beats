@@ -1,6 +1,6 @@
 # Automatic tests for Packetbeat
 
-This repository contains the integration tests for the [Packetbeat](http://packetbeat.com)
+This repository contains the system tests for the [Packetbeat](http://packetbeat.com)
 project.
 
 ## Running

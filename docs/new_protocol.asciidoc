@@ -352,7 +352,7 @@ As an example, here is the relevant code from the REDIS module:
 ----------------------------------------------------------------------
 
 The following fields are required and their presence will be checked by
-integration tests:
+system tests:
 
  * `timestamp`. Set this to the timestamp of the first packet from the message
    and cast it to `common.Time` like in the example above.
@@ -571,7 +571,7 @@ there's no transaction present.
 To check the coverage of your unit tests, run the `make cover` command at the
 top of the repository.
 
-==== Integration testing
+==== Sytem testing
 
 Because the main input to Packetbeat are packets and the main output are JSON
 objects, a convenient way of testing its functionality is by providing PCAP
