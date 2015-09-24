@@ -385,6 +385,10 @@ func (m *loadBalancerMode) onFail(msg eventsMessage) {
 		}
 
 		select {
+		case <-m.done:
+			// shutting down -> mark message as failed and return
+			outputs.SignalFailed(msg.signaler)
+			return
 		case m.retries <- msg: // forward message to another worker
 			return
 		case <-time.After(m.timeout):
