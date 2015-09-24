@@ -12,10 +12,6 @@ type syncPublisher struct {
 
 type syncClient func(message)
 
-type syncSignal struct {
-	ch chan bool
-}
-
 func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	s := &syncPublisher{pub: pub}
 	s.messageWorker.init(&pub.wsPublisher, 1000, newPreprocessor(pub, s))
@@ -45,13 +41,8 @@ func (c syncClient) PublishEvents(events []common.MapStr) bool {
 }
 
 func (c syncClient) send(m message) bool {
-	sync := newSyncSignal()
+	sync := outputs.NewSyncSignal()
 	m.signal = sync
 	c(m)
-	return sync.wait()
+	return sync.Wait()
 }
-
-func newSyncSignal() *syncSignal { return &syncSignal{make(chan bool)} }
-func (s *syncSignal) wait() bool { return <-s.ch }
-func (s *syncSignal) Completed() { s.ch <- true }
-func (s *syncSignal) Failed()    { s.ch <- false }
