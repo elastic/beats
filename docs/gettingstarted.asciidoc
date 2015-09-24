@@ -214,52 +214,6 @@ output {
 ------------------------------------------------------------------------------
 
 
-=== Starting the Beat shipper
-
-
-There is an _init.d_ script for each Beat that can be used for starting and stopping the Beat. 
-In the following examples, packetbeat is used as an example, but it can be any Beat.
-
-deb:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo /etc/init.d/packetbeat start
-----------------------------------------------------------------------
-
-rpm:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo /etc/init.d/packetbeat start
-----------------------------------------------------------------------
-
-mac:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo ./packetbeat -e -c packetbeat.yml -d "publish"
-----------------------------------------------------------------------
-
-Packetbeat is now ready to capture data from your network traffic. You can test
-that it works by creating a simple HTTP request. For example:
-
-[source,shell]
-----------------------------------------------------------------------
-curl http://www.elastic.co/ > /dev/null
-----------------------------------------------------------------------
-
-Now check that the data is present in Elasticsearch with the following command:
-
-[source,shell]
-----------------------------------------------------------------------
-curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
-----------------------------------------------------------------------
-
-Make sure to replace `localhost:9200` with the address of your Elasticsearch
-instance. It should return data about the HTTP transaction you just created.
-
-
 === Kibana installation
 
 https://www.elastic.co/products/kibana[Kibana] is a visualization application
