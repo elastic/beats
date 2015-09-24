@@ -27,5 +27,5 @@ deploy:
   local-dir: build/upload
   acl: public_read
   on:
-    repo: tsg/beats-packer
-    branch: travis_build
+    repo: elastic/beats-packer
+    branch: master
