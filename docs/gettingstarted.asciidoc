@@ -7,10 +7,11 @@ statistics together with disk space overview.
 Follow the steps to get started with your own Topbeat setup:
 
  * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
- * Install Elasticsearch for storing the data. TODO[More details]
- * Install Kibana for visualizing the statistics from your servers. TODO[More details]
- * Install optionally Logstash. TODO[More details]
+* Install Elasticsearch for storage and indexing the data. {libbeat}beats-getting-started.html#_elasticsearch_installation[More details]
+ * Install Kibana for the UI. {libbeat}/beats-getting-started.html#_kibana_installation[More details]
+ * Install optionally Logstash. {libbeat}/beats-getting-started.html#logstash[More details]
  * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
+
 
 
 [[topbeat-installation]]
@@ -99,7 +100,7 @@ curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening on.
 
-You are now ready to start topbeat:
+You are now ready to start Topbeat:
 
 deb:
 
