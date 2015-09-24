@@ -1,4 +1,4 @@
-[[beats-getting-started]]
+[[getting-started]]
 == Getting started
 
 A regular _Beats setup_ consists of:
