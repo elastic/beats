@@ -120,9 +120,52 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-Before starting the shipper, you need to load the `packetbeat.template.json` template
-as described {libbeat}/beats-getting-started.html#_beat_configuration[here].
+Before starting topbeat, you need to load the
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is used to let Elasticsearch know which fields should be analyzed
+in which way.
 
-You can start Packetbeat by using the {libbeat}/beats-getting-started.html#_starting_the_beat_shipper[init.d script].
+The recommended template file is installed by the Topbeat packages. Load it with the
+following command:
+
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+Packetbeat is now ready to capture data from your network traffic. You can test
+that it works by creating a simple HTTP request. For example:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://www.elastic.co/ > /dev/null
+----------------------------------------------------------------------
+
+Now check that the data is present in Elasticsearch with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure to replace `localhost:9200` with the address of your Elasticsearch
+instance. It should return data about the HTTP transaction you just created.
 
 Enjoy!
