@@ -7,10 +7,10 @@ dashboards are maintained in this
 https://github.com/elastic/beats-dashboards[GitHub repository], which also
 includes instructions for loading them.
 
-Load automatically all the sample dashboards in Kibana by following the TODO[steps].
+Load automatically all the sample dashboards in Kibana by following the {libbeat}/beats-getting-started.html#_load_kibana_dashboards[steps].
 
 
-image:./images/packetbeat-statistics.png[Topbeat statistics]
+image:./images/packetbeat-statistics.png[Packetbeat statistics]
 
 These dashboards are provided as examples, we recommend that you
 http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them

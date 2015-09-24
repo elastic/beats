@@ -16,9 +16,9 @@ Packetbeat is to try it on your own traffic.
 Follow the steps to get started with your own Packetbeat setup:
 
  * Install the Packetbeat shippers on your servers so that they capture the network traffic. <<packetbeat-installation>>
- * Install Elasticsearch for storage and indexing the data. TODO[More details]
- * Install Kibana for the UI. TODO[More details]
- * Install optionally Logstash. TODO[More details]
+ * Install Elasticsearch for storage and indexing the data. {libbeat}beats-getting-started.html#_elasticsearch_installation[More details]
+ * Install Kibana for the UI. {libbeat}/beats-getting-started.html#_kibana_installation[More details]
+ * Install optionally Logstash. {libbeat}/beats-getting-started.html#logstash[More details]
  * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
 
@@ -129,10 +129,71 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-Before starting the shipper, you need to load the `packetbeat.template.json` template
-as described TODO[here].
+Before starting Packetbeat, you need to load the
+http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is used to let Elasticsearch know which fields should be analyzed
+in which way.
 
-More details about getting started with your Beat are TODO[here].
+The recommended template file is installed by the Packetbeat packages. Load it with the
+following command:
 
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+cd beats-1.0.0-beta3-darwin
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on
+Replace `packetbeat` with the beat name that you are running.
+
+You are now ready to start Packetbeat:
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/packetbeat start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./packetbeat -e -c packetbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+Packetbeat is now ready to capture data from your network traffic. You can test
+that it works by creating a simple HTTP request. For example:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://www.elastic.co/ > /dev/null
+----------------------------------------------------------------------
+
+Now check that the data is present in Elasticsearch with the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure to replace `localhost:9200` with the address of your Elasticsearch
+instance. It should return data about the HTTP transaction you just created.
 
 Enjoy!
