@@ -16,6 +16,11 @@ type FileStateOS struct {
 // GetOSFileState returns the platform specific FileStateOS
 func GetOSFileState(info *os.FileInfo) *FileStateOS {
 
+	// os.SameFile must be called to populate the id fields. Otherwise in case for example
+	// os.Stat(file) is used to get the fileInfo, the ids are empty.
+	// https://github.com/elastic/filebeat/pull/53
+	os.SameFile(*info, *info)
+
 	// Gathering fileStat (which is fileInfo) through reflection as otherwise not accessible
 	// See https://github.com/golang/go/blob/90c668d1afcb9a17ab9810bce9578eebade4db56/src/os/stat_windows.go#L33
 	fileStat := reflect.ValueOf(*info).Elem()
