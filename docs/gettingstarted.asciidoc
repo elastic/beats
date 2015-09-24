@@ -10,91 +10,19 @@ re-generate this file with:
 [[packetbeat-getting-started]]
 == Getting started
 
-
 The best way to understand the value of an network packet analytics system like
-Packetbeat is to try it on your own traffic. This quick tutorial will walk you
-through installing the essential components of the Packetbeat system:
+Packetbeat is to try it on your own traffic. 
 
- * Packetbeat shippers. They collect the traffic. You should install these on
-   your servers so that they capture the network traffic.
- * Elasticsearch for storage and indexing.
- * Kibana for the UI.
+Follow the steps to get started with your own Packetbeat setup:
 
-For now, you can just install Elasticsearch and Kibana on a single VM or even
-on your laptop. The only condition is that this machine is accessible from the
-servers you want to monitor. As you add more shippers and your traffic grows, you
-will want replace the single Elasticsearch instance with a cluster. You will
-probably also want to automate the installation process.  But for now, let's
-just do the fun part.
-
-=== Elasticsearch installation
-
-http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
-storage, search and analytics engine. It can be used for many purposes, but one
-context where it excels is indexing streams of semi-structured data, like logs
-or decoded network packets.
-
-The binary packages of Elasticsearch have only one dependency: Java. Choose the
-tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
-mac for OS X):
-
-deb:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
-sudo dpkg -i elasticsearch-1.5.2.deb
-sudo /etc/init.d/elasticsearch start
-----------------------------------------------------------------------
-
-rpm:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
-sudo rpm -i elasticsearch-1.5.2.noarch.rpm
-sudo service elasticsearch start
-----------------------------------------------------------------------
-
-mac:
-
-[source,shell]
-----------------------------------------------------------------------
-# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
-unzip elasticsearch-1.5.2.zip
-cd elasticsearch-1.5.2
-./bin/elasticsearch
-----------------------------------------------------------------------
-
-You can learn more about installing, configuring and running Elasticsearch in
-http://www.elastic.co/guide/en/elasticsearch/guide/current/_installing_elasticsearch.html[Elasticsearch: The Definitive Guide].
+ * Install the Packetbeat shippers on your servers so that they capture the network traffic. <<packetbeat-installation>>
+ * Install Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * Install Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * Install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
 
-To test that the Elasticsearch daemon is up and running, try sending a HTTP GET
-request on port 9200:
-
-[source,shell]
-----------------------------------------------------------------------
-curl http://127.0.0.1:9200
-{
-  "status" : 200,
-  "name" : "Unicorn",
-  "cluster_name" : "elasticsearch",
-  "version" : {
-    "number" : "1.4.3",
-    "build_hash" : "36a29a7144cfde87a960ba039091d40856fcb9af",
-    "build_timestamp" : "2015-02-11T14:23:15Z",
-    "build_snapshot" : false,
-    "lucene_version" : "4.10.3"
-  },
-  "tagline" : "You Know, for Search"
-}
-----------------------------------------------------------------------
-
-
+[[packetbeat-installation]]
 === Packetbeat installation
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
@@ -201,9 +129,9 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-Before starting the shipper, you should also load an
+Before starting Packetbeat, you need to load the
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which is used to tell Elasticsearch which fields should be analyzed
+template], which is used to let Elasticsearch know which fields should be analyzed
 in which way.
 
 The recommended template file is installed by the Packetbeat packages. Load it with the
@@ -220,13 +148,14 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd packetbeat-1.0.0-beta3-darwin
+cd beats-1.0.0-beta3-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+where `localhost:9200` is the IP and port where Elasticsearch is listening on
+Replace `packetbeat` with the beat name that you are running.
 
-You are now ready to start the shipper:
+You are now ready to start Packetbeat:
 
 deb:
 
@@ -266,124 +195,5 @@ curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
 
 Make sure to replace `localhost:9200` with the address of your Elasticsearch
 instance. It should return data about the HTTP transaction you just created.
-
-
-=== Kibana installation
-
-https://www.elastic.co/products/kibana[Kibana] is a visualization application
-that gets its data from Elasticsearch. It provides a customizable and
-user-friendly UI in which you can combine various widget types to create your
-own dashboards. The dashboards can be easily saved, shared and linked.
-
-For this tutorial, we recommend to install Kibana on the same server as
-Elasticsearch, but it is not required.
-
-Use the following commands to download and run Kibana:
-
-deb or rpm:
-
-[source,shell]
-----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
-tar xzvf kibana-4.0.2-linux-x64.tar.gz
-cd kibana-4.0.2-linux-x64/
-./bin/kibana
-----------------------------------------------------------------------
-
-mac:
-
-[source,shell]
-----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-darwin-x64.tar.gz
-tar xzvf kibana-4.0.2-darwin-x64.tar.gz
-cd kibana-4.0.2-darwin-x64/
-./bin/kibana
-----------------------------------------------------------------------
-
-You can find Kibana binaries for other operating systems on the
-https://www.elastic.co/downloads/kibana[Kibana downloads page].
-
-If Kibana cannot reach the Elasticsearch server, you can adjust the settings for
-it from the `config/kibana.yml` file.
-
-Now point your browser to port 5601 and you should see the Kibana web
-interface.
-
-The first thing you need to do is to configure the index pattern. There are two ways you can 
-configure the index patterns in Kibana:
-
- - Automatically by loading dashboards, visualizations, seacrhes and index patterns. The steps 
-    are described in the next chapter.
-
- - Manually by configuring the [packetbeat-]YYYY.MM.DD index pattern under the `Settings`->`Indices` page.
-
-==== Configure manually index pattern in Kibana
-
-Enable `Use event times to create index names` in order to create the index based
-on the events already available in Elasticsearch. 
-The index pattern for Packetbeat contains a date format as an index is created daily: 
-`[packetbeat-]YYYY.MM.DD`
-
-image:./images/kibana-index-pattern.png[Kibana index pattern]
-
-If an error like `_Unable to fetch mapping` persists even after you configure the 
-`[packetbeat-]YYYY.MMDD` index pattern check if you have indices matching the pattern. 
-If not, it means that Packetbeat hasn't yet written any data into Elasticsearch. Make sure that
-some traffic was running on your servers and that Packetbeat could see it.
-
-
-If everything goes fine, you should already see some traffic reported by
-Packetbeat under the Discover page:
-
-image:./images/kibana-discover.png[Kibana discover page]
-
-You can learn more about Kibana in the
-http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
-
-=== Sample Kibana dashboards
-
-Kibana has a large set of visualization types which you can combine to create
-the perfect dashboards for your needs. But this flexibility can be a bit
-overwhelming at the beginning, so we have created a couple of
-<<sample-dashboards,sample dashboards>> to give you a good start and to
-demonstrate what is possible based on the packet data.
-
-To load the sample pages, follow these steps:
-
-[source,shell]
-----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/beats-dashboards-1.0.0-beta2.tar.gz
-tar xzvf beats-dashboards-1.0.0-beta2.tar.gz
-cd beats-dashboards-1.0.0-beta2/
-./load.sh
-----------------------------------------------------------------------
-
-NOTE: In case the Elasticsearch is not running on `127.0.0.1:9200`, you need to specify the Elasticsearch location
-as argument of the load.sh command line:
-
-[source,shell]
--------------------------------------------------------------------------
-./load.sh http://192.168.33.60:9200
--------------------------------------------------------------------------
-
-The load command uploads the example dashboards with the visualizations and searches that can be used.
-Additionally, the index patterns for Packetbeat and Topbeat are created:
-
-   - [packetbeat-]YYYY.MM.DD
-   - [topbeat-]YYYY.MM.DD
-
-After loading the dashboards, Kibana rises the following error 
-`No default index pattern. You must select or create one to continue.` that can be solved
-by setting one index pattern as favorite.
-
-image:./images/kibana-created-indexes.png[Kibana configured indexes]
-
-
-To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
-icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
-between the dashboards by using the `Navigation` widget.
-
-image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
-
 
 Enjoy!

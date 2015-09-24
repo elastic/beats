@@ -1,4 +1,5 @@
 = Packetbeat reference
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 
 include::./overview.asciidoc[]
 
@@ -12,10 +13,6 @@ include::./https.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::./logstash.asciidoc[]
-
-include::./dashboards.asciidoc[]
-
 include::./thrift.asciidoc[]
 
 include::./windows.asciidoc[]
@@ -23,6 +20,8 @@ include::./windows.asciidoc[]
 include::./kibana3.asciidoc[]
 
 include::./filtering.asciidoc[]
+
+include::./dashboards.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
