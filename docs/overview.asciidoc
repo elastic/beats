@@ -29,7 +29,4 @@ Topbeat helps you monitor your servers by collecting metrics like:
 
 
 The shippers can insert the collected metrics directly into Elasticsearch
-or via a central queue created with Redis and Logstash.
-
-In the near future, a direct integration between Topbeat and Logstash will
-be implemented, so the Redis instance will no longer be needed.
+or via Logstash.
