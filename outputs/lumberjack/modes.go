@@ -57,33 +57,65 @@ type ConnectionMode interface {
 	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
 }
 
+// singleConnectionMode sends all Output on one single connection. If connection is
+// not available, the output plugin blocks until the connection is either available
+// again or the connection mode is closed by Close.
 type singleConnectionMode struct {
-	conn      ProtocolClient
-	timeout   time.Duration
-	waitRetry time.Duration
-	closed    bool
+	conn ProtocolClient
+
+	closed bool // mode closed flag to break publisher loop
+
+	timeout   time.Duration // connection timeout
+	waitRetry time.Duration // wait time until reconnect
 }
 
-// Connect to at most one host by random and swap to another host (by random) if
-// active host becomes unavailable
+// failOverConnectionMode connects to at most one host by random and swap to
+// another host (by random) if currently active host becomes unavailable. If no
+// connection is available, the mode blocks until a new connection can be established.
 type failOverConnectionMode struct {
-	conns     []ProtocolClient
-	timeout   time.Duration
-	active    int
-	waitRetry time.Duration
-	closed    bool
+	conns  []ProtocolClient
+	active int // id of active connection
+
+	closed bool // mode closed flag to break publisher loop
+
+	timeout   time.Duration // connection timeout
+	waitRetry time.Duration // wait time until trying a new connection
 }
 
+// loadBalancerMode balances the sending of events between multiple connections.
+//
+// The balancing algorithm is mostly pull-based, with multiple workers trying to pull
+// some amount of work from a shared queue. Workers will try to get a new work item
+// only if they have a working/active connection. Workers without active connection
+// do not participate until a connection has been re-established.
+// Due to the pull based nature the algorithm will load-balance events by random
+// with workers having less latencies/turn-around times potentially getting more
+// work items then other workers with higher latencies. Thusly the algorithm
+// dynamically adapts to resource availability of server events are forwarded to.
+//
+// Workers not participating in the load-balancing will continuously try to reconnect
+// to their configured endpoints. Once a new connection has been established,
+// these workers will participate in in load-balancing again.
+//
+// If a connection becomes unavailable, the events are rescheduled for another
+// connection to pick up. Rescheduling events is limited to a maximum number of
+// send attempts. If events have not been send after maximum number of allowed
+// attemps has been passed, they will be dropped.
+//
+// Distributing events to workers is subject to timeout. If no worker is available to
+// pickup a message for sending, the message will be dropped internally.
 type loadBalancerMode struct {
-	timeout     time.Duration
-	waitRetry   time.Duration
-	maxAttempts int
-	closed      bool
+	timeout   time.Duration // send/retry timeout. Every timeout is a failed send attempt
+	waitRetry time.Duration // duration to wait during re-connection attempts
 
-	wg      sync.WaitGroup
-	work    chan eventsMessage
-	retries chan eventsMessage
-	done    chan struct{}
+	maxAttempts int // maximum number of configured send attempts
+
+	// waitGroup + signaling channel for handling shutdown
+	wg   sync.WaitGroup
+	done chan struct{}
+
+	work    chan eventsMessage // work channel with new events to be published
+	retries chan eventsMessage // work channel for fail send attempts being forwarded to other workers
 }
 
 type eventsMessage struct {
@@ -273,7 +305,6 @@ func newLoadBalancerMode(
 		timeout:     timeout,
 		waitRetry:   waitRetry,
 		maxAttempts: maxAttempts,
-		closed:      false,
 
 		work:    make(chan eventsMessage),
 		retries: make(chan eventsMessage),
@@ -314,8 +345,8 @@ func (m *loadBalancerMode) start(clients []ProtocolClient) {
 			select {
 			case <-m.done:
 				return
-			case msg = <-m.retries:
-			case msg = <-m.work:
+			case msg = <-m.retries: // receive message from other failed worker
+			case msg = <-m.work: // receive message from publisher
 			}
 			m.onMessage(client, msg)
 		}
@@ -354,9 +385,10 @@ func (m *loadBalancerMode) onFail(msg eventsMessage) {
 		}
 
 		select {
-		case m.retries <- msg:
+		case m.retries <- msg: // forward message to another worker
 			return
 		case <-time.After(m.timeout):
+			// another failed send
 		}
 	}
 }
@@ -380,6 +412,8 @@ func (m *loadBalancerMode) PublishEvents(
 	select {
 	case m.work <- msg:
 	case <-time.After(m.timeout):
+		// failed send attempt if no worker is available to pick up message
+		// within configured time limit.
 		m.onFail(msg)
 	}
 	return nil
