@@ -1,3 +1,4 @@
+[[beats-reference]]
 = Beats Platform Reference
 
 include::./overview.asciidoc[]
