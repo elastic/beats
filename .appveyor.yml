@@ -53,5 +53,5 @@ deploy: off
 notifications:
   - provider: HipChat
     auth_token:
-      secure: fyUjfVqKUW41SO10S1D3/dV3SRTojt5TFy6ToXpZ/GQ=
+      secure: TcnoWoYmHc653RjOdbK+bb/9NI1gFUHXp+1jjhK8k0M=
     room: beats
