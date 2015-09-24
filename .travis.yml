@@ -27,3 +27,8 @@ deploy:
   on:
     repo: elastic/beats-packer
     branch: master
+
+notifications:
+  hipchat:
+    rooms:
+      secure: nTzgxmZ2tp2tdAbcpNVGXZ3alUfxqvPQ2MTGu0OMM0U+GcgGpqFk5tlvo3Yb636V2Rhy20absE9/I7tTB6HWHSw2VYtm7IHVWN09tt/2owggqgrdOzU7nlXuuP1m4opiVoeWCtPkcQoT65eCElFYE8djX/h4TgLSdHkcA10/2ayeUBYZxajrGMIAXPXroaqg/KIJtUSvR6lL2p/ttkBDTUP+/ssxF2/4jKDG7fvinP6DT7jfaFsnQ1uNfBMsNc3xDMVfK1MxBraC2300MEX/y2P+3jqhwqjcWDtvskm9ONmq1IF+oav5Vjqo/TWvCYuEDSdVAKzzHcebVgerT7NH0ui+9IW2O5c9q2v+5QS/K4p/0h80RtB+5EoGQX7ETnm2m+7MLoxn8ALESTMoFOPWcLZGEmooGHbJLq4wR7l8NWusnvim7PQGjPIqaphf4Wrrp+H7pbaYuLFQ3sKbp1j+56Y6+NCQSYBp5RbuJLbU6iT5g6eTp4hhsN84cHlEgogXA6PwGWIwIs1ikCqoCoD0SODkWtbF4/6V5j+KPCOSZWsaB0+fTm56Md8Nk471h5vVEjXyx7K3TZJsFHPTkp1v3aaM7Vh42fLZLEUQy1AkRPjZGb8J2BMeoLup2fXENWMDV408IPcOwmuZCtN3xQdoLW3wTOJwajd9Om5TlYxsjGs=
