@@ -10,6 +10,7 @@ filebeat:
       # For each file found under this path, a harvester is started.
       paths:
         - /var/log/*.log
+      # - c:\programdata\elasticsearch\logs\*
 
       # Type of the files. Based on this the way the file is read is decided.
       # The different types cannot be mixed in one prospector
@@ -66,9 +67,9 @@ filebeat:
   # Flush even though spoolSize is not reached.
   #idleTimeout: 5s
 
-  # Name of the registry file. Per default it is put in the same directory as
-  # the executable binary. In case this is changed after running filebeat,
-  # indexing starts from the beginning again.
+  # Name of the registry file. Per default it is put in the current working
+  # directory. In case the working directory is changed after when running
+  # filebeat again, indexing starts from the beginning again.
   #registryfile: .filebeat
 
 
