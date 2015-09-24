@@ -125,9 +125,28 @@ http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-te
 template], which is used to let Elasticsearch know which fields should be analyzed
 in which way.
 
-The recommended template file is installed by the Topbeat packages. Load it with the
+The recommended template file is installed by the Packetbeat packages. Load it with the
 following command:
 
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+cd beats-1.0.0-beta3-darwin
+curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on
+Replace `packetbeat` with the beat name that you are running.
+
+You are now ready to start Packetbeat:
 
 deb:
 
