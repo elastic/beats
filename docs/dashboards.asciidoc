@@ -7,7 +7,7 @@ dashboards are maintained in this
 https://github.com/elastic/beats-dashboards[GitHub repository], which also
 includes instructions for loading them.
 
-Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#_load_kibana_dashboards[steps].
+Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#load-kibana-dashboards[steps].
 
 image:./images/topbeat-dashboard.png[Topbeat statistics]
 
