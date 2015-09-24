@@ -68,8 +68,8 @@ crosscompile: $(GOFILES)
 
 # This is called by the beats-packer to obtain the configuration file and
 # default template
-.PHONY: install_cfg
-install_cfg:
+.PHONY: install-cfg
+install-cfg:
 	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
 	cp etc/filebeat.template.json $(PREFIX)/filebeat.template.json
 	# darwin
