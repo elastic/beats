@@ -4,7 +4,8 @@
 In order to make it as easy as possible to get application performance insights
 from packet data, we provide a few sample Kibana dashboards. The
 dashboards are maintained in this
-https://github.com/elastic/beats-dashboards[GitHub repository].
+https://github.com/elastic/beats-dashboards[GitHub repository], which also
+includes instructions for loading them.
 
 Load automatically all the sample dashboards in Kibana by following the TODO[steps].
 
