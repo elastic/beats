@@ -5,7 +5,16 @@ Tools, scripts and docker images for cross-compiling and packaging the Elastic
 
 ## Prepare
 
-You need Go and docker installed. Prepare the rest with:
+You need Go and docker installed. This project uses several docker files, you
+can either build them with:
+
+     make images
+
+Or pull them from the Docker registry with:
+
+     make pull-images
+
+Prepare the rest with:
 
      make deps
 
