@@ -2,12 +2,14 @@ package lumberjack
 
 import (
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/outputs"
 )
 
 type mockClient struct {
@@ -49,10 +51,20 @@ func failConnect(n int, err error) func(time.Duration) error {
 	}
 }
 
+func alwaysFailConnect(err error) func(time.Duration) error {
+	return func(timeout time.Duration) error {
+		return err
+	}
+}
+
 func collectPublish(
 	collected *[][]common.MapStr,
 ) func(events []common.MapStr) (int, error) {
+	mutex := sync.Mutex{}
 	return func(events []common.MapStr) (int, error) {
+		mutex.Lock()
+		defer mutex.Unlock()
+
 		*collected = append(*collected, events)
 		return len(events), nil
 	}
@@ -79,6 +91,21 @@ func publishTimeoutEvery(
 	}
 }
 
+func publishFailStart(
+	n int,
+	pub func(events []common.MapStr) (int, error),
+) func(events []common.MapStr) (int, error) {
+	count := 0
+	return func(events []common.MapStr) (int, error) {
+		if count < n {
+			count++
+			return 0, errNetTimeout{}
+		}
+		count = 0
+		return pub(events)
+	}
+}
+
 func closeOK() error {
 	return nil
 }
@@ -93,7 +120,7 @@ func TestSingleSend(t *testing.T) {
 			publish:   collectPublish(&collected),
 		},
 		0,
-		1*time.Second,
+		100*time.Millisecond,
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
@@ -116,7 +143,7 @@ func TestSingleConnectFailConnect(t *testing.T) {
 			publish:   collectPublish(&collected),
 		},
 		0,
-		1*time.Second,
+		100*time.Millisecond,
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
@@ -146,7 +173,7 @@ func TestFailoverSingleSend(t *testing.T) {
 			},
 		},
 		0,
-		1*time.Second,
+		100*time.Millisecond,
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
@@ -178,7 +205,7 @@ func TestFailoverFlakyConnections(t *testing.T) {
 			},
 		},
 		0,
-		1*time.Second,
+		100*time.Millisecond,
 	)
 
 	events := []common.MapStr{common.MapStr{"hello": "world"}}
@@ -189,5 +216,143 @@ func TestFailoverFlakyConnections(t *testing.T) {
 	mode.Close()
 
 	assert.Equal(t, 10, len(collected))
+	assert.Equal(t, events, collected[0])
+}
+
+func TestLoadBalancerStartStopOnOkConnection(t *testing.T) {
+	mode, _ := newLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+			},
+		},
+		1,
+		100*time.Millisecond,
+		100*time.Millisecond,
+	)
+
+	mode.Close()
+}
+
+func TestLoadBalancerStartStopOnFailingConnection(t *testing.T) {
+	errFail := errors.New("fail connect")
+	mode, _ := newLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   alwaysFailConnect(errFail),
+			},
+		},
+		1,
+		100*time.Millisecond,
+		100*time.Millisecond,
+	)
+
+	mode.Close()
+}
+
+func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
+	errFail := errors.New("fail connect")
+	mode, _ := newLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   alwaysFailConnect(errFail),
+			},
+		},
+		2,
+		100*time.Millisecond,
+		100*time.Millisecond,
+	)
+	defer mode.Close()
+
+	ch := make(chan bool, 1)
+	signal := outputs.NewChanSignal(ch)
+
+	mode.PublishEvents(signal, []common.MapStr{
+		common.MapStr{"test": "abc"},
+	})
+
+	result := <-ch
+	assert.Equal(t, false, result)
+}
+
+func TestLoadBalancerOKSend(t *testing.T) {
+	var collected [][]common.MapStr
+	mode, _ := newLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   collectPublish(&collected),
+			},
+		},
+		2,
+		100*time.Millisecond,
+		100*time.Millisecond,
+	)
+	defer mode.Close()
+
+	ch := make(chan bool, 1)
+	signal := outputs.NewChanSignal(ch)
+
+	events := []common.MapStr{common.MapStr{"hello": "world"}}
+	err := mode.PublishEvents(signal, events)
+
+	result := <-ch
+	assert.Equal(t, true, result)
+
+	if len(collected) == 0 {
+		t.Fatalf("no message send")
+	}
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(collected))
+	assert.Equal(t, events, collected[0])
+}
+
+func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
+	var collected [][]common.MapStr
+	mode, _ := newLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(1, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(1, collectPublish(&collected)),
+			},
+		},
+		3,
+		100*time.Millisecond,
+		100*time.Millisecond,
+	)
+	defer mode.Close()
+
+	ch := make(chan bool, 1)
+	signal := outputs.NewChanSignal(ch)
+
+	events := []common.MapStr{common.MapStr{"hello": "world"}}
+	err := mode.PublishEvents(signal, events)
+
+	result := <-ch
+	assert.Equal(t, true, result)
+
+	if len(collected) == 0 {
+		t.Fatalf("no message send")
+	}
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(collected))
 	assert.Equal(t, events, collected[0])
 }
