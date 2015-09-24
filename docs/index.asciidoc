@@ -1,4 +1,5 @@
 = Topbeat reference
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 
 include::./overview.asciidoc[]
 
