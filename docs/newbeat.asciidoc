@@ -1,4 +1,4 @@
-== Create your own Beat
+== Developer guide: creating a new Beat
 
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
