@@ -8,6 +8,7 @@ filebeat: $(GOFILES)
 	go get github.com/tools/godep
 	$(GODEP) go build
 
+
 .PHONY: check
 check:
 	# This should be modified so it throws an error on the build system in case the output is not empty
@@ -64,3 +65,14 @@ crosscompile: $(GOFILES)
 	go get github.com/tools/godep
 	mkdir -p bin
 	source crosscompile.bash; OUT='bin' go-build-all
+
+# This is called by the beats-packer to obtain the configuration file and
+# default template
+.PHONY: install-cfg
+install-cfg:
+	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
+	cp etc/filebeat.template.json $(PREFIX)/filebeat.template.json
+	# darwin
+	cp etc/filebeat.yml $(PREFIX)/filebeat-darwin.yml
+	# win
+	cp etc/filebeat.yml $(PREFIX)/filebeat-win.yml
