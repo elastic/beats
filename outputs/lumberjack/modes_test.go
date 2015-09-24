@@ -110,6 +110,55 @@ func closeOK() error {
 	return nil
 }
 
+var testEvent = common.MapStr{
+	"msg": "hello world",
+}
+
+func testMode(
+	t *testing.T,
+	mode ConnectionMode,
+	events [][]common.MapStr,
+	expectedSignal bool,
+	collectedEvents *[][]common.MapStr,
+) {
+	defer mode.Close()
+
+	if events != nil {
+		ch := make(chan bool, 1)
+		signal := outputs.NewChanSignal(ch)
+		for _, pubEvents := range events {
+			_ = mode.PublishEvents(signal, pubEvents)
+
+			result := <-ch
+			assert.Equal(t, expectedSignal, result)
+		}
+
+		if collectedEvents != nil {
+			assert.Equal(t, len(events), len(*collectedEvents))
+			for i := range *collectedEvents {
+				expected := events[i]
+				actual := (*collectedEvents)[i]
+				assert.Equal(t, expected, actual)
+			}
+		}
+	}
+}
+
+func singleEvent(e common.MapStr) [][]common.MapStr {
+	return [][]common.MapStr{
+		[]common.MapStr{e},
+	}
+}
+
+func repeatEvent(n int, e common.MapStr) [][]common.MapStr {
+	event := []common.MapStr{e}
+	var events [][]common.MapStr
+	for i := 0; i < n; i++ {
+		events = append(events, event)
+	}
+	return events
+}
+
 func TestSingleSend(t *testing.T) {
 	var collected [][]common.MapStr
 	mode, _ := newSingleConnectionMode(
@@ -122,14 +171,7 @@ func TestSingleSend(t *testing.T) {
 		0,
 		100*time.Millisecond,
 	)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(nil, events)
-	mode.Close()
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, singleEvent(testEvent), true, &collected)
 }
 
 func TestSingleConnectFailConnect(t *testing.T) {
@@ -145,14 +187,7 @@ func TestSingleConnectFailConnect(t *testing.T) {
 		0,
 		100*time.Millisecond,
 	)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(nil, events)
-	mode.Close()
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, singleEvent(testEvent), true, &collected)
 }
 
 func TestFailoverSingleSend(t *testing.T) {
@@ -175,18 +210,12 @@ func TestFailoverSingleSend(t *testing.T) {
 		0,
 		100*time.Millisecond,
 	)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-
-	err := mode.PublishEvents(nil, events)
-	mode.Close()
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, singleEvent(testEvent), true, &collected)
 }
 
 func TestFailoverFlakyConnections(t *testing.T) {
+	// t.SkipNow()
+
 	errFail := errors.New("fail connect")
 	var collected [][]common.MapStr
 	mode, _ := newFailOverConnectionMode(
@@ -204,22 +233,13 @@ func TestFailoverFlakyConnections(t *testing.T) {
 				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
 			},
 		},
-		0,
+		1*time.Millisecond,
 		100*time.Millisecond,
 	)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	for i := 0; i < 10; i++ {
-		mode.PublishEvents(nil, events)
-	}
-
-	mode.Close()
-
-	assert.Equal(t, 10, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, repeatEvent(10, testEvent), true, &collected)
 }
 
-func TestLoadBalancerStartStopOnOkConnection(t *testing.T) {
+func TestLoadBalancerStartStop(t *testing.T) {
 	mode, _ := newLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
@@ -232,26 +252,7 @@ func TestLoadBalancerStartStopOnOkConnection(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-
-	mode.Close()
-}
-
-func TestLoadBalancerStartStopOnFailingConnection(t *testing.T) {
-	errFail := errors.New("fail connect")
-	mode, _ := newLoadBalancerMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   alwaysFailConnect(errFail),
-			},
-		},
-		1,
-		100*time.Millisecond,
-		100*time.Millisecond,
-	)
-
-	mode.Close()
+	testMode(t, mode, nil, true, nil)
 }
 
 func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
@@ -268,17 +269,7 @@ func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	defer mode.Close()
-
-	ch := make(chan bool, 1)
-	signal := outputs.NewChanSignal(ch)
-
-	mode.PublishEvents(signal, []common.MapStr{
-		common.MapStr{"test": "abc"},
-	})
-
-	result := <-ch
-	assert.Equal(t, false, result)
+	testMode(t, mode, singleEvent(testEvent), false, nil)
 }
 
 func TestLoadBalancerOKSend(t *testing.T) {
@@ -296,24 +287,7 @@ func TestLoadBalancerOKSend(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	defer mode.Close()
-
-	ch := make(chan bool, 1)
-	signal := outputs.NewChanSignal(ch)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(signal, events)
-
-	result := <-ch
-	assert.Equal(t, true, result)
-
-	if len(collected) == 0 {
-		t.Fatalf("no message send")
-	}
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, singleEvent(testEvent), true, &collected)
 }
 
 func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
@@ -337,22 +311,5 @@ func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	defer mode.Close()
-
-	ch := make(chan bool, 1)
-	signal := outputs.NewChanSignal(ch)
-
-	events := []common.MapStr{common.MapStr{"hello": "world"}}
-	err := mode.PublishEvents(signal, events)
-
-	result := <-ch
-	assert.Equal(t, true, result)
-
-	if len(collected) == 0 {
-		t.Fatalf("no message send")
-	}
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(collected))
-	assert.Equal(t, events, collected[0])
+	testMode(t, mode, singleEvent(testEvent), true, &collected)
 }
