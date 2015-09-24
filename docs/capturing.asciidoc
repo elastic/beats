@@ -20,7 +20,7 @@ Currently Packetbeat has several options for traffic capturing:
 
  * `pcap` which uses the libpcap library and works on most platforms, but
    it's not the fastest option.
- * `af_paket` which uses memory mapped sniffing. It is faster than libpcap
+ * `af_packet` which uses memory mapped sniffing. It is faster than libpcap
    and doesn't require a kernel module, but it is Linux specific.
  * `pf_ring` which makes use of an ntop.org
    http://www.ntop.org/products/pf_ring/[project]. This will get you the best
