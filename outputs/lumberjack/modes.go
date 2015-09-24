@@ -275,8 +275,8 @@ func newLoadBalancerMode(
 		maxAttempts: maxAttempts,
 		closed:      false,
 
-		work:    make(chan eventsMessage, len(clients)),
-		retries: make(chan eventsMessage, len(clients)),
+		work:    make(chan eventsMessage),
+		retries: make(chan eventsMessage),
 		done:    make(chan struct{}),
 	}
 	m.start(clients)
@@ -285,6 +285,7 @@ func newLoadBalancerMode(
 }
 
 func (m *loadBalancerMode) start(clients []ProtocolClient) {
+	var waitStart sync.WaitGroup
 	worker := func(client ProtocolClient) {
 		defer func() {
 			if client.IsConnected() {
@@ -293,17 +294,18 @@ func (m *loadBalancerMode) start(clients []ProtocolClient) {
 			m.wg.Done()
 		}()
 
-		// try to connect proactively
-		_ = client.Connect(m.timeout)
-
+		waitStart.Done()
 		for {
 			// reconnect loop
 			for !client.IsConnected() {
+				if err := client.Connect(m.timeout); err == nil {
+					break
+				}
+
 				select {
 				case <-m.done:
 					return
 				case <-time.After(m.waitRetry):
-					_ = client.Connect(m.timeout)
 				}
 			}
 
@@ -321,8 +323,10 @@ func (m *loadBalancerMode) start(clients []ProtocolClient) {
 
 	for _, client := range clients {
 		m.wg.Add(1)
+		waitStart.Add(1)
 		go worker(client)
 	}
+	waitStart.Wait()
 }
 
 func (m *loadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
@@ -333,7 +337,7 @@ func (m *loadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 		if err != nil {
 			// retry only non-confirmed subset of events in batch
 			msg.events = msg.events[published:]
-			m.onFail(client, msg)
+			m.onFail(msg)
 			return
 		}
 		published += n
@@ -341,13 +345,20 @@ func (m *loadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	outputs.SignalCompleted(msg.signaler)
 }
 
-func (m *loadBalancerMode) onFail(client ProtocolClient, msg eventsMessage) {
-	msg.attemptsLeft--
-	if msg.attemptsLeft <= 0 {
-		outputs.SignalFailed(msg.signaler)
-		return
+func (m *loadBalancerMode) onFail(msg eventsMessage) {
+	for {
+		msg.attemptsLeft--
+		if msg.attemptsLeft <= 0 {
+			outputs.SignalFailed(msg.signaler)
+			return
+		}
+
+		select {
+		case m.retries <- msg:
+			return
+		case <-time.After(m.timeout):
+		}
 	}
-	m.retries <- msg
 }
 
 func (m *loadBalancerMode) Close() error {
@@ -360,10 +371,16 @@ func (m *loadBalancerMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	m.work <- eventsMessage{
+	msg := eventsMessage{
 		attemptsLeft: m.maxAttempts,
 		signaler:     signaler,
 		events:       events,
+	}
+
+	select {
+	case m.work <- msg:
+	case <-time.After(m.timeout):
+		m.onFail(msg)
 	}
 	return nil
 }
