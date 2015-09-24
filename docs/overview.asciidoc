@@ -2,7 +2,7 @@
 
 Packetbeat is a real-time network packet analyzer that can be used together
 with Elasticsearch to provide an _application monitoring and performance
-analytics system_. It completes the <<beats-configuration.html>> 
+analytics system_. It completes the {libbeat}/index.html[Beats platform] 
 by providing visibility between the servers of your network.
 
 It works by capturing the network traffic between your application servers,

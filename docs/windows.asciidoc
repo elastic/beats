@@ -41,7 +41,7 @@ interfaces:
 ----------------------------------------------------------------------
 
 You might want to change other settings in the `packetbeat.yml` file, see the
- <<configuration>> documentation for details.
+ <<packetbeat-configuration>> documentation for details.
 
 Then you can install Packetbeat as a Windows service by using the following
 Powershell script:

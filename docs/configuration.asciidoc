@@ -1,16 +1,16 @@
-[[configuration]]
+[[packetbeat-configuration]]
 == Configuration
 
 The Packetbeat configuration file uses http://yaml.org/[YAML] as any other Beat. 
 It consists of the following sections:
 
 
-* <<beats-configuration.html#configuration-shipper>>
+* {libbeat}/configuration.html#configuration-shipper[Shipper]
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
-* <<beats-configuration.html#configuration-output>>
-* <<beats-configuration.html#configuration-run-options>>
+* {libbeat}/configuration.html#configuration-output[Output]
+* {libbeat}/configuration.html#configuration-run-options[Run options (optional)]
 
 NOTE: Packetbeat maintains in real-time a topology map with all the servers from your network. 
 Check <<maintaining-topology>> for more details.
