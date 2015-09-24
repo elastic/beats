@@ -1,4 +1,4 @@
-[[beats-configuration]]
+[[configuration]]
 == Configuration
 
 The Beat configuration file uses
