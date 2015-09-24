@@ -66,7 +66,7 @@ class TestCase(unittest.TestCase):
                      "-I", os.path.join("pcaps", pcap),
                      "-c", os.path.join(self.working_dir, config),
                      "-t",
-                     "-integration",
+                     "-systemTest",
                      "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                      ])
         if extra_args:
@@ -95,7 +95,7 @@ class TestCase(unittest.TestCase):
         args = [cmd,
                 "-e",
                 "-c", os.path.join(self.working_dir, config),
-                "-integration",
+                "-systemTest",
                 "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                 ]
         if extra_args:
