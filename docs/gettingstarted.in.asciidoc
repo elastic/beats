@@ -120,7 +120,7 @@ output:
     save_topology: true
 ----------------------------------------------------------------------
 
-Before starting topbeat, you need to load the
+Before starting Packetbeat, you need to load the
 http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to let Elasticsearch know which fields should be analyzed
 in which way.
