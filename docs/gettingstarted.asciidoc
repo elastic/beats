@@ -7,9 +7,9 @@ statistics together with disk space overview.
 Follow the steps to get started with your own Topbeat setup:
 
  * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
-* Install Elasticsearch for storage and indexing the data. {libbeat}beats-getting-started.html#_elasticsearch_installation[More details]
- * Install Kibana for the UI. {libbeat}/beats-getting-started.html#_kibana_installation[More details]
- * Install optionally Logstash. {libbeat}/beats-getting-started.html#logstash[More details]
+* Install Elasticsearch for storage and indexing the data. {libbeat}getting-started.html#_elasticsearch_installation[More details]
+ * Install Kibana for the UI. {libbeat}/getting-started.html#_kibana_installation[More details]
+ * Install optionally Logstash. {libbeat}/getting-started.html#logstash[More details]
  * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
 
 
@@ -20,9 +20,9 @@ Follow the steps to get started with your own Topbeat setup:
 
 deb:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat_1.0.0-beta3_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat_{version}_amd64.deb
 sudo dpkg -i topbeat_1.0.0-beta3_amd64.deb
 ------------------------------------------------
 
@@ -30,19 +30,19 @@ sudo dpkg -i topbeat_1.0.0-beta3_amd64.deb
 
 rpm:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-1.0.0-beta3-x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-{version}-x86_64.rpm
 sudo rpm -vi topbeat-1.0.0-beta3-x86_64.rpm
 ------------------------------------------------
 
 
 mac:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-1.0.0-beta3-darwin.tgz
-tar xzvf topbeat-1.0.0-beta3-darwin.tgz
+curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-{version}-darwin.tgz
+tar xzvf topbeat-{version}-darwin.tgz
 ------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
