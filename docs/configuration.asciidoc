@@ -1,7 +1,7 @@
 [[configuration]]
 == Configuration
 
-The Packetbeat configuration file useshttp://yaml.org/[YAML] as any other Beat. 
+The Packetbeat configuration file uses http://yaml.org/[YAML] as any other Beat. 
 The common configuration options to all Beats are described TODO[here].
 
 The Packetbeat specific configuration options are:
