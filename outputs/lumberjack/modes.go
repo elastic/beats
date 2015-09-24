@@ -9,6 +9,7 @@ package lumberjack
 import (
 	"errors"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -74,19 +75,21 @@ type failOverConnectionMode struct {
 }
 
 type loadBalancerMode struct {
-	conns       []ProtocolClient
-	sendRetries int
 	timeout     time.Duration
+	waitRetry   time.Duration
+	maxAttempts int
 	closed      bool
 
+	wg      sync.WaitGroup
 	work    chan eventsMessage
 	retries chan eventsMessage
+	done    chan struct{}
 }
 
 type eventsMessage struct {
-	retriesLeft int
-	signaler    outputs.Signaler
-	events      []common.MapStr
+	attemptsLeft int
+	signaler     outputs.Signaler
+	events       []common.MapStr
 }
 
 var (
@@ -263,19 +266,104 @@ func (f *failOverConnectionMode) PublishEvents(
 
 func newLoadBalancerMode(
 	clients []ProtocolClient,
-	sendRetries int,
-	timeout time.Duration,
+	maxAttempts int,
+	waitRetry, timeout time.Duration,
 ) (*loadBalancerMode, error) {
-	return nil, errors.New("not implemented")
+	m := &loadBalancerMode{
+		timeout:     timeout,
+		waitRetry:   waitRetry,
+		maxAttempts: maxAttempts,
+		closed:      false,
+
+		work:    make(chan eventsMessage, len(clients)),
+		retries: make(chan eventsMessage, len(clients)),
+		done:    make(chan struct{}),
+	}
+	m.start(clients)
+
+	return m, nil
+}
+
+func (m *loadBalancerMode) start(clients []ProtocolClient) {
+	worker := func(client ProtocolClient) {
+		defer func() {
+			if client.IsConnected() {
+				_ = client.Close()
+			}
+			m.wg.Done()
+		}()
+
+		// try to connect proactively
+		_ = client.Connect(m.timeout)
+
+		for {
+			// reconnect loop
+			for !client.IsConnected() {
+				select {
+				case <-m.done:
+					return
+				case <-time.After(m.waitRetry):
+					_ = client.Connect(m.timeout)
+				}
+			}
+
+			// receive and process messages
+			var msg eventsMessage
+			select {
+			case <-m.done:
+				return
+			case msg = <-m.retries:
+			case msg = <-m.work:
+			}
+			m.onMessage(client, msg)
+		}
+	}
+
+	for _, client := range clients {
+		m.wg.Add(1)
+		go worker(client)
+	}
+}
+
+func (m *loadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
+	published := 0
+	events := msg.events
+	for published < len(events) {
+		n, err := client.PublishEvents(events[published:])
+		if err != nil {
+			// retry only non-confirmed subset of events in batch
+			msg.events = msg.events[published:]
+			m.onFail(client, msg)
+			return
+		}
+		published += n
+	}
+	outputs.SignalCompleted(msg.signaler)
+}
+
+func (m *loadBalancerMode) onFail(client ProtocolClient, msg eventsMessage) {
+	msg.attemptsLeft--
+	if msg.attemptsLeft <= 0 {
+		outputs.SignalFailed(msg.signaler)
+		return
+	}
+	m.retries <- msg
 }
 
 func (m *loadBalancerMode) Close() error {
-	return errors.New("not implemented")
+	close(m.done)
+	m.wg.Wait()
+	return nil
 }
 
 func (m *loadBalancerMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	return errors.New("not implemented")
+	m.work <- eventsMessage{
+		attemptsLeft: m.maxAttempts,
+		signaler:     signaler,
+		events:       events,
+	}
+	return nil
 }

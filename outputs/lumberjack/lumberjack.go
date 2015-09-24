@@ -96,7 +96,7 @@ func (lj *lumberjack) init(
 			if config.Max_retries != nil {
 				sendRetries = *config.Max_retries
 			}
-			mode, err = newLoadBalancerMode(clients, sendRetries, timeout)
+			mode, err = newLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
 		} else {
 			mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
 		}
