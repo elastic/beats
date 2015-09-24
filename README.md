@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/elastic/beats-packer.svg)](https://travis-ci.org/elastic/beats-packer)
+
 # Beats Packer
 
 Tools, scripts and docker images for cross-compiling and packaging the Elastic
