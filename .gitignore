@@ -11,3 +11,6 @@ filebeat
 cover
 profile.cov
 filebeat.test
+
+.vagrant
+filebeat.exe
