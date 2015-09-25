@@ -31,32 +31,32 @@ mac for OS X):
 
 deb:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
-sudo dpkg -i elasticsearch-1.5.2.deb
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
+sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
 rpm:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
-sudo rpm -i elasticsearch-1.5.2.noarch.rpm
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.noarch.rpm
+sudo rpm -i elasticsearch-{ES-version}.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
 mac:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
-unzip elasticsearch-1.5.2.zip
-cd elasticsearch-1.5.2
+curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
+unzip elasticsearch-{ES-version}.zip
+cd elasticsearch-{ES-version}
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
@@ -180,21 +180,21 @@ Use the following commands to download and run Kibana:
 
 deb or rpm:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz
-tar xzvf kibana-4.0.2-linux-x64.tar.gz
-cd kibana-4.0.2-linux-x64/
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-linux-x64.tar.gz
+tar xzvf kibana-{Kibana-version}-linux-x64.tar.gz
+cd kibana-{Kibana-version}-linux-x64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
 mac:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/kibana/kibana/kibana-4.0.2-darwin-x64.tar.gz
-tar xzvf kibana-4.0.2-darwin-x64.tar.gz
-cd kibana-4.0.2-darwin-x64/
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-darwin-x64.tar.gz
+tar xzvf kibana-{Kibana-version}-darwin-x64.tar.gz
+cd kibana-{Kibana-version}-darwin-x64/
 ./bin/kibana
 ----------------------------------------------------------------------
 
@@ -221,11 +221,11 @@ demonstrate what is possible based on the packet data.
 
 To load the sample pages, follow these steps:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/beats-dashboards-1.0.0-beta2.tar.gz
-tar xzvf beats-dashboards-1.0.0-beta2.tar.gz
-cd beats-dashboards-1.0.0-beta2/
+curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.tar.gz
+tar xzvf beats-dashboards-{Dashboards-version}.tar.gz
+cd beats-dashboards-{Dashboards-version}/
 ./load.sh
 ----------------------------------------------------------------------
 
