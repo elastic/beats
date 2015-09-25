@@ -4,33 +4,28 @@ BUILDID?=$(DATE)
 
 .PHONY: all
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
-	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin
+	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin \
+	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin
 
 
-.PHONY: packetbeat topbeat
-packetbeat topbeat: build
+.PHONY: packetbeat topbeat filebeat
+packetbeat topbeat filebeat: build
+	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
 		github.com/elastic/$@
-
-.PHONY: packetbeat-linux topbeat-linux
-packetbeat-linux: build
+	# linux builds on debian 6
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
-		-before-build=../xgo-scripts/packetbeat_before_build.sh \
+		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
-		github.com/elastic/packetbeat
-topbeat-linux: build
-	cd build && xgo -image=tudorg/beats-builder-deb6 \
-		-before-build=../xgo-scripts/topbeat_before_build.sh \
-		-branch $(RELEASE) \
-		github.com/elastic/topbeat
+		github.com/elastic/$@
 
-%/deb: %-linux build/god-linux-386 build/god-linux-amd64 fpm-image
+%/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 
-%/rpm: %-linux build/god-linux-386 build/god-linux-amd64 fpm-image
+%/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 
@@ -40,7 +35,7 @@ topbeat-linux: build
 %/win: %
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
 
-%/bin: %-linux
+%/bin: %
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
 	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
 
