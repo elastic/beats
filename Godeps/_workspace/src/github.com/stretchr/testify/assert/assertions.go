@@ -54,7 +54,7 @@ func ObjectsAreEqualValues(expected, actual interface{}) bool {
 	expectedValue := reflect.ValueOf(expected)
 	if expectedValue.Type().ConvertibleTo(actualType) {
 		// Attempt comparison after type conversion
-		if reflect.DeepEqual(actual, expectedValue.Convert(actualType).Interface()) {
+		if reflect.DeepEqual(expectedValue.Convert(actualType).Interface(), actual) {
 			return true
 		}
 	}
@@ -287,24 +287,10 @@ func Exactly(t TestingT, expected, actual interface{}, msgAndArgs ...interface{}
 //
 // Returns whether the assertion was successful (true) or not (false).
 func NotNil(t TestingT, object interface{}, msgAndArgs ...interface{}) bool {
-
-	success := true
-
-	if object == nil {
-		success = false
-	} else {
-		value := reflect.ValueOf(object)
-		kind := value.Kind()
-		if kind >= reflect.Chan && kind <= reflect.Slice && value.IsNil() {
-			success = false
-		}
+	if !isNil(object) {
+		return true
 	}
-
-	if !success {
-		Fail(t, "Expected value not to be nil.", msgAndArgs...)
-	}
-
-	return success
+	return Fail(t, "Expected value not to be nil.", msgAndArgs...)
 }
 
 // isNil checks if a specified object is nil or not, without Failing.
@@ -334,7 +320,7 @@ func Nil(t TestingT, object interface{}, msgAndArgs ...interface{}) bool {
 	return Fail(t, fmt.Sprintf("Expected nil, but got: %#v", object), msgAndArgs...)
 }
 
-var zeros = []interface{}{
+var numericZeros = []interface{}{
 	int(0),
 	int8(0),
 	int16(0),
@@ -360,7 +346,7 @@ func isEmpty(object interface{}) bool {
 		return true
 	}
 
-	for _, v := range zeros {
+	for _, v := range numericZeros {
 		if object == v {
 			return true
 		}
@@ -492,7 +478,7 @@ func False(t TestingT, value bool, msgAndArgs ...interface{}) bool {
 func NotEqual(t TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool {
 
 	if ObjectsAreEqual(expected, actual) {
-		return Fail(t, "Should not be equal", msgAndArgs...)
+		return Fail(t, fmt.Sprintf("Should not be: %#v\n", actual), msgAndArgs...)
 	}
 
 	return true
@@ -842,7 +828,7 @@ func EqualError(t TestingT, theError error, errString string, msgAndArgs ...inte
 		return false
 	}
 	s := "An error with value \"%s\" is expected but got \"%s\". %s"
-	return Equal(t, theError.Error(), errString,
+	return Equal(t, errString, theError.Error(),
 		s, errString, theError.Error(), message)
 }
 
@@ -892,4 +878,20 @@ func NotRegexp(t TestingT, rx interface{}, str interface{}, msgAndArgs ...interf
 
 	return !match
 
+}
+
+// Zero asserts that i is the zero value for its type and returns the truth.
+func Zero(t TestingT, i interface{}, msgAndArgs ...interface{}) bool {
+	if i != nil && !reflect.DeepEqual(i, reflect.Zero(reflect.TypeOf(i)).Interface()) {
+		return Fail(t, fmt.Sprintf("Should be zero, but was %v", i), msgAndArgs...)
+	}
+	return true
+}
+
+// NotZero asserts that i is not the zero value for its type and returns the truth.
+func NotZero(t TestingT, i interface{}, msgAndArgs ...interface{}) bool {
+	if i == nil || reflect.DeepEqual(i, reflect.Zero(reflect.TypeOf(i)).Interface()) {
+		return Fail(t, fmt.Sprintf("Should not be zero, but was %v", i), msgAndArgs...)
+	}
+	return true
 }
