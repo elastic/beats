@@ -9,13 +9,14 @@
 *.swn
 libbeat
 libbeat.test
-coverage/*
 
 # Folders
 _obj
 _test
 _output
 /docs/html_docs
+.vagrant
+coverage/*
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -27,6 +28,7 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
+/crosscompile.bash
 _testmain.go
 
 *.exe

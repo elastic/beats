@@ -13,7 +13,7 @@ COPY docker-entrypoint.sh /entrypoint.sh
 
 # Setup work environment
 ENV LIBBEAT_PATH /go/src/github.com/elastic/libbeat
-RUN mkdir -p $LIBBEAT_PATH
+RUN mkdir -p $LIBBEAT_PATH/coverage
 WORKDIR $LIBBEAT_PATH
 
 # Create a copy of the respository inside the container.
