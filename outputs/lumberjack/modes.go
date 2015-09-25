@@ -79,8 +79,9 @@ type failOverConnectionMode struct {
 
 	closed bool // mode closed flag to break publisher loop
 
-	timeout   time.Duration // connection timeout
-	waitRetry time.Duration // wait time until trying a new connection
+	timeout     time.Duration // connection timeout
+	waitRetry   time.Duration // wait time until trying a new connection
+	maxAttempts int           // maximum number of configured send attempts
 }
 
 // loadBalancerMode balances the sending of events between multiple connections.
@@ -167,6 +168,7 @@ func (s *singleConnectionMode) PublishEvents(
 	fails := 0
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
 		if err := s.Connect(); err != nil {
+			fails++
 			time.Sleep(s.waitRetry)
 			continue
 		}
@@ -185,6 +187,9 @@ func (s *singleConnectionMode) PublishEvents(
 			outputs.SignalCompleted(trans)
 			return nil
 		}
+
+		time.Sleep(s.waitRetry)
+		fails++
 	}
 
 	outputs.SignalFailed(trans)
@@ -193,13 +198,14 @@ func (s *singleConnectionMode) PublishEvents(
 
 func newFailOverConnectionMode(
 	clients []ProtocolClient,
-	waitRetry time.Duration,
-	timeout time.Duration,
+	maxAttempts int,
+	waitRetry, timeout time.Duration,
 ) (*failOverConnectionMode, error) {
 	f := &failOverConnectionMode{
-		conns:     clients,
-		timeout:   timeout,
-		waitRetry: waitRetry,
+		conns:       clients,
+		timeout:     timeout,
+		waitRetry:   waitRetry,
+		maxAttempts: maxAttempts,
 	}
 
 	// Try to connect preliminary, but ignore errors for now.
@@ -268,8 +274,11 @@ func (f *failOverConnectionMode) PublishEvents(
 	events []common.MapStr,
 ) error {
 	published := 0
-	for !f.closed {
+	fails := 0
+	for !f.closed && (f.maxAttempts == 0 || fails < f.maxAttempts) {
 		if err := f.Connect(f.active); err != nil {
+			fails++
+			time.Sleep(f.waitRetry)
 			continue
 		}
 
@@ -278,14 +287,7 @@ func (f *failOverConnectionMode) PublishEvents(
 			conn := f.conns[f.active]
 			n, err := conn.PublishEvents(events[published:])
 			if err != nil {
-				// TODO(sissel): Track how frequently we timeout and reconnect. If we're
-				// timing out too frequently, there's really no point in timing out since
-				// basically everything is slow or down. We'll want to ratchet up the
-				// timeout value slowly until things improve, then ratchet it down once
-				// things seem healthy.
-				time.Sleep(f.waitRetry)
-
-				continue
+				break
 			}
 			published += n
 		}
@@ -294,6 +296,14 @@ func (f *failOverConnectionMode) PublishEvents(
 			outputs.SignalCompleted(trans)
 			return nil
 		}
+
+		// TODO(sissel): Track how frequently we timeout and reconnect. If we're
+		// timing out too frequently, there's really no point in timing out since
+		// basically everything is slow or down. We'll want to ratchet up the
+		// timeout value slowly until things improve, then ratchet it down once
+		// things seem healthy.
+		time.Sleep(f.waitRetry)
+		fails++
 	}
 
 	outputs.SignalFailed(trans)

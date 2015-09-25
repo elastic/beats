@@ -99,7 +99,7 @@ func (lj *lumberjack) init(
 		if loadBalance {
 			mode, err = newLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
 		} else {
-			mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
+			mode, err = newFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
 		}
 	}
 	if err != nil {
