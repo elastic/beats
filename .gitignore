@@ -1,4 +1,4 @@
-packetbeat
+
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
@@ -7,9 +7,9 @@ packetbeat
 *.swp
 *.swo
 *.swn
-packetbeat.test
-profile.cov
-cover/coverage.html
+libbeat
+libbeat.test
+coverage/*
 
 # Folders
 _obj
