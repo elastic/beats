@@ -13,6 +13,7 @@ type MothershipConfig struct {
 	Host               string
 	Port               int
 	Hosts              []string
+	LoadBalance        *bool
 	Protocol           string
 	Username           string
 	Password           string

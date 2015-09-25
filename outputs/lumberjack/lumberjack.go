@@ -38,7 +38,10 @@ type lumberjack struct {
 	mode ConnectionMode
 }
 
-const lumberjackDefaultTimeout = 5 * time.Second
+const (
+	lumberjackDefaultTimeout = 5 * time.Second
+	defaultSendRetries       = 3
+)
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration
 var ErrNoHostsConfigured = errors.New("no host configuration found")
@@ -87,7 +90,16 @@ func (lj *lumberjack) init(
 	if len(clients) == 1 {
 		mode, err = newSingleConnectionMode(clients[0], waitRetry, timeout)
 	} else {
-		mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
+		loadBalance := config.LoadBalance == nil || *config.LoadBalance
+		if loadBalance {
+			sendRetries := defaultSendRetries
+			if config.Max_retries != nil {
+				sendRetries = *config.Max_retries
+			}
+			mode, err = newLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
+		} else {
+			mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
+		}
 	}
 	if err != nil {
 		return err
