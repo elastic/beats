@@ -42,6 +42,13 @@ shipper:
   # All the IPs will be deleted afterwards. Note, that the value must be higher than
   # refresh_topology_freq. The default is 15 seconds.
   topology_expire: 15
+
+  # Configure local GeoIP database support. If no path configured
+  # the locations /usr/share/GeoIP/GeoLiteCity.dat and
+  # /usr/local/var/GeoIP/GeoLiteCity.dat are searched for a GeoIP database.
+  geoip:
+    # If paths is empty, GeoIP support will be disabled.
+    paths: ["/path/to/geoip/data/GeoLiteCity.dat"]
 ------------------------------------------------------------------------------
 
 ==== Options
@@ -125,6 +132,14 @@ This setting controls the expiration time for the topology in seconds. This is
 useful in case a shipper stops publishing its IP addresses.  The IP addresses
 are removed automatically from the topology map after expiration. The default
 is 15 seconds.
+
+===== geoip.paths
+
+The geoip.paths setting configures the search path for the GeoIP databases. If no database can be loaded or geoip.paths is an empty list, GeoIP support is disabled. The first file found will be loaded.
+
+If geoip.paths is missing from config file the default paths /usr/share/GeoIP/GeoLiteCity.dat and /usr/local/var/GeoIP/GeoLiteCity.dat are searched for installed GeopIP databases.
+
+*Important*: For GeoIP support to function correctly the [GeoLite City database](https://dev.maxmind.com/geoip/legacy/geolite/) is required.
 
 
 [[configuration-output]]
