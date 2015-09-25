@@ -2,12 +2,17 @@
 /coverage
 /etc/filebeat.dev.yml
 .idea
-filebeat
 .DS_Store
+.vagrant
 .filebeat
 *.swp
 *.swo
 
 cover
 profile.cov
+
+filebeat
 filebeat.test
+filebeat.exe
+filebeat.test.exe
+
