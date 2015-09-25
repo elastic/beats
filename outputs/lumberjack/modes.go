@@ -65,8 +65,9 @@ type singleConnectionMode struct {
 
 	closed bool // mode closed flag to break publisher loop
 
-	timeout   time.Duration // connection timeout
-	waitRetry time.Duration // wait time until reconnect
+	timeout     time.Duration // connection timeout
+	waitRetry   time.Duration // wait time until reconnect
+	maxAttempts int           // maximum number of configured send attempts
 }
 
 // failOverConnectionMode connects to at most one host by random and swap to
@@ -133,12 +134,13 @@ var (
 
 func newSingleConnectionMode(
 	client ProtocolClient,
-	waitRetry time.Duration,
-	timeout time.Duration,
+	maxAttempts int,
+	waitRetry, timeout time.Duration,
 ) (*singleConnectionMode, error) {
 	s := &singleConnectionMode{
-		timeout: timeout,
-		conn:    client,
+		timeout:     timeout,
+		conn:        client,
+		maxAttempts: maxAttempts,
 	}
 
 	_ = s.Connect() // try to connect, but ignore errors for now
@@ -162,7 +164,8 @@ func (s *singleConnectionMode) PublishEvents(
 	events []common.MapStr,
 ) error {
 	published := 0
-	for !s.closed {
+	fails := 0
+	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
 		if err := s.Connect(); err != nil {
 			time.Sleep(s.waitRetry)
 			continue
@@ -174,6 +177,7 @@ func (s *singleConnectionMode) PublishEvents(
 				break
 			}
 
+			fails = 0
 			published += n
 		}
 
