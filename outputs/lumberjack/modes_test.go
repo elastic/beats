@@ -168,6 +168,7 @@ func TestSingleSend(t *testing.T) {
 			connect:   connectOK,
 			publish:   collectPublish(&collected),
 		},
+		3,
 		0,
 		100*time.Millisecond,
 	)
@@ -181,9 +182,10 @@ func TestSingleConnectFailConnect(t *testing.T) {
 		&mockClient{
 			connected: false,
 			close:     closeOK,
-			connect:   failConnect(5, errFail),
+			connect:   failConnect(2, errFail),
 			publish:   collectPublish(&collected),
 		},
+		3,
 		0,
 		100*time.Millisecond,
 	)
@@ -207,6 +209,7 @@ func TestFailoverSingleSend(t *testing.T) {
 				publish:   collectPublish(&collected),
 			},
 		},
+		3,
 		0,
 		100*time.Millisecond,
 	)
@@ -233,6 +236,7 @@ func TestFailoverFlakyConnections(t *testing.T) {
 				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
 			},
 		},
+		3,
 		1*time.Millisecond,
 		100*time.Millisecond,
 	)

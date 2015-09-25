@@ -86,19 +86,20 @@ func (lj *lumberjack) init(
 		return err
 	}
 
+	sendRetries := defaultSendRetries
+	if config.Max_retries != nil {
+		sendRetries = *config.Max_retries
+	}
+
 	var mode ConnectionMode
 	if len(clients) == 1 {
-		mode, err = newSingleConnectionMode(clients[0], waitRetry, timeout)
+		mode, err = newSingleConnectionMode(clients[0], sendRetries, waitRetry, timeout)
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
-			sendRetries := defaultSendRetries
-			if config.Max_retries != nil {
-				sendRetries = *config.Max_retries
-			}
 			mode, err = newLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
 		} else {
-			mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
+			mode, err = newFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
 		}
 	}
 	if err != nil {
