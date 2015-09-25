@@ -5,8 +5,9 @@ import (
 )
 
 // Signaler signals the completion of potentially asynchronous output operation.
-// Completed is send by output plugin when all events have been send. On failure or
-// only subset of data being published Failed will be send.
+// Completed is called by the output plugin when all events have been sent. On
+// failure or if only a subset of the data is published then Failed will be
+// invoked.
 type Signaler interface {
 	Completed()
 
