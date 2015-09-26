@@ -38,8 +38,9 @@ func Confirm(options *publishOptions) {
 	options.confirm = true
 }
 
-// Sync option will block the event publisher until an event has beend ACKed by
-// the output plugin. If output plugin signals failure, the event is send again.
+// Sync option will block the event publisher until an event has been ACKed by
+// the output plugin. If output plugin signals failure, the client will retry
+// until success is signaled.
 func Sync(options *publishOptions) {
 	options.confirm = true
 	options.sync = true
