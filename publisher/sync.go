@@ -10,7 +10,7 @@ type syncPublisher struct {
 	pub *PublisherType
 }
 
-type syncClient func(message)
+type syncClient func(message) bool
 
 func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	s := &syncPublisher{pub: pub}
@@ -18,8 +18,11 @@ func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	return s
 }
 
-func (p *syncPublisher) client() eventPublisher {
-	return syncClient(p.send)
+func (p *syncPublisher) client(confirmOnly bool) eventPublisher {
+	if confirmOnly {
+		return syncClient(p.forward)
+	}
+	return syncClient(p.forceForward)
 }
 
 func (p *syncPublisher) onStop() {}
@@ -33,16 +36,24 @@ func (p *syncPublisher) onMessage(m message) {
 }
 
 func (c syncClient) PublishEvent(event common.MapStr) bool {
-	return c.send(message{event: event})
+	return c(message{event: event})
 }
 
 func (c syncClient) PublishEvents(events []common.MapStr) bool {
-	return c.send(message{events: events})
+	return c(message{events: events})
 }
 
-func (c syncClient) send(m message) bool {
+func (p *syncPublisher) forward(m message) bool {
 	sync := outputs.NewSyncSignal()
 	m.signal = sync
-	c(m)
+	p.send(m)
 	return sync.Wait()
+}
+
+func (p *syncPublisher) forceForward(m message) bool {
+	for {
+		if ok := p.forward(m); ok {
+			return true
+		}
+	}
 }
