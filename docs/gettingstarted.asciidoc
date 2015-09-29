@@ -1,12 +1,3 @@
-////
-
-This file is generated! Edit gettingstarted.in.asciidoc instead and then
-re-generate this file with:
-
-  ../scripts/generate_gettingstarted.sh gettingstarted.in.asciidoc gettingstarted.asciidoc
-
-////
-
 [[packetbeat-getting-started]]
 == Getting started
 
@@ -31,29 +22,29 @@ servers:
 
 deb:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0-beta3_amd64.deb
-sudo dpkg -i packetbeat_1.0.0-beta3_amd64.deb
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_{version}_amd64.deb
+sudo dpkg -i packetbeat_{version}_amd64.deb
 ----------------------------------------------------------------------
 
 rpm:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0-beta3-x86_64.rpm
-sudo rpm -vi packetbeat-1.0.0-beta3-x86_64.rpm
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-{version}-x86_64.rpm
+sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
 
 mac:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0-beta3-darwin.tgz
-tar xzvf packetbeat-1.0.0-beta3-darwin.tgz
+curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-{version}-darwin.tgz
+tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
 NOTE: We also provide 32bits images. You can get them from our
@@ -148,7 +139,7 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd beats-1.0.0-beta3-darwin
+cd beats-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 

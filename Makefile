@@ -81,7 +81,6 @@ env/bin/activate: requirements.txt
 
 .PHONY: gen
 gen: env
-	./scripts/generate_gettingstarted.sh docs/gettingstarted.in.asciidoc docs/gettingstarted.asciidoc
 	. env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
 	. env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
 
