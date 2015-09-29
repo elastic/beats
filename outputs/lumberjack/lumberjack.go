@@ -147,12 +147,11 @@ func makeClients(
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.
 func (lj *lumberjack) PublishEvent(
-	trans outputs.Signaler,
+	signaler outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	events := []common.MapStr{event}
-	return lj.mode.PublishEvents(trans, events)
+	return lj.mode.PublishEvent(signaler, event)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events

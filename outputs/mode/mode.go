@@ -9,6 +9,21 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
+// ConnectionMode takes care of connecting to hosts
+// and potentially doing load balancing and/or failover
+type ConnectionMode interface {
+	// Close will stop the modes it's publisher loop and close all it's
+	// associated clients
+	Close() error
+
+	// PublishEvents will send all events (potentially asynchronous) to its
+	// clients.
+	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
+
+	// PublishEvent will send an event to its clients.
+	PublishEvent(trans outputs.Signaler, event common.MapStr) error
+}
+
 // ProtocolClient interface is a output plugin specific client implementation
 // for encoding and publishing events. A ProtocolClient must be able to connection
 // to it's sink and indicate connection failures in order to be reconnected byte
@@ -36,16 +51,8 @@ type ProtocolClient interface {
 	// error case. On return n indicates the number of events guaranteed to be
 	// published.
 	PublishEvents(events []common.MapStr) (n int, err error)
-}
 
-// ConnectionMode takes care of connecting to hosts
-// and potentially doing load balancing and/or failover
-type ConnectionMode interface {
-	// Close will stop the modes it's publisher loop and close all it's
-	// associated clients
-	Close() error
-
-	// PublishEvents will send all events (potentially asynchronous) to its
-	// clients.
-	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
+	// PublishEvent sends one event to the clients sink. On failure and error is
+	// returned.
+	PublishEvent(event common.MapStr) error
 }

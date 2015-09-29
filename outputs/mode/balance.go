@@ -57,6 +57,7 @@ type eventsMessage struct {
 	attemptsLeft int
 	signaler     outputs.Signaler
 	events       []common.MapStr
+	event        common.MapStr
 }
 
 // NewLoadBalancerMode create a new load balancer connection mode.
@@ -92,12 +93,26 @@ func (m *LoadBalancerMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	msg := eventsMessage{
+	return m.publishEventsMessage(eventsMessage{
 		attemptsLeft: m.maxAttempts,
 		signaler:     signaler,
 		events:       events,
-	}
+	})
+}
 
+// PublishEvent forwards the event to some load balancing worker.
+func (m *LoadBalancerMode) PublishEvent(
+	signaler outputs.Signaler,
+	event common.MapStr,
+) error {
+	return m.publishEventsMessage(eventsMessage{
+		attemptsLeft: m.maxAttempts,
+		signaler:     signaler,
+		event:        event,
+	})
+}
+
+func (m *LoadBalancerMode) publishEventsMessage(msg eventsMessage) error {
 	if ok := m.forwardEvent(m.work, msg); !ok {
 		outputs.SignalFailed(msg.signaler)
 	}
@@ -150,24 +165,31 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 }
 
 func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
-	published := 0
-	events := msg.events
-	send := 0
-	for published < len(events) {
-		n, err := client.PublishEvents(events[published:])
-		if err != nil {
-			// retry only non-confirmed subset of events in batch
-			msg.events = msg.events[published:]
-
-			// reset attempt count if subset of message has been send
-			if send > 0 {
-				msg.attemptsLeft = m.maxAttempts + 1
-			}
+	if msg.event != nil {
+		if err := client.PublishEvent(msg.event); err != nil {
 			m.onFail(msg)
 			return
 		}
-		published += n
-		send++
+	} else {
+		published := 0
+		events := msg.events
+		send := 0
+		for published < len(events) {
+			n, err := client.PublishEvents(events[published:])
+			if err != nil {
+				// retry only non-confirmed subset of events in batch
+				msg.events = msg.events[published:]
+
+				// reset attempt count if subset of message has been send
+				if send > 0 {
+					msg.attemptsLeft = m.maxAttempts + 1
+				}
+				m.onFail(msg)
+				return
+			}
+			published += n
+			send++
+		}
 	}
 	outputs.SignalCompleted(msg.signaler)
 }

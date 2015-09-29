@@ -33,6 +33,11 @@ func (c *mockClient) PublishEvents(events []common.MapStr) (int, error) {
 	return c.publish(events)
 }
 
+func (c *mockClient) PublishEvent(event common.MapStr) error {
+	_, err := c.PublishEvents([]common.MapStr{event})
+	return err
+}
+
 func connectOK(timeout time.Duration) error {
 	return nil
 }

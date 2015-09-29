@@ -153,3 +153,29 @@ func (f *FailOverConnectionMode) PublishEvents(
 	outputs.SignalFailed(trans)
 	return nil
 }
+
+// PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
+func (f *FailOverConnectionMode) PublishEvent(
+	signaler outputs.Signaler,
+	event common.MapStr,
+) error {
+	fails := 0
+	for !f.closed && (f.maxAttempts == 0 || fails < f.maxAttempts) {
+		if err := f.connect(f.active); err != nil {
+			fails++
+			time.Sleep(f.waitRetry)
+			continue
+		}
+
+		if err := f.conns[f.active].PublishEvent(event); err != nil {
+			fails++
+			continue
+		}
+
+		outputs.SignalCompleted(signaler)
+		return nil
+	}
+
+	outputs.SignalFailed(signaler)
+	return nil
+}

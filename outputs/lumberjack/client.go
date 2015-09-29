@@ -58,6 +58,11 @@ func newLumberjackClient(conn TransportClient, timeout time.Duration) *lumberjac
 	}
 }
 
+func (l *lumberjackClient) PublishEvent(event common.MapStr) error {
+	_, err := l.PublishEvents([]common.MapStr{event})
+	return err
+}
+
 func (l *lumberjackClient) PublishEvents(events []common.MapStr) (int, error) {
 	if len(events) == 0 {
 		return 0, nil

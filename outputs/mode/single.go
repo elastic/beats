@@ -90,3 +90,28 @@ func (s *SingleConnectionMode) PublishEvents(
 	outputs.SignalFailed(signaler)
 	return nil
 }
+
+// PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
+func (s *SingleConnectionMode) PublishEvent(
+	signaler outputs.Signaler,
+	event common.MapStr,
+) error {
+	fails := 0
+	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
+		if err := s.connect(); err != nil {
+			fails++
+			time.Sleep(s.waitRetry)
+			continue
+		}
+		if err := s.conn.PublishEvent(event); err != nil {
+			fails++
+			continue
+		}
+
+		outputs.SignalCompleted(signaler)
+		return nil
+	}
+
+	outputs.SignalFailed(signaler)
+	return nil
+}
