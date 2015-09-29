@@ -122,7 +122,7 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 				// don't follow
 				return
 			}
-			logp.Debug("tcp", "Stream doesn't exists, creating new")
+			logp.Debug("tcp", "Stream doesn't exist, creating new")
 
 			// create
 			stream = &TcpStream{id: tcp.getId(), tuple: &pkt.Tuple, protocol: protocol, tcp: tcp}
@@ -143,8 +143,7 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 		stream.lastSeq[original_dir] != 0 {
 
 		if tcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
-
-			logp.Debug("tcp", "Ignoring what looks like a retrasmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+			logp.Debug("tcp", "Ignoring what looks like a retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 				tcphdr.Seq, len(pkt.Payload), stream.lastSeq[original_dir])
 			return
 		}
