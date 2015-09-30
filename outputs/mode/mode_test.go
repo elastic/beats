@@ -120,44 +120,91 @@ var testEvent = common.MapStr{
 func testMode(
 	t *testing.T,
 	mode ConnectionMode,
-	events [][]common.MapStr,
-	expectedSignal bool,
+	events []eventInfo,
+	expectedSignals []bool,
 	collectedEvents *[][]common.MapStr,
 ) {
 	defer mode.Close()
 
-	if events != nil {
-		ch := make(chan bool, 1)
-		signal := outputs.NewChanSignal(ch)
-		for _, pubEvents := range events {
-			_ = mode.PublishEvents(signal, pubEvents)
+	if events == nil {
+		return
+	}
 
-			result := <-ch
-			assert.Equal(t, expectedSignal, result)
+	numSignals := 0
+	for _, pubEvents := range events {
+		if pubEvents.single {
+			numSignals += len(pubEvents.events)
+		} else {
+			numSignals++
 		}
+	}
 
-		if collectedEvents != nil {
-			assert.Equal(t, len(events), len(*collectedEvents))
-			for i := range *collectedEvents {
-				expected := events[i]
-				actual := (*collectedEvents)[i]
-				assert.Equal(t, expected, actual)
+	var expectedEvents [][]common.MapStr
+	ch := make(chan bool, numSignals)
+	signal := outputs.NewChanSignal(ch)
+	idx := 0
+	for _, pubEvents := range events {
+		if pubEvents.single {
+			for _, event := range pubEvents.events {
+				_ = mode.PublishEvent(signal, event)
+				if expectedSignals[idx] {
+					expectedEvents = append(expectedEvents, []common.MapStr{event})
+				}
+				idx++
 			}
+		} else {
+			_ = mode.PublishEvents(signal, pubEvents.events)
+			if expectedSignals[idx] {
+				expectedEvents = append(expectedEvents, pubEvents.events)
+			}
+			idx++
+		}
+	}
+
+	results := make([]bool, len(expectedSignals))
+	for i := 0; i < len(expectedSignals); i++ {
+		results[i] = <-ch
+	}
+	assert.Equal(t, expectedSignals, results)
+
+	if collectedEvents != nil {
+		assert.Equal(t, len(expectedEvents), len(*collectedEvents))
+		for i := range *collectedEvents {
+			expected := expectedEvents[i]
+			actual := (*collectedEvents)[i]
+			assert.Equal(t, expected, actual)
 		}
 	}
 }
 
-func singleEvent(e common.MapStr) [][]common.MapStr {
-	return [][]common.MapStr{
-		[]common.MapStr{e},
+type eventInfo struct {
+	single bool
+	events []common.MapStr
+}
+
+func singleEvent(e common.MapStr) []eventInfo {
+	events := []common.MapStr{e}
+	return []eventInfo{
+		{single: true, events: events},
 	}
 }
 
-func repeatEvent(n int, e common.MapStr) [][]common.MapStr {
-	event := []common.MapStr{e}
-	var events [][]common.MapStr
+func multiEvent(n int, event common.MapStr) []eventInfo {
+	var events []common.MapStr
 	for i := 0; i < n; i++ {
 		events = append(events, event)
 	}
+	return []eventInfo{{single: false, events: events}}
+}
+
+func repeat(n int, evt []eventInfo) []eventInfo {
+	var events []eventInfo
+	for _, e := range evt {
+		events = append(events, e)
+	}
 	return events
+}
+
+func signals(s ...bool) []bool {
+	return s
 }

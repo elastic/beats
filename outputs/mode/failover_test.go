@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/libbeat/common"
 )
 
-func TestFailoverSingleSend(t *testing.T) {
+func testFailoverSend(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
 	mode, _ := NewFailOverConnectionMode(
 		[]ProtocolClient{
@@ -29,10 +29,18 @@ func TestFailoverSingleSend(t *testing.T) {
 		0,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, singleEvent(testEvent), true, &collected)
+	testMode(t, mode, events, signals(true), &collected)
 }
 
-func TestFailoverFlakyConnections(t *testing.T) {
+func TestFailoverSingleSendOne(t *testing.T) {
+	testFailoverSend(t, singleEvent(testEvent))
+}
+
+func TestFailoverSendMultiple(t *testing.T) {
+	testFailoverSend(t, multiEvent(2, testEvent))
+}
+
+func testFailoverConnectFailAndSend(t *testing.T, events []eventInfo) {
 	errFail := errors.New("fail connect")
 	var collected [][]common.MapStr
 	mode, _ := NewFailOverConnectionMode(
@@ -40,13 +48,13 @@ func TestFailoverFlakyConnections(t *testing.T) {
 			&mockClient{
 				connected: false,
 				close:     closeOK,
-				connect:   failConnect(2, errFail),
+				connect:   failConnect(3, errFail),
 				publish:   publishTimeoutEvery(1, collectPublish(&collected)),
 			},
 			&mockClient{
 				connected: false,
 				close:     closeOK,
-				connect:   failConnect(1, errFail),
+				connect:   failConnect(2, errFail),
 				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
 			},
 		},
@@ -54,5 +62,78 @@ func TestFailoverFlakyConnections(t *testing.T) {
 		1*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, repeatEvent(10, testEvent), true, &collected)
+	testMode(t, mode, events, signals(true), &collected)
+}
+
+func TestFailoverConnectFailAndSend(t *testing.T) {
+	testFailoverConnectFailAndSend(t, singleEvent(testEvent))
+}
+
+func TestFailoverConnectFailConnectAndSendMultiple(t *testing.T) {
+	testFailoverConnectFailAndSend(t, multiEvent(10, testEvent))
+}
+
+func testFailoverConnectionFail(t *testing.T, events []eventInfo) {
+	errFail := errors.New("fail connect")
+	var collected [][]common.MapStr
+	mode, _ := NewFailOverConnectionMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   alwaysFailConnect(errFail),
+				publish:   publishTimeoutEvery(1, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   alwaysFailConnect(errFail),
+				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
+			},
+		},
+		3,
+		1*time.Millisecond,
+		100*time.Millisecond,
+	)
+	testMode(t, mode, events, signals(false), &collected)
+}
+
+func TestFailoverConnectionFail(t *testing.T) {
+	testFailoverConnectionFail(t, singleEvent(testEvent))
+}
+
+func TestFailoverConnectionFailMulti(t *testing.T) {
+	testFailoverConnectionFail(t, multiEvent(10, testEvent))
+}
+
+func testFailoverSendFlaky(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewFailOverConnectionMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(1, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(1, collectPublish(&collected)),
+			},
+		},
+		3,
+		1*time.Millisecond,
+		100*time.Millisecond,
+	)
+	testMode(t, mode, events, signals(true), &collected)
+}
+
+func TestFailoverSendFlaky(t *testing.T) {
+	testFailoverSendFlaky(t, singleEvent(testEvent))
+}
+
+func TestFailoverSendMultiFlaky(t *testing.T) {
+	testFailoverSendFlaky(t, multiEvent(10, testEvent))
 }

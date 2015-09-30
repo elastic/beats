@@ -21,7 +21,7 @@ func TestLoadBalancerStartStop(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, nil, true, nil)
+	testMode(t, mode, nil, nil, nil)
 }
 
 func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
@@ -38,7 +38,7 @@ func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, singleEvent(testEvent), false, nil)
+	testMode(t, mode, multiEvent(2, testEvent), signals(false), nil)
 }
 
 func TestLoadBalancerOKSend(t *testing.T) {
@@ -56,7 +56,7 @@ func TestLoadBalancerOKSend(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, singleEvent(testEvent), true, &collected)
+	testMode(t, mode, multiEvent(10, testEvent), signals(true), &collected)
 }
 
 func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
@@ -80,5 +80,5 @@ func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, singleEvent(testEvent), true, &collected)
+	testMode(t, mode, multiEvent(10, testEvent), signals(true), &collected)
 }
