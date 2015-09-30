@@ -68,46 +68,36 @@ func (f *FailOverConnectionMode) Close() error {
 }
 
 func (f *FailOverConnectionMode) connect(active int) error {
-	for !f.closed {
-		if 0 <= active && active < len(f.conns) && f.conns[active].IsConnected() {
-			return nil
-		}
-
-		var next int
-		switch {
-		case len(f.conns) == 0:
-			return ErrNoConnectionConfigured
-		case len(f.conns) == 1:
-			next = 0
-		case len(f.conns) == 2 && 0 <= active && active <= 1:
-			next = 1 - active
-		default:
-			for {
-				// Connect to random server to potentially spread the
-				// load when large number of beats with same set of sinks
-				// are started up at about the same time.
-				next = rand.Int() % len(f.conns)
-				if next != active {
-					break
-				}
-			}
-		}
-
-		f.active = next
-		if f.conns[next].IsConnected() {
-			return nil
-		}
-
-		if err := f.conns[next].Connect(f.timeout); err != nil {
-			active = next
-			continue
-		}
-
-		// found active connection -> return it
+	if 0 <= active && active < len(f.conns) && f.conns[active].IsConnected() {
 		return nil
 	}
 
-	return errNoActiveConnection
+	var next int
+	switch {
+	case len(f.conns) == 0:
+		return ErrNoConnectionConfigured
+	case len(f.conns) == 1:
+		next = 0
+	case len(f.conns) == 2 && 0 <= active && active <= 1:
+		next = 1 - active
+	default:
+		for {
+			// Connect to random server to potentially spread the
+			// load when large number of beats with same set of sinks
+			// are started up at about the same time.
+			next = rand.Int() % len(f.conns)
+			if next != active {
+				break
+			}
+		}
+	}
+
+	f.active = next
+	if f.conns[next].IsConnected() {
+		return nil
+	}
+
+	return f.conns[next].Connect(f.timeout)
 }
 
 // PublishEvents tries to publish the events with retries if connection becomes
