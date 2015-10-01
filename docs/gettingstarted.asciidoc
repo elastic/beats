@@ -29,7 +29,7 @@ just do the fun part.
 
 === Elasticsearch installation
 
-http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
+https://www.elastic.co/products/elasticsearch[Elasticsearch] is a distributed real-time
 storage, search and analytics engine. It can be used for many purposes, but one
 context where it excels is indexing streams of semi-structured data, like logs
 or decoded network packets.
@@ -43,7 +43,7 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb
 sudo dpkg -i elasticsearch-1.5.2.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -53,7 +53,7 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.2.noarch.rpm
 sudo rpm -i elasticsearch-1.5.2.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ mac:
 [source,shell]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.2.zip
 unzip elasticsearch-1.5.2.zip
 cd elasticsearch-1.5.2
 ./bin/elasticsearch
@@ -106,7 +106,7 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_1.0.0-beta3_amd64.deb
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat_1.0.0-beta3_amd64.deb
 sudo dpkg -i packetbeat_1.0.0-beta3_amd64.deb
 ----------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0-beta3-x86_64.rpm
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta3-x86_64.rpm
 sudo rpm -vi packetbeat-1.0.0-beta3-x86_64.rpm
 ----------------------------------------------------------------------
 
@@ -124,7 +124,7 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-1.0.0-beta3-darwin.tgz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta3-darwin.tgz
 tar xzvf packetbeat-1.0.0-beta3-darwin.tgz
 ----------------------------------------------------------------------
 
@@ -202,7 +202,7 @@ output:
 ----------------------------------------------------------------------
 
 Before starting the shipper, you should also load an
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to tell Elasticsearch which fields should be analyzed
 in which way.
 
@@ -340,7 +340,7 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/dashboards/beats-dashboards-1.0.0-beta3.tar.gz
+curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.0.0-beta3.tar.gz
 tar xzvf beats-dashboards-1.0.0-beta3.tar.gz
 cd beats-dashboards-1.0.0-beta3/
 ./load.sh

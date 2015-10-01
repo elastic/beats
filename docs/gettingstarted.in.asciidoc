@@ -20,7 +20,7 @@ just do the fun part.
 
 === Elasticsearch installation
 
-http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
+https://www.elastic.co/products/elasticsearch[Elasticsearch] is a distributed real-time
 storage, search and analytics engine. It can be used for many purposes, but one
 context where it excels is indexing streams of semi-structured data, like logs
 or decoded network packets.
@@ -34,7 +34,7 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.deb
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.deb
 sudo dpkg -i elasticsearch-$ES_VERSION.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -44,7 +44,7 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.noarch.rpm
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.noarch.rpm
 sudo rpm -i elasticsearch-$ES_VERSION.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
@@ -54,7 +54,7 @@ mac:
 [source,shell]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.zip
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-$ES_VERSION.zip
 unzip elasticsearch-$ES_VERSION.zip
 cd elasticsearch-$ES_VERSION
 ./bin/elasticsearch
@@ -97,7 +97,7 @@ deb:
 [source,shell]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_$PB_VERSION_amd64.deb
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat_$PB_VERSION_amd64.deb
 sudo dpkg -i packetbeat_$PB_VERSION_amd64.deb
 ----------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ rpm:
 [source,shell]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.rpm
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-$PB_VERSION-x86_64.rpm
 sudo rpm -vi packetbeat-$PB_VERSION-x86_64.rpm
 ----------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-$PB_VERSION-darwin.tgz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-$PB_VERSION-darwin.tgz
 tar xzvf packetbeat-$PB_VERSION-darwin.tgz
 ----------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ output:
 ----------------------------------------------------------------------
 
 Before starting the shipper, you should also load an
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to tell Elasticsearch which fields should be analyzed
 in which way.
 
@@ -331,7 +331,7 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/dashboards/beats-dashboards-$DASHBOARDS_VERSION.tar.gz
+curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-$DASHBOARDS_VERSION.tar.gz
 tar xzvf beats-dashboards-$DASHBOARDS_VERSION.tar.gz
 cd beats-dashboards-$DASHBOARDS_VERSION/
 ./load.sh
