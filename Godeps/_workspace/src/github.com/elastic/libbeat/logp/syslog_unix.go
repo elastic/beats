@@ -1,4 +1,4 @@
-// +build !windows
+// +build !windows,!nacl,!plan9
 
 package logp
 

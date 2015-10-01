@@ -59,6 +59,13 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 // To set additional cmd line args use the beat.CmdLine type before calling the function
 func (beat *Beat) CommandLineSetup() {
 
+	// The -c flag is treated separately because it needs the Beat name
+	err := cfgfile.ChangeDefaultCfgfileFlag(beat.Name)
+	if err != nil {
+		fmt.Printf("Failed to fix the -c flag: %v\n", err)
+		os.Exit(1)
+	}
+
 	flag.Parse()
 
 	if *printVersion {
