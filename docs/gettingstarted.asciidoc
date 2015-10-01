@@ -25,7 +25,7 @@ deb:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install libpcap0.8
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat_{version}_amd64.deb
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat_{version}_amd64.deb
 sudo dpkg -i packetbeat_{version}_amd64.deb
 ----------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ rpm:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install libpcap
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-{version}-x86_64.rpm
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-x86_64.rpm
 sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/packetbeat/packetbeat-{version}-darwin.tgz
+curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-darwin.tgz
 tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ output:
 ----------------------------------------------------------------------
 
 Before starting Packetbeat, you need to load the
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to let Elasticsearch know which fields should be analyzed
 in which way.
 
