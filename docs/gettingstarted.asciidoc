@@ -4,6 +4,8 @@
 Topbeat helps you monitor the availability of your website or service by providing system wide and per process
 statistics together with disk space overview.
 
+=== Steps:
+
 Follow the steps to get started with your own Topbeat setup:
 
  * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
