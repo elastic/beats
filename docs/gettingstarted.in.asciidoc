@@ -331,11 +331,19 @@ To load the sample pages, follow these steps:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-$DASHBOARDS_VERSION.tar.gz
-tar xzvf packetbeat-dashboards-$DASHBOARDS_VERSION.tar.gz
-cd packetbeat-dashboards-$DASHBOARDS_VERSION/
+curl -L -O https://download.elasticsearch.org/beats/dashboards/beats-dashboards-$DASHBOARDS_VERSION.tar.gz
+tar xzvf beats-dashboards-$DASHBOARDS_VERSION.tar.gz
+cd beats-dashboards-$DASHBOARDS_VERSION/
 ./load.sh
 ----------------------------------------------------------------------
+
+NOTE: In case the Elasticsearch is not running on 127.0.0.1:9200, you need to specify the Elasticsearch location as argument of the load.sh command line:
+
+[source,shell]
+----------------------------------------------------------------------------
+./load.sh http://192.168.33.60:9200
+----------------------------------------------------------------------------
+
 
 To open the loaded dashboards, go to the _Dashboard_ page and click the "Open"
 icon. Select _Packetbeat Dashboard_ from the list. You can then switch easier
