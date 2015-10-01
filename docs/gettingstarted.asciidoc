@@ -4,6 +4,8 @@
 The best way to understand the value of an network packet analytics system like
 Packetbeat is to try it on your own traffic. 
 
+=== Steps:
+
 Follow the steps to get started with your own Packetbeat setup:
 
  * Install the Packetbeat shippers on your servers so that they capture the network traffic. <<packetbeat-installation>>
