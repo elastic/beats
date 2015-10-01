@@ -4,6 +4,8 @@
 Topbeat helps you monitor the availability of your website or service by providing system wide and per process
 statistics together with disk space overview.
 
+=== Steps:
+
 Follow the steps to get started with your own Topbeat setup:
 
  * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
@@ -22,7 +24,7 @@ deb:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat_{version}_amd64.deb
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat_{version}_amd64.deb
 sudo dpkg -i topbeat_1.0.0-beta3_amd64.deb
 ------------------------------------------------
 
@@ -32,7 +34,7 @@ rpm:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-{version}-x86_64.rpm
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-x86_64.rpm
 sudo rpm -vi topbeat-1.0.0-beta3-x86_64.rpm
 ------------------------------------------------
 
@@ -41,7 +43,7 @@ mac:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://download.elasticsearch.org/beats/topbeat/topbeat-{version}-darwin.tgz
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-darwin.tgz
 tar xzvf topbeat-{version}-darwin.tgz
 ------------------------------------------------
 
@@ -76,7 +78,7 @@ input:
 -------------------------------------
 
 Before starting topbeat, you need to load the
-http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/indices-templates.html[index
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to let Elasticsearch know which fields should be analyzed
 in which way.
 
