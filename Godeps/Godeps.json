@@ -7,43 +7,43 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/filters",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Comment": "v1.0.0-beta3-90-gb4cc3ae",
-			"Rev": "b4cc3aec923a0aad2c53887ab6a305f6c862f619"
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",

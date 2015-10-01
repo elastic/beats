@@ -5,12 +5,23 @@ import (
 )
 
 // Signaler signals the completion of potentially asynchronous output operation.
-// Completed is send by output plugin when all events have been send. On failure or
-// only subset of data being published Failed will be send.
+// Completed is called by the output plugin when all events have been sent. On
+// failure or if only a subset of the data is published then Failed will be
+// invoked.
 type Signaler interface {
 	Completed()
 
 	Failed()
+}
+
+// ChanSignal will send outputer signals on configurable channel.
+type ChanSignal struct {
+	ch chan bool
+}
+
+// SyncSignal blocks waiting for a signal.
+type SyncSignal struct {
+	ch chan bool
 }
 
 // SplitSignal guards one output signaler from multiple calls
@@ -32,6 +43,29 @@ type SplitSignal struct {
 type CompositeSignal struct {
 	signalers []Signaler
 }
+
+// NewChanSignal create a new ChanSignal forwarding signals to a channel.
+func NewChanSignal(ch chan bool) *ChanSignal { return &ChanSignal{ch} }
+
+// Completed sends true to the confiugred channel.
+func (c *ChanSignal) Completed() { c.ch <- true }
+
+// Failed sends false to the confiugred channel.
+func (c *ChanSignal) Failed() { c.ch <- false }
+
+// NewSyncSignal create a new SyncSignal signaler. Use Wait() method to wait for
+// a signal from the publisher
+func NewSyncSignal() *SyncSignal { return &SyncSignal{make(chan bool, 1)} }
+
+// Wait blocks waiting for a signal from the outputer. Wait return true if
+// Completed was signaled and false if a Failed signal was received
+func (s *SyncSignal) Wait() bool { return <-s.ch }
+
+// Completed sends true to the process waiting for a signal.
+func (s *SyncSignal) Completed() { s.ch <- true }
+
+// Failed sends false to the process waiting for a signal.
+func (s *SyncSignal) Failed() { s.ch <- false }
 
 // NewSplitSignaler creates a new SplitSignal if s is not nil.
 // If s is nil, nil will be returned. The count is the number of events to be

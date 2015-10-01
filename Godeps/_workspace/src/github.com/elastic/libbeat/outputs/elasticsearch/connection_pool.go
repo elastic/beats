@@ -19,7 +19,7 @@ type Connection struct {
 }
 
 const (
-	defaultDeadTimeout = 60 //seconds
+	defaultDeadTimeout time.Duration = 60 * time.Second
 )
 
 type ConnectionPool struct {
@@ -50,8 +50,8 @@ func (pool *ConnectionPool) SetConnections(urls []string, username string, passw
 	return nil
 }
 
-func (pool *ConnectionPool) SetDeadTimeout(timeout int) {
-	pool.DeadTimeout = time.Duration(timeout)
+func (pool *ConnectionPool) SetDeadTimeout(timeout time.Duration) {
+	pool.DeadTimeout = timeout
 }
 
 func (pool *ConnectionPool) selectRoundRobin() *Connection {
@@ -84,9 +84,9 @@ func (pool *ConnectionPool) GetConnection() *Connection {
 }
 
 // MarkDead marks a failed connection as dead and put on timeout.
-// timeout = default_timeout * 2 ** (fail_count - 1)
+// timeout = DeadTimeout * 2 ^ (deadCount - 1)
 // When the timeout is over, the connection will be resurrected and
-// returned to the live pool
+// returned to the live pool.
 func (pool *ConnectionPool) MarkDead(conn *Connection) {
 
 	if !conn.dead {
