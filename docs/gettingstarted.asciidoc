@@ -20,7 +20,7 @@ just do the fun part.
 [[elasticsearch-installation]]
 === Elasticsearch installation
 
-http://www.elasticsearch.org/[Elasticsearch] is a distributed real-time
+https://www.elastic.co/products/elasticsearch[Elasticsearch] is a distributed real-time
 storage, search and analytics engine. It can be used for many purposes, but one
 context where it excels is indexing streams of semi-structured data, like logs
 or decoded network packets.
@@ -34,7 +34,7 @@ deb:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
 sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -44,7 +44,7 @@ rpm:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.noarch.rpm
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.noarch.rpm
 sudo rpm -i elasticsearch-{ES-version}.noarch.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
@@ -54,7 +54,7 @@ mac:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
 unzip elasticsearch-{ES-version}.zip
 cd elasticsearch-{ES-version}
 ./bin/elasticsearch
