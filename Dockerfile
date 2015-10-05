@@ -1,4 +1,4 @@
-FROM golang:1.4
+FROM golang:1.5
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
 ## Install go package dependencies
