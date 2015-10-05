@@ -73,7 +73,7 @@ func (out *elasticsearchOutput) Init(
 		urls = append(urls, url)
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
 	}
