@@ -3,13 +3,14 @@ package harvester
 import (
 	"bufio"
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestReadLine(t *testing.T) {

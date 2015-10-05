@@ -1,10 +1,11 @@
 package beat
 
 import (
+	"time"
+
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
-	"time"
 )
 
 type Spooler struct {

@@ -28,6 +28,7 @@ filebeat:
   spoolSize: 1024
   idleTimeout: 5s
   tailOnRotate:
+  configDir: "/prospectorConfigs/"
 
 
 # Additional stuff we should be ignore
