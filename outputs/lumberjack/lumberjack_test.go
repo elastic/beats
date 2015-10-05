@@ -163,7 +163,6 @@ func genCertsIfMIssing(
 }
 
 func TestLumberjackTCP(t *testing.T) {
-	useTLS := false
 	var serverErr error
 	var win, data *message
 
@@ -175,7 +174,7 @@ func TestLumberjackTCP(t *testing.T) {
 
 	// create lumberjack output client
 	config := outputs.MothershipConfig{
-		TLS:     &useTLS,
+		TLS:     nil,
 		Timeout: 1,
 		Hosts:   []string{listener.Addr().String()},
 	}
@@ -238,17 +237,17 @@ func TestLumberjackTLS(t *testing.T) {
 	}
 
 	// create lumberjack output client
-	useTLS := true
 	config := outputs.MothershipConfig{
-		TLS:            &useTLS,
-		Timeout:        5,
-		Hosts:          []string{tcpListener.Addr().String()},
-		Certificate:    pem,
-		CertificateKey: key,
-		CAs:            []string{pem},
+		TLS: &outputs.TLSConfig{
+			Certificate:    pem,
+			CertificateKey: key,
+			CAs:            []string{pem},
+		},
+		Timeout: 5,
+		Hosts:   []string{tcpListener.Addr().String()},
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		tcpListener.Close()
 		t.Fatalf("failed to load certificates")

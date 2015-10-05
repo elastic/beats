@@ -55,7 +55,7 @@ func (lj *lumberjack) init(
 ) error {
 	useTLS := false
 	if config.TLS != nil {
-		useTLS = *config.TLS
+		useTLS = !config.TLS.Disabled
 	}
 
 	timeout := lumberjackDefaultTimeout
@@ -67,7 +67,7 @@ func (lj *lumberjack) init(
 	var err error
 	if useTLS {
 		var tlsConfig *tls.Config
-		tlsConfig, err = outputs.LoadTLSConfig(config)
+		tlsConfig, err = outputs.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return err
 		}
