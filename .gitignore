@@ -9,6 +9,7 @@
 *.swn
 libbeat
 libbeat.test
+coverage/coverage.html
 
 # Folders
 _obj
