@@ -138,7 +138,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 				"timestamp": common.Time(time.Now()),
 				"source":    event.Source,
 				"offset":    event.Offset,
-				"line":      event.Line,
+				"message":   event.Line,
 				"text":      event.Text,
 				"fields":    event.Fields,
 				"fileinfo":  event.Fileinfo,
