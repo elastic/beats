@@ -1,4 +1,4 @@
-packetbeat
+
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
@@ -7,15 +7,16 @@ packetbeat
 *.swp
 *.swo
 *.swn
-packetbeat.test
-profile.cov
-cover/coverage.html
+libbeat
+libbeat.test
 
 # Folders
 _obj
 _test
 _output
 /docs/html_docs
+.vagrant
+coverage/*
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -27,6 +28,7 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
+/crosscompile.bash
 _testmain.go
 
 *.exe

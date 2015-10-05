@@ -8,7 +8,7 @@ import (
 )
 
 type TestConfig struct {
-	Server ElasticsearchConfig
+	Output ElasticsearchConfig
 }
 
 type ElasticsearchConfig struct {
@@ -32,8 +32,8 @@ func TestRead(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Access config
-	assert.Equal(t, "localhost", config.Server.Elasticsearch.Host)
+	assert.Equal(t, "localhost", config.Output.Elasticsearch.Host)
 
 	// Chat that it is integer
-	assert.Equal(t, 9200, config.Server.Elasticsearch.Port)
+	assert.Equal(t, 9200, config.Output.Elasticsearch.Port)
 }

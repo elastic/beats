@@ -1,6 +1,8 @@
 GODEP=$(GOPATH)/bin/godep
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
+GOFILES = $(shell find . -type f -name '*.go')
+SHELL=/bin/bash
 
 .PHONY: build
 build:
@@ -23,6 +25,12 @@ gofmt:
 test:
 	$(GODEP) go test -short ./...
 
+.PHONY: check
+check:
+	# This should be modified so it throws an error on the build system in case the output is not empty
+	gofmt -d .
+	godep go vet ./...
+
 .PHONY: autotest
 autotest:
 	goautotest -short ./...
@@ -40,14 +48,13 @@ benchmark:
 coverage:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/libbeat/...
 	mkdir -p coverage
-	$(GODEP) go tool cover -html=profile.cov -o coverage/coverage.html
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=coverage/unit.cov -covermode=count github.com/elastic/libbeat/...
+	$(GODEP) go tool cover -html=coverage/unit.cov -o coverage/unit.html
 
 .PHONY: clean
 clean:
 	make gofmt
-	-rm profile.cov
 	-rm -r coverage
 
 
@@ -62,7 +69,7 @@ build-image:
 .PHONY: start-environment
 start-environment: stop-environment
 	docker-compose up -d redis elasticsearch
-	
+
 .PHONY: stop-environment
 stop-environment:
 	-docker-compose stop
@@ -74,9 +81,9 @@ stop-environment:
 testsuite: build-image
 	docker-compose run libbeat make testlong
 	# Copy coverage file back to host
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/profile.cov $(shell pwd)/
 	mkdir -p coverage
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/coverage.html $(shell pwd)/coverage/
+	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/
+	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/
 
 # Sets up docker-compose locally for jenkins so no global installation is needed
 .PHONY: testsuite
@@ -84,4 +91,32 @@ docker-compose-setup:
 	mkdir -p bin
 	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > bin/docker-compose
 	chmod +x bin/docker-compose
-	
+
+.PHONY: libbeat.test
+libbeat.test: $(GOFILES)
+	$(GODEP) go test -c -covermode=count -coverpkg ./...
+
+
+.PHONY: system-tests
+system-tests: libbeat.test
+	mkdir -p coverage
+	./libbeat.test -c tests/files/config.yml -d "*" -test.coverprofile coverage/system.cov
+
+# Cross-compile libbeat for the OS and architectures listed in
+# crosscompile.bash. The binaries are placed in the ./bin dir.
+.PHONY: crosscompile
+crosscompile: $(GOFILES)
+	go get github.com/tools/godep
+	curl https://raw.githubusercontent.com/elastic/filebeat/fe0f6a82d46b56d852f3f9ef81196aef4624d1a7/crosscompile.bash > crosscompile.bash
+	mkdir -p bin
+	source crosscompile.bash; OUT='bin' go-build-all
+
+.PHONY: full-coverage
+full-coverage:
+	make testlong
+	make -C ./tests/system coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ./coverage/full.cov
+	# Collects all coverage files and skips top line with mode
+	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
+	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
