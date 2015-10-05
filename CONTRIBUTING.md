@@ -46,9 +46,15 @@ Go library. Have a look at the way
 for an example.
 
 
+## Coding Standards
+
+We try to follow the [Golang coding standards](https://github.com/golang/go/wiki/CodeReviewComments)
+ as close as possible. Make sure to run `gofmt` before you push your code.
+
+
 ## Dependency Management
 
-Beats are using [godep](https://github.com/tools/godep) for dependency management. 
+Beats are using [godep](https://github.com/tools/godep) for dependency management.
 This means all dependencies are part of the repository. For updating dependencies we
 have the following strategy:
 
@@ -58,14 +64,14 @@ have the following strategy:
 
 ### Update Dependencies
 
-Godep allows to update all dependencies at once. We DON'T do that. If a dependency 
+Godep allows to update all dependencies at once. We DON'T do that. If a dependency
 is updated, the newest dependency must be loaded into the `$GOPATH` through either
-using 
+using
 
-`go get your-go-package-path` 
+`go get your-go-package-path`
 
 or by having the package already in the `$GOPATH`with the correct version / tag.
-To then save the most recent packages into Godep, run 
+To then save the most recent packages into Godep, run
 
 `godep update your-go-package-path`
 
