@@ -151,6 +151,7 @@ func (lj *lumberjack) PublishEvent(
 	ts time.Time,
 	event common.MapStr,
 ) error {
+	compatFix(event)
 	return lj.mode.PublishEvent(signaler, event)
 }
 
@@ -161,5 +162,20 @@ func (lj *lumberjack) BulkPublish(
 	ts time.Time,
 	events []common.MapStr,
 ) error {
+	for _, event := range events {
+		compatFix(event)
+	}
 	return lj.mode.PublishEvents(trans, events)
+}
+
+// compatFix adapts events to be compatible with logstash forwarer messages by renaming
+// the "message" field to "line". The lumberjack server in logstash will
+// decode/rename the "line" field into "message".
+func compatFix(event common.MapStr) {
+	if msg, hasMessage := event["message"]; hasMessage {
+		if _, hasLine := event["line"]; !hasLine {
+			event["line"] = msg
+			delete(event, "message")
+		}
+	}
 }
