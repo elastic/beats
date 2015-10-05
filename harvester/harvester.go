@@ -1,9 +1,10 @@
 package harvester
 
 import (
+	"os"
+
 	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
-	"os"
 )
 
 type Harvester struct {

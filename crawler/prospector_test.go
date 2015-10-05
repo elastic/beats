@@ -1,10 +1,11 @@
 package crawler
 
 import (
-	"github.com/elastic/filebeat/config"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/elastic/filebeat/config"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestProspectorInit(t *testing.T) {

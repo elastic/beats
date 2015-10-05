@@ -1,13 +1,14 @@
 package config
 
 import (
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/logp"
 	"log"
 	"math"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/elastic/libbeat/cfgfile"
+	"github.com/elastic/libbeat/logp"
 )
 
 // Defaults for config variables which are not set

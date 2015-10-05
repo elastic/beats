@@ -1,8 +1,9 @@
 package harvester
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Most harvester tests need real files to tes that can be modified. These tests are implemented with
