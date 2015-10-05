@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/elastic/libbeat/cfgfile"
+	"github.com/elastic/libbeat/logp"
 	"log"
 	"math"
 	"os"
@@ -31,6 +32,7 @@ type FilebeatConfig struct {
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
 	RegistryFile        string
+	ConfigDir           string `yaml:"configDir"`
 }
 
 type ProspectorConfig struct {
@@ -80,6 +82,8 @@ func getConfigFiles(path string) (configFiles []string, err error) {
 func mergeConfigFiles(configFiles []string, config *Config) error {
 
 	for _, file := range configFiles {
+		logp.Info("Additional configs loaded from: %s", file)
+
 		tmpConfig := &Config{}
 		cfgfile.Read(tmpConfig, file)
 
@@ -89,13 +93,23 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 	return nil
 }
 
-// Fetches and merges all config files given by Options.configArgs. All are put into one config object
-func (config *Config) FetchConfigs(path string) {
+// Fetches and merges all config files given by configDir. All are put into one config object
+func (config *Config) FetchConfigs() {
 
-	configFiles, err := getConfigFiles(path)
+	configDir := config.Filebeat.ConfigDir
+
+	// If option not set, do nothing
+	if configDir == "" {
+		return
+	}
+
+	// Check if optional configDir is set to fetch additional config files
+	logp.Info("Additional config files are fetched from: %s", configDir)
+
+	configFiles, err := getConfigFiles(configDir)
 
 	if err != nil {
-		log.Fatal("Could not use -configDir of ", path, err)
+		log.Fatal("Could not use configDir of: ", configDir, err)
 	}
 
 	err = mergeConfigFiles(configFiles, config)

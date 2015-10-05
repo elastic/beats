@@ -1,7 +1,6 @@
 package beat
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -26,13 +25,6 @@ var exitStat = struct {
 	faulted:    2,
 }
 
-var configDirPath string
-
-// Init config path flag
-func init() {
-	flag.StringVar(&configDirPath, "configDir", "", "path to additional filebeat configuration directory with .yml files")
-}
-
 // Beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	FbConfig *cfg.Config
@@ -53,11 +45,8 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	// This is optiona
-	if configDirPath != "" {
-		logp.Info("Additional config files are fetched from:", configDirPath)
-		fb.FbConfig.FetchConfigs(configDirPath)
-	}
+	// Check if optional configDir is set to fetch additional prospector config files
+	fb.FbConfig.FetchConfigs()
 
 	return nil
 }

@@ -21,6 +21,7 @@ func TestReadConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, uint64(1024), config.Filebeat.SpoolSize)
+	assert.Equal(t, "/prospectorConfigs/", config.Filebeat.ConfigDir)
 
 	prospectors := config.Filebeat.Prospectors
 

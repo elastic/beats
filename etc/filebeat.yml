@@ -56,6 +56,11 @@ filebeat:
   cpuProfileFile:
   registryfile: .filebeat
 
+  # Full Path to directory with additional prospector configuration files. Each file must end with .yml
+  # These config files must have the full filbeat config part inside, but only
+  # the prospector part is processed. All global options like spoolSize are ignored.
+  configDir:
+
 
 ############################# Shipper ############################################
 shipper:
