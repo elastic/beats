@@ -294,6 +294,8 @@ func TestLumberjackTLS(t *testing.T) {
 		defer wg.Done()
 
 		for i := 0; i < 3; i++ { // try up to 3 failed connection attempts
+			// server read timeout
+			timeout := 5 * time.Second
 			buf := streambuf.New(nil)
 			wgReady.Done()
 			client, err := listener.Accept()
@@ -307,18 +309,31 @@ func TestLumberjackTLS(t *testing.T) {
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
+
 			err = tlsConn.Handshake()
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			win, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			data, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
