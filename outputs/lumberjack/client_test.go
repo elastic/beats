@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/common/streambuf"
+	"github.com/elastic/libbeat/outputs/mode"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,7 +40,7 @@ type testDriverCommand struct {
 }
 
 type testClientDriver struct {
-	client  ProtocolClient
+	client  mode.ProtocolClient
 	ch      chan testDriverCommand
 	returns []testClientReturn
 }
@@ -62,7 +63,7 @@ type mockTransport struct {
 	control chan mockTransportCommand
 }
 
-func newClientTestDriver(client ProtocolClient) *testClientDriver {
+func newClientTestDriver(client mode.ProtocolClient) *testClientDriver {
 	driver := &testClientDriver{
 		client:  client,
 		ch:      make(chan testDriverCommand),

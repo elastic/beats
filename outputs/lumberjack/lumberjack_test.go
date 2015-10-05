@@ -41,18 +41,21 @@ func newTestLumberjackOutput(
 }
 
 func sockReadMessage(buf *streambuf.Buffer, in io.Reader) (*message, error) {
-	buffer := make([]byte, 1024)
 	for {
+		// try parse message from buffered data
+		msg, err := readMessage(buf)
+		if msg != nil || (err != nil && err != streambuf.ErrNoMoreBytes) {
+			return msg, err
+		}
+
+		// read next bytes from socket if incomplete message in buffer
+		buffer := make([]byte, 1024)
 		n, err := in.Read(buffer)
 		if err != nil {
 			return nil, err
 		}
 
 		buf.Write(buffer[:n])
-		msg, err := readMessage(buf)
-		if msg != nil || err != nil {
-			return msg, err
-		}
 	}
 }
 
@@ -172,38 +175,63 @@ func TestLumberjackTCP(t *testing.T) {
 		t.Fatalf("Failed to create test server")
 	}
 
-	// create lumberjack output client
-	config := outputs.MothershipConfig{
-		TLS:     nil,
-		Timeout: 1,
-		Hosts:   []string{listener.Addr().String()},
-	}
-	output := newTestLumberjackOutput(t, config)
-
 	// start server
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+
+		// server read timeout
+		timeout := 5 * time.Second
 		buf := streambuf.New(nil)
+
 		client, err := listener.Accept()
 		if err != nil {
+			t.Logf("failed on accept: %v", err)
+			serverErr = err
+			return
+		}
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
 			serverErr = err
 			return
 		}
 		win, err = sockReadMessage(buf, client)
 		if err != nil {
+			t.Logf("failed on read window size: %v", err)
+			serverErr = err
+			return
+		}
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
 			serverErr = err
 			return
 		}
 		data, err = sockReadMessage(buf, client)
 		if err != nil {
+			t.Logf("failed on read data frame: %v", err)
 			serverErr = err
 			return
 		}
-		serverErr = sockSendACK(client, 1)
-		return
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+			serverErr = err
+			return
+		}
+		err = sockSendACK(client, 1)
+		if err != nil {
+			t.Logf("failed on read data frame: %v", err)
+			serverErr = err
+		}
 	}()
+
+	// create lumberjack output client
+	config := outputs.MothershipConfig{
+		TLS:     nil,
+		Timeout: 2,
+		Hosts:   []string{listener.Addr().String()},
+	}
+	output := newTestLumberjackOutput(t, config)
 
 	// send event to server
 	event := common.MapStr{"name": "me", "line": 10}
@@ -215,7 +243,9 @@ func TestLumberjackTCP(t *testing.T) {
 	// validate output
 	assert.Nil(t, serverErr)
 	assert.NotNil(t, win)
-	assert.NotNil(t, data)
+	if data == nil {
+		t.Fatalf("No data received")
+	}
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
 	assert.Equal(t, "me", data.doc["name"])
@@ -264,6 +294,8 @@ func TestLumberjackTLS(t *testing.T) {
 		defer wg.Done()
 
 		for i := 0; i < 3; i++ { // try up to 3 failed connection attempts
+			// server read timeout
+			timeout := 5 * time.Second
 			buf := streambuf.New(nil)
 			wgReady.Done()
 			client, err := listener.Accept()
@@ -277,18 +309,31 @@ func TestLumberjackTLS(t *testing.T) {
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
+
 			err = tlsConn.Handshake()
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			win, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			data, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
