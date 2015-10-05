@@ -215,7 +215,13 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 	if err == io.EOF {
 		// timed out waiting for data, got eof.
 		// Check to see if the file was truncated
-		info, _ := h.file.Stat()
+		info, statErr := h.file.Stat()
+
+		// This could happen if the file was removed / rotate after reading and before calling the stat function
+		if statErr != nil {
+			logp.Err("Unexpected error reading from %s; error: %s", h.Path, statErr)
+			return statErr
+		}
 
 		if h.ProspectorConfig.IgnoreOlder != "" {
 			logp.Debug("harvester", "Ignore Unmodified After: %s", h.ProspectorConfig.IgnoreOlder)
