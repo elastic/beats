@@ -119,3 +119,4 @@ dev-shell: build-image
 
 testsuite: build-image
 	docker run ruflin/packetbeat-dev make testlong
+
