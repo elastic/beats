@@ -16,15 +16,6 @@ import (
 	. "github.com/elastic/filebeat/input"
 )
 
-// TODO: Cleanup if possible
-var exitStat = struct {
-	ok, usageError, faulted int
-}{
-	ok:         0,
-	usageError: 1,
-	faulted:    2,
-}
-
 // Beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	FbConfig *cfg.Config
@@ -64,7 +55,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 
 		fmt.Printf("recovered panic: %v", p)
-		os.Exit(exitStat.faulted)
+		os.Exit(1)
 	}()
 
 	// Init channels
