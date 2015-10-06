@@ -1,40 +1,45 @@
-BIN_PATH?=/usr/bin
-CONF_PATH?=/etc/packetbeat
-VERSION?=0.5.0
-ARCH?=$(shell uname -m)
+GODEP=$(GOPATH)/bin/godep
+
+# default install target used by the beats-packer
+PREFIX?=/build
 
 GOFILES = $(shell find . -type f -name '*.go')
 packetbeat: $(GOFILES)
-	go build
-
-go-daemon/god: go-daemon/god.c
-	make -C go-daemon
+	# first make sure we have godep
+	go get github.com/tools/godep
+	$(GODEP) go build
 
 .PHONY: with_pfring
 with_pfring:
 	go build --tags havepfring
 
-.PHONY: deps
-deps:
-	go get -t
+.PHONY: getdeps
+getdeps:
+	go get -t -u -f ./...
 	# goautotest is used from the Makefile to run tests in a loop
-	go get github.com/tsg/goautotest
+	go get -u github.com/tsg/goautotest
 	# websocket is needed by the gobeacon tests
-	go get golang.org/x/net/websocket
+	go get -u golang.org/x/net/websocket
+	# godep is needed in this makefile
+	go get -u github.com/tools/godep
 
-.PHONY: install
-install: packetbeat go-daemon/god
-	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
-	install -D go-daemon/god $(DESTDIR)/$(BIN_PATH)/packetbeat-god
-	install -m 644 -D packetbeat.conf $(DESTDIR)/$(CONF_PATH)/packetbeat.conf
+.PHONY: updatedeps
+updatedeps:
+	$(GODEP) update ...
 
-.PHONY: dist
-dist: packetbeat go-daemon/god
-	mkdir packetbeat-$(VERSION)
-	cp packetbeat packetbeat-$(VERSION)/
-	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
-	cp packetbeat.conf packetbeat-$(VERSION)/
-	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
+# This is called by the beats-packer to obtain the configuration file
+.PHONY: install_cfg
+install_cfg:
+	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
+	cp etc/packetbeat.template.json $(PREFIX)/packetbeat.template.json
+	# darwin
+	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
+	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
+	rm $(PREFIX)/packetbeat-darwin.yml.bk
+	# win
+	cp etc/packetbeat.yml $(PREFIX)/packetbeat-win.yml
+	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
+	rm $(PREFIX)/packetbeat-win.yml.bk
 
 .PHONY: gofmt
 gofmt:
@@ -42,7 +47,7 @@ gofmt:
 
 .PHONY: test
 test:
-	go test -short ./...
+	$(GODEP) go test -short ./...
 	make -C tests test
 
 .PHONY: autotest
@@ -52,19 +57,49 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	go test ./...
+	make coverage
 	make -C tests test
 
-.PHONY: cover
-cover:
-	go test -short -coverprofile=coverage.out
-	go tool cover -html=coverage.out
+.PHONY: coverage
+coverage:
+	# gotestcover is needed to fetch coverage for multiple packages
+	go get github.com/pierrre/gotestcover
+	mkdir -p coverage
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=./coverage/unit.cov -covermode=count github.com/elastic/packetbeat/...
+	$(GODEP) go tool cover -html=./coverage/unit.cov -o coverage/unit.html
 
 .PHONY: benchmark
 benchmark:
-	go test -short -bench=. ./...
+	$(GODEP) go test -short -bench=. ./... -cpu=2
+
+.PHONY: env
+env: env/bin/activate
+env/bin/activate: requirements.txt
+	test -d env || virtualenv env > /dev/null
+	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
+	touch env/bin/activate
+
+.PHONY: gen
+gen: env
+	. env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
+	. env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
 
 .PHONY: clean
 clean:
-	rm packetbeat || true
-	rm -r packetbeat-$(VERSION) || true
+	-rm packetbeat
+	-rm packetbeat.test
+	-rm -r coverage
+	-rm -r env
+
+# Generates packetbeat.test coverage testing binary
+packetbeat.test: $(GOFILES)
+	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
+
+full-coverage:
+	make coverage
+	make -C ./tests coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ./coverage/full.cov
+	# Collects all coverage files and skips top line with mode
+	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
+	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html

@@ -1,0 +1,86 @@
+{
+	"ImportPath": "github.com/elastic/packetbeat",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/elastic/libbeat/beat",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/cfgfile",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/common",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/filters",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/logp",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/outputs",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/publisher",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/elastic/libbeat/service",
+			"Comment": "v1.0.0-beta3-140-g70eb1e6",
+			"Rev": "70eb1e6f2ca2d4bd81bc178acc8122fd457d3c2b"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+		},
+		{
+			"ImportPath": "github.com/nranchev/go-libGeoIP",
+			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
+		},
+		{
+			"ImportPath": "github.com/samuel/go-parser/parser",
+			"Rev": "ca8abbf65d0e61dedf061f98bd3850f250e27539"
+		},
+		{
+			"ImportPath": "github.com/samuel/go-thrift/parser",
+			"Rev": "2187045faa54fce7f5028706ffeb2f2fc342aa7e"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+		},
+		{
+			"ImportPath": "github.com/tsg/gopacket",
+			"Rev": "3e34b6b28c05a799db2f246a1e425f8be436b98a"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
+		},
+		{
+			"ImportPath": "labix.org/v2/mgo/bson",
+			"Comment": "287",
+			"Rev": "gustavo@niemeyer.net-20130722041249-5v5syfwrb8gq243v"
+		}
+	]
+}

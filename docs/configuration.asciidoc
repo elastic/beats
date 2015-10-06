@@ -1,0 +1,618 @@
+[[packetbeat-configuration]]
+== Configuration
+
+The Packetbeat configuration file uses http://yaml.org/[YAML] as any other Beat. 
+It consists of the following sections:
+
+
+* {libbeat}/configuration.html#configuration-shipper[Shipper]
+* <<configuration-interfaces>>
+* <<configuration-protocols>>
+* <<configuration-processes>>
+* {libbeat}/configuration.html#configuration-output[Output]
+* {libbeat}/configuration.html#configuration-run-options[Run options (optional)]
+
+NOTE: Packetbeat maintains in real-time a topology map with all the servers from your network. 
+Check <<maintaining-topology>> for more details.
+
+[[configuration-interfaces]]
+=== Interfaces
+
+The `interfaces` section configures the sniffer. Here is a sample
+configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+# Select the network interfaces to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
+interfaces:
+  # On which device to sniff
+  device: any
+
+  # The maximum capture size of a single packet.
+  snaplen: 1514
+
+  # The type of the sniffer to use
+  type: af_packet
+
+  # The size of the sniffing buffer
+  buffer_size_mb: 100
+------------------------------------------------------------------------------
+
+==== Options
+
+===== device
+
+Configures the network devices from which the traffic is
+captured. The configured device is set automatically in promiscuous mode,
+meaning that it can capture traffic from other hosts of the same LAN.
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+------------------------------------------------------------------------------
+
+Alternatively, on Linux the Packetbeat shipper supports capturing of all
+messages sent or received by the server on which it is installed. For this, use
+the special "any" device.
+
+NOTE: When using the "any" device, the interfaces are not set
+      in promiscuous mode.
+
+This option also accepts specifying the device by its index in the list of
+devices available for sniffing. To obtain the list of available devices, you can
+use run Packetbeat like this: `packetbeat -devices`. This is especially useful
+on Windows where device names are long. The following example will setup
+sniffing on the first interface available:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: 0
+------------------------------------------------------------------------------
+
+
+===== snaplen
+
+The *snaplen* option controls the maximum size of the packets to capture. The
+default is 65535 which is large enough for almost all networks and interfaces
+types. If you sniff on a physical network interface, you can optimize this by
+setting it to the MTU size. On virtual interfaces, however, it's safer to leave
+this to the default value.
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+  snaplen: 1514
+------------------------------------------------------------------------------
+
+===== type
+
+Packetbeat supports three sniffer types:
+
+ * `pcap` which uses the libpcap library and works on most platforms, but
+   it's not the fastest option.
+ * `af_paket` which uses memory mapped sniffing. It is faster than libpcap
+   and doesn't require a kernel module, but it is Linux specific.
+ * `pf_ring` which makes use of an ntop.org
+   http://www.ntop.org/products/pf_ring/[project]. This will get you the best
+   sniffing speed but requires a kernel module and is Linux specific.
+
+The default sniffer is `pcap`. Here is an example configuration that switches
+to the `af_packet` sniffing type:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+  type: af_packet
+------------------------------------------------------------------------------
+
+If you are on Linux and you are trying to optimize the CPU usage of the shipper,
+we recommend trying the `af_packet` and `pf_ring` options. Read this
+http://packetbeat.com/blog/sniffing-performance-and-ipv6.html[blog post]
+for some details.
+
+If you use the `af_packet` sniffer, you can tune its behaviour with the
+following options:
+
+===== buffer_size_mb
+
+This option controls the maximum size of the shared memory buffer to use
+between the kernel and user space. A bigger buffer usually results in lower CPU
+usage, but consumes more memory. This setting is only available for the
+`af_packet` sniffer type. The default is 30 MB.
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+  type: af_packet
+  buffer_size_mb: 100
+------------------------------------------------------------------------------
+
+==== with_vlans
+
+Packetbeat automatically generates a
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on the ports on which the known protocols are expected to be found.
+For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
+Packetbeat will generate the following BPF filter: `"port 80 or port 3306"`.
+
+However, if the traffic contains https://en.wikipedia.org/wiki/IEEE_802.1Q[VLAN]
+tags, the above filter is ineffective because the offset used are moved with
+four bytes. To fix this, you can enabled the `with_vlans` option, which will
+generate a BPF filter looking like this: `"port 80 or port 3306 or (vlan and (port 80 or port 3306))"`.
+
+==== bpf_filter
+
+Packetbeat automatically generates a
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on the ports on which the known protocols are expected to be found.
+For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
+Packetbeat will generate the following BPF filter: `"port 80 or port 3306"`.
+
+With this setting, you can overwrite the generated BPF filter. For example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+interfaces:
+  device: eth0
+  bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+------------------------------------------------------------------------------
+
+Note that this setting disables the automatic generation of the BPF filter so if
+you use it, it is your responsibility to keep the BPF filters in sync with the
+ports defined in the protocols sections.
+
+
+[[configuration-protocols]]
+=== Protocols
+
+A section for each supported protocol is defined to configure options like
+`ports`, `send_request`, `send_response` or options that are protocol specific.
+
+Currently, Packetbeat supports the following protocols:
+
+ - HTTP
+ - Mysql
+ - PostgreSQL
+ - Redis
+ - Thrift-RPC
+ - MongoDB
+ - Memcache
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+protocols:
+  http:
+    ports: [80, 8080, 8000, 5000, 8002]
+
+  memcache:
+    ports: [11211]
+
+  mysql:
+    ports: [3306]
+
+  redis:
+    ports: [6379]
+
+  pgsql:
+    ports: [5432]
+
+  thrift:
+    ports: [9090]
+------------------------------------------------------------------------------
+
+==== Common protocol options
+
+The following options are available for all protocols:
+
+===== ports
+
+The Packetbeat shipper installs a BPF filter based on the ports configured in
+this section.
+If a packet doesn't match the filter, very little CPU is required to discard
+the packet. The shipper also uses the ports configured here to decide which
+parser to use for each packet.
+
+===== send_request
+
+If this option is enabled, the raw message of the request (`request` field) is
+sent to Elasticsearch. The default is false. This is useful in case you want to
+index the whole request. Note that for HTTP, the body is not included by
+default, only the HTTP headers.
+
+===== send_response
+
+If this option is enabled, the raw message of the response (`response` field)
+is sent to Elasticsearch. The default is false.  This is useful in case you
+want to index the whole request. Note that for HTTP, the body is not included
+by default, only the HTTP headers.
+
+
+==== HTTP configuration
+
+The Http protocol has several specific configuration options. Here is a
+sample configuration section:
+
+[source,yaml]
+------------------------------------------------------------------------------
+protocols:
+  http:
+
+    # Configure the ports where to listen for HTTP traffic. You can disable
+    # the http protocol by commenting the list of ports.
+    ports: [80, 8080, 8000, 5000, 8002]
+
+    # Uncomment the following to hide certain parameters in URL or forms attached
+    # to HTTP requests. The names of the parameters are case insensitive.
+    # The value of the parameters will be replaced with the 'xxxxx' string.
+    # This is generally useful for avoiding storing user passwords or other
+    # sensitive information.
+    hide_keywords: ["pass", "password", "passwd"]
+
+    # Uncomment the following to export a list of extra HTTP headers. By
+    default is none sent.
+    send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
+
+    # Uncomment the following to export Cookie or Set-Cookie headers. By
+    # default is false.
+    split_coookie: true
+
+    # Configure the HTTP header that contains the real IP address.
+    real_ip_header: "X-Forwarded-For"
+------------------------------------------------------------------------------
+
+===== hide_keywords
+
+The Packetbeat shipper has the option of automatically censor certain strings
+from the transactions it saves. This is done because while the SQL traffic
+typically only contains the hashes of the passwords, it is possible that the
+HTTP traffic contains sensitive data. In order to reduce the security risks,
+the shipper can automatically avoid sending the contents of certain HTTP POST
+parameters. The sensitive content associated with these keywords is replaced
+by ``xxxxx``. By default, no changes are made to the HTTP messages.
+
+WARNING: This option replaces query parameters from GET requests and top level
+parameters from POST requests. If the sensitive data is encoded inside a
+parameter with a different name, we cannot censor it there. Also, note that if
+you enable saving the raw request and response fields (see the `send_requset`
+and the `send_response` options), the sensitive data will be present in those
+fields.
+
+===== strip_authorisation
+
+If enabled, this option hides the value of the `Authorization` HTTP header.
+
+===== send_headers
+
+A list of header names to be captured and send to Elasticsearch. These
+headers are placed under the `headers` dictionary in the resulting JSON.
+
+===== send_all_headers
+
+Alternatively to sending a white list of headers to Elasticsearch, you can
+send all headers by setting this option to true. The default is false.
+
+===== include_body_for
+
+The list of content types for which Packetbeat includes the full HTTP payload in
+the `response` field. Should be used together with the `send_response` option.
+
+Example configuration:
+
+[source,yml]
+------------------------------------------------------------------------------
+protocols:
+  http:
+    ports: [80, 8080]
+    send_response: true
+    include_body_for: ["text/html"]
+------------------------------------------------------------------------------
+
+
+===== split_cookie
+
+If the `Cookie` or `Set-Cookie` headers are sent, this option controls whether
+they are split into individual values. For example, with this option set, a
+HTTP response might result in the following JSON:
+
+[source,json]
+------------------------------------------------------------------------------
+"response": {
+  "code": 200,
+  "headers": {
+    "connection": "close",
+    "content-language": "en",
+    "content-type": "text/html; charset=utf-8",
+    "date": "Fri, 21 Nov 2014 17:07:34 GMT",
+    "server": "gunicorn/19.1.1",
+    "set-cookie": { <1>
+      "csrftoken": "S9ZuJF8mvIMT5CL4T1Xqn32wkA6ZSeyf",
+      "expires": "Fri, 20-Nov-2015 17:07:34 GMT",
+      "max-age": "31449600",
+      "path": "/"
+    },
+    "vary": "Cookie, Accept-Language"
+  },
+  "phrase": "OK"
+}
+------------------------------------------------------------------------------
+
+<1> Note that `set-cookie` is a map having the cookie names as keys.
+
+The default is false.
+
+===== real_ip_header
+
+The header field to extract the real IP from. This is often useful when
+capturing behind a reverse proxy and still wanting to get the geo-location
+information. If this header is present and contains a valid IP addresses, the
+information is used for the `real_ip` and `client_location` indexed
+fields.
+
+==== Memcache configuration
+
+[source,yaml]
+------------------------------------------------------------------------------
+  memcache:
+    ports: [11211]
+    parseunknown: false
+    maxvalues: 0
+    maxbytespervalue: 100
+    udptransactiontimeout: 200
+    tcptransactiontimeout: 200
+------------------------------------------------------------------------------
+
+===== parseunknown
+
+Force memcache text protocol parser to accept unknown commands.
+Note: All unknown commands MUST NOT contain a data part.
+
+===== maxvalues
+
+Maximum number of values to store in message (multi-get).
+All values will be base64 encoded.
+
+possible values:
+  maxvalue: -1  - store all values (text based protocol multi-get)
+  maxvalue: 0   - store no values at all (default)
+  maxvalue: N   - store up to N values
+
+===== maxbytespervalue
+
+Limit the number of bytes to be copied per value element.
+
+Note:
+values will be base64 encoded, so actual size in json document will be 4 times
+maxbytespervalue.
+
+===== udptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Note:
+Quiet messages in UDP binary protocol will get response only in error case.
+The memcache protocol analyzer will wait for udptransactiontimeout milliseconds
+before publishing quiet messages. Non quiet messages or quiet requests with
+error response will not have to wait for the timeout
+
+===== tcptransactiontimeout
+
+Transaction timeout in milliseconds. Default 200ms.
+
+Time until all unfinished tcp based transactions will be published if there is
+no activity on the TCP stream.
+
+
+==== MySQL and PgSQL configuration
+
+===== max_rows
+
+Maximum number of rows from the SQL message to publish to Elasticsearch. The
+default is 10 rows in order to publish data as little as needed.
+
+
+===== max_row_length
+
+Maximum length in bytes of a row from the SQL message to publish to
+Elasticsearch. The default is 1024 bytes.
+
+[[configuration-thrift]]
+==== Thrift configuration
+
+Thrift protocol has several specific configuration options. Here is a
+sample configuration section:
+
+[source,yaml]
+------------------------------------------------------------------------------
+  thrift:
+    transport_type: socket
+    protocol_type: binary
+    idl_files: ["tutorial.thrift", "shared.thrift"]
+    string_max_size: 200
+    collection_max_size: 20
+    capture_reply: true
+    obfuscate_strings: true
+    drop_after_n_struct_fields: 100
+------------------------------------------------------------------------------
+
+===== transport_type
+
+Thrift transport type. Currently this option accepts the options `socket`
+for TSocket which is the default Thrift transport and `framed` which
+corresponds to the TFramed Thrift transport. The default is `socket`.
+
+===== protocol_type
+
+Thrift protocol type. Currently the only accepted value is `binary`
+corresponding to the TBinary protocol, which is the default Thrift protocol.
+
+===== idl_files
+
+The Thrift Interface description language (IDL) files for the service that the
+shipper is monitoring. Providing the IDL files is optional, because the Thrift
+messages contain enough information to decode them without having the IDL
+files. However, providing the IDL will additionally fill in parameter and
+exceptions names.
+
+===== string_max_size
+
+If a string from one of the parameters or from the return value is longer than
+this value, the string is automatically truncated to this length. Dots are added
+at the end of the string to mark that it was truncated. The default is 200.
+
+===== collection_max_size
+
+If a Thrift list, set, map or structure has more elements than this value, only
+this many number of elements will be captured. A fictive last element `...` is
+added at the end to mark that the collection was truncated. The default is 15.
+
+===== capture_reply
+
+If set to false, the Packetbeat shipper only decodes the method name from
+the reply and simply skip the rest of the response message. This can be useful
+for performance, disk usage or data retention reasons. The default is true.
+
+===== obfuscate_strings
+
+If enabled, this option replaces all strings found in the method parameters or
+in the return code or in the exception structures with the `"*"` string.
+
+===== drop_after_n_struct_fields
+
+If a structure has more fields than this given value, the Packetbeat shipper will
+ignore the whole transaction. This is a memory protection mechanism (so that
+the shipper's memory doesn't grow indefinitely), so you would topically set this
+to a relatively high value. The default is 500.
+
+
+[[configuration-mongodb]]
+==== MongoDB configuration
+
+The following settings are specific to the MongoDB protocol. Here is a sample
+configuration section:
+
+[source,yaml]
+------------------------------------------------------------------------------
+  mongodb:
+    send_request: true
+    send_response: true
+    max_docs: 0
+    max_doc_length: 0
+------------------------------------------------------------------------------
+
+The following two settings are useful for limiting the amount of data
+Packetbeat indexes in the `response` fields.
+
+===== max_docs
+
+Maximum number of docs from the response to index in the `response` field. The
+default is 10. You can set this to 0 to index an unlimited number of documents.
+
+A `[...]` line is added automatically at the end to signify that there were
+more documents but they weren't saved because of this setting.
+
+===== max_doc_length
+
+Maximum number of characters in a single document indexed in the `resposne`
+field. The default is 5000. You can set this to 0 to index an unlimited number
+of characters per document.
+
+If the document is trimmed because of this setting, the string ` ...` is added
+at the end of it.
+
+Note that limiting documents this way means that they are no longer correctly
+formatted JSON objects.
+
+
+[[maintaining-topology]]
+=== Maintaining the real-time state of the network topology
+
+One of the important features of Packetbeat is that it knows for each
+transaction which is the source server and is the destination server by names.
+It does this without the requirement of maintaining a central configuration.
+Instead each shipper notes the hostname of the server on which it runs on, and
+maps that to the list of IP addresses of that server. This information is
+shared between shippers by using the mechanisms provided by the output plugins.
+
+For example, the Redis output plugin stores the topology in a dedicated Redis
+database and the Elasticsearch output plugin stores the topology in an
+Elasticsearch index.
+
+While multiple output plugins can be enabled at the same time, only one of them
+can be used for sharing the topology. If you have both Redis and Elasticsearch
+enabled as outputs, we suggest using Redis for saving the topology. This can be
+controlled from the `save_topology` configuration option.
+
+
+
+[[configuration-processes]]
+=== Processes (optional)
+
+This section is optional, but configuring the processes enables Packetbeat
+shipper to not only show you between which servers the traffic is flowing, but
+also between which processes. It can even show you the traffic between two
+processes running on the same host, so this is particularly useful when you
+have more services running on the same server. By default, process matching
+is disabled.
+
+When it starts (and then periodically) the shipper scans the process table for
+processes matching the configuration file. For each of these processes, it
+monitors which file descriptors it has opened. When a new packet is captured,
+it reads the list of active TCP connections and matches the corresponding one
+with the list of file descriptors.
+
+On a Linux system, all this information is available via the `/proc`
+filesystem, so the Packetbeat shipper doesn't need a kernel module.
+
+
+NOTE: Process monitoring is currently only supported on
+      Linux systems. The Packetbeat shipper automatically disables
+      it when it detects other operating systems.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+procs:
+  enabled: true
+  monitored:
+    - process: mysqld
+      cmdline_grep: mysqld
+
+    - process: pgsql
+      cmdline_grep: postgres
+
+    - process: nginx
+      cmdline_grep: nginx
+
+    - process: app
+      cmdline_grep: gunicorn
+------------------------------------------------------------------------------
+
+==== Options
+
+===== process
+
+The `process` option for each process defines the name of the process, as it
+appears in the published transactions. The name doesn't have to match the name
+of the executable, feel free to choose something more descriptive (e.g. "my
+app" instead of "gunicorn")
+
+===== cmdline_grep
+
+This option for each process is used to identify the process at
+runtime. When it starts, and then periodically, the shipper scans the process table for
+processes matching `cmdline_grep` option. The match is done against the
+process' command line as read from `/proc/<pid>/cmdline`.
+
+For each of these processes, it monitors which file descriptors it has opened.
+When a new packet is captured, it reads the list of active TCP connections and
+matches the corresponding one with the list of file descriptors.
+

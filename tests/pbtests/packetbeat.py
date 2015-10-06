@@ -28,11 +28,11 @@ class Proc(object):
         return self.proc
 
     def wait(self):
-        self.proc.wait()
+        return self.proc.wait()
 
     def kill_and_wait(self):
         self.proc.terminate()
-        self.proc.wait()
+        return self.proc.wait()
 
     def __del__(self):
         try:
@@ -49,8 +49,8 @@ class Proc(object):
 class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
-                       cmd="../packetbeat",
-                       config="packetbeat.conf",
+                       cmd="../packetbeat.test",
+                       config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
                        debug_selectors=[]):
@@ -65,7 +65,10 @@ class TestCase(unittest.TestCase):
         args.extend(["-e",
                      "-I", os.path.join("pcaps", pcap),
                      "-c", os.path.join(self.working_dir, config),
-                     "-t"])
+                     "-t",
+                     "-systemTest",
+                     "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                     ])
         if extra_args:
             args.extend(extra_args)
 
@@ -76,11 +79,11 @@ class TestCase(unittest.TestCase):
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
-            proc.wait()
+            return proc.wait()
 
     def start_packetbeat(self,
-                         cmd="../packetbeat",
-                         config="packetbeat.conf",
+                         cmd="../packetbeat.test",
+                         config="packetbeat.yml",
                          output="packetbeat.log",
                          extra_args=[],
                          debug_selectors=[]):
@@ -91,7 +94,10 @@ class TestCase(unittest.TestCase):
         """
         args = [cmd,
                 "-e",
-                "-c", os.path.join(self.working_dir, config)]
+                "-c", os.path.join(self.working_dir, config),
+                "-systemTest",
+                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                ]
         if extra_args:
             args.extend(extra_args)
 
@@ -102,8 +108,8 @@ class TestCase(unittest.TestCase):
         proc.start()
         return proc
 
-    def render_config_template(self, template="packetbeat.conf.j2",
-                               output="packetbeat.conf", **kargs):
+    def render_config_template(self, template="packetbeat.yml.j2",
+                               output="packetbeat.yml", **kargs):
         template = self.template_env.get_template(template)
         kargs["pb"] = self
         output_str = template.render(**kargs)
@@ -116,8 +122,8 @@ class TestCase(unittest.TestCase):
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
                                                  self.dict_fields))
-        self.all_have_fields(jsons, ["@timestamp", "type", "status",
-                                     "agent", "count"])
+        self.all_have_fields(jsons, ["timestamp", "type", "status",
+                                     "shipper", "count"])
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
@@ -138,10 +144,15 @@ class TestCase(unittest.TestCase):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
-        # update the last_run link
-        if os.path.islink("last_run"):
-            os.unlink("last_run")
-        os.symlink("run/{}".format(self.id()), "last_run")
+        try:
+            # update the last_run link
+            if os.path.islink("last_run"):
+                os.unlink("last_run")
+            os.symlink("run/{}".format(self.id()), "last_run")
+        except:
+            # symlink is best effort and can fail when
+            # running tests in parallel
+            pass
 
         self.expected_fields, self.dict_fields = self.load_fields()
 

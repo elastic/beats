@@ -5,17 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/BurntSushi/toml"
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 const (
@@ -57,8 +58,12 @@ type HttpMessage struct {
 	TransferEncoding string
 	Headers          map[string]string
 	Body             string
+	Size             uint64
 	//Raw Data
 	Raw []byte
+
+	Notes []string
+
 	//Timing
 	start int
 	end   int
@@ -90,17 +95,20 @@ type HttpTransaction struct {
 	Method       string
 	RequestUri   string
 	Params       string
+	Path         string
+	BytesOut     uint64
+	BytesIn      uint64
+	Notes        []string
 
 	Http common.MapStr
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 type Http struct {
 	// config
+	Ports               []int
 	Send_request        bool
 	Send_response       bool
 	Send_headers        bool
@@ -111,67 +119,82 @@ type Http struct {
 	Hide_keywords       []string
 	Strip_authorization bool
 
-	transactionsMap map[common.HashableTcpTuple]*HttpTransaction
+	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
+}
+
+func (http *Http) getTransaction(k common.HashableTcpTuple) *HttpTransaction {
+	v := http.transactions.Get(k)
+	if v != nil {
+		return v.(*HttpTransaction)
+	}
+	return nil
 }
 
 func (http *Http) InitDefaults() {
-	http.Send_request = true
-	http.Send_response = true
+	http.Send_request = false
+	http.Send_response = false
+	http.Strip_authorization = false
 }
 
-func (http *Http) SetFromConfig(config *config.Config, meta *toml.MetaData) (err error) {
-	if meta.IsDefined("protocols", "http", "send_request") {
-		http.Send_request = config.Protocols["http"].Send_request
-	}
-	if meta.IsDefined("protocols", "http", "send_response") {
-		http.Send_response = config.Protocols["http"].Send_response
-	}
-	http.Hide_keywords = config.Passwords.Hide_keywords
-	http.Strip_authorization = config.Passwords.Strip_authorization
+func (http *Http) SetFromConfig(config config.Http) (err error) {
 
-	if config.Http.Send_all_headers {
+	http.Ports = config.Ports
+
+	if config.Send_request != nil {
+		http.Send_request = *config.Send_request
+	}
+	if config.Send_response != nil {
+		http.Send_response = *config.Send_response
+	}
+	http.Hide_keywords = config.Hide_keywords
+	if config.Strip_authorization != nil {
+		http.Strip_authorization = *config.Strip_authorization
+	}
+
+	if config.Send_all_headers != nil {
 		http.Send_headers = true
 		http.Send_all_headers = true
 	} else {
-		if len(config.Http.Send_headers) > 0 {
+		if len(config.Send_headers) > 0 {
 			http.Send_headers = true
 
 			http.Headers_whitelist = map[string]bool{}
-			for _, hdr := range config.Http.Send_headers {
+			for _, hdr := range config.Send_headers {
 				http.Headers_whitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	http.Split_cookie = config.Http.Split_cookie
+	if config.Split_cookie != nil {
+		http.Split_cookie = *config.Split_cookie
+	}
 
-	http.Real_ip_header = strings.ToLower(config.Http.Real_ip_header)
+	if config.Real_ip_header != nil {
+		http.Real_ip_header = strings.ToLower(*config.Real_ip_header)
+	}
 
 	return nil
 }
 
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
+func (http *Http) GetPorts() []int {
+	return http.Ports
+}
 
-func (http *Http) Init(test_mode bool, results chan common.MapStr) error {
-
+func (http *Http) Init(test_mode bool, results publisher.Client) error {
 	http.InitDefaults()
 
 	if !test_mode {
-		err := http.SetFromConfig(&config.ConfigSingleton, &config.ConfigMeta)
+		err := http.SetFromConfig(config.ConfigSingleton.Protocols.Http)
 		if err != nil {
 			return err
 		}
 	}
 
-	http.transactionsMap = make(map[common.HashableTcpTuple]*HttpTransaction, TransactionsHashSize)
-
-	logp.Debug("http", "transactionsMap: %p http: %p", http.transactionsMap, &http)
-
+	http.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	http.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	http.results = results
 
 	return nil
@@ -354,6 +377,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					// by the first empty line after the  header fields
 					logp.Debug("http", "Terminate response, status code %d", m.StatusCode)
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				}
 				if m.TransferEncoding == "chunked" {
@@ -367,6 +391,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 					logp.Debug("http", "Empty content length, ignore body")
 					// Ignore body for request that contains a message body but not a Content-Length
 					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				}
 				logp.Debug("http", "Read body")
@@ -385,7 +410,10 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 		case BODY:
 			logp.Debug("http", "eat body: %d", s.parseOffset)
-			if !m.hasContentLength && (m.connection == "close" || (m.version_major == 1 && m.version_minor == 0 && m.connection != "keep-alive")) {
+			if !m.hasContentLength && (m.connection == "close" ||
+				(m.version_major == 1 && m.version_minor == 0 &&
+					m.connection != "keep-alive")) {
+
 				// HTTP/1.0 no content length. Add until the end of the connection
 				logp.Debug("http", "close connection, %d", len(s.data)-s.parseOffset)
 				s.bodyReceived += (len(s.data) - s.parseOffset)
@@ -395,6 +423,7 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 			} else if len(s.data[s.parseOffset:]) >= m.ContentLength-s.bodyReceived {
 				s.parseOffset += (m.ContentLength - s.bodyReceived)
 				m.end = s.parseOffset
+				m.Size = uint64(m.end - m.start)
 				return true, true
 			} else {
 				s.bodyReceived += (len(s.data) - s.parseOffset)
@@ -424,6 +453,43 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 	return true, false
 }
 
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Decides if we can ignore the gap or it's a parser error
+// and we need to drop the stream.
+func (http *Http) messageGap(s *HttpStream, nbytes int) (ok bool, complete bool) {
+
+	m := s.message
+	switch s.parseState {
+	case START, HEADERS:
+		// we know we cannot recover from these
+		return false, false
+	case BODY:
+		logp.Debug("http", "gap in body: %d", nbytes)
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
+		if !m.hasContentLength && (m.connection == "close" ||
+			(m.version_major == 1 && m.version_minor == 0 &&
+				m.connection != "keep-alive")) {
+
+			s.bodyReceived += nbytes
+			m.ContentLength += nbytes
+			return true, false
+		} else if len(s.data[s.parseOffset:])+nbytes >= m.ContentLength-s.bodyReceived {
+			// we're done, but the last portion of the data is gone
+			m.end = s.parseOffset
+			return true, true
+		} else {
+			s.bodyReceived += nbytes
+			return true, false
+		}
+	}
+	// assume we cannot recover
+	return false, false
+}
+
 func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool, complete bool) {
 	if len(s.data[s.parseOffset:]) < 2 {
 		return true, false
@@ -434,6 +500,7 @@ func state_body_chunked_wait_final_crlf(s *HttpStream, m *HttpMessage) (ok bool,
 		}
 		s.parseOffset += 2 // skip final CRLF
 		m.end = s.parseOffset
+		m.Size = uint64(m.end - m.start)
 		return true, true
 	}
 }
@@ -464,6 +531,7 @@ func state_body_chunked_start(s *HttpStream, m *HttpMessage) (cont bool, ok bool
 		s.parseOffset += 2 // skip final CRLF
 
 		m.end = s.parseOffset
+		m.Size = uint64(m.end - m.start)
 		return false, true, true
 	}
 	s.bodyReceived = 0
@@ -504,6 +572,18 @@ func (stream *HttpStream) PrepareForNewMessage() {
 
 type httpPrivateData struct {
 	Data [2]*HttpStream
+}
+
+// Called when the parser has identified the boundary
+// of a message.
+func (http *Http) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *HttpStream) {
+	msg := stream.data[stream.message.start:stream.message.end]
+	http.hideHeaders(stream.message, msg)
+
+	http.handleHttp(stream.message, tcptuple, dir, msg)
+
+	// and reset message
+	stream.PrepareForNewMessage()
 }
 
 func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
@@ -553,13 +633,7 @@ func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 
 	if complete {
 		// all ok, ship it
-		msg := stream.data[stream.message.start:stream.message.end]
-		http.hideHeaders(stream.message, msg)
-
-		http.handleHttp(stream.message, tcptuple, dir, msg)
-
-		// and reset message
-		stream.PrepareForNewMessage()
+		http.messageComplete(tcptuple, dir, stream)
 	}
 
 	return priv
@@ -600,10 +674,41 @@ func (http *Http) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return httpData
 }
 
+// Called when a gap of nbytes bytes is found in the stream (due to
+// packet loss).
 func (http *Http) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	return private
+	defer logp.Recover("GapInStream(http) exception")
+
+	if private == nil {
+		return private, false
+	}
+	httpData, ok := private.(httpPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := httpData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	ok, complete := http.messageGap(stream, nbytes)
+	logp.Debug("httpdetailed", "messageGap returned ok=%v complete=%v", ok, complete)
+	if !ok {
+		// on errors, drop stream
+		httpData.Data[dir] = nil
+		return httpData, true
+	}
+
+	if complete {
+		// Current message is complete, we need to publish from here
+		http.messageComplete(tcptuple, dir, stream)
+	}
+
+	// don't drop the stream, we can ignore the gap
+	return private, false
 }
 
 func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
@@ -623,15 +728,14 @@ func (http *Http) handleHttp(m *HttpMessage, tcptuple *common.TcpTuple,
 
 func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
-	trans := http.transactionsMap[msg.TcpTuple.Hashable()]
+	trans := http.getTransaction(msg.TcpTuple.Hashable())
 	if trans != nil {
 		if len(trans.Http) != 0 {
 			logp.Warn("Two requests without a response. Dropping old request")
 		}
 	} else {
 		trans = &HttpTransaction{Type: "http", tuple: msg.TcpTuple}
-		logp.Debug("http", "transactionsMap %p http %p", http.transactionsMap, http)
-		http.transactionsMap[msg.TcpTuple.Hashable()] = trans
+		http.transactions.Put(msg.TcpTuple.Hashable(), trans)
 	}
 
 	logp.Debug("http", "Received request with tuple: %s", msg.TcpTuple)
@@ -660,6 +764,8 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 
 	trans.Method = msg.Method
 	trans.RequestUri = msg.RequestUri
+	trans.BytesIn = msg.Size
+	trans.Notes = msg.Notes
 
 	trans.Http = common.MapStr{}
 
@@ -683,21 +789,10 @@ func (http *Http) receivedHttpRequest(msg *HttpMessage) {
 	trans.Real_ip = msg.Real_ip
 
 	var err error
-	trans.Params, err = http.paramsHideSecrets(msg, msg.Raw)
+	trans.Path, trans.Params, err = http.extractParameters(msg, msg.Raw)
 	if err != nil {
 		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
 	}
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { http.expireTransaction(trans) })
-
-}
-
-func (http *Http) expireTransaction(trans *HttpTransaction) {
-	// remove from map
-	delete(http.transactionsMap, trans.tuple.Hashable())
 }
 
 func (http *Http) receivedHttpResponse(msg *HttpMessage) {
@@ -707,7 +802,7 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 
 	logp.Debug("http", "Received response with tuple: %s", tuple)
 
-	trans := http.transactionsMap[tuple.Hashable()]
+	trans := http.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -741,7 +836,9 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		}
 	}
 
+	trans.BytesOut = msg.Size
 	trans.Http.Update(response)
+	trans.Notes = append(trans.Notes, msg.Notes...)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
@@ -750,18 +847,13 @@ func (http *Http) receivedHttpResponse(msg *HttpMessage) {
 		trans.Response_raw = string(http.cutMessageBody(msg))
 	}
 
-	http.PublishTransaction(trans)
+	http.publishTransaction(trans)
+	http.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("http", "HTTP transaction completed: %s\n", trans.Http)
-
-	// remove from map
-	delete(http.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
-func (http *Http) PublishTransaction(t *HttpTransaction) {
+func (http *Http) publishTransaction(t *HttpTransaction) {
 
 	if http.results == nil {
 		return
@@ -778,25 +870,39 @@ func (http *Http) PublishTransaction(t *HttpTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if http.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if http.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["http"] = t.Http
 	if len(t.Real_ip) > 0 {
 		event["real_ip"] = t.Real_ip
 	}
 	event["method"] = t.Method
-	event["path"] = t.RequestUri
-	event["query"] = fmt.Sprintf("%s %s", t.Method, t.RequestUri)
+	event["path"] = t.Path
+	event["query"] = fmt.Sprintf("%s %s", t.Method, t.Path)
 	event["params"] = t.Params
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	http.results <- event
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
+
+	http.results.PublishEvent(event)
+}
+
+func parseCookieValue(raw string) string {
+	// Strip the quotes, if present.
+	if len(raw) > 1 && raw[0] == '"' && raw[len(raw)-1] == '"' {
+		raw = raw[1 : len(raw)-1]
+	}
+	return raw
 }
 
 func splitCookiesHeader(headerVal string) map[string]string {
@@ -804,8 +910,11 @@ func splitCookiesHeader(headerVal string) map[string]string {
 
 	cstring := strings.Split(headerVal, ";")
 	for _, cval := range cstring {
-		cookie := strings.Split(cval, "=")
-		cookies[strings.ToLower(strings.Trim(cookie[0], " "))] = cookie[1]
+		cookie := strings.SplitN(cval, "=", 2)
+		if len(cookie) == 2 {
+			cookies[strings.ToLower(strings.TrimSpace(cookie[0]))] =
+				parseCookieValue(strings.TrimSpace(cookie[1]))
+		}
 	}
 
 	return cookies
@@ -831,7 +940,7 @@ func (http *Http) cutMessageBody(m *HttpMessage) []byte {
 }
 
 func (http *Http) shouldIncludeInBody(contenttype string) bool {
-	include_body := config.ConfigSingleton.Http.Include_body_for
+	include_body := config.ConfigSingleton.Protocols.Http.Include_body_for
 	for _, include := range include_body {
 		if strings.Contains(contenttype, include) {
 			logp.Debug("http", "Should Include Body = true Content-Type "+contenttype+" include_body "+include)
@@ -850,7 +959,8 @@ func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 		if http.Strip_authorization {
 
 			authheader_start_x := m.headerOffset + bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
-			authheader_end_x := m.bodyOffset
+			authheader_end_x := m.bodyOffset			
+			logp.Debug("http", "Strip authorization from %d to %d", authheader_start_x, authheader_end_x)
 			
 			if authheader_start_x >= m.headerOffset {
 
@@ -858,7 +968,6 @@ func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 				if authheader_end_x < authheader_start_x || authheader_end_x > m.bodyOffset {
 					authheader_end_x = m.bodyOffset
 				}
-				logp.Debug("http", "Strip authorization from %d to %d", authheader_start_x, authheader_end_x)
 
 				for i := authheader_start_x + len(auth_text); i < authheader_end_x; i++ {
 					msg[i] = byte('*')
@@ -887,34 +996,36 @@ func (http *Http) hideSecrets(values url.Values) url.Values {
 	return params
 }
 
-// paramsHideSecrets parses the URL and the form parameters and replaces the secrets
+// extractParameters parses the URL and the form parameters and replaces the secrets
 // with the string xxxxx. The parameters containing secrets are defined in http.Hide_secrets.
-func (http *Http) paramsHideSecrets(m *HttpMessage, msg []byte) (string, error) {
+// Returns the Request URI path and the (ajdusted) parameters.
+func (http *Http) extractParameters(m *HttpMessage, msg []byte) (path string, params string, err error) {
 	var values url.Values
-	var err error
 
 	u, err := url.Parse(m.RequestUri)
 	if err != nil {
-		return "", err
+		return
 	}
 	values = u.Query()
+	path = u.Path
 
-	params := http.hideSecrets(values)
+	paramsMap := http.hideSecrets(values)
 
 	if m.ContentLength > 0 && strings.Contains(m.ContentType, "urlencoded") {
 		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
 		if err != nil {
-			return "", err
+			return
 		}
 
 		for key, value := range http.hideSecrets(values) {
-			params[key] = value
+			paramsMap[key] = value
 		}
 	}
+	params = paramsMap.Encode()
 
-	logp.Debug("httpdetailed", "Parameters: %s", params.Encode())
+	logp.Debug("httpdetailed", "Parameters: %s", params)
 
-	return params.Encode(), nil
+	return
 }
 
 func (http *Http) isSecretParameter(key string) bool {

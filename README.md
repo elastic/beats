@@ -1,40 +1,45 @@
-# [Packetbeat](http://packetbeat.com)
+[![Jenkins Build Status](http://build-eu-00.elastic.co/job/packetbeat/badge/icon)](http://build-eu-00.elastic.co/job/packetbeat/)
+[![Travis Build Status](https://travis-ci.org/elastic/packetbeat.svg?branch=master)](https://travis-ci.org/elastic/packetbeat)
+[![codecov.io](http://codecov.io/github/elastic/packetbeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/packetbeat?branch=master)
 
-Packetbeat is an open source application monitoring and packet tracing system.
-It works by sniffing the traffic between your application services, correlating
-them into transactions and using Elasticsearch for analysing them and for
-ad-hoc queries.
+# Packetbeat
 
-This repository contains the code for the Packetbeat agent.
 
-To learn more about Packetbeat, check out <http://packetbeat.com>.
+Packetbeat is an open source network packet analyzer that ships the data to
+Elasticsearch. Think of it like a distributed real-time Wireshark with a lot
+more analytics features.
 
-You can also read the [user manual](http://packetbeat.com/docs/) and the
-[getting started](http://packetbeat.com/getstarted) guide.
+The Packetbeat shippers sniff the traffic between your application processes,
+parse on the fly protocols like HTTP, MySQL, PostgreSQL, Redis or Thrift and
+correlate the messages into transactions.
+
+For each transaction, the shipper inserts a JSON document into Elasticsearch,
+where it is stored and indexed. You can then use Kibana to view key metrics and
+do ad-hoc queries against the data.
+
+To learn more about Packetbeat, check out <https://www.elastic.co/products/beats/packetbeat>.
+
+## Getting started
+
+Please follow the [getting started](https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-getting-started.html)
+guide from the docs.
+
+## Documentation
+
+Please visit
+[elastic.co](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html) for the
+documentation.
 
 ## Bugs and feature requests
 
-[![Build Status](https://travis-ci.org/packetbeat/packetbeat.svg?branch=master)](https://travis-ci.org/packetbeat/packetbeat)
+If you have an issue, please start by opening a topic on the
+[forums](https://discuss.elastic.co/c/beats/packetbeat). We'll help you
+troubleshoot and work with you on a solution.
 
-Have a bug or a feature request? Please first check the list of
-[issues](https://github.com/packetbeat/packetbeat/issues).
+If you are sure you found a bug or have a feature request, open an issue on
+[Github](https://github.com/elastic/packetbeat/issues).
 
-If your problem or idea is not addressed yet, [please open a new
-issue](https://github.com/packetbeat/packetbeat/issues/new), or contact us at
-[info@packetbeat.com](mailto:info@packetbeat.com).
+## Contributions
 
-## Announcement mailing list
-
-You can sign in in to the mailing list by using the form from the footer of
-[our website](http://packetbeat.com/). There will be maximum two emails per
-week with updates about new releases.
-
-## Authors
-
-Monica Sarbu (monica@packetbeat.com), Tudor Golubenco (tudor@packetbeat.com)
-and the
-[contributors](https://github.com/packetbeat/packetbeat/graphs/contributors).
-
-## Copyright and license
-
-Copyright Packetbeat 2014-2015. Code released under [the GNU license](LICENSE).
+We love contributions from our community! Please read the
+[CONTRIBUTING.md](CONTRIBUTING.md) file.

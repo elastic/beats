@@ -1,0 +1,48 @@
+== Overview
+
+Packetbeat is a real-time network packet analyzer that can be used together
+with Elasticsearch to provide an _application monitoring and performance
+analytics system_. It completes the {libbeat}/index.html[Beats platform] 
+by providing visibility between the servers of your network.
+
+It works by capturing the network traffic between your application servers,
+decoding the application layer protocols (HTTP, MySQL, Redis, etc.),
+correlating the requests with the responses into transactions and recording the
+interesting <<exported-fields,fields>> for each transaction.
+
+It can help you easily notice issues with your back-end application, like bugs
+or performance problems, and it makes troubleshooting them - and therefore
+fixing them - much faster.
+
+Packetbeat shippers sniff the traffic between your servers, parse on the fly the
+application level protocols and correlate the messages into transactions.
+Currently, the Packetbeat shipper supports the following protocols:
+
+ * HTTP
+ * MySQL
+ * PostgreSQL
+ * Redis
+ * Thrift-RPC
+ * Mongodb
+ * DNS
+ * Memcache
+
+The shippers can insert the correlated transactions directly into Elasticsearch
+or via a central queue created with Redis and Logstash.
+
+Packetbeat shippers can run on the same servers as your application processes or
+on their own servers. When running on dedicated servers, they can get the
+traffic from the switches mirror ports or from tapping devices. In such a
+deployment, there is zero overhead on the monitored application. See
+<<capturing-options>> for details.
+
+After decoding the Layer 7 messages, Packetbeat correlates the requests with
+the responses in what we call "transactions" and for each such transaction it
+inserts a JSON document into Elasticsearch. See the <<exported-fields>> section
+for details about which fields are indexed.
+
+The same Elasticsearch and Kibana instance that are used for analysing the
+network traffic gathered by Packetbeat can be used for analysing the log files
+gathered by Logstash. This way, you can have network traffic and log analysis
+in the same system.
+

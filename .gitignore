@@ -1,4 +1,4 @@
-packetbeat
+/packetbeat
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
@@ -8,7 +8,11 @@ packetbeat
 *.swo
 *.swn
 packetbeat.test
-coverage.out
+*.dev.yml
+
+/coverage/
+/docs/html_docs
+/build/
 
 # Folders
 _obj
@@ -28,3 +32,13 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+# IDE files / folders
+.idea
+
+last_run
+
+*.test
+.DS_Store
+
+env

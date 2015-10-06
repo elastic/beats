@@ -1,0 +1,17 @@
+[[sample-dashboards]]
+== Sample dashboards
+
+In order to make it as easy as possible to get application performance insights
+from packet data, we provide a few sample Kibana dashboards. The
+dashboards are maintained in this
+https://github.com/elastic/beats-dashboards[GitHub repository], which also
+includes instructions for loading them.
+
+Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#load-kibana-dashboards[steps].
+
+
+image:./images/packetbeat-statistics.png[Packetbeat statistics]
+
+These dashboards are provided as examples, we recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to your needs.

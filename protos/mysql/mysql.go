@@ -1,15 +1,19 @@
 package mysql
 
 import (
+	"errors"
 	"fmt"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 // Packet types
@@ -35,10 +39,10 @@ type MysqlMessage struct {
 	Rows           [][]string
 	Tables         string
 	IsOK           bool
-	AffectedRows   int
-	InsertId       int
+	AffectedRows   uint64
+	InsertId       uint64
 	IsError        bool
-	ErrorCode      int
+	ErrorCode      uint16
 	ErrorInfo      string
 	Query          string
 	IgnoreMessage  bool
@@ -48,6 +52,7 @@ type MysqlMessage struct {
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Raw          []byte
+	Notes        []string
 }
 
 type MysqlTransaction struct {
@@ -62,14 +67,14 @@ type MysqlTransaction struct {
 	Query        string
 	Method       string
 	Path         string // for mysql, Path refers to the mysql table queried
-	Size         uint64
+	BytesOut     uint64
+	BytesIn      uint64
+	Notes        []string
 
 	Mysql common.MapStr
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 type MysqlStream struct {
@@ -78,37 +83,58 @@ type MysqlStream struct {
 	data []byte
 
 	parseOffset int
-	parseState  int
+	parseState  parseState
 	isClient    bool
 
 	message *MysqlMessage
 }
 
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
+type parseState int
 
 const (
-	MysqlStateStart = iota
-	MysqlStateEatMessage
-	MysqlStateEatFields
-	MysqlStateEatRows
+	mysqlStateStart parseState = iota
+	mysqlStateEatMessage
+	mysqlStateEatFields
+	mysqlStateEatRows
+
+	MysqlStateMax
 )
+
+var stateStrings []string = []string{
+	"Start",
+	"EatMessage",
+	"EatFields",
+	"EatRows",
+}
+
+func (state parseState) String() string {
+	return stateStrings[state]
+}
 
 type Mysql struct {
-	transactionsMap map[common.HashableTcpTuple]*MysqlTransaction
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
 
-	results chan common.MapStr
+	transactions *common.Cache
+
+	results publisher.Client
 
 	// function pointer for mocking
 	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
+}
+
+func (mysql *Mysql) getTransaction(k common.HashableTcpTuple) *MysqlTransaction {
+	v := mysql.transactions.Get(k)
+	if v != nil {
+		return v.(*MysqlTransaction)
+	}
+	return nil
 }
 
 func (mysql *Mysql) InitDefaults() {
@@ -118,33 +144,42 @@ func (mysql *Mysql) InitDefaults() {
 	mysql.Send_response = false
 }
 
-func (mysql *Mysql) setFromConfig() error {
-	if config.ConfigSingleton.Mysql.Max_row_length > 0 {
-		mysql.maxRowLength = config.ConfigSingleton.Mysql.Max_row_length
+func (mysql *Mysql) setFromConfig(config config.Mysql) error {
+
+	mysql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		mysql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Mysql.Max_rows > 0 {
-		mysql.maxStoreRows = config.ConfigSingleton.Mysql.Max_rows
+	if config.Max_rows != nil {
+		mysql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_request") {
-		mysql.Send_request = config.ConfigSingleton.Protocols["mysql"].Send_request
+	if config.Send_request != nil {
+		mysql.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "mysql", "send_response") {
-		mysql.Send_response = config.ConfigSingleton.Protocols["mysql"].Send_response
+	if config.Send_response != nil {
+		mysql.Send_response = *config.Send_response
 	}
 	return nil
 }
 
-func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
+func (mysql *Mysql) GetPorts() []int {
+	return mysql.Ports
+}
+
+func (mysql *Mysql) Init(test_mode bool, results publisher.Client) error {
 
 	mysql.InitDefaults()
 	if !test_mode {
-		err := mysql.setFromConfig()
+		err := mysql.setFromConfig(config.ConfigSingleton.Protocols.Mysql)
 		if err != nil {
 			return err
 		}
 	}
 
-	mysql.transactionsMap = make(map[common.HashableTcpTuple]*MysqlTransaction, TransactionsHashSize)
+	mysql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	mysql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	mysql.handleMysql = handleMysql
 	mysql.results = results
 
@@ -152,8 +187,8 @@ func (mysql *Mysql) Init(test_mode bool, results chan common.MapStr) error {
 }
 
 func (stream *MysqlStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.message.end:]
-	stream.parseState = MysqlStateStart
+	stream.data = stream.data[stream.parseOffset:]
+	stream.parseState = mysqlStateStart
 	stream.parseOffset = 0
 	stream.isClient = false
 	stream.message = nil
@@ -161,12 +196,12 @@ func (stream *MysqlStream) PrepareForNewMessage() {
 
 func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 
-	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %d", s.parseState)
+	logp.Debug("mysqldetailed", "MySQL parser called. parseState = %s", s.parseState)
 
 	m := s.message
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
-		case MysqlStateStart:
+		case mysqlStateStart:
 			m.start = s.parseOffset
 			if len(s.data[s.parseOffset:]) < 5 {
 				logp.Warn("MySQL Message too short. Ignore it.")
@@ -186,12 +221,12 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					// parse request
 					m.IsRequest = true
 					m.start = s.parseOffset
-					s.parseState = MysqlStateEatMessage
+					s.parseState = mysqlStateEatMessage
 
 				} else {
 					// ignore command
 					m.IgnoreMessage = true
-					s.parseState = MysqlStateEatMessage
+					s.parseState = mysqlStateEatMessage
 				}
 
 				if !s.isClient {
@@ -202,26 +237,26 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				// parse response
 				m.IsRequest = false
 
-				if uint8(hdr[4]) == 0x00 {
+				if uint8(hdr[4]) == 0x00 || uint8(hdr[4]) == 0xfe {
 					logp.Debug("mysqldetailed", "Received OK response")
 					m.start = s.parseOffset
-					s.parseState = MysqlStateEatMessage
+					s.parseState = mysqlStateEatMessage
 					m.IsOK = true
 				} else if uint8(hdr[4]) == 0xff {
 					logp.Debug("mysqldetailed", "Received ERR response")
 					m.start = s.parseOffset
-					s.parseState = MysqlStateEatMessage
+					s.parseState = mysqlStateEatMessage
 					m.IsError = true
 				} else if m.PacketLength == 1 {
 					logp.Debug("mysqldetailed", "Query response. Number of fields %d", uint8(hdr[4]))
 					m.NumberOfFields = int(hdr[4])
 					m.start = s.parseOffset
 					s.parseOffset += 5
-					s.parseState = MysqlStateEatFields
+					s.parseState = mysqlStateEatFields
 				} else {
 					// something else. ignore
 					m.IgnoreMessage = true
-					s.parseState = MysqlStateEatMessage
+					s.parseState = mysqlStateEatMessage
 				}
 
 			} else {
@@ -231,7 +266,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 			}
 			break
 
-		case MysqlStateEatMessage:
+		case mysqlStateEatMessage:
 			if len(s.data[s.parseOffset:]) >= int(m.PacketLength)+4 {
 				s.parseOffset += 4 //header
 				s.parseOffset += int(m.PacketLength)
@@ -239,12 +274,38 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				if m.IsRequest {
 					m.Query = string(s.data[m.start+5 : m.end])
 				} else if m.IsOK {
-					m.AffectedRows = int(s.data[m.start+5])
-					m.InsertId = int(s.data[m.start+6])
+					// affected rows
+					affectedRows, off, complete, err := read_linteger(s.data, m.start+5)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.AffectedRows = affectedRows
+
+					// last insert id
+					insertId, off, complete, err := read_linteger(s.data, off)
+					if !complete {
+						return true, false
+					}
+					if err != nil {
+						logp.Debug("mysql", "Error on read_linteger: %s", err)
+						return false, false
+					}
+					m.InsertId = insertId
 				} else if m.IsError {
-					m.ErrorCode = int(uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+7]))
-					m.ErrorInfo = string(s.data[m.start+9:m.start+14]) + ": " + string(s.data[m.start+15:])
+					// int<1>header (0xff)
+					// int<2>error code
+					// string[1] sql state marker
+					// string[5] sql state
+					// string<EOF> error message
+					m.ErrorCode = uint16(s.data[m.start+6])<<8 | uint16(s.data[m.start+5])
+
+					m.ErrorInfo = string(s.data[m.start+8:m.start+13]) + ": " + string(s.data[m.start+13:])
 				}
+				m.Size = uint64(m.end - m.start)
 				logp.Debug("mysqldetailed", "Message complete. remaining=%d", len(s.data[s.parseOffset:]))
 				return true, true
 			} else {
@@ -252,11 +313,12 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 				return true, false
 			}
 
-		case MysqlStateEatFields:
+		case mysqlStateEatFields:
 			if len(s.data[s.parseOffset:]) < 4 {
 				// wait for more
 				return true, false
 			}
+
 			hdr := s.data[s.parseOffset : s.parseOffset+4]
 			m.PacketLength = uint32(hdr[0]) | uint32(hdr[1])<<8 | uint32(hdr[2])<<16
 			m.Seq = uint8(hdr[3])
@@ -270,7 +332,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					// EOF marker
 					s.parseOffset += int(m.PacketLength)
 
-					s.parseState = MysqlStateEatRows
+					s.parseState = mysqlStateEatRows
 				} else {
 					_ /* catalog */, off, complete, err := read_lstring(s.data, s.parseOffset)
 					if !complete {
@@ -314,7 +376,7 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 			}
 			break
 
-		case MysqlStateEatRows:
+		case mysqlStateEatRows:
 			if len(s.data[s.parseOffset:]) < 4 {
 				// wait for more
 				return true, false
@@ -338,11 +400,11 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 					} else {
 						m.IsTruncated = true
 					}
-					m.Size = uint64(s.parseOffset - m.start)
 					if !m.IsError {
 						// in case the response was sent successfully
 						m.IsOK = true
 					}
+					m.Size = uint64(m.end - m.start)
 					return true, true
 				} else {
 					s.parseOffset += int(m.PacketLength)
@@ -365,8 +427,45 @@ func mysqlMessageParser(s *MysqlStream) (bool, bool) {
 	return true, false
 }
 
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Returns true if there is already enough data in the message
+// read so far that we can use it further in the stack.
+func (mysql *Mysql) messageGap(s *MysqlStream, nbytes int) (complete bool) {
+
+	m := s.message
+	switch s.parseState {
+	case mysqlStateStart, mysqlStateEatMessage:
+		// not enough data yet to be useful
+		return false
+	case mysqlStateEatFields, mysqlStateEatRows:
+		// enough data here
+		m.end = s.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
+		return true
+	}
+
+	return true
+}
+
 type mysqlPrivateData struct {
 	Data [2]*MysqlStream
+}
+
+// Called when the parser has identified a full message.
+func (mysql *Mysql) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *MysqlStream) {
+	// all ok, ship it
+	msg := stream.data[stream.message.start:stream.message.end]
+
+	if !stream.message.IgnoreMessage {
+		mysql.handleMysql(mysql, stream.message, tcptuple, dir, msg)
+	}
+
+	// and reset message
+	stream.PrepareForNewMessage()
 }
 
 func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
@@ -406,6 +505,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		ok, complete := mysqlMessageParser(priv.Data[dir])
+		//logp.Debug("mysqldetailed", "mysqlMessageParser returned ok=%b complete=%b", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -415,15 +515,7 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		if complete {
-			// all ok, ship it
-			msg := stream.data[stream.message.start:stream.message.end]
-
-			if !stream.message.IgnoreMessage {
-				mysql.handleMysql(mysql, stream.message, tcptuple, dir, msg)
-			}
-
-			// and reset message
-			stream.PrepareForNewMessage()
+			mysql.messageComplete(tcptuple, dir, stream)
 		} else {
 			// wait for more data
 			break
@@ -433,17 +525,39 @@ func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 }
 
 func (mysql *Mysql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	defer logp.Recover("GapInStream(mysql) exception")
 
-	return private
+	if private == nil {
+		return private, false
+	}
+	mysqlData, ok := private.(mysqlPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := mysqlData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	if mysql.messageGap(stream, nbytes) {
+		// we need to publish from here
+		mysql.messageComplete(tcptuple, dir, stream)
+	}
+
+	// we always drop the TCP stream. Because it's binary and len based,
+	// there are too few cases in which we could recover the stream (maybe
+	// for very large blobs, leaving that as TODO)
+	return private, true
 }
 
 func (mysql *Mysql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	// TODO
+	// TODO: check if we have data pending and either drop it to free
+	// memory or send it up the stack.
 	return private
 }
 
@@ -463,18 +577,15 @@ func handleMysql(mysql *Mysql, m *MysqlMessage, tcptuple *common.TcpTuple,
 }
 
 func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
-
-	// Add it to the HT
 	tuple := msg.TcpTuple
-
-	trans := mysql.transactionsMap[tuple.Hashable()]
+	trans := mysql.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.Mysql != nil {
 			logp.Debug("mysql", "Two requests without a Response. Dropping old request: %s", trans.Mysql)
 		}
 	} else {
 		trans = &MysqlTransaction{Type: "mysql", tuple: tuple}
-		mysql.transactionsMap[tuple.Hashable()] = trans
+		mysql.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.ts = msg.Ts
@@ -510,18 +621,15 @@ func (mysql *Mysql) receivedMysqlRequest(msg *MysqlMessage) {
 
 	trans.Mysql = common.MapStr{}
 
+	trans.Notes = msg.Notes
+
 	// save Raw message
 	trans.Request_raw = msg.Query
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { mysql.expireTransaction(trans) })
+	trans.BytesIn = msg.Size
 }
 
 func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
-	tuple := msg.TcpTuple
-	trans := mysql.transactionsMap[tuple.Hashable()]
+	trans := mysql.getTransaction(msg.TcpTuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -542,7 +650,7 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		"error_code":    msg.ErrorCode,
 		"error_message": msg.ErrorInfo,
 	})
-	trans.Size = msg.Size
+	trans.BytesOut = msg.Size
 	trans.Path = msg.Tables
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
@@ -554,27 +662,22 @@ func (mysql *Mysql) receivedMysqlResponse(msg *MysqlMessage) {
 		trans.Response_raw = common.DumpInCSVFormat(fields, rows)
 	}
 
-	mysql.publishMysqlTransaction(trans)
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
+	mysql.publishTransaction(trans)
+	mysql.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("mysql", "Mysql transaction completed: %s", trans.Mysql)
 	logp.Debug("mysql", "%s", trans.Response_raw)
-
-	// remove from map
-	delete(mysql.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-}
-
-func (mysql *Mysql) expireTransaction(trans *MysqlTransaction) {
-	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
-	// remove from map
-	delete(mysql.transactionsMap, trans.tuple.Hashable())
 }
 
 func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
-	length := read_length(data, 0)
+	length, err := read_length(data, 0)
+	if err != nil {
+		logp.Warn("Invalid response: %v", err)
+		return []string{}, [][]string{}
+	}
 	if length < 1 {
 		logp.Warn("Warning: Skipping empty Response")
 		return []string{}, [][]string{}
@@ -583,6 +686,11 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	fields := []string{}
 	rows := [][]string{}
 
+	if len(data) < 5 {
+		logp.Warn("Invalid response: data less than 4 bytes")
+		return []string{}, [][]string{}
+	}
+
 	if uint8(data[4]) == 0x00 {
 		// OK response
 	} else if uint8(data[4]) == 0xff {
@@ -590,9 +698,20 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	} else {
 		offset := 5
 
+		logp.Debug("mysql", "Data len: %d", len(data))
+
 		// Read fields
 		for {
-			length = read_length(data, offset)
+			length, err = read_length(data, offset)
+			if err != nil {
+				logp.Warn("Invalid response: %v", err)
+				return []string{}, [][]string{}
+			}
+
+			if len(data[offset:]) < 5 {
+				logp.Warn("Invalid response.")
+				return []string{}, [][]string{}
+			}
 
 			if uint8(data[offset+4]) == 0xfe {
 				// EOF
@@ -602,38 +721,42 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 
 			_ /* catalog */, off, complete, err := read_lstring(data, offset+4)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*database*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*table*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /*org table*/, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			name, off, complete, err := read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 			_ /* org name */, off, complete, err = read_lstring(data, off)
 			if err != nil || !complete {
-				logp.Debug("mysql", "Reading field: %s %b", err, complete)
+				logp.Debug("mysql", "Reading field: %v %v", err, complete)
 				return fields, rows
 			}
 
 			fields = append(fields, string(name))
 
 			offset += length + 4
+			if len(data) < offset {
+				logp.Warn("Invalid response.")
+				return []string{}, [][]string{}
+			}
 		}
 
 		// Read rows
@@ -641,13 +764,22 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 			var row []string
 			var row_len int
 
+			if len(data[offset:]) < 5 {
+				logp.Warn("Invalid response.")
+				break
+			}
+
 			if uint8(data[offset+4]) == 0xfe {
 				// EOF
 				offset += length + 4
 				break
 			}
 
-			length = read_length(data, offset)
+			length, err = read_length(data, offset)
+			if err != nil {
+				logp.Warn("Invalid response: %v", err)
+				break
+			}
 			off := offset + 4 // skip length + packet number
 			start := off
 			for off < start+length {
@@ -660,7 +792,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 					var err error
 					var complete bool
 					text, off, complete, err = read_lstring(data, off)
-					if err != nil {
+					if err != nil || !complete {
 						logp.Debug("mysql", "Error parsing rows: %s %b", err, complete)
 						// nevertheless, return what we have so far
 						return fields, rows
@@ -676,6 +808,8 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 				}
 			}
 
+			logp.Debug("mysqldetailed", "Append row: %v", row)
+
 			rows = append(rows, row)
 			if len(rows) >= mysql.maxStoreRows {
 				break
@@ -687,7 +821,7 @@ func (mysql *Mysql) parseMysqlResponse(data []byte) ([]string, [][]string) {
 	return fields, rows
 }
 
-func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
+func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 
 	if mysql.results == nil {
 		return
@@ -706,22 +840,27 @@ func (mysql *Mysql) publishMysqlTransaction(t *MysqlTransaction) {
 
 	event["responsetime"] = t.ResponseTime
 	if mysql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if mysql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["method"] = t.Method
 	event["query"] = t.Query
 	event["mysql"] = t.Mysql
 	event["path"] = t.Path
-	event["bytes_out"] = t.Size
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
 
-	event["@timestamp"] = common.Time(t.ts)
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
+
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	mysql.results <- event
+	mysql.results.PublishEvent(event)
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {
@@ -736,7 +875,7 @@ func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {
 	return data[off : off+int(length)], off + int(length), true, nil
 }
 func read_linteger(data []byte, offset int) (uint64, int, bool, error) {
-	if len(data) == 0 {
+	if len(data) < offset+1 {
 		return 0, 0, false, nil
 	}
 	switch uint8(data[offset]) {
@@ -769,9 +908,13 @@ func read_linteger(data []byte, offset int) (uint64, int, bool, error) {
 	return uint64(data[offset]), offset + 1, true, nil
 }
 
-func read_length(data []byte, offset int) int {
+// Read a mysql length field (3 bytes LE)
+func read_length(data []byte, offset int) (int, error) {
+	if len(data[offset:]) < 3 {
+		return 0, errors.New("Data too small to contain a valid length")
+	}
 	length := uint32(data[offset]) |
 		uint32(data[offset+1])<<8 |
 		uint32(data[offset+2])<<16
-	return int(length)
+	return int(length), nil
 }

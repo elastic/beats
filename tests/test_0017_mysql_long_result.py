@@ -23,7 +23,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[3:]:
@@ -47,7 +47,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 11    # 10 plus header
 
         for line in lines[3:]:
@@ -71,7 +71,7 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 6    # 5 plus header
 
         for line in lines[3:]:
@@ -94,5 +94,21 @@ class Test(TestCase):
         res = objs[0]
         assert res["mysql.num_rows"] == 15
 
-        lines = res["response_raw"].strip().split("\n")
+        lines = res["response"].strip().split("\n")
         assert len(lines) == 16    # 15 plus header
+
+    def test_larger_than_100k(self):
+        """
+        Should work for MySQL messages larger than 100k bytes.
+        """
+        self.render_config_template(
+            mysql_ports=[3306],
+            mysql_send_response=True
+        )
+        self.run_packetbeat(pcap="mysql_long.pcap",
+                            debug_selectors=["mysqldetailed"])
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        res = objs[0]
+        assert res["mysql.num_rows"] == 400

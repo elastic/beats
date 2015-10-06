@@ -2,17 +2,24 @@ package http
 
 import (
 	"bytes"
-	"packetbeat/logp"
+	"net"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-	//"fmt"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/stretchr/testify/assert"
 )
 
 func HttpModForTests() *Http {
 	var http Http
-	http.Init(true, nil)
+	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	http.Init(true, results)
 	return &http
 }
 
@@ -62,6 +69,9 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
 	}
+	if stream.message.Size != 262 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
+	}
 }
 
 func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
@@ -109,6 +119,9 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 	}
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
+	}
+	if stream.message.Size != 262 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 }
 
@@ -165,6 +178,9 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	}
 	if stream.message.version_minor != 1 {
 		t.Errorf("Failed to parse version minor")
+	}
+	if stream.message.Size != 669 {
+		t.Errorf("Wrong message size %d", stream.message.Size)
 	}
 
 }
@@ -886,9 +902,13 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/test" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -928,9 +948,13 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Fail to parse parameters")
+	}
+
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
 	}
 
 	if strings.Contains(params, "secret") {
@@ -971,11 +995,15 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 
 	msg := stream.data[stream.message.start:stream.message.end]
-	params, err := http.paramsHideSecrets(stream.message, msg)
+	path, params, err := http.extractParameters(stream.message, msg)
 	if err != nil {
 		t.Errorf("Faile to parse parameters")
 	}
 	logp.Debug("httpdetailed", "parameters %s", params)
+
+	if path != "/users/login" {
+		t.Errorf("Wrong path: %s", path)
+	}
 
 	if strings.Contains(params, "secret") {
 		t.Errorf("Failed to censor the password: %s", msg)
@@ -1054,10 +1082,290 @@ func TestHttpParser_StripAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*\r\n"))
+	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*"))
         if raw_message_obscured < 0 {
 		t.Errorf("Obscured authorization string not found: " + string(msg[:]) )
 	}
+}
 
+
+func Test_splitCookiesHeader(t *testing.T) {
+	type io struct {
+		Input  string
+		Output map[string]string
+	}
+
+	tests := []io{
+		io{
+			Input: "sessionToken=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"expires":      "Wed, 09 Jun 2021 10:18:14 GMT",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; invalid",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123;;;; ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+			},
+		},
+
+		io{
+			Input: "sessionToken=abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input: "sessionToken=\"abc123\"; multiple=\"a=d=2 \"",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2 ",
+			},
+		},
+
+		io{
+			Input: "sessionToken\t=   abc123; multiple=a=d=2 ",
+			Output: map[string]string{
+				"sessiontoken": "abc123",
+				"multiple":     "a=d=2",
+			},
+		},
+
+		io{
+			Input:  ";",
+			Output: map[string]string{},
+		},
+
+		io{
+			Input:  "",
+			Output: map[string]string{},
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Output, splitCookiesHeader(test.Input))
+	}
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// headers, drop the stream.
+func Test_gap_in_headers(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 5)
+	assert.Equal(t, false, ok)
+	assert.Equal(t, false, complete)
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// parts of the body, it's ok.
+func Test_gap_in_body(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 40\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, true, complete)
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for
+// parts of the body, it's ok.
+func Test_gap_in_body_http1dot0(t *testing.T) {
+
+	http := HttpModForTests()
+
+	data1 := []byte("HTTP/1.0 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	ok, complete := http.messageParser(stream)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+	ok, complete = http.messageGap(stream, 10)
+	assert.Equal(t, true, ok)
+	assert.Equal(t, false, complete)
+
+}
+
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
+		Ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: 6512, Dst_port: 80,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
+// Helper function to read from the Publisher Queue
+func expectTransaction(t *testing.T, http *Http) common.MapStr {
+	client := http.results.(publisher.ChanClient)
+	select {
+	case trans := <-client.Channel:
+		return trans
+	default:
+		t.Error("No transaction")
+	}
+	return nil
+}
+
+func Test_gap_in_body_http1dot0_fin(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http",
+			"httpdetailed"})
+	}
+	http := HttpModForTests()
+
+	data1 := []byte("GET / HTTP/1.0\r\n\r\n")
+
+	data2 := []byte("HTTP/1.0 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n" +
+		"xxxxxxxxxxxxxxxxxxxx")
+
+	tcptuple := testTcpTuple()
+	req := protos.Packet{Payload: data1}
+	resp := protos.Packet{Payload: data2}
+
+	private := protos.ProtocolData(new(httpPrivateData))
+
+	private = http.Parse(&req, tcptuple, 0, private)
+	private = http.ReceivedFin(tcptuple, 0, private)
+
+	private = http.Parse(&resp, tcptuple, 1, private)
+
+	logp.Debug("http", "Now sending gap..")
+
+	private, drop := http.GapInStream(tcptuple, 1, 10, private)
+	assert.Equal(t, false, drop)
+
+	private = http.ReceivedFin(tcptuple, 1, private)
+
+	trans := expectTransaction(t, http)
+	assert.NotNil(t, trans)
+	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+}
+
+func TestHttp_configsSettingAll(t *testing.T) {
+
+	http := HttpModForTests()
+	config := new(config.Http)
+
+	// Assign config vars
+	config.Ports = []int{80, 8080}
+
+	trueVar := true
+	config.Send_request = &trueVar
+	config.Send_response = &trueVar
+	config.Hide_keywords = []string{"a", "b"}
+	config.Strip_authorization = &trueVar
+	config.Send_all_headers = &trueVar
+	config.Split_cookie = &trueVar
+	realIpHeader := "X-Forwarded-For"
+	config.Real_ip_header = &realIpHeader
+
+	// Set config
+	http.SetFromConfig(*config)
+
+	// Check if http config is set correctly
+	assert.Equal(t, config.Ports, http.Ports)
+	assert.Equal(t, config.Ports, http.GetPorts())
+	assert.Equal(t, *config.Send_request, http.Send_request)
+	assert.Equal(t, *config.Send_response, http.Send_response)
+	assert.Equal(t, config.Hide_keywords, http.Hide_keywords)
+	assert.Equal(t, *config.Strip_authorization, http.Strip_authorization)
+	assert.True(t, http.Send_headers)
+	assert.True(t, http.Send_all_headers)
+	assert.Equal(t, *config.Split_cookie, http.Split_cookie)
+	assert.Equal(t, strings.ToLower(*config.Real_ip_header), http.Real_ip_header)
+}
+
+func TestHttp_configsSettingHeaders(t *testing.T) {
+
+	http := HttpModForTests()
+	config := new(config.Http)
+
+	// Assign config vars
+	config.Send_headers = []string{"a", "b", "c"}
+
+	// Set config
+	http.SetFromConfig(*config)
+
+	// Check if http config is set correctly
+	assert.True(t, http.Send_headers)
+	assert.Equal(t, len(config.Send_headers), len(http.Headers_whitelist))
+
+	for _, val := range http.Headers_whitelist {
+		assert.True(t, val)
+	}
 
 }

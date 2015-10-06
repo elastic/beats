@@ -34,3 +34,6 @@ class Test(TestCase):
         assert objs[5]["status"] == "OK"
         assert objs[5]["bytes_out"] == 118
         assert objs[0]["count"] == 1
+
+        assert all(["bytes_in" in o.keys() for o in objs])
+        assert all(["bytes_out" in o.keys() for o in objs])

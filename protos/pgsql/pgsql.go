@@ -1,14 +1,17 @@
 package pgsql
 
 import (
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type PgsqlMessage struct {
@@ -32,9 +35,9 @@ type PgsqlMessage struct {
 	ErrorInfo      string
 	ErrorCode      string
 	ErrorSeverity  string
+	Notes          []string
 
 	Direction    uint8
-	Incomplete   bool
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 }
@@ -50,14 +53,14 @@ type PgsqlTransaction struct {
 	ts           time.Time
 	Query        string
 	Method       string
-	Size         uint64
+	BytesOut     uint64
+	BytesIn      uint64
+	Notes        []string
 
 	Pgsql common.MapStr
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 type PgsqlStream struct {
@@ -74,11 +77,6 @@ type PgsqlStream struct {
 }
 
 const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
-
-const (
 	PgsqlStartState = iota
 	PgsqlGetDataState
 )
@@ -90,17 +88,28 @@ const (
 )
 
 type Pgsql struct {
-	transactionsMap map[common.HashableTcpTuple][]*PgsqlTransaction
-	results         chan common.MapStr
 
+	// config
+	Ports         []int
 	maxStoreRows  int
 	maxRowLength  int
 	Send_request  bool
 	Send_response bool
 
+	transactions *common.Cache
+	results      publisher.Client
+
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
 		dir uint8, raw_msg []byte)
+}
+
+func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {
+	v := pgsql.transactions.Get(k)
+	if v != nil {
+		return v.([]*PgsqlTransaction)
+	}
+	return nil
 }
 
 func (pgsql *Pgsql) InitDefaults() {
@@ -110,33 +119,42 @@ func (pgsql *Pgsql) InitDefaults() {
 	pgsql.Send_response = false
 }
 
-func (pgsql *Pgsql) setFromConfig() error {
-	if config.ConfigSingleton.Pgsql.Max_row_length > 0 {
-		pgsql.maxRowLength = config.ConfigSingleton.Pgsql.Max_row_length
+func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
+
+	pgsql.Ports = config.Ports
+
+	if config.Max_row_length != nil {
+		pgsql.maxRowLength = *config.Max_row_length
 	}
-	if config.ConfigSingleton.Pgsql.Max_rows > 0 {
-		pgsql.maxStoreRows = config.ConfigSingleton.Pgsql.Max_rows
+	if config.Max_rows != nil {
+		pgsql.maxStoreRows = *config.Max_rows
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_request") {
-		pgsql.Send_request = config.ConfigSingleton.Protocols["pgsql"].Send_request
+	if config.Send_request != nil {
+		pgsql.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "pgsql", "send_response") {
-		pgsql.Send_response = config.ConfigSingleton.Protocols["pgsql"].Send_response
+	if config.Send_response != nil {
+		pgsql.Send_response = *config.Send_response
 	}
 	return nil
 }
 
-func (pgsql *Pgsql) Init(test_mode bool, results chan common.MapStr) error {
+func (pgsql *Pgsql) GetPorts() []int {
+	return pgsql.Ports
+}
+
+func (pgsql *Pgsql) Init(test_mode bool, results publisher.Client) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
-		err := pgsql.setFromConfig()
+		err := pgsql.setFromConfig(config.ConfigSingleton.Protocols.Pgsql)
 		if err != nil {
 			return err
 		}
 	}
 
-	pgsql.transactionsMap = make(map[common.HashableTcpTuple][]*PgsqlTransaction, TransactionsHashSize)
+	pgsql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	pgsql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	pgsql.handlePgsql = handlePgsql
 	pgsql.results = results
 
@@ -368,6 +386,8 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += length
 						m.end = s.parseOffset
 						m.isSSLRequest = true
+						m.Size = uint64(m.end - m.start)
+
 						return true, true
 					}
 					s.parseOffset += length
@@ -392,12 +412,20 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1
 						m.end = s.parseOffset
 						m.isSSLResponse = true
+						m.Size = uint64(m.end - m.start)
+
 						return true, true
 					}
 				}
 
 				// read length
 				length := int(common.Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
+
+				if length < 4 {
+					// length should include the size of itself (int32)
+					logp.Debug("pgsqldetailed", "Invalid pgsql command length.")
+					return false, false
+				}
 
 				logp.Debug("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
 
@@ -410,9 +438,12 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 //type
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
+
 						m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
+
 						m.toExport = true
-						logp.Debug("pgsqldetailed", "Simple Query", "%s", m.Query)
+						logp.Debug("pgsqldetailed", "Simple Query: %s", m.Query)
 						return true, true
 					} else {
 						// wait for more
@@ -511,6 +542,7 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						s.parseOffset += 1 // type
 						s.parseOffset += length
 						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
 
 						return true, true
 					} else {
@@ -524,6 +556,12 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					if len(s.data[s.parseOffset:]) >= length+1 {
 						s.parseOffset += 1 //type
 						s.parseOffset += length
+						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
+
+						// ok and complete, but ignore
+						m.toExport = false
+						return true, true
 					} else {
 						// wait for more
 						logp.Debug("pgsqldetailed", "Wait for more data 6")
@@ -583,7 +621,6 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 					s.parseOffset += length
 					m.end = s.parseOffset
-
 					m.Size = uint64(m.end - m.start)
 
 					s.parseState = PgsqlStartState
@@ -657,6 +694,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		}
 
 		ok, complete := pgsql.pgsqlMessageParser(priv.Data[dir])
+		//logp.Debug("pgsqldetailed", "MessageParser returned ok=%v complete=%v", ok, complete)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -709,19 +747,19 @@ func messageHasEnoughData(msg *PgsqlMessage) bool {
 
 // Called when there's a drop packet
 func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
 	defer logp.Recover("GapInPgsqlStream exception")
 
 	if private == nil {
-		return private
+		return private, false
 	}
 	pgsqlData, ok := private.(pgsqlPrivateData)
 	if !ok {
-		return private
+		return private, false
 	}
 	if pgsqlData.Data[dir] == nil {
-		return pgsqlData
+		return pgsqlData, false
 	}
 
 	// If enough data was received, send it to the
@@ -729,9 +767,14 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	stream := pgsqlData.Data[dir]
 	if messageHasEnoughData(stream.message) {
 		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
-		stream.message.toExport = true
-		stream.message.end = stream.parseOffset
-		stream.message.Incomplete = true
+		m := stream.message
+		m.toExport = true
+		m.end = stream.parseOffset
+		if m.IsRequest {
+			m.Notes = append(m.Notes, "Packet loss while capturing the request")
+		} else {
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+		}
 
 		msg := stream.data[stream.message.start:stream.message.end]
 		pgsql.handlePgsql(pgsql, stream.message, tcptuple, dir, msg)
@@ -739,7 +782,7 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 		// and reset message
 		stream.PrepareForNewMessage()
 	}
-	return pgsqlData
+	return pgsqlData, true
 }
 
 func (pgsql *Pgsql) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
@@ -773,8 +816,9 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 
 	logp.Debug("pgsqldetailed", "Queries (%d) :%s", len(queries), queries)
 
-	if pgsql.transactionsMap[tuple.Hashable()] == nil {
-		pgsql.transactionsMap[tuple.Hashable()] = []*PgsqlTransaction{}
+	transList := pgsql.getTransaction(tuple.Hashable())
+	if transList == nil {
+		transList = []*PgsqlTransaction{}
 	}
 
 	for _, query := range queries {
@@ -801,30 +845,28 @@ func (pgsql *Pgsql) receivedPgsqlRequest(msg *PgsqlMessage) {
 		trans.Pgsql = common.MapStr{}
 		trans.Query = query
 		trans.Method = getQueryMethod(query)
+		trans.BytesIn = msg.Size
+
+		trans.Notes = msg.Notes
 
 		trans.Request_raw = query
 
-		if trans.timer != nil {
-			trans.timer.Stop()
-		}
-		trans.timer = time.AfterFunc(TransactionTimeout, func() { pgsql.expireTransaction(trans) })
-
-		pgsql.transactionsMap[tuple.Hashable()] = append(pgsql.transactionsMap[tuple.Hashable()], trans)
+		transList = append(transList, trans)
 	}
+	pgsql.transactions.Put(tuple.Hashable(), transList)
 }
 
 func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	tuple := msg.TcpTuple
-	trans_list := pgsql.transactionsMap[tuple.Hashable()]
-
-	if trans_list == nil || len(trans_list) == 0 {
+	transList := pgsql.getTransaction(tuple.Hashable())
+	if transList == nil || len(transList) == 0 {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
 	}
 
 	// extract the first transaction from the array
-	trans := pgsql.removeTransaction(tuple, 0)
+	trans := pgsql.removeTransaction(transList, tuple, 0)
 
 	// check if the request was received
 	if trans.Pgsql == nil {
@@ -840,18 +882,16 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 		"error_message":  msg.ErrorInfo,
 		"error_severity": msg.ErrorSeverity,
 	})
-	trans.Size = msg.Size
+	trans.BytesOut = msg.Size
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 	trans.Response_raw = common.DumpInCSVFormat(msg.Fields, msg.Rows)
 
+	trans.Notes = append(trans.Notes, msg.Notes...)
+
 	pgsql.publishTransaction(trans)
 
 	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
 func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
@@ -870,46 +910,37 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if pgsql.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if pgsql.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["query"] = t.Query
 	event["method"] = t.Method
-	event["bytes_out"] = t.Size
+	event["bytes_out"] = t.BytesOut
+	event["bytes_in"] = t.BytesIn
 	event["pgsql"] = t.Pgsql
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	pgsql.results <- event
+	if len(t.Notes) > 0 {
+		event["notes"] = t.Notes
+	}
+
+	pgsql.results.PublishEvent(event)
 }
 
-func (pgsql *Pgsql) expireTransaction(trans *PgsqlTransaction) {
-	// TODO: Here we need to PUBLISH an incomplete/timeout transaction
-	// remove from map
-	for i, t := range pgsql.transactionsMap[trans.tuple.Hashable()] {
-		if t == trans {
-			pgsql.removeTransaction(trans.tuple, i)
-			break
-		}
-	}
-	if len(pgsql.transactionsMap[trans.tuple.Hashable()]) == 0 {
-		delete(pgsql.transactionsMap, trans.tuple.Hashable())
-	}
-}
+func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,
+	tuple common.TcpTuple, index int) *PgsqlTransaction {
 
-func (pgsql *Pgsql) removeTransaction(tuple common.TcpTuple, index int) *PgsqlTransaction {
-
-	trans_list := pgsql.transactionsMap[tuple.Hashable()]
-	trans := trans_list[index]
-	trans_list = append(trans_list[:index], trans_list[index+1:]...)
-	if len(trans_list) == 0 {
-		delete(pgsql.transactionsMap, trans.tuple.Hashable())
+	trans := transList[index]
+	transList = append(transList[:index], transList[index+1:]...)
+	if len(transList) == 0 {
+		pgsql.transactions.Delete(trans.tuple.Hashable())
 	} else {
-		pgsql.transactionsMap[tuple.Hashable()] = trans_list
+		pgsql.transactions.Put(tuple.Hashable(), transList)
 	}
 
 	return trans

@@ -2,15 +2,24 @@ package redis
 
 import (
 	"bytes"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
+)
+
+const (
+	START = iota
+	BULK_ARRAY
+	SIMPLE_MESSAGE
 )
 
 type RedisMessage struct {
@@ -28,6 +37,10 @@ type RedisMessage struct {
 	Method    string
 	Path      string
 	Size      int
+
+	parseState int
+	start      int
+	end        int
 }
 
 type RedisStream struct {
@@ -62,8 +75,6 @@ type RedisTransaction struct {
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 // Keep sorted for future command addition
@@ -228,19 +239,23 @@ var RedisCommands = map[string]struct{}{
 	"ZUNIONSTORE":      struct{}{},
 }
 
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
-
 type Redis struct {
 	// config
+	Ports         []int
 	Send_request  bool
 	Send_response bool
 
-	transactionsMap map[common.HashableTcpTuple]*RedisTransaction
+	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
+}
+
+func (redis *Redis) getTransaction(k common.HashableTcpTuple) *RedisTransaction {
+	v := redis.transactions.Get(k)
+	if v != nil {
+		return v.(*RedisTransaction)
+	}
+	return nil
 }
 
 func (redis *Redis) InitDefaults() {
@@ -248,23 +263,32 @@ func (redis *Redis) InitDefaults() {
 	redis.Send_response = false
 }
 
-func (redis *Redis) setFromConfig() error {
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_request") {
-		redis.Send_request = config.ConfigSingleton.Protocols["redis"].Send_request
+func (redis *Redis) setFromConfig(config config.Redis) error {
+
+	redis.Ports = config.Ports
+
+	if config.Send_request != nil {
+		redis.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "redis", "send_response") {
-		redis.Send_response = config.ConfigSingleton.Protocols["redis"].Send_response
+	if config.Send_response != nil {
+		redis.Send_response = *config.Send_response
 	}
 	return nil
 }
 
-func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
+func (redis *Redis) GetPorts() []int {
+	return redis.Ports
+}
+
+func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	redis.InitDefaults()
 	if !test_mode {
-		redis.setFromConfig()
+		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
-	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
+	redis.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	redis.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	redis.results = results
 
 	return nil
@@ -273,7 +297,7 @@ func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseOffset = 0
-	stream.message = &RedisMessage{Ts: stream.message.Ts}
+	stream.message = nil
 	stream.message.Bulks = []string{}
 }
 
@@ -288,18 +312,27 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 	for s.parseOffset < len(s.data) {
 
 		if s.data[s.parseOffset] == '*' {
-			//Multi Bulk Message
+			//Arrays
+
+			m.parseState = BULK_ARRAY
+			m.start = s.parseOffset
+			logp.Debug("redis", "start %d", m.start)
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				logp.Debug("redis", "End of line not found, waiting for more data")
 				return true, false
 			}
+			logp.Debug("redis", "line %s: %d", line, off)
 
 			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				//NULL Multi Bulk
+				//Null array
 				s.parseOffset = off
 				value = "nil"
+			} else if len(line) == 2 && line[1] == '0' {
+				// Empty array
+				s.parseOffset = off
+				value = "[]"
 			} else {
 
 				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
@@ -315,15 +348,20 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			}
 
 		} else if s.data[s.parseOffset] == '$' {
-			old_offset := s.parseOffset
-			// Bulk Reply
+			// Bulk Strings
+			if m.parseState == START {
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
+			starting_offset := s.parseOffset
 
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				logp.Debug("redis", "End of line not found, waiting for more data")
-				s.parseOffset = old_offset
+				s.parseOffset = starting_offset
 				return true, false
 			}
+			logp.Debug("redis", "line %s: %d", line, off)
 
 			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
 				// NULL Bulk Reply
@@ -341,9 +379,10 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 				found, line, off = readLine(s.data, s.parseOffset)
 				if !found {
 					logp.Debug("redis", "End of line not found, waiting for more data")
-					s.parseOffset = old_offset
+					s.parseOffset = starting_offset
 					return true, false
 				}
+				logp.Debug("redis", "line %s: %d", line, off)
 
 				if int64(len(line)) != length {
 					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
@@ -354,7 +393,13 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			}
 
 		} else if s.data[s.parseOffset] == ':' {
-			// Integer reply
+			// Integers
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
+
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -369,7 +414,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			s.parseOffset = off
 
 		} else if s.data[s.parseOffset] == '+' {
-			// Status Reply
+			// Simple Strings
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -378,7 +428,12 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			value = line[1:]
 			s.parseOffset = off
 		} else if s.data[s.parseOffset] == '-' {
-			// Error Reply
+			// Errors
+			if m.parseState == START {
+				// it's not in a bulk message
+				m.parseState = SIMPLE_MESSAGE
+				m.start = s.parseOffset
+			}
 			found, line, off := readLine(s.data, s.parseOffset)
 			if !found {
 				return true, false
@@ -417,13 +472,19 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 			if m.NumberOfBulks == 0 {
 				// the last bulk received
-				m.Message = strings.Join(m.Bulks, " ")
-				m.Size = s.parseOffset
+				if m.IsRequest {
+					m.Message = strings.Join(m.Bulks, " ")
+				} else {
+					m.Message = "[" + strings.Join(m.Bulks, ", ") + "]"
+				}
+				m.end = s.parseOffset
+				m.Size = m.end - m.start
 				return true, true
 			}
 		} else {
 			m.Message = value
-			m.Size = s.parseOffset
+			m.end = s.parseOffset
+			m.Size = m.end - m.start
 			if iserror {
 				m.IsError = true
 			}
@@ -535,17 +596,15 @@ func (redis *Redis) handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 }
 
 func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
-	// Add it to the HT
 	tuple := msg.TcpTuple
-
-	trans := redis.transactionsMap[tuple.Hashable()]
+	trans := redis.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.Redis != nil {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
-		redis.transactionsMap[tuple.Hashable()] = trans
+		redis.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.Redis = common.MapStr{}
@@ -572,24 +631,11 @@ func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { redis.expireTransaction(trans) })
-
-}
-
-func (redis *Redis) expireTransaction(trans *RedisTransaction) {
-
-	// remove from map
-	delete(redis.transactionsMap, trans.tuple.Hashable())
 }
 
 func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
-
 	tuple := msg.TcpTuple
-	trans := redis.transactionsMap[tuple.Hashable()]
+	trans := redis.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -614,29 +660,25 @@ func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	redis.publishTransaction(trans)
+	redis.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
-
-	// remove from map
-	delete(redis.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	// tsg: being packet loss tolerant is probably not very useful for Redis,
+	// because most requests/response tend to fit in a single packet.
 
-	return private
+	return private, true
 }
 
 func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	// TODO
+	// TODO: check if we have pending data that we can send up the stack
+
 	return private
 }
 
@@ -655,10 +697,10 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	}
 	event["responsetime"] = t.ResponseTime
 	if redis.Send_request {
-		event["request_raw"] = t.Request_raw
+		event["request"] = t.Request_raw
 	}
 	if redis.Send_response {
-		event["response_raw"] = t.Response_raw
+		event["response"] = t.Response_raw
 	}
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)
@@ -667,9 +709,9 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
 
-	event["@timestamp"] = common.Time(t.ts)
+	event["timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	redis.results <- event
+	redis.results.PublishEvent(event)
 }

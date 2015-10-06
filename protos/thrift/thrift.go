@@ -5,16 +5,19 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
-	"packetbeat/common"
-	"packetbeat/config"
-	"packetbeat/logp"
-	"packetbeat/procs"
-	"packetbeat/protos"
-	"packetbeat/protos/tcp"
 	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+
+	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type ThriftMessage struct {
@@ -39,6 +42,7 @@ type ThriftMessage struct {
 	Exceptions   string
 	FrameSize    uint32
 	Service      string
+	Notes        []string
 }
 
 type ThriftField struct {
@@ -73,17 +77,12 @@ type ThriftTransaction struct {
 	JsTs         time.Time
 	ts           time.Time
 	cmdline      *common.CmdlineTuple
+	BytesIn      uint64
+	BytesOut     uint64
 
 	Request *ThriftMessage
 	Reply   *ThriftMessage
-
-	timer *time.Timer
 }
-
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
 
 const (
 	ThriftStartState = iota
@@ -139,6 +138,7 @@ const (
 type Thrift struct {
 
 	// config
+	Ports                  []int
 	StringMaxSize          int
 	CollectionMaxSize      int
 	DropAfterNStructFields int
@@ -150,14 +150,22 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transMap map[common.HashableTcpTuple]*ThriftTransaction
+	transactions *common.Cache
 
 	PublishQueue chan *ThriftTransaction
-	results      chan common.MapStr
+	results      publisher.Client
 	Idl          *ThriftIdl
 }
 
 var ThriftMod Thrift
+
+func (thrift *Thrift) getTransaction(k common.HashableTcpTuple) *ThriftTransaction {
+	v := thrift.transactions.Get(k)
+	if v != nil {
+		return v.(*ThriftTransaction)
+	}
+	return nil
+}
 
 func (thrift *Thrift) InitDefaults() {
 	// defaults
@@ -172,71 +180,79 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.Send_response = false
 }
 
-func (thrift *Thrift) readConfig() error {
+func (thrift *Thrift) readConfig(config config.Thrift) error {
 	var err error
 
-	if config.ConfigMeta.IsDefined("thrift", "string_max_size") {
-		thrift.StringMaxSize = config.ConfigSingleton.Thrift.String_max_size
+	thrift.Ports = config.Ports
+
+	if config.String_max_size != nil {
+		thrift.StringMaxSize = *config.String_max_size
 	}
-	if config.ConfigMeta.IsDefined("thrift", "collection_max_size") {
-		thrift.CollectionMaxSize = config.ConfigSingleton.Thrift.Collection_max_size
+	if config.Collection_max_size != nil {
+		thrift.CollectionMaxSize = *config.Collection_max_size
 	}
-	if config.ConfigMeta.IsDefined("thrift", "drop_after_n_struct_fields") {
-		thrift.DropAfterNStructFields = config.ConfigSingleton.Thrift.Drop_after_n_struct_fields
+	if config.Drop_after_n_struct_fields != nil {
+		thrift.DropAfterNStructFields = *config.Drop_after_n_struct_fields
 	}
-	if config.ConfigMeta.IsDefined("thrift", "transport_type") {
-		switch config.ConfigSingleton.Thrift.Transport_type {
+	if config.Transport_type != nil {
+		switch *config.Transport_type {
 		case "socket":
 			thrift.TransportType = ThriftTSocket
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known", config.ConfigSingleton.Thrift.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", *config.Transport_type)
 		}
 	}
-	if config.ConfigMeta.IsDefined("thrift", "protocol_type") {
-		switch config.ConfigSingleton.Thrift.Transport_type {
+	if config.Protocol_type != nil {
+		switch *config.Protocol_type {
 		case "binary":
 			thrift.ProtocolType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known", config.ConfigSingleton.Thrift.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", *config.Protocol_type)
 		}
 	}
-	if config.ConfigMeta.IsDefined("thrift", "capture_reply") {
-		thrift.CaptureReply = config.ConfigSingleton.Thrift.Capture_reply
+	if config.Capture_reply != nil {
+		thrift.CaptureReply = *config.Capture_reply
 	}
-	if config.ConfigMeta.IsDefined("thrift", "obfuscate_strings") {
-		thrift.ObfuscateStrings = config.ConfigSingleton.Thrift.Obfuscate_strings
+	if config.Obfuscate_strings != nil {
+		thrift.ObfuscateStrings = *config.Obfuscate_strings
 	}
-	if config.ConfigMeta.IsDefined("thrift", "idl_files") {
-		thrift.Idl, err = NewThriftIdl(config.ConfigSingleton.Thrift.Idl_files)
+	if len(config.Idl_files) > 0 {
+		thrift.Idl, err = NewThriftIdl(config.Idl_files)
 		if err != nil {
 			return err
 		}
 	}
 
-	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_request") {
-		thrift.Send_request = config.ConfigSingleton.Protocols["thrift"].Send_request
+	if config.Send_request != nil {
+		thrift.Send_request = *config.Send_request
 	}
-	if config.ConfigMeta.IsDefined("protocols", "thrift", "send_response") {
-		thrift.Send_response = config.ConfigSingleton.Protocols["thrift"].Send_response
+	if config.Send_response != nil {
+		thrift.Send_response = *config.Send_response
 	}
 
 	return nil
 }
 
-func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
+func (thrift *Thrift) GetPorts() []int {
+	return thrift.Ports
+}
+
+func (thrift *Thrift) Init(test_mode bool, results publisher.Client) error {
 
 	thrift.InitDefaults()
 
 	if !test_mode {
-		err := thrift.readConfig()
+		err := thrift.readConfig(config.ConfigSingleton.Protocols.Thrift)
 		if err != nil {
 			return err
 		}
 	}
 
-	thrift.transMap = make(map[common.HashableTcpTuple]*ThriftTransaction, TransactionsHashSize)
+	thrift.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	thrift.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
@@ -290,6 +306,7 @@ func (thrift *Thrift) readMessageBegin(s *ThriftStream) (bool, bool) {
 		logp.Debug("thriftdetailed", "offset = %d", offset)
 
 		if len(s.data[offset:]) < 4 {
+			logp.Debug("thriftdetailed", "Less then 4 bytes remaining")
 			return true, false // ok, not complete
 		}
 		m.SeqId = common.Bytes_Ntohl(s.data[offset : offset+4])
@@ -703,6 +720,9 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	var ok, complete bool
 	var m = s.message
 
+	logp.Debug("thriftdetailed", "messageParser called parseState=%v offset=%v",
+		s.parseState, s.parseOffset)
+
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
 		case ThriftStartState:
@@ -717,6 +737,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			}
 
 			ok, complete = thrift.readMessageBegin(s)
+			logp.Debug("thriftdetailed", "readMessageBegin returned: %v %v", ok, complete)
 			if !ok {
 				return false, false
 			}
@@ -734,6 +755,7 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 			s.parseState = ThriftFieldState
 		case ThriftFieldState:
 			ok, complete, field := thrift.readField(s)
+			logp.Debug("thriftdetailed", "readField returned: %v %v", ok, complete)
 			if !ok {
 				return false, false
 			}
@@ -784,13 +806,33 @@ func (thrift *Thrift) messageParser(s *ThriftStream) (bool, bool) {
 	return true, false
 }
 
+// messageGap is called when a gap of size `nbytes` is found in the
+// tcp stream. Returns true if there is already enough data in the message
+// read so far that we can use it further in the stack.
+func (thrift *Thrift) messageGap(s *ThriftStream, nbytes int) (complete bool) {
+	m := s.message
+	switch s.parseState {
+	case ThriftStartState:
+		// not enough data yet to be useful
+		return false
+	case ThriftFieldState:
+		if !m.IsRequest {
+			// large response case, can tolerate loss
+			m.Notes = append(m.Notes, "Packet loss while capturing the response")
+			return true
+		}
+	}
+
+	return false
+}
+
 func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
 	if flush {
 		stream.data = []byte{}
 	} else {
 		stream.data = stream.data[stream.parseOffset:]
 	}
-	logp.Debug("thrift", "remaining data: [%s]", stream.data)
+	//logp.Debug("thrift", "remaining data: [%s]", stream.data)
 	stream.parseOffset = 0
 	stream.message = nil
 	stream.parseState = ThriftStartState
@@ -798,6 +840,45 @@ func (stream *ThriftStream) PrepareForNewMessage(flush bool) {
 
 type thriftPrivateData struct {
 	Data [2]*ThriftStream
+}
+
+func (thrift *Thrift) messageComplete(tcptuple *common.TcpTuple, dir uint8,
+	stream *ThriftStream, priv *thriftPrivateData) {
+
+	var flush bool = false
+
+	if stream.message.IsRequest {
+		logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
+		if !thrift.CaptureReply {
+			// enable the stream in the other direction to get the reply
+			stream_rev := priv.Data[1-dir]
+			if stream_rev != nil {
+				stream_rev.skipInput = false
+			}
+		}
+	} else {
+		logp.Debug("thrift", "Thrift response message: %s", stream.message.Method)
+		if !thrift.CaptureReply {
+			// disable stream in this direction
+			stream.skipInput = true
+
+			// and flush current data
+			flush = true
+		}
+	}
+
+	// all ok, go to next level
+	stream.message.TcpTuple = *tcptuple
+	stream.message.Direction = dir
+	stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
+	if stream.message.FrameSize == 0 {
+		stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
+	}
+	thrift.handleThrift(stream.message)
+
+	// and reset message
+	stream.PrepareForNewMessage(flush)
+
 }
 
 func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
@@ -843,6 +924,7 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir u
 		}
 
 		ok, complete := thrift.messageParser(priv.Data[dir])
+		logp.Debug("thriftdetailed", "messageParser returned %v %v", ok, complete)
 
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
@@ -853,44 +935,14 @@ func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir u
 		}
 
 		if complete {
-			var flush bool = false
-
-			if stream.message.IsRequest {
-				logp.Debug("thrift", "Thrift request message: %s", stream.message.Method)
-				if !thrift.CaptureReply {
-					// enable the stream in the other direction to get the reply
-					stream_rev := priv.Data[1-dir]
-					if stream_rev != nil {
-						stream_rev.skipInput = false
-					}
-				}
-			} else {
-				logp.Debug("thrift", "Thrift response message: %s", stream.message.Method)
-				if !thrift.CaptureReply {
-					// disable stream in this direction
-					stream.skipInput = true
-
-					// and flush current data
-					flush = true
-				}
-			}
-
-			// all ok, go to next level
-			stream.message.TcpTuple = *tcptuple
-			stream.message.Direction = dir
-			stream.message.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
-			if stream.message.FrameSize == 0 {
-				stream.message.FrameSize = uint32(stream.parseOffset - stream.message.start)
-			}
-			thrift.handleThrift(stream.message)
-
-			// and reset message
-			stream.PrepareForNewMessage(flush)
+			thrift.messageComplete(tcptuple, dir, stream, &priv)
 		} else {
 			// wait for more data
 			break
 		}
 	}
+
+	logp.Debug("thriftdetailed", "Out")
 
 	return priv
 }
@@ -906,7 +958,7 @@ func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
 func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.Hashable()]
+	trans := thrift.getTransaction(tuple.Hashable())
 	if trans != nil {
 		logp.Debug("thrift", "Two requests without reply, assuming the old one is oneway")
 		thrift.PublishQueue <- trans
@@ -916,7 +968,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Type:  "thrift",
 		tuple: tuple,
 	}
-	thrift.transMap[tuple.Hashable()] = trans
+	thrift.transactions.Put(tuple.Hashable(), trans)
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
@@ -936,12 +988,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	}
 
 	trans.Request = msg
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { thrift.expireTransaction(trans) })
-
+	trans.BytesIn = uint64(msg.FrameSize)
 }
 
 func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
@@ -949,7 +996,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	// we need to search the request first.
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.Hashable()]
+	trans := thrift.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Debug("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -962,32 +1009,25 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	}
 
 	trans.Reply = msg
+	trans.BytesOut = uint64(msg.FrameSize)
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	thrift.PublishQueue <- trans
+	thrift.transactions.Delete(tuple.Hashable())
 
 	logp.Debug("thrift", "Transaction queued")
-
-	// remove from map
-	thrift.transMap[tuple.Hashable()] = nil
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
 func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	trans := thrift.transMap[tcptuple.Hashable()]
+	trans := thrift.getTransaction(tcptuple.Hashable())
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			logp.Debug("thrift", "FIN and had only one transaction. Assuming one way")
 			thrift.PublishQueue <- trans
-			delete(thrift.transMap, trans.tuple.Hashable())
-			if trans.timer != nil {
-				trans.timer.Stop()
-			}
+			thrift.transactions.Delete(trans.tuple.Hashable())
 		}
 	}
 
@@ -995,11 +1035,33 @@ func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 }
 
 func (thrift *Thrift) GapInStream(tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
-	// TODO
+	defer logp.Recover("GapInStream(thrift) exception")
+	logp.Debug("thriftdetailed", "GapInStream called")
 
-	return private
+	if private == nil {
+		return private, false
+	}
+	thriftData, ok := private.(thriftPrivateData)
+	if !ok {
+		return private, false
+	}
+	stream := thriftData.Data[dir]
+	if stream == nil || stream.message == nil {
+		// nothing to do
+		return private, false
+	}
+
+	if thrift.messageGap(stream, nbytes) {
+		// we need to publish from here
+		thrift.messageComplete(tcptuple, dir, stream, &thriftData)
+	}
+
+	// we always drop the TCP stream. Because it's binary and len based,
+	// there are too few cases in which we could recover the stream (maybe
+	// for very large blobs, leaving that as TODO)
+	return private, true
 }
 
 func (thrift *Thrift) publishTransactions() {
@@ -1019,7 +1081,8 @@ func (thrift *Thrift) publishTransactions() {
 			event["method"] = t.Request.Method
 			event["path"] = t.Request.Service
 			event["query"] = fmt.Sprintf("%s%s", t.Request.Method, t.Request.Params)
-			event["bytes_in"] = uint64(t.Request.FrameSize)
+			event["bytes_in"] = t.BytesIn
+			event["bytes_out"] = t.BytesOut
 			thriftmap = common.MapStr{
 				"params": t.Request.Params,
 			}
@@ -1028,7 +1091,7 @@ func (thrift *Thrift) publishTransactions() {
 			}
 
 			if thrift.Send_request {
-				event["request_raw"] = fmt.Sprintf("%s%s", t.Request.Method,
+				event["request"] = fmt.Sprintf("%s%s", t.Request.Method,
 					t.Request.Params)
 			}
 		}
@@ -1042,31 +1105,28 @@ func (thrift *Thrift) publishTransactions() {
 
 			if thrift.Send_response {
 				if !t.Reply.HasException {
-					event["response_raw"] = t.Reply.ReturnValue
+					event["response"] = t.Reply.ReturnValue
 				} else {
-					event["response_raw"] = fmt.Sprintf("Exceptions: %s",
+					event["response"] = fmt.Sprintf("Exceptions: %s",
 						t.Reply.Exceptions)
 				}
+			}
+			if len(t.Reply.Notes) > 0 {
+				event["notes"] = t.Reply.Notes
 			}
 		} else {
 			event["bytes_out"] = 0
 		}
 		event["thrift"] = thriftmap
 
-		event["@timestamp"] = common.Time(t.ts)
+		event["timestamp"] = common.Time(t.ts)
 		event["src"] = &t.Src
 		event["dst"] = &t.Dst
 
 		if thrift.results != nil {
-			thrift.results <- event
+			thrift.results.PublishEvent(event)
 		}
 
 		logp.Debug("thrift", "Published event")
 	}
-}
-
-func (thrift *Thrift) expireTransaction(trans *ThriftTransaction) {
-	// TODO - also publish?
-	// remove from map
-	delete(thrift.transMap, trans.tuple.Hashable())
 }

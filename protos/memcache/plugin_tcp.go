@@ -1,0 +1,449 @@
+package memcache
+
+// Memcache TCP Protocol Plugin implementation
+
+import (
+	"time"
+
+	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+
+	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/applayer"
+	"github.com/elastic/packetbeat/protos/tcp"
+)
+
+type tcpMemcache struct {
+	tcpConfig
+}
+
+type tcpConfig struct {
+	tcpTransTimeout time.Duration
+}
+
+type tcpConnectionData struct {
+	Streams    [2]*stream
+	connection *connection
+}
+
+// memcache application layer streams
+type stream struct {
+	applayer.Stream
+	parser parser
+}
+
+type connection struct {
+	timer     *time.Timer
+	requests  messageList
+	responses messageList
+}
+
+type messageList struct {
+	head *message
+	tail *message
+}
+
+const defaultTcpTransDuration uint = 200
+
+func ensureMemcacheConnection(private protos.ProtocolData) *tcpConnectionData {
+	if private == nil {
+		return &tcpConnectionData{}
+	}
+
+	priv, ok := private.(*tcpConnectionData)
+	if !ok {
+		logp.Warn("memcache connection data type error, create new one")
+		return &tcpConnectionData{}
+	}
+
+	return priv
+}
+
+func isMemcacheConnection(private protos.ProtocolData) bool {
+	if private == nil {
+		return false
+	}
+
+	_, ok := private.(*tcpConnectionData)
+	return ok
+}
+
+// Called when payload data is available for parsing.
+func (mc *Memcache) Parse(
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
+	defer logp.Recover("ParseMemcache(TCP) exception")
+
+	tcpConn := ensureMemcacheConnection(private)
+	debug("memcache connection %p", tcpConn)
+	return mc.memcacheParseTcp(tcpConn, pkt, tcptuple, dir)
+}
+
+func (mc *Memcache) newStream(tcptuple *common.TcpTuple) *stream {
+	s := &stream{}
+	s.parser.init(&mc.config)
+	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
+	return s
+}
+
+func (mc *Memcache) memcacheParseTcp(
+	tcpConn *tcpConnectionData,
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) *tcpConnectionData {
+	// assume we are in sync
+	stream := tcpConn.Streams[dir]
+	if stream == nil {
+		stream = mc.newStream(tcptuple)
+		tcpConn.Streams[dir] = stream
+	}
+
+	debug("add payload to stream(%p): %v", stream, dir)
+	if err := stream.Append(pkt.Payload); err != nil {
+		debug("%v, dropping TCP streams", err)
+		mc.pushAllTcpTrans(tcpConn.connection)
+		tcpConn.drop(dir)
+		return nil
+	}
+
+	if tcpConn.connection == nil {
+		tcpConn.connection = &connection{}
+	} else {
+		stopped := tcpConn.connection.timer.Stop()
+		if !stopped {
+			// timer was stopped by someone else, create new connection
+			tcpConn.connection = &connection{}
+		}
+	}
+	conn := tcpConn.connection
+
+	for stream.Buf.Total() > 0 {
+		debug("stream(%p) try to content", stream)
+		msg, err := stream.parse(pkt.Ts)
+		if err != nil {
+			// parsing error, drop tcp stream and retry with next segement
+			debug("Ignore Memcache message, drop tcp stream: %v", err)
+			mc.pushAllTcpTrans(conn)
+			tcpConn.drop(dir)
+			return nil
+		}
+
+		if msg == nil {
+			// wait for more data
+			break
+		}
+		stream.reset()
+
+		tuple := tcptuple.IpPort()
+		err = mc.onTcpMessage(conn, tuple, dir, msg)
+		if err != nil {
+			logp.Warn("error processing memcache message: %s", err)
+		}
+	}
+
+	conn.timer = time.AfterFunc(mc.tcpTransTimeout, func() {
+		debug("connection=%p timed out", conn)
+		mc.pushAllTcpTrans(conn)
+	})
+
+	return tcpConn
+}
+
+func (mc *Memcache) onTcpMessage(
+	conn *connection,
+	tuple *common.IpPortTuple,
+	dir uint8,
+	msg *message,
+) error {
+	msg.Tuple = *tuple
+	msg.Transport = applayer.TransportTcp
+	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
+
+	if msg.IsRequest {
+		return mc.onTcpRequest(conn, tuple, dir, msg)
+	} else {
+		return mc.onTcpResponse(conn, tuple, dir, msg)
+	}
+}
+
+func (mc *Memcache) onTcpRequest(
+	conn *connection,
+	tuple *common.IpPortTuple,
+	dir uint8,
+	msg *message,
+) error {
+	requestSeenFirst := dir == tcp.TcpDirectionOriginal
+	if requestSeenFirst {
+		msg.Direction = applayer.NetOriginalDirection
+	} else {
+		msg.Direction = applayer.NetReverseDirection
+	}
+
+	debug("received memcached(tcp) request message=%p, tuple=%s",
+		msg, msg.IsRequest, msg.Tuple)
+
+	msg.isComplete = true
+	waitResponse := msg.noreply ||
+		(!msg.isBinary && msg.command.code != MemcacheCmdQuit) ||
+		(msg.isBinary && msg.opcode != opcodeQuitQ)
+	if waitResponse {
+		conn.requests.append(msg)
+	} else {
+		mc.onTcpTrans(msg, nil)
+	}
+	return nil
+}
+
+func (mc *Memcache) onTcpResponse(
+	conn *connection,
+	tuple *common.IpPortTuple,
+	dir uint8,
+	msg *message,
+) error {
+	requestSeenFirst := dir == tcp.TcpDirectionReverse
+	if requestSeenFirst {
+		msg.Direction = applayer.NetOriginalDirection
+	} else {
+		msg.Direction = applayer.NetReverseDirection
+	}
+
+	debug("received memcached(tcp) response message=%p, tuple=%s",
+		msg, msg.IsRequest, msg.Tuple)
+
+	// try to merge response with last received response
+	// (values and stats responses can be merged)
+	prev := conn.responses.last()
+	merged, err := tryMergeResponses(mc, prev, msg)
+	if err != nil {
+		return err
+	}
+	if merged {
+		debug("response message got merged")
+		msg = prev
+	} else {
+		conn.responses.append(msg)
+	}
+	if !msg.isComplete {
+		return nil
+	}
+
+	debug("response message complete")
+
+	return mc.correlateTcp(conn)
+}
+
+func (mc *Memcache) correlateTcp(conn *connection) error {
+	// merge requests with responses into transactions
+	for !conn.responses.empty() {
+		var requ *message
+		resp := conn.responses.pop()
+
+		for !conn.requests.empty() {
+			requ = conn.requests.pop()
+			if requ.isBinary != resp.isBinary {
+				err := ErrMixOfBinaryAndText
+				logp.Warn("%v", err)
+				return err
+			}
+
+			// If requ and response belong to the same transaction, continue
+			// merging them into one transaction
+			sameTransaction := !requ.isBinary ||
+				(requ.opaque == resp.opaque &&
+					requ.opcode == resp.opcode)
+			if sameTransaction {
+				break
+			}
+
+			// check if we are missing a response or quiet message.
+			// Quiet message only MAY get a response -> so we need
+			// to clear message list from all quiet messages not having
+			// received a response
+			if requ.isBinary && !requ.isQuiet {
+				note := NoteNonQuietResponseOnly
+				logp.Warn("%s", note)
+				requ.AddNotes(note)
+			}
+
+			// send request
+			debug("send single request=%p", requ)
+			err := mc.onTcpTrans(requ, nil)
+			if err != nil {
+				logp.Warn("error processing memcache transaction: %s", err)
+			}
+			requ = nil
+		}
+
+		// Check if response without request. This should only happen when a TCP
+		// stream is found (or after message gap) when we receive a response
+		// without having seen a request.
+		if requ == nil {
+			debug("found orphan memcached response=%p", resp)
+			resp.AddNotes(NoteTransactionNoRequ)
+		}
+
+		debug("merge request=%p and response=%p", requ, resp)
+		err := mc.onTcpTrans(requ, resp)
+		if err != nil {
+			logp.Warn("error processing memcache transaction: %s", err)
+		}
+		// continue processing more transactions (reporting error only)
+	}
+
+	return nil
+}
+
+func (mc *Memcache) onTcpTrans(requ, resp *message) error {
+	debug("received memcache(tcp) transaction")
+	trans := newTransaction(requ, resp)
+	return mc.finishTransaction(trans)
+}
+
+// Called when a packets are missing from the tcp
+// stream.
+func (mc *Memcache) GapInStream(
+	tcptuple *common.TcpTuple,
+	dir uint8, nbytes int,
+	private protos.ProtocolData,
+) (priv protos.ProtocolData, drop bool) {
+	debug("memcache(tcp) stream gap detected")
+
+	defer logp.Recover("GapInStream(memcache) exception")
+	if !isMemcacheConnection(private) {
+		return private, false
+	}
+
+	conn := private.(*tcpConnectionData)
+	stream := conn.Streams[dir]
+	parser := stream.parser
+	msg := parser.message
+
+	if msg != nil {
+		if msg.IsRequest {
+			msg.AddNotes(NoteRequestPacketLoss)
+		} else {
+			msg.AddNotes(NoteResponsePacketLoss)
+		}
+	}
+
+	// If we are about to read binary data (length) encoded, but missing gab
+	// does fully cover data area, we might be able to continue processing the
+	// stream + transactions
+	inData := parser.state == parseStateDataBinary ||
+		parser.state == parseStateIncompleteDataBinary ||
+		parser.state == parseStateData ||
+		parser.state == parseStateIncompleteData
+	if inData {
+		if msg == nil {
+			logp.WTF("parser message is nil on data load")
+			return private, true
+		}
+
+		already_read := stream.Buf.Len() - int(msg.bytesLost)
+		data_required := int(msg.bytes) - already_read
+		if nbytes <= data_required {
+			// yay, all bytes included in message binary data part.
+			// just drop binary data part and recover parsing.
+			if msg.isBinary {
+				parser.state = parseStateIncompleteDataBinary
+			} else {
+				parser.state = parseStateIncompleteData
+			}
+			msg.bytesLost += uint(nbytes)
+			return private, false
+		}
+	}
+
+	// need to drop TCP stream. But try to publish all cached trancsactions first
+	mc.pushAllTcpTrans(conn.connection)
+
+	return conn, true
+}
+
+// Called when the FIN flag is seen in the TCP stream.
+func (mc *Memcache) ReceivedFin(
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
+	// We rely on transaction timeout to publish all unfinished transactions.
+	return private
+}
+
+func (mc *Memcache) pushAllTcpTrans(conn *connection) {
+	if conn == nil {
+		return
+	}
+
+	// first let's try to send finished transactions
+	// (unlikely we have some, though)
+	mc.correlateTcp(conn)
+
+	// only requests in map:
+	debug("publish incomplete transactions")
+	for !conn.requests.empty() {
+		msg := conn.requests.pop()
+		if !msg.isQuiet && !msg.noreply {
+			msg.AddNotes(NoteTransUnfinished)
+		}
+		debug("push incomplete request=%p", msg)
+		err := mc.onTcpTrans(msg, nil)
+		if err != nil {
+			logp.Warn("failed to publish unfinished transaction with %v", err)
+		}
+		// continue processing more transactions (reporting error only)
+	}
+}
+
+func (private *tcpConnectionData) drop(dir uint8) {
+	private.Streams[dir] = nil
+	private.Streams[1-dir] = nil
+}
+
+func (stream *stream) reset() {
+	parser := &stream.parser
+	debug("consumed %v bytes", stream.Buf.BufferConsumed())
+	stream.Stream.Reset()
+	parser.reset()
+}
+
+func (stream *stream) parse(ts time.Time) (*message, error) {
+	return stream.parser.parse(&stream.Buf, ts)
+}
+
+func (ml *messageList) append(msg *message) {
+	if ml.tail == nil {
+		ml.head = msg
+	} else {
+		ml.tail.next = msg
+	}
+	msg.next = nil
+	ml.tail = msg
+}
+
+func (ml *messageList) empty() bool {
+	return ml.head == nil
+}
+
+func (ml *messageList) pop() *message {
+	if ml.head == nil {
+		return nil
+	}
+
+	msg := ml.head
+	ml.head = ml.head.next
+	if ml.head == nil {
+		ml.tail = nil
+	}
+	debug("new head=%p", ml.head)
+	return msg
+}
+
+func (ml *messageList) last() *message {
+	return ml.tail
+}
