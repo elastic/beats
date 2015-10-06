@@ -86,7 +86,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
 
-    @unittest.skipIf(os.name == "nt", "Watching log file currently not supported on Windows")
     def test_file_renaming(self):
         """
         Makes sure that when a file is renamed, the content is not read again.
@@ -141,7 +140,6 @@ class Test(TestCase):
         # Make sure all 11 lines were read
         assert len(output) == 11
 
-    @unittest.skipIf(os.name == "nt", "Watching log file currently not supported on Windows")
     def test_file_disappear(self):
         """
         Checks that filebeat keeps running in case a log files is deleted
