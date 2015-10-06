@@ -16,23 +16,13 @@ import (
 	. "github.com/elastic/filebeat/input"
 )
 
-// TODO: Cleanup if possible
-var exitStat = struct {
-	ok, usageError, faulted int
-}{
-	ok:         0,
-	usageError: 1,
-	faulted:    2,
-}
-
 // Beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	FbConfig *cfg.Config
 	// Channel from harvesters to spooler
-	SpoolChan     chan *FileEvent
 	publisherChan chan []*FileEvent
-	RegistrarChan chan []*FileEvent
 	Spooler       *Spooler
+	registrar     *Registrar
 }
 
 // Config setups up the filebeat configuration by fetch all additional config files
@@ -64,44 +54,41 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 
 		fmt.Printf("recovered panic: %v", p)
-		os.Exit(exitStat.faulted)
+		os.Exit(1)
 	}()
 
 	// Init channels
-	fb.SpoolChan = make(chan *FileEvent, 16)
 	fb.publisherChan = make(chan []*FileEvent, 1)
-	fb.RegistrarChan = make(chan []*FileEvent, 1)
 
 	// Setup registrar to persist state
-	registrar := NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
+	fb.registrar = NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
 
 	crawl := &Crawler{
-		Registrar: registrar,
+		Registrar: fb.registrar,
 	}
 
 	// Load the previous log file locations now, for use in prospector
-	registrar.LoadState()
-	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.SpoolChan)
+	fb.registrar.LoadState()
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
-	spooler := NewSpooler(fb)
-	err := spooler.Config()
+	fb.Spooler = NewSpooler(fb)
+	err := fb.Spooler.Config()
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
 		return err
 	}
 
-	fb.Spooler = spooler
+	// Start up spooler
+	go fb.Spooler.Run()
 
-	// TODO: Check if spooler shouldn't start earlier?
-	go spooler.Run()
+	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
 
 	// Publishes event to output
 	go Publish(b, fb)
 
 	// registrar records last acknowledged positions in all files.
-	registrar.WriteState(fb.RegistrarChan)
+	fb.registrar.Run()
 
 	return nil
 }
@@ -110,19 +97,20 @@ func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 	return nil
 }
 
+// Stop is called on exit for cleanup
 func (fb *Filebeat) Stop() {
 
 	// Stop harvesters
 	// Stop prospectors
-	// Flush what is in spooler
-	// Write state
 
+	// Stopping spooler will flush items
 	fb.Spooler.Stop()
 
-	// FIXME: Improve to first write state and then close channels
-	close(fb.SpoolChan)
+	// Stopping registrar will write last state
+	fb.registrar.Stop()
+
+	// Close channels
 	close(fb.publisherChan)
-	close(fb.RegistrarChan)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {
@@ -153,7 +141,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 		logp.Debug("filebeat", "Events sent: %d", len(events))
 
 		// Tell the registrar that we've successfully sent these events
-		fb.RegistrarChan <- events
+		fb.registrar.Channel <- events
 	}
 }
 

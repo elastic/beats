@@ -18,6 +18,7 @@ type Prospector struct {
 	lastscan         time.Time
 	registrar        *Registrar
 	missingFiles     map[string]os.FileInfo
+	running          bool
 }
 
 // Contains statistic about file when it was last seend by the prospector
@@ -75,6 +76,8 @@ func (p *Prospector) Init() error {
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
+
+	p.running = true
 
 	// Handle any "-" (stdin) paths
 	for i, path := range p.ProspectorConfig.Paths {
@@ -135,6 +138,10 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		}
 
 		p.iteration++ // Overflow is allowed
+
+		if !p.running {
+			break
+		}
 	}
 }
 
@@ -316,5 +323,34 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 }
 
 func (p *Prospector) Stop() {
+	// TODO: Stopping is currently not implemented
+	p.running = false
+}
 
+// Check if the given file was renamed. If file is known but with different path,
+// renamed will be set true and previous will be set to the previously known file path.
+// Otherwise renamed will be false.
+func (p *Prospector) getPreviousFile(file string, info os.FileInfo) string {
+	// TODO: To implement this properly the file state of the previous file is required.
+
+	for path, pFileStat := range p.prospectorList {
+		if path == file {
+			continue
+		}
+
+		if os.SameFile(info, pFileStat.Fileinfo) {
+			return path
+		}
+	}
+
+	// Now check the missingfiles
+	for path, fileInfo := range p.missingFiles {
+
+		if os.SameFile(info, fileInfo) {
+			return path
+		}
+	}
+
+	// NOTE(ruflin): should instead an error be returned if not previous file?
+	return ""
 }
