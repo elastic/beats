@@ -95,7 +95,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.Spooler = spooler
 
 	// TODO: Check if spooler shouldn't start earlier?
-	go spooler.Start()
+	go spooler.Run()
 
 	// Publishes event to output
 	go Publish(b, fb)
