@@ -18,6 +18,7 @@ type Prospector struct {
 	lastscan         time.Time
 	registrar        *Registrar
 	missingFiles     map[string]os.FileInfo
+	running          bool
 }
 
 // Contains statistic about file when it was last seend by the prospector
@@ -75,6 +76,8 @@ func (p *Prospector) Init() error {
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
+
+	p.running = true
 
 	// Handle any "-" (stdin) paths
 	for i, path := range p.ProspectorConfig.Paths {
@@ -135,6 +138,10 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		}
 
 		p.iteration++ // Overflow is allowed
+
+		if !p.running {
+			break
+		}
 	}
 }
 
@@ -316,5 +323,6 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 }
 
 func (p *Prospector) Stop() {
-
+	// TODO: Stopping is currently not implemented
+	p.running = false
 }

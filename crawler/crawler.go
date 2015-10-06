@@ -24,11 +24,13 @@ import (
 type Crawler struct {
 	// Registrar object to persist the state
 	Registrar *Registrar
+	running   bool
 }
 
 func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *input.FileEvent) {
 
 	pendingProspectorCnt := 0
+	crawler.running = true
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, fileconfig := range files {
@@ -57,6 +59,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 
 	for event := range crawler.Registrar.Persist {
 		if event.Source == nil {
+
 			pendingProspectorCnt--
 			if pendingProspectorCnt == 0 {
 				break
@@ -65,11 +68,16 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 		}
 		crawler.Registrar.State[*event.Source] = event
 		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
+
+		if !crawler.running {
+			break
+		}
 	}
 
 	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
 }
 
 func (crawler *Crawler) Stop() {
-	// TODO: To be implemented for proper shutdown
+	// TODO: Properly stop prospectors and harvesters
+	crawler.running = false
 }

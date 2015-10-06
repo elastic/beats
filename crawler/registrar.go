@@ -16,7 +16,9 @@ type Registrar struct {
 	// Map with all file paths inside and the corresponding state
 	State map[string]*FileState
 	// Channel used by the prospector and crawler to send FileStates to be persisted
-	Persist chan *input.FileState
+	Persist       chan *input.FileState
+	running       bool
+	RegistrarChan chan []*FileEvent
 }
 
 func NewRegistrar(registryFile string) *Registrar {
@@ -33,6 +35,7 @@ func (r *Registrar) Init() {
 	// Init state
 	r.Persist = make(chan *FileState)
 	r.State = make(map[string]*FileState)
+	r.RegistrarChan = make(chan []*FileEvent, 1)
 
 	// Set to default in case it is not set
 	if r.registryFile == "" {
@@ -59,12 +62,23 @@ func (r *Registrar) LoadState() {
 	}
 }
 
-func (r *Registrar) WriteState(input chan []*FileEvent) {
+func (r *Registrar) Run() {
 	logp.Debug("registrar", "Starting Registrar")
-	for events := range input {
+
+	r.running = true
+
+	// Writes registry
+	defer r.writeRegistry()
+
+	for events := range r.RegistrarChan {
 		logp.Debug("registrar", "Registrar: processing %d events", len(events))
 		// Take the last event found for each file source
 		for _, event := range events {
+
+			if !r.running {
+				break
+			}
+
 			// skip stdin
 			if *event.Source == "-" {
 				continue
@@ -77,8 +91,17 @@ func (r *Registrar) WriteState(input chan []*FileEvent) {
 			// REVU: but we should panic, or something, right?
 			logp.Err("Update of registry returned error: %v. Continuing..", e)
 		}
+
+		if !r.running {
+			break
+		}
 	}
 	logp.Debug("registrar", "Ending Registrar")
+}
+
+func (r *Registrar) Stop() {
+	r.running = false
+	close(r.RegistrarChan)
 }
 
 func (r *Registrar) GetFileState(path string) (*FileState, bool) {
