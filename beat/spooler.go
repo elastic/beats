@@ -13,7 +13,7 @@ type Spooler struct {
 	running       bool
 	nextFlushTime time.Time
 	spool         []*input.FileEvent
-	SpoolChan     chan *input.FileEvent
+	Channel       chan *input.FileEvent
 }
 
 func NewSpooler(filebeat *Filebeat) *Spooler {
@@ -26,7 +26,7 @@ func NewSpooler(filebeat *Filebeat) *Spooler {
 
 	// Set the next flush time
 	spooler.nextFlushTime = time.Now().Add(config.IdleTimeoutDuration)
-	spooler.SpoolChan = make(chan *input.FileEvent, 16)
+	spooler.Channel = make(chan *input.FileEvent, 16)
 
 	return spooler
 }
@@ -81,7 +81,7 @@ func (s *Spooler) Run() {
 		}
 
 		select {
-		case event := <-s.SpoolChan:
+		case event := <-s.Channel:
 			s.spool = append(s.spool, event)
 
 			// Spooler is full -> flush
@@ -98,7 +98,7 @@ func (s *Spooler) Run() {
 
 	// Flush again before exiting spooler and closes channel
 	s.flush()
-	close(s.SpoolChan)
+	close(s.Channel)
 }
 
 // Stop stops the spooler. Flushes events before stopping

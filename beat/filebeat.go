@@ -82,7 +82,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start up spooler
 	go fb.Spooler.Run()
 
-	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.SpoolChan)
+	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
 
 	// Publishes event to output
 	go Publish(b, fb)
@@ -141,7 +141,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 		logp.Debug("filebeat", "Events sent: %d", len(events))
 
 		// Tell the registrar that we've successfully sent these events
-		fb.registrar.RegistrarChan <- events
+		fb.registrar.Channel <- events
 	}
 }
 

@@ -16,9 +16,9 @@ type Registrar struct {
 	// Map with all file paths inside and the corresponding state
 	State map[string]*FileState
 	// Channel used by the prospector and crawler to send FileStates to be persisted
-	Persist       chan *input.FileState
-	running       bool
-	RegistrarChan chan []*FileEvent
+	Persist chan *input.FileState
+	running bool
+	Channel chan []*FileEvent
 }
 
 func NewRegistrar(registryFile string) *Registrar {
@@ -35,7 +35,7 @@ func (r *Registrar) Init() {
 	// Init state
 	r.Persist = make(chan *FileState)
 	r.State = make(map[string]*FileState)
-	r.RegistrarChan = make(chan []*FileEvent, 1)
+	r.Channel = make(chan []*FileEvent, 1)
 
 	// Set to default in case it is not set
 	if r.registryFile == "" {
@@ -70,7 +70,7 @@ func (r *Registrar) Run() {
 	// Writes registry
 	defer r.writeRegistry()
 
-	for events := range r.RegistrarChan {
+	for events := range r.Channel {
 		logp.Debug("registrar", "Registrar: processing %d events", len(events))
 		// Take the last event found for each file source
 		for _, event := range events {
@@ -101,7 +101,7 @@ func (r *Registrar) Run() {
 
 func (r *Registrar) Stop() {
 	r.running = false
-	close(r.RegistrarChan)
+	close(r.Channel)
 }
 
 func (r *Registrar) GetFileState(path string) (*FileState, bool) {
