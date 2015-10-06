@@ -21,9 +21,9 @@ packetbeat:
       - packetbeat: https://download.elastic.co/beats/packetbeat/packetbeat_1.0.0-beta3_amd64.deb
 {% endif %}
   service:
-      - running
-      - watch:
-          - file: /etc/packetbeat/packetbeat.yml
+    - running
+    - watch:
+      - file: /etc/packetbeat/packetbeat.yml
 /etc/packetbeat/packetbeat.yml:
   file:
     - managed
@@ -33,8 +33,8 @@ packetbeat:
     - mode: 755
     - template: jinja
     - context:
-      elasticsearch: {{ elasticsearch }} 
-      procs: {{ procs }} 
-      ignore_outgoing: {{ ignore_outgoing }} 
+      elasticsearch: {{ elasticsearch }}
+      procs: {{ procs }}
+      ignore_outgoing: {{ ignore_outgoing }}
     - require:
-      - pkg:  packetbeat
+      - pkg: packetbeat

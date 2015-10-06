@@ -1,4 +1,4 @@
-################### Packetbeat Configuration Example #########################
+################### Packetbeat Configuration Example ##########################
 
 # This file contains an overview of various configuration settings. Please consult
 # the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/_configuration.html
@@ -8,33 +8,31 @@
 # application components. It inserts meta-data about each transaction into
 # Elasticsearch.
 
-############################# Shipper ############################################
+############################# Shipper #########################################
 shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  name:
 
- # The name of the shipper that publishes the network data. It can be used to group
- # all the transactions sent by a single shipper in the web interface.
- # If this options is not defined, the hostname is used.
- name:
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group transactions by different
+  # logical properties.
+  # tags: ["service1"]
 
- # The tags of the shipper are included in their own field with each
- # transaction published. Tags make it easy to group transactions by different
- # logical properties.
- #tags: ["service1"]
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  # ignore_outgoing: true
 
- # Uncomment the following if you want to ignore transactions created
- # by the server on which the shipper is installed. This option is useful
- # to remove duplicates if shippers are installed on multiple servers.
- # ignore_outgoing: true
-
-############################# Sniffer ############################################
+############################# Sniffer #########################################
 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 interfaces:
- device: any
+  device: any
 
-
-############################# Protocols ######################################
+############################# Protocols #######################################
 protocols:
   dns:
     # Configure the ports where to listen for DNS traffic. You can disable
@@ -42,24 +40,26 @@ protocols:
     ports: [53]
 
     # include_authorities controls whether or not the dns.authorities field
-    # (authority resource records) is added to messages. The default is false.
+    # (authority resource records) is added to messages.
+    # Default: false
     include_authorities: true
     # include_additionals controls whether or not the dns.additionals field
-    # (additional resource records) is added to messages. The default is false.
+    # (additional resource records) is added to messages.
+    # Default: false
     include_additionals: true
 
     # send_request and send_response control whether or not the stringified DNS
-    # request and response message are added to the result. The default is false.
+    # request and response message are added to the result.
     # Nearly all data about the request/response is available in the dns.*
     # fields, but this can be useful if you need visibility specifically
     # into the request or the response.
-    #send_request:  true
-    #send_response: true
+    # Default: false
+    # send_request:  true
+    # send_response: true
 
   http:
-
     # Configure the ports where to listen for HTTP traffic. You can disable
-    # the http protocol by commenting out the list of ports.
+    # the HTTP protocol by commenting out the list of ports.
     ports: [80, 8080, 8000, 5000, 8002]
 
     # Uncomment the following to hide certain parameters in URL or forms attached
@@ -72,40 +72,37 @@ protocols:
 
   memcache:
     # Configure the ports where to listen for memcache traffic. You can disable
-    # the memcache protocol by commenting out the list of ports.
+    # the Memcache protocol by commenting out the list of ports.
     ports: [11211]
 
-    # Uncomment the parseunknown option to force the memcache text protocol parse
-    # to parse unknown commands.
-    # Default: false
+    # Uncomment the parseunknown option to force the memcache text protocol parser
+    # to accept unknown commands.
     # Note: All unknown commands MUST not contain any data parts!
+    # Default: false
     # parseunknown: true
-
 
     # Update the maxvalue option to store the values - base64 encoded - in the
     # json output.
     # possible values:
     #    maxvalue: -1  # store all values (text based protocol multi-get)
-    #    maxvalue: 0   # store no values at all (default)
+    #    maxvalue: 0   # store no values at all
     #    maxvalue: N   # store up to N values
-    # maxvalues: 0
+    # Default: 0
+    # maxvalues: -1
 
     # Use maxbytespervalue to limit the number of bytes to be copied per value element.
-    # Notes: values will be base64 encoded, so actual size in json document
-    #        will be 4 times maxbytespervalue
-    #
+    # Note: Values will be base64 encoded, so actual size in json document
+    #       will be 4 times maxbytespervalue.
     # Default: unlimited
     # maxbytespervalue: 100
 
-    # Udp transaction timeout in milliseconds.
-    # Default: 200
+    # UDP transaction timeout in milliseconds.
     # Note: Quiet messages in UDP binary protocol will get response only in error case.
-    #       The memcached analyzer will wait for udptransactiontimeout
-    #       milliseconds before publishing quiet messages.
-    #       Non quiet messages or quiet requests with error response will not
-    #       have to wait for the timeout
-    # udptransactiontimeout: 200
-
+    #       The memcached analyzer will wait for udptransactiontimeout milliseconds
+    #       before publishing quiet messages. Non quiet messages or quiet requests with
+    #       error response will not have to wait for the timeout.
+    # Default: 200
+    # udptransactiontimeout: 1000
 
   mysql:
     # Configure the ports where to listen for MySQL traffic. You can disable
@@ -113,29 +110,26 @@ protocols:
     ports: [3306]
 
   pgsql:
-
     # Configure the ports where to listen for Pgsql traffic. You can disable
     # the Pgsql protocol by commenting out the list of ports.
     ports: [5432]
 
   redis:
-
     # Configure the ports where to listen for Redis traffic. You can disable
     # the Redis protocol by commenting out the list of ports.
     ports: [6379]
 
   thrift:
-
-    # Configure the ports where to listen for Thrift traffic. You can disable
-    # the Thrift protocol by commenting out the list of ports.
+    # Configure the ports where to listen for Thrift-RPC traffic. You can disable
+    # the Thrift-RPC protocol by commenting out the list of ports.
     ports: [9090]
 
   mongodb:
-    # Configure the ports where to listen for Mongodb traffic. You can disable
-    # the Mongodb protocol by commenting out the list of ports.
+    # Configure the ports where to listen for MongoDB traffic. You can disable
+    # the MongoDB protocol by commenting out the list of ports.
     ports: [27017]
 
-############################# Output ############################################
+############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by packetbeat.
 # You can enable one or multiple outputs by setting enabled option to true.
@@ -173,7 +167,7 @@ output:
   #  rotate_every_kb: 1000
   #  number_of_files: 7
 
-############################# Processes ############################################
+############################# Processes #######################################
 
 # Configure the processes to be monitored and how to find them. If a process is
 # monitored than Packetbeat attempts to use it's name to fill in the `proc` and
