@@ -1,6 +1,6 @@
 Dockerfile
 packetbeat
-cover
+doverage
 docs
 
 tests/env

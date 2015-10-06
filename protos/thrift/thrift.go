@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -81,14 +82,7 @@ type ThriftTransaction struct {
 
 	Request *ThriftMessage
 	Reply   *ThriftMessage
-
-	timer *time.Timer
 }
-
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
 
 const (
 	ThriftStartState = iota
@@ -156,14 +150,22 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transMap map[common.HashableTcpTuple]*ThriftTransaction
+	transactions *common.Cache
 
 	PublishQueue chan *ThriftTransaction
-	results      chan common.MapStr
+	results      publisher.Client
 	Idl          *ThriftIdl
 }
 
 var ThriftMod Thrift
+
+func (thrift *Thrift) getTransaction(k common.HashableTcpTuple) *ThriftTransaction {
+	v := thrift.transactions.Get(k)
+	if v != nil {
+		return v.(*ThriftTransaction)
+	}
+	return nil
+}
 
 func (thrift *Thrift) InitDefaults() {
 	// defaults
@@ -237,7 +239,7 @@ func (thrift *Thrift) GetPorts() []int {
 	return thrift.Ports
 }
 
-func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
+func (thrift *Thrift) Init(test_mode bool, results publisher.Client) error {
 
 	thrift.InitDefaults()
 
@@ -248,7 +250,9 @@ func (thrift *Thrift) Init(test_mode bool, results chan common.MapStr) error {
 		}
 	}
 
-	thrift.transMap = make(map[common.HashableTcpTuple]*ThriftTransaction, TransactionsHashSize)
+	thrift.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	thrift.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
@@ -954,7 +958,7 @@ func (thrift *Thrift) handleThrift(msg *ThriftMessage) {
 func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.Hashable()]
+	trans := thrift.getTransaction(tuple.Hashable())
 	if trans != nil {
 		logp.Debug("thrift", "Two requests without reply, assuming the old one is oneway")
 		thrift.PublishQueue <- trans
@@ -964,7 +968,7 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 		Type:  "thrift",
 		tuple: tuple,
 	}
-	thrift.transMap[tuple.Hashable()] = trans
+	thrift.transactions.Put(tuple.Hashable(), trans)
 
 	trans.ts = msg.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
@@ -985,12 +989,6 @@ func (thrift *Thrift) receivedRequest(msg *ThriftMessage) {
 
 	trans.Request = msg
 	trans.BytesIn = uint64(msg.FrameSize)
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { thrift.expireTransaction(trans) })
-
 }
 
 func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
@@ -998,7 +996,7 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	// we need to search the request first.
 	tuple := msg.TcpTuple
 
-	trans := thrift.transMap[tuple.Hashable()]
+	trans := thrift.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Debug("thrift", "Response from unknown transaction. Ignoring: %v", tuple)
 		return
@@ -1016,28 +1014,20 @@ func (thrift *Thrift) receivedReply(msg *ThriftMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	thrift.PublishQueue <- trans
+	thrift.transactions.Delete(tuple.Hashable())
 
 	logp.Debug("thrift", "Transaction queued")
-
-	// remove from map
-	thrift.transMap[tuple.Hashable()] = nil
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
 }
 
 func (thrift *Thrift) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	trans := thrift.transMap[tcptuple.Hashable()]
+	trans := thrift.getTransaction(tcptuple.Hashable())
 	if trans != nil {
 		if trans.Request != nil && trans.Reply == nil {
 			logp.Debug("thrift", "FIN and had only one transaction. Assuming one way")
 			thrift.PublishQueue <- trans
-			delete(thrift.transMap, trans.tuple.Hashable())
-			if trans.timer != nil {
-				trans.timer.Stop()
-			}
+			thrift.transactions.Delete(trans.tuple.Hashable())
 		}
 	}
 
@@ -1134,15 +1124,9 @@ func (thrift *Thrift) publishTransactions() {
 		event["dst"] = &t.Dst
 
 		if thrift.results != nil {
-			thrift.results <- event
+			thrift.results.PublishEvent(event)
 		}
 
 		logp.Debug("thrift", "Published event")
 	}
-}
-
-func (thrift *Thrift) expireTransaction(trans *ThriftTransaction) {
-	// TODO - also publish?
-	// remove from map
-	delete(thrift.transMap, trans.tuple.Hashable())
 }

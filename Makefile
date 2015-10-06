@@ -1,8 +1,6 @@
-BIN_PATH?=/usr/bin
-CONF_PATH?=/etc/packetbeat
-VERSION?=1.0.0-beta2
-ARCH?=$(shell uname -m)
 GODEP=$(GOPATH)/bin/godep
+
+# default install target used by the beats-packer
 PREFIX?=/build
 
 GOFILES = $(shell find . -type f -name '*.go')
@@ -11,16 +9,13 @@ packetbeat: $(GOFILES)
 	go get github.com/tools/godep
 	$(GODEP) go build
 
-go-daemon/god: go-daemon/god.c
-	make -C go-daemon
-
 .PHONY: with_pfring
 with_pfring:
 	go build --tags havepfring
 
 .PHONY: getdeps
 getdeps:
-	go get -t -u -f
+	go get -t -u -f ./...
 	# goautotest is used from the Makefile to run tests in a loop
 	go get -u github.com/tsg/goautotest
 	# websocket is needed by the gobeacon tests
@@ -28,43 +23,11 @@ getdeps:
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
 
-.PHONY: deps
-deps:
-	# no longer needed
-	true
-
-
 .PHONY: updatedeps
 updatedeps:
 	$(GODEP) update ...
 
-.PHONY: install
-install: packetbeat go-daemon/god
-	install -D packetbeat $(DESTDIR)/$(BIN_PATH)/packetbeat
-	install -D go-daemon/god $(DESTDIR)/$(BIN_PATH)/packetbeat-god
-	install -m 644 -D etc/packetbeat.yml $(DESTDIR)/$(CONF_PATH)/packetbeat.yml
-	install -m 644 -D etc/packetbeat.template.json $(DESTDIR)/$(CONF_PATH)/packetbeat.template.json
-
-.PHONY: dist
-dist: packetbeat go-daemon/god
-	mkdir packetbeat-$(VERSION)
-	cp packetbeat packetbeat-$(VERSION)/
-	cp go-daemon/god packetbeat-$(VERSION)/packetbeat-god
-	cp etc/packetbeat.yml packetbeat-$(VERSION)/
-	cp etc/packetbeat.template.json packetbeat-$(VERSION)/
-	tar czvf packetbeat-$(VERSION)-$(ARCH).tar.gz packetbeat-$(VERSION)
-
-.PHONY: darwin_dist
-darwin_dist: packetbeat
-	mkdir packetbeat-$(VERSION)-darwin
-	cp packetbeat packetbeat-$(VERSION)-darwin
-	cp etc/packetbeat.yml packetbeat-$(VERSION)-darwin/
-	cp etc/packetbeat.template.json packetbeat-$(VERSION)-darwin/
-	sed -i .bk 's/device: any/device: en0/' packetbeat-$(VERSION)-darwin/packetbeat.yml
-	rm packetbeat-$(VERSION)-darwin/packetbeat.yml.bk
-	tar czvf packetbeat-$(VERSION)-darwin.tgz packetbeat-$(VERSION)-darwin
-	shasum packetbeat-$(VERSION)-darwin.tgz > packetbeat-$(VERSION)-darwin.tgz.sha1.txt
-
+# This is called by the beats-packer to obtain the configuration file
 .PHONY: install_cfg
 install_cfg:
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
@@ -72,10 +35,11 @@ install_cfg:
 	# darwin
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
 	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
+	rm $(PREFIX)/packetbeat-darwin.yml.bk
 	# win
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-win.yml
-	sed -i.bk 's/device: any/device: 1/' $(PREFIX)/packetbeat-win.yml
-
+	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
+	rm $(PREFIX)/packetbeat-win.yml.bk
 
 .PHONY: gofmt
 gofmt:
@@ -93,34 +57,55 @@ autotest:
 .PHONY: testlong
 testlong:
 	go vet ./...
-	make cover
+	make coverage
 	make -C tests test
 
-.PHONY: cover
-cover:
+.PHONY: coverage
+coverage:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=profile.cov -covermode=count github.com/elastic/packetbeat/...
-	mkdir -p cover
-	$(GODEP) go tool cover -html=profile.cov -o cover/coverage.html
-
+	mkdir -p coverage
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=./coverage/unit.cov -covermode=count github.com/elastic/packetbeat/...
+	$(GODEP) go tool cover -html=./coverage/unit.cov -o coverage/unit.html
 
 .PHONY: benchmark
 benchmark:
-	$(GODEP) go test -short -bench=. ./...
+	$(GODEP) go test -short -bench=. ./... -cpu=2
+
+.PHONY: env
+env: env/bin/activate
+env/bin/activate: requirements.txt
+	test -d env || virtualenv env > /dev/null
+	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
+	touch env/bin/activate
 
 .PHONY: gen
-gen:
-	./scripts/generate_gettingstarted.sh docs/gettingstarted.in.asciidoc docs/gettingstarted.asciidoc
-	python scripts/generate_template.py etc/fields.yml etc/packetbeat.template.json
-	python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
+gen: env
+	. env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
+	. env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
 
 .PHONY: clean
 clean:
 	-rm packetbeat
-	-rm -r packetbeat-$(VERSION)
-	-rm profile.cov cover/coverage.html
-	-rm -r docs/html_docs
+	-rm packetbeat.test
+	-rm -r coverage
+	-rm -r env
+
+# Generates packetbeat.test coverage testing binary
+packetbeat.test: $(GOFILES)
+	$(GODEP) go test -c -cover -covermode=count -coverpkg ./...
+
+full-coverage:
+	make coverage
+	make -C ./tests coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ./coverage/full.cov
+	# Collects all coverage files and skips top line with mode
+	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
+	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
+
+
+### Docker implementation ###
 
 build-image:
 	# Clean up local environment before creating image -> remove files not needed

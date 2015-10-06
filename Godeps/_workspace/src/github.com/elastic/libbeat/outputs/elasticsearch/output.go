@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -11,26 +12,48 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
-type ElasticsearchOutput struct {
-	Index          string
-	TopologyExpire int
-	Conn           *Elasticsearch
-	FlushInterval  time.Duration
-	BulkMaxSize    int
+var debug = logp.MakeDebug("elasticsearch")
 
-	TopologyMap  map[string]string
-	sendingQueue chan EventMsg
-
-	ttlEnabled bool
+func init() {
+	outputs.RegisterOutputPlugin("elasticsearch", elasticsearchOutputPlugin{})
 }
 
-type PublishedTopology struct {
+type elasticsearchOutputPlugin struct{}
+
+// NewOutput instantiates a new output plugin instance publishing to elasticsearch.
+func (f elasticsearchOutputPlugin) NewOutput(
+	beat string,
+	config *outputs.MothershipConfig,
+	TopologyExpire int,
+) (outputs.Outputer, error) {
+	output := &elasticsearchOutput{}
+	err := output.Init(beat, *config, TopologyExpire)
+	if err != nil {
+		return nil, err
+	}
+	return output, nil
+}
+
+type elasticsearchOutput struct {
+	Index string
+	Conn  *Elasticsearch
+
+	TopologyExpire int
+	TopologyMap    atomic.Value // Value holds a map[string][string]
+	ttlEnabled     bool
+}
+
+type publishedTopology struct {
 	Name string
 	IPs  string
 }
 
 // Initialize Elasticsearch as output
-func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *elasticsearchOutput) Init(
+	beat string,
+	config outputs.MothershipConfig,
+	topologyExpire int,
+) error {
 
 	if len(config.Protocol) == 0 {
 		config.Protocol = "http"
@@ -50,27 +73,23 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		urls = append(urls, url)
 	}
 
-	es := NewElasticsearch(urls, config.Username, config.Password)
+	tlsConfig, err := outputs.LoadTLSConfig(config)
+	if err != nil {
+		return err
+	}
+
+	es := NewElasticsearch(urls, tlsConfig, config.Username, config.Password)
 	out.Conn = es
 
 	if config.Index != "" {
 		out.Index = config.Index
 	} else {
-		out.Index = "packetbeat"
+		out.Index = beat
 	}
 
 	out.TopologyExpire = 15000
-	if topology_expire != 0 {
-		out.TopologyExpire = topology_expire /*sec*/ * 1000 // millisec
-	}
-
-	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != nil {
-		out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
-	}
-	out.BulkMaxSize = 10000
-	if config.Bulk_size != nil {
-		out.BulkMaxSize = *config.Bulk_size
+	if topologyExpire != 0 {
+		out.TopologyExpire = topologyExpire /*sec*/ * 1000 // millisec
 	}
 
 	if config.Max_retries != nil {
@@ -80,11 +99,6 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", urls)
 	logp.Info("[ElasticsearchOutput] Using index pattern [%s-]YYYY.MM.DD", out.Index)
 	logp.Info("[ElasticsearchOutput] Topology expires after %ds", out.TopologyExpire/1000)
-	if out.FlushInterval > 0 {
-		logp.Info("[ElasticsearchOutput] Insert events in batches. Flush interval is %s. Bulk size is %d.", out.FlushInterval, out.BulkMaxSize)
-	} else {
-		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
-	}
 
 	if config.Save_topology {
 		err := out.EnableTTL()
@@ -104,17 +118,17 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		}
 	}
 
-	out.sendingQueue = make(chan EventMsg, 1000)
-	go out.SendMessagesGoroutine()
-
 	return nil
 }
 
 // Enable using ttl as paramters in a server-ip doc type
-func (out *ElasticsearchOutput) EnableTTL() error {
+func (out *elasticsearchOutput) EnableTTL() error {
 
 	// make sure the .packetbeat-topology index exists
-	out.Conn.CreateIndex(".packetbeat-topology", nil)
+	// Ignore error here, as CreateIndex will error (400 Bad Request) if index
+	// already exists. If index could not be created, next api call to index will
+	// fail anyway.
+	_, _ = out.Conn.CreateIndex(".packetbeat-topology", nil)
 
 	setting := map[string]interface{}{
 		"server-ip": map[string]interface{}{
@@ -133,71 +147,19 @@ func (out *ElasticsearchOutput) EnableTTL() error {
 }
 
 // Get the name of a shipper by its IP address from the local topology map
-func (out *ElasticsearchOutput) GetNameByIP(ip string) string {
-	name, exists := out.TopologyMap[ip]
-	if !exists {
-		return ""
-	}
-	return name
-}
-
-// Insert a list of events in the bulkChannel
-func (out *ElasticsearchOutput) InsertBulkMessage(bulkChannel chan interface{}) {
-	close(bulkChannel)
-	go func(channel chan interface{}) {
-		_, err := out.Conn.Bulk("", "", nil, channel)
-		if err != nil {
-			logp.Err("Fail to perform many index operations in a single API call: %s", err)
-		}
-	}(bulkChannel)
-}
-
-// Goroutine that sends one or multiple events to Elasticsearch.
-// If the flush_interval > 0, then the events are sent in batches. Otherwise, one by one.
-func (out *ElasticsearchOutput) SendMessagesGoroutine() {
-	flushChannel := make(<-chan time.Time)
-
-	if out.FlushInterval > 0 {
-		flushTicker := time.NewTicker(out.FlushInterval)
-		flushChannel = flushTicker.C
-	}
-
-	bulkChannel := make(chan interface{}, out.BulkMaxSize)
-
-	for {
-		select {
-		case msg := <-out.sendingQueue:
-			index := fmt.Sprintf("%s-%d.%02d.%02d", out.Index, msg.Ts.Year(), msg.Ts.Month(), msg.Ts.Day())
-			if out.FlushInterval > 0 {
-				// insert the events in batches
-				if len(bulkChannel)+2 > out.BulkMaxSize {
-					logp.Debug("output_elasticsearch", "Channel size reached. Calling bulk")
-					out.InsertBulkMessage(bulkChannel)
-					bulkChannel = make(chan interface{}, out.BulkMaxSize)
-				}
-				bulkChannel <- map[string]interface{}{
-					"index": map[string]interface{}{
-						"_index": index,
-						"_type":  msg.Event["type"].(string),
-					},
-				}
-				bulkChannel <- msg.Event
-			} else {
-				// insert the events one by one
-				_, err := out.Conn.Index(index, msg.Event["type"].(string), "", nil, msg.Event)
-				if err != nil {
-					logp.Err("Fail to insert a single event: %s", err)
-				}
-			}
-		case _ = <-flushChannel:
-			out.InsertBulkMessage(bulkChannel)
-			bulkChannel = make(chan interface{}, out.BulkMaxSize)
+func (out *elasticsearchOutput) GetNameByIP(ip string) string {
+	topologyMap, ok := out.TopologyMap.Load().(map[string]string)
+	if ok {
+		name, exists := topologyMap[ip]
+		if exists {
+			return name
 		}
 	}
+	return ""
 }
 
 // Each shipper publishes a list of IPs together with its name to Elasticsearch
-func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
+func (out *elasticsearchOutput) PublishIPs(name string, localAddrs []string) error {
 	if !out.ttlEnabled {
 		logp.Debug("output_elasticsearch", "Not publishing IPs because TTL was not yet confirmed to be enabled")
 		return nil
@@ -213,7 +175,7 @@ func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 		"server-ip",            /*type*/
 		name,                   /* id */
 		params,                 /* parameters */
-		PublishedTopology{name, strings.Join(localAddrs, ",")} /* body */)
+		publishedTopology{name, strings.Join(localAddrs, ",")} /* body */)
 
 	if err != nil {
 		logp.Err("Fail to publish IP addresses: %s", err)
@@ -226,12 +188,12 @@ func (out *ElasticsearchOutput) PublishIPs(name string, localAddrs []string) err
 }
 
 // Update the local topology map
-func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
+func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 
 	// get all shippers IPs from Elasticsearch
-	TopologyMapTmp := make(map[string]string)
+	topologyMapTmp := make(map[string]string)
 
-	res, err := out.Conn.SearchUri(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.searchURI(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, obj := range res.Hits.Hits {
 			var result QueryResult
@@ -240,7 +202,7 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 				return
 			}
 
-			var pub PublishedTopology
+			var pub publishedTopology
 			err = json.Unmarshal(result.Source, &pub)
 			if err != nil {
 				logp.Err("json.Unmarshal fails with: %s", err)
@@ -248,7 +210,7 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 			// add mapping
 			ipaddrs := strings.Split(pub.IPs, ",")
 			for _, addr := range ipaddrs {
-				TopologyMapTmp[addr] = pub.Name
+				topologyMapTmp[addr] = pub.Name
 			}
 		}
 	} else {
@@ -256,16 +218,67 @@ func (out *ElasticsearchOutput) UpdateLocalTopologyMap() {
 	}
 
 	// update topology map
-	out.TopologyMap = TopologyMapTmp
+	out.TopologyMap.Store(topologyMapTmp)
 
-	logp.Debug("output_elasticsearch", "Topology map %s", out.TopologyMap)
+	logp.Debug("output_elasticsearch", "Topology map %s", topologyMapTmp)
 }
 
 // Publish an event by adding it to the queue of events.
-func (out *ElasticsearchOutput) PublishEvent(ts time.Time, event common.MapStr) error {
-
-	out.sendingQueue <- EventMsg{Ts: ts, Event: event}
+func (out *elasticsearchOutput) PublishEvent(
+	signaler outputs.Signaler,
+	ts time.Time,
+	event common.MapStr,
+) error {
+	index := fmt.Sprintf("%s-%d.%02d.%02d",
+		out.Index, ts.Year(), ts.Month(), ts.Day())
 
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
+
+	// insert the events one by one
+	_, err := out.Conn.Index(index, event["type"].(string), "", nil, event)
+	outputs.Signal(signaler, err)
+	if err != nil {
+		logp.Err("Fail to insert a single event: %s", err)
+	}
+
+	return nil
+}
+
+func (out *elasticsearchOutput) BulkPublish(
+	trans outputs.Signaler,
+	ts time.Time,
+	events []common.MapStr,
+) error {
+	go func() {
+		request, err := out.Conn.startBulkRequest("", "", nil)
+		if err != nil {
+			logp.Err("Failed to perform many index operations in a single API call: %s", err)
+			outputs.Signal(trans, err)
+			return
+		}
+
+		for _, event := range events {
+			ts := time.Time(event["timestamp"].(common.Time))
+			index := fmt.Sprintf("%s-%d.%02d.%02d",
+				out.Index, ts.Year(), ts.Month(), ts.Day())
+			meta := common.MapStr{
+				"index": map[string]interface{}{
+					"_index": index,
+					"_type":  event["type"].(string),
+				},
+			}
+			err := request.Send(meta, event)
+			if err != nil {
+				logp.Err("Fail to encode event: %s", err)
+			}
+		}
+
+		_, err = request.Flush()
+		outputs.Signal(trans, err)
+		if err != nil {
+			logp.Err("Failed to perform many index operations in a single API call: %s",
+				err)
+		}
+	}()
 	return nil
 }

@@ -38,11 +38,11 @@ func TestOneHostSuccessResp(t *testing.T) {
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",
 	}
-	expected_resp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", Id: "1", Version: 1, Created: true})
+	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", ID: "1", Version: 1, Created: true})
 
-	server := ElasticsearchMock(200, expected_resp)
+	server := ElasticsearchMock(200, expectedResp)
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -71,7 +71,7 @@ func TestOneHost500Resp(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -101,7 +101,7 @@ func TestOneHost503Resp(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	es := NewElasticsearch([]string{server.URL}, "", "")
+	es := NewElasticsearch([]string{server.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -128,13 +128,13 @@ func TestMultipleHosts(t *testing.T) {
 		"post_date": "2009-11-15T14:12:12",
 		"message":   "trying out",
 	}
-	expected_resp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", Id: "1", Version: 1, Created: true})
+	expectedResp, _ := json.Marshal(QueryResult{Ok: true, Index: index, Type: "test", ID: "1", Version: 1, Created: true})
 
 	server1 := ElasticsearchMock(503, []byte("Something went wrong"))
-	server2 := ElasticsearchMock(200, expected_resp)
+	server2 := ElasticsearchMock(200, expectedResp)
 
 	logp.Debug("elasticsearch", "%s, %s", server1.URL, server2.URL)
-	es := NewElasticsearch([]string{server1.URL, server2.URL}, "", "")
+	es := NewElasticsearch([]string{server1.URL, server2.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -165,7 +165,7 @@ func TestMultipleFailingHosts(t *testing.T) {
 	server2 := ElasticsearchMock(500, []byte("Something went wrong"))
 
 	logp.Debug("elasticsearch", "%s, %s", server1.URL, server2.URL)
-	es := NewElasticsearch([]string{server1.URL, server2.URL}, "", "")
+	es := NewElasticsearch([]string{server1.URL, server2.URL}, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ type TestProtocol struct {
 
 type TcpProtocol TestProtocol
 
-func (proto *TcpProtocol) Init(test_mode bool, results chan common.MapStr) error {
+func (proto *TcpProtocol) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 
@@ -39,7 +40,7 @@ func (proto *TcpProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 
 type UdpProtocol TestProtocol
 
-func (proto *UdpProtocol) Init(test_mode bool, results chan common.MapStr) error {
+func (proto *UdpProtocol) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 
@@ -53,7 +54,7 @@ func (proto *UdpProtocol) ParseUdp(pkt *Packet) {
 
 type TcpUdpProtocol TestProtocol
 
-func (proto *TcpUdpProtocol) Init(test_mode bool, results chan common.MapStr) error {
+func (proto *TcpUdpProtocol) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 
@@ -114,7 +115,7 @@ func TestBpfFilter_withoutVlan(t *testing.T) {
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53", filter)
 }
 
-func TestBpfFilter_withtVlan(t *testing.T) {
+func TestBpfFilter_withVlan(t *testing.T) {
 	p := newProtocols()
 	filter := p.BpfFilter(true)
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or (vlan and "+

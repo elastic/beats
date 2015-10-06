@@ -21,13 +21,13 @@ func TestRoundRobin(t *testing.T) {
 
 	conn := pool.GetConnection()
 
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9200" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9201" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 }
 
@@ -45,24 +45,24 @@ func TestMarkDead(t *testing.T) {
 
 	conn := pool.GetConnection()
 
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9200" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 	pool.MarkDead(conn)
 
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9201" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9201" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 	pool.MarkDead(conn)
 
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" && conn.Url != "localhost:9200" {
+	if conn.URL != "localhost:9201" && conn.URL != "localhost:9200" {
 		t.Errorf("No expected connection returned")
 	}
 
@@ -75,32 +75,23 @@ func TestDeadTimeout(t *testing.T) {
 	}
 
 	var pool ConnectionPool
-
 	urls := []string{"localhost:9200", "localhost:9201"}
-
 	err := pool.SetConnections(urls, "test", "secret")
 	if err != nil {
 		t.Errorf("Fail to set the connections: %s", err)
 	}
-	pool.SetDeadTimeout(10)
+	// Set dead timeout to zero so that dead connections are immediately
+	// returned to the pool.
+	pool.SetDeadTimeout(0)
 
 	conn := pool.GetConnection()
+	assertExpectedConnectionURL(t, conn.URL, urls[0])
 
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
-	}
 	pool.MarkDead(conn)
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Millisecond)
 
-	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
-	}
-
-	conn = pool.GetConnection()
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
-	}
+	assertExpectedConnectionURL(t, pool.GetConnection().URL, urls[1])
+	assertExpectedConnectionURL(t, pool.GetConnection().URL, urls[0])
 }
 
 func TestMarkLive(t *testing.T) {
@@ -116,19 +107,24 @@ func TestMarkLive(t *testing.T) {
 	}
 
 	conn := pool.GetConnection()
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9200" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 	pool.MarkDead(conn)
 	pool.MarkLive(conn)
 
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9201" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9201" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
 	conn = pool.GetConnection()
-	if conn.Url != "localhost:9200" {
-		t.Errorf("Wrong connection returned: %s", conn.Url)
+	if conn.URL != "localhost:9200" {
+		t.Errorf("Wrong connection returned: %s", conn.URL)
 	}
+}
 
+func assertExpectedConnectionURL(t testing.TB, returned, expected string) {
+	if returned != expected {
+		t.Errorf("Wrong connection returned: %s, expecting: %s", returned, expected)
+	}
 }

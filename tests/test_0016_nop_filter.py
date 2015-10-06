@@ -1,7 +1,10 @@
+import unittest
 from pbtests.packetbeat import TestCase
 
 
 class Test(TestCase):
+    @unittest.skip(
+        "Disabled until filters have been added to processing chain again")
     def test_nop_filter(self):
         """
         Should work fine with the nop filter
@@ -21,6 +24,8 @@ class Test(TestCase):
 
         assert self.log_contains("Filters plugins order: [nop]")
 
+    @unittest.skip(
+        "Disabled until filters have been added to processing chain again")
     def test_multiple_nops(self):
         """
         Multiple nops are just as useless as one or none.

@@ -44,16 +44,13 @@ type MongodbStream struct {
 
 	data []byte
 
-	parseOffset   int
-	bytesReceived int
-
 	message *MongodbMessage
 }
 
 // Parser moves to next message in stream
 func (stream *MongodbStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.messageLength:]
-	stream.message = &MongodbMessage{Ts: stream.message.Ts}
+	stream.message = nil
 }
 
 // The private data of a parser instance
@@ -76,7 +73,6 @@ type MongodbTransaction struct {
 	ts           time.Time
 	BytesOut     int
 	BytesIn      int
-	timer        *time.Timer
 
 	Mongodb common.MapStr
 
@@ -87,11 +83,6 @@ type MongodbTransaction struct {
 	params    map[string]interface{}
 	documents []interface{}
 }
-
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
 
 // List of valid mongodb wire protocol operation codes
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#request-opcodes

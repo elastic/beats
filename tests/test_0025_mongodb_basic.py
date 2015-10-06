@@ -202,3 +202,20 @@ class Test(TestCase):
         assert o["method"] == "insert"
         assert o["status"] == "Error"
         assert len(o["mongodb.error"]) > 0
+
+    def test_request_after_reply(self):
+        """
+        Tests that the response time is correctly captured when a single
+        reply is seen before the request.
+        This is a regression test for bug #216.
+        """
+        self.render_config_template(
+            mongodb_ports=[27017]
+        )
+        self.run_packetbeat(pcap="mongodb_reply_request_reply.pcap",
+                            debug_selectors=["mongodb"])
+
+        objs = self.read_output()
+        o = objs[0]
+        assert o["type"] == "mongodb"
+        assert o["responsetime"] >= 0

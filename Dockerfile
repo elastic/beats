@@ -1,4 +1,4 @@
-FROM golang:1.4
+FROM golang:1.5.1
 MAINTAINER Nicolas Ruflin <spam@ruflin.com>
 
 # Install required packages
@@ -24,8 +24,7 @@ COPY . /go/src/github.com/elastic/packetbeat
 # Make sure to clean up environment first
 RUN make clean
 RUN make -C tests/ clean
-RUN make -C tests/
 
 # Build base environment
 RUN make
-RUN make -C tests/ env
+RUN make packetbeat.test

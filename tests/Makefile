@@ -1,17 +1,25 @@
 SHELL := /bin/bash
-
-env: env/bin/activate
-env/bin/activate: requirements.txt
-	test -d env || virtualenv env > /dev/null
-	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
-	touch env/bin/activate
+PROCESSES ?= 4
+TIMEOUT ?= 30
 
 .PHONY: test
-test: env
-	make -C ..
-	. env/bin/activate; nosetests --processes=4
+test:
+	make -C .. packetbeat.test
+	make -C .. env
+	. ../env/bin/activate && nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
 
+.PHONY: coverage
+coverage: test
+	mkdir -p ../coverage
+	# Writes count mode on top of file
+	echo 'mode: count' > ../coverage/system.cov
+	# Collects all system coverage files and skips top line with mode
+	tail -q -n +2 ./run/**/*.cov >> ../coverage/system.cov
+	# Generates HTML output
+	go tool cover -html=../coverage/system.cov -o ../coverage/system.html
+
+.PHONY: clean
 clean:
-	-rm last_run
 	-rm -r run
+	-rm last_run
 	-rm -r env

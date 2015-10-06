@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
 
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
@@ -74,8 +75,6 @@ type RedisTransaction struct {
 
 	Request_raw  string
 	Response_raw string
-
-	timer *time.Timer
 }
 
 // Keep sorted for future command addition
@@ -240,20 +239,23 @@ var RedisCommands = map[string]struct{}{
 	"ZUNIONSTORE":      struct{}{},
 }
 
-const (
-	TransactionsHashSize = 2 ^ 16
-	TransactionTimeout   = 10 * 1e9
-)
-
 type Redis struct {
 	// config
 	Ports         []int
 	Send_request  bool
 	Send_response bool
 
-	transactionsMap map[common.HashableTcpTuple]*RedisTransaction
+	transactions *common.Cache
 
-	results chan common.MapStr
+	results publisher.Client
+}
+
+func (redis *Redis) getTransaction(k common.HashableTcpTuple) *RedisTransaction {
+	v := redis.transactions.Get(k)
+	if v != nil {
+		return v.(*RedisTransaction)
+	}
+	return nil
 }
 
 func (redis *Redis) InitDefaults() {
@@ -278,13 +280,15 @@ func (redis *Redis) GetPorts() []int {
 	return redis.Ports
 }
 
-func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
+func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	redis.InitDefaults()
 	if !test_mode {
 		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
-	redis.transactionsMap = make(map[common.HashableTcpTuple]*RedisTransaction, TransactionsHashSize)
+	redis.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize)
+	redis.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 	redis.results = results
 
 	return nil
@@ -293,7 +297,7 @@ func (redis *Redis) Init(test_mode bool, results chan common.MapStr) error {
 func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseOffset = 0
-	stream.message = &RedisMessage{Ts: stream.message.Ts}
+	stream.message = nil
 	stream.message.Bulks = []string{}
 }
 
@@ -592,17 +596,15 @@ func (redis *Redis) handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 }
 
 func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
-	// Add it to the HT
 	tuple := msg.TcpTuple
-
-	trans := redis.transactionsMap[tuple.Hashable()]
+	trans := redis.getTransaction(tuple.Hashable())
 	if trans != nil {
 		if trans.Redis != nil {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
 		trans = &RedisTransaction{Type: "redis", tuple: tuple}
-		redis.transactionsMap[tuple.Hashable()] = trans
+		redis.transactions.Put(tuple.Hashable(), trans)
 	}
 
 	trans.Redis = common.MapStr{}
@@ -629,24 +631,11 @@ func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 	if msg.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
-
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-	trans.timer = time.AfterFunc(TransactionTimeout, func() { redis.expireTransaction(trans) })
-
-}
-
-func (redis *Redis) expireTransaction(trans *RedisTransaction) {
-
-	// remove from map
-	delete(redis.transactionsMap, trans.tuple.Hashable())
 }
 
 func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
-
 	tuple := msg.TcpTuple
-	trans := redis.transactionsMap[tuple.Hashable()]
+	trans := redis.getTransaction(tuple.Hashable())
 	if trans == nil {
 		logp.Warn("Response from unknown transaction. Ignoring.")
 		return
@@ -671,15 +660,9 @@ func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	redis.publishTransaction(trans)
+	redis.transactions.Delete(trans.tuple.Hashable())
 
 	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
-
-	// remove from map
-	delete(redis.transactionsMap, trans.tuple.Hashable())
-	if trans.timer != nil {
-		trans.timer.Stop()
-	}
-
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
@@ -730,5 +713,5 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	redis.results <- event
+	redis.results.PublishEvent(event)
 }

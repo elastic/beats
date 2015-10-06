@@ -1,6 +1,7 @@
 package protos
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -8,6 +9,12 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/publisher"
+)
+
+const (
+	DefaultTransactionHashSize                 = 2 ^ 16
+	DefaultTransactionExpiration time.Duration = 10 * time.Second
 )
 
 // ProtocolData interface to represent an upper
@@ -21,10 +28,38 @@ type Packet struct {
 	Payload []byte
 }
 
+var ErrInvalidPort = errors.New("port number out of range")
+
+// Protocol Plugin Port configuration with validation on init
+type PortsConfig struct {
+	Ports []int
+}
+
+func (p *PortsConfig) Init(ports ...int) error {
+	return p.Set(ports)
+}
+
+func (p *PortsConfig) Set(ports []int) error {
+	if err := validatePorts(ports); err != nil {
+		return err
+	}
+	p.Ports = ports
+	return nil
+}
+
+func validatePorts(ports []int) error {
+	for port := range ports {
+		if port < 0 || port > 65535 {
+			return ErrInvalidPort
+		}
+	}
+	return nil
+}
+
 // Functions to be exported by a protocol plugin
 type ProtocolPlugin interface {
 	// Called to initialize the Plugin
-	Init(test_mode bool, results chan common.MapStr) error
+	Init(test_mode bool, results publisher.Client) error
 
 	// Called to return the configured ports
 	GetPorts() []int
@@ -66,6 +101,8 @@ const (
 	PgsqlProtocol
 	ThriftProtocol
 	MongodbProtocol
+	DnsProtocol
+	MemcacheProtocol
 )
 
 // Protocol names
@@ -77,6 +114,8 @@ var ProtocolNames = []string{
 	"pgsql",
 	"thrift",
 	"mongodb",
+	"dns",
+	"memcache",
 }
 
 func (p Protocol) String() string {

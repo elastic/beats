@@ -37,7 +37,7 @@ type Logger struct {
 
 var _log Logger
 
-func Debug(selector string, format string, v ...interface{}) {
+func debugMessage(calldepth int, selector, format string, v ...interface{}) {
 	if _log.level >= LOG_DEBUG {
 		if !_log.debug_all_selectors {
 			selected := _log.selectors[selector]
@@ -46,14 +46,24 @@ func Debug(selector string, format string, v ...interface{}) {
 			}
 		}
 		if _log.toSyslog {
-			_log.syslog[LOG_INFO].Output(2, fmt.Sprintf(format, v...))
+			_log.syslog[LOG_INFO].Output(calldepth, fmt.Sprintf(format, v...))
 		}
 		if _log.toStderr {
-			_log.logger.Output(2, fmt.Sprintf("DBG  "+format, v...))
+			_log.logger.Output(calldepth, fmt.Sprintf("DBG  "+format, v...))
 		}
 		if _log.toFile {
 			_log.rotator.WriteLine([]byte(fmt.Sprintf("DBG  "+format, v...)))
 		}
+	}
+}
+
+func Debug(selector string, format string, v ...interface{}) {
+	debugMessage(3, selector, format, v...)
+}
+
+func MakeDebug(selector string) func(string, ...interface{}) {
+	return func(msg string, v ...interface{}) {
+		debugMessage(3, selector, msg, v...)
 	}
 }
 
