@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -1010,10 +1011,14 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 	}
 }
 
-func TestHttpParser_StripAuthorization(t *testing.T) {
+func TestHttpParser_RedactAuthorization(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
+	}
 
 	http := HttpModForTests()
-	http.Strip_authorization = true
+	http.Redact_authorization = true
 	http.Send_headers = true
 	http.Send_all_headers = true
 
@@ -1022,6 +1027,7 @@ func TestHttpParser_StripAuthorization(t *testing.T) {
 		"Content-Type: text/xml; charset=utf-8\r\n" +
 		"SOAPAction: \"\"\r\n" +
 		"Authorization: Basic ZHVtbXk6NmQlc1AwOC1XemZ3Cg\r\n" +
+		"Proxy-Authorization: Basic cHJveHk6MWM3MGRjM2JhZDIwCg==\r\n" +
 		"Host: production.example.com\r\n" +
 		"Content-Length: 0\r\n" +
 		"Expect: 100-continue\r\n" +
@@ -1041,24 +1047,32 @@ func TestHttpParser_StripAuthorization(t *testing.T) {
 	}
 
 	if stream.message.Headers["authorization"] != "*" {
-		t.Errorf("Failed to strip authorization header: " + stream.message.Headers["authorization"])
+		t.Errorf("Failed to redact authorization header: " + stream.message.Headers["authorization"])
+	}
+	authPattern, _ := regexp.Compile(`(?m)^[Aa]uthorization:\*+`)
+	authObscured := authPattern.Match(msg)
+	if !authObscured {
+		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
 	}
 
-	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*"))
-        if raw_message_obscured < 0 {
-		t.Errorf("Obscured authorization string not found: " + string(msg[:]) )
+	if stream.message.Headers["proxy-authorization"] != "*" {
+		t.Errorf("Failed to redact proxy authorization header: " + stream.message.Headers["proxy-authorization"])
+	}
+	proxyPattern, _ := regexp.Compile(`(?m)^[Pp]roxy-[Aa]uthorization:\*+`)
+	proxyObscured := proxyPattern.Match(msg)
+	if !proxyObscured {
+		t.Errorf("Obscured proxy-authorization string not found: " + string(msg[:]))
 	}
 
 }
 
-
-func TestHttpParser_StripAuthorization_raw(t *testing.T) {
+func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	http := HttpModForTests()
-	http.Strip_authorization = true
+	http.Redact_authorization = true
 	http.Send_headers = false
 	http.Send_all_headers = false
-	
+
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
 		"accept: */*\r\n" +
@@ -1082,12 +1096,47 @@ func TestHttpParser_StripAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	raw_message_obscured := bytes.Index( msg, []byte("uthorization:*"))
-        if raw_message_obscured < 0 {
-		t.Errorf("Obscured authorization string not found: " + string(msg[:]) )
+	raw_message_obscured := bytes.Index(msg, []byte("uthorization:*"))
+	if raw_message_obscured < 0 {
+		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
 
+func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
+
+	http := HttpModForTests()
+	http.Redact_authorization = true
+	http.Send_headers = false
+	http.Send_all_headers = false
+
+	data := []byte("POST / HTTP/1.1\r\n" +
+		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
+		"accept: */*\r\n" +
+		"proxy-authorization: cHJveHk6MWM3MGRjM2JhZDIwCg==\r\n" +
+		"content-length: 0\r\n" +
+		"connection: close\r\n" +
+		"\r\n")
+
+	stream := &HttpStream{data: data, message: new(HttpMessage)}
+
+	ok, complete := http.messageParser(stream)
+
+	msg := stream.data[stream.message.start:]
+	http.hideHeaders(stream.message, msg)
+
+	if !ok {
+		t.Errorf("Parsing returned error")
+	}
+
+	if !complete {
+		t.Errorf("Expecting a complete message")
+	}
+
+	raw_message_obscured := bytes.Index(msg, []byte("uthorization:*"))
+	if raw_message_obscured < 0 {
+		t.Errorf("Failed to redact proxy-authorization header: " + string(msg[:]))
+	}
+}
 
 func Test_splitCookiesHeader(t *testing.T) {
 	type io struct {
@@ -1327,7 +1376,7 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	config.Send_request = &trueVar
 	config.Send_response = &trueVar
 	config.Hide_keywords = []string{"a", "b"}
-	config.Strip_authorization = &trueVar
+	config.Redact_authorization = &trueVar
 	config.Send_all_headers = &trueVar
 	config.Split_cookie = &trueVar
 	realIpHeader := "X-Forwarded-For"
@@ -1342,7 +1391,7 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	assert.Equal(t, *config.Send_request, http.Send_request)
 	assert.Equal(t, *config.Send_response, http.Send_response)
 	assert.Equal(t, config.Hide_keywords, http.Hide_keywords)
-	assert.Equal(t, *config.Strip_authorization, http.Strip_authorization)
+	assert.Equal(t, *config.Redact_authorization, http.Redact_authorization)
 	assert.True(t, http.Send_headers)
 	assert.True(t, http.Send_all_headers)
 	assert.Equal(t, *config.Split_cookie, http.Split_cookie)

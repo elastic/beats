@@ -12,7 +12,7 @@ class Test(TestCase):
             dns_ports=[],       # disable dns because the pcap
                                 # contains the DNS query
             http_send_all_headers=1,
-            http_strip_authorization=1,
+            http_redact_authorization=1,
             http_ports=[80]
         )
         self.run_packetbeat(pcap="http_basicauth.pcap",
@@ -29,7 +29,7 @@ class Test(TestCase):
         self.render_config_template(
             dns_ports=[],       # disable dns because the pcap
                                 # contains the DNS query
-            http_strip_authorization=1,
+            http_redact_authorization=1,
             http_send_request=1,
             http_ports=[80]
         )
