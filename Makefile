@@ -3,6 +3,7 @@ GODEP=$(GOPATH)/bin/godep
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
+ES_HOST?=""
 
 .PHONY: build
 build:
@@ -79,14 +80,14 @@ stop-environment:
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
 testsuite: build-image
-	docker-compose run libbeat make testlong
+	docker-compose run -e ES_HOST=${ES_HOST} libbeat make testlong
 	# Copy coverage file back to host
 	mkdir -p coverage
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/
 	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/
 
 # Sets up docker-compose locally for jenkins so no global installation is needed
-.PHONY: testsuite
+.PHONY: docker-compose-setup
 docker-compose-setup:
 	mkdir -p bin
 	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > bin/docker-compose

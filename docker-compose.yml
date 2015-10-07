@@ -2,13 +2,17 @@ libbeat:
   build: .
   links:
     - redis
-    - elasticsearch
+    - elasticsearch-172
+    - elasticsearch-200
   environment:
-    - ES_HOST=elasticsearch
+    - ES_HOST=elasticsearch-172
     - ES_PORT=9200
     - REDIS_HOST=redis
     - REDIS_PORT=6379
-elasticsearch:
-  image: elasticsearch
+elasticsearch-172:
+  image: elasticsearch:1.7.2
+elasticsearch-200:
+  image: elasticsearch:2.0.0-beta2
+  command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis
