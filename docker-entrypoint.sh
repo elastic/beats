@@ -7,22 +7,23 @@ set -e
 # to the docker container.
 
 # Read parameters from the environment and validate them.
-readParams() {
-  if [ -z "$ES_HOST" ]; then
-    echo >&2 'Error: missing required ES_HOST environment variable'
-    echo >&2 '  Did you forget to -e ES_HOST=... ?'
-    exit 1
-  fi
+checkHost() {
+    if [ -z "$$1" ]; then
+        echo >&2 'Error: missing required $1 environment variable'
+        echo >&2 '  Did you forget to -e $1=... ?'
+        exit 1
+    fi
+}
 
-  if [ -z "$REDIS_HOST" ]; then
-    echo >&2 'Error: missing required REDIS_HOST environment variable'
-    echo >&2 '  Did you forget to -e REDIS_HOST=... ?'
-    exit 1
-  fi
+readParams() {
+  checkHost "ES_HOST"
+  checkHost "REDIS_HOST"
+  checkHost "LS_HOST"
 
   # Use default ports if not specified.
   : ${ES_PORT:=9200}
   : ${REDIS_PORT:=6379}
+  : ${LS_LUMBERJACK_TCP_PORT:=12345}
 }
 
 # Wait for elasticsearch to start. It requires that the status be either
@@ -51,7 +52,27 @@ waitForElasticsearch() {
   exit 1
 }
 
+waitForLogstash() {
+    echo -n 'Waiting for logstash to start.'
+    for ((i=1; i<=30; i++)) do
+        if nc -vz ${LS_HOST} ${LS_LUMBERJACK_TCP_PORT} 2>/dev/null; then
+            echo
+            echo "Logstash is ready!"
+            return 0
+        fi
+
+        ((i++))
+        echo -n '.'
+        sleep 1
+    done
+
+    echo
+    echo >&2 'Logstash is not available'
+    echo >&2 "Address: ${LS_HOST}:${LS_LUMBERJACK_TCP_PORT}"
+}
+
 # Main
 readParams
 waitForElasticsearch
+waitForLogstash
 exec "$@"
