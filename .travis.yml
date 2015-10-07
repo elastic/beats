@@ -1,23 +1,17 @@
+sudo: required
+services:
+  - docker
+
 language: go
 
 go:
   - 1.5.1
 
-sudo: false
-
 env:
-  - TARGETS="check full-coverage"
+  - TARGETS="check"
+  - TARGETS="testsuite ES_HOST=elasticsearch-172"
+  - TARGETS="testsuite ES_HOST=elasticsearch-200"
   - TARGETS="crosscompile"
-
-services:
-  - redis-server
-  - elasticsearch
-
-addons:
-  apt:
-    packages:
-      - python-virtualenv
-      - geoip-database
 
 before_install:
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
@@ -25,12 +19,13 @@ before_install:
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/libbeat/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/libbeat
   - cd $HOME/gopath/src/github.com/elastic/libbeat
+  # Docker-compose installation
+  - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 addonsbefore_install:
   - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
-
-before_script:
-  - sleep 10
 
 install:
   - make deps
