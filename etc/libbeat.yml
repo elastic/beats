@@ -6,7 +6,7 @@
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
 
-  # Elasticsearch output configuration
+  ### Elasticsearch as output
   elasticsearch:
 
     # Set to true to enable elasticsearch output
@@ -18,3 +18,163 @@ output:
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
+    # Optional protocol and basic auth credentials. These are deprectad
+    #protocol: "https"
+    #username: "admin"
+    #password: "s3cr3t"
+
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    #save_topology: false
+
+    # Optional index name. The default is "beatname" and generates
+    # [beatname-]YYYY.MM.DD keys.
+    #index: "beatname"
+
+    # Optional HTTP Path
+    #path: "/elasticsearch"
+
+    # List of root certificates for HTTPS server verifications
+    #cas: ["/etc/pki/root/ca.pem"]
+
+    # Certificate for TLS client authentication
+    #certificate: "/etc/pki/client/cert.pem"
+
+    # Client Certificate Key
+    #certificatekey: "/etc/pki/client/cert.key"
+
+    # The number of times a particular Elasticsearch index operation is attempted. If
+    # the indexing operation doesn't succeed after this many retries, the events are
+    # dropped. The default is 3.
+    #max_retries: 3
+
+    # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+    # The default is 10000.
+    #bulk_max_size: 10000
+
+    # The number of seconds to wait for new events between two bulk API index requests.
+    # If `bulk_max_size` is reached before this interval expires, addition bulk index
+    # requests are made.
+    #flush_interval
+
+    # Boolean that sets if the topology is kept in Elasticsearch. The default is
+    # false. This option makes sense only for Packetbeat.
+    #save_topology:
+
+    #The time to live in seconds for the topology information that is stored in
+    #Elasticsearch. The default is 15 seconds.
+    #topology_expire:
+
+    # Controls whether the client verifies server certificates and host name.
+    # If tlsinsecure is set to true, all server host names and certificates will be
+    # accepted. In this mode TLS based connections are susceptible to
+    # man-in-the-middle attacks. Use only for testing.
+    #tlsinsecure
+
+
+  ### Redis as output
+  #redis:
+    # Uncomment out this option if you want to output to Redis. The default is false.
+    #enabled: true
+
+    # Set the host and port where to find Redis.
+    #host: "localhost"
+    #port: 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # The default is false.
+    #save_topology: true
+
+    # Optional index name. The default is packetbeat and generates packetbeat keys.
+    #index: "packetbeat"
+
+    # Optional Redis database number where the events are stored
+    # The default is 0.
+    #db: 0
+
+    # Optional Redis database number where the topology is stored
+    # The default is 1. It must have a different value than db.
+    #db_topology: 1
+
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    #password: ""
+
+    # Optional Redis initial connection timeout in seconds.
+    # The default is 5 seconds.
+    #timeout: 5
+
+    # Optional interval for reconnecting to failed Redis connections.
+    # The default is 1 second.
+    #reconnect_interval: 1
+
+
+  ### File as output
+  #file:
+    # Enabling file output
+    #enabled: false
+
+    # Path to the directory where to save the generated files. The option is mandatory.
+    #path: "/tmp/packetbeat"
+
+    # Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
+    #filename: packetbeat
+
+    # Maximum size in kilobytes of each file. When this size is reached, the files are
+    # rotated. The default value is 10 MB.
+    #rotate_every_kb: 10000
+
+    # Maximum number of files under path. When this number of files is reached, the
+    # oldest file is deleted and the rest are shifted from last to first. The default
+    # is 7 files.
+    #number_of_files: 7
+
+
+############################# Shipper #########################################
+
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  #ignore_outgoing: true
+
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # The default is 10 seconds.
+  #refresh_topology_freq: 10
+
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # All the IPs will be deleted afterwards. Note, that the value must be higher than
+  # refresh_topology_freq. The default is 15 seconds.
+  #topology_expire: 15
+
+  # Configure local GeoIP database support. If no paths are configured
+  # the locations /usr/share/GeoIP/GeoLiteCity.dat and
+  # /usr/local/var/GeoIP/GeoLiteCity.dat are searched for a GeoIP database.
+  #geoip:
+    # If paths is empty, GeoIP support will be disabled.
+    #paths: ["/path/to/geoip/data/GeoLiteCity.dat"]
+
+
+############################# Logging #########################################
+
+#logging:
+#  selectors: []
+#
+#  # Rotator config
+#  files:
+#    path:
+#    name:
+#    rotateEveryBytes:
+#    keepFiles:
+#  to_syslog: false
+#  to_files: false
