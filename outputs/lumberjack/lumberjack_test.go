@@ -8,6 +8,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -23,21 +24,45 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
+func testEvent() common.MapStr {
+	return common.MapStr{
+		"timestamp": common.Time(time.Now()),
+		"type":      "log",
+		"extra":     10,
+		"message":   "message",
+	}
+}
+
+func testLogstashIndex(test string) string {
+	return fmt.Sprintf("beat-logstash-int-%v-%d", test, os.Getpid())
+}
+
 func newTestLumberjackOutput(
 	t *testing.T,
-	config outputs.MothershipConfig,
-) outputs.Outputer {
+	test string,
+	config *outputs.MothershipConfig,
+) outputs.BulkOutputer {
+	if config == nil {
+		config = &outputs.MothershipConfig{
+			Enabled: true,
+			TLS:     nil,
+			Hosts:   []string{getLumberjackHost()},
+			Index:   testLogstashIndex(test),
+		}
+
+	}
+
 	plugin := outputs.FindOutputPlugin("lumberjack")
 	if plugin == nil {
 		t.Fatalf("No lumberjack output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", &config, 0)
+	output, err := plugin.NewOutput("test", config, 0)
 	if err != nil {
 		t.Fatalf("init lumberjack output plugin failed: %v", err)
 	}
 
-	return output
+	return output.(outputs.BulkOutputer)
 }
 
 func sockReadMessage(buf *streambuf.Buffer, in io.Reader) (*message, error) {
@@ -231,10 +256,10 @@ func TestLumberjackTCP(t *testing.T) {
 		Timeout: 2,
 		Hosts:   []string{listener.Addr().String()},
 	}
-	output := newTestLumberjackOutput(t, config)
+	output := newTestLumberjackOutput(t, "", &config)
 
 	// send event to server
-	event := common.MapStr{"name": "me", "line": 10}
+	event := testEvent()
 	output.PublishEvent(nil, time.Now(), event)
 
 	wg.Wait()
@@ -248,8 +273,8 @@ func TestLumberjackTCP(t *testing.T) {
 	}
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
-	assert.Equal(t, "me", data.doc["name"])
-	assert.Equal(t, 10.0, data.doc["line"])
+	assert.Equal(t, 10.0, data.doc["extra"])
+	assert.Equal(t, "message", data.doc["line"])
 }
 
 func TestLumberjackTLS(t *testing.T) {
@@ -348,9 +373,9 @@ func TestLumberjackTLS(t *testing.T) {
 	// send event to server
 	go func() {
 		wgReady.Wait()
-		output := newTestLumberjackOutput(t, config)
+		output := newTestLumberjackOutput(t, "", &config)
 
-		event := common.MapStr{"name": "me", "line": 10}
+		event := testEvent()
 		output.PublishEvent(nil, time.Now(), event)
 	}()
 
@@ -364,7 +389,7 @@ func TestLumberjackTLS(t *testing.T) {
 	if data != nil {
 		assert.Equal(t, 1, len(data.events))
 		data = data.events[0]
-		assert.Equal(t, "me", data.doc["name"])
-		assert.Equal(t, 10.0, data.doc["line"])
+		assert.Equal(t, 10.0, data.doc["extra"])
+		assert.Equal(t, "message", data.doc["line"])
 	}
 }
