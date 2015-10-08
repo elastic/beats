@@ -3,7 +3,6 @@ GODEP=$(GOPATH)/bin/godep
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
-ES_HOST?=""
 ES_HOST?="elasticsearch-200"
 
 .PHONY: build
