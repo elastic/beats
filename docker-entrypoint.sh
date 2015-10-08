@@ -54,7 +54,7 @@ waitForElasticsearch() {
 
 waitForLogstash() {
     echo -n 'Waiting for logstash to start.'
-    for ((i=1; i<=30; i++)) do
+    for ((i=1; i<=90; i++)) do
         if nc -vz ${LS_HOST} ${LS_LUMBERJACK_TCP_PORT} 2>/dev/null; then
             echo
             echo "Logstash is ready!"
