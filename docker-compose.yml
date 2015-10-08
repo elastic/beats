@@ -26,3 +26,4 @@ logstash:
     - ES_PORT=9200
   links:
     - elasticsearch-172
+    - elasticsearch-200

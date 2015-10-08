@@ -29,7 +29,7 @@ readParams() {
 # Wait for elasticsearch to start. It requires that the status be either
 # green or yellow.
 waitForElasticsearch() {
-  echo -n 'Waiting on elasticsearch to start.'
+  echo -n "Waiting on elasticsearch(${ES_HOST}:${ES_PORT}) to start."
   for ((i=1;i<=30;i++))
   do
     health=$(curl --silent "http://${ES_HOST}:${ES_PORT}/_cat/health" | awk '{print $4}')
@@ -53,7 +53,7 @@ waitForElasticsearch() {
 }
 
 waitForLogstash() {
-    echo -n 'Waiting for logstash to start.'
+    echo -n "Waiting for logstash(${LS_HOST}:${LS_LUMBERJACK_TCP_PORT}) to start."
     for ((i=1; i<=90; i++)) do
         if nc -vz ${LS_HOST} ${LS_LUMBERJACK_TCP_PORT} 2>/dev/null; then
             echo

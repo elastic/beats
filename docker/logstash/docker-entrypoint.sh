@@ -21,14 +21,14 @@ readParams() {
 # Wait for elasticsearch to start. It requires that the status be either
 # green or yellow.
 waitForElasticsearch() {
-  echo -n 'Waiting on elasticsearch to start.'
+  echo -n "Waiting on elasticsearch(${ES_HOST}:${ES_PORT}) to start."
   for ((i=1;i<=30;i++))
   do
     health=$(curl --silent "http://${ES_HOST}:${ES_PORT}/_cat/health" | awk '{print $4}')
     if [[ "$health" == "green" ]] || [[ "$health" == "yellow" ]]
     then
       echo
-      echo "Elasticsearch is ready!"
+      echo "Elasticsearch(http://${ES_HOST}:${ES_PORT}) is ready!"
       return 0
     fi
 
@@ -45,7 +45,7 @@ waitForElasticsearch() {
 }
 
 updateConfigFile() {
-    sed -i -e "s/host.*/host => \"$ES_HOST\"/" /logstash.conf
+    sed -e "s/host.*/host => \"$ES_HOST\"/" /logstash.conf.tmpl > /logstash.conf
 }
 
 # Main

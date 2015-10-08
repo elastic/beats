@@ -40,7 +40,7 @@ RUN set -x && \
     plugin install --no-verify logstash-input-lumberjack*.gem && \
     plugin install --no-verify logstash-output-elasticsearch
 
-COPY logstash.conf /logstash.conf
+COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
