@@ -1,7 +1,7 @@
 ################### Packetbeat Configuration Example ##########################
 
 # This file contains an overview of various configuration settings. Please consult
-# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/_configuration.html
+# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/configuration.html
 # for more details.
 
 # The Packetbeat shipper works by sniffing the network traffic between your
