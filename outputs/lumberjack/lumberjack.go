@@ -6,6 +6,7 @@ package lumberjack
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -36,7 +37,8 @@ func (p lumberjackOutputPlugin) NewOutput(
 }
 
 type lumberjack struct {
-	mode mode.ConnectionMode
+	mode  mode.ConnectionMode
+	index string
 }
 
 const (
@@ -109,6 +111,11 @@ func (lj *lumberjack) init(
 	}
 
 	lj.mode = m
+	if config.Index != "" {
+		lj.index = config.Index
+	} else {
+		lj.index = beat
+	}
 	return nil
 }
 
@@ -151,7 +158,7 @@ func (lj *lumberjack) PublishEvent(
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	compatFix(event)
+	lj.compatFix(event)
 	return lj.mode.PublishEvent(signaler, event)
 }
 
@@ -163,7 +170,7 @@ func (lj *lumberjack) BulkPublish(
 	events []common.MapStr,
 ) error {
 	for _, event := range events {
-		compatFix(event)
+		lj.compatFix(event)
 	}
 	return lj.mode.PublishEvents(trans, events)
 }
@@ -171,11 +178,20 @@ func (lj *lumberjack) BulkPublish(
 // compatFix adapts events to be compatible with logstash forwarer messages by renaming
 // the "message" field to "line". The lumberjack server in logstash will
 // decode/rename the "line" field into "message".
-func compatFix(event common.MapStr) {
+func (lj *lumberjack) compatFix(event common.MapStr) {
 	if msg, hasMessage := event["message"]; hasMessage {
 		if _, hasLine := event["line"]; !hasLine {
 			event["line"] = msg
 			delete(event, "message")
 		}
+	}
+
+	// add metadata for indexing
+	ts := time.Time(event["timestamp"].(common.Time))
+	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
+		ts.Year(), ts.Month(), ts.Day())
+	event["@metadata"] = common.MapStr{
+		"index": index,
+		"type":  event["type"].(string),
 	}
 }
