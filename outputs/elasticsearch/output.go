@@ -310,11 +310,11 @@ func getUrl(rawUrl string) (string, error) {
 		urlStruct.Path = ""
 	}
 
-	// Check for port
-	i := strings.Index(urlStruct.Host, ":")
+	// Checks if split host works
+	_, _, err = net.SplitHostPort(urlStruct.Host)
 
-	// If port exists
-	if i >= 0 {
+	// Only does split host if no errors
+	if err == nil {
 		host, port, err = net.SplitHostPort(urlStruct.Host)
 		if err != nil {
 			return "", err
@@ -336,6 +336,11 @@ func getUrl(rawUrl string) (string, error) {
 	// Assign default scheme if not set
 	if urlStruct.Scheme == "" {
 		urlStruct.Scheme = "http"
+	}
+
+	// Check if ipv6
+	if strings.Count(host, ":") > 1 && strings.Count(host, "]") == 0 {
+		host = "[" + host + "]"
 	}
 
 	urlStruct.Host = host + ":" + port
