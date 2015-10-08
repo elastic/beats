@@ -22,7 +22,7 @@ redis:
 logstash:
   build: docker/logstash
   environment:
-    - ES_HOST=elasticsearch
+    - ES_HOST=elasticsearch-172
     - ES_PORT=9200
   links:
     - elasticsearch-172
