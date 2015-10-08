@@ -201,7 +201,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 	// get all shippers IPs from Elasticsearch
 	topologyMapTmp := make(map[string]string)
 
-	res, err := out.Conn.searchURI(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.SearchURI(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, obj := range res.Hits.Hits {
 			var result QueryResult

@@ -179,7 +179,7 @@ func TestIndex(t *testing.T) {
 	params = map[string]string{
 		"q": "user:test",
 	}
-	result, err := es.searchURI(index, "test", params)
+	result, err := es.SearchURI(index, "test", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
