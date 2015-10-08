@@ -222,6 +222,38 @@ func TestSendMessageViaLogstash(t *testing.T) {
 	}
 }
 
+func TestSendMultipleViaLogstash(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
+	}
+
+	test := "multiple"
+	ls := newTestLogstashOutput(t, test)
+	defer ls.Cleanup()
+
+	for i := 0; i < 10; i++ {
+		event := common.MapStr{
+			"timestamp": common.Time(time.Now()),
+			"host":      "test-host",
+			"type":      "log",
+			"message":   fmt.Sprintf("hello world - %v", i),
+		}
+		ls.PublishEvent(nil, time.Now(), event)
+	}
+
+	// wait for logstash event flush + elasticsearch
+	waitUntilTrue(5*time.Second, checkIndex(ls, 10))
+
+	// search value in logstash elasticsearch index
+	resp, err := ls.Read()
+	if err != nil {
+		return
+	}
+	if len(resp) != 10 {
+		t.Errorf("wrong number of results: %d", len(resp))
+	}
+}
+
 func TestLogstashElasticOutputPluginCompatibleMessage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
