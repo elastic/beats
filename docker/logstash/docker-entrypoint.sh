@@ -44,7 +44,12 @@ waitForElasticsearch() {
   exit 1
 }
 
+updateConfigFile() {
+    sed -i -e "s/host.*/host => \"$ES_HOST\"/" /logstash.conf
+}
+
 # Main
 readParams
+updateConfigFile
 waitForElasticsearch
 exec "$@"
