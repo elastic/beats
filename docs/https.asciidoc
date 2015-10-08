@@ -12,7 +12,6 @@ elasticsearch:
 	password: verysecret <2>
 	protocol: https <3>
 	hosts: ["packetbeat.example.com:9200"] <4>
-	save_topology: true
 -----------------------------------------------
 
 <1> The username to use for authenticating to Elasticsearch

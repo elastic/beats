@@ -117,9 +117,10 @@ output:
     host: 192.168.1.42
     port: 9200
 
-    # Comment this option if you don't want to store the topology in
-    # Elasticsearch. The default is false.
-    save_topology: true
+    # Uncomment this option and set it to true if you want to store the topology in
+    # Elasticsearch. Default behavior if this setting is left out of the
+    # config file is equivalent to setting "save_topology" to "false"
+    #save_topology: false
 ----------------------------------------------------------------------
 
 Before starting Packetbeat, you need to load the

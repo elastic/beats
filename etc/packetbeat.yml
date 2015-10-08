@@ -142,7 +142,7 @@ output:
   elasticsearch:
     enabled: true
     hosts: ["localhost:9200"]
-    save_topology: true
+    #save_topology: false
 
   # Redis as output
   # Options:
@@ -152,7 +152,7 @@ output:
   #  enabled: true
   #  host: localhost
   #  port: 6379
-  #  save_topology: true
+  #  save_topology: false
 
   # File as output
   # Options:
