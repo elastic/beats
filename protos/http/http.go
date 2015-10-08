@@ -958,7 +958,7 @@ func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 		if http.Redact_authorization {
 
 			redactHeaders := []string{"authorization", "proxy-authorization"}
-			auth_text := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authentication:
+			auth_text := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
 
 			authHeaderStartX := m.headerOffset
 			authHeaderEndX := m.bodyOffset
