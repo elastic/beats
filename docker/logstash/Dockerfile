@@ -5,6 +5,7 @@ ENV LOGSTASH_REPO https://github.com/elastic/logstash.git
 ENV LUMBERJACK_REPO https://github.com/urso/ruby-lumberjack.git
 ENV LUMBERJACK_PLUGIN_REPO https://github.com/urso/logstash-input-lumberjack.git
 
+ENV LOGSTASH_CHANGESET bfbb49dc14fbdc764254e13f90d23639703c0f06
 ENV LUMBERJACK_BRANCH dev/json
 ENV LUMBERJACK_PLUGIN_BRANCH beat_testing
 
@@ -22,6 +23,8 @@ RUN set -x && \
     git clone $LOGSTASH_REPO /opt/logstash && \
     git clone $LUMBERJACK_REPO /ruby-lumberjack && \
     git clone $LUMBERJACK_PLUGIN_REPO /logstash-input-lumberjack && \
+    cd /opt/logstash && \
+    git checkout $LOGSTASH_CHANGESET && \
     cd /ruby-lumberjack && \
     git checkout -b $LUMBERJACK_BRANCH origin/$LUMBERJACK_BRANCH && \
     gem build jls-lumberjack.gemspec && \
