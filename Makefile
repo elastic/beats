@@ -4,6 +4,7 @@ export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 ES_HOST?=""
+ES_HOST?="elasticsearch-200"
 
 .PHONY: build
 build:
@@ -61,7 +62,7 @@ clean:
 
 # Builds the environment to test libbeat
 .PHONY: build-image
-build-image:
+build-image: write-environment
 	make clean
 	docker-compose build
 
@@ -69,7 +70,7 @@ build-image:
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch logstash
+	docker-compose up -d redis elasticsearch-172 elasticsearch-200 logstash
 
 .PHONY: stop-environment
 stop-environment:
@@ -77,9 +78,14 @@ stop-environment:
 	-docker-compose rm -f
 	-docker ps -a  | grep libbeat | grep Exited | awk '{print $$1}' | xargs docker rm
 
+.PHONY: write-environment
+write-environment:
+	echo "ES_HOST=${ES_HOST}" > docker/test.env
+	echo "ES_PORT=9200" >> docker/test.env
+
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
-testsuite: build-image
+testsuite: build-image write-environment
 	docker-compose run -e ES_HOST=${ES_HOST} libbeat make testlong
 	# Copy coverage file back to host
 	mkdir -p coverage

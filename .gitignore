@@ -41,3 +41,5 @@ _testmain.go
 .jenkins
 
 bin
+
+docker/test.env

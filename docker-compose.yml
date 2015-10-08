@@ -6,12 +6,12 @@ libbeat:
     - elasticsearch-200
     - logstash
   environment:
-    - ES_HOST=elasticsearch-172
-    - ES_PORT=9200
     - REDIS_HOST=redis
     - REDIS_PORT=6379
     - LS_HOST=logstash
     - LS_LUMBERJACK_TCP_PORT=12345
+  env_file:
+    - docker/test.env
 elasticsearch-172:
   image: elasticsearch:1.7.2
 elasticsearch-200:
@@ -21,9 +21,8 @@ redis:
   image: redis
 logstash:
   build: docker/logstash
-  environment:
-    - ES_HOST=elasticsearch-172
-    - ES_PORT=9200
+  env_file:
+    - docker/test.env
   links:
     - elasticsearch-172
     - elasticsearch-200
