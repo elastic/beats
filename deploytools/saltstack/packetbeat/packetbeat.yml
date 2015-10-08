@@ -148,7 +148,7 @@ output:
   elasticsearch:
     enabled: true
     hosts: ["{{ elasticsearch }}"]
-    save_topology: true
+    save_topology: false
 
   # Redis as output
   # Options:

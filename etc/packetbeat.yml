@@ -1,7 +1,7 @@
 ################### Packetbeat Configuration Example #########################
 
 # This file contains an overview of various configuration settings. Please consult
-# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/_configuration.html
+# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/configuration.html
 # for more details.
 
 # The Packetbeat shipper works by sniffing the network traffic between your
@@ -148,7 +148,7 @@ output:
   elasticsearch:
     enabled: true
     hosts: ["localhost:9200"]
-    save_topology: true
+    #save_topology: false
 
   # Redis as output
   # Options:
@@ -158,7 +158,7 @@ output:
   #  enabled: true
   #  host: localhost
   #  port: 6379
-  #  save_topology: true
+  #  save_topology: false
 
   # File as output
   # Options:
