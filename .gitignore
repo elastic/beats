@@ -16,7 +16,7 @@ _test
 _output
 /docs/html_docs
 .vagrant
-coverage/*
+build
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -28,7 +28,6 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
-/crosscompile.bash
 _testmain.go
 
 *.exe
@@ -40,6 +39,3 @@ _testmain.go
 .idea
 .jenkins
 
-bin
-
-docker/test.env

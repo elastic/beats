@@ -28,7 +28,6 @@ addonsbefore_install:
   - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
 
 install:
-  - make deps
   - make
 
 script:
@@ -41,4 +40,4 @@ notifications:
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
-  - test -f coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
+  - test -f build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f build/coverage/full.cov

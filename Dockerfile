@@ -16,7 +16,7 @@ RUN set -x \
 	golang.org/x/tools/cmd/cover \
 	golang.org/x/tools/cmd/vet
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY scripts/docker-entrypoint.sh /entrypoint.sh
 
 # Setup work environment
 ENV LIBBEAT_PATH /go/src/github.com/elastic/libbeat
