@@ -1,8 +1,15 @@
 FROM golang:1.5.1
 MAINTAINER Nicolas Ruflin <ruflin@elastic.co>
 
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y netcat && \
+    apt-get clean
+
+
 ## Install go package dependencies
-RUN go get \
+RUN set -x \
+  go get \
 	github.com/pierrre/gotestcover \
 	github.com/tools/godep \
 	github.com/tsg/goautotest \

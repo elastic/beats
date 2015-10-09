@@ -1,0 +1,18 @@
+input {
+  lumberjack {
+    port => 12345
+    ssl => false
+  }
+}
+
+output {
+  elasticsearch {
+      protocol => "http"
+      host => ""
+      port => "9200"
+      index => "%{[@metadata][index]}"
+      document_type => "%{[@metadata][type]}"
+  }
+
+  stdout{}
+}

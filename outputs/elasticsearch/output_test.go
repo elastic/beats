@@ -14,7 +14,6 @@ import (
 )
 
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	esPort, err := strconv.Atoi(GetEsPort())
@@ -141,7 +140,7 @@ func TestOneEvent(t *testing.T) {
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
@@ -220,7 +219,7 @@ func TestEvents(t *testing.T) {
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -281,7 +280,7 @@ func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)

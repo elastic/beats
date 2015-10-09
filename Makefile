@@ -61,7 +61,7 @@ clean:
 
 # Builds the environment to test libbeat
 .PHONY: build-image
-build-image:
+build-image: write-environment
 	make clean
 	docker-compose build
 
@@ -69,7 +69,7 @@ build-image:
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch
+	docker-compose up -d redis elasticsearch-172 elasticsearch-200 logstash
 
 .PHONY: stop-environment
 stop-environment:
@@ -77,14 +77,22 @@ stop-environment:
 	-docker-compose rm -f
 	-docker ps -a  | grep libbeat | grep Exited | awk '{print $$1}' | xargs docker rm
 
+.PHONY: write-environment
+write-environment:
+	echo "ES_HOST=${ES_HOST}" > docker/test.env
+	echo "ES_PORT=9200" >> docker/test.env
+
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
-testsuite: build-image
-	docker-compose run -e ES_HOST=${ES_HOST} libbeat make testlong
-	# Copy coverage file back to host
-	mkdir -p coverage
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/
+testsuite: build-image write-environment
+	NAME=$$(docker-compose run -d libbeat make testlong | awk 'END{print}') || exit 1; \
+	echo "docker libbeat test container: '$$NAME'"; \
+	docker attach $$NAME; CODE=$$?;\
+	mkdir -p coverage; \
+	docker cp $$NAME:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/; \
+	docker cp $$NAME:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/; \
+	docker rm $$NAME > /dev/null; \
+	exit $$CODE
 
 # Sets up docker-compose locally for jenkins so no global installation is needed
 .PHONY: docker-compose-setup
