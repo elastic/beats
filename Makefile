@@ -85,7 +85,7 @@ write-environment:
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
 testsuite: build-image write-environment
-	NAME=$$(docker-compose run -d libbeat make testlong) || exit 1; \
+	NAME=$$(docker-compose run -d libbeat make testlong | awk 'END{print}') || exit 1; \
 	echo "docker libbeat test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
 	mkdir -p coverage; \
