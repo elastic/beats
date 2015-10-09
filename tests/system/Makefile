@@ -1,6 +1,4 @@
-SHELL := /bin/bash
-PROCESSES ?= 4
-TIMEOUT ?= 90
+
 
 env: env/bin/activate
 env/bin/activate: requirements.txt
@@ -8,20 +6,15 @@ env/bin/activate: requirements.txt
 	. env/bin/activate && pip install -Ur requirements.txt > /dev/null
 	touch env/bin/activate
 
-.PHONY: test
-test: env
+.PHONY: system-tests
+system-tests: env
 	make -C ../.. libbeat.test
+	make -C ../.. prepare-tests
 	. env/bin/activate; nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
-
-.PHONY: coverage
-coverage: test
-	mkdir -p ../../coverage
 	# Writes count mode on top of file
-	echo 'mode: count' > ../../coverage/system.cov
+	echo 'mode: count' > ${COVERAGE_DIR}/system.cov
 	# Collects all system coverage files and skips top line with mode
-	tail -q -n +2 ./run/**/*.cov >> ../../coverage/system.cov
-	# Generates HTML output
-	go tool cover -html=../../coverage/system.cov -o ../../coverage/system.html
+	tail -q -n +2 ./run/**/*.cov >> ${COVERAGE_DIR}/system.cov
 
 .PHONY: clean
 clean:
