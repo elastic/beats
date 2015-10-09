@@ -285,9 +285,13 @@ you enable saving the raw request and response fields (see the `send_requset`
 and the `send_response` options), the sensitive data will be present in those
 fields.
 
-===== strip_authorisation
+===== redact_authorization
 
-If enabled, this option hides the value of the `Authorization` HTTP header.
+If the transactions that are being observed use Basic Authentication
+then the exchange contains the base64 unencrypted username and
+password.  Enabling `redact_authorization` obscures the value of the
+`Authorization` and `Proxy-Authorization` HTTP headers, and censors
+those strings in the response.
 
 ===== send_headers
 

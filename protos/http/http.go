@@ -108,16 +108,16 @@ type HttpTransaction struct {
 
 type Http struct {
 	// config
-	Ports               []int
-	Send_request        bool
-	Send_response       bool
-	Send_headers        bool
-	Send_all_headers    bool
-	Headers_whitelist   map[string]bool
-	Split_cookie        bool
-	Real_ip_header      string
-	Hide_keywords       []string
-	Strip_authorization bool
+	Ports                []int
+	Send_request         bool
+	Send_response        bool
+	Send_headers         bool
+	Send_all_headers     bool
+	Headers_whitelist    map[string]bool
+	Split_cookie         bool
+	Real_ip_header       string
+	Hide_keywords        []string
+	Redact_authorization bool
 
 	transactions *common.Cache
 
@@ -135,7 +135,7 @@ func (http *Http) getTransaction(k common.HashableTcpTuple) *HttpTransaction {
 func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
-	http.Strip_authorization = false
+	http.Redact_authorization = false
 }
 
 func (http *Http) SetFromConfig(config config.Http) (err error) {
@@ -149,8 +149,8 @@ func (http *Http) SetFromConfig(config config.Http) (err error) {
 		http.Send_response = *config.Send_response
 	}
 	http.Hide_keywords = config.Hide_keywords
-	if config.Strip_authorization != nil {
-		http.Strip_authorization = *config.Strip_authorization
+	if config.Redact_authorization != nil {
+		http.Redact_authorization = *config.Redact_authorization
 	}
 
 	if config.Send_all_headers != nil {
@@ -300,8 +300,6 @@ func (http *Http) messageParser(s *HttpStream) (bool, bool) {
 
 	var cont, ok, complete bool
 	m := s.message
-
-	logp.Debug("http", "Stream state=%d", s.parseState)
 
 	for s.parseOffset < len(s.data) {
 		switch s.parseState {
@@ -956,26 +954,45 @@ func (http *Http) shouldIncludeInBody(contenttype string) bool {
 func (http *Http) hideHeaders(m *HttpMessage, msg []byte) {
 
 	if m.IsRequest {
-		// byte64 != encryption, so remove it from headers in case of Basic Authentication
-		auth_text := []byte("Authorization:")
-		if http.Strip_authorization && (m.Headers["authorization"] != "") {
-			header_len := m.bodyOffset - m.headerOffset
-			val_start_x := bytes.Index(msg[m.headerOffset:m.bodyOffset], auth_text)
-			val_end_x := -1
-			if val_start_x != -1 {
-				val_end_x = bytes.Index(msg[m.headerOffset+val_start_x:m.bodyOffset], []byte("\r\n"))
+		// byte64 != encryption, so obscure it in headers in case of Basic Authentication
+		if http.Redact_authorization {
 
-				if val_end_x < 0 || val_end_x > header_len {
-					val_end_x = header_len
+			redactHeaders := []string{"authorization", "proxy-authorization"}
+			auth_text := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
+
+			authHeaderStartX := m.headerOffset
+			authHeaderEndX := m.bodyOffset
+
+			for authHeaderStartX < m.bodyOffset {
+				logp.Debug("http", "looking for authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+
+				startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], auth_text)
+				if startOfHeader >= 0 {
+					authHeaderStartX = authHeaderStartX + startOfHeader
+
+					endOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], []byte("\r\n"))
+					if endOfHeader >= 0 {
+						authHeaderEndX = authHeaderStartX + endOfHeader
+
+						if authHeaderEndX > m.bodyOffset {
+							authHeaderEndX = m.bodyOffset
+						}
+
+						logp.Debug("http", "Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+
+						for i := authHeaderStartX + len(auth_text); i < authHeaderEndX; i++ {
+							msg[i] = byte('*')
+						}
+					}
 				}
-				start_index := m.headerOffset + val_start_x + len(auth_text)
-				end_index := m.headerOffset + val_end_x
-
-				for i := start_index; i < end_index; i++ {
-					msg[i] = byte('*')
+				authHeaderStartX = authHeaderEndX + len("\r\n")
+				authHeaderEndX = m.bodyOffset
+			}
+			for _, header := range redactHeaders {
+				if m.Headers[header] != "" {
+					m.Headers[header] = "*"
 				}
 			}
-			m.Headers["authorization"] = "*"
 		}
 	}
 }

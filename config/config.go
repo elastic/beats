@@ -53,16 +53,16 @@ type Dns struct {
 }
 
 type Http struct {
-	Ports               []int
-	Send_all_headers    *bool
-	Send_headers        []string
-	Split_cookie        *bool
-	Real_ip_header      *string
-	Include_body_for    []string
-	Hide_keywords       []string
-	Strip_authorization *bool
-	Send_request        *bool
-	Send_response       *bool
+	Ports                []int
+	Send_all_headers     *bool
+	Send_headers         []string
+	Split_cookie         *bool
+	Real_ip_header       *string
+	Include_body_for     []string
+	Hide_keywords        []string
+	Redact_authorization *bool
+	Send_request         *bool
+	Send_response        *bool
 }
 
 type Memcache struct {

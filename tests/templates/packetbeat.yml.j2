@@ -73,7 +73,7 @@ protocols:
         {%- endfor -%}
     ]
 {%- endif %}
-{% if http_strip_authorization %}    strip_authorization: true{% endif %}
+{% if http_redact_authorization %}    redact_authorization: true{% endif %}
 {%- if http_hide_keywords %}
     hide_keywords: [
         {%- for keyword in http_hide_keywords -%}
