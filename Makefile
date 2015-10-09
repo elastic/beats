@@ -86,6 +86,7 @@ write-environment:
 .PHONY: testsuite
 testsuite: build-image write-environment
 	NAME=$$(docker-compose run -d libbeat make testlong) || exit 1; \
+	echo "docker libbeat test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
 	mkdir -p coverage; \
 	docker cp $$NAME:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/; \
