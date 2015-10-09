@@ -85,11 +85,13 @@ write-environment:
 # Runs the full test suite and puts out the result. This can be run on any docker-machine (local, remote)
 .PHONY: testsuite
 testsuite: build-image write-environment
-	docker-compose run -e ES_HOST=${ES_HOST} libbeat make testlong
-	# Copy coverage file back to host
-	mkdir -p coverage
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/
-	docker cp libbeat_libbeat_run_1:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/
+	NAME=$$(docker-compose run -d libbeat make testlong) || exit 1; \
+	docker attach $$NAME; CODE=$$?;\
+	mkdir -p coverage; \
+	docker cp $$NAME:/go/src/github.com/elastic/libbeat/coverage/unit.cov $(shell pwd)/coverage/; \
+	docker cp $$NAME:/go/src/github.com/elastic/libbeat/coverage/unit.html $(shell pwd)/coverage/; \
+	docker rm $$NAME > /dev/null; \
+	exit $$CODE
 
 # Sets up docker-compose locally for jenkins so no global installation is needed
 .PHONY: docker-compose-setup
