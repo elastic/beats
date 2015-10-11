@@ -22,6 +22,9 @@ getdeps:
 	go get -u golang.org/x/net/websocket
 	# godep is needed in this makefile
 	go get -u github.com/tools/godep
+	# go-fuzz and go-fuzz-build are needed for fuzzy testing
+	go get -u github.com/dvyukov/go-fuzz/go-fuzz
+	go get -u github.com/dvyukov/go-fuzz/go-fuzz-build
 
 .PHONY: updatedeps
 updatedeps:
@@ -75,6 +78,16 @@ coverage:
 benchmark:
 	$(GODEP) go test -short -bench=. ./... -cpu=2
 
+.PHONY: testfuzz
+testfuzz:
+	mkdir -p go-fuzz/workdir/corpus
+	$(GODEP) go build -o go-fuzz/workdir/prepare_corpus go-fuzz/prepare_corpus.go
+	cd go-fuzz/workdir/corpus; find ../../../tests/pcaps/ -name '*.pcap' | xargs -n1 ../prepare_corpus
+	find go-fuzz/workdir/corpus -type f -size 0 -exec rm {} \;
+	# not possible to use together with godeb -> so have the correct version of all dependencies checked out (e.g. go-thrift)
+	go-fuzz-build -o go-fuzz/workdir/decoder-fuzz.zip github.com/elastic/packetbeat/decoder
+	nice go-fuzz -bin=go-fuzz/workdir/decoder-fuzz.zip -workdir=go-fuzz/workdir -dup -timeout 60
+
 .PHONY: env
 env: env/bin/activate
 env/bin/activate: requirements.txt
@@ -93,6 +106,7 @@ clean:
 	-rm packetbeat.test
 	-rm -r coverage
 	-rm -r env
+	-rm -r go-fuzz/workdir
 
 # Generates packetbeat.test coverage testing binary
 packetbeat.test: $(GOFILES)
