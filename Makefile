@@ -9,7 +9,7 @@ all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/b
 	build/upload/build_id.txt
 
 .PHONY: packetbeat topbeat filebeat
-packetbeat topbeat filebeat: build
+packetbeat topbeat filebeat: build/upload
 	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
@@ -60,8 +60,8 @@ go-daemon-image:
 build/god-linux-386 build/god-linux-amd64:
 	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
 
-build:
-	mkdir -p build
+build/upload:
+	mkdir -p build/upload
 
 build/upload/build_id.txt:
 	echo $(BUILDID) > build/upload/build_id.txt
