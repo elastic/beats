@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
+	"github.com/tsg/gopacket/layers"
 )
 
 // Test Constants
@@ -350,6 +351,26 @@ func TestParseUdp_allTestMessages(t *testing.T) {
 		t.Logf("Testing with query for %s", q.q_name)
 		parseUdpRequestResponse(t, dns, q)
 	}
+}
+
+// Verify that expireTransaction publishes an event with an error status
+// and note.
+func TestExpireTransaction(t *testing.T) {
+	dns := newDns(testing.Verbose())
+
+	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
+	trans.Request = &DnsMessage{
+		Data: &layers.DNS{
+			Questions: []layers.DNSQuestion{layers.DNSQuestion{}},
+		},
+	}
+	dns.expireTransaction(trans)
+
+	m := expectResult(t, dns)
+	assert.Nil(t, mapValue(t, m, "bytes_out"))
+	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	assert.Equal(t, NoResponse, mapValue(t, m, "notes"))
 }
 
 // Benchmarks UDP parsing for the given test message.
