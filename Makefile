@@ -168,10 +168,3 @@ write-environment:
 	mkdir -p build
 	echo "ES_HOST=${ES_HOST}" > build/test.env
 	echo "ES_PORT=9200" >> build/test.env
-
-# Sets up docker-compose locally for jenkins so no global installation is needed
-.PHONY: docker-compose-setup
-docker-compose-setup:
-	mkdir -p bin
-	curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > bin/docker-compose
-	chmod +x bin/docker-compose
