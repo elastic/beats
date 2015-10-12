@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file based on the
 ### Added
 - add [.editorconfig file](http://editorconfig.org/)
 - add (experimental/unsupported?) saltstack files
+- Publish expired DNS transactions
 
 ### Improvements
 - Sample config file cleanup
@@ -27,5 +28,6 @@ All notable changes to this project will be documented in this file based on the
 - Generate coverage for system tests
 - Move go-daemon dependency to beats-packer
 - Rename integration tests to system tests
+- Publish expired DNS transactions
 
 ### Deprecated
