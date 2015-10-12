@@ -5,8 +5,8 @@ BUILDID?=$(DATE)
 .PHONY: all
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
 	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin \
-	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin
-
+	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin \
+	build/upload/build_id.txt
 
 .PHONY: packetbeat topbeat filebeat
 packetbeat topbeat filebeat: build
@@ -63,9 +63,11 @@ build/god-linux-386 build/god-linux-amd64:
 build:
 	mkdir -p build
 
+build/upload/build_id.txt:
+	echo $(BUILDID) > build/upload/build_id.txt
+
 .PHONY: s3-nightlies-upload
 s3-nightlies-upload: all
-	echo $(BUILDID) > build/upload/build_id.txt
 	aws s3 cp --recursive --acl public-read build/upload s3://beats-nightlies
 
 .PHONY: release-upload
