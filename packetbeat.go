@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/elastic/libbeat/beat"
@@ -94,6 +95,14 @@ func (pb *Packetbeat) CliFlags(b *beat.Beat) {
 		if err != nil {
 			fmt.Printf("Error getting devices list: %v\n", err)
 			os.Exit(1)
+		}
+		if len(devs) == 0 {
+			fmt.Printf("No devices found.")
+			if runtime.GOOS != "windows" {
+				fmt.Printf(" You might need sudo?\n")
+			} else {
+				fmt.Printf("\n")
+			}
 		}
 		for i, dev := range devs {
 			fmt.Printf("%d: %s\n", i, dev)
