@@ -150,6 +150,7 @@ exporting the correlated transactions. Currently the following output types are
 supported:
 
 * Elasticsearch
+* Lumberjack (Logstash)
 * Redis
 * File
 
@@ -297,6 +298,120 @@ Controls whether the client verifies server certificates and host name.
 If tlsinsecure is set to true, all server host names and certificates will be
 accepted. In this mode TLS based connections are susceptible to
 man-in-the-middle attacks. Use only for testing.
+
+
+[[lumberjack-output]]
+==== Lumberjack (Logstash) Output
+
+The lumberjack output sends the events directly to logstash using the lumberjack
+protocol. The logstash-input-lumberjack plugin must be installed and configured
+in logstash. Logstash will allow for additional processing and routing of
+generated events.
+
+Every event send to logstash contains additional meta data for indexing and filtering:
+
+[source,json]
+------------------------------------------------------------------------------
+{
+    ...
+    @metadata: {
+      "index": "<beat>-<date>",
+      "type": "<event type>"
+    }
+}
+------------------------------------------------------------------------------
+
+Logstash elasticsearch output can be configured to use metadata and event type
+for indexing.
+
+[source,logstash]
+------------------------------------------------------------------------------
+...
+
+output {
+  elasticsearch {
+    host => "localhost"
+    port => "9200"
+    protocol => "http"
+    index => "%{[@metadata][index]}"
+    document_type => "%{[@metadata][type]}"
+  }
+
+  ...
+}
+------------------------------------------------------------------------------
+
+Example configuration:
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  lumberjack:
+    enabled: true
+
+    hosts:
+      - logstash1:12345
+      - logstash2:12345
+      - logstash3:12345
+
+    # configure index prefix name
+    index: mybeat
+
+    # configure lumberjack to loadbalance events between logstash instances
+    loadbalance: true
+
+    tls:
+      # disable tls for testing (TLS must be disabled in logstash too)
+      disabled: true
+------------------------------------------------------------------------------
+
+===== enabled
+
+Boolean option that enables lumberjack output. The default is true.
+
+===== hosts
+
+List of known logstash servers to connect to. All entries in this list can
+contain a port number. If no port number is given, the port options value is
+used as default port number.
+
+===== loadbalance
+
+If set to true and multiple logstash hosts are configured, The output plugin will
+load balance published events onto all logstash hosts. If set to false,
+the output plugin will send all events to only one host (determined by random)
+switching to another host if selected one becomes unresponsive.
+The default value is false.
+
+===== port
+
+Default port to use if port number not given in hosts. The default port number
+is 10200.
+
+===== index
+
+The index root name where to write events to. The default is the beat its name.
+For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
+
+===== tls
+
+TLS configuration like root CA for the lumberjack connections. See
+<<configuration-tls>> for TLS options. If missing or tls.disabled is set to
+true, a TCP only connection is assumed. Logstash must also be configured to use
+TCP for lumberjack input.
+
+===== timeout
+
+Lumberjack connection timeout waiting for responses from logstash server.
+
+===== max_retries
+
+The number of times a particular logstash send attempted is tried. If
+the send operation doesn't succeed after this many retries, the events are
+dropped. The default is 3.
+
+It is up to the beat to decide to drop the event or try again sending the event
+if it was dropped by the output plugin. If send operation doesn't succeed after
+max_retries, the beat optionally will be notified about it.
 
 
 [[redis-output]]
