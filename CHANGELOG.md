@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file based on the
 - Redact proxy-authorization if redact-authorization is set
 - Fix some multithreading issues #203
 - Fix negative response time #216
+- Fix memcache TCP connection being nil after dropping stream data. #299
 
 ### Added
 - add [.editorconfig file](http://editorconfig.org/)
