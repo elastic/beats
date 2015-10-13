@@ -153,7 +153,7 @@ func (mc *Memcache) setFromConfig(config config.Memcache) error {
 		defaultUdpTransDuration)
 	mc.tcpConfig.tcpTransTimeout = computeTransTimeout(
 		config.TcpTransactionTimeout,
-		defaultTcpTransDuration)
+		defaultTCPTransDuration)
 
 	debug("maxValues = %v", mc.config.maxValues)
 	debug("maxBytesPerValue = %v", mc.config.maxBytesPerValue)
