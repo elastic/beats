@@ -145,9 +145,8 @@ If geoip.paths is missing from config file the default paths /usr/share/GeoIP/Ge
 [[configuration-output]]
 === Outputs
 
-Starting with Beat version 0.3.0, multiple outputs can be configured for
-exporting the correlated transactions. Currently the following output types are
-supported:
+Multiple outputs can be configured for exporting the correlated transactions.
+Currently the following output types are supported:
 
 * Elasticsearch
 * Lumberjack (Logstash)
@@ -244,6 +243,10 @@ Basic authentication password for connecting to Elasticsearch.
 
 The index root name where to write events to. The default is `packetbeat` and
 generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
+
+The index root name where to write events to. The default is the beat its name.
+For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
+
 
 ===== max_retries
 
@@ -422,7 +425,7 @@ TODO: I think besides the list option, PUB-SUB is also supported here (there
 was a pull request some time ago. But that's not documented yet.
 ////
 
-Inserts the transaction in a Redis list. This output plugin is compatibile with
+Inserts the events in a Redis list. This output plugin is compatibile with
 http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
 so Redis can be used as queue between the Beat shippers and Logstash.
 
