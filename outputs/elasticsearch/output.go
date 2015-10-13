@@ -75,8 +75,7 @@ func (out *elasticsearchOutput) Init(
 			urls = append(urls, url)
 		}
 	} else {
-		// use host and port settings
-		// TODO: Deprecate usage of host and port always use hosts
+		// usage of host and port is deprecated as it is replaced by hosts
 		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
 		urls = append(urls, url)
 	}

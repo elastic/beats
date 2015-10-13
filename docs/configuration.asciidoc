@@ -307,7 +307,7 @@ Basic authentication password for connecting to Elasticsearch.
 ===== protocol
 
 The name of the protocol Elasticsearch is reachable on. The options are:
-`http` or `https`. The default is `http`.
+`http` or `https`. The default is `http`. Its value is overwritten by the scheme available in the URL.
 
 [[path-option]]
 ===== path
