@@ -92,6 +92,9 @@ Packetbeat uses https://github.com/tools/godep[Godep] for vendoring its
 dependencies. The way Godep works is that it copies the source code of all
 dependencies in the `Godep/_workspace` folder.
 
+Use `godep restore` to install vendored dependencies into your GOPATH. This
+helps with validating code as you type.
+
 If you add a new dependency, you can use `godep get` to add it to the vendored
 folder.
 
@@ -182,6 +185,83 @@ decisions about what to do with partial data received. For example, for the
 HTTP/1.0 protocol, the end of connection is used to know when the message is
 finished.
 
+==== Registering your plugin
+
+To Configure your plugin you have to add a configuration struct to 
+`config/config.go` Protocols struct. This struct will be filled by
+https://gopkg.in/yaml.v2[goyaml] on startup.
+
+[source,go]
+----------------------------------------------------------------------
+type Protocols struct {
+	Dns      Dns
+	Http     Http
+	Memcache Memcache
+	Mysql    Mysql
+	Mongodb  Mongodb
+	Pgsql    Pgsql
+	Redis    Redis
+	Thrift   Thrift
+}
+----------------------------------------------------------------------
+
+Next create an ID for the new plugin in `protos/protos.go`:
+
+[source,go]
+----------------------------------------------------------------------
+// Protocol constants.
+const (
+	UnknownProtocol Protocol = iota
+	HttpProtocol
+	MysqlProtocol
+	RedisProtocol
+	PgsqlProtocol
+	ThriftProtocol
+	MongodbProtocol
+	DnsProtocol
+	MemcacheProtocol
+)
+
+// Protocol names
+var ProtocolNames = []string{
+	"unknown",
+	"http",
+	"mysql",
+	"redis",
+	"pgsql",
+	"thrift",
+	"mongodb",
+	"dns",
+	"memcache",
+}
+----------------------------------------------------------------------
+
+Protocol names order must match the protocol IDs. Additionally the protocol name must match the configuration name.
+
+Finally register your new protocol plugin in `packetbeat.go` EnabledProtocolPlugins:
+
+[source,go]
+----------------------------------------------------------------------
+
+var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
+	protos.HttpProtocol:     new(http.Http),
+	protos.MemcacheProtocol: new(memcache.Memcache),
+	protos.MysqlProtocol:    new(mysql.Mysql),
+	protos.PgsqlProtocol:    new(pgsql.Pgsql),
+	protos.RedisProtocol:    new(redis.Redis),
+	protos.ThriftProtocol:   new(thrift.Thrift),
+	protos.MongodbProtocol:  new(mongodb.Mongodb),
+	protos.DnsProtocol:      new(dns.Dns),
+}
+
+----------------------------------------------------------------------
+
+Once the module is registered it can be configured and packets will be processed.
+
+Before implementing all the logic for your new protocol module, it can be
+helpful to first register it and implement the minimal plugin interface printing
+a debug message on received packets. This way you can test plugin registration
+working correctly.
 
 ==== The TCP Parse function
 
@@ -313,11 +393,12 @@ the request from memory on a timer, otherwise we risk leaking memory.
 ==== Send the result
 
 After the correlation step, you should have an JSON like object that can be sent
-to Elasticsearch for indexing. The way you do that is by putting it through the
-`results` channel, which is received by the `Init` function. The channel accepts
-structures of type `common.MapStr`, which is essentially  a `map[string][interface{}`
-with a few more convenience
-https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods] added.
+to Elasticsearch for indexing. The way you do that is by publishing the it
+through the `results` publisher client, which is received by the `Init`
+function. The publisher client accepts structures of type `common.MapStr`, which
+is essentially a `map[string][interface{}` with a few more convenience
+https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods]
+added.
 
 As an example, here is the relevant code from the REDIS module:
 
@@ -348,7 +429,7 @@ As an example, here is the relevant code from the REDIS module:
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	redis.results <- event
+	redis.results.PublishEvent(event)
 ----------------------------------------------------------------------
 
 The following fields are required and their presence will be checked by
