@@ -34,15 +34,6 @@ output:
     # Optional HTTP Path
     #path: "/elasticsearch"
 
-    # List of root certificates for HTTPS server verifications
-    #cas: ["/etc/pki/root/ca.pem"]
-
-    # Certificate for TLS client authentication
-    #certificate: "/etc/pki/client/cert.pem"
-
-    # Client Certificate Key
-    #certificatekey: "/etc/pki/client/cert.key"
-
     # The number of times a particular Elasticsearch index operation is attempted. If
     # the indexing operation doesn't succeed after this many retries, the events are
     # dropped. The default is 3.
@@ -65,11 +56,32 @@ output:
     #Elasticsearch. The default is 15 seconds.
     #topology_expire:
 
-    # Controls whether the client verifies server certificates and host name.
-    # If tlsinsecure is set to true, all server host names and certificates will be
-    # accepted. In this mode TLS based connections are susceptible to
-    # man-in-the-middle attacks. Use only for testing.
-    #tlsinsecure
+    # tls configuration
+    #tls:
+      # If disabled is set to true, the tls section will be ignored and the
+      # host its certificate authorities will be used.
+      #disabled: true
+
+      # List of root certificates for HTTPS server verifications
+      #certificate-authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate-key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher-suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve-types: []
 
 
   ### Redis as output
