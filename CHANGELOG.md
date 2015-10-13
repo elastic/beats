@@ -14,3 +14,6 @@ All notable changes to this project will be documented in this file based on the
 ### Improvements
 
 ### Deprecated
+
+ * host and port configuration options are deprecated. They are replaced by the hosts
+ configuration option.
