@@ -356,7 +356,18 @@ func TestGetUrl(t *testing.T) {
 	}
 
 	for input, output := range inputOutput {
-		urlNew, err := getUrl(input)
+		urlNew, err := getUrl("http", "", input)
+		assert.Nil(t, err)
+		assert.Equal(t, output, urlNew)
+	}
+
+	inputOutputWithDefaults := map[string]string{
+		"http://localhost":                          "http://localhost:9200/hello",
+		"192.156.4.5":                               "https://192.156.4.5:9200/hello",
+		"http://username:password@es.found.io:9324": "http://username:password@es.found.io:9324/hello",
+	}
+	for input, output := range inputOutputWithDefaults {
+		urlNew, err := getUrl("https", "/hello", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew)
 	}

@@ -67,7 +67,7 @@ func (out *elasticsearchOutput) Init(
 	if len(config.Hosts) > 0 {
 		// use hosts setting
 		for _, host := range config.Hosts {
-			url, err := getUrl(host)
+			url, err := getUrl(config.Protocol, config.Path, host)
 
 			if err != nil {
 				logp.Err("Invalid host param set: %s, Error: %v", host, err)
@@ -76,7 +76,7 @@ func (out *elasticsearchOutput) Init(
 		}
 	} else {
 		// use host and port settings
-		// TODO: Deprecate usage of host, always use hosts
+		// TODO: Deprecate usage of host and port always use hosts
 		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
 		urls = append(urls, url)
 	}
@@ -293,7 +293,7 @@ func (out *elasticsearchOutput) BulkPublish(
 
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
-func getUrl(rawUrl string) (string, error) {
+func getUrl(default_scheme string, default_path string, rawUrl string) (string, error) {
 
 	urlStruct, err := url.Parse(rawUrl)
 
@@ -304,7 +304,7 @@ func getUrl(rawUrl string) (string, error) {
 	host := ""
 	port := ""
 
-	// If url doesn't have a scheme, host is written into path
+	// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
 	if urlStruct.Host == "" {
 		urlStruct.Host = urlStruct.Path
 		urlStruct.Path = ""
@@ -335,7 +335,12 @@ func getUrl(rawUrl string) (string, error) {
 
 	// Assign default scheme if not set
 	if urlStruct.Scheme == "" {
-		urlStruct.Scheme = "http"
+		urlStruct.Scheme = default_scheme
+	}
+
+	// Assign default path if not set
+	if urlStruct.Path == "" {
+		urlStruct.Path = default_path
 	}
 
 	// Check if ipv6
