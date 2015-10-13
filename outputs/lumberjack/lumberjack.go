@@ -42,6 +42,8 @@ type lumberjack struct {
 }
 
 const (
+	lumberjackDefaultPort = 10200
+
 	lumberjackDefaultTimeout = 5 * time.Second
 	defaultSendRetries       = 3
 )
@@ -66,6 +68,11 @@ func (lj *lumberjack) init(
 		timeout = time.Duration(config.Timeout) * time.Second
 	}
 
+	defaultPort := lumberjackDefaultPort
+	if config.Port != 0 {
+		defaultPort = config.Port
+	}
+
 	var clients []mode.ProtocolClient
 	var err error
 	if useTLS {
@@ -77,12 +84,12 @@ func (lj *lumberjack) init(
 
 		clients, err = makeClients(config, timeout,
 			func(host string) (TransportClient, error) {
-				return newTLSClient(host, tlsConfig)
+				return newTLSClient(host, defaultPort, tlsConfig)
 			})
 	} else {
 		clients, err = makeClients(config, timeout,
 			func(host string) (TransportClient, error) {
-				return newTCPClient(host)
+				return newTCPClient(host, defaultPort)
 			})
 	}
 	if err != nil {
