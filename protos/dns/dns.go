@@ -49,6 +49,7 @@ const (
 	DuplicateQueryMsg = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
+	NoResponse          = "No response to this query was received."
 )
 
 // Transport protocol.
@@ -283,8 +284,17 @@ func (dns *Dns) Init(test_mode bool, results publisher.Client) error {
 		dns.setFromConfig(config.ConfigSingleton.Protocols.Dns)
 	}
 
-	dns.transactions = common.NewCache(protos.DefaultTransactionExpiration,
-		protos.DefaultTransactionHashSize)
+	dns.transactions = common.NewCacheWithRemovalListener(
+		protos.DefaultTransactionExpiration,
+		protos.DefaultTransactionHashSize,
+		func(k common.Key, v common.Value) {
+			trans, ok := v.(*DnsTransaction)
+			if !ok {
+				logp.Err("Expired value is not a *DnsTransaction.")
+				return
+			}
+			dns.expireTransaction(trans)
+		})
 	dns.transactions.StartJanitor(protos.DefaultTransactionExpiration)
 
 	dns.results = results
@@ -338,6 +348,7 @@ func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
 		trans.Notes = append(trans.Notes, DuplicateQueryMsg)
 		logp.Debug("dns", DuplicateQueryMsg+" %s", tuple)
 		dns.publishTransaction(trans)
+		dns.deleteTransaction(trans.tuple.Hashable())
 	}
 
 	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
@@ -358,6 +369,7 @@ func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 
 	trans.Response = msg
 	dns.publishTransaction(trans)
+	dns.deleteTransaction(trans.tuple.Hashable())
 }
 
 func (dns *Dns) publishTransaction(t *DnsTransaction) {
@@ -366,7 +378,6 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	}
 
 	logp.Debug("dns", "Publishing transaction. %s", t.tuple.String())
-	dns.deleteTransaction(t.tuple.Hashable())
 
 	event := common.MapStr{}
 	event["timestamp"] = common.Time(t.ts)
@@ -428,6 +439,12 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	}
 
 	dns.results.PublishEvent(event)
+}
+
+func (dns *Dns) expireTransaction(t *DnsTransaction) {
+	t.Notes = append(t.Notes, NoResponse)
+	logp.Debug("dns", NoResponse+" %s", t.tuple.String())
+	dns.publishTransaction(t)
 }
 
 // Adds the DNS message data to the supplied MapStr.
