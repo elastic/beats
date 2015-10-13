@@ -296,3 +296,43 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
         assert len(output) == 3
+
+    def test_new_line_on_open_file(self):
+        """
+        Checks that filebeat follows future writes to the same
+        file. Same as the test_new_line_on_existing_file but this
+        time keep the file open and just flush it.
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as f:
+            f.write("hello world\n")
+            f.flush()
+
+            filebeat = self.start_filebeat()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 1 events"),
+                max_timeout=15)
+
+            # now write another line
+            f.write("hello world 1\n")
+            f.write("hello world 2\n")
+            f.flush()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 2 events"),
+                max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        # Check that output file has the same number of lines as the log file
+        output = self.read_output()
+        assert len(output) == 3
