@@ -198,7 +198,8 @@ class Test(TestCase):
 
         assert len(output) == 5 + 6
 
-    @unittest.skipIf(os.name == "nt", "Watching log file currently not supported on Windows")
+    @unittest.skipIf(os.name == "nt", "Watching log file currently not " +
+                                      "supported on Windows")
     def test_file_disappear_appear(self):
         """
         Checks that filebeat keeps running in case a log files is deleted
@@ -257,3 +258,41 @@ class Test(TestCase):
         # from scratch
         output = self.read_output()
         assert len(output) == 5 + 6
+
+    def test_new_line_on_existing_file(self):
+        """
+        Checks that filebeat follows future writes to the same
+        file.
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as f:
+            f.write("hello world\n")
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.log_contains(
+                "Registrar: processing 1 events"),
+            max_timeout=15)
+
+        with open(testfile, 'a') as f:
+            # now write another line
+            f.write("hello world 1\n")
+            f.write("hello world 2\n")
+
+        self.wait_until(
+            lambda: self.log_contains(
+                "Registrar: processing 2 events"),
+            max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        # Check that output file has the same number of lines as the log file
+        output = self.read_output()
+        assert len(output) == 3
