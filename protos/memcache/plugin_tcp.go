@@ -56,7 +56,10 @@ func ensureMemcacheConnection(private protos.ProtocolData) *tcpConnectionData {
 		logp.Warn("memcache connection data type error, create new one")
 		return &tcpConnectionData{}
 	}
-
+	if priv == nil {
+		logp.Warn("Unexpected: memcache TCP connection data not set, create new one")
+		return &tcpConnectionData{}
+	}
 	return priv
 }
 
@@ -80,8 +83,11 @@ func (mc *Memcache) Parse(
 
 	tcpConn := ensureMemcacheConnection(private)
 	debug("memcache connection %p", tcpConn)
-	return mc.memcacheParseTcp(tcpConn, pkt, tcptuple, dir)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
+	if tcpConn == nil {
+		// explicitely return nil if tcpConn equals nil so ProtocolData really is nil
+		return nil
+	}
 	return tcpConn
 }
 
@@ -362,9 +368,8 @@ func (mc *Memcache) GapInStream(
 	}
 
 	// need to drop TCP stream. But try to publish all cached trancsactions first
-
-	return conn, true
 	mc.pushAllTCPTrans(conn.connection)
+	return private, true
 }
 
 // ReceivedFin is called by tcp layer when the FIN flag is seen in the TCP stream.
