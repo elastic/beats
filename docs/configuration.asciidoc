@@ -196,11 +196,13 @@ output:
     # List of root certificates for HTTPS server verifications
     cas: ["/etc/pki/root/ca.pem"]
 
-    # Certificate for TLS client authentication
-    certificate: "/etc/pki/client/cert.pem"
+    # TLS configuration.
+    tls:
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
 
-    # Client Certificate Key
-    certificatekey: "/etc/pki/client/cert.key"
+      # Client Certificate Key
+      certificatekey: "/etc/pki/client/cert.key"
 
 ------------------------------------------------------------------------------
 
@@ -277,26 +279,13 @@ false. This option makes sense only for Packetbeat.
 The time to live in seconds for the topology information that is stored in
 Elasticsearch. The default is 15 seconds.
 
-===== cas
+===== tls
 
-List of root certificates for HTTPS server verifications. If cas is empty or not
-set, the trusted certificate authorities of the host system will be employed.
+Configure TLS parameters like certificate authority for HTTPS based connections.
+If tls section is missing, the host CAs will be used for HTTPS connections to
+elasticsearch.
 
-===== certificate: "/etc/pki/client/cert.pem"
-
-Certificate for TLS client authentication. Both certificate and certificatekey
-are required.
-
-===== certificatekey: "/etc/pki/client/cert.key"
-
-Client certificate key. Both certificate and certificatekey are required.
-
-===== tlsinsecure
-
-Controls whether the client verifies server certificates and host name.
-If tlsinsecure is set to true, all server host names and certificates will be
-accepted. In this mode TLS based connections are susceptible to
-man-in-the-middle attacks. Use only for testing.
+See <<configuration-output-tls>> for available TLS configuration options.
 
 
 [[redis-output]]
@@ -438,6 +427,96 @@ rotated. The default value is 10 MB.
 Maximum number of files under path. When this number of files is reached, the
 oldest file is deleted and the rest are shifted from last to first. The default
 is 7 files.
+
+[[configuration-output-tls]]
+
+==== TLS options
+
+===== disabled
+
+When set to true none of the TLS configuration options will be applied. Effect is similar to missing TLS configuration in output plugin.
+
+===== certificate-authorities
+
+List of root certificates for server verifications. If certificate-authorities is empty or not set, the trusted certificate authorities of the host system will be employed.
+
+===== certificate: "/etc/pki/client/cert.pem"
+
+Certificate for TLS client authentication. Both certificate and certificate-key
+are required.
+
+===== certificate-key: "/etc/pki/client/cert.key"
+
+Client certificate key. Both certificate and certificate-key are required.
+
+===== insecure
+
+Controls whether the client verifies server certificates and host name.
+If insecure is set to true, all server host names and certificates will be
+accepted. In this mode TLS based connections are susceptible to
+man-in-the-middle attacks. Use only for testing.
+
+===== cipher-suites
+
+Configure list of used cipher suites. First entry has highest priority. If cipher-suites config option is missing, the go crypto library its default suites configuration is used(recommended).
+
+
+List of allowed cipher suites names and their meanings.
+
+* 3DES:
+  Cipher suites using tripple DES
+
+* AES128/256:
+  Cipher suites using AES with 128/256bit keys.
+
+* CBC:
+  Cipher using Cipher Block Chaining as block cipher mode.
+
+* ECDHE:
+  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
+
+* ECDSA:
+  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
+
+* GCM:
+  Galois/Counter mode is used for symmetric key cryptography.
+
+* RC4:
+  Cipher suites using RC4.
+
+* RSA:
+  Cipher suites using RSA.
+
+* SHA, SHA256, SHA384:
+  Cipher suites using SHA-1, SHA-256 or SHA-384.
+
+The following cipher suites are available:
+
+* RSA-RC4-128-SHA (disabled by default)
+* RSA-3DES-CBC3-SHA
+* RSA-AES128-CBC-SHA
+* RSA-AES256-CBC-SHA
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default)
+* ECDHE-ECDSA-AES128-CBC-SHA
+* ECDHE-ECDSA-AES256-CBC-SHA
+* ECDHE-RSA-RC4-128-SHA (disabled by default)
+* ECDHE-RSA-3DES-CBC3-SHA
+* ECDHE-RSA-AES128-CBC-SHA
+* ECDHE-RSA-AES256-CBC-SHA
+* ECDHE-RSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
+
+===== curve-types
+
+Configure available curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
+
+Available elliptic curve types:
+
+* P-256
+* P-384
+* P-521
 
 [[configuration-run-options]]
 === Run options (optional)
