@@ -492,14 +492,14 @@ List of allowed cipher suites names and their meanings.
 
 The following cipher suites are available:
 
-* RSA-RC4-128-SHA (disabled by default)
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * RSA-3DES-CBC3-SHA
 * RSA-AES128-CBC-SHA
 * RSA-AES256-CBC-SHA
-* ECDHE-ECDSA-RC4-128-SHA (disabled by default)
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
 * ECDHE-ECDSA-AES128-CBC-SHA
 * ECDHE-ECDSA-AES256-CBC-SHA
-* ECDHE-RSA-RC4-128-SHA (disabled by default)
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
 * ECDHE-RSA-3DES-CBC3-SHA
 * ECDHE-RSA-AES128-CBC-SHA
 * ECDHE-RSA-AES256-CBC-SHA
