@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	lumberjackDefaultHost = "localhost"
-	lumberjackDefaultPort = "12345"
+	lumberjackDefaultHost     = "localhost"
+	lumberjackTestDefaultPort = "12345"
 
 	elasticsearchDefaultHost = "localhost"
 	elasticsearchDefaultPort = "9200"
@@ -50,7 +50,7 @@ func getenv(name, defaultValue string) string {
 func getLumberjackHost() string {
 	return fmt.Sprintf("%v:%v",
 		getenv("LS_HOST", lumberjackDefaultHost),
-		getenv("LS_LUMBERJACK_TCP_PORT", lumberjackDefaultPort),
+		getenv("LS_LUMBERJACK_TCP_PORT", lumberjackTestDefaultPort),
 	)
 }
 
