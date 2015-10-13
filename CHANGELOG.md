@@ -27,5 +27,7 @@ All notable changes to this project will be documented in this file based on the
 - Generate coverage for system tests
 - Move go-daemon dependency to beats-packer
 - Rename integration tests to system tests
+- Made the `-devices` option more user friendly in case `sudo` is not used.
+  Issue #296.
 
 ### Deprecated
