@@ -387,7 +387,7 @@ For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `pack
 ===== tls
 
 TLS configuration like root CA for the lumberjack connections. See
-<<configuration-tls>> for TLS options. If missing or tls.disabled is set to
+<<configuration-output-tls>> for TLS options. If missing or tls.disabled is set to
 true, a TCP only connection is assumed. Logstash must also be configured to use
 TCP for lumberjack input.
 
