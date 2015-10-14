@@ -139,6 +139,10 @@ type TcpProtocolPlugin interface {
 	// stream.
 	GapInStream(tcptuple *common.TcpTuple, dir uint8, nbytes int,
 		private ProtocolData) (priv ProtocolData, drop bool)
+
+	// ConnectionTimeout returns the per stream connection timeout.
+	// Return <=0 to set default tcp module transaction timeout.
+	ConnectionTimeout() time.Duration
 }
 
 type UdpProtocolPlugin interface {
