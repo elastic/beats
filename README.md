@@ -9,8 +9,6 @@ server monitoring. It is a lightweight agent that installed on your servers,
 reads periodically system wide and per process CPU and memory statistics and indexes them in
 Elasticsearch.
 
-This is quite early stage and not yet released.
-
 ## Exported fields
 
 There are two types of documents exported:
