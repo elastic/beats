@@ -176,6 +176,7 @@ A section for each supported protocol is defined to configure options like
 
 Currently, Packetbeat supports the following protocols:
 
+ - DNS
  - HTTP
  - Mysql
  - PostgreSQL
@@ -189,6 +190,9 @@ Example configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 protocols:
+  dns:
+    ports: [53]
+
   http:
     ports: [80, 8080, 8000, 5000, 8002]
 
@@ -234,6 +238,36 @@ is sent to Elasticsearch. The default is false.  This is useful in case you
 want to index the whole request. Note that for HTTP, the body is not included
 by default, only the HTTP headers.
 
+
+==== DNS configuration
+
+DNS protocol supports processing DNS message on UDP. Here is a sample configuration section for DNS:
+
+[source,yaml]
+------------------------------------------------------------------------------
+protocols:
+  dns:
+    ports: [53]
+
+    # include_authorities controls whether or not the dns.authorities field
+    # (authority resource records) is added to messages.
+    # Default: false
+    include_authorities: true
+    # include_additionals controls whether or not the dns.additionals field
+    # (additional resource records) is added to messages.
+    # Default: false
+    include_additionals: true
+------------------------------------------------------------------------------
+
+===== include_authorities
+
+If enabled dns.authority fields (authority resource records) are added to DNS events.
+By default publishing authority data is disabled.
+
+===== include_additionals
+
+If enabled dns.additionals field (additional resource records) are added to DNS events.
+By default publishing additional resource records is disabled.
 
 ==== HTTP configuration
 
