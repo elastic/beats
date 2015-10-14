@@ -246,7 +246,7 @@ DNS protocol supports processing DNS message via TCP and UDP. Here is a sample c
 [source,yaml]
 ------------------------------------------------------------------------------
 protocols:
-  http:
+  dns:
     ports: [53]
 
     # include_authorities controls whether or not the dns.authorities field
