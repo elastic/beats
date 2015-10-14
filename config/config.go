@@ -31,7 +31,7 @@ type FilebeatConfig struct {
 	SpoolSize           uint64 `yaml:"spoolSize"`
 	IdleTimeout         string `yaml:"idleTimeout"`
 	IdleTimeoutDuration time.Duration
-	RegistryFile        string
+	RegistryFile        string `yaml:"registryFile"`
 	ConfigDir           string `yaml:"configDir"`
 }
 

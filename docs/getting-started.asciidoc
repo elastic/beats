@@ -1,0 +1,135 @@
+[[filebeat-getting-started]]
+== Getting Started
+
+The following steps help you setup a complete log analyzer system using 
+Filebeat for gathering the log files, Elasticsearch for indexing them and Kibana for visualization.
+
+ * Install Filebeat on your servers to make use of your log files. <<filebeat-installation>>
+ * Install Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * Install Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * Install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
+
+
+
+[[filebeat-installation]]
+=== Installing Filebeat
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat_{version}_amd64.deb
+sudo dpkg -i filebeat_{version}_amd64.deb
+------------------------------------------------
+
+
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-x86_64.rpm
+sudo rpm -vi filebeat-{version}-x86_64.rpm
+------------------------------------------------
+
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin.tgz
+tar xzvf filebeat-{version}-darwin.tgz
+------------------------------------------------
+
+NOTE: We also provide 32bits images. You can get them from our
+https://www.elastic.co/downloads/beats/filebeat[download page].
+
+Before starting filebeat, have a look at the configuration options from `/etc/filebeat/filebeat.yml`, 
+described in the next chapter.
+
+[[filebeat-configuration]]
+=== Configure Filebeat
+
+Here is a sample of the _filebeat.yml_ file:
+
+[source,shell]
+-------------------------------------------------------------------------------------
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+    # Each - is a prospector. Below are the prospector specific configurations
+    -
+      # Paths that should be crawled and fetched. Glob based paths.
+      # For each file found under this path, a harvester is started.
+      paths:
+        - /var/log/*.log
+      # - c:\programdata\elasticsearch\logs\*
+
+      # Type of the files. Based on this the way the file is read is decided.
+      # The different types cannot be mixed in one prospector
+      #
+      # Possible options are:
+      # * log: Reads every line of the log file (default)
+      # * stdin: Reads the standard in
+      type: log
+-------------------------------------------------------------------------------------
+
+Check <<filebeat-configuration-details>> for more details about each configuration options.
+
+[[filebeat-template]]
+=== Load index template in Elasticsearch
+
+Before starting Filebeat, you need to load the
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which is used to let Elasticsearch know which fields should be analyzed
+in which way.
+
+The recommended template file is installed by the Filebeat packages. Load it with the
+following command:
+
+deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/filebeat' -d@/etc/filebeat/filebeat.template.json
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+cd filebeat-{version}-darwin
+curl -XPUT 'http://localhost:9200/_template/filebeat' -d@filebeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
+
+=== Running Filbeat
+
+Run the binary with the command:
+
+deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/filebeat start
+----------------------------------------------------------------------
+
+rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/filebeat start
+----------------------------------------------------------------------
+
+mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./filebeat -e -c filebeat.yml -d "publish"
+----------------------------------------------------------------------
+
+Filebeat is now ready to send log files to your defined output.
+
+Enjoy!

@@ -1,0 +1,29 @@
+== Command Line Options
+
+Filebeat does not have any command line options. All options must be configured in the config file. To start Filbeat
+the option `-c config/path` from libbeat must be used. For more command line options see the https://www.elastic.co/guide/index.html[libbeat] docs.
+
+[source,shell]
+----------------------------------------------------------------------------
+$ ./filebeat -h
+Usage of ./filebeat:
+  -N	Disable actual publishing for testing
+  -c string
+    	Configuration file (default "/etc/filebeat/filebeat.yml")
+  -cpuprofile string
+    	Write cpu profile to file
+  -d string
+    	Enable certain debug selectors
+  -e	Output to stdout and disable syslog/file output
+  -memprofile string
+    	Write memory profile to this file
+  -test
+    	Test configuration and exit.
+  -v	Log at INFO level
+  -version
+    	Print version and exit
+-----------------------------------------------------------------------------
+
+For details about each option, check {libbeat}/command-line-options.html[Beats Command Line Options].
+
+

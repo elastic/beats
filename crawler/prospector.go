@@ -210,7 +210,7 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 	} // for each file matched by the glob
 }
 
-// Check if harvester for new file hast to be started
+// Check if harvester for new file has to be started
 // For a new file the following options exist:
 func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, output chan *input.FileEvent) {
 
