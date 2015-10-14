@@ -1,10 +1,12 @@
 == Logtash-Forwarder to Filebeat Migration
 
-The following guide should help you to upgrade from the logstash-fordwader to filebeat.
+The following guide should help you to upgrade from the
+https://github.com/elastic/logstash-forwarder[Logstash-Forwarder] to Filebeat.
 
-There are four major changes:
+Filebeat brings the following major changes:
+
 * The config file was restructured and converted from json to yaml
-* The registry file which stores the state of the logstash-fowarder was renamed
+* The registry file which stores the state of the currently read files was changed
 * Command line options were removed and moved to the confg file
 * Configuration options for outputs are inherited from libbeat. Details can be found https://www.elastic.co/guide/en/beats/libbeat/current/index.html[here]
 
@@ -44,17 +46,199 @@ output:
     hosts: ["http://localhost:5043"]
 -------------------------------------------------------------------------------------
 
-=== Command Line Options
-Most command line options from logstash-forwarder have been removed and migrated to config file options. The only mandatory
-option for filebeat is `-c` with the path to the config file to be loaded. In case you used command line options with
-logstash-forwarder, make sure to add your options to the configuration file. For the naming changes, check the list below.
+=== Migrate your configuration
 
-The general concept for the config options is that all options are available as part of the config file and only some
-special options are also available as command line option.
+Logstash-Forwarder uses JSON + comments for its configuration file while
+Filebeat uses YaML for consistency with the other Beats. Like the
+Logstash-Forwarder, Filebeat also accepts reading multiple configuration files
+from a `conf.d` directory with similar restrictions. So the conversion can be
+done in most cases 1 to 1.
+
+We recommend to first read the <<filebeat-configuration-details>> section which
+documents the Filebeat options.
+
+
+NOTE:: Logstash-Forwarder has the option of auto-completing environment variables in
+the configuration file. This option currently doesn't exist in Filebeat.
+
+==== The "files" section
+
+The "files" section from the Logstash-Forwarder configuration is transformed in
+a "prospectors" section in the Filebeat config. For example, assuming you start
+with this configuration:
+
+[source,json]
+-------------------------------------------------------------------------------------
+  # The list of files configurations
+  "files": [
+    # An array of hashes. Each hash tells what paths to watch and
+    # what fields to annotate on events from those paths.
+    {
+      "paths": [
+        "/var/log/messages",
+        "/var/log/*.log"
+      ],
+
+      # A dictionary of fields to annotate on each event.
+      "fields": { "type": "syslog" }
+    }, {
+      # A path of "-" means stdin.
+      "paths": [ "-" ],
+      "fields": { "type": "stdin" }
+    }, {
+      "paths": [
+        "/var/log/apache/httpd-*.log"
+      ],
+      "fields": { "type": "apache" }
+    }
+  ]
+-------------------------------------------------------------------------------------
+
+The equivalent "prospectors" section would look like this:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+    # Each - is a prospector. Below are the prospector specific configurations
+    -
+      paths:
+        - /var/log/messages
+        - /var/log/*.log
+    -
+      paths:
+        - "-"
+      type: stdin <1>
+      fields:
+        type: stdin
+    -
+      paths:
+        - /var/log/apache/httpd-*.log
+      fields:
+        type: apache
+-------------------------------------------------------------------------------------
+
+<1> The explicit type field was introduced to separate between normal files and
+    stdin. In the future, more types might be supported.
+
+As you can see, apart from the new optional `type` field which was introduced,
+the rest of the options can be migrated mechanically.
+
+The Filebeat configuration allows some of the options that are global in the
+Logstash-Forwarder to be configured per prospector. See
+<<filebeat-configuration-details>>.
+
+==== The "network" section
+
+Like the Logstash-Forwarder, Filebeat uses the Lumberjack protocol for
+communicating with Logstash. In addition, Filebeat can also insert directly
+into Elasticsearch, this is why the "output" configuration in the sample
+Filebeat configuration little bit more complex. The Logstash part of it,
+however, can be easily translated from the equivalent Logstash-Forwarder
+configuration.
+
+Assuming you start from the following "network" section:
+
+[source,json]
+-------------------------------------------------------------------------------------
+  # The network section covers network configuration :)
+  "network": {
+    # A list of downstream servers listening for our messages.
+    # logstash-forwarder will pick one at random and only switch if
+    # the selected one appears to be dead or unresponsive
+    "servers": [ "localhost:5043" ],
+
+    # The path to your client ssl certificate (optional)
+    "ssl certificate": "./logstash-forwarder.crt",
+    # The path to your client ssl key (optional)
+    "ssl key": "./logstash-forwarder.key",
+
+    # The path to your trusted ssl CA file. This is used
+    # to authenticate your downstream server.
+    "ssl ca": "./logstash-forwarder.crt",
+
+    # Network timeout in seconds. This is most important for
+    # logstash-forwarder determining whether to stop waiting for an
+    # acknowledgement from the downstream server. If an timeout is reached,
+    # logstash-forwarder will assume the connection or server is bad and
+    # will connect to a server chosen at random from the servers list.
+    "timeout": 15
+  }
+-------------------------------------------------------------------------------------
+
+The equivalent in Filebeat would look like this:
+
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+output:
+  lumberjack:
+    enabled: true
+
+    # The list of downstream Logstash servers. <1>
+    hosts:
+      - localhost:5043
+
+    tls: <2>
+      # The path to your client ssl certificate
+      certificate: ./logstash-forwarder.crt
+      # The path to your client ssl key
+      certificate-ssl: ./logstash-forwarder.key
+
+      # The path to your trusted ssl CA file. This is used
+      # to authenticate your downstream server.
+      certificate-authorities:
+        - ./logstash-forwarder.crt
+
+      # Network timeout in seconds.
+      timeout: 15
+-------------------------------------------------------------------------------------
+
+<1> When multiple hosts are defined, the default behavior in Filebeat is to
+    pick a random one for new connections, similar to the Logstash-Forwarder
+    behavior. Filebeat can optionally also to load balancing, see
+    {libbeat}/configuration.html#_loadbalance/[the configuration option].
+<2> Note that if the `tls` section is missing the encryption is disabled. It's
+   automatically enabled when adding the `tls` section. More TLS options are
+   documented {libbeat}/configuration.html#configuration-output-tls[here].
+
+==== Changed configuration file options
+
+With the refactoring of the configuration file, some options were also removed or renamed. Below is a list with the changed entries:
+
+[cols="2*", options="header"]
+|===
+|Config Option
+|Action
+
+|`deadTime`
+|`deadTime` was renamed to `ignoreOlder`. In case a file is not changed for `ignoreOlder`, the file handler will be closed. If the file is changed again after ignoreOlder has passed, it is be reopened.
+
+|`netTimeout`
+|`netTimeout` was removed as it is replaced by the Timeout option in libbeat.
+
+|`log-to-syslog` and `syslog`
+|Both options were removed as logging is part of the libbeat config.
+
+|===
+
+=== Command Line Options
+
+Most command line options from logstash-forwarder have been removed and
+migrated to config file options. The only mandatory option for filebeat is `-c`
+with the path to the config file to be loaded. In case you used command line
+options with Logstash-Forwarder, make sure to add your options to the
+configuration file. For the naming changes, check the list below.
+
+The general concept for the config options is that all options are available as
+part of the config file and only some special options are also available as
+command line option.
 
 ==== Renamed options
-The renamed command line options are listed below. Also check Config Options below for options that were either completely
-removed or moved to libbeat.
+
+The renamed command line options are listed below. Also check Config Options
+below for options that were either completely removed or moved to libbeat.
 
 [cols="3*", options="header"]
 |===
@@ -97,8 +281,6 @@ removed or moved to libbeat.
 
 |===
 
-
-
 ==== Config Options
 With the refactoring of the configuration file, some options were also removed or renamed. Below is a list with the changed entries:
 
@@ -118,7 +300,6 @@ With the refactoring of the configuration file, some options were also removed o
 
 |===
 
-
 ==== Renamed config options
 * DeadTime was renamed to ignore_older
 
@@ -134,3 +315,31 @@ This will start indexing from scratch. In case it is preferred to start at the e
 can be set to true.
 
 The above will allow to keep the old logstash-forwarder running and it can be slowly switched over to Filebeat.
+
+=== New input plug-in for Logstash
+
+TODO
+
+
+=== Other changes
+
+The following is a list of implementation changes that we don't expect to
+affect your experience migrating from Logstash-Forwarder but that you should be
+aware of. Please post GitHub issues if notice any regression from
+Logstash-Forwarder.
+
+==== Packaging
+
+The packaging process for Filebeat uses the Beats infrastructure, so some
+things like the init scripts are different from those that the
+Logstash-Forwarder provided. Please post GitHub issues if you hit any issues
+with the new packages.
+
+==== Publisher improvements
+
+Behind the scenes, Filebeat uses a sightly improved protocol for communicating
+with Logstash.
+
+==== Logging
+
+Filebeat uses libbeat logging and can also log to a file instead of syslog.
