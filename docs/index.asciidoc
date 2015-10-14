@@ -11,6 +11,8 @@ include::./fields.asciidoc[]
 
 // include::./configuration.asciidoc[]
 
+include::./command-line.asciidoc[]
+
 include::./windows.asciidoc[]
 
 include::./dashboards.asciidoc[]
