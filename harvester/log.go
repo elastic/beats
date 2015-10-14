@@ -23,6 +23,7 @@ func (h *Harvester) Harvest() {
 		panic(fmt.Sprintf("Harvest: unexpected error: %s", e.Error()))
 	}
 
+	// File is closed as soon as harvester stops
 	defer h.file.Close()
 
 	// On completion, push offset so we can continue where we left off if we relaunch on the same file
@@ -233,6 +234,7 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 			h.Offset = 0
 		} else if age := time.Since(lastTimeRead); age > h.ProspectorConfig.IgnoreOlderDuration {
 			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
+			// As an error is returned, the harvester will stop and the file is closed
 			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
 			return err
 		}

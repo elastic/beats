@@ -1,0 +1,18 @@
+= Filebeat
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:version: 1.0.0-beta4
+
+include::./overview.asciidoc[]
+
+include::./getting-started.asciidoc[]
+
+include::./configuration.asciidoc[]
+
+include::./command-line.asciidoc[]
+
+include::./migration.asciidoc[]
+
+include::./support.asciidoc[]
+
+include::./contributions.asciidoc[]
+

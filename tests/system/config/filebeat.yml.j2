@@ -13,7 +13,7 @@ filebeat:
   spoolSize:
   idleTimeout: 5s
   tailOnRotate:
-  registryfile: {{ fb.working_dir + '/' }}.filebeat
+  registryFile: {{ fb.working_dir + '/' }}.filebeat
 
 
 
@@ -46,7 +46,7 @@ shipper:
 
 ############################# Output ############################################
 
-# Configure what outputs to use when sending the data collected by packetbeat.
+# Configure what outputs to use when sending the data collected by filebeat.
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
 

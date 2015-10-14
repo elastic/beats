@@ -1,0 +1,107 @@
+== Logtash-Forwarder to Filebeat Migration
+
+The following guide should help you to upgrade from the logstash-fordwader to filebeat.
+
+There are three major changes:
+* The config file was restructured and converted from json to yaml
+* The registry file which stores the state of the logstash-fowarder was renamed
+* Command line options were removed and moved to the confg file
+
+=== Command Line Options
+Most command line options from logstash-forwarder have been removed and migrated to config file options. The only mandatory
+option for filebeat is `-c` with the path to the config file to be loaded. In case you used command line options with
+logstash-forwarder, make sure to add your options to the configuration file. For the naming changes, check the list below.
+
+The general concept for the config options is that all options are available as part of the config file and only some
+special options are also available as command line option.
+
+==== Renamed options
+The renamed command line options are listed below. Also check Config Options below for options that were either completely
+removed or moved to libbeat.
+
+[cols="3*", options="header"]
+|===
+|Command Line Option
+|Config File Option
+|Description
+
+|`-config`
+|`-c`
+|The config options was split up in two part. The base and required config is linked with -c. Additional config files can be linked as part of the config file.
+
+|`-config`
+|`configDir`
+|Path to directory with additional configuration files
+
+|`-idle-timeout`
+|`idleTimeout`
+|`idleTimeout` was moved to the config file and removed as flag.
+
+|`-spool-size`
+|`spoolSize`
+|`spoolSize` was moved to the config file and removed as flag.
+
+|`-harvester-buff-size`
+|`harvesterBufferSize`
+|`harvesterBufferSize` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+
+|`-tail`
+|`tailOnRotate`
+|`tailOnRotate` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+
+|`-cpuProfileFile`
+|
+|`cpuProfileFile` option was removed. The profiling options of libbeat can be used instead. For more details on profiling see https://github.com/elastic/libbeat/issues/122
+
+|`-quiet`
+|
+|The `quiet` option was removed. Libbeat is used for logging and the libbeat configuration options have to be used.
+
+
+|===
+
+=== Config file
+* New config file
+* Output definitions (see libbeat docs)
+* JSON to YAML
+* Config options in prospector
+* One main config files, directory to specify sub config files
+* Type was introduced
+* Getting config options from the environment was removed as this was part of the JSON implementation.! See https://github.com/elastic/logstash-forwarder/pull/435
+* Files inside the config was renamed to prospectors as this makes more sense
+
+==== Config Options
+With the refactoring of the configuration file, some options were also removed or renamed. Below is a list with the changed entries:
+
+[cols="2*", options="header"]
+|===
+|Config Option
+|Action
+
+|`deadTime`
+|`deadTime` was renamed to `ignoreOlder`. In case a file is not changed for `ignoreOlder`, the file handler will be closed. If the file is changed again after ignoreOlder has passed, it is be reopened.
+
+|`netTimeout`
+|`netTimeout` was removed as it is replaced by the Timeout option in libbeat.
+
+|`log-to-syslog` and `syslog`
+|Both options were removed as logging is part of the libbeat config.
+
+|===
+
+
+==== Renamed config options
+* DeadTime was renamed to ignoreOlder
+
+
+===  Registry file
+
+The registry file stores the state and location from which Filbeat was reading last. Under logstash-forwarder was called
+`.logstash-fowarder`. For Filebeat it was renamed to `.filebeat`. For enhancements reasons, especially for Windows the
+structure of the registry file has been changed. This makes a migration complex and leads to potential errors.
+
+Instead of a migration we recommend to start Filebeat on the same host and send the log files to a different index.
+This will start indexing from scratch. In case it is preferred to start at the end of all files, the option tailOnRotate
+can be set to true.
+
+The above will allow to keep the old logstash-forwarder running and it can be slowly switched over to Filebeat.

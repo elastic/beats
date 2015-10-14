@@ -5,6 +5,7 @@
 .DS_Store
 .vagrant
 .filebeat
+/docs/html_docs
 *.swp
 *.swo
 
