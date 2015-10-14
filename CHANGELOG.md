@@ -18,9 +18,6 @@ All notable changes to this project will be documented in this file based on the
 ### Added
 - add [.editorconfig file](http://editorconfig.org/)
 - add (experimental/unsupported?) saltstack files
-- Publish expired DNS transactions
-
-### Improvements
 - Sample config file cleanup
 - Moved common documentation to [libbeat repository](https://github.com/elastic/libbeat)
 - Update build to go 1.5.1
@@ -28,6 +25,6 @@ All notable changes to this project will be documented in this file based on the
 - Generate coverage for system tests
 - Move go-daemon dependency to beats-packer
 - Rename integration tests to system tests
-- Publish expired DNS transactions
+- Publish expired DNS transactions #301
 
 ### Deprecated
