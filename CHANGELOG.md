@@ -29,5 +29,7 @@ All notable changes to this project will be documented in this file based on the
 - Made the `-devices` option more user friendly in case `sudo` is not used.
   Issue #296.
 - Publish expired DNS transactions #301
+- Update protocol guide to libbeat changes
+- Add protocol registration to new protocol guide
 
 ### Deprecated
