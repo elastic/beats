@@ -215,7 +215,7 @@ output:
     # This option makes sense only for Packetbeat
     save_topology: true
 
-    # SSL configurations 
+    # HTTP basic auth
     username: "admin"
     password: "s3cr3t"
 
@@ -241,7 +241,7 @@ output:
     # This option makes sense only for Packetbeat
     save_topology: true
 
-    # SSL configurations 
+    # HTTP basic auth
     username: "admin"
     password: "s3cr3t"
 
