@@ -1,0 +1,39 @@
+== Command Line Options
+
+
+The command line for starting the beats share couple of common options, but
+each beat can have specific command line options that are detailed in the beat
+documentation.
+
+=== Common Options for all Beats
+
+==== -N
+Disable publishing the events to the defined output. This option is useful only for testing Packetbeat.
+
+==== -c
+Pass the configuration file of your beat.
+
+==== -cpuprofile
+Write CPU profile to a given file. This option is useful for troubleshooting
+the beat.
+
+==== -d
+Enable debugging for certail selectors. For example `-d publish` displays all
+the publish related messages. 
+
+==== -e
+Output the error messages to stdout and disable syslog output.
+
+==== -memprofile
+Write memory profile to a give file. This option is useful for troubleshooting
+the beat.
+
+==== -test
+Test only the configuration file and exit. This option is useful for
+troubleshooting the beat.
+
+==== -v
+Enable verbose, showing INFO level messages.
+
+==== -version
+Display the beat version and exit.
