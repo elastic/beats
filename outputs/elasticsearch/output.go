@@ -292,7 +292,7 @@ func (out *elasticsearchOutput) BulkPublish(
 
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
-func getUrl(default_scheme string, default_path string, rawUrl string) (string, error) {
+func getUrl(defaultScheme string, defaultPath string, rawUrl string) (string, error) {
 
 	urlStruct, err := url.Parse(rawUrl)
 
@@ -334,12 +334,12 @@ func getUrl(default_scheme string, default_path string, rawUrl string) (string, 
 
 	// Assign default scheme if not set
 	if urlStruct.Scheme == "" {
-		urlStruct.Scheme = default_scheme
+		urlStruct.Scheme = defaultScheme
 	}
 
 	// Assign default path if not set
 	if urlStruct.Path == "" {
-		urlStruct.Path = default_path
+		urlStruct.Path = defaultPath
 	}
 
 	// Check if ipv6
