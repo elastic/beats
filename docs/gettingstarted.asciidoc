@@ -16,7 +16,7 @@ Follow the steps to get started with your own Packetbeat setup:
 
 
 [[packetbeat-installation]]
-=== Packetbeat installation
+=== Installing Packetbeat
 
 Now that you have Elasticsearch running, I'm sure you are eager to put some
 data in it. For this, install the Packetbeat shippers on your application
@@ -51,6 +51,9 @@ tar xzvf packetbeat-{version}-darwin.tgz
 
 NOTE: We also provide 32bits images. You can get them from our
 https://www.elastic.co/downloads/beats/packetbeat[download page].
+
+
+=== Configure Packetbeat
 
 Before starting the shipper, edit the configuration file. For rpm and deb the
 configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
@@ -123,6 +126,10 @@ output:
     #save_topology: false
 ----------------------------------------------------------------------
 
+
+[[packetbeat-template]]
+=== Load index template in Elasticsearch
+
 Before starting Packetbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to let Elasticsearch know which fields should be analyzed
@@ -142,12 +149,13 @@ mac:
 
 [source,shell]
 ----------------------------------------------------------------------
-cd beats-{version}-darwin
+cd packetbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening on
-Replace `packetbeat` with the beat name that you are running.
+where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
+=== Running Packetbeat
 
 You are now ready to start Packetbeat:
 
