@@ -8,6 +8,8 @@ include::./gettingstarted.asciidoc[]
 
 include::./configuration.asciidoc[]
 
+include::./command-line.asciidoc[]
+
 include::./capturing.asciidoc[]
 
 include::./https.asciidoc[]
