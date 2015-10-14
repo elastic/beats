@@ -393,7 +393,7 @@ the request from memory on a timer, otherwise we risk leaking memory.
 ==== Send the result
 
 After the correlation step, you should have an JSON like object that can be sent
-to Elasticsearch for indexing. The way you do that is by publishing the it
+to Elasticsearch for indexing. The way you do that is by publishing it
 through the `results` publisher client, which is received by the `Init`
 function. The publisher client accepts structures of type `common.MapStr`, which
 is essentially a `map[string][interface{}` with a few more convenience
