@@ -241,7 +241,7 @@ by default, only the HTTP headers.
 
 ==== DNS configuration
 
-DNS protocol supports processing DNS message via TCP and UDP. Here is a sample configuration section for DNS:
+DNS protocol supports processing DNS message on UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
