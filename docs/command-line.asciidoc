@@ -39,9 +39,6 @@ Usage of ./packetbeat:
 Instead of reading packets from the network, you can pass a `PCAP` file as input to Packetbeat. 
 This option is useful only for testing Packetbeat. Example: `-I ~/pcaps/network_traffic.pcap`.
 
-==== -N
-Disable publishing the events to the defined output. This option is useful only for testing Packetbeat.
-
 ==== -O
 Read a packet one by one by pressing _Enter_ after each. This option is useful only for testing Packetbeat.
 
