@@ -634,12 +634,21 @@ List of root certificates for server verifications. If certificate-authorities i
 
 ===== certificate: "/etc/pki/client/cert.pem"
 
-Certificate for TLS client authentication. Both certificate and certificate-key
-are required.
+Configure the certificate for optional TLS client authentication. If certificate
+is not configured, client authentication is not available in client. Connection
+may fail if server requests client authentication. If TLS server does not
+require client authentication, the certificate will be loaded but not be
+requested/used by server.
+
+When configured, both certificate and certificate-key options are required.
 
 ===== certificate-key: "/etc/pki/client/cert.key"
 
-Client certificate key. Both certificate and certificate-key are required.
+Client certificate key required to configure certificate for client
+authentication. If certificate is not configured, client authentication is
+not available in client.
+
+When configured, both certificate and certificate-key are required.
 
 ===== insecure
 
