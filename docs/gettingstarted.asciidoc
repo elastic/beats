@@ -17,7 +17,7 @@ Follow the steps to get started with your own Topbeat setup:
 
 
 [[topbeat-installation]]
-=== Topbeat installation
+=== Installing Topbeat
 
 
 deb:
@@ -77,6 +77,9 @@ input:
   procs: ["^$"]
 -------------------------------------
 
+[[topbeat-template]]
+=== Load index template in Elasticsearch
+
 Before starting topbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which is used to let Elasticsearch know which fields should be analyzed
@@ -94,13 +97,15 @@ curl -XPUT 'http://localhost:9200/_template/topbeat' -d@/etc/topbeat/topbeat.tem
 
 mac:
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd topbeat-$PB_VERSION-darwin
+cd topbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+
+=== Running Topbeat
 
 You are now ready to start Topbeat:
 

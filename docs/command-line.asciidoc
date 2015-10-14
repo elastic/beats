@@ -1,0 +1,28 @@
+[[command-line-options]]
+== Command Line Options
+
+[source,shell]
+---------------------------------------------------------
+
+$ ./topbeat -h
+Usage of ./topbeat:
+  -N	Disable actual publishing for testing
+  -c string
+    	Configuration file (default "/etc/topbeat/topbeat.yml")
+  -cpuprofile string
+    	Write cpu profile to file
+  -d string
+    	Enable certain debug selectors
+  -e	Output to stdout and disable syslog/file output
+  -memprofile string
+    	Write memory profile to this file
+  -test
+    	Test configuration and exit.
+  -v	Log at INFO level
+  -version
+    	Print version and exit
+
+---------------------------------------------------------
+
+
+For details about each option, check {libbeat}/command-line-options.html[Beats Command Line Options].
