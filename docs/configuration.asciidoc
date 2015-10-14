@@ -228,12 +228,14 @@ If the Elasticsearch nodes are defined by `IP:PORT` then add `protocol: https` t
 
 output:
   elasticsearch:
-	
+
     # Enable Elasticsearch as output
     enabled: true
 
     # The Elasticsearch cluster
     hosts: ["10.45.3.2", "10.45.3.1"]
+
+    # Optional http or https. Default is http
     protocol: "https"
 
     # Comment this option if you don't want to store the topology in
@@ -276,7 +278,7 @@ output:
     hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
 
     # Optional http or https. Default is http
-    protocol: https 
+    protocol: https
 
     # HTTP Path at which each Elasticsearch server lives
     path: /elasticsearch
