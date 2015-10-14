@@ -1,0 +1,68 @@
+== Command Line Options
+
+[source,shell]
+------------------------------------------------------------------------
+$ ./packetbeat -h
+Usage of ./packetbeat:
+  -I string
+    	file
+  -N	Disable actual publishing for testing
+  -O	Read packets one at a time (press Enter)
+  -c string
+    	Configuration file (default "/etc/packetbeat/packetbeat.yml")
+  -cpuprofile string
+    	Write cpu profile to file
+  -d string
+    	Enable certain debug selectors
+  -devices
+    	Print the list of devices and exit
+  -dump string
+    	Write all captured packets to this libpcap file
+  -e	Output to stdout and disable syslog/file output
+  -l int
+    	Loop file. 0 - loop forever (default 1)
+  -memprofile string
+    	Write memory profile to this file
+  -t	Read packets as fast as possible, without sleeping
+  -test
+    	Test configuration and exit.
+  -v	Log at INFO level
+  -version
+    	Print version and exit
+  -waitstop int
+    	Additional seconds to wait befor shutting down
+----------------------------------------------------------------------------
+
+=== Packetbeat specific Options 
+
+==== -I
+Instead of reading packets from the network, you can pass a `PCAP` file as input to Packetbeat. 
+This option is used only for testing Packetbeat. Example: `-I ~/pcaps/network_traffic.pcap`.
+
+==== -N
+Disable publishing the events to the defined output. This option is used only for testing Packetbeat.
+
+==== -O
+Read a packet one by one by pressing _Enter_ after each. This option is used only for testing Packetbeat.
+
+==== -devices
+Print the list of devices. This option is used only for testing Packetbeat.
+
+==== -dump
+Write all captured packets to a file. This option is used only for testing Packetbeat.
+
+==== -l
+This option needs to be used in combination with the _pcap file input (-I)_ in order to define how many times to read
+the pcap file. For a infinite loop, use _0_. This option is used only for testing Packetbeat.
+
+==== -t
+This option needs to be used in combination with the _pcap file input (-I)_. If present, reads the packets from the pcap
+file as fast as possible, without sleeping. This option is used only for testing Packetbeat.
+
+==== -waitstop
+Additional seconds to wait before exiting.
+
+
+For the other options, check {libbeat}/command-line-options.html[Beats Command Line Options].
+
+
