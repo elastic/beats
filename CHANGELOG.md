@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file based on the
 - Fix some multithreading issues #203
 - Fix negative response time #216
 - Fix memcache TCP connection being nil after dropping stream data. #299
+- Add missing DNS protocol configuration to documentation #269
 
 ### Added
 - add [.editorconfig file](http://editorconfig.org/)
