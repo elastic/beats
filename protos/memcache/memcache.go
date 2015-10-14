@@ -150,10 +150,10 @@ func (mc *Memcache) setFromConfig(config config.Memcache) error {
 
 	mc.udpConfig.transTimeout = computeTransTimeout(
 		config.UdpTransactionTimeout,
-		defaultUdpTransDuration)
+		protos.DefaultTransactionExpiration)
 	mc.tcpConfig.tcpTransTimeout = computeTransTimeout(
-		config.TcpTransactionTimeout,
-		defaultTCPTransDuration)
+		config.TransactionTimeout,
+		protos.DefaultTransactionExpiration)
 
 	debug("maxValues = %v", mc.config.maxValues)
 	debug("maxBytesPerValue = %v", mc.config.maxBytesPerValue)
@@ -161,7 +161,7 @@ func (mc *Memcache) setFromConfig(config config.Memcache) error {
 	return nil
 }
 
-// Called to return the configured ports
+// GetPorts return the configured memcache application ports.
 func (mc *Memcache) GetPorts() []int {
 	return mc.Ports.Ports
 }
@@ -459,9 +459,9 @@ func (mc memcacheData) IsSet() bool {
 	return mc.data != nil
 }
 
-func computeTransTimeout(to, defaultTo uint) time.Duration {
-	if to == 0 {
-		to = defaultTo
+func computeTransTimeout(to *int, defaultTo time.Duration) time.Duration {
+	if to == nil || *to <= 0 {
+		return defaultTo
 	}
-	return time.Duration(to) * time.Millisecond
+	return time.Duration(*to) * time.Millisecond
 }

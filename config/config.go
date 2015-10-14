@@ -45,9 +45,10 @@ type Protocols struct {
 }
 
 type ProtocolCommon struct {
-	Ports         []int
-	Send_request  *bool
-	Send_response *bool
+	Ports              []int `yaml:"ports"`
+	SendRequest        *bool `yaml:"send_request"`
+	SendResponse       *bool `yaml:"send_response"`
+	TransactionTimeout *int  `yaml:"transaction_timeout"`
 }
 
 type Dns struct {
@@ -71,8 +72,7 @@ type Memcache struct {
 	ProtocolCommon        `yaml:",inline"`
 	MaxValues             int
 	MaxBytesPerValue      int
-	UdpTransactionTimeout uint
-	TcpTransactionTimeout uint
+	UdpTransactionTimeout *int
 	ParseUnknown          bool
 }
 

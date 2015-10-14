@@ -3,6 +3,7 @@ package mongodb
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
@@ -21,7 +22,8 @@ type Mongodb struct {
 	Max_docs       int
 	Max_doc_length int
 
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	results publisher.Client
 }
@@ -39,22 +41,26 @@ func (mongodb *Mongodb) InitDefaults() {
 	mongodb.Send_response = false
 	mongodb.Max_docs = 10
 	mongodb.Max_doc_length = 5000
+	mongodb.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
 	mongodb.Ports = config.Ports
 
-	if config.Send_request != nil {
-		mongodb.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		mongodb.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		mongodb.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		mongodb.Send_response = *config.SendResponse
 	}
 	if config.Max_docs != nil {
 		mongodb.Max_docs = *config.Max_docs
 	}
 	if config.Max_doc_length != nil {
 		mongodb.Max_doc_length = *config.Max_doc_length
+	}
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		mongodb.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
 	}
 	return nil
 }
@@ -74,12 +80,17 @@ func (mongodb *Mongodb) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	mongodb.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	mongodb.transactions = common.NewCache(
+		mongodb.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	mongodb.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	mongodb.transactions.StartJanitor(mongodb.transactionTimeout)
 	mongodb.results = results
 
 	return nil
+}
+
+func (mongodb *Mongodb) ConnectionTimeout() time.Duration {
+	return mongodb.transactionTimeout
 }
 
 func (mongodb *Mongodb) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
