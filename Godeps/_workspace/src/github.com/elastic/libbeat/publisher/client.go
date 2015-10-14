@@ -12,7 +12,7 @@ type Client interface {
 	// PublishEvents publishes multiple events with given options. If Confirm
 	// option is set, PublishEvent will block until output plugins report
 	// success or failure state being returned by this method.
-	PublishEvents(event []common.MapStr, opts ...ClientOption) bool
+	PublishEvents(events []common.MapStr, opts ...ClientOption) bool
 }
 
 // ChanClient will forward all published events one by one to the given channel
@@ -26,6 +26,7 @@ type client struct {
 
 type publishOptions struct {
 	confirm bool
+	sync    bool
 }
 
 // ClientOption allows API users to set additional options when publishing events.
@@ -35,6 +36,14 @@ type ClientOption func(option *publishOptions)
 // by output plugin or fail is reported.
 func Confirm(options *publishOptions) {
 	options.confirm = true
+}
+
+// Sync option will block the event publisher until an event has been ACKed by
+// the output plugin. If output plugin signals failure, the client will retry
+// until success is signaled.
+func Sync(options *publishOptions) {
+	options.confirm = true
+	options.sync = true
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
@@ -53,16 +62,20 @@ func (c *client) getClient(opts []ClientOption) eventPublisher {
 	}
 
 	if options.confirm {
-		return c.publisher.syncPublisher.client()
+		return c.publisher.syncPublisher.client(!options.sync)
 	}
 	return c.publisher.asyncPublisher.client()
 }
 
+// PublishEvent will publish the event on the channel. Options will be ignored.
+// Always returns true.
 func (c ChanClient) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	c.Channel <- event
 	return true
 }
 
+// PublishEvents publishes all event on the configured channel. Options will be ignored.
+// Always returns true.
 func (c ChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
 	for _, event := range events {
 		c.Channel <- event
