@@ -10,10 +10,10 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
+	"github.com/stretchr/testify/assert"
 )
 
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	esPort, err := strconv.Atoi(GetEsPort())
@@ -140,7 +140,7 @@ func TestOneEvent(t *testing.T) {
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
@@ -219,7 +219,7 @@ func TestEvents(t *testing.T) {
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -280,7 +280,7 @@ func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.searchURI(index, "", params)
+	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -331,4 +331,33 @@ func TestEnableTTL(t *testing.T) {
 		t.Errorf("Fail to enable TTL: %s", err)
 	}
 
+}
+
+func TestGetUrl(t *testing.T) {
+
+	// List of inputs / outputs that must match after fetching url
+	// Setting a path without a scheme is not allowed. Example: 192.168.1.1:9200/hello
+	inputOutput := map[string]string{
+		"":                         "http://localhost:9200",
+		"http://localhost":         "http://localhost:9200",
+		"http://localhost/":        "http://localhost:9200/",
+		"http://192.168.1.1:9200":  "http://192.168.1.1:9200",
+		"https://192.168.1.1:9200": "https://192.168.1.1:9200",
+		"http://192.168.1.1":       "http://192.168.1.1:9200",
+		"http://192.168.1.1/hello": "http://192.168.1.1:9200/hello",
+		"192.168.1.1":              "http://192.168.1.1:9200",
+		"192.168.1.1:9200":         "http://192.168.1.1:9200",
+		// IPv6 addresses
+		"[2001:db8::1]:80":                               "http://[2001:db8::1]:80",
+		"http://[2001:db8::1]:80":                        "http://[2001:db8::1]:80",
+		"http://[2001:db8::1]":                           "http://[2001:db8::1]:9200",
+		"https://[2001:db8::1]:9200":                     "https://[2001:db8::1]:9200",
+		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329": "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200",
+	}
+
+	for input, output := range inputOutput {
+		urlNew, err := getUrl(input)
+		assert.Nil(t, err)
+		assert.Equal(t, output, urlNew)
+	}
 }

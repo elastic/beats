@@ -8,6 +8,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -23,36 +24,63 @@ import (
 	"github.com/elastic/libbeat/outputs"
 )
 
+func testEvent() common.MapStr {
+	return common.MapStr{
+		"timestamp": common.Time(time.Now()),
+		"type":      "log",
+		"extra":     10,
+		"message":   "message",
+	}
+}
+
+func testLogstashIndex(test string) string {
+	return fmt.Sprintf("beat-logstash-int-%v-%d", test, os.Getpid())
+}
+
 func newTestLumberjackOutput(
 	t *testing.T,
-	config outputs.MothershipConfig,
-) outputs.Outputer {
+	test string,
+	config *outputs.MothershipConfig,
+) outputs.BulkOutputer {
+	if config == nil {
+		config = &outputs.MothershipConfig{
+			Enabled: true,
+			TLS:     nil,
+			Hosts:   []string{getLumberjackHost()},
+			Index:   testLogstashIndex(test),
+		}
+
+	}
+
 	plugin := outputs.FindOutputPlugin("lumberjack")
 	if plugin == nil {
 		t.Fatalf("No lumberjack output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", &config, 0)
+	output, err := plugin.NewOutput("test", config, 0)
 	if err != nil {
 		t.Fatalf("init lumberjack output plugin failed: %v", err)
 	}
 
-	return output
+	return output.(outputs.BulkOutputer)
 }
 
 func sockReadMessage(buf *streambuf.Buffer, in io.Reader) (*message, error) {
-	buffer := make([]byte, 1024)
 	for {
+		// try parse message from buffered data
+		msg, err := readMessage(buf)
+		if msg != nil || (err != nil && err != streambuf.ErrNoMoreBytes) {
+			return msg, err
+		}
+
+		// read next bytes from socket if incomplete message in buffer
+		buffer := make([]byte, 1024)
 		n, err := in.Read(buffer)
 		if err != nil {
 			return nil, err
 		}
 
 		buf.Write(buffer[:n])
-		msg, err := readMessage(buf)
-		if msg != nil || err != nil {
-			return msg, err
-		}
 	}
 }
 
@@ -163,7 +191,6 @@ func genCertsIfMIssing(
 }
 
 func TestLumberjackTCP(t *testing.T) {
-	useTLS := false
 	var serverErr error
 	var win, data *message
 
@@ -173,41 +200,66 @@ func TestLumberjackTCP(t *testing.T) {
 		t.Fatalf("Failed to create test server")
 	}
 
-	// create lumberjack output client
-	config := outputs.MothershipConfig{
-		TLS:     &useTLS,
-		Timeout: 1,
-		Hosts:   []string{listener.Addr().String()},
-	}
-	output := newTestLumberjackOutput(t, config)
-
 	// start server
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+
+		// server read timeout
+		timeout := 5 * time.Second
 		buf := streambuf.New(nil)
+
 		client, err := listener.Accept()
 		if err != nil {
+			t.Logf("failed on accept: %v", err)
+			serverErr = err
+			return
+		}
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
 			serverErr = err
 			return
 		}
 		win, err = sockReadMessage(buf, client)
 		if err != nil {
+			t.Logf("failed on read window size: %v", err)
+			serverErr = err
+			return
+		}
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
 			serverErr = err
 			return
 		}
 		data, err = sockReadMessage(buf, client)
 		if err != nil {
+			t.Logf("failed on read data frame: %v", err)
 			serverErr = err
 			return
 		}
-		serverErr = sockSendACK(client, 1)
-		return
+
+		if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+			serverErr = err
+			return
+		}
+		err = sockSendACK(client, 1)
+		if err != nil {
+			t.Logf("failed on read data frame: %v", err)
+			serverErr = err
+		}
 	}()
 
+	// create lumberjack output client
+	config := outputs.MothershipConfig{
+		TLS:     nil,
+		Timeout: 2,
+		Hosts:   []string{listener.Addr().String()},
+	}
+	output := newTestLumberjackOutput(t, "", &config)
+
 	// send event to server
-	event := common.MapStr{"name": "me", "line": 10}
+	event := testEvent()
 	output.PublishEvent(nil, time.Now(), event)
 
 	wg.Wait()
@@ -216,11 +268,13 @@ func TestLumberjackTCP(t *testing.T) {
 	// validate output
 	assert.Nil(t, serverErr)
 	assert.NotNil(t, win)
-	assert.NotNil(t, data)
+	if data == nil {
+		t.Fatalf("No data received")
+	}
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
-	assert.Equal(t, "me", data.doc["name"])
-	assert.Equal(t, 10.0, data.doc["line"])
+	assert.Equal(t, 10.0, data.doc["extra"])
+	assert.Equal(t, "message", data.doc["line"])
 }
 
 func TestLumberjackTLS(t *testing.T) {
@@ -238,17 +292,17 @@ func TestLumberjackTLS(t *testing.T) {
 	}
 
 	// create lumberjack output client
-	useTLS := true
 	config := outputs.MothershipConfig{
-		TLS:            &useTLS,
-		Timeout:        5,
-		Hosts:          []string{tcpListener.Addr().String()},
-		Certificate:    pem,
-		CertificateKey: key,
-		CAs:            []string{pem},
+		TLS: &outputs.TLSConfig{
+			Certificate:    pem,
+			CertificateKey: key,
+			CAs:            []string{pem},
+		},
+		Timeout: 5,
+		Hosts:   []string{tcpListener.Addr().String()},
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		tcpListener.Close()
 		t.Fatalf("failed to load certificates")
@@ -265,6 +319,8 @@ func TestLumberjackTLS(t *testing.T) {
 		defer wg.Done()
 
 		for i := 0; i < 3; i++ { // try up to 3 failed connection attempts
+			// server read timeout
+			timeout := 5 * time.Second
 			buf := streambuf.New(nil)
 			wgReady.Done()
 			client, err := listener.Accept()
@@ -278,18 +334,31 @@ func TestLumberjackTLS(t *testing.T) {
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
+
 			err = tlsConn.Handshake()
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			win, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
 				return
 			}
 
+			if err := client.SetDeadline(time.Now().Add(timeout)); err != nil {
+				serverErr = err
+				return
+			}
 			data, err = sockReadMessage(buf, client)
 			if err != nil {
 				serverErr = err
@@ -304,9 +373,9 @@ func TestLumberjackTLS(t *testing.T) {
 	// send event to server
 	go func() {
 		wgReady.Wait()
-		output := newTestLumberjackOutput(t, config)
+		output := newTestLumberjackOutput(t, "", &config)
 
-		event := common.MapStr{"name": "me", "line": 10}
+		event := testEvent()
 		output.PublishEvent(nil, time.Now(), event)
 	}()
 
@@ -320,7 +389,7 @@ func TestLumberjackTLS(t *testing.T) {
 	if data != nil {
 		assert.Equal(t, 1, len(data.events))
 		data = data.events[0]
-		assert.Equal(t, "me", data.doc["name"])
-		assert.Equal(t, 10.0, data.doc["line"])
+		assert.Equal(t, 10.0, data.doc["extra"])
+		assert.Equal(t, "message", data.doc["line"])
 	}
 }

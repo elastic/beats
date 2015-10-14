@@ -62,24 +62,15 @@ func NewElasticsearch(
 	tls *tls.Config,
 	username, password string,
 ) *Elasticsearch {
-
 	var pool ConnectionPool
 	_ = pool.SetConnections(urls, username, password) // never errors
 
-	if tls != nil {
-		return &Elasticsearch{
-			connectionPool: pool,
-			client: &http.Client{
-				Transport: &http.Transport{TLSClientConfig: tls},
-			},
-			MaxRetries: defaultMaxRetries,
-		}
-	}
-
 	return &Elasticsearch{
 		connectionPool: pool,
-		client:         &http.Client{},
-		MaxRetries:     defaultMaxRetries,
+		client: &http.Client{
+			Transport: &http.Transport{TLSClientConfig: tls},
+		},
+		MaxRetries: defaultMaxRetries,
 	}
 }
 
@@ -335,7 +326,7 @@ func (es *Elasticsearch) Delete(index string, docType string, id string, params 
 
 // A search request can be executed purely using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
-func (es *Elasticsearch) searchURI(index string, docType string, params map[string]string) (*SearchResults, error) {
+func (es *Elasticsearch) SearchURI(index string, docType string, params map[string]string) (*SearchResults, error) {
 
 	path, err := makePath(index, docType, "_search")
 	if err != nil {

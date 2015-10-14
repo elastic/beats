@@ -7,6 +7,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"net"
+	"net/url"
+
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
@@ -64,16 +67,21 @@ func (out *elasticsearchOutput) Init(
 	if len(config.Hosts) > 0 {
 		// use hosts setting
 		for _, host := range config.Hosts {
-			url := fmt.Sprintf("%s://%s%s", config.Protocol, host, config.Path)
+			url, err := getUrl(host)
+
+			if err != nil {
+				logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			}
 			urls = append(urls, url)
 		}
 	} else {
 		// use host and port settings
+		// TODO: Deprecate usage of host, always use hosts
 		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
 		urls = append(urls, url)
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
 	}
@@ -193,7 +201,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 	// get all shippers IPs from Elasticsearch
 	topologyMapTmp := make(map[string]string)
 
-	res, err := out.Conn.searchURI(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.SearchURI(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, obj := range res.Hits.Hits {
 			var result QueryResult
@@ -281,4 +289,62 @@ func (out *elasticsearchOutput) BulkPublish(
 		}
 	}()
 	return nil
+}
+
+// Creates the url based on the url configuration.
+// Adds missing parts with defaults (scheme, host, port)
+func getUrl(rawUrl string) (string, error) {
+
+	urlStruct, err := url.Parse(rawUrl)
+
+	if err != nil {
+		return "", err
+	}
+
+	host := ""
+	port := ""
+
+	// If url doesn't have a scheme, host is written into path
+	if urlStruct.Host == "" {
+		urlStruct.Host = urlStruct.Path
+		urlStruct.Path = ""
+	}
+
+	// Checks if split host works
+	_, _, err = net.SplitHostPort(urlStruct.Host)
+
+	// Only does split host if no errors
+	if err == nil {
+		host, port, err = net.SplitHostPort(urlStruct.Host)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		host = urlStruct.Host
+	}
+
+	// Assign default host if not set
+	if host == "" {
+		host = "localhost"
+	}
+
+	// Assign default port if not set
+	if port == "" {
+		port = "9200"
+	}
+
+	// Assign default scheme if not set
+	if urlStruct.Scheme == "" {
+		urlStruct.Scheme = "http"
+	}
+
+	// Check if ipv6
+	if strings.Count(host, ":") > 1 && strings.Count(host, "]") == 0 {
+		host = "[" + host + "]"
+	}
+
+	urlStruct.Host = host + ":" + port
+
+	return urlStruct.String(), nil
+
 }

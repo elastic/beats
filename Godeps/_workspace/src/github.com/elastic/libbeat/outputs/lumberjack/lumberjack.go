@@ -6,11 +6,13 @@ package lumberjack
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/libbeat/outputs/mode"
 )
 
 var debug = logp.MakeDebug("lumberjack")
@@ -35,10 +37,16 @@ func (p lumberjackOutputPlugin) NewOutput(
 }
 
 type lumberjack struct {
-	mode ConnectionMode
+	mode  mode.ConnectionMode
+	index string
 }
 
-const lumberjackDefaultTimeout = 5 * time.Second
+const (
+	lumberjackDefaultPort = 10200
+
+	lumberjackDefaultTimeout = 5 * time.Second
+	defaultSendRetries       = 3
+)
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration
 var ErrNoHostsConfigured = errors.New("no host configuration found")
@@ -52,7 +60,7 @@ func (lj *lumberjack) init(
 ) error {
 	useTLS := false
 	if config.TLS != nil {
-		useTLS = *config.TLS
+		useTLS = !config.TLS.Disabled
 	}
 
 	timeout := lumberjackDefaultTimeout
@@ -60,40 +68,61 @@ func (lj *lumberjack) init(
 		timeout = time.Duration(config.Timeout) * time.Second
 	}
 
-	var clients []ProtocolClient
+	defaultPort := lumberjackDefaultPort
+	if config.Port != 0 {
+		defaultPort = config.Port
+	}
+
+	var clients []mode.ProtocolClient
 	var err error
 	if useTLS {
 		var tlsConfig *tls.Config
-		tlsConfig, err = outputs.LoadTLSConfig(config)
+		tlsConfig, err = outputs.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return err
 		}
 
 		clients, err = makeClients(config, timeout,
 			func(host string) (TransportClient, error) {
-				return newTLSClient(host, tlsConfig)
+				return newTLSClient(host, defaultPort, tlsConfig)
 			})
 	} else {
 		clients, err = makeClients(config, timeout,
 			func(host string) (TransportClient, error) {
-				return newTCPClient(host)
+				return newTCPClient(host, defaultPort)
 			})
 	}
 	if err != nil {
 		return err
 	}
 
-	var mode ConnectionMode
+	sendRetries := defaultSendRetries
+	if config.Max_retries != nil {
+		sendRetries = *config.Max_retries
+	}
+
+	var m mode.ConnectionMode
 	if len(clients) == 1 {
-		mode, err = newSingleConnectionMode(clients[0], waitRetry, timeout)
+		m, err = mode.NewSingleConnectionMode(clients[0],
+			sendRetries, waitRetry, timeout)
 	} else {
-		mode, err = newFailOverConnectionMode(clients, waitRetry, timeout)
+		loadBalance := config.LoadBalance == nil || *config.LoadBalance
+		if loadBalance {
+			m, err = mode.NewLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
+		} else {
+			m, err = mode.NewFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
+		}
 	}
 	if err != nil {
 		return err
 	}
 
-	lj.mode = mode
+	lj.mode = m
+	if config.Index != "" {
+		lj.index = config.Index
+	} else {
+		lj.index = beat
+	}
 	return nil
 }
 
@@ -101,10 +130,10 @@ func makeClients(
 	config outputs.MothershipConfig,
 	timeout time.Duration,
 	newTransp func(string) (TransportClient, error),
-) ([]ProtocolClient, error) {
+) ([]mode.ProtocolClient, error) {
 	switch {
 	case len(config.Hosts) > 0:
-		var clients []ProtocolClient
+		var clients []mode.ProtocolClient
 		for _, host := range config.Hosts {
 			transp, err := newTransp(host)
 			if err != nil {
@@ -122,7 +151,7 @@ func makeClients(
 		if err != nil {
 			return nil, err
 		}
-		return []ProtocolClient{newLumberjackClient(transp, timeout)}, nil
+		return []mode.ProtocolClient{newLumberjackClient(transp, timeout)}, nil
 	default:
 		return nil, ErrNoHostsConfigured
 	}
@@ -132,12 +161,12 @@ func makeClients(
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.
 func (lj *lumberjack) PublishEvent(
-	trans outputs.Signaler,
+	signaler outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	events := []common.MapStr{event}
-	return lj.mode.PublishEvents(trans, events)
+	lj.compatFix(event)
+	return lj.mode.PublishEvent(signaler, event)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
@@ -147,5 +176,29 @@ func (lj *lumberjack) BulkPublish(
 	ts time.Time,
 	events []common.MapStr,
 ) error {
+	for _, event := range events {
+		lj.compatFix(event)
+	}
 	return lj.mode.PublishEvents(trans, events)
+}
+
+// compatFix adapts events to be compatible with logstash forwarer messages by renaming
+// the "message" field to "line". The lumberjack server in logstash will
+// decode/rename the "line" field into "message".
+func (lj *lumberjack) compatFix(event common.MapStr) {
+	if msg, hasMessage := event["message"]; hasMessage {
+		if _, hasLine := event["line"]; !hasLine {
+			event["line"] = msg
+			delete(event, "message")
+		}
+	}
+
+	// add metadata for indexing
+	ts := time.Time(event["timestamp"].(common.Time))
+	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
+		ts.Year(), ts.Month(), ts.Day())
+	event["@metadata"] = common.MapStr{
+		"index": index,
+		"type":  event["type"].(string),
+	}
 }
