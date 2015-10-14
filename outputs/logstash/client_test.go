@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 // TODO:
 //  - test window increase for multiple sends

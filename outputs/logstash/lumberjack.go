@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 // lumberjack.go defines the lumberjack plugin as being registered with all
 // output plugins

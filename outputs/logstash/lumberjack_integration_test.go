@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 import (
 	"encoding/json"
