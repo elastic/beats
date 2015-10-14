@@ -148,6 +148,15 @@ func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 		delete(event, "dst")
 	}
 
+	//get the direction of the transaction: outgoing (as client)/incoming (as server)
+	if (publisher.IsPublisherIP(dst.Ip)) {
+		// outgoing transaction
+		event["direction"] = "out"
+	} else {
+		//incoming transaction
+		event["direction"] = "in"
+	}
+
 	if publisher.IgnoreOutgoing && dstServer != "" &&
 		dstServer != publisher.name {
 		// duplicated transaction -> ignore it
