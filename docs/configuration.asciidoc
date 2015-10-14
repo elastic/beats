@@ -169,17 +169,12 @@ Example configuration:
 ------------------------------------------------------------------------------
 output:
   elasticsearch:
-    # Uncomment out this option if you want to output to Elasticsearch. The
-    # default is false.
+
+    # Enable Elasticsearch as output
     enabled: true
 
-    # Set the host and port where to find Elasticsearch.
-    hosts: ["localhost:9200"]
-
-    # Optional protocol and basic auth credentials
-    # protocol: "https"
-    # username: "admin"
-    # password: "s3cr3t"
+    # The Elasticsearch cluster
+    hosts: ["http://10.45.3.2", "http://10.45.3.1/elasticsearch"]
 
     # Comment this option if you don't want to store the topology in
     # Elasticsearch. The default is false.
@@ -189,9 +184,6 @@ output:
     # Optional index name. The default is packetbeat and generates
     # [packetbeat-]YYYY.MM.DD keys.
     index: "packetbeat"
-
-    # Optional HTTP Path
-    path: "/elasticsearch"
 
     # List of root certificates for HTTPS server verifications
     cas: ["/etc/pki/root/ca.pem"]
@@ -206,31 +198,106 @@ output:
 
 ------------------------------------------------------------------------------
 
+To enable SSL, just add `https` to all URLs defined under __hosts__.
+
+[source,yaml]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+	
+    # Enable Elasticsearch as output
+    enabled: true
+
+    # The Elasticsearch cluster
+    hosts: ["https://10.45.3.2", "https://10.45.3.1"]
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
+If the Elasticsearch nodes are defined by `IP:PORT` then add `protocol: https` to your yaml file.
+
+[source,yaml]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+
+    # Enable Elasticsearch as output
+    enabled: true
+
+    # The Elasticsearch cluster
+    hosts: ["10.45.3.2", "10.45.3.1"]
+
+    # Optional http or https. Default is http
+    protocol: "https"
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
 
 ===== enabled
 
 Boolean option that enables Elasticsearch as output. The default is true.
 
+[[hosts-option]]
 ===== hosts
 
 The list of Elasticsearch nodes to which to connect. The events are distributed to
 these nodes in round robin order. If one node becomes unreachable, the event is
-automatically sent to another node.
+automatically sent to another node. Each Elasticsearch node can be defined as an `URL` or `IP:PORT`.
+Examples: `http://192.15.3.2`, `https://es.found.io:9230` or `192.24.3.2:9300`.
+If no port is specified, `9200` is used.
 
-===== host
+Note:: In case of `IP:PORT`, the _scheme_ and _path_ are taken from the <<protocol-option>> and <<path-option>> config
+options. 
 
-The host of the Elasticsearch server. This option is deprecated and only used if
-the `hosts` option is not present.
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
 
-===== port
+    # Enable Elasticsearch as output
+    enabled: true
 
-The port of the Elasticsearch server. This option is deprecated and only used if
-the `hosts` option is not present.
+    # The Elasticsearch cluster
+    hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
 
-===== protocol
+    # Optional http or https. Default is http
+    protocol: https
 
-The name of the protocol Elasticsearch is reachable on. The options are:
-`http` or `https`. The default is `http`.
+    # HTTP Path at which each Elasticsearch server lives
+    path: /elasticsearch
+------------------------------------------------------------------------------
+
+In the previous example, the Elasticsearch nodes are available at https://10.45.3.2:9220/elasticsearch and
+https://10.45.3.1:9230/elasticsearch.
+
+
+===== host (DEPRECATED)
+
+The host of the Elasticsearch server. This option is deprecated as it is replaced by <<hosts-option>>.
+
+===== port (DEPRECATED)
+
+The port of the Elasticsearch server. This option is deprecated as it is replaced by <<hosts-option>>.
+
 
 ===== username
 
@@ -239,6 +306,19 @@ Basic authentication username for connecting to Elasticsearch.
 ===== password
 
 Basic authentication password for connecting to Elasticsearch.
+
+[[protocol-option]]
+===== protocol
+
+The name of the protocol Elasticsearch is reachable on. The options are:
+`http` or `https`. The default is `http`. Its value is overwritten by the scheme available in the URL.
+
+[[path-option]]
+===== path
+
+An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
+the API under a custom prefix.
 
 
 ===== index
@@ -266,12 +346,6 @@ The default is 10000.
 The number of seconds to wait for new events between two bulk API index requests.
 If `bulk_max_size` is reached before this interval expires, addition bulk index
 requests are made.
-
-===== path
-
-An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
-the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
-the API under a custom prefix.
 
 ===== save_topology
 
