@@ -99,7 +99,7 @@ mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd topbeat-$PB_VERSION-darwin
+cd topbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 ----------------------------------------------------------------------
 
