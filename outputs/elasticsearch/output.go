@@ -302,19 +302,20 @@ func getURL(defaultScheme string, defaultPath string, rawURL string) (string, er
 	host := addr.Host
 	port := "9200"
 
-	// sanitize parse errors if url does not contain scheme :/
-	switch {
-	case addr.Scheme == "":
-		// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
-		scheme = defaultScheme
-		host = addr.Path
-		addr.Path = ""
-	case addr.Host == "" && addr.Path == "" && addr.Opaque != "":
-		// if host and path empty, url only contains ':' but no schema.
-		// Port is written to opaque
-		scheme = defaultScheme
-		host = rawURL
-		addr.Opaque = ""
+	// sanitize parse errors if url does not contain scheme
+	// if parse url looks funny, prepend schema and try again:
+	if addr.Scheme == "" || (addr.Host == "" && addr.Path == "" && addr.Opaque != "") {
+		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
+		if tmpAddr, err := url.Parse(rawURL); err == nil {
+			addr = tmpAddr
+			scheme = addr.Scheme
+			host = addr.Host
+		} else {
+			// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
+			scheme = defaultScheme
+			host = addr.Path
+			addr.Path = ""
+		}
 	}
 
 	if host == "" {

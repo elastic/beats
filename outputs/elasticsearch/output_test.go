@@ -339,38 +339,54 @@ func TestGetUrl(t *testing.T) {
 	// Setting a path without a scheme is not allowed. Example: 192.168.1.1:9200/hello
 	inputOutput := map[string]string{
 		// shema + hostname
-		"":                  "http://localhost:9200",
-		"http://localhost":  "http://localhost:9200",
-		"http://localhost/": "http://localhost:9200/",
+		"":                     "http://localhost:9200",
+		"http://localhost":     "http://localhost:9200",
+		"http://localhost:80":  "http://localhost:80",
+		"http://localhost:80/": "http://localhost:80/",
+		"http://localhost/":    "http://localhost:9200/",
 
 		// no schema + hostname
-		"localhost":      "http://localhost:9200",
-		"localhost:1234": "http://localhost:1234",
+		"localhost":        "http://localhost:9200",
+		"localhost:80":     "http://localhost:80",
+		"localhost:80/":    "http://localhost:80/",
+		"localhost/":       "http://localhost:9200/",
+		"localhost/mypath": "http://localhost:9200/mypath",
 
 		// shema + ipv4
-		"http://192.168.1.1:9200":  "http://192.168.1.1:9200",
-		"https://192.168.1.1:9200": "https://192.168.1.1:9200",
-		"http://192.168.1.1":       "http://192.168.1.1:9200",
-		"http://192.168.1.1/hello": "http://192.168.1.1:9200/hello",
+		"http://192.168.1.1:80":        "http://192.168.1.1:80",
+		"https://192.168.1.1:80/hello": "https://192.168.1.1:80/hello",
+		"http://192.168.1.1":           "http://192.168.1.1:9200",
+		"http://192.168.1.1/hello":     "http://192.168.1.1:9200/hello",
 
 		// no schema + ipv4
-		"192.168.1.1":      "http://192.168.1.1:9200",
-		"192.168.1.1:9200": "http://192.168.1.1:9200",
+		"192.168.1.1":          "http://192.168.1.1:9200",
+		"192.168.1.1:80":       "http://192.168.1.1:80",
+		"192.168.1.1/hello":    "http://192.168.1.1:9200/hello",
+		"192.168.1.1:80/hello": "http://192.168.1.1:80/hello",
 
 		// schema + ipv6
-		"http://[2001:db8::1]:80":                        "http://[2001:db8::1]:80",
-		"http://[2001:db8::1]":                           "http://[2001:db8::1]:9200",
-		"https://[2001:db8::1]:9200":                     "https://[2001:db8::1]:9200",
-		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329": "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200",
+		"http://[2001:db8::1]:80":                              "http://[2001:db8::1]:80",
+		"http://[2001:db8::1]":                                 "http://[2001:db8::1]:9200",
+		"https://[2001:db8::1]:9200":                           "https://[2001:db8::1]:9200",
+		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329":       "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200",
+		"http://[2001:db8::1]:80/hello":                        "http://[2001:db8::1]:80/hello",
+		"http://[2001:db8::1]/hello":                           "http://[2001:db8::1]:9200/hello",
+		"https://[2001:db8::1]:9200/hello":                     "https://[2001:db8::1]:9200/hello",
+		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329/hello": "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200/hello",
 
 		// no schema + ipv6
-		"[2001:db8::1]:80": "http://[2001:db8::1]:80",
+		"2001:db8::1":            "http://[2001:db8::1]:9200",
+		"[2001:db8::1]:80":       "http://[2001:db8::1]:80",
+		"[2001:db8::1]":          "http://[2001:db8::1]:9200",
+		"2001:db8::1/hello":      "http://[2001:db8::1]:9200/hello",
+		"[2001:db8::1]:80/hello": "http://[2001:db8::1]:80/hello",
+		"[2001:db8::1]/hello":    "http://[2001:db8::1]:9200/hello",
 	}
 
 	for input, output := range inputOutput {
 		urlNew, err := getURL("http", "", input)
 		assert.Nil(t, err)
-		assert.Equal(t, output, urlNew)
+		assert.Equal(t, output, urlNew, fmt.Sprintf("input: %v", input))
 	}
 
 	inputOutputWithDefaults := map[string]string{
