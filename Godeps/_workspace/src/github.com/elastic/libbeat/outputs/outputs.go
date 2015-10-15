@@ -13,6 +13,7 @@ type MothershipConfig struct {
 	Host               string
 	Port               int
 	Hosts              []string
+	LoadBalance        *bool
 	Protocol           string
 	Username           string
 	Password           string
@@ -29,11 +30,7 @@ type MothershipConfig struct {
 	Flush_interval     *int
 	Bulk_size          *int
 	Max_retries        *int
-	TLS                *bool
-	Certificate        string
-	CertificateKey     string
-	CAs                []string
-	TLSInsecure        *bool
+	TLS                *TLSConfig
 }
 
 type Outputer interface {
