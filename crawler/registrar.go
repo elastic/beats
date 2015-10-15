@@ -2,7 +2,9 @@ package crawler
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
 
 	cfg "github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
@@ -21,17 +23,17 @@ type Registrar struct {
 	Channel chan []*FileEvent
 }
 
-func NewRegistrar(registryFile string) *Registrar {
+func NewRegistrar(registryFile string) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
 	}
-	r.Init()
+	err := r.Init()
 
-	return r
+	return r, err
 }
 
-func (r *Registrar) Init() {
+func (r *Registrar) Init() error {
 	// Init state
 	r.Persist = make(chan *FileState)
 	r.State = make(map[string]*FileState)
@@ -42,7 +44,19 @@ func (r *Registrar) Init() {
 		r.registryFile = cfg.DefaultRegistryFile
 	}
 
+	// Make sure the directory where we store the registryFile exists
+	absPath, err := filepath.Abs(r.registryFile)
+	if err != nil {
+		return fmt.Errorf("Failed to get the absolute path for %s: %v", r.registryFile, err)
+	}
+	err = os.MkdirAll(filepath.Dir(absPath), 0755)
+	if err != nil {
+		return fmt.Errorf("Failed to created folder %s: %v", filepath.Dir(absPath), err)
+	}
+
 	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)
+
+	return nil
 }
 
 // loadState fetches the previous reading state from the configure RegistryFile file
