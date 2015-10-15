@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	lumberjackDefaultHost     = "localhost"
-	lumberjackTestDefaultPort = "12345"
+	logstashDefaultHost     = "localhost"
+	logstashTestDefaultPort = "12345"
 
 	elasticsearchDefaultHost = "localhost"
 	elasticsearchDefaultPort = "9200"
@@ -47,10 +47,10 @@ func getenv(name, defaultValue string) string {
 	return strDefault(os.Getenv(name), defaultValue)
 }
 
-func getLumberjackHost() string {
+func getLogstashHost() string {
 	return fmt.Sprintf("%v:%v",
-		getenv("LS_HOST", lumberjackDefaultHost),
-		getenv("LS_LUMBERJACK_TCP_PORT", lumberjackTestDefaultPort),
+		getenv("LS_HOST", logstashDefaultHost),
+		getenv("LS_TCP_PORT", logstashTestDefaultPort),
 	)
 }
 

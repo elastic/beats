@@ -117,9 +117,9 @@ func TestApplyEmptyConfig(t *testing.T) {
 func TestApplyWithConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(&TLSConfig{
 		Disabled:       false,
-		Certificate:    "lumberjack/ca_test.pem",
-		CertificateKey: "lumberjack/ca_test.key",
-		CAs:            []string{"lumberjack/ca_test.pem"},
+		Certificate:    "logstash/ca_test.pem",
+		CertificateKey: "logstash/ca_test.key",
+		CAs:            []string{"logstash/ca_test.pem"},
 		Insecure:       true,
 		CipherSuites: []string{
 			"ECDHE-ECDSA-AES-256-CBC-SHA",

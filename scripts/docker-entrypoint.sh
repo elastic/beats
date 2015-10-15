@@ -23,7 +23,7 @@ readParams() {
   # Use default ports if not specified.
   : ${ES_PORT:=9200}
   : ${REDIS_PORT:=6379}
-  : ${LS_LUMBERJACK_TCP_PORT:=12345}
+  : ${LS_TCP_PORT:=12345}
 }
 
 # Wait for elasticsearch to start. It requires that the status be either
@@ -53,9 +53,9 @@ waitForElasticsearch() {
 }
 
 waitForLogstash() {
-    echo -n "Waiting for logstash(${LS_HOST}:${LS_LUMBERJACK_TCP_PORT}) to start."
+    echo -n "Waiting for logstash(${LS_HOST}:${LS_TCP_PORT}) to start."
     for ((i=1; i<=90; i++)) do
-        if nc -vz ${LS_HOST} ${LS_LUMBERJACK_TCP_PORT} 2>/dev/null; then
+        if nc -vz ${LS_HOST} ${LS_TCP_PORT} 2>/dev/null; then
             echo
             echo "Logstash is ready!"
             return 0
@@ -68,7 +68,7 @@ waitForLogstash() {
 
     echo
     echo >&2 'Logstash is not available'
-    echo >&2 "Address: ${LS_HOST}:${LS_LUMBERJACK_TCP_PORT}"
+    echo >&2 "Address: ${LS_HOST}:${LS_TCP_PORT}"
 }
 
 # Main
