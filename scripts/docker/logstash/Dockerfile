@@ -1,44 +1,42 @@
 # FROM logstash:2
 FROM java:8-jre
 
-ENV LOGSTASH_REPO https://github.com/elastic/logstash.git
+ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash_1.5.4-1_all.deb
+
 ENV LUMBERJACK_REPO https://github.com/urso/ruby-lumberjack.git
 ENV LUMBERJACK_PLUGIN_REPO https://github.com/urso/logstash-input-lumberjack.git
 
-ENV LOGSTASH_CHANGESET bfbb49dc14fbdc764254e13f90d23639703c0f06
 ENV LUMBERJACK_BRANCH dev/json
 ENV LUMBERJACK_PLUGIN_BRANCH beat_testing
 
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
-# add missing packages
 RUN set -x && \
+    mkdir -p /var/tmp && \
+    wget -qO /var/tmp/logstash.deb $DEB_URL && \
     apt-get update -y && \
-    apt-get install -y git rbenv rake && \
+    apt-get install -y logrotate git && \
+    dpkg -i /var/tmp/logstash.deb && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# clone repos + checkout dev branches
+# 1. clone repos + checkout dev branches
+# 2. patch lumberjack server module
+# 3. patch lumberjack plugin
 RUN set -x && \
     mkdir -p /opt/logstash && \
-    git clone $LOGSTASH_REPO /opt/logstash && \
     git clone $LUMBERJACK_REPO /ruby-lumberjack && \
     git clone $LUMBERJACK_PLUGIN_REPO /logstash-input-lumberjack && \
-    cd /opt/logstash && \
-    git checkout $LOGSTASH_CHANGESET && \
     cd /ruby-lumberjack && \
     git checkout -b $LUMBERJACK_BRANCH origin/$LUMBERJACK_BRANCH && \
-    gem build jls-lumberjack.gemspec && \
     cd /logstash-input-lumberjack && \
     git checkout -b $LUMBERJACK_PLUGIN_BRANCH origin/$LUMBERJACK_PLUGIN_BRANCH && \
-    gem build logstash-input-lumberjack.gemspec
-
-# install plugins
-RUN set -x && \
-    echo 'gem "jls-lumberjack", :path => "/ruby-lumberjack"' >> /opt/logstash/Gemfile && \
-    cd /opt/logstash && rake test:install-core && \
-    cd /logstash-input-lumberjack && \
-    plugin install --no-verify logstash-input-lumberjack*.gem && \
-    plugin install --no-verify logstash-output-elasticsearch
+    \
+    rm -fR /opt/logstash/vendor/bundle/jruby/1.9/gems/jls-lumberjack-*/* && \
+     cp -R /ruby-lumberjack/spec /ruby-lumberjack/lib /opt/logstash/vendor/bundle/jruby/1.9/gems/jls-lumberjack-*/ && \
+     \
+     rm -fR /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-input-lumberjack-*/lib && \
+    cp -R /logstash-input-lumberjack/lib /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-input-lumberjack-*/.
 
 COPY logstash.conf.tmpl /logstash.conf.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
@@ -46,3 +44,4 @@ COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD logstash agent -f /logstash.conf
+
