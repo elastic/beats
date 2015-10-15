@@ -63,13 +63,13 @@ output:
       #disabled: true
 
       # List of root certificates for HTTPS server verifications
-      #certificate-authorities: ["/etc/pki/root/ca.pem"]
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
       # Certificate for TLS client authentication
       #certificate: "/etc/pki/client/cert.pem"
 
       # Client Certificate Key
-      #certificate-key: "/etc/pki/client/cert.key"
+      #certificate_key: "/etc/pki/client/cert.key"
 
       # Controls whether the client verifies server certificates and host name.
       # If insecure is set to true, all server host names and certificates will be
@@ -78,10 +78,10 @@ output:
       #insecure: true
 
       # Configure cipher suites to be used for TLS connections
-      #cipher-suites: []
+      #cipher_suites: []
 
       # Configure curve types for ECDHE based cipher suites
-      #curve-types: []
+      #curve_types: []
 
 
   ### Redis as output
