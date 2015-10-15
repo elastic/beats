@@ -99,9 +99,14 @@ func (p *preprocessor) onMessage(m message) {
 // filterEvent validates an event for common required fields with types.
 // If event is to be filtered out the reason is returned as error.
 func filterEvent(event common.MapStr) error {
-	_, ok := event["timestamp"].(common.Time)
+	ts, ok := event["timestamp"]
 	if !ok {
 		return errors.New("Missing 'timestamp' field from event")
+	}
+
+	_, ok = ts.(common.Time)
+	if !ok {
+		return errors.New("Invalid 'timestamp' field from event.")
 	}
 
 	err := event.EnsureCountField()
