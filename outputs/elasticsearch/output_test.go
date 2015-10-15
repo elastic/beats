@@ -338,25 +338,37 @@ func TestGetUrl(t *testing.T) {
 	// List of inputs / outputs that must match after fetching url
 	// Setting a path without a scheme is not allowed. Example: 192.168.1.1:9200/hello
 	inputOutput := map[string]string{
-		"":                         "http://localhost:9200",
-		"http://localhost":         "http://localhost:9200",
-		"http://localhost/":        "http://localhost:9200/",
+		// shema + hostname
+		"":                  "http://localhost:9200",
+		"http://localhost":  "http://localhost:9200",
+		"http://localhost/": "http://localhost:9200/",
+
+		// no schema + hostname
+		"localhost":      "http://localhost:9200",
+		"localhost:1234": "http://localhost:1234",
+
+		// shema + ipv4
 		"http://192.168.1.1:9200":  "http://192.168.1.1:9200",
 		"https://192.168.1.1:9200": "https://192.168.1.1:9200",
 		"http://192.168.1.1":       "http://192.168.1.1:9200",
 		"http://192.168.1.1/hello": "http://192.168.1.1:9200/hello",
-		"192.168.1.1":              "http://192.168.1.1:9200",
-		"192.168.1.1:9200":         "http://192.168.1.1:9200",
-		// IPv6 addresses
-		"[2001:db8::1]:80":                               "http://[2001:db8::1]:80",
+
+		// no schema + ipv4
+		"192.168.1.1":      "http://192.168.1.1:9200",
+		"192.168.1.1:9200": "http://192.168.1.1:9200",
+
+		// schema + ipv6
 		"http://[2001:db8::1]:80":                        "http://[2001:db8::1]:80",
 		"http://[2001:db8::1]":                           "http://[2001:db8::1]:9200",
 		"https://[2001:db8::1]:9200":                     "https://[2001:db8::1]:9200",
 		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329": "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200",
+
+		// no schema + ipv6
+		"[2001:db8::1]:80": "http://[2001:db8::1]:80",
 	}
 
 	for input, output := range inputOutput {
-		urlNew, err := getUrl("http", "", input)
+		urlNew, err := getURL("http", "", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew)
 	}
@@ -367,7 +379,7 @@ func TestGetUrl(t *testing.T) {
 		"http://username:password@es.found.io:9324": "http://username:password@es.found.io:9324/hello",
 	}
 	for input, output := range inputOutputWithDefaults {
-		urlNew, err := getUrl("https", "/hello", input)
+		urlNew, err := getURL("https", "/hello", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew)
 	}
