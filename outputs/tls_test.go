@@ -64,15 +64,15 @@ func TestValuesSet(t *testing.T) {
 	cfg, err := load(`
     disabled: true
     certificate: mycert.pem
-    certificate-key: mycert.key
-    certificate-authorities: ["ca1.pem", "ca2.pem"]
+    certificate_key: mycert.key
+    certificate_authorities: ["ca1.pem", "ca2.pem"]
     insecure: true
-    cipher-suites:
+    cipher_suites:
       - ECDHE-ECDSA-AES-256-CBC-SHA
       - ECDHE-ECDSA-AES-256-GCM-SHA384
-    min-version: 1.1
-    max-version: 1.2
-    curve-types:
+    min_version: 1.1
+    max_version: 1.2
+    curve_types:
       - P-521
   `)
 

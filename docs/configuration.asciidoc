@@ -628,9 +628,9 @@ is 7 files.
 
 When set to true none of the TLS configuration options will be applied. Effect is similar to missing TLS configuration in output plugin.
 
-===== certificate-authorities
+===== certificate_authorities
 
-List of root certificates for server verifications. If certificate-authorities is empty or not set, the trusted certificate authorities of the host system will be employed.
+List of root certificates for server verifications. If certificate_authorities is empty or not set, the trusted certificate authorities of the host system will be employed.
 
 ===== certificate: "/etc/pki/client/cert.pem"
 
@@ -640,15 +640,15 @@ may fail if server requests client authentication. If TLS server does not
 require client authentication, the certificate will be loaded but not be
 requested/used by server.
 
-When configured, both certificate and certificate-key options are required.
+When configured, both certificate and certificate_key options are required.
 
-===== certificate-key: "/etc/pki/client/cert.key"
+===== certificate_key: "/etc/pki/client/cert.key"
 
 Client certificate key required to configure certificate for client
 authentication. If certificate is not configured, client authentication is
 not available in client.
 
-When configured, both certificate and certificate-key are required.
+When configured, both certificate and certificate_key are required.
 
 ===== insecure
 
@@ -657,9 +657,9 @@ If insecure is set to true, all server host names and certificates will be
 accepted. In this mode TLS based connections are susceptible to
 man-in-the-middle attacks. Use only for testing.
 
-===== cipher-suites
+===== cipher_suites
 
-Configure list of used cipher suites. First entry has highest priority. If cipher-suites config option is missing, the go crypto library its default suites configuration is used(recommended).
+Configure list of used cipher suites. First entry has highest priority. If cipher_suites config option is missing, the go crypto library its default suites configuration is used(recommended).
 
 
 List of allowed cipher suites names and their meanings.
@@ -709,7 +709,7 @@ The following cipher suites are available:
 * ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
 * ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
 
-===== curve-types
+===== curve_types
 
 Configure available curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
 

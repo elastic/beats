@@ -34,13 +34,13 @@ var (
 type TLSConfig struct {
 	Disabled       bool     `yaml:"disabled"`
 	Certificate    string   `yaml:"certificate"`
-	CertificateKey string   `yaml:"certificate-key"`
-	CAs            []string `yaml:"certificate-authorities"`
+	CertificateKey string   `yaml:"certificate_key"`
+	CAs            []string `yaml:"certificate_authorities"`
 	Insecure       bool     `yaml:"insecure,omitempty"`
-	CipherSuites   []string `yaml:"cipher-suites"`
-	MinVersion     string   `yaml:"min-version,omitempty"`
-	MaxVersion     string   `yaml:"max-version,omitempty"`
-	CurveTypes     []string `yaml:"curve-types"`
+	CipherSuites   []string `yaml:"cipher_suites"`
+	MinVersion     string   `yaml:"min_version,omitempty"`
+	MaxVersion     string   `yaml:"max_version,omitempty"`
+	CurveTypes     []string `yaml:"curve_types"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
