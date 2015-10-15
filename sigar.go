@@ -156,11 +156,11 @@ func GetMemory() (*MemStat, error) {
 	}
 
 	return &MemStat{
-		Total:      mem.Total / 1024,
-		Used:       mem.Used / 1024,
-		Free:       mem.Free / 1024,
-		ActualFree: mem.ActualFree / 1024,
-		ActualUsed: mem.ActualUsed / 1024,
+		Total:      mem.Total,
+		Used:       mem.Used,
+		Free:       mem.Free,
+		ActualFree: mem.ActualFree,
+		ActualUsed: mem.ActualUsed,
 	}, nil
 }
 
@@ -234,9 +234,9 @@ func GetProcess(pid int) (*Process, error) {
 		Name:  state.Name,
 		State: getProcState(byte(state.State)),
 		Mem: &ProcMemStat{
-			Size:  mem.Size / 1024,
-			Rss:   mem.Resident / 1024,
-			Share: mem.Share / 1024,
+			Size:  mem.Size,
+			Rss:   mem.Resident,
+			Share: mem.Share,
 		},
 		Cpu: &ProcCpuTime{
 			Start:  cpu.FormatStartTime(),
