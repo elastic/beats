@@ -32,5 +32,6 @@ All notable changes to this project will be documented in this file based on the
 - Publish expired DNS transactions #301
 - Update protocol guide to libbeat changes
 - Add protocol registration to new protocol guide
+- Make transaction timeouts configurable #300
 
 ### Deprecated

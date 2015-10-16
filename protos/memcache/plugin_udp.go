@@ -66,8 +66,6 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
-const defaultUdpTransDuration uint = 200
-
 func (mc *Memcache) ParseUdp(pkt *protos.Packet) {
 	defer logp.Recover("ParseMemcache(UDP) exception")
 

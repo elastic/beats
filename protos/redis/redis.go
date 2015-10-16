@@ -245,7 +245,8 @@ type Redis struct {
 	Send_request  bool
 	Send_response bool
 
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	results publisher.Client
 }
@@ -261,17 +262,21 @@ func (redis *Redis) getTransaction(k common.HashableTcpTuple) *RedisTransaction 
 func (redis *Redis) InitDefaults() {
 	redis.Send_request = false
 	redis.Send_response = false
+	redis.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (redis *Redis) setFromConfig(config config.Redis) error {
 
 	redis.Ports = config.Ports
 
-	if config.Send_request != nil {
-		redis.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		redis.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		redis.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		redis.Send_response = *config.SendResponse
+	}
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		redis.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
 	}
 	return nil
 }
@@ -286,9 +291,10 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
-	redis.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	redis.transactions = common.NewCache(
+		redis.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	redis.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	redis.transactions.StartJanitor(redis.transactionTimeout)
 	redis.results = results
 
 	return nil
@@ -506,6 +512,10 @@ func readLine(data []byte, offset int) (bool, string, int) {
 
 type redisPrivateData struct {
 	Data [2]*RedisStream
+}
+
+func (redis *Redis) ConnectionTimeout() time.Duration {
+	return redis.transactionTimeout
 }
 
 func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,

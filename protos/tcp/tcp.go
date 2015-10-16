@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
@@ -122,12 +123,19 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 				// don't follow
 				return
 			}
+
+			timeout := time.Duration(0)
+			mod := tcp.protocols.GetTcp(protocol)
+			if mod != nil {
+				timeout = mod.ConnectionTimeout()
+			}
+
 			logp.Debug("tcp", "Stream doesn't exist, creating new")
 
 			// create
 			stream = &TcpStream{id: tcp.getId(), tuple: &pkt.Tuple, protocol: protocol, tcp: tcp}
 			stream.tcptuple = common.TcpTupleFromIpPort(stream.tuple, stream.id)
-			tcp.streams.Put(pkt.Tuple.Hashable(), stream)
+			tcp.streams.PutWithTimeout(pkt.Tuple.Hashable(), stream, timeout)
 			created = true
 		} else {
 			original_dir = TcpDirectionReverse
@@ -195,7 +203,8 @@ func NewTcp(p protos.Protocols) (*Tcp, error) {
 	tcp := &Tcp{
 		protocols: p,
 		portMap:   portMap,
-		streams: common.NewCache(protos.DefaultTransactionExpiration,
+		streams: common.NewCache(
+			protos.DefaultTransactionExpiration,
 			protos.DefaultTransactionHashSize),
 	}
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)

@@ -21,6 +21,7 @@ type clock func() time.Time
 // An element stored in the cache.
 type element struct {
 	expiration time.Time
+	timeout    time.Duration
 	value      Value
 }
 
@@ -86,6 +87,15 @@ func newCache(d time.Duration, initialSize int, l RemovalListener, t clock) *Cac
 // absent from the cache. Nil is returned if the key-value pair were written,
 // otherwise the old value is returned.
 func (c *Cache) PutIfAbsent(k Key, v Value) Value {
+	return c.PutIfAbsentWithTimeout(k, v, 0)
+}
+
+// PutIfAbsentWithTimeout writes the given key and value to the cache only if
+// the key is absent from the cache. Nil is returned if the key-value pair were
+// written, otherwise the old value is returned.
+// The cache expiration time will be overwritten by timeout of the key being
+// inserted.
+func (c *Cache) PutIfAbsentWithTimeout(k Key, v Value, timeout time.Duration) Value {
 	c.Lock()
 	defer c.Unlock()
 	oldValue, exists := c.get(k)
@@ -93,7 +103,7 @@ func (c *Cache) PutIfAbsent(k Key, v Value) Value {
 		return oldValue
 	}
 
-	c.put(k, v)
+	c.put(k, v, timeout)
 	return nil
 }
 
@@ -101,16 +111,33 @@ func (c *Cache) PutIfAbsent(k Key, v Value) Value {
 // if it exists. The previous value associated with the key returned or nil
 // if the key was not present.
 func (c *Cache) Put(k Key, v Value) Value {
+	return c.PutWithTimeout(k, v, 0)
+}
+
+// PutWithTimeout writes the given key and value to the map replacing any
+// existing value if it exists. The previous value associated with the key
+// returned or nil if the key was not present.
+// The cache expiration time will be overwritten by timeout of the key being
+// inserted.
+func (c *Cache) PutWithTimeout(k Key, v Value, timeout time.Duration) Value {
 	c.Lock()
 	defer c.Unlock()
 	oldValue, _ := c.get(k)
-	c.put(k, v)
+	c.put(k, v, timeout)
 	return oldValue
 }
 
 // Replace overwrites the value for a key only if the key exists. The old
 // value is returned if the value is updated, otherwise nil is returned.
 func (c *Cache) Replace(k Key, v Value) Value {
+	return c.ReplaceWithTimeout(k, v, 0)
+}
+
+// ReplaceWithTimeout overwrites the value for a key only if the key exists. The
+// old value is returned if the value is updated, otherwise nil is returned.
+// The cache expiration time will be overwritten by timeout of the key being
+// inserted.
+func (c *Cache) ReplaceWithTimeout(k Key, v Value, timeout time.Duration) Value {
 	c.Lock()
 	defer c.Unlock()
 	oldValue, exists := c.get(k)
@@ -118,7 +145,7 @@ func (c *Cache) Replace(k Key, v Value) Value {
 		return nil
 	}
 
-	c.put(k, v)
+	c.put(k, v, timeout)
 	return oldValue
 }
 
@@ -210,20 +237,24 @@ func (c *Cache) get(k Key) (Value, bool) {
 	elem, exists := c.elements[k]
 	now := c.clock()
 	if exists && !elem.IsExpired(now) {
-		elem.UpdateLastAccessTime(now, c.timeout)
+		elem.UpdateLastAccessTime(now, elem.timeout)
 		return elem.value, true
 	}
 	return nil, false
 }
 
 // put writes a key-value to the cache replacing any existing mapping.
-func (c *Cache) put(k Key, v Value) {
+func (c *Cache) put(k Key, v Value, timeout time.Duration) {
 	if v == nil {
 		panic("Cache does not support storing nil values.")
 	}
 
+	if timeout <= 0 {
+		timeout = c.timeout
+	}
 	c.elements[k] = &element{
-		expiration: c.clock().Add(c.timeout),
+		expiration: c.clock().Add(timeout),
+		timeout:    timeout,
 		value:      v,
 	}
 }

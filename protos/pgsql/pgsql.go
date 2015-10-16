@@ -96,8 +96,10 @@ type Pgsql struct {
 	Send_request  bool
 	Send_response bool
 
-	transactions *common.Cache
-	results      publisher.Client
+	transactions       *common.Cache
+	transactionTimeout time.Duration
+
+	results publisher.Client
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -117,6 +119,7 @@ func (pgsql *Pgsql) InitDefaults() {
 	pgsql.maxStoreRows = 10
 	pgsql.Send_request = false
 	pgsql.Send_response = false
+	pgsql.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
@@ -129,11 +132,14 @@ func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
 	if config.Max_rows != nil {
 		pgsql.maxStoreRows = *config.Max_rows
 	}
-	if config.Send_request != nil {
-		pgsql.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		pgsql.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		pgsql.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		pgsql.Send_response = *config.SendResponse
+	}
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		pgsql.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
 	}
 	return nil
 }
@@ -152,9 +158,10 @@ func (pgsql *Pgsql) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	pgsql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	pgsql.transactions = common.NewCache(
+		pgsql.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	pgsql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	pgsql.transactions.StartJanitor(pgsql.transactionTimeout)
 	pgsql.handlePgsql = handlePgsql
 	pgsql.results = results
 
@@ -647,6 +654,10 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 
 type pgsqlPrivateData struct {
 	Data [2]*PgsqlStream
+}
+
+func (pgsql *Pgsql) ConnectionTimeout() time.Duration {
+	return pgsql.transactionTimeout
 }
 
 func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,

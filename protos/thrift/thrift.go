@@ -150,7 +150,8 @@ type Thrift struct {
 	TransportType byte
 	ProtocolType  byte
 
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	PublishQueue chan *ThriftTransaction
 	results      publisher.Client
@@ -178,6 +179,7 @@ func (thrift *Thrift) InitDefaults() {
 	thrift.ObfuscateStrings = false
 	thrift.Send_request = false
 	thrift.Send_response = false
+	thrift.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (thrift *Thrift) readConfig(config config.Thrift) error {
@@ -225,11 +227,11 @@ func (thrift *Thrift) readConfig(config config.Thrift) error {
 		}
 	}
 
-	if config.Send_request != nil {
-		thrift.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		thrift.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		thrift.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		thrift.Send_response = *config.SendResponse
 	}
 
 	return nil
@@ -250,9 +252,10 @@ func (thrift *Thrift) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	thrift.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	thrift.transactions = common.NewCache(
+		thrift.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	thrift.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	thrift.transactions.StartJanitor(thrift.transactionTimeout)
 
 	if !test_mode {
 		thrift.PublishQueue = make(chan *ThriftTransaction, 1000)
@@ -879,6 +882,10 @@ func (thrift *Thrift) messageComplete(tcptuple *common.TcpTuple, dir uint8,
 	// and reset message
 	stream.PrepareForNewMessage(flush)
 
+}
+
+func (thrift *Thrift) ConnectionTimeout() time.Duration {
+	return thrift.transactionTimeout
 }
 
 func (thrift *Thrift) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,

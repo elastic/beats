@@ -238,6 +238,10 @@ is sent to Elasticsearch. The default is false.  This is useful in case you
 want to index the whole request. Note that for HTTP, the body is not included
 by default, only the HTTP headers.
 
+===== transaction_timeout
+
+Per protocol transaction timeout. Expired transaction won't be correlated to incoming responses anymore, but sent to Elasticsearch immediately.
+
 
 ==== DNS configuration
 
@@ -403,8 +407,8 @@ fields.
     parseunknown: false
     maxvalues: 0
     maxbytespervalue: 100
+    transaction_timeout: 200
     udptransactiontimeout: 200
-    tcptransactiontimeout: 200
 ------------------------------------------------------------------------------
 
 ===== parseunknown
@@ -432,20 +436,13 @@ maxbytespervalue.
 
 ===== udptransactiontimeout
 
-Transaction timeout in milliseconds. Default 200ms.
+Transaction timeout in milliseconds. Defaults to 10000 milliseconds.
 
 Note:
 Quiet messages in UDP binary protocol will get response only in error case.
 The memcache protocol analyzer will wait for udptransactiontimeout milliseconds
 before publishing quiet messages. Non quiet messages or quiet requests with
 error response will not have to wait for the timeout.
-
-===== tcptransactiontimeout
-
-Transaction timeout in milliseconds. Default 200ms.
-
-Time until all unfinished tcp based transactions will be published if there is
-no activity on the TCP stream.
 
 
 ==== MySQL and PgSQL configuration

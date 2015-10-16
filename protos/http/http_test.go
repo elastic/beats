@@ -1373,8 +1373,8 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	config.Ports = []int{80, 8080}
 
 	trueVar := true
-	config.Send_request = &trueVar
-	config.Send_response = &trueVar
+	config.SendRequest = &trueVar
+	config.SendResponse = &trueVar
 	config.Hide_keywords = []string{"a", "b"}
 	config.Redact_authorization = &trueVar
 	config.Send_all_headers = &trueVar
@@ -1388,8 +1388,8 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	// Check if http config is set correctly
 	assert.Equal(t, config.Ports, http.Ports)
 	assert.Equal(t, config.Ports, http.GetPorts())
-	assert.Equal(t, *config.Send_request, http.Send_request)
-	assert.Equal(t, *config.Send_response, http.Send_response)
+	assert.Equal(t, *config.SendRequest, http.Send_request)
+	assert.Equal(t, *config.SendResponse, http.Send_response)
 	assert.Equal(t, config.Hide_keywords, http.Hide_keywords)
 	assert.Equal(t, *config.Redact_authorization, http.Redact_authorization)
 	assert.True(t, http.Send_headers)

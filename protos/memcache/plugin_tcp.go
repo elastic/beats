@@ -72,6 +72,10 @@ func isMemcacheConnection(private protos.ProtocolData) bool {
 	return ok
 }
 
+func (mc *Memcache) ConnectionTimeout() time.Duration {
+	return mc.tcpTransTimeout
+}
+
 // Parse is called from TCP layer when payload data is available for parsing.
 func (mc *Memcache) Parse(
 	pkt *protos.Packet,

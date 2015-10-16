@@ -225,7 +225,8 @@ type Dns struct {
 
 	// Cache of active DNS transactions. The map key is the HashableDnsTuple
 	// associated with the request.
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	results publisher.Client // Channel where results are pushed.
 }
@@ -257,17 +258,18 @@ func (dns *Dns) initDefaults() {
 	dns.Send_response = false
 	dns.Include_authorities = false
 	dns.Include_additionals = false
+	dns.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (dns *Dns) setFromConfig(config config.Dns) error {
 
 	dns.Ports = config.Ports
 
-	if config.Send_request != nil {
-		dns.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		dns.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		dns.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		dns.Send_response = *config.SendResponse
 	}
 	if config.Include_authorities != nil {
 		dns.Include_authorities = *config.Include_authorities
@@ -275,6 +277,10 @@ func (dns *Dns) setFromConfig(config config.Dns) error {
 	if config.Include_additionals != nil {
 		dns.Include_additionals = *config.Include_additionals
 	}
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		dns.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
+	}
+
 	return nil
 }
 
@@ -285,7 +291,7 @@ func (dns *Dns) Init(test_mode bool, results publisher.Client) error {
 	}
 
 	dns.transactions = common.NewCacheWithRemovalListener(
-		protos.DefaultTransactionExpiration,
+		dns.transactionTimeout,
 		protos.DefaultTransactionHashSize,
 		func(k common.Key, v common.Value) {
 			trans, ok := v.(*DnsTransaction)
@@ -295,7 +301,7 @@ func (dns *Dns) Init(test_mode bool, results publisher.Client) error {
 			}
 			dns.expireTransaction(trans)
 		})
-	dns.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	dns.transactions.StartJanitor(dns.transactionTimeout)
 
 	dns.results = results
 

@@ -19,13 +19,39 @@ var (
 
 	// ErrKeyNoCertificate indicate a configuration error with missing certificate file
 	ErrKeyNoCertificate = errors.New("certificate file not configured")
+
+	// ErrInvalidTLSVersion indicates an unknown tls version string given.
+	ErrInvalidTLSVersion = errors.New("invalid TLS version string")
+
+	// ErrUnknownCipherSuite indicates an unknown tls cipher suite being used
+	ErrUnknownCipherSuite = errors.New("unknown cypher suite")
+
+	// ErrUnknownCurveID indicates an unknown curve id has been configured
+	ErrUnknownCurveID = errors.New("unknown curve id")
 )
+
+// TLSConfig defines config file options for TLS clients.
+type TLSConfig struct {
+	Disabled       bool     `yaml:"disabled"`
+	Certificate    string   `yaml:"certificate"`
+	CertificateKey string   `yaml:"certificate_key"`
+	CAs            []string `yaml:"certificate_authorities"`
+	Insecure       bool     `yaml:"insecure,omitempty"`
+	CipherSuites   []string `yaml:"cipher_suites"`
+	MinVersion     string   `yaml:"min_version,omitempty"`
+	MaxVersion     string   `yaml:"max_version,omitempty"`
+	CurveTypes     []string `yaml:"curve_types"`
+}
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
 // defined. If Certificate and CertificateKey are configured, client authentication
 // will be configured. If no CAs are configured, the host CA will be used by go
 // built-in TLS support.
-func LoadTLSConfig(config MothershipConfig) (*tls.Config, error) {
+func LoadTLSConfig(config *TLSConfig) (*tls.Config, error) {
+	if config == nil || config.Disabled {
+		return nil, nil
+	}
+
 	certificate := config.Certificate
 	key := config.CertificateKey
 	rootCAs := config.CAs
@@ -63,19 +89,103 @@ func LoadTLSConfig(config MothershipConfig) (*tls.Config, error) {
 		}
 	}
 
-	insecureSkipVerify := false
-	if config.TLSInsecure != nil {
-		insecureSkipVerify = *config.TLSInsecure
+	minVersion, err := parseTLSVersion(config.MinVersion)
+	if err != nil {
+		return nil, err
+	}
+	if minVersion == 0 {
+		// require minimum TLS-1.1 if not configured
+		minVersion = tls.VersionTLS11
 	}
 
-	// Support minimal TLS 1.0.
-	// TODO: check supported JRuby versions for logstash supported
-	//       TLS 1.1 and switch
+	maxVersion, err := parseTLSVersion(config.MaxVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	cipherSuites, err := parseTLSCipherSuites(config.CipherSuites)
+	if err != nil {
+		return nil, err
+	}
+
+	curveIDs, err := parseCurveTypes(config.CurveTypes)
+	if err != nil {
+		return nil, err
+	}
+
 	tlsConfig := tls.Config{
-		MinVersion:         tls.VersionTLS10,
+		MinVersion:         minVersion,
+		MaxVersion:         maxVersion,
 		Certificates:       certs,
 		RootCAs:            roots,
-		InsecureSkipVerify: insecureSkipVerify,
+		InsecureSkipVerify: config.Insecure,
+		CipherSuites:       cipherSuites,
+		CurvePreferences:   curveIDs,
 	}
 	return &tlsConfig, nil
+}
+
+func parseTLSVersion(s string) (uint16, error) {
+	versions := map[string]uint16{
+		"":        0,
+		"SSL-3.0": tls.VersionSSL30,
+		"1.0":     tls.VersionTLS10,
+		"1.1":     tls.VersionTLS11,
+		"1.2":     tls.VersionTLS12,
+	}
+
+	id, ok := versions[s]
+	if !ok {
+		return 0, ErrInvalidTLSVersion
+	}
+	return id, nil
+}
+
+func parseTLSCipherSuites(names []string) ([]uint16, error) {
+	suites := map[string]uint16{
+		"RSA-RC4-128-SHA":                tls.TLS_RSA_WITH_RC4_128_SHA,
+		"RSA-3DES-CBC3-SHA":              tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+		"RSA-AES-128-CBC-SHA":            tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+		"RSA-AES-256-CBC-SHA":            tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		"ECDHE-ECDSA-RC4-128-SHA":        tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA,
+		"ECDHE-ECDSA-AES-128-CBC-SHA":    tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+		"ECDHE-ECDSA-AES-256-CBC-SHA":    tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+		"ECDHE-RSA-RC4-128-SHA":          tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA,
+		"ECDHE-RSA-3DES-CBC3-SHA":        tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+		"ECDHE-RSA-AES-128-CBC-SHA":      tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+		"ECDHE-RSA-AES-256-CBC-SHA":      tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+		"ECDHE-RSA-AES-128-GCM-SHA256":   tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		"ECDHE-ECDSA-AES-128-GCM-SHA256": tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+		"ECDHE-RSA-AES-256-GCM-SHA384":   tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+		"ECDHE-ECDSA-AES-256-GCM-SHA384": tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+	}
+
+	var list []uint16
+	for _, name := range names {
+		id, ok := suites[name]
+		if !ok {
+			return nil, ErrUnknownCipherSuite
+		}
+
+		list = append(list, id)
+	}
+	return list, nil
+}
+
+func parseCurveTypes(names []string) ([]tls.CurveID, error) {
+	curveIDs := map[string]tls.CurveID{
+		"P-256": tls.CurveP256,
+		"P-384": tls.CurveP384,
+		"P-521": tls.CurveP521,
+	}
+
+	var list []tls.CurveID
+	for _, name := range names {
+		id, ok := curveIDs[name]
+		if !ok {
+			return nil, ErrUnknownCurveID
+		}
+		list = append(list, id)
+	}
+	return list, nil
 }
