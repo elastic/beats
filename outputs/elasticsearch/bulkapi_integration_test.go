@@ -15,6 +15,7 @@ func TestBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
+
 	es := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -68,6 +69,7 @@ func TestEmptyBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
+
 	es := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -92,6 +94,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
+
 	es := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 

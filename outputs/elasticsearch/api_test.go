@@ -1,11 +1,9 @@
 package elasticsearch
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
-	"github.com/elastic/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,11 +31,9 @@ func GetEsHost() string {
 	return host
 }
 
-func GetTestingElasticsearch() *Elasticsearch {
-
+func GetTestingElasticsearch() *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
-
-	return NewElasticsearch([]string{address}, nil, "", "")
+	return NewClient(address, "", nil, "", "")
 }
 
 func GetValidQueryResult() QueryResult {
@@ -144,53 +140,6 @@ func TestMakePath(t *testing.T) {
 		t.Errorf("Wrong path created: %s", path)
 	}
 
-}
-
-func TestIndex(t *testing.T) {
-
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Elasticsearch")
-	}
-
-	es := GetTestingElasticsearch()
-
-	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
-
-	body := map[string]interface{}{
-		"user":      "test",
-		"post_date": "2009-11-15T14:12:12",
-		"message":   "trying out",
-	}
-	params := map[string]string{
-		"refresh": "true",
-	}
-	resp, err := es.Index(index, "test", "1", params, body)
-	if err != nil {
-		t.Errorf("Index() returns error: %s", err)
-	}
-	if !resp.Created {
-		t.Errorf("Index() fails: %s", resp)
-	}
-
-	params = map[string]string{
-		"q": "user:test",
-	}
-	result, err := es.SearchURI(index, "test", params)
-	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
-	}
-	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
-	}
-
-	resp, err = es.Delete(index, "test", "1", nil)
-	if err != nil {
-		t.Errorf("Delete() returns error: %s", err)
-	}
 }
 
 func TestReadQueryResult(t *testing.T) {
