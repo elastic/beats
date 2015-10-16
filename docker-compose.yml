@@ -15,7 +15,7 @@ libbeat:
 elasticsearch-172:
   image: elasticsearch:1.7.2
 elasticsearch-200:
-  image: elasticsearch:2.0.0-beta2
+  image: elasticsearch:2.0.0-rc1
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis
