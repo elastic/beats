@@ -10,9 +10,10 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 
 ### Added
+- Add logstash output plugin
 
 ### Improvements
-- Add tls configuration support to elasticsearch and lumberjack outputers
+- Add tls configuration support to elasticsearch and logstash outputers
 
 ### Deprecated
 

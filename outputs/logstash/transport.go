@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 import (
 	"crypto/tls"

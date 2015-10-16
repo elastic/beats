@@ -149,7 +149,7 @@ Multiple outputs can be configured for exporting the correlated transactions.
 Currently the following output types are supported:
 
 * Elasticsearch
-* Lumberjack (Logstash)
+* Logstash
 * Redis
 * File
 
@@ -366,11 +366,11 @@ elasticsearch.
 See <<configuration-output-tls>> for available TLS configuration options.
 
 
-[[lumberjack-output]]
-==== Lumberjack (Logstash) Output
+[[logstash-output]]
+==== Logstash Output
 
-The lumberjack output sends the events directly to logstash using the lumberjack
-protocol. The logstash-input-lumberjack plugin must be installed and configured
+The logstash output sends the events directly to logstash using the lumberjack
+protocol. The logstash-input-beats plugin must be installed and configured
 in logstash. Logstash will allow for additional processing and routing of
 generated events.
 
@@ -411,7 +411,7 @@ Example configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
-  lumberjack:
+  logstash:
     enabled: true
 
     hosts:
@@ -422,7 +422,7 @@ output:
     # configure index prefix name
     index: mybeat
 
-    # configure lumberjack to loadbalance events between logstash instances
+    # configure logstash plugin to loadbalance events between logstash instances
     loadbalance: true
 
     tls:
@@ -432,7 +432,7 @@ output:
 
 ===== enabled
 
-Boolean option that enables lumberjack output. The default is true.
+Boolean option that enables logstash output. The default is true.
 
 ===== hosts
 
@@ -460,14 +460,14 @@ For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `pack
 
 ===== tls
 
-TLS configuration like root CA for the lumberjack connections. See
+TLS configuration like root CA for the logstash connections. See
 <<configuration-output-tls>> for TLS options. If missing or tls.disabled is set to
 true, a TCP only connection is assumed. Logstash must also be configured to use
-TCP for lumberjack input.
+TCP for logstash input.
 
 ===== timeout
 
-Lumberjack connection timeout waiting for responses from logstash server.
+Logstash connection timeout waiting for responses from logstash server.
 
 ===== max_retries
 

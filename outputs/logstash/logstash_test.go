@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 import (
 	"crypto/rand"
@@ -46,20 +46,20 @@ func newTestLumberjackOutput(
 		config = &outputs.MothershipConfig{
 			Enabled: true,
 			TLS:     nil,
-			Hosts:   []string{getLumberjackHost()},
+			Hosts:   []string{getLogstashHost()},
 			Index:   testLogstashIndex(test),
 		}
 
 	}
 
-	plugin := outputs.FindOutputPlugin("lumberjack")
+	plugin := outputs.FindOutputPlugin("logstash")
 	if plugin == nil {
-		t.Fatalf("No lumberjack output plugin found")
+		t.Fatalf("No logstash output plugin found")
 	}
 
 	output, err := plugin.NewOutput("test", config, 0)
 	if err != nil {
-		t.Fatalf("init lumberjack output plugin failed: %v", err)
+		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
 
 	return output.(outputs.BulkOutputer)
@@ -190,7 +190,7 @@ func genCertsIfMIssing(
 	return nil
 }
 
-func TestLumberjackTCP(t *testing.T) {
+func TestLogstashTCP(t *testing.T) {
 	var serverErr error
 	var win, data *message
 
@@ -277,7 +277,7 @@ func TestLumberjackTCP(t *testing.T) {
 	assert.Equal(t, "message", data.doc["line"])
 }
 
-func TestLumberjackTLS(t *testing.T) {
+func TestLogstashTLS(t *testing.T) {
 	pem := "ca_test.pem"
 	key := "ca_test.key"
 
