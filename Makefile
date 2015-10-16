@@ -70,9 +70,14 @@ crosscompile: $(GOFILES)
 # default template
 .PHONY: install-cfg
 install-cfg:
-	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
 	cp etc/filebeat.template.json $(PREFIX)/filebeat.template.json
+	# linux
+	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
+	sed -i 's$#registryFile: .filebeat$registryFile: /var/lib/filebeat/registry' $(PREFIX)/filebeat-linux.yml
+	# binary
+	cp etc/filebeat.yml $(PREFIX)/filebeat-binary.yml
 	# darwin
 	cp etc/filebeat.yml $(PREFIX)/filebeat-darwin.yml
 	# win
 	cp etc/filebeat.yml $(PREFIX)/filebeat-win.yml
+	sed -i 's$#registryFile: .filebeat$registryFile: C:\ProgramData\filebeat\registry' $(PREFIX)/filebeat-windows.yml
