@@ -28,10 +28,13 @@ updatedeps:
 	$(GODEP) update ...
 
 # This is called by the beats-packer to obtain the configuration file
-.PHONY: install_cfg
-install_cfg:
-	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
+.PHONY: install-cfg
+install-cfg:
 	cp etc/packetbeat.template.json $(PREFIX)/packetbeat.template.json
+	# linux
+	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
+	# binary
+	cp etc/packetbeat.yml $(PREFIX)/packetbeat-binary.yml
 	# darwin
 	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
 	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
