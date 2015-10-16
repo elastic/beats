@@ -59,6 +59,13 @@ required: True
 For how many transactions is this event representative. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values.
 
 
+==== direction
+
+required: True
+
+Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
+
+
 ==== status
 
 required: True

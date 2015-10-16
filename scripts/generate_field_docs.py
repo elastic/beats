@@ -98,7 +98,7 @@ following categories:
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Usage: %s file.yml file.md" % sys.argv[0]
+        print "Usage: %s file.yml file.asciidoc" % sys.argv[0]
         sys.exit(1)
 
     input = open(sys.argv[1], 'r')
