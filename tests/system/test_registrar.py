@@ -127,12 +127,15 @@ class Test(TestCase):
             path=os.path.abspath(self.working_dir) + "/log/*",
             registryFile="a/b/c/registry",
         )
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as f:
+            f.write("hello world\n")
         filebeat = self.start_filebeat()
-        # just need to give it enough time to initialize
         self.wait_until(
             lambda: self.log_contains(
-                "Starting Registrar"),
-            max_timeout=3)
+                "Registrar: processing 1 events"),
+            max_timeout=15)
         filebeat.kill_and_wait()
 
         assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))
