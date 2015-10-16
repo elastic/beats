@@ -186,13 +186,6 @@ func (lj *logstash) BulkPublish(
 // the "message" field to "line". The lumberjack server in logstash will
 // decode/rename the "line" field into "message".
 func (lj *logstash) compatFix(event common.MapStr) {
-	if msg, hasMessage := event["message"]; hasMessage {
-		if _, hasLine := event["line"]; !hasLine {
-			event["line"] = msg
-			delete(event, "message")
-		}
-	}
-
 	// add metadata for indexing
 	ts := time.Time(event["timestamp"].(common.Time)).UTC()
 	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
