@@ -3,12 +3,6 @@ FROM java:8-jre
 
 ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash_1.5.4-1_all.deb
 
-ENV LUMBERJACK_REPO https://github.com/elastic/ruby-lumberjack.git
-ENV LUMBERJACK_PLUGIN_REPO https://github.com/ph/logstash-input-beats.git
-
-ENV LUMBERJACK_BRANCH fix/small-fixes-for-beats
-ENV LUMBERJACK_PLUGIN_BRANCH fix/initial-beats
-
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
 RUN set -x && \
@@ -19,6 +13,12 @@ RUN set -x && \
     dpkg -i /var/tmp/logstash.deb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+ENV LUMBERJACK_REPO https://github.com/elastic/ruby-lumberjack.git
+ENV LUMBERJACK_PLUGIN_REPO https://github.com/urso/logstash-input-beats.git
+
+ENV LUMBERJACK_BRANCH fix/small-fixes-for-beats
+ENV LUMBERJACK_PLUGIN_BRANCH fix/initial-beats
 
 # 1. clone repos + checkout dev branches
 # 2. patch lumberjack server module
