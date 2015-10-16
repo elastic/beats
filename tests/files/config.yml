@@ -12,9 +12,9 @@ filebeat:
         level: debug
         review: 1
         type: log
-      ignoreOlder: 24h
-      scanFrequency: 10s
-      harvesterBufferSize: 5000
+      ignore_older: 24h
+      scan_frequency: 10s
+      harvester_buffer_size: 5000
 
     -
       fields:
@@ -25,10 +25,10 @@ filebeat:
       fields:
       input: stdin
       # Paths is not required
-  spoolSize: 1024
-  idleTimeout: 5s
-  tailOnRotate:
-  configDir: "/prospectorConfigs/"
+  spool_size: 1024
+  idle_timeout: 5s
+  tail_on_rotate:
+  config_dir: "/prospectorConfigs/"
 
 
 # Additional stuff we should be ignore

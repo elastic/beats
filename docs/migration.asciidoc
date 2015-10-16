@@ -30,24 +30,24 @@ removed or moved to libbeat.
 |The config options was split up in two part. The base and required config is linked with -c. Additional config files can be linked as part of the config file.
 
 |`-config`
-|`configDir`
+|`config_dir`
 |Path to directory with additional configuration files
 
 |`-idle-timeout`
-|`idleTimeout`
-|`idleTimeout` was moved to the config file and removed as flag.
+|`idle_timeout`
+|`idle_timeout` was moved to the config file and removed as flag.
 
 |`-spool-size`
-|`spoolSize`
-|`spoolSize` was moved to the config file and removed as flag.
+|`spool_size`
+|`spool_size` was moved to the config file and removed as flag.
 
 |`-harvester-buff-size`
-|`harvesterBufferSize`
-|`harvesterBufferSize` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+|`harvester_buffer_size`
+|`harvester_buffer_size` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
 
 |`-tail`
-|`tailOnRotate`
-|`tailOnRotate` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+|`tail_on_rotate`
+|`tail_on_rotate` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
 
 |`-cpuProfileFile`
 |
@@ -79,7 +79,7 @@ With the refactoring of the configuration file, some options were also removed o
 |Action
 
 |`deadTime`
-|`deadTime` was renamed to `ignoreOlder`. In case a file is not changed for `ignoreOlder`, the file handler will be closed. If the file is changed again after ignoreOlder has passed, it is be reopened.
+|`deadTime` was renamed to `ignore_older`. In case a file is not changed for `ignore_older`, the file handler will be closed. If the file is changed again after ignore_older has passed, it is be reopened.
 
 |`netTimeout`
 |`netTimeout` was removed as it is replaced by the Timeout option in libbeat.
@@ -91,7 +91,7 @@ With the refactoring of the configuration file, some options were also removed o
 
 
 ==== Renamed config options
-* DeadTime was renamed to ignoreOlder
+* DeadTime was renamed to ignore_older
 
 
 ===  Registry file
@@ -101,7 +101,7 @@ The registry file stores the state and location from which Filbeat was reading l
 structure of the registry file has been changed. This makes a migration complex and leads to potential errors.
 
 Instead of a migration we recommend to start Filebeat on the same host and send the log files to a different index.
-This will start indexing from scratch. In case it is preferred to start at the end of all files, the option tailOnRotate
+This will start indexing from scratch. In case it is preferred to start at the end of all files, the option tail_on_rotate
 can be set to true.
 
 The above will allow to keep the old logstash-forwarder running and it can be slowly switched over to Filebeat.
