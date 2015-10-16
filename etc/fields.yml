@@ -125,6 +125,15 @@ event:
         UIs to return estimated values.
       required: true
 
+    - name: direction
+      required: true
+      description: >
+        Indicates whether the transaction is inbound (emitted by server)
+        or outbound (emitted by the client). Values can be in or out. No defaults.
+      possible_values:
+        - in
+        - out
+
     - name: status
       description: >
         High level status of the transaction. The way to compute this
