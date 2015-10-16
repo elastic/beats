@@ -1,6 +1,6 @@
 
 [[filebeat-configuration-details]]
-== Configuration 
+== Configuration
 
 Filebeat uses for most configuration a predefined default value. The most basic filebeat configuration
 looks as following. Please note that this excludes the libbeat configuration part.
@@ -92,46 +92,46 @@ filebeat:
 
       # Ignore files which were modified more then the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-      #ignoreOlder:
+      #ignore_older:
 
       # Scan frequency in seconds.
       # How often these files should be checked for changes. In case it is set
       # to 0s, it is done as often as possible. Default: 10s
-      #scanFrequency: 10s
+      #scan_frequency: 10s
 
       # Defines the buffer size every harvester uses when fetching the file
-      #harvesterBufferSize: 16384
+      #harvester_buffer_size: 16384
 
       # Always tail on log rotation. Disabled by default
       # Note: This may skip entries
-      #tailOnRotate: false
+      #tail_on_rotate: false
 -------------------------------------------------------------------------------------
 
 
-==== spoolSize
+==== spool_size
 
 Event count spool threshold - forces network flush if exceeded.
 
 -------------------------------------------------------------------------------------
 filebeat:
-  spoolSize: 1024
+  spool_size: 1024
 -------------------------------------------------------------------------------------
 
 
-==== idleTimeout
+==== idle_timeout
 
-Defines how often the spooler is flushed. After idleTimeout the spooler is
-Flush even though spoolSize is not reached. The value must be given as duration string.
+Defines how often the spooler is flushed. After idle_timeout the spooler is
+Flush even though spool_size is not reached. The value must be given as duration string.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
-  idleTimeout: 5s
+  idle_timeout: 5s
 -------------------------------------------------------------------------------------
 
 
 
-==== registryFile
+==== registry_file
 
 Name of the registry file. Per default it is put in the current working
 directory. In case the working directory is changed after when running
@@ -140,19 +140,19 @@ filebeat again, indexing starts from the beginning again.
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
-  registryFile: .filebeat
+  registry_file: .filebeat
 -------------------------------------------------------------------------------------
 
 
-==== configDir
+==== config_dir
 
 Full Path to directory with additional prospector configuration files. Each file must end with .yml
 These config files must have the full filbeat config hierarchy inside, but only
-the prospector part is processed. All global options like spoolSize are ignored.
+the prospector part is processed. All global options like spool_size are ignored.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
-  configDir: path/to/configs
+  config_dir: path/to/configs
 -------------------------------------------------------------------------------------
 

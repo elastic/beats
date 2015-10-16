@@ -35,7 +35,7 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	// Check if optional configDir is set to fetch additional prospector config files
+	// Check if optional config_dir is set to fetch additional prospector config files
 	fb.FbConfig.FetchConfigs()
 
 	return nil

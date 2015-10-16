@@ -5,4 +5,4 @@ filebeat:
         - /var/log/*.log
       input: log
 
-  spoolSize:
+  spool_size:

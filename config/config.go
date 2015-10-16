@@ -28,23 +28,23 @@ type Config struct {
 
 type FilebeatConfig struct {
 	Prospectors         []ProspectorConfig
-	SpoolSize           uint64 `yaml:"spoolSize"`
-	IdleTimeout         string `yaml:"idleTimeout"`
+	SpoolSize           uint64 `yaml:"spool_size"`
+	IdleTimeout         string `yaml:"idle_timeout"`
 	IdleTimeoutDuration time.Duration
-	RegistryFile        string `yaml:"registryFile"`
-	ConfigDir           string `yaml:"configDir"`
+	RegistryFile        string `yaml:"registry_file"`
+	ConfigDir           string `yaml:"config_dir"`
 }
 
 type ProspectorConfig struct {
 	Paths                 []string
 	Fields                map[string]string
 	Input                 string
-	IgnoreOlder           string `yaml:"ignoreOlder"`
+	IgnoreOlder           string `yaml:"ignore_older"`
 	IgnoreOlderDuration   time.Duration
-	ScanFrequency         string `yaml:"scanFrequency"`
+	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
-	HarvesterBufferSize   int  `yaml:"harvesterBufferSize"`
-	TailOnRotate          bool `yaml:"tailOnRotate"`
+	HarvesterBufferSize   int  `yaml:"harvester_buffer_size"`
+	TailOnRotate          bool `yaml:"tail_on_rotate"`
 }
 
 // getConfigFiles returns list of config files.
@@ -109,7 +109,7 @@ func (config *Config) FetchConfigs() {
 	configFiles, err := getConfigFiles(configDir)
 
 	if err != nil {
-		log.Fatal("Could not use configDir of: ", configDir, err)
+		log.Fatal("Could not use config_dir of: ", configDir, err)
 	}
 
 	err = mergeConfigFiles(configFiles, config)
