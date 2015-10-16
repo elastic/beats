@@ -33,5 +33,6 @@ All notable changes to this project will be documented in this file based on the
 - Update protocol guide to libbeat changes
 - Add protocol registration to new protocol guide
 - Make transaction timeouts configurable #300
+- Add direction field to the exported field #317
 
 ### Deprecated
