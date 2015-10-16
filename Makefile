@@ -16,10 +16,13 @@ test:
 	$(GODEP) go test ./...
 
 
-.PHONY: install_cfg
-install_cfg:
-	cp etc/topbeat.yml $(PREFIX)/topbeat-linux.yml
+.PHONY: install-cfg
+install-cfg:
 	cp etc/topbeat.template.json $(PREFIX)/topbeat.template.json
+	# linux
+	cp etc/topbeat.yml $(PREFIX)/topbeat-linux.yml
+	# binary
+	cp etc/topbeat.yml $(PREFIX)/topbeat-binary.yml
 	# darwin
 	cp etc/topbeat.yml $(PREFIX)/topbeat-darwin.yml
 	# win
