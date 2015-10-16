@@ -120,7 +120,8 @@ type Mysql struct {
 	Send_request  bool
 	Send_response bool
 
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	results publisher.Client
 
@@ -142,6 +143,7 @@ func (mysql *Mysql) InitDefaults() {
 	mysql.maxStoreRows = 10
 	mysql.Send_request = false
 	mysql.Send_response = false
+	mysql.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (mysql *Mysql) setFromConfig(config config.Mysql) error {
@@ -154,11 +156,14 @@ func (mysql *Mysql) setFromConfig(config config.Mysql) error {
 	if config.Max_rows != nil {
 		mysql.maxStoreRows = *config.Max_rows
 	}
-	if config.Send_request != nil {
-		mysql.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		mysql.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		mysql.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		mysql.Send_response = *config.SendResponse
+	}
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		mysql.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
 	}
 	return nil
 }
@@ -177,9 +182,10 @@ func (mysql *Mysql) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	mysql.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	mysql.transactions = common.NewCache(
+		mysql.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	mysql.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	mysql.transactions.StartJanitor(mysql.transactionTimeout)
 	mysql.handleMysql = handleMysql
 	mysql.results = results
 
@@ -466,6 +472,10 @@ func (mysql *Mysql) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream
 
 	// and reset message
 	stream.PrepareForNewMessage()
+}
+
+func (mysql *Mysql) ConnectionTimeout() time.Duration {
+	return mysql.transactionTimeout
 }
 
 func (mysql *Mysql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,

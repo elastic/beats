@@ -2,6 +2,7 @@ package protos
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/publisher"
@@ -37,6 +38,8 @@ func (proto *TcpProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private ProtocolData) (priv ProtocolData, drop bool) {
 	return private, true
 }
+
+func (proto *TcpProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 type UdpProtocol TestProtocol
 
@@ -80,6 +83,8 @@ func (proto *TcpUdpProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 func (proto *TcpUdpProtocol) ParseUdp(pkt *Packet) {
 	return
 }
+
+func (proto *TcpUdpProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 func TestProtocolNames(t *testing.T) {
 	assert.Equal(t, "unknown", UnknownProtocol.String())

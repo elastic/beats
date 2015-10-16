@@ -119,7 +119,8 @@ type Http struct {
 	Hide_keywords        []string
 	Redact_authorization bool
 
-	transactions *common.Cache
+	transactions       *common.Cache
+	transactionTimeout time.Duration
 
 	results publisher.Client
 }
@@ -136,17 +137,18 @@ func (http *Http) InitDefaults() {
 	http.Send_request = false
 	http.Send_response = false
 	http.Redact_authorization = false
+	http.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
 func (http *Http) SetFromConfig(config config.Http) (err error) {
 
 	http.Ports = config.Ports
 
-	if config.Send_request != nil {
-		http.Send_request = *config.Send_request
+	if config.SendRequest != nil {
+		http.Send_request = *config.SendRequest
 	}
-	if config.Send_response != nil {
-		http.Send_response = *config.Send_response
+	if config.SendResponse != nil {
+		http.Send_response = *config.SendResponse
 	}
 	http.Hide_keywords = config.Hide_keywords
 	if config.Redact_authorization != nil {
@@ -175,6 +177,10 @@ func (http *Http) SetFromConfig(config config.Http) (err error) {
 		http.Real_ip_header = strings.ToLower(*config.Real_ip_header)
 	}
 
+	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
+		http.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
+	}
+
 	return nil
 }
 
@@ -192,9 +198,10 @@ func (http *Http) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	http.transactions = common.NewCache(protos.DefaultTransactionExpiration,
+	http.transactions = common.NewCache(
+		http.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	http.transactions.StartJanitor(protos.DefaultTransactionExpiration)
+	http.transactions.StartJanitor(http.transactionTimeout)
 	http.results = results
 
 	return nil
@@ -584,6 +591,10 @@ func (http *Http) messageComplete(tcptuple *common.TcpTuple, dir uint8, stream *
 
 	// and reset message
 	stream.PrepareForNewMessage()
+}
+
+func (http *Http) ConnectionTimeout() time.Duration {
+	return http.transactionTimeout
 }
 
 func (http *Http) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,

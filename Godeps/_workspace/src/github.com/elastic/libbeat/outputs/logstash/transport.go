@@ -1,9 +1,11 @@
-package lumberjack
+package logstash
 
 import (
 	"crypto/tls"
+	"fmt"
 	"math/rand"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/logp"
@@ -27,8 +29,8 @@ type tlsClient struct {
 	tls tls.Config
 }
 
-func newTCPClient(host string) (*tcpClient, error) {
-	return &tcpClient{hostport: host}, nil
+func newTCPClient(host string, defaultPort int) (*tcpClient, error) {
+	return &tcpClient{hostport: fullAddress(host, defaultPort)}, nil
 }
 
 func (c *tcpClient) Connect(timeout time.Duration) error {
@@ -85,9 +87,9 @@ func (c *tcpClient) Close() error {
 	return err
 }
 
-func newTLSClient(host string, tls *tls.Config) (*tlsClient, error) {
+func newTLSClient(host string, defaultPort int, tls *tls.Config) (*tlsClient, error) {
 	c := tlsClient{}
-	c.hostport = host
+	c.hostport = fullAddress(host, defaultPort)
 	c.tls = *tls
 	return &c, nil
 }
@@ -128,4 +130,17 @@ func (c *tlsClient) onFail(err error) error {
 	c.Conn = nil
 	c.connected = false
 	return err
+}
+
+func fullAddress(host string, defaultPort int) string {
+	if _, _, err := net.SplitHostPort(host); err == nil {
+		return host
+	}
+
+	idx := strings.Index(host, ":")
+	if idx >= 0 {
+		// IPv6 address detected
+		return fmt.Sprintf("[%v]:%v", host, defaultPort)
+	}
+	return fmt.Sprintf("%v:%v", host, defaultPort)
 }

@@ -44,16 +44,21 @@ type Protocols struct {
 	Thrift   Thrift
 }
 
+type ProtocolCommon struct {
+	Ports              []int `yaml:"ports"`
+	SendRequest        *bool `yaml:"send_request"`
+	SendResponse       *bool `yaml:"send_response"`
+	TransactionTimeout *int  `yaml:"transaction_timeout"`
+}
+
 type Dns struct {
-	Ports               []int
-	Send_request        *bool
-	Send_response       *bool
+	ProtocolCommon      `yaml:",inline"`
 	Include_authorities *bool
 	Include_additionals *bool
 }
 
 type Http struct {
-	Ports                []int
+	ProtocolCommon       `yaml:",inline"`
 	Send_all_headers     *bool
 	Send_headers         []string
 	Split_cookie         *bool
@@ -61,45 +66,36 @@ type Http struct {
 	Include_body_for     []string
 	Hide_keywords        []string
 	Redact_authorization *bool
-	Send_request         *bool
-	Send_response        *bool
 }
 
 type Memcache struct {
-	Ports                 []int
+	ProtocolCommon        `yaml:",inline"`
 	MaxValues             int
 	MaxBytesPerValue      int
-	UdpTransactionTimeout uint
-	TcpTransactionTimeout uint
+	UdpTransactionTimeout *int
 	ParseUnknown          bool
 }
 
 type Mysql struct {
-	Ports          []int
+	ProtocolCommon `yaml:",inline"`
 	Max_row_length *int
 	Max_rows       *int
-	Send_request   *bool
-	Send_response  *bool
 }
 
 type Mongodb struct {
-	Ports          []int
+	ProtocolCommon `yaml:",inline"`
 	Max_doc_length *int
 	Max_docs       *int
-	Send_request   *bool
-	Send_response  *bool
 }
 
 type Pgsql struct {
-	Ports          []int
+	ProtocolCommon `yaml:",inline"`
 	Max_row_length *int
 	Max_rows       *int
-	Send_request   *bool
-	Send_response  *bool
 }
 
 type Thrift struct {
-	Ports                      []int
+	ProtocolCommon             `yaml:",inline"`
 	String_max_size            *int
 	Collection_max_size        *int
 	Drop_after_n_struct_fields *int
@@ -108,14 +104,10 @@ type Thrift struct {
 	Capture_reply              *bool
 	Obfuscate_strings          *bool
 	Idl_files                  []string
-	Send_request               *bool
-	Send_response              *bool
 }
 
 type Redis struct {
-	Ports         []int
-	Send_request  *bool
-	Send_response *bool
+	ProtocolCommon `yaml:",inline"`
 }
 
 // Config Singleton

@@ -50,6 +50,10 @@ func (proto TestProtocol) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	return private, true
 }
 
+func (proto TestProtocol) ConnectionTimeout() time.Duration {
+	return 0
+}
+
 func Test_configToPortsMap(t *testing.T) {
 
 	type configTest struct {
