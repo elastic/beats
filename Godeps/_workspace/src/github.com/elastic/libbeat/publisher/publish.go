@@ -15,7 +15,7 @@ import (
 	// load supported output plugins
 	_ "github.com/elastic/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/libbeat/outputs/fileout"
-	_ "github.com/elastic/libbeat/outputs/lumberjack"
+	_ "github.com/elastic/libbeat/outputs/logstash"
 	_ "github.com/elastic/libbeat/outputs/redis"
 )
 

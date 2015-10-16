@@ -7,6 +7,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"net"
+	"net/url"
+
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
@@ -64,16 +67,20 @@ func (out *elasticsearchOutput) Init(
 	if len(config.Hosts) > 0 {
 		// use hosts setting
 		for _, host := range config.Hosts {
-			url := fmt.Sprintf("%s://%s%s", config.Protocol, host, config.Path)
+			url, err := getURL(config.Protocol, config.Path, host)
+
+			if err != nil {
+				logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			}
 			urls = append(urls, url)
 		}
 	} else {
-		// use host and port settings
+		// usage of host and port is deprecated as it is replaced by hosts
 		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
 		urls = append(urls, url)
 	}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
 	}
@@ -193,7 +200,7 @@ func (out *elasticsearchOutput) UpdateLocalTopologyMap() {
 	// get all shippers IPs from Elasticsearch
 	topologyMapTmp := make(map[string]string)
 
-	res, err := out.Conn.searchURI(".packetbeat-topology", "server-ip", nil)
+	res, err := out.Conn.SearchURI(".packetbeat-topology", "server-ip", nil)
 	if err == nil {
 		for _, obj := range res.Hits.Hits {
 			var result QueryResult
@@ -281,4 +288,58 @@ func (out *elasticsearchOutput) BulkPublish(
 		}
 	}()
 	return nil
+}
+
+// Creates the url based on the url configuration.
+// Adds missing parts with defaults (scheme, host, port)
+func getURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
+	addr, err := url.Parse(rawURL)
+	if err != nil {
+		return "", err
+	}
+
+	scheme := addr.Scheme
+	host := addr.Host
+	port := "9200"
+
+	// sanitize parse errors if url does not contain scheme
+	// if parse url looks funny, prepend schema and try again:
+	if addr.Scheme == "" || (addr.Host == "" && addr.Path == "" && addr.Opaque != "") {
+		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
+		if tmpAddr, err := url.Parse(rawURL); err == nil {
+			addr = tmpAddr
+			scheme = addr.Scheme
+			host = addr.Host
+		} else {
+			// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
+			scheme = defaultScheme
+			host = addr.Path
+			addr.Path = ""
+		}
+	}
+
+	if host == "" {
+		host = "localhost"
+	} else {
+		// split host and optional port
+		if splitHost, splitPort, err := net.SplitHostPort(host); err == nil {
+			host = splitHost
+			port = splitPort
+		}
+
+		// Check if ipv6
+		if strings.Count(host, ":") > 1 && strings.Count(host, "]") == 0 {
+			host = "[" + host + "]"
+		}
+	}
+
+	// Assign default path if not set
+	if addr.Path == "" {
+		addr.Path = defaultPath
+	}
+
+	// reconstruct url
+	addr.Scheme = scheme
+	addr.Host = host + ":" + port
+	return addr.String(), nil
 }
