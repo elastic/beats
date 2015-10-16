@@ -13,7 +13,7 @@ filebeat:
   spool_size:
   idle_timeout: 5s
   tail_on_rotate:
-  registry_file: {{ fb.working_dir + '/' }}.filebeat
+  registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
 
 
 

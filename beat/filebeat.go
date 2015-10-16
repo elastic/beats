@@ -57,11 +57,17 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		os.Exit(1)
 	}()
 
+	var err error
+
 	// Init channels
 	fb.publisherChan = make(chan []*FileEvent, 1)
 
 	// Setup registrar to persist state
-	fb.registrar = NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
+	fb.registrar, err = NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
+	if err != nil {
+		logp.Err("Could not init registrar: %v", err)
+		return err
+	}
 
 	crawl := &Crawler{
 		Registrar: fb.registrar,
@@ -72,7 +78,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	fb.Spooler = NewSpooler(fb)
-	err := fb.Spooler.Config()
+	err = fb.Spooler.Config()
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
