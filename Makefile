@@ -3,6 +3,9 @@ GODEP=$(GOPATH)/bin/godep
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 
+# default install folder used by the beats-packer
+PREFIX?=/build
+
 filebeat: $(GOFILES)
 	# first make sure we have godep
 	go get github.com/tools/godep
@@ -73,11 +76,11 @@ install-cfg:
 	cp etc/filebeat.template.json $(PREFIX)/filebeat.template.json
 	# linux
 	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
-	sed -i 's$#registryFile: .filebeat$registryFile: /var/lib/filebeat/registry' $(PREFIX)/filebeat-linux.yml
+	sed -i 's@#registry_file: .filebeat@registry_file: /var/lib/filebeat/registry@' $(PREFIX)/filebeat-linux.yml
 	# binary
 	cp etc/filebeat.yml $(PREFIX)/filebeat-binary.yml
 	# darwin
 	cp etc/filebeat.yml $(PREFIX)/filebeat-darwin.yml
 	# win
 	cp etc/filebeat.yml $(PREFIX)/filebeat-win.yml
-	sed -i 's$#registryFile: .filebeat$registryFile: C:\ProgramData\filebeat\registry' $(PREFIX)/filebeat-windows.yml
+	sed -i 's@#registry_file: .filebeat@registry_file: "C:/ProgramData/\filebeat/registry"@' $(PREFIX)/filebeat-win.yml
