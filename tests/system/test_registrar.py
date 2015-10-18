@@ -34,6 +34,13 @@ class Test(TestCase):
             lambda: self.log_contains(
                 "Registrar: processing 5 events"),
             max_timeout=15)
+
+        # wait until the registry file exist. Needed to avoid a race between
+        # the logging and actual writing the file. Seems to happen on Windows.
+        self.wait_until(
+            lambda: os.path.isfile(os.path.join(self.working_dir,
+                                                ".filebeat")),
+            max_timeout=1)
         filebeat.kill_and_wait()
 
         # Check that file exist
@@ -110,6 +117,12 @@ class Test(TestCase):
             lambda: self.log_contains(
                 "Registrar: processing 10 events"),
             max_timeout=15)
+        # wait until the registry file exist. Needed to avoid a race between
+        # the logging and actual writing the file. Seems to happen on Windows.
+        self.wait_until(
+            lambda: os.path.isfile(os.path.join(self.working_dir,
+                                                ".filebeat")),
+            max_timeout=1)
         filebeat.kill_and_wait()
 
         # Check that file exist
@@ -136,6 +149,13 @@ class Test(TestCase):
             lambda: self.log_contains(
                 "Registrar: processing 1 events"),
             max_timeout=15)
+        # wait until the registry file exist. Needed to avoid a race between
+        # the logging and actual writing the file. Seems to happen on Windows.
+        self.wait_until(
+            lambda: os.path.isfile(os.path.join(self.working_dir,
+                                                "a/b/c/registry")),
+
+            max_timeout=1)
         filebeat.kill_and_wait()
 
         assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))
