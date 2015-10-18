@@ -2,6 +2,7 @@ package beat
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/gosigar"
@@ -59,13 +60,14 @@ type ProcCpuTime struct {
 }
 
 type Process struct {
-	Pid   int          `json:"pid"`
-	Ppid  int          `json:"ppid"`
-	Name  string       `json:"name"`
-	State string       `json:"state"`
-	Mem   *ProcMemStat `json:"mem"`
-	Cpu   *ProcCpuTime `json:"cpu"`
-	ctime time.Time
+	Pid     int          `json:"pid"`
+	Ppid    int          `json:"ppid"`
+	Name    string       `json:"name"`
+	State   string       `json:"state"`
+	CmdLine string       `json:"cmdline"`
+	Mem     *ProcMemStat `json:"mem"`
+	Cpu     *ProcCpuTime `json:"cpu"`
+	ctime   time.Time
 }
 
 type FileSystemStat struct {
@@ -246,6 +248,7 @@ func GetProcess(pid int) (*Process, error) {
 	state := sigar.ProcState{}
 	mem := sigar.ProcMem{}
 	cpu := sigar.ProcTime{}
+	args := sigar.ProcArgs{}
 
 	err := state.Get(pid)
 	if err != nil {
@@ -262,11 +265,19 @@ func GetProcess(pid int) (*Process, error) {
 		return nil, fmt.Errorf("Error getting cpu info: %v", err)
 	}
 
+	err = args.Get(pid)
+	if err != nil {
+		return nil, fmt.Errorf("Error getting command line: %v", err)
+	}
+
+	cmdLine := strings.Join(args.List, " ")
+
 	proc := Process{
-		Pid:   pid,
-		Ppid:  state.Ppid,
-		Name:  state.Name,
-		State: getProcState(byte(state.State)),
+		Pid:     pid,
+		Ppid:    state.Ppid,
+		Name:    state.Name,
+		State:   getProcState(byte(state.State)),
+		CmdLine: cmdLine,
 		Mem: &ProcMemStat{
 			Size:  mem.Size,
 			Rss:   mem.Resident,
