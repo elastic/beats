@@ -43,8 +43,9 @@ type ProspectorConfig struct {
 	IgnoreOlderDuration   time.Duration
 	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
-	HarvesterBufferSize   int  `yaml:"harvester_buffer_size"`
-	TailOnRotate          bool `yaml:"tail_on_rotate"`
+	HarvesterBufferSize   int    `yaml:"harvester_buffer_size"`
+	TailOnRotate          bool   `yaml:"tail_on_rotate"`
+	Encoding              string `yaml:"encoding"`
 }
 
 // getConfigFiles returns list of config files.

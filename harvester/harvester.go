@@ -15,6 +15,7 @@ type Harvester struct {
 	SpoolerChan      chan *input.FileEvent
 	BufferSize       int
 	TailOnRotate     bool
+	encoding         Decoder
 	file             *os.File /* the file being watched */
 }
 

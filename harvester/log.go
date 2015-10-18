@@ -8,9 +8,31 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 	"github.com/elastic/libbeat/logp"
 )
+
+func NewHarvester(
+	cfg config.ProspectorConfig,
+	path string,
+	signal chan int64,
+	spooler chan *input.FileEvent,
+) (*Harvester, error) {
+	encoding, ok := find(cfg.Encoding)
+	if !ok {
+		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
+	}
+
+	h := &Harvester{
+		Path:             path,
+		ProspectorConfig: cfg,
+		FinishChan:       signal,
+		SpoolerChan:      spooler,
+		encoding:         encoding,
+	}
+	return h, nil
+}
 
 // Log harvester reads files line by line and sends events to logstash
 // Multiline log support is required
@@ -35,7 +57,7 @@ func (h *Harvester) Harvest() {
 
 	h.initOffset()
 
-	reader := bufio.NewReaderSize(h.file, h.BufferSize)
+	reader := bufio.NewReaderSize(h.encoding(h.file), h.BufferSize)
 	buffer := new(bytes.Buffer)
 
 	var readTimeout = 10 * time.Second

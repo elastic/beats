@@ -279,11 +279,11 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s", file)
 
-	h := &harvester.Harvester{
-		Path:             file,
-		ProspectorConfig: p.ProspectorConfig,
-		FinishChan:       newinfo.Harvester,
-		SpoolerChan:      output,
+	h, err := harvester.NewHarvester(
+		p.ProspectorConfig, file, newinfo.Harvester, output)
+	if err != nil {
+		logp.Err("Error initializing harvester: %v", err)
+		return
 	}
 
 	if !oldFile.IsSameFile(newFile) {
