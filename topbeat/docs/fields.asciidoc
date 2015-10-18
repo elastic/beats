@@ -390,6 +390,13 @@ type: int
 The process parent pid.
 
 
+==== proc.cmdline
+
+type: string
+
+The full command-line used to start the process, including the arguments separated by space.
+
+
 === cpu Fields
 
 CPU-specific statistics per process.
