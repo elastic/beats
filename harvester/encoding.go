@@ -19,8 +19,8 @@ type Decoder func(io.Reader) io.Reader
 
 var encodings = map[string]Decoder{
 	// default
-	"nop":   Nop,
-	"plain": Nop,
+	"nop":   Plain,
+	"plain": Plain,
 
 	// utf8 (validate input)
 	"utf-8": trans(encoding.UTF8Validator),
@@ -53,13 +53,13 @@ var encodings = map[string]Decoder{
 	"iso8859-8i": enc(charmap.ISO8859_8I),
 }
 
-// Nop encoder no transforming any read bytes
-var Nop Decoder = nopEnc
+// Plain file encoding not transforming any read bytes.
+var Plain = nopEnc
 
 // Find returns
 func findEncoding(name string) (Decoder, bool) {
 	if name == "" {
-		return Nop, true
+		return Plain, true
 	}
 	d, ok := encodings[strings.ToLower(name)]
 	return d, ok
