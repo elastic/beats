@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 import (
 	"encoding/json"
@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	lumberjackDefaultHost     = "localhost"
-	lumberjackTestDefaultPort = "12345"
+	logstashDefaultHost     = "localhost"
+	logstashTestDefaultPort = "12345"
 
 	elasticsearchDefaultHost = "localhost"
 	elasticsearchDefaultPort = "9200"
@@ -36,6 +36,10 @@ type esValueReader interface {
 	Read() ([]map[string]interface{}, error)
 }
 
+type esCountReader interface {
+	Count() (int, error)
+}
+
 func strDefault(a, defaults string) string {
 	if len(a) == 0 {
 		return defaults
@@ -47,10 +51,10 @@ func getenv(name, defaultValue string) string {
 	return strDefault(os.Getenv(name), defaultValue)
 }
 
-func getLumberjackHost() string {
+func getLogstashHost() string {
 	return fmt.Sprintf("%v:%v",
-		getenv("LS_HOST", lumberjackDefaultHost),
-		getenv("LS_LUMBERJACK_TCP_PORT", lumberjackTestDefaultPort),
+		getenv("LS_HOST", logstashDefaultHost),
+		getenv("LS_TCP_PORT", logstashTestDefaultPort),
 	)
 }
 
@@ -163,6 +167,22 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 	return hits, err
 }
 
+func (es *esConnection) Count() (int, error) {
+	_, err := es.Refresh(es.index)
+	if err != nil {
+		es.t.Errorf("Failed to refresh: %s", err)
+	}
+
+	params := map[string]string{}
+	resp, err := es.CountSearchURI(es.index, "", params)
+	if err != nil {
+		es.t.Errorf("Failed to query elasticsearch for index(%s): %s", es.index, err)
+		return 0, err
+	}
+
+	return resp.Count, nil
+}
+
 func waitUntilTrue(duration time.Duration, fn func() bool) bool {
 	end := time.Now().Add(duration)
 	for time.Now().Before(end) {
@@ -174,10 +194,10 @@ func waitUntilTrue(duration time.Duration, fn func() bool) bool {
 	return false
 }
 
-func checkIndex(reader esValueReader, minValues int) func() bool {
+func checkIndex(reader esCountReader, minValues int) func() bool {
 	return func() bool {
-		resp, err := reader.Read()
-		return err != nil || len(resp) >= minValues
+		resp, err := reader.Count()
+		return err != nil || resp >= minValues
 	}
 }
 
@@ -243,6 +263,52 @@ func TestSendMultipleViaLogstash(t *testing.T) {
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 10))
+
+	// search value in logstash elasticsearch index
+	resp, err := ls.Read()
+	if err != nil {
+		return
+	}
+	if len(resp) != 10 {
+		t.Errorf("wrong number of results: %d", len(resp))
+	}
+}
+
+func TestSendMultipleBigBatchesViaLogstash(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
+	}
+
+	test := "multiple"
+	ls := newTestLogstashOutput(t, test)
+	defer ls.Cleanup()
+
+	numBatches := 15
+	batchSize := 256
+	batches := make([][]common.MapStr, 0, numBatches)
+	for i := 0; i < numBatches; i++ {
+		batch := make([]common.MapStr, 0, batchSize)
+		for j := 0; j < batchSize; j++ {
+			event := common.MapStr{
+				"timestamp": common.Time(time.Now()),
+				"host":      "test-host",
+				"type":      "log",
+				"message":   fmt.Sprintf("batch hello world - %v", i*batchSize+j),
+			}
+			batch = append(batch, event)
+		}
+		batches = append(batches, batch)
+	}
+
+	for _, batch := range batches {
+		sig := outputs.NewSyncSignal()
+		ls.BulkPublish(sig, time.Now(), batch)
+		ok := sig.Wait()
+		assert.Equal(t, true, ok)
+	}
+
+	// wait for logstash event flush + elasticsearch
+	waitUntilTrue(5*time.Second, checkIndex(ls, numBatches*batchSize))
 
 	// search value in logstash elasticsearch index
 	resp, err := ls.Read()

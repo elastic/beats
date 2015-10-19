@@ -1,4 +1,4 @@
-package lumberjack
+package logstash
 
 import (
 	"bytes"
@@ -45,9 +45,11 @@ var (
 )
 
 var (
-	codeWindowSize    = []byte("1W")
-	codeJSONDataFrame = []byte("1J")
-	codeCompressed    = []byte("1C")
+	codeVersion byte = '2'
+
+	codeWindowSize    = []byte{codeVersion, 'W'}
+	codeJSONDataFrame = []byte{codeVersion, 'J'}
+	codeCompressed    = []byte{codeVersion, 'C'}
 )
 
 func newLumberjackClient(conn TransportClient, timeout time.Duration) *lumberjackClient {
@@ -194,7 +196,7 @@ func (l *lumberjackClient) readACK() (uint32, error) {
 		ackbytes += n
 	}
 
-	isACK := response[0] == '1' && response[1] == 'A'
+	isACK := response[0] == codeVersion && response[1] == 'A'
 	if !isACK {
 		return 0, ErrProtocolError
 	}
@@ -233,7 +235,7 @@ func (l *lumberjackClient) writeDataFrame(
 	out io.Writer,
 ) error {
 	// Write JSON Data Frame:
-	// version: uint8 = '1'
+	// version: uint8 = '2'
 	// code: uint8 = 'J'
 	// seq: uint32
 	// payloadLen (bytes): uint32
