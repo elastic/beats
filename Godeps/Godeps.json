@@ -61,6 +61,14 @@
 			"Rev": "68a71b6be5774eece23e35475fc28514a84297a3"
 		},
 		{
+			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
+		},
+		{
 			"ImportPath": "gopkg.in/yaml.v2",
 			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
 		}

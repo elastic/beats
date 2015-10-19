@@ -63,8 +63,8 @@ func (p *Prospector) Init() error {
 		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
 
-	if p.ProspectorConfig.HarvesterBufferSize == 0 {
-		p.ProspectorConfig.HarvesterBufferSize = cfg.DefaultHarvesterBufferSize
+	if p.ProspectorConfig.Harvester.BufferSize == 0 {
+		p.ProspectorConfig.Harvester.BufferSize = cfg.DefaultHarvesterBufferSize
 	}
 
 	// Init list
@@ -86,13 +86,12 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 		if path == "-" {
 			// Offset and Initial never get used when path is "-"
-			h := harvester.Harvester{
-				Path:             path,
-				ProspectorConfig: p.ProspectorConfig,
-				// TODO: SpoolerChan is passed around, but could be part of prospector (init)
-				SpoolerChan:  spoolChan,
-				BufferSize:   p.ProspectorConfig.HarvesterBufferSize,
-				TailOnRotate: p.ProspectorConfig.TailOnRotate,
+			h, err := harvester.NewHarvester(
+				p.ProspectorConfig, &p.ProspectorConfig.Harvester,
+				path, nil, spoolChan)
+			if err != nil {
+				logp.Err("Error initializing harvester: %v", err)
+				return
 			}
 
 			h.Start()
@@ -217,11 +216,12 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 	logp.Debug("prospector", "Start harvesting unkown file: %s", file)
 
 	// Init harvester with info
-	h := &harvester.Harvester{
-		Path:             file,
-		ProspectorConfig: p.ProspectorConfig,
-		FinishChan:       newinfo.Harvester,
-		SpoolerChan:      output,
+	h, err := harvester.NewHarvester(
+		p.ProspectorConfig, &p.ProspectorConfig.Harvester,
+		file, newinfo.Harvester, output)
+	if err != nil {
+		logp.Err("Error initializing harvester: %v", err)
+		return
 	}
 
 	// Check for unmodified time, but only if the file modification time is before the last scan started
@@ -279,11 +279,12 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s", file)
 
-	h := &harvester.Harvester{
-		Path:             file,
-		ProspectorConfig: p.ProspectorConfig,
-		FinishChan:       newinfo.Harvester,
-		SpoolerChan:      output,
+	h, err := harvester.NewHarvester(
+		p.ProspectorConfig, &p.ProspectorConfig.Harvester,
+		file, newinfo.Harvester, output)
+	if err != nil {
+		logp.Err("Error initializing harvester: %v", err)
+		return
 	}
 
 	if !oldFile.IsSameFile(newFile) {

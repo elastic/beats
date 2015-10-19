@@ -10,11 +10,11 @@ import (
 type Harvester struct {
 	Path             string /* the file path to harvest */
 	ProspectorConfig config.ProspectorConfig
+	Config           *config.HarvesterConfig
 	Offset           int64
 	FinishChan       chan int64
 	SpoolerChan      chan *input.FileEvent
-	BufferSize       int
-	TailOnRotate     bool
+	encoding         Decoder
 	file             *os.File /* the file being watched */
 }
 
