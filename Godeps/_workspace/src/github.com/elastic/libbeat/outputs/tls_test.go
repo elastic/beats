@@ -64,15 +64,15 @@ func TestValuesSet(t *testing.T) {
 	cfg, err := load(`
     disabled: true
     certificate: mycert.pem
-    certificate-key: mycert.key
-    certificate-authorities: ["ca1.pem", "ca2.pem"]
+    certificate_key: mycert.key
+    certificate_authorities: ["ca1.pem", "ca2.pem"]
     insecure: true
-    cipher-suites:
+    cipher_suites:
       - ECDHE-ECDSA-AES-256-CBC-SHA
       - ECDHE-ECDSA-AES-256-GCM-SHA384
-    min-version: 1.1
-    max-version: 1.2
-    curve-types:
+    min_version: 1.1
+    max_version: 1.2
+    curve_types:
       - P-521
   `)
 
@@ -117,9 +117,9 @@ func TestApplyEmptyConfig(t *testing.T) {
 func TestApplyWithConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(&TLSConfig{
 		Disabled:       false,
-		Certificate:    "lumberjack/ca_test.pem",
-		CertificateKey: "lumberjack/ca_test.key",
-		CAs:            []string{"lumberjack/ca_test.pem"},
+		Certificate:    "logstash/ca_test.pem",
+		CertificateKey: "logstash/ca_test.key",
+		CAs:            []string{"logstash/ca_test.pem"},
 		Insecure:       true,
 		CipherSuites: []string{
 			"ECDHE-ECDSA-AES-256-CBC-SHA",

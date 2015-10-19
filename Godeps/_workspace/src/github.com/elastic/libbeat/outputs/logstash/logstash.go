@@ -1,6 +1,6 @@
-package lumberjack
+package logstash
 
-// lumberjack.go defines the lumberjack plugin as being registered with all
+// logstash.go defines the logtash plugin (using lumberjack protocol) as being registered with all
 // output plugins
 
 import (
@@ -15,20 +15,20 @@ import (
 	"github.com/elastic/libbeat/outputs/mode"
 )
 
-var debug = logp.MakeDebug("lumberjack")
+var debug = logp.MakeDebug("logstash")
 
 func init() {
-	outputs.RegisterOutputPlugin("lumberjack", lumberjackOutputPlugin{})
+	outputs.RegisterOutputPlugin("logstash", logstashOutputPlugin{})
 }
 
-type lumberjackOutputPlugin struct{}
+type logstashOutputPlugin struct{}
 
-func (p lumberjackOutputPlugin) NewOutput(
+func (p logstashOutputPlugin) NewOutput(
 	beat string,
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
-	output := &lumberjack{}
+	output := &logstash{}
 	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
 		return nil, err
@@ -36,16 +36,16 @@ func (p lumberjackOutputPlugin) NewOutput(
 	return output, nil
 }
 
-type lumberjack struct {
+type logstash struct {
 	mode  mode.ConnectionMode
 	index string
 }
 
 const (
-	lumberjackDefaultPort = 10200
+	logstashDefaultPort = 10200
 
-	lumberjackDefaultTimeout = 5 * time.Second
-	defaultSendRetries       = 3
+	logstashDefaultTimeout = 30 * time.Second
+	defaultSendRetries     = 3
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration
@@ -53,7 +53,7 @@ var ErrNoHostsConfigured = errors.New("no host configuration found")
 
 var waitRetry = time.Duration(1) * time.Second
 
-func (lj *lumberjack) init(
+func (lj *logstash) init(
 	beat string,
 	config outputs.MothershipConfig,
 	topologyExpire int,
@@ -63,12 +63,12 @@ func (lj *lumberjack) init(
 		useTLS = !config.TLS.Disabled
 	}
 
-	timeout := lumberjackDefaultTimeout
+	timeout := logstashDefaultTimeout
 	if config.Timeout != 0 {
 		timeout = time.Duration(config.Timeout) * time.Second
 	}
 
-	defaultPort := lumberjackDefaultPort
+	defaultPort := logstashDefaultPort
 	if config.Port != 0 {
 		defaultPort = config.Port
 	}
@@ -160,41 +160,34 @@ func makeClients(
 // TODO: update Outputer interface to support multiple events for batch-like
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.
-func (lj *lumberjack) PublishEvent(
+func (lj *logstash) PublishEvent(
 	signaler outputs.Signaler,
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	lj.compatFix(event)
+	lj.addMeta(event)
 	return lj.mode.PublishEvent(signaler, event)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
 // via lumberjack.
-func (lj *lumberjack) BulkPublish(
+func (lj *logstash) BulkPublish(
 	trans outputs.Signaler,
 	ts time.Time,
 	events []common.MapStr,
 ) error {
 	for _, event := range events {
-		lj.compatFix(event)
+		lj.addMeta(event)
 	}
 	return lj.mode.PublishEvents(trans, events)
 }
 
-// compatFix adapts events to be compatible with logstash forwarer messages by renaming
+// addMeta adapts events to be compatible with logstash forwarer messages by renaming
 // the "message" field to "line". The lumberjack server in logstash will
 // decode/rename the "line" field into "message".
-func (lj *lumberjack) compatFix(event common.MapStr) {
-	if msg, hasMessage := event["message"]; hasMessage {
-		if _, hasLine := event["line"]; !hasLine {
-			event["line"] = msg
-			delete(event, "message")
-		}
-	}
-
+func (lj *logstash) addMeta(event common.MapStr) {
 	// add metadata for indexing
-	ts := time.Time(event["timestamp"].(common.Time))
+	ts := time.Time(event["timestamp"].(common.Time)).UTC()
 	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
 		ts.Year(), ts.Month(), ts.Day())
 	event["@metadata"] = common.MapStr{

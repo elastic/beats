@@ -44,6 +44,11 @@ type Hits struct {
 	Hits  []json.RawMessage `json:"hits"`
 }
 
+type CountResults struct {
+	Count  int             `json:"count"`
+	Shards json.RawMessage `json:"_shards"`
+}
+
 func (r QueryResult) String() string {
 	out, err := json.Marshal(r)
 	if err != nil {
@@ -127,6 +132,19 @@ func readSearchResult(obj []byte) (*SearchResults, error) {
 	if obj == nil {
 		return nil, nil
 	}
+	err := json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
+}
+
+func readCountResult(obj []byte) (*CountResults, error) {
+	if obj == nil {
+		return nil, nil
+	}
+
+	var result CountResults
 	err := json.Unmarshal(obj, &result)
 	if err != nil {
 		return nil, err
@@ -338,4 +356,21 @@ func (es *Elasticsearch) SearchURI(index string, docType string, params map[stri
 		return nil, err
 	}
 	return readSearchResult(resp)
+}
+
+func (es *Elasticsearch) CountSearchURI(
+	index string, docType string,
+	params map[string]string,
+) (*CountResults, error) {
+	path, err := makePath(index, docType, "_count")
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := es.request("GET", path, params, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return readCountResult(resp)
 }

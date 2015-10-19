@@ -67,7 +67,7 @@ func (out *elasticsearchOutput) Init(
 	if len(config.Hosts) > 0 {
 		// use hosts setting
 		for _, host := range config.Hosts {
-			url, err := getUrl(config.Protocol, config.Path, host)
+			url, err := getURL(config.Protocol, config.Path, host)
 
 			if err != nil {
 				logp.Err("Invalid host param set: %s, Error: %v", host, err)
@@ -265,7 +265,7 @@ func (out *elasticsearchOutput) BulkPublish(
 		}
 
 		for _, event := range events {
-			ts := time.Time(event["timestamp"].(common.Time))
+			ts := time.Time(event["timestamp"].(common.Time)).UTC()
 			index := fmt.Sprintf("%s-%d.%02d.%02d",
 				out.Index, ts.Year(), ts.Month(), ts.Day())
 			meta := common.MapStr{
@@ -292,63 +292,54 @@ func (out *elasticsearchOutput) BulkPublish(
 
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
-func getUrl(defaultScheme string, defaultPath string, rawUrl string) (string, error) {
-
-	urlStruct, err := url.Parse(rawUrl)
-
+func getURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
+	addr, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
 	}
 
-	host := ""
-	port := ""
+	scheme := addr.Scheme
+	host := addr.Host
+	port := "9200"
 
-	// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
-	if urlStruct.Host == "" {
-		urlStruct.Host = urlStruct.Path
-		urlStruct.Path = ""
-	}
-
-	// Checks if split host works
-	_, _, err = net.SplitHostPort(urlStruct.Host)
-
-	// Only does split host if no errors
-	if err == nil {
-		host, port, err = net.SplitHostPort(urlStruct.Host)
-		if err != nil {
-			return "", err
+	// sanitize parse errors if url does not contain scheme
+	// if parse url looks funny, prepend schema and try again:
+	if addr.Scheme == "" || (addr.Host == "" && addr.Path == "" && addr.Opaque != "") {
+		rawURL = fmt.Sprintf("%v://%v", defaultScheme, rawURL)
+		if tmpAddr, err := url.Parse(rawURL); err == nil {
+			addr = tmpAddr
+			scheme = addr.Scheme
+			host = addr.Host
+		} else {
+			// If url doesn't have a scheme, host is written into path. For example: 192.168.3.7
+			scheme = defaultScheme
+			host = addr.Path
+			addr.Path = ""
 		}
-	} else {
-		host = urlStruct.Host
 	}
 
-	// Assign default host if not set
 	if host == "" {
 		host = "localhost"
-	}
+	} else {
+		// split host and optional port
+		if splitHost, splitPort, err := net.SplitHostPort(host); err == nil {
+			host = splitHost
+			port = splitPort
+		}
 
-	// Assign default port if not set
-	if port == "" {
-		port = "9200"
-	}
-
-	// Assign default scheme if not set
-	if urlStruct.Scheme == "" {
-		urlStruct.Scheme = defaultScheme
+		// Check if ipv6
+		if strings.Count(host, ":") > 1 && strings.Count(host, "]") == 0 {
+			host = "[" + host + "]"
+		}
 	}
 
 	// Assign default path if not set
-	if urlStruct.Path == "" {
-		urlStruct.Path = defaultPath
+	if addr.Path == "" {
+		addr.Path = defaultPath
 	}
 
-	// Check if ipv6
-	if strings.Count(host, ":") > 1 && strings.Count(host, "]") == 0 {
-		host = "[" + host + "]"
-	}
-
-	urlStruct.Host = host + ":" + port
-
-	return urlStruct.String(), nil
-
+	// reconstruct url
+	addr.Scheme = scheme
+	addr.Host = host + ":" + port
+	return addr.String(), nil
 }
