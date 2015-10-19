@@ -22,7 +22,7 @@ deploy:
   secret_access_key:
     secure: Q1UeAGpJSMNvHHHOyGCipV5cHGQPOtprQsc12TJg6GGbvCL8aFUtR8B6Kw3iZC/EvuklaEOcoY0w+nV60J9yHt68kT6y+RUlNaj8ehYvwsVDqH8aSYXecG27EItM93ZtpmFHJ4wCtm7UCM19sLnOBiNZ5YnBbEZx7+2DNL2UZ1tUUspLu+8ZKHk8LI3C5tmXqQQ6gRcFeGewkIbSlBQ8+zXX3wpCpme3W1AQHl4JQwmam4q3Jty+8Oys01HZf8uOFrH4bVevaS0/ThcjVGtE8H5cnZW3YHLtRjLV5Hef3Vs+Ob+3ME0Zl43b/PR6lo0Dj36NeMD31FPtlZ7nf+x0XmCWas58dCHUqXg/eOnCKnw/lop8dgD5+VeZu2MGJQLEOVSs1Ve87mxj2k+C/gKeFVZChnFaFMRhvyRwttcI+8LFMARu50ybn13yaYsnxurbkAh8VOGQjRyBmYoGlqIO3DhJno5PtGzyndMRZ0PkrugrcpqBH0BNQEClGzuITWrEDaX9Or5iHqeFlakwWSkiiLhYeoS8E5JEXYVTST8DowdteOzwqlYGfy/Q/VBY5/qdLSaEFCWITqXzUFzguTALg7dj7lLJJyoJST8ENubcrxTNDorK0ubG0UO2SKlkdRnDJXL+AfigORTDEULqms11ZF+Ga8/85sCdWPBgTd5oi08=
   bucket: beats-nightlies
-  local-dir: build/upload
+  local-dir: build/binary/upload
   acl: public_read
   on:
     repo: elastic/beats-packer

@@ -2,11 +2,12 @@ RELEASE?=master
 DATE:=$(shell date +%y%m%d%H%M%S)
 BUILDID?=$(DATE)
 
+
 .PHONY: all
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
 	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin \
 	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin \
-	build/upload/build_id.txt
+	build/upload/build_id.txt latest
 
 .PHONY: packetbeat topbeat filebeat
 packetbeat topbeat filebeat: build/upload
@@ -100,3 +101,10 @@ pull-images:
 .PHONY: clean
 clean:
 	rm -rf build/ || true
+	-docker rm -v build-image
+
+# Creates a latest file for the most recent build
+.PHONY: latest
+latest:
+	BUILDID=${BUILDID} \
+	./xgo-scripts/latest.sh
