@@ -265,7 +265,7 @@ func (out *elasticsearchOutput) BulkPublish(
 		}
 
 		for _, event := range events {
-			ts := time.Time(event["timestamp"].(common.Time))
+			ts := time.Time(event["timestamp"].(common.Time)).UTC()
 			index := fmt.Sprintf("%s-%d.%02d.%02d",
 				out.Index, ts.Year(), ts.Month(), ts.Day())
 			meta := common.MapStr{

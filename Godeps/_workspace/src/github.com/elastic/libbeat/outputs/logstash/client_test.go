@@ -203,7 +203,7 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 	}
 
 	version, _ := buf.ReadNetUint8At(0)
-	if version != '1' {
+	if version != '2' {
 		return nil, errors.New("version error")
 	}
 
@@ -245,7 +245,7 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 		var events []*message
 		for dataBuf.Len() > 0 {
 			version, _ := dataBuf.ReadNetUint8()
-			if version != '1' {
+			if version != '2' {
 				return nil, errors.New("version error 2")
 			}
 
@@ -289,7 +289,7 @@ func recvMessage(buf *streambuf.Buffer, transp *mockTransport) (*message, error)
 
 func sendAck(transp *mockTransport, seq uint32) {
 	buf := streambuf.New(nil)
-	buf.WriteByte('1')
+	buf.WriteByte('2')
 	buf.WriteByte('A')
 	buf.WriteNetUint32(seq)
 	transp.sendBytes(buf.Bytes())
