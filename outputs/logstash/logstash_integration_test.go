@@ -278,14 +278,13 @@ func TestSendMultipleBigBatchesViaLogstash(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
-	t.Skip("skip for now")
 
 	test := "multiple"
 	ls := newTestLogstashOutput(t, test)
 	defer ls.Cleanup()
 
-	numBatches := 100
-	batchSize := 1024
+	numBatches := 15
+	batchSize := 256
 	batches := make([][]common.MapStr, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
 		batch := make([]common.MapStr, 0, batchSize)
