@@ -98,27 +98,45 @@ output:
     #save_topology: true
 
     # Optional index name. The default is packetbeat and generates packetbeat keys.
-    #index: "packetbeat"
+    # index: "packetbeat"
 
     # Optional Redis database number where the events are stored
     # The default is 0.
-    #db: 0
+    # db: 0
 
     # Optional Redis database number where the topology is stored
     # The default is 1. It must have a different value than db.
-    #db_topology: 1
+    # db_topology: 1
 
     # Optional password to authenticate with. By default, no
     # password is set.
-    #password: ""
+    # password: ""
 
     # Optional Redis initial connection timeout in seconds.
     # The default is 5 seconds.
-    #timeout: 5
+    # timeout: 5
 
     # Optional interval for reconnecting to failed Redis connections.
     # The default is 1 second.
-    #reconnect_interval: 1
+    # reconnect_interval: 1
+
+
+  ### Logstash as output
+    # Uncomment out this option if you want to output to Logstash. The default is false.
+    # enabled: true
+
+    # The Logstash hosts
+    # hosts: [localhost:5044]
+
+    # Optional load balance the events between the Logstash hosts
+    # loadbalance: true
+
+    # Optional index name. The default index name is logstash
+    # index: logstash
+
+    # Optional TLS. The default is on
+    # tls:
+    #   disabled: true
 
 
   ### File as output
