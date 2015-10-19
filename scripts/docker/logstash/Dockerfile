@@ -15,9 +15,9 @@ RUN set -x && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LUMBERJACK_REPO https://github.com/elastic/ruby-lumberjack.git
-ENV LUMBERJACK_PLUGIN_REPO https://github.com/urso/logstash-input-beats.git
-
 ENV LUMBERJACK_BRANCH fix/small-fixes-for-beats
+
+ENV LUMBERJACK_PLUGIN_REPO https://github.com/ph/logstash-input-beats.git
 ENV LUMBERJACK_PLUGIN_BRANCH fix/initial-beats
 
 # 1. clone repos + checkout dev branches
