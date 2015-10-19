@@ -182,7 +182,7 @@ func (lj *logstash) BulkPublish(
 	return lj.mode.PublishEvents(trans, events)
 }
 
-// compatFix adapts events to be compatible with logstash forwarer messages by renaming
+// compatFix adapts events to be compatible with logstash forwarder messages by renaming
 // the "message" field to "line". The lumberjack server in logstash will
 // decode/rename the "line" field into "message".
 func (lj *logstash) compatFix(event common.MapStr) {
@@ -194,7 +194,7 @@ func (lj *logstash) compatFix(event common.MapStr) {
 	}
 
 	// add metadata for indexing
-	ts := time.Time(event["timestamp"].(common.Time))
+	ts := time.Time(event["timestamp"].(common.Time)).UTC()
 	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
 		ts.Year(), ts.Month(), ts.Day())
 	event["@metadata"] = common.MapStr{

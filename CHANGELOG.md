@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Determine Elasticsearch index for an event based on UTC time [#81](https://github.com/elastic/libbeat/issues/81)
 
 ### Added
 - Add logstash output plugin
