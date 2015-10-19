@@ -19,7 +19,8 @@ type Decoder func(io.Reader) io.Reader
 
 var encodings = map[string]Decoder{
 	// default
-	"nop": Nop,
+	"nop":   Nop,
+	"plain": Nop,
 
 	// utf8 (validate input)
 	"utf-8": trans(encoding.UTF8Validator),
