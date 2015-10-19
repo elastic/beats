@@ -387,8 +387,8 @@ Every event send to logstash contains additional meta data for indexing and filt
 }
 ------------------------------------------------------------------------------
 
-Logstash elasticsearch output can be configured to use metadata and event type
-for indexing.
+In Logstash the elasticsearch output plugin can be configured to use the
+metadata and event type for indexing.
 
 This logstash configuration file for logstash 1.5 will use the index and
 document type reported by beats for indexing events right into elasticsearch.
@@ -412,7 +412,7 @@ output {
 }
 ------------------------------------------------------------------------------
 
-See the same configuration for logstash 2 releases:
+See the same configuration for logstash 2.x releases:
 [source,logstash]
 ------------------------------------------------------------------------------
 
