@@ -1,7 +1,7 @@
 [[filebeat-getting-started]]
 == Getting Started
 
-The following steps help you setup a complete log analyzer system using 
+The following steps help you setup a complete log analyzer system using
 Filebeat for gathering the log files, Elasticsearch for indexing them and Kibana for visualization.
 
  * Install Filebeat on your servers to make use of your log files. <<filebeat-installation>>
@@ -44,7 +44,7 @@ tar xzvf filebeat-{version}-darwin.tgz
 NOTE: We also provide 32bits images. You can get them from our
 https://www.elastic.co/downloads/beats/filebeat[download page].
 
-Before starting filebeat, have a look at the configuration options from `/etc/filebeat/filebeat.yml`, 
+Before starting filebeat, have a look at the configuration options from `/etc/filebeat/filebeat.yml`,
 described in the next chapter.
 
 [[filebeat-configuration]]
@@ -52,7 +52,7 @@ described in the next chapter.
 
 Here is a sample of the _filebeat.yml_ file:
 
-[source,shell]
+[source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
   # List of prospectors to fetch data.

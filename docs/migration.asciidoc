@@ -2,10 +2,47 @@
 
 The following guide should help you to upgrade from the logstash-fordwader to filebeat.
 
-There are three major changes:
+There are four major changes:
 * The config file was restructured and converted from json to yaml
 * The registry file which stores the state of the logstash-fowarder was renamed
 * Command line options were removed and moved to the confg file
+* Configuration options for outputs are inherited from libbeat. Details can be found https://www.elastic.co/guide/en/beats/libbeat/current/index.html[here]
+
+Here is a simple example how a simple config from logstash-forwarder can be migrated to filebeat:
+
+=== logstash-forwarder.json
+[source,json]
+-------------------------------------------------------------------------------------
+{
+  "files": [
+    {
+      "paths": [
+        "/var/log/*.log"
+      ],
+      "fields": { "type": "syslog" }
+    }
+  ],
+  "network": {
+    "servers": [ "localhost:5043" ],
+  }
+}
+-------------------------------------------------------------------------------------
+
+=== filebeat.yml
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/*.log
+    fields:
+      type: syslog
+output:
+  elasticsearch:
+    enabled: true
+    hosts: ["http://localhost:5043"]
+-------------------------------------------------------------------------------------
 
 === Command Line Options
 Most command line options from logstash-forwarder have been removed and migrated to config file options. The only mandatory
@@ -27,7 +64,7 @@ removed or moved to libbeat.
 
 |`-config`
 |`-c`
-|The config options was split up in two part. The base and required config is linked with -c. Additional config files can be linked as part of the config file.
+|The config options was split up in two part. The base and required config is linked with -c. Additional config files can be linked as part of the config file. Note: Additional config files must be in a different directory than the main config file.
 
 |`-config`
 |`config_dir`
@@ -60,15 +97,7 @@ removed or moved to libbeat.
 
 |===
 
-=== Config file
-* New config file
-* Output definitions (see libbeat docs)
-* JSON to YAML
-* Config options in prospector
-* One main config files, directory to specify sub config files
-* Type was introduced
-* Getting config options from the environment was removed as this was part of the JSON implementation.! See https://github.com/elastic/logstash-forwarder/pull/435
-* Files inside the config was renamed to prospectors as this makes more sense
+
 
 ==== Config Options
 With the refactoring of the configuration file, some options were also removed or renamed. Below is a list with the changed entries:
