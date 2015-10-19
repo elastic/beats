@@ -165,7 +165,7 @@ func (lj *logstash) PublishEvent(
 	ts time.Time,
 	event common.MapStr,
 ) error {
-	lj.compatFix(event)
+	lj.addMeta(event)
 	return lj.mode.PublishEvent(signaler, event)
 }
 
@@ -177,24 +177,17 @@ func (lj *logstash) BulkPublish(
 	events []common.MapStr,
 ) error {
 	for _, event := range events {
-		lj.compatFix(event)
+		lj.addMeta(event)
 	}
 	return lj.mode.PublishEvents(trans, events)
 }
 
-// compatFix adapts events to be compatible with logstash forwarer messages by renaming
+// addMeta adapts events to be compatible with logstash forwarer messages by renaming
 // the "message" field to "line". The lumberjack server in logstash will
 // decode/rename the "line" field into "message".
-func (lj *logstash) compatFix(event common.MapStr) {
-	if msg, hasMessage := event["message"]; hasMessage {
-		if _, hasLine := event["line"]; !hasLine {
-			event["line"] = msg
-			delete(event, "message")
-		}
-	}
-
+func (lj *logstash) addMeta(event common.MapStr) {
 	// add metadata for indexing
-	ts := time.Time(event["timestamp"].(common.Time))
+	ts := time.Time(event["timestamp"].(common.Time)).UTC()
 	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
 		ts.Year(), ts.Month(), ts.Day())
 	event["@metadata"] = common.MapStr{
