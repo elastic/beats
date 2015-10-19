@@ -380,7 +380,7 @@ Every event send to logstash contains additional meta data for indexing and filt
 ------------------------------------------------------------------------------
 {
     ...
-    @metadata: {
+    "@metadata": {
       "index": "<beat>-<date>",
       "type": "<event type>"
     }
@@ -390,6 +390,7 @@ Every event send to logstash contains additional meta data for indexing and filt
 Logstash elasticsearch output can be configured to use metadata and event type
 for indexing.
 
+Example Logstash 1.5 config:
 [source,logstash]
 ------------------------------------------------------------------------------
 ...
@@ -407,7 +408,23 @@ output {
 }
 ------------------------------------------------------------------------------
 
-Example configuration:
+Example Logstash 2 config:
+[source,logstash]
+------------------------------------------------------------------------------
+...
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "%{[@metadata][index]}"
+    document_type => "%{[@metadata][type]}"
+  }
+
+  ...
+}
+------------------------------------------------------------------------------
+
+Example beat configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
