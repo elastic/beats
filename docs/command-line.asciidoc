@@ -18,9 +18,10 @@ Pass the configuration file of your Beat.
 Write CPU profile to a given file. This option is useful for troubleshooting
 the Beat.
 
-==== -d
-Enable debugging for certail selectors. For example `-d publish` displays all
-the publish related messages. 
+==== -d [selectors]
+Enable debugging for the specified selectors. The selectors are a comma-separated
+list of components for which to enable debug. Use `*` to enable debug for all
+components. For example, `-d publish` displays all the "publish" related messages.
 
 ==== -e
 Output the error messages to stdout and disable syslog output.

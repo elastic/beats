@@ -659,8 +659,9 @@ man-in-the-middle attacks. Use only for testing.
 
 ===== cipher_suites
 
-Configure list of used cipher suites. First entry has highest priority. If cipher_suites config option is missing, the go crypto library its default suites configuration is used(recommended).
-
+Configure list of used cipher suites. The first entry has the highest priority.
+If cipher_suites config option is omitted, the go crypto library's default
+suites are used (recommended).
 
 List of allowed cipher suites names and their meanings.
 
