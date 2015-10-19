@@ -274,7 +274,7 @@ func TestLogstashTCP(t *testing.T) {
 	assert.Equal(t, 1, len(data.events))
 	data = data.events[0]
 	assert.Equal(t, 10.0, data.doc["extra"])
-	assert.Equal(t, "message", data.doc["line"])
+	assert.Equal(t, "message", data.doc["message"])
 }
 
 func TestLogstashTLS(t *testing.T) {
@@ -390,6 +390,6 @@ func TestLogstashTLS(t *testing.T) {
 		assert.Equal(t, 1, len(data.events))
 		data = data.events[0]
 		assert.Equal(t, 10.0, data.doc["extra"])
-		assert.Equal(t, "message", data.doc["line"])
+		assert.Equal(t, "message", data.doc["message"])
 	}
 }
