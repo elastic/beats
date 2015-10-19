@@ -9,50 +9,174 @@ input:
  # By default, all the processes are monitored
  procs: [".*"]
 
-############################# Shipper ############################################
-shipper:
 
- # The name of the shipper that publishes the network data. It can be used to group
- # all the transactions sent by a single shipper in the web interface.
- # If this options is not defined, the hostname is used.
- name:
+############################# Output ##########################################
 
- # The tags of the shipper are included in their own field with each
- # transaction published. Tags make it easy to group transactions by different
- # logical properties.
- #tags: ["service1"]
-
-############################# Output ############################################
-
-# Configure what outputs to use when sending the data collected by topbeat.
+# Configure what outputs to use when sending the data collected by the beat.
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
 
-  # Elasticsearch as output
-  # Options:
-  # host, port: where Elasticsearch is listening on
+  ### Elasticsearch as output
   elasticsearch:
+
+    # Set to true to enable elasticsearch output
     enabled: true
+
+    # Array of hosts to connect to.
+    # Scheme and port can be left out and will be set to the default (http and 9200)
+    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
-  # Redis as output
-  # Options:
-  # host, port: where Redis is listening on
-  #redis:
-  #  enabled: true
-  #  host: localhost
-  #  port: 6379
+    # Optional protocol and basic auth credentials. These are deprectad
+    #protocol: "https"
+    #username: "admin"
+    #password: "s3cr3t"
 
-  # File as output
-  # Options:
-  # path: where to save the files
-  # filename: name of the files
-  # rotate_every_kb: maximum size of the files in path
-  # number of files: maximum number of files in path
+    # Optional index name. The default is "topbeat" and generates
+    # [topbeat-]YYYY.MM.DD keys.
+    #index: "topbeat"
+
+    # Optional HTTP Path
+    #path: "/elasticsearch"
+
+    # The number of times a particular Elasticsearch index operation is attempted. If
+    # the indexing operation doesn't succeed after this many retries, the events are
+    # dropped. The default is 3.
+    #max_retries: 3
+
+    # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+    # The default is 10000.
+    #bulk_max_size: 10000
+
+    # The number of seconds to wait for new events between two bulk API index requests.
+    # If `bulk_max_size` is reached before this interval expires, addition bulk index
+    # requests are made.
+    #flush_interval
+
+    #The time to live in seconds for the topology information that is stored in
+    #Elasticsearch. The default is 15 seconds.
+    #topology_expire:
+
+    # tls configuration
+    #tls:
+      # If disabled is set to true, the tls section will be ignored and the
+      # host its certificate authorities will be used.
+      #disabled: true
+
+      # List of root certificates for HTTPS server verifications
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+
+  ### Logstash as output
+  #logstash:
+    # Uncomment out this option if you want to output to Logstash. The default is false.
+    #enabled: true
+
+    # The Logstash hosts
+    #hosts: ["localhost:5044", "logstash:5045"]
+
+    # Optional load balance the events between the Logstash hosts
+    #loadbalance: true
+
+    # Optional index name. The default index name is logstash
+    #index: logstash
+
+    # Optional TLS. The default is on
+    #tls:
+      #disabled: true
+
+      # List of root certificates for HTTPS server verifications
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
+
+  ### File as output
   #file:
-  #  enabled: true
-  #  path: "/tmp/topbeat"
-  #  filename: topbeat
-  #  rotate_every_kb: 1000
-  #  number_of_files: 7
+    # Enabling file output
+    #enabled: false
 
+    # Path to the directory where to save the generated files. The option is mandatory.
+    #path: "/tmp/topbeat"
+
+    # Name of the generated files. The default is `topbeat` and it generates
+    # files: `topbeat`, `topbeat.1`, `topbeat.2`, etc.
+    #filename: topbeat
+
+    # Maximum size in kilobytes of each file. When this size is reached, the files are
+    # rotated. The default value is 10 MB.
+    #rotate_every_kb: 10000
+
+    # Maximum number of files under path. When this number of files is reached, the
+    # oldest file is deleted and the rest are shifted from last to first. The default
+    # is 7 files.
+    #number_of_files: 7
+
+
+############################# Shipper #########################################
+
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  #ignore_outgoing: true
+
+
+############################# Logging #########################################
+
+#logging:
+#  selectors: []
+#
+#  # Rotator config
+#  files:
+#    path:
+#    name:
+#    rotateEveryBytes:
+#    keepFiles:
+#  to_syslog: false
+#  to_files: false
