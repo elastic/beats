@@ -36,9 +36,9 @@ go get github.com/elastic/topbeat
 === Overview
 
 At the high level, a simple Beat like Topbeat has two main components: one that
-collects the actual data and the Publisher. The Publisher is implemented in
+collects the actual data and the publisher. The publisher is implemented in
 libbeat, so you typically only have to worry about the logic specific to your
-Beat. Besides the Publisher, libbeat offers common services like configuration
+Beat. Besides the publisher, libbeat offers common services like configuration
 management, logging, daemonizing/Windows service handling and in the future it
 will offer data processing modules like filtering or sampling.
 
