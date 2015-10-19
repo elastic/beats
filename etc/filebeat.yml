@@ -7,7 +7,10 @@ filebeat:
     # Each - is a prospector. Below are the prospector specific configurations
     -
       # Paths that should be crawled and fetched. Glob based paths.
+      # To fetch all ".log" files from a specific level of subdirectories
+      # /var/log/*/*.log can be used.
       # For each file found under this path, a harvester is started.
+      # Make sure not file is defined twice as this can lead to unexpected behaviour.
       paths:
         - /var/log/*.log
       # - c:\programdata\elasticsearch\logs\*
@@ -75,6 +78,7 @@ filebeat:
   # Full Path to directory with additional prospector configuration files. Each file must end with .yml
   # These config files must have the full filebeat config part inside, but only
   # the prospector part is processed. All global options like spool_size are ignored.
+  # The config_dir MUST point to a different directory then where the main filebeat config file is in.
   config_dir:
 
 
@@ -107,7 +111,7 @@ output:
   # host, port: where Elasticsearch is listening on
   elasticsearch:
     enabled: true
-    hosts: ["localhost:9200"]
+    hosts: ["http://localhost:9200"]
 
   # Redis as output
   # Options:

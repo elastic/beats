@@ -18,8 +18,16 @@ The above defines one prospector which is harvesting the path `/var/log/*.log`. 
 harvest all files in the directory `/var/log/` which end with `.log`. All patterns supported
 by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] can be used here.
 
+To fetch all files from a predefined level of subdirectories, the following pattern can be used:
+`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
+fetch all files in all subdirectories of a directory.
+
 Every config file can contain multiple prospectors and multiple paths per prospector
 as shown below.
+
+Note: Make sure a file is not defined multiple times across all prospectors as this can lead
+to unexpected behaviour.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -149,10 +157,10 @@ filebeat:
 Full Path to directory with additional prospector configuration files. Each file must end with .yml
 These config files must have the full filbeat config hierarchy inside, but only
 the prospector part is processed. All global options like spool_size are ignored.
+The config_dir MUST point to a different directory then where the main filebeat config file is in.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
   config_dir: path/to/configs
 -------------------------------------------------------------------------------------
-
