@@ -37,15 +37,19 @@ type FilebeatConfig struct {
 
 type ProspectorConfig struct {
 	Paths                 []string
-	Fields                map[string]string
 	Input                 string
 	IgnoreOlder           string `yaml:"ignore_older"`
 	IgnoreOlderDuration   time.Duration
 	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
-	HarvesterBufferSize   int    `yaml:"harvester_buffer_size"`
-	TailOnRotate          bool   `yaml:"tail_on_rotate"`
-	Encoding              string `yaml:"encoding"`
+	Harvester             HarvesterConfig `yaml:",inline"`
+}
+
+type HarvesterConfig struct {
+	Fields       map[string]string
+	BufferSize   int    `yaml:"harvester_buffer_size"`
+	TailOnRotate bool   `yaml:"tail_on_rotate"`
+	Encoding     string `yaml:"encoding"`
 }
 
 // getConfigFiles returns list of config files.

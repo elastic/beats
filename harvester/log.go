@@ -14,19 +14,21 @@ import (
 )
 
 func NewHarvester(
-	cfg config.ProspectorConfig,
+	prospectorCfg config.ProspectorConfig,
+	cfg *config.HarvesterConfig,
 	path string,
 	signal chan int64,
 	spooler chan *input.FileEvent,
 ) (*Harvester, error) {
-	encoding, ok := find(cfg.Encoding)
-	if !ok {
+	encoding, ok := findEncoding(cfg.Encoding)
+	if !ok || encoding == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
 	}
 
 	h := &Harvester{
 		Path:             path,
-		ProspectorConfig: cfg,
+		ProspectorConfig: prospectorCfg,
+		Config:           cfg,
 		FinishChan:       signal,
 		SpoolerChan:      spooler,
 		encoding:         encoding,
@@ -57,8 +59,10 @@ func (h *Harvester) Harvest() {
 
 	h.initOffset()
 
-	reader := bufio.NewReaderSize(h.encoding(h.file), h.BufferSize)
-	buffer := new(bytes.Buffer)
+	var in io.Reader = h.file
+	in = h.encoding(in)
+	reader := bufio.NewReaderSize(in, h.Config.BufferSize)
+	buffer := bytes.NewBuffer(nil)
 
 	var readTimeout = 10 * time.Second
 	lastReadTime := time.Now()
@@ -83,7 +87,7 @@ func (h *Harvester) Harvest() {
 			Offset:   h.Offset,
 			Line:     line,
 			Text:     text,
-			Fields:   &h.ProspectorConfig.Fields,
+			Fields:   &h.Config.Fields,
 			Fileinfo: &info,
 		}
 		h.Offset += int64(bytesread)
@@ -99,7 +103,7 @@ func (h *Harvester) initOffset() {
 
 	if h.Offset > 0 {
 		logp.Debug("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-	} else if h.TailOnRotate {
+	} else if h.Config.TailOnRotate {
 		logp.Debug("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
 	} else {
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
@@ -112,7 +116,7 @@ func (h *Harvester) initOffset() {
 func (h *Harvester) setFileOffset() {
 	if h.Offset > 0 {
 		h.file.Seek(h.Offset, os.SEEK_SET)
-	} else if h.TailOnRotate {
+	} else if h.Config.TailOnRotate {
 		h.file.Seek(0, os.SEEK_END)
 	} else {
 		h.file.Seek(0, os.SEEK_SET)

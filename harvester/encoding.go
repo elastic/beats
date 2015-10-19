@@ -56,13 +56,11 @@ var encodings = map[string]Decoder{
 var Nop Decoder = nopEnc
 
 // Find returns
-func find(name string) (Decoder, bool) {
+func findEncoding(name string) (Decoder, bool) {
 	if name == "" {
 		return Nop, true
 	}
-
-	name = strings.ToLower(name)
-	d, ok := encodings[name]
+	d, ok := encodings[strings.ToLower(name)]
 	return d, ok
 }
 

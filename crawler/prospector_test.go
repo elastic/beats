@@ -11,10 +11,12 @@ import (
 func TestProspectorInit(t *testing.T) {
 
 	prospectorConfig := config.ProspectorConfig{
-		ScanFrequency:       "15s",
-		IgnoreOlder:         "100m",
-		HarvesterBufferSize: 100,
-		TailOnRotate:        true,
+		ScanFrequency: "15s",
+		IgnoreOlder:   "100m",
+		Harvester: config.HarvesterConfig{
+			BufferSize:   100,
+			TailOnRotate: true,
+		},
 	}
 
 	prospector := Prospector{
@@ -28,16 +30,18 @@ func TestProspectorInit(t *testing.T) {
 	// Predefined values expected
 	assert.Equal(t, 100*time.Minute, prospector.ProspectorConfig.IgnoreOlderDuration)
 	assert.Equal(t, 15*time.Second, prospector.ProspectorConfig.ScanFrequencyDuration)
-	assert.Equal(t, 100, prospector.ProspectorConfig.HarvesterBufferSize)
-	assert.Equal(t, true, prospector.ProspectorConfig.TailOnRotate)
+	assert.Equal(t, 100, prospector.ProspectorConfig.Harvester.BufferSize)
+	assert.Equal(t, true, prospector.ProspectorConfig.Harvester.TailOnRotate)
 }
 
 func TestProspectorInitEmpty(t *testing.T) {
 
 	prospectorConfig := config.ProspectorConfig{
-		ScanFrequency:       "",
-		IgnoreOlder:         "",
-		HarvesterBufferSize: 0,
+		ScanFrequency: "",
+		IgnoreOlder:   "",
+		Harvester: config.HarvesterConfig{
+			BufferSize: 0,
+		},
 	}
 
 	prospector := Prospector{
@@ -64,8 +68,8 @@ func TestProspectorInitNotSet(t *testing.T) {
 	// Default values expected
 	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.ProspectorConfig.IgnoreOlderDuration)
 	assert.Equal(t, config.DefaultScanFrequency, prospector.ProspectorConfig.ScanFrequencyDuration)
-	assert.Equal(t, config.DefaultHarvesterBufferSize, prospector.ProspectorConfig.HarvesterBufferSize)
-	assert.Equal(t, config.DefaultTailOnRotate, prospector.ProspectorConfig.TailOnRotate)
+	assert.Equal(t, config.DefaultHarvesterBufferSize, prospector.ProspectorConfig.Harvester.BufferSize)
+	assert.Equal(t, config.DefaultTailOnRotate, prospector.ProspectorConfig.Harvester.TailOnRotate)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {
