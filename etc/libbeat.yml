@@ -56,7 +56,7 @@ output:
     #Elasticsearch. The default is 15 seconds.
     #topology_expire:
 
-    # tls configuration
+    # tls configuration. By default is off.
     #tls:
       # If disabled is set to true, the tls section will be ignored and the
       # host its certificate authorities will be used.
@@ -100,7 +100,7 @@ output:
     # top topbeat and for Filebeat to filebeat.
     #index: filebeat
 
-    # Optional TLS. The default is off
+    # Optional TLS. By default is off.
     #tls:
       #disabled: true
       
