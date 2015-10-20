@@ -468,6 +468,7 @@ List of known logstash servers to connect to. All entries in this list can
 contain a port number. If no port number is given, the port options value is
 used as default port number.
 
+[[loadbalance]]
 ===== loadbalance
 
 If set to true and multiple logstash hosts are configured, The output plugin will
