@@ -106,7 +106,7 @@ integration between the Beat and Logstash is implemented. We plan to use the
 same protocol as it is used between the
 https://github.com/elastic/logstash-forwarder[Logstash Forwarder] and Logstash.
 
-image:./images/packetbeat_logstash.png[Integration with Logstash]
+image:./images/beats-logstash.png[Integration with Logstash]
 
 In this setup, the Beat shippers use the `RPUSH` Redis command to insert
 into a list stored in memory by Redis. Logstash reads from this key using the
