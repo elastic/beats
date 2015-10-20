@@ -2,62 +2,24 @@
 [[filebeat-configuration-details]]
 == Configuration
 
-Filebeat uses for most configuration a predefined default value. The most basic filebeat configuration
-looks as following. Please note that this excludes the libbeat configuration part.
+The configuration file of Filebeat uses http://yaml.org/[YAML] as any other Beat. 
+To start with the configuration it is best to have a look at the default configuration. It is described in detail
+what each configuration option is for and how it can be used. Remove the items that are not needed for your setup.
 
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    -
-      paths:
-        - /var/log/*.log
--------------------------------------------------------------------------------------
+The _etc/filebeat.yml_ consists of the following sections:
 
-The above defines one prospector which is harvesting the path `/var/log/*.log`. Filebeat will
-harvest all files in the directory `/var/log/` which end with `.log`. All patterns supported
-by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] can be used here.
+* {libbeat}/configuration.html#configuration-shipper[Shipper]
+* {libbeat}/configuration.html#configuration-output[Output]
+* <<configuration-filebeat-options>>
+* {libbeat}/configuration.html#configuration-logging[Logging (optional)]
+* {libbeat}/configuration.html#configuration-run-options[Run options (optional)]
 
-To fetch all files from a predefined level of subdirectories, the following pattern can be used:
-`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
-fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
-fetch all files in all subdirectories of a directory.
-
-Every config file can contain multiple prospectors and multiple paths per prospector
-as shown below.
-
-Note: Make sure a file is not defined multiple times across all prospectors as this can lead
-to unexpected behaviour.
-
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    -
-      paths:
-        - /var/log/system.log
-        - /var/log/wifi.log
-    -
-      paths:
-        - /var/log/apache/*
--------------------------------------------------------------------------------------
-
-The config file above will start to prospectors. The first prospector will have two harvesters,
-one harvesting the system.log file, the other wifi.log. The second prospector will start a harvester
-for each file in the apache directory.
-
-=== Config Options
-
-All existing config options are listed and described in the default config file under `etc/filebeat.yml`. Below is a list
-of all supported configuration options. Part of the configuration are also the libbeat related parts which can be found
-{libbeat}/configuration.html[here].
-
-The start with the configuration it is best to have a look at the default configuration. It is described in detail
-what each config is for and how it can be used. Remove the items that are needed for your setup.
-
+[[configuration-filebeat-options]]
+=== Filebeat
 
 ==== Prospectors
-Contains a list of prospector items. Each prospector item is described below
+
+Contains a list of prospector items. Each prospector item is described below.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -65,7 +27,6 @@ filebeat:
   prospectors: 1024
 -------------------------------------------------------------------------------------
 
-==== Prospector
 Every prospector item stats with a -. Inside are the prospector specific configs defined
 and a list of paths is added that should be crawled. The config fields itself are described
 in the config below.
@@ -122,8 +83,55 @@ filebeat:
       #encoding: plain
 -------------------------------------------------------------------------------------
 
+===== paths
 
-==== spool_size
+A list of glob based paths that should be crawled and fetched. For each file found under this path, a harvester is
+started. Each path is defined one per line.
+
+===== type
+
+It has two options:
+
+    * log:  Reads every line of the log file (default)
+    * stdin: Reads the standard in
+
+
+===== fields
+
+Add optionally couple of fields to be included to the exported fields by the currently configured 
+Filebeat instance. These fields can be freely picked to add additional information to the crawled 
+log files for filtering.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+fields:
+    level: debug
+    review: 1
+
+-------------------------------------------------------------------------------------
+
+===== ignore_older
+
+If set, ignores the files which were modified more then the defined timespan in the past
+Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+
+===== scan_frequency
+
+In seconds, specifies how often these files should be checked for changes. In case it is set
+to 0s, it is done as often as possible. Default: 10s
+
+
+===== harvester_buffer_size
+
+Defines the buffer size every harvester uses when fetching the file. By default is 16384.
+
+
+===== tail_on_rotate
+
+If true, tail on log rotation. By default, it is disabled. 
+Note:: If enabled, it may skip entries.
+
+===== spool_size
 
 Event count spool threshold - forces network flush if exceeded.
 
@@ -133,7 +141,7 @@ filebeat:
 -------------------------------------------------------------------------------------
 
 
-==== idle_timeout
+===== idle_timeout
 
 Defines how often the spooler is flushed. After idle_timeout the spooler is
 Flush even though spool_size is not reached. The value must be given as duration string.
@@ -146,7 +154,7 @@ filebeat:
 
 
 
-==== registry_file
+===== registry_file
 
 Name of the registry file. Per default it is put in the current working
 directory. In case the working directory is changed after when running
@@ -159,7 +167,7 @@ filebeat:
 -------------------------------------------------------------------------------------
 
 
-==== config_dir
+===== config_dir
 
 Full Path to directory with additional prospector configuration files. Each file must end with .yml
 These config files must have the full filbeat config hierarchy inside, but only
@@ -171,3 +179,13 @@ The config_dir MUST point to a different directory then where the main filebeat 
 filebeat:
   config_dir: path/to/configs
 -------------------------------------------------------------------------------------
+
+===== encoding
+
+Configures the file encoding for reading file with international characters. The 
+supported encodings are:
+
+    * plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
+    * euckr, eucjp, iso2022jp, shiftjis, iso8859-63, iso8859-6i, iso8859-8e,
+    * iso8859-8i
+

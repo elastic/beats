@@ -1,8 +1,6 @@
 [[filebeat-getting-started]]
 == Getting Started
 
-Filebeat makes use of your log files by sending them to the ELK stack.
-
 Get started with your own Filebeat setup by first:
 
  * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
@@ -73,6 +71,51 @@ filebeat:
       # * stdin: Reads the standard in
       type: log
 -------------------------------------------------------------------------------------
+
+Filebeat uses for most configuration a predefined default value. The most basic filebeat configuration
+looks as following. Please note that this excludes the libbeat configuration part.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/*.log
+-------------------------------------------------------------------------------------
+
+The above defines one prospector which is harvesting the path `/var/log/*.log`. Filebeat will
+harvest all files in the directory `/var/log/` which end with `.log`. All patterns supported
+by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] can be used here.
+
+To fetch all files from a predefined level of subdirectories, the following pattern can be used:
+`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
+fetch all files in all subdirectories of a directory.
+
+Every config file can contain multiple prospectors and multiple paths per prospector
+as shown below.
+
+Note:: Make sure a file is not defined multiple times across all prospectors as this can lead
+to unexpected behaviour.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/system.log
+        - /var/log/wifi.log
+    -
+      paths:
+        - /var/log/apache/*
+-------------------------------------------------------------------------------------
+
+The config file above will start to prospectors. The first prospector will have two harvesters,
+one harvesting the system.log file, the other wifi.log. The second prospector will start a harvester
+for each file in the apache directory.
+
 
 Check <<filebeat-configuration-details>> for more details about each configuration options.
 

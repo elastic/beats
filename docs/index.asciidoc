@@ -13,6 +13,3 @@ include::./command-line.asciidoc[]
 include::./migration.asciidoc[]
 
 include::./support.asciidoc[]
-
-include::./contributions.asciidoc[]
-
