@@ -20,13 +20,16 @@ type Registrar struct {
 	// Channel used by the prospector and crawler to send FileStates to be persisted
 	Persist chan *input.FileState
 	running bool
+
 	Channel chan []*FileEvent
+	done    chan struct{}
 }
 
 func NewRegistrar(registryFile string) (*Registrar, error) {
 
 	r := &Registrar{
 		registryFile: registryFile,
+		done:         make(chan struct{}),
 	}
 	err := r.Init()
 
@@ -81,14 +84,22 @@ func (r *Registrar) Run() {
 
 	r.running = true
 
-	// Writes registry
+	// Writes registry on shutdown
 	defer r.writeRegistry()
 
-	for events := range r.Channel {
+	for {
+		var events []*FileEvent
+		select {
+		case <-r.done:
+			logp.Debug("registrar", "Ending Registrar")
+			return
+		case events = <-r.Channel:
+		}
+
 		logp.Debug("registrar", "Registrar: processing %d events", len(events))
+
 		// Take the last event found for each file source
 		for _, event := range events {
-
 			if !r.running {
 				break
 			}
@@ -105,18 +116,13 @@ func (r *Registrar) Run() {
 			// REVU: but we should panic, or something, right?
 			logp.Err("Update of registry returned error: %v. Continuing..", e)
 		}
-
-		if !r.running {
-			break
-		}
 	}
-	logp.Debug("registrar", "Ending Registrar")
 }
 
 func (r *Registrar) Stop() {
 	r.running = false
-	close(r.Channel)
-	r.writeRegistry()
+	close(r.done)
+	// Note: don't block using waitGroup, cause this method is run by async signal handler
 }
 
 func (r *Registrar) GetFileState(path string) (*FileState, bool) {
