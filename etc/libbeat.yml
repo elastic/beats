@@ -83,44 +83,6 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
-
-  ### Redis as output
-  #redis:
-    # Uncomment out this option if you want to output to Redis. The default is false.
-    #enabled: true
-
-    # Set the host and port where to find Redis.
-    #host: "localhost"
-    #port: 6379
-
-    # Uncomment out this option if you want to store the topology in Redis.
-    # The default is false.
-    #save_topology: true
-
-    # Optional index name. The default is packetbeat and generates packetbeat keys.
-    # index: "packetbeat"
-
-    # Optional Redis database number where the events are stored
-    # The default is 0.
-    # db: 0
-
-    # Optional Redis database number where the topology is stored
-    # The default is 1. It must have a different value than db.
-    #db_topology: 1
-
-    # Optional password to authenticate with. By default, no
-    # password is set.
-    #password: ""
-
-    # Optional Redis initial connection timeout in seconds.
-    # The default is 5 seconds.
-    #timeout: 5
-
-    # Optional interval for reconnecting to failed Redis connections.
-    # The default is 1 second.
-    #reconnect_interval: 1
-
-
   ### Logstash as output
 
   #logstash:
@@ -133,12 +95,36 @@ output:
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name is logstash
-    #index: logstash
+    # Optional index name. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat
+    # top topbeat and for Filebeat to filebeat.
+    #index: filebeat
 
-    # Optional TLS. The default is on
+    # Optional TLS. The default is off
     #tls:
       #disabled: true
+      
+      # List of root certificates for HTTPS server verifications
+      #certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      #certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      #certificate_key: "/etc/pki/client/cert.key"
+
+      # Controls whether the client verifies server certificates and host name.
+      # If insecure is set to true, all server host names and certificates will be
+      # accepted. In this mode TLS based connections are susceptible to
+      # man-in-the-middle attacks. Use only for testing.
+      #insecure: true
+
+      # Configure cipher suites to be used for TLS connections
+      #cipher_suites: []
+
+      # Configure curve types for ECDHE based cipher suites
+      #curve_types: []
+
 
 
   ### File as output
