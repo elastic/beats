@@ -155,7 +155,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch-172 elasticsearch-200 logstash
+	docker-compose up -d redis elasticsearch-173 elasticsearch-200 logstash
 
 .PHONY: stop-environment
 stop-environment:
