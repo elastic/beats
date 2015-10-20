@@ -520,7 +520,7 @@ was a pull request some time ago. But that's not documented yet.
 
 Inserts the events in a Redis list. This output plugin is compatibile with
 the http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
-so the Redis Output for the Beats is depreciated. 
+so the Redis Output for the Beats is deprecated. 
 Example configuration:
 
 [source,yaml]
