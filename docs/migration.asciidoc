@@ -203,7 +203,7 @@ output:
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
     pick a random one for new connections, similar to the Logstash-Forwarder
     behavior. Filebeat can optionally also to load balancing, see
-    {libbeat}/configuration.html#_loadbalance/[the configuration option].
+    {libbeat}/configuration.html#loadbalance[the configuration option].
 <2> Note that if the `tls` section is missing the encryption is disabled. It is
    automatically enabled when adding the `tls` section. More TLS options are
    documented {libbeat}/configuration.html#configuration-output-tls[here].
