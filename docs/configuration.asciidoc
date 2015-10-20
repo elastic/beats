@@ -151,7 +151,7 @@ Currently the following output types are supported:
 
 * Elasticsearch
 * Logstash
-* Redis
+* Redis (DEPRECATED)
 * File
 
 One or multiple outputs can be enabled at a time. The output plugins are
@@ -511,7 +511,7 @@ max_retries, the beat optionally will be notified about it.
 
 
 [[redis-output]]
-==== Redis Output
+==== Redis Output (DEPRECATED)
 
 ////
 TODO: I think besides the list option, PUB-SUB is also supported here (there
@@ -520,7 +520,7 @@ was a pull request some time ago. But that's not documented yet.
 
 Inserts the events in a Redis list. This output plugin is compatibile with
 the http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
-so the Redis Output for the Beats is depreciated. 
+so the Redis Output for the Beats is deprecated. 
 Example configuration:
 
 [source,yaml]
@@ -775,29 +775,27 @@ logging:
 In addition to the logging system, the logging output configuration can be
 modified from <<command-line-options, command line>>.
 
-==== to_syslog
+==== Logging options
+
+===== to_syslog
 
 Send all logging output to syslog if enabled. For non Windows systems default
 value is true.
 
-==== to_files
+===== to_files
 
 Write all logging output to files subject to file rotation. On Windows systems
 default value is true.
 
-==== selectors
+===== selectors
 
 List of debugging only selector tags used by different beats components. Use `*`
 to enable debug output for all components. For example add 'publish' to display
 all the debug messages related to event publishing.
 
-==== files
-
-Log rotation for file output can be configured in the files subsection.
-
 ===== files.path
 
-The path setting sets the directory log files will be written to. For Windows
+The path setting sets the directory where the log files are written to. For Windows
 systems the default path is C:\\ProgramData\<beat-name>\Logs. Default for
 non-Windows systems is /var/log/<beat-name>.
 
@@ -808,12 +806,12 @@ Beat's name is used.
 
 ===== files.rotateeverybytes
 
-Maximum Log file size. If limit is reached a new log file will be generated.
-Default log file size limit is 10485760 (=10MB).
+The maximum size of a log file. If the limit is reached, a new log file is generated.
+Default size limit is 10485760 (=10MB).
 
 ===== files.keepfiles
 
-Number of most recent rotated log files to keep on disc. Older files will be
+Number of most recent rotated log files to keep on disc. Older files are
 deleted during log rotation. Default value is 7. The keepfiles options has to be
 in the range of 2 to 1024 files.
 
