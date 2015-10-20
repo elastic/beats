@@ -380,19 +380,26 @@ Every event send to logstash contains additional meta data for indexing and filt
 ------------------------------------------------------------------------------
 {
     ...
-    @metadata: {
+    "@metadata": {
       "index": "<beat>-<date>",
       "type": "<event type>"
     }
 }
 ------------------------------------------------------------------------------
 
-Logstash elasticsearch output can be configured to use metadata and event type
-for indexing.
+In Logstash the elasticsearch output plugin can be configured to use the
+metadata and event type for indexing.
 
+This logstash configuration file for logstash 1.5 will use the index and
+document type reported by beats for indexing events right into elasticsearch.
 [source,logstash]
 ------------------------------------------------------------------------------
-...
+
+input {
+  beats {
+    port => 5044
+  }
+}
 
 output {
   elasticsearch {
@@ -402,12 +409,33 @@ output {
     index => "%{[@metadata][index]}"
     document_type => "%{[@metadata][type]}"
   }
-
-  ...
 }
 ------------------------------------------------------------------------------
 
-Example configuration:
+See the same configuration for logstash 2.x releases:
+[source,logstash]
+------------------------------------------------------------------------------
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "%{[@metadata][index]}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Events indexed into elasticsearch with shown logstash configuration will be
+similar to events directly indexed by beats into elasticsearch.
+
+
+Example beat configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
@@ -415,9 +443,9 @@ output:
     enabled: true
 
     hosts:
-      - logstash1:12345
-      - logstash2:12345
-      - logstash3:12345
+      - logstash1:5044
+      - logstash2:5044
+      - logstash3:5044
 
     # configure index prefix name
     index: mybeat

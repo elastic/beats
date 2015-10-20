@@ -36,12 +36,11 @@ go get github.com/elastic/topbeat
 === Overview
 
 At the high level, a simple Beat like Topbeat has two main components: one that
-collects the actual data and the Publisher. They communicate via a Go channel,
-over which _events_ are sent. The Publisher is implemented in libbeat, so you
-typically only have to worry about the logic specific to your Beat. Besides the
-Publisher, libbeat offers common services like configuration management,
-logging, daemonizing/Windows service handling and in the future it will offer
-data processing modules like filtering or sampling.
+collects the actual data and the publisher. The publisher is implemented in
+libbeat, so you typically only have to worry about the logic specific to your
+Beat. Besides the publisher, libbeat offers common services like configuration
+management, logging, daemonizing/Windows service handling and in the future it
+will offer data processing modules like filtering or sampling.
 
 image:./images/beat_overview.png[Beat overview architecture]
 
@@ -133,7 +132,7 @@ type ConfigSettings struct {
 ----------------------------------------------------------------------
 
 Pointers are used to separate between the case when the setting is completely
-missing from the configuration file and when it has a values that matches the
+missing from the configuration file and when it has values that matches the
 type default.
 
 With these structures defined, the `Config` function looks like this:
@@ -211,7 +210,7 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 
 Inside the loop, Topbeat sleeps for a configured period of time and then
 captures the required data and sends it to the publisher via the `events`
-channel. The events channel is available as part of the Beat object
+publisher client. The publisher client is available as part of the Beat object
 through the `Beat.Events` variable.
 
 The actual sending is done inside the `exportSystemStats()`:
@@ -238,7 +237,7 @@ func (t *Topbeat) exportSystemStats() error {
 		"swap":      swap_stat,
 	}
 
-	t.Beat.Events <- event <3>
+	t.Beat.Events.PublishEvent(event) <3>
 
 	return nil
 }
