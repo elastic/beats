@@ -103,7 +103,6 @@ func (s *Spooler) Run() {
 
 // Stop stops the spooler. Flushes events before stopping
 func (s *Spooler) Stop() {
-	s.running = false
 }
 
 // flush flushes all event and sends them to the publisher

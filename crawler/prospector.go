@@ -325,7 +325,6 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 func (p *Prospector) Stop() {
 	// TODO: Stopping is currently not implemented
-	p.running = false
 }
 
 // Check if the given file was renamed. If file is known but with different path,

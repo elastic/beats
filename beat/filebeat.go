@@ -116,7 +116,7 @@ func (fb *Filebeat) Stop() {
 	fb.registrar.Stop()
 
 	// Close channels
-	close(fb.publisherChan)
+	//close(fb.publisherChan)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {

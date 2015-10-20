@@ -79,5 +79,4 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 
 func (crawler *Crawler) Stop() {
 	// TODO: Properly stop prospectors and harvesters
-	crawler.running = false
 }
