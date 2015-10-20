@@ -44,12 +44,21 @@ waitForElasticsearch() {
   exit 1
 }
 
-updateConfigFile() {
-    sed -e "s/host.*/host => \"$ES_HOST\"/" /logstash.conf.tmpl > /logstash.conf
+updateConfigFile_1_5() {
+    sed -e "s/host .*/host => \"$ES_HOST\"/" /logstash.conf.1.5.tmpl > /logstash.conf
+}
+
+updateConfigFile_2() {
+    sed -e "s/hosts.*/hosts => [\"$ES_HOST:$ES_PORT\"]/" /logstash.conf.2.tmpl > /logstash.conf
 }
 
 # Main
 readParams
-updateConfigFile
+if [ "$LS_VERSION" == "2" ]; then
+    updateConfigFile_2
+else
+    updateConfigFile_1_5
+fi
+
 waitForElasticsearch
 exec "$@"

@@ -1,0 +1,16 @@
+input {
+  beats {
+    port => 12345
+    ssl => false
+  }
+}
+
+output {
+  elasticsearch {
+      hosts => []
+      index => "%{[@metadata][index]}"
+      document_type => "%{[@metadata][type]}"
+  }
+
+  # stdout{}
+}
