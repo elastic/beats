@@ -22,11 +22,11 @@ output:
     # Set to true to enable elasticsearch output
     enabled: true
 
-    # Array of hosts to connect to.
-    # Scheme and port can be left out and will be set to the default (http and 9200)
-    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
-    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["localhost:9200"]
+    # A list of Elasticsearch hosts. If the connection to the first host fails, it connects to the second one.
+    # A host can be defined as an IP:PORT or an URL with the format: scheme://IP:PORT/path. In case you specify and
+    # additional path, the scheme is required. The defaults are ( port is 9200, path is '/', scheme is http).
+    # In case of an IPv6 address, please use http://[2001:db8::1]:9200.
+    hosts: ["http://localhost:9200"]
 
     # Optional protocol and basic auth credentials. These are deprectad
     #protocol: "https"
@@ -97,8 +97,8 @@ output:
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name is logstash
-    #index: logstash
+    # Optional index name. The default index name is topbeat
+    #index: topbeat
 
     # Optional TLS. The default is on
     #tls:
