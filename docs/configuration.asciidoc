@@ -119,7 +119,7 @@ filebeat:
       #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
       #   euckr, eucjp, iso2022jp, shiftjis, iso8859-63, iso8859-6i, iso8859-8e,
       #   iso8859-8i
-      #encoding: utf-16
+      #encoding: plain
 -------------------------------------------------------------------------------------
 
 
