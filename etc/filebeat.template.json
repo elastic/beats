@@ -7,9 +7,34 @@
           "enabled": false
         }
       },
+      "dynamic_templates": [
+        {
+          "template1": {
+            "mapping": {
+              "doc_values": true,
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "{dynamic_type}"
+            },
+            "match": "*"
+          }
+        }
+      ],
       "properties": {
         "timestamp": {
           "type": "date"
+        },
+        "message": {
+          "type": "string",
+          "index": "analyzed"
+        },
+        "line": {
+          "type": "integer",
+          "doc_values": "true"
+        },
+        "offset": {
+          "type": "integer",
+          "doc_values": "true"
         }
       }
     }
