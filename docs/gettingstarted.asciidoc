@@ -110,6 +110,10 @@ input plugin] and then sends the transaction to Elasticsearch using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making indexing very efficient.
 
+Note: If Logstash 1.5.4 is installed, the beats input plugin must be installed
+prior to applying this configuration. Run 'bin/plugin install
+logstash-input-beats' to install the required plugin.
+
 To use this setup, disable the Elasticsearch output and use instead the
 <<logstash-output,Logstash output>> in the Beat configuration file:
 
