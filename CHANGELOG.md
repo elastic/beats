@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
+## [Unreleased](https://github.com/elastic/packetbeat/compare/1.0.0-beta4...HEAD)
+
+### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
 ## [1.0.0-beta4] - 2015-10-21
 
 ### Backward Compatibility Breaks
