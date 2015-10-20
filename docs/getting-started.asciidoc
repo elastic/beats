@@ -1,15 +1,15 @@
 [[filebeat-getting-started]]
 == Getting Started
 
-The following steps help you setup a complete log analyzer system using
-Filebeat for gathering the log files, Elasticsearch for indexing them and Kibana for visualization.
+Filebeat makes use of your log files by sending them to the ELK stack.
 
- * Install Filebeat on your servers to make use of your log files. <<filebeat-installation>>
- * Install Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Install Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
+Get started with your own Filebeat setup by first:
 
+ * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * installing optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
 
+After you have Elasticsearch, Kibana and optionally Logstash installed, you can start <<filebeat-installation>>.
 
 [[filebeat-installation]]
 === Installing Filebeat
