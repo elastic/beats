@@ -27,7 +27,7 @@ filebeat:
   prospectors: 1024
 -------------------------------------------------------------------------------------
 
-Every prospector item stats with a -. Inside are the prospector specific configs defined
+Every prospector item starts with a -. Inside are the prospector specific configs defined
 and a list of paths is added that should be crawled. The config fields itself are described
 in the config below.
 

@@ -5,9 +5,9 @@ Get started with your own Filebeat setup by first:
 
  * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
  * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * installing optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
+ * installing Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
 
-After you have Elasticsearch, Kibana and optionally Logstash installed, you can start <<filebeat-installation>>.
+After you have Elasticsearch, Kibana and Logstash installed, you can start <<filebeat-installation>>.
 
 [[filebeat-installation]]
 === Installing Filebeat
@@ -112,7 +112,7 @@ filebeat:
         - /var/log/apache/*
 -------------------------------------------------------------------------------------
 
-The config file above will start to prospectors. The first prospector will have two harvesters,
+The config file above will start two prospectors. The first prospector will have two harvesters,
 one harvesting the system.log file, the other wifi.log. The second prospector will start a harvester
 for each file in the apache directory.
 
