@@ -4,16 +4,13 @@
 Topbeat helps you monitor the availability of your website or service by providing system wide and per process
 statistics together with disk space overview.
 
-=== Steps:
+Get started with your own Topbeat setup by: 
 
-Follow the steps to get started with your own Topbeat setup:
+ * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[Follow steps]
+ * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[Follow steps]
+ * installing optionally Logstash. {libbeat}/getting-started.html#logstash-installation[Follow steps]
 
- * Install Topbeat on your servers to capture system wide and per process statistics. <<topbeat-installation>>
- * Install Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Install Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
- * Load sample Kibana dashboards to get it started. <<sample-dashboards>>
-
+After you have Elasticsearch, Kibana and optionally Logstash installed, you can start <<topbeat-installation>>.
 
 
 [[topbeat-installation]]
@@ -141,8 +138,22 @@ curl -XGET 'http://localhost:9200/topbeat-*/_search?pretty'
 Make sure to replace `localhost:9200` with the address of your Elasticsearch
 instance. 
 
+=== Sample dashboards
 
-=== System wide overview
+In order to make it as easy as possible to start monitoring your servers in Kibana, 
+we provide a few sample Kibana dashboards. The dashboards are maintained in this
+https://github.com/elastic/beats-dashboards[GitHub repository], which also
+includes instructions for loading them.
+
+Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#load-kibana-dashboards[steps].
+
+image:./images/topbeat-dashboard.png[Topbeat statistics]
+
+These dashboards are provided as examples, we recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to your needs.
+
+==== System wide overview
 
 You can configure the `Dashboard` page to show the statistics that you are interested in for all the servers or for a
 subset of them.
@@ -151,7 +162,7 @@ running on different servers, free and used disk space for all servers, the CPU 
 
 image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
 
-=== Per server overview
+==== Per server overview
 
 To display the statistics coming from a single server, a search query like *shipper: precise32* can be used:
 
