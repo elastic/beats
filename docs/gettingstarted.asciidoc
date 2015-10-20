@@ -89,81 +89,75 @@ curl http://127.0.0.1:9200
 [[logstash-installation]]
 === Insert data to Elasticsearch via Logstash
 
-The simplest architecture for the Beat platform setup consists of the Beats shippers, Elasticsearch and Kibana.
-This is nice and easy to get started with and enough for networks with small traffic. It also uses the
-minimum amount of servers: a single machine running Elasticsearch + Kibana. The
-Beat shippers insert the transactions directly into the Elasticsearch
-instance.
+The simplest architecture for the Beat platform setup consists of the Beats
+shippers, Elasticsearch and Kibana. This is nice and easy to get started with
+and enough for networks with small traffic. It also uses the minimum amount of
+servers: a single machine running Elasticsearch + Kibana. The Beat shippers
+insert the transactions directly into the Elasticsearch instance.
 
-This article explains how to use the Beat together with Redis and Logstash to
-provide buffering and efficient indexing.  Another important advantage is that
-you have the opportunity in Logstash to modify the data captured by Beat
-any way you like. You can also use Logstash's many output plugins to integrate
-with other systems.
-
-WARNING: The Redis output is meant to be used only temporarily until the direct
-integration between the Beat and Logstash is implemented. We plan to use the
-same protocol as it is used between the
-https://github.com/elastic/logstash-forwarder[Logstash Forwarder] and Logstash.
+This article explains how to use the Beat together with Logstash to provide
+additional buffering. Another important advantage is that you have
+the opportunity in Logstash to modify the data captured by Beat any way you
+like. You can also use Logstash's many output plugins to integrate with other
+systems.
 
 image:./images/beats-logstash.png[Integration with Logstash]
 
-In this setup, the Beat shippers use the `RPUSH` Redis command to insert
-into a list stored in memory by Redis. Logstash reads from this key using the
-http://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis
-input plugin] and then sends the transactions to Elasticsearch using the
+In this setup, the Beat shippers send events to Logstash. Logstash receives
+these events using the
+https://github.com/logstash-plugins/logstash-input-beats[Beats
+input plugin] and then sends the transaction to Elasticsearch using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
-output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
-indexing very efficient.
+output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making indexing very efficient.
 
 To use this setup, disable the Elasticsearch output and use instead the
-<<redis-output,Redis output>> in the Beat configuration file:
+<<logstash-output,Logstash output>> in the Beat configuration file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
-  redis:
-    # Uncomment out this option if you want to output to Redis.
-    # The default is false.
+  logstash:
     enabled: true
 
-    # Set the host and port where to find Redis.
-    host: "127.0.0.1"
-    port: 6379
+    hosts: ["127.0.0.1:5044"]
 
-    # This option makes sense only for Packetbeat
-    save_topology: true
+    # configure logstash plugin to loadbalance events between
+    # configured logstash hosts
+    #loadbalance: false
 ------------------------------------------------------------------------------
 
-NOTE: If you want the Beat to monitor Redis traffic, it's better to change
-the port for the Redis instance that you use for collecting the traffic.
-Otherwise, you create a loop where the shipper captures the traffic it sends.
-
-Then, configure Logstash to read from Redis and index into Elasticsearch. Here
-is a sample configuration that you can save under `/etc/logstash/conf.d/`:
+Next configure Logstash to listen on Port 5044 for incoming beats connections
+and index into Elasticsearch. The Beats platform sends the index and document
+type that the Beat would use for indexing into Elasticsearch as additional meta data.
+Here is an example configuration that you can save under `/etc/logstash/conf.d/`:
 
 [source,ruby]
 ------------------------------------------------------------------------------
 input {
-    redis {
-        codec => "json"
-        host => "127.0.0.1"
-        port => 6379
-        data_type => "list"
-        key => "packetbeat"
-    }
+  beats {
+    port => 5044
+  }
 }
 
 output {
-    elasticsearch {
-        protocol => "http"
-        host => "127.0.0.1"
-        sniffing => true
-        manage_template => false
-        index => "packetbeat-%{+YYYY.MM.dd}"
-    }
+  elasticsearch {
+    protocol => "http"
+    host => "localhost"
+    port => "9200"
+    sniffing => true
+    manage_template => false
+    index => "%{[@metadata][index]}"
+    document_type => "%{[@metadata][type]}"
+  }
 }
 ------------------------------------------------------------------------------
+
+Using this configuration Logstash will index events in Elasticsearch the same
+way the Beat would do.
+
+Note: Default configuration in Beat and Logstash uses plain TCP. For encryption
+TLS must be explicitly enabled in Beat and Logstash configuration.
+
 
 [[kibana-installation]]
 === Kibana installation
