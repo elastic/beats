@@ -116,6 +116,7 @@ func (r *Registrar) Run() {
 func (r *Registrar) Stop() {
 	r.running = false
 	close(r.Channel)
+	r.writeRegistry()
 }
 
 func (r *Registrar) GetFileState(path string) (*FileState, bool) {
