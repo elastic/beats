@@ -106,7 +106,7 @@ func (lj *logstash) init(
 		m, err = mode.NewSingleConnectionMode(clients[0],
 			sendRetries, waitRetry, timeout)
 	} else {
-		loadBalance := config.LoadBalance == nil || *config.LoadBalance
+		loadBalance := config.LoadBalance != nil && *config.LoadBalance
 		if loadBalance {
 			m, err = mode.NewLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
 		} else {
