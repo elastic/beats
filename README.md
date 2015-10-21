@@ -36,3 +36,7 @@ If you are sure you found a bug or have a feature request, open an issue on
 
 We love contributions from our community! Please read the
 [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+## Nightlies
+
+For testing purpose every day nightlies are generated which can be found [here](https://beats-nightlies.s3.amazonaws.com/index.html?prefix=filebeat/). Please be aware that these are built on top of master and are not stable.
