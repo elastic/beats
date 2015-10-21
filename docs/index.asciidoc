@@ -24,8 +24,6 @@ include::./kibana3.asciidoc[]
 
 include::./filtering.asciidoc[]
 
-include::./dashboards.asciidoc[]
-
 include::./troubleshooting.asciidoc[]
 
 include::./new_protocol.asciidoc[]

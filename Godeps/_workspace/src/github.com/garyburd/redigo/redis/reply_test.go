@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/garyburd/redigo/internal/redistest"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -101,15 +100,16 @@ func TestReply(t *testing.T) {
 	}
 }
 
-// dial wraps DialTestDB() with a more suitable function name for examples.
+// dial wraps DialDefaultServer() with a more suitable function name for examples.
 func dial() (redis.Conn, error) {
-	return redistest.Dial()
+	return redis.DialDefaultServer()
 }
 
 func ExampleBool() {
 	c, err := dial()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	defer c.Close()
 
@@ -123,7 +123,8 @@ func ExampleBool() {
 func ExampleInt() {
 	c, err := dial()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	defer c.Close()
 
@@ -140,7 +141,8 @@ func ExampleInt() {
 func ExampleInts() {
 	c, err := dial()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	defer c.Close()
 
@@ -154,7 +156,8 @@ func ExampleInts() {
 func ExampleString() {
 	c, err := dial()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	defer c.Close()
 

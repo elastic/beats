@@ -54,7 +54,7 @@ func NewDecoder(datalink layers.LinkType, tcp tcp.Processor, udp udp.Processor) 
 			&d.lo, &d.d1q, &d.ip4, &d.ip6, &d.tcp, &d.udp, &d.payload)
 
 	default:
-		return nil, fmt.Errorf("Unsuported link type: %s", datalink.String())
+		return nil, fmt.Errorf("Unsupported link type: %s", datalink.String())
 
 	}
 
