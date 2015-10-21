@@ -35,11 +35,11 @@
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+			"Rev": "3d0709611e0e29c05a4e925e8447b065abb4eef6"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+			"Rev": "3d0709611e0e29c05a4e925e8447b065abb4eef6"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",

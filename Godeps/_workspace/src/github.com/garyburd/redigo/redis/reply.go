@@ -215,7 +215,9 @@ func Bool(reply interface{}, err error) (bool, error) {
 	return false, fmt.Errorf("redigo: unexpected type for Bool, got type %T", reply)
 }
 
-// MultiBulk is deprecated. Use Values.
+// MultiBulk is a helper that converts an array command reply to a []interface{}.
+//
+// Deprecated: Use Values instead.
 func MultiBulk(reply interface{}, err error) ([]interface{}, error) { return Values(reply, err) }
 
 // Values is a helper that converts an array command reply to a []interface{}.
@@ -275,9 +277,6 @@ func Strings(reply interface{}, err error) ([]string, error) {
 // err is not equal to nil, then Ints returns nil, err.
 func Ints(reply interface{}, err error) ([]int, error) {
 	var ints []int
-	if reply == nil {
-		return ints, ErrNil
-	}
 	values, err := Values(reply, err)
 	if err != nil {
 		return ints, err
