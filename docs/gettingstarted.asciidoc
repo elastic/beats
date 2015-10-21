@@ -276,6 +276,20 @@ overwhelming at the beginning, so we have created a couple of
 https://github.com/elastic/beats-dashboards[Sample Dashboards] to give you a good start and to
 demonstrate what is possible based on the packet data.
 
+NOTE: Make sure your Kibana version works with your Elasticsearch version. See the table below.
+
+.Kibana versions compatible with the Elasticsearch versions
+|===
+|Kibana version |Elasticsearch version
+
+|Kibana 4.1.x
+|Elasticsearch 1.7.3
+
+|Kibana 4.2.0
+|Elasticsearch 2.0.0
+|===
+
+
 To load the sample pages, follow these steps:
 
 ["source","sh",subs="attributes,callouts"]
