@@ -37,10 +37,10 @@ log:
     Contains log files lines.
   fields:
     - name: source
-     type: string
-     required: true
-     description: >
-       File the line was read from.
+      type: string
+      required: true
+      description: >
+        File the line was read from.
 
     - name: offset
       type: int
@@ -72,5 +72,3 @@ log:
       description: >
         Operating System specific file information use to identify the source
         file. For example on linux an inode might be reported.
-
-    

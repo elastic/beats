@@ -15,11 +15,11 @@ SECTIONS = [
 ]
 
 
-def document_fields(output, section):
+def document_fields(output, section, level=3):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-    output.write("=== {} fields\n\n".format(section["name"]))
+    output.write("{} {} fields\n\n".format(level*'=', section["name"]))
 
     if "description" in section:
         output.write("{}\n\n".format(section["description"]))
@@ -36,17 +36,17 @@ def document_fields(output, section):
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
-            document_fields(output, field)
+            document_fields(output, field, level + 1)
         else:
-            document_field(output, field)
+            document_field(output, field, level + 1)
 
 
-def document_field(output, field):
+def document_field(output, field, level):
 
     if "path" not in field:
         field["path"] = field["name"]
 
-    output.write("==== {}\n\n".format(field["path"]))
+    output.write("{} {}\n\n".format(level*'=', field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
