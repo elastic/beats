@@ -83,6 +83,12 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
+
   ### Logstash as output
 
   #logstash:

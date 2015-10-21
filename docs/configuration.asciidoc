@@ -693,6 +693,20 @@ not available in client.
 
 When configured, both certificate and certificate_key are required.
 
+===== min_version
+
+Minimum SSL/TLS version allowed for the encrypted connections. Must be one of
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+Default value is `1.0`.
+
+===== max_version
+
+Maximum SSL/TLS version allowed for the encrypted connections. Must be one of
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+Default value is `1.2`.
+
 ===== insecure
 
 Controls whether the client verifies server certificates and host name.
