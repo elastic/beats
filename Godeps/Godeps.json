@@ -52,7 +52,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/sys/windows",
-			"Rev": "68a71b6be5774eece23e35475fc28514a84297a3"
+			"Rev": "354f231ae1a9ca2d3a6a1a7c5d40b1213d761675"
 		},
 		{
 			"ImportPath": "golang.org/x/text/encoding",
