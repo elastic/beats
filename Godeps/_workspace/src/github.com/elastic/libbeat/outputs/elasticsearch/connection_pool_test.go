@@ -88,7 +88,7 @@ func TestDeadTimeout(t *testing.T) {
 	assertExpectedConnectionURL(t, conn.URL, urls[0])
 
 	pool.MarkDead(conn)
-	time.Sleep(1 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	assertExpectedConnectionURL(t, pool.GetConnection().URL, urls[1])
 	assertExpectedConnectionURL(t, pool.GetConnection().URL, urls[0])
