@@ -443,13 +443,13 @@ output:
   logstash:
     enabled: true
 
-    hosts: ["localhost:5044", "localhost:5045"]
+    hosts: ["localhost:5044"]
 
     # configure index prefix name
     index: mybeat
 
     # configure logstash plugin to loadbalance events between the logstash instances
-    loadbalance: true
+    loadbalance: false
 
     tls:
       # disable tls for testing (TLS must be disabled in logstash too)
