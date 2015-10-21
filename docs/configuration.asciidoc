@@ -448,9 +448,6 @@ output:
     # configure index prefix name
     index: mybeat
 
-    # configure logstash plugin to loadbalance events between the logstash instances
-    loadbalance: false
-
     tls:
       # disable tls for testing (TLS must be disabled in logstash too)
       disabled: true
@@ -474,6 +471,26 @@ load balance published events onto all logstash hosts. If set to false,
 the output plugin will send all events to only one host (determined by random)
 switching to another host if selected one becomes unresponsive.
 The default value is false.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    enabled: true
+
+    hosts: ["localhost:5044", "localhost:5045"]
+
+    # configure index prefix name
+    index: mybeat
+
+    # configure logstash plugin to loadbalance events between the logstash instances
+    loadbalance: true
+
+    tls:
+      # disable tls for testing (TLS must be disabled in logstash too)
+      disabled: true
+------------------------------------------------------------------------------
+
 
 ===== port
 
