@@ -87,7 +87,7 @@ curl http://127.0.0.1:9200
 
 
 [[logstash-installation]]
-=== Insert data to Elasticsearch via Logstash
+=== Logstash Installation
 
 The simplest architecture for the Beat platform setup consists of the Beats
 shippers, Elasticsearch and Kibana. This is nice and easy to get started with
@@ -103,6 +103,46 @@ systems.
 
 image:./images/beats-logstash.png[Integration with Logstash]
 
+To download, install and run Logstash pick your platform and follow the steps below:
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
+sudo dpkg -i logstash-{LS-version}-1_all.deb
+sudo /etc/init.d/logstash start
+----------------------------------------------------------------------
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}-1.noarch.rpm
+sudo rpm -i lgostash-{LS-version}-1.noarch.rpm
+sudo service logstash start
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elastic.co/logstash/logstash/logstash-{LS-version}.zip
+unzip logstash-{LS-version}.zip
+cd logstash-{LS-version}
+./bin/logstash
+----------------------------------------------------------------------
+
+You can learn more about installing, configuring and running Logstash
+https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html[here].
+
+
+
+==== Logstash Setup
+
 In this setup, the Beat shippers send events to Logstash. Logstash receives
 these events using the
 https://github.com/logstash-plugins/logstash-input-beats[Beats
@@ -110,9 +150,18 @@ input plugin] and then sends the transaction to Elasticsearch using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making indexing very efficient.
 
-Note: If Logstash 1.5.4 is installed, the beats input plugin must be installed
-prior to applying this configuration. Run 'bin/plugin install
-logstash-input-beats' to install the required plugin.
+Note: The mininum required Logstash version for this plugin is 1.5.4.
+If Logstash 1.5.4 is installed, the beats input plugin must be installed
+prior to applying this configuration as the plugin is not shipped with 1.5.4.
+To install the required plugin run the following command inside the logstash
+directory. In case you used deb or rpm for installation, run the logstash
+plugin executable instead.
+
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/plugin install logstash-input-beats
+----------------------------------------------------------------------
 
 To use this setup, disable the Elasticsearch output and use instead the
 <<logstash-output,Logstash output>> in the Beat configuration file:
@@ -133,7 +182,7 @@ output:
 Next configure Logstash to listen on Port 5044 for incoming beats connections
 and index into Elasticsearch. The Beats platform sends the index and document
 type that the Beat would use for indexing into Elasticsearch as additional meta data.
-Here is an example configuration that you can save under `/etc/logstash/conf.d/`:
+Here is an example configuration that you can save in your `conf.json` file:
 
 [source,ruby]
 ------------------------------------------------------------------------------
@@ -158,6 +207,16 @@ output {
 
 Using this configuration Logstash will index events in Elasticsearch the same
 way the Beat would do.
+
+Now you can start logstash with:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/logstash -f config.json
+----------------------------------------------------------------------
+
+Adjust the path to your configuration file. In case you installed logstash
+as deb or rpm package, place to config file in the expected directory.
 
 Note: Default configuration in Beat and Logstash uses plain TCP. For encryption
 TLS must be explicitly enabled in Beat and Logstash configuration.
@@ -209,7 +268,7 @@ You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 
 [[load-kibana-dashboards]]
-=== Load Kibana dashboards
+==== Load Kibana dashboards
 
 Kibana has a large set of visualization types which you can combine to create
 the perfect dashboards for your needs. But this flexibility can be a bit
@@ -242,7 +301,7 @@ Additionally, the index patterns for Packetbeat and Topbeat are created:
    - [topbeat-]YYYY.MM.DD
    - [filebeat-]YYYY.MM.DD
 
-After loading the dashboards, Kibana rises the following error 
+After loading the dashboards, Kibana rises the following error
 `No default index pattern. You must select or create one to continue.` that can be solved
 by setting one index pattern as favorite.
 
