@@ -68,7 +68,7 @@ waitForLogstash() {
 
     echo
     echo >&2 'Logstash is not available'
-    echo >&2 "Address: ${LS_HOST}:${LS_TCP_PORT}"
+    echo >&2 "Address: ${LS_HOST}:${LS_TCP_PORT} and ${LS_HOST}:${LS_TLS_PORT}"
 }
 
 # Main

@@ -9,7 +9,8 @@ libbeat:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
     - LS_HOST=logstash
-    - LS_TCP_PORT=12345
+    - LS_TCP_PORT=5044
+    - LS_TLS_PORT=5055
   env_file:
     - build/test.env
 elasticsearch-173:
