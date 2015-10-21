@@ -134,7 +134,7 @@ deb or rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -XPUT 'http://localhost:9200/_template/filebeat' -d@/etc/filebeat/filebeat.template.json
+curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json
 ----------------------------------------------------------------------
 
 mac:
@@ -142,7 +142,7 @@ mac:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 cd filebeat-{version}-darwin
-curl -XPUT 'http://localhost:9200/_template/filebeat' -d@filebeat.template.json
+curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat.template.json
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening on.
