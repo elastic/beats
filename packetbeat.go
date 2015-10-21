@@ -91,7 +91,7 @@ func fetchAdditionalCmdLineArgs() CmdLineArgs {
 func (pb *Packetbeat) CliFlags(b *beat.Beat) {
 	// -devices CLI flag
 	if *pb.CmdLineArgs.PrintDevices {
-		devs, err := sniffer.ListDeviceNames()
+		devs, err := sniffer.ListDeviceNames(true)
 		if err != nil {
 			fmt.Printf("Error getting devices list: %v\n", err)
 			os.Exit(1)
