@@ -15,5 +15,6 @@ All documentation about Filebeat can be found here.
 ### Added
 
 ### Improvements
+- All Godeps dependencies were updated to master on 2015-10-21 [#122](https://github.com/elastic/filebeat/pull/122)
 
 ### Deprecated
