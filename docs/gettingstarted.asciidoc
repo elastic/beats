@@ -151,12 +151,11 @@ http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.ht
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
 indexing very efficient.
 
-Note: The minimum required Logstash version for this plugin is 1.5.4.
+The minimum required Logstash version for this plugin is 1.5.4.
 If using Logstash 1.5.4, the beats input plugin must be installed prior to
 applying this configuration as the plugin is not shipped with 1.5.4. To install
-the required plugin run the following command inside the logstash directory. In
-case you used deb or rpm for installation, run the logstash plugin executable
-instead.
+the required plugin run the following command inside the logstash directory
+(for deb and rpm installs, the directory is `/opt/logstash`).
 
 
 ["source","sh",subs="attributes,callouts"]
@@ -220,8 +219,9 @@ Now you can start logstash with:
 Adjust the path to your configuration file. In case you installed logstash
 as deb or rpm package, place the config file in the expected directory.
 
-Note: Default configuration in Beat and Logstash uses plain TCP. For encryption
-TLS must be explicitly enabled in the Beat and Logstash configuration.
+NOTE: The default configuration in Beat and Logstash uses plain TCP. For
+encryption TLS must be explicitly enabled in the Beat and Logstash
+configuration.
 
 
 [[kibana-installation]]
