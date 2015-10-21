@@ -1,0 +1,74 @@
+version: 1.0
+
+defaults:
+  type: string
+  required: false
+  index: not_analyzed
+  doc_values: true
+  ignore_above: 1024
+
+env:
+  type: group
+  description: >
+    Contains common fields available in all event types.
+  fields:
+    - name: shipper
+      type: string
+      description: >
+        Name of the shipper sending the log messages
+
+    - name: timestamp
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The timestamp when the log line is published. The precision is in milliseconds.
+        The timezone is UTC.
+
+    - name: type
+      description: >
+        Set to "log" to telling the event contains content read from log files.
+      required: true
+
+log:
+  type: group
+  description: >
+    Contains log files lines.
+  fields:
+    - name: source
+      type: string
+      required: true
+      description: >
+        File the line was read from.
+
+    - name: offset
+      type: int
+      required: false
+      description: >
+        File offset the reported line starts at.
+
+    - name: line
+      type: int
+      required: true
+      description: >
+        The line number the published line starts at.
+
+    - name: message
+      type: string
+      required: true
+      description: >
+        Content of line read from log file given by source.
+
+    - name: fields
+      type: group
+      required: false
+      description: >
+        Contains user configurable fields.
+
+    - name: fileinfo
+      type: group
+      required: false
+      description: >
+        Operating System specific file information use to identify the source
+        file. For example on linux an inode might be reported.

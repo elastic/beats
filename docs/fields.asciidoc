@@ -1,0 +1,101 @@
+
+////
+This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+== Exported fields
+
+This document describes the fields that are exported by filebeat. They are
+grouped in the following categories:
+
+* <<exported-fields-env>>
+* <<exported-fields-log>>
+
+[[exported-fields-env]]
+=== Common fields fields
+
+Contains common fields available in all event types.
+
+
+
+==== shipper
+
+type: string
+
+Name of the shipper sending the log messages
+
+
+==== timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the log line is published. The precision is in milliseconds. The timezone is UTC.
+
+
+==== type
+
+required: True
+
+Set to "log" to telling the event contains content read from log files.
+
+
+[[exported-fields-log]]
+=== Log files content fields
+
+Contains log files lines.
+
+
+
+==== source
+
+type: string
+
+required: True
+
+File the line was read from.
+
+
+==== offset
+
+type: int
+
+required: False
+
+File offset the reported line starts at.
+
+
+==== line
+
+type: int
+
+required: True
+
+The line number the published line starts at.
+
+
+==== message
+
+type: string
+
+required: True
+
+Content of line read from log file given by source.
+
+
+==== fields fields
+
+Contains user configurable fields.
+
+
+==== fileinfo fields
+
+Operating System specific file information use to identify the source file. For example on linux an inode might be reported.
+
+
