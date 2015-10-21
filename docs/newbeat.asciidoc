@@ -2,12 +2,12 @@
 
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
-your servers and ship it to Logstash or Elasticsearch.  The common parts from
+your servers and ship it to Elasticsearch or Logstash.  The common parts from
 all Beats are placed in the libbeat library, which contains packages for sending
 data to Elasticsearch and Logstash, for configuration file handling, for signal
-handling, for logging and so on. By using this common framework, we can ensure
-that all Beats are behaving the same and they are easy to package and run with
-common tools.
+handling, for logging and more. By using this common framework, we can ensure
+that all Beats are behaving the same and that they are easy to package and run
+with common tools.
 
 === Getting ready
 
@@ -23,10 +23,10 @@ https://github.com/elastic/topbeat[Topbeat] source code. Topbeat is similar to
 the `top` command line tool but instead of printing the statistics to the screen
 it periodically ships them to Elasticsearch for storage.
 
-After having https://golang.org/doc/install[installed Go] and having setup the
+After having https://golang.org/doc/install[installed Go] and setup the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your preferred workspace location, a simple way of getting the source code for
-Topbeat and libeat and compiling them at the same time is to do:
+Topbeat and libbeat and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -45,10 +45,10 @@ will offer data processing modules like filtering or sampling.
 image:./images/beat_overview.png[Beat overview architecture]
 
 An event is a JSON like object (Golang type `map[string]interface{}`) that
-contains the collected data and which is indexed into Elasticsearch. The only
+contains the collected data which is indexed into Elasticsearch. The only
 rules are that it must contain a `timestamp` field and a `type` field. Beyond
 that, these events can contain anything and they can be created as often as
-needed.
+necessary.
 
 [source,json]
 ----------------------------------------------------------------------
@@ -131,9 +131,9 @@ type ConfigSettings struct {
 }
 ----------------------------------------------------------------------
 
-Pointers are used to separate between the case when the setting is completely
-missing from the configuration file and when it has values that matches the
-type default.
+Pointers are used to distinguish between when the setting is completely
+missing from the configuration file and when it has a value that matches the
+type's default value.
 
 With these structures defined, the `Config` function looks like this:
 
@@ -167,8 +167,9 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 ==== Setup
 
 The `Setup` method gives you the opportunity to execute things before the main
-loop, usually for initialization. In the case of Topbeat, it only assigns the Beat
-object to the Topbeat object, so it doesn't have to be passed to all sub functions.
+loop, usually for initialization. In the case of Topbeat, it only assigns the
+Beat object to the Topbeat object, so it doesn't have to be passed to all sub
+functions.
 
 [source,go]
 ----------------------------------------------------------------------
@@ -208,7 +209,7 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 }
 ----------------------------------------------------------------------
 
-Inside the loop, Topbeat sleeps for a configured period of time and then
+Inside the loop, Topbeat sleeps for a configurable period of time and then
 captures the required data and sends it to the publisher via the `events`
 publisher client. The publisher client is available as part of the Beat object
 through the `Beat.Events` variable.
@@ -244,14 +245,14 @@ func (t *Topbeat) exportSystemStats() error {
 ----------------------------------------------------------------------
 
 <1> Creating the event object.
-<2> The `timestamp` fields needs to be of time `common.Time`.
+<2> The `timestamp` field needs to be of time `common.Time`.
 <3> Sending the event.
 
 ==== Cleanup
 
 The `Cleanup` method is executed after the main loop finishes or is interrupted
 and gives you the opportunity to release any resources you might use. For
-Topbeat, it's completely empty:
+Topbeat, it is completely empty:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -276,7 +277,7 @@ func (t *Topbeat) Stop() {
 
 === The main function
 
-If you follow the Topbeat model and put your Beat specific code in it's own type
+If you follow the Topbeat model and put your Beat specific code in its own type
 that implements the `Beater` interface, the code from your main package becomes
 very simple:
 
