@@ -7,46 +7,39 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Comment": "v1.0.0-beta3-265-g7f89fab",
-			"Rev": "7f89fab385b11861e74ae02b2ff1ee5fe635bdfc"
+			"Rev": "212e420de80ea9d5bfbfb22a5d7952e3b34cf14f"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+			"Rev": "3d0709611e0e29c05a4e925e8447b065abb4eef6"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Rev": "1a6effc8b0a7bb1b21c683ea5645c4e0fb52f302"
+			"Rev": "3d0709611e0e29c05a4e925e8447b065abb4eef6"
 		},
 		{
 			"ImportPath": "github.com/nranchev/go-libGeoIP",
@@ -54,11 +47,12 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "dab07ac62d4905d3e48d17dc549c684ac3b7c15a"
+			"Comment": "v1.0-51-gf3960ab",
+			"Rev": "f3960ab1f9664ecc4e27c78af27cc9063d745a43"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/windows",
-			"Rev": "68a71b6be5774eece23e35475fc28514a84297a3"
+			"Rev": "354f231ae1a9ca2d3a6a1a7c5d40b1213d761675"
 		},
 		{
 			"ImportPath": "golang.org/x/text/encoding",
@@ -70,7 +64,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "7ad95dd0798a40da1ccdff6dff35fd177b5edf40"
+			"Rev": "53feefa2559fb8dfa8d81baad31be332c97d6c77"
 		}
 	]
 }
