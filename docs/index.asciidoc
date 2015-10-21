@@ -1,6 +1,7 @@
 [[beats-reference]]
 = Beats Platform Reference
 :ES-version: 1.7.3
+:LS-version: 1.5.4
 :Kibana-version: 4.1.2
 :Dashboards-version: 1.0.0-beta4
 
