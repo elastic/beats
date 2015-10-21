@@ -175,7 +175,7 @@ output:
     enabled: true
 
     # The Elasticsearch cluster
-    hosts: ["http://10.45.3.2", "http://10.45.3.1/elasticsearch"]
+    hosts: ["http://localhost:9200"]
 
     # Comment this option if you don't want to store the topology in
     # Elasticsearch. The default is false.
@@ -211,7 +211,7 @@ output:
     enabled: true
 
     # The Elasticsearch cluster
-    hosts: ["https://10.45.3.2", "https://10.45.3.1"]
+    hosts: ["https://localhost:9200"]
 
     # Comment this option if you don't want to store the topology in
     # Elasticsearch. The default is false.
@@ -236,7 +236,7 @@ output:
     enabled: true
 
     # The Elasticsearch cluster
-    hosts: ["10.45.3.2", "10.45.3.1"]
+    hosts: ["localhost"]
 
     # Optional http or https. Default is http
     protocol: "https"
