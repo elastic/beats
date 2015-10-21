@@ -168,7 +168,7 @@ output:
     #enabled: true
 
     # The Logstash hosts
-    #hosts: ["localhost:5044", "logstash:5045"]
+    #hosts: ["localhost:5044"]
 
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
