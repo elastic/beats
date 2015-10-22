@@ -511,7 +511,8 @@ TCP for logstash input.
 
 ===== timeout
 
-Logstash connection timeout waiting for responses from logstash server.
+Logstash connection timeout in seconds waiting for responses from logstash
+server. Default is 30 (seconds).
 
 ===== max_retries
 
