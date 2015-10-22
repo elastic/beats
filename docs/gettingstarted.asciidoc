@@ -10,24 +10,23 @@ A regular _Beats setup_ consists of:
  * Kibana for the UI. <<kibana-installation>>
  * Kibana dashboards to customize your widgets. <<load-kibana-dashboards>>
 
-NOTE:  For now, you can just install Elasticsearch and Kibana on a single VM or even
-on your laptop. The only condition is that this machine is accessible from the
-servers you want to monitor. As you add more shippers and your traffic grows, you
-will want replace the single Elasticsearch instance with a cluster. You will
-probably also want to automate the installation process.  But for now, let's
-just do the fun part.
+NOTE:  For getting started, you can just install Elasticsearch and Kibana on a
+single VM or even on your laptop. The only condition is that this machine is
+accessible from the servers you want to monitor. As you add more shippers and
+your traffic grows, you will want replace the single Elasticsearch instance with
+a cluster. You will probably also want to automate the installation process.
 
 [[elasticsearch-installation]]
 === Elasticsearch installation
 
-https://www.elastic.co/products/elasticsearch[Elasticsearch] is a distributed real-time
-storage, search and analytics engine. It can be used for many purposes, but one
-context where it excels is indexing streams of semi-structured data, like logs
-or decoded network packets.
+https://www.elastic.co/products/elasticsearch[Elasticsearch] is a distributed
+real-time storage, search and analytics engine. It can be used for many
+purposes, but one context where it excels is indexing streams of semi-structured
+data, like logs or decoded network packets.
 
 The binary packages of Elasticsearch have only one dependency: Java. Choose the
-tab that fits your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora,
-mac for OS X):
+section that fits your system (deb for Debian/Ubuntu, rpm for
+Redhat/Centos/Fedora, mac for OS X) and run the commands:
 
 deb:
 
@@ -87,7 +86,7 @@ curl http://127.0.0.1:9200
 
 
 [[logstash-installation]]
-=== Logstash Installation
+=== Logstash Installation (Optional)
 
 The simplest architecture for the Beat platform setup consists of the Beats
 shippers, Elasticsearch and Kibana. This is nice and easy to get started with
@@ -103,7 +102,8 @@ systems.
 
 image:./images/beats-logstash.png[Integration with Logstash]
 
-To download, install and run Logstash pick your platform and follow the steps below:
+To download, install and run Logstash pick your platform and follow the steps
+below:
 
 deb:
 
@@ -148,14 +148,14 @@ these events using the
 https://github.com/logstash-plugins/logstash-input-beats[Beats
 input plugin] and then sends the transaction to Elasticsearch using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
-output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making indexing very efficient.
+output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
+indexing very efficient.
 
-Note: The mininum required Logstash version for this plugin is 1.5.4.
-If Logstash 1.5.4 is installed, the beats input plugin must be installed
-prior to applying this configuration as the plugin is not shipped with 1.5.4.
-To install the required plugin run the following command inside the logstash
-directory. In case you used deb or rpm for installation, run the logstash
-plugin executable instead.
+The minimum required Logstash version for this plugin is 1.5.4.
+If using Logstash 1.5.4, the beats input plugin must be installed prior to
+applying this configuration as the plugin is not shipped with 1.5.4. To install
+the required plugin run the following command inside the logstash directory
+(for deb and rpm installs, the directory is `/opt/logstash`).
 
 
 ["source","sh",subs="attributes,callouts"]
@@ -163,7 +163,7 @@ plugin executable instead.
 ./bin/plugin install logstash-input-beats
 ----------------------------------------------------------------------
 
-To use this setup, disable the Elasticsearch output and use instead the
+To use this setup, disable the Elasticsearch output and instead use the
 <<logstash-output,Logstash output>> in the Beat configuration file:
 
 [source,yaml]
@@ -179,10 +179,11 @@ output:
     #loadbalance: false
 ------------------------------------------------------------------------------
 
-Next configure Logstash to listen on Port 5044 for incoming beats connections
+Next configure Logstash to listen on port 5044 for incoming beats connections
 and index into Elasticsearch. The Beats platform sends the index and document
-type that the Beat would use for indexing into Elasticsearch as additional meta data.
-Here is an example configuration that you can save in your `conf.json` file:
+type that the Beat would use for indexing into Elasticsearch as additional
+metadata. Here is an example configuration that you can save in your `conf.json`
+file:
 
 [source,ruby]
 ------------------------------------------------------------------------------
@@ -205,8 +206,8 @@ output {
 }
 ------------------------------------------------------------------------------
 
-Using this configuration Logstash will index events in Elasticsearch the same
-way the Beat would do.
+Using this configuration, Logstash will index events in Elasticsearch the same
+way the Beat would.
 
 Now you can start logstash with:
 
@@ -216,10 +217,11 @@ Now you can start logstash with:
 ----------------------------------------------------------------------
 
 Adjust the path to your configuration file. In case you installed logstash
-as deb or rpm package, place to config file in the expected directory.
+as deb or rpm package, place the config file in the expected directory.
 
-Note: Default configuration in Beat and Logstash uses plain TCP. For encryption
-TLS must be explicitly enabled in Beat and Logstash configuration.
+NOTE: The default configuration in Beat and Logstash uses plain TCP. For
+encryption TLS must be explicitly enabled in the Beat and Logstash
+configuration.
 
 
 [[kibana-installation]]
@@ -261,8 +263,7 @@ https://www.elastic.co/downloads/kibana[Kibana downloads page].
 If Kibana cannot reach the Elasticsearch server, you can adjust the settings for
 it from the `config/kibana.yml` file.
 
-Now point your browser to port 5601 and you should see the Kibana web
-interface.
+Now point your browser to port 5601 and you should see the Kibana web interface.
 
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
@@ -273,10 +274,10 @@ http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 Kibana has a large set of visualization types which you can combine to create
 the perfect dashboards for your needs. But this flexibility can be a bit
 overwhelming at the beginning, so we have created a couple of
-https://github.com/elastic/beats-dashboards[Sample Dashboards] to give you a good start and to
-demonstrate what is possible based on the packet data.
+https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
+started and to demonstrate what is possible based on the beat data.
 
-To load the sample pages, follow these steps:
+To load the sample dashboards, follow these steps:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -286,29 +287,29 @@ cd beats-dashboards-{Dashboards-version}/
 ./load.sh
 ----------------------------------------------------------------------
 
-NOTE: In case the Elasticsearch is not running on `127.0.0.1:9200`, you need to specify the Elasticsearch location
-as argument of the load.sh command line:
+NOTE: In case the Elasticsearch is not running on `127.0.0.1:9200`, you need to
+specify the Elasticsearch location as argument of the load.sh command line:
 
 [source,shell]
 -------------------------------------------------------------------------
 ./load.sh http://192.168.33.60:9200
 -------------------------------------------------------------------------
 
-The load command uploads the example dashboards with the visualizations and searches that can be used.
-Additionally, the index patterns for Packetbeat and Topbeat are created:
+The load command uploads the example dashboards, visualizations, and searches
+that can be used. Additionally, the index patterns for each Beat are created:
 
    - [packetbeat-]YYYY.MM.DD
    - [topbeat-]YYYY.MM.DD
    - [filebeat-]YYYY.MM.DD
 
-After loading the dashboards, Kibana rises the following error
-`No default index pattern. You must select or create one to continue.` that can be solved
+After loading the dashboards, Kibana rises the following error `No default index
+pattern. You must select or create one to continue.` that can be solved
 by setting one index pattern as favorite.
 
 image:./images/kibana-created-indexes.png[Kibana configured indexes]
 
 To open the loaded dashboards, go to the `Dashboard` page and click the "Open"
-icon. Select `Packetbeat Dashboard` from the list. You can then switch easier
+icon. Select `Packetbeat Dashboard` from the list. You can then easily switch
 between the dashboards by using the `Navigation` widget.
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
