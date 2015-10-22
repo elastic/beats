@@ -83,6 +83,7 @@ func (h *Harvester) Harvest() {
 
 		line++
 		event := &input.FileEvent{
+			ReadTime: lastReadTime,
 			Source:   &h.Path,
 			Offset:   h.Offset,
 			Line:     line,

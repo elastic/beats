@@ -2,7 +2,9 @@ package input
 
 import (
 	"os"
+	"time"
 
+	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 )
 
@@ -15,6 +17,7 @@ type File struct {
 
 // FileEvent is sent to the output and must contain all relevant information
 type FileEvent struct {
+	ReadTime time.Time
 	Source   *string
 	Offset   int64
 	Line     uint64
@@ -42,6 +45,24 @@ func (f *FileEvent) GetState() *FileState {
 	}
 
 	return state
+}
+
+func (f *FileEvent) ToMapStr() common.MapStr {
+	event := common.MapStr{
+		"timestamp": common.Time(f.ReadTime),
+		"source":    f.Source,
+		"offset":    f.Offset,
+		"line":      f.Line,
+		"message":   f.Text,
+		"fileinfo":  f.Fileinfo,
+		"type":      "log",
+	}
+
+	if f.Fields != nil {
+		event["fields"] = f.Fields
+	}
+
+	return event
 }
 
 // Check that the file isn't a symlink, mode is regular or file is nil

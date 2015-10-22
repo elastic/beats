@@ -103,3 +103,11 @@ func TestSafeFileRotateExistingFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("new filebeat 2"), contents)
 }
+
+func TestFileEventToMapStr(t *testing.T) {
+	// Test 'fields' is not present when it is nil.
+	event := FileEvent{}
+	mapStr := event.ToMapStr()
+	_, found := mapStr["fields"]
+	assert.False(t, found)
+}
