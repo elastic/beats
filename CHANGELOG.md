@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-beta4] - 2015-10-22
+## [1.0.0-beta4](https://github.com/elastic/topbeat/compare/1.0.0-beta3...1.0.0-beta4) - 2015-10-22
 
 ### Backward Compatibility Breaks
 - Percentage fields (e.g user_p) are exported as a float between 0 and 1 #34
@@ -26,5 +26,3 @@ All notable changes to this project will be documented in this file based on the
 - Update to go 1.5.1 #43
 - Updated configuration files with comments for all options #65
 - Documentation improvements
-
-### Deprecated
