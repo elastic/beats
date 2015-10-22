@@ -105,7 +105,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(&TLSConfig{})
 	assert.Nil(t, err)
 
-	assert.Equal(t, int(tls.VersionTLS11), int(cfg.MinVersion))
+	assert.Equal(t, int(tls.VersionTLS10), int(cfg.MinVersion))
 	assert.Equal(t, 0, int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
