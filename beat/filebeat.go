@@ -3,7 +3,6 @@ package beat
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
@@ -126,18 +125,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 
 		pubEvents := make([]common.MapStr, 0, len(events))
 		for _, event := range events {
-			bEvent := common.MapStr{
-				"timestamp": common.Time(time.Now()),
-				"source":    event.Source,
-				"offset":    event.Offset,
-				"line":      event.Line,
-				"message":   event.Text,
-				"fields":    event.Fields,
-				"fileinfo":  event.Fileinfo,
-				"type":      "log",
-			}
-
-			pubEvents = append(pubEvents, bEvent)
+			pubEvents = append(pubEvents, event.ToMapStr())
 		}
 
 		beat.Events.PublishEvents(pubEvents, publisher.Sync)

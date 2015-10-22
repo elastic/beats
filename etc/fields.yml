@@ -23,8 +23,8 @@ env:
       format: YYYY-MM-DDTHH:MM:SS.milliZ
       example: 2015-01-24T14:06:05.071Z
       description: >
-        The timestamp when the log line is published. The precision is in milliseconds.
-        The timezone is UTC.
+        The timestamp when the log line was read. The precision is in
+        milliseconds. The timezone is UTC.
 
     - name: type
       description: >
