@@ -178,7 +178,7 @@ The equivalent in Filebeat would look like this:
 [source,yaml]
 -------------------------------------------------------------------------------------
 output:
-  lumberjack:
+  logstash:
     enabled: true
 
     # The list of downstream Logstash servers. <1>
