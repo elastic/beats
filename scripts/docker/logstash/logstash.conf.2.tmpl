@@ -1,9 +1,17 @@
 input {
   beats {
-    port => 12345
+    port => 5044
     ssl => false
   }
+
+  beats {
+    port => 5055
+    ssl => true
+    ssl_certificate => "/etc/pki/tls/certs/logstash.crt"
+    ssl_key => "/etc/pki/tls/private/logstash.key"
+  }
 }
+
 
 output {
   elasticsearch {

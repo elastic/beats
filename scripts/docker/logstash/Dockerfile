@@ -24,6 +24,8 @@ COPY logstash.conf.1.5.tmpl /logstash.conf.1.5.tmpl
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
 
+COPY pki /etc/pki
+
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD logstash agent -f /logstash.conf
