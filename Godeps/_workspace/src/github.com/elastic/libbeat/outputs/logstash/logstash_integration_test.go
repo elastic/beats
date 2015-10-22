@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	logstashDefaultHost     = "localhost"
-	logstashTestDefaultPort = "12345"
+	logstashDefaultHost        = "localhost"
+	logstashTestDefaultPort    = "5044"
+	logstashTestDefaultTLSPort = "5055"
 
 	elasticsearchDefaultHost = "localhost"
 	elasticsearchDefaultPort = "9200"
@@ -55,6 +56,13 @@ func getLogstashHost() string {
 	return fmt.Sprintf("%v:%v",
 		getenv("LS_HOST", logstashDefaultHost),
 		getenv("LS_TCP_PORT", logstashTestDefaultPort),
+	)
+}
+
+func getLogstashTLSHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("LS_HOST", logstashDefaultHost),
+		getenv("LS_LS_PORT", logstashTestDefaultTLSPort),
 	)
 }
 
@@ -98,8 +106,24 @@ func testElasticsearchIndex(test string) string {
 	return fmt.Sprintf("beat-es-int-%v-%d", test, os.Getpid())
 }
 
-func newTestLogstashOutput(t *testing.T, test string) *testOutputer {
-	lumberjack := newTestLumberjackOutput(t, test, nil)
+func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
+	config := &outputs.MothershipConfig{
+		Enabled: true,
+		Hosts:   []string{getLogstashHost()},
+		TLS:     nil,
+		Index:   testLogstashIndex(test),
+	}
+	if tls {
+		config.Hosts = []string{getLogstashTLSHost()}
+		config.TLS = &outputs.TLSConfig{
+			Insecure: false,
+			CAs: []string{
+				"/etc/pki/tls/certs/logstash.crt",
+			},
+		}
+	}
+
+	lumberjack := newTestLumberjackOutput(t, test, config)
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
@@ -212,13 +236,20 @@ func checkAll(checks ...func() bool) func() bool {
 	}
 }
 
-func TestSendMessageViaLogstash(t *testing.T) {
+func TestSendMessageViaLogstashTCP(t *testing.T) {
+	testSendMessageViaLogstash(t, "basic-tcp", false)
+}
+
+func TestSendMessageViaLogstashTLS(t *testing.T) {
+	testSendMessageViaLogstash(t, "basic-tls", true)
+}
+
+func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	test := "basic"
-	ls := newTestLogstashOutput(t, test)
+	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
 	event := common.MapStr{
@@ -242,15 +273,21 @@ func TestSendMessageViaLogstash(t *testing.T) {
 	}
 }
 
-func TestSendMultipleViaLogstash(t *testing.T) {
+func TestSendMultipleViaLogstashTCP(t *testing.T) {
+	testSendMultipleViaLogstash(t, "multiple-tcp", false)
+}
+
+func TestSendMultipleViaLogstashTLS(t *testing.T) {
+	testSendMultipleViaLogstash(t, "multiple-tls", true)
+}
+
+func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	test := "multiple"
-	ls := newTestLogstashOutput(t, test)
+	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
-
 	for i := 0; i < 10; i++ {
 		event := common.MapStr{
 			"timestamp": common.Time(time.Now()),
@@ -274,13 +311,20 @@ func TestSendMultipleViaLogstash(t *testing.T) {
 	}
 }
 
-func TestSendMultipleBigBatchesViaLogstash(t *testing.T) {
+func TestSendMultipleBigBatchesViaLogstashTCP(t *testing.T) {
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tcp", false)
+}
+
+func TestSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tls", true)
+}
+
+func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	test := "multiple"
-	ls := newTestLogstashOutput(t, test)
+	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
 	numBatches := 15
@@ -320,18 +364,25 @@ func TestSendMultipleBigBatchesViaLogstash(t *testing.T) {
 	}
 }
 
-func TestLogstashElasticOutputPluginCompatibleMessage(t *testing.T) {
+func TestLogstashElasticOutputPluginCompatibleMessageTCP(t *testing.T) {
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tcp", false)
+}
+
+func TestLogstashElasticOutputPluginCompatibleMessageTLS(t *testing.T) {
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tls", true)
+}
+
+func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string, tls bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	test := "cmp"
 	timeout := 10 * time.Second
 
-	ls := newTestLogstashOutput(t, test)
+	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	es := newTestElasticsearchOutput(t, test)
+	es := newTestElasticsearchOutput(t, name)
 	defer es.Cleanup()
 
 	ts := time.Now()
@@ -367,18 +418,25 @@ func TestLogstashElasticOutputPluginCompatibleMessage(t *testing.T) {
 	checkEvent(t, lsResp[0], esResp[0])
 }
 
-func TestLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T) {
+func TestLogstashElasticOutputPluginBulkCompatibleMessageTCP(t *testing.T) {
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tcp", false)
+}
+
+func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tls", true)
+}
+
+func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	test := "cmpbulk"
 	timeout := 10 * time.Second
 
-	ls := newTestLogstashOutput(t, test)
+	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	es := newTestElasticsearchOutput(t, test)
+	es := newTestElasticsearchOutput(t, name)
 	defer es.Cleanup()
 
 	ts := time.Now()
