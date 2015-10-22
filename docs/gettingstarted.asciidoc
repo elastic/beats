@@ -145,7 +145,7 @@ https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.h
 
 In this setup, the Beat shippers send events to Logstash. Logstash receives
 these events using the
-https://github.com/logstash-plugins/logstash-input-beats[Beats
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats
 input plugin] and then sends the transaction to Elasticsearch using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
