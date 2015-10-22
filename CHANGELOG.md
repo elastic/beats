@@ -11,7 +11,7 @@ All documentation about Filebeat can be found here.
 ### Backward Compatibility Breaks
 
 ### Bugfixes
-- Omit 'fields' from event JSON when null.
+- Omit 'fields' from event JSON when null. #126
 
 ### Added
 
