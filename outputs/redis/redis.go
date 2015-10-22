@@ -1,4 +1,4 @@
-// Starting with version 1.0.0-beta4 the Redis Output is deprecated as
+//@deprecated: Starting with version 1.0.0-beta4 the Redis Output is deprecated as
 // it's replaced by the Logstash Output that has support for Redis Output plugin.
 
 package redis
