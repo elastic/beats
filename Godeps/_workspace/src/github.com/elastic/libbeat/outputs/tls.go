@@ -94,8 +94,8 @@ func LoadTLSConfig(config *TLSConfig) (*tls.Config, error) {
 		return nil, err
 	}
 	if minVersion == 0 {
-		// require minimum TLS-1.1 if not configured
-		minVersion = tls.VersionTLS11
+		// require minimum TLS-1.0 if not configured
+		minVersion = tls.VersionTLS10
 	}
 
 	maxVersion, err := parseTLSVersion(config.MaxVersion)
