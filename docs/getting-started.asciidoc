@@ -7,7 +7,7 @@ Get started with your own Filebeat setup by first:
  * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
  * installing Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
 
-After you have Elasticsearch, Kibana and Logstash installed, you can start <<filebeat-installation>>.
+After you have Elasticsearch, Kibana, and Logstash installed, you can start <<filebeat-installation>>.
 
 [[filebeat-installation]]
 === Installing Filebeat
