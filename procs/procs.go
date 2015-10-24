@@ -168,6 +168,7 @@ func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 	if err != nil {
 		return pids, fmt.Errorf("Open /proc: %s", err)
 	}
+	defer proc.Close()
 
 	names, err := proc.Readdirnames(0)
 	if err != nil {
@@ -271,6 +272,7 @@ func (proc *ProcessesWatcher) UpdateMap() {
 		logp.Err("Open: %s", err)
 		return
 	}
+	defer file.Close()
 	socks, err := Parse_Proc_Net_Tcp(file)
 	if err != nil {
 		logp.Err("Parse_Proc_Net_Tcp: %s", err)
@@ -365,6 +367,7 @@ func FindSocketsOfPid(prefix string, pid int) (inodes []int64, err error) {
 	if err != nil {
 		return []int64{}, fmt.Errorf("Open: %s", err)
 	}
+	defer procfs.Close()
 	names, err := procfs.Readdirnames(0)
 	if err != nil {
 		return []int64{}, fmt.Errorf("Readdirnames: %s", err)
