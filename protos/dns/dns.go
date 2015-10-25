@@ -344,6 +344,10 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	}
 }
 
+func (dns *Dns) ConnectionTimeout() time.Duration {
+	return dns.transactionTimeout
+}
+
 func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
 	logp.Debug("dns", "Processing query. %s", tuple)
 
@@ -701,3 +705,73 @@ func decodeDnsPacket(data []byte) (dns *layers.DNS, err error) {
 	}
 	return d, nil
 }
+
+// TCP implementation
+
+func (dns *Dns) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	defer logp.Recover("DNS ParseTcp")
+
+	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
+		pkt.Tuple.String(), len(pkt.Payload))
+
+	dnsPkt, err := decodeDnsPacket(pkt.Payload)
+	if err != nil {
+		// This means that malformed requests or responses are being sent or
+		// that someone is attempting to the DNS port for non-DNS traffic. Both
+		// are issues that a monitoring system should report.
+		logp.Debug("dns", NonDnsPacketMsg+" addresses %s, length %d",
+			pkt.Tuple.String(), len(pkt.Payload))
+		return
+	}
+
+	priv := dnsPrivateData{}
+	if private != nil {
+		var ok bool
+		priv, ok = private.(dnsPrivateData)
+		if !ok {
+			priv = dnsPrivateData{}
+		}
+	}
+
+	if priv.Data[dir] == nil {
+		priv.Data[dir] = &DnsStream{
+			tcptuple: tcptuple,
+			data:     dnsPkt,
+			message:  &DnsMessage{Ts: pkt.Ts},
+		}
+
+	} else {
+		priv.Data[dir].data = append(priv.Data[dir].data, dnsPkt...)
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			logp.Debug("dns", "Stream data too large, dropping DNS stream")
+			priv.Data[dir] = nil
+			return priv
+		}
+	}
+
+	stream := priv.Data[dir]
+	if stream.message == nil {
+		&DnsMessage{Ts: pkt.Ts}
+	}
+
+	// what kind of checks should be done here ?
+	// parse decoded payload to know if the query is complete
+
+	// reset offset ? see if RFC allows for multiple queries with the same TCP connection
+
+	// needed ?
+	// ok, complete := dns.messageParse(stream)
+
+	return priv
+
+}
+
+/*
+func (dns *Dns) ReceivedFin(tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	return
+}
+
+func (dns *Dns) GapInStream(tcptuple *common.TcpTuple, dir unint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+	return
+}
+*/

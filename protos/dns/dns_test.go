@@ -227,7 +227,7 @@ var (
 var _ protos.UdpProtocolPlugin = &Dns{}
 
 // TODO: Uncomment when TCP is implemented.
-//var _ protos.TcpProtocolPlugin = &Dns{}
+var _ protos.TcpProtocolPlugin = &Dns{}
 
 func newDns(verbose bool) *Dns {
 	if verbose {
@@ -621,3 +621,37 @@ func assertAddress(t testing.TB, expected common.IpPortTuple, endpoint interface
 	assert.Equal(t, expected.Src_ip.String(), e.Ip)
 	assert.Equal(t, expected.Src_port, e.Port)
 }
+
+// TCP tests
+
+func testTcpTuple() *common.TcpTuple {
+	t := &common.TcpTuple{
+		Ip_length: 4,
+		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
+		Src_port: ClientPort, Dst_port: ServerPort,
+	}
+	t.ComputeHashebles()
+	return t
+}
+
+// Verify that an empty packet is safely handled (no panics).
+func TestParseTcp_emptyPacket(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	packet := newPacket(forward, []byte{})
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	dns.Parse(packet, tcptuple, 0, private)
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
+	client := dns.results.(publisher.ChanClient)
+	close(client.Channel)
+	assert.Nil(t, <-client.Channel, "No result should have been published.")
+}
+
+// If a TCP gap (lost packets) happen while we're waiting for parts
+// of the query, drop the stream
+/*
+func Test_gap_in_query_fin(t *testing.T) {
+
+}
+*/
