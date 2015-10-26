@@ -2,10 +2,10 @@
 
 
 Filebeat is a log data shipper initially based on the https://github.com/elastic/logstash-forwarder[Logstash-Forwarder]
-source code. Installed as an agent on your servers, Filebeat monitors the log directories or specific log files, tails them and forwards them to
-https://www.elastic.co/products/logstash[Logstash] for parsing or directly to
+source code. Installed as an agent on your servers, Filebeat monitors the log directories or specific log files, tails the files, 
+and forwards them either to https://www.elastic.co/products/logstash[Logstash] for parsing or directly to
 https://www.elastic.co/products/elasticsearch[Elasticsearch] for indexing.
 
-Filebeat is a https://www.elastic.co/products/beats[Beat] and it is based on the libbeat framework. 
-The general configuration options for libbeat and how to setup Elasticsearch, Logstash and Kibana can be found
-https://www.elastic.co/guide/index.html[here].
+Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework. 
+The general configuration options for libbeat and how to setup Elasticsearch, Logstash, and Kibana are covered 
+https://www.elastic.co/guide/en/beats/libbeat/current/index.html[here].
