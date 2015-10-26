@@ -219,7 +219,7 @@ func (publisher *PublisherType) Init(
 		}
 
 		if publisher.TopologyOutput == nil {
-			logp.Warn("No output is defined to store the topology. The server fields might not be filled.")
+			logp.Debug("publish", "No output is defined to store the topology. The server fields might not be filled.")
 		}
 	}
 
