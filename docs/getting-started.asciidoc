@@ -5,7 +5,7 @@ To get started with your own Filebeat setup, install and configure these related
 
  * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
  * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
 
 After you have installed these products, you can start <<filebeat-installation>>.
 
@@ -52,8 +52,8 @@ see <<filebeat-configuration-details,Configuration>>.
 [[filebeat-configuration]]
 === Configuring Filebeat
 
-Before configuring Filebeat, you need to set up Logstash to work with the Beat. For detailed 
-steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
+NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
+configure Filebeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
 To configure Filebeat, you edit the _filebeat.yml_ file. Here is a sample of 
 the _filebeat.yml_ file:
@@ -68,7 +68,7 @@ filebeat:
       # Paths that should be crawled and fetched. Glob based paths.
       # For each file found under this path, a harvester is started.
       paths:
-        - /var/log/*.log
+        - "/var/log/*.log"
       # - c:\programdata\elasticsearch\logs\*
 
       # Type of the files. Based on this the way the file is read is decided.
@@ -89,7 +89,7 @@ filebeat:
   prospectors:
     -
       paths:
-        - /var/log/*.log
+        - "/var/log/*.log"
 -------------------------------------------------------------------------------------
 
 The prospector in this example harvests all files in the path `/var/log/*.log`, which means 
@@ -117,7 +117,7 @@ filebeat:
         - /var/log/wifi.log
     -
       paths:
-        - /var/log/apache/*
+        - "/var/log/apache/*"
 -------------------------------------------------------------------------------------
 
 The config file in the example starts two prospectors. The first prospector has two harvesters,

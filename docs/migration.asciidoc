@@ -109,7 +109,7 @@ filebeat:
     -
       paths:
         - /var/log/messages
-        - /var/log/*.log
+        - "/var/log/*.log"
     -
       paths:
         - "-"
@@ -118,7 +118,7 @@ filebeat:
         type: stdin
     -
       paths:
-        - /var/log/apache/httpd-*.log
+        - "/var/log/apache/httpd-*.log"
       fields:
         type: apache
 -------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ filebeat:
   prospectors:
     -
       paths:
-        - /var/log/*.log
+        - "/var/log/*.log"
       fields:
         type: syslog
 output:
