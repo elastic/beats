@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file based on the
 - Handle empty event array in publisher. #207
 
 ### Added
+- Add Console output plugin. #218
 
 ### Improvements
 

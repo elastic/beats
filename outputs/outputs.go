@@ -30,6 +30,7 @@ type MothershipConfig struct {
 	Flush_interval     *int
 	Bulk_size          *int
 	Max_retries        *int
+	Pretty             *bool
 	TLS                *TLSConfig
 }
 

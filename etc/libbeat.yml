@@ -153,6 +153,14 @@ output:
     # is 7 files.
     #number_of_files: 7
 
+  ### Console output
+  # console:
+    # Enabling console output
+    #enabled: false
+
+    # pretty print json event
+    #pretty: false
+
 
 ############################# Shipper #########################################
 
