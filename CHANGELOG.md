@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Use stderr for console log output. #219
 - Handle empty event array in publisher. #207
 
 ### Added
