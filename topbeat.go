@@ -17,13 +17,14 @@ import (
 type ProcsMap map[int]*Process
 
 type Topbeat struct {
-	isAlive      bool
 	period       time.Duration
 	procs        []string
 	procsMap     ProcsMap
 	lastCpuTimes *CpuTimes
 	TbConfig     ConfigSettings
 	events       publisher.Client
+
+	done chan struct{}
 }
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
@@ -54,32 +55,46 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 
 func (tb *Topbeat) Setup(b *beat.Beat) error {
 	tb.events = b.Events
+	tb.done = make(chan struct{})
 	return nil
 }
 
 func (t *Topbeat) Run(b *beat.Beat) error {
-
-	t.isAlive = true
-
-	t.initProcStats()
-
 	var err error
 
-	for t.isAlive {
-		time.Sleep(t.period)
+	t.initProcStats()
+	lastTickTime := time.Now()
+
+	ticker := time.NewTicker(t.period)
+	for {
+		select {
+		case <-t.done:
+			return nil
+		case tickTime := <-ticker.C:
+			if lastTickTime.After(tickTime) {
+				// ignore tick if processing took longer then one period
+				logp.Warn("Ignoring tick due to processing taking longer than one tick")
+				continue
+			}
+		}
 
 		err = t.exportSystemStats()
 		if err != nil {
 			logp.Err("Error reading system stats: %v", err)
+			break
 		}
 		err = t.exportProcStats()
 		if err != nil {
 			logp.Err("Error reading proc stats: %v", err)
+			break
 		}
 		err = t.exportFileSystemStats()
 		if err != nil {
 			logp.Err("Error reading fs stats: %v", err)
+			break
 		}
+
+		lastTickTime = time.Now()
 	}
 
 	return err
@@ -90,8 +105,7 @@ func (tb *Topbeat) Cleanup(b *beat.Beat) error {
 }
 
 func (t *Topbeat) Stop() {
-
-	t.isAlive = false
+	close(t.done)
 }
 
 func (t *Topbeat) initProcStats() {
@@ -162,7 +176,6 @@ func (t *Topbeat) exportProcStats() error {
 }
 
 func (t *Topbeat) exportSystemStats() error {
-
 	load_stat, err := GetSystemLoad()
 	if err != nil {
 		logp.Warn("Getting load statistics: %v", err)
