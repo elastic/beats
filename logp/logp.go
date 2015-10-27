@@ -19,6 +19,7 @@ type Logging struct {
 	Files     *FileRotator
 	To_syslog *bool
 	To_files  *bool
+	Level     string
 }
 
 func init() {
@@ -34,12 +35,23 @@ func init() {
 // line flag with a later SetStderr call.
 func Init(name string, config *Logging) error {
 
-	logLevel := LOG_ERR
-	if *verbose {
-		logLevel = LOG_INFO
+	logLevel, err := getLogLevel(config)
+	if err != nil {
+		return err
 	}
 
-	debugSelectors := []string{}
+	if *verbose {
+		if LOG_INFO > logLevel {
+			logLevel = LOG_INFO
+		}
+	}
+
+	debugSelectors := config.Selectors
+	if logLevel == LOG_DEBUG {
+		if len(debugSelectors) == 0 {
+			debugSelectors = []string{"*"}
+		}
+	}
 	if len(*debugSelectorsStr) > 0 {
 		debugSelectors = strings.Split(*debugSelectorsStr, ",")
 		logLevel = LOG_DEBUG
@@ -112,4 +124,24 @@ func SetStderr() {
 		Info("Startup successful, disable stderr logging")
 		SetToStderr(false, "")
 	}
+}
+
+func getLogLevel(config *Logging) (Priority, error) {
+	if config == nil || config.Level == "" {
+		return LOG_ERR, nil
+	}
+
+	levels := map[string]Priority{
+		"critical": LOG_CRIT,
+		"error":    LOG_ERR,
+		"warning":  LOG_WARNING,
+		"info":     LOG_INFO,
+		"debug":    LOG_DEBUG,
+	}
+
+	level, ok := levels[strings.ToLower(config.Level)]
+	if !ok {
+		return 0, fmt.Errorf("unknown log level: %v", config.Level)
+	}
+	return level, nil
 }

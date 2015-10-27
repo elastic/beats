@@ -811,6 +811,8 @@ output on Linux and OS X.
 [source,yaml]
 ------------------------------------------------------------------------------
 logging:
+  level: warning
+
   # enable file rotation with default configuration
   to_files: true
 
@@ -838,11 +840,19 @@ value is true.
 Write all logging output to files subject to file rotation. On Windows systems
 default value is true.
 
+===== level
+
+Minimum log level. One of debug, info, warning, error or critical. If debug is
+used, but no selectors are configured, the `*` selector will be used.
+The default log level is error.
+
 ===== selectors
 
 List of debugging only selector tags used by different beats components. Use `*`
 to enable debug output for all components. For example add 'publish' to display
-all the debug messages related to event publishing.
+all the debug messages related to event publishing. when starting the beat,
+selectors can be overwritten using the '-d' command line option ('-d' also sets
+the debug log level).
 
 ===== files.path
 
