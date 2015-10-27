@@ -33,6 +33,7 @@ import (
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
+	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 const MaxDnsTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
@@ -46,6 +47,7 @@ const (
 // Notes that are added to messages during exceptional conditions.
 const (
 	NonDnsPacketMsg   = "Packet's data could not be decoded as DNS."
+	NonDnsCompleteMsg = "Complete message could not be decoded as DNS."
 	DuplicateQueryMsg = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
@@ -166,7 +168,7 @@ type DnsMessage struct {
 // DnsStream contains DNS data from one side of a TCP transmission. A pair
 // of DnsStream's are used to represent the full conversation.
 type DnsStream struct {
-	tcptuple *common.TcpTuple
+	tcpTuple *common.TcpTuple
 
 	data []byte
 
@@ -318,7 +320,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
-	dnsPkt, err := decodeDnsPacket(pkt.Payload)
+	dnsPkt, err := decodeDnsData(pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
@@ -688,10 +690,10 @@ func nameToString(name []byte) string {
 	return string(s)
 }
 
-// decodeDnsPacket decodes a byte array into a DNS struct. If an error occurs
+// decodeDnsData decodes a byte array into a DNS struct. If an error occurs
 // then the returnd dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
-func decodeDnsPacket(data []byte) (dns *layers.DNS, err error) {
+func decodeDnsData(data []byte) (dns *layers.DNS, err error) {
 	// Recover from any panics that occur while parsing a packet.
 	defer func() {
 		if r := recover(); r != nil {
@@ -708,23 +710,14 @@ func decodeDnsPacket(data []byte) (dns *layers.DNS, err error) {
 
 // TCP implementation
 
-func (dns *Dns) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	defer logp.Recover("DNS ParseTcp")
 
 	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
-	dnsPkt, err := decodeDnsPacket(pkt.Payload)
-	if err != nil {
-		// This means that malformed requests or responses are being sent or
-		// that someone is attempting to the DNS port for non-DNS traffic. Both
-		// are issues that a monitoring system should report.
-		logp.Debug("dns", NonDnsPacketMsg+" addresses %s, length %d",
-			pkt.Tuple.String(), len(pkt.Payload))
-		return
-	}
-
 	priv := dnsPrivateData{}
+
 	if private != nil {
 		var ok bool
 		priv, ok = private.(dnsPrivateData)
@@ -735,13 +728,13 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8, 
 
 	if priv.Data[dir] == nil {
 		priv.Data[dir] = &DnsStream{
-			tcptuple: tcptuple,
-			data:     dnsPkt,
+			tcpTuple: tcpTuple,
+			data:     pkt.Payload,
 			message:  &DnsMessage{Ts: pkt.Ts},
 		}
 
 	} else {
-		priv.Data[dir].data = append(priv.Data[dir].data, dnsPkt...)
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
 		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("dns", "Stream data too large, dropping DNS stream")
 			priv.Data[dir] = nil
@@ -751,27 +744,87 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8, 
 
 	stream := priv.Data[dir]
 	if stream.message == nil {
-		&DnsMessage{Ts: pkt.Ts}
+		stream.message = &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple}
 	}
 
 	// what kind of checks should be done here ?
-	// parse decoded payload to know if the query is complete
+	ok, complete := dns.messageParser(stream)
 
-	// reset offset ? see if RFC allows for multiple queries with the same TCP connection
+	if !ok {
+		// drop this tcp stream. Will retry parsing with the next
+		// segment in it
+		priv.Data[dir] = nil
+		return priv
+	}
 
-	// needed ?
-	// ok, complete := dns.messageParse(stream)
+	if complete {
+		dns.messageComplete(tcpTuple, dir, stream)
+	}
 
 	return priv
 
 }
 
+func (dns *Dns) messageParser(s *DnsStream) (bool, bool){
+	var ok, complete bool
+
+	dnsData, err := decodeDnsData(s.data)
+
+	if err != nil {
+		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
+			s.tcpTuple.String(), len(s.data))
+		return false, false
+	}
+
+	if dnsData.QR == Query {
+
+	} else /* Response */ {
+
+
+	}
+
+	return ok, complete
+}
+
+func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream) {
+	dns.handleDns(s.message, tcpTuple, dir, s.data)
+
+	s.PrepareForNewMessage()
+}
+
+func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, data []byte) {
+	decodedData, err := decodeDnsData(data)
+
+	if err != nil {
+		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
+			tcpTuple.String(), len(data))
+		return
+	}
+
+	dnsTuple := DnsTupleFromIpPort(&m.Tuple, TransportTcp, decodedData.ID)
+
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
+	m.Data = decodedData
+
+	if decodedData.QR == Query {
+		dns.receivedDnsRequest(&dnsTuple, m)
+	} else /* Response */ {
+		dns.receivedDnsResponse(&dnsTuple, m)
+	}
+}
+
+func (stream *DnsStream) PrepareForNewMessage() {
+	stream.data = stream.data[stream.parseOffset:]
+	stream.parseOffset = 0
+	stream.message = nil
+}
+
 /*
-func (dns *Dns) ReceivedFin(tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	return
 }
 
-func (dns *Dns) GapInStream(tcptuple *common.TcpTuple, dir unint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir unint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 	return
 }
 */
