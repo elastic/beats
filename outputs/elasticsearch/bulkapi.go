@@ -11,19 +11,20 @@ import (
 type MetaBuilder func(interface{}) interface{}
 
 type bulkRequest struct {
-	es     bulkRequestSender
+	es     *Connection
 	buf    bytes.Buffer
 	enc    *json.Encoder
 	path   string
 	params map[string]string
 }
 
-type bulkRequestSender interface {
-	sendBulkRequest(
-		method, path string,
-		params map[string]string,
-		buf *bytes.Buffer,
-	) ([]byte, error)
+type bulkMeta struct {
+	Index bulkMetaIndex `json:"index"`
+}
+
+type bulkMetaIndex struct {
+	Index   string `json:"_index"`
+	DocType string `json:"_type"`
 }
 
 func (r *bulkRequest) Send(meta, obj interface{}) error {
@@ -56,19 +57,17 @@ func (r *bulkRequest) Flush() (*QueryResult, error) {
 
 // Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
-func Bulk(
-	es bulkRequestSender,
-	index string, docType string,
+func (conn *Connection) Bulk(
+	index, docType string,
 	params map[string]string, body []interface{},
 ) (*QueryResult, error) {
-	return BulkWith(es, index, docType, params, nil, body)
+	return conn.BulkWith(index, docType, params, nil, body)
 }
 
 // BulkWith creates a HTTP request containing a bunch of operations and send
 // them to Elasticsearch. The request is retransmitted up to max_retries before
 // returning an error.
-func BulkWith(
-	es bulkRequestSender,
+func (conn *Connection) BulkWith(
 	index string,
 	docType string,
 	params map[string]string,
@@ -91,11 +90,41 @@ func BulkWith(
 		return nil, nil
 	}
 
-	resp, err := es.sendBulkRequest("POST", path, params, &buf)
+	resp, err := conn.sendBulkRequest("POST", path, params, &buf)
 	if err != nil {
 		return nil, err
 	}
 	return readQueryResult(resp)
+}
+
+func (conn *Connection) startBulkRequest(
+	index string,
+	docType string,
+	params map[string]string,
+) (*bulkRequest, error) {
+	path, err := makePath(index, docType, "_bulk")
+	if err != nil {
+		return nil, err
+	}
+
+	r := &bulkRequest{
+		es:     conn,
+		path:   path,
+		params: params,
+	}
+	r.enc = json.NewEncoder(&r.buf)
+	return r, nil
+}
+
+func (conn *Connection) sendBulkRequest(
+	method, path string,
+	params map[string]string,
+	buf *bytes.Buffer,
+) ([]byte, error) {
+	url := makeURL(conn.URL, path, params)
+	logp.Debug("elasticsearch", "Sending bulk request to %s", url)
+
+	return conn.execRequest(method, url, buf)
 }
 
 func bulkEncode(metaBuilder MetaBuilder, body []interface{}) bytes.Buffer {

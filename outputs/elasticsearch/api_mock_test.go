@@ -48,12 +48,12 @@ func TestOneHostSuccessResp(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	es := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := es.Index(index, "test", "1", params, body)
+	resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
 		t.Errorf("Index() returns error: %s", err)
 	}
@@ -77,8 +77,8 @@ func TestOneHost500Resp(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	es := NewClient(server.URL, "", nil, "", "")
-	err := es.Connect(1 * time.Second)
+	client := NewClient(server.URL, "", nil, "", "")
+	err := client.Connect(1 * time.Second)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -86,7 +86,7 @@ func TestOneHost500Resp(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err = es.Index(index, "test", "1", params, body)
+	_, err = client.Index(index, "test", "1", params, body)
 
 	if err == nil {
 		t.Errorf("Index() should return error.")
@@ -112,12 +112,12 @@ func TestOneHost503Resp(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	es := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := es.Index(index, "test", "1", params, body)
+	_, err := client.Index(index, "test", "1", params, body)
 	if err == nil {
 		t.Errorf("Index() should return error.")
 	}

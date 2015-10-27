@@ -15,13 +15,14 @@ import (
 )
 
 type Client struct {
-	elasticsearchConnection
+	Connection
 	index string
 }
 
-type elasticsearchConnection struct {
-	URL                string
-	Username, Password string
+type Connection struct {
+	URL      string
+	Username string
+	Password string
 
 	http      *http.Client
 	connected bool
@@ -32,7 +33,7 @@ func NewClient(
 	username, password string,
 ) *Client {
 	client := &Client{
-		elasticsearchConnection{
+		Connection{
 			URL:      url,
 			Username: username,
 			Password: password,
@@ -45,63 +46,30 @@ func NewClient(
 	return client
 }
 
-func (es *Client) Clone() *Client {
-	client := &Client{
-		elasticsearchConnection{
-			URL:      es.URL,
-			Username: es.Username,
-			Password: es.Password,
+func (client *Client) Clone() *Client {
+	newClient := &Client{
+		Connection{
+			URL:      client.URL,
+			Username: client.Username,
+			Password: client.Password,
 			http: &http.Client{
-				Transport: es.http.Transport,
+				Transport: client.http.Transport,
 			},
 			connected: false,
 		},
-		es.index,
+		client.index,
 	}
-	return client
+	return newClient
 }
 
-func (es *Client) Connect(timeout time.Duration) error {
-	var err error
-	es.connected, err = es.Ping()
-	if err != nil {
-		return err
-	}
-	if !es.connected {
-		return ErrNotConnected
-	}
-	return nil
-}
-
-func (es *Client) Ping() (bool, error) {
-	es.http.Timeout = defaultEsOpenTimeout
-	resp, err := es.http.Head(es.URL)
-	if err != nil {
-		return false, err
-	}
-	defer closing(resp.Body)
-
-	status := resp.StatusCode
-	return status < 300, nil
-}
-
-func (es *Client) IsConnected() bool {
-	return es.connected
-}
-
-func (es *Client) Close() error {
-	es.connected = false
-	return nil
-}
-
-func (es *Client) PublishEvents(
+func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) (n int, err error) {
-	if !es.connected {
+	if !client.connected {
 		return 0, ErrNotConnected
 	}
 
-	request, err := es.startBulkRequest("", "", nil)
+	request, err := client.startBulkRequest("", "", nil)
 	if err != nil {
 		logp.Err(
 			"Failed to perform many index operations in a single API call: %s",
@@ -112,19 +80,13 @@ func (es *Client) PublishEvents(
 	for _, event := range events {
 		ts := time.Time(event["timestamp"].(common.Time))
 		index := fmt.Sprintf("%s-%d.%02d.%02d",
-			es.index, ts.Year(), ts.Month(), ts.Day())
+			client.index, ts.Year(), ts.Month(), ts.Day())
 		meta := bulkMeta{
 			Index: bulkMetaIndex{
 				Index:   index,
 				DocType: event["type"].(string),
 			},
 		}
-		// meta := common.MapStr{
-		// 	"index": map[string]interface{}{
-		// 		"_index": index,
-		// 		"_type":  event["type"].(string),
-		// 	},
-		// }
 		err := request.Send(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
@@ -142,101 +104,63 @@ func (es *Client) PublishEvents(
 	return len(events), nil
 }
 
-func (es *Client) PublishEvent(event common.MapStr) error {
-	if !es.connected {
+func (client *Client) PublishEvent(event common.MapStr) error {
+	if !client.connected {
 		return ErrNotConnected
 	}
 
 	ts := time.Time(event["timestamp"].(common.Time))
 	index := fmt.Sprintf("%s-%d.%02d.%02d",
-		es.index, ts.Year(), ts.Month(), ts.Day())
+		client.index, ts.Year(), ts.Month(), ts.Day())
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 
 	// insert the events one by one
-	_, err := es.Index(index, event["type"].(string), "", nil, event)
+	_, err := client.Index(index, event["type"].(string), "", nil, event)
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
 	}
 	return nil
 }
 
-func (es *Client) CreateIndex(index string, body interface{}) (*QueryResult, error) {
-	return CreateIndex(es, index, body)
-}
-
-func (es *Client) Index(
-	index, docType, id string,
-	params map[string]string,
-	body interface{},
-) (*QueryResult, error) {
-	return Index(es, index, docType, id, params, body)
-}
-
-func (es *Client) Refresh(index string) (*QueryResult, error) {
-	return Refresh(es, index)
-}
-
-func (es *Client) Delete(index string, docType string, id string, params map[string]string) (*QueryResult, error) {
-	return Delete(es, index, docType, id, params)
-}
-
-func (es *Client) SearchURI(
-	index, docType string,
-	params map[string]string,
-) (*SearchResults, error) {
-	return SearchURI(es, index, docType, params)
-}
-
-func (es *Client) CountSearchURI(
-	index string, docType string,
-	params map[string]string,
-) (*CountResults, error) {
-	return CountSearchURI(es, index, docType, params)
-}
-
-func (es *Client) Bulk(
-	index, docType string,
-	params map[string]string, body []interface{},
-) (*QueryResult, error) {
-	return Bulk(es, index, docType, params, body)
-}
-
-func (es *Client) startBulkRequest(
-	index string,
-	docType string,
-	params map[string]string,
-) (*bulkRequest, error) {
-	path, err := makePath(index, docType, "_bulk")
+func (conn *Connection) Connect(timeout time.Duration) error {
+	var err error
+	conn.connected, err = conn.Ping()
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	r := &bulkRequest{
-		es:     es,
-		path:   path,
-		params: params,
+	if !conn.connected {
+		return ErrNotConnected
 	}
-	r.enc = json.NewEncoder(&r.buf)
-	return r, nil
+	return nil
 }
 
-func (es *Client) sendBulkRequest(
-	method, path string,
-	params map[string]string,
-	buf *bytes.Buffer,
-) ([]byte, error) {
-	url := makeURL(es.URL, path, params)
-	logp.Debug("elasticsearch", "Sending bulk request to %s", url)
+func (conn *Connection) Ping() (bool, error) {
+	conn.http.Timeout = defaultEsOpenTimeout
+	resp, err := conn.http.Head(conn.URL)
+	if err != nil {
+		return false, err
+	}
+	defer closing(resp.Body)
 
-	return es.execRequest(method, url, buf)
+	status := resp.StatusCode
+	return status < 300, nil
 }
 
-func (es *elasticsearchConnection) request(
+func (conn *Connection) IsConnected() bool {
+	return conn.connected
+}
+
+func (conn *Connection) Close() error {
+	conn.connected = false
+	return nil
+}
+
+func (conn *Connection) request(
 	method, path string,
 	params map[string]string,
 	body interface{},
 ) ([]byte, error) {
-	url := makeURL(es.URL, path, params)
+	url := makeURL(conn.URL, path, params)
 	logp.Debug("elasticsearch", "%s %s %s", method, url, body)
 
 	var obj []byte
@@ -244,14 +168,14 @@ func (es *elasticsearchConnection) request(
 		var err error
 		obj, err = json.Marshal(body)
 		if err != nil {
-			return nil, ErrJsonEncodeFailed
+			return nil, ErrJSONEncodeFailed
 		}
 	}
 
-	return es.execRequest(method, url, bytes.NewReader(obj))
+	return conn.execRequest(method, url, bytes.NewReader(obj))
 }
 
-func (es *elasticsearchConnection) execRequest(
+func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) ([]byte, error) {
@@ -262,26 +186,26 @@ func (es *elasticsearchConnection) execRequest(
 	}
 
 	req.Header.Add("Accept", "application/json")
-	if es.Username != "" || es.Password != "" {
-		req.SetBasicAuth(es.Username, es.Password)
+	if conn.Username != "" || conn.Password != "" {
+		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
-	resp, err := es.http.Do(req)
+	resp, err := conn.http.Do(req)
 	if err != nil {
-		es.connected = false
+		conn.connected = false
 		return nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
 	if status >= 300 {
-		es.connected = false
+		conn.connected = false
 		return nil, fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		es.connected = false
+		conn.connected = false
 		return nil, err
 	}
 	return obj, nil

@@ -18,7 +18,7 @@ func TestIndex(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
-	es := GetTestingElasticsearch()
+	client := GetTestingElasticsearch()
 
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -30,7 +30,7 @@ func TestIndex(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := es.Index(index, "test", "1", params, body)
+	resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
 		t.Errorf("Index() returns error: %s", err)
 	}
@@ -41,7 +41,7 @@ func TestIndex(t *testing.T) {
 	params = map[string]string{
 		"q": "user:test",
 	}
-	result, err := es.SearchURI(index, "test", params)
+	result, err := client.SearchURI(index, "test", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -49,7 +49,7 @@ func TestIndex(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	resp, err = es.Delete(index, "test", "1", nil)
+	resp, err = client.Delete(index, "test", "1", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}

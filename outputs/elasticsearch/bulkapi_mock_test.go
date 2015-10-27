@@ -40,12 +40,12 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	es := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := es.Bulk(index, "type1", params, body)
+	resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
 	}
@@ -81,12 +81,12 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	es := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := es.Bulk(index, "type1", params, body)
+	_, err := client.Bulk(index, "type1", params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}
@@ -123,12 +123,12 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	es := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := es.Bulk(index, "type1", params, body)
+	_, err := client.Bulk(index, "type1", params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}

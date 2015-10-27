@@ -83,8 +83,7 @@ func readCountResult(obj []byte) (*CountResults, error) {
 // searchable. In case id is empty, a new id is created over a HTTP POST request.
 // Otherwise, a HTTP PUT request is issued.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-func Index(
-	es requestExecutor,
+func (es *Client) Index(
 	index, docType, id string,
 	params map[string]string,
 	body interface{},
@@ -94,7 +93,7 @@ func Index(
 		method = "POST"
 	}
 
-	resp, err := esAPICall(es, method, index, docType, id, params, body)
+	resp, err := es.apiCall(method, index, docType, id, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +102,8 @@ func Index(
 
 // Refresh an index. Call this after doing inserts or creating/deleting
 // indexes in unit tests.
-func Refresh(es requestExecutor, index string) (*QueryResult, error) {
-	resp, err := esAPICall(es, "POST", index, "", "_refresh", nil, nil)
+func (es *Client) Refresh(index string) (*QueryResult, error) {
+	resp, err := es.apiCall("POST", index, "", "_refresh", nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +114,8 @@ func Refresh(es requestExecutor, index string) (*QueryResult, error) {
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
 //
-func CreateIndex(es requestExecutor, index string, body interface{}) (*QueryResult, error) {
-	resp, err := esAPICall(es, "PUT", index, "", "", nil, body)
+func (es *Client) CreateIndex(index string, body interface{}) (*QueryResult, error) {
+	resp, err := es.apiCall("PUT", index, "", "", nil, body)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +124,8 @@ func CreateIndex(es requestExecutor, index string, body interface{}) (*QueryResu
 
 // Delete deletes a typed JSON document from a specific index based on its id.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
-func Delete(es requestExecutor, index string, docType string, id string, params map[string]string) (*QueryResult, error) {
-	resp, err := esAPICall(es, "DELETE", index, docType, id, params, nil)
+func (es *Client) Delete(index string, docType string, id string, params map[string]string) (*QueryResult, error) {
+	resp, err := es.apiCall("DELETE", index, docType, id, params, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -135,28 +134,26 @@ func Delete(es requestExecutor, index string, docType string, id string, params 
 
 // A search request can be executed purely using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
-func SearchURI(es requestExecutor, index string, docType string, params map[string]string) (*SearchResults, error) {
-	resp, err := esAPICall(es, "GET", index, docType, "_search", params, nil)
+func (es *Client) SearchURI(index string, docType string, params map[string]string) (*SearchResults, error) {
+	resp, err := es.apiCall("GET", index, docType, "_search", params, nil)
 	if err != nil {
 		return nil, err
 	}
 	return readSearchResult(resp)
 }
 
-func CountSearchURI(
-	es requestExecutor,
+func (es *Client) CountSearchURI(
 	index string, docType string,
 	params map[string]string,
 ) (*CountResults, error) {
-	resp, err := esAPICall(es, "GET", index, docType, "_count", params, nil)
+	resp, err := es.apiCall("GET", index, docType, "_count", params, nil)
 	if err != nil {
 		return nil, err
 	}
 	return readCountResult(resp)
 }
 
-func esAPICall(
-	es requestExecutor,
+func (es *Client) apiCall(
 	method, index, docType, id string,
 	params map[string]string,
 	body interface{},
