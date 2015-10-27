@@ -1,20 +1,22 @@
 [[topbeat-getting-started]]
-== Getting started
+== Getting Started
 
 Topbeat helps you monitor the availability of your website or service by providing system wide and per process
-statistics together with disk space overview.
+statistics along with a disk usage overview.
 
-Get started with your own Topbeat setup by: 
+To get started with your own Topbeat setup, install and configure these related products:
 
- * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[Follow steps]
- * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[Follow steps]
- * installing optionally Logstash. {libbeat}/getting-started.html#logstash-installation[Follow steps]
+ * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
 
-After you have Elasticsearch, Kibana and optionally Logstash installed, you can start <<topbeat-installation>>.
+After you have installed these products, you can start <<topbeat-installation>>.
 
 
 [[topbeat-installation]]
 === Installing Topbeat
+
+To download and install Topbeat, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
 
 
 deb:
@@ -44,14 +46,20 @@ curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-darwin.tg
 tar xzvf topbeat-{version}-darwin.tgz
 ------------------------------------------------
 
-NOTE: We also provide 32bits images. You can get them from our
+NOTE: We also provide 32-bit images that you can get from our 
 https://www.elastic.co/downloads/beats/topbeat[download page].
 
-Before starting topbeat, have a look at the configuration options from `/etc/topbeat/topbeat.yml`, 
-described in the next chapter.
+Before starting Topbeat, you should look at the configuration options in the configuration file, 
+for example `/etc/topbeat/topbeat.yml`. For more information about these options, see the <<topbeat-configuration>>.
 
 [[topbeat-configuration]]
-=== Topbeat configuration
+=== Configuring Topbeat
+
+NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
+configure Topbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
+
+To configure Topbeat, you edit the _topbeat.yml_ file. Here is a sample of 
+the _topbeat.yml_ file:
 
 [source, shell]
 -------------------------------------
@@ -60,12 +68,12 @@ input:
   procs: [".*"]
 -------------------------------------
 
-`period` defines how often to read system wide and per process statistics from your servers. The interval is in seconds. 
+The `period` option defines how often to read system wide and per process statistics from your servers. The interval is in seconds. 
 By default, it's set to 10 seconds.
 
-`procs` defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
+The `procs` option defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
 
-If you are not interested in monitoring your processes, then you can use:
+If you are not interested in monitoring your processes, you can use:
 
 [source, shell]
 -------------------------------------
@@ -75,11 +83,11 @@ input:
 -------------------------------------
 
 [[topbeat-template]]
-=== Load index template in Elasticsearch
+=== Loading the Index Template in Elasticsearch
 
-Before starting topbeat, you need to load the
+Before starting Topbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which is used to let Elasticsearch know which fields should be analyzed
+template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
 The recommended template file is installed by the Topbeat packages. Load it with the
@@ -100,11 +108,11 @@ cd topbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 === Running Topbeat
 
-You are now ready to start Topbeat:
+Run Topbeat by issuing the following command: 
 
 deb:
 
@@ -128,43 +136,49 @@ sudo ./topbeat -e -c topbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
 
-Check if your servers statistics are present in Elasticsearch:
+To verify that your server's statistics are present in Elasticsearch, issue 
+the following command: 
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XGET 'http://localhost:9200/topbeat-*/_search?pretty'
 ----------------------------------------------------------------------
 
-Make sure to replace `localhost:9200` with the address of your Elasticsearch
+Make sure that you replace `localhost:9200` with the address of your Elasticsearch
 instance. 
 
-=== Sample dashboards
+=== Loading Sample Kibana Dashboards
 
-In order to make it as easy as possible to start monitoring your servers in Kibana, 
-we provide a few sample Kibana dashboards. The dashboards are maintained in this
+To make it easier for you to start monitoring your servers in Kibana, 
+we have created a few sample dashboards. The dashboards are maintained in this
 https://github.com/elastic/beats-dashboards[GitHub repository], which also
-includes instructions for loading them.
+includes instructions for loading the dashboards.
 
-Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#load-kibana-dashboards[steps].
+You can load all of the sample dashboards automatically by following   
+{libbeat}/getting-started.html#load-kibana-dashboards[these steps].
 
 image:./images/topbeat-dashboard.png[Topbeat statistics]
 
-These dashboards are provided as examples, we recommend that you
+These dashboards are provided as examples. We recommend that you
 http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
-to your needs.
+to meet your needs.
 
-==== System wide overview
+==== Example of a System Wide Overview
 
-You can configure the `Dashboard` page to show the statistics that you are interested in for all the servers or for a
-subset of them.
-An example of a dashboard page can consist of CPU usage and memory consumption for the top 10 CPU consuming processes
-running on different servers, free and used disk space for all servers, the CPU usage per processes, memory consumption per processes.
+You can configure the `Dashboard` page to show the statistics for all servers or for a
+subset. For example, you might have a dashboard page that shows:
+
+* CPU usage and memory consumption for the top 10 CPU-consuming processes
+running on different servers
+* Free and used disk space for all servers
+* CPU usage per process
+* Memory consumption per process
 
 image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
 
-==== Per server overview
+==== Example of a Per Server Overview
 
-To display the statistics coming from a single server, a search query like *shipper: precise32* can be used:
+To display the statistics coming from a single server, you can use a search query like *shipper: precise32*:
 
 image:./images/topbeat-dashboard-1shipper.png[Topbeat Dashboard page in Kibana for one server]
 
