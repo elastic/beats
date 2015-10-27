@@ -59,21 +59,21 @@ func TestReadLine(t *testing.T) {
 	buffer := new(bytes.Buffer)
 
 	// Read third line
-	text, bytesread, err := h.readLine(reader, buffer, 0)
+	text, bytesread, err := readLine(reader, buffer, 0)
 
 	assert.Equal(t, *text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 	assert.Nil(t, err)
 
 	// read second line
-	text, bytesread, err = h.readLine(reader, buffer, 0)
+	text, bytesread, err = readLine(reader, buffer, 0)
 
 	assert.Equal(t, *text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
 
 	// Read third line, which doesn't exist
-	text, bytesread, err = h.readLine(reader, buffer, 0)
+	text, bytesread, err = readLine(reader, buffer, 0)
 	assert.Nil(t, text)
 	assert.Equal(t, bytesread, 0)
 	assert.Equal(t, err, io.EOF)
