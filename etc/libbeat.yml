@@ -211,6 +211,9 @@ logging:
   # Enable debug output for selected components.
   #selectors: []
 
+  # Set log level
+  #level: error
+
   files:
     # The directory where the log files will written to.
     #path: /var/log/mybeat
