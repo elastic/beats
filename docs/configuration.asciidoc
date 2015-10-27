@@ -51,7 +51,7 @@ filebeat:
       # Possible options are:
       # * log: Reads every line of the log file (default)
       # * stdin: Reads the standard in
-      type: log
+      input_type: log
 
       # Optional additional fields. These field can be freely picked
       # to add additional information to the crawled log files for filtering
@@ -88,12 +88,15 @@ filebeat:
 A list of glob based paths that should be crawled and fetched. For each file found under this path, a harvester is
 started. Each path is defined one per line.
 
-===== type
+===== input_type
 
 It has two options:
 
     * log:  Reads every line of the log file (default)
     * stdin: Reads the standard in
+
+The type value will be put into each event published to Logstash and
+Elasticsearch in the 'input_type' field.
 
 
 ===== fields
@@ -119,6 +122,12 @@ Time strings like 2h (2 hours), 5m (5 minutes) can be used.
 
 In seconds, specifies how often these files should be checked for changes. In case it is set
 to 0s, it is done as often as possible. Default: 10s
+
+===== document_type
+
+Defines the event its type value to be used for published lines read by
+harvesters. The document_type will be used by Elasticsearch output as document
+type. Default value is `log`.
 
 
 ===== harvester_buffer_size

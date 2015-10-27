@@ -14,6 +14,9 @@ All documentation about Filebeat can be found here.
 - Omit 'fields' from event JSON when null. #126
 - Make offset and line value of type long in elasticsearch template to prevent overflow. #140
 - Fix locking files for writing behaviour. #156
+- Introduce 'document_type' config option per prospector to define document type
+  for event stored in elasticsearch. #133
+- Add 'input_type' field to published events reporting the prospector type being used. #133
 
 ### Added
 
