@@ -24,7 +24,7 @@ type Logging struct {
 func init() {
 	// Adds logging specific flags: -v, -e and -d.
 	verbose = flag.Bool("v", false, "Log at INFO level")
-	toStderr = flag.Bool("e", false, "Output to stdout and disable syslog/file output")
+	toStderr = flag.Bool("e", false, "Output to stderr and disable syslog/file output")
 	debugSelectorsStr = flag.String("d", "", "Enable certain debug selectors")
 }
 
@@ -68,8 +68,10 @@ func Init(name string, config *Logging) error {
 	}
 
 	// toStderr disables logging to syslog/files
-	toSyslog = toSyslog && !*toStderr
-	toFiles = toFiles && !*toStderr
+	if *toStderr {
+		toSyslog = false
+		toFiles = false
+	}
 
 	LogInit(Priority(logLevel), "", toSyslog, true, debugSelectors)
 	if len(debugSelectors) > 0 {
@@ -107,7 +109,7 @@ func Init(name string, config *Logging) error {
 
 func SetStderr() {
 	if !*toStderr {
-		Info("Startup successful, disable stdout logging")
+		Info("Startup successful, disable stderr logging")
 		SetToStderr(false, "")
 	}
 }
