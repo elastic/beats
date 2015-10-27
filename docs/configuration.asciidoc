@@ -153,6 +153,7 @@ Currently the following output types are supported:
 * Logstash
 * Redis (DEPRECATED)
 * File
+* Console
 
 One or multiple outputs can be enabled at a time. The output plugins are
 responsible for sending the transaction data in JSON format to the next step in
@@ -663,6 +664,27 @@ rotated. The default value is 10 MB.
 Maximum number of files under path. When this number of files is reached, the
 oldest file is deleted and the rest are shifted from last to first. The default
 is 7 files.
+
+==== Console Output
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  console:
+    enabled: true
+
+    pretty: true
+------------------------------------------------------------------------------
+
+The Console output write events in JSON format to stdout.
+
+===== enabled
+
+Boolean option that enables Console as output. The default is false.
+
+===== pretty
+
+If pretty is set events written to stdout will be nicely formatted. The default is false.
 
 [[configuration-output-tls]]
 
