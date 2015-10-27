@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Close file descriptors used to monitor processes. #337
+- Remove old RPM spec file. It moved to elastic/beats-packer. #334
 
 ### Added
 
