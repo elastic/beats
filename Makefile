@@ -83,4 +83,4 @@ install-cfg:
 	cp etc/filebeat.yml $(PREFIX)/filebeat-darwin.yml
 	# win
 	cp etc/filebeat.yml $(PREFIX)/filebeat-win.yml
-	sed -i 's@#registry_file: .filebeat@registry_file: "C:/ProgramData/\filebeat/registry"@' $(PREFIX)/filebeat-win.yml
+	sed -i 's@#registry_file: .filebeat@registry_file: "C:/ProgramData/filebeat/registry"@' $(PREFIX)/filebeat-win.yml
