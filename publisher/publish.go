@@ -13,6 +13,7 @@ import (
 	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
+	_ "github.com/elastic/libbeat/outputs/console"
 	_ "github.com/elastic/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/libbeat/outputs/fileout"
 	_ "github.com/elastic/libbeat/outputs/logstash"
