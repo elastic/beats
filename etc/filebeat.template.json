@@ -29,11 +29,11 @@
           "index": "analyzed"
         },
         "line": {
-          "type": "integer",
+          "type": "long",
           "doc_values": "true"
         },
         "offset": {
-          "type": "integer",
+          "type": "long",
           "doc_values": "true"
         }
       }
