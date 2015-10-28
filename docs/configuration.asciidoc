@@ -291,6 +291,11 @@ output:
 In the previous example, the Elasticsearch nodes are available at https://10.45.3.2:9220/elasticsearch and
 https://10.45.3.1:9230/elasticsearch.
 
+===== worker
+
+Number of workers per configured host publishing events to Elasticsearch. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
 
 ===== host (DEPRECATED)
 
@@ -465,6 +470,12 @@ Boolean option that enables logstash output. The default is true.
 List of known logstash servers to connect to. All entries in this list can
 contain a port number. If no port number is given, the port options value is
 used as default port number.
+
+===== worker
+
+Number of workers per configured host publishing events to Logstash. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
 
 [[loadbalance]]
 ===== loadbalance
