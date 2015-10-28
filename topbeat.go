@@ -63,20 +63,18 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 	var err error
 
 	t.initProcStats()
-	lastTickTime := time.Now()
 
 	ticker := time.NewTicker(t.period)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-t.done:
 			return nil
-		case tickTime := <-ticker.C:
-			if lastTickTime.After(tickTime) {
-				// ignore tick if processing took longer then one period
-				logp.Warn("Ignoring tick due to processing taking longer than one tick")
-				continue
-			}
+		case <-ticker.C:
 		}
+
+		timerStart := time.Now()
 
 		err = t.exportSystemStats()
 		if err != nil {
@@ -94,7 +92,11 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 			break
 		}
 
-		lastTickTime = time.Now()
+		timerEnd := time.Now()
+		duration := timerEnd.Sub(timerStart)
+		if duration.Nanoseconds() > t.period.Nanoseconds() {
+			logp.Warn("Ignoring tick(s) due to processing taking longer than one period")
+		}
 	}
 
 	return err
