@@ -15,7 +15,8 @@ func TestBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := GetTestingElasticsearch()
+
+	client := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -39,7 +40,7 @@ func TestBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := es.Bulk(index, "type1", params, body)
+	_, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returned error: %s", err)
 	}
@@ -47,7 +48,7 @@ func TestBulk(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value1",
 	}
-	result, err := es.SearchURI(index, "type1", params)
+	result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -55,7 +56,7 @@ func TestBulk(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	_, err = es.Delete(index, "", "", nil)
+	_, err = client.Delete(index, "", "", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}
@@ -68,7 +69,8 @@ func TestEmptyBulk(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := GetTestingElasticsearch()
+
+	client := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	body := make([]interface{}, 0, 10)
@@ -76,7 +78,7 @@ func TestEmptyBulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := es.Bulk(index, "type1", params, body)
+	resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returned error: %s", err)
 	}
@@ -92,7 +94,8 @@ func TestBulkMoreOperations(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
-	es := GetTestingElasticsearch()
+
+	client := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -145,7 +148,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := es.Bulk(index, "type1", params, body)
+	resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
 		t.Errorf("Bulk() returned error: %s [%s]", err, resp)
 		return
@@ -154,7 +157,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value3",
 	}
-	result, err := es.SearchURI(index, "type1", params)
+	result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -165,7 +168,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field2:value2",
 	}
-	result, err = es.SearchURI(index, "type1", params)
+	result, err = client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -173,7 +176,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	_, err = es.Delete(index, "", "", nil)
+	_, err = client.Delete(index, "", "", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}

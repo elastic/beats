@@ -23,7 +23,7 @@ const (
 )
 
 type esConnection struct {
-	*elasticsearch.Elasticsearch
+	*elasticsearch.Client
 	t     *testing.T
 	index string
 }
@@ -80,12 +80,12 @@ func esConnect(t *testing.T, index string) *esConnection {
 	index = fmt.Sprintf("%s-%02d.%02d.%02d",
 		index, ts.Year(), ts.Month(), ts.Day())
 
-	connection := elasticsearch.NewElasticsearch([]string{host}, nil, "", "")
+	client := elasticsearch.NewClient(host, "", nil, "", "")
 
 	// try to drop old index if left over from failed test
-	_, _ = connection.Delete(index, "", "", nil) // ignore error
+	_, _ = client.Delete(index, "", "", nil) // ignore error
 
-	_, err := connection.CreateIndex(index, common.MapStr{
+	_, err := client.CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
@@ -97,7 +97,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	es := &esConnection{}
 	es.t = t
-	es.Elasticsearch = connection
+	es.Client = client
 	es.index = index
 	return es
 }

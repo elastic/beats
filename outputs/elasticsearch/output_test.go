@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
-	"github.com/stretchr/testify/assert"
 )
 
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
@@ -23,7 +22,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	var output elasticsearchOutput
-	output.Init("packetbeat", outputs.MothershipConfig{
+	output.init("packetbeat", outputs.MothershipConfig{
 		Enabled:        true,
 		Save_topology:  true,
 		Host:           GetEsHost(),
@@ -32,7 +31,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		Password:       "",
 		Path:           "",
 		Index:          index,
-		Protocol:       "",
+		Protocol:       "http",
 		Flush_interval: &flushInterval,
 		Bulk_size:      &bulkSize,
 	}, 10)
@@ -92,9 +91,10 @@ func TestOneEvent(t *testing.T) {
 
 	ts := time.Now()
 
-	elasticsearchOutput := createElasticsearchConnection(0, 0)
+	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
+	event["timestamp"] = common.Time(time.Now())
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -107,16 +107,18 @@ func TestOneEvent(t *testing.T) {
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
+	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
 	logp.Debug("output_elasticsearch", "index = %s", index)
-	elasticsearchOutput.Conn.CreateIndex(index, common.MapStr{
+
+	client := output.randomClient()
+	client.CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
 		},
 	})
 
-	err := elasticsearchOutput.PublishEvent(nil, ts, event)
+	err := output.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -125,13 +127,13 @@ func TestOneEvent(t *testing.T) {
 	// before the refresh. We should find a better solution for this.
 	time.Sleep(200 * time.Millisecond)
 
-	_, err = elasticsearchOutput.Conn.Refresh(index)
+	_, err = client.Refresh(index)
 	if err != nil {
 		t.Errorf("Failed to refresh: %s", err)
 	}
 
 	defer func() {
-		_, err = elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		_, err = client.Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
@@ -140,7 +142,7 @@ func TestOneEvent(t *testing.T) {
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
-	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
+	resp, err := client.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
@@ -163,9 +165,10 @@ func TestEvents(t *testing.T) {
 
 	ts := time.Now()
 
-	elasticsearchOutput := createElasticsearchConnection(0, 0)
+	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
+	event["timestamp"] = common.Time(time.Now())
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -179,15 +182,15 @@ func TestEvents(t *testing.T) {
 	r["response"] = "value1"
 	event["redis"] = r
 
-	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
-	elasticsearchOutput.Conn.CreateIndex(index, common.MapStr{
+	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
+	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
 		},
 	})
 
-	err := elasticsearchOutput.PublishEvent(nil, ts, event)
+	err := output.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -197,7 +200,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = 0
 	event["redis"] = r
 
-	err = elasticsearchOutput.PublishEvent(nil, ts, event)
+	err = output.PublishEvent(nil, ts, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -206,20 +209,20 @@ func TestEvents(t *testing.T) {
 	// before the refresh. We should find a better solution for this.
 	time.Sleep(200 * time.Millisecond)
 
-	elasticsearchOutput.Conn.Refresh(index)
+	output.randomClient().Refresh(index)
 
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
 
 	defer func() {
-		_, err = elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		_, err = output.randomClient().Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
+	resp, err := output.randomClient().SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -229,11 +232,11 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
+func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 	ts := time.Now()
-	index := fmt.Sprintf("%s-%d.%02d.%02d", elasticsearchOutput.Index, ts.Year(), ts.Month(), ts.Day())
+	index := fmt.Sprintf("%s-%d.%02d.%02d", output.index, ts.Year(), ts.Month(), ts.Day())
 
-	elasticsearchOutput.Conn.CreateIndex(index, common.MapStr{
+	output.randomClient().CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
@@ -243,6 +246,7 @@ func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 	for i := 0; i < 10; i++ {
 
 		event := common.MapStr{}
+		event["timestamp"] = common.Time(time.Now())
 		event["type"] = "redis"
 		event["status"] = "OK"
 		event["responsetime"] = 34
@@ -256,7 +260,7 @@ func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 		r["response"] = "value" + strconv.Itoa(i)
 		event["redis"] = r
 
-		err := elasticsearchOutput.PublishEvent(nil, ts, event)
+		err := output.PublishEvent(nil, ts, event)
 		if err != nil {
 			t.Errorf("Failed to publish the event: %s", err)
 		}
@@ -267,20 +271,20 @@ func testBulkWithParams(t *testing.T, elasticsearchOutput elasticsearchOutput) {
 	// before the index. We should find a better solution for this.
 	time.Sleep(200 * time.Millisecond)
 
-	elasticsearchOutput.Conn.Refresh(index)
+	output.randomClient().Refresh(index)
 
 	params := map[string]string{
 		"q": "type:redis",
 	}
 
 	defer func() {
-		_, err := elasticsearchOutput.Conn.Delete(index, "", "", nil)
+		_, err := output.randomClient().Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
 	}()
 
-	resp, err := elasticsearchOutput.Conn.SearchURI(index, "", params)
+	resp, err := output.randomClient().SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -299,14 +303,14 @@ func TestBulkEvents(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
 	}
 
-	elasticsearchOutput := createElasticsearchConnection(50, 2)
-	testBulkWithParams(t, elasticsearchOutput)
+	output := createElasticsearchConnection(50, 2)
+	testBulkWithParams(t, output)
 
-	elasticsearchOutput = createElasticsearchConnection(50, 1000)
-	testBulkWithParams(t, elasticsearchOutput)
+	output = createElasticsearchConnection(50, 1000)
+	testBulkWithParams(t, output)
 
-	elasticsearchOutput = createElasticsearchConnection(50, 5)
-	testBulkWithParams(t, elasticsearchOutput)
+	output = createElasticsearchConnection(50, 5)
+	testBulkWithParams(t, output)
 }
 
 func TestEnableTTL(t *testing.T) {
@@ -317,86 +321,17 @@ func TestEnableTTL(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
 	}
 
-	elasticsearchOutput := createElasticsearchConnection(0, 0)
-	elasticsearchOutput.Conn.Delete(".packetbeat-topology", "", "", nil)
+	output := createElasticsearchConnection(0, 0)
+	output.randomClient().Delete(".packetbeat-topology", "", "", nil)
 
-	err := elasticsearchOutput.EnableTTL()
+	err := output.EnableTTL()
 	if err != nil {
 		t.Errorf("Fail to enable TTL: %s", err)
 	}
 
 	// should succeed also when index already exists
-	err = elasticsearchOutput.EnableTTL()
+	err = output.EnableTTL()
 	if err != nil {
 		t.Errorf("Fail to enable TTL: %s", err)
-	}
-
-}
-
-func TestGetUrl(t *testing.T) {
-
-	// List of inputs / outputs that must match after fetching url
-	// Setting a path without a scheme is not allowed. Example: 192.168.1.1:9200/hello
-	inputOutput := map[string]string{
-		// shema + hostname
-		"":                     "http://localhost:9200",
-		"http://localhost":     "http://localhost:9200",
-		"http://localhost:80":  "http://localhost:80",
-		"http://localhost:80/": "http://localhost:80/",
-		"http://localhost/":    "http://localhost:9200/",
-
-		// no schema + hostname
-		"localhost":        "http://localhost:9200",
-		"localhost:80":     "http://localhost:80",
-		"localhost:80/":    "http://localhost:80/",
-		"localhost/":       "http://localhost:9200/",
-		"localhost/mypath": "http://localhost:9200/mypath",
-
-		// shema + ipv4
-		"http://192.168.1.1:80":        "http://192.168.1.1:80",
-		"https://192.168.1.1:80/hello": "https://192.168.1.1:80/hello",
-		"http://192.168.1.1":           "http://192.168.1.1:9200",
-		"http://192.168.1.1/hello":     "http://192.168.1.1:9200/hello",
-
-		// no schema + ipv4
-		"192.168.1.1":          "http://192.168.1.1:9200",
-		"192.168.1.1:80":       "http://192.168.1.1:80",
-		"192.168.1.1/hello":    "http://192.168.1.1:9200/hello",
-		"192.168.1.1:80/hello": "http://192.168.1.1:80/hello",
-
-		// schema + ipv6
-		"http://[2001:db8::1]:80":                              "http://[2001:db8::1]:80",
-		"http://[2001:db8::1]":                                 "http://[2001:db8::1]:9200",
-		"https://[2001:db8::1]:9200":                           "https://[2001:db8::1]:9200",
-		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329":       "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200",
-		"http://[2001:db8::1]:80/hello":                        "http://[2001:db8::1]:80/hello",
-		"http://[2001:db8::1]/hello":                           "http://[2001:db8::1]:9200/hello",
-		"https://[2001:db8::1]:9200/hello":                     "https://[2001:db8::1]:9200/hello",
-		"http://FE80:0000:0000:0000:0202:B3FF:FE1E:8329/hello": "http://[FE80:0000:0000:0000:0202:B3FF:FE1E:8329]:9200/hello",
-
-		// no schema + ipv6
-		"2001:db8::1":            "http://[2001:db8::1]:9200",
-		"[2001:db8::1]:80":       "http://[2001:db8::1]:80",
-		"[2001:db8::1]":          "http://[2001:db8::1]:9200",
-		"2001:db8::1/hello":      "http://[2001:db8::1]:9200/hello",
-		"[2001:db8::1]:80/hello": "http://[2001:db8::1]:80/hello",
-		"[2001:db8::1]/hello":    "http://[2001:db8::1]:9200/hello",
-	}
-
-	for input, output := range inputOutput {
-		urlNew, err := getURL("http", "", input)
-		assert.Nil(t, err)
-		assert.Equal(t, output, urlNew, fmt.Sprintf("input: %v", input))
-	}
-
-	inputOutputWithDefaults := map[string]string{
-		"http://localhost":                          "http://localhost:9200/hello",
-		"192.156.4.5":                               "https://192.156.4.5:9200/hello",
-		"http://username:password@es.found.io:9324": "http://username:password@es.found.io:9324/hello",
-	}
-	for input, output := range inputOutputWithDefaults {
-		urlNew, err := getURL("https", "/hello", input)
-		assert.Nil(t, err)
-		assert.Equal(t, output, urlNew)
 	}
 }

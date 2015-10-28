@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 - Use stderr for console log output. #219
 - Handle empty event array in publisher. #207
+- Limit number of workers for Elasticsearch output to 1 per configured host. packetbeat#226
 
 ### Added
 - Add Console output plugin. #218
