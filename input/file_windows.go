@@ -90,7 +90,7 @@ func ReadOpen(path string) (*os.File, error) {
 	}
 
 	var access uint32
-	access = syscall.GENERIC_READ | syscall.GENERIC_WRITE
+	access = syscall.GENERIC_READ
 
 	sharemode := uint32(syscall.FILE_SHARE_READ | syscall.FILE_SHARE_WRITE | syscall.FILE_SHARE_DELETE)
 

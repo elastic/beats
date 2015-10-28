@@ -12,7 +12,8 @@ All documentation about Filebeat can be found here.
 
 ### Bugfixes
 - Omit 'fields' from event JSON when null. #126
-- Make offset and line value of type long in elasticsearch template to prevent overflow #140
+- Make offset and line value of type long in elasticsearch template to prevent overflow. #140
+- Fix locking files for writing behaviour. #156
 
 ### Added
 
