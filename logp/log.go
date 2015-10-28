@@ -68,7 +68,7 @@ func MakeDebug(selector string) func(string, ...interface{}) {
 }
 
 func IsDebug(selector string) bool {
-	return _log.selectors[selector]
+	return _log.debug_all_selectors || _log.selectors[selector]
 }
 
 func msg(level Priority, prefix string, format string, v ...interface{}) {
