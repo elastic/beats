@@ -16,3 +16,5 @@ include::./command-line.asciidoc[]
 include::./https.asciidoc[]
 
 include::./newbeat.asciidoc[]
+
+include::./communitybeats.asciidoc[]
