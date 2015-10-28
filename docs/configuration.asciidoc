@@ -383,17 +383,18 @@ Every event send to logstash contains additional meta data for indexing and filt
 {
     ...
     "@metadata": {
-      "index": "<beat>-<date>",
+      "beat": "<beat>",
       "type": "<event type>"
     }
 }
 ------------------------------------------------------------------------------
 
-In Logstash the elasticsearch output plugin can be configured to use the
+In Logstash the Elasticsearch Output Plugin can be configured to use the
 metadata and event type for indexing.
 
-This logstash configuration file for logstash 1.5 will use the index and
-document type reported by beats for indexing events right into elasticsearch.
+This Logstash configuration file for logstash 1.5 will use the beat name and
+document type reported by beats for indexing events right into Elasticsearch.
+The index used will depend on `@timestamp` field as identified by Logstash.
 [source,logstash]
 ------------------------------------------------------------------------------
 
@@ -408,13 +409,13 @@ output {
     host => "localhost"
     port => "9200"
     protocol => "http"
-    index => "%{[@metadata][index]}"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
     document_type => "%{[@metadata][type]}"
   }
 }
 ------------------------------------------------------------------------------
 
-See the same configuration for logstash 2.x releases:
+See the same configuration for Logstash 2.x releases:
 [source,logstash]
 ------------------------------------------------------------------------------
 
@@ -427,14 +428,14 @@ input {
 output {
   elasticsearch {
     hosts => ["http://localhost:9200"]
-    index => "%{[@metadata][index]}"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
     document_type => "%{[@metadata][type]}"
   }
 }
 ------------------------------------------------------------------------------
 
-Events indexed into elasticsearch with shown logstash configuration will be
-similar to events directly indexed by beats into elasticsearch.
+Events indexed into Elasticsearch with shown Logstash configuration will be
+similar to events directly indexed by beats into Elasticsearch.
 
 
 Example beat configuration:
@@ -446,7 +447,8 @@ output:
 
     hosts: ["localhost:5044"]
 
-    # configure index prefix name
+    # index configures '@metadata.beat' field to be used by Logstash for
+    # indexing. By Default the beat name is used (e.g. filebeat, topbeat, packetbeat)
     index: mybeat
 
     tls:
