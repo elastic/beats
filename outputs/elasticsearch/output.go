@@ -22,8 +22,6 @@ var (
 )
 
 const (
-	defaultEsOpenTimeout = 3000 * time.Millisecond
-
 	defaultMaxRetries = 3
 
 	elasticsearchDefaultTimeout = 30 * time.Second

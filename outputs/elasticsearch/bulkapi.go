@@ -27,6 +27,10 @@ type bulkMetaIndex struct {
 	DocType string `json:"_type"`
 }
 
+type BulkResult struct {
+	Items []json.RawMessage `json:"items"`
+}
+
 func (r *bulkRequest) Send(meta, obj interface{}) error {
 	var err error
 
@@ -40,7 +44,7 @@ func (r *bulkRequest) Send(meta, obj interface{}) error {
 	return err
 }
 
-func (r *bulkRequest) Flush() (*QueryResult, error) {
+func (r *bulkRequest) Flush() (*BulkResult, error) {
 	if r.buf.Len() == 0 {
 		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
 		return nil, nil
@@ -52,7 +56,7 @@ func (r *bulkRequest) Flush() (*QueryResult, error) {
 	}
 	r.buf.Truncate(0)
 
-	return readQueryResult(resp)
+	return readBulkResult(resp)
 }
 
 // Bulk performs many index/delete operations in a single API call.
@@ -153,4 +157,17 @@ func bulkEncode(metaBuilder MetaBuilder, body []interface{}) bytes.Buffer {
 		}
 	}
 	return buf
+}
+
+func readBulkResult(obj []byte) (*BulkResult, error) {
+	if obj == nil {
+		return nil, nil
+	}
+
+	var result BulkResult
+	err := json.Unmarshal(obj, &result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }

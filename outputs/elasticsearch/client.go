@@ -77,6 +77,7 @@ func (client *Client) PublishEvents(
 		return 0, err
 	}
 
+	// encode events into bulk request buffer
 	for _, event := range events {
 		ts := time.Time(event["@timestamp"].(common.Time))
 		index := fmt.Sprintf("%s-%d.%02d.%02d",
@@ -93,15 +94,40 @@ func (client *Client) PublishEvents(
 		}
 	}
 
-	_, err = request.Flush()
+	// send bulk request
+	res, err := request.Flush()
 	if err != nil {
 		logp.Err(
-			"Failed to perform many index operations in a single API call; %s",
+			"Failed to perform many index operations in a single API call: %s",
 			err)
 		return 0, err
 	}
 
-	return len(events), nil
+	// check per item errors. On first failure encountered an error is returned
+	// with number of successful events published. Mode will not retry
+	// value reported ok until first failure was found.
+	count := 0
+	for _, rawItem := range res.Items {
+		var itemRes map[string]struct {
+			Status int `json:"status"`
+		}
+
+		err = json.Unmarshal(rawItem, &itemRes)
+		if err != nil {
+			logp.Err("Failed to parse bulk response item: %s", err)
+			return count, err
+		}
+
+		for _, r := range itemRes {
+			if r.Status >= 300 {
+				return count, fmt.Errorf("item status response %v", r.Status)
+			}
+		}
+
+		count++
+	}
+
+	return count, nil
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
@@ -124,7 +150,7 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
-	conn.connected, err = conn.Ping()
+	conn.connected, err = conn.Ping(timeout)
 	if err != nil {
 		return err
 	}
@@ -134,8 +160,8 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-func (conn *Connection) Ping() (bool, error) {
-	conn.http.Timeout = defaultEsOpenTimeout
+func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
+	conn.http.Timeout = timeout
 	resp, err := conn.http.Head(conn.URL)
 	if err != nil {
 		return false, err
