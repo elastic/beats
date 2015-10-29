@@ -37,7 +37,7 @@ func (mh *testMessageHandler) acknowledgeMessage(m message) {
 	if mh.response == CompletedResponse {
 		outputs.SignalCompleted(m.signal)
 	} else {
-		outputs.SignalFailed(m.signal)
+		outputs.SignalFailed(m.signal, nil)
 	}
 }
 

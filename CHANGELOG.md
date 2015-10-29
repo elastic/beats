@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file based on the
 - Send @metadata.beat to Logstash instead of @metadata.index to prevent
   possible name clashes and give user full control over index name used for
   Elasticsearch
+- Add logging messages for bulk publishing in case of error #229
 
 ### Deprecated
 
