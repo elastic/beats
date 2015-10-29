@@ -23,6 +23,9 @@ output:
     #username: "admin"
     #password: "s3cr3t"
 
+    # Number of workers per Elasticsearch host.
+    #worker: 1
+
     # Elasticsearch. The default is false.
     # This option makes sense only for Packetbeat
     #save_topology: false
@@ -97,6 +100,9 @@ output:
 
     # The Logstash hosts
     #hosts: ["localhost:5044", "logstash:5045"]
+
+    # Number of workers per Logstash host.
+    #worker: 1
 
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true

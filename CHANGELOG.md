@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file based on the
 - Handle empty event array in publisher. #207
 - Limit number of workers for Elasticsearch output to 1 per configured host. packetbeat#226
 - Respect '*' debug selector in IsDebug. #226 (elastic/packetbeat#339)
+- Limit number of workers for Elasticsearch output. elastic/packetbeat#226
 
 ### Added
 - Add Console output plugin. #218
@@ -20,6 +21,8 @@ All notable changes to this project will be documented in this file based on the
   possible name clashes and give user full control over index name used for
   Elasticsearch
 - Add logging messages for bulk publishing in case of error #229
+- Add option to configure number of parallel workers publishing to Elasticsearch
+  or Logstash.
 
 ### Deprecated
 
