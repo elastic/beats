@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file based on the
 - Determine Elasticsearch index for an event based on UTC time #81
 - Fixing ES output's defaultDeadTimeout so that it is 60 seconds #103
 - Es outputer: fix timestamp conversion #91
+- Fix TLS insecure config option #239
 
 ### Added
 - Add logstash output plugin #151
