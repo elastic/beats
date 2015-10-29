@@ -13,6 +13,7 @@ import (
 	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
+	_ "github.com/elastic/libbeat/outputs/console"
 	_ "github.com/elastic/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/libbeat/outputs/fileout"
 	_ "github.com/elastic/libbeat/outputs/logstash"
@@ -219,7 +220,7 @@ func (publisher *PublisherType) Init(
 		}
 
 		if publisher.TopologyOutput == nil {
-			logp.Warn("No output is defined to store the topology. The server fields might not be filled.")
+			logp.Debug("publish", "No output is defined to store the topology. The server fields might not be filled.")
 		}
 	}
 
