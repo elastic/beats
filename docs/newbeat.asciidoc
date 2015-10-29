@@ -46,7 +46,7 @@ image:./images/beat_overview.png[Beat overview architecture]
 
 An event is a JSON like object (Golang type `map[string]interface{}`) that
 contains the collected data which is indexed into Elasticsearch. The only
-rules are that it must contain a `timestamp` field and a `type` field. Beyond
+rules are that it must contain a `@timestamp` field and a `type` field. Beyond
 that, these events can contain anything and they can be created as often as
 necessary.
 
@@ -71,7 +71,7 @@ necessary.
   "proc.ppid":10027,
   "proc.state":"sleeping",
   "shipper":"vagrant-ubuntu-trusty-64",
-  "timestamp":"2015-08-06T20:20:34.089Z",
+  "@timestamp":"2015-08-06T20:20:34.089Z",
   "type":"proc"
 }
 ----------------------------------------------------------------------
@@ -230,7 +230,7 @@ func (t *Topbeat) exportSystemStats() error {
 	[...]
 
 	event := common.MapStr{ <1>
-		"timestamp": common.Time(time.Now()), <2>
+		"@timestamp": common.Time(time.Now()), <2>
 		"type":      "system",
 		"load":      load_stat,
 		"cpu":       cpu_stat,
@@ -245,7 +245,7 @@ func (t *Topbeat) exportSystemStats() error {
 ----------------------------------------------------------------------
 
 <1> Creating the event object.
-<2> The `timestamp` field needs to be of time `common.Time`.
+<2> The `@timestamp` field needs to be of time `common.Time`.
 <3> Sending the event.
 
 ==== Cleanup

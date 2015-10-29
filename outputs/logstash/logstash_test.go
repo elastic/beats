@@ -26,10 +26,10 @@ import (
 
 func testEvent() common.MapStr {
 	return common.MapStr{
-		"timestamp": common.Time(time.Now()),
-		"type":      "log",
-		"extra":     10,
-		"message":   "message",
+		"@timestamp": common.Time(time.Now()),
+		"type":       "log",
+		"extra":      10,
+		"message":    "message",
 	}
 }
 

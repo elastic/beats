@@ -106,7 +106,7 @@ func (s *testSignaler) Failed() {
 // populated.
 func testEvent() common.MapStr {
 	event := common.MapStr{}
-	event["timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(time.Now())
 	event["type"] = "test"
 	event["src"] = &common.Endpoint{}
 	event["dst"] = &common.Endpoint{}

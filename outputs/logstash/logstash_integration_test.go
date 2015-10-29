@@ -266,10 +266,10 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 	defer ls.Cleanup()
 
 	event := common.MapStr{
-		"timestamp": common.Time(time.Now()),
-		"host":      "test-host",
-		"type":      "log",
-		"message":   "hello world",
+		"@timestamp": common.Time(time.Now()),
+		"host":       "test-host",
+		"type":       "log",
+		"message":    "hello world",
 	}
 	ls.PublishEvent(nil, time.Now(), event)
 
@@ -303,10 +303,10 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
 		event := common.MapStr{
-			"timestamp": common.Time(time.Now()),
-			"host":      "test-host",
-			"type":      "log",
-			"message":   fmt.Sprintf("hello world - %v", i),
+			"@timestamp": common.Time(time.Now()),
+			"host":       "test-host",
+			"type":       "log",
+			"message":    fmt.Sprintf("hello world - %v", i),
 		}
 		ls.PublishEvent(nil, time.Now(), event)
 	}
@@ -347,10 +347,10 @@ func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) 
 		batch := make([]common.MapStr, 0, batchSize)
 		for j := 0; j < batchSize; j++ {
 			event := common.MapStr{
-				"timestamp": common.Time(time.Now()),
-				"host":      "test-host",
-				"type":      "log",
-				"message":   fmt.Sprintf("batch hello world - %v", i*batchSize+j),
+				"@timestamp": common.Time(time.Now()),
+				"host":       "test-host",
+				"type":       "log",
+				"message":    fmt.Sprintf("batch hello world - %v", i*batchSize+j),
 			}
 			batch = append(batch, event)
 		}
@@ -400,10 +400,10 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 
 	ts := time.Now()
 	event := common.MapStr{
-		"timestamp": common.Time(ts),
-		"host":      "test-host",
-		"type":      "log",
-		"message":   "hello world",
+		"@timestamp": common.Time(ts),
+		"host":       "test-host",
+		"type":       "log",
+		"message":    "hello world",
 	}
 
 	es.PublishEvent(nil, ts, event)
@@ -455,10 +455,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 	ts := time.Now()
 	events := []common.MapStr{
 		common.MapStr{
-			"timestamp": common.Time(ts),
-			"host":      "test-host",
-			"type":      "log",
-			"message":   "hello world",
+			"@timestamp": common.Time(ts),
+			"host":       "test-host",
+			"type":       "log",
+			"message":    "hello world",
 		},
 	}
 	es.BulkPublish(nil, ts, events)
@@ -489,7 +489,7 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 	lsEvent := ls["_source"].(map[string]interface{})
 	esEvent := es["_source"].(map[string]interface{})
-	commonFields := []string{"timestamp", "host", "type", "message"}
+	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {
 		assert.NotNil(t, lsEvent[field])
 		assert.NotNil(t, esEvent[field])
