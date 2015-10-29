@@ -7,38 +7,31 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Comment": "v1.0.0-beta3-327-gf55a32e",
-			"Rev": "f55a32e4bfa6c99eba0bf3b0409a708badc2564b"
+			"Rev": "3989f8f01bb335d756bad200f8b3b1fa0ae941db"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
