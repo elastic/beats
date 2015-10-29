@@ -17,7 +17,7 @@ output {
       protocol => "http"
       host => ""
       port => "9200"
-      index => "%{[@metadata][index]}"
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
       document_type => "%{[@metadata][type]}"
   }
 

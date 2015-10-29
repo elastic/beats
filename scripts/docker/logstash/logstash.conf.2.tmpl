@@ -16,7 +16,7 @@ input {
 output {
   elasticsearch {
       hosts => []
-      index => "%{[@metadata][index]}"
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
       document_type => "%{[@metadata][type]}"
   }
 

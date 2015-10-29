@@ -33,11 +33,17 @@ type testOutputer struct {
 	*esConnection
 }
 
+type esSoure interface {
+	RefreshIndex()
+}
+
 type esValueReader interface {
+	esSoure
 	Read() ([]map[string]interface{}, error)
 }
 
 type esCountReader interface {
+	esSoure
 	Count() (int, error)
 }
 
@@ -171,6 +177,8 @@ func (es *esConnection) Cleanup() {
 }
 
 func (es *esConnection) Read() ([]map[string]interface{}, error) {
+	fmt.Printf("try to read from index: %v\n", es.index)
+
 	_, err := es.Refresh(es.index)
 	if err != nil {
 		es.t.Errorf("Failed to refresh: %s", err)
@@ -189,6 +197,10 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 	}
 
 	return hits, err
+}
+
+func (es *esConnection) RefreshIndex() {
+	es.Refresh(es.index)
 }
 
 func (es *esConnection) Count() (int, error) {
@@ -220,6 +232,7 @@ func waitUntilTrue(duration time.Duration, fn func() bool) bool {
 
 func checkIndex(reader esCountReader, minValues int) func() bool {
 	return func() bool {
+		reader.RefreshIndex()
 		resp, err := reader.Count()
 		return err != nil || resp >= minValues
 	}
