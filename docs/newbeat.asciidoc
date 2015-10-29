@@ -1,3 +1,4 @@
+[[new-beat]]
 == Developer guide: creating a new Beat
 
 This guide walks you through the steps for creating a new Elastic Beat.  The
