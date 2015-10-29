@@ -7,6 +7,8 @@
 
 include::./overview.asciidoc[]
 
+include::./communitybeats.asciidoc[]
+
 include::./gettingstarted.asciidoc[]
 
 include::./configuration.asciidoc[]
@@ -17,4 +19,3 @@ include::./https.asciidoc[]
 
 include::./newbeat.asciidoc[]
 
-include::./communitybeats.asciidoc[]
