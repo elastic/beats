@@ -105,6 +105,7 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 	tlsconfig.RootCAs = c.tls.RootCAs
 	tlsconfig.Certificates = c.tls.Certificates
 	tlsconfig.ServerName = host
+	tlsconfig.InsecureSkipVerify = c.tls.InsecureSkipVerify
 
 	if err := c.tcpClient.Connect(timeout); err != nil {
 		return c.onFail(err)
