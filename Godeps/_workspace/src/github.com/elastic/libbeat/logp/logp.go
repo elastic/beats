@@ -19,12 +19,13 @@ type Logging struct {
 	Files     *FileRotator
 	To_syslog *bool
 	To_files  *bool
+	Level     string
 }
 
 func init() {
 	// Adds logging specific flags: -v, -e and -d.
 	verbose = flag.Bool("v", false, "Log at INFO level")
-	toStderr = flag.Bool("e", false, "Output to stdout and disable syslog/file output")
+	toStderr = flag.Bool("e", false, "Log to stderr and disable syslog/file output")
 	debugSelectorsStr = flag.String("d", "", "Enable certain debug selectors")
 }
 
@@ -34,12 +35,23 @@ func init() {
 // line flag with a later SetStderr call.
 func Init(name string, config *Logging) error {
 
-	logLevel := LOG_ERR
-	if *verbose {
-		logLevel = LOG_INFO
+	logLevel, err := getLogLevel(config)
+	if err != nil {
+		return err
 	}
 
-	debugSelectors := []string{}
+	if *verbose {
+		if LOG_INFO > logLevel {
+			logLevel = LOG_INFO
+		}
+	}
+
+	debugSelectors := config.Selectors
+	if logLevel == LOG_DEBUG {
+		if len(debugSelectors) == 0 {
+			debugSelectors = []string{"*"}
+		}
+	}
 	if len(*debugSelectorsStr) > 0 {
 		debugSelectors = strings.Split(*debugSelectorsStr, ",")
 		logLevel = LOG_DEBUG
@@ -68,8 +80,10 @@ func Init(name string, config *Logging) error {
 	}
 
 	// toStderr disables logging to syslog/files
-	toSyslog = toSyslog && !*toStderr
-	toFiles = toFiles && !*toStderr
+	if *toStderr {
+		toSyslog = false
+		toFiles = false
+	}
 
 	LogInit(Priority(logLevel), "", toSyslog, true, debugSelectors)
 	if len(debugSelectors) > 0 {
@@ -107,7 +121,27 @@ func Init(name string, config *Logging) error {
 
 func SetStderr() {
 	if !*toStderr {
-		Info("Startup successful, disable stdout logging")
+		Info("Startup successful, disable stderr logging")
 		SetToStderr(false, "")
 	}
+}
+
+func getLogLevel(config *Logging) (Priority, error) {
+	if config == nil || config.Level == "" {
+		return LOG_ERR, nil
+	}
+
+	levels := map[string]Priority{
+		"critical": LOG_CRIT,
+		"error":    LOG_ERR,
+		"warning":  LOG_WARNING,
+		"info":     LOG_INFO,
+		"debug":    LOG_DEBUG,
+	}
+
+	level, ok := levels[strings.ToLower(config.Level)]
+	if !ok {
+		return 0, fmt.Errorf("unknown log level: %v", config.Level)
+	}
+	return level, nil
 }

@@ -62,7 +62,9 @@ func (b *bulkWorker) run() {
 				b.publish()
 			}
 		case <-b.flushTicker.C:
-			b.publish()
+			if len(b.events) > 0 {
+				b.publish()
+			}
 		}
 	}
 }

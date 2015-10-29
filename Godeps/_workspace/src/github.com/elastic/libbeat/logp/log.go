@@ -140,14 +140,14 @@ func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugS
 		}
 	}
 	if _log.toStderr {
-		_log.logger = log.New(os.Stdout, prefix, log.Lshortfile)
+		_log.logger = log.New(os.Stderr, prefix, log.Lshortfile)
 	}
 }
 
 func SetToStderr(toStderr bool, prefix string) {
 	_log.toStderr = toStderr
 	if _log.toStderr {
-		_log.logger = log.New(os.Stdout, prefix, log.Lshortfile)
+		_log.logger = log.New(os.Stderr, prefix, log.Lshortfile)
 	}
 }
 

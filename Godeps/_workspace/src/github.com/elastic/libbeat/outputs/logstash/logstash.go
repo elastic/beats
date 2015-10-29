@@ -187,11 +187,9 @@ func (lj *logstash) BulkPublish(
 // decode/rename the "line" field into "message".
 func (lj *logstash) addMeta(event common.MapStr) {
 	// add metadata for indexing
-	ts := time.Time(event["timestamp"].(common.Time)).UTC()
-	index := fmt.Sprintf("%s-%02d.%02d.%02d", lj.index,
-		ts.Year(), ts.Month(), ts.Day())
 	event["@metadata"] = common.MapStr{
-		"index": index,
-		"type":  event["type"].(string),
+		"beat": lj.index,
+		"type": event["type"].(string),
 	}
+	fmt.Printf("meta data: %v\n", event["@metadata"])
 }

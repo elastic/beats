@@ -76,7 +76,7 @@ func (out *fileOutput) PublishEvent(
 ) error {
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
-		// mark as success so event is not send again.
+		// mark as success so event is not sent again.
 		outputs.SignalCompleted(trans)
 
 		logp.Err("Fail to convert the event to JSON: %s", err)
@@ -84,6 +84,10 @@ func (out *fileOutput) PublishEvent(
 	}
 
 	err = out.rotator.WriteLine(jsonEvent)
+	if err != nil {
+		logp.Err("Error when writing line to file: %s", err)
+	}
+
 	outputs.Signal(trans, err)
 	return err
 }
