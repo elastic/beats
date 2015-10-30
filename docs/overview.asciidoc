@@ -6,6 +6,10 @@ source code. Installed as an agent on your servers, Filebeat monitors the log di
 and forwards them either to https://www.elastic.co/products/logstash[Logstash] for parsing or directly to
 https://www.elastic.co/products/elasticsearch[Elasticsearch] for indexing.
 
+Here's how Filebeat works: When you start Filebeat, it starts one or more prospectors that look in the paths you've specified for log files. For each log file that the prospector locates, Filebeat starts a harvester. Each harvester reads a single log file for new content and sends the new log data to the spooler, which aggregates the events and sends the aggregated data to the output that you've configured for Filebeat.
+
+image:./images/filebeat.png[Beats design]
+
 Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework. 
 The general configuration options for libbeat and how to setup Elasticsearch, Logstash, and Kibana are covered 
 https://www.elastic.co/guide/en/beats/libbeat/current/index.html[here].
