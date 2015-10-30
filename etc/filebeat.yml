@@ -28,7 +28,7 @@ filebeat:
       # Possible options are:
       # * log: Reads every line of the log file (default)
       # * stdin: Reads the standard in
-      type: log
+      input_type: log
 
       # Optional additional fields. These field can be freely picked
       # to add additional information to the crawled log files for filtering
@@ -39,6 +39,11 @@ filebeat:
       # Ignore files which were modified more then the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
       #ignore_older:
+
+      # Type to be published in the 'type' field. For Elasticsearch output,
+      # the type defines the document type these entries should be stored
+      # in. Default: log
+      #document_type: log
 
       # Scan frequency in seconds.
       # How often these files should be checked for changes. In case it is set

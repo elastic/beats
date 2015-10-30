@@ -36,14 +36,21 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp when the log line is published. The precision is in milliseconds. The timezone is UTC.
+The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
 
 
 ==== type
 
 required: True
 
-Set to "log" to telling the event contains content read from log files.
+Name of the log event. Set to the prospectors document_type configuration option.
+
+
+==== input_type
+
+required: True
+
+Prospector input type event was generated from. Set to prospectors type configuration option.
 
 
 [[exported-fields-log]]

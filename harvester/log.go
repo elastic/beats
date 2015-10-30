@@ -83,13 +83,15 @@ func (h *Harvester) Harvest() {
 
 		line++
 		event := &input.FileEvent{
-			ReadTime: lastReadTime,
-			Source:   &h.Path,
-			Offset:   h.Offset,
-			Line:     line,
-			Text:     text,
-			Fields:   &h.Config.Fields,
-			Fileinfo: &info,
+			ReadTime:     lastReadTime,
+			Source:       &h.Path,
+			InputType:    h.Config.InputType,
+			DocumentType: h.Config.DocumentType,
+			Offset:       h.Offset,
+			Line:         line,
+			Text:         text,
+			Fields:       &h.Config.Fields,
+			Fileinfo:     &info,
 		}
 		h.Offset += int64(bytesread)
 

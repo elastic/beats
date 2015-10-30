@@ -19,6 +19,7 @@ const (
 	DefaultSpoolSize           uint64        = 1024
 	DefaultIdleTimeout         time.Duration = time.Second * 5
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
+	DefaultDocumentType                      = "log"
 	DefaultTailOnRotate                      = false
 )
 
@@ -46,10 +47,12 @@ type ProspectorConfig struct {
 }
 
 type HarvesterConfig struct {
+	InputType    string `yaml:"input_type"`
 	Fields       map[string]string
 	BufferSize   int    `yaml:"harvester_buffer_size"`
 	TailOnRotate bool   `yaml:"tail_on_rotate"`
 	Encoding     string `yaml:"encoding"`
+	DocumentType string `yaml:"document_type"`
 }
 
 // getConfigFiles returns list of config files.

@@ -27,9 +27,14 @@ env:
         milliseconds. The timezone is UTC.
 
     - name: type
-      description: >
-        Set to "log" to telling the event contains content read from log files.
       required: true
+      description: >
+        Name of the log event. Set to the prospectors document_type configuration option.
+
+    - name: input_type
+      required: true
+      description: >
+        Prospector input type event was generated from. Set to prospectors type configuration option.
 
 log:
   type: group

@@ -67,6 +67,10 @@ func (p *Prospector) Init() error {
 		p.ProspectorConfig.Harvester.BufferSize = cfg.DefaultHarvesterBufferSize
 	}
 
+	if p.ProspectorConfig.Harvester.DocumentType == "" {
+		p.ProspectorConfig.Harvester.DocumentType = cfg.DefaultDocumentType
+	}
+
 	// Init list
 	p.prospectorList = make(map[string]ProspectorFileStat)
 

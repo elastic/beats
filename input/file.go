@@ -17,13 +17,15 @@ type File struct {
 
 // FileEvent is sent to the output and must contain all relevant information
 type FileEvent struct {
-	ReadTime time.Time
-	Source   *string
-	Offset   int64
-	Line     uint64
-	Text     *string
-	Fields   *map[string]string
-	Fileinfo *os.FileInfo
+	ReadTime     time.Time
+	Source       *string
+	InputType    string
+	DocumentType string
+	Offset       int64
+	Line         uint64
+	Text         *string
+	Fields       *map[string]string
+	Fileinfo     *os.FileInfo
 }
 
 type FileState struct {
@@ -49,13 +51,14 @@ func (f *FileEvent) GetState() *FileState {
 
 func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
-		"timestamp": common.Time(f.ReadTime),
-		"source":    f.Source,
-		"offset":    f.Offset,
-		"line":      f.Line,
-		"message":   f.Text,
-		"fileinfo":  f.Fileinfo,
-		"type":      "log",
+		"timestamp":  common.Time(f.ReadTime),
+		"source":     f.Source,
+		"offset":     f.Offset,
+		"line":       f.Line,
+		"message":    f.Text,
+		"fileinfo":   f.Fileinfo,
+		"type":       f.DocumentType,
+		"input_type": f.InputType,
 	}
 
 	if f.Fields != nil {

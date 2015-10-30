@@ -113,22 +113,21 @@ filebeat:
     -
       paths:
         - "-"
-      type: stdin <1>
-      fields:
-        type: stdin
+      input_type: stdin
+      document_type: stdin <1>
     -
       paths:
         - /var/log/apache/httpd-*.log
-      fields:
-        type: apache
+      document_type: apache
 -------------------------------------------------------------------------------------
 
 <1> The explicit type field was introduced to separate between normal files and
     stdin. In the future, more types might be supported.
 
-As you can see, apart from the new optional `type` field which was introduced,
+As you can see, apart from the new optional `document_type` field which was introduced,
 the rest of the options can be migrated mechanically. In case no type is defined
-the default is to to `log`.
+the default is to to `log`. If filebeat is used to index into Elasticsearch
+directly, the `document_type` determines the document type to use when indexing.
 
 The Filebeat configuration allows some of the options that are global in the
 Logstash-Forwarder to be configured per prospector. See
