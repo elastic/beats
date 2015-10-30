@@ -12,7 +12,7 @@ env:
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: timestamp
+    - name: "@timestamp"
       type: date
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ
