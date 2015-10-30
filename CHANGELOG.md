@@ -19,6 +19,7 @@ All documentation about Filebeat can be found here.
 - Add 'input_type' field to published events reporting the prospector type being used. #133
 
 ### Added
+- Rename the timestamp field with @timestamp #168
 
 ### Improvements
 - All Godeps dependencies were updated to master on 2015-10-21 [#122]
