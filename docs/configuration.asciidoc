@@ -267,7 +267,7 @@ automatically sent to another node. Each Elasticsearch node can be defined as an
 Examples: `http://192.15.3.2`, `https://es.found.io:9230` or `192.24.3.2:9300`.
 If no port is specified, `9200` is used.
 
-Note:: In case of `IP:PORT`, the _scheme_ and _path_ are taken from the <<protocol-option>> and <<path-option>> config
+NOTE: In case of `IP:PORT`, the _scheme_ and _path_ are taken from the <<protocol-option>> and <<path-option>> config
 options. 
 
 [source,yaml]

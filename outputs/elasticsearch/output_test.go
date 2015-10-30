@@ -94,7 +94,7 @@ func TestOneEvent(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(time.Now())
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -168,7 +168,7 @@ func TestEvents(t *testing.T) {
 	output := createElasticsearchConnection(0, 0)
 
 	event := common.MapStr{}
-	event["timestamp"] = common.Time(time.Now())
+	event["@timestamp"] = common.Time(time.Now())
 	event["type"] = "redis"
 	event["status"] = "OK"
 	event["responsetime"] = 34
@@ -246,7 +246,7 @@ func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 	for i := 0; i < 10; i++ {
 
 		event := common.MapStr{}
-		event["timestamp"] = common.Time(time.Now())
+		event["@timestamp"] = common.Time(time.Now())
 		event["type"] = "redis"
 		event["status"] = "OK"
 		event["responsetime"] = 34

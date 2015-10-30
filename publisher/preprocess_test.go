@@ -21,15 +21,15 @@ func TestFilterEvent(t *testing.T) {
 
 		{func() common.MapStr {
 			m := testEvent()
-			m["timestamp"] = time.Now()
+			m["@timestamp"] = time.Now()
 			return m
-		}, "Invalid 'timestamp'"},
+		}, "Invalid '@timestamp'"},
 
 		{func() common.MapStr {
 			m := testEvent()
-			delete(m, "timestamp")
+			delete(m, "@timestamp")
 			return m
-		}, "Missing 'timestamp'"},
+		}, "Missing '@timestamp'"},
 
 		{func() common.MapStr {
 			m := testEvent()

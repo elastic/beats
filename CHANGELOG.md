@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 - Add Console output plugin. #218
+- Rename the timestamp field with @timestamp. #237
 
 ### Improvements
 - Send @metadata.beat to Logstash instead of @metadata.index to prevent
