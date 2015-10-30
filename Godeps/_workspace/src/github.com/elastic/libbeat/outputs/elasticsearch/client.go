@@ -78,7 +78,7 @@ func (client *Client) PublishEvents(
 	}
 
 	for _, event := range events {
-		ts := time.Time(event["timestamp"].(common.Time))
+		ts := time.Time(event["@timestamp"].(common.Time))
 		index := fmt.Sprintf("%s-%d.%02d.%02d",
 			client.index, ts.Year(), ts.Month(), ts.Day())
 		meta := bulkMeta{
@@ -109,7 +109,7 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 		return ErrNotConnected
 	}
 
-	ts := time.Time(event["timestamp"].(common.Time))
+	ts := time.Time(event["@timestamp"].(common.Time))
 	index := fmt.Sprintf("%s-%d.%02d.%02d",
 		client.index, ts.Year(), ts.Month(), ts.Day())
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)

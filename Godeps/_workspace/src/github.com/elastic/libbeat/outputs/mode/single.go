@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -61,8 +62,12 @@ func (s *SingleConnectionMode) PublishEvents(
 ) error {
 	published := 0
 	fails := 0
+	var err error
+
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
 		if err := s.connect(); err != nil {
+			logp.Info("Connecting error publishing events (retrying): %s", err)
+
 			fails++
 			time.Sleep(s.waitRetry)
 			continue
@@ -71,6 +76,7 @@ func (s *SingleConnectionMode) PublishEvents(
 		for published < len(events) {
 			n, err := s.conn.PublishEvents(events[published:])
 			if err != nil {
+				logp.Info("Error publishing events (retrying): %s", err)
 				break
 			}
 
@@ -87,7 +93,7 @@ func (s *SingleConnectionMode) PublishEvents(
 		fails++
 	}
 
-	outputs.SignalFailed(signaler)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }
 
@@ -97,13 +103,20 @@ func (s *SingleConnectionMode) PublishEvent(
 	event common.MapStr,
 ) error {
 	fails := 0
+
+	var err error
+
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
-		if err := s.connect(); err != nil {
+		if err = s.connect(); err != nil {
+			logp.Info("Connecting error publishing event (retrying): %s", err)
+
 			fails++
 			time.Sleep(s.waitRetry)
 			continue
 		}
 		if err := s.conn.PublishEvent(event); err != nil {
+			logp.Info("Error publishing event (retrying): %s", err)
+
 			fails++
 			continue
 		}
@@ -112,6 +125,6 @@ func (s *SingleConnectionMode) PublishEvent(
 		return nil
 	}
 
-	outputs.SignalFailed(signaler)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }
