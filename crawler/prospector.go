@@ -31,6 +31,7 @@ type ProspectorFileStat struct {
 // Init sets up default config for prospector
 func (p *Prospector) Init() error {
 
+	// Setup Ignore Older
 	if p.ProspectorConfig.IgnoreOlder != "" {
 
 		var err error
@@ -47,6 +48,7 @@ func (p *Prospector) Init() error {
 		p.ProspectorConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
 
+	// Setup Scan Frequency
 	if p.ProspectorConfig.ScanFrequency != "" {
 
 		var err error
@@ -58,20 +60,21 @@ func (p *Prospector) Init() error {
 			return err
 		}
 	} else {
-		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
-		// Set it to default
+		logp.Debug("propsector", "Set scanFrequency to %s", cfg.DefaultScanFrequency)
 		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
 
+	// Setup Buffer Size
 	if p.ProspectorConfig.Harvester.BufferSize == 0 {
 		p.ProspectorConfig.Harvester.BufferSize = cfg.DefaultHarvesterBufferSize
 	}
 
+	// Setup DocumentType
 	if p.ProspectorConfig.Harvester.DocumentType == "" {
 		p.ProspectorConfig.Harvester.DocumentType = cfg.DefaultDocumentType
 	}
 
-	// Init list
+	// Init File Stat list
 	p.prospectorList = make(map[string]ProspectorFileStat)
 
 	return nil
