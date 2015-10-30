@@ -2,7 +2,6 @@ package config
 
 import (
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,10 +13,10 @@ import (
 // Defaults for config variables which are not set
 const (
 	DefaultRegistryFile                      = ".filebeat"
-	DefaultIgnoreOlderDuration time.Duration = math.MaxInt64
-	DefaultScanFrequency       time.Duration = 10 * time.Second // 10 seconds
+	DefaultIgnoreOlderDuration time.Duration = 10 * time.Minute
+	DefaultScanFrequency       time.Duration = 10 * time.Second
 	DefaultSpoolSize           uint64        = 1024
-	DefaultIdleTimeout         time.Duration = time.Second * 5
+	DefaultIdleTimeout         time.Duration = 5 * time.Second
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
 	DefaultDocumentType                      = "log"
 	DefaultTailOnRotate                      = false

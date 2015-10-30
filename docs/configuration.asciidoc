@@ -2,7 +2,7 @@
 [[filebeat-configuration-details]]
 == Configuration
 
-The configuration file of Filebeat uses http://yaml.org/[YAML] as any other Beat. 
+The configuration file of Filebeat uses http://yaml.org/[YAML] as any other Beat.
 To start with the configuration it is best to have a look at the default configuration. It is described in detail
 what each configuration option is for and how it can be used. Remove the items that are not needed for your setup.
 
@@ -101,8 +101,8 @@ Elasticsearch in the 'input_type' field.
 
 ===== fields
 
-Add optionally couple of fields to be included to the exported fields by the currently configured 
-Filebeat instance. These fields can be freely picked to add additional information to the crawled 
+Add optionally couple of fields to be included to the exported fields by the currently configured
+Filebeat instance. These fields can be freely picked to add additional information to the crawled
 log files for filtering.
 
 [source,yaml]
@@ -116,7 +116,7 @@ fields:
 ===== ignore_older
 
 If set, ignores the files which were modified more then the defined timespan in the past
-Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+Time strings like 2h (2 hours), 5m (5 minutes) can be used. Default is set to 10m.
 
 ===== scan_frequency
 
@@ -137,7 +137,7 @@ Defines the buffer size every harvester uses when fetching the file. By default 
 
 ===== tail_on_rotate
 
-If true, tail on log rotation. By default, it is disabled. 
+If true, tail on log rotation. By default, it is disabled.
 Note:: If enabled, it may skip entries.
 
 ===== spool_size
@@ -191,7 +191,7 @@ filebeat:
 
 ===== encoding
 
-Configures the file encoding for reading file with international characters. The 
+Configures the file encoding for reading file with international characters. The
 supported encodings are:
 
     * plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
