@@ -1,4 +1,4 @@
-// Unit tests and benchmarks for the dns package.
+// uNIT Tests and benchmarks for the dns package.
 //
 // The byte array test data was generated from pcap files using the gopacket
 // test_creator.py script contained in the gopacket repository. The script was
@@ -634,6 +634,16 @@ func testTcpTuple() *common.TcpTuple {
 	return t
 }
 
+// If a TCP gap (lost packets) happen while we're waiting for parts
+// of the query, drop the stream
+/*
+func Test_gap_in_query_fin(t *testing.T) {
+
+}
+*/
+
+// Test that loss of data during the response don't cause the whole transaction to be dropped
+
 // Verify that an empty packet is safely handled (no panics).
 func TestParseTcp_emptyPacket(t *testing.T) {
 	dns := newDns(testing.Verbose())
@@ -648,10 +658,192 @@ func TestParseTcp_emptyPacket(t *testing.T) {
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
 
-// If a TCP gap (lost packets) happen while we're waiting for parts
-// of the query, drop the stream
-/*
-func Test_gap_in_query_fin(t *testing.T) {
+// Verify that a malformed packet is safely handled (no panics).
+func TestParseTcp_malformedPacket(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	garbage := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
+	tcptuple := testTcpTuple()
+	packet := newPacket(forward, garbage)
+	private := protos.ProtocolData(new(dnsPrivateData))
 
+	dns.Parse(packet, tcptuple, 0, private)
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
+
+	// As a future addition, a malformed message should publish a result.
+}
+
+// Verify that the lone request packet is parsed.
+func TestParseTcp_requestPacket(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	packet := newPacket(forward, elasticA.request)
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	dns.Parse(packet, tcptuple, 0, private)
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
+	client := dns.results.(publisher.ChanClient)
+	close(client.Channel)
+	assert.Nil(t, <-client.Channel, "No result should have been published.")
+}
+
+// Verify that the lone response packet is parsed and that an error
+// result is published.
+func TestParseTcp_responseOnly(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	q := elasticA
+	packet := newPacket(reverse, q.response)
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	dns.Parse(packet, tcptuple, 0, private)
+	m := expectResult(t, dns)
+	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
+	assert.Nil(t, mapValue(t, m, "bytes_in"))
+	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
+	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	assert.Equal(t, OrphanedResponseMsg, mapValue(t, m, "notes"))
+	assertMapStrData(t, m, q)
+}
+
+/*
+// Verify that the first request if published without a response and that
+// the status is error. This second packet will remain in the transaction
+// map awaiting a response.
+func TestParseUdp_duplicateRequests(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	q := elasticA
+	packet := newPacket(forward, q.request)
+	dns.ParseUdp(packet)
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
+	packet = newPacket(forward, q.request)
+	dns.ParseUdp(packet)
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
+
+	m := expectResult(t, dns)
+	assert.Equal(t, "udp", mapValue(t, m, "transport"))
+	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
+	assert.Nil(t, mapValue(t, m, "bytes_out"))
+	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	assert.Equal(t, DuplicateQueryMsg, mapValue(t, m, "notes"))
+}
+
+// Verify that the request/response pair are parsed and that a result
+// is published.
+func TestParseUdp_requestResponse(t *testing.T) {
+	parseUdpRequestResponse(t, newDns(testing.Verbose()), elasticA)
+}
+
+// Verify all DNS test messages are parsed correctly.
+func TestParseUdp_allTestMessages(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	for _, q := range messages {
+		t.Logf("Testing with query for %s", q.q_name)
+		parseUdpRequestResponse(t, dns, q)
+	}
+}
+
+// Verify that expireTransaction publishes an event with an error status
+// and note.
+func TestExpireTransaction(t *testing.T) {
+	dns := newDns(testing.Verbose())
+
+	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
+	trans.Request = &DnsMessage{
+		Data: &layers.DNS{
+			Questions: []layers.DNSQuestion{layers.DNSQuestion{}},
+		},
+	}
+	dns.expireTransaction(trans)
+
+	m := expectResult(t, dns)
+	assert.Nil(t, mapValue(t, m, "bytes_out"))
+	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	assert.Equal(t, NoResponse, mapValue(t, m, "notes"))
+}
+
+// Benchmarks UDP parsing for the given test message.
+func benchmarkUdp(b *testing.B, q DnsTestMessage) {
+	dns := newDns(false)
+	for i := 0; i < b.N; i++ {
+		packet := newPacket(forward, q.request)
+		dns.ParseUdp(packet)
+		packet = newPacket(reverse, q.response)
+		dns.ParseUdp(packet)
+
+		client := dns.results.(publisher.ChanClient)
+		<-client.Channel
+	}
+}
+
+// Benchmark UDP parsing against each test message.
+func BenchmarkUdpElasticA(b *testing.B)  { benchmarkUdp(b, elasticA) }
+func BenchmarkUdpZoneIxfr(b *testing.B)  { benchmarkUdp(b, zoneIxfr) }
+func BenchmarkUdpGithubPtr(b *testing.B) { benchmarkUdp(b, githubPtr) }
+func BenchmarkUdpSophosTxt(b *testing.B) { benchmarkUdp(b, sophosTxt) }
+
+// Benchmark that runs with parallelism to help find concurrency related
+// issues. To run with parallelism, the 'go test' cpu flag must be set
+// greater than 1, otherwise it just runs concurrently but not in parallel.
+func BenchmarkParallelParse(b *testing.B) {
+	rand.Seed(22)
+	numMessages := len(messages)
+	dns := newDns(false)
+	client := dns.results.(publisher.ChanClient)
+
+	// Drain the results channal while the test is running.
+	go func() {
+		totalMessages := 0
+		for r := range client.Channel {
+			_ = r
+			totalMessages++
+		}
+		fmt.Printf("Parsed %d messages.\n", totalMessages)
+	}()
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		// Each iteration parses one message, either a request or a response.
+		// The request and response could be parsed on different goroutines.
+		for pb.Next() {
+			q := messages[rand.Intn(numMessages)]
+			var packet *protos.Packet
+			if rand.Intn(2) == 0 {
+				packet = newPacket(forward, q.request)
+			} else {
+				packet = newPacket(reverse, q.response)
+			}
+			dns.ParseUdp(packet)
+		}
+	})
+
+	defer close(client.Channel)
+}
+
+// parseUdpRequestResponse parses a request then a response packet and validates
+// the published result.
+func parseUdpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
+	packet := newPacket(forward, q.request)
+	dns.ParseUdp(packet)
+	packet = newPacket(reverse, q.response)
+	dns.ParseUdp(packet)
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
+
+	m := expectResult(t, dns)
+	assert.Equal(t, "udp", mapValue(t, m, "transport"))
+	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
+	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
+	assert.NotNil(t, mapValue(t, m, "responsetime"))
+
+	if assert.ObjectsAreEqual("NOERROR", mapValue(t, m, "dns.response_code")) {
+		assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
+	} else {
+		assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	}
+
+	assert.Nil(t, mapValue(t, m, "notes"))
+	assertMapStrData(t, m, q)
 }
 */

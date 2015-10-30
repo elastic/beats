@@ -31,9 +31,9 @@ import (
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 
+	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
-	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 const MaxDnsTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
@@ -47,7 +47,7 @@ const (
 // Notes that are added to messages during exceptional conditions.
 const (
 	NonDnsPacketMsg   = "Packet's data could not be decoded as DNS."
-	NonDnsCompleteMsg = "Complete message could not be decoded as DNS."
+	NonDnsCompleteMsg = "Message's data could not be decoded as DNS."
 	DuplicateQueryMsg = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
@@ -748,9 +748,10 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	}
 
 	// what kind of checks should be done here ?
-	ok, complete := dns.messageParser(stream)
+	// gopacket decodeDns already check QDCount, ANCount, NScount, ARcount
+	data, complete := dns.messageParser(stream)
 
-	if !ok {
+	if data == nil {
 		// drop this tcp stream. Will retry parsing with the next
 		// segment in it
 		priv.Data[dir] = nil
@@ -758,49 +759,43 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	}
 
 	if complete {
-		dns.messageComplete(tcpTuple, dir, stream)
+		dns.messageComplete(tcpTuple, dir, stream, data)
 	}
 
 	return priv
 
 }
 
-func (dns *Dns) messageParser(s *DnsStream) (bool, bool){
-	var ok, complete bool
-
+// return decoded data so we don't have to do it twice
+func (dns *Dns) messageParser(s *DnsStream) (*layers.DNS, bool) {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
 		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
 			s.tcpTuple.String(), len(s.data))
-		return false, false
+		return nil, false
 	}
 
-	if dnsData.QR == Query {
+	// no other check ? make sure gopacket checks are enough
+	// if they are, change this foo return
+	return dnsData, true
 
-	} else /* Response */ {
+	/*
+		if dnsData.QR == Query {
 
+		} else {
 
-	}
-
-	return ok, complete
+		}
+	*/
 }
 
-func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream) {
-	dns.handleDns(s.message, tcpTuple, dir, s.data)
+func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream, decodedData *layers.DNS) {
+	dns.handleDns(s.message, tcpTuple, dir, decodedData)
 
 	s.PrepareForNewMessage()
 }
 
-func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, data []byte) {
-	decodedData, err := decodeDnsData(data)
-
-	if err != nil {
-		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-			tcpTuple.String(), len(data))
-		return
-	}
-
+func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, decodedData *layers.DNS) {
 	dnsTuple := DnsTupleFromIpPort(&m.Tuple, TransportTcp, decodedData.ID)
 
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
@@ -815,16 +810,35 @@ func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, d
 
 func (stream *DnsStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
-	stream.parseOffset = 0
+	stream.parseOffset = 0 // useful field ?
 	stream.message = nil
 }
 
-/*
 func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
-	return
+	if private == nil {
+		return private
+	}
+	dnsData, ok := private.(dnsPrivateData)
+	if !ok {
+		return private
+	}
+	if dnsData.Data[dir] == nil {
+		return dnsData
+	}
+
+	stream := dnsData.Data[dir]
+	if stream.message != nil {
+		data, _ := dns.messageParser(stream)
+		if data != nil {
+			dns.handleDns(stream.message, tcpTuple, dir, data)
+			stream.PrepareForNewMessage()
+		}
+	}
+
+	return dnsData
 }
 
-func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir unint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-	return
+func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+
+	return private, true
 }
-*/
