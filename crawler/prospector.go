@@ -33,36 +33,29 @@ func (p *Prospector) Init() error {
 
 	// Setup Ignore Older
 	if p.ProspectorConfig.IgnoreOlder != "" {
-
 		var err error
-
 		p.ProspectorConfig.IgnoreOlderDuration, err = time.ParseDuration(p.ProspectorConfig.IgnoreOlder)
-
 		if err != nil {
-			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder, err)
+			logp.Warn("Failed to parse ignore_older value '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder)
 			return err
 		}
 	} else {
-		logp.Debug("propsector", "Set ignoreOlderDuration to %s", cfg.DefaultIgnoreOlderDuration)
-		// Set it to default
 		p.ProspectorConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
 	}
+	logp.Debug("propsector", "Set IgnoreOlderDuration to %s", p.ProspectorConfig.IgnoreOlderDuration)
 
 	// Setup Scan Frequency
 	if p.ProspectorConfig.ScanFrequency != "" {
-
 		var err error
-
 		p.ProspectorConfig.ScanFrequencyDuration, err = time.ParseDuration(p.ProspectorConfig.ScanFrequency)
-
 		if err != nil {
-			logp.Warn("Failed to parse dead time duration '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder, err)
+			logp.Warn("Failed to parse scan_frequency value '%s'. Error was: %s\n", p.ProspectorConfig.ScanFrequency, err)
 			return err
 		}
 	} else {
-		logp.Debug("propsector", "Set scanFrequency to %s", cfg.DefaultScanFrequency)
 		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
 	}
+	logp.Debug("propsector", "Set ScanFrequencyDuration to %s", p.ProspectorConfig.ScanFrequencyDuration)
 
 	// Setup Buffer Size
 	if p.ProspectorConfig.Harvester.BufferSize == 0 {
@@ -220,7 +213,7 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 // For a new file the following options exist:
 func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, output chan *input.FileEvent) {
 
-	logp.Debug("prospector", "Start harvesting unkown file: %s", file)
+	logp.Debug("prospector", "Start harvesting unknown file: %s", file)
 
 	// Init harvester with info
 	h, err := harvester.NewHarvester(
