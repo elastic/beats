@@ -300,7 +300,7 @@ func (out *redisOutput) BulkPublish(
 		}
 		err = out.Conn.Send(command, out.Index, string(jsonEvent))
 		if err != nil {
-			outputs.SignalFailed(signal)
+			outputs.SignalFailed(signal, err)
 			out.onFail(err)
 			return err
 		}
