@@ -87,6 +87,6 @@ func (ws *workerSignal) Init() {
 func stopQueue(qu chan message) {
 	close(qu)
 	for msg := range qu { // clear queue and send fail signal
-		outputs.SignalFailed(msg.signal)
+		outputs.SignalFailed(msg.signal, nil)
 	}
 }

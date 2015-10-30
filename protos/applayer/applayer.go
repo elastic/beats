@@ -212,7 +212,7 @@ func (t *Transaction) InitWithMsg(
 // Event fills common event fields.
 func (t *Transaction) Event(event common.MapStr) error {
 	event["type"] = t.Type
-	event["timestamp"] = common.Time(t.Ts.Ts)
+	event["@timestamp"] = common.Time(t.Ts.Ts)
 	event["responsetime"] = t.ResponseTime
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst

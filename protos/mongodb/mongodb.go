@@ -335,7 +335,7 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	event["responsetime"] = t.ResponseTime
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

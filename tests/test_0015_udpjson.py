@@ -68,7 +68,7 @@ class Test(TestCase):
 
         objs = self.read_output()
 
-        expected_fields = ["shipper", "status", "type", "timestamp", "count"]
+        expected_fields = ["shipper", "status", "type", "@timestamp", "count"]
         self.all_have_only_fields(objs, expected_fields)
 
         assert objs[0]["type"] == "http"
