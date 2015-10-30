@@ -71,6 +71,18 @@ build/upload/build_id.txt:
 s3-nightlies-upload: all
 	aws s3 cp --recursive --acl public-read build/upload s3://beats-nightlies
 
+# Build the image required for package-upload.
+.PHONY: deb-rpm-s3
+deb-rpm-s3:
+	docker/deb-rpm-s3/build.sh
+
+# Run after building to sign packages and publish to APT and YUM repos.
+.PHONY: package-upload
+package-upload:
+	# You must export AWS_ACCESS_KEY=<AWS access> and export AWS_SECRET_KEY=<secret>
+	# before running this make target.
+	docker/deb-rpm-s3/deb-rpm-s3.sh
+
 .PHONY: release-upload
 release-upload:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
