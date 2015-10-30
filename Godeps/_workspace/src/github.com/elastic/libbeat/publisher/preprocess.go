@@ -27,7 +27,7 @@ func (p *preprocessor) onMessage(m message) {
 	publisher := p.pub
 	single := false
 	events := m.events
-	if events == nil {
+	if m.event != nil {
 		single = true
 		events = []common.MapStr{m.event}
 	}
