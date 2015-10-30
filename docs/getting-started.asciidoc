@@ -52,9 +52,6 @@ see <<filebeat-configuration-details,Configuration>>.
 [[filebeat-configuration]]
 === Configuring Filebeat
 
-NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
-configure Filebeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
-
 To configure Filebeat, you edit the _filebeat.yml_ file. Here is a sample of 
 the _filebeat.yml_ file:
 
@@ -155,6 +152,12 @@ curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat.templat
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
+=== Setting Up Filebeat to Use Logstash
+
+If you want to use Logstash to perform additional processing on the data collected by 
+Filebeat, you need to set up Filebeat to use Logstash. For detailed steps, see 
+{libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
+
 
 === Running Filebeat
 
@@ -181,6 +184,6 @@ mac:
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
 
-Filebeat is now ready to send log files to your defined output.
+Filebeat is now ready to send log files to your defined output. 
 
 Enjoy!
