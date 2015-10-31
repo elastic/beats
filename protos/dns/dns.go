@@ -727,13 +727,16 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	}
 
 	if priv.Data[dir] == nil {
+		logp.Debug("dns", "priv.Data nil")
+
 		priv.Data[dir] = &DnsStream{
 			tcpTuple: tcpTuple,
 			data:     pkt.Payload,
-			message:  &DnsMessage{Ts: pkt.Ts},
+			message:  &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple},
 		}
 
 	} else {
+		logp.Debug("dns", "priv.Data not nil")
 		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
 		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("dns", "Stream data too large, dropping DNS stream")
@@ -744,21 +747,26 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 
 	stream := priv.Data[dir]
 	if stream.message == nil {
+		logp.Debug("dns", "stream message nil")
 		stream.message = &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple}
+	} else {
+		logp.Debug("dns", "stream message not nil")
 	}
 
 	// what kind of checks should be done here ?
 	// gopacket decodeDns already check QDCount, ANCount, NScount, ARcount
-	data, complete := dns.messageParser(stream)
+	data, ok := dns.messageParser(stream)
 
-	if data == nil {
+	if !ok {
+		logp.Debug("dns", "decode fail")
 		// drop this tcp stream. Will retry parsing with the next
 		// segment in it
 		priv.Data[dir] = nil
 		return priv
 	}
 
-	if complete {
+	if data != nil {
+		logp.Debug("dns", "decode succeed")
 		dns.messageComplete(tcpTuple, dir, stream, data)
 	}
 
@@ -790,16 +798,20 @@ func (dns *Dns) messageParser(s *DnsStream) (*layers.DNS, bool) {
 }
 
 func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream, decodedData *layers.DNS) {
-	dns.handleDns(s.message, tcpTuple, dir, decodedData)
+	dns.handleDns(s.message, tcpTuple, dir, s.data, decodedData)
 
 	s.PrepareForNewMessage()
 }
 
-func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, decodedData *layers.DNS) {
+func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, data []byte, decodedData *layers.DNS) {
 	dnsTuple := DnsTupleFromIpPort(&m.Tuple, TransportTcp, decodedData.ID)
-
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
 	m.Data = decodedData
+	m.Length = len(data)
+
+	//logp.Debug("dns", "tcpTuple is %s", tcpTuple)
+	//logp.Debug("dns", "m.tuple is %s", m.Tuple)
+	//logp.Debug("dns", "DnsTuple is %s", dnsTuple)
 
 	if decodedData.QR == Query {
 		dns.receivedDnsRequest(&dnsTuple, m)
@@ -828,9 +840,9 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 
 	stream := dnsData.Data[dir]
 	if stream.message != nil {
-		data, _ := dns.messageParser(stream)
-		if data != nil {
-			dns.handleDns(stream.message, tcpTuple, dir, data)
+		decodedData, _ := dns.messageParser(stream)
+		if decodedData != nil {
+			dns.handleDns(stream.message, tcpTuple, dir, stream.data, decodedData)
 			stream.PrepareForNewMessage()
 		}
 	}

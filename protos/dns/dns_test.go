@@ -225,8 +225,6 @@ var (
 
 // Verify that the interfaces for UDP and TCP have been satisfied.
 var _ protos.UdpProtocolPlugin = &Dns{}
-
-// TODO: Uncomment when TCP is implemented.
 var _ protos.TcpProtocolPlugin = &Dns{}
 
 func newDns(verbose bool) *Dns {
@@ -316,7 +314,7 @@ func TestParseUdp_responseOnly(t *testing.T) {
 	assertMapStrData(t, m, q)
 }
 
-// Verify that the first request if published without a response and that
+// Verify that the first request is published without a response and that
 // the status is error. This second packet will remain in the transaction
 // map awaiting a response.
 func TestParseUdp_duplicateRequests(t *testing.T) {
@@ -396,7 +394,7 @@ func BenchmarkUdpSophosTxt(b *testing.B) { benchmarkUdp(b, sophosTxt) }
 // Benchmark that runs with parallelism to help find concurrency related
 // issues. To run with parallelism, the 'go test' cpu flag must be set
 // greater than 1, otherwise it just runs concurrently but not in parallel.
-func BenchmarkParallelParse(b *testing.B) {
+func BenchmarkParallelUdpParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messages)
 	dns := newDns(false)
@@ -706,22 +704,24 @@ func TestParseTcp_responseOnly(t *testing.T) {
 	assertMapStrData(t, m, q)
 }
 
-/*
-// Verify that the first request if published without a response and that
+// Verify that the first request is published without a response and that
 // the status is error. This second packet will remain in the transaction
 // map awaiting a response.
-func TestParseUdp_duplicateRequests(t *testing.T) {
+func TestParseTcp_duplicateRequests(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	q := elasticA
 	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	dns.Parse(packet, tcptuple, 0, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 	packet = newPacket(forward, q.request)
-	dns.ParseUdp(packet)
+	dns.Parse(packet, tcptuple, 0, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
 	m := expectResult(t, dns)
-	assert.Equal(t, "udp", mapValue(t, m, "transport"))
+	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
 	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
 	assert.Nil(t, mapValue(t, m, "bytes_out"))
 	assert.Nil(t, mapValue(t, m, "responsetime"))
@@ -729,65 +729,81 @@ func TestParseUdp_duplicateRequests(t *testing.T) {
 	assert.Equal(t, DuplicateQueryMsg, mapValue(t, m, "notes"))
 }
 
+// parseTcpRequestResponse parses a request then a response packet and validates
+// the published result.
+func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
+	packet := newPacket(forward, q.request)
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+	dns.Parse(packet, tcptuple, 0, private)
+
+	packet = newPacket(reverse, q.response)
+	tcptuple = testTcpTuple()
+	private = protos.ProtocolData(new(dnsPrivateData))
+	dns.Parse(packet, tcptuple, 0, private)
+
+	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
+
+	m := expectResult(t, dns)
+	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
+	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
+	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
+	assert.NotNil(t, mapValue(t, m, "responsetime"))
+
+	if assert.ObjectsAreEqual("NOERROR", mapValue(t, m, "dns.response_code")) {
+		assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
+	} else {
+		assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	}
+
+	assert.Nil(t, mapValue(t, m, "notes"))
+	assertMapStrData(t, m, q)
+}
+
 // Verify that the request/response pair are parsed and that a result
 // is published.
-func TestParseUdp_requestResponse(t *testing.T) {
-	parseUdpRequestResponse(t, newDns(testing.Verbose()), elasticA)
+func TestParseTcp_requestResponse(t *testing.T) {
+	parseTcpRequestResponse(t, newDns(testing.Verbose()), elasticA)
 }
 
 // Verify all DNS test messages are parsed correctly.
-func TestParseUdp_allTestMessages(t *testing.T) {
+func TestParseTcp_allTestMessages(t *testing.T) {
 	dns := newDns(testing.Verbose())
 	for _, q := range messages {
 		t.Logf("Testing with query for %s", q.q_name)
-		parseUdpRequestResponse(t, dns, q)
+		parseTcpRequestResponse(t, dns, q)
 	}
 }
 
-// Verify that expireTransaction publishes an event with an error status
-// and note.
-func TestExpireTransaction(t *testing.T) {
-	dns := newDns(testing.Verbose())
-
-	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
-	trans.Request = &DnsMessage{
-		Data: &layers.DNS{
-			Questions: []layers.DNSQuestion{layers.DNSQuestion{}},
-		},
-	}
-	dns.expireTransaction(trans)
-
-	m := expectResult(t, dns)
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
-	assert.Nil(t, mapValue(t, m, "responsetime"))
-	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, NoResponse, mapValue(t, m, "notes"))
-}
-
-// Benchmarks UDP parsing for the given test message.
-func benchmarkUdp(b *testing.B, q DnsTestMessage) {
+// Benchmarks TCP parsing for the given test message.
+func benchmarkTcp(b *testing.B, q DnsTestMessage) {
 	dns := newDns(false)
 	for i := 0; i < b.N; i++ {
 		packet := newPacket(forward, q.request)
-		dns.ParseUdp(packet)
+		tcptuple := testTcpTuple()
+		private := protos.ProtocolData(new(dnsPrivateData))
+		dns.Parse(packet, tcptuple, 0, private)
+
 		packet = newPacket(reverse, q.response)
-		dns.ParseUdp(packet)
+		tcptuple = testTcpTuple()
+		private = protos.ProtocolData(new(dnsPrivateData))
+		dns.Parse(packet, tcptuple, 0, private)
 
 		client := dns.results.(publisher.ChanClient)
 		<-client.Channel
 	}
 }
 
-// Benchmark UDP parsing against each test message.
-func BenchmarkUdpElasticA(b *testing.B)  { benchmarkUdp(b, elasticA) }
-func BenchmarkUdpZoneIxfr(b *testing.B)  { benchmarkUdp(b, zoneIxfr) }
-func BenchmarkUdpGithubPtr(b *testing.B) { benchmarkUdp(b, githubPtr) }
-func BenchmarkUdpSophosTxt(b *testing.B) { benchmarkUdp(b, sophosTxt) }
+// Benchmark Tcp parsing against each test message.
+func BenchmarkTcpElasticA(b *testing.B)  { benchmarkTcp(b, elasticA) }
+func BenchmarkTcpZoneIxfr(b *testing.B)  { benchmarkTcp(b, zoneIxfr) }
+func BenchmarkTcpGithubPtr(b *testing.B) { benchmarkTcp(b, githubPtr) }
+func BenchmarkTcpSophosTxt(b *testing.B) { benchmarkTcp(b, sophosTxt) }
 
 // Benchmark that runs with parallelism to help find concurrency related
 // issues. To run with parallelism, the 'go test' cpu flag must be set
 // greater than 1, otherwise it just runs concurrently but not in parallel.
-func BenchmarkParallelParse(b *testing.B) {
+func BenchmarkParallelTcpParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messages)
 	dns := newDns(false)
@@ -810,40 +826,21 @@ func BenchmarkParallelParse(b *testing.B) {
 		for pb.Next() {
 			q := messages[rand.Intn(numMessages)]
 			var packet *protos.Packet
+			var tcptuple *common.TcpTuple
+			var private protos.ProtocolData
+
 			if rand.Intn(2) == 0 {
 				packet = newPacket(forward, q.request)
+				tcptuple = testTcpTuple()
+				private = protos.ProtocolData(new(dnsPrivateData))
 			} else {
 				packet = newPacket(reverse, q.response)
+				tcptuple = testTcpTuple()
+				private = protos.ProtocolData(new(dnsPrivateData))
 			}
-			dns.ParseUdp(packet)
+			dns.Parse(packet, tcptuple, 0, private)
 		}
 	})
 
 	defer close(client.Channel)
 }
-
-// parseUdpRequestResponse parses a request then a response packet and validates
-// the published result.
-func parseUdpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
-	packet := newPacket(forward, q.request)
-	dns.ParseUdp(packet)
-	packet = newPacket(reverse, q.response)
-	dns.ParseUdp(packet)
-	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
-
-	m := expectResult(t, dns)
-	assert.Equal(t, "udp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
-	assert.NotNil(t, mapValue(t, m, "responsetime"))
-
-	if assert.ObjectsAreEqual("NOERROR", mapValue(t, m, "dns.response_code")) {
-		assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
-	} else {
-		assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	}
-
-	assert.Nil(t, mapValue(t, m, "notes"))
-	assertMapStrData(t, m, q)
-}
-*/
