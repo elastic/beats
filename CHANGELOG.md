@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file based on the
 - Limit number of workers for Elasticsearch output to 1 per configured host. packetbeat#226
 - Respect '*' debug selector in IsDebug. #226 (elastic/packetbeat#339)
 - Limit number of workers for Elasticsearch output. elastic/packetbeat#226
+- On Windows, remove service related error message when running in the console. #242
 
 ### Added
 - Add Console output plugin. #218
