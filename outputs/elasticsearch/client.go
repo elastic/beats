@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs/mode"
 )
 
 type Client struct {
@@ -131,7 +132,7 @@ func (client *Client) PublishEvents(
 	if softFails > 0 {
 		events = removedDropped(events, dropInit)
 		events = removedDropped(events, dropFail)
-		return events, ErrTempBulkFailure
+		return events, mode.ErrTempBulkFailure
 	}
 
 	return nil, nil

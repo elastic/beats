@@ -60,6 +60,11 @@ type ProtocolClient interface {
 	PublishEvent(event common.MapStr) error
 }
 
+var (
+	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
+)
+
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
 func MakeClients(

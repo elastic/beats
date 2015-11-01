@@ -95,19 +95,27 @@ func publishTimeoutEvery(
 	}
 }
 
-func publishFailStart(
+func publishFailWith(
 	n int,
-	pub func(events []common.MapStr) ([]common.MapStr, error),
-) func(events []common.MapStr) ([]common.MapStr, error) {
+	err error,
+	pub func([]common.MapStr) ([]common.MapStr, error),
+) func([]common.MapStr) ([]common.MapStr, error) {
 	count := 0
 	return func(events []common.MapStr) ([]common.MapStr, error) {
 		if count < n {
 			count++
-			return events, errNetTimeout{}
+			return events, err
 		}
 		count = 0
 		return pub(events)
 	}
+}
+
+func publishFailStart(
+	n int,
+	pub func(events []common.MapStr) ([]common.MapStr, error),
+) func(events []common.MapStr) ([]common.MapStr, error) {
+	return publishFailWith(n, errNetTimeout{}, pub)
 }
 
 func closeOK() error {

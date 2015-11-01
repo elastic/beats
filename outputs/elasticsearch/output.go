@@ -22,8 +22,6 @@ var (
 
 	// ErrResponseRead indicates error parsing Elasticsearch response
 	ErrResponseRead = errors.New("bulk item status parse failed.")
-
-	ErrTempBulkFailure = errors.New("temporary bulk send failure")
 )
 
 const (
@@ -96,7 +94,8 @@ func (out *elasticsearchOutput) init(
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxRetries, waitRetry, timeout)
+			m, err = mode.NewLoadBalancerMode(clients, maxRetries,
+				waitRetry, timeout, maxWaitRetry)
 		} else {
 			m, err = mode.NewFailOverConnectionMode(clients, maxRetries, waitRetry, timeout)
 		}
