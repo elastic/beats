@@ -80,7 +80,7 @@ func getElasticsearchHost() string {
 }
 
 func esConnect(t *testing.T, index string) *esConnection {
-	ts := time.Now()
+	ts := time.Now().UTC()
 
 	host := getElasticsearchHost()
 	index = fmt.Sprintf("%s-%02d.%02d.%02d",
@@ -177,8 +177,6 @@ func (es *esConnection) Cleanup() {
 }
 
 func (es *esConnection) Read() ([]map[string]interface{}, error) {
-	fmt.Printf("try to read from index: %v\n", es.index)
-
 	_, err := es.Refresh(es.index)
 	if err != nil {
 		es.t.Errorf("Failed to refresh: %s", err)
