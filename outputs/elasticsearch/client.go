@@ -64,9 +64,9 @@ func (client *Client) Clone() *Client {
 
 func (client *Client) PublishEvents(
 	events []common.MapStr,
-) (n int, err error) {
+) ([]common.MapStr, error) {
 	if !client.connected {
-		return 0, ErrNotConnected
+		return events, ErrNotConnected
 	}
 
 	request, err := client.startBulkRequest("", "", nil)
@@ -74,11 +74,12 @@ func (client *Client) PublishEvents(
 		logp.Err(
 			"Failed to perform many index operations in a single API call: %s",
 			err)
-		return 0, err
+		return events, err
 	}
 
 	// encode events into bulk request buffer
-	for _, event := range events {
+	var dropInit []int
+	for i, event := range events {
 		ts := time.Time(event["@timestamp"].(common.Time))
 		index := fmt.Sprintf("%s-%d.%02d.%02d",
 			client.index, ts.Year(), ts.Month(), ts.Day())
@@ -91,6 +92,7 @@ func (client *Client) PublishEvents(
 		err := request.Send(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
+			dropInit = append(dropInit, i)
 		}
 	}
 
@@ -100,34 +102,74 @@ func (client *Client) PublishEvents(
 		logp.Err(
 			"Failed to perform many index operations in a single API call: %s",
 			err)
-		return 0, err
+		return events, err
 	}
 
 	// check per item errors. On first failure encountered an error is returned
 	// with number of successful events published. Mode will not retry
 	// value reported ok until first failure was found.
-	count := 0
-	for _, rawItem := range res.Items {
-		var itemRes map[string]struct {
-			Status int `json:"status"`
-		}
-
-		err = json.Unmarshal(rawItem, &itemRes)
-		if err != nil {
-			logp.Err("Failed to parse bulk response item: %s", err)
-			return count, err
-		}
-
-		for _, r := range itemRes {
-			if r.Status >= 300 {
-				return count, fmt.Errorf("item status response %v", r.Status)
+	var dropFail []int
+	softFails := 0
+	for i, rawItem := range res.Items {
+		status, err := itemStatus(rawItem)
+		if err == nil {
+			if status < 300 {
+				continue // ok value
 			}
-		}
 
-		count++
+			if status < 500 && status != 429 {
+				// hard failure, drop element
+				dropFail = append(dropFail, i)
+				continue
+			}
+
+			softFails++
+		}
 	}
 
-	return count, nil
+	// report errors if some elements have been failed due to server errors
+	if softFails > 0 {
+		events = removedDropped(events, dropInit)
+		events = removedDropped(events, dropFail)
+		return events, ErrTempBulkFailure
+	}
+
+	return nil, nil
+}
+
+// drop elements given by indexes from events slice. Delete will not preserve order
+func removedDropped(events []common.MapStr, indexes []int) []common.MapStr {
+	if len(indexes) == 0 {
+		return events
+	}
+
+	end := len(events) - 1
+	for _, i := range indexes {
+		events[i] = events[end]
+		end--
+	}
+
+	return events
+}
+
+func itemStatus(m json.RawMessage) (int, error) {
+	var item map[string]struct {
+		Status int `json:"status"`
+	}
+
+	err := json.Unmarshal(m, &item)
+	if err != nil {
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, err
+	}
+
+	for _, r := range item {
+		return r.Status, nil
+	}
+
+	err = ErrResponseRead
+	logp.Err("%v", err)
+	return 0, err
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {

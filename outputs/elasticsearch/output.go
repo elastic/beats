@@ -19,6 +19,11 @@ var (
 
 	// ErrJSONEncodeFailed indicates encoding failures
 	ErrJSONEncodeFailed = errors.New("json encode failed")
+
+	// ErrResponseRead indicates error parsing Elasticsearch response
+	ErrResponseRead = errors.New("bulk item status parse failed.")
+
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
 )
 
 const (

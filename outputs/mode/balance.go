@@ -172,24 +172,24 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 			return
 		}
 	} else {
-		published := 0
 		events := msg.events
-		send := 0
-		for published < len(events) {
-			n, err := client.PublishEvents(events[published:])
-			if err != nil {
-				// retry only non-confirmed subset of events in batch
-				msg.events = msg.events[published:]
+		total := len(events)
 
-				// reset attempt count if subset of message has been send
-				if send > 0 {
+		for len(events) > 0 {
+			var err error
+
+			events, err = client.PublishEvents(events)
+			if err != nil {
+				// retry non-published subset of events in batch
+				msg.events = events
+
+				// reset attempt count if subset of messages has been processed
+				if len(events) < total {
 					msg.attemptsLeft = m.maxAttempts + 1
 				}
 				m.onFail(msg, err)
 				return
 			}
-			published += n
-			send++
 		}
 	}
 	outputs.SignalCompleted(msg.signaler)

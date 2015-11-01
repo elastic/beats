@@ -82,7 +82,8 @@ func newClientTestDriver(client mode.ProtocolClient) *testClientDriver {
 				close(driver.ch)
 				return
 			case driverCmdPublish:
-				n, err := driver.client.PublishEvents(cmd.events)
+				events, err := driver.client.PublishEvents(cmd.events)
+				n := len(cmd.events) - len(events)
 				driver.returns = append(driver.returns, testClientReturn{n, err})
 			}
 		}
