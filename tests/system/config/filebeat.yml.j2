@@ -10,9 +10,9 @@ filebeat:
       scan_frequency: 1s
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
+      tail_on_rotate: {{tailOnRotate}}
   spool_size:
   idle_timeout: 5s
-  tail_on_rotate:
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
 
 
