@@ -297,6 +297,52 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == 3
 
+    def test_multiple_appends(self):
+        """
+        Test that filebeat keeps picking up new lines
+        after appending multiple times
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        filebeat = self.start_filebeat()
+
+        # Write initial file
+        with open(testfile, 'w') as f:
+            f.write("hello world\n")
+            f.flush()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 1 events"),
+                max_timeout=15)
+
+        for n in range(3):
+            with open(testfile, 'a') as f:
+
+                for i in range(0, 20 + n):
+                    f.write("hello world " + str(i) + " " + str(n) + "\n")
+
+                f.flush()
+
+                self.wait_until(
+                    lambda: self.log_contains(
+                        "Registrar: processing " + str(20 + n) + " events"),
+                    max_timeout=15)
+
+
+        filebeat.kill_and_wait()
+
+        # Check that output file has the same number of lines as the log file
+        output = self.read_output()
+        assert len(output) == (3 * 20 + sum(range(0, 3)) + 1)
+
+
     def test_new_line_on_open_file(self):
         """
         Checks that filebeat follows future writes to the same

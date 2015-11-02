@@ -12,7 +12,8 @@ filebeat:
       harvester_buffer_size:
       tail_on_rotate: {{tailOnRotate}}
   spool_size:
-  idle_timeout: 5s
+  idle_timeout: 0.5s
+  tail_on_rotate:
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
 
 
