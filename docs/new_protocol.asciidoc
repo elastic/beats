@@ -429,7 +429,7 @@ As an example, here is the relevant code from the REDIS module:
 	event["bytes_in"] = uint64(t.BytesIn)
 	event["bytes_out"] = uint64(t.BytesOut)
 
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
@@ -439,7 +439,7 @@ As an example, here is the relevant code from the REDIS module:
 The following fields are required and their presence will be checked by
 system tests:
 
- * `timestamp`. Set this to the timestamp of the first packet from the message
+ * `@timestamp`. Set this to the timestamp of the first packet from the message
    and cast it to `common.Time` like in the example above.
  * `type`. Set this to the protocol name.
  * `count`. This is reserved for future sampling support. Set it to 1.

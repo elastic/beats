@@ -1,5 +1,5 @@
 {
-  "timestamp": "2015-04-26T08:44:15.704Z",
+  "@timestamp": "2015-04-26T08:44:15.704Z",
   "agent": "vagrant",
   "bytes_out": 517,
   "client_ip": "127.0.0.1",
