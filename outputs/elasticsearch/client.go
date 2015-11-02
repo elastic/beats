@@ -70,6 +70,7 @@ func (client *Client) PublishEvents(
 		return events, ErrNotConnected
 	}
 
+	// new request to store all events into
 	request, err := client.startBulkRequest("", "", nil)
 	if err != nil {
 		logp.Err(
@@ -78,23 +79,11 @@ func (client *Client) PublishEvents(
 		return events, err
 	}
 
-	// encode events into bulk request buffer
-	var dropInit []int
-	for i, event := range events {
-		ts := time.Time(event["@timestamp"].(common.Time))
-		index := fmt.Sprintf("%s-%d.%02d.%02d",
-			client.index, ts.Year(), ts.Month(), ts.Day())
-		meta := bulkMeta{
-			Index: bulkMetaIndex{
-				Index:   index,
-				DocType: event["type"].(string),
-			},
-		}
-		err := request.Send(meta, event)
-		if err != nil {
-			logp.Err("Failed to encode event: %s", err)
-			dropInit = append(dropInit, i)
-		}
+	// encode events into bulk request buffer, dropping failed elements from
+	// events slice
+	events = bulkEncodePublishRequest(request, client.index, events)
+	if len(events) == 0 {
+		return nil, nil
 	}
 
 	// send bulk request
@@ -106,51 +95,76 @@ func (client *Client) PublishEvents(
 		return events, err
 	}
 
-	// check per item errors. On first failure encountered an error is returned
-	// with number of successful events published. Mode will not retry
-	// value reported ok until first failure was found.
-	var dropFail []int
-	softFails := 0
-	for i, rawItem := range res.Items {
-		status, err := itemStatus(rawItem)
-		if err == nil {
-			if status < 300 {
-				continue // ok value
-			}
-
-			if status < 500 && status != 429 {
-				// hard failure, drop element
-				dropFail = append(dropFail, i)
-				continue
-			}
-
-			softFails++
-		}
-	}
-
-	// report errors if some elements have been failed due to server errors
-	if softFails > 0 {
-		events = removedDropped(events, dropInit)
-		events = removedDropped(events, dropFail)
+	// check response for transient errors
+	events = bulkCollectPublishFails(res, events)
+	if len(events) > 0 {
 		return events, mode.ErrTempBulkFailure
 	}
 
 	return nil, nil
 }
 
-// drop elements given by indexes from events slice. Delete will not preserve order
-func removedDropped(events []common.MapStr, indexes []int) []common.MapStr {
-	if len(indexes) == 0 {
-		return events
-	}
+// fillBulkRequest encodes all bulk requests and returns slice of events
+// successfully added to bulk request.
+func bulkEncodePublishRequest(
+	requ *bulkRequest,
+	index string,
+	events []common.MapStr,
+) []common.MapStr {
+	okEvents := events[:0]
+	for _, event := range events {
+		ts := time.Time(event["@timestamp"].(common.Time))
+		index := fmt.Sprintf("%s-%d.%02d.%02d",
+			index, ts.Year(), ts.Month(), ts.Day())
+		meta := bulkMeta{
+			Index: bulkMetaIndex{
+				Index:   index,
+				DocType: event["type"].(string),
+			},
+		}
 
-	end := len(events) - 1
-	for _, i := range indexes {
-		events[i] = events[end]
-		end--
-	}
+		err := requ.Send(meta, event)
+		if err != nil {
+			logp.Err("Failed to encode event: %s", err)
+			continue
+		}
 
-	return events
+		okEvents = append(okEvents, event)
+	}
+	return okEvents
+}
+
+// bulkCollectPublishFails checks per item errors. On first failure encountered
+// an error is returned with number of successful events published. Mode will not
+// retry value reported ok until first failure was found.
+func bulkCollectPublishFails(
+	res *BulkResult,
+	events []common.MapStr,
+) []common.MapStr {
+	failed := events[:0]
+	for i, rawItem := range res.Items {
+		status, err := itemStatus(rawItem)
+		if err != nil {
+			logp.Info("Failed to parse bulk reponse for item (%i): %v", i, err)
+			// add index if response parse error as we can not determine success/fail
+			failed = append(failed, events[i])
+			continue
+		}
+
+		if status < 300 {
+			continue // ok value
+		}
+
+		if status < 500 && status != 429 {
+			// hard failure, don't collect
+			continue
+		}
+
+		debug("Failed to insert data(%i): %v", i, events[i])
+		logp.Info("Bulk item insert failed (%i)", i)
+		failed = append(failed, events[i])
+	}
+	return failed
 }
 
 func itemStatus(m json.RawMessage) (int, error) {
