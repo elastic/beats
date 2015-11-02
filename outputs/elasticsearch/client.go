@@ -87,7 +87,7 @@ func (client *Client) PublishEvents(
 	}
 
 	// send bulk request
-	res, err := request.Flush()
+	_, res, err := request.Flush()
 	if err != nil {
 		logp.Err(
 			"Failed to perform many index operations in a single API call: %s",
@@ -113,16 +113,7 @@ func bulkEncodePublishRequest(
 ) []common.MapStr {
 	okEvents := events[:0]
 	for _, event := range events {
-		ts := time.Time(event["@timestamp"].(common.Time))
-		index := fmt.Sprintf("%s-%d.%02d.%02d",
-			index, ts.Year(), ts.Month(), ts.Day())
-		meta := bulkMeta{
-			Index: bulkMetaIndex{
-				Index:   index,
-				DocType: event["type"].(string),
-			},
-		}
-
+		meta := eventBulkMeta(index, event)
 		err := requ.Send(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
@@ -132,6 +123,19 @@ func bulkEncodePublishRequest(
 		okEvents = append(okEvents, event)
 	}
 	return okEvents
+}
+
+func eventBulkMeta(index string, event common.MapStr) bulkMeta {
+	ts := time.Time(event["@timestamp"].(common.Time))
+	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
+		ts.Year(), ts.Month(), ts.Day())
+	meta := bulkMeta{
+		Index: bulkMetaIndex{
+			Index:   index,
+			DocType: event["type"].(string),
+		},
+	}
+	return meta
 }
 
 // bulkCollectPublishFails checks per item errors. On first failure encountered
@@ -198,10 +202,24 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 
 	// insert the events one by one
-	_, err := client.Index(index, event["type"].(string), "", nil, event)
+	status, _, err := client.Index(index, event["type"].(string), "", nil, event)
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
+		if err == ErrJSONEncodeFailed {
+			// don't retry unencodable values
+			return nil
+		}
 	}
+	switch {
+	case status == 0: // event was not send yet
+		return nil
+	case status >= 500 || status == 429: // server error, retry
+		return err
+	case status >= 300 && status < 500:
+		// won't be able to index event in Elasticsearch => don't retry
+		return nil
+	}
+
 	return nil
 }
 
@@ -242,7 +260,7 @@ func (conn *Connection) request(
 	method, path string,
 	params map[string]string,
 	body interface{},
-) ([]byte, error) {
+) (int, []byte, error) {
 	url := makeURL(conn.URL, path, params)
 	logp.Debug("elasticsearch", "%s %s %s", method, url, body)
 
@@ -251,7 +269,7 @@ func (conn *Connection) request(
 		var err error
 		obj, err = json.Marshal(body)
 		if err != nil {
-			return nil, ErrJSONEncodeFailed
+			return 0, nil, ErrJSONEncodeFailed
 		}
 	}
 
@@ -261,11 +279,11 @@ func (conn *Connection) request(
 func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
-) ([]byte, error) {
+) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		logp.Warn("Failed to create request", err)
-		return nil, err
+		return 0, nil, err
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -276,22 +294,22 @@ func (conn *Connection) execRequest(
 	resp, err := conn.http.Do(req)
 	if err != nil {
 		conn.connected = false
-		return nil, err
+		return 0, nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
 	if status >= 300 {
 		conn.connected = false
-		return nil, fmt.Errorf("%v", resp.Status)
+		return status, nil, fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		conn.connected = false
-		return nil, err
+		return status, nil, err
 	}
-	return obj, nil
+	return status, obj, nil
 }
 
 func closing(c io.Closer) {

@@ -48,7 +48,7 @@ func TestBulk(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value1",
 	}
-	result, err := client.SearchURI(index, "type1", params)
+	_, result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -56,7 +56,7 @@ func TestBulk(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	_, err = client.Delete(index, "", "", nil)
+	_, _, err = client.Delete(index, "", "", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}
@@ -157,7 +157,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field1:value3",
 	}
-	result, err := client.SearchURI(index, "type1", params)
+	_, result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -168,7 +168,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	params = map[string]string{
 		"q": "field2:value2",
 	}
-	result, err = client.SearchURI(index, "type1", params)
+	_, result, err = client.SearchURI(index, "type1", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -176,7 +176,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	_, err = client.Delete(index, "", "", nil)
+	_, _, err = client.Delete(index, "", "", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}

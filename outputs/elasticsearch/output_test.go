@@ -127,13 +127,13 @@ func TestOneEvent(t *testing.T) {
 	// before the refresh. We should find a better solution for this.
 	time.Sleep(200 * time.Millisecond)
 
-	_, err = client.Refresh(index)
+	_, _, err = client.Refresh(index)
 	if err != nil {
 		t.Errorf("Failed to refresh: %s", err)
 	}
 
 	defer func() {
-		_, err = client.Delete(index, "", "", nil)
+		_, _, err = client.Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
@@ -142,7 +142,7 @@ func TestOneEvent(t *testing.T) {
 	params := map[string]string{
 		"q": "shipper:appserver1",
 	}
-	resp, err := client.SearchURI(index, "", params)
+	_, resp, err := client.SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch for index(%s): %s", index, err)
@@ -216,13 +216,13 @@ func TestEvents(t *testing.T) {
 	}
 
 	defer func() {
-		_, err = output.randomClient().Delete(index, "", "", nil)
+		_, _, err = output.randomClient().Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
 	}()
 
-	resp, err := output.randomClient().SearchURI(index, "", params)
+	_, resp, err := output.randomClient().SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)
@@ -278,13 +278,13 @@ func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 	}
 
 	defer func() {
-		_, err := output.randomClient().Delete(index, "", "", nil)
+		_, _, err := output.randomClient().Delete(index, "", "", nil)
 		if err != nil {
 			t.Errorf("Failed to delete index: %s", err)
 		}
 	}()
 
-	resp, err := output.randomClient().SearchURI(index, "", params)
+	_, resp, err := output.randomClient().SearchURI(index, "", params)
 
 	if err != nil {
 		t.Errorf("Failed to query elasticsearch: %s", err)

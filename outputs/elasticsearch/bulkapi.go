@@ -44,19 +44,20 @@ func (r *bulkRequest) Send(meta, obj interface{}) error {
 	return err
 }
 
-func (r *bulkRequest) Flush() (*BulkResult, error) {
+func (r *bulkRequest) Flush() (int, *BulkResult, error) {
 	if r.buf.Len() == 0 {
 		logp.Debug("elasticsearch", "Empty channel. Wait for more data.")
-		return nil, nil
+		return 0, nil, nil
 	}
 
-	resp, err := r.es.sendBulkRequest("POST", r.path, r.params, &r.buf)
+	status, resp, err := r.es.sendBulkRequest("POST", r.path, r.params, &r.buf)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
 	r.buf.Truncate(0)
 
-	return readBulkResult(resp)
+	result, err := readBulkResult(resp)
+	return status, result, err
 }
 
 // Bulk performs many index/delete operations in a single API call.
@@ -94,7 +95,7 @@ func (conn *Connection) BulkWith(
 		return nil, nil
 	}
 
-	resp, err := conn.sendBulkRequest("POST", path, params, &buf)
+	_, resp, err := conn.sendBulkRequest("POST", path, params, &buf)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +125,7 @@ func (conn *Connection) sendBulkRequest(
 	method, path string,
 	params map[string]string,
 	buf *bytes.Buffer,
-) ([]byte, error) {
+) (int, []byte, error) {
 	url := makeURL(conn.URL, path, params)
 	logp.Debug("elasticsearch", "Sending bulk request to %s", url)
 

@@ -30,7 +30,7 @@ func TestIndex(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Index(index, "test", "1", params, body)
+	_, resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
 		t.Errorf("Index() returns error: %s", err)
 	}
@@ -41,7 +41,7 @@ func TestIndex(t *testing.T) {
 	params = map[string]string{
 		"q": "user:test",
 	}
-	result, err := client.SearchURI(index, "test", params)
+	_, result, err := client.SearchURI(index, "test", params)
 	if err != nil {
 		t.Errorf("SearchUri() returns an error: %s", err)
 	}
@@ -49,7 +49,7 @@ func TestIndex(t *testing.T) {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
 	}
 
-	resp, err = client.Delete(index, "test", "1", nil)
+	_, resp, err = client.Delete(index, "test", "1", nil)
 	if err != nil {
 		t.Errorf("Delete() returns error: %s", err)
 	}

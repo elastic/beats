@@ -89,9 +89,9 @@ func esConnect(t *testing.T, index string) *esConnection {
 	client := elasticsearch.NewClient(host, "", nil, "", "")
 
 	// try to drop old index if left over from failed test
-	_, _ = client.Delete(index, "", "", nil) // ignore error
+	_, _, _ = client.Delete(index, "", "", nil) // ignore error
 
-	_, err := client.CreateIndex(index, common.MapStr{
+	_, _, err := client.CreateIndex(index, common.MapStr{
 		"settings": common.MapStr{
 			"number_of_shards":   1,
 			"number_of_replicas": 0,
@@ -170,20 +170,20 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 }
 
 func (es *esConnection) Cleanup() {
-	_, err := es.Delete(es.index, "", "", nil)
+	_, _, err := es.Delete(es.index, "", "", nil)
 	if err != nil {
 		es.t.Errorf("Failed to delete index: %s", err)
 	}
 }
 
 func (es *esConnection) Read() ([]map[string]interface{}, error) {
-	_, err := es.Refresh(es.index)
+	_, _, err := es.Refresh(es.index)
 	if err != nil {
 		es.t.Errorf("Failed to refresh: %s", err)
 	}
 
 	params := map[string]string{}
-	resp, err := es.SearchURI(es.index, "", params)
+	_, resp, err := es.SearchURI(es.index, "", params)
 	if err != nil {
 		es.t.Errorf("Failed to query elasticsearch for index(%s): %s", es.index, err)
 		return nil, err
@@ -202,13 +202,13 @@ func (es *esConnection) RefreshIndex() {
 }
 
 func (es *esConnection) Count() (int, error) {
-	_, err := es.Refresh(es.index)
+	_, _, err := es.Refresh(es.index)
 	if err != nil {
 		es.t.Errorf("Failed to refresh: %s", err)
 	}
 
 	params := map[string]string{}
-	resp, err := es.CountSearchURI(es.index, "", params)
+	_, resp, err := es.CountSearchURI(es.index, "", params)
 	if err != nil {
 		es.t.Errorf("Failed to query elasticsearch for index(%s): %s", es.index, err)
 		return 0, err
