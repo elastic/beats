@@ -27,7 +27,9 @@ var (
 const (
 	defaultMaxRetries = 3
 
-	elasticsearchDefaultTimeout = 30 * time.Second
+	defaultBulkSize = 50
+
+	elasticsearchDefaultTimeout = 90 * time.Second
 )
 
 func init() {
@@ -65,6 +67,12 @@ func (out *elasticsearchOutput) init(
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
+	}
+
+	// configure bulk size in config in case it is not set
+	if config.Bulk_size == nil {
+		bulkSize := defaultBulkSize
+		config.Bulk_size = &bulkSize
 	}
 
 	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
