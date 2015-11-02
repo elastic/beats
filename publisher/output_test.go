@@ -37,13 +37,13 @@ func TestOutputWorker(t *testing.T) {
 	ow.onStop() // Noop
 
 	var testCases = []message{
-		message{signal: newTestSignaler()},
-		message{signal: newTestSignaler(), event: testEvent()},
-		message{signal: newTestSignaler(), events: []common.MapStr{testEvent()}},
+		testMessage(newTestSignaler(), nil),
+		testMessage(newTestSignaler(), testEvent()),
+		testBulkMessage(newTestSignaler(), []common.MapStr{testEvent()}),
 	}
 
 	for _, m := range testCases {
-		sig := m.signal.(*testSignaler)
+		sig := m.context.signal.(*testSignaler)
 		ow.onMessage(m)
 		assert.True(t, sig.wait())
 

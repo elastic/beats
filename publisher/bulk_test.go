@@ -26,7 +26,7 @@ func TestBulkWorkerSendSingle(t *testing.T) {
 	bw := newBulkWorker(ws, queueSize, mh, flushInterval, maxBatchSize)
 
 	s := newTestSignaler()
-	m := message{event: testEvent(), signal: s}
+	m := testMessage(s, testEvent())
 	bw.send(m)
 	msgs, err := mh.waitForMessages(1)
 	if err != nil {
@@ -53,7 +53,7 @@ func TestBulkWorkerSendBatch(t *testing.T) {
 		events[i] = testEvent()
 	}
 	s := newTestSignaler()
-	m := message{events: events, signal: s}
+	m := testBulkMessage(s, events)
 	bw.send(m)
 
 	// Validate
@@ -84,7 +84,7 @@ func TestBulkWorkerSendBatchGreaterThanMaxBatchSize(t *testing.T) {
 		events[i] = testEvent()
 	}
 	s := newTestSignaler()
-	m := message{events: events, signal: s}
+	m := testBulkMessage(s, events)
 	bw.send(m)
 
 	// Read first message and verify no Completed or Failed signal has

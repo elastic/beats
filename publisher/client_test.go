@@ -18,8 +18,8 @@ func TestGetClient(t *testing.T) {
 		},
 	}
 	asyncClient := c.publisher.asyncPublisher.client()
-	confirmClient := c.publisher.syncPublisher.client(true)
-	syncClient := c.publisher.syncPublisher.client(false)
+	confirmClient := c.publisher.syncPublisher.client()
+	syncClient := c.publisher.syncPublisher.client()
 
 	var testCases = []struct {
 		in  []ClientOption
@@ -34,7 +34,8 @@ func TestGetClient(t *testing.T) {
 
 	for _, test := range testCases {
 		expected := reflect.ValueOf(test.out)
-		actual := reflect.ValueOf(c.getClient(test.in))
+		_, client := c.getClient(test.in)
+		actual := reflect.ValueOf(client)
 		assert.Equal(t, expected.Pointer(), actual.Pointer())
 	}
 }
