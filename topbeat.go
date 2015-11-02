@@ -160,8 +160,8 @@ func (t *Topbeat) exportProcStats() error {
 			t.procsMap[process.Pid] = process
 
 			event := common.MapStr{
-				"timestamp": common.Time(time.Now()),
-				"type":      "proc",
+				"@timestamp": common.Time(time.Now()),
+				"type":       "proc",
 				"proc": common.MapStr{
 					"pid":   process.Pid,
 					"ppid":  process.Ppid,
@@ -206,12 +206,12 @@ func (t *Topbeat) exportSystemStats() error {
 	t.addMemPercentage(swap_stat)
 
 	event := common.MapStr{
-		"timestamp": common.Time(time.Now()),
-		"type":      "system",
-		"load":      load_stat,
-		"cpu":       cpu_stat,
-		"mem":       mem_stat,
-		"swap":      swap_stat,
+		"@timestamp": common.Time(time.Now()),
+		"type":       "system",
+		"load":       load_stat,
+		"cpu":        cpu_stat,
+		"mem":        mem_stat,
+		"swap":       swap_stat,
 	}
 
 	t.events.PublishEvent(event)
@@ -241,9 +241,9 @@ func collectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
 		addFileSystemUsedPercentage(fsStat)
 
 		event := common.MapStr{
-			"timestamp": common.Time(time.Now()),
-			"type":      "filesystem",
-			"fs":        fsStat,
+			"@timestamp": common.Time(time.Now()),
+			"type":       "filesystem",
+			"fs":         fsStat,
 		}
 		events = append(events, event)
 	}

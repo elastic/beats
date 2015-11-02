@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file based on the
 - Don't wait for one period until shutdown #75
 
 ### Added
+- Change timestamp field with @timestamp for a better integration with Logstash
+#80
 
 ### Deprecated
 

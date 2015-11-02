@@ -21,6 +21,9 @@
         }
       ],
       "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
         "cpu": {
           "properties": {
             "system_p": {
@@ -92,9 +95,6 @@
               "type": "float"
             }
           }
-        },
-        "timestamp": {
-          "type": "date"
         }
       }
     }
