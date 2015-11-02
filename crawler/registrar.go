@@ -50,11 +50,17 @@ func (r *Registrar) Init() error {
 	// Make sure the directory where we store the registryFile exists
 	absPath, err := filepath.Abs(r.registryFile)
 	if err != nil {
-		return fmt.Errorf("Failed to get the absolute path for %s: %v", r.registryFile, err)
+		return fmt.Errorf("Failed to get the absolute path of %s: %v",
+			r.registryFile, err)
 	}
-	err = os.MkdirAll(filepath.Dir(absPath), 0755)
+	r.registryFile = absPath
+
+	// Create directory if it does not already exist.
+	registryPath := filepath.Dir(r.registryFile)
+	err = os.MkdirAll(registryPath, 0755)
 	if err != nil {
-		return fmt.Errorf("Failed to created folder %s: %v", filepath.Dir(absPath), err)
+		return fmt.Errorf("Failed to created registry file dir %s: %v",
+			registryPath, err)
 	}
 
 	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)
@@ -65,15 +71,9 @@ func (r *Registrar) Init() error {
 // loadState fetches the previous reading state from the configure RegistryFile file
 // The default file is .filebeat file which is stored in the same path as the binary is running
 func (r *Registrar) LoadState() {
-
 	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()
-		wd := ""
-		if wd, e = os.Getwd(); e != nil {
-			logp.Warn("WARNING: os.Getwd retuned unexpected error %s -- ignoring", e.Error())
-		}
-		logp.Info("Loading registrar data from %s/%s", wd, r.registryFile)
-
+		logp.Info("Loading registrar data from %s", r.registryFile)
 		decoder := json.NewDecoder(existing)
 		decoder.Decode(&r.State)
 	}
@@ -130,7 +130,7 @@ func (r *Registrar) GetFileState(path string) (*FileState, bool) {
 	return state, exist
 }
 
-// writeRegistry Writes the new json registry file  to disk
+// writeRegistry writes the new json registry file to disk.
 func (r *Registrar) writeRegistry() error {
 	logp.Debug("registrar", "Write registry file: %s", r.registryFile)
 
