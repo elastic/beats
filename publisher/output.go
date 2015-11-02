@@ -10,8 +10,9 @@ import (
 
 type outputWorker struct {
 	messageWorker
-	out    outputs.BulkOutputer
-	config outputs.MothershipConfig
+	out         outputs.BulkOutputer
+	config      outputs.MothershipConfig
+	maxBulkSize int
 }
 
 func newOutputWorker(
@@ -20,7 +21,16 @@ func newOutputWorker(
 	ws *workerSignal,
 	hwm int,
 ) *outputWorker {
-	o := &outputWorker{out: outputs.CastBulkOutputer(out), config: config}
+	maxBulkSize := defaultBulkSize
+	if config.Bulk_size != nil {
+		maxBulkSize = *config.Bulk_size
+	}
+
+	o := &outputWorker{
+		out:         outputs.CastBulkOutputer(out),
+		config:      config,
+		maxBulkSize: maxBulkSize,
+	}
 	o.messageWorker.init(ws, hwm, o)
 	return o
 }
@@ -30,22 +40,45 @@ func (o *outputWorker) onStop() {}
 func (o *outputWorker) onMessage(m message) {
 
 	if m.event != nil {
-		debug("output worker: publish single event")
-		ts := time.Time(m.event["@timestamp"].(common.Time)).UTC()
-		_ = o.out.PublishEvent(m.signal, ts, m.event)
+		o.onEvent(m.signal, m.event)
 	} else {
-		if len(m.events) == 0 {
-			debug("output worker: no events to publish")
-			outputs.SignalCompleted(m.signal)
-			return
-		}
+		o.onBulk(m.signal, m.events)
+	}
+}
 
-		debug("output worker: publish %v events", len(m.events))
-		ts := time.Time(m.events[0]["@timestamp"].(common.Time)).UTC()
-		err := o.out.BulkPublish(m.signal, ts, m.events)
+func (o *outputWorker) onEvent(s outputs.Signaler, event common.MapStr) {
+	debug("output worker: publish single event")
+	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
+	_ = o.out.PublishEvent(s, ts, event)
+}
 
-		if err != nil {
-			logp.Info("Error bulk publishing events: %s", err)
-		}
+func (o *outputWorker) onBulk(signal outputs.Signaler, events []common.MapStr) {
+	if len(events) == 0 {
+		debug("output worker: no events to publish")
+		outputs.SignalCompleted(signal)
+		return
+	}
+
+	if o.maxBulkSize < 0 || len(events) <= o.maxBulkSize {
+		o.sendBulk(signal, events)
+		return
+	}
+
+	// start splitting bulk request
+	splits := (len(events) + (o.maxBulkSize - 1)) / o.maxBulkSize
+	signal = outputs.NewSplitSignaler(signal, splits)
+	for len(events) > 0 {
+		o.sendBulk(signal, events[:o.maxBulkSize])
+		events = events[o.maxBulkSize:]
+	}
+}
+
+func (o *outputWorker) sendBulk(signal outputs.Signaler, events []common.MapStr) {
+	debug("output worker: publish %v events", len(events))
+	ts := time.Time(events[0]["@timestamp"].(common.Time)).UTC()
+
+	err := o.out.BulkPublish(signal, ts, events)
+	if err != nil {
+		logp.Info("Error bulk publishing events: %s", err)
 	}
 }
