@@ -9,6 +9,7 @@ This is the first filebeat release. As of this no changelog is provided for the 
 All documentation about Filebeat can be found here.
 
 ### Backward Compatibility Breaks
+- Rename tail_on_rotate prospector config to tail_files
 
 ### Bugfixes
 - Omit 'fields' from event JSON when null. #126

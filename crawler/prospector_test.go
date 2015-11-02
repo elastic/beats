@@ -14,8 +14,8 @@ func TestProspectorInit(t *testing.T) {
 		ScanFrequency: "15s",
 		IgnoreOlder:   "100m",
 		Harvester: config.HarvesterConfig{
-			BufferSize:   100,
-			TailOnRotate: true,
+			BufferSize: 100,
+			TailFiles:  true,
 		},
 	}
 
@@ -31,7 +31,7 @@ func TestProspectorInit(t *testing.T) {
 	assert.Equal(t, 100*time.Minute, prospector.ProspectorConfig.IgnoreOlderDuration)
 	assert.Equal(t, 15*time.Second, prospector.ProspectorConfig.ScanFrequencyDuration)
 	assert.Equal(t, 100, prospector.ProspectorConfig.Harvester.BufferSize)
-	assert.Equal(t, true, prospector.ProspectorConfig.Harvester.TailOnRotate)
+	assert.Equal(t, true, prospector.ProspectorConfig.Harvester.TailFiles)
 }
 
 func TestProspectorInitEmpty(t *testing.T) {
@@ -69,7 +69,7 @@ func TestProspectorInitNotSet(t *testing.T) {
 	assert.Equal(t, config.DefaultIgnoreOlderDuration, prospector.ProspectorConfig.IgnoreOlderDuration)
 	assert.Equal(t, config.DefaultScanFrequency, prospector.ProspectorConfig.ScanFrequencyDuration)
 	assert.Equal(t, config.DefaultHarvesterBufferSize, prospector.ProspectorConfig.Harvester.BufferSize)
-	assert.Equal(t, config.DefaultTailOnRotate, prospector.ProspectorConfig.Harvester.TailOnRotate)
+	assert.Equal(t, config.DefaultTailFiles, prospector.ProspectorConfig.Harvester.TailFiles)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {

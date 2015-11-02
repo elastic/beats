@@ -19,7 +19,7 @@ const (
 	DefaultIdleTimeout         time.Duration = 5 * time.Second
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
 	DefaultDocumentType                      = "log"
-	DefaultTailOnRotate                      = false
+	DefaultTailFiles                         = false
 )
 
 type Config struct {
@@ -49,7 +49,7 @@ type HarvesterConfig struct {
 	InputType    string `yaml:"input_type"`
 	Fields       map[string]string
 	BufferSize   int    `yaml:"harvester_buffer_size"`
-	TailOnRotate bool   `yaml:"tail_on_rotate"`
+	TailFiles    bool   `yaml:"tail_files"`
 	Encoding     string `yaml:"encoding"`
 	DocumentType string `yaml:"document_type"`
 }

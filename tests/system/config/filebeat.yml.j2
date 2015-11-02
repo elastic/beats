@@ -10,8 +10,8 @@ filebeat:
       scan_frequency: 0.5s
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
-      tail_on_rotate: {{tailOnRotate}}
       encoding: {{encoding | default("utf-8") }}
+      tail_files: {{tailFiles}}
   spool_size:
   idle_timeout: 0.5s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}

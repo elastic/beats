@@ -386,7 +386,7 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == 3
 
-    def test_tail_on_rotate(self):
+    def test_tail_files(self):
         """
         Tests that every new file discovered is started
         at the end and not beginning
@@ -394,7 +394,7 @@ class Test(TestCase):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            tailOnRotate="true"
+            tailFiles="true"
         )
         os.mkdir(self.working_dir + "/log/")
 

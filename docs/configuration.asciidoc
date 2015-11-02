@@ -71,9 +71,10 @@ filebeat:
       # Defines the buffer size every harvester uses when fetching the file
       #harvester_buffer_size: 16384
 
-      # Always tail on log rotation. Disabled by default
-      # Note: This may skip entries
-      #tail_on_rotate: false
+      # Setting tail_files to true means filebeat starts readding new files at the end
+      # instead of the beginning. If this is used in combination with log rotation
+      # this can mean that the first entries of a new file are skipped.
+      #tail_files: false
 
       # Configure the file encoding for reading file with international characters
       # supported encodings:
@@ -135,10 +136,11 @@ type. Default value is `log`.
 Defines the buffer size every harvester uses when fetching the file. By default is 16384.
 
 
-===== tail_on_rotate
+===== tail_files
 
-If true, tail on log rotation. By default, it is disabled.
-Note:: If enabled, it may skip entries.
+Setting tail_files to true means filebeat starts readding new files at the end
+instead of the beginning. If this is used in combination with log rotation
+this can mean that the first entries of a new file are skipped.
 
 ===== spool_size
 
