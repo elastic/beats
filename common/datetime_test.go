@@ -80,16 +80,16 @@ func TestTimeMarshal(t *testing.T) {
 	tests := []inputOutput{
 		inputOutput{
 			Input: MapStr{
-				"timestamp": Time(time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.UTC)),
+				"@timestamp": Time(time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.UTC)),
 			},
-			Output: `{"timestamp":"2015-03-01T11:19:05.112Z"}`,
+			Output: `{"@timestamp":"2015-03-01T11:19:05.112Z"}`,
 		},
 		inputOutput{
 			Input: MapStr{
-				"timestamp": MustParseTime("2015-03-01T11:19:05.112Z"),
-				"another":   MustParseTime("2015-03-01T14:19:05.112Z"),
+				"@timestamp": MustParseTime("2015-03-01T11:19:05.112Z"),
+				"another":    MustParseTime("2015-03-01T14:19:05.112Z"),
 			},
-			Output: `{"another":"2015-03-01T14:19:05.112Z","timestamp":"2015-03-01T11:19:05.112Z"}`,
+			Output: `{"@timestamp":"2015-03-01T11:19:05.112Z","another":"2015-03-01T14:19:05.112Z"}`,
 		},
 	}
 

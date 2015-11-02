@@ -126,7 +126,7 @@ class TestCase(unittest.TestCase):
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
                                                  []))
-        self.all_have_fields(jsons, ["timestamp", "type",
+        self.all_have_fields(jsons, ["@timestamp", "type",
                                      "shipper", "count"])
         return jsons
 
