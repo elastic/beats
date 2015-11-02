@@ -336,3 +336,45 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
         assert len(output) == 3
+
+    def test_tail_on_rotate(self):
+        """
+        Tests that every new file discovered is started
+        at the end and not beginning
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            tailOnRotate="true"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'w') as f:
+            # Write lines before registar started
+            f.write("hello world 1\n")
+            f.write("hello world 2\n")
+            f.flush()
+
+        filebeat = self.start_filebeat()
+        self.wait_until(
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=5)
+
+        with open(testfile, 'a') as f:
+            # write additional lines
+            f.write("hello world 3\n")
+            f.write("hello world 4\n")
+            f.flush()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 2 events"),
+                max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        # Make sure output has only 2 and not lines, means it started at the end
+        output = self.read_output()
+        assert len(output) == 2
