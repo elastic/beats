@@ -20,6 +20,7 @@ func testSingleSendOneEvent(t *testing.T, events []eventInfo) {
 		3,
 		0,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, events, signals(true), &collected)
 }
@@ -45,6 +46,7 @@ func testSingleConnectFailConnectAndSend(t *testing.T, events []eventInfo) {
 		3,
 		0,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, events, signals(true), &collected)
 }
@@ -70,6 +72,7 @@ func testSingleConnectionFail(t *testing.T, events []eventInfo) {
 		3,
 		0,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, events, signals(false), &collected)
 }
@@ -94,6 +97,7 @@ func testSingleSendFlaky(t *testing.T, events []eventInfo) {
 		3,
 		0,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, singleEvent(testEvent), signals(true), &collected)
 }

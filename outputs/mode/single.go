@@ -16,8 +16,9 @@ type SingleConnectionMode struct {
 
 	closed bool // mode closed flag to break publisher loop
 
-	timeout   time.Duration // connection timeout
-	waitRetry time.Duration // wait time until reconnect
+	timeout      time.Duration // connection timeout
+	waitRetry    time.Duration // wait time until reconnect
+	maxWaitRetry time.Duration // Maximum send/retry timeout in backoff case.
 
 	// maximum number of configured send attempts. If set to 0, publisher will
 	// block until event has been successfully published.
@@ -29,11 +30,15 @@ type SingleConnectionMode struct {
 func NewSingleConnectionMode(
 	client ProtocolClient,
 	maxAttempts int,
-	waitRetry, timeout time.Duration,
+	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*SingleConnectionMode, error) {
 	s := &SingleConnectionMode{
-		timeout:     timeout,
-		conn:        client,
+		conn: client,
+
+		timeout:      timeout,
+		waitRetry:    waitRetry,
+		maxWaitRetry: maxWaitRetry,
+
 		maxAttempts: maxAttempts,
 	}
 
@@ -62,15 +67,13 @@ func (s *SingleConnectionMode) PublishEvents(
 ) error {
 	published := 0
 	fails := 0
+	var backoffCount uint
 	var err error
 
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
 		if err := s.connect(); err != nil {
 			logp.Info("Connecting error publishing events (retrying): %s", err)
-
-			fails++
-			time.Sleep(s.waitRetry)
-			continue
+			goto sendFail
 		}
 
 		for published < len(events) {
@@ -89,7 +92,16 @@ func (s *SingleConnectionMode) PublishEvents(
 			return nil
 		}
 
-		time.Sleep(s.waitRetry)
+	sendFail:
+		logp.Info("send fail")
+		backoff := time.Duration(int64(s.waitRetry) * (1 << backoffCount))
+		if backoff > s.maxWaitRetry {
+			backoff = s.maxWaitRetry
+		} else {
+			backoffCount++
+		}
+		logp.Info("backoff retry: %v", backoff)
+		time.Sleep(backoff)
 		fails++
 	}
 
