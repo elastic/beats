@@ -51,7 +51,7 @@ func (f *FileEvent) GetState() *FileState {
 
 func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
-		"timestamp":  common.Time(f.ReadTime),
+		"@timestamp": common.Time(f.ReadTime),
 		"source":     f.Source,
 		"offset":     f.Offset,
 		"line":       f.Line,

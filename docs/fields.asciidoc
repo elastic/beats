@@ -26,7 +26,7 @@ type: string
 Name of the shipper sending the log messages
 
 
-==== timestamp
+==== @timestamp
 
 type: date
 

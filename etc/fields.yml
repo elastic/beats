@@ -17,7 +17,7 @@ env:
       description: >
         Name of the shipper sending the log messages
 
-    - name: timestamp
+    - name: "@timestamp"
       type: date
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ

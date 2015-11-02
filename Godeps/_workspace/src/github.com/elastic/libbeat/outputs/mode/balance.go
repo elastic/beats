@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -114,7 +115,7 @@ func (m *LoadBalancerMode) PublishEvent(
 
 func (m *LoadBalancerMode) publishEventsMessage(msg eventsMessage) error {
 	if ok := m.forwardEvent(m.work, msg); !ok {
-		outputs.SignalFailed(msg.signaler)
+		outputs.SignalFailed(msg.signaler, nil)
 	}
 	return nil
 }
@@ -167,7 +168,7 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	if msg.event != nil {
 		if err := client.PublishEvent(msg.event); err != nil {
-			m.onFail(msg)
+			m.onFail(msg, err)
 			return
 		}
 	} else {
@@ -184,7 +185,7 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 				if send > 0 {
 					msg.attemptsLeft = m.maxAttempts + 1
 				}
-				m.onFail(msg)
+				m.onFail(msg, err)
 				return
 			}
 			published += n
@@ -194,9 +195,12 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	outputs.SignalCompleted(msg.signaler)
 }
 
-func (m *LoadBalancerMode) onFail(msg eventsMessage) {
+func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
+
+	logp.Info("Error publishing events (retrying): %s", err)
+
 	if ok := m.forwardEvent(m.retries, msg); !ok {
-		outputs.SignalFailed(msg.signaler)
+		outputs.SignalFailed(msg.signaler, err)
 	}
 }
 
