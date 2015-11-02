@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -30,7 +31,7 @@ func (o *outputWorker) onMessage(m message) {
 
 	if m.event != nil {
 		debug("output worker: publish single event")
-		ts := time.Time(m.event["timestamp"].(common.Time)).UTC()
+		ts := time.Time(m.event["@timestamp"].(common.Time)).UTC()
 		_ = o.out.PublishEvent(m.signal, ts, m.event)
 	} else {
 		if len(m.events) == 0 {
@@ -40,7 +41,11 @@ func (o *outputWorker) onMessage(m message) {
 		}
 
 		debug("output worker: publish %v events", len(m.events))
-		ts := time.Time(m.events[0]["timestamp"].(common.Time)).UTC()
-		_ = o.out.BulkPublish(m.signal, ts, m.events)
+		ts := time.Time(m.events[0]["@timestamp"].(common.Time)).UTC()
+		err := o.out.BulkPublish(m.signal, ts, m.events)
+
+		if err != nil {
+			logp.Info("Error bulk publishing events: %s", err)
+		}
 	}
 }

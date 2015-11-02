@@ -30,7 +30,7 @@ These fields contained data about the transaction itself.
 
 
 
-==== timestamp
+==== @timestamp
 
 type: date
 

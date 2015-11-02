@@ -21,6 +21,9 @@
         }
       ],
       "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
         "client_location": {
           "type": "geo_point"
         },
@@ -49,9 +52,6 @@
             "enabled": false
           },
           "type": "string"
-        },
-        "timestamp": {
-          "type": "date"
         }
       }
     }

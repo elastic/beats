@@ -386,7 +386,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	logp.Debug("dns", "Publishing transaction. %s", t.tuple.String())
 
 	event := common.MapStr{}
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["type"] = "dns"
 	event["transport"] = t.Transport.String()
 	event["src"] = &t.Src

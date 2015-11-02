@@ -101,7 +101,7 @@ event:
   description: >
     These fields contained data about the transaction itself.
   fields:
-    - name: "timestamp"
+    - name: "@timestamp"
       type: date
       required: true
       format: YYYY-MM-DDTHH:MM:SS.milliZ

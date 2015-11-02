@@ -146,7 +146,7 @@
    "server":"",
    "shipper":"macbook",
    "status":"OK",
-   "timestamp":"2015-08-23T04:43:51.861Z",
+   "@timestamp":"2015-08-23T04:43:51.861Z",
    "transport":"udp",
    "type":"dns"
 }
