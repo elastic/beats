@@ -73,9 +73,7 @@ func (client *Client) PublishEvents(
 	// new request to store all events into
 	request, err := client.startBulkRequest("", "", nil)
 	if err != nil {
-		logp.Err(
-			"Failed to perform many index operations in a single API call: %s",
-			err)
+		logp.Err("Failed to perform any bulk index operations: %s", err)
 		return events, err
 	}
 
@@ -89,9 +87,7 @@ func (client *Client) PublishEvents(
 	// send bulk request
 	_, res, err := request.Flush()
 	if err != nil {
-		logp.Err(
-			"Failed to perform many index operations in a single API call: %s",
-			err)
+		logp.Err("Failed to perform any bulk index operations: %s", err)
 		return events, err
 	}
 
@@ -126,7 +122,7 @@ func bulkEncodePublishRequest(
 }
 
 func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-	ts := time.Time(event["@timestamp"].(common.Time))
+	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
 	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
 		ts.Year(), ts.Month(), ts.Day())
 	meta := bulkMeta{
@@ -138,16 +134,17 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 	return meta
 }
 
-// bulkCollectPublishFails checks per item errors. On first failure encountered
-// an error is returned with number of successful events published. Mode will not
-// retry value reported ok until first failure was found.
+// bulkCollectPublishFails checks per item errors returning all events
+// to be tried again due to error code returned for that items. If indexing an
+// event failed due to some error in the event itself (e.g. does not respect mapping),
+// the event will be dropped.
 func bulkCollectPublishFails(
 	res *BulkResult,
 	events []common.MapStr,
 ) []common.MapStr {
 	failed := events[:0]
 	for i, rawItem := range res.Items {
-		status, err := itemStatus(rawItem)
+		status, msg, err := itemStatus(rawItem)
 		if err != nil {
 			logp.Info("Failed to parse bulk reponse for item (%i): %v", i, err)
 			// add index if response parse error as we can not determine success/fail
@@ -161,34 +158,36 @@ func bulkCollectPublishFails(
 
 		if status < 500 && status != 429 {
 			// hard failure, don't collect
+			logp.Warn("Can not index event (status=%v): %v", status, msg)
 			continue
 		}
 
-		debug("Failed to insert data(%i): %v", i, events[i])
-		logp.Info("Bulk item insert failed (%i)", i)
+		debug("Failed to insert data(%v): %v", i, events[i])
+		logp.Info("Bulk item insert failed (i=%v, status=%v): %v", i, status, msg)
 		failed = append(failed, events[i])
 	}
 	return failed
 }
 
-func itemStatus(m json.RawMessage) (int, error) {
+func itemStatus(m json.RawMessage) (int, string, error) {
 	var item map[string]struct {
-		Status int `json:"status"`
+		Status int    `json:"status"`
+		Error  string `json:"error"`
 	}
 
 	err := json.Unmarshal(m, &item)
 	if err != nil {
 		logp.Err("Failed to parse bulk response item: %s", err)
-		return 0, err
+		return 0, "", err
 	}
 
 	for _, r := range item {
-		return r.Status, nil
+		return r.Status, r.Error, nil
 	}
 
 	err = ErrResponseRead
 	logp.Err("%v", err)
-	return 0, err
+	return 0, "", err
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
