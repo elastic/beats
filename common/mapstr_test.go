@@ -49,37 +49,37 @@ func TestEnsureTimestampField(t *testing.T) {
 	}
 
 	tests := []io{
-		// should add a timestamp field if it doesn't exists.
+		// should add a @timestamp field if it doesn't exists.
 		io{
 			Input: MapStr{},
 			Output: MapStr{
-				"timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
+				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
 		},
 		// should convert from string to Time
 		io{
-			Input: MapStr{"timestamp": "2015-03-01T12:34:57.123Z"},
+			Input: MapStr{"@timestamp": "2015-03-01T12:34:57.123Z"},
 			Output: MapStr{
-				"timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
+				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
 			},
 		},
 		// should convert from time.Time to Time
 		io{
 			Input: MapStr{
-				"timestamp": time.Date(2015, time.March, 01,
+				"@timestamp": time.Date(2015, time.March, 01,
 					12, 34, 57, 123*1e6, time.UTC),
 			},
 			Output: MapStr{
-				"timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
+				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
 			},
 		},
 		// should leave a Time alone
 		io{
 			Input: MapStr{
-				"timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
+				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
 			},
 			Output: MapStr{
-				"timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
+				"@timestamp": MustParseTime("2015-03-01T12:34:57.123Z"),
 			},
 		},
 	}
@@ -101,11 +101,11 @@ func TestEnsureTimestampFieldNegative(t *testing.T) {
 	inputs := []MapStr{
 		// should error on invalid string layout (microseconds)
 		MapStr{
-			"timestamp": "2015-03-01T12:34:57.123456Z",
+			"@timestamp": "2015-03-01T12:34:57.123456Z",
 		},
-		// should error when the timestamp is an integer
+		// should error when the @timestamp is an integer
 		MapStr{
-			"timestamp": 123456678,
+			"@timestamp": 123456678,
 		},
 	}
 
