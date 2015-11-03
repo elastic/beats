@@ -5,7 +5,6 @@ package logstash
 
 import (
 	"crypto/tls"
-	"fmt"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -48,6 +47,7 @@ const (
 )
 
 var waitRetry = time.Duration(1) * time.Second
+var maxWaitRetry = time.Duration(60) * time.Second
 
 func (lj *logstash) init(
 	beat string,
@@ -100,7 +100,7 @@ func (lj *logstash) init(
 	var m mode.ConnectionMode
 	if len(clients) == 1 {
 		m, err = mode.NewSingleConnectionMode(clients[0],
-			sendRetries, waitRetry, timeout)
+			sendRetries, waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance != nil && *config.LoadBalance
 		if loadBalance {
@@ -169,5 +169,4 @@ func (lj *logstash) addMeta(event common.MapStr) {
 		"beat": lj.index,
 		"type": event["type"].(string),
 	}
-	fmt.Printf("meta data: %v\n", event["@metadata"])
 }

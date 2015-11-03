@@ -42,9 +42,9 @@ func (m MapStr) Update(d MapStr) {
 // Checks if a timestamp field exists and if it doesn't it adds
 // one by using the injected now() function as a time source.
 func (m MapStr) EnsureTimestampField(now func() time.Time) error {
-	ts, exists := m["timestamp"]
+	ts, exists := m["@timestamp"]
 	if !exists {
-		m["timestamp"] = Time(now())
+		m["@timestamp"] = Time(now())
 		return nil
 	}
 
@@ -56,14 +56,14 @@ func (m MapStr) EnsureTimestampField(now func() time.Time) error {
 
 	tstime, is_time := ts.(time.Time)
 	if is_time {
-		m["timestamp"] = Time(tstime)
+		m["@timestamp"] = Time(tstime)
 		return nil
 	}
 
 	tsstr, is_string := ts.(string)
 	if is_string {
 		var err error
-		m["timestamp"], err = ParseTime(tsstr)
+		m["@timestamp"], err = ParseTime(tsstr)
 		return err
 	}
 	return fmt.Errorf("Don't know how to convert %v to a Time value", ts)

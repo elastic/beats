@@ -87,7 +87,7 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 	}
 
 	// batching disabled
-	if flushInterval < 0 || maxBulkSize < 0 {
+	if flushInterval <= 0 || maxBulkSize <= 0 {
 		return worker
 	}
 
