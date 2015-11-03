@@ -321,7 +321,7 @@ The basic authentication password for connecting to Elasticsearch.
 
 The name of the protocol Elasticsearch is reachable on. The options are:
 `http` or `https`. The default is `http`. However, if you specify a URL for 
-<<hosts-option>>, the value of protocol defaults to whatever scheme you 
+<<hosts-option>>, the value of protocol is overridden by whatever scheme you 
 specify in the URL. 
 
 [[path-option]]
@@ -615,7 +615,7 @@ The Redis initial connection timeout in seconds. The default is 5 seconds.
 
 ===== reconnect_interval
 
-The interval for reconnecting a failed Redis connections. The default is 1 second.
+The interval for reconnecting failed Redis connections. The default is 1 second.
 
 ==== File Output
 
