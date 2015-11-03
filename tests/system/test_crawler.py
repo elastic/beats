@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 from filebeat import TestCase
 
+import codecs
 import os
 import time
 import unittest
@@ -421,6 +424,57 @@ class Test(TestCase):
 
         filebeat.kill_and_wait()
 
-        # Make sure output has only 2 and not lines, means it started at the end
+        # Make sure output has only 2 and not 4 lines, means it started at the end
         output = self.read_output()
         assert len(output) == 2
+
+    def test_utf8(self):
+        """
+        Tests that every new file discovered is started
+        at the end and not beginning
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            encoding="utf-8"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+
+        filebeat = self.start_filebeat()
+        self.wait_until(
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=15)
+
+        # Add utf-8 Chars for the first time
+        with codecs.open(testfile, "w", "utf-8") as f:
+            # Write lines before registar started
+
+            # Special encoding needed?!?
+            f.write("ニコラスRuflin".decode("utf-8") + "\n")
+            f.flush()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 1 events"),
+                max_timeout=15)
+
+        # Append utf-8 chars to check if it keeps reading
+        with codecs.open(testfile, "a") as f:
+            # write additional lines
+            f.write("Hello\n")
+            f.write("薩科Ruflin" + "\n")
+            f.flush()
+
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Registrar: processing 2 events"),
+                max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        # Make sure output has 3
+        output = self.read_output()
+        assert len(output) == 3

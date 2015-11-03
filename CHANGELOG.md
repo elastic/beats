@@ -18,6 +18,7 @@ All documentation about Filebeat can be found here.
   for event stored in elasticsearch. #133
 - Add 'input_type' field to published events reporting the prospector type being used. #133
 - Fix high CPU usage when not connected to Elasticsearch or Logstash. #144
+- Fix issue that files were not crawled anymore when encoding was set to something other then plain. #182
 
 ### Added
 - Rename the timestamp field with @timestamp #168
