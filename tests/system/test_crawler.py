@@ -494,10 +494,12 @@ class Test(TestCase):
                 u"Pot să mănânc sticlă și ea nu mă rănește."),
             ("utf-16le", "utf_16_le",
                 u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
-            ("big5", "big5", u"我能吞下玻璃而不傷身體。"),
+            ("latin1", "latin1",
+             u"I kå Glas frässa, ond des macht mr nix!"),
+            ("BIG5", "big5", u"我能吞下玻璃而不傷身體。"),
             ("gb18030", "gb18030", u"我能吞下玻璃而不傷身。體"),
-            ("euckr", "euckr", u" 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
-            ("eucjp", "eucjp", u"私はガラスを食べられます。それは私を傷つけません。")
+            ("euc-kr", "euckr", u" 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
+            ("euc-jp", "eucjp", u"私はガラスを食べられます。それは私を傷つけません。")
         ]
 
         # create a file in each encoding
