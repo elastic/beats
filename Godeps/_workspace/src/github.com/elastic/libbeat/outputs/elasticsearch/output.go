@@ -82,12 +82,14 @@ func (out *elasticsearchOutput) init(
 	}
 
 	var waitRetry = time.Duration(1) * time.Second
+	var maxWaitRetry = time.Duration(60) * time.Second
 
 	var m mode.ConnectionMode
 	out.clients = clients
 	if len(clients) == 1 {
 		client := clients[0]
-		m, err = mode.NewSingleConnectionMode(client, maxRetries, waitRetry, timeout)
+		m, err = mode.NewSingleConnectionMode(client, maxRetries,
+			waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
