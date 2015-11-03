@@ -338,13 +338,11 @@ class Test(TestCase):
                         "Registrar: processing " + str(20 + n) + " events"),
                     max_timeout=15)
 
-
         filebeat.kill_and_wait()
 
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
         assert len(output) == (3 * 20 + sum(range(0, 3)) + 1)
-
 
     def test_new_line_on_open_file(self):
         """
@@ -424,14 +422,14 @@ class Test(TestCase):
 
         filebeat.kill_and_wait()
 
-        # Make sure output has only 2 and not 4 lines, means it started at the end
+        # Make sure output has only 2 and not 4 lines, means it started at
+        # the end
         output = self.read_output()
         assert len(output) == 2
 
     def test_utf8(self):
         """
-        Tests that every new file discovered is started
-        at the end and not beginning
+        Tests that UTF-8 chars don't break our log tailing.
         """
 
         self.render_config_template(
@@ -478,3 +476,67 @@ class Test(TestCase):
         # Make sure output has 3
         output = self.read_output()
         assert len(output) == 3
+
+    def test_encodings(self):
+        """
+        Tests that several common encodings work.
+        """
+
+        # Sample texts are from http://www.columbia.edu/~kermit/utf8.html
+        encodings = [
+            # golang, python, sample text
+            ("plain", "ascii", u"I can eat glass"),
+            ("utf-8", "utf_8",
+                u"ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
+            ("utf-16be", "utf_16_be",
+                u"Pot să mănânc sticlă și ea nu mă rănește."),
+            ("utf-16le", "utf_16_le",
+                u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
+            ("big5", "big5", u"我能吞下玻璃而不傷身體。"),
+            ("gb18030", "gb18030", u"我能吞下玻璃而不傷身。體"),
+            ("euckr", "euckr", u" 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
+            ("eucjp", "eucjp", u"私はガラスを食べられます。それは私を傷つけません。")
+        ]
+
+        # create a file in each encoding
+        os.mkdir(self.working_dir + "/log/")
+        for _, enc_py, text in encodings:
+            with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
+                             "w", enc_py) as f:
+                f.write(text + "\n")
+
+        # create the config file
+        prospectors = []
+        for enc_go, enc_py, _ in encodings:
+            prospectors.append({
+                "path": self.working_dir + "/log/test-{}".format(enc_py),
+                "encoding": enc_go
+            })
+        self.render_config_template(
+            template="filebeat_prospectors.yml.j2",
+            prospectors=prospectors
+        )
+
+        # run filebeat
+        filebeat = self.start_filebeat()
+        self.wait_until(lambda: self.output_has(lines=len(encodings)),
+                        max_timeout=15)
+
+        # write another line in all files
+        for _, enc_py, text in encodings:
+            with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
+                             "a", enc_py) as f:
+                f.write(text + " 2" + "\n")
+
+        # wait again
+        self.wait_until(lambda: self.output_has(lines=len(encodings)*2),
+                        max_timeout=15)
+        filebeat.kill_and_wait()
+
+        # check that all outputs are present in the JSONs in UTF-8
+        # encoding
+        output = self.read_output()
+        lines = [o["message"] for o in output]
+        for _, _, text in encodings:
+            assert text in lines
+            assert text + " 2" in lines
