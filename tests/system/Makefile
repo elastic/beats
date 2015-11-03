@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PROCESSES ?= 4
-TIMEOUT ?= 90
+TIMEOUT ?= 120
 
 env: env/bin/activate
 env/bin/activate: requirements.txt

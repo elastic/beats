@@ -7,13 +7,13 @@ filebeat:
         - {{ path }}
       # Type of the files. Annotated in every documented
       input: log
-      scan_frequency: 1s
+      scan_frequency: 0.5s
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
       tail_on_rotate: {{tailOnRotate}}
+      encoding: {{encoding | default("utf-8") }}
   spool_size:
   idle_timeout: 0.5s
-  tail_on_rotate:
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
 
 

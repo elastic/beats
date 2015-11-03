@@ -58,15 +58,14 @@ func (h *Harvester) Harvest() {
 	var line uint64 = 0 // Ask registrar about the line number
 
 	h.initOffset()
-
-	var in io.Reader = h.file
-	in = h.encoding(in)
+	in := h.encoding(h.file)
 	reader := bufio.NewReaderSize(in, h.Config.BufferSize)
 	buffer := bytes.NewBuffer(nil)
 
 	var readTimeout = 10 * time.Second
 	lastReadTime := time.Now()
 	for {
+
 		text, bytesread, err := h.readLine(reader, buffer, readTimeout)
 
 		if err != nil {
@@ -75,6 +74,9 @@ func (h *Harvester) Harvest() {
 			if err != nil {
 				return
 			} else {
+				// EOF reached, reset encoding
+				in = h.encoding(h.file)
+				reader = bufio.NewReaderSize(in, h.Config.BufferSize)
 				continue
 			}
 		}
