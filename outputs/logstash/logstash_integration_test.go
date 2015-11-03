@@ -155,7 +155,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		Hosts:          []string{getElasticsearchHost()},
 		Index:          index,
 		Flush_interval: &flushInterval,
-		Bulk_size:      &bulkSize,
+		BulkMaxSize:    &bulkSize,
 	}
 
 	output, err := plugin.NewOutput("test", &config, 10)
