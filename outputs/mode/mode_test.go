@@ -12,7 +12,7 @@ import (
 )
 
 type mockClient struct {
-	publish   func([]common.MapStr) (int, error)
+	publish   func([]common.MapStr) ([]common.MapStr, error)
 	close     func() error
 	connected bool
 	connect   func(time.Duration) error
@@ -30,7 +30,7 @@ func (c *mockClient) IsConnected() bool {
 	return c.connected
 }
 
-func (c *mockClient) PublishEvents(events []common.MapStr) (int, error) {
+func (c *mockClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
 	return c.publish(events)
 }
 
@@ -63,14 +63,14 @@ func alwaysFailConnect(err error) func(time.Duration) error {
 
 func collectPublish(
 	collected *[][]common.MapStr,
-) func(events []common.MapStr) (int, error) {
+) func(events []common.MapStr) ([]common.MapStr, error) {
 	mutex := sync.Mutex{}
-	return func(events []common.MapStr) (int, error) {
+	return func(events []common.MapStr) ([]common.MapStr, error) {
 		mutex.Lock()
 		defer mutex.Unlock()
 
 		*collected = append(*collected, events)
-		return len(events), nil
+		return nil, nil
 	}
 }
 
@@ -82,32 +82,40 @@ func (e errNetTimeout) Temporary() bool { return false }
 
 func publishTimeoutEvery(
 	n int,
-	pub func(events []common.MapStr) (int, error),
-) func(events []common.MapStr) (int, error) {
+	pub func(events []common.MapStr) ([]common.MapStr, error),
+) func(events []common.MapStr) ([]common.MapStr, error) {
 	count := 0
-	return func(events []common.MapStr) (int, error) {
+	return func(events []common.MapStr) ([]common.MapStr, error) {
 		if count < n {
 			count++
 			return pub(events)
 		}
 		count = 0
-		return 0, errNetTimeout{}
+		return events, errNetTimeout{}
+	}
+}
+
+func publishFailWith(
+	n int,
+	err error,
+	pub func([]common.MapStr) ([]common.MapStr, error),
+) func([]common.MapStr) ([]common.MapStr, error) {
+	count := 0
+	return func(events []common.MapStr) ([]common.MapStr, error) {
+		if count < n {
+			count++
+			return events, err
+		}
+		count = 0
+		return pub(events)
 	}
 }
 
 func publishFailStart(
 	n int,
-	pub func(events []common.MapStr) (int, error),
-) func(events []common.MapStr) (int, error) {
-	count := 0
-	return func(events []common.MapStr) (int, error) {
-		if count < n {
-			count++
-			return 0, errNetTimeout{}
-		}
-		count = 0
-		return pub(events)
-	}
+	pub func(events []common.MapStr) ([]common.MapStr, error),
+) func(events []common.MapStr) ([]common.MapStr, error) {
+	return publishFailWith(n, errNetTimeout{}, pub)
 }
 
 func closeOK() error {

@@ -53,7 +53,7 @@ func TestOneHostSuccessResp(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	resp, err := client.Index(index, "test", "1", params, body)
+	_, resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
 		t.Errorf("Index() returns error: %s", err)
 	}
@@ -86,7 +86,7 @@ func TestOneHost500Resp(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err = client.Index(index, "test", "1", params, body)
+	_, _, err = client.Index(index, "test", "1", params, body)
 
 	if err == nil {
 		t.Errorf("Index() should return error.")
@@ -117,7 +117,7 @@ func TestOneHost503Resp(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, err := client.Index(index, "test", "1", params, body)
+	_, _, err := client.Index(index, "test", "1", params, body)
 	if err == nil {
 		t.Errorf("Index() should return error.")
 	}

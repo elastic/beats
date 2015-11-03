@@ -19,14 +19,17 @@ var (
 
 	// ErrJSONEncodeFailed indicates encoding failures
 	ErrJSONEncodeFailed = errors.New("json encode failed")
+
+	// ErrResponseRead indicates error parsing Elasticsearch response
+	ErrResponseRead = errors.New("bulk item status parse failed.")
 )
 
 const (
-	defaultEsOpenTimeout = 3000 * time.Millisecond
-
 	defaultMaxRetries = 3
 
-	elasticsearchDefaultTimeout = 30 * time.Second
+	defaultBulkSize = 50
+
+	elasticsearchDefaultTimeout = 90 * time.Second
 )
 
 func init() {
@@ -66,6 +69,12 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	// configure bulk size in config in case it is not set
+	if config.Bulk_size == nil {
+		bulkSize := defaultBulkSize
+		config.Bulk_size = &bulkSize
+	}
+
 	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
 	if err != nil {
 		return err
@@ -93,7 +102,8 @@ func (out *elasticsearchOutput) init(
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxRetries, waitRetry, timeout)
+			m, err = mode.NewLoadBalancerMode(clients, maxRetries,
+				waitRetry, timeout, maxWaitRetry)
 		} else {
 			m, err = mode.NewFailOverConnectionMode(clients, maxRetries, waitRetry, timeout)
 		}

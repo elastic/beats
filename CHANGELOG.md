@@ -9,12 +9,13 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 - Use stderr for console log output. #219
 - Handle empty event array in publisher. #207
-- Limit number of workers for Elasticsearch output to 1 per configured host. packetbeat#226
 - Respect '*' debug selector in IsDebug. #226 (elastic/packetbeat#339)
 - Limit number of workers for Elasticsearch output. elastic/packetbeat#226
 - On Windows, remove service related error message when running in the console. #242
 - Fix waitRetry no configured in single output mode configuration. elastic/filebeat#144
 - Use http as the default scheme in the elasticsearch hosts #253
+- Respect max bulk size if bulk publisher (collector) is disabled or sync flag is set.
+- Always evaluate status code from Elasticsearch responses when indexing events. #192
 
 ### Added
 - Add Console output plugin. #218
@@ -27,6 +28,10 @@ All notable changes to this project will be documented in this file based on the
 - Add logging messages for bulk publishing in case of error #229
 - Add option to configure number of parallel workers publishing to Elasticsearch
   or Logstash.
+- Set default bulk size for Elasticsearch output to 50.
+- Set default http timeout for Elasticsearch to 90s.
+- Improve publish retry if sync flag is set by retrying only up to max bulk size
+  events instead of all events to be published.
 
 ### Deprecated
 
@@ -40,8 +45,9 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 - Determine Elasticsearch index for an event based on UTC time #81
 - Fixing ES output's defaultDeadTimeout so that it is 60 seconds #103
-- Es outputer: fix timestamp conversion #91
+- ES outputer: fix timestamp conversion #91
 - Fix TLS insecure config option #239
+- ES outputer: check bulk API per item status code for retransmit on failure.
 
 ### Added
 - Add logstash output plugin #151

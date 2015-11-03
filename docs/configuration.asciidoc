@@ -305,7 +305,6 @@ The host of the Elasticsearch server. This option is deprecated as it is replace
 
 The port of the Elasticsearch server. This option is deprecated as it is replaced by <<hosts-option>>.
 
-
 ===== username
 
 Basic authentication username for connecting to Elasticsearch.
@@ -327,7 +326,6 @@ An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
-
 ===== index
 
 The index root name where to write events to. The default is `packetbeat` and
@@ -335,7 +333,6 @@ generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
 
 The index root name where to write events to. The default is the beat its name.
 For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (e.g. `packetbeat-2015.04.26`).
-
 
 ===== max_retries
 
@@ -346,7 +343,11 @@ dropped. The default is 3.
 ===== bulk_max_size
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-The default is 10000.
+The default is 50.
+
+===== timeout
+
+The http request timeout in seconds for Elasticsearch request. The default is 90.
 
 ===== flush_interval
 

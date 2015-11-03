@@ -11,7 +11,7 @@ func TestSyncPublishEventSuccess(t *testing.T) {
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	event := testEvent()
 
-	assert.True(t, testPub.pub.syncPublisher.client(true).PublishEvent(event))
+	assert.True(t, testPub.syncPublishEvent(event))
 
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
 	if err != nil {
@@ -24,7 +24,7 @@ func TestSyncPublishEventsSuccess(t *testing.T) {
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	events := []common.MapStr{testEvent(), testEvent()}
 
-	assert.True(t, testPub.pub.syncPublisher.client(true).PublishEvents(events))
+	assert.True(t, testPub.syncPublishEvents(events))
 
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
 	if err != nil {
@@ -38,7 +38,7 @@ func TestSyncPublishEventFailed(t *testing.T) {
 	testPub := newTestPublisherNoBulk(FailedResponse)
 	event := testEvent()
 
-	assert.False(t, testPub.pub.syncPublisher.client(true).PublishEvent(event))
+	assert.False(t, testPub.syncPublishEvent(event))
 
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
 	if err != nil {
@@ -51,7 +51,7 @@ func TestSyncPublishEventsFailed(t *testing.T) {
 	testPub := newTestPublisherNoBulk(FailedResponse)
 	events := []common.MapStr{testEvent(), testEvent()}
 
-	assert.False(t, testPub.pub.syncPublisher.client(true).PublishEvents(events))
+	assert.False(t, testPub.syncPublishEvents(events))
 
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
 	if err != nil {
@@ -67,5 +67,5 @@ func TestSyncPublisherDisabled(t *testing.T) {
 	testPub.pub.disabled = true
 	event := testEvent()
 
-	assert.True(t, testPub.pub.syncPublisher.client(true).PublishEvent(event))
+	assert.True(t, testPub.syncPublishEvent(event))
 }

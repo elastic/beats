@@ -35,9 +35,9 @@ func (mh *testMessageHandler) send(m message) {
 
 func (mh *testMessageHandler) acknowledgeMessage(m message) {
 	if mh.response == CompletedResponse {
-		outputs.SignalCompleted(m.signal)
+		outputs.SignalCompleted(m.context.signal)
 	} else {
-		outputs.SignalFailed(m.signal, nil)
+		outputs.SignalFailed(m.context.signal, nil)
 	}
 }
 
@@ -156,6 +156,26 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	}
 }
 
+func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
+	ctx := context{}
+	return t.pub.asyncPublisher.client().PublishEvent(&ctx, event)
+}
+
+func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
+	ctx := context{}
+	return t.pub.asyncPublisher.client().PublishEvents(&ctx, events)
+}
+
+func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
+	ctx := context{publishOptions: publishOptions{confirm: true}}
+	return t.pub.syncPublisher.client().PublishEvent(&ctx, event)
+}
+
+func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
+	ctx := context{publishOptions: publishOptions{confirm: true}}
+	return t.pub.syncPublisher.client().PublishEvents(&ctx, events)
+}
+
 // newTestPublisherWithBulk returns a new testPublisher with bulk message
 // dispatching enabled.
 func newTestPublisherWithBulk(response OutputResponse) *testPublisher {
@@ -166,4 +186,12 @@ func newTestPublisherWithBulk(response OutputResponse) *testPublisher {
 // dispatching disabled.
 func newTestPublisherNoBulk(response OutputResponse) *testPublisher {
 	return newTestPublisher(-1, response)
+}
+
+func testMessage(s *testSignaler, event common.MapStr) message {
+	return message{context: context{signal: s}, event: event}
+}
+
+func testBulkMessage(s *testSignaler, events []common.MapStr) message {
+	return message{context: context{signal: s}, events: events}
 }

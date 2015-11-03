@@ -13,7 +13,7 @@ func TestAsyncPublishEvent(t *testing.T) {
 	event := testEvent()
 
 	// Execute. Async PublishEvent always immediately returns true.
-	assert.True(t, testPub.pub.asyncPublisher.client().PublishEvent(event))
+	assert.True(t, testPub.asyncPublishEvent(event))
 
 	// Validate
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
@@ -29,7 +29,7 @@ func TestAsyncPublishEvents(t *testing.T) {
 	events := []common.MapStr{testEvent(), testEvent()}
 
 	// Execute. Async PublishEvent always immediately returns true.
-	assert.True(t, testPub.pub.asyncPublisher.client().PublishEvents(events))
+	assert.True(t, testPub.asyncPublishEvents(events))
 
 	// Validate
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
@@ -46,7 +46,7 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 	event := testEvent()
 
 	// Execute. Async PublishEvent always immediately returns true.
-	assert.True(t, testPub.pub.asyncPublisher.client().PublishEvent(event))
+	assert.True(t, testPub.asyncPublishEvent(event))
 
 	// validate
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
@@ -64,7 +64,7 @@ func TestBulkAsyncPublishEvents(t *testing.T) {
 	events := []common.MapStr{testEvent(), testEvent()}
 
 	// Async PublishEvent always immediately returns true.
-	assert.True(t, testPub.pub.asyncPublisher.client().PublishEvents(events))
+	assert.True(t, testPub.asyncPublishEvents(events))
 
 	msgs, err := testPub.outputMsgHandler.waitForMessages(1)
 	if err != nil {

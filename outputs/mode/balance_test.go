@@ -20,6 +20,7 @@ func TestLoadBalancerStartStop(t *testing.T) {
 		1,
 		100*time.Millisecond,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, nil, nil, nil)
 }
@@ -37,6 +38,7 @@ func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
 		2,
 		100*time.Millisecond,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, multiEvent(2, testEvent), signals(false), nil)
 }
@@ -55,6 +57,7 @@ func TestLoadBalancerOKSend(t *testing.T) {
 		2,
 		100*time.Millisecond,
 		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, multiEvent(10, testEvent), signals(true), &collected)
 }
@@ -79,6 +82,26 @@ func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
 		3,
 		100*time.Millisecond,
 		100*time.Millisecond,
+		1*time.Second,
+	)
+	testMode(t, mode, multiEvent(10, testEvent), signals(true), &collected)
+}
+
+func TestLoadBalancerTemporayFailure(t *testing.T) {
+	var collected [][]common.MapStr
+	mode, _ := NewLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailWith(1, ErrTempBulkFailure, collectPublish(&collected)),
+			},
+		},
+		3,
+		100*time.Millisecond,
+		100*time.Millisecond,
+		1*time.Second,
 	)
 	testMode(t, mode, multiEvent(10, testEvent), signals(true), &collected)
 }
