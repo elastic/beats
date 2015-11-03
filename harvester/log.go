@@ -130,7 +130,7 @@ func (h *Harvester) Harvest() {
 			// EOF reached
 			// Encoding and reader are reinitialised here as other encoder stops reading. See #182
 			in = h.encoding(h.file)
-			reader = bufio.NewReaderSize(in, h.Config.BufferSize)
+			reader.Reset(in)
 			continue
 		}
 
