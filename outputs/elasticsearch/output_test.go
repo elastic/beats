@@ -33,7 +33,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		Index:          index,
 		Protocol:       "http",
 		Flush_interval: &flushInterval,
-		Bulk_size:      &bulkSize,
+		BulkMaxSize:    &bulkSize,
 	}, 10)
 
 	return output

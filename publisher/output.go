@@ -22,8 +22,8 @@ func newOutputWorker(
 	hwm int,
 ) *outputWorker {
 	maxBulkSize := defaultBulkSize
-	if config.Bulk_size != nil {
-		maxBulkSize = *config.Bulk_size
+	if config.BulkMaxSize != nil {
+		maxBulkSize = *config.BulkMaxSize
 	}
 
 	o := &outputWorker{

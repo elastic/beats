@@ -70,9 +70,9 @@ func (out *elasticsearchOutput) init(
 	}
 
 	// configure bulk size in config in case it is not set
-	if config.Bulk_size == nil {
+	if config.BulkMaxSize == nil {
 		bulkSize := defaultBulkSize
-		config.Bulk_size = &bulkSize
+		config.BulkMaxSize = &bulkSize
 	}
 
 	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))

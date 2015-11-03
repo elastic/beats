@@ -82,8 +82,8 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 	}
 
 	maxBulkSize := defaultBulkSize
-	if config.Bulk_size != nil {
-		maxBulkSize = *config.Bulk_size
+	if config.BulkMaxSize != nil {
+		maxBulkSize = *config.BulkMaxSize
 	}
 
 	// batching disabled

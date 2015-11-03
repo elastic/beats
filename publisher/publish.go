@@ -193,7 +193,7 @@ func (publisher *PublisherType) Init(
 			output := plugin.Output
 			config := plugin.Config
 
-			debug("create output worker: %p, %p", config.Flush_interval, config.Bulk_size)
+			debug("create output worker: %p, %p", config.Flush_interval, config.BulkMaxSize)
 
 			outputers = append(outputers,
 				newOutputWorker(config, output, &publisher.wsOutput, 1000))
