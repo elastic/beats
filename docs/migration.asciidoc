@@ -44,7 +44,7 @@ complex and leads to potential errors.
 Instead of a migration of the registry file we recommend to start Filebeat on
 the same host and send the log files to a different index.  This will start
 indexing from scratch. In case it is preferred to start at the end of all
-files, the option `tail_on_rotate` can be set to true.
+files, the option `tail_files` can be set to true.
 
 The above will allow to keep the old Logstash-Forwarder running and it can be
 slowly migrated over to Filebeat.
@@ -317,8 +317,8 @@ either completely removed or moved to libbeat.
 |`harvester_buffer_size` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
 
 |`-tail`
-|`tail_on_rotate`
-|`tail_on_rotate` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+|`tail_files`
+|`tail_files` was moved to the config file and removed as flag. It can now be configured specific for each prospector.
 
 |`-cpuProfileFile`
 |

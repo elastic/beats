@@ -15,7 +15,7 @@ filebeat:
       ignore_older: 10m
       scan_frequency: 10s
       harvester_buffer_size: 5000
-      tail_on_rotate: false
+      tail_files: false
     -
       fields:
       paths:

@@ -108,7 +108,7 @@ func (h *Harvester) initOffset() {
 
 	if h.Offset > 0 {
 		logp.Debug("harvester", "harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-	} else if h.Config.TailOnRotate {
+	} else if h.Config.TailFiles {
 		logp.Debug("harvester", "harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
 	} else {
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
@@ -121,7 +121,7 @@ func (h *Harvester) initOffset() {
 func (h *Harvester) setFileOffset() {
 	if h.Offset > 0 {
 		h.file.Seek(h.Offset, os.SEEK_SET)
-	} else if h.Config.TailOnRotate {
+	} else if h.Config.TailFiles {
 		h.file.Seek(0, os.SEEK_END)
 	} else {
 		h.file.Seek(0, os.SEEK_SET)
