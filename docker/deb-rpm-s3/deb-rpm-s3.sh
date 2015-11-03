@@ -10,15 +10,34 @@
 
 cd "$(dirname "$0")"
 
+if [ ! -e "elasticsearch.asc" ]; then
+    cat << EOF
+You must place a copy of the Elasticsearch GPG signing key (named
+elasticsearch.asc) into
+  
+  $PWD
+
+prior to building this docker image.
+
+EOF
+    exit 1
+fi
+
+bucket="packages.elasticsearch.org"
+prefix="beats"
+dir="/beats-packer/build/upload"
+gpg_key="/beats-packer/docker/deb-rpm-s3/elasticsearch.asc"
+
 docker run -it --rm \
   --env="PASS=$PASS" \
   --volume `pwd`/../..:/beats-packer \
   deb-rpm-s3 \
-  --bucket=packages.elasticsearch.org \
-  --prefix=beats \
-  --directory=/beats-packer/build/upload \
+  --bucket=$bucket \
+  --prefix=$prefix \
+  --directory="$dir" \
   --aws-access-key="$AWS_ACCESS_KEY" \
   --aws-secret-key="$AWS_SECRET_KEY" \
+  --gpg-key="$gpg_key" \
   --verbose \
   "$@"
 

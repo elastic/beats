@@ -34,6 +34,8 @@ cat << EOF
     -d=DIR | --directory=DIR         Required. Directory to recursively search
                                      for .rpm and .deb files.
 
+    -g=GPG_KEY | --gpg-key=GPG_KEY   Optional. Path to GPG key file to import.
+
     -v | --verbose                   Optional. Enable verbose logging to stderr.
     
     -h | --help                      Optional. Print this usage information.
@@ -73,6 +75,10 @@ parseArgs() {
       ;;
     -d=*|--directory=*)
       DIRECTORY="${i#*=}"
+      shift
+      ;;
+    -g=*|--gpg-key=*)
+      GPG_KEY="${i#*=}"
       shift
       ;;
     -h|--help)
@@ -131,6 +137,20 @@ parseArgs() {
   export AWS_SECRET_KEY
 }
 
+importGpg() {
+  if [ ! -z "$GPG_KEY" ]; then
+    if [ ! -f "$GPG_KEY" ]; then
+      err "GPG key file $GPG_KEY does not exists."
+      exit 1
+    fi
+
+    debug "Importing GPG key $GPG_KEY"
+    gpg --import --allow-secret-key-import "$GPG_KEY" | true
+  else
+    debug "Not importing a GPG key because --gpg-key not specified."
+  fi
+}
+
 getPassword() {
   if [ -z "$PASS" ]; then
     echo -n "Enter GPG pass phrase: "
@@ -187,6 +207,7 @@ publishToYumRepo() {
 
 main() {
   parseArgs $*
+  importGpg
   getPassword
   signDebianPackages
   signRpmPackages
