@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file based on the
 - Limit number of workers for Elasticsearch output. elastic/packetbeat#226
 - On Windows, remove service related error message when running in the console. #242
 - Fix waitRetry no configured in single output mode configuration. elastic/filebeat#144
+- Use http as the default scheme in the elasticsearch hosts #253
 
 ### Added
 - Add Console output plugin. #218

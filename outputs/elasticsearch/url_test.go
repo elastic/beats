@@ -115,7 +115,7 @@ func TestGetUrl(t *testing.T) {
 	}
 
 	for input, output := range inputOutput {
-		urlNew, err := getURL("http", "", input)
+		urlNew, err := getURL("", "", input)
 		assert.Nil(t, err)
 		assert.Equal(t, output, urlNew, fmt.Sprintf("input: %v", input))
 	}

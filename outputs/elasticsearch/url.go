@@ -10,6 +10,11 @@ import (
 // Creates the url based on the url configuration.
 // Adds missing parts with defaults (scheme, host, port)
 func getURL(defaultScheme string, defaultPath string, rawURL string) (string, error) {
+
+	if defaultScheme == "" {
+		defaultScheme = "http"
+	}
+
 	addr, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
