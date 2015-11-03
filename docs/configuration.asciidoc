@@ -138,9 +138,13 @@ Defines the buffer size every harvester uses when fetching the file. By default 
 
 ===== tail_files
 
-Setting tail_files to true means filebeat starts readding new files at the end
-instead of the beginning. If this is used in combination with log rotation
-this can mean that the first entries of a new file are skipped.
+If set to true, Filebeat starts reading new files at the end
+instead of the beginning. If it is used in combination with log rotation, 
+it might be that the first log entries of a new file are skipped.
+By default is set to false.
+
+
+NOTE: This setting is meant to be used only on the first Filebeat run on a set of log files if you want to avoid indexing old log lines. After the first run, we recommend disabling this option, otherwise you risk losing lines on file rotation.
 
 ===== spool_size
 
