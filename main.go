@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/elastic/libbeat/beat"
+	"github.com/elastic/libbeat/logp"
 )
 
 // You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
@@ -17,7 +20,11 @@ func main() {
 	b.CommandLineSetup()
 
 	b.LoadConfig()
-	tb.Config(b)
+	err := tb.Config(b)
+	if err != nil {
+		logp.Critical("Config error: %v", err)
+		os.Exit(1)
+	}
 
 	b.Run()
 
