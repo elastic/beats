@@ -53,6 +53,7 @@ type ProspectorConfig struct {
 type HarvesterConfig struct {
 	InputType                  string `yaml:"input_type"`
 	Fields                     map[string]string
+	FieldsUnderRoot            bool   `yaml:"fields_under_root"`
 	BufferSize                 int    `yaml:"harvester_buffer_size"`
 	TailFiles                  bool   `yaml:"tail_files"`
 	Encoding                   string `yaml:"encoding"`

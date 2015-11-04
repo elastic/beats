@@ -26,6 +26,8 @@ type FileEvent struct {
 	Text         *string
 	Fields       *map[string]string
 	Fileinfo     *os.FileInfo
+
+	fieldsUnderRoot bool
 }
 
 type FileState struct {
@@ -49,6 +51,13 @@ func (f *FileEvent) GetState() *FileState {
 	return state
 }
 
+// SetFieldsUnderRoot sets whether the fields should be added
+// top level to the output documentation (fieldsUnderRoot = true) or
+// under a fields dictionary.
+func (f *FileEvent) SetFieldsUnderRoot(fieldsUnderRoot bool) {
+	f.fieldsUnderRoot = fieldsUnderRoot
+}
+
 func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
 		"@timestamp": common.Time(f.ReadTime),
@@ -62,7 +71,18 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 	}
 
 	if f.Fields != nil {
-		event["fields"] = f.Fields
+		if f.fieldsUnderRoot {
+			for key, value := range *f.Fields {
+				// in case of conflicts, overwrite
+				_, found := event[key]
+				if found {
+					logp.Warn("Overwriting %s key", key)
+				}
+				event[key] = value
+			}
+		} else {
+			event["fields"] = f.Fields
+		}
 	}
 
 	return event

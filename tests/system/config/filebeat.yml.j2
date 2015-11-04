@@ -16,6 +16,13 @@ filebeat:
       backoff_factor: 1
       max_backoff: 1s
       force_close_windows_files: {{force_close_windows_files}}
+      {% if fields %}
+      fields:
+      {% for k,v in fields.items() %}
+        {{k}}: {{v}}
+      {% endfor %}
+      {% endif %}
+      fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
   spool_size:
   idle_timeout: 0.5s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
