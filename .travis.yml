@@ -1,0 +1,21 @@
+sudo: false
+
+language: go
+go:
+  - 1.5.1
+
+before_install:
+  # This is needed so the package path uses elastic/eventbeat as its path.
+  - mkdir -p $HOME/gopath/src/github.com/elastic/eventbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/eventbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/eventbeat
+  - cd $HOME/gopath/src/github.com/elastic/eventbeat
+
+install:
+  - make install-deps
+
+script:
+  - make check
+  - make build
+  - make native
+  - make coverage
