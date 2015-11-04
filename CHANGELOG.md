@@ -2,7 +2,17 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/topbeat/compare/1.0.0-beta4...HEAD)
+## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc1...HEAD)
+
+### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1) - 2015-11-04
 
 ### Backward Compatibility Breaks
 
