@@ -52,14 +52,18 @@ type ProtocolClient interface {
 	// must be set. If connection has been lost, IsConnected must return false
 	// in future calls.
 	// PublishEvents is free to publish only a subset of given events, even in
-	// error case. On return n indicates the number of events guaranteed to be
-	// published.
-	PublishEvents(events []common.MapStr) (n int, err error)
+	// error case. On return nextEvents contains all events not yet published.
+	PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error)
 
 	// PublishEvent sends one event to the clients sink. On failure and error is
 	// returned.
 	PublishEvent(event common.MapStr) error
 }
+
+var (
+	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
+)
 
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
