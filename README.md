@@ -93,7 +93,8 @@ There are two types of documents exported:
       "free": 5361135616,
       "used_p": 0.69,
       "actual_used": 9940553728,
-      "actual_free": 7239315456
+      "actual_free": 7239315456,
+      "actual_used_p": 0.57
     },
     "shipper": "mar.localdomain",
     "swap": {
@@ -102,7 +103,8 @@ There are two types of documents exported:
       "free": 854327296,
       "used_p": 0.2,
       "actual_used": 0,
-      "actual_free": 0
+      "actual_free": 0,
+      "actual_used_p": 0.0
     },
     "type": "system"
   },

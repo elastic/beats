@@ -212,6 +212,13 @@ type: int
 Actual available memory. Available only on Unix.
 
 
+==== mem.actual_used_p
+
+type: float
+
+Actual used memory, in percentage
+
+
 === swap fields
 
 This group contains statistics related to the swap memory usage on the system.
@@ -257,6 +264,13 @@ Actual used swap memory. Available only on Unix.
 type: int
 
 Actual available swap memory. Available only on Unix.
+
+
+==== swap.actual_used_p
+
+type: float
+
+Actual used swap memory, in percentage
 
 
 [[exported-fields-process]]

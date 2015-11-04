@@ -62,6 +62,10 @@
         },
         "mem": {
           "properties": {
+            "actual_used_p": {
+              "doc_values": "true",
+              "type": "float"
+            },
             "used_p": {
               "doc_values": "true",
               "type": "float"
@@ -90,6 +94,10 @@
         },
         "swap": {
           "properties": {
+            "actual_used_p": {
+              "doc_values": "true",
+              "type": "float"
+            },
             "used_p": {
               "doc_values": "true",
               "type": "float"

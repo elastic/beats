@@ -176,6 +176,12 @@ system:
           description: >
             Actual available memory. Available only on Unix.
 
+        - name: actual_used_p
+          path: mem.actual_used_p
+          type: float
+          description: >
+            Actual used memory, in percentage
+
     - name: swap
       type: group
       description: This group contains statistics related to the swap memory usage on the system.
@@ -215,6 +221,12 @@ system:
           type: int
           description: >
             Actual available swap memory. Available only on Unix.
+
+        - name: actual_used_p
+          path: swap.actual_used_p
+          type: float
+          description: >
+            Actual used swap memory, in percentage
 
 process:
   type: group
