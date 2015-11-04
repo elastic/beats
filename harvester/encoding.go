@@ -6,10 +6,8 @@ import (
 
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/encoding/korean"
+	"golang.org/x/text/encoding/htmlindex"
 	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/encoding/traditionalchinese"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -22,29 +20,16 @@ var encodings = map[string]Decoder{
 	"nop":   Plain,
 	"plain": Plain,
 
-	// utf8 (validate input)
-	"utf-8": trans(encoding.UTF8Validator),
+	// utf8 (validate input) - shadow htmlindex utf8 codecs not validating input
+	"unicode-1-1-utf-8": trans(encoding.UTF8Validator),
+	"utf-8":             trans(encoding.UTF8Validator),
+	"utf8":              trans(encoding.UTF8Validator),
 
 	// utf16
 	"utf-16be-bom": enc(unicode.UTF16(unicode.BigEndian, unicode.UseBOM)),
-	"utf-16be":     enc(unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)),
-	"utf-16le":     enc(unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)),
-
-	// traditional chinese
-	"big5": enc(traditionalchinese.Big5),
 
 	// simplified chinese
-	"gb18030":  enc(simplifiedchinese.GB18030),
-	"gbk":      enc(simplifiedchinese.GBK),
-	"hzgb2312": enc(simplifiedchinese.HZGB2312),
-
-	// korean
-	"euckr": enc(korean.EUCKR),
-
-	// japanese
-	"eucjp":     enc(japanese.EUCJP),
-	"iso2022jp": enc(japanese.ISO2022JP),
-	"shiftjis":  enc(japanese.ShiftJIS),
+	"gbk": enc(simplifiedchinese.GBK), // shadow htmlindex using 'GB10830' for GBK
 
 	// 8bit charmap encodings
 	"iso8859-6e": enc(charmap.ISO8859_6E),
@@ -62,7 +47,15 @@ func findEncoding(name string) (Decoder, bool) {
 		return Plain, true
 	}
 	d, ok := encodings[strings.ToLower(name)]
-	return d, ok
+	if ok {
+		return d, ok
+	}
+
+	codec, err := htmlindex.Get(name)
+	if err != nil {
+		return nil, false
+	}
+	return enc(codec), true
 }
 
 func nopEnc(r io.Reader) io.Reader { return r }

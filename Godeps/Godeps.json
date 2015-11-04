@@ -66,6 +66,14 @@
 			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
 		},
 		{
+			"ImportPath": "golang.org/x/text/internal/tag",
+			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
+		},
+		{
+			"ImportPath": "golang.org/x/text/language",
+			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
+		},
+		{
 			"ImportPath": "golang.org/x/text/transform",
 			"Rev": "f024ad8118c1182f0c9c976f0fa8e56b39ef821b"
 		},

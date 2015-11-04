@@ -31,6 +31,8 @@ All documentation about Filebeat can be found here.
 - Set default value for ignore_older config to 10 minutes. #164
 - Added the fields_under_root setting to optionally store the custom fields top
 level in the output dictionary. #188
+- Add more encodings by using x/text/encodings/htmlindex package to select
+  encoding by name.
 
 ### Deprecated
 

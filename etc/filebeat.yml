@@ -15,11 +15,11 @@ filebeat:
         - /var/log/*.log
       # - c:\programdata\elasticsearch\logs\*
 
-      # Configure the file encoding for reading file with international characters
-      # supported encodings:
-      #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
-      #   euckr, eucjp, iso2022jp, shiftjis, iso8859-63, iso8859-6i, iso8859-8e,
-      #   iso8859-8i
+      # Configure the file encoding for reading files with international characters
+      # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+      # Some sample encodings:
+      #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+      #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
       #encoding: plain
 
       # Type of the files. Based on this the way the file is read is decided.

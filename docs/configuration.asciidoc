@@ -82,11 +82,11 @@ filebeat:
       # this can mean that the first entries of a new file are skipped.
       #tail_files: false
 
-      # Configure the file encoding for reading file with international characters
-      # supported encodings:
-      #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
-      #   euckr, eucjp, iso2022jp, shiftjis, iso8859-63, iso8859-6i, iso8859-8e,
-      #   iso8859-8i
+      # Configure the file encoding for reading files with international characters
+      # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+      # Some sample encodings:
+      #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+      #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
       #encoding: plain
 -------------------------------------------------------------------------------------
 
@@ -251,10 +251,12 @@ filebeat:
 
 ===== encoding
 
-Configures the file encoding for reading file with international characters. The
-supported encodings are:
+Configures the file encoding for reading file with international characters.
+Encodings names as [recommended by the W3C for use in HTML5](http://www.w3.org/TR/encoding/).
 
-    * plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hzgb2312,
-    * euckr, eucjp, iso2022jp, shiftjis, iso8859-63, iso8859-6i, iso8859-8e,
-    * iso8859-8i
+Some sample encodings from W3C recommendation:
 
+    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hz-gb-2312,
+    * euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
+
+The `plain` encoding is special, as it does not validates or transforms any input.
