@@ -65,33 +65,78 @@ func (s *SingleConnectionMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
+	return s.publish(signaler, func() (bool, bool) {
+		for len(events) > 0 {
+			var err error
+			total := len(events)
+			events, err = s.conn.PublishEvents(events)
+			if err != nil {
+				logp.Info("Error publishing events (retrying): %s", err)
+				madeProgress := len(events) < total
+				return false, madeProgress
+			}
+		}
+		return true, false
+	})
+}
+
+// PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
+func (s *SingleConnectionMode) PublishEvent(
+	signaler outputs.Signaler,
+	event common.MapStr,
+) error {
+	return s.publish(signaler, func() (bool, bool) {
+		if err := s.conn.PublishEvent(event); err != nil {
+			logp.Info("Error publishing event (retrying): %s", err)
+			return false, false
+		}
+		return true, false
+	})
+}
+
+// publish is used to publish events using the configured protocol client.
+// It provides general error handling and back off support used on failed
+// send attempts. To be used by PublishEvent and PublishEvents.
+// The send callback will try to progress sending traffic and returns kind of
+// progress made in ok or resetFail. If ok is set to true, send finished
+// processing events. If ok is false but resetFail is set, send was partially
+// successful. If send was partially successful, the fail counter is reset thus up
+// to maxAttempts send attempts without any progress might be executed.
+func (s *SingleConnectionMode) publish(
+	signaler outputs.Signaler,
+	send func() (ok bool, resetFail bool),
+) error {
 	fails := 0
 	var backoffCount uint
 	var err error
 
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
+		ok := false
+		resetFail := false
+
 		if err := s.connect(); err != nil {
 			logp.Info("Connecting error publishing events (retrying): %s", err)
 			goto sendFail
 		}
 
-		for len(events) > 0 {
-			var err error
-			events, err = s.conn.PublishEvents(events)
-			if err != nil {
-				logp.Info("Error publishing events (retrying): %s", err)
-				break
-			}
-
-			fails = 0
+		ok, resetFail = send()
+		if !ok {
+			goto sendFail
 		}
 
-		if len(events) == 0 {
-			outputs.SignalCompleted(signaler)
-			return nil
-		}
+		outputs.SignalCompleted(signaler)
+		return nil
 
 	sendFail:
+		fails++
+		if resetFail {
+			fails = 0
+		}
+		if s.maxAttempts > 0 && fails == s.maxAttempts {
+			// max number of attempts reached
+			break
+		}
+
 		logp.Info("send fail")
 		backoff := time.Duration(int64(s.waitRetry) * (1 << backoffCount))
 		if backoff > s.maxWaitRetry {
@@ -101,39 +146,6 @@ func (s *SingleConnectionMode) PublishEvents(
 		}
 		logp.Info("backoff retry: %v", backoff)
 		time.Sleep(backoff)
-		fails++
-	}
-
-	outputs.SignalFailed(signaler, err)
-	return nil
-}
-
-// PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
-func (s *SingleConnectionMode) PublishEvent(
-	signaler outputs.Signaler,
-	event common.MapStr,
-) error {
-	fails := 0
-
-	var err error
-
-	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
-		if err = s.connect(); err != nil {
-			logp.Info("Connecting error publishing event (retrying): %s", err)
-
-			fails++
-			time.Sleep(s.waitRetry)
-			continue
-		}
-		if err := s.conn.PublishEvent(event); err != nil {
-			logp.Info("Error publishing event (retrying): %s", err)
-
-			fails++
-			continue
-		}
-
-		outputs.SignalCompleted(signaler)
-		return nil
 	}
 
 	outputs.SignalFailed(signaler, err)
