@@ -27,9 +27,10 @@ All notable changes to this project will be documented in this file based on the
 ## [1.0.0-beta4](https://github.com/elastic/libbeat/compare/1.0.0-beta3...1.0.0-beta4) 2015-10-21
 
 ### Backward Compatibility Breaks
-- renamed http module config file option 'strip_authorization' to 'redact_authorization'
-- save_topology is set to false by default
-- rename elasticsearch index to [packetbeat-]YYYY.MM.DD
+- Renamed http module config file option 'strip_authorization' to 'redact_authorization'
+- Save_topology is set to false by default
+- Rename elasticsearch index to [packetbeat-]YYYY.MM.DD
+- Rename timestamp field with @timestamp #343
 
 ### Bugfixes
 - Support for lower-case header names when redacting http authorization headers
