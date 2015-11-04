@@ -1,8 +1,11 @@
 package main
 
 import (
+	"os"
+
 	filebeat "github.com/elastic/filebeat/beat"
 	"github.com/elastic/libbeat/beat"
+	"github.com/elastic/libbeat/logp"
 )
 
 var Version = "1.0.0-rc1"
@@ -34,7 +37,11 @@ func main() {
 	b.LoadConfig()
 
 	// Configures beat
-	fb.Config(b)
+	err := fb.Config(b)
+	if err != nil {
+		logp.Critical("Config error: %v", err)
+		os.Exit(1)
+	}
 
 	// Run beat. This calls first beater.Setup,
 	// then beater.Run and beater.Cleanup in the end
