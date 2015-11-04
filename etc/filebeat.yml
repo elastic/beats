@@ -171,8 +171,8 @@ output:
     #max_retries: 3
 
     # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-    # The default is 10000.
-    #bulk_max_size: 10000
+    # The default is 50.
+    #bulk_max_size: 50
 
     # The number of seconds to wait for new events between two bulk API index requests.
     # If `bulk_max_size` is reached before this interval expires, addition bulk index
@@ -291,13 +291,30 @@ shipper:
 ############################# Logging #########################################
 
 #logging:
-#  selectors: []
-#
-#  # Rotator config
-#  files:
-#    path:
-#    name:
-#    rotateEveryBytes:
-#    keepFiles:
-#  to_syslog: false
-#  to_files: false
+  # Send all logging output to syslog. On Windows default is false, otherwise
+  # default is true.
+  #to_syslog: true
+
+  # Write all logging output to files. Beats automatically rotate files if configurable
+  # limit is reached.
+  #to_files: false
+
+  # Enable debug output for selected components.
+  #selectors: []
+
+  # Set log level
+  #level: error
+
+  #files:
+    # The directory where the log files will written to.
+    #path: /var/log/mybeat
+
+    # The name of the files where the logs are written to.
+    #name: mybeat
+
+    # Configure log file size limit. If limit is reached, log file will be
+    # automatically rotated
+    #rotateeverybytes: 10485760 # = 10MB
+
+    # Number of rotated log files to keep. Oldest files will be deleted first.
+    #keepfiles: 7
