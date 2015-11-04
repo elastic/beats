@@ -42,7 +42,7 @@ filebeat:
       # Paths that should be crawled and fetched. Glob based paths.
       # For each file found under this path, a harvester is started.
       paths:
-        - /var/log/*.log
+        - "/var/log/*.log"
       # - c:\programdata\elasticsearch\logs\*
 
       # Type of the files. Based on this the way the file is read is decided.
