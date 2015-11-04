@@ -51,6 +51,13 @@ func (f elasticsearchOutputPlugin) NewOutput(
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
+
+	// configure bulk size in config in case it is not set
+	if config.BulkMaxSize == nil {
+		bulkSize := defaultBulkSize
+		config.BulkMaxSize = &bulkSize
+	}
+
 	output := &elasticsearchOutput{}
 	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
@@ -67,12 +74,6 @@ func (out *elasticsearchOutput) init(
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
-	}
-
-	// configure bulk size in config in case it is not set
-	if config.BulkMaxSize == nil {
-		bulkSize := defaultBulkSize
-		config.BulkMaxSize = &bulkSize
 	}
 
 	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
