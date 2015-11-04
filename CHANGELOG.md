@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file based on the
 - Use http as the default scheme in the elasticsearch hosts #253
 - Respect max bulk size if bulk publisher (collector) is disabled or sync flag is set.
 - Always evaluate status code from Elasticsearch responses when indexing events. #192
+- Use bulk_max_size configuration option instead of bulk_size. #256
 
 ### Added
 - Add Console output plugin. #218
