@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/libbeat/outputs/mode"
 )
 
 type Client struct {
@@ -64,44 +65,129 @@ func (client *Client) Clone() *Client {
 
 func (client *Client) PublishEvents(
 	events []common.MapStr,
-) (n int, err error) {
+) ([]common.MapStr, error) {
 	if !client.connected {
-		return 0, ErrNotConnected
+		return events, ErrNotConnected
 	}
 
+	// new request to store all events into
 	request, err := client.startBulkRequest("", "", nil)
 	if err != nil {
-		logp.Err(
-			"Failed to perform many index operations in a single API call: %s",
-			err)
-		return 0, err
+		logp.Err("Failed to perform any bulk index operations: %s", err)
+		return events, err
 	}
 
+	// encode events into bulk request buffer, dropping failed elements from
+	// events slice
+	events = bulkEncodePublishRequest(request, client.index, events)
+	if len(events) == 0 {
+		return nil, nil
+	}
+
+	// send bulk request
+	_, res, err := request.Flush()
+	if err != nil {
+		logp.Err("Failed to perform any bulk index operations: %s", err)
+		return events, err
+	}
+
+	// check response for transient errors
+	events = bulkCollectPublishFails(res, events)
+	if len(events) > 0 {
+		return events, mode.ErrTempBulkFailure
+	}
+
+	return nil, nil
+}
+
+// fillBulkRequest encodes all bulk requests and returns slice of events
+// successfully added to bulk request.
+func bulkEncodePublishRequest(
+	requ *bulkRequest,
+	index string,
+	events []common.MapStr,
+) []common.MapStr {
+	okEvents := events[:0]
 	for _, event := range events {
-		ts := time.Time(event["@timestamp"].(common.Time))
-		index := fmt.Sprintf("%s-%d.%02d.%02d",
-			client.index, ts.Year(), ts.Month(), ts.Day())
-		meta := bulkMeta{
-			Index: bulkMetaIndex{
-				Index:   index,
-				DocType: event["type"].(string),
-			},
-		}
-		err := request.Send(meta, event)
+		meta := eventBulkMeta(index, event)
+		err := requ.Send(meta, event)
 		if err != nil {
 			logp.Err("Failed to encode event: %s", err)
+			continue
 		}
+
+		okEvents = append(okEvents, event)
+	}
+	return okEvents
+}
+
+func eventBulkMeta(index string, event common.MapStr) bulkMeta {
+	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
+	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
+		ts.Year(), ts.Month(), ts.Day())
+	meta := bulkMeta{
+		Index: bulkMetaIndex{
+			Index:   index,
+			DocType: event["type"].(string),
+		},
+	}
+	return meta
+}
+
+// bulkCollectPublishFails checks per item errors returning all events
+// to be tried again due to error code returned for that items. If indexing an
+// event failed due to some error in the event itself (e.g. does not respect mapping),
+// the event will be dropped.
+func bulkCollectPublishFails(
+	res *BulkResult,
+	events []common.MapStr,
+) []common.MapStr {
+	failed := events[:0]
+	for i, rawItem := range res.Items {
+		status, msg, err := itemStatus(rawItem)
+		if err != nil {
+			logp.Info("Failed to parse bulk reponse for item (%i): %v", i, err)
+			// add index if response parse error as we can not determine success/fail
+			failed = append(failed, events[i])
+			continue
+		}
+
+		if status < 300 {
+			continue // ok value
+		}
+
+		if status < 500 && status != 429 {
+			// hard failure, don't collect
+			logp.Warn("Can not index event (status=%v): %v", status, msg)
+			continue
+		}
+
+		debug("Failed to insert data(%v): %v", i, events[i])
+		logp.Info("Bulk item insert failed (i=%v, status=%v): %v", i, status, msg)
+		failed = append(failed, events[i])
+	}
+	return failed
+}
+
+func itemStatus(m json.RawMessage) (int, string, error) {
+	var item map[string]struct {
+		Status int    `json:"status"`
+		Error  string `json:"error"`
 	}
 
-	_, err = request.Flush()
+	err := json.Unmarshal(m, &item)
 	if err != nil {
-		logp.Err(
-			"Failed to perform many index operations in a single API call; %s",
-			err)
-		return 0, err
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, "", err
 	}
 
-	return len(events), nil
+	for _, r := range item {
+		return r.Status, r.Error, nil
+	}
+
+	err = ErrResponseRead
+	logp.Err("%v", err)
+	return 0, "", err
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
@@ -115,16 +201,30 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 
 	// insert the events one by one
-	_, err := client.Index(index, event["type"].(string), "", nil, event)
+	status, _, err := client.Index(index, event["type"].(string), "", nil, event)
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
+		if err == ErrJSONEncodeFailed {
+			// don't retry unencodable values
+			return nil
+		}
 	}
+	switch {
+	case status == 0: // event was not send yet
+		return nil
+	case status >= 500 || status == 429: // server error, retry
+		return err
+	case status >= 300 && status < 500:
+		// won't be able to index event in Elasticsearch => don't retry
+		return nil
+	}
+
 	return nil
 }
 
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
-	conn.connected, err = conn.Ping()
+	conn.connected, err = conn.Ping(timeout)
 	if err != nil {
 		return err
 	}
@@ -134,8 +234,8 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	return nil
 }
 
-func (conn *Connection) Ping() (bool, error) {
-	conn.http.Timeout = defaultEsOpenTimeout
+func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
+	conn.http.Timeout = timeout
 	resp, err := conn.http.Head(conn.URL)
 	if err != nil {
 		return false, err
@@ -159,7 +259,7 @@ func (conn *Connection) request(
 	method, path string,
 	params map[string]string,
 	body interface{},
-) ([]byte, error) {
+) (int, []byte, error) {
 	url := makeURL(conn.URL, path, params)
 	logp.Debug("elasticsearch", "%s %s %s", method, url, body)
 
@@ -168,7 +268,7 @@ func (conn *Connection) request(
 		var err error
 		obj, err = json.Marshal(body)
 		if err != nil {
-			return nil, ErrJSONEncodeFailed
+			return 0, nil, ErrJSONEncodeFailed
 		}
 	}
 
@@ -178,11 +278,11 @@ func (conn *Connection) request(
 func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
-) ([]byte, error) {
+) (int, []byte, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		logp.Warn("Failed to create request", err)
-		return nil, err
+		return 0, nil, err
 	}
 
 	req.Header.Add("Accept", "application/json")
@@ -193,22 +293,22 @@ func (conn *Connection) execRequest(
 	resp, err := conn.http.Do(req)
 	if err != nil {
 		conn.connected = false
-		return nil, err
+		return 0, nil, err
 	}
 	defer closing(resp.Body)
 
 	status := resp.StatusCode
 	if status >= 300 {
 		conn.connected = false
-		return nil, fmt.Errorf("%v", resp.Status)
+		return status, nil, fmt.Errorf("%v", resp.Status)
 	}
 
 	obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		conn.connected = false
-		return nil, err
+		return status, nil, err
 	}
-	return obj, nil
+	return status, obj, nil
 }
 
 func closing(c io.Closer) {

@@ -83,84 +83,90 @@ func readCountResult(obj []byte) (*CountResults, error) {
 // searchable. In case id is empty, a new id is created over a HTTP POST request.
 // Otherwise, a HTTP PUT request is issued.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html
-func (es *Client) Index(
+func (es *Connection) Index(
 	index, docType, id string,
 	params map[string]string,
 	body interface{},
-) (*QueryResult, error) {
+) (int, *QueryResult, error) {
 	method := "PUT"
 	if id == "" {
 		method = "POST"
 	}
 
-	resp, err := es.apiCall(method, index, docType, id, params, body)
+	status, resp, err := es.apiCall(method, index, docType, id, params, body)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readQueryResult(resp)
+	result, err := readQueryResult(resp)
+	return status, result, err
 }
 
 // Refresh an index. Call this after doing inserts or creating/deleting
 // indexes in unit tests.
-func (es *Client) Refresh(index string) (*QueryResult, error) {
-	resp, err := es.apiCall("POST", index, "", "_refresh", nil, nil)
+func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
+	status, resp, err := es.apiCall("POST", index, "", "_refresh", nil, nil)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readQueryResult(resp)
+	result, err := readQueryResult(resp)
+	return status, result, err
 }
 
 // CreateIndex creates a new index, optionally with settings and mappings passed in
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
 //
-func (es *Client) CreateIndex(index string, body interface{}) (*QueryResult, error) {
-	resp, err := es.apiCall("PUT", index, "", "", nil, body)
+func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
+	status, resp, err := es.apiCall("PUT", index, "", "", nil, body)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readQueryResult(resp)
+	result, err := readQueryResult(resp)
+	return status, result, err
 }
 
 // Delete deletes a typed JSON document from a specific index based on its id.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
-func (es *Client) Delete(index string, docType string, id string, params map[string]string) (*QueryResult, error) {
-	resp, err := es.apiCall("DELETE", index, docType, id, params, nil)
+func (es *Connection) Delete(index string, docType string, id string, params map[string]string) (int, *QueryResult, error) {
+	status, resp, err := es.apiCall("DELETE", index, docType, id, params, nil)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readQueryResult(resp)
+	result, err := readQueryResult(resp)
+	return status, result, err
 }
 
 // A search request can be executed purely using a URI by providing request parameters.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
-func (es *Client) SearchURI(index string, docType string, params map[string]string) (*SearchResults, error) {
-	resp, err := es.apiCall("GET", index, docType, "_search", params, nil)
+func (es *Connection) SearchURI(index string, docType string, params map[string]string) (int, *SearchResults, error) {
+	status, resp, err := es.apiCall("GET", index, docType, "_search", params, nil)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readSearchResult(resp)
+	result, err := readSearchResult(resp)
+	return status, result, err
 }
 
-func (es *Client) CountSearchURI(
+func (es *Connection) CountSearchURI(
 	index string, docType string,
 	params map[string]string,
-) (*CountResults, error) {
-	resp, err := es.apiCall("GET", index, docType, "_count", params, nil)
+) (int, *CountResults, error) {
+	status, resp, err := es.apiCall("GET", index, docType, "_count", params, nil)
 	if err != nil {
-		return nil, err
+		return status, nil, err
 	}
-	return readCountResult(resp)
+	result, err := readCountResult(resp)
+	return status, result, err
 }
 
-func (es *Client) apiCall(
+func (es *Connection) apiCall(
 	method, index, docType, id string,
 	params map[string]string,
 	body interface{},
-) ([]byte, error) {
+) (int, []byte, error) {
 	path, err := makePath(index, docType, id)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 	return es.request(method, path, params, body)
 }
