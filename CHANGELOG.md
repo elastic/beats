@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Packetbeat will now exit if a configuration error is detected. #357
 
 ### Added
 
