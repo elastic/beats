@@ -29,6 +29,8 @@ All documentation about Filebeat can be found here.
 ### Improvements
 - All Godeps dependencies were updated to master on 2015-10-21 [#122]
 - Set default value for ignore_older config to 10 minutes. #164
+- Added the fields_under_root setting to optionally store the custom fields top
+level in the output dictionary. #188
 
 ### Deprecated
 

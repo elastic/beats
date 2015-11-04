@@ -36,6 +36,12 @@ filebeat:
       #  level: debug
       #  review: 1
 
+      # Set to true to store the additional fields as top level fields instead
+      # of under the "fields" sub-dictionary. In case of name conflicts with the
+      # fields added by Filebeat itself, the custom fields overwrite the default
+      # fields.
+      #fields_under_root: false
+
       # Ignore files which were modified more then the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
       #ignore_older: 10m

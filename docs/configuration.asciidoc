@@ -59,6 +59,12 @@ filebeat:
       #  level: debug
       #  review: 1
 
+      # Set to true to store the additional fields as top level fields instead
+      # of under the "fields" sub-dictionary. In case of name conflicts with the
+      # fields added by Filebeat itself, the custom fields overwrite the default
+      # fields.
+      #fields_under_root: false
+
       # Ignore files which were modified more then the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
       #ignore_older:
@@ -99,7 +105,7 @@ It has two options:
 The type value will be put into each event published to Logstash and
 Elasticsearch in the 'input_type' field.
 
-
+[[configuration-fields]]
 ===== fields
 
 Add optionally couple of fields to be included to the exported fields by the currently configured
@@ -113,6 +119,12 @@ fields:
     review: 1
 
 -------------------------------------------------------------------------------------
+
+===== fields_under_root
+
+If set to true, the custom <<configuration-fields>> are stored as top level into the output
+document instead of being grouped under a `fields` sub-dictionary. In case of conflicts with
+the fields names added by Filebeat, the custom fields overwrite the existing fields.
 
 ===== ignore_older
 

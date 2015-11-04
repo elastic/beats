@@ -150,7 +150,7 @@ func (h *Harvester) Harvest() {
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
 		}
-
+		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
 		h.Offset += int64(bytesRead) // Update offset
 		h.SpoolerChan <- event       // ship the new event downstream
 	}
