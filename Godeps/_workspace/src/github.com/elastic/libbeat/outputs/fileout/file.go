@@ -42,7 +42,7 @@ func (out *fileOutput) init(beat string, config *outputs.MothershipConfig, topol
 	// disable bulk support
 	configDisableInt := -1
 	config.Flush_interval = &configDisableInt
-	config.Bulk_size = &configDisableInt
+	config.BulkMaxSize = &configDisableInt
 
 	rotateeverybytes := uint64(config.Rotate_every_kb) * 1024
 	if rotateeverybytes == 0 {
