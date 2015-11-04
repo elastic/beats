@@ -34,7 +34,7 @@ deb:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.0.0/elasticsearch-{ES-version}.deb
 sudo dpkg -i elasticsearch-{ES-version}.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
@@ -44,8 +44,8 @@ rpm:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.noarch.rpm
-sudo rpm -i elasticsearch-{ES-version}.noarch.rpm
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/2.0.0/elasticsearch-{ES-version}.rpm
+sudo rpm -i elasticsearch-{ES-version}.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ mac:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.0.0/elasticsearch-{ES-version}.zip
 unzip elasticsearch-{ES-version}.zip
 cd elasticsearch-{ES-version}
 ./bin/elasticsearch
@@ -117,7 +117,6 @@ deb:
 sudo apt-get install openjdk-7-jre
 curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
 sudo dpkg -i logstash-{LS-version}-1_all.deb
-sudo /etc/init.d/logstash start
 ----------------------------------------------------------------------
 
 rpm:
@@ -126,8 +125,7 @@ rpm:
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
 curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}-1.noarch.rpm
-sudo rpm -i lgostash-{LS-version}-1.noarch.rpm
-sudo service logstash start
+sudo rpm -i logstash-{LS-version}-1.noarch.rpm
 ----------------------------------------------------------------------
 
 mac:
@@ -137,8 +135,6 @@ mac:
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
 curl -L -O https://download.elastic.co/logstash/logstash/logstash-{LS-version}.zip
 unzip logstash-{LS-version}.zip
-cd logstash-{LS-version}
-./bin/logstash
 ----------------------------------------------------------------------
 
 You can learn more about installing, configuring, and running Logstash
@@ -202,9 +198,7 @@ input {
 
 output {
   elasticsearch {
-    protocol => "http"
-    host => "localhost"
-    port => "9200"
+    hosts => "localhost:9200"
     sniffing => true
     manage_template => false
     index => "%{[@metadata][index]}"
@@ -217,8 +211,25 @@ Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities 
 provided by Logstash.
 
-Now you can start logstash, passing in the path to your configuration file. 
-For example:
+==== Running Logstash
+
+Now you can start Logstash. Use the command that works with your system:
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo /etc/init.d/logstash start
+----------------------------------------------------------------------
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo service logstash start
+----------------------------------------------------------------------
+
+mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
