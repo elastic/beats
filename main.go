@@ -5,7 +5,7 @@ import (
 	"github.com/elastic/libbeat/beat"
 )
 
-var Version = "1.0.0-beta4"
+var Version = "1.0.0-rc1"
 var Name = "filebeat"
 
 var GlobalBeat *beat.Beat

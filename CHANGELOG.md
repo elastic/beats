@@ -3,12 +3,20 @@ All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
 
-## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0-beta4...HEAD)
-
-This is the first filebeat release. As of this no changelog is provided for the first release.
-All documentation about Filebeat can be found here.
+## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc1...HEAD)
 
 ### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1)
+
+### Backward Compatibility Breaks
+- Rename the timestamp field with @timestamp #168
 - Rename tail_on_rotate prospector config to tail_files
 
 ### Bugfixes
@@ -22,7 +30,6 @@ All documentation about Filebeat can be found here.
 - Fix issue that files were not crawled anymore when encoding was set to something other then plain. #182
 
 ### Added
-- Rename the timestamp field with @timestamp #168
 - Introduction of backoff, backoff_factor, max_backoff, partial_line_waiting, force_close_windows_files
   config variables to make crawling more configurable.
 
