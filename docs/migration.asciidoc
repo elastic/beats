@@ -109,7 +109,7 @@ filebeat:
     -
       paths:
         - /var/log/messages
-        - /var/log/*.log
+        - "/var/log/*.log"
     -
       paths:
         - "-"
@@ -117,7 +117,7 @@ filebeat:
       document_type: stdin <1>
     -
       paths:
-        - /var/log/apache/httpd-*.log
+        - "/var/log/apache/httpd-*.log"
       document_type: apache
 -------------------------------------------------------------------------------------
 
@@ -187,6 +187,7 @@ output:
     tls: <2>
       # The path to your SSL client certificate.
       certificate: ./logstash-forwarder.crt
+
       # The path to your SSL client certificate key.
       certificate_key: ./logstash-forwarder.key
 
@@ -263,7 +264,7 @@ filebeat:
   prospectors:
     -
       paths:
-        - /var/log/*.log
+        - "/var/log/*.log"
       fields:
         type: syslog
 output:
