@@ -1,25 +1,21 @@
 [[packetbeat-getting-started]]
-== Getting started
+== Getting Started
 
 The best way to understand the value of a network packet analytics system like
 Packetbeat is to try it on your own traffic. 
 
-=== Steps:
+To get started with your own Packetbeat setup, install and configure these related products:
 
-Get started with your own Packetbeat setup by:
+ * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
 
- * installing Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * installing Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * install optionally Logstash. {libbeat}/getting-started.html#logstash-installation[More details]
-
-After you have Elasticsearch, Kibana and Logstash installed, you can start <<packetbeat-installation>>.
+After you have installed these products, you can start <<packetbeat-installation>>.
 
 [[packetbeat-installation]]
 === Installing Packetbeat
 
-Now that you have Elasticsearch running, I'm sure you are eager to put some
-data in it. For this, install the Packetbeat shippers on your application
-servers:
+To download and install Packetbeat shippers on your application servers, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
 
 deb:
 
@@ -48,20 +44,25 @@ curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-dar
 tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
-NOTE: We also provide 32bits images. You can get them from our
+NOTE: We also provide 32-bit images that you can get from our 
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
 
-=== Configure Packetbeat
+=== Configuring Packetbeat
 
-Before starting the shipper, edit the configuration file. For rpm and deb the
-configuration file is `/etc/packetbeat/packetbeat.yml`. For mac the
-configuration file is found in the archive you just downloaded.
+NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
+configure Packetbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
-First, select the network interface from which to capture the traffic. On
+Before starting the shipper, edit the configuration file. For rpm and deb, you'll 
+find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac, look in 
+the archive that you just downloaded.
+
+To configure Packetbeat:
+
+. Select the network interface from which to capture the traffic. On
 Linux, Packetbeat supports capturing all messages sent or received by the
-server on which it is installed. For this, use `any` as the device:
-
+server on which Packetbeat is installed. For this, use `any` as the device:
++
 [source,yaml]
 ----------------------------------------------------------------------
 interfaces:
@@ -69,15 +70,15 @@ interfaces:
   # keyword to sniff on all connected interfaces.
   device: any
 ----------------------------------------------------------------------
-
++
 Note that on OS X, capturing from the `any` device doesn't work. You would
 typically use either `lo0` or `en0` depending on which traffic you want to
 capture.
 
-In the next section, configure the ports on which Packetbeat can find each
+. In the protocols section, configure the ports on which Packetbeat can find each
 protocol. If you use any non-standard ports, add them here. Otherwise, the
 default values should do just fine.
-
++
 [source,yaml]
 ----------------------------------------------------------------------
 protocols:
@@ -102,10 +103,10 @@ protocols:
   thrift:
     ports: [9090]
 ----------------------------------------------------------------------
-
-Set the IP address and port where the shipper can find the Elasticsearch
++
+. Set the IP address and port where the shipper can find the Elasticsearch
 installation:
-
++
 [source,yaml]
 ----------------------------------------------------------------------
 output:
@@ -127,11 +128,11 @@ output:
 
 
 [[packetbeat-template]]
-=== Load index template in Elasticsearch
+=== Loading the Index Template in Elasticsearch
 
 Before starting Packetbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which is used to let Elasticsearch know which fields should be analyzed
+template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
 The recommended template file is installed by the Packetbeat packages. Load it with the
@@ -152,11 +153,11 @@ cd packetbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening on.
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 === Running Packetbeat
 
-You are now ready to start Packetbeat:
+Run Packetbeat by issuing the following command:
 
 deb:
 
@@ -187,31 +188,31 @@ that it works by creating a simple HTTP request. For example:
 curl http://www.elastic.co/ > /dev/null
 ----------------------------------------------------------------------
 
-Now check that the data is present in Elasticsearch with the following command:
+Now verify that the data is present in Elasticsearch by issuing the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
 ----------------------------------------------------------------------
 
-Make sure to replace `localhost:9200` with the address of your Elasticsearch
-instance. It should return data about the HTTP transaction you just created.
+Make sure that you replace `localhost:9200` with the address of your Elasticsearch
+instance. The command should return data about the HTTP transaction you just created.
 
-=== Sample dashboards
+=== Loading Sample Kibana Dashboards
 
-In order to make it as easy as possible to get application performance insights
-from packet data, we provide a few sample Kibana dashboards. The
+To make it easier for you to get application performance insights
+from packet data, we have created a few sample dashboards. The
 dashboards are maintained in this
 https://github.com/elastic/beats-dashboards[GitHub repository], which also
-includes instructions for loading them.
+includes instructions for loading the dashboards.
 
-Load automatically all the sample dashboards in Kibana by following the {libbeat}/getting-started.html#load-kibana-dashboards[steps].
+You can load all of the sample dashboards automatically by following {libbeat}/getting-started.html#load-kibana-dashboards[these steps].
 
 
 image:./images/packetbeat-statistics.png[Packetbeat statistics]
 
-These dashboards are provided as examples, we recommend that you
+These dashboards are provided as examples. We recommend that you
 http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
-to your needs.
+to meet your needs.
 
 Enjoy!
