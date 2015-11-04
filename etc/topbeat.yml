@@ -22,16 +22,19 @@ output:
     # Set to true to enable elasticsearch output
     enabled: true
 
-    # A list of Elasticsearch hosts. If the connection to the first host fails, it connects to the second one.
-    # A host can be defined as an IP:PORT or an URL with the format: scheme://IP:PORT/path. In case you specify and
-    # additional path, the scheme is required. The defaults are ( port is 9200, path is '/', scheme is http).
-    # In case of an IPv6 address, please use http://[2001:db8::1]:9200.
-    hosts: ["http://localhost:9200"]
+    # Array of hosts to connect to.
+    # Scheme and port can be left out and will be set to the default (http and 9200)
+    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+    hosts: ["localhost:9200"]
 
     # Optional protocol and basic auth credentials. These are deprectad
     #protocol: "https"
     #username: "admin"
     #password: "s3cr3t"
+
+    # Number of workers per Elasticsearch host.
+    #worker: 1
 
     # Optional index name. The default is "topbeat" and generates
     # [topbeat-]YYYY.MM.DD keys.
@@ -49,14 +52,13 @@ output:
     # The default is 50.
     #bulk_max_size: 50
 
+    # Configure http request timeout before failing an request to Elasticsearch.
+    #timeout: 90
+
     # The number of seconds to wait for new events between two bulk API index requests.
     # If `bulk_max_size` is reached before this interval expires, addition bulk index
     # requests are made.
     #flush_interval
-
-    #The time to live in seconds for the topology information that is stored in
-    #Elasticsearch. The default is 15 seconds.
-    #topology_expire:
 
     # tls configuration
     #tls:
@@ -85,6 +87,12 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
+
 
   ### Logstash as output
   #logstash:
@@ -94,13 +102,16 @@ output:
     # The Logstash hosts
     #hosts: ["localhost:5044", "logstash:5045"]
 
+    # Number of workers per Logstash host.
+    #worker: 1
+
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
     # Optional index name. The default index name is topbeat
     #index: topbeat
 
-    # Optional TLS. The default is on
+    # Optional TLS. By default is off.
     #tls:
       #disabled: true
 
@@ -125,6 +136,12 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
+
 
   ### File as output
   #file:
@@ -147,6 +164,14 @@ output:
     # is 7 files.
     #number_of_files: 7
 
+
+  ### Console output
+  # console:
+    # Enabling console output
+    #enabled: false
+
+    # pretty print json event
+    #pretty: false
 
 ############################# Shipper #########################################
 
