@@ -66,7 +66,7 @@ func (p *preprocessor) onMessage(m message) {
 	// return if no event is left
 	if len(ignore) == len(events) {
 		debug("no event left, complete send")
-		outputs.SignalCompleted(m.signal)
+		outputs.SignalCompleted(m.context.signal)
 		return
 	}
 
@@ -84,15 +84,15 @@ func (p *preprocessor) onMessage(m message) {
 
 	if publisher.disabled {
 		debug("publisher disabled")
-		outputs.SignalCompleted(m.signal)
+		outputs.SignalCompleted(m.context.signal)
 		return
 	}
 
 	debug("preprocessor forward")
 	if single {
-		p.handler.onMessage(message{signal: m.signal, event: events[0]})
+		p.handler.onMessage(message{context: m.context, event: events[0]})
 	} else {
-		p.handler.onMessage(message{signal: m.signal, events: events})
+		p.handler.onMessage(message{context: m.context, events: events})
 	}
 }
 

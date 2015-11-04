@@ -47,8 +47,8 @@ func (p *asyncPublisher) onMessage(m message) {
 	// be implemented in the furute.
 	// If m.signal is nil, NewSplitSignaler will return nil -> signaler will
 	// only set if client did send one
-	if m.signal != nil && len(p.outputs) > 1 {
-		m.signal = outputs.NewSplitSignaler(m.signal, len(p.outputs))
+	if m.context.signal != nil && len(p.outputs) > 1 {
+		m.context.signal = outputs.NewSplitSignaler(m.context.signal, len(p.outputs))
 	}
 	for _, o := range p.outputs {
 		o.send(m)
@@ -59,12 +59,12 @@ func (p *asyncPublisher) client() eventPublisher {
 	return asyncClient(p.send)
 }
 
-func (c asyncClient) PublishEvent(event common.MapStr) bool {
-	return c.send(message{event: event})
+func (c asyncClient) PublishEvent(ctx *context, event common.MapStr) bool {
+	return c.send(message{context: *ctx, event: event})
 }
 
-func (c asyncClient) PublishEvents(events []common.MapStr) bool {
-	return c.send(message{events: events})
+func (c asyncClient) PublishEvents(ctx *context, events []common.MapStr) bool {
+	return c.send(message{context: *ctx, events: events})
 }
 
 func (c asyncClient) send(m message) bool {
@@ -82,12 +82,12 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 	}
 
 	maxBulkSize := defaultBulkSize
-	if config.Bulk_size != nil {
-		maxBulkSize = *config.Bulk_size
+	if config.BulkMaxSize != nil {
+		maxBulkSize = *config.BulkMaxSize
 	}
 
 	// batching disabled
-	if flushInterval < 0 || maxBulkSize < 0 {
+	if flushInterval <= 0 || maxBulkSize <= 0 {
 		return worker
 	}
 

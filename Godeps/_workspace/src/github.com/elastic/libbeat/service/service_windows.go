@@ -6,6 +6,7 @@ import (
 
 	"github.com/elastic/libbeat/logp"
 	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/debug"
 )
 
 type beatService struct{}
@@ -40,7 +41,18 @@ loop:
 // function is called when the Stop/Shutdown request is
 // received.
 func ProcessWindowsControlEvents(stopCallback func()) {
-	err := svc.Run(os.Args[0], &beatService{})
+	isInteractive, err := svc.IsAnInteractiveSession()
+	if err != nil {
+		logp.Err("IsAnInteractiveSession: %v", err)
+		return
+	}
+	logp.Debug("service", "Windows is interactive: %v", isInteractive)
+
+	run := svc.Run
+	if isInteractive {
+		run = debug.Run
+	}
+	err = run(os.Args[0], &beatService{})
 	if err != nil {
 		logp.Err("Error: %v", err)
 	} else {

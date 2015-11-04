@@ -27,8 +27,18 @@ var debug = logp.MakeDebug("publish")
 
 // EventPublisher provides the interface for beats to publish events.
 type eventPublisher interface {
-	PublishEvent(event common.MapStr) bool
-	PublishEvents(events []common.MapStr) bool
+	PublishEvent(ctx *context, event common.MapStr) bool
+	PublishEvents(ctx *context, events []common.MapStr) bool
+}
+
+type context struct {
+	publishOptions
+	signal outputs.Signaler
+}
+
+type publishOptions struct {
+	confirm bool
+	sync    bool
 }
 
 type TransactionalEventPublisher interface {
@@ -183,7 +193,7 @@ func (publisher *PublisherType) Init(
 			output := plugin.Output
 			config := plugin.Config
 
-			debug("create output worker: %p, %p", config.Flush_interval, config.Bulk_size)
+			debug("create output worker: %p, %p", config.Flush_interval, config.BulkMaxSize)
 
 			outputers = append(outputers,
 				newOutputWorker(config, output, &publisher.wsOutput, 1000))
