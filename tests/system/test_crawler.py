@@ -201,15 +201,17 @@ class Test(TestCase):
 
         assert len(output) == 5 + 6
 
-    @unittest.skipIf(os.name == "nt", "Watching log file currently not " +
-                                      "supported on Windows")
     def test_file_disappear_appear(self):
         """
         Checks that filebeat keeps running in case a log files is deleted
+
+        On Windows this tests in addition if the file was closed as it couldn't be found anymore
+        If Windows does not close the file, a new one can't be created.
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            force_close_windows_files="true"
         )
         os.mkdir(self.working_dir + "/log/")
 

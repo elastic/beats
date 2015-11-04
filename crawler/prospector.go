@@ -31,47 +31,97 @@ type ProspectorFileStat struct {
 // Init sets up default config for prospector
 func (p *Prospector) Init() error {
 
-	// Setup Ignore Older
-	if p.ProspectorConfig.IgnoreOlder != "" {
-		var err error
-		p.ProspectorConfig.IgnoreOlderDuration, err = time.ParseDuration(p.ProspectorConfig.IgnoreOlder)
-		if err != nil {
-			logp.Warn("Failed to parse ignore_older value '%s'. Error was: %s\n", p.ProspectorConfig.IgnoreOlder)
-			return err
-		}
-	} else {
-		p.ProspectorConfig.IgnoreOlderDuration = cfg.DefaultIgnoreOlderDuration
-	}
-	logp.Debug("propsector", "Set IgnoreOlderDuration to %s", p.ProspectorConfig.IgnoreOlderDuration)
-
-	// Setup Scan Frequency
-	if p.ProspectorConfig.ScanFrequency != "" {
-		var err error
-		p.ProspectorConfig.ScanFrequencyDuration, err = time.ParseDuration(p.ProspectorConfig.ScanFrequency)
-		if err != nil {
-			logp.Warn("Failed to parse scan_frequency value '%s'. Error was: %s\n", p.ProspectorConfig.ScanFrequency, err)
-			return err
-		}
-	} else {
-		p.ProspectorConfig.ScanFrequencyDuration = cfg.DefaultScanFrequency
-	}
-	logp.Debug("propsector", "Set ScanFrequencyDuration to %s", p.ProspectorConfig.ScanFrequencyDuration)
-
-	// Setup Buffer Size
-	if p.ProspectorConfig.Harvester.BufferSize == 0 {
-		p.ProspectorConfig.Harvester.BufferSize = cfg.DefaultHarvesterBufferSize
+	err := p.setupProspectorConfig()
+	if err != nil {
+		return err
 	}
 
-	// Setup DocumentType
-	if p.ProspectorConfig.Harvester.DocumentType == "" {
-		p.ProspectorConfig.Harvester.DocumentType = cfg.DefaultDocumentType
+	err = p.setupHarvesterConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+// Setup Prospector Config
+func (p *Prospector) setupProspectorConfig() error {
+	var err error
+	config := &p.ProspectorConfig
+
+	config.IgnoreOlderDuration, err = getConfigDuration(config.IgnoreOlder, cfg.DefaultIgnoreOlderDuration, "ignore_older")
+	if err != nil {
+		return err
+	}
+
+	config.ScanFrequencyDuration, err = getConfigDuration(config.ScanFrequency, cfg.DefaultScanFrequency, "scan_frequency")
+	if err != nil {
+		return err
 	}
 
 	// Init File Stat list
 	p.prospectorList = make(map[string]ProspectorFileStat)
 
 	return nil
+}
 
+// Setup Harvester Config
+func (p *Prospector) setupHarvesterConfig() error {
+
+	var err error
+	config := &p.ProspectorConfig.Harvester
+
+	// Setup Buffer Size
+	if config.BufferSize == 0 {
+		config.BufferSize = cfg.DefaultHarvesterBufferSize
+	}
+
+	// Setup DocumentType
+	if config.DocumentType == "" {
+		config.DocumentType = cfg.DefaultDocumentType
+	}
+
+	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
+	if err != nil {
+		return err
+	}
+
+	// Setup DocumentType
+	if config.BackoffFactor == 0 {
+		config.BackoffFactor = cfg.DefaultBackoffFactor
+	}
+
+	config.MaxBackoffDuration, err = getConfigDuration(config.MaxBackoff, cfg.DefaultMaxBackoff, "max_backoff")
+	if err != nil {
+		return err
+	}
+
+	config.PartialLineWaitingDuration, err = getConfigDuration(config.PartialLineWaiting, cfg.DefaultPartialLineWaiting, "partial_line_waiting")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// getConfigDuration builds the duration based on the input string.
+// Returns error if an invalid string duration is passed
+// In case no duration is set, default duration will be used.
+func getConfigDuration(config string, duration time.Duration, name string) (time.Duration, error) {
+
+	// Setup Ignore Older
+	if config != "" {
+		var err error
+		duration, err = time.ParseDuration(config)
+		if err != nil {
+			logp.Warn("Failed to parse %s value '%s'. Error was: %s\n", name, config)
+			return 0, err
+		}
+	}
+	logp.Debug("propsector", "Set %s duration to %s", name, duration)
+
+	return duration, nil
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file

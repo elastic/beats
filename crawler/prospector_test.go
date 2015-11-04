@@ -70,6 +70,11 @@ func TestProspectorInitNotSet(t *testing.T) {
 	assert.Equal(t, config.DefaultScanFrequency, prospector.ProspectorConfig.ScanFrequencyDuration)
 	assert.Equal(t, config.DefaultHarvesterBufferSize, prospector.ProspectorConfig.Harvester.BufferSize)
 	assert.Equal(t, config.DefaultTailFiles, prospector.ProspectorConfig.Harvester.TailFiles)
+	assert.Equal(t, config.DefaultBackoff, prospector.ProspectorConfig.Harvester.BackoffDuration)
+	assert.Equal(t, config.DefaultBackoffFactor, prospector.ProspectorConfig.Harvester.BackoffFactor)
+	assert.Equal(t, config.DefaultMaxBackoff, prospector.ProspectorConfig.Harvester.MaxBackoffDuration)
+	assert.Equal(t, config.DefaultPartialLineWaiting, prospector.ProspectorConfig.Harvester.PartialLineWaitingDuration)
+	assert.Equal(t, config.DefaultForceCloseWindowsFiles, prospector.ProspectorConfig.Harvester.ForceCloseWindowsFiles)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {

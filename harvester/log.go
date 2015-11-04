@@ -3,9 +3,11 @@ package harvester
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/elastic/filebeat/config"
@@ -36,54 +38,107 @@ func NewHarvester(
 	return h, nil
 }
 
-// Log harvester reads files line by line and sends events to logstash
-// Multiline log support is required
-
+// Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
-	h.open()
-	info, e := h.file.Stat()
 
-	if e != nil {
-		panic(fmt.Sprintf("Harvest: unexpected error: %s", e.Error()))
+	err := h.open()
+
+	// Make sure file is closed as soon as harvester exits
+	defer h.file.Close()
+
+	if err != nil {
+		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		return
 	}
 
-	// File is closed as soon as harvester stops
-	defer h.file.Close()
+	info, err := h.file.Stat()
+	if err != nil {
+		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		return
+	}
 
 	// On completion, push offset so we can continue where we left off if we relaunch on the same file
 	defer func() {
 		h.FinishChan <- h.Offset
 	}()
 
-	var line uint64 = 0 // Ask registrar about the line number
+	var line uint64 = 0
 
+	// Load last offset from registrar
 	h.initOffset()
+
 	in := h.encoding(h.file)
+
 	reader := bufio.NewReaderSize(in, h.Config.BufferSize)
 	buffer := bytes.NewBuffer(nil)
+	hConfig := h.ProspectorConfig.Harvester
 
-	var readTimeout = 10 * time.Second
+	// It waits a maximum of 5 seconds for a partial line to be update
+	partialLineWaiting := hConfig.PartialLineWaitingDuration
+
+	// Current backoff when reaching EOF
+	backoff := hConfig.BackoffDuration
+
+	// Maximum backoff time. Backoff will not exceed this value
+	maxBackoff := hConfig.MaxBackoffDuration
+
+	// Factor to increase backoff every time
+	backoffFactor := time.Duration(hConfig.BackoffFactor)
+
+	// Windows setting
+	forceCloseWindowsFiles := hConfig.ForceCloseWindowsFiles
+
 	lastReadTime := time.Now()
-	for {
 
-		text, bytesread, err := h.readLine(reader, buffer, readTimeout)
+	for {
+		text, bytesRead, err := readLine(reader, buffer, partialLineWaiting)
 
 		if err != nil {
+			// End of file
+			if err == io.EOF {
+
+				// On windows, check if the file name exists (see #93)
+				if forceCloseWindowsFiles && runtime.GOOS == "windows" {
+					_, statErr := os.Stat(h.file.Name())
+					if statErr != nil {
+						logp.Err("Unexpected windows specific error reading from %s; error: %s", h.Path, statErr)
+						// Return directly on windows -> file is closing
+						return
+					}
+				}
+
+				// Wait before trying to read file which reached EOF again
+				time.Sleep(backoff)
+
+				// Increment backoff up to maxBackoff
+				if backoff < maxBackoff {
+					backoff = backoff * backoffFactor
+					if backoff > maxBackoff {
+						backoff = maxBackoff
+					}
+				}
+			}
+
+			// In case of err = io.EOF returns nil
 			err = h.handleReadlineError(lastReadTime, err)
 
 			if err != nil {
+				logp.Err("File reading error. Stopping harvester. Error: %s", err)
 				return
-			} else {
-				// EOF reached, reset encoding
-				in = h.encoding(h.file)
-				reader = bufio.NewReaderSize(in, h.Config.BufferSize)
-				continue
 			}
+
+			// EOF reached
+			// Encoding and reader are reinitialised here as other encoder stops reading. See #182
+			in = h.encoding(h.file)
+			reader.Reset(in)
+			continue
 		}
 
 		lastReadTime = time.Now()
-
+		backoff = hConfig.BackoffDuration
 		line++
+
+		// Sends text to spooler
 		event := &input.FileEvent{
 			ReadTime:     lastReadTime,
 			Source:       &h.Path,
@@ -95,9 +150,9 @@ func (h *Harvester) Harvest() {
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
 		}
-		h.Offset += int64(bytesread)
 
-		h.SpoolerChan <- event // ship the new event downstream
+		h.Offset += int64(bytesRead) // Update offset
+		h.SpoolerChan <- event       // ship the new event downstream
 	}
 }
 
@@ -128,11 +183,12 @@ func (h *Harvester) setFileOffset() {
 	}
 }
 
-func (h *Harvester) open() *os.File {
+// open does open the file given under h.Path and assigns the file handler to h.file
+func (h *Harvester) open() error {
 	// Special handling that "-" means to read from standard input
 	if h.Path == "-" {
 		h.file = os.Stdin
-		return h.file
+		return nil
 	}
 
 	for {
@@ -155,63 +211,58 @@ func (h *Harvester) open() *os.File {
 
 	// Check we are not following a rabbit hole (symlinks, etc.)
 	if !file.IsRegularFile() {
-		// TODO: This should be replaced by a normal error
-		panic(fmt.Errorf("Harvester file error"))
+		return errors.New("Given file is not a regular file.")
 	}
 
 	h.setFileOffset()
 
-	return h.file
+	return nil
 }
 
-// TODO: It seems like this function does not depend at all on harvester
-// To could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
-func (h *Harvester) readLine(reader *bufio.Reader, buffer *bytes.Buffer, eofTimeout time.Duration) (*string, int, error) {
-	// TODO: Read line should be improved in a way so it can also read multi lines or even full files when required. See "type" in config file
+// handleReadlineError handles error which are raised during reading file.
+//
+// If error is EOF, it will check for:
+// * File truncated
+// * Older then ignore_older
+// * General file error
+//
+// If none of the above cases match, no error will be returned and file is kept open
+//
+// In case of a general error, the error itself is returned
+func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
 
-	isPartial := true
-	startTime := time.Now()
+	if err == io.EOF {
+		// Refetch fileinfo to check if the file was truncated or disappeared
+		info, statErr := h.file.Stat()
 
-	for {
-		segment, err := reader.ReadBytes('\n')
-
-		if segment != nil && len(segment) > 0 {
-			if isLine(segment) {
-				isPartial = false
-			}
-
-			// TODO(sissel): if buffer exceeds a certain length, maybe report an error condition? chop it?
-			buffer.Write(segment)
+		// This could happen if the file was removed / rotate after reading and before calling the stat function
+		if statErr != nil {
+			logp.Err("Unexpected error reading from %s; error: %s", h.Path, statErr)
+			return statErr
 		}
 
-		if err != nil {
-			if err == io.EOF && isPartial {
-				time.Sleep(1 * time.Second) // TODO(sissel): Implement backoff
-
-				// Give up waiting for data after a certain amount of time.
-				// If we time out, return the error (eof)
-				if time.Since(startTime) >= eofTimeout {
-					return nil, 0, err
-				}
-				continue
-			} else {
-				logp.Err("Harvester.readLine: %s", err.Error())
-				return nil, 0, err // TODO(sissel): don't do this?
-			}
+		// Check if file was truncated
+		if info.Size() < h.Offset {
+			logp.Debug("harvester", "File was truncated as offset > size. Begin reading file from offset 0: %s", h.Path)
+			h.Offset = 0
+			h.file.Seek(h.Offset, os.SEEK_SET)
+		} else if age := time.Since(lastTimeRead); age > h.ProspectorConfig.IgnoreOlderDuration {
+			// If the file hasn't change for longer the ignore_older, harvester stops and file handle will be closed.
+			logp.Debug("harvester", "Stopping harvesting of file as older then ignore_old: ", h.Path, "Last change was: ", age)
+			return err
 		}
-
-		// If we got a full line, return the whole line without the EOL chars (CRLF or LF)
-		if !isPartial {
-			// Get the str length with the EOL chars (LF or CRLF)
-			bufferSize := buffer.Len()
-			str := new(string)
-			*str = buffer.String()[:bufferSize-lineEndingChars(segment)]
-			// Reset the buffer for the next line
-			buffer.Reset()
-			return str, bufferSize, nil
-		}
+		// Do nothing in case it is just EOF, keep reading the file
+		return nil
+	} else {
+		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
+		return err
 	}
 }
+
+func (h *Harvester) Stop() {
+}
+
+/*** Utility Functions ***/
 
 // isLine checks if the given byte array is a line, means has a line ending \n
 func isLine(line []byte) bool {
@@ -242,36 +293,58 @@ func lineEndingChars(line []byte) int {
 	return 0
 }
 
-// Handles error during reading file. If EOF and nothing special, exit without errors
-func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
-	if err == io.EOF {
-		// timed out waiting for data, got eof.
-		// Check to see if the file was truncated
-		info, statErr := h.file.Stat()
+// readLine reads a full line into buffer and returns it.
+// In case of partial lines, readLine waits for a maximum of 5 seconds for new segments to arrive.
+// This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
+func readLine(reader *bufio.Reader, buffer *bytes.Buffer, partialLineWaiting time.Duration) (*string, int, error) {
 
-		// This could happen if the file was removed / rotate after reading and before calling the stat function
-		if statErr != nil {
-			logp.Err("Unexpected error reading from %s; error: %s", h.Path, statErr)
-			return statErr
+	lastSegementTime := time.Now()
+	isPartialLine := true
+
+	for {
+		segment, err := reader.ReadBytes('\n')
+
+		if segment != nil && len(segment) > 0 {
+			if isLine(segment) {
+				isPartialLine = false
+			}
+
+			// Update last segment time as new segment of line arrived
+			lastSegementTime = time.Now()
+			buffer.Write(segment)
 		}
 
-		if h.ProspectorConfig.IgnoreOlder != "" {
-			logp.Debug("harvester", "Ignore Unmodified After: %s", h.ProspectorConfig.IgnoreOlder)
+		if err != nil {
+			// EOF, jump out of the loop
+			if err == io.EOF {
+				return nil, 0, err
+			}
+
+			if isPartialLine {
+				// Wait for a second for the next segments
+				time.Sleep(1 * time.Second)
+
+				// If last segment written is older then partialLineWaiting, partial line is discarded
+				if time.Since(lastSegementTime) >= partialLineWaiting {
+					return nil, 0, err
+				}
+				continue
+			} else {
+				logp.Err("Error reading line: %s", err.Error())
+				return nil, 0, err
+			}
 		}
 
-		if info.Size() < h.Offset {
-			logp.Debug("harvester", "File truncated, seeking to beginning: %s", h.Path)
-			h.file.Seek(0, os.SEEK_SET)
-			h.Offset = 0
-		} else if age := time.Since(lastTimeRead); age > h.ProspectorConfig.IgnoreOlderDuration {
-			// if lastTimeRead was more than ignore older and ignore older is set, this file is probably dead. Stop watching it.
-			// As an error is returned, the harvester will stop and the file is closed
-			logp.Debug("harvester", "Stopping harvest of ", h.Path, "last change was: ", age)
-			return err
+		// If we got a full line, return the whole line without the EOL chars (LF or CRLF)
+		if !isPartialLine {
+			// Get the str length with the EOL chars (LF or CRLF)
+			bufferSize := buffer.Len()
+			str := new(string)
+			// Remove line endings
+			*str = buffer.String()[:bufferSize-lineEndingChars(segment)]
+			// Reset the buffer for the next line
+			buffer.Reset()
+			return str, bufferSize, nil
 		}
-	} else {
-		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
-		return err
 	}
-	return nil
 }

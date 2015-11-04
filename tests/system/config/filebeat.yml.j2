@@ -7,15 +7,18 @@ filebeat:
         - {{ path }}
       # Type of the files. Annotated in every documented
       input: log
-      scan_frequency: 0.5s
+      scan_frequency: 1s
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
       encoding: {{encoding | default("utf-8") }}
       tail_files: {{tailFiles}}
+      backoff: 1s
+      backoff_factor: 1
+      max_backoff: 1s
+      force_close_windows_files: {{force_close_windows_files}}
   spool_size:
   idle_timeout: 0.5s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
-
 
 
 ############################# Shipper ############################################

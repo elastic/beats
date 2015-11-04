@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
 
-## [Unreleased](https://github.com/elastic/filebeat/compare/13678f4...HEAD)
+## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0-beta4...HEAD)
 
 This is the first filebeat release. As of this no changelog is provided for the first release.
 All documentation about Filebeat can be found here.
@@ -23,9 +23,15 @@ All documentation about Filebeat can be found here.
 
 ### Added
 - Rename the timestamp field with @timestamp #168
+- Introduction of backoff, backoff_factor, max_backoff, partial_line_waiting, force_close_windows_files
+  config variables to make crawling more configurable.
 
 ### Improvements
 - All Godeps dependencies were updated to master on 2015-10-21 [#122]
 - Set default value for ignore_older config to 10 minutes. #164
 
 ### Deprecated
+
+
+## [1.0.0-beta4](https://github.com/elastic/topbeat/compare/13678f4...1.0.0-beta4) - 2015-10-22
+This was the first release of Filebeat.

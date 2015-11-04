@@ -15,7 +15,7 @@ import (
  Crawler: Filebeat has one crawler. The crawler is the single point of control
  	and stores the state. The state is written through the registrar
  Prospector: For every FileConfig the crawler starts a prospector
- Harvestor: For every file found inside the FileConfig, the Prospector starts a Harvestor
+ Harvester: For every file found inside the FileConfig, the Prospector starts a Harvester
  		The harvester send their events to the spooler
  		The spooler sends the event to the publisher
  		The publisher writes the state down with the registrar
