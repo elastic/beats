@@ -52,9 +52,9 @@ func (b *bulkWorker) run() {
 			return
 		case m := <-b.queue:
 			if m.event != nil { // single event
-				b.onEvent(m.signal, m.event)
+				b.onEvent(m.context.signal, m.event)
 			} else { // batch of events
-				b.onEvents(m.signal, m.events)
+				b.onEvents(m.context.signal, m.events)
 			}
 
 			// buffer full?
@@ -108,8 +108,11 @@ func (b *bulkWorker) onEvents(signal outputs.Signaler, events []common.MapStr) {
 }
 
 func (b *bulkWorker) publish() {
+	// TODO: remember/merge and forward context options to output worker
 	b.output.send(message{
-		signal: outputs.NewCompositeSignaler(b.pending...),
+		context: context{
+			signal: outputs.NewCompositeSignaler(b.pending...),
+		},
 		events: b.events,
 	})
 

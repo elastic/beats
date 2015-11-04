@@ -54,8 +54,8 @@ func (t *topology) EnableTTL() error {
 	// already exists. If index could not be created, next api call to index will
 	// fail anyway.
 	index := ".packetbeat-topology"
-	_, _ = client.CreateIndex(index, nil)
-	_, err := client.Index(index, "server-ip", "_mapping", nil, setting)
+	_, _, _ = client.CreateIndex(index, nil)
+	_, _, err := client.Index(index, "server-ip", "_mapping", nil, setting)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (t *topology) PublishIPs(name string, localAddrs []string) error {
 		"ttl":     fmt.Sprintf("%dms", t.TopologyExpire),
 		"refresh": "true",
 	}
-	_, err := client.Index(
+	_, _, err := client.Index(
 		".packetbeat-topology", //index
 		"server-ip",            //type
 		name,                   // id
@@ -126,14 +126,14 @@ func loadTopolgyMap(client *Client) (map[string]string, error) {
 	docType := "server-ip"
 
 	// get number of entries in index for search query to return all entries in one query
-	cntRes, err := client.CountSearchURI(index, docType, nil)
+	_, cntRes, err := client.CountSearchURI(index, docType, nil)
 	if err != nil {
 		logp.Err("Getting topology map fails with: %s", err)
 		return nil, err
 	}
 
 	params := map[string]string{"size": strconv.Itoa(cntRes.Count)}
-	res, err := client.SearchURI(index, docType, params)
+	_, res, err := client.SearchURI(index, docType, params)
 	if err != nil {
 		logp.Err("Getting topology map fails with: %s", err)
 		return nil, err

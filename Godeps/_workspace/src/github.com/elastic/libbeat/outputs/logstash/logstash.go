@@ -42,11 +42,14 @@ type logstash struct {
 const (
 	logstashDefaultPort = 10200
 
-	logstashDefaultTimeout = 30 * time.Second
-	defaultSendRetries     = 3
+	logstashDefaultTimeout   = 30 * time.Second
+	logstasDefaultMaxTimeout = 90 * time.Second
+	defaultSendRetries       = 3
 )
 
 var waitRetry = time.Duration(1) * time.Second
+
+// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does not return ErrTempBulkFailure
 var maxWaitRetry = time.Duration(60) * time.Second
 
 func (lj *logstash) init(
@@ -104,7 +107,8 @@ func (lj *logstash) init(
 	} else {
 		loadBalance := config.LoadBalance != nil && *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
+			m, err = mode.NewLoadBalancerMode(clients, sendRetries,
+				waitRetry, timeout, maxWaitRetry)
 		} else {
 			m, err = mode.NewFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
 		}

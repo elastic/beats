@@ -24,11 +24,6 @@ type client struct {
 	publisher *PublisherType
 }
 
-type publishOptions struct {
-	confirm bool
-	sync    bool
-}
-
 // ClientOption allows API users to set additional options when publishing events.
 type ClientOption func(option *publishOptions)
 
@@ -47,14 +42,16 @@ func Sync(options *publishOptions) {
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	return c.getClient(opts).PublishEvent(event)
+	options, client := c.getClient(opts)
+	return client.PublishEvent(&context{publishOptions: options}, event)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	return c.getClient(opts).PublishEvents(events)
+	options, client := c.getClient(opts)
+	return client.PublishEvents(&context{publishOptions: options}, events)
 }
 
-func (c *client) getClient(opts []ClientOption) eventPublisher {
+func (c *client) getClient(opts []ClientOption) (publishOptions, eventPublisher) {
 	debug("send event")
 	options := publishOptions{}
 	for _, opt := range opts {
@@ -62,9 +59,9 @@ func (c *client) getClient(opts []ClientOption) eventPublisher {
 	}
 
 	if options.confirm {
-		return c.publisher.syncPublisher.client(!options.sync)
+		return options, c.publisher.syncPublisher.client()
 	}
-	return c.publisher.asyncPublisher.client()
+	return options, c.publisher.asyncPublisher.client()
 }
 
 // PublishEvent will publish the event on the channel. Options will be ignored.

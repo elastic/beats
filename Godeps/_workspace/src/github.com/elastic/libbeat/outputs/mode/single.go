@@ -65,7 +65,6 @@ func (s *SingleConnectionMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	published := 0
 	fails := 0
 	var backoffCount uint
 	var err error
@@ -76,18 +75,18 @@ func (s *SingleConnectionMode) PublishEvents(
 			goto sendFail
 		}
 
-		for published < len(events) {
-			n, err := s.conn.PublishEvents(events[published:])
+		for len(events) > 0 {
+			var err error
+			events, err = s.conn.PublishEvents(events)
 			if err != nil {
 				logp.Info("Error publishing events (retrying): %s", err)
 				break
 			}
 
 			fails = 0
-			published += n
 		}
 
-		if published == len(events) {
+		if len(events) == 0 {
 			outputs.SignalCompleted(signaler)
 			return nil
 		}
