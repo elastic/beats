@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Filename used for file based logging now defaults to beat name. #267
 
 ### Added
 
