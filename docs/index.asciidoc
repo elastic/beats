@@ -1,11 +1,13 @@
 [[beats-reference]]
 = Beats Platform Reference
-:ES-version: 1.7.3
-:LS-version: 1.5.4
-:Kibana-version: 4.1.2
+:ES-version: 2.0.0
+:LS-version: 2.0.0
+:Kibana-version: 4.2.0
 :Dashboards-version: 1.0.0-beta4
 
 include::./overview.asciidoc[]
+
+include::./communitybeats.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
@@ -16,3 +18,4 @@ include::./command-line.asciidoc[]
 include::./https.asciidoc[]
 
 include::./newbeat.asciidoc[]
+
