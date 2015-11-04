@@ -105,10 +105,9 @@ func (f *FailOverConnectionMode) connect(active int) error {
 // unavailable. On failure PublishEvents tries to connect to another configured
 // connection by random.
 func (f *FailOverConnectionMode) PublishEvents(
-	trans outputs.Signaler,
+	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	published := 0
 	fails := 0
 	var err error
 
@@ -121,18 +120,18 @@ func (f *FailOverConnectionMode) PublishEvents(
 		}
 
 		// loop until all events have been send in case client supports partial sends
-		for published < len(events) {
+		for len(events) > 0 {
+			var err error
 			conn := f.conns[f.active]
-			n, err := conn.PublishEvents(events[published:])
+			events, err = conn.PublishEvents(events)
 			if err != nil {
 				logp.Info("Error publishing events (retrying): %s", err)
 				break
 			}
-			published += n
 		}
 
-		if published == len(events) {
-			outputs.SignalCompleted(trans)
+		if len(events) == 0 {
+			outputs.SignalCompleted(signaler)
 			return nil
 		}
 
@@ -145,7 +144,7 @@ func (f *FailOverConnectionMode) PublishEvents(
 		fails++
 	}
 
-	outputs.SignalFailed(trans, err)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }
 

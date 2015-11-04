@@ -18,42 +18,31 @@ func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	return s
 }
 
-func (p *syncPublisher) client(confirmOnly bool) eventPublisher {
-	if confirmOnly {
-		return syncClient(p.forward)
-	}
-	return syncClient(p.forceForward)
+func (p *syncPublisher) client() eventPublisher {
+	return syncClient(p.forward)
 }
 
 func (p *syncPublisher) onStop() {}
 
 func (p *syncPublisher) onMessage(m message) {
-	signal := outputs.NewSplitSignaler(m.signal, len(p.pub.Output))
-	m.signal = signal
+	signal := outputs.NewSplitSignaler(m.context.signal, len(p.pub.Output))
+	m.context.signal = signal
 	for _, o := range p.pub.Output {
 		o.send(m)
 	}
 }
 
-func (c syncClient) PublishEvent(event common.MapStr) bool {
-	return c(message{event: event})
+func (c syncClient) PublishEvent(ctx *context, event common.MapStr) bool {
+	return c(message{context: *ctx, event: event})
 }
 
-func (c syncClient) PublishEvents(events []common.MapStr) bool {
-	return c(message{events: events})
+func (c syncClient) PublishEvents(ctx *context, events []common.MapStr) bool {
+	return c(message{context: *ctx, events: events})
 }
 
 func (p *syncPublisher) forward(m message) bool {
 	sync := outputs.NewSyncSignal()
-	m.signal = sync
+	m.context.signal = sync
 	p.send(m)
 	return sync.Wait()
-}
-
-func (p *syncPublisher) forceForward(m message) bool {
-	for {
-		if ok := p.forward(m); ok {
-			return true
-		}
-	}
 }
