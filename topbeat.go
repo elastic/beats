@@ -269,6 +269,9 @@ func (t *Topbeat) addMemPercentage(m *MemStat) {
 
 	perc := float64(m.Used) / float64(m.Total)
 	m.UsedPercent = Round(perc, .5, 2)
+
+	actual_perc := float64(m.ActualUsed) / float64(m.Total)
+	m.ActualUsedPercent = Round(actual_perc, .5, 2)
 }
 
 func addFileSystemUsedPercentage(f *FileSystemStat) {

@@ -41,6 +41,25 @@ func TestMemPercentage(t *testing.T) {
 	assert.Equal(t, m.UsedPercent, 0.0)
 }
 
+func TestActualMemPercentage(t *testing.T) {
+
+	beat := Topbeat{}
+
+	m := MemStat{
+		Total: 7,
+		ActualUsed:  5,
+		ActualFree:  2,
+	}
+	beat.addMemPercentage(&m)
+	assert.Equal(t, m.ActualUsedPercent, 0.71)
+
+	m = MemStat{
+		Total: 0,
+	}
+	beat.addMemPercentage(&m)
+	assert.Equal(t, m.ActualUsedPercent, 0.0)
+}
+
 func TestCpuPercentage(t *testing.T) {
 
 	beat := Topbeat{}
