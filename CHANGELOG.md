@@ -15,13 +15,13 @@ All notable changes to this project will be documented in this file based on the
 ## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1) - 2015-11-04
 
 ### Backward Compatibility Breaks
+- Rename timestamp field with @timestamp for a better integration with
+Logstash. #80
 
 ### Bugfixes
 - Don't wait for one period until shutdown #75
 
 ### Added
-- Change timestamp field with @timestamp for a better integration with Logstash
-#80
 
 ### Deprecated
 
