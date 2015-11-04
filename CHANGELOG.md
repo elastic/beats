@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file based on the
 ## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1)
 
 ### Backward Compatibility Breaks
+- Rename timestamp field with @timestamp. #237
+
 
 ### Bugfixes
 - Use stderr for console log output. #219
@@ -30,7 +32,6 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 - Add Console output plugin. #218
-- Rename the timestamp field with @timestamp. #237
 - Add timestamp to log messages #245
 - Send @metadata.beat to Logstash instead of @metadata.index to prevent
   possible name clashes and give user full control over index name used for
