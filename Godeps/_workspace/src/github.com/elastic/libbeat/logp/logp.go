@@ -104,6 +104,11 @@ func Init(name string, config *Logging) error {
 				}
 			}
 		}
+
+		if config.Files.Name == "" {
+			config.Files.Name = name
+		}
+
 		err := SetToFile(true, config.Files)
 		if err != nil {
 			return err
