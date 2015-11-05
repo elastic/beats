@@ -12,7 +12,7 @@ http://yaml.org/[YAML] for its syntax. The file consists of the following sectio
 [[configuration-shipper]]
 === Shipper
 
-The shipper section contains options for the Beats shipper and some
+The shipper section contains configuration options for the Beat and some
 general settings that control its behaviour.
 
 Here is an example configuration:
@@ -56,19 +56,19 @@ shipper:
 
 ===== name
 
-The name of the Beats shipper. If this option is empty, the `hostname` of the server is
+The name of the Beat. If this option is empty, the `hostname` of the server is
 used. The name is included as the `shipper` field in each published transaction. You can 
-use the name to group all transactions sent by a single shipper.
+use the name to group all transactions sent by a single Beat.
 
-At startup, each Beat can publish its IP, port, and Beats shipper name to Elasticsearch. 
-This information is stored in Elasticsearch as a network topology map that maps the IP and port 
-of each Beat to the name of the shipper.
+At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information 
+is stored in Elasticsearch as a network topology map that maps the IP and port 
+of each Beat to the name that you specify here.
 
 When a Beat receives a new request and response (called a transaction), the Beat can query  
 Elasticsearch to see if the network topology includes the IP and port of the source 
 and destination servers. If this information is available, the `client_server` field in the 
-output is set to the shipper name of the source server, and the `server` field is set to the 
-shipper name of the destination server.
+output is set to the name of the Beat running on the source server, and the `server` field is set to the 
+name of the Beat running on the destination server.
 
 To use the topology map in Elasticsearch, you must set <<save_topology>> 
 to true and enable Elasticsearch as output. 
@@ -83,10 +83,10 @@ shipper:
 
 ===== tags
 
-A list of tags that the shipper includes in the `tags` field of each published 
+A list of tags that the Beat includes in the `tags` field of each published 
 transaction. Tags make it easy to group servers by different logical properties.
 For example, if you have a cluster of web servers, you can add the "webservers" tag 
-to the shipper on each server, and then use filters and queries in the
+to the Beat on each server, and then use filters and queries in the
 Kibana web interface to get visualisations for the whole group of servers.
 
 Example:
@@ -99,52 +99,52 @@ shipper:
 
 ===== ignore_outgoing
 
-If the `ignore_outgoing` option is enabled, the Beats shipper ignores all the
-transactions initiated from the server running the shipper.
+If the `ignore_outgoing` option is enabled, the Beat ignores all the
+transactions initiated from the server running the Beat.
 
-This is useful when two shippers publish the same transactions. Because one shipper 
+This is useful when two Beats publish the same transactions. Because one Beat  
 sees the transaction in its outgoing queue and the other sees it in its incoming 
 queue, you can end up with duplicate transactions. To remove the duplicates, you 
 can enable the `ignore_outgoing` option on one of the servers.
 
 For example, in the following scenario, you see a 3-server architecture 
-where a shipper is installed on each server. t1 is the transaction exchanged between 
+where a Beat is installed on each server. t1 is the transaction exchanged between 
 Server1 and Server2, and t2 is the transaction between Server2 and Server3. 
 
-image:./images/option_ignore_outgoing.png[Shippers Architecture]
+image:./images/option_ignore_outgoing.png[Beats Architecture]
 
-By default, each transaction is indexed twice because Shipper2 
+By default, each transaction is indexed twice because Beat2 
 sees both transactions. So you would see the following published transactions 
 (when `ignore_outgoing` is false):
 
- - Shipper1: t1
- - Shipper2: t1 and t2
- - Shipper3: t2
+ - Beat1: t1
+ - Beat2: t1 and t2
+ - Beat3: t2
 
-To avoid duplicates, you can force your shippers to send only the incoming
+To avoid duplicates, you can force your Beats to send only the incoming
 transactions and ignore the transactions created by the local server. So you would 
 see the following published transactions (when `ignore_outgoing` is true):
 
- - Shipper1: none
- - Shipper2: t1
- - Shipper3: t2
+ - Beat1: none
+ - Beat2: t1
+ - Beat3: t2
 
 ===== refresh_topology_freq
 
 The refresh interval of the topology map in
-seconds. In other words, this setting specifies how often each shipper publishes its 
+seconds. In other words, this setting specifies how often each Beat publishes its 
 IP addresses to the topology map. The default is 10 seconds.
 
 ===== topology_expire
 
 The expiration time for the topology in seconds. This is
-useful in case a shipper stops publishing its IP addresses. The IP addresses
+useful in case a Beat stops publishing its IP addresses. The IP addresses
 are removed automatically from the topology map after expiration. The default
 is 15 seconds.
 
 ===== geoip.paths
 
-The paths to search for GeoIP databases. The shipper loads the first installed GeoIP database that if finds. Then, for each transaction, the shipper exports the GeoIP location of the client.  
+The paths to search for GeoIP databases. The Beat loads the first installed GeoIP database that if finds. Then, for each transaction, the Beat exports the GeoIP location of the client.  
 
 If no value is specified for geoip.paths, the default paths `/usr/share/GeoIP/GeoLiteCity.dat` and `/usr/local/var/GeoIP/GeoLiteCity.dat` are searched for installed GeoIP databases.
 
@@ -171,7 +171,7 @@ network topology.
 
 ==== Elasticsearch Output
 
-When you specify elasticsearch for the output, the shipper sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+When you specify elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -451,7 +451,7 @@ output {
 ------------------------------------------------------------------------------
 
 Events indexed into Elasticsearch with shown Logstash configuration will be
-similar to events directly indexed by beats into Elasticsearch.
+similar to events directly indexed by Beats into Elasticsearch.
 
 Here is an example of how to configure the Beat to use Logstash:
 [source,yaml]
@@ -867,7 +867,7 @@ The default log level is error.
 
 The list of debugging-only selector tags used by different Beats components. Use `*`
 to enable debug output for all components. For example add 'publish' to display
-all the debug messages related to event publishing. when starting the beat,
+all the debug messages related to event publishing. when starting the Beat,
 selectors can be overwritten using the '-d' command line option ('-d' also sets
 the debug log level).
 
@@ -896,11 +896,11 @@ in the range of 2 to 1024 files.
 [[configuration-run-options]]
 === Run options (optional)
 
-The Beats shipper can drop privileges after creating the sniffing socket.
+The Beat can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket, but everything else requires no
-privileges. Therefore, it is recommended that you have the shipper switch users after
+privileges. Therefore, it is recommended that you have the Beat switch users after
 the initialization phase. The `uid` and `gid` settings set the User Id and Group
-Id under which the shipper runs.
+Id under which the Beat runs.
 
 WARNING: On Linux, Setuid doesn't change the uid of all threads, so the Go
          garbage collector will continue to run as root. Also note that process

@@ -3,9 +3,8 @@
 
 A regular _Beats setup_ consists of:
 
- * Beats shippers for collecting the data. You install these shippers on
-   your servers to capture the data. For installation steps, see the documentation 
-   for your Beat.
+ * One or more Beats. You install Beats on your servers to capture the data. 
+ For installation steps, see the documentation for your Beat.
  * Elasticsearch for storage and indexing. <<elasticsearch-installation>>
  * Optionally Logstash for inserting data into Elasticsearch. <<logstash-installation>>
  * Kibana for the UI. <<kibana-installation>>
@@ -13,7 +12,7 @@ A regular _Beats setup_ consists of:
 
 NOTE: To get started, you can install Elasticsearch and Kibana on a
 single VM or even on your laptop. The only condition is that the machine must be 
-accessible from the servers you want to monitor. As you add more shippers and
+accessible from the servers you want to monitor. As you add more Beats and
 your traffic grows, you'll want to replace the single Elasticsearch instance with
 a cluster. You'll probably also want to automate the installation process.
 
@@ -94,13 +93,13 @@ You should see this response:
 [[logstash-installation]]
 === Installing Logstash (Optional)
 
-The simplest architecture for the Beats platform setup consists of Beats
-shippers, Elasticsearch, and Kibana. This architecture is easy to get started 
+The simplest architecture for the Beats platform setup consists of one or more Beats, 
+Elasticsearch, and Kibana. This architecture is easy to get started 
 with and sufficient for networks with low traffic. It also uses the minimum amount of
-servers: a single machine running Elasticsearch and Kibana. The Beats shippers
+servers: a single machine running Elasticsearch and Kibana. The Beats 
 insert the transactions directly into the Elasticsearch instance.
 
-This section explains how to use the Beats shippers together with Logstash to provide
+This section explains how to use the Beats together with Logstash to provide
 additional buffering. An important advantage to this approach is that you can
 use Logstash to modify the data captured by Beats in any way you like. You can also 
 use Logstash's many output plugins to integrate with other systems.
@@ -144,10 +143,10 @@ https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.h
 [[logstash-setup]]
 ==== Setting Up Logstash
 
-Before setting up Logstash, you need to install the Beats shipper. For installation steps, 
-see the documentation for your Beats shipper. 
+Before setting up Logstash, you need to install the Beat. For installation steps, 
+see the documentation for your Beat. 
 
-In this setup, the Beats shipper sends events to Logstash. Logstash receives
+In this setup, the Beat sends events to Logstash. Logstash receives
 these events by using the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats
 input plugin] and then sends the transaction to Elasticsearch by using the
@@ -183,7 +182,7 @@ output:
     #loadbalance: false
 ------------------------------------------------------------------------------
 
-Next configure Logstash to listen on port 5044 for incoming beats connections
+Next configure Logstash to listen on port 5044 for incoming Beats connections
 and to index into Elasticsearch. You configure Logstash by creating a 
 configuration file. For example, you can save the following example configuration 
 to a file called `config.json`:
@@ -236,7 +235,7 @@ mac:
 ./bin/logstash -f config.json
 ----------------------------------------------------------------------
 
-If you installed logstash as a deb or rpm package, place the config file in the 
+If you installed Logstash as a deb or rpm package, place the config file in the 
 expected directory.
 
 NOTE: The default configuration for Beats and Logstash uses plain TCP. For

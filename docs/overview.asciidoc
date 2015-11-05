@@ -2,7 +2,7 @@
 
 The _Beats_ are open source data shippers that you install as _agents_ on
 your servers to send different types of operational data to
-https://www.elastic.co/products/elasticsearch[Elasticsearch]. The shippers can
+https://www.elastic.co/products/elasticsearch[Elasticsearch]. Beats can
 send data directly to Elasticsearch or send it to Elasticsearch via Logstash, which 
 you can use to enrich or archive the data. 
 
