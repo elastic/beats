@@ -210,6 +210,20 @@ Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities 
 provided by Logstash.
 
+[[logstash-input-update]]
+==== Updating Logstash Input Beats Plugin
+
+The latest version of Logstash might not come with the latest version of the 
+https://rubygems.org/gems/logstash-input-beats[Logstash Input Beats Plugin].
+You can easily update to the latest version of the plugin by just running the 
+following command:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/plugin update logstash-input-beats
+----------------------------------------------------------------------
+
+
 ==== Running Logstash
 
 Now you can start Logstash. Use the command that works with your system:
