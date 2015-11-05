@@ -1,4 +1,4 @@
-== Using HTTPS and basic authentication
+== Using HTTPS and Basic Authentication
 
 To secure the communication between a Beat and Elasticsearch, you can use HTTPS
 and basic authentication. Here is an sample configuration:
@@ -15,22 +15,22 @@ elasticsearch:
 ----
 <1> The username to use for authenticating to Elasticsearch.
 <2> The password to use for authenticating to Elasticsearch.
-<3> This enables the HTTPS protocol.
-<4> The IP/port of the Elasticsearch nodes.
+<3> This setting enables the HTTPS protocol.
+<4> The IP and port of the Elasticsearch nodes.
 
 
-Elasticsearch doesn't have built in basic authentication but you can achieve it
+Elasticsearch doesn't have built-in basic authentication, but you can achieve it
 either by using a web proxy or by using the
 https://www.elastic.co/products/shield[Shield] commercial plugin.
 
-Beats verifies the validity of the server certificates and only accept trusted
+The Beat verifies the validity of the server certificates and only accepts trusted
 certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
 this document, but a good guide to follow is the
 https://www.elastic.co/guide/en/shield/current/certificate-authority.html[Running a Certificate Authority]
 appendix from the Shield guide.
 
-By default Beats use the list of trusted certificate authorities from the
-operating system they run on. You can configure a Beat to use a specific list of
+By default the Beat uses the list of trusted certificate authorities from the
+operating system where the Beat is running. You can configure a Beat to use a specific list of
 CA certificates instead of the list from the OS. Here is an example:
 
 [source,yaml]
@@ -49,10 +49,10 @@ elasticsearch:
 <1> The list of CA certificates to trust
 
 
-NOTE: The TLS handshake fails in case the SSL/TLS certificates have a subject
-which does not match the `hosts` value, for any given connection. For example,
-if you have `hosts: ["foobar:9200"]`, then the certificate MUST include
-`CN=foobar` in the subject or as a subject alternative name (SAN). Make sure
-the hostname resolves to the desired IP address. If no DNS is available, then
-you can just associate the IP address with your hostname in `/etc/hosts`
+NOTE: For any given connection, the SSL/TLS certificates must have a subject
+that matches the value specified for `hosts`, or the TLS handshake fails. 
+For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST  
+include `foobar` in the subject (`CN=foobar`) or as a subject alternative name 
+(SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then
+you can associate the IP address with your hostname in `/etc/hosts`
 (on Unix systems).

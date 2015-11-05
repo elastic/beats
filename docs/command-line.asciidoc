@@ -1,42 +1,38 @@
 [[command-line-options]]
 == Command Line Options
 
-All Beats share some common command line options, but each Beat can also have
-its own tailored command line options.
+The following command line options are available for all Beats. For additional 
+command line options, see the documentation for your Beat. 
 
-=== Common Options for all Beats
-
-==== -N
-Disable publishing of events to the defined output. This option is useful only
+*-N*:: 
+Disable the publishing of events to the defined output. This option is useful only
 for testing the Beat.
 
-==== -c [file]
+*-c [file]*:: 
 Pass the location of a configuration file for the Beat.
 
-==== -cpuprofile [output file]
+*-cpuprofile [output file]*:: 
 Write CPU profile data to the specified file. This option is useful for
 troubleshooting the Beat.
 
-==== -d [selectors]
-Enable debugging for the specified selectors. The selectors are a
-comma-separated list of components for which to enable debug. Use `-d "*"` to
-enable debug for all components, or specifically list the component from which
-you want debug. For example, `-d "publish"` displays all the "publish" related
-messages.
+*-d [selectors]*:: 
+Enable debugging for the specified selectors. For the selectors, you can specify a comma-separated 
+list of components, or you can use `-d "*"` to enable debugging for all components. For example, 
+`-d "publish"` displays all the "publish" related messages.
 
-==== -e
+*-e*:: 
 Output the error messages to stdout and disable syslog output.
 
-==== -memprofile [output file]
-Write memory profile data to the specified file. This option is useful for
+*-memprofile [output file]*:: 
+Write memory profile data to the specified output file. This option is useful for
 troubleshooting the Beat.
 
-==== -test
-Test only the configuration file and exit. This option is useful for
+*-test*:: 
+Test only the configuration file and then exit. This option is useful for
 troubleshooting the configuration of a Beat.
 
-==== -v
-Enable verbose output showing INFO level messages.
+*-v*:: 
+Enable verbose output to show INFO-level messages.
 
-==== -version
+*-version*:: 
 Display the Beat version and exit.
