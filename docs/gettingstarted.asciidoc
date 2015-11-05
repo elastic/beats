@@ -148,8 +148,8 @@ see the documentation for your Beat.
 
 In this setup, the Beat sends events to Logstash. Logstash receives
 these events by using the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats
-input plugin] and then sends the transaction to Elasticsearch by using the
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats
+plugin] and then sends the transaction to Elasticsearch by using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
 output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
 indexing very efficient.
@@ -214,14 +214,15 @@ provided by Logstash.
 ==== Updating Logstash Input Beats Plugin
 
 The latest version of Logstash might not come with the latest version of the 
-https://rubygems.org/gems/logstash-input-beats[Logstash Input Beats Plugin].
-You can easily update to the latest version of the plugin by just running the 
-following command:
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats Plugin].
+You can easily update to the latest version of the input plugin from your logstash installation: 
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 ./bin/plugin update logstash-input-beats
 ----------------------------------------------------------------------
+
+More details about working with input plugins in Logstash are available https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
 
 
 ==== Running Logstash
