@@ -4,6 +4,7 @@ import (
 	"math"
 	"regexp"
 	"time"
+	"errors"
 
 	"github.com/elastic/gosigar"
 
@@ -23,6 +24,10 @@ type Topbeat struct {
 	lastCpuTimes *CpuTimes
 	TbConfig     ConfigSettings
 	events       publisher.Client
+
+	sysStats     bool
+	procStats    bool
+	fsStats      bool
 
 	done chan struct{}
 }
@@ -46,9 +51,20 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 		tb.procs = []string{".*"} //all processes
 	}
 
+	tb.sysStats = tb.TbConfig.Input.Stats.System
+	tb.procStats = tb.TbConfig.Input.Stats.Proc
+	tb.fsStats = tb.TbConfig.Input.Stats.Filesystem
+
+	if !tb.sysStats && !tb.procStats && !tb.fsStats {
+		return errors.New("Invalid statistics configuration")
+	}
+
 	logp.Debug("topbeat", "Init toppbeat")
 	logp.Debug("topbeat", "Follow processes %q\n", tb.procs)
 	logp.Debug("topbeat", "Period %v\n", tb.period)
+	logp.Debug("topbeat", "System statistics %t\n", tb.sysStats)
+	logp.Debug("topbeat", "Process statistics %t\n", tb.procStats)
+	logp.Debug("topbeat", "File system statistics %t\n", tb.fsStats)
 
 	return nil
 }
@@ -76,20 +92,26 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 
 		timerStart := time.Now()
 
-		err = t.exportSystemStats()
-		if err != nil {
-			logp.Err("Error reading system stats: %v", err)
-			break
+		if t.sysStats {
+			err = t.exportSystemStats()
+			if err != nil {
+				logp.Err("Error reading system stats: %v", err)
+				break
+			}
 		}
-		err = t.exportProcStats()
-		if err != nil {
-			logp.Err("Error reading proc stats: %v", err)
-			break
+		if t.procStats {
+			err = t.exportProcStats()
+			if err != nil {
+				logp.Err("Error reading proc stats: %v", err)
+				break
+			}
 		}
-		err = t.exportFileSystemStats()
-		if err != nil {
-			logp.Err("Error reading fs stats: %v", err)
-			break
+		if t.fsStats {
+			err = t.exportFileSystemStats()
+			if err != nil {
+				logp.Err("Error reading fs stats: %v", err)
+				break
+			}
 		}
 
 		timerEnd := time.Now()
