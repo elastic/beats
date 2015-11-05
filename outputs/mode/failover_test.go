@@ -37,7 +37,7 @@ func TestFailoverSingleSendOne(t *testing.T) {
 }
 
 func TestFailoverSendMultiple(t *testing.T) {
-	testFailoverSend(t, multiEvent(2, testEvent))
+	testFailoverSend(t, multiEvent(10, testEvent))
 }
 
 func testFailoverConnectFailAndSend(t *testing.T, events []eventInfo) {
@@ -136,4 +136,68 @@ func TestFailoverSendFlaky(t *testing.T) {
 
 func TestFailoverSendMultiFlaky(t *testing.T) {
 	testFailoverSendFlaky(t, multiEvent(10, testEvent))
+}
+
+func testFailoverSendFlakyFail(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewFailOverConnectionMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(2, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(2, collectPublish(&collected)),
+			},
+		},
+		3,
+		1*time.Millisecond,
+		100*time.Millisecond,
+	)
+	testMode(t, mode, events, signals(false), &collected)
+}
+
+func TestFailoverSendFlakyFail(t *testing.T) {
+	testFailoverSendFlakyFail(t, singleEvent(testEvent))
+}
+
+func TestFailoverSendMultiFlakyFail(t *testing.T) {
+	testFailoverSendFlakyFail(t, multiEvent(10, testEvent))
+}
+
+func testFailoverSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewFailOverConnectionMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(50, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: false,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(50, collectPublish(&collected)),
+			},
+		},
+		0,
+		1*time.Millisecond,
+		100*time.Millisecond,
+	)
+	testMode(t, mode, events, signals(true), &collected)
+}
+
+func TestFailoverSendFlakyInfAttempts(t *testing.T) {
+	testFailoverSendFlakyInfAttempts(t, singleEvent(testEvent))
+}
+
+func TestFailoverSendMultiFlakyInfAttempts(t *testing.T) {
+	testFailoverSendFlakyInfAttempts(t, multiEvent(10, testEvent))
 }

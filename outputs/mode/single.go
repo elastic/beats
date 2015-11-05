@@ -68,14 +68,17 @@ func (s *SingleConnectionMode) PublishEvents(
 	return s.publish(signaler, func() (bool, bool) {
 		for len(events) > 0 {
 			var err error
+
 			total := len(events)
 			events, err = s.conn.PublishEvents(events)
 			if err != nil {
 				logp.Info("Error publishing events (retrying): %s", err)
+
 				madeProgress := len(events) < total
 				return false, madeProgress
 			}
 		}
+
 		return true, false
 	})
 }
