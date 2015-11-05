@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 
 ### Added
+- Export mem.actual_used_p and swap.actual_used_p #93
 
 ### Deprecated
 
