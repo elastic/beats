@@ -250,6 +250,7 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 		if !isKnown {
 			p.checkNewFile(&newInfo, file, output)
 		} else {
+			newInfo.Harvester = lastinfo.Harvester
 			p.checkExistingFile(&newInfo, &newFile, &oldFile, file, output)
 		}
 

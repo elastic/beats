@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix to enable prospector to harvest existing files that are modified. #199
 
 ### Added
 
