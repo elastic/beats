@@ -38,7 +38,7 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	if tb.TbConfig.Input.Period != nil {
 		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
 	} else {
-		tb.period = 1 * time.Second
+		tb.period = 10 * time.Second
 	}
 	if tb.TbConfig.Input.Procs != nil {
 		tb.procs = *tb.TbConfig.Input.Procs
