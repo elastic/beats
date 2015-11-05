@@ -40,13 +40,13 @@ func testSingleConnectFailConnectAndSend(t *testing.T, events []eventInfo) {
 		&mockClient{
 			connected: false,
 			close:     closeOK,
-			connect:   failConnect(3, errFail),
+			connect:   failConnect(4, errFail), // 3 fails + 1 on create
 			publish:   collectPublish(&collected),
 		},
 		3,
 		0,
 		100*time.Millisecond,
-		1*time.Second,
+		100*time.Millisecond,
 	)
 	testMode(t, mode, events, signals(true), &collected)
 }
@@ -99,7 +99,7 @@ func testSingleSendFlaky(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, singleEvent(testEvent), signals(true), &collected)
+	testMode(t, mode, events, signals(true), &collected)
 }
 
 func TestSingleSendFlaky(t *testing.T) {
@@ -108,4 +108,54 @@ func TestSingleSendFlaky(t *testing.T) {
 
 func TestSingleSendMultiFlaky(t *testing.T) {
 	testSingleSendFlaky(t, multiEvent(10, testEvent))
+}
+
+func testSingleSendFlakyFail(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(3, collectPublish(&collected)),
+		},
+		3,
+		0,
+		100*time.Millisecond,
+		1*time.Second,
+	)
+	testMode(t, mode, events, signals(false), &collected)
+}
+
+func TestSingleSendFlakyFail(t *testing.T) {
+	testSingleSendFlakyFail(t, singleEvent(testEvent))
+}
+
+func TestSingleSendMultiFlakyFail(t *testing.T) {
+	testSingleSendFlakyFail(t, multiEvent(10, testEvent))
+}
+
+func testSingleSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(50, collectPublish(&collected)),
+		},
+		0, // infinite number of send attempts
+		0,
+		100*time.Millisecond,
+		1*time.Second,
+	)
+	testMode(t, mode, events, signals(true), &collected)
+}
+
+func TestSingleSendFlakyInfAttempts(t *testing.T) {
+	testSingleSendFlakyInfAttempts(t, singleEvent(testEvent))
+}
+
+func TestSingleSendMultiFlakyInfAttempts(t *testing.T) {
+	testSingleSendFlakyInfAttempts(t, multiEvent(10, testEvent))
 }

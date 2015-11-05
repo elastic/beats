@@ -343,9 +343,17 @@ For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (for exampl
 
 ===== max_retries
 
-The number of times a particular Elasticsearch index operation will be attempted. If
-the indexing operation doesn't succeed after the specified number of retries, the events are
+The number of times to try a particular Logstash send attempt. If
+the send operation doesn't succeed after the specified number of retries, the events are
 dropped. The default is 3.
+
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after
+max_retries, the Beat is optionally notified.
 
 ===== bulk_max_size
 
@@ -542,7 +550,12 @@ The number of times to try a particular Logstash send attempt. If
 the send operation doesn't succeed after the specified number of retries, the events are
 dropped. The default is 3.
 
-If an event is dropped by the output plugin, each Beat implementation must determine whether to drop the event or try sending it again. If the send operation doesn't succeed after
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after
 max_retries, the Beat is optionally notified.
 
 

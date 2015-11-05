@@ -99,18 +99,22 @@ func (lj *logstash) init(
 	if config.Max_retries != nil {
 		sendRetries = *config.Max_retries
 	}
+	maxAttempts := sendRetries + 1
+	if sendRetries < 0 {
+		maxAttempts = 0
+	}
 
 	var m mode.ConnectionMode
 	if len(clients) == 1 {
 		m, err = mode.NewSingleConnectionMode(clients[0],
-			sendRetries, waitRetry, timeout, maxWaitRetry)
+			maxAttempts, waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance != nil && *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, sendRetries,
+			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
 				waitRetry, timeout, maxWaitRetry)
 		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
+			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
 		}
 	}
 	if err != nil {
