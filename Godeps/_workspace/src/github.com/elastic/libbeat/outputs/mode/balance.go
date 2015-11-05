@@ -170,6 +170,7 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	if msg.event != nil {
 		if err := client.PublishEvent(msg.event); err != nil {
+			msg.attemptsLeft--
 			m.onFail(msg, err)
 			return
 		}
@@ -183,9 +184,11 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 
 			events, err = client.PublishEvents(events)
 			if err != nil {
+				msg.attemptsLeft--
+
 				// reset attempt count if subset of messages has been processed
 				if len(events) < total {
-					msg.attemptsLeft = m.maxAttempts + 1
+					msg.attemptsLeft = m.maxAttempts
 				}
 
 				if err != ErrTempBulkFailure {
@@ -195,7 +198,6 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 					return
 				}
 
-				msg.attemptsLeft--
 				if m.maxAttempts > 0 && msg.attemptsLeft <= 0 {
 					// no more attempts left => drop
 					outputs.SignalFailed(msg.signaler, err)
