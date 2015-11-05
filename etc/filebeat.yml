@@ -174,6 +174,9 @@ output:
     # The default is 50.
     #bulk_max_size: 50
 
+    # Configure http request timeout before failing an request to Elasticsearch.
+    #timeout: 90
+
     # The number of seconds to wait for new events between two bulk API index requests.
     # If `bulk_max_size` is reached before this interval expires, addition bulk index
     # requests are made.
@@ -206,6 +209,12 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
+
 
   ### Logstash as output
   #logstash:
@@ -221,7 +230,7 @@ output:
     # Optional index name. The default index name is filebeat.
     #index: filebeat
 
-    # Optional TLS. The default is on
+    # Optional TLS. By default is off.
     #tls:
       #disabled: true
 
@@ -246,6 +255,11 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
+      # Configure minimum TLS version allowed for connection to logstash
+      #min_version: 1.0
+
+      # Configure maximum TLS version allowed for connection to logstash
+      #max_version: 1.2
 
   ### File as output
   #file:
@@ -268,6 +282,14 @@ output:
     # is 7 files.
     #number_of_files: 7
 
+
+  ### Console output
+  # console:
+    # Enabling console output
+    #enabled: false
+
+    # pretty print json event
+    #pretty: false
 
 ############################# Shipper #########################################
 
