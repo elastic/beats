@@ -1,6 +1,6 @@
 
 [[filebeat-configuration-details]]
-== Configuration
+== Configuration Options
 
 The configuration file of Filebeat uses http://yaml.org/[YAML] as any other Beat.
 To start with the configuration it is best to have a look at the default configuration. It is described in detail
@@ -156,7 +156,7 @@ NOTE: You can use this setting to avoid indexing old log lines when you run File
 
 ===== backoff
 
-Backoff values define how agressively filebeat crawls new files for updates
+Backoff values define how aggressively Filebeat crawls new files for updates
 The default values can be used in most cases. Backoff defines how long it is waited
 to check a file again after EOF is reached. Default is 1s which means the file
 is checked every second if new lines were added. This leads to a near real time crawling.
@@ -166,7 +166,7 @@ Default: 1s
 ===== max_backoff
 
 Max backoff defines what the maximum waiting time is. After having backed off multiple times
-from checking the files, the waiting time will never exceed max_backoff idenependent of the
+from checking the files, the waiting time will never exceed max_backoff independent of the
 backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
 file after having backed off multiple times, it takes a maximum of 10s to read the new line.
 Default: 10s
@@ -183,7 +183,7 @@ Default: 2
 ===== partial_line_waiting
 
 Defines the time on how long the harvester will wait for a line to be completed.
-Sometimes a lines it not completely written when checked by filebeat. Filebeat
+Sometimes a lines it not completely written when checked by Filebeat. Filebeat
 will wait for the time defined below so the system can complete the line.
 In case the line is not completed in this time, the line will be skipped.
 Default: 5s
@@ -192,7 +192,7 @@ Default: 5s
 
 This option closes a file on windows, as soon as the file name changes.
 This config option is windows only. Filebeat keeps the files it's reading open. This can cause
-issues when the file is removed, as the file will not be fully removed until also filebeat closes
+issues when the file is removed, as the file will not be fully removed until also Filebeat closes
 the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
 same name can be created. Turning this feature on the other hand can lead to loss of data
 on rotate files. It can happen that after file rotation the beginning of the new
@@ -227,7 +227,7 @@ filebeat:
 
 Name of the registry file. Per default it is put in the current working
 directory. In case the working directory is changed after when running
-filebeat again, indexing starts from the beginning again.
+Filebeat again, indexing starts from the beginning again.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -239,9 +239,9 @@ filebeat:
 ===== config_dir
 
 Full Path to directory with additional prospector configuration files. Each file must end with .yml
-These config files must have the full filbeat config hierarchy inside, but only
+These config files must have the full Filebeat config hierarchy inside, but only
 the prospector part is processed. All global options like spool_size are ignored.
-The config_dir MUST point to a different directory then where the main filebeat config file is in.
+The config_dir MUST point to a different directory then where the main Filebeat config file is in.
 
 [source,yaml]
 -------------------------------------------------------------------------------------

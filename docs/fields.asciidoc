@@ -4,16 +4,16 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported fields
+== Exported Fields
 
-This document describes the fields that are exported by filebeat. They are
+This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
 * <<exported-fields-env>>
 * <<exported-fields-log>>
 
 [[exported-fields-env]]
-=== Common fields fields
+=== Common Fields
 
 Contains common fields available in all event types.
 
@@ -23,7 +23,7 @@ Contains common fields available in all event types.
 
 type: string
 
-Name of the shipper sending the log messages
+Name of the Beat sending the log messages
 
 
 ==== @timestamp
@@ -54,9 +54,9 @@ Prospector input type event was generated from. Set to prospectors type configur
 
 
 [[exported-fields-log]]
-=== Log files content fields
+=== Log File Content Fields
 
-Contains log files lines.
+Contains log file lines.
 
 
 
@@ -96,12 +96,12 @@ required: True
 Content of line read from log file given by source.
 
 
-==== fields fields
+==== fields Fields
 
 Contains user configurable fields.
 
 
-==== fileinfo fields
+==== fileinfo Fields
 
 Operating System specific file information use to identify the source file. For example on linux an inode might be reported.
 
