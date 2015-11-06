@@ -4,10 +4,10 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported fields
+== Exported Fields
 
-This document describes the fields that are exported by the
-topbeat. They are grouped in the
+This document describes the fields that are exported by 
+Topbeat. They are grouped in the
 following categories:
 
 * <<exported-fields-env>>
@@ -16,7 +16,7 @@ following categories:
 * <<exported-fields-filesystem>>
 
 [[exported-fields-env]]
-=== Common fields fields
+=== Common Fields
 
 Contains common fields available in all event types.
 
@@ -55,17 +55,17 @@ For how many transactions is this event representative. This is generally the in
 
 type: string
 
-Name of the shipper sending the statistics
+Name of the Beat sending the statistics
 
 
 [[exported-fields-system]]
-=== System wide statistics fields
+=== System-Wide Statistics Fields
 
 Contains system wide statistics. Details that you can get by running the *top* command on Unix systems.
 
 
 
-=== load fields
+=== load Fields
 
 System load average. The load average is the average number  of jobs in the run queue.
 
@@ -92,7 +92,7 @@ type: float
 Load average over 15 minutes. 
 
 
-=== cpu fields
+=== cpu Fields
 
 This group contains statistics related to the CPU usage.
 
@@ -165,7 +165,7 @@ type: int
 
 CPU time in involuntary wait by virtual cpu while hypervisor is servicing another processor CPU time stolen from a virtual machine. Available only on Unix.
 
-=== mem fields
+=== mem Fields
 
 This group contains statistics related to the memory usage on the system.
 
@@ -219,7 +219,7 @@ type: float
 Actual used memory, in percentage
 
 
-=== swap fields
+=== swap Fields
 
 This group contains statistics related to the swap memory usage on the system.
 
@@ -274,15 +274,15 @@ Actual used swap memory, in percentage
 
 
 [[exported-fields-process]]
-=== Per process statistics fields
+=== Per-Process Statistics Fields
 
-Per process statistics that you can get by running the *top* or *ps* command on Unix systems.
+Per-process statistics that you can get by running the *top* or *ps* command on Unix systems.
 
 
 
-=== proc fields
+=== proc Fields
 
-Contains per process statistics like memory usage, CPU usage and details about each process like state, name, pid, ppid.
+Contains per-process statistics like memory usage, CPU usage and details about each process like state, name, pid, ppid.
 
 
 
@@ -314,7 +314,7 @@ type: int
 Process parent pid.
 
 
-=== cpu fields
+=== cpu Fields
 
 CPU specific statistics per process.
 
@@ -354,7 +354,7 @@ type: string
 Time when the process was started. Example: "17:45".
 
 
-=== mem fields
+=== mem Fields
 
 Memory specific statistics per process.
 
@@ -388,13 +388,13 @@ Shared memory the process uses.
 
 
 [[exported-fields-filesystem]]
-=== File system statistics fields
+=== File System Statistics Fields
 
 File system related statistics that you can get by using the *df* command on Unix systems.
 
 
 
-=== fs fields
+=== fs Fields
 
 Contains details about the mounted disks like the total or used disk space and details about each disk like device name and the mounting place.
 

@@ -28,5 +28,5 @@ Topbeat helps you monitor your servers by collecting metrics like:
     * For each disk, the total, used (and percentage), free, and available space
 
 
-The shippers can insert the collected metrics directly into Elasticsearch
+Topbeat can insert the collected metrics directly into Elasticsearch
 or use Logstash.
