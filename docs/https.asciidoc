@@ -1,4 +1,4 @@
-== Using HTTPS and basic authentication
+== Using HTTPS and Basic Authentication
 
 To secure the communication between Packetbeat and Elasticsearch, you can use HTTPS and basic authentication. Here is an
 sample configuration:
@@ -31,7 +31,7 @@ the Shield's guide.
 Packetbeat uses the list of trusted certificate authorities from the host it is running on. Please see the documentation
 for your operating system for details on how to import your own CA certificate.
 
-NOTE: The TLS handshake fails in case the SSL/TLS ceritificates have a subject which does not match the `hosts` value,
+NOTE: The TLS handshake fails in case the SSL/TLS certificates have a subject which does not match the `hosts` value,
 for any given connection. For example, if you have `hosts: ["foobar:9200"]`, then the certificate MUST include
 `CN=foobar` in the subject or subject-alternative. Make sure the hostname resolves to the desired IP address. If no DNS
 is available, then you can just associate the right IP address with your hostname in `/etc/hosts` (on Unix systems).

@@ -15,7 +15,7 @@ After you have installed these products, you can start <<packetbeat-installation
 [[packetbeat-installation]]
 === Installing Packetbeat
 
-To download and install Packetbeat shippers on your application servers, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
+To download and install Packetbeat on your application servers, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
 
 deb:
 
@@ -53,7 +53,7 @@ https://www.elastic.co/downloads/beats/packetbeat[download page].
 NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
 configure Packetbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
-Before starting the shipper, edit the configuration file. For rpm and deb, you'll 
+Before starting Packetbeat, edit the configuration file. For rpm and deb, you'll 
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac, look in 
 the archive that you just downloaded.
 
@@ -104,7 +104,7 @@ protocols:
     ports: [9090]
 ----------------------------------------------------------------------
 +
-. Set the IP address and port where the shipper can find the Elasticsearch
+. Set the IP address and port where Packetbeat can find the Elasticsearch
 installation:
 +
 [source,yaml]

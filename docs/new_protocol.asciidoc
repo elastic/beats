@@ -1,9 +1,9 @@
-== Developer guide: adding a new protocol
+== Developer Guide: Adding a New Protocol
 
 This guide walks you through the steps needed to add a new protocol to
 Packetbeat.
 
-=== Getting ready
+=== Getting Ready
 
 Packetbeat is written in http://golang.org/[Go], so having it installed and
 knowing its basics is a prerequisite for adding a new protocol. However, don't
@@ -27,7 +27,7 @@ Before starting, please also read the
 https://github.com/elastic/packetbeat/blob/master/CONTRIBUTING.md[CONTRIBUTING]
 file on Github.
 
-==== Cloning and compiling
+==== Cloning and Compiling
 
 After having https://golang.org/doc/install[installed Go] and having setup the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
@@ -53,7 +53,7 @@ Note that the location where you clone is important. If you prefer working
 outside of the `GOPATH` environment, you can clone to another directory and only
 create a symlink it to the `$GOPATH/src/github.com/elastic/` directory.
 
-==== Fork and branch
+==== Forking and Branching
 
 We recommend the following work flow for contributing to Packetbeat:
 
@@ -86,7 +86,7 @@ $ git push --set-upstream tsg cool_new_protocol
   the branch after creating the PR. Submitting it early gives us more time to
   provide feedback and perhaps help you with it.
 
-==== A note about dependencies
+==== A Note About Dependencies
 
 Packetbeat uses https://github.com/tools/godep[Godep] for vendoring its
 dependencies. The way Godep works is that it copies the source code of all
@@ -98,7 +98,7 @@ helps with validating code as you type.
 If you add a new dependency, you can use `godep get` to add it to the vendored
 folder.
 
-=== Protocol modules
+=== Protocol Modules
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
 modules can be found in individual folders the
@@ -189,7 +189,7 @@ decisions about what to do with partial data received. For example, for the
 HTTP/1.0 protocol, the end of connection is used to know when the message is
 finished.
 
-==== Registering your plugin
+==== Registering Your Plugin
 
 To Configure your plugin you have to add a configuration struct to 
 `config/config.go` Protocols struct. This struct will be filled by
@@ -240,7 +240,8 @@ var ProtocolNames = []string{
 }
 ----------------------------------------------------------------------
 
-Protocol names order must match the protocol IDs. Additionally the protocol name must match the configuration name.
+Protocol names order must match the protocol IDs. Additionally the protocol name 
+must match the configuration name.
 
 Finally register your new protocol plugin in `packetbeat.go` EnabledProtocolPlugins:
 
@@ -267,7 +268,7 @@ helpful to first register it and implement the minimal plugin interface printing
 a debug message on received packets. This way you can test plugin registration
 working correctly.
 
-==== The TCP Parse function
+==== The TCP Parse Function
 
 For TCP protocols, the `Parse()` function is the heart of the module. As
 mentioned before, it is called for every TCP packet containing data on the
@@ -365,7 +366,7 @@ data. Finally, if the message is complete, we go to the next level.
 This block of code is called in a loop so that it can separate multiple messages
 found in the same packet.
 
-==== The UDP ParseUdp function
+==== The UDP ParseUdp Function
 
 If the protocol you are working on is running on top of UDP, then all the
 complexities around extracting messages from packets that the TCP
@@ -394,7 +395,7 @@ this map incomplete transactions. For example, we might see the request that has
 created an entry in the map, but if we never see the reply, we need to remove
 the request from memory on a timer, otherwise we risk leaking memory.
 
-==== Send the result
+==== Send the Result
 
 After the correlation step, you should have an JSON like object that can be sent
 to Elasticsearch for indexing. The way you do that is by publishing it
@@ -453,7 +454,7 @@ system tests:
 
 ==== Helpers
 
-===== Parsing helpers
+===== Parsing Helpers
 
 In libbeat you also find some helpers for implementing parsers for binary and
 text based protocols. The `Bytes_*` functions being the most low level helpers
@@ -533,7 +534,7 @@ It also implements a number of interfaces defined in the standard "io" package
 and can easily be used to serialize some packets for testing parsers (see
 `protos/memcache/binary_test.go`).
 
-===== Module helpers
+===== Module Helpers
 
 Packetbeat provides the module `packetbeat/protos/applayer` with
 common definitions among all application layer protocols. For example using the
@@ -573,7 +574,7 @@ transaction and `applayer.Stream` to manage your stream buffers for parsing.
 
 === Testing
 
-==== Unit tests
+==== Unit Tests
 
 For unit tests, use only the Go standard library
 http://golang.org/pkg/testing/[testing] package. To make comparing complex
@@ -656,7 +657,7 @@ there's no transaction present.
 To check the coverage of your unit tests, run the `make cover` command at the
 top of the repository.
 
-==== Sytem testing
+==== System Testing
 
 Because the main input to Packetbeat are packets and the main output are JSON
 objects, a convenient way of testing its functionality is by providing PCAP
