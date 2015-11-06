@@ -112,7 +112,6 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 		return c.onFail(err)
 	}
 	if err := socket.Handshake(); err != nil {
-		fmt.Printf("client handshake: %v\n", err)
 		_ = socket.Close()
 		return c.onFail(err)
 	}

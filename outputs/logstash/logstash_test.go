@@ -432,7 +432,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 		TLS: &outputs.TLSConfig{
 			CAs: []string{certName + ".pem"},
 		},
-		Timeout:     5,
+		Timeout:     1,
 		Max_retries: &retries,
 		Hosts:       []string{server.Addr()},
 	}
