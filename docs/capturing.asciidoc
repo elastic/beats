@@ -1,7 +1,7 @@
 [[capturing-options]]
-== Traffic capturing options
+== Traffic Capturing Options
 
-There are two main ways of deploying the Packetbeat shipper:
+There are two main ways of deploying Packetbeat:
 
 * On dedicated servers, getting the traffic from mirror ports or tap devices.
 
@@ -13,8 +13,8 @@ generally not available on cloud setups.
 
 In both cases, the sniffing (reading packets passively from the network)
 performance is very important. In the case of a dedicated server, better
-sniffing performance means less hardware required. In the shipper case, better
-sniffing performance means less overhead.
+sniffing performance means less hardware required. When Packetbeat is installed 
+on an existing application server, better sniffing performance means less overhead.
 
 Currently Packetbeat has several options for traffic capturing:
 
@@ -33,8 +33,8 @@ Gigabits per second using only standard hardware.
 The `af_packet` option, also known as "memory mapped sniffing" makes use of a
 Linux specific
 http://lxr.free-electrons.com/source/Documentation/networking/packet_mmap.txt[feature].
-This could be the optimal sniffing mode for both the dedicated server and the
-shipper cases.
+This could be the optimal sniffing mode for both the dedicated server and 
+when Packetbeat is deployed on an existing application server.
 
 The way it works is that both the kernel and the user space program map the
 same memory zone and a simple circular buffer is organized in this memory zone.

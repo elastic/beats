@@ -1,11 +1,12 @@
 [[packetbeat-configuration]]
-== Configuration
+== Configuration Options
 
 The Packetbeat configuration file uses http://yaml.org/[YAML] as any other Beat. 
 It consists of the following sections:
 
 
-* {libbeat}/configuration.html#configuration-shipper[Shipper]
+* {libbeat}/configuration.html#configuration-shipper[Shipper] (this section is covered in the
+{libbeat}/configuration.html#configuration-shipper[Beats Platform Reference])
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
@@ -53,7 +54,7 @@ interfaces:
   device: eth0
 ------------------------------------------------------------------------------
 
-Alternatively, on Linux the Packetbeat shipper supports capturing of all
+Alternatively, on Linux Packetbeat supports capturing of all
 messages sent or received by the server on which it is installed. For this, use
 the special "any" device.
 
@@ -110,7 +111,7 @@ interfaces:
   type: af_packet
 ------------------------------------------------------------------------------
 
-If you are on Linux and you are trying to optimize the CPU usage of the shipper,
+If you are on Linux and you are trying to optimize the CPU usage of Packetbeat,
 we recommend trying the `af_packet` and `pf_ring` options. Read this
 http://packetbeat.com/blog/sniffing-performance-and-ipv6.html[blog post]
 for some details.
@@ -133,7 +134,7 @@ interfaces:
   buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
-==== with_vlans
+===== with_vlans
 
 Packetbeat automatically generates a
 https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
@@ -146,7 +147,7 @@ tags, the above filter is ineffective because the offset used are moved with
 four bytes. To fix this, you can enabled the `with_vlans` option, which will
 generate a BPF filter looking like this: `"port 80 or port 3306 or (vlan and (port 80 or port 3306))"`.
 
-==== bpf_filter
+===== bpf_filter
 
 Packetbeat automatically generates a
 https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
@@ -212,16 +213,16 @@ protocols:
     ports: [9090]
 ------------------------------------------------------------------------------
 
-==== Common protocol options
+==== Common Protocol Options
 
 The following options are available for all protocols:
 
 ===== ports
 
-The Packetbeat shipper installs a BPF filter based on the ports configured in
+Packetbeat installs a BPF filter based on the ports configured in
 this section.
 If a packet doesn't match the filter, very little CPU is required to discard
-the packet. The shipper also uses the ports configured here to decide which
+the packet. Packetbeat also uses the ports configured here to decide which
 parser to use for each packet.
 
 ===== send_request
@@ -243,7 +244,7 @@ by default, only the HTTP headers.
 Per protocol transaction timeout. Expired transaction won't be correlated to incoming responses anymore, but sent to Elasticsearch immediately.
 
 
-==== DNS configuration
+==== DNS Configuration
 
 DNS protocol supports processing DNS message on UDP. Here is a sample configuration section for DNS:
 
@@ -273,7 +274,7 @@ By default publishing authority data is disabled.
 If enabled dns.additionals field (additional resource records) are added to DNS events.
 By default publishing additional resource records is disabled.
 
-==== HTTP configuration
+==== HTTP Configuration
 
 The Http protocol has several specific configuration options. Here is a
 sample configuration section:
@@ -308,11 +309,11 @@ protocols:
 
 ===== hide_keywords
 
-The Packetbeat shipper has the option of automatically censor certain strings
+Packetbeat has the option of automatically censor certain strings
 from the transactions it saves. This is done because while the SQL traffic
 typically only contains the hashes of the passwords, it is possible that the
-HTTP traffic contains sensitive data. In order to reduce the security risks,
-the shipper can automatically avoid sending the contents of certain HTTP POST
+HTTP traffic contains sensitive data. In order to reduce the security risks, 
+Packetbeat can automatically avoid sending the contents of certain HTTP POST
 parameters. The sensitive content associated with these keywords is replaced
 by ``xxxxx``. By default, no changes are made to the HTTP messages.
 
@@ -398,7 +399,7 @@ information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
 
-==== Memcache configuration
+==== Memcache Configuration
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -445,7 +446,7 @@ before publishing quiet messages. Non quiet messages or quiet requests with
 error response will not have to wait for the timeout.
 
 
-==== MySQL and PgSQL configuration
+==== MySQL and PgSQL Configuration
 
 ===== max_rows
 
@@ -459,7 +460,7 @@ Maximum length in bytes of a row from the SQL message to publish to
 Elasticsearch. The default is 1024 bytes.
 
 [[configuration-thrift]]
-==== Thrift configuration
+==== Thrift Configuration
 
 Thrift protocol has several specific configuration options. Here is a
 sample configuration section:
@@ -490,8 +491,8 @@ corresponding to the TBinary protocol, which is the default Thrift protocol.
 
 ===== idl_files
 
-The Thrift Interface description language (IDL) files for the service that the
-shipper is monitoring. Providing the IDL files is optional, because the Thrift
+The Thrift Interface description language (IDL) files for the service that 
+Packetbeat is monitoring. Providing the IDL files is optional, because the Thrift
 messages contain enough information to decode them without having the IDL
 files. However, providing the IDL will additionally fill in parameter and
 exceptions names.
@@ -510,7 +511,7 @@ added at the end to mark that the collection was truncated. The default is 15.
 
 ===== capture_reply
 
-If set to false, the Packetbeat shipper only decodes the method name from
+If set to false, Packetbeat only decodes the method name from
 the reply and simply skip the rest of the response message. This can be useful
 for performance, disk usage or data retention reasons. The default is true.
 
@@ -521,14 +522,14 @@ in the return code or in the exception structures with the `"*"` string.
 
 ===== drop_after_n_struct_fields
 
-If a structure has more fields than this given value, the Packetbeat shipper will
-ignore the whole transaction. This is a memory protection mechanism (so that
-the shipper's memory doesn't grow indefinitely), so you would topically set this
+If a structure has more fields than this given value, Packetbeat will
+ignore the whole transaction. This is a memory protection mechanism (so that 
+Packetbeat's memory doesn't grow indefinitely), so you would topically set this
 to a relatively high value. The default is 500.
 
 
 [[configuration-mongodb]]
-==== MongoDB configuration
+==== MongoDB Configuration
 
 The following settings are specific to the MongoDB protocol. Here is a sample
 configuration section:
@@ -555,7 +556,7 @@ more documents but they weren't saved because of this setting.
 
 ===== max_doc_length
 
-Maximum number of characters in a single document indexed in the `resposne`
+Maximum number of characters in a single document indexed in the `response`
 field. The default is 5000. You can set this to 0 to index an unlimited number
 of characters per document.
 
@@ -567,14 +568,14 @@ formatted JSON objects.
 
 
 [[maintaining-topology]]
-=== Maintaining the real-time state of the network topology
+=== Maintaining the Real-time State of the Network Topology
 
 One of the important features of Packetbeat is that it knows for each
 transaction which is the source server and is the destination server by names.
 It does this without the requirement of maintaining a central configuration.
-Instead each shipper notes the hostname of the server on which it runs on, and
+Instead each Beat notes the hostname of the server on which it runs, and
 maps that to the list of IP addresses of that server. This information is
-shared between shippers by using the mechanisms provided by the output plugins.
+shared between Beats by using the mechanisms provided by the output plugins.
 
 For example, the Redis output plugin stores the topology in a dedicated Redis
 database and the Elasticsearch output plugin stores the topology in an
@@ -590,25 +591,25 @@ controlled from the `save_topology` configuration option.
 [[configuration-processes]]
 === Processes (optional)
 
-This section is optional, but configuring the processes enables Packetbeat
-shipper to not only show you between which servers the traffic is flowing, but
+This section is optional, but configuring the processes enables Packetbeat 
+to not only show you between which servers the traffic is flowing, but
 also between which processes. It can even show you the traffic between two
 processes running on the same host, so this is particularly useful when you
 have more services running on the same server. By default, process matching
 is disabled.
 
-When it starts (and then periodically) the shipper scans the process table for
+When it starts (and then periodically) Packetbeat scans the process table for
 processes matching the configuration file. For each of these processes, it
 monitors which file descriptors it has opened. When a new packet is captured,
 it reads the list of active TCP connections and matches the corresponding one
 with the list of file descriptors.
 
 On a Linux system, all this information is available via the `/proc`
-filesystem, so the Packetbeat shipper doesn't need a kernel module.
+filesystem, so Packetbeat doesn't need a kernel module.
 
 
 NOTE: Process monitoring is currently only supported on
-      Linux systems. The Packetbeat shipper automatically disables
+      Linux systems. Packetbeat automatically disables
       it when it detects other operating systems.
 
 Example configuration:
@@ -643,7 +644,7 @@ app" instead of "gunicorn")
 ===== cmdline_grep
 
 This option for each process is used to identify the process at
-runtime. When it starts, and then periodically, the shipper scans the process table for
+runtime. When it starts, and then periodically, Packetbeat scans the process table for
 processes matching `cmdline_grep` option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 

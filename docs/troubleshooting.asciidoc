@@ -1,6 +1,6 @@
 == Troubleshooting
 
-If you suspect an issue with the Packetbeat shipper itself, please read the
+If you suspect an issue with Packetbeat, please read the
 following tips and send us the logs and, if possible, a traffic trace.
 
 Please contact us on the https://discuss.elastic.co/c/beats/packetbeat[forums].
@@ -11,7 +11,7 @@ https://github.com/elastic/packetbeat/issues?state=open[GitHub]. Note, however,
 that we close GitHub issues if they are questions or requests for help that
 don't indicate the presence of a bug.
 
-=== Running in foreground and enabling debugging
+=== Running in the Foreground and Enabling Debugging
 
 By default, Packetbeat sends all its output to syslog. You can use the `-e`
 command line flag to direct the output at standard error instead:
@@ -30,7 +30,7 @@ packetbeat -e -c /etc/packetbeat/packetbeat.yml
 ------------------------------------------------------------
 
 You can increase the verbosity by enabling one or more debug selectors. For
-example, to view which transactions are published, you can start the shipper like
+example, to view which transactions are published, you can start Packetbeat like
 this:
 
 [source,shell]
@@ -74,7 +74,7 @@ use `*`, like this:
 packetbeat -e -d "*"
 ------------------------------------------------------------
 
-=== Recording a trace
+=== Recording a Trace
 
 If you are having an issue, it is often useful to record a full network trace
 and send it to us. It will help us reproduce the issue and we can also add it
