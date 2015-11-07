@@ -51,9 +51,21 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 		tb.procs = []string{".*"} //all processes
 	}
 
-	tb.sysStats = tb.TbConfig.Input.Stats.System
-	tb.procStats = tb.TbConfig.Input.Stats.Proc
-	tb.fsStats = tb.TbConfig.Input.Stats.Filesystem
+	if tb.TbConfig.Input.Stats.System != nil {
+		tb.sysStats = *tb.TbConfig.Input.Stats.System
+	} else {
+		tb.sysStats = true
+	}
+	if tb.TbConfig.Input.Stats.Proc != nil {
+		tb.procStats = *tb.TbConfig.Input.Stats.Proc
+	} else {
+		tb.procStats = true
+	}
+	if tb.TbConfig.Input.Stats.Filesystem != nil {
+		tb.fsStats = *tb.TbConfig.Input.Stats.Filesystem
+	} else {
+		tb.fsStats = true
+	}
 
 	if !tb.sysStats && !tb.procStats && !tb.fsStats {
 		return errors.New("Invalid statistics configuration")
