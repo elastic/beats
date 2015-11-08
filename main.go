@@ -1,7 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/elastic/libbeat/beat"
+	"github.com/elastic/libbeat/logp"
 )
 
 // Setups and Runs Packetbeat
@@ -26,7 +29,11 @@ func main() {
 	b.LoadConfig()
 
 	// Configures beat
-	pb.Config(b)
+	err := pb.Config(b)
+	if err != nil {
+		logp.Critical("Config error: %v", err)
+		os.Exit(1)
+	}
 
 	// Run beat. This calls first beater.Setup,
 	// then beater.Run and beater.Cleanup in the end

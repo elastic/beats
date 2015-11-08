@@ -1,8 +1,8 @@
 package elasticsearch
 
 import (
+	"crypto/tls"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -14,22 +14,22 @@ import (
 var debug = logp.MakeDebug("elasticsearch")
 
 var (
-	// ErrNoHostsConfigured indicates missing host or hosts configuration
-	ErrNoHostsConfigured = errors.New("no host configuration found")
-
 	// ErrNotConnected indicates failure due to client having no valid connection
 	ErrNotConnected = errors.New("not connected")
 
 	// ErrJSONEncodeFailed indicates encoding failures
 	ErrJSONEncodeFailed = errors.New("json encode failed")
+
+	// ErrResponseRead indicates error parsing Elasticsearch response
+	ErrResponseRead = errors.New("bulk item status parse failed.")
 )
 
 const (
-	defaultEsOpenTimeout = 3000 * time.Millisecond
-
 	defaultMaxRetries = 3
 
-	elasticsearchDefaultTimeout = 30 * time.Second
+	defaultBulkSize = 50
+
+	elasticsearchDefaultTimeout = 90 * time.Second
 )
 
 func init() {
@@ -51,6 +51,13 @@ func (f elasticsearchOutputPlugin) NewOutput(
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
+
+	// configure bulk size in config in case it is not set
+	if config.BulkMaxSize == nil {
+		bulkSize := defaultBulkSize
+		config.BulkMaxSize = &bulkSize
+	}
+
 	output := &elasticsearchOutput{}
 	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
@@ -64,7 +71,12 @@ func (out *elasticsearchOutput) init(
 	config outputs.MothershipConfig,
 	topologyExpire int,
 ) error {
-	clients, err := makeClients(beat, config)
+	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return err
+	}
+
+	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
 	if err != nil {
 		return err
 	}
@@ -80,16 +92,19 @@ func (out *elasticsearchOutput) init(
 	}
 
 	var waitRetry = time.Duration(1) * time.Second
+	var maxWaitRetry = time.Duration(60) * time.Second
 
 	var m mode.ConnectionMode
 	out.clients = clients
 	if len(clients) == 1 {
 		client := clients[0]
-		m, err = mode.NewSingleConnectionMode(client, maxRetries, waitRetry, timeout)
+		m, err = mode.NewSingleConnectionMode(client, maxRetries,
+			waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxRetries, waitRetry, timeout)
+			m, err = mode.NewLoadBalancerMode(clients, maxRetries,
+				waitRetry, timeout, maxWaitRetry)
 		} else {
 			m, err = mode.NewFailOverConnectionMode(clients, maxRetries, waitRetry, timeout)
 		}
@@ -130,43 +145,26 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
-func makeClients(
+func makeClientFactory(
 	beat string,
+	tls *tls.Config,
 	config outputs.MothershipConfig,
-) ([]mode.ProtocolClient, error) {
-	var urls []string
-	if len(config.Hosts) > 0 {
-		// use hosts setting
-		for _, host := range config.Hosts {
-			url, err := getURL(config.Protocol, config.Path, host)
-			if err != nil {
-				logp.Err("Invalid host param set: %s, Error: %v", host, err)
-			}
-
-			urls = append(urls, url)
+) func(string) (mode.ProtocolClient, error) {
+	return func(host string) (mode.ProtocolClient, error) {
+		url, err := getURL(config.Protocol, config.Path, host)
+		if err != nil {
+			logp.Err("Invalid host param set: %s, Error: %v", host, err)
+			return nil, err
 		}
-	} else {
-		// usage of host and port is deprecated as it is replaced by hosts
-		url := fmt.Sprintf("%s://%s:%d%s", config.Protocol, config.Host, config.Port, config.Path)
-		urls = append(urls, url)
-	}
 
-	index := beat
-	if config.Index != "" {
-		index = config.Index
-	}
+		index := beat
+		if config.Index != "" {
+			index = config.Index
+		}
 
-	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
+		client := NewClient(url, index, tls, config.Username, config.Password)
+		return client, nil
 	}
-
-	var clients []mode.ProtocolClient
-	for _, url := range urls {
-		client := NewClient(url, index, tlsConfig, config.Username, config.Password)
-		clients = append(clients, client)
-	}
-	return clients, nil
 }
 
 func (out *elasticsearchOutput) PublishEvent(

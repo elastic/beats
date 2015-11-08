@@ -866,7 +866,7 @@ func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 		event["notes"] = t.Notes
 	}
 
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

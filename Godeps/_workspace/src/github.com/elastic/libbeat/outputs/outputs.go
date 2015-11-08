@@ -28,10 +28,11 @@ type MothershipConfig struct {
 	Number_of_files    int
 	DataType           string
 	Flush_interval     *int
-	Bulk_size          *int
+	BulkMaxSize        *int `yaml:"bulk_max_size"`
 	Max_retries        *int
 	Pretty             *bool
 	TLS                *TLSConfig
+	Worker             int
 }
 
 type Outputer interface {

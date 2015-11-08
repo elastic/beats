@@ -1,6 +1,7 @@
 package outputs
 
 import (
+	"github.com/elastic/libbeat/logp"
 	"sync/atomic"
 )
 
@@ -140,7 +141,12 @@ func SignalCompleted(s Signaler) {
 }
 
 // SignalFailed sends the Failed event to s if s is not nil
-func SignalFailed(s Signaler) {
+func SignalFailed(s Signaler, err error) {
+
+	if err != nil {
+		logp.Err("Error sending/writing event: %s", err)
+	}
+
 	if s != nil {
 		s.Failed()
 	}
@@ -149,6 +155,11 @@ func SignalFailed(s Signaler) {
 // Signal will send the Completed or Failed event to s depending
 // on err being set if s is not nil.
 func Signal(s Signaler, err error) {
+
+	if err != nil {
+		logp.Info("Failed to send event %s", err)
+	}
+
 	if s != nil {
 		if err == nil {
 			s.Completed()

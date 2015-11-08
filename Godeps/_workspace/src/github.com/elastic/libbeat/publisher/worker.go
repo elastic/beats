@@ -18,9 +18,9 @@ type messageWorker struct {
 }
 
 type message struct {
-	signal outputs.Signaler
-	event  common.MapStr
-	events []common.MapStr
+	context context
+	event   common.MapStr
+	events  []common.MapStr
 }
 
 type workerSignal struct {
@@ -87,6 +87,6 @@ func (ws *workerSignal) Init() {
 func stopQueue(qu chan message) {
 	close(qu)
 	for msg := range qu { // clear queue and send fail signal
-		outputs.SignalFailed(msg.signal)
+		outputs.SignalFailed(msg.context.signal, nil)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -104,30 +105,33 @@ func (f *FailOverConnectionMode) connect(active int) error {
 // unavailable. On failure PublishEvents tries to connect to another configured
 // connection by random.
 func (f *FailOverConnectionMode) PublishEvents(
-	trans outputs.Signaler,
+	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	published := 0
 	fails := 0
+	var err error
+
 	for !f.closed && (f.maxAttempts == 0 || fails < f.maxAttempts) {
-		if err := f.connect(f.active); err != nil {
+		if err = f.connect(f.active); err != nil {
+			logp.Info("Connecting error publishing events (retrying): %s", err)
 			fails++
 			time.Sleep(f.waitRetry)
 			continue
 		}
 
 		// loop until all events have been send in case client supports partial sends
-		for published < len(events) {
+		for len(events) > 0 {
+			var err error
 			conn := f.conns[f.active]
-			n, err := conn.PublishEvents(events[published:])
+			events, err = conn.PublishEvents(events)
 			if err != nil {
+				logp.Info("Error publishing events (retrying): %s", err)
 				break
 			}
-			published += n
 		}
 
-		if published == len(events) {
-			outputs.SignalCompleted(trans)
+		if len(events) == 0 {
+			outputs.SignalCompleted(signaler)
 			return nil
 		}
 
@@ -140,7 +144,7 @@ func (f *FailOverConnectionMode) PublishEvents(
 		fails++
 	}
 
-	outputs.SignalFailed(trans)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }
 
@@ -150,14 +154,17 @@ func (f *FailOverConnectionMode) PublishEvent(
 	event common.MapStr,
 ) error {
 	fails := 0
+	var err error
 	for !f.closed && (f.maxAttempts == 0 || fails < f.maxAttempts) {
 		if err := f.connect(f.active); err != nil {
+			logp.Info("Connecting error publishing events (retrying): %s", err)
 			fails++
 			time.Sleep(f.waitRetry)
 			continue
 		}
 
 		if err := f.conns[f.active].PublishEvent(event); err != nil {
+			logp.Info("Error publishing events (retrying): %s", err)
 			fails++
 			continue
 		}
@@ -166,6 +173,6 @@ func (f *FailOverConnectionMode) PublishEvent(
 		return nil
 	}
 
-	outputs.SignalFailed(signaler)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }

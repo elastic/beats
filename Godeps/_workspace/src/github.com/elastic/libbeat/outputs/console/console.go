@@ -75,7 +75,6 @@ func (c *console) PublishEvent(
 	outputs.SignalCompleted(s)
 	return nil
 fail:
-	logp.Err("Fail to write event: %s", err)
-	outputs.SignalFailed(s)
+	outputs.SignalFailed(s, err)
 	return err
 }

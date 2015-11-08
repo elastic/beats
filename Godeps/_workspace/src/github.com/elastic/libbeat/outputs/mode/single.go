@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/outputs"
 )
 
@@ -15,8 +16,9 @@ type SingleConnectionMode struct {
 
 	closed bool // mode closed flag to break publisher loop
 
-	timeout   time.Duration // connection timeout
-	waitRetry time.Duration // wait time until reconnect
+	timeout      time.Duration // connection timeout
+	waitRetry    time.Duration // wait time until reconnect
+	maxWaitRetry time.Duration // Maximum send/retry timeout in backoff case.
 
 	// maximum number of configured send attempts. If set to 0, publisher will
 	// block until event has been successfully published.
@@ -28,11 +30,15 @@ type SingleConnectionMode struct {
 func NewSingleConnectionMode(
 	client ProtocolClient,
 	maxAttempts int,
-	waitRetry, timeout time.Duration,
+	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*SingleConnectionMode, error) {
 	s := &SingleConnectionMode{
-		timeout:     timeout,
-		conn:        client,
+		conn: client,
+
+		timeout:      timeout,
+		waitRetry:    waitRetry,
+		maxWaitRetry: maxWaitRetry,
+
 		maxAttempts: maxAttempts,
 	}
 
@@ -59,35 +65,46 @@ func (s *SingleConnectionMode) PublishEvents(
 	signaler outputs.Signaler,
 	events []common.MapStr,
 ) error {
-	published := 0
 	fails := 0
+	var backoffCount uint
+	var err error
+
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
 		if err := s.connect(); err != nil {
-			fails++
-			time.Sleep(s.waitRetry)
-			continue
+			logp.Info("Connecting error publishing events (retrying): %s", err)
+			goto sendFail
 		}
 
-		for published < len(events) {
-			n, err := s.conn.PublishEvents(events[published:])
+		for len(events) > 0 {
+			var err error
+			events, err = s.conn.PublishEvents(events)
 			if err != nil {
+				logp.Info("Error publishing events (retrying): %s", err)
 				break
 			}
 
 			fails = 0
-			published += n
 		}
 
-		if published == len(events) {
+		if len(events) == 0 {
 			outputs.SignalCompleted(signaler)
 			return nil
 		}
 
-		time.Sleep(s.waitRetry)
+	sendFail:
+		logp.Info("send fail")
+		backoff := time.Duration(int64(s.waitRetry) * (1 << backoffCount))
+		if backoff > s.maxWaitRetry {
+			backoff = s.maxWaitRetry
+		} else {
+			backoffCount++
+		}
+		logp.Info("backoff retry: %v", backoff)
+		time.Sleep(backoff)
 		fails++
 	}
 
-	outputs.SignalFailed(signaler)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }
 
@@ -97,13 +114,20 @@ func (s *SingleConnectionMode) PublishEvent(
 	event common.MapStr,
 ) error {
 	fails := 0
+
+	var err error
+
 	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
-		if err := s.connect(); err != nil {
+		if err = s.connect(); err != nil {
+			logp.Info("Connecting error publishing event (retrying): %s", err)
+
 			fails++
 			time.Sleep(s.waitRetry)
 			continue
 		}
 		if err := s.conn.PublishEvent(event); err != nil {
+			logp.Info("Error publishing event (retrying): %s", err)
+
 			fails++
 			continue
 		}
@@ -112,6 +136,6 @@ func (s *SingleConnectionMode) PublishEvent(
 		return nil
 	}
 
-	outputs.SignalFailed(signaler)
+	outputs.SignalFailed(signaler, err)
 	return nil
 }

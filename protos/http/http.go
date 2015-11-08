@@ -897,7 +897,7 @@ func (http *Http) publishTransaction(t *HttpTransaction) {
 
 	event["bytes_out"] = t.BytesOut
 	event["bytes_in"] = t.BytesIn
-	event["timestamp"] = common.Time(t.ts)
+	event["@timestamp"] = common.Time(t.ts)
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 

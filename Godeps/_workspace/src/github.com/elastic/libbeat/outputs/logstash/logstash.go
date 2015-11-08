@@ -5,8 +5,6 @@ package logstash
 
 import (
 	"crypto/tls"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -44,14 +42,15 @@ type logstash struct {
 const (
 	logstashDefaultPort = 10200
 
-	logstashDefaultTimeout = 30 * time.Second
-	defaultSendRetries     = 3
+	logstashDefaultTimeout   = 30 * time.Second
+	logstasDefaultMaxTimeout = 90 * time.Second
+	defaultSendRetries       = 3
 )
 
-// ErrNoHostsConfigured indicates missing host or hosts configuration
-var ErrNoHostsConfigured = errors.New("no host configuration found")
-
 var waitRetry = time.Duration(1) * time.Second
+
+// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does not return ErrTempBulkFailure
+var maxWaitRetry = time.Duration(60) * time.Second
 
 func (lj *logstash) init(
 	beat string,
@@ -82,15 +81,15 @@ func (lj *logstash) init(
 			return err
 		}
 
-		clients, err = makeClients(config, timeout,
+		clients, err = mode.MakeClients(config, makeClientFactory(timeout,
 			func(host string) (TransportClient, error) {
 				return newTLSClient(host, defaultPort, tlsConfig)
-			})
+			}))
 	} else {
-		clients, err = makeClients(config, timeout,
+		clients, err = mode.MakeClients(config, makeClientFactory(timeout,
 			func(host string) (TransportClient, error) {
 				return newTCPClient(host, defaultPort)
-			})
+			}))
 	}
 	if err != nil {
 		return err
@@ -104,11 +103,12 @@ func (lj *logstash) init(
 	var m mode.ConnectionMode
 	if len(clients) == 1 {
 		m, err = mode.NewSingleConnectionMode(clients[0],
-			sendRetries, waitRetry, timeout)
+			sendRetries, waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance != nil && *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, sendRetries, waitRetry, timeout)
+			m, err = mode.NewLoadBalancerMode(clients, sendRetries,
+				waitRetry, timeout, maxWaitRetry)
 		} else {
 			m, err = mode.NewFailOverConnectionMode(clients, sendRetries, waitRetry, timeout)
 		}
@@ -126,34 +126,16 @@ func (lj *logstash) init(
 	return nil
 }
 
-func makeClients(
-	config outputs.MothershipConfig,
+func makeClientFactory(
 	timeout time.Duration,
-	newTransp func(string) (TransportClient, error),
-) ([]mode.ProtocolClient, error) {
-	switch {
-	case len(config.Hosts) > 0:
-		var clients []mode.ProtocolClient
-		for _, host := range config.Hosts {
-			transp, err := newTransp(host)
-			if err != nil {
-				for _, client := range clients {
-					_ = client.Close() // ignore error
-				}
-				return nil, err
-			}
-			client := newLumberjackClient(transp, timeout)
-			clients = append(clients, client)
-		}
-		return clients, nil
-	case config.Host != "":
-		transp, err := newTransp(config.Host)
+	makeTransp func(string) (TransportClient, error),
+) func(string) (mode.ProtocolClient, error) {
+	return func(host string) (mode.ProtocolClient, error) {
+		transp, err := makeTransp(host)
 		if err != nil {
 			return nil, err
 		}
-		return []mode.ProtocolClient{newLumberjackClient(transp, timeout)}, nil
-	default:
-		return nil, ErrNoHostsConfigured
+		return newLumberjackClient(transp, timeout), nil
 	}
 }
 
@@ -191,5 +173,4 @@ func (lj *logstash) addMeta(event common.MapStr) {
 		"beat": lj.index,
 		"type": event["type"].(string),
 	}
-	fmt.Printf("meta data: %v\n", event["@metadata"])
 }

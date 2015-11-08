@@ -3,11 +3,15 @@
 package mode
 
 import (
+	"errors"
 	"time"
 
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/outputs"
 )
+
+// ErrNoHostsConfigured indicates missing host or hosts configuration
+var ErrNoHostsConfigured = errors.New("no host configuration found")
 
 // ConnectionMode takes care of connecting to hosts
 // and potentially doing load balancing and/or failover
@@ -48,11 +52,66 @@ type ProtocolClient interface {
 	// must be set. If connection has been lost, IsConnected must return false
 	// in future calls.
 	// PublishEvents is free to publish only a subset of given events, even in
-	// error case. On return n indicates the number of events guaranteed to be
-	// published.
-	PublishEvents(events []common.MapStr) (n int, err error)
+	// error case. On return nextEvents contains all events not yet published.
+	PublishEvents(events []common.MapStr) (nextEvents []common.MapStr, err error)
 
 	// PublishEvent sends one event to the clients sink. On failure and error is
 	// returned.
 	PublishEvent(event common.MapStr) error
+}
+
+var (
+	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
+	ErrTempBulkFailure = errors.New("temporary bulk send failure")
+)
+
+// MakeClients will create a list from of ProtocolClient instances from
+// outputer configuration host list and client factory function.
+func MakeClients(
+	config outputs.MothershipConfig,
+	newClient func(string) (ProtocolClient, error),
+) ([]ProtocolClient, error) {
+	hosts := readHostList(config)
+	if len(hosts) == 0 {
+		return nil, ErrNoHostsConfigured
+	}
+
+	clients := make([]ProtocolClient, 0, len(hosts))
+	for _, host := range hosts {
+		client, err := newClient(host)
+		if err != nil {
+			// on error destroy all client instance created
+			for _, client := range clients {
+				_ = client.Close() // ignore error
+			}
+			return nil, err
+		}
+		clients = append(clients, client)
+	}
+	return clients, nil
+}
+
+func readHostList(config outputs.MothershipConfig) []string {
+	var lst []string
+
+	// TODO: remove config.Host
+	if len(config.Hosts) > 0 {
+		lst = config.Hosts
+	} else if config.Host != "" {
+		lst = []string{config.Host}
+	}
+
+	if len(lst) == 0 || config.Worker <= 1 {
+		return lst
+	}
+
+	// duplicate entries config.Workers times
+	hosts := make([]string, 0, len(lst)*config.Worker)
+	for _, entry := range lst {
+		for i := 0; i < config.Worker; i++ {
+			hosts = append(hosts, entry)
+		}
+	}
+
+	return hosts
 }
