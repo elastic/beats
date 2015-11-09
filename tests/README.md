@@ -1,9 +1,12 @@
-# Automatic tests for Packetbeat
+# System tests for Packetbeat
 
-This repository contains the system tests for the [Packetbeat](http://packetbeat.com)
-project.
+This folder contains the system tests for Packetbeat. The system tests
+are written in Python and they make use of the nose framework.
 
 ## Running
+
+You need python (>=2.7), virtualenv and pip installed. Then you can prepare
+the setup and run all the tests with:
 
         make test
 
@@ -11,7 +14,3 @@ Running a single test, e.g.:
 
         . env/bin/activate
         nosetests test_0002_thrift_basics.py:Test.test_thrift_integration
-
-## Build status
-
-[![Build Status](https://travis-ci.org/packetbeat/packetbeat.svg?branch=master)](https://travis-ci.org/packetbeat/packetbeat)
