@@ -10,8 +10,8 @@ import sys
 import yaml
 
 SECTIONS = [
-    ("env", "Common fields"),
-    ("log", "Log files content"),
+    ("env", "Common"),
+    ("log", "Log File Content"),
 ]
 
 
@@ -19,7 +19,7 @@ def document_fields(output, section, level=3):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-    output.write("{} {} fields\n\n".format(level*'=', section["name"]))
+    output.write("{} {} Fields\n\n".format(level*'=', section["name"]))
 
     if "description" in section:
         output.write("{}\n\n".format(section["description"]))
@@ -69,9 +69,9 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported fields
+== Exported Fields
 
-This document describes the fields that are exported by filebeat. They are
+This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
 """)
