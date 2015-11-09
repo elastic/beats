@@ -233,7 +233,13 @@ class Test(TestCase):
                 "Registrar: processing 5 events"),
             max_timeout=15)
         os.remove(testfile)
-        time.sleep(5)
+
+        if os.name == 'nt':
+            # Wait until error shows up on windows
+            self.wait_until(
+                lambda: self.log_contains(
+                    "Unexpected windows specific error reading from"),
+                max_timeout=15)
 
         # Create new file with same name to see if it is picked up
         file = open(testfile, 'w')
@@ -323,21 +329,22 @@ class Test(TestCase):
             f.flush()
 
             self.wait_until(
-                lambda: self.log_contains(
-                    "Registrar: processing 1 events"),
+                lambda: self.output_has(1),
                 max_timeout=15)
+
+        lines_written = 0
 
         for n in range(3):
             with open(testfile, 'a') as f:
 
                 for i in range(0, 20 + n):
                     f.write("hello world " + str(i) + " " + str(n) + "\n")
+                    lines_written = lines_written + 1
 
                 f.flush()
 
                 self.wait_until(
-                    lambda: self.log_contains(
-                        "Registrar: processing " + str(20 + n) + " events"),
+                    lambda: self.output_has( lines_written + 1),
                     max_timeout=15)
 
         filebeat.kill_and_wait()

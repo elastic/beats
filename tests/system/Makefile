@@ -1,6 +1,6 @@
 SHELL := /bin/bash
-PROCESSES ?= 4
-TIMEOUT ?= 120
+# No test should take more then 30 seconds
+TIMEOUT ?= 30
 
 env: env/bin/activate
 env/bin/activate: requirements.txt
@@ -11,7 +11,7 @@ env/bin/activate: requirements.txt
 .PHONY: test
 test: env
 	make -C ../.. filebeat.test
-	. env/bin/activate; nosetests --processes=${PROCESSES} --process-timeout=$(TIMEOUT)
+	. env/bin/activate; nosetests --process-timeout=$(TIMEOUT) --with-timer
 
 .PHONY: coverage
 coverage: test
