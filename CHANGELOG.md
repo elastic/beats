@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 - Export mem.actual_used_p and swap.actual_used_p #93
+- Configure what type of statistics to be exported #99
 
 ### Deprecated
 
