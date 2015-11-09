@@ -7,8 +7,8 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/elastic/gosigar",
-			"Comment": "scotty_09012012-36-g1de52ef",
-			"Rev": "1de52efa015ad9c4f45a1aece6a3541d3603129e"
+			"Comment": "scotty_09012012-41-g2c80298",
+			"Rev": "2c8029813fbceca97293a0f818e2f2f42071e3d3"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",

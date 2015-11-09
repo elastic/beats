@@ -179,6 +179,7 @@ func (t *Topbeat) exportProcStats() error {
 		return err
 	}
 
+	newProcs := make(ProcsMap, len(pids))
 	for _, pid := range pids {
 		process, err := GetProcess(pid)
 		if err != nil {
@@ -191,7 +192,7 @@ func (t *Topbeat) exportProcStats() error {
 			t.addProcCpuPercentage(process)
 			t.addProcMemPercentage(process, 0 /*read total mem usage */)
 
-			t.procsMap[process.Pid] = process
+			newProcs[process.Pid] = process
 
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
@@ -208,6 +209,7 @@ func (t *Topbeat) exportProcStats() error {
 			t.events.PublishEvent(event)
 		}
 	}
+	t.procsMap = newProcs
 	return nil
 }
 
