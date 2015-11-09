@@ -755,9 +755,9 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 
 	// what kind of checks should be done here ?
 	// gopacket decodeDns already check QDCount, ANCount, NScount, ARcount
-	data, ok := dns.messageParser(stream)
+	data := dns.messageParser(stream)
 
-	if !ok {
+	if data == nil {
 		logp.Debug("dns", "decode fail")
 		// drop this tcp stream. Will retry parsing with the next
 		// segment in it
@@ -765,36 +765,27 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 		return priv
 	}
 
-	if data != nil {
-		logp.Debug("dns", "decode succeed")
-		dns.messageComplete(tcpTuple, dir, stream, data)
-	}
+	logp.Debug("dns", "decode succeed")
+	dns.messageComplete(tcpTuple, dir, stream, data)
 
 	return priv
 
 }
 
-// return decoded data so we don't have to do it twice
-func (dns *Dns) messageParser(s *DnsStream) (*layers.DNS, bool) {
+// return decoded data so we don't have to do decode twice
+// return nil if failed
+func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
 		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
 			s.tcpTuple.String(), len(s.data))
-		return nil, false
+		return nil
 	}
 
 	// no other check ? make sure gopacket checks are enough
 	// if they are, change this foo return
-	return dnsData, true
-
-	/*
-		if dnsData.QR == Query {
-
-		} else {
-
-		}
-	*/
+	return dnsData
 }
 
 func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream, decodedData *layers.DNS) {
@@ -809,10 +800,6 @@ func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, d
 	m.Data = decodedData
 	m.Length = len(data)
 
-	//logp.Debug("dns", "tcpTuple is %s", tcpTuple)
-	//logp.Debug("dns", "m.tuple is %s", m.Tuple)
-	//logp.Debug("dns", "DnsTuple is %s", dnsTuple)
-
 	if decodedData.QR == Query {
 		dns.receivedDnsRequest(&dnsTuple, m)
 	} else /* Response */ {
@@ -821,8 +808,8 @@ func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, d
 }
 
 func (stream *DnsStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.parseOffset:]
-	stream.parseOffset = 0 // useful field ?
+	stream.data = stream.data[stream.parseOffset:] // useful var ?
+	stream.parseOffset = 0                         // useful var ?...
 	stream.message = nil
 }
 
@@ -840,7 +827,7 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 
 	stream := dnsData.Data[dir]
 	if stream.message != nil {
-		decodedData, _ := dns.messageParser(stream)
+		decodedData := dns.messageParser(stream)
 		if decodedData != nil {
 			dns.handleDns(stream.message, tcpTuple, dir, stream.data, decodedData)
 			stream.PrepareForNewMessage()
@@ -851,6 +838,6 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 }
 
 func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	// DNS decoder shouldnt be able to decode it anyway, right ?
 	return private, true
 }
