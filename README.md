@@ -1,6 +1,6 @@
 Notice: *This is an experimental proof of concept project. See [Current Status](https://github.com/elastic/eventbeat/issues/1) for details.*
 
-Eventbeat
+Eventbeat [![GoDoc](https://godoc.org/github.com/elastic/eventbeat?status.svg)](https://godoc.org/github.com/elastic/eventbeat) [![Build Status](https://travis-ci.org/elastic/eventbeat.svg?branch=master)](https://travis-ci.org/elastic/eventbeat)
 =========
 
 *You know, for windows event logs*
