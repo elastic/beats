@@ -51,11 +51,19 @@ required: True
 For how many transactions is this event representative. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values. Reserved for future usage.
 
 
-==== shipper
+==== beat.name
 
-type: string
+Name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
-Name of the Beat sending the statistics
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+==== beat.version
+
+The version of the Beat.
 
 
 [[exported-fields-system]]
