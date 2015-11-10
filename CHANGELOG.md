@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Filebeat will now exit if a configuration error is detected. #198
+- Fix to enable prospector to harvest existing files that are modified. #199
 
 ### Added
 
