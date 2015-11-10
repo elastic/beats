@@ -12,10 +12,20 @@ env:
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: shipper
-      type: string
+    - name: beat.name
       description: >
-        Name of the Beat sending the log messages
+        Name of the Beat sending the log messages. If the shipper name is set
+        in the configuration file, then that value is used. If it is not set,
+        the hostname is used.
+
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+
+    - name: beat.version
+      description: >
+        The version of the Beat.
 
     - name: "@timestamp"
       type: date
