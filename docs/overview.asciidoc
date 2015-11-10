@@ -14,30 +14,30 @@ Packetbeat can help you easily notice issues with your back-end application, suc
 or performance problems, and it makes troubleshooting them - and therefore
 fixing them - much faster.
 
-Packetbeat shippers sniff the traffic between your servers, parse the
-application-level protocols on the fly, and correlate the messages into transactions.
-Currently, the Packetbeat shipper supports the following protocols:
+Packetbeat sniffs the traffic between your servers, parses the
+application-level protocols on the fly, and correlates the messages into transactions.
+Currently, Packetbeat supports the following protocols:
 
  * HTTP
  * MySQL
  * PostgreSQL
  * Redis
  * Thrift-RPC
- * Mongodb
+ * MongoDB
  * DNS
  * Memcache
 
-The shippers can insert the correlated transactions directly into Elasticsearch
-or into a central queue created with Redis and Logstash.
+Packetbeat can insert the correlated transactions directly into Elasticsearch
+or into a central queue created with Redis (DEPRECATED) and Logstash. 
 
-Packetbeat shippers can run on the same servers as your application processes or
-on their own servers. When running on dedicated servers, the shippers can get the
+Packetbeat can run on the same servers as your application processes or
+on its own servers. When running on dedicated servers, Packetbeat can get the
 traffic from the switch's mirror ports or from tapping devices. In such a
 deployment, there is zero overhead on the monitored application. See
 <<capturing-options>> for details.
 
 After decoding the Layer 7 messages, Packetbeat correlates the requests with
-the responses in what we call "transactions." For each transaction, Packetbeat 
+the responses in what we call _transactions_. For each transaction, Packetbeat 
 inserts a JSON document into Elasticsearch. See the <<exported-fields>> section
 for details about which fields are indexed.
 

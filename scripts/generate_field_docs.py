@@ -28,7 +28,7 @@ def document_fields(output, section):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-    output.write("=== {} fields\n\n".format(section["name"]))
+    output.write("=== {} Fields\n\n".format(section["name"]))
 
     if "description" in section:
         output.write("{}\n\n".format(section["description"]))
@@ -72,10 +72,10 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported fields
+== Exported Fields
 
-This document describes the fields that are exported by the
-Packetbeat shipper for each transaction. They are grouped in the
+This document describes the fields that are exported by 
+Packetbeat for each transaction. They are grouped in the
 following categories:
 
 """)
