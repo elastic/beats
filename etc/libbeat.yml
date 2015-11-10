@@ -1,3 +1,5 @@
+###############################################################################
+############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features
 
 ############################# Output ##########################################
@@ -18,17 +20,13 @@ output:
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
-    # Optional protocol and basic auth credentials. These are deprectad
+    # Optional protocol and basic auth credentials. These are deprectated.
     #protocol: "https"
     #username: "admin"
     #password: "s3cr3t"
 
     # Number of workers per Elasticsearch host.
     #worker: 1
-
-    # Elasticsearch. The default is false.
-    # This option makes sense only for Packetbeat
-    #save_topology: false
 
     # Optional index name. The default is "beatname" and generates
     # [beatname-]YYYY.MM.DD keys.
@@ -102,7 +100,7 @@ output:
     #enabled: true
 
     # The Logstash hosts
-    #hosts: ["localhost:5044", "logstash:5045"]
+    #hosts: ["localhost:5044"]
 
     # Number of workers per Logstash host.
     #worker: 1
@@ -113,12 +111,12 @@ output:
     # Optional index name. The default index name depends on the each beat.
     # For Packetbeat, the default is set to packetbeat, for Topbeat
     # top topbeat and for Filebeat to filebeat.
-    #index: filebeat
+    #index: beatname
 
     # Optional TLS. By default is off.
     #tls:
       #disabled: true
-      
+
       # List of root certificates for HTTPS server verifications
       #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -148,10 +146,10 @@ output:
     #enabled: false
 
     # Path to the directory where to save the generated files. The option is mandatory.
-    #path: "/tmp/packetbeat"
+    #path: "/tmp/beatname"
 
-    # Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
-    #filename: packetbeat
+    # Name of the generated files. The default is `beatname` and it generates files: `beatname`, `beatname.1`, `beatname.2`, etc.
+    #filename: beatname
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.
