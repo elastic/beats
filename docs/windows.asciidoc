@@ -1,5 +1,5 @@
 
-== Windows support
+== Windows Support
 
 This page walks you through the steps required for running Topbeat on
 Windows. It assumes your Windows system has Powershell installed.
@@ -10,7 +10,7 @@ it on your computer. The location where it is extracted is not important, but
 remember that you shouldn't delete this repository after the installation is
 finished. The exe file and the configuration file will continue to live there.
 
-You might want to change some settings in the `topbeat.yml` file, see the
+You might want to change some settings in the `topbeat.yml` file. See the
  <<topbeat-configuration>> section.
 
 Then start an Administrator Powershell session (right click the Powershell icon
@@ -34,7 +34,7 @@ PS > Start-Service topbeat
 
 By default the log files can be found under `C:\ProgramData\topbeat\Logs`.
 
-=== Known limitations
+=== Known Limitations
 
 On Windows, some statistics are not captured:
 

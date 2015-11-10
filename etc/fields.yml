@@ -38,7 +38,7 @@ env:
     - name: shipper
       type: string
       description: >
-        Name of the shipper sending the statistics
+        Name of the Beat sending the statistics
 
 
 system:
@@ -231,12 +231,12 @@ system:
 process:
   type: group
   description: >
-    Per process statistics that you can get by running the *top* or *ps* command on Unix systems.
+    Per-process statistics that you can get by running the *top* or *ps* command on Unix systems.
   fields:
     - name: proc
       type: group
       description: >
-        Contains per process statistics like memory usage, CPU usage and details about each process like state, name,
+        Contains per-process statistics like memory usage, CPU usage and details about each process like state, name,
         pid, ppid.
       fields:
         - name: name
