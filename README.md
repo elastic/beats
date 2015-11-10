@@ -1,4 +1,4 @@
-Notice: *This is an experimental proof of concept project.*
+Notice: *This is an experimental proof of concept project. See [Current Status](https://github.com/elastic/eventbeat/issues/1) for details.*
 
 Eventbeat
 =========
