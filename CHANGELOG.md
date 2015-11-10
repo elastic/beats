@@ -6,10 +6,15 @@ All notable changes to this project will be documented in this file based on the
 
 ### Backward Compatibility Breaks
 
+* The `shipper` output field is renamed to `beat.name`. #285
+
 ### Bugfixes
 
-
 ### Added
+
+* Added `beat.hostname` to contain the hostname where the Beat is running on as
+  returned by the operating system. #285
+* Added `beat.version` to contain the version of the Beat. #285
 
 ### Deprecated
 
