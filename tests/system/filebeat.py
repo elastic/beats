@@ -7,6 +7,7 @@ import json
 import time
 from datetime import datetime, timedelta
 
+build_path = "../../build/system-tests/"
 
 class Proc(object):
     """
@@ -142,16 +143,16 @@ class TestCase(unittest.TestCase):
         )
 
         # create working dir
-        self.working_dir = os.path.join("run", self.id())
+        self.working_dir = os.path.join(build_path + "run", self.id())
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
         try:
             # update the last_run link
-            if os.path.islink("last_run"):
-                os.unlink("last_run")
-            os.symlink("run/{}".format(self.id()), "last_run")
+            if os.path.islink(build_path + "last_run"):
+                os.unlink(build_path + "last_run")
+            os.symlink(build_path + "run/{}".format(self.id()), build_path + "last_run")
         except:
             # symlink is best effort and can fail when
             # running tests in parallel

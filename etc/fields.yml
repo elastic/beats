@@ -58,7 +58,7 @@ log:
         File the line was read from.
 
     - name: offset
-      type: int
+      type: long
       required: false
       description: >
         File offset the reported line starts at.
