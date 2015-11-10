@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix leak of Windows handles. #98
+- Fix memory leak of process information. #104
 
 ### Added
 - Export mem.actual_used_p and swap.actual_used_p #93
