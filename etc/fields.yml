@@ -15,7 +15,7 @@ env:
     - name: shipper
       type: string
       description: >
-        Name of the shipper sending the log messages
+        Name of the Beat sending the log messages
 
     - name: "@timestamp"
       type: date
@@ -39,7 +39,7 @@ env:
 log:
   type: group
   description: >
-    Contains log files lines.
+    Contains log file lines.
   fields:
     - name: source
       type: string
