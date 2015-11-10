@@ -28,10 +28,6 @@
           "type": "string",
           "index": "analyzed"
         },
-        "line": {
-          "type": "long",
-          "doc_values": "true"
-        },
         "offset": {
           "type": "long",
           "doc_values": "true"

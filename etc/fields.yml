@@ -53,12 +53,6 @@ log:
       description: >
         File offset the reported line starts at.
 
-    - name: line
-      type: int
-      required: true
-      description: >
-        The line number the published line starts at.
-
     - name: message
       type: string
       required: true
