@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 - Rename the timestamp field with @timestamp #168
 - Rename tail_on_rotate prospector config to tail_files
+- Removal of line field in event. Line number was not correct and does not add value. #217
 
 ### Bugfixes
 - Omit 'fields' from event JSON when null. #126
