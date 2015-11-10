@@ -44,8 +44,7 @@ deps:
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
-	# This should be modified so it throws an error on the build system in case the output is not empty
-	gofmt -d .
+	gofmt -l . | read && echo "Code differs from gofmt's style" && exit 1 || true
 	godep go vet ./...
 
 # Cleans up directory and source code with gofmt
