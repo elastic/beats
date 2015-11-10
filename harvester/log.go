@@ -62,8 +62,6 @@ func (h *Harvester) Harvest() {
 		h.FinishChan <- h.Offset
 	}()
 
-	var line uint64 = 0
-
 	// Load last offset from registrar
 	h.initOffset()
 
@@ -136,7 +134,6 @@ func (h *Harvester) Harvest() {
 
 		lastReadTime = time.Now()
 		backoff = hConfig.BackoffDuration
-		line++
 
 		// Sends text to spooler
 		event := &input.FileEvent{
@@ -145,7 +142,6 @@ func (h *Harvester) Harvest() {
 			InputType:    h.Config.InputType,
 			DocumentType: h.Config.DocumentType,
 			Offset:       h.Offset,
-			Line:         line,
 			Text:         text,
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
