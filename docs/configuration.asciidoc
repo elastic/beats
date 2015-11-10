@@ -133,11 +133,11 @@ Time strings like 2h (2 hours), 5m (5 minutes) can be used. Default is set to 10
 
 ===== scan_frequency
 
-Scan frequency defines how often the prospector checks if new files exist in the defined paths
-to be harvested.
-In case a glob like `/var/log/*` was defined, the directory is rescanned for files by
-the time schedule defined in scan_frequency. In case it is set to 0s, it is done as often
-as possible. We don't recommend to do this. Default: 10s.
+Scan frequency specifies how often the prospector checks for new files in the
+paths that are specified for harvesting. For example, if you specify a glob like
+`/var/log/*`, the directory is scanned for files using the frequency specified by
+scan_frequency. If you specify 0s, the directory is scanned as frequently as
+possible. We recommend that you do not specify 0. The default setting is 10s.
 
 ===== document_type
 
