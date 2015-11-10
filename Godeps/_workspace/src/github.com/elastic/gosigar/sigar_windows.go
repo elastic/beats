@@ -324,6 +324,7 @@ func GetParentPid(pid int) (int, error) {
 	if handle < 0 {
 		return 0, syscall.GetLastError()
 	}
+	defer syscall.CloseHandle(syscall.Handle(handle))
 
 	var entry PROCESSENTRY32
 	entry.Size = uint32(unsafe.Sizeof(entry))
