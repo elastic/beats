@@ -19,3 +19,4 @@ include::./https.asciidoc[]
 
 include::./newbeat.asciidoc[]
 
+include::./repositories.asciidoc[]
