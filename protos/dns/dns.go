@@ -758,7 +758,9 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	data := dns.messageParser(stream)
 
 	if data == nil {
-		logp.Debug("dns", "decode fail")
+		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
+			tcpTuple.String(), len(stream.data))
+
 		// drop this tcp stream. Will retry parsing with the next
 		// segment in it
 		priv.Data[dir] = nil
@@ -778,13 +780,14 @@ func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
-		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-			s.tcpTuple.String(), len(s.data))
+		if s.data == nil {
+			logp.Debug("dns", "data nil")
+		}
+
 		return nil
 	}
 
 	// no other check ? make sure gopacket checks are enough
-	// if they are, change this foo return
 	return dnsData
 }
 

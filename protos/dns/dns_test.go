@@ -760,19 +760,15 @@ func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 	assertMapStrData(t, m, q)
 }
 
-// Verify that the lone request packet is parsed.
+// Verify that the split lone request packet is parsed.
 func TestParseTcpSplitRequest(t *testing.T) {
 	dns := newDns(testing.Verbose())
-
 	stream := &DnsStream{data: sophosTxt.request[:10], message: new(DnsMessage)}
-
-	// TODO: correct bug
 	data := dns.messageParser(stream)
 
 	assert.Nil(t, data, "Not expecting a complete message yet")
 
 	stream.data = append(stream.data, sophosTxt.request[10:]...)
-
 	data = dns.messageParser(stream)
 
 	assert.NotNil(t, data, "Message should be complete")
