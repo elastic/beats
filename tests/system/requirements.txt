@@ -1,0 +1,4 @@
+nose
+nose-timer
+jinja2
+PyYAML

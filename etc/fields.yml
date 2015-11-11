@@ -63,16 +63,19 @@ system:
         of jobs in the run queue.
       fields:
         - name: load1
+          path: load.load1
           type: float
           description: >
             Load average over 1 minute. 
 
         - name: load5
+          path: load.load5
           type: float
           description: >
             Load average over 5 minutes.
 
         - name: load15
+          path load.load15
           type: float
           description: >
             Load average over 15 minutes. 
@@ -141,7 +144,7 @@ system:
           path: cpu.steal
           type: int
           description:
-            CPU time in involuntary wait by virtual cpu while hypervisor 
+            CPU time in involuntary wait by virtual the CPU while the hypervisor
             is servicing another processor CPU time stolen from a virtual machine.
             Available only on Unix.
 
