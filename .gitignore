@@ -5,6 +5,7 @@ topbeat
 *.so
 *.swp
 *.swo
+*.pyc
 
 
 *.dev.yml
@@ -29,7 +30,11 @@ _testmain.go
 *.test
 *.prof
 
-cover/
+/cover/
+/coverage/
+/tests/system/env/
+/tests/system/run/
+/tests/system/last_run
 profile.cov
 .idea
 .DS_Store
