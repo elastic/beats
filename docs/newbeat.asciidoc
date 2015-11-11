@@ -120,7 +120,7 @@ and sends it to the publisher
 The `Beat` parameter received by most of these methods contains data about the
 Beat, such as the name, version, and common configuration options.
 
-NOTE: We recommend that your Beat name end with `beat`.
+NOTE: To be consistent with other Beats, you should append `beat` to your Beat name.
 
 Let's go through each of the methods in the `Beater` interface and look at a 
 sample implementation.
