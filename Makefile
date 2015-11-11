@@ -27,7 +27,7 @@ coverage:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
 	mkdir -p coverage
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=coverage/unit.cov -covermode=count github.com/elastic/topbeat/...
+	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -race -coverprofile=coverage/unit.cov -covermode=atomic github.com/elastic/topbeat/...
 
 .PHONY: full-coverage
 full-coverage:
