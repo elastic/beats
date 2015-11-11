@@ -31,7 +31,6 @@ libbeat.test: $(GOFILES)
 # crosscompile.bash. The binaries are placed in the ./bin dir.
 .PHONY: crosscompile
 crosscompile: deps $(GOFILES)
-	go get github.com/tools/godep
 	mkdir -p ${BUILD_DIR}/bin
 	source $(GOPATH)/src/github.com/elastic/libbeat/scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
 
