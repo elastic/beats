@@ -126,6 +126,10 @@ func (b *Beat) Run() {
 	// it can register the signals that stop or query (on Windows) the loop.
 	service.HandleSignals(b.BT.Stop)
 
+	// Startup successful, disable stderr logging if requested by
+	// cmdline flag
+	logp.SetStderr()
+
 	// Run beater specific stuff
 	err = b.BT.Run(b)
 	if err != nil {
