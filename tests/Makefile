@@ -22,3 +22,4 @@ coverage: test
 clean:
 	-rm -r run
 	-rm last_run
+	-rm -r env

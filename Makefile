@@ -106,3 +106,20 @@ full-coverage:
 	# Collects all coverage files and skips top line with mode
 	tail -q -n +2 ./coverage/*.cov >> ./coverage/full.cov
 	$(GODEP) go tool cover -html=./coverage/full.cov -o coverage/full.html
+
+
+### Docker implementation ###
+
+build-image:
+	# Clean up local environment before creating image -> remove files not needed
+	make clean
+	make -C tests/ clean
+	-docker rm -f ruflin/packetbeat-dev
+	docker build -t ruflin/packetbeat-dev .
+
+dev-shell: build-image
+	docker run -it -v $(shell pwd):/go/src/github.com/elastic/packetbeat ruflin/packetbeat-dev /bin/bash
+
+testsuite: build-image
+	docker run ruflin/packetbeat-dev make testlong
+
