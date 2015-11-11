@@ -1,3 +1,4 @@
+import re
 from topbeat import TestCase
 
 
@@ -25,7 +26,7 @@ class Test(TestCase):
         output = self.read_output()[0]
 
         print output["proc.name"]
-        assert output["proc.name"] == "topbeat.test"
+        assert re.match("topbeat.test(.exe)?", output["proc.name"])
         assert output["proc.state"] == "running"
         assert isinstance(output["proc.cpu.start_time"], basestring)
 
