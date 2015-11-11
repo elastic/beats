@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file based on the
 * The `shipper` output field is renamed to `beat.name`. #285
 
 ### Bugfixes
+- Disable logging to stderr after configuration phase. #276
+- Set the default file logging path when not set in config. #275
 
 ### Added
 
