@@ -767,7 +767,6 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 		return priv
 	}
 
-	logp.Debug("dns", "decode succeed")
 	dns.messageComplete(tcpTuple, dir, stream, data)
 
 	return priv
@@ -780,10 +779,6 @@ func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
-		if s.data == nil {
-			logp.Debug("dns", "data nil")
-		}
-
 		return nil
 	}
 
@@ -841,6 +836,31 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 }
 
 func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-	// DNS decoder shouldnt be able to decode it anyway, right ?
-	return private, true
+	dnsData, ok := private.(dnsPrivateData)
+
+	if !ok {
+		return private, false
+	}
+
+	stream := dnsData.Data[dir]
+
+	if stream == nil || stream.message == nil {
+		return private, false
+	}
+
+	decodedData := dns.messageParser(stream)
+	if decodedData == nil {
+		// cannot create a DnsTuple because we cannot read ID from a failed decodedData
+		// -> no error message in Notes
+
+		//trans := dns.getTransaction(dnsTuple)
+		//trans.Notes = append(trans.Notes, "Packet loss while capturing")
+
+		logp.Debug("dns", "Packet loss, dropping the stream")
+
+		return private, true
+	}
+
+	// ignore the gap
+	return private, false
 }

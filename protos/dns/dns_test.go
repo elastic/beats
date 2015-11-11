@@ -738,9 +738,7 @@ func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 	dns.Parse(packet, tcptuple, 0, private)
 
 	packet = newPacket(reverse, q.response)
-	tcptuple = testTcpTuple()
-	private = protos.ProtocolData(new(dnsPrivateData))
-	dns.Parse(packet, tcptuple, 0, private)
+	dns.Parse(packet, tcptuple, 1, private)
 
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
@@ -772,6 +770,32 @@ func TestParseTcpSplitRequest(t *testing.T) {
 	data = dns.messageParser(stream)
 
 	assert.NotNil(t, data, "Message should be complete")
+}
+
+func TestGap(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	q := sophosTxt.request
+	r := sophosTxt.response[:10]
+
+	packet := newPacket(forward, q)
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	private = dns.Parse(packet, tcptuple, 0, private)
+
+	packet = newPacket(reverse, r)
+	private = dns.Parse(packet, tcptuple, 1, private)
+
+	private, drop := dns.GapInStream(tcptuple, 1, 10, private)
+	assert.Equal(t, false, drop)
+
+	private = dns.ReceivedFin(tcptuple, 1, private)
+
+	client := dns.results.(publisher.ChanClient)
+	close(client.Channel)
+	mapStr := <-client.Channel
+	assert.Nil(t, mapStr, "No result should have been published.")
+	//assert.Equal(t, mapStr["notes"], []string{"Packet loss while capturing"})
 }
 
 // Verify that the request/response pair are parsed and that a result
