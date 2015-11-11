@@ -30,7 +30,7 @@ libbeat.test: $(GOFILES)
 # Cross-compile beat for the OS and architectures listed in
 # crosscompile.bash. The binaries are placed in the ./bin dir.
 .PHONY: crosscompile
-crosscompile: $(GOFILES)
+crosscompile: deps $(GOFILES)
 	go get github.com/tools/godep
 	mkdir -p ${BUILD_DIR}/bin
 	source $(GOPATH)/src/github.com/elastic/libbeat/scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
@@ -39,8 +39,6 @@ crosscompile: $(GOFILES)
 .PHONY: deps
 deps:
 	go get github.com/tools/godep
-	# TODO: Is this still needed?
-	go get -t ./...
 
 # Checks project and source code if everything is according to standard
 .PHONY: check
