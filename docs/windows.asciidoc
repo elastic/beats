@@ -1,5 +1,5 @@
 
-== Windows support
+== Windows Support
 
 This page walks you through the steps required for running Packetbeat on
 Windows. It assumes your Windows system has Powershell installed.

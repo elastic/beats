@@ -1,4 +1,4 @@
-== Kibana query and filter
+== Kibana Query and Filter
 
 === Kibana Query
 
@@ -41,7 +41,7 @@ To search for all transactions with the "chunked" encoding:
 "Transfer-Encoding: chunked"
 -----------------------------
 
-==== Field based Query
+==== Field-based Query
 
 To only view HTTP transactions:
 

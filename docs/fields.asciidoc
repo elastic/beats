@@ -4,10 +4,10 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 ////
 
 [[exported-fields]]
-== Exported fields
+== Exported Fields
 
-This document describes the fields that are exported by the
-Packetbeat shipper for each transaction. They are grouped in the
+This document describes the fields that are exported by 
+Packetbeat for each transaction. They are grouped in the
 following categories:
 
 * <<exported-fields-event>>
@@ -24,7 +24,7 @@ following categories:
 * <<exported-fields-raw>>
 
 [[exported-fields-event]]
-=== Event fields
+=== Event Fields
 
 These fields contained data about the transaction itself.
 
@@ -40,7 +40,7 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp of the event, as measured either by the shipper or by a common collector point. The precision is in milliseconds. The timezone is UTC.
+The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
 
 
 ==== type
@@ -108,7 +108,7 @@ Messages from Packetbeat itself. This usually contains error messages for interp
 
 
 [[exported-fields-dns]]
-=== DNS fields
+=== DNS Fields
 
 DNS specific event fields.
 
@@ -313,7 +313,7 @@ The data describing the resource. The meaning of this data depends on the type a
 
 
 [[exported-fields-http]]
-=== Http fields
+=== Http Fields
 
 HTTP specific event fields.
 
@@ -352,7 +352,7 @@ The value of the Content-Length header if present.
 
 
 [[exported-fields-memcache]]
-=== Memcache fields
+=== Memcache Fields
 
 Memcached specific event fields
 
@@ -652,7 +652,7 @@ Returned memcache version string.
 
 
 [[exported-fields-mysql]]
-=== Mysql fields
+=== Mysql Fields
 
 MySQL specific event fields.
 
@@ -704,7 +704,7 @@ The error info message returned by MySQL.
 
 
 [[exported-fields-pgsql]]
-=== PostgreSQL fields
+=== PostgreSQL Fields
 
 PostgreSQL specific event fields.
 
@@ -746,7 +746,7 @@ In case of a successful ``SELECT`` query, it is set to the number of rows return
 
 
 [[exported-fields-thrift]]
-=== Thrift-RPC fields
+=== Thrift-RPC Fields
 
 Thrift-RPC specific event fields.
 
@@ -772,7 +772,7 @@ If the call resulted in exceptions, this field contains them in a human readable
 
 
 [[exported-fields-redis]]
-=== Redis fields
+=== Redis Fields
 
 Redis specific event fields.
 
@@ -788,7 +788,7 @@ If the Redis command has resulted in an error, this field contains the error mes
 
 
 [[exported-fields-mongodb]]
-=== MongoDb fields
+=== MongoDb Fields
 
 MongoDB specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (e.g. `query`, `resource`) apply to MongoDB events as well.
 
@@ -856,7 +856,7 @@ Cursor identifier that came in the OP_REPLY. This must be the value that came fr
 
 
 [[exported-fields-measurements]]
-=== Measurements fields
+=== Measurements Fields
 
 These fields contain measurements related to the transaction.
 
@@ -918,7 +918,7 @@ In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded.
 
 
 [[exported-fields-env]]
-=== Environmental fields
+=== Environmental Fields
 
 These fields contain data about the environment in which the transaction was captured.
 
@@ -926,7 +926,7 @@ These fields contain data about the environment in which the transaction was cap
 
 ==== shipper
 
-The name of the shipper that captured the transaction.
+The name of the Beat that captured the transaction.
 
 
 ==== server
@@ -1018,11 +1018,11 @@ The software release of the service serving the transaction. This can be the com
 
 ==== tags
 
-Arbitrary tags that can be set per shipper and per transaction type.
+Arbitrary tags that can be set per Beat and per transaction type.
 
 
 [[exported-fields-raw]]
-=== Raw fields
+=== Raw Fields
 
 These fields contain the raw transaction data.
 
