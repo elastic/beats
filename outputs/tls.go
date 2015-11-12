@@ -32,7 +32,6 @@ var (
 
 // TLSConfig defines config file options for TLS clients.
 type TLSConfig struct {
-	Disabled       bool     `yaml:"disabled"`
 	Certificate    string   `yaml:"certificate"`
 	CertificateKey string   `yaml:"certificate_key"`
 	CAs            []string `yaml:"certificate_authorities"`
@@ -48,7 +47,7 @@ type TLSConfig struct {
 // will be configured. If no CAs are configured, the host CA will be used by go
 // built-in TLS support.
 func LoadTLSConfig(config *TLSConfig) (*tls.Config, error) {
-	if config == nil || config.Disabled {
+	if config == nil {
 		return nil, nil
 	}
 

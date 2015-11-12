@@ -6,7 +6,6 @@ and basic authentication. Here is an sample configuration:
 [source,yaml]
 ----
 elasticsearch:
-  enabled: true
   username: packetbeat <1>
   password: verysecret <2>
   protocol: https <3>
@@ -36,7 +35,6 @@ CA certificates instead of the list from the OS. Here is an example:
 [source,yaml]
 ----
 elasticsearch:
-  enabled: true
   username: packetbeat
   password: verysecret
   protocol: https
