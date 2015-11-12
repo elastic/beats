@@ -27,13 +27,13 @@ type CpuTimes struct {
 }
 
 type MemStat struct {
-	Total       		uint64  `json:"total"`
-	Used        		uint64  `json:"used"`
-	Free        		uint64  `json:"free"`
-	UsedPercent 		float64 `json:"used_p"`
-	ActualUsed  		uint64  `json:"actual_used"`
-	ActualFree  		uint64  `json:"actual_free"`
-	ActualUsedPercent	float64 `json:"actual_used_p"`
+	Total             uint64  `json:"total"`
+	Used              uint64  `json:"used"`
+	Free              uint64  `json:"free"`
+	UsedPercent       float64 `json:"used_p"`
+	ActualUsed        uint64  `json:"actual_used"`
+	ActualFree        uint64  `json:"actual_free"`
+	ActualUsedPercent float64 `json:"actual_used_p"`
 }
 
 type ProcMemStat struct {

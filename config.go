@@ -1,9 +1,9 @@
 package main
 
 type TopConfig struct {
-	Period     *int64
-	Procs      *[]string
-	Stats struct {
+	Period *int64
+	Procs  *[]string
+	Stats  struct {
 		System     *bool
 		Proc       *bool
 		Filesystem *bool
