@@ -115,6 +115,7 @@ func (l *lineReader) next() ([]byte, int, error) {
 	// output buffer contains complete line ending with '\n'. Extract
 	// byte slice from buffer and reset output buffer.
 	bytes, err := l.outBuffer.Collect(l.outBuffer.Len())
+	l.outBuffer.Reset()
 	if err != nil {
 		panic(err)
 	}
