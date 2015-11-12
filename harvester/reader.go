@@ -128,12 +128,17 @@ func (l *lineReader) next() ([]byte, int, error) {
 
 func (l *lineReader) advance() error {
 	var idx int
+	var err error
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
 	for {
 		idx = l.inBuffer.IndexFrom(l.inOffset, l.nl)
-		if idx > 0 {
+		if idx >= 0 {
 			break
+		}
+		if err != nil {
+			// if no newline and last read returned error, return error now
+			return err
 		}
 
 		// increase search offset to reduce iterations on buffer when looping
@@ -147,7 +152,8 @@ func (l *lineReader) advance() error {
 		buf := make([]byte, l.bufferSize)
 		n, err := l.rawInput.Read(buf)
 		l.inBuffer.Append(buf[:n])
-		if err != nil {
+
+		if n == 0 && err != nil {
 			return err
 		}
 
