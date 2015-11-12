@@ -103,9 +103,13 @@ func TestReaderPartialWithEncodings(t *testing.T) {
 			continue
 		}
 
+		var expected []string
 		var partials []string
+		lastString := ""
 		for _, str := range test.strings {
 			writer.Write([]byte(str))
+			lastString += str
+			expected = append(expected, lastString)
 
 			line, sz, err := reader.next()
 			assert.NotNil(t, err)
@@ -117,16 +121,24 @@ func TestReaderPartialWithEncodings(t *testing.T) {
 			t.Logf("partials: %v", partials)
 		}
 
+		// finish line:
+		writer.Write([]byte{'\n'})
+
+		// finally read line
+		line, _, err := reader.next()
+		assert.Nil(t, err)
+		t.Logf("line: '%v'", line)
+
 		// validate partial lines
-		if len(test.strings) != len(partials) {
+		if len(test.strings) != len(expected) {
 			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
 				len(test.strings), len(partials))
 			continue
 		}
-		for i := range test.strings {
-			expected := test.strings[i]
-			actual := partials[i]
-			assert.Equal(t, expected, actual)
+		for i := range expected {
+			assert.Equal(t, expected[i], partials[i])
 		}
+
+		assert.Equal(t, lastString+"\n", string(line))
 	}
 }

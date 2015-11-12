@@ -152,8 +152,9 @@ func (l *lineReader) advance() error {
 		buf := make([]byte, l.bufferSize)
 		n, err := l.rawInput.Read(buf)
 		l.inBuffer.Append(buf[:n])
-
 		if n == 0 && err != nil {
+			// return error only if no bytes have been received. Otherwise try to
+			// parse '\n' before returning the error.
 			return err
 		}
 
@@ -206,8 +207,12 @@ func (l *lineReader) decode(end int) (int, error) {
 	return start, err
 }
 
+// partial returns current state of decoded input bytes and amount of bytes
+// processed so far. If decoder has detected an error in input stream, the error
+// will be returned.
 func (l *lineReader) partial() ([]byte, int, error) {
-	sz, err := l.decode(l.inBuffer.Len()) // decode all input buffer
+	// decode all input buffer
+	sz, err := l.decode(l.inBuffer.Len())
 	l.inBuffer.Advance(sz)
 	l.inBuffer.Reset()
 
@@ -216,13 +221,18 @@ func (l *lineReader) partial() ([]byte, int, error) {
 		l.inOffset = 0
 	}
 
-	bytes, err := l.outBuffer.Collect(l.outBuffer.Len())
-	if err != nil {
-		panic(err)
-	}
-	l.outBuffer.Reset()
-
+	// return current state of outBuffer, but do not consume any content yet
+	bytes := l.outBuffer.Bytes()
 	sz = l.byteCount
-	l.byteCount = 0
 	return bytes, sz, err
+}
+
+// dropPartial drops current output buffer of decoded characters returning total number
+// of input bytes consumed
+func (l *lineReader) dropPartial() int {
+	l.outBuffer.Advance(l.outBuffer.Len())
+	l.outBuffer.Reset()
+	sz := l.byteCount
+	l.byteCount = 0
+	return sz
 }

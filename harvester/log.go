@@ -316,6 +316,7 @@ func readLine(
 			// return partial line:
 			// XXX: we rather want to drop partial line (like orignial implementation?)
 			line, sz, err = reader.partial()
+			reader.dropPartial()
 			return readlineString(line, sz)
 		}
 
