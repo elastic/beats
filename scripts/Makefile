@@ -13,6 +13,8 @@ BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 TIMEOUT?= 90
 BEATNAME?=libbeat
+TEST_ENVIRONMENT?=false
+SYSTEM_TESTS?=false
 
 
 ### BUILDING ###
@@ -20,7 +22,7 @@ BEATNAME?=libbeat
 # Builds beat
 .PHONY: build
 build: deps $(GOFILES)
-	$(GODEP) go build ./...
+	$(GODEP) go build
 
 # Create test coverage binary
 .PHONY: libbeat.test
@@ -32,7 +34,7 @@ libbeat.test: $(GOFILES)
 .PHONY: crosscompile
 crosscompile: deps $(GOFILES)
 	mkdir -p ${BUILD_DIR}/bin
-	source $(GOPATH)/src/github.com/elastic/libbeat/scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
+	source ./scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
 
 # Fetch dependencies
 .PHONY: deps
@@ -49,7 +51,7 @@ check:
 .PHONY: clean
 clean:
 	go fmt ./...
-	go fmt -w .
+	gofmt -w .
 	-rm -r build
 	-rm ${BEATNAME} ${BEATNAME}.test
 
@@ -126,11 +128,17 @@ benchmark-tests:
 .PHONY: testsuite
 testsuite:
 	# Setups environment if TEST_ENVIRONMENT is set to true
-	if [ $(TEST_ENVIRONMENT) = "true" ]; then \
+	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		 make integration-tests-environment; \
+	else \
+		make integration-tests; \
 	fi
 
-	make system-tests
+	# Runs system tests if SYSTEM_TESTS is set to true
+	if [ $(SYSTEM_TESTS) = true ]; then \
+		 make system-tests; \
+	fi
+
 	make benchmark-tests
 	make coverage-report
 
