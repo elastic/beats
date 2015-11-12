@@ -59,3 +59,5 @@ sed -i "" -e s/libbeat.test/$BEATNAME.test/g scripts/Makefile
 sed -i "" -e "s/.PHONY: build$/.PHONY: $BEATNAME/" scripts/Makefile
 sed -i "" -e "s/^build:/$BEATNAME:/" scripts/Makefile
 
+echo "Update crosscompile.bash"
+cat ${LIBBEAT}/scripts/crosscompile.bash > scripts/crosscompile.bash
