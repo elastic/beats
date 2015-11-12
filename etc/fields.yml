@@ -13,13 +13,20 @@ env:
       These fields contain data about the environment in which the
       transaction was captured.
   fields:
-    - name: beat.hostname
-      description: >
-          The hostname of the Beat that captured the transaction.
-
     - name: beat.name
       description: >
-          The name of the Beat that captured the transaction.
+        Name of the Beat sending the events. If the shipper name is set
+        in the configuration file, then that value is used. If it is not set,
+        the hostname is used.
+
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+
+    - name: beat.version
+      description: >
+        The version of the Beat.
 
     - name: beat.version
       description: >
