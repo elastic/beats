@@ -163,11 +163,13 @@ func (h *Harvester) Harvest() {
 			Text:         &text,
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
+			IsPartial:    isPartial,
 		}
-		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
 		if !isPartial {
 			h.Offset += int64(bytesRead) // Update offset if complete line has been processed
 		}
+
+		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
 		h.SpoolerChan <- event // ship the new event downstream
 	}
 }
