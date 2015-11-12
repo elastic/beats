@@ -52,8 +52,12 @@ func (p *preprocessor) onMessage(m message) {
 			continue
 		}
 
-		// add additional meta data
-		event["shipper"] = publisher.name
+		// add additional Beat meta data
+		event["beat"] = common.MapStr{
+			"name":     publisher.name,
+			"hostname": publisher.hostname,
+			"version":  publisher.version,
+		}
 		if len(publisher.tags) > 0 {
 			event["tags"] = publisher.tags
 		}

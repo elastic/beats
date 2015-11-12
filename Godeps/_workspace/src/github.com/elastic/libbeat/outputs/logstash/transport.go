@@ -100,17 +100,12 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 		return err
 	}
 
-	var tlsconfig tls.Config
-	tlsconfig.MinVersion = c.tls.MinVersion
-	tlsconfig.RootCAs = c.tls.RootCAs
-	tlsconfig.Certificates = c.tls.Certificates
-	tlsconfig.ServerName = host
-	tlsconfig.InsecureSkipVerify = c.tls.InsecureSkipVerify
-
 	if err := c.tcpClient.Connect(timeout); err != nil {
 		return c.onFail(err)
 	}
 
+	tlsconfig := c.tls
+	tlsconfig.ServerName = host
 	socket := tls.Client(c.Conn, &tlsconfig)
 	if err := socket.SetDeadline(time.Now().Add(timeout)); err != nil {
 		_ = socket.Close()

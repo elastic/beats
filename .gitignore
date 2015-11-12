@@ -10,7 +10,6 @@
 packetbeat.test
 *.dev.yml
 
-/coverage/
 /docs/html_docs
 /build/
 
@@ -36,9 +35,6 @@ _testmain.go
 # IDE files / folders
 .idea
 
-last_run
-
 *.test
 .DS_Store
 
-env

@@ -137,6 +137,9 @@ protocols:
 #    - process: app
 #      cmdline_grep: gunicorn
 
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
 
 ############################# Output ##########################################
 
@@ -156,13 +159,16 @@ output:
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
-    # Optional protocol and basic auth credentials. These are deprectad
+    # Optional protocol and basic auth credentials. These are deprectated.
     #protocol: "https"
     #username: "admin"
     #password: "s3cr3t"
 
-    # Optional index name. The default is "beatname" and generates
-    # [beatname-]YYYY.MM.DD keys.
+    # Number of workers per Elasticsearch host.
+    #worker: 1
+
+    # Optional index name. The default is "packetbeat" and generates
+    # [packetbeat-]YYYY.MM.DD keys.
     #index: "packetbeat"
 
     # Optional HTTP Path
@@ -187,13 +193,13 @@ output:
 
     # Boolean that sets if the topology is kept in Elasticsearch. The default is
     # false. This option makes sense only for Packetbeat.
-    #save_topology: false
+    #save_topology:
 
     #The time to live in seconds for the topology information that is stored in
     #Elasticsearch. The default is 15 seconds.
     #topology_expire:
 
-    # tls configuration
+    # tls configuration. By default is off.
     #tls:
       # If disabled is set to true, the tls section will be ignored and the
       # host its certificate authorities will be used.
@@ -226,19 +232,24 @@ output:
       # Configure maximum TLS version allowed for connection to logstash
       #max_version: 1.2
 
-
   ### Logstash as output
+
   #logstash:
     # Uncomment out this option if you want to output to Logstash. The default is false.
     #enabled: true
 
     # The Logstash hosts
-    #hosts: ["localhost:5044", "logstash:5045"]
+    #hosts: ["localhost:5044"]
+
+    # Number of workers per Logstash host.
+    #worker: 1
 
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name is packetbeat.
+    # Optional index name. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat
+    # top topbeat and for Filebeat to filebeat.
     #index: packetbeat
 
     # Optional TLS. By default is off.
@@ -266,11 +277,6 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
-      # Configure minimum TLS version allowed for connection to logstash
-      #min_version: 1.0
-
-      # Configure maximum TLS version allowed for connection to logstash
-      #max_version: 1.2
 
 
   ### File as output
@@ -281,8 +287,7 @@ output:
     # Path to the directory where to save the generated files. The option is mandatory.
     #path: "/tmp/packetbeat"
 
-    # Name of the generated files. The default is `packetbeat` and it generates
-    # files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
+    # Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
     #filename: packetbeat
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
@@ -293,7 +298,6 @@ output:
     # oldest file is deleted and the rest are shifted from last to first. The default
     # is 7 files.
     #number_of_files: 7
-
 
   ### Console output
   # console:
@@ -341,7 +345,7 @@ shipper:
 
 ############################# Logging #########################################
 
-#logging:
+logging:
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
   #to_syslog: true
@@ -356,7 +360,7 @@ shipper:
   # Set log level
   #level: error
 
-  #files:
+  files:
     # The directory where the log files will written to.
     #path: /var/log/mybeat
 
@@ -365,7 +369,7 @@ shipper:
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated
-    #rotateeverybytes: 10485760 # = 10MB
+    rotateeverybytes: 10485760 # = 10MB
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
