@@ -48,7 +48,7 @@ test_script:
 
 # After testing, cross-compile and publish artifacts.
 after_test:
-  - ps: cd c:\gopath\src\github.com\elastic\filebeat
+  - cd c:\gopath\src\github.com\elastic\filebeat
   - appveyor AddCompilationMessage "Starting cross-compile"
   - set GOOS=linux
   - set GOARCH=386
@@ -189,6 +189,12 @@ after_test:
   - go build -o bin/filebeat-windows-amd64.exe
   - ps: Push-AppveyorArtifact bin/filebeat-windows-amd64.exe
   - appveyor AddCompilationMessage "Cross-compile success"
+
+# Executes for both successful and failed builds
+on_finish:
+  - cd c:\gopath\src\github.com\elastic\filebeat
+  - 7z a -r system-tests-output.zip build\system-tests\run
+  - ps: Push-AppveyorArtifact system-tests-output.zip
 
 # To disable deployment
 deploy: off
