@@ -1,10 +1,10 @@
 package main
 
 import (
+	"errors"
 	"math"
 	"regexp"
 	"time"
-	"errors"
 
 	"github.com/elastic/gosigar"
 
@@ -25,9 +25,9 @@ type Topbeat struct {
 	TbConfig     ConfigSettings
 	events       publisher.Client
 
-	sysStats     bool
-	procStats    bool
-	fsStats      bool
+	sysStats  bool
+	procStats bool
+	fsStats   bool
 
 	done chan struct{}
 }

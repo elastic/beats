@@ -46,9 +46,9 @@ func TestActualMemPercentage(t *testing.T) {
 	beat := Topbeat{}
 
 	m := MemStat{
-		Total: 7,
-		ActualUsed:  5,
-		ActualFree:  2,
+		Total:      7,
+		ActualUsed: 5,
+		ActualFree: 2,
 	}
 	beat.addMemPercentage(&m)
 	assert.Equal(t, m.ActualUsedPercent, 0.71)
