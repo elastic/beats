@@ -93,7 +93,7 @@ func (b *Beat) LoadConfig() {
 
 	logp.Debug("beat", "Initializing output plugins")
 
-	if err := publisher.Publisher.Init(b.Name, b.Config.Output, b.Config.Shipper); err != nil {
+	if err := publisher.Publisher.Init(b.Name, b.Version, b.Config.Output, b.Config.Shipper); err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
@@ -125,6 +125,10 @@ func (b *Beat) Run() {
 	// This needs to be called before the main loop is started so that
 	// it can register the signals that stop or query (on Windows) the loop.
 	service.HandleSignals(b.BT.Stop)
+
+	// Startup successful, disable stderr logging if requested by
+	// cmdline flag
+	logp.SetStderr()
 
 	// Run beater specific stuff
 	err = b.BT.Run(b)
