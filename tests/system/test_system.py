@@ -57,4 +57,4 @@ class Test(TestCase):
             "swap.actual_used",
             "swap.actual_free",
         ]:
-            assert type(output[key]) is int
+            assert type(output[key]) is int or type(output[key]) is long

@@ -41,4 +41,4 @@ class Test(TestCase):
             "fs.total",
             "fs.used",
         ]:
-            assert type(output[key]) is int
+            assert type(output[key]) is int or type(output[key]) is long
