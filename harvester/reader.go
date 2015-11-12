@@ -202,13 +202,20 @@ func (l *lineReader) decode(end int) (int, error) {
 
 func (l *lineReader) partial() ([]byte, int, error) {
 	sz, err := l.decode(l.inBuffer.Len()) // decode all input buffer
-	l.inBuffer.Consume(sz)                // advance by number of decoded bytes
+	l.inBuffer.Advance(sz)
+	l.inBuffer.Reset()
+
 	l.inOffset -= sz
 	if l.inOffset < 0 {
 		l.inOffset = 0
 	}
 
-	bytes, _ := l.outBuffer.Consume(l.outBuffer.Len())
+	bytes, err := l.outBuffer.Collect(l.outBuffer.Len())
+	if err != nil {
+		panic(err)
+	}
+	l.outBuffer.Reset()
+
 	sz = l.byteCount
 	l.byteCount = 0
 	return bytes, sz, err
