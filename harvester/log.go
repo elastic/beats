@@ -94,8 +94,12 @@ func (h *Harvester) Harvest() {
 	//      timedReader provides timestamp some bytes have actually been read from file
 	lastReadTime := time.Now()
 
+	// remember size of last partial line being sent. Do not publish partial line, if
+	// no new bytes have been processed
+	lastPartialLen := 0
+
 	for {
-		text, bytesRead, err := readLine(reader, &timedIn.lastReadTime, partialLineWaiting)
+		text, bytesRead, isPartial, err := readLine(reader, &timedIn.lastReadTime, partialLineWaiting)
 
 		if err != nil {
 			// End of file
@@ -137,6 +141,18 @@ func (h *Harvester) Harvest() {
 		lastReadTime = time.Now()
 		backoff = hConfig.BackoffDuration
 
+		if isPartial {
+			if bytesRead <= lastPartialLen {
+				// drop partial line event, as no new bytes have been consumed from
+				// input stream
+				continue
+			}
+
+			lastPartialLen = bytesRead
+		} else {
+			lastPartialLen = 0
+		}
+
 		// Sends text to spooler
 		event := &input.FileEvent{
 			ReadTime:     lastReadTime,
@@ -149,8 +165,10 @@ func (h *Harvester) Harvest() {
 			Fileinfo:     &info,
 		}
 		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
-		h.Offset += int64(bytesRead) // Update offset
-		h.SpoolerChan <- event       // ship the new event downstream
+		if !isPartial {
+			h.Offset += int64(bytesRead) // Update offset if complete line has been processed
+		}
+		h.SpoolerChan <- event // ship the new event downstream
 	}
 }
 
@@ -298,26 +316,25 @@ func readLine(
 	reader *lineReader,
 	lastReadTime *time.Time,
 	partialLineWaiting time.Duration,
-) (string, int, error) {
+) (string, int, bool, error) {
 	for {
 		line, sz, err := reader.next()
 		if err != nil {
 			if err == io.EOF {
-				return "", 0, err
+				return "", 0, false, err
 			}
 		}
 
 		if sz != 0 {
-			return readlineString(line, sz)
+			return readlineString(line, sz, false)
 		}
 
 		// test for no file updates longer than partialLineWaiting
 		if time.Since(*lastReadTime) >= partialLineWaiting {
-			// return partial line:
-			// XXX: we rather want to drop partial line (like orignial implementation?)
+			// return all bytes read for current line to be processed.
+			// Line might grow with further read attempts
 			line, sz, err = reader.partial()
-			reader.dropPartial()
-			return readlineString(line, sz)
+			return readlineString(line, sz, true)
 		}
 
 		// wait for file updates before reading new lines
@@ -325,7 +342,7 @@ func readLine(
 	}
 }
 
-func readlineString(bytes []byte, sz int) (string, int, error) {
+func readlineString(bytes []byte, sz int, partial bool) (string, int, bool, error) {
 	s := string(bytes)[:len(bytes)-lineEndingChars(bytes)]
-	return s, sz, nil
+	return s, sz, partial, nil
 }

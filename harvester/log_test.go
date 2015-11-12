@@ -57,24 +57,27 @@ func TestReadLine(t *testing.T) {
 	reader, _ := newLineReader(timedIn, Plain, 100)
 
 	// Read third line
-	text, bytesread, err := readLine(reader, &timedIn.lastReadTime, 0)
+	text, bytesread, isPartial, err := readLine(reader, &timedIn.lastReadTime, 0)
 
 	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 	assert.Nil(t, err)
+	assert.False(t, isPartial)
 
 	// read second line
-	text, bytesread, err = readLine(reader, &timedIn.lastReadTime, 0)
+	text, bytesread, isPartial, err = readLine(reader, &timedIn.lastReadTime, 0)
 
 	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
+	assert.False(t, isPartial)
 
 	// Read third line, which doesn't exist
-	text, bytesread, err = readLine(reader, &timedIn.lastReadTime, 0)
+	text, bytesread, isPartial, err = readLine(reader, &timedIn.lastReadTime, 0)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
 	assert.Equal(t, err, io.EOF)
+	assert.False(t, isPartial)
 }
 
 func TestIsLine(t *testing.T) {
