@@ -34,7 +34,7 @@ shipper:
 ############################# Output ############################################
 
 # Configure what outputs to use when sending the data collected by packetbeat.
-# You can enable one or multiple outputs by setting enabled option to true.
+# Multiple outputs may be enabled.
 output:
 
   # Elasticsearch as output
@@ -42,7 +42,6 @@ output:
   # host, port: where Elasticsearch is listening on
   # save_topology: specify if the topology is saved in Elasticsearch
   #elasticsearch:
-  #  enabled: false
   #  host: localhost
   #  port: 9200
   #  save_topology: true
@@ -52,7 +51,6 @@ output:
   # host, port: where Redis is listening on
   # save_topology: specify if the topology is saved in Redis
   #redis:
-  #  enabled: false
   #  host: localhost
   #  port: 6379
   #  save_topology: true
@@ -64,7 +62,6 @@ output:
   # rotate_every_kb: maximum size of the files in path
   # number of files: maximum number of files in path
   file:
-    enabled: true
     path: {{ output_file_path|default(fb.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("mockbeat") }}"
     rotate_every_kb: 1000
