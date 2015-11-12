@@ -3,6 +3,8 @@ package harvester
 import (
 	"os"
 
+	"golang.org/x/text/encoding"
+
 	"github.com/elastic/filebeat/config"
 	"github.com/elastic/filebeat/input"
 )
@@ -14,7 +16,7 @@ type Harvester struct {
 	Offset           int64
 	FinishChan       chan int64
 	SpoolerChan      chan *input.FileEvent
-	encoding         Decoder
+	encoding         encoding.Encoding
 	file             *os.File /* the file being watched */
 }
 

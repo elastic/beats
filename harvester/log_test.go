@@ -1,8 +1,6 @@
 package harvester
 
 import (
-	"bufio"
-	"bytes"
 	"io"
 	"math/rand"
 	"os"
@@ -55,26 +53,26 @@ func TestReadLine(t *testing.T) {
 	assert.NotNil(t, h)
 
 	// Read only 10 bytes which is not the end of the file
-	reader := bufio.NewReaderSize(readFile, 100)
-	buffer := new(bytes.Buffer)
+	timedIn := newTimedReader(readFile)
+	reader, _ := newLineReader(timedIn, Plain, 100)
 
 	// Read third line
-	text, bytesread, err := readLine(reader, buffer, 0)
+	text, bytesread, err := readLine(reader, &timedIn.lastReadTime, 0)
 
-	assert.Equal(t, *text, firstLineString[0:len(firstLineString)-1])
+	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 	assert.Nil(t, err)
 
 	// read second line
-	text, bytesread, err = readLine(reader, buffer, 0)
+	text, bytesread, err = readLine(reader, &timedIn.lastReadTime, 0)
 
-	assert.Equal(t, *text, secondLineString[0:len(secondLineString)-1])
+	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
 
 	// Read third line, which doesn't exist
-	text, bytesread, err = readLine(reader, buffer, 0)
-	assert.Nil(t, text)
+	text, bytesread, err = readLine(reader, &timedIn.lastReadTime, 0)
+	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
 	assert.Equal(t, err, io.EOF)
 }
