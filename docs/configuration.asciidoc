@@ -276,7 +276,7 @@ The per protocol transaction timeout. Expired transactions will no longer be cor
 
 ==== DNS Configuration Options
 
-The `dns` section specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS message on UDP. Here is a sample configuration section for DNS:
+The `dns` section specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -352,7 +352,7 @@ WARNING: This option replaces query parameters from GET requests and top-level
 parameters from POST requests. If sensitive data is encoded inside a
 parameter that you don't specify here, Packetbeat cannot censor it. Also, note that if
 you configure Packetbeat to save the raw request and response fields (see the <<send-request-option>>
-and the <<send-response-option>> options), the sensitive data will be present in those
+and the <<send-response-option>> options), sensitive data may be present in those
 fields.
 
 
@@ -449,7 +449,7 @@ fields.
 
 When this option is enabled, it forces the memcache text protocol parser to accept unknown commands.
 
-NOTE: Unknown commands MUST NOT contain a data part.
+NOTE: The unknown commands MUST NOT contain a data part.
 
 ===== maxvalues
 
