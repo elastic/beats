@@ -132,12 +132,16 @@ filebeat:
   # These config files must have the full filebeat config part inside, but only
   # the prospector part is processed. All global options like spool_size are ignored.
   # The config_dir MUST point to a different directory then where the main filebeat config file is in.
-  config_dir:
+  #config_dir:
 
+
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
 
 ############################# Output ##########################################
 
-# Configure what outputs to use when sending the data collected by filebeat.
+# Configure what outputs to use when sending the data collected by the beat.
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
 
@@ -153,10 +157,13 @@ output:
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
-    # Optional protocol and basic auth credentials. These are deprecated.
+    # Optional protocol and basic auth credentials. These are deprectated.
     #protocol: "https"
     #username: "admin"
     #password: "s3cr3t"
+
+    # Number of workers per Elasticsearch host.
+    #worker: 1
 
     # Optional index name. The default is "filebeat" and generates
     # [filebeat-]YYYY.MM.DD keys.
@@ -182,7 +189,15 @@ output:
     # requests are made.
     #flush_interval
 
-    # tls configuration
+    # Boolean that sets if the topology is kept in Elasticsearch. The default is
+    # false. This option makes sense only for Packetbeat.
+    #save_topology:
+
+    #The time to live in seconds for the topology information that is stored in
+    #Elasticsearch. The default is 15 seconds.
+    #topology_expire:
+
+    # tls configuration. By default is off.
     #tls:
       # If disabled is set to true, the tls section will be ignored and the
       # host its certificate authorities will be used.
@@ -215,8 +230,8 @@ output:
       # Configure maximum TLS version allowed for connection to logstash
       #max_version: 1.2
 
-
   ### Logstash as output
+
   #logstash:
     # Uncomment out this option if you want to output to Logstash. The default is false.
     #enabled: true
@@ -224,10 +239,15 @@ output:
     # The Logstash hosts
     #hosts: ["localhost:5044"]
 
+    # Number of workers per Logstash host.
+    #worker: 1
+
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name is filebeat.
+    # Optional index name. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat
+    # top topbeat and for Filebeat to filebeat.
     #index: filebeat
 
     # Optional TLS. By default is off.
@@ -255,11 +275,7 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
-      # Configure minimum TLS version allowed for connection to logstash
-      #min_version: 1.0
 
-      # Configure maximum TLS version allowed for connection to logstash
-      #max_version: 1.2
 
   ### File as output
   #file:
@@ -269,8 +285,7 @@ output:
     # Path to the directory where to save the generated files. The option is mandatory.
     #path: "/tmp/filebeat"
 
-    # Name of the generated files. The default is `filebeat` and it generates
-    # files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
+    # Name of the generated files. The default is `filebeat` and it generates files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
     #filename: filebeat
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
@@ -282,7 +297,6 @@ output:
     # is 7 files.
     #number_of_files: 7
 
-
   ### Console output
   # console:
     # Enabling console output
@@ -290,6 +304,7 @@ output:
 
     # pretty print json event
     #pretty: false
+
 
 ############################# Shipper #########################################
 
@@ -309,10 +324,26 @@ shipper:
   # to remove duplicates if shippers are installed on multiple servers.
   #ignore_outgoing: true
 
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # The default is 10 seconds.
+  #refresh_topology_freq: 10
+
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # All the IPs will be deleted afterwards. Note, that the value must be higher than
+  # refresh_topology_freq. The default is 15 seconds.
+  #topology_expire: 15
+
+  # Configure local GeoIP database support. If no paths are configured
+  # the locations /usr/share/GeoIP/GeoLiteCity.dat and
+  # /usr/local/var/GeoIP/GeoLiteCity.dat are searched for a GeoIP database.
+  #geoip:
+    # If paths is empty, GeoIP support will be disabled.
+    #paths: ["/path/to/geoip/data/GeoLiteCity.dat"]
+
 
 ############################# Logging #########################################
 
-#logging:
+logging:
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
   #to_syslog: true
@@ -327,7 +358,7 @@ shipper:
   # Set log level
   #level: error
 
-  #files:
+  files:
     # The directory where the log files will written to.
     #path: /var/log/mybeat
 
@@ -336,7 +367,7 @@ shipper:
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated
-    #rotateeverybytes: 10485760 # = 10MB
+    rotateeverybytes: 10485760 # = 10MB
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
