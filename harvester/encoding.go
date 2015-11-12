@@ -8,6 +8,7 @@ import (
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/htmlindex"
 	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 // Decoder wraps a reader for decoding input to utf-8 on read.
@@ -18,12 +19,10 @@ var encodings = map[string]encoding.Encoding{
 	"nop":   Plain,
 	"plain": Plain,
 
-	/*
-		// utf8 (validate input) - shadow htmlindex utf8 codecs not validating input
-		"unicode-1-1-utf-8": trans(encoding.UTF8Validator),
-		"utf-8":             trans(encoding.UTF8Validator),
-		"utf8":              trans(encoding.UTF8Validator),
-	*/
+	// utf8 (validate input) - shadow htmlindex utf8 codecs not validating input
+	"unicode-1-1-utf-8": utf8Encoding{},
+	"utf-8":             utf8Encoding{},
+	"utf8":              utf8Encoding{},
 
 	// utf16
 	// "utf-16be-bom": unicode.UTF16(unicode.BigEndian, unicode.UseBOM),
@@ -41,6 +40,20 @@ var encodings = map[string]encoding.Encoding{
 // Plain file encoding not transforming any read bytes.
 var Plain = encoding.Nop
 
+// UTF-8 encoding copying input to output sequence replacing invalid UTF-8
+// converted to '\uFFFD'.
+//
+// See: http://encoding.spec.whatwg.org/#replacement
+type utf8Encoding struct{}
+
+func (utf8Encoding) NewDecoder() transform.Transformer {
+	return encoding.Replacement.NewEncoder()
+}
+
+func (utf8Encoding) NewEncoder() transform.Transformer {
+	return encoding.Replacement.NewEncoder()
+}
+
 // Find returns
 func findEncoding(name string) (encoding.Encoding, bool) {
 	if name == "" {
@@ -54,17 +67,3 @@ func findEncoding(name string) (encoding.Encoding, bool) {
 	codec, err := htmlindex.Get(name)
 	return codec, err == nil
 }
-
-/*
-func nopEnc(r io.Reader) io.Reader { return r }
-
-func enc(encoding encoding.Encoding) Decoder {
-	return trans(encoding.NewDecoder())
-}
-
-func trans(t transform.Transformer) Decoder {
-	return func(r io.Reader) io.Reader {
-		return transform.NewReader(r, t)
-	}
-}
-*/
