@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file based on the
 * Use of `enabled` as a configuration option for outputs (elasticsearch,
   logstash, etc.) has been removed. #264
 * Use of `disabled` as a configuration option for tls has been removed. #264
+- The `shipper` output field is renamed to `beat.name`. #285
 
 ### Bugfixes
 - Disable logging to stderr after configuration phase. #276
@@ -17,9 +18,10 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 
-* Added `beat.hostname` to contain the hostname where the Beat is running on as
+- Added `beat.hostname` to contain the hostname where the Beat is running on as
   returned by the operating system. #285
-* Added `beat.version` to contain the version of the Beat. #285
+- Added `beat.version` to contain the version of the Beat. #285
+- Added timestamp for file logging. #291
 
 ### Deprecated
 
