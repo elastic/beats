@@ -335,3 +335,73 @@ func (b *Buffer) CollectWithSuffix(count int, delim []byte) ([]byte, error) {
 	b.Advance(total)
 	return data, nil
 }
+
+// Index returns offset of seq in unprocessed buffer.
+// Returns -1 if seq can not be found.
+func (b *Buffer) Index(seq []byte) int {
+	return b.IndexFrom(0, seq)
+}
+
+// IndexFrom returns offset of seq in unprocessed buffer start at from.
+// Returns -1 if seq can not be found.
+func (b *Buffer) IndexFrom(from int, seq []byte) int {
+	if b.err != nil {
+		return -1
+	}
+
+	idx := bytes.Index(b.data[b.mark+from:], seq)
+	if idx < 0 {
+		return -1
+	}
+
+	return idx + from + b.mark
+}
+
+// IndexByte returns offset of byte in unprocessed buffer.
+// Returns -1 if byte not in buffer.
+func (b *Buffer) IndexByte(byte byte) int {
+	if b.err != nil {
+		return -1
+	}
+
+	idx := bytes.IndexByte(b.data[b.mark:], byte)
+	if idx < 0 {
+		return -1
+	}
+	return idx + b.mark
+}
+
+// CollectUntil collects all bytes until delim was found (including delim).
+func (b *Buffer) CollectUntil(delim []byte) ([]byte, error) {
+	if b.err != nil {
+		return nil, b.err
+	}
+
+	idx := bytes.Index(b.data[b.mark:], delim)
+	if idx < 0 {
+		return nil, b.bufferEndError()
+	}
+
+	end := b.mark + idx + len(delim)
+	data := b.data[b.mark:end]
+	b.Advance(len(data))
+	return data, nil
+}
+
+// CollectUntilByte collects all bytes until delim was found (including delim).
+func (b *Buffer) CollectUntilByte(delim byte) ([]byte, error) {
+	if b.err != nil {
+		return nil, b.err
+	}
+
+	idx := bytes.IndexByte(b.data[b.offset:], delim)
+	if idx < 0 {
+		b.offset = b.mark + b.available
+		return nil, b.bufferEndError()
+	}
+
+	end := b.offset + idx + 1
+	data := b.data[b.mark:end]
+	b.Advance(len(data))
+	return data, nil
+}

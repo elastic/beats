@@ -8,7 +8,6 @@ import (
 )
 
 type MothershipConfig struct {
-	Enabled            bool
 	Save_topology      bool
 	Host               string
 	Port               int
@@ -97,7 +96,7 @@ func InitOutputs(
 	var plugins []OutputPlugin = nil
 	for name, plugin := range enabledOutputPlugins {
 		config, exists := configs[name]
-		if !exists || !config.Enabled {
+		if !exists {
 			continue
 		}
 

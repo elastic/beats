@@ -1,4 +1,3 @@
-#!/bin/bash
 
 ### VARIABLE SETUP ###
 
@@ -128,14 +127,14 @@ benchmark-tests:
 .PHONY: testsuite
 testsuite:
 	# Setups environment if TEST_ENVIRONMENT is set to true
-	if [ $(TEST_ENVIRONMENT) = "true" ]; then \
+	if [ $(TEST_ENVIRONMENT) = true ]; then \
 		 make integration-tests-environment; \
+	else \
+		make integration-tests; \
 	fi
 
-	make integration-tests
-
 	# Runs system tests if SYSTEM_TESTS is set to true
-	if [ $(SYSTEM_TESTS) = "true" ]; then \
+	if [ $(SYSTEM_TESTS) = true ]; then \
 		 make system-tests; \
 	fi
 
