@@ -57,11 +57,7 @@ func (lj *logstash) init(
 	config outputs.MothershipConfig,
 	topologyExpire int,
 ) error {
-	useTLS := false
-	if config.TLS != nil {
-		useTLS = !config.TLS.Disabled
-	}
-
+	useTLS := (config.TLS != nil)
 	timeout := logstashDefaultTimeout
 	if config.Timeout != 0 {
 		timeout = time.Duration(config.Timeout) * time.Second
