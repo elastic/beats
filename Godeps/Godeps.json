@@ -12,55 +12,68 @@
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/cfgfile",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/common",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/logp",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/outputs",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/publisher",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/service",
-			"Rev": "3ba2a2c92c8e8ead89bd51cb27281e757f6d3313"
+			"Comment": "v1.0.0-rc1-49-gd16e409",
+			"Rev": "d16e4096e4074a5fddbc82de03b00f0a40e3ad4e"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
