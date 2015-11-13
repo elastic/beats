@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
+	"time"
 )
 
 type Priority int
@@ -58,6 +59,8 @@ func send(calldepth int, level Priority, prefix string, format string, v ...inte
 		_log.logger.Output(calldepth, fmt.Sprintf(prefix+format, v...))
 	}
 	if _log.toFile {
+		// Creates a timestamp for the file log message and formats it
+		prefix = time.Now().Format(time.RFC3339) + " " + prefix
 		_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
 	}
 }

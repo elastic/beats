@@ -848,6 +848,15 @@ The number of most recent rotated log files to keep on disc. Older files are
 deleted during log rotation. The default value is 7. The keepfiles options has to be
 in the range of 2 to 1024 files.
 
+==== Logging Format
+
+The logging format is different for each logging type. In case of syslog, syslog adds the timestamp itself.
+For logging to file, the format RFC3339 is used which is `2006-01-02T15:04:05Z07:00 WARN log-message`.
+First is the timestamp with the time zone, then
+the logging level. As logging to stderr should be mainly used for debugging, additional debug information
+is added here. The format is `2015/11/12 09:03:37.369262 geolite.go:52: WARN log-message`. First is the UTC timestamp
+with the milliseconds, then the name of the caller that sent the log entry followed by the log level.
+
 [[configuration-run-options]]
 === Run options (optional)
 
