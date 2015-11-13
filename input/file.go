@@ -26,6 +26,7 @@ type FileEvent struct {
 	Text         *string
 	Fields       *map[string]string
 	Fileinfo     *os.FileInfo
+	IsPartial    bool
 
 	fieldsUnderRoot bool
 }
@@ -68,6 +69,10 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 		"fileinfo":   f.Fileinfo,
 		"type":       f.DocumentType,
 		"input_type": f.InputType,
+	}
+
+	if f.IsPartial {
+		event["partial"] = true
 	}
 
 	if f.Fields != nil {

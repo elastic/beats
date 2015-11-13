@@ -1,8 +1,6 @@
 package harvester
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -65,10 +63,16 @@ func (h *Harvester) Harvest() {
 	// Load last offset from registrar
 	h.initOffset()
 
-	in := h.encoding(h.file)
+	// TODO: newLineReader uses additional buffering to deal with encoding and testing
+	//       for new lines in input stream. Simple 8-bit based encodings, or plain
+	//       don't require 'complicated' logic.
+	timedIn := newTimedReader(h.file)
+	reader, err := newLineReader(timedIn, h.encoding, h.Config.BufferSize)
+	if err != nil {
+		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		return
+	}
 
-	reader := bufio.NewReaderSize(in, h.Config.BufferSize)
-	buffer := bytes.NewBuffer(nil)
 	hConfig := h.ProspectorConfig.Harvester
 
 	// It waits a maximum of 5 seconds for a partial line to be update
@@ -86,10 +90,16 @@ func (h *Harvester) Harvest() {
 	// Windows setting
 	forceCloseWindowsFiles := hConfig.ForceCloseWindowsFiles
 
+	// XXX: lastReadTime handling last time a full line was read only?
+	//      timedReader provides timestamp some bytes have actually been read from file
 	lastReadTime := time.Now()
 
+	// remember size of last partial line being sent. Do not publish partial line, if
+	// no new bytes have been processed
+	lastPartialLen := 0
+
 	for {
-		text, bytesRead, err := readLine(reader, buffer, partialLineWaiting)
+		text, bytesRead, isPartial, err := readLine(reader, &timedIn.lastReadTime, partialLineWaiting)
 
 		if err != nil {
 			// End of file
@@ -125,15 +135,23 @@ func (h *Harvester) Harvest() {
 				return
 			}
 
-			// EOF reached
-			// Encoding and reader are reinitialised here as other encoder stops reading. See #182
-			in = h.encoding(h.file)
-			reader.Reset(in)
 			continue
 		}
 
 		lastReadTime = time.Now()
 		backoff = hConfig.BackoffDuration
+
+		if isPartial {
+			if bytesRead <= lastPartialLen {
+				// drop partial line event, as no new bytes have been consumed from
+				// input stream
+				continue
+			}
+
+			lastPartialLen = bytesRead
+		} else {
+			lastPartialLen = 0
+		}
 
 		// Sends text to spooler
 		event := &input.FileEvent{
@@ -142,13 +160,17 @@ func (h *Harvester) Harvest() {
 			InputType:    h.Config.InputType,
 			DocumentType: h.Config.DocumentType,
 			Offset:       h.Offset,
-			Text:         text,
+			Text:         &text,
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
+			IsPartial:    isPartial,
 		}
+		if !isPartial {
+			h.Offset += int64(bytesRead) // Update offset if complete line has been processed
+		}
+
 		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
-		h.Offset += int64(bytesRead) // Update offset
-		h.SpoolerChan <- event       // ship the new event downstream
+		h.SpoolerChan <- event // ship the new event downstream
 	}
 }
 
@@ -292,55 +314,37 @@ func lineEndingChars(line []byte) int {
 // readLine reads a full line into buffer and returns it.
 // In case of partial lines, readLine waits for a maximum of 5 seconds for new segments to arrive.
 // This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
-func readLine(reader *bufio.Reader, buffer *bytes.Buffer, partialLineWaiting time.Duration) (*string, int, error) {
-
-	lastSegementTime := time.Now()
-	isPartialLine := true
-
+func readLine(
+	reader *lineReader,
+	lastReadTime *time.Time,
+	partialLineWaiting time.Duration,
+) (string, int, bool, error) {
 	for {
-		segment, err := reader.ReadBytes('\n')
-
-		if segment != nil && len(segment) > 0 {
-			if isLine(segment) {
-				isPartialLine = false
-			}
-
-			// Update last segment time as new segment of line arrived
-			lastSegementTime = time.Now()
-			buffer.Write(segment)
-		}
-
+		line, sz, err := reader.next()
 		if err != nil {
-			// EOF, jump out of the loop
 			if err == io.EOF {
-				return nil, 0, err
-			}
-
-			if isPartialLine {
-				// Wait for a second for the next segments
-				time.Sleep(1 * time.Second)
-
-				// If last segment written is older then partialLineWaiting, partial line is discarded
-				if time.Since(lastSegementTime) >= partialLineWaiting {
-					return nil, 0, err
-				}
-				continue
-			} else {
-				logp.Err("Error reading line: %s", err.Error())
-				return nil, 0, err
+				return "", 0, false, err
 			}
 		}
 
-		// If we got a full line, return the whole line without the EOL chars (LF or CRLF)
-		if !isPartialLine {
-			// Get the str length with the EOL chars (LF or CRLF)
-			bufferSize := buffer.Len()
-			str := new(string)
-			// Remove line endings
-			*str = buffer.String()[:bufferSize-lineEndingChars(segment)]
-			// Reset the buffer for the next line
-			buffer.Reset()
-			return str, bufferSize, nil
+		if sz != 0 {
+			return readlineString(line, sz, false)
 		}
+
+		// test for no file updates longer than partialLineWaiting
+		if time.Since(*lastReadTime) >= partialLineWaiting {
+			// return all bytes read for current line to be processed.
+			// Line might grow with further read attempts
+			line, sz, err = reader.partial()
+			return readlineString(line, sz, true)
+		}
+
+		// wait for file updates before reading new lines
+		time.Sleep(1 * time.Second)
 	}
+}
+
+func readlineString(bytes []byte, sz int, partial bool) (string, int, bool, error) {
+	s := string(bytes)[:len(bytes)-lineEndingChars(bytes)]
+	return s, sz, partial, nil
 }
