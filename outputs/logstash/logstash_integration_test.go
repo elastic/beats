@@ -332,6 +332,28 @@ func TestSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) {
+	testSendMultipleBatchesViaLogstash(t, name, 15, 128, tls)
+}
+
+func TestSendMultipleSmallBatchesViaLogstashTCP(t *testing.T) {
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tcp", false)
+}
+
+func TestSendMultipleSmallBatchesViaLogstashTLS(t *testing.T) {
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tls", true)
+}
+
+func testSendMultipleSmallBatchesViaLogstash(t *testing.T, name string, tls bool) {
+	testSendMultipleBatchesViaLogstash(t, name, 15, 16, tls)
+}
+
+func testSendMultipleBatchesViaLogstash(
+	t *testing.T,
+	name string,
+	numBatches int,
+	batchSize int,
+	tls bool,
+) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
@@ -339,8 +361,6 @@ func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) 
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
 
-	numBatches := 15
-	batchSize := 64
 	batches := make([][]common.MapStr, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
 		batch := make([]common.MapStr, 0, batchSize)
