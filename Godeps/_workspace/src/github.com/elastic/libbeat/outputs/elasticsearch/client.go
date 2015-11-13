@@ -63,6 +63,9 @@ func (client *Client) Clone() *Client {
 	return newClient
 }
 
+// PublishEvents sends all events to elasticsearch. On error a slice with all
+// events not published or confirmed to be processed by elasticsearch will be
+// returned. The input slice backing memory will be reused by return the value.
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
