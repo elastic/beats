@@ -29,7 +29,6 @@ type lumberjackClient struct {
 	countTimeoutErr int
 }
 
-// TODO: make max window size configurable
 const (
 	minWindowSize             int = 1
 	defaultStartMaxWindowSize int = 10
