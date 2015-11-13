@@ -113,10 +113,13 @@ func testElasticsearchIndex(test string) string {
 }
 
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
+	windowSize := 32
+
 	config := &outputs.MothershipConfig{
-		Hosts: []string{getLogstashHost()},
-		TLS:   nil,
-		Index: testLogstashIndex(test),
+		Hosts:       []string{getLogstashHost()},
+		TLS:         nil,
+		Index:       testLogstashIndex(test),
+		BulkMaxSize: &windowSize,
 	}
 	if tls {
 		config.Hosts = []string{getLogstashTLSHost()}
@@ -337,7 +340,7 @@ func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) 
 	defer ls.Cleanup()
 
 	numBatches := 15
-	batchSize := 256
+	batchSize := 64
 	batches := make([][]common.MapStr, 0, numBatches)
 	for i := 0; i < numBatches; i++ {
 		batch := make([]common.MapStr, 0, batchSize)
@@ -361,7 +364,8 @@ func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) 
 	}
 
 	// wait for logstash event flush + elasticsearch
-	waitUntilTrue(5*time.Second, checkIndex(ls, numBatches*batchSize))
+	ok := waitUntilTrue(5*time.Second, checkIndex(ls, numBatches*batchSize))
+	assert.True(t, ok) // check number of events matches total number of events
 
 	// search value in logstash elasticsearch index
 	resp, err := ls.Read()
