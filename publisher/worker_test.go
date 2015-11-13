@@ -3,6 +3,7 @@
 package publisher
 
 import (
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,7 +43,7 @@ func TestMessageWorkerSend(t *testing.T) {
 	// Verify that stopping workerSignal causes a onStop notification
 	// in the messageHandler.
 	ws.stop()
-	assert.True(t, mh.stopped)
+	assert.True(t, atomic.LoadUint32(&mh.stopped) == 1)
 }
 
 // Test that stopQueue invokes the Failed callback on all events in the queue.
