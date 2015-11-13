@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -13,7 +14,7 @@ import (
 type testMessageHandler struct {
 	msgs     chan message   // Channel that hold received messages.
 	response OutputResponse // Response type to give to received messages.
-	stopped  bool           // Indicates if the messageHandler has been stopped.
+	stopped  uint32         // Indicates if the messageHandler has been stopped.
 }
 
 var _ messageHandler = &testMessageHandler{}
@@ -25,7 +26,7 @@ func (mh *testMessageHandler) onMessage(m message) {
 }
 
 func (mh *testMessageHandler) onStop() {
-	mh.stopped = true
+	atomic.AddUint32(&mh.stopped, 1)
 }
 
 func (mh *testMessageHandler) send(m message) {
