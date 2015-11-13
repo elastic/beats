@@ -21,14 +21,14 @@ list of components, or you can use `-d "*"` to enable debugging for all componen
 `-d "publish"` displays all the "publish" related messages.
 
 *-e*:: 
-Output the error messages to stdout and disable syslog output.
+Log to stderr and disable syslog/file output.
 
 *-memprofile [output file]*:: 
 Write memory profile data to the specified output file. This option is useful for
 troubleshooting the Beat.
 
-*-test*:: 
-Test only the configuration file and then exit. This option is useful for
+*-configtest*:: 
+Test the configuration file and then exit. This option is useful for
 troubleshooting the configuration of a Beat.
 
 *-v*:: 
