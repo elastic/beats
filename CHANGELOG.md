@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file based on the
 ## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc1...HEAD)
 
 ### Backward Compatibility Breaks
-- Removed utf-16be-bom encoding support
+- Removed utf-16be-bom encoding support. Support will be added with fix for #205
 
 ### Bugfixes
 - Filebeat will now exit if a configuration error is detected. #198
