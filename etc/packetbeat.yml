@@ -144,15 +144,11 @@ protocols:
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by the beat.
-# You can enable one or multiple outputs by setting enabled option to true.
+# Multiple outputs may be used. 
 output:
 
   ### Elasticsearch as output
   elasticsearch:
-
-    # Set to true to enable elasticsearch output
-    enabled: true
-
     # Array of hosts to connect to.
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
@@ -189,22 +185,18 @@ output:
     # The number of seconds to wait for new events between two bulk API index requests.
     # If `bulk_max_size` is reached before this interval expires, addition bulk index
     # requests are made.
-    #flush_interval
+    #flush_interval: 1
 
     # Boolean that sets if the topology is kept in Elasticsearch. The default is
     # false. This option makes sense only for Packetbeat.
-    #save_topology:
+    #save_topology: false
 
-    #The time to live in seconds for the topology information that is stored in
-    #Elasticsearch. The default is 15 seconds.
-    #topology_expire:
+    # The time to live in seconds for the topology information that is stored in
+    # Elasticsearch. The default is 15 seconds.
+    #topology_expire: 15
 
     # tls configuration. By default is off.
     #tls:
-      # If disabled is set to true, the tls section will be ignored and the
-      # host its certificate authorities will be used.
-      #disabled: true
-
       # List of root certificates for HTTPS server verifications
       #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -232,12 +224,9 @@ output:
       # Configure maximum TLS version allowed for connection to logstash
       #max_version: 1.2
 
+
   ### Logstash as output
-
   #logstash:
-    # Uncomment out this option if you want to output to Logstash. The default is false.
-    #enabled: true
-
     # The Logstash hosts
     #hosts: ["localhost:5044"]
 
@@ -254,8 +243,6 @@ output:
 
     # Optional TLS. By default is off.
     #tls:
-      #disabled: true
-
       # List of root certificates for HTTPS server verifications
       #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -278,12 +265,8 @@ output:
       #curve_types: []
 
 
-
   ### File as output
   #file:
-    # Enabling file output
-    #enabled: false
-
     # Path to the directory where to save the generated files. The option is mandatory.
     #path: "/tmp/packetbeat"
 
@@ -299,12 +282,10 @@ output:
     # is 7 files.
     #number_of_files: 7
 
+
   ### Console output
   # console:
-    # Enabling console output
-    #enabled: false
-
-    # pretty print json event
+    # Pretty print json event
     #pretty: false
 
 
