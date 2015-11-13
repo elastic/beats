@@ -73,8 +73,22 @@ func (l *lumberjackClient) PublishEvent(event common.MapStr) error {
 func (l *lumberjackClient) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
+	for len(events) > 0 {
+		n, err := l.publishWindowed(events)
+		events = events[n:]
+		if err != nil {
+			return events, err
+		}
+	}
+	return nil, nil
+}
+
+// publishWindowed published events with current maximum window size to logstash
+// returning the total number of events send (due to window size, or acks until
+// failure).
+func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) {
 	if len(events) == 0 {
-		return nil, nil
+		return 0, nil
 	}
 
 	// prepare message payload
@@ -83,7 +97,7 @@ func (l *lumberjackClient) PublishEvents(
 	}
 	count, payload, err := l.compressEvents(events)
 	if err != nil {
-		return events, err
+		return 0, err
 	}
 
 	if count == 0 {
@@ -91,17 +105,17 @@ func (l *lumberjackClient) PublishEvents(
 		// as exported so no one tries to send/encode the same events once again
 		// The compress/encode function already prints critical per failed encoding
 		// failure.
-		return nil, nil
+		return len(events), nil
 	}
 
 	// send window size:
 	if err = l.sendWindowSize(count); err != nil {
-		return l.onFail(events, err)
+		return l.onFail(0, err)
 	}
 
 	// send payload
 	if err = l.sendCompressed(payload); err != nil {
-		return l.onFail(events, err)
+		return l.onFail(0, err)
 	}
 
 	// wait for ACK (accept partial ACK to reset timeout)
@@ -111,7 +125,7 @@ func (l *lumberjackClient) PublishEvents(
 		// read until all acks
 		ackSeq, err = l.readACK()
 		if err != nil {
-			return l.onFail(events[ackSeq:], err)
+			return l.onFail(int(ackSeq), err)
 		}
 	}
 
@@ -134,36 +148,33 @@ func (l *lumberjackClient) PublishEvents(
 		}
 	}
 
-	return nil, nil
+	return len(events), nil
 }
 
-func (l *lumberjackClient) onFail(
-	events []common.MapStr,
-	err error,
-) ([]common.MapStr, error) {
+func (l *lumberjackClient) onFail(n int, err error) (int, error) {
 	// if timeout error, back off and ignore error
 	nerr, ok := err.(net.Error)
 	if !ok || !nerr.Timeout() {
 		// no timeout error, close connection and return error
 		_ = l.Close()
-		return events, err
+		return n, err
 	}
 
 	// if we've seen 3 consecutive timeout errors, close connection
 	l.countTimeoutErr++
 	if l.countTimeoutErr == maxAllowedTimeoutErr {
 		_ = l.Close()
-		return events, err
+		return n, err
 	}
 
 	// timeout error. reduce window size and return 0 published events. Send
 	// mode might try to publish again with reduce window size or ask another
-	// client to send events (round robin load balancer)
+	// client to send events
 	l.windowSize = l.windowSize / 2
 	if l.windowSize < minWindowSize {
 		l.windowSize = minWindowSize
 	}
-	return events, nil
+	return n, nil
 }
 
 func (l *lumberjackClient) compressEvents(
