@@ -44,8 +44,8 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 
 		err := prospector.Init()
 		if err != nil {
-			logp.Critical("Error in initing propsecptor: %s", err)
-			fmt.Printf("Error in initing propsecptor: %s", err)
+			logp.Critical("Error in initing prospector: %s", err)
+			fmt.Printf("Error in initing prospector: %s", err)
 			os.Exit(1)
 		}
 

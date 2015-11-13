@@ -211,7 +211,8 @@ class Test(TestCase):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            force_close_windows_files="true"
+            force_close_windows_files="true",
+            scan_frequency="5s"
         )
         os.mkdir(self.working_dir + "/log/")
 

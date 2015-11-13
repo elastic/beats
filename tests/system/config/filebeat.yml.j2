@@ -7,7 +7,7 @@ filebeat:
         - {{ path }}
       # Type of the files. Annotated in every documented
       input: log
-      scan_frequency: 0.1s
+      scan_frequency: {{scan_frequency | default("0.1s") }}
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
       encoding: {{encoding | default("utf-8") }}
