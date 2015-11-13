@@ -20,6 +20,8 @@ const (
 
 	elasticsearchDefaultHost = "localhost"
 	elasticsearchDefaultPort = "9200"
+
+	integrationTestWindowSize = 32
 )
 
 type esConnection struct {
@@ -113,7 +115,7 @@ func testElasticsearchIndex(test string) string {
 }
 
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
-	windowSize := 32
+	windowSize := integrationTestWindowSize
 
 	config := &outputs.MothershipConfig{
 		Hosts:       []string{getLogstashHost()},
@@ -332,7 +334,7 @@ func TestSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) {
-	testSendMultipleBatchesViaLogstash(t, name, 15, 128, tls)
+	testSendMultipleBatchesViaLogstash(t, name, 15, 4*integrationTestWindowSize, tls)
 }
 
 func TestSendMultipleSmallBatchesViaLogstashTCP(t *testing.T) {
@@ -344,7 +346,7 @@ func TestSendMultipleSmallBatchesViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMultipleSmallBatchesViaLogstash(t *testing.T, name string, tls bool) {
-	testSendMultipleBatchesViaLogstash(t, name, 15, 16, tls)
+	testSendMultipleBatchesViaLogstash(t, name, 15, integrationTestWindowSize/2, tls)
 }
 
 func testSendMultipleBatchesViaLogstash(
