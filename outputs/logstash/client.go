@@ -24,6 +24,7 @@ type lumberjackClient struct {
 	TransportClient
 	windowSize      int
 	maxOkWindowSize int // max window size sending was successful for
+	maxWindowSize   int
 	timeout         time.Duration
 	countTimeoutErr int
 }
@@ -31,7 +32,6 @@ type lumberjackClient struct {
 // TODO: make max window size configurable
 const (
 	minWindowSize             int = 1
-	maxWindowSize             int = 1024
 	defaultStartMaxWindowSize int = 10
 
 	maxAllowedTimeoutErr int = 3
@@ -52,11 +52,16 @@ var (
 	codeCompressed    = []byte{codeVersion, 'C'}
 )
 
-func newLumberjackClient(conn TransportClient, timeout time.Duration) *lumberjackClient {
+func newLumberjackClient(
+	conn TransportClient,
+	maxWindowSize int,
+	timeout time.Duration,
+) *lumberjackClient {
 	return &lumberjackClient{
 		TransportClient: conn,
 		windowSize:      defaultStartMaxWindowSize,
 		timeout:         timeout,
+		maxWindowSize:   maxWindowSize,
 	}
 }
 
@@ -116,10 +121,10 @@ func (l *lumberjackClient) PublishEvents(
 	if l.maxOkWindowSize < l.windowSize {
 		l.maxOkWindowSize = l.windowSize
 
-		if l.windowSize < maxWindowSize {
+		if l.windowSize < l.maxWindowSize {
 			l.windowSize = l.windowSize + l.windowSize/2
-			if l.windowSize > maxWindowSize {
-				l.windowSize = maxWindowSize
+			if l.windowSize > l.maxWindowSize {
+				l.windowSize = l.maxWindowSize
 			}
 		}
 	} else if l.windowSize < l.maxOkWindowSize {
