@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 * The `shipper` output field is renamed to `beat.name`. #285
+* Use of `enabled` as a configuration option for outputs (elasticsearch,
+  logstash, etc.) has been removed. #264
+* Use of `disabled` as a configuration option for tls has been removed. #264
 
 ### Bugfixes
 - Disable logging to stderr after configuration phase. #276

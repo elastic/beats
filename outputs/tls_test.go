@@ -23,7 +23,6 @@ func TestEmptyTlsConfig(t *testing.T) {
 	cfg, err := load("")
 	assert.Nil(t, err)
 
-	assert.Equal(t, false, cfg.Disabled)
 	assert.Equal(t, "", cfg.Certificate)
 	assert.Equal(t, "", cfg.CertificateKey)
 	assert.Len(t, cfg.CAs, 0)
@@ -49,7 +48,6 @@ func TestLoadWithEmptyValues(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, false, cfg.Disabled)
 	assert.Equal(t, "", cfg.Certificate)
 	assert.Equal(t, "", cfg.CertificateKey)
 	assert.Len(t, cfg.CAs, 0)
@@ -78,7 +76,6 @@ func TestValuesSet(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, true, cfg.Disabled)
 	assert.Equal(t, "mycert.pem", cfg.Certificate)
 	assert.Equal(t, "mycert.key", cfg.CertificateKey)
 	assert.Len(t, cfg.CAs, 2)
@@ -91,12 +88,6 @@ func TestValuesSet(t *testing.T) {
 
 func TestNoLoadNilConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(nil)
-	assert.Nil(t, err)
-	assert.Nil(t, cfg)
-}
-
-func TestNoLoadDisabled(t *testing.T) {
-	cfg, err := LoadTLSConfig(&TLSConfig{Disabled: true})
 	assert.Nil(t, err)
 	assert.Nil(t, cfg)
 }
@@ -116,7 +107,6 @@ func TestApplyEmptyConfig(t *testing.T) {
 
 func TestApplyWithConfig(t *testing.T) {
 	cfg, err := LoadTLSConfig(&TLSConfig{
-		Disabled:       false,
 		Certificate:    "logstash/ca_test.pem",
 		CertificateKey: "logstash/ca_test.key",
 		CAs:            []string{"logstash/ca_test.pem"},

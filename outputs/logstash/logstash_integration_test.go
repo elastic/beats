@@ -114,10 +114,9 @@ func testElasticsearchIndex(test string) string {
 
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	config := &outputs.MothershipConfig{
-		Enabled: true,
-		Hosts:   []string{getLogstashHost()},
-		TLS:     nil,
-		Index:   testLogstashIndex(test),
+		Hosts: []string{getLogstashHost()},
+		TLS:   nil,
+		Index: testLogstashIndex(test),
 	}
 	if tls {
 		config.Hosts = []string{getLogstashTLSHost()}
@@ -151,7 +150,6 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	flushInterval := 0
 	bulkSize := 0
 	config := outputs.MothershipConfig{
-		Enabled:        true,
 		Hosts:          []string{getElasticsearchHost()},
 		Index:          index,
 		Flush_interval: &flushInterval,

@@ -142,10 +142,9 @@ func newTestLumberjackOutput(
 ) outputs.BulkOutputer {
 	if config == nil {
 		config = &outputs.MothershipConfig{
-			Enabled: true,
-			TLS:     nil,
-			Hosts:   []string{getLogstashHost()},
-			Index:   testLogstashIndex(test),
+			TLS:   nil,
+			Hosts: []string{getLogstashHost()},
+			Index: testLogstashIndex(test),
 		}
 
 	}

@@ -173,8 +173,6 @@ output and use the <<logstash-output,Logstash output>> instead:
 ------------------------------------------------------------------------------
 output:
   logstash:
-    enabled: true
-
     hosts: ["127.0.0.1:5044"]
 
     # configure logstash plugin to loadbalance events between
