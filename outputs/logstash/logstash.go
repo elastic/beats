@@ -45,6 +45,7 @@ const (
 	logstashDefaultTimeout   = 30 * time.Second
 	logstasDefaultMaxTimeout = 90 * time.Second
 	defaultSendRetries       = 3
+	defaultMaxWindowSize     = 1024
 )
 
 var waitRetry = time.Duration(1) * time.Second
@@ -68,6 +69,11 @@ func (lj *logstash) init(
 		defaultPort = config.Port
 	}
 
+	maxWindowSize := defaultMaxWindowSize
+	if config.BulkMaxSize != nil {
+		maxWindowSize = *config.BulkMaxSize
+	}
+
 	var clients []mode.ProtocolClient
 	var err error
 	if useTLS {
@@ -77,15 +83,17 @@ func (lj *logstash) init(
 			return err
 		}
 
-		clients, err = mode.MakeClients(config, makeClientFactory(timeout,
-			func(host string) (TransportClient, error) {
-				return newTLSClient(host, defaultPort, tlsConfig)
-			}))
+		clients, err = mode.MakeClients(config,
+			makeClientFactory(maxWindowSize, timeout,
+				func(host string) (TransportClient, error) {
+					return newTLSClient(host, defaultPort, tlsConfig)
+				}))
 	} else {
-		clients, err = mode.MakeClients(config, makeClientFactory(timeout,
-			func(host string) (TransportClient, error) {
-				return newTCPClient(host, defaultPort)
-			}))
+		clients, err = mode.MakeClients(config,
+			makeClientFactory(maxWindowSize, timeout,
+				func(host string) (TransportClient, error) {
+					return newTCPClient(host, defaultPort)
+				}))
 	}
 	if err != nil {
 		return err
@@ -127,6 +135,7 @@ func (lj *logstash) init(
 }
 
 func makeClientFactory(
+	maxWindowSize int,
 	timeout time.Duration,
 	makeTransp func(string) (TransportClient, error),
 ) func(string) (mode.ProtocolClient, error) {
@@ -135,7 +144,7 @@ func makeClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(transp, timeout), nil
+		return newLumberjackClient(transp, maxWindowSize, timeout), nil
 	}
 }
 
