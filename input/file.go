@@ -22,6 +22,7 @@ type FileEvent struct {
 	InputType    string
 	DocumentType string
 	Offset       int64
+	Bytes        int
 	Line         uint64
 	Text         *string
 	Fields       *map[string]string
@@ -39,13 +40,16 @@ type FileState struct {
 
 // Builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
+	// do not add total bytes for event if partial line, so reading continues
+	// at current line
+	offset := f.Offset
+	if !f.IsPartial {
+		offset += int64(f.Bytes)
+	}
 
 	state := &FileState{
-		Source: f.Source,
-		// take the offset + length of the line + newline char and
-		// save it as the new starting offset.
-		// This issues a problem, if the EOL is a CRLF! Then on start it read the LF again and generates a event with an empty line
-		Offset:      f.Offset + int64(len(*f.Text)) + 1, // REVU: this is begging for BUGs
+		Source:      f.Source,
+		Offset:      offset,
 		FileStateOS: GetOSFileState(f.Fileinfo),
 	}
 
