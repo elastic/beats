@@ -47,6 +47,8 @@ tar xzvf packetbeat-{version}-darwin.tgz
 NOTE: We also provide 32-bit images that you can get from our 
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
+If you are using Windows, see <<windows-install>>.
+
 
 === Configuring Packetbeat
 

@@ -5,23 +5,18 @@ Packetbeat.
 
 === Getting Ready
 
-Packetbeat is written in http://golang.org/[Go], so having it installed and
-knowing its basics is a prerequisite for adding a new protocol. However, don't
-worry if you are not yet a Go expert, it is a sufficiently new language that
-very few people can consider themselves experts. In fact, several people learned
-Go by contributing to Packetbeat, including the original authors.
+Packetbeat is written in http://golang.org/[Go], so having Go installed and knowing the basics are prerequisites for understanding this guide. But don't worry if you aren't a Go expert. Go is a relatively new language, and very few people are experts in it. In fact, several people learned Go by contributing to Packetbeat and libbeat, including the original Packetbeat authors.
 
 You will also need a good understanding of the wire protocol that you want to
 add support for. For standard protocols or protocols used in open source
-projects you can usually find detailed specifications and example source code.
+projects, you can usually find detailed specifications and example source code.
 Wireshark is a very useful tool for understanding the inner workings of the
 protocols it supports.
 
 In some cases you can even make use of existing libraries for doing the actual
-parsing/decoding of the protocol. If the particular protocol has a Go
-implementation with a liberal enough license and that can be used to
-parse/decode individual messages, it's worth trying to use it instead of writing
-your own parser.
+parsing and decoding of the protocol. If the particular protocol has a Go
+implementation with a liberal enough license, you might be able to use it to 
+parse and decode individual messages instead of writing your own parser.
 
 Before starting, please also read the
 https://github.com/elastic/packetbeat/blob/master/CONTRIBUTING.md[CONTRIBUTING]
@@ -29,9 +24,9 @@ file on Github.
 
 ==== Cloning and Compiling
 
-After having https://golang.org/doc/install[installed Go] and having setup the
+After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, you can clone and compile Packetbeat with the
+your preferred workspace location, you can clone Packetbeat with the
 following commands:
 
 [source,shell]
@@ -41,7 +36,7 @@ $ cd $GOPATH/src/github.com/elastic
 $ git clone https://github.com/elastic/packetbeat.git
 ----------------------------------------------------------------------
 
-and then compile it with:
+Then you can compile it with:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -51,7 +46,7 @@ $ make
 
 Note that the location where you clone is important. If you prefer working
 outside of the `GOPATH` environment, you can clone to another directory and only
-create a symlink it to the `$GOPATH/src/github.com/elastic/` directory.
+create a symlink to the `$GOPATH/src/github.com/elastic/` directory.
 
 ==== Forking and Branching
 
@@ -82,8 +77,8 @@ $ git push --set-upstream tsg cool_new_protocol
 ----------------------------------------------------------------------
 
 * When you are ready to submit your PR, simply do so from the GitHub web
-  interface. Feel free to submit your PR early, you can still add commits to
-  the branch after creating the PR. Submitting it early gives us more time to
+  interface. Feel free to submit your PR early. You can still add commits to
+  the branch after creating the PR. Submitting the PR early gives us more time to
   provide feedback and perhaps help you with it.
 
 ==== A Note About Dependencies
@@ -153,7 +148,7 @@ type UdpProtocolPlugin interface {
 }
 ----------------------------------------------------------------------
 
-At the high level, the protocols plugins receive raw packet data via the
+At a high level, the protocols plugins receive raw packet data via the
 `Parse()` or `ParseUdp()` methods and produce objects that will be indexed into
 Elasticsearch via the `results` channel.
 
@@ -174,24 +169,24 @@ type Packet struct {
 <1> The timestamp of the packet
 <2> The source IP address, source port, destination IP address, destination port
 combination.
-<3> The application layer payload (i.e. without the IP and TCP/UDP headers) as a
+<3> The application layer payload (that is, without the IP and TCP/UDP headers) as a
 byte slice.
 
-The objects sent through the `results` channel have the type `common.MapStr`
+The objects sent through the `results` channel have the type `common.MapStr`, 
 which is essentially a `map[string]interface{}` with a few more convenience
 https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods]
 added.
 
-Besides the `Parse()` function, the TCP layer also calls the `ReceivedFin()`
-when a TCP stream is closed and the `GapInStream()` functions when packet loss
-is detected in a TCP stream. The protocol module can use these callbacks to take
-decisions about what to do with partial data received. For example, for the
+Besides the `Parse()` function, the TCP layer also calls the `ReceivedFin()` function
+when a TCP stream is closed, and it calls the `GapInStream()` function when packet 
+loss is detected in a TCP stream. The protocol module can use these callbacks to make
+decisions about what to do with partial data that it receives. For example, for the
 HTTP/1.0 protocol, the end of connection is used to know when the message is
 finished.
 
 ==== Registering Your Plugin
 
-To Configure your plugin you have to add a configuration struct to 
+To Configure your plugin, you need to add a configuration struct to 
 `config/config.go` Protocols struct. This struct will be filled by
 https://gopkg.in/yaml.v2[goyaml] on startup.
 
@@ -240,8 +235,7 @@ var ProtocolNames = []string{
 }
 ----------------------------------------------------------------------
 
-Protocol names order must match the protocol IDs. Additionally the protocol name 
-must match the configuration name.
+The protocol names must be in the same order as their corresponding protocol IDs. Additionally the protocol name must match the configuration name.
 
 Finally register your new protocol plugin in `packetbeat.go` EnabledProtocolPlugins:
 
@@ -261,29 +255,28 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 
 ----------------------------------------------------------------------
 
-Once the module is registered it can be configured and packets will be processed.
+Once the module is registered, it can be configured, and packets will be processed.
 
 Before implementing all the logic for your new protocol module, it can be
-helpful to first register it and implement the minimal plugin interface printing
-a debug message on received packets. This way you can test plugin registration
-working correctly.
+helpful to first register the module and implement the minimal plugin interface 
+for printing a debug message on received packets. This way you can test the plugin registration to ensure that it's working correctly.
 
 ==== The TCP Parse Function
 
 For TCP protocols, the `Parse()` function is the heart of the module. As
-mentioned before, it is called for every TCP packet containing data on the
-configured ports.
+mentioned earlier, this function is called for every TCP packet 
+that contains data on the configured ports.
 
-It is important to understand that because TCP is a stream
-based protocol, the packets boundaries don't necessarily match the application
+It is important to understand that because TCP is a stream-based protocol, 
+the packet boundaries don't necessarily match the application
 layer message boundaries. For example, a packet can contain only a part of the
-message, it can contain a complete message or it can contain multiple messages.
+message, it can contain a complete message, or it can contain multiple messages.
 
-If you see a packet in the middle of the stream, you have no guaranties that its
+If you see a packet in the middle of the stream, you have no guaranties that it's
 first byte is the beginning of a message. However, if the packet is the first
-seen in a given TCP stream, that you can assume is the beginning of the message.
+seen in a given TCP stream, then you can assume it is the beginning of the message.
 
-The Parse function needs to deal with these facts which generally means that it
+The `Parse()` function needs to deal with these facts, which generally means that it
 needs to keep state across multiple packets.
 
 Let's have a look again at its signature:
@@ -294,26 +287,26 @@ func Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData
 ----------------------------------------------------------------------
 
-We've already talked about the first parameter which contains the packet data.
+We've already talked about the first parameter, which contains the packet data.
 The rest of the parameters and the return value are used for maintaining state
 inside the TCP stream.
 
-The `tcptuple` is an unique identifier for the TCP stream from which the packet
-is part of. You can use the `tcptuple.Hashable()` functions to get a value that
+The `tcptuple` is a unique identifier for the TCP stream that the packet
+is part of. You can use the `tcptuple.Hashable()` function to get a value that
 you can store in a map. The `dir` flag gives you the direction in which the
 packet is flowing inside the TCP stream. The two possible values are
 `TcpDirectionOriginal` if the packet goes in the same direction as the first
-packet that we saw from that stream and `TcpDirectionReverse` if the packet goes
+packet from the stream and `TcpDirectionReverse` if the packet goes in 
 the other direction.
 
-The `private` parameter can be used by the module to store in the TCP stream
-whatever state it needs. The module would typically cast this at runtime to a
-type of its choice, modify it as needed and then return the modified value.
-Next time the TCP layer calls the `Parse()` or the others functions from the
-`TcpProtocolPlugin` interface, it will call it with the modified private value.
+The `private` parameter can be used by the module to store state in the TCP stream. 
+The module would typically cast this at runtime to a
+type of its choice, modify it as needed, and then return the modified value.
+The next time the TCP layer calls `Parse()` or another function from the
+`TcpProtocolPlugin` interface, it will call the function with the modified 
+private value.
 
-Here is an example handling of the private data as it's done by the MySQL
-module:
+Here is an example of how the MySQL module handles the private data:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -331,8 +324,8 @@ module:
 	return priv
 ----------------------------------------------------------------------
 
-Most modules then use a logic like this to deal with incomplete data (example
-again from MySQL):
+Most modules then use a logic similar to the following to deal with incomplete 
+data (this example is also from MySQL):
 
 
 [source,go]
@@ -355,9 +348,9 @@ again from MySQL):
 ----------------------------------------------------------------------
 
 The `mysqlMessageParser()` is the function that tries to parse a single MySQL
-message. Its implementation is MySQL specific so not interesting to us for this
-guide. It returns two values: `ok` which is `false` if there was a parsing error
-from which we cannot recover and `complete` which indicates whether a complete
+message. Its implementation is MySQL-specific, so it's not interesting to us for this
+guide. It returns two values: `ok`, which is `false` if there was a parsing error
+from which we cannot recover, and `complete`, which indicates whether a complete
 and valid message was separated from the stream. These two values are used for
 deciding what to do next. In case of errors, we drop the stream. If there are no
 errors, but the message is not yet complete, we do nothing and wait for more
@@ -381,23 +374,23 @@ Packetbeat indexes into Elasticsearch a document for each request-response pair
 (called a transaction). This way we can have data from the request and the
 response in the same document and measure the response time.
 
-But this can be different for your protocol, for example for an asynchronous
+But this can be different for your protocol. For example for an asynchronous
 protocol like AMPQ, it makes more sense to index a document for every message,
-and then no correlation is necessary. On the other hand, for a session based
-protocol like SIP it might make sense to index a document for a SIP transaction
+and then no correlation is necessary. On the other hand, for a session-based
+protocol like SIP, it might make sense to index a document for a SIP transaction
 or for a full SIP dialog, which can have more than two messages.
 
 The TCP stream or UDP ports are usually good indicators that two messages belong
-to the same transactions. Therefore most protocol implementations we have in
+to the same transactions. Therefore most protocol implementations in
 Packetbeat use a map with `tcptuple` maps for correlating the requests with the
 responses. One thing you should be careful about is to expire and remove from
 this map incomplete transactions. For example, we might see the request that has
 created an entry in the map, but if we never see the reply, we need to remove
 the request from memory on a timer, otherwise we risk leaking memory.
 
-==== Send the Result
+==== Sending the Result
 
-After the correlation step, you should have an JSON like object that can be sent
+After the correlation step, you should have an JSON-like object that can be sent
 to Elasticsearch for indexing. The way you do that is by publishing it
 through the `results` publisher client, which is received by the `Init`
 function. The publisher client accepts structures of type `common.MapStr`, which
@@ -441,10 +434,10 @@ The following fields are required and their presence will be checked by
 system tests:
 
  * `@timestamp`. Set this to the timestamp of the first packet from the message
-   and cast it to `common.Time` like in the example above.
+   and cast it to `common.Time` like in the example.
  * `type`. Set this to the protocol name.
  * `count`. This is reserved for future sampling support. Set it to 1.
- * `status`. The status of the transactions, use either `common.OK_STATUS` or
+ * `status`. The status of the transactions. Use either `common.OK_STATUS` or
    `common.ERROR_STATUS`. If the protocol doesn't have responses or a meaning of
    status code, use OK.
  * `path`. This should represent what is requested, with the exact meaning
@@ -457,11 +450,11 @@ system tests:
 ===== Parsing Helpers
 
 In libbeat you also find some helpers for implementing parsers for binary and
-text based protocols. The `Bytes_*` functions being the most low level helpers
-for binary protocols using network byte order can be found in the
-`libbeat/common` module. In addition to these very low level helpers a stream
-buffer for parsing TCP based streams, or simply UDP packets with integrated
-error handling is provided by `libbeat/common/streambuf`. This demonstrates its
+text-based protocols. The `Bytes_*` functions are the most low level helpers
+for binary protocols that use network byte order. These functions can be found in the
+`libbeat/common` module. In addition to these very low level helpers, a stream
+buffer for parsing TCP-based streams, or simply UDP packets with integrated
+error handling, is provided by `libbeat/common/streambuf`. This demonstrates its
 usage for parsing the Memcache protocol UDP header:
 
 [source,go]
@@ -476,7 +469,7 @@ func parseUdpHeader(buf *streambuf.Buffer) (mcUdpHeader, error) {
 }
 ----------------------------------------------------------------------
 
-The stream buffer is also used to implement the binary and text based protocols
+The stream buffer is also used to implement the binary and text-based protocols
 for memcache.
 
 [source,go]
@@ -530,7 +523,7 @@ for memcache.
 	}
 ----------------------------------------------------------------------
 
-It also implements a number of interfaces defined in the standard "io" package
+The stream buffer also implements a number of interfaces defined in the standard "io" package
 and can easily be used to serialize some packets for testing parsers (see
 `protos/memcache/binary_test.go`).
 
@@ -538,9 +531,8 @@ and can easily be used to serialize some packets for testing parsers (see
 
 Packetbeat provides the module `packetbeat/protos/applayer` with
 common definitions among all application layer protocols. For example using the
-Transaction type from `applayer` guarantees the final document to have all common
-required fields defined. Just embed the `applayer.Transaction` with your own
-application layer transaction type to make use of it (from memcache protocol):
+Transaction type from `applayer` guarantees that the final document will have all common required fields defined. Just embed the `applayer.Transaction` with your own
+application layer transaction type to make use of it. Here is an example from the memcache protocol:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -581,14 +573,13 @@ http://golang.org/pkg/testing/[testing] package. To make comparing complex
 structures less verbose, we use the assert package from the
 https://github.com/stretchr/testify[testify] library.
 
-For parser/decoder tests, we find it is a good practice to have an array with
-test cases containing the inputs and expected outputs. For an example, see for
-example the
+For parser and decoder tests, we find it is a good practice to have an array with
+test cases containing the inputs and expected outputs. For an example, see the 
 https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
 unit test.
 
 You can also have unit tests that treat the whole module as a black box, calling
-it's interface functions then reading the result from the `results` channel and
+its interface functions, then reading the result from the `results` channel and
 checking it. This pattern is especially useful for checking corner cases related
 to packet boundaries or correlation issues. Here is an example from the HTTP
 module:
@@ -651,7 +642,7 @@ is passed from one call to the next like the TCP layer would do.
 
 <4> The
 https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1182[`expectTransaction`]
-function tries to read from the `results` channel and errors the test case if
+function tries to read from the `results` channel and causes errors in the test case if
 there's no transaction present.
 
 To check the coverage of your unit tests, run the `make cover` command at the
@@ -701,7 +692,7 @@ all debug messages.
 
 <3> After the run, the test reads the output files and checks the result.
 
-Tip: to generate the PCAP files, you can use Packetbeat itself. The `-dump` CLI
+Tip: To generate the PCAP files, you can use Packetbeat. The `-dump` CLI
 flag will dump to disk all the packets sniffed from the network that match the
 BPF filter.
 
@@ -712,7 +703,7 @@ To run the whole test suite, use:
 $ make test
 ----------------------------------------------------------------------
 
-This requires you to have python and virtualenv installed, but it automatically
+This requires you to have Python and virtualenv installed, but it automatically
 creates and uses the virtualenv.
 
 To run an individual test, use the following steps:
@@ -724,9 +715,9 @@ $ . env/bin/activate
 $ nosetests test_0025_mongodb_basic.py:Test.test_write_errors
 ----------------------------------------------------------------------
 
-After running the individual test, you can check the logs, the output and
-configuration file manually by looking into the folder pointed by the `last_run`
-symlink:
+After running the individual test, you can check the logs, the output, and the
+configuration file manually by looking into the folder that the `last_run`
+symlink points to:
 
 [source,shell]
 ----------------------------------------------------------------------

@@ -1,20 +1,18 @@
-== Topology Diagram
+== Viewing the Topology Diagram
 
-We currently recommend using Kibana 4 together with Packetbeat. However, there
-is one panel type that is not yet available for Kibana 4, namely the topology
-diagram. This panel type is implemented in a fork of Kibana 3 that was never merged
-(and never will be). When Kibana 4 will support plugins, the panel will be
+We currently recommend using Kibana 4 together with Packetbeat. However, the topology panel type is not yet available for Kibana 4. This panel type is implemented in a fork of Kibana 3 that was never merged
+(and never will be). When Kibana 4 adds support for plugins, the topology panel will be
 re-implemented as a plugin.
 
 image:./images/topology_map.png[Topology map]
 
 This page walks you through the steps required to install the forked Kibana 3
-version and load the Packetbeat dashboards for it. You can install it side by
-side with Kibana 4.
+and load the Packetbeat dashboards. You can install Kibana 3 on the same system
+as Kibana 4.
 
-=== Download the Kibana 3 Fork
+=== Downloading the Kibana 3 Fork
 
-Download the forked Kibana like this:
+Download and install the Kibana 3 fork by issuing the following commands:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -22,11 +20,10 @@ curl -L -O https://github.com/packetbeat/kibana/releases/download/v3.1.2-pb/kiba
 tar -xzvf kibana-3.1.2-packetbeat.tar.gz
 ----------------------------------------------------------------------
 
-
 Kibana 3 is a pure Javascript application running fully in the browser. It
-doesn't have or need a sever side part like most web applications do. Instead,
+doesn't have or need a sever-side part like most web applications. Instead,
 you only needed a web server to serve the Javascript files and the static
-resources. For example, you can use python to create a simple web server:
+resources. For example, you can use Python to create a simple web server:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -34,17 +31,17 @@ cd kibana-3.1.2-packetbeat
 python -m SimpleHTTPServer
 ----------------------------------------------------------------------
 
-Now point your browser to port 8000 and you should see the Kibana web
+Now point your browser to port 8000, and you should see the Kibana web
 interface. It will probably complain that it cannot reach Elasticsearch, like
 in the following screenshot:
 
 image:./images/kibana_connection_failed.png[Kibana connection failed]
 
 This is because 
-http://en.wikipedia.org/wiki/Cross-origin_resource_sharing[CORS] is
-disabled by default in recent versions of Elasticsearch, to respect the "secure
-by default" philosophy. You can enable it by adding the following lines at the
-end of your `/etc/elasticsearch/elasticsearch.yml` file:
+http://en.wikipedia.org/wiki/Cross-origin_resource_sharing[cross-origin resource sharing (CORS)] is
+disabled by default in recent versions of Elasticsearch to respect the "secure
+by default" philosophy. You can enable CORS by adding the following lines to the
+end of the `/etc/elasticsearch/elasticsearch.yml` file:
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -52,8 +49,7 @@ http.cors.enabled: true
 http.cors.allow-origin: http://localhost:8000
 ----------------------------------------------------------------------
 
-
-Make sure to replace `http://localhost:8000` with the URL under which you
+Make sure that you replace `http://localhost:8000` with the URL under which you
 access Kibana up to the first slash. Restart Elasticsearch:
 
 [source,shell]
@@ -62,11 +58,11 @@ sudo /etc/init.d/elasticsearch restart
 ----------------------------------------------------------------------
 
 And try again to access Kibana in your browser. You should now see
-Kibana's welcoming page.
+Kibana's welcome page.
 
-=== Load Packetbeat Dashboards
+=== Loading Packetbeat Dashboards
 
-To load our sample Kibana 3 dashboards, follow these steps:
+To load our sample Kibana 3 dashboards, use the following commands:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -76,5 +72,5 @@ cd packetbeat-dashboards-k3-1.0.0~Beta1/
 ./load.sh localhost
 ----------------------------------------------------------------------
 
-In which you should replace `localhost` with the host of your Elasticsearch
+Make sure you replace `localhost` with the host of your Elasticsearch
 server.
