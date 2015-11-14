@@ -132,7 +132,7 @@ system:
           type: int
           description:
             The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-            is servicing another processor.
+            was servicing another processor.
             Available only on Unix.
 
 
