@@ -10,7 +10,7 @@ filebeat:
       # To fetch all ".log" files from a specific level of subdirectories
       # /var/log/*/*.log can be used.
       # For each file found under this path, a harvester is started.
-      # Make sure not file is defined twice as this can lead to unexpected behaviour.
+      # Make sure no file is defined twice as this can lead to unexpected behaviour.
       paths:
         - /var/log/*.log
       # - c:\programdata\elasticsearch\logs\*
@@ -30,7 +30,7 @@ filebeat:
       # * stdin: Reads the standard in
       input_type: log
 
-      # Optional additional fields. These field can be freely picked
+      # Optional additional fields. These fields can be freely picked
       # to add additional information to the crawled log files for filtering
       #fields:
       #  level: debug
@@ -42,7 +42,7 @@ filebeat:
       # fields.
       #fields_under_root: false
 
-      # Ignore files which were modified more then the defined timespan in the past
+      # Ignore files which were modified more than the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
       #ignore_older: 10m
 
@@ -102,7 +102,7 @@ filebeat:
     #    - /var/log/apache/*.log
     #  type: log
     #
-    #  # Ignore files which are older then 24 hours
+    #  # Ignore files which are older than 24 hours
     #  ignore_older: 24h
     #
     #  # Additional fields which can be freely defined
@@ -120,7 +120,7 @@ filebeat:
   #spool_size: 1024
 
   # Defines how often the spooler is flushed. After idle_timeout the spooler is
-  # Flush even though spool_size is not reached.
+  # flushed even though spool_size is not reached.
   #idle_timeout: 5s
 
   # Name of the registry file. Per default it is put in the current working
@@ -131,7 +131,7 @@ filebeat:
   # Full Path to directory with additional prospector configuration files. Each file must end with .yml
   # These config files must have the full filebeat config part inside, but only
   # the prospector part is processed. All global options like spool_size are ignored.
-  # The config_dir MUST point to a different directory then where the main filebeat config file is in.
+  # The config_dir MUST point to a different directory than where the main filebeat config file is in.
   #config_dir:
 
 
@@ -340,7 +340,7 @@ logging:
   #level: error
 
   files:
-    # The directory where the log files will written to.
+    # The directory where the log files will be written to.
     #path: /var/log/mybeat
 
     # The name of the files where the logs are written to.
