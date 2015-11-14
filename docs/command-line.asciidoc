@@ -37,31 +37,30 @@ Usage of ./packetbeat:
 
 === Packetbeat-Specific Options 
 
-These command line options are specific to Packetbeat. For other options, see {libbeat}/command-line-options.html[Beats Command Line Options].
+These command line options are specific to Packetbeat. For command line options common to all Beats, see {libbeat}/command-line-options.html[Beats Command Line Options].
 
-*-I <file>*::
-Pass a `PCAP` file as input to Packetbeat instead of reading packets from the network. 
+*`-I <file>`*::
+Pass a pcap file as input to Packetbeat instead of reading packets from the network. 
 This option is useful only for testing Packetbeat. Example: `-I ~/pcaps/network_traffic.pcap`.
 
-*-O*::
+*`-O`*::
 Read packets one by one by pressing _Enter_ after each. This option is useful only for testing Packetbeat.
 
-*-devices*::
+*`-devices`*::
 Print the list of devices that are available for sniffing.
 
-*-dump <file>*::
+*`-dump <file>`*::
 Write all captured packets to a file. This option is useful for troubleshooting Packetbeat.
 
-*-l <n>*::
-Read the pcap file n number of times. Use this option in combination with _pcap file input (-I)_. 
-For an infinite loop, use _0_. This option is useful only for testing Packetbeat.
+*`-l <n>`*::
+Read the pcap file `n` number of times. Use this option in combination with the `-I` option. 
+For an infinite loop, use _0_. The `-l` option is useful only for testing Packetbeat.
 
-*-t*::
-Read the packets from the pcap file as fast as possible without sleeping. Use this option 
-in combination with _pcap file input (-I)_. This option is useful only for testing Packetbeat.
+*`-t`*::
+Read the packets from the pcap file as fast as possible without sleeping. Use this option in combination with the `-I` option. The `-t` option is useful only for testing Packetbeat.
 
-*-waitstop <n>*::
-Wait an additional n seconds before exiting.
+*`-waitstop <n>`*::
+Wait an additional `n` seconds before exiting.
 
 
 

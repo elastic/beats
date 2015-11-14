@@ -148,7 +148,7 @@ type UdpProtocolPlugin interface {
 }
 ----------------------------------------------------------------------
 
-At a high level, the protocols plugins receive raw packet data via the
+At the high level, the protocols plugins receive raw packet data via the
 `Parse()` or `ParseUdp()` methods and produce objects that will be indexed into
 Elasticsearch via the `results` channel.
 
@@ -186,7 +186,7 @@ finished.
 
 ==== Registering Your Plugin
 
-To Configure your plugin, you need to add a configuration struct to 
+To configure your plugin, you need to add a configuration struct to 
 `config/config.go` Protocols struct. This struct will be filled by
 https://gopkg.in/yaml.v2[goyaml] on startup.
 
@@ -450,12 +450,12 @@ system tests:
 ===== Parsing Helpers
 
 In libbeat you also find some helpers for implementing parsers for binary and
-text-based protocols. The `Bytes_*` functions are the most low level helpers
+text-based protocols. The `Bytes_*` functions are the most low-level helpers
 for binary protocols that use network byte order. These functions can be found in the
-`libbeat/common` module. In addition to these very low level helpers, a stream
+`libbeat/common` module. In addition to these very low-level helpers, a stream
 buffer for parsing TCP-based streams, or simply UDP packets with integrated
-error handling, is provided by `libbeat/common/streambuf`. This demonstrates its
-usage for parsing the Memcache protocol UDP header:
+error handling, is provided by `libbeat/common/streambuf`. The following example
+demonstrates using the stream buffer for parsing the Memcache protocol UDP header:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -573,7 +573,7 @@ http://golang.org/pkg/testing/[testing] package. To make comparing complex
 structures less verbose, we use the assert package from the
 https://github.com/stretchr/testify[testify] library.
 
-For parser and decoder tests, we find it is a good practice to have an array with
+For parser and decoder tests, it's a good practice to have an array with
 test cases containing the inputs and expected outputs. For an example, see the 
 https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
 unit test.

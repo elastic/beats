@@ -13,7 +13,7 @@ any way and without any latency overhead. Packetbeat captures the transactions f
 network and indexes them in Elasticsearch so that they can be analyzed and
 searched.
 
-Packetbeat indexes the method, parameters, return value, and the
+Packetbeat indexes the method, parameters, return value, and 
 exceptions of each Thrift-RPC call. You can search by and create statistics
 based on any of these fields. Packetbeat automatically fills in the `status`
 column with either `OK` or `Error`, so it's easy to find the problematic RPC calls.
@@ -22,7 +22,7 @@ A transaction is put into the `Error` state if it returned an exception.
 Packetbeat also indexes the `responsetime` field so you can get performance
 analytics and find the slow RPC calls.
 
-Here is an example a performance dashboard:
+Here is an example performance dashboard:
 
 image:./images/thrift-dashboard.png[Thrift-RPC dashboard]
 
