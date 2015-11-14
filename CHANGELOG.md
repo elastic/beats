@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 
+### Improvements
+- Handling end of line under windows was improved #233
+
 ### Deprecated
 
 ## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1)
