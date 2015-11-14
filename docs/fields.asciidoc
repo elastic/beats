@@ -32,14 +32,14 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp when the measurements were taken. The precision is in milliseconds. The timezone is UTC.
+The timestamp of when the measurements were taken. The precision is in milliseconds. The timezone is UTC.
 
 
 ==== type
 
 required: True
 
-Set to "system" to specify that are system wide statistics.
+Set to "system" to indicate that the statistics are system-wide.
 
 
 ==== count
@@ -48,26 +48,26 @@ type: int
 
 required: True
 
-For how many transactions is this event representative. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values. Reserved for future usage.
+The number of transactions that this event represents. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values. Reserved for future usage.
 
 
 ==== shipper
 
 type: string
 
-Name of the Beat sending the statistics
+The name of the Beat sending the statistics
 
 
 [[exported-fields-system]]
 === System-Wide Statistics Fields
 
-Contains system wide statistics. Details that you can get by running the *top* command on Unix systems.
+Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
 
 
 
 === load Fields
 
-System load average. The load average is the average number  of jobs in the run queue.
+The system load average. The load average is the average number  of jobs in the run queue.
 
 
 
@@ -75,95 +75,95 @@ System load average. The load average is the average number  of jobs in the run 
 
 type: float
 
-Load average over 1 minute. 
+The load average over 1 minute. 
 
 
 ==== load5
 
 type: float
 
-Load average over 5 minutes.
+The load average over 5 minutes.
 
 
 ==== load15
 
 type: float
 
-Load average over 15 minutes. 
+The load average over 15 minutes. 
 
 
 === cpu Fields
 
-This group contains statistics related to the CPU usage.
+This group contains statistics related to CPU usage.
 
 
 ==== cpu.user
 
 type: int
 
-CPU time spent in user space 
+The amount of CPU time spent in user space.
 
 
 ==== cpu.user_p
 
 type: float
 
-CPU time spent in user space, in percentage. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the cpu.user_p will be 180%.
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the +cpu.user_p+ will be 180%.
 
 
 ==== cpu.nice
 
 type: int
 
-CPU time spent on low priority processes
+The amount of CPU time spent on low-priority processes.
 
 
 ==== cpu.system
 
 type: int
 
-CPU time spent in kernel space
+The amount of CPU time spent in kernel space.
 
 
 ==== cpu.system_p
 
 type: float
 
-CPU time spent in kernel space, in percentage.
+The percentage of CPU time spent in kernel space.
 
 
 ==== cpu.idle
 
 type: int
 
-CPU time spent idle
+The amount of CPU time spent idle.
 
 
 ==== cpu.iowait
 
 type: int
 
-CPU time spent in wait (on disk)
+The amount of CPU time spent in wait (on disk).
 
 
 ==== cpu.irq
 
 type: int
 
-CPU time spent servicing/handling hardware interrupts
+The amount of CPU time spent servicing and handling hardware interrupts.
 
 
 ==== cpu.softirq
 
 type: int
 
-CPU time spent servicing/handling software interrupts
+The amount of CPU time spent servicing and handling software interrupts.
 
 ==== cpu.steal
 
 type: int
 
-CPU time in involuntary wait by virtual cpu while hypervisor is servicing another processor CPU time stolen from a virtual machine. Available only on Unix.
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor is servicing another processor. Available only on Unix.
 
 === mem Fields
 
@@ -174,28 +174,28 @@ This group contains statistics related to the memory usage on the system.
 
 type: int
 
-Total memory
+Total memory.
 
 
 ==== mem.used
 
 type: int
 
-Used memory
+Used memory.
 
 
 ==== mem.free
 
 type: int
 
-Available memory
+Available memory.
 
 
 ==== mem.used_p
 
 type: float
 
-Used memory, in percentage
+The percentage of used memory.
 
 
 ==== mem.actual_used
@@ -216,7 +216,7 @@ Actual available memory. Available only on Unix.
 
 type: float
 
-Actual used memory, in percentage
+The percentage of actual used memory.
 
 
 === swap Fields
@@ -228,28 +228,28 @@ This group contains statistics related to the swap memory usage on the system.
 
 type: int
 
-Total swap memory
+Total swap memory.
 
 
 ==== swap.used
 
 type: int
 
-Used swap memory
+Used swap memory.
 
 
 ==== swap.free
 
 type: int
 
-Available swap memory
+Available swap memory.
 
 
 ==== swap.used_p
 
 type: float
 
-Used swap memory, in percentage
+The percentage of used swap memory.
 
 
 ==== swap.actual_used
@@ -270,7 +270,7 @@ Actual available swap memory. Available only on Unix.
 
 type: float
 
-Actual used swap memory, in percentage
+The percentage of actual used swap memory.
 
 
 [[exported-fields-process]]
@@ -282,7 +282,7 @@ Per-process statistics that you can get by running the *top* or *ps* command on 
 
 === proc Fields
 
-Contains per-process statistics like memory usage, CPU usage and details about each process like state, name, pid, ppid.
+Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name, pid, and ppid.
 
 
 
@@ -290,113 +290,113 @@ Contains per-process statistics like memory usage, CPU usage and details about e
 
 type: string
 
-Process name.
+The process name.
 
 
 ==== proc.state
 
 type: string
 
-Process state. Example: "running"
+The process state. For example: "running"
 
 
 ==== proc.pid
 
 type: int
 
-Process pid.
+The process pid.
 
 
 ==== proc.ppid
 
 type: int
 
-Process parent pid.
+The process parent pid.
 
 
 === cpu Fields
 
-CPU specific statistics per process.
+CPU-specific statistics per process.
 
 
 ==== proc.cpu.user
 
 type: int
 
-CPU time spent in user space by the process.
+The amount of CPU time the process spent in user space.
 
 
 ==== proc.cpu.user_p
 
 type: float
 
-CPU time spent in user space by the process, in percentage.
+The percentage of CPU time the process spent in user space.
 
 
 ==== proc.cpu.system
 
 type: int
 
-CPU time spent in kernel space by the process.
+The amount of CPU time the process spent in kernel space.
 
 
 ==== proc.cpu.total
 
 type: int
 
-Total CPU time spent by the process.
+The total CPU time spent by the process.
 
 
 ==== proc.cpu.start_time
 
 type: string
 
-Time when the process was started. Example: "17:45".
+The time when the process was started. Example: "17:45".
 
 
 === mem Fields
 
-Memory specific statistics per process.
+Memory-specific statistics per process.
 
 
 ==== proc.mem.size
 
 type: int
 
-Virtual memory the process has in total.
+The total virtual memory the process has.
 
 
 ==== proc.mem.rss
 
 type: int
 
-Resident Set Size. Memory occupied by the process in main memory (RAM).
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
 ==== proc.mem.rss_p
 
 type: float
 
-Memory occupied by the process in main memory (RAM), in percentage.
+The percentage of memory the process occupied in main memory (RAM).
 
 
 ==== proc.mem.share
 
 type: int
 
-Shared memory the process uses.
+The shared memory the process uses.
 
 
 [[exported-fields-filesystem]]
 === File System Statistics Fields
 
-File system related statistics that you can get by using the *df* command on Unix systems.
+File system-related statistics that you can get by using the *df* command on Unix systems.
 
 
 
 === fs Fields
 
-Contains details about the mounted disks like the total or used disk space and details about each disk like device name and the mounting place.
+Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as  the device name and the mounting place.
 
 
 
@@ -404,55 +404,55 @@ Contains details about the mounted disks like the total or used disk space and d
 
 type: int
 
-Available disk space in bytes.
+The available disk space in bytes.
 
 
 ==== fs.device_name
 
 type: string
 
-Disk name. Example: /dev/disk1
+The disk name. For example: +/dev/disk1+
 
 
 ==== fs.mount_point
 
 type: string
 
-Mounting point. Example: /
+The mounting point. For example: +/+
 
 
 ==== fs.files
 
 type: int
 
-Total file nodes in the file system. 
+The total number of file nodes in the file system. 
 
 
 ==== fs.free_files
 
 type: int
 
-Free file nodes in the file system.
+The number of free file nodes in the file system.
 
 
 ==== fs.total
 
 type: int
 
-Total disk space in bytes.
+The total disk space in bytes.
 
 
 ==== fs.used
 
 type: int
 
-Used disk space in bytes.
+The used disk space in bytes.
 
 
 ==== fs.used_p
 
 type: float
 
-Used disk space in percentage
+The percentage of used disk space.
 
 
