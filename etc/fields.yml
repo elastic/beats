@@ -18,18 +18,18 @@ env:
       format: YYYY-MM-DDTHH:MM:SS.milliZ
       example: 2015-01-24T14:06:05.071Z
       description: >
-        The timestamp when the measurements were taken. The precision is in milliseconds.
+        The timestamp of when the measurements were taken. The precision is in milliseconds.
         The timezone is UTC.
 
     - name: type
       description: >
-        Set to "system" to specify that are system wide statistics.
+        Set to "system" to indicate that the statistics are system-wide.
       required: true
 
     - name: count
       type: int
       description: >
-        For how many transactions is this event representative. This
+        The number of transactions that this event represents. This
         is generally the inverse of the sampling rate. For example, for
         a sample rate of 1/10, the count is 10. The count is used by the
         UIs to return estimated values. Reserved for future usage.
@@ -38,101 +38,101 @@ env:
     - name: shipper
       type: string
       description: >
-        Name of the Beat sending the statistics
+        The name of the Beat sending the statistics
 
 
 system:
   type: group
   description: >
-    Contains system wide statistics. Details that you can get by running the *top* command on Unix systems.
+    Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
   fields:
     - name: load
       type: group
       description: > 
-        System load average. The load average is the average number 
+        The system load average. The load average is the average number 
         of jobs in the run queue.
       fields:
         - name: load1
           type: float
           description: >
-            Load average over 1 minute. 
+            The load average over 1 minute. 
 
         - name: load5
           type: float
           description: >
-            Load average over 5 minutes.
+            The load average over 5 minutes.
 
         - name: load15
           type: float
           description: >
-            Load average over 15 minutes. 
+            The load average over 15 minutes. 
 
     - name: cpu
       type: group
-      description: This group contains statistics related to the CPU usage. 
+      description: This group contains statistics related to CPU usage. 
       fields:
         - name: user
           path: cpu.user
           type: int
           description: >
-            CPU time spent in user space 
+           The amount of CPU time spent in user space.
 
         - name: user_p
           path: cpu.user_p
           type: float
           description: >
-            CPU time spent in user space, in percentage. On multi-core systems, you can have percentages that are greater than 100%. 
-            For example, if 3 cores are at 60% use, then the cpu.user_p will be 180%.
+            The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. 
+            For example, if 3 cores are at 60% use, then the +cpu.user_p+ will be 180%.
 
         - name: nice
           path: cpu.nice
           type: int
           description: >
-            CPU time spent on low priority processes
+            The amount of CPU time spent on low-priority processes.
 
 
         - name: system
           path: cpu.system
           type: int
           description: >
-            CPU time spent in kernel space
+            The amount of CPU time spent in kernel space.
 
         - name: system_p
           path: cpu.system_p
           type: float
           description: >
-            CPU time spent in kernel space, in percentage.
+            The percentage of CPU time spent in kernel space.
 
         - name: idle
           path: cpu.idle
           type: int
           description: >
-            CPU time spent idle
+            The amount of CPU time spent idle.
 
         - name: iowait
           path: cpu.iowait
           type: int
           description: >
-            CPU time spent in wait (on disk)
+            The amount of CPU time spent in wait (on disk).
 
         - name: irq
           path: cpu.irq
           type: int
           description: >
-            CPU time spent servicing/handling hardware interrupts
+            The amount of CPU time spent servicing and handling hardware interrupts.
 
         - name: softirq
           path: cpu.softirq
           type: int
           description:
-            CPU time spent servicing/handling software interrupts
+            The amount of CPU time spent servicing and handling software interrupts.
 
         - name: steal
           path: cpu.steal
           type: int
           description:
-            CPU time in involuntary wait by virtual cpu while hypervisor 
-            is servicing another processor CPU time stolen from a virtual machine.
+            The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+            was servicing another processor.
             Available only on Unix.
 
 
@@ -144,25 +144,25 @@ system:
           path: mem.total
           type: int
           description: >
-            Total memory
+            Total memory.
 
         - name: used
           path: mem.used
           type: int
           description: >
-            Used memory
+            Used memory.
 
         - name: free
           path: mem.free
           type: int
           description: >
-            Available memory
+            Available memory.
 
         - name: used_p
           path: mem.used_p
           type: float
           description: >
-            Used memory, in percentage
+            The percentage of used memory.
 
         - name: actual_used
           path: mem.actual_used
@@ -180,7 +180,7 @@ system:
           path: mem.actual_used_p
           type: float
           description: >
-            Actual used memory, in percentage
+            The percentage of actual used memory.
 
     - name: swap
       type: group
@@ -190,25 +190,25 @@ system:
           path: swap.total
           type: int
           description: >
-            Total swap memory
+            Total swap memory.
 
         - name: used
           path: swap.used
           type: int
           description: >
-            Used swap memory
+            Used swap memory.
 
         - name: free
           path: swap.free
           type: int
           description: >
-            Available swap memory
+            Available swap memory.
 
         - name: used_p
           path: swap.used_p
           type: float
           description: >
-            Used swap memory, in percentage
+            The percentage of used swap memory.
 
         - name: actual_used
           path: swap.actual_used
@@ -226,7 +226,7 @@ system:
           path: swap.actual_used_p
           type: float
           description: >
-            Actual used swap memory, in percentage
+            The percentage of actual used swap memory.
 
 process:
   type: group
@@ -236,150 +236,150 @@ process:
     - name: proc
       type: group
       description: >
-        Contains per-process statistics like memory usage, CPU usage and details about each process like state, name,
-        pid, ppid.
+        Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name,
+        pid, and ppid.
       fields:
         - name: name
           path: proc.name
           type: string
           description: >
-            Process name.
+            The process name.
 
         - name: state
           path: proc.state
           type: string
           description: >
-            Process state. Example: "running"
+            The process state. For example: "running"
 
         - name: pid
           path: proc.pid
           type: int
           description: >
-            Process pid.
+            The process pid.
 
         - name: ppid
           path: proc.ppid
           type: int
           description: >
-            Process parent pid.
+            The process parent pid.
 
         - name: cpu
           type: group
-          description: CPU specific statistics per process.
+          description: CPU-specific statistics per process.
           fields:
             - name: user
               path: proc.cpu.user
               type: int
               description: >
-                CPU time spent in user space by the process.
+                The amount of CPU time the process spent in user space.
 
             - name: user_p
               path: proc.cpu.user_p
               type: float
               description: >
-                CPU time spent in user space by the process, in percentage.
+                The percentage of CPU time the process spent in user space.
 
             - name: system
               path: proc.cpu.system
               type: int
               description: >
-                CPU time spent in kernel space by the process.
+                The amount of CPU time the process spent in kernel space.
 
             - name: total
               path: proc.cpu.total
               type: int
               description: >
-                Total CPU time spent by the process.
+                The total CPU time spent by the process.
 
             - name: start_time
               path: proc.cpu.start_time
               type: string
               description: >
-                Time when the process was started. Example: "17:45".
+                The time when the process was started. Example: "17:45".
 
         - name: mem
           type: group
-          description: Memory specific statistics per process.
+          description: Memory-specific statistics per process.
           fields:
             - name: size
               path: proc.mem.size
               type: int
               description: >
-                Virtual memory the process has in total.
+                The total virtual memory the process has.
 
             - name: rss
               path: proc.mem.rss
               type: int
               description: >
-                Resident Set Size. Memory occupied by the process in main memory (RAM).
+                The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
             - name: rss_p
               path: proc.mem.rss_p
               type: float
               description: >
-                Memory occupied by the process in main memory (RAM), in percentage.
+                The percentage of memory the process occupied in main memory (RAM).
 
             - name: share
               path: proc.mem.share
               type: int
               description: >
-                Shared memory the process uses.
+                The shared memory the process uses.
 
 filesystem:
   type: group
   description: >
-    File system related statistics that you can get by using the *df* command on Unix systems.
+    File system-related statistics that you can get by using the *df* command on Unix systems.
   fields:
     - name: fs
       type: group
       description: >
-        Contains details about the mounted disks like the total or used disk space and details about each disk like
-        device name and the mounting place.
+        Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as 
+        the device name and the mounting place.
       fields:
         - name: avail
           path: fs.avail
           type: int
           description: >
-            Available disk space in bytes.
+            The available disk space in bytes.
   
         - name: device_name
           path: fs.device_name
           type: string
           description: >
-            Disk name. Example: /dev/disk1
+            The disk name. For example: +/dev/disk1+
 
         - name: mount_point
           path: fs.mount_point
           type: string
           description: >
-            Mounting point. Example: /
+            The mounting point. For example: +/+
 
         - name: files
           path: fs.files
           type: int
           description: >
-            Total file nodes in the file system. 
+            The total number of file nodes in the file system. 
 
         - name: free_files
           path: fs.free_files
           type: int
           description: >
-            Free file nodes in the file system.
+            The number of free file nodes in the file system.
 
         - name: total
           path: fs.total
           type: int
           description: >
-            Total disk space in bytes.
+            The total disk space in bytes.
 
         - name: used
           path: fs.used
           type: int
           description: >
-            Used disk space in bytes.
+            The used disk space in bytes.
 
         - name: used_p
           path: fs.used_p
           type: float
           description: >
-            Used disk space in percentage
+            The percentage of used disk space.
