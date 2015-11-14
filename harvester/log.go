@@ -160,6 +160,7 @@ func (h *Harvester) Harvest() {
 			InputType:    h.Config.InputType,
 			DocumentType: h.Config.DocumentType,
 			Offset:       h.Offset,
+			Bytes:        bytesRead,
 			Text:         &text,
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
