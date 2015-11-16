@@ -108,7 +108,7 @@ The amount of CPU time spent in user space.
 
 type: float
 
-The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the +cpu.user_p+ will be 180%.
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
 ==== cpu.nice
@@ -411,14 +411,14 @@ The available disk space in bytes.
 
 type: string
 
-The disk name. For example: +/dev/disk1+
+The disk name. For example: `/dev/disk1`
 
 
 ==== fs.mount_point
 
 type: string
 
-The mounting point. For example: +/+
+The mounting point. For example: `/`
 
 
 ==== fs.files
