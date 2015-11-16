@@ -60,9 +60,9 @@ func (p *messageWorker) run() {
 }
 
 func (p *messageWorker) shutdown() {
+	p.handler.onStop()
 	stopQueue(p.queue)
 	p.ws.wg.Done()
-	p.handler.onStop()
 }
 
 func (p *messageWorker) send(m message) {

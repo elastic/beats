@@ -56,7 +56,6 @@ func (p *preprocessor) onMessage(m message) {
 		event["beat"] = common.MapStr{
 			"name":     publisher.name,
 			"hostname": publisher.hostname,
-			"version":  publisher.version,
 		}
 		if len(publisher.tags) > 0 {
 			event["tags"] = publisher.tags
@@ -153,11 +152,11 @@ func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 
 		//get the direction of the transaction: outgoing (as client)/incoming (as server)
 		if publisher.IsPublisherIP(dst.Ip) {
-			// outgoing transaction
-			event["direction"] = "out"
-		} else {
-			//incoming transaction
+			// incoming transaction
 			event["direction"] = "in"
+		} else {
+			//outgoing transaction
+			event["direction"] = "out"
 		}
 	}
 
