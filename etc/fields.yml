@@ -46,11 +46,6 @@ env:
         The hostname as returned by the operating system on which the Beat is
         running.
 
-    - name: beat.version
-      description: >
-        The version of the Beat.
-
-
 system:
   type: group
   description: >
@@ -75,7 +70,7 @@ system:
             Load average over 5 minutes.
 
         - name: load15
-          path load.load15
+          path: load.load15
           type: float
           description: >
             Load average over 15 minutes. 
@@ -144,7 +139,7 @@ system:
           path: cpu.steal
           type: int
           description:
-            CPU time in involuntary wait by virtual the CPU while the hypervisor
+            CPU time in involuntary wait by the virtual CPU while the hypervisor
             is servicing another processor CPU time stolen from a virtual machine.
             Available only on Unix.
 
