@@ -81,7 +81,7 @@ func (b *Beat) LoadConfig() {
 	err := cfgfile.Read(&b.Config, "")
 	if err != nil {
 		// logging not yet initialized, so using fmt.Printf
-		fmt.Printf("%v\n", err)
+		fmt.Printf("Loading config file error: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -91,9 +91,13 @@ func (b *Beat) LoadConfig() {
 		os.Exit(1)
 	}
 
+	// Disable stderr logging if requested by cmdline flag
+	logp.SetStderr()
+
 	logp.Debug("beat", "Initializing output plugins")
 
 	if err := publisher.Publisher.Init(b.Name, b.Version, b.Config.Output, b.Config.Shipper); err != nil {
+		fmt.Printf("Error Initialising publisher: %v\n", err)
 		logp.Critical(err.Error())
 		os.Exit(1)
 	}
@@ -126,9 +130,7 @@ func (b *Beat) Run() {
 	// it can register the signals that stop or query (on Windows) the loop.
 	service.HandleSignals(b.BT.Stop)
 
-	// Startup successful, disable stderr logging if requested by
-	// cmdline flag
-	logp.SetStderr()
+	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
 	// Run beater specific stuff
 	err = b.BT.Run(b)
@@ -138,7 +140,7 @@ func (b *Beat) Run() {
 
 	service.Cleanup()
 
-	logp.Debug("beat", "Cleanup")
+	logp.Info("Cleaning up %s before shutting down.", b.Name)
 
 	// Call beater cleanup function
 	err = b.BT.Cleanup(b)
