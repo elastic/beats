@@ -126,8 +126,8 @@ func Init(name string, config *Logging) error {
 
 func SetStderr() {
 	if !*toStderr {
-		Info("Startup successful, disable stderr logging")
 		SetToStderr(false, "")
+		Debug("log", "Disable stderr logging")
 	}
 }
 

@@ -15,49 +15,49 @@ type Geoip struct {
 
 func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 
-	geoip_paths := []string{
-		"/usr/share/GeoIP/GeoLiteCity.dat",
-		"/usr/local/var/GeoIP/GeoLiteCity.dat",
-	}
+	geoipPaths := []string{}
+
 	if config.Paths != nil {
-		geoip_paths = *config.Paths
+		geoipPaths = *config.Paths
 	}
-	if len(geoip_paths) == 0 {
+	if len(geoipPaths) == 0 {
+		logp.Info("GeoIP disabled: No paths were set under output.geoip.paths")
 		// disabled
 		return nil
 	}
 
 	// look for the first existing path
-	var geoip_path string
-	for _, path := range geoip_paths {
+	var geoipPath string
+	for _, path := range geoipPaths {
 		fi, err := os.Lstat(path)
 		if err != nil {
+			logp.Err("GeoIP path could not be loaded: %s", path)
 			continue
 		}
 
 		if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
 			// follow symlink
-			geoip_path, err = filepath.EvalSymlinks(path)
+			geoipPath, err = filepath.EvalSymlinks(path)
 			if err != nil {
 				logp.Warn("Could not load GeoIP data: %s", err.Error())
 				return nil
 			}
 		} else {
-			geoip_path = path
+			geoipPath = path
 		}
 		break
 	}
 
-	if len(geoip_path) == 0 {
+	if len(geoipPath) == 0 {
 		logp.Warn("Couldn't load GeoIP database")
 		return nil
 	}
 
-	geoLite, err := libgeo.Load(geoip_path)
+	geoLite, err := libgeo.Load(geoipPath)
 	if err != nil {
 		logp.Warn("Could not load GeoIP data: %s", err.Error())
 	}
 
-	logp.Info("Loaded GeoIP data from: %s", geoip_path)
+	logp.Info("Loaded GeoIP data from: %s", geoipPath)
 	return geoLite
 }
