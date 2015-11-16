@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Bugfixes
 - Packetbeat will now exit if a configuration error is detected. #357
+- Fixed an issue handling DNS requests containing no questions. #369
 
 ### Added
 
