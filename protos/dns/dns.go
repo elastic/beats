@@ -406,8 +406,10 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 		event["bytes_out"] = t.Response.Length
 		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
 		event["method"] = dnsOpCodeToString(t.Request.Data.OpCode)
-		event["query"] = dnsQuestionToString(t.Request.Data.Questions[0])
-		event["resource"] = nameToString(t.Request.Data.Questions[0].Name)
+		if len(t.Request.Data.Questions) > 0 {
+			event["query"] = dnsQuestionToString(t.Request.Data.Questions[0])
+			event["resource"] = nameToString(t.Request.Data.Questions[0].Name)
+		}
 		addDnsToMapStr(dnsEvent, t.Response.Data, dns.Include_authorities,
 			dns.Include_additionals)
 
@@ -424,8 +426,10 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	} else if t.Request != nil {
 		event["bytes_in"] = t.Request.Length
 		event["method"] = dnsOpCodeToString(t.Request.Data.OpCode)
-		event["query"] = dnsQuestionToString(t.Request.Data.Questions[0])
-		event["resource"] = nameToString(t.Request.Data.Questions[0].Name)
+		if len(t.Request.Data.Questions) > 0 {
+			event["query"] = dnsQuestionToString(t.Request.Data.Questions[0])
+			event["resource"] = nameToString(t.Request.Data.Questions[0].Name)
+		}
 		addDnsToMapStr(dnsEvent, t.Request.Data, dns.Include_authorities,
 			dns.Include_additionals)
 
@@ -435,8 +439,10 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	} else if t.Response != nil {
 		event["bytes_out"] = t.Response.Length
 		event["method"] = dnsOpCodeToString(t.Response.Data.OpCode)
-		event["query"] = dnsQuestionToString(t.Response.Data.Questions[0])
-		event["resource"] = nameToString(t.Response.Data.Questions[0].Name)
+		if len(t.Response.Data.Questions) > 0 {
+			event["query"] = dnsQuestionToString(t.Response.Data.Questions[0])
+			event["resource"] = nameToString(t.Response.Data.Questions[0].Name)
+		}
 		addDnsToMapStr(dnsEvent, t.Response.Data, dns.Include_authorities,
 			dns.Include_additionals)
 		if dns.Send_response {

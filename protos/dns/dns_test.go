@@ -373,6 +373,34 @@ func TestExpireTransaction(t *testing.T) {
 	assert.Equal(t, NoResponse, mapValue(t, m, "notes"))
 }
 
+// Verify that an empty DNS request packet can be published.
+func TestPublishTransaction_emptyDnsRequest(t *testing.T) {
+	dns := newDns(testing.Verbose())
+
+	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
+	trans.Request = &DnsMessage{
+		Data: &layers.DNS{},
+	}
+	dns.publishTransaction(trans)
+
+	m := expectResult(t, dns)
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+}
+
+// Verify that an empty DNS response packet can be published.
+func TestPublishTransaction_emptyDnsResponse(t *testing.T) {
+	dns := newDns(testing.Verbose())
+
+	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
+	trans.Response = &DnsMessage{
+		Data: &layers.DNS{},
+	}
+	dns.publishTransaction(trans)
+
+	m := expectResult(t, dns)
+	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+}
+
 // Benchmarks UDP parsing for the given test message.
 func benchmarkUdp(b *testing.B, q DnsTestMessage) {
 	dns := newDns(false)
