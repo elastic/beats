@@ -25,7 +25,7 @@ class Test(TestCase):
 
         if os.name != "nt":
             for key in ["load1", "load5", "load15"]:
-                assert type(output["load.{}".format(key)]) is float
+                assert type(output["load.{}".format(key)]) in [float, int]
 
         for key in [
             "cpu.user_p",
