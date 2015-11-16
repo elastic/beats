@@ -139,7 +139,7 @@ system:
           path: cpu.steal
           type: int
           description:
-            CPU time in involuntary wait by virtual the CPU while the hypervisor
+            CPU time in involuntary wait by the virtual CPU while the hypervisor
             is servicing another processor CPU time stolen from a virtual machine.
             Available only on Unix.
 

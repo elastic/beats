@@ -166,7 +166,7 @@ CPU time spent servicing/handling software interrupts
 
 type: int
 
-CPU time in involuntary wait by virtual the CPU while the hypervisor is servicing another processor CPU time stolen from a virtual machine. Available only on Unix.
+CPU time in involuntary wait by the virtual CPU while the hypervisor is servicing another processor CPU time stolen from a virtual machine. Available only on Unix.
 
 === mem Fields
 
