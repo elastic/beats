@@ -10,8 +10,8 @@ All notable changes to this project will be documented in this file based on the
 - Use of `enabled` as a configuration option for outputs (elasticsearch,
   logstash, etc.) has been removed. #264
 - Use of `disabled` as a configuration option for tls has been removed. #264
-- The `shipper` output field is renamed to `beat.name`. #285
 - The `-test` command line flag was renamed to `-configtest`. #264
+- Disable geoip by default. To enable it uncomment in config file. #305
 
 ### Bugfixes
 - Disable logging to stderr after configuration phase. #276
