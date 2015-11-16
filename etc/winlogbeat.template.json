@@ -34,5 +34,5 @@
   "settings": {
     "index.refresh_interval": "5s"
   },
-  "template": "eventbeat-*"
+  "template": "winlogbeat-*"
 }

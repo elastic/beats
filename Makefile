@@ -21,7 +21,7 @@ check:
 .PHONY: clean
 clean:
 	gofmt -w .
-	-rm -rf eventbeat eventbeat.exe eventbeat.test .eventbeat profile.cov coverage bin
+	-rm -rf winlogbeat winlogbeat.exe winlogbeat.test .winlogbeat profile.cov coverage bin
 
 .PHONY: unit
 unit:
@@ -30,7 +30,7 @@ unit:
 .PHONY: coverage
 coverage:
 	mkdir -p coverage
-	GOPATH=$(shell godep path):$(GOPATH) gotestcover -coverprofile=coverage/unit.cov -covermode=count github.com/elastic/eventbeat/...
+	GOPATH=$(shell godep path):$(GOPATH) gotestcover -coverprofile=coverage/unit.cov -covermode=count github.com/elastic/winlogbeat/...
 	godep go tool cover -html=coverage/unit.cov -o coverage/unit.html
 
 .PHONY: install-deps

@@ -7,13 +7,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/eventbeat/config"
-	"github.com/elastic/eventbeat/eventlog"
 	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/cfgfile"
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/winlogbeat/config"
+	"github.com/elastic/winlogbeat/eventlog"
 )
 
 // Metrics that can retrieved through the expvar web interface. Metrics must be
@@ -23,7 +23,7 @@ var (
 	ignoredEvents   = expvar.NewMap("ignoredEvents")
 )
 
-type Eventbeat struct {
+type Winlogbeat struct {
 	beat      *beat.Beat                 // Common beat information.
 	config    *config.ConfigSettings     // Configuration settings.
 	eventLogs []eventlog.EventLoggingAPI // Interface to the event logs.
@@ -31,7 +31,7 @@ type Eventbeat struct {
 	client    publisher.Client           // Interface to publish event.
 }
 
-func (eb *Eventbeat) Config(b *beat.Beat) error {
+func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	// Read configuration.
 	err := cfgfile.Read(&eb.config, "")
 	if err != nil {
@@ -40,23 +40,23 @@ func (eb *Eventbeat) Config(b *beat.Beat) error {
 	}
 
 	// Validate configuration.
-	err = eb.config.Eventbeat.Validate()
+	err = eb.config.Winlogbeat.Validate()
 	if err != nil {
 		logp.Err("Error validating configuration file: %v", err)
 		return err
 	}
-	logp.Debug("eventbeat", "Init eventbeat. Config: %v", eb.config)
+	logp.Debug("winlogbeat", "Init winlogbeat. Config: %v", eb.config)
 
 	return nil
 }
 
-func (eb *Eventbeat) Setup(b *beat.Beat) error {
+func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
 	eb.client = b.Events
 
 	// If metrics are enabled, host expvars at http://<bindaddress>/debug/vars.
-	if eb.config.Eventbeat.Metrics.BindAddress != "" {
-		bindAddress := eb.config.Eventbeat.Metrics.BindAddress
+	if eb.config.Winlogbeat.Metrics.BindAddress != "" {
+		bindAddress := eb.config.Winlogbeat.Metrics.BindAddress
 		sock, err := net.Listen("tcp", bindAddress)
 		if err != nil {
 			return err
@@ -70,9 +70,9 @@ func (eb *Eventbeat) Setup(b *beat.Beat) error {
 	return nil
 }
 
-func (eb *Eventbeat) Run(b *beat.Beat) error {
+func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	// TODO: Persist last published RecordNumber for each event log so that
-	// when restarted, eventbeat resumes from the last read event. This should
+	// when restarted, winlogbeat resumes from the last read event. This should
 	// provide at-least-once publish semantics.
 
 	publishedEvents.Add("total", 0)
@@ -82,8 +82,8 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 
 	// TODO: If no event_logs are specified in the configuration, use the
 	// Windows registry to discover the available event logs.
-	for _, eventLogConfig := range eb.config.Eventbeat.EventLogs {
-		logp.Debug("eventbeat", "Creating event log for %s.",
+	for _, eventLogConfig := range eb.config.Winlogbeat.EventLogs {
+		logp.Debug("winlogbeat", "Creating event log for %s.",
 			eventLogConfig.Name)
 		eventLogAPI := eventlog.NewEventLoggingAPI(eventLogConfig.Name)
 		ignoreOlder, _ := config.IgnoreOlderDuration(eventLogConfig.IgnoreOlder)
@@ -101,7 +101,7 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 			}
 			defer api.Close()
 
-			logp.Debug("eventlog", "EventLog[%s] opened successfully",
+			logp.Debug("winlogbeat", "EventLog[%s] opened successfully",
 				api.Name())
 
 			for !eb.stop.Get() {
@@ -111,7 +111,7 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 					break
 				}
 
-				logp.Debug("eventbeat", "EventLog[%s] Read() returned %d "+
+				logp.Debug("winlogbeat", "EventLog[%s] Read() returned %d "+
 					"records.", api.Name(), len(records))
 				if len(records) == 0 {
 					time.Sleep(time.Second)
@@ -125,7 +125,7 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 					// TODO: Add a severity filter.
 					// TODO: Check the global IgnoreOlder filter.
 					if ignoreOlder != 0 && time.Since(lr.TimeGenerated) > ignoreOlder {
-						logp.Debug("eventbeat", "ignoreOlder filter dropping "+
+						logp.Debug("winlogbeat", "ignoreOlder filter dropping "+
 							"event: %s", lr.String())
 						ignoredEvents.Add("total", 1)
 						ignoredEvents.Add(api.Name(), 1)
@@ -140,10 +140,10 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 				if ok {
 					publishedEvents.Add("total", numEvents)
 					publishedEvents.Add(api.Name(), numEvents)
-					logp.Debug("eventbeat", "EvengLog[%s] Successfully "+
+					logp.Debug("winlogbeat", "EvengLog[%s] Successfully "+
 						"published %d events.", api.Name(), numEvents)
 				} else {
-					logp.Warn("eventbeat", "EventLog[%s] Failed to publish %d "+
+					logp.Warn("winlogbeat", "EventLog[%s] Failed to publish %d "+
 						"events.", api.Name(), numEvents)
 					publishedEvents.Add("failures", 1)
 				}
@@ -159,15 +159,15 @@ func (eb *Eventbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (eb *Eventbeat) Cleanup(b *beat.Beat) error {
-	logp.Debug("eventbeat", "Dumping runtime metrics...")
+func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
+	logp.Debug("winlogbeat", "Dumping runtime metrics...")
 	expvar.Do(func(kv expvar.KeyValue) {
-		logp.Debug("eventbeat", "%s=%s", kv.Key, kv.Value.String())
+		logp.Debug("winlogbeat", "%s=%s", kv.Key, kv.Value.String())
 	})
 	return nil
 }
 
-func (eb *Eventbeat) Stop() {
+func (eb *Winlogbeat) Stop() {
 	logp.Info("Initiating shutdown, please wait.")
 	// TODO: Remove atomic bool and use a channel to signal shutdown. Caution:
 	// Stop() can be invoked more than once on Windows when you Ctrl+C (one

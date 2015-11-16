@@ -1,7 +1,7 @@
-################### Eventbeat Configuration Example #########################
+################### Winlogbeat Configuration Example #########################
 
-############################# Eventbeat ######################################
-eventbeat:
+############################# Winlogbeat ######################################
+winlogbeat:
   # Filter events that are older than this amount of time. This value may be
   # overwritten on a per event_log basis. If omitted then no filtering will
   # occur unless ignore_older is specified with the individual event_log
@@ -9,7 +9,7 @@ eventbeat:
   ignore_older: 24h
 
   # List of event logs to monitor. If the configuration option is omitted then
-  # eventbeat will discover the available log through the Windows registry and
+  # winlogbeat will discover the available log through the Windows registry and
   # monitor them all.
   event_logs:
     - name: Application
@@ -27,7 +27,7 @@ eventbeat:
 
 ############################# Output ##########################################
 
-# Configure what outputs to use when sending the data collected by eventbeat.
+# Configure what outputs to use when sending the data collected by winlogbeat.
 # You can enable one or multiple outputs by setting enabled option to true.
 output:
 
@@ -51,9 +51,9 @@ output:
     # Number of workers per Elasticsearch host.
     #worker: 1
 
-    # Optional index name. The default is "eventbeat" and generates
-    # [eventbeat-]YYYY.MM.DD indices.
-    #index: "eventbeat"
+    # Optional index name. The default is "winlogbeat" and generates
+    # [winlogbeat-]YYYY.MM.DD indices.
+    #index: "winlogbeat"
 
     # Optional HTTP Path
     #path: "/elasticsearch"
@@ -122,9 +122,9 @@ output:
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default is "eventbeat" and generates
-    # [eventbeat-]YYYY.MM.DD indices.
-    #index: "eventbeat"
+    # Optional index name. The default is "winlogbeat" and generates
+    # [winlogbeat-]YYYY.MM.DD indices.
+    #index: "winlogbeat"
 
     # Optional TLS. By default is off.
     #tls:
@@ -159,11 +159,11 @@ output:
     #enabled: false
 
     # Path to the directory where to save the generated files. The option is mandatory.
-    #path: "/tmp/eventbeat"
+    #path: "/tmp/winlogbeat"
 
-    # Name of the generated files. The default is `eventbeat` and it generates
-    # files: `eventbeat`, `eventbeat.1`, `eventbeat.2`, etc.
-    #filename: eventbeat
+    # Name of the generated files. The default is `winlogbeat` and it generates
+    # files: `winlogbeat`, `winlogbeat.1`, `winlogbeat.2`, etc.
+    #filename: winlogbeat
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.

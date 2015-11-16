@@ -23,7 +23,7 @@ func TestConfigValidate(t *testing.T) {
 	testCases := []validationTestCase{
 		// Top-level config
 		{
-			EventbeatConfig{
+			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
 					EventLogConfig{Name: "App"},
 				},
@@ -31,18 +31,18 @@ func TestConfigValidate(t *testing.T) {
 			"", // No Error
 		},
 		{
-			EventbeatConfig{},
+			WinlogbeatConfig{},
 			"1 error: At least one event log must be configured as part of " +
 				"event_logs",
 		},
 		{
-			EventbeatConfig{IgnoreOlder: "1"},
+			WinlogbeatConfig{IgnoreOlder: "1"},
 			"2 errors: Invalid top level ignore_older value '1' (time: " +
 				"missing unit in duration 1); At least one event log must be " +
 				"configured as part of event_logs",
 		},
 		{
-			EventbeatConfig{
+			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
 					EventLogConfig{Name: "App"},
 				},
@@ -51,7 +51,7 @@ func TestConfigValidate(t *testing.T) {
 			"1 error: bind_address",
 		},
 		{
-			EventbeatConfig{
+			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
 					EventLogConfig{},
 				},

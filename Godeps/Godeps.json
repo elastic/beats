@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/elastic/eventbeat",
+	"ImportPath": "github.com/elastic/winlogbeat",
 	"GoVersion": "go1.5.1",
 	"Packages": [
 		"./..."

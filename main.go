@@ -3,19 +3,19 @@ package main
 import (
 	"os"
 
-	eventbeat "github.com/elastic/eventbeat/beat"
 	"github.com/elastic/libbeat/beat"
 	"github.com/elastic/libbeat/logp"
+	winlogbeat "github.com/elastic/winlogbeat/beat"
 )
 
 var Version = "0.0.1"
-var Name = "eventbeat"
+var Name = "winlogbeat"
 
 var GlobalBeat *beat.Beat
 
 func main() {
 	// Create Beater object
-	fb := &eventbeat.Eventbeat{}
+	fb := &winlogbeat.Winlogbeat{}
 
 	// Initialize beat objectefile
 	b := beat.NewBeat(Name, Version, fb)

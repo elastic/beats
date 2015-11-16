@@ -1,4 +1,4 @@
-// Package config provides the eventbeat specific configuration options.
+// Package config provides the winlogbeat specific configuration options.
 package config
 
 import (
@@ -15,18 +15,18 @@ type Validator interface {
 }
 
 type ConfigSettings struct {
-	Eventbeat EventbeatConfig
+	Winlogbeat WinlogbeatConfig
 }
 
-type EventbeatConfig struct {
+type WinlogbeatConfig struct {
 	IgnoreOlder string           `yaml:"ignore_older"`
 	EventLogs   []EventLogConfig `yaml:"event_logs"`
 	Metrics     MetricsConfig
 }
 
-// Validates the EventbeatConfig data and returns an error describing all
+// Validates the WinlogbeatConfig data and returns an error describing all
 // problems or nil if there are none.
-func (ebc EventbeatConfig) Validate() error {
+func (ebc WinlogbeatConfig) Validate() error {
 	var errs multierror.Errors
 	if _, err := IgnoreOlderDuration(ebc.IgnoreOlder); err != nil {
 		errs = append(errs, fmt.Errorf("Invalid top level ignore_older value "+
