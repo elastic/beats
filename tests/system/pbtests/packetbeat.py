@@ -128,7 +128,7 @@ class TestCase(unittest.TestCase):
                                                  self.dict_fields))
         self.all_have_fields(jsons, ["@timestamp", "type", "status",
                                      "beat.name", "beat.hostname",
-                                     "beat.version", "count"])
+                                     "count"])
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 

@@ -16,7 +16,7 @@ class Test(TestCase):
         """
         self.render_config_template()
         exit_code = self.run_packetbeat(pcap="http_post.pcap",
-                                        extra_args=["-test"])
+                                        extra_args=["-configtest"])
         assert exit_code == 0
 
         assert not os.path.isfile(
@@ -30,7 +30,7 @@ class Test(TestCase):
         self.render_config_template(
             iface_device="NoSuchDevice"
         )
-        proc = self.start_packetbeat(extra_args=["-test"])
+        proc = self.start_packetbeat(extra_args=["-configtest"])
         exit_code = proc.wait()
         print exit_code
         assert exit_code == 1
