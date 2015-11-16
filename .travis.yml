@@ -2,7 +2,7 @@ language: go
 
 os:
   - linux
-#  - osx
+  - osx
 
 go:
   - 1.5.1
@@ -10,13 +10,12 @@ go:
 env:
   - TARGETS="check testsuite"
 
-# Only execute the crosscompile target one time during the build.
-#matrix:
-#  exclude:
-#    - os: osx
-#      env: TARGETS="crosscompile"
-
 sudo: false
+
+addons:
+  apt:
+    packages:
+      - python-virtualenv
 
 before_install:
   # Redo the travis setup but with the elastic/topbeat path. This is needed so the package path is correct
