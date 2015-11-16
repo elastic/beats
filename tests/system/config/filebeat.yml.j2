@@ -7,7 +7,7 @@ filebeat:
         - {{ path }}
       # Type of the files. Annotated in every documented
       input: log
-      scan_frequency: 0.1s
+      scan_frequency: {{scan_frequency | default("0.1s") }}
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:
       encoding: {{encoding | default("utf-8") }}
@@ -15,7 +15,7 @@ filebeat:
       backoff: 0.1s
       backoff_factor: 1
       max_backoff: 0.1s
-      force_close_windows_files: {{force_close_windows_files}}
+      force_close_files: {{force_close_files}}
       {% if fields %}
       fields:
       {% for k,v in fields.items() %}

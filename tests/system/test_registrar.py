@@ -32,7 +32,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 5 events"),
+                "Processing 5 events"),
             max_timeout=15)
 
         # wait until the registry file exist. Needed to avoid a race between
@@ -46,18 +46,12 @@ class Test(TestCase):
         # Check that file exist
         data = self.get_dot_filebeat()
 
-        # FIXME: workaround for filebeat not dealing correctly
-        # with new lines larger than one character.
-        correction = 0
-        if os.name == "nt":
-            correction = -1
-
         # Check that offset is set correctly
         logFileAbs = os.path.abspath(testfile)
         # Hello world text plus newline, multiplied by the number
         # of lines and the windows correction applied
         assert data[logFileAbs]['offset'] == \
-            iterations * (11 + len(os.linesep)) + correction
+            iterations * (11 + len(os.linesep))
 
         # Check that right source field is inside
         assert data[logFileAbs]['source'] == logFileAbs
@@ -115,7 +109,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 10 events"),
+                "Processing 10 events"),
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
@@ -147,7 +141,7 @@ class Test(TestCase):
         filebeat = self.start_filebeat()
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 1 events"),
+                "Processing 1 events"),
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.

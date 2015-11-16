@@ -63,7 +63,7 @@ func (r *Registrar) Init() error {
 			registryPath, err)
 	}
 
-	logp.Debug("registrar", "Registry file set to: %s", r.registryFile)
+	logp.Info("Registry file set to: %s", r.registryFile)
 
 	return nil
 }
@@ -80,7 +80,7 @@ func (r *Registrar) LoadState() {
 }
 
 func (r *Registrar) Run() {
-	logp.Debug("registrar", "Starting Registrar")
+	logp.Info("Starting Registrar")
 
 	r.running = true
 
@@ -91,12 +91,12 @@ func (r *Registrar) Run() {
 		var events []*FileEvent
 		select {
 		case <-r.done:
-			logp.Debug("registrar", "Ending Registrar")
+			logp.Info("Ending Registrar")
 			return
 		case events = <-r.Channel:
 		}
 
-		logp.Debug("registrar", "Registrar: processing %d events", len(events))
+		logp.Debug("registrar", "Processing %d events", len(events))
 
 		// Take the last event found for each file source
 		for _, event := range events {
@@ -114,12 +114,13 @@ func (r *Registrar) Run() {
 
 		if e := r.writeRegistry(); e != nil {
 			// REVU: but we should panic, or something, right?
-			logp.Err("Update of registry returned error: %v. Continuing..", e)
+			logp.Err("Writing of registry returned error: %v. Continuing..", e)
 		}
 	}
 }
 
 func (r *Registrar) Stop() {
+	logp.Info("Stopping Registrar")
 	r.running = false
 	close(r.done)
 	// Note: don't block using waitGroup, cause this method is run by async signal handler
@@ -147,6 +148,8 @@ func (r *Registrar) writeRegistry() error {
 	// Directly close file because of windows
 	file.Close()
 
+	logp.Info("Registry file updated. %d states written.", len(r.State))
+
 	return SafeFileRotate(r.registryFile, tempfile)
 }
 
@@ -159,6 +162,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		r.Persist <- lastState
+		logp.Debug("registrar", "Existing file with offset: %s, offset: %s", filePath, lastState.Offset)
 		return lastState.Offset, true
 	}
 
@@ -166,7 +170,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		logp.Debug("prospector", "Detected rename of a previously harvested file: %s -> %s", previous, filePath)
+		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
 		lastState.Source = &filePath
@@ -175,7 +179,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	}
 
 	if isFound {
-		logp.Debug("prospector", "Not resuming rotated file: %s", filePath)
+		logp.Info("Not resuming rotated file: %s", filePath)
 	}
 
 	// New file so just start from an automatic position
@@ -197,8 +201,8 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 
 		// Compare states
 		if newState.IsSame(oldState.FileStateOS) {
+			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
 			return oldFilePath
-
 		}
 	}
 

@@ -36,7 +36,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 80 events"),
+                "Processing 80 events"),
             max_timeout=15)
 
         # TODO: Find better solution when filebeat did crawl the file
@@ -77,7 +77,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 80 events"),
+                "Processing 80 events"),
             max_timeout=15)
 
         # Give it more time to make sure it doesn't read the unfinished line
@@ -113,7 +113,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 5 events"),
+                "Processing 5 events"),
             max_timeout=15)
 
         # Rename the file (no new file created)
@@ -133,7 +133,7 @@ class Test(TestCase):
         # expecting 6 more events
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 6 events"),
+                "Processing 6 events"),
             max_timeout=20)
 
         filebeat.kill_and_wait()
@@ -168,7 +168,7 @@ class Test(TestCase):
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 5 events"),
+                "Processing 5 events"),
             max_timeout=15)
         os.remove(testfile)
 
@@ -186,7 +186,7 @@ class Test(TestCase):
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 6 events"),
+                "Processing 6 events"),
             max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -211,7 +211,8 @@ class Test(TestCase):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            force_close_windows_files="true"
+            force_close_files="true",
+            scan_frequency="5s"
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -230,16 +231,16 @@ class Test(TestCase):
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 5 events"),
+                "Processing 5 events"),
             max_timeout=15)
         os.remove(testfile)
 
-        if os.name == 'nt':
-            # Wait until error shows up on windows
-            self.wait_until(
-                lambda: self.log_contains(
-                    "Unexpected windows specific error reading from"),
-                max_timeout=15)
+        #if os.name == 'nt':
+        # Wait until error shows up on windows
+        self.wait_until(
+            lambda: self.log_contains(
+                "Unexpected force close specific"),
+            max_timeout=15)
 
         # Create new file with same name to see if it is picked up
         file = open(testfile, 'w')
@@ -254,7 +255,7 @@ class Test(TestCase):
         # Let it read the file
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 6 events"),
+                "Processing 6 events"),
             max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -289,7 +290,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 1 events"),
+                "Processing 1 events"),
             max_timeout=15)
 
         with open(testfile, 'a') as f:
@@ -299,7 +300,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 2 events"),
+                "Processing 2 events"),
             max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -374,7 +375,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Registrar: processing 1 events"),
+                    "Processing 1 events"),
                 max_timeout=15)
 
             # now write another line
@@ -384,7 +385,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Registrar: processing 2 events"),
+                    "Processing 2 events"),
                 max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -426,7 +427,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Registrar: processing 2 events"),
+                    "Processing 2 events"),
                 max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -465,7 +466,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Registrar: processing 1 events"),
+                    "Processing 1 events"),
                 max_timeout=15)
 
         # Append utf-8 chars to check if it keeps reading
@@ -477,7 +478,7 @@ class Test(TestCase):
 
             self.wait_until(
                 lambda: self.log_contains(
-                    "Registrar: processing 2 events"),
+                    "Processing 2 events"),
                 max_timeout=15)
 
         filebeat.kill_and_wait()

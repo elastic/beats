@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file based on the
 
 ### Backward Compatibility Breaks
 - Removed utf-16be-bom encoding support. Support will be added with fix for #205
+- Rename force_close_windows_files to force_close_files and make it available for all platforms.
+
 
 ### Bugfixes
 - Filebeat will now exit if a configuration error is detected. #198
@@ -15,6 +17,9 @@ All notable changes to this project will be documented in this file based on the
   on encoding. #224
 
 ### Added
+
+### Improvements
+- Handling end of line under windows was improved #233
 
 ### Deprecated
 
