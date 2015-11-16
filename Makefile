@@ -1,6 +1,5 @@
-#!/bin/bash
-
 BEATNAME=topbeat
+SYSTEM_TESTS=true
 
 include scripts/Makefile
 
