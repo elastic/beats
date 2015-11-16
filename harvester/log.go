@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/elastic/filebeat/config"
@@ -250,12 +249,12 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 		}
 
 		// On windows, check if the file name exists (see #93)
-		if h.Config.ForceCloseWindowsFiles && runtime.GOOS == "windows" {
+		if h.Config.ForceCloseFiles {
 			_, statErr := os.Stat(h.file.Name())
 			if statErr != nil {
-				logp.Info("Unexpected windows specific error reading from %s; error: %s", h.Path, statErr)
+				logp.Info("Unexpected force close specific error reading from %s; error: %s", h.Path, statErr)
 				// Return directly on windows -> file is closing
-				return fmt.Errorf("windows file closing")
+				return fmt.Errorf("force closing file %s", h.Path)
 			}
 		}
 

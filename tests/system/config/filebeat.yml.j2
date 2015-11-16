@@ -15,7 +15,7 @@ filebeat:
       backoff: 0.1s
       backoff_factor: 1
       max_backoff: 0.1s
-      force_close_windows_files: {{force_close_windows_files}}
+      force_close_files: {{force_close_files}}
       {% if fields %}
       fields:
       {% for k,v in fields.items() %}

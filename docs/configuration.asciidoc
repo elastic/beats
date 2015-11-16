@@ -191,10 +191,10 @@ will wait for the time defined below so the system can complete the line.
 In case the line is not completed in this time, the line will be skipped.
 Default: 5s
 
-===== force_close_windows_files
+===== force_close_files
 
-This option closes a file on windows, as soon as the file name changes.
-This config option is windows only. Filebeat keeps the files it's reading open. This can cause
+This option closes a file, as soon as the file name changes.
+This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
 issues when the file is removed, as the file will not be fully removed until also Filebeat closes
 the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
 same name can be created. Turning this feature on the other hand can lead to loss of data

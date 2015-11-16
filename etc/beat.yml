@@ -88,14 +88,15 @@ filebeat:
       # In case the line is not completed in this time, the line will be skipped.
       #partial_line_waiting: 5s
 
-      # This option closes a file on windows, as soon as the file name changes.
-      # This config option is windows only. Filebeat keeps the files it's reading open. This can cause
-      # issues when the file is removed, as the file will not be fully removed until also filebeat closes
+      # This option closes a file, as soon as the file name changes.
+      # This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
+      # issues when the file is removed, as the file will not be fully removed until also Filebeat closes
       # the reading. Filebeat closes the file handler after ignore_older. During this time no new file with the
-      # same name can be created. Turning this feature on can on the other hand lead to loss of data
-      # on rotate files as rotate files are not followed. We recommend to leave this option on false
+      # same name can be created. Turning this feature on the other hand can lead to loss of data
+      # on rotate files. It can happen that after file rotation the beginning of the new
+      # file is skipped, as the reading starts at the end. We recommend to leave this option on false
       # but lower the ignore_older value to release files faster.
-      #force_close_windows_files: false
+      #force_close_files: false
 
     #-
     #  paths:

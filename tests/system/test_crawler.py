@@ -211,7 +211,7 @@ class Test(TestCase):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            force_close_windows_files="true",
+            force_close_files="true",
             scan_frequency="5s"
         )
         os.mkdir(self.working_dir + "/log/")
@@ -235,12 +235,12 @@ class Test(TestCase):
             max_timeout=15)
         os.remove(testfile)
 
-        if os.name == 'nt':
-            # Wait until error shows up on windows
-            self.wait_until(
-                lambda: self.log_contains(
-                    "Unexpected windows specific error reading from"),
-                max_timeout=15)
+        #if os.name == 'nt':
+        # Wait until error shows up on windows
+        self.wait_until(
+            lambda: self.log_contains(
+                "Unexpected force close specific"),
+            max_timeout=15)
 
         # Create new file with same name to see if it is picked up
         file = open(testfile, 'w')

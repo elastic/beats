@@ -12,19 +12,19 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile                         = ".filebeat"
-	DefaultIgnoreOlderDuration    time.Duration = 10 * time.Minute
-	DefaultScanFrequency          time.Duration = 10 * time.Second
-	DefaultSpoolSize              uint64        = 1024
-	DefaultIdleTimeout            time.Duration = 5 * time.Second
-	DefaultHarvesterBufferSize    int           = 16 << 10 // 16384
-	DefaultDocumentType                         = "log"
-	DefaultTailFiles                            = false
-	DefaultBackoff                              = 1 * time.Second
-	DefaultBackoffFactor                        = 2
-	DefaultMaxBackoff                           = 10 * time.Second
-	DefaultPartialLineWaiting                   = 5 * time.Second
-	DefaultForceCloseWindowsFiles               = false
+	DefaultRegistryFile                      = ".filebeat"
+	DefaultIgnoreOlderDuration time.Duration = 10 * time.Minute
+	DefaultScanFrequency       time.Duration = 10 * time.Second
+	DefaultSpoolSize           uint64        = 1024
+	DefaultIdleTimeout         time.Duration = 5 * time.Second
+	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
+	DefaultDocumentType                      = "log"
+	DefaultTailFiles                         = false
+	DefaultBackoff                           = 1 * time.Second
+	DefaultBackoffFactor                     = 2
+	DefaultMaxBackoff                        = 10 * time.Second
+	DefaultPartialLineWaiting                = 5 * time.Second
+	DefaultForceCloseFiles                   = false
 )
 
 type Config struct {
@@ -65,7 +65,7 @@ type HarvesterConfig struct {
 	MaxBackoffDuration         time.Duration
 	PartialLineWaiting         string `yaml:"partial_line_wating"`
 	PartialLineWaitingDuration time.Duration
-	ForceCloseWindowsFiles     bool `yaml:"force_close_windows_files"`
+	ForceCloseFiles            bool `yaml:"force_close_files"`
 }
 
 // getConfigFiles returns list of config files.
