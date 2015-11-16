@@ -96,7 +96,7 @@ func (b *Beat) LoadConfig() {
 
 	logp.Debug("beat", "Initializing output plugins")
 
-	if err := publisher.Publisher.Init(b.Name, b.Version, b.Config.Output, b.Config.Shipper); err != nil {
+	if err := publisher.Publisher.Init(b.Name, b.Config.Output, b.Config.Shipper); err != nil {
 		fmt.Printf("Error Initialising publisher: %v\n", err)
 		logp.Critical(err.Error())
 		os.Exit(1)
