@@ -108,6 +108,7 @@ func InitOutputs(
 
 		plugin := OutputPlugin{Name: name, Config: config, Output: output}
 		plugins = append(plugins, plugin)
+		logp.Info("Activated %s as output plugin.", name)
 	}
 	return plugins, nil
 }
