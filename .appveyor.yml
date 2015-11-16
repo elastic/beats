@@ -15,9 +15,9 @@ clone_folder: c:\gopath\src\github.com\elastic\topbeat
 
 # Cache mingw install until appveyor.yml is modified.
 cache:
-- C:\ProgramData\chocolatey\bin -> appveyor.yml
-- C:\ProgramData\chocolatey\lib -> appveyor.yml
-- C:\tools\mingw64 -> appveyor.yml
+- C:\ProgramData\chocolatey\bin -> .appveyor.yml
+- C:\ProgramData\chocolatey\lib -> .appveyor.yml
+- C:\tools\mingw64 -> .appveyor.yml
 
 # Scripts that run after cloning repository
 install:
