@@ -29,11 +29,6 @@ Name of the Beat sending the log messages. If the shipper name is set in the con
 The hostname as returned by the operating system on which the Beat is running.
 
 
-==== beat.version
-
-The version of the Beat.
-
-
 ==== @timestamp
 
 type: date
@@ -79,20 +74,11 @@ File the line was read from.
 
 ==== offset
 
-type: int
+type: long
 
 required: False
 
 File offset the reported line starts at.
-
-
-==== line
-
-type: int
-
-required: True
-
-The line number the published line starts at.
 
 
 ==== message

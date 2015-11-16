@@ -23,10 +23,6 @@ env:
         The hostname as returned by the operating system on which the Beat is
         running.
 
-    - name: beat.version
-      description: >
-        The version of the Beat.
-
     - name: "@timestamp"
       type: date
       required: true

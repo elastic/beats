@@ -61,7 +61,7 @@ class Test(TestCase):
     def test_beat_fields(self):
         """
         Checks that it's possible to set a custom shipper name. Also
-        tests that beat.hostname and beat.version have values.
+        tests that beat.hostname  has values.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
@@ -79,4 +79,3 @@ class Test(TestCase):
         doc = output[0]
         assert doc["beat.name"] == "testShipperName"
         assert doc["beat.hostname"] == socket.gethostname()
-        assert "beat.version" in doc
