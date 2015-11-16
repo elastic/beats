@@ -82,7 +82,7 @@ system:
           type: float
           description: >
             The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. 
-            For example, if 3 cores are at 60% use, then the +cpu.user_p+ will be 180%.
+            For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
         - name: nice
           path: cpu.nice
@@ -346,13 +346,13 @@ filesystem:
           path: fs.device_name
           type: string
           description: >
-            The disk name. For example: +/dev/disk1+
+            The disk name. For example: `/dev/disk1`
 
         - name: mount_point
           path: fs.mount_point
           type: string
           description: >
-            The mounting point. For example: +/+
+            The mounting point. For example: `/`
 
         - name: files
           path: fs.files
