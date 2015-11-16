@@ -32,7 +32,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 5 events"),
+                "Processing 5 events"),
             max_timeout=15)
 
         # wait until the registry file exist. Needed to avoid a race between
@@ -109,7 +109,7 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 10 events"),
+                "Processing 10 events"),
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
@@ -141,7 +141,7 @@ class Test(TestCase):
         filebeat = self.start_filebeat()
         self.wait_until(
             lambda: self.log_contains(
-                "Registrar: processing 1 events"),
+                "Processing 1 events"),
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.

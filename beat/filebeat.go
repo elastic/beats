@@ -119,9 +119,10 @@ func (fb *Filebeat) Stop() {
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {
+	logp.Info("Start sending events to output")
+
 	// Receives events from spool during flush
 	for events := range fb.publisherChan {
-		logp.Debug("filebeat", "Send events to output")
 
 		pubEvents := make([]common.MapStr, 0, len(events))
 		for _, event := range events {
@@ -130,7 +131,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 
 		beat.Events.PublishEvents(pubEvents, publisher.Sync)
 
-		logp.Debug("filebeat", "Events sent: %d", len(events))
+		logp.Info("Events sent: %d", len(events))
 
 		// Tell the registrar that we've successfully sent these events
 		fb.registrar.Channel <- events

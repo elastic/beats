@@ -119,7 +119,7 @@ func getConfigDuration(config string, duration time.Duration, name string) (time
 			return 0, err
 		}
 	}
-	logp.Debug("propsector", "Set %s duration to %s", name, duration)
+	logp.Debug("prospector", "Set %s duration to %s", name, duration)
 
 	return duration, nil
 }

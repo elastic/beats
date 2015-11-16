@@ -96,7 +96,7 @@ func (r *Registrar) Run() {
 		case events = <-r.Channel:
 		}
 
-		logp.Info("Registrar: processing %d events", len(events))
+		logp.Debug("registrar", "Processing %d events", len(events))
 
 		// Take the last event found for each file source
 		for _, event := range events {
@@ -162,7 +162,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		r.Persist <- lastState
-		logp.Debug("Existing file with offset: %s, offset: %s", filePath, lastState.Offset)
+		logp.Debug("registrar", "Existing file with offset: %s, offset: %s", filePath, lastState.Offset)
 		return lastState.Offset, true
 	}
 
@@ -201,7 +201,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 
 		// Compare states
 		if newState.IsSame(oldState.FileStateOS) {
-			logp.Debug("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
+			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
 			return oldFilePath
 		}
 	}

@@ -244,8 +244,7 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 			h.file.Seek(h.Offset, os.SEEK_SET)
 		} else if age := time.Since(lastTimeRead); age > h.ProspectorConfig.IgnoreOlderDuration {
 			// If the file hasn't change for longer the ignore_older, harvester stops and file handle will be closed.
-			logp.Debug("harvester", "Stopping harvesting of file as older then ignore_old: ", h.Path, "Last change was: ", age)
-			return err
+			return fmt.Errorf("Stop harvesting as file is older then ignore_older: %s; Last change was: %s ", h.Path, age)
 		}
 
 		// On windows, check if the file name exists (see #93)
@@ -254,7 +253,7 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 			if statErr != nil {
 				logp.Info("Unexpected force close specific error reading from %s; error: %s", h.Path, statErr)
 				// Return directly on windows -> file is closing
-				return fmt.Errorf("force closing file %s", h.Path)
+				return fmt.Errorf("Force closing file: %s", h.Path)
 			}
 		}
 
