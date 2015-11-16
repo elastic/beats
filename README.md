@@ -1,36 +1,36 @@
-Notice: *This is an experimental proof of concept project. See [Current Status](https://github.com/elastic/eventbeat/issues/1) for details.*
+Notice: *This is an experimental proof of concept project. See [Current Status](https://github.com/elastic/winlogbeat/issues/1) for details.*
 
-Eventbeat [![GoDoc](https://godoc.org/github.com/elastic/eventbeat?status.svg)](https://godoc.org/github.com/elastic/eventbeat) [![Build Status](https://travis-ci.org/elastic/eventbeat.svg?branch=master)](https://travis-ci.org/elastic/eventbeat)
+Winlogbeat [![GoDoc](https://godoc.org/github.com/elastic/winlogbeat?status.svg)](https://godoc.org/github.com/elastic/winlogbeat) [![Build Status](https://travis-ci.org/elastic/winlogbeat.svg?branch=master)](https://travis-ci.org/elastic/winlogbeat)
 =========
 
 *You know, for windows event logs*
 
-Eventbeat is an open-source log collector that ships Windows Event Logs to
+Winlogbeat is an open-source log collector that ships Windows Event Logs to
 Elasticsearch or Logstash. It installs as a Windows service on all versions
 since Windows XP.
 
-To learn more about Eventbeat, check out <https://www.elastic.co/products/beats/eventbeat>.
+To learn more about Winlogbeat, check out <https://www.elastic.co/products/beats/winlogbeat>.
 
 ## Getting started
 
 Please follow the
-[getting started](https://www.elastic.co/guide/en/beats/eventbeat/current/eventbeat-getting-started.html)
+[getting started](https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-getting-started.html)
 guide from the docs.
 
 ## Documentation
 
 Please visit
-[elastic.co](https://www.elastic.co/guide/en/beats/eventbeat/current/index.html) for the
+[elastic.co](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html) for the
 documentation.
 
 ## Bugs and feature requests
 
 If you have an issue, please start by opening a topic on the
-[forums](https://discuss.elastic.co/c/beats/eventbeat). We'll help you
+[forums](https://discuss.elastic.co/c/beats/winlogbeat). We'll help you
 troubleshoot and work with you on a solution.
 
 If you are sure you found a bug or have a feature request, open an issue on
-[Github](https://github.com/elastic/eventbeat/issues).
+[Github](https://github.com/elastic/winlogbeat/issues).
 
 ## Contributions
 

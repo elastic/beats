@@ -5,11 +5,11 @@ go:
   - 1.5.1
 
 before_install:
-  # This is needed so the package path uses elastic/eventbeat as its path.
-  - mkdir -p $HOME/gopath/src/github.com/elastic/eventbeat
-  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/eventbeat/
-  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/eventbeat
-  - cd $HOME/gopath/src/github.com/elastic/eventbeat
+  # This is needed so the package path uses elastic/winlogbeat as its path.
+  - mkdir -p $HOME/gopath/src/github.com/elastic/winlogbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/winlogbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/winlogbeat
+  - cd $HOME/gopath/src/github.com/elastic/winlogbeat
 
 install:
   - make install-deps
