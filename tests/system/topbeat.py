@@ -95,7 +95,7 @@ class TestCase(unittest.TestCase):
                                                  []))
         self.all_have_fields(jsons, ["@timestamp", "type",
                                      "beat.name", "beat.hostname",
-                                     "beat.version", "count"])
+                                     "count"])
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
