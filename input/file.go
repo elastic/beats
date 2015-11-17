@@ -23,7 +23,6 @@ type FileEvent struct {
 	DocumentType string
 	Offset       int64
 	Bytes        int
-	Line         uint64
 	Text         *string
 	Fields       *map[string]string
 	Fileinfo     *os.FileInfo
@@ -68,9 +67,7 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 		"@timestamp": common.Time(f.ReadTime),
 		"source":     f.Source,
 		"offset":     f.Offset,
-		"line":       f.Line,
 		"message":    f.Text,
-		"fileinfo":   f.Fileinfo,
 		"type":       f.DocumentType,
 		"input_type": f.InputType,
 	}

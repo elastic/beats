@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file based on the
 - Fix to enable prospector to harvest existing files that are modified. #199
 - Improve line reading and encoding to better keep track of file offsets based
   on encoding. #224
+- Set input_type by default to "log"
 
 ### Added
 - Handling end of line under windows was improved #233
