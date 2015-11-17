@@ -21,7 +21,7 @@ input:
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used. 
+# Multiple outputs may be used.
 output:
 
   ### Elasticsearch as output
@@ -193,12 +193,12 @@ shipper:
   # refresh_topology_freq. The default is 15 seconds.
   #topology_expire: 15
 
-  # Configure local GeoIP database support. If no paths are configured
-  # the locations /usr/share/GeoIP/GeoLiteCity.dat and
-  # /usr/local/var/GeoIP/GeoLiteCity.dat are searched for a GeoIP database.
+  # Configure local GeoIP database support.
+  # If no paths are not configured geoip is disabled.
   #geoip:
-    # If paths is empty, GeoIP support will be disabled.
-    #paths: ["/path/to/geoip/data/GeoLiteCity.dat"]
+    #paths:
+    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
+    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
 
 
 ############################# Logging #########################################
