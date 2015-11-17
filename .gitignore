@@ -39,5 +39,6 @@ profile.cov
 .idea
 .DS_Store
 /docs/html_docs
+.vagrant
 
 build/
