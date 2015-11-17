@@ -34,7 +34,7 @@ func (p *preprocessor) onMessage(m message) {
 
 	var ignore []int // indices of events to be removed from events
 
-	debug("preprocessor")
+	debug("Start Preprocessing")
 
 	for i, event := range events {
 		// validate some required field
@@ -91,7 +91,7 @@ func (p *preprocessor) onMessage(m message) {
 		return
 	}
 
-	debug("preprocessor forward")
+	debug("Forward preprocessed events")
 	if single {
 		p.handler.onMessage(message{context: m.context, event: events[0]})
 	} else {
