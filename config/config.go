@@ -18,6 +18,7 @@ const (
 	DefaultSpoolSize           uint64        = 1024
 	DefaultIdleTimeout         time.Duration = 5 * time.Second
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
+	DefaultInputType                      = "log"
 	DefaultDocumentType                      = "log"
 	DefaultTailFiles                         = false
 	DefaultBackoff                           = 1 * time.Second
