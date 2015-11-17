@@ -1,49 +1,53 @@
-
-== Windows Support
+[[windows-install]]
+== Installing Packetbeat on Windows
 
 This page walks you through the steps required for running Packetbeat on
 Windows. It assumes your Windows system has Powershell installed.
 
-Start by downloading and installing WinPcap from this
+To install and run Packetbeat:
+
+. Download and install WinPcap from this
 http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
 a driver to enable packet capturing.
 
-Then download the Packetbeat Windows zip file from the
+. Download the Packetbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/packetbeat[downloads page] and unzip
-it on your computer. The location where it is extracted is not important, but
+it on your computer. The location where you extract the file is not important, but
 remember that you shouldn't delete this repository after the installation is
 finished. The exe file and the configuration file will continue to live there.
 
-Then start an Administrator Powershell session (right click the Powershell icon
-and select *Run as Administrator*), and navigate to where you uncompressed the
+. Start an Administrator Powershell session (right click the Powershell icon
+and select *Run as Administrator*), and navigate to where you extracted the
 zip file.
-
++
 Use the following command to list the available network interfaces:
-
++
 [source,shell]
 ----------------------------------------------------------------------
 PS > .\packetbeat.exe -devices
 
 0: \Device\NPF_{113535AD-934A-452E-8D5F-3004797DE286} (Intel(R) PRO/1000 MT Desktop Adapter)
 ----------------------------------------------------------------------
-
++
 In this example, there is only one network card installed on the system. If
-there are more of them, remember the index of the device you want to use for
+there are multiple network cards, remember the index of the device you want to use for
 capturing the traffic.
 
-Then edit the `packetbeat.yml` file and modify the `device` line to point to the
-index that you just found:
-
+. Edit the `packetbeat.yml` file and modify the `device` line to point to the
+index of the device:
++
 [source,yml]
 ----------------------------------------------------------------------
 interfaces:
   device: 0
 ----------------------------------------------------------------------
++
+You might want to change other settings in the `packetbeat.yml` file. See 
+ <<packetbeat-configuration>> for details.
 
-You might want to change other settings in the `packetbeat.yml` file, see the
- <<packetbeat-configuration>> documentation for details.
+=== Installing Packetbeat as a Windows Service
 
-Then you can install Packetbeat as a Windows service by using the following
+You can install Packetbeat as a Windows service by using the following
 Powershell script:
 
 [source,shell]
@@ -51,11 +55,11 @@ Powershell script:
 PS > .\install-service-packetbeat.ps1
 ----------------------------------------------------------------------
 
-And then start it with:
+To start the Packetbeat service, issue this command:
 
 [source,shell]
 ----------------------------------------------------------------------
 PS > Start-Service packetbeat
 ----------------------------------------------------------------------
 
-By default the log files can be found under `C:\ProgramData\packetbeat\Logs`.
+By default the log files are stored in `C:\ProgramData\packetbeat\Logs`.
