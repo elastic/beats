@@ -75,6 +75,8 @@ func (l *lumberjackClient) PublishEvents(
 ) ([]common.MapStr, error) {
 	for len(events) > 0 {
 		n, err := l.publishWindowed(events)
+
+		logp.Debug("logstash", "%s events out of %s events sent to logstash. Continue sending ...", n, len(events))
 		events = events[n:]
 		if err != nil {
 			return events, err
@@ -84,12 +86,14 @@ func (l *lumberjackClient) PublishEvents(
 }
 
 // publishWindowed published events with current maximum window size to logstash
-// returning the total number of events send (due to window size, or acks until
+// returning the total number of events sent (due to window size, or acks until
 // failure).
 func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) {
 	if len(events) == 0 {
 		return 0, nil
 	}
+
+	logp.Debug("logstash", "Try to publish %s events to logstash with window size %s", len(events), l.windowSize)
 
 	// prepare message payload
 	if len(events) > l.windowSize {
