@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file based on the
 - Set the default file logging path when not set in config. #275
 - Fix bug silently dropping records based on current window size. elastic/filebeat#226
 - Fix direction field in published events. #300
+- Fix elasticsearch structured errors breaking error handling. #309
 
 ### Added
 
