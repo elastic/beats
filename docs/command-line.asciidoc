@@ -1,7 +1,13 @@
 == Command Line Options
 
-Filebeat does not have any command line options. All options must be configured in the config file. To start Filbeat
-the option `-c config/path` from libbeat must be used. For more command line options see the https://www.elastic.co/guide/index.html[libbeat] docs.
+Filebeat does not have any Filebeat-specific command line options. Instead, you
+configure the behaviour of Filebeat by specifying options in the configuration file.
+
+The following command line options from libbeat are also available for Filebeat. For
+details about each option, see {libbeat}/command-line-options.html[Beats Command Line Options].
+
+To start Filebeat, you must use the `-c config/path` option to specify the path to the
+configuration file.
 
 [source,shell]
 ----------------------------------------------------------------------------
@@ -24,6 +30,5 @@ Usage of ./filebeat:
     	Print version and exit
 -----------------------------------------------------------------------------
 
-For details about each option, check {libbeat}/command-line-options.html[Beats Command Line Options].
 
 
