@@ -1,23 +1,25 @@
-== Kibana Query and Filter
+== Kibana Queries and Filters
 
-=== Kibana Query
+In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization. 
 
-The search field under the *Discover* page provides a way to query 
-a specific subset of the transactions from the selected time frame.
+=== Creating Queries
+
+The search field on the *Discover* page provides a way to query 
+a specific subset of transactions from the selected time frame.
 The query syntax is based on the 
 http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax]. 
-It allows boolean operators, wildcards and field filtering. For example, if 
-you want to find the http redirects, you can search for
+It allows boolean operators, wildcards, and field filtering. For example, if 
+you want to find the HTTP redirects, you can search for
 `type: http AND http.code: 302`.
 
 image:./images/kibana-query-filtering.png[Kibana query]
 
-==== String Query
+==== String Queries
 
-A query may consists of one or more words or a phrase. A phrase is a
-group of words surrounded by double quotes such as "test search".
+A query may consist of one or more words or a phrase. A phrase is a
+group of words surrounded by double quotation marks, such as `"test search"`.
 
-To search for all http requests initiated by Mozilla Web browser version 5.0:
+To search for all HTTP requests initiated by Mozilla Web browser version 5.0:
 
 [source,yaml]
 ---------------
@@ -31,8 +33,8 @@ To search for all the transactions that contain the following message:
 "Cannot change the info of a user"
 ------------------------------------
 
-Note: Double quotes are mandatory here to search for the exact
-string. Without any quotes, the search would match documents containing one of the following words:"Cannot" OR "change" OR "the" OR "info" OR "a" OR "user".
+NOTE: To search for an exact string, you need to wrap the string in double quotation 
+marks. Without quotation marks, the search in the example would match any documents containing one of the following words: "Cannot" OR "change" OR "the" OR "info" OR "a" OR "user".
 
 To search for all transactions with the "chunked" encoding:
 
@@ -41,16 +43,18 @@ To search for all transactions with the "chunked" encoding:
 "Transfer-Encoding: chunked"
 -----------------------------
 
-==== Field-based Query
+==== Field-Based Queries
 
-To only view HTTP transactions:
+Kibana allows you to search specific fields.
+
+To view HTTP transactions only:
 
 [source,yaml]
 --------------------
 type: http
 -------------------
 
-To only view failed transactions:
+To view failed transactions only:
 
 [source,yaml]
 -------------------
@@ -58,17 +62,17 @@ status: Error
 -------------------
 
 
-To only view MySQL INSERT queries:
+To view MySQL INSERT queries only:
 
 [source,yaml]
 ---------------------
 mysql.method: INSERT
 ---------------------
 
-==== Regexp Query
+==== Regexp Queries
 
-Kibana supports regular expression for filters and expressions.  For example,
-to search for all http responses with json as returned value type: 
+Kibana supports regular expression for filters and expressions. For example,
+to search for all HTTP responses with JSON as the returned value type: 
 
 [source,yaml]
 -------------------------
@@ -80,31 +84,31 @@ http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-
 for more details about the syntax.
 
 
-==== Range Query
+==== Range Queries
 
-Range queries allow a field to have values between the lower and upper bound.
+Range queries allow a field to have values between the lower and upper bounds.
 The interval can include or exclude the bounds depending on the type of
-brackets used.
+brackets that you use.
 
-To search for slow transactions with a responsetime greater or equal than 10ms:
+To search for slow transactions with a response time greater than or equal to 10ms:
 
 [source,yaml]
 ------------------------
 responsetime: [10 TO *]
 ------------------------
 
-
-To search for slow transactions with a responsetime greater than 10ms:
+To search for slow transactions with a response time greater than 10ms:
 
 [source,yaml]
 -------------------------
 responsetime: {10 TO *}
 -------------------------
 
-==== Bool Query 
+==== Boolean Queries
 
-Boolean operators (AND, OR, NOT) allow combining multiple sub queries through logic operators.
-Note: Operators such as AND, OR and NOT must be CAPITALIZED. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
+Boolean operators (AND, OR, NOT) allow combining multiple sub-queries through logic operators.
+
+NOTE: Operators such as AND, OR, and NOT must be capitalized. See http://lucene.apache.org/core/3_5_0/queryparsersyntax.html[Lucene query syntax] for more details about the boolean operators.
 
 To search for all transactions except MySQL transactions:
 
@@ -122,21 +126,21 @@ mysql.method: SELECT AND mysql.size: [10000 TO *]
 -------------------------------------------------
 
 
-Lucene also supports parentheses to group sub queries.
+Lucene also supports parentheses to group sub-queries.
 
-To search for either INSERT or UPDATE MySQL queries with a responsetime greater or equal with 30ms:
+To search for either INSERT or UPDATE MySQL queries with a response time greater than or equal to 30ms:
 
 [source,yaml]
 ---------------------------------------------------------------------------
 (mysql.method: INSERT OR mysql.method: UPDATE) AND responsetime: [30 TO *]
 ---------------------------------------------------------------------------
 
-=== Kibana Filter
+=== Creating Filters
 
-In Kibana, the transactions can be filtered either by entering a search query or by clicking on
-the elements within the visualization. For example, to filter for all the http redirects that are coming from a specific
-IP and port, click on both green sections of `client_ip` and `client_port` fields from the transaction detail widget. To
-exclude the http redirects coming from the IP and port, use the red sections.
+In Kibana, you can also filter transactions by clicking on
+elements within a visualization. For example, to filter for all the HTTP redirects that are coming from a specific
+IP and port, click the "Filter for value" icons (highlighted in green below) for the `client_ip` and `client_port` fields in the transaction detail widget. To
+exclude the HTTP redirects coming from the IP and port, click the icons highlighted in red.
 
 image:./images/filter_from_context.png[Filter from context]
 
