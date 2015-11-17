@@ -104,7 +104,7 @@ func (b *Beat) LoadConfig() {
 
 	b.Events = publisher.Publisher.Client()
 
-	logp.Debug("beat", "Init %s", b.Name)
+	logp.Info("Init Beat: %s; Version: %s", b.Name, b.Version)
 }
 
 // Run calls the beater Setup and Run methods. In case of errors
