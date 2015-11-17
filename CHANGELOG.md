@@ -2,13 +2,21 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
+## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc2...HEAD)
 
-## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc1...HEAD)
+### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0-rc2](https://github.com/elastic/libbeat/compare/1.0.0-rc1...1.0.0-rc2) - 2015-11-17
 
 ### Backward Compatibility Breaks
 - Removed utf-16be-bom encoding support. Support will be added with fix for #205
 - Rename force_close_windows_files to force_close_files and make it available for all platforms.
-
 
 ### Bugfixes
 - Filebeat will now exit if a configuration error is detected. #198
@@ -17,8 +25,6 @@ All notable changes to this project will be documented in this file based on the
   on encoding. #224
 
 ### Added
-
-### Improvements
 - Handling end of line under windows was improved #233
 
 ### Deprecated
