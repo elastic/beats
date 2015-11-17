@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
+	"time"
 )
 
 type Priority int
@@ -45,15 +46,22 @@ func debugMessage(calldepth int, selector, format string, v ...interface{}) {
 				return
 			}
 		}
-		if _log.toSyslog {
-			_log.syslog[LOG_INFO].Output(calldepth, fmt.Sprintf(format, v...))
-		}
-		if _log.toStderr {
-			_log.logger.Output(calldepth, fmt.Sprintf("DBG  "+format, v...))
-		}
-		if _log.toFile {
-			_log.rotator.WriteLine([]byte(fmt.Sprintf("DBG  "+format, v...)))
-		}
+
+		send(calldepth+1, LOG_DEBUG, "DBG  ", format, v...)
+	}
+}
+
+func send(calldepth int, level Priority, prefix string, format string, v ...interface{}) {
+	if _log.toSyslog {
+		_log.syslog[level].Output(calldepth, fmt.Sprintf(format, v...))
+	}
+	if _log.toStderr {
+		_log.logger.Output(calldepth, fmt.Sprintf(prefix+format, v...))
+	}
+	if _log.toFile {
+		// Creates a timestamp for the file log message and formats it
+		prefix = time.Now().Format(time.RFC3339) + " " + prefix
+		_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
 	}
 }
 
@@ -73,15 +81,7 @@ func IsDebug(selector string) bool {
 
 func msg(level Priority, prefix string, format string, v ...interface{}) {
 	if _log.level >= level {
-		if _log.toSyslog {
-			_log.syslog[level].Output(3, fmt.Sprintf(format, v...))
-		}
-		if _log.toStderr {
-			_log.logger.Output(3, fmt.Sprintf(prefix+format, v...))
-		}
-		if _log.toFile {
-			_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
-		}
+		send(4, level, prefix, format, v...)
 	}
 }
 
@@ -130,24 +130,20 @@ func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugS
 	}
 
 	if _log.toSyslog {
-		for prio := LOG_EMERG; prio <= LOG_DEBUG; prio++ {
-			_log.syslog[prio] = openSyslog(prio, prefix)
-			if _log.syslog[prio] == nil {
-				// syslog not available
-				_log.toSyslog = false
-				break
-			}
-		}
+		SetToSyslog(true, prefix)
 	}
+
 	if _log.toStderr {
-		_log.logger = log.New(os.Stderr, prefix, log.Lshortfile)
+		SetToStderr(true, prefix)
 	}
 }
 
 func SetToStderr(toStderr bool, prefix string) {
 	_log.toStderr = toStderr
 	if _log.toStderr {
-		_log.logger = log.New(os.Stderr, prefix, log.Lshortfile)
+		// Add timestamp
+		flag := log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile
+		_log.logger = log.New(os.Stderr, prefix, flag)
 	}
 }
 
@@ -156,6 +152,11 @@ func SetToSyslog(toSyslog bool, prefix string) {
 	if _log.toSyslog {
 		for prio := LOG_EMERG; prio <= LOG_DEBUG; prio++ {
 			_log.syslog[prio] = openSyslog(prio, prefix)
+			if _log.syslog[prio] == nil {
+				// syslog not available
+				_log.toSyslog = false
+				break
+			}
 		}
 	}
 }

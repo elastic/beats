@@ -58,13 +58,16 @@ func Init(name string, config *Logging) error {
 	}
 
 	var defaultToFiles, defaultToSyslog bool
+	var defaultFilePath string
 	if runtime.GOOS == "windows" {
 		// always disabled on windows
 		defaultToSyslog = false
 		defaultToFiles = true
+		defaultFilePath = fmt.Sprintf("C:\\ProgramData\\%s\\Logs", name)
 	} else {
 		defaultToSyslog = true
 		defaultToFiles = false
+		defaultFilePath = fmt.Sprintf("/var/log/%s", name)
 	}
 
 	var toSyslog, toFiles bool
@@ -92,18 +95,20 @@ func Init(name string, config *Logging) error {
 
 	if toFiles {
 		if config.Files == nil {
-			if runtime.GOOS == "windows" {
-				config.Files = &FileRotator{
-					Path: fmt.Sprintf("C:\\ProgramData\\%s\\Logs", name),
-					Name: name,
-				}
-			} else {
-				config.Files = &FileRotator{
-					Path: fmt.Sprintf("/var/log/%s", name),
-					Name: name,
-				}
+			config.Files = &FileRotator{
+				Path: defaultFilePath,
+				Name: name,
+			}
+		} else {
+			if config.Files.Path == "" {
+				config.Files.Path = defaultFilePath
+			}
+
+			if config.Files.Name == "" {
+				config.Files.Name = name
 			}
 		}
+
 		err := SetToFile(true, config.Files)
 		if err != nil {
 			return err
@@ -121,8 +126,8 @@ func Init(name string, config *Logging) error {
 
 func SetStderr() {
 	if !*toStderr {
-		Info("Startup successful, disable stderr logging")
 		SetToStderr(false, "")
+		Debug("log", "Disable stderr logging")
 	}
 }
 

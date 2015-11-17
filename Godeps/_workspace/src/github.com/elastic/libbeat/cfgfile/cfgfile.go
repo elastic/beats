@@ -16,7 +16,7 @@ func init() {
 	// The default config cannot include the beat name as it is not initialised when this
 	// function is called, but see ChangeDefaultCfgfileFlag
 	configfile = flag.String("c", "/etc/beat/beat.yml", "Configuration file")
-	testConfig = flag.Bool("test", false, "Test configuration and exit.")
+	testConfig = flag.Bool("configtest", false, "Test configuration and exit.")
 }
 
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c` flag so that

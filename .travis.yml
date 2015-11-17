@@ -12,10 +12,14 @@ before_install:
   - cd $HOME/gopath/src/github.com/elastic/winlogbeat
 
 install:
-  - make install-deps
+  - make deps
 
 script:
   - make check
-  - make build
-  - make native
-  - make coverage
+  - make winlogbeat
+  - make testsuite
+  - make crosscompile
+
+after_success:
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - test -f build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f build/coverage/full.cov
