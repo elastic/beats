@@ -174,8 +174,8 @@ func bulkCollectPublishFails(
 
 func itemStatus(m json.RawMessage) (int, string, error) {
 	var item map[string]struct {
-		Status int    `json:"status"`
-		Error  string `json:"error"`
+		Status int             `json:"status"`
+		Error  json.RawMessage `json:"error"`
 	}
 
 	err := json.Unmarshal(m, &item)
@@ -185,7 +185,10 @@ func itemStatus(m json.RawMessage) (int, string, error) {
 	}
 
 	for _, r := range item {
-		return r.Status, r.Error, nil
+		if len(r.Error) > 0 {
+			return r.Status, string(r.Error), nil
+		}
+		return r.Status, "", nil
 	}
 
 	err = ErrResponseRead
