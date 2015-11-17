@@ -49,7 +49,6 @@ type PublisherType struct {
 	shipperName    string // Shipper name as set in the configuration file
 	hostname       string // Host name as returned by the operation system
 	name           string // The shipperName if configured, the hostname otherwise
-	version        string // The Beat version to include in the output docs
 	ipaddrs        []string
 	tags           []string
 	disabled       bool
@@ -168,7 +167,6 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 
 func (publisher *PublisherType) Init(
 	beatName string,
-	version string,
 	configs map[string]outputs.MothershipConfig,
 	shipper ShipperConfig,
 ) error {
@@ -184,7 +182,6 @@ func (publisher *PublisherType) Init(
 
 	publisher.wsOutput.Init()
 	publisher.wsPublisher.Init()
-	publisher.version = version
 
 	if !publisher.disabled {
 		plugins, err := outputs.InitOutputs(beatName, configs, shipper.Topology_expire)
