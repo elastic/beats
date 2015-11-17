@@ -187,21 +187,20 @@ shipper:
 
 ############################# Logging #########################################
 
+# There are three options for the log ouput: syslog, file, stderr.
+# Under Windos systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
 logging:
+
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
   #to_syslog: true
 
-  # Write all logging output to files. Beats automatically rotate files if configurable
+  # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
   # limit is reached.
   #to_files: false
 
-  # Enable debug output for selected components.
-  #selectors: []
-
-  # Set log level
-  #level: error
-
+  # To enable logging to files, to_files option has to be set to true
   files:
     # The directory where the log files will written to.
     #path: /var/log/mybeat
@@ -215,3 +214,14 @@ logging:
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
+
+  # Enable debug output for selected components. To enable all selectors use ["*"]
+  # Other available selectors are beat, publish, service
+  # Multiple selectors can be chained.
+  #selectors: [ ]
+
+  # Sets log level. The default log level is error.
+  # Available log levels are: critical, error, warning, info, debug
+  #level: error
+
+
