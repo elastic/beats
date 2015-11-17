@@ -2,7 +2,7 @@
 = Beats Platform Reference
 :ES-version: 2.0.0
 :LS-version: 2.0.0
-:Kibana-version: 4.2.0
+:Kibana-version: 4.2.1
 :Dashboards-version: 1.0.0-rc2
 
 include::./overview.asciidoc[]
