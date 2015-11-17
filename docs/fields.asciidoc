@@ -69,7 +69,7 @@ type: string
 
 required: True
 
-The file the line was read from.
+The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
 
 
 ==== offset

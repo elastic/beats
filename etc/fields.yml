@@ -51,7 +51,8 @@ log:
       type: string
       required: true
       description: >
-        The file the line was read from.
+        The file from which the line was read. This field contains the full path to the file.
+        For example: `/var/log/system.log`.
 
     - name: offset
       type: long
