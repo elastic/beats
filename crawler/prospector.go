@@ -82,6 +82,11 @@ func (p *Prospector) setupHarvesterConfig() error {
 		config.DocumentType = cfg.DefaultDocumentType
 	}
 
+	// Setup InputType
+	if config.InputType == "" {
+		config.InputType = cfg.DefaultInputType
+	}
+
 	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
 	if err != nil {
 		return err
