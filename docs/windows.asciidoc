@@ -1,42 +1,44 @@
 
-== Windows Support
+== Installing Topbeat on Windows
 
 This page walks you through the steps required for running Topbeat on
 Windows. It assumes your Windows system has Powershell installed.
 
-Start by downloading the Topbeat Windows zip file from the
+To install and run Topbeat:
+
+. Download the Topbeat Windows zip file from the
 https://www.elastic.co/downloads/beats/topbeat[downloads page] and unzip
-it on your computer. The location where it is extracted is not important, but
+it on your computer. The location where you extract the file is not important, but
 remember that you shouldn't delete this repository after the installation is
 finished. The exe file and the configuration file will continue to live there.
 
-You might want to change some settings in the `topbeat.yml` file. See the
+. If necessary, edit settings in the `topbeat.yml` file. See the
  <<topbeat-configuration>> section.
 
-Then start an Administrator Powershell session (right click the Powershell icon
-and select *Run as Administrator*), and navigate to where you uncompressed the
+. Start an Administrator Powershell session (right click the Powershell icon
+and select *Run as Administrator*), and navigate to where you extracted the
 zip file.
 
-Then you can install Topbeat as a Windows service by using the following
+. Install Topbeat as a Windows service by using the following
 Powershell script:
-
++
 [source,shell]
 ----------------------------------------------------------------------
 PS > .\install-service-topbeat.ps1
 ----------------------------------------------------------------------
 
-And then start it with:
-
+. To start the Topbeat service, issue this command:
++
 [source,shell]
 ----------------------------------------------------------------------
 PS > Start-Service topbeat
 ----------------------------------------------------------------------
-
-By default the log files can be found under `C:\ProgramData\topbeat\Logs`.
++
+By default the log files are stored in `C:\ProgramData\topbeat\Logs`.
 
 === Known Limitations
 
-On Windows, some statistics are not captured:
+On Windows, the following statistics are not captured:
 
 * System load
 * Swap usage statistics
