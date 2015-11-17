@@ -25,7 +25,7 @@ export PATH
 pidfile=${PIDFILE-/var/run/{{.beat_name}}.pid}
 agent=${PB_AGENT-/usr/bin/{{.beat_name}}}
 args="-c /etc/{{.beat_name}}/{{.beat_name}}.yml"
-test_args="-e -test"
+test_args="-e -configtest"
 wrapper="{{.beat_name}}-god"
 wrapperopts="-r / -n -p $pidfile"
 RETVAL=0
