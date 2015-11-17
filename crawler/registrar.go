@@ -162,7 +162,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		r.Persist <- lastState
-		logp.Debug("registrar", "Existing file with offset: %s, offset: %s", filePath, lastState.Offset)
+		logp.Debug("registrar", "Continue reading existing file: %s; offset: %v", filePath, lastState.Offset)
 		return lastState.Offset, true
 	}
 
