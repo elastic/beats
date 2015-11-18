@@ -88,34 +88,40 @@ func (r *Registrar) Run() {
 	defer r.writeRegistry()
 
 	for {
-		var events []*FileEvent
 		select {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		case events = <-r.Channel:
-		}
-
-		logp.Debug("registrar", "Processing %d events", len(events))
-
-		// Take the last event found for each file source
-		for _, event := range events {
-			if !r.running {
-				break
-			}
-
-			// skip stdin
-			if *event.Source == "-" {
-				continue
-			}
-
-			r.State[*event.Source] = event.GetState()
+		// Treats new log files to persist with higher priority then new events
+		case state := <-r.Persist:
+			r.State[*state.Source] = state
+			logp.Debug("prospector", "Registrar will re-save state for %s", *state.Source)
+		case events := <-r.Channel:
+			r.processEvents(events)
 		}
 
 		if e := r.writeRegistry(); e != nil {
 			// REVU: but we should panic, or something, right?
 			logp.Err("Writing of registry returned error: %v. Continuing..", e)
 		}
+	}
+}
+
+func (r *Registrar) processEvents(events []*FileEvent) {
+	logp.Debug("registrar", "Processing %d events", len(events))
+
+	// Take the last event found for each file source
+	for _, event := range events {
+		if !r.running {
+			break
+		}
+
+		// skip stdin
+		if *event.Source == "-" {
+			continue
+		}
+
+		r.State[*event.Source] = event.GetState()
 	}
 }
 
@@ -159,14 +165,14 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	lastState, isFound := r.GetFileState(filePath)
 
 	if isFound && input.IsSameFile(filePath, fileInfo) {
+		logp.Debug("registar", "Same file as before found. Fetch the state and persist it.")
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		r.Persist <- lastState
-		logp.Debug("registrar", "Continue reading existing file: %s; offset: %v", filePath, lastState.Offset)
 		return lastState.Offset, true
 	}
 
-	if previous := r.getPreviousFile(filePath, fileInfo); previous != "" {
+	if previous, err := r.getPreviousFile(filePath, fileInfo); err == nil {
 		// File has rotated between shutdown and startup
 		// We return last state downstream, with a modified event source with the new file name
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
@@ -187,8 +193,8 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 }
 
 // getPreviousFile checks in the registrar if there is the newFile already exist with a different name
-// In case an old file is found, the path to the file is returned
-func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) string {
+// In case an old file is found, the path to the file is returned, if not, an error is returned
+func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) (string, error) {
 
 	newState := input.GetOSFileState(&newFileInfo)
 
@@ -202,9 +208,9 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 		// Compare states
 		if newState.IsSame(oldState.FileStateOS) {
 			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
-			return oldFilePath
+			return oldFilePath, nil
 		}
 	}
 
-	return ""
+	return "", fmt.Errorf("No previous file found")
 }
