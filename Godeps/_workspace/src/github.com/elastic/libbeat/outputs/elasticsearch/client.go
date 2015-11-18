@@ -63,6 +63,9 @@ func (client *Client) Clone() *Client {
 	return newClient
 }
 
+// PublishEvents sends all events to elasticsearch. On error a slice with all
+// events not published or confirmed to be processed by elasticsearch will be
+// returned. The input slice backing memory will be reused by return the value.
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
@@ -171,8 +174,8 @@ func bulkCollectPublishFails(
 
 func itemStatus(m json.RawMessage) (int, string, error) {
 	var item map[string]struct {
-		Status int    `json:"status"`
-		Error  string `json:"error"`
+		Status int             `json:"status"`
+		Error  json.RawMessage `json:"error"`
 	}
 
 	err := json.Unmarshal(m, &item)
@@ -182,7 +185,10 @@ func itemStatus(m json.RawMessage) (int, string, error) {
 	}
 
 	for _, r := range item {
-		return r.Status, r.Error, nil
+		if len(r.Error) > 0 {
+			return r.Status, string(r.Error), nil
+		}
+		return r.Status, "", nil
 	}
 
 	err = ErrResponseRead

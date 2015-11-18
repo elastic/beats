@@ -46,7 +46,9 @@ type TransactionalEventPublisher interface {
 }
 
 type PublisherType struct {
-	name           string
+	shipperName    string // Shipper name as set in the configuration file
+	hostname       string // Host name as returned by the operation system
+	name           string // The shipperName if configured, the hostname otherwise
 	ipaddrs        []string
 	tags           []string
 	disabled       bool
@@ -164,7 +166,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(
-	beat string,
+	beatName string,
 	configs map[string]outputs.MothershipConfig,
 	shipper ShipperConfig,
 ) error {
@@ -182,7 +184,7 @@ func (publisher *PublisherType) Init(
 	publisher.wsPublisher.Init()
 
 	if !publisher.disabled {
-		plugins, err := outputs.InitOutputs(beat, configs, shipper.Topology_expire)
+		plugins, err := outputs.InitOutputs(beatName, configs, shipper.Topology_expire)
 		if err != nil {
 			return err
 		}
@@ -234,16 +236,17 @@ func (publisher *PublisherType) Init(
 		}
 	}
 
-	publisher.name = shipper.Name
-	if len(publisher.name) == 0 {
-		// use the hostname
-		publisher.name, err = os.Hostname()
-		if err != nil {
-			return err
-		}
-
-		logp.Info("No shipper name configured, using hostname '%s'", publisher.name)
+	publisher.shipperName = shipper.Name
+	publisher.hostname, err = os.Hostname()
+	if err != nil {
+		return err
 	}
+	if len(publisher.shipperName) > 0 {
+		publisher.name = publisher.shipperName
+	} else {
+		publisher.name = publisher.hostname
+	}
+	logp.Info("Publisher name: %s", publisher.name)
 
 	publisher.tags = shipper.Tags
 

@@ -51,6 +51,13 @@ func (f elasticsearchOutputPlugin) NewOutput(
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
+
+	// configure bulk size in config in case it is not set
+	if config.BulkMaxSize == nil {
+		bulkSize := defaultBulkSize
+		config.BulkMaxSize = &bulkSize
+	}
+
 	output := &elasticsearchOutput{}
 	err := output.init(beat, *config, topologyExpire)
 	if err != nil {
@@ -69,12 +76,6 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	// configure bulk size in config in case it is not set
-	if config.BulkMaxSize == nil {
-		bulkSize := defaultBulkSize
-		config.BulkMaxSize = &bulkSize
-	}
-
 	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
 	if err != nil {
 		return err
@@ -89,6 +90,10 @@ func (out *elasticsearchOutput) init(
 	if config.Max_retries != nil {
 		maxRetries = *config.Max_retries
 	}
+	maxAttempts := maxRetries + 1 // maximum number of send attempts (-1 = infinite)
+	if maxRetries < 0 {
+		maxAttempts = 0
+	}
 
 	var waitRetry = time.Duration(1) * time.Second
 	var maxWaitRetry = time.Duration(60) * time.Second
@@ -97,15 +102,15 @@ func (out *elasticsearchOutput) init(
 	out.clients = clients
 	if len(clients) == 1 {
 		client := clients[0]
-		m, err = mode.NewSingleConnectionMode(client, maxRetries,
+		m, err = mode.NewSingleConnectionMode(client, maxAttempts,
 			waitRetry, timeout, maxWaitRetry)
 	} else {
 		loadBalance := config.LoadBalance == nil || *config.LoadBalance
 		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxRetries,
+			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
 				waitRetry, timeout, maxWaitRetry)
 		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxRetries, waitRetry, timeout)
+			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
 		}
 	}
 	if err != nil {
