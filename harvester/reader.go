@@ -193,7 +193,7 @@ func (l *lineReader) decode(end int) (int, error) {
 		nDst, nSrc, err = l.decoder.Transform(buffer, inBytes[start:end], false)
 		start += nSrc
 
-		l.outBuffer.Append(buffer[:nDst])
+		l.outBuffer.Write(buffer[:nDst])
 
 		if err != nil {
 			if err == transform.ErrShortDst { // continue transforming
