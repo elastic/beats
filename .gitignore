@@ -1,5 +1,3 @@
-/bin
-/coverage
 /etc/filebeat.dev.yml
 .idea
 .DS_Store
@@ -8,9 +6,6 @@
 /docs/html_docs
 *.swp
 *.swo
-
-cover
-profile.cov
 
 filebeat
 filebeat.test

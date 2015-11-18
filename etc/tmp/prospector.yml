@@ -1,7 +1,0 @@
-filebeat:
-  # List of prospectors to fetch data
-  prospectors:
-    -
-      # Paths that should be crawled and fetched
-      paths:
-        - /var/log/*.log
