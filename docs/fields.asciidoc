@@ -21,7 +21,7 @@ Contains common fields available in all event types.
 
 ==== beat.name
 
-Name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
 
 
 ==== beat.hostname
@@ -46,14 +46,14 @@ The timestamp when the log line was read. The precision is in milliseconds. The 
 
 required: True
 
-Name of the log event. Set to the prospectors document_type configuration option.
+The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
 
 
 ==== input_type
 
 required: True
 
-Prospector input type event was generated from. Set to prospectors type configuration option.
+The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
 
 
 [[exported-fields-log]]
@@ -69,7 +69,7 @@ type: string
 
 required: True
 
-File the line was read from.
+The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
 
 
 ==== offset
@@ -78,7 +78,7 @@ type: long
 
 required: False
 
-File offset the reported line starts at.
+The file offset the reported line starts at.
 
 
 ==== message
@@ -87,16 +87,16 @@ type: string
 
 required: True
 
-Content of line read from log file given by source.
+The content of the line read from the log file.
 
 
 ==== fields Fields
 
-Contains user configurable fields.
+Contains user-configurable fields.
 
 
 ==== fileinfo Fields
 
-Operating System specific file information use to identify the source file. For example on linux an inode might be reported.
+Operating system-specific file information used to identify the source file. For example, on Linux this field might report an inode.
 
 
