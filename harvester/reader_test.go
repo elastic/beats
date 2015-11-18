@@ -2,6 +2,7 @@ package harvester
 
 import (
 	"bytes"
+	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -141,4 +142,28 @@ func TestReaderPartialWithEncodings(t *testing.T) {
 
 		assert.Equal(t, lastString+"\n", string(line))
 	}
+}
+
+func TestReadLongLines(t *testing.T) {
+	lineLength := 10 * 1024
+	inputLine := make([]byte, lineLength+1)
+	for i := 0; i < lineLength; i++ {
+		char := rand.Intn('z'-'a') + 'a'
+		inputLine[i] = byte(char)
+	}
+	inputLine[len(inputLine)-1] = '\n'
+
+	buffer := bytes.NewBuffer(inputLine)
+	reader, err := newLineReader(buffer, Plain, buffer.Len())
+	if err != nil {
+		t.Fatalf("Error initializing reader: %v", err)
+	}
+
+	// read line from reader
+	bytes, sz, err := reader.next()
+
+	assert.Nil(t, err)
+	assert.Equal(t, lineLength+1, sz)
+	assert.Equal(t, len(inputLine), len(bytes))
+	assert.Equal(t, inputLine, bytes)
 }

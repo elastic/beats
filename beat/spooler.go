@@ -88,13 +88,13 @@ func (s *Spooler) Run() {
 
 			// Spooler is full -> flush
 			if len(s.spool) == cap(s.spool) {
-				logp.Debug("spooler", "Flushing spooler because spooler full. Events flushed: %s", len(s.spool))
+				logp.Debug("spooler", "Flushing spooler because spooler full. Events flushed: %v", len(s.spool))
 				s.flush()
 			}
 		case <-ticker.C:
 			// Flush periodically
-			if now := time.Now(); now.After(s.nextFlushTime) {
-				logp.Debug("spooler", "Flushing spooler because of timemout. Events flushed: %s", len(s.spool))
+			if time.Now().After(s.nextFlushTime) {
+				logp.Debug("spooler", "Flushing spooler because of timemout. Events flushed: %v", len(s.spool))
 				s.flush()
 			}
 		}

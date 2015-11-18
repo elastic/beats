@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix problem that harvesters stopped reading after some time and filebeat stopped processing events #257
+- Fix line truncating by internal buffers being reused by accident #258
 
 ### Added
 

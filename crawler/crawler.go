@@ -62,6 +62,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 
 			pendingProspectorCnt--
 			if pendingProspectorCnt == 0 {
+				logp.Debug("prospector", "No pending prospectors. Finishing setup")
 				break
 			}
 			continue

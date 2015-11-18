@@ -13,3 +13,4 @@ filebeat.exe
 filebeat.test.exe
 
 build
+/tests/load/logs
