@@ -53,7 +53,7 @@ The name of the log event. This field is set to the value specified for the `doc
 
 required: True
 
-The input type the event was generated from. This field is set to the value specified for the `type` option in the prospector section of the Filebeat config file.
+The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
 
 
 [[exported-fields-log]]
