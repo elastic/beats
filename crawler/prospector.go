@@ -1,6 +1,7 @@
 package crawler
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -285,6 +286,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 	if newinfo.Fileinfo.ModTime().Before(p.lastscan) &&
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
+		logp.Debug("prospector", "Fetching old state of file to resume: %s", file)
 		// Call crawler if there if there exists a state for the given file
 		offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
 
@@ -301,7 +303,7 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.ProspectorConfig.IgnoreOlderDuration, file)
 			newinfo.Harvester <- newinfo.Fileinfo.Size()
 		}
-	} else if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
+	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 		newinfo.Harvester = p.prospectorList[previousFile].Harvester
@@ -345,7 +347,7 @@ func (p *Prospector) checkExistingFile(newinfo *ProspectorFileStat, newFile *inp
 
 	if !oldFile.IsSameFile(newFile) {
 
-		if previousFile := p.getPreviousFile(file, newinfo.Fileinfo); previousFile != "" {
+		if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
 			// This file was renamed from another file we know - link the same harvester channel as the old file
 			logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 			logp.Debug("prospector", "Launching harvester on renamed file: %s", file)
@@ -384,10 +386,9 @@ func (p *Prospector) Stop() {
 }
 
 // Check if the given file was renamed. If file is known but with different path,
-// renamed will be set true and previous will be set to the previously known file path.
-// Otherwise renamed will be false.
-func (p *Prospector) getPreviousFile(file string, info os.FileInfo) string {
-	// TODO: To implement this properly the file state of the previous file is required.
+// the previous file path will be returned. If no file is found, an error
+// will be returned.
+func (p *Prospector) getPreviousFile(file string, info os.FileInfo) (string, error) {
 
 	for path, pFileStat := range p.prospectorList {
 		if path == file {
@@ -395,7 +396,7 @@ func (p *Prospector) getPreviousFile(file string, info os.FileInfo) string {
 		}
 
 		if os.SameFile(info, pFileStat.Fileinfo) {
-			return path
+			return path, nil
 		}
 	}
 
@@ -403,10 +404,10 @@ func (p *Prospector) getPreviousFile(file string, info os.FileInfo) string {
 	for path, fileInfo := range p.missingFiles {
 
 		if os.SameFile(info, fileInfo) {
-			return path
+			return path, nil
 		}
 	}
 
 	// NOTE(ruflin): should instead an error be returned if not previous file?
-	return ""
+	return "", fmt.Errorf("No previous file found")
 }
