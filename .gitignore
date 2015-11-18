@@ -5,6 +5,7 @@ winlogbeat
 *.so
 *.swp
 *.swo
+*.pyc
 
 # Folders
 _obj

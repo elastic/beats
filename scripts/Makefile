@@ -51,8 +51,7 @@ check:
 clean:
 	go fmt ./...
 	gofmt -w .
-	-rm -r build
-	-rm ${BEATNAME} ${BEATNAME}.test
+	-rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe
 
 # Shortcut for continuous integration
 # This should always run before merging.
@@ -107,7 +106,8 @@ system-tests: winlogbeat.test prepare-tests system-tests-setup
 	# Writes atomic mode on top of file
 	echo 'mode: atomic' > ${COVERAGE_DIR}/system.cov
 	# Collects all system coverage files and skips top line with mode
-	tail -q -n +2 ./build/system-tests/run/**/*.cov >> ${COVERAGE_DIR}/system.cov
+	# TODO: Uncomment when there are system-tests that produce coverage reports.
+	#tail -q -n +2 ./build/system-tests/run/**/*.cov >> ${COVERAGE_DIR}/system.cov
 
 # Runs the system tests
 .PHONY: system-tests-setup
