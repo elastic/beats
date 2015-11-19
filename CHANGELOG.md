@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
 
 ### Added
 
