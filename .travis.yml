@@ -1,7 +1,21 @@
 language: go
 
+os:
+  - linux
+  - osx
+
 go:
   - 1.5.1
+
+env:
+  - TARGETS="check testsuite"
+#  - TARGETS="crosscompile"
+
+# Only execute the crosscompile target one time during the build.
+#matrix:
+#  exclude:
+#    - os: osx
+#      env: TARGETS="crosscompile"
 
 sudo: false
 
@@ -23,7 +37,7 @@ install:
   - make
 
 script:
-  - make full-coverage
+  - make $TARGETS
 
 notifications:
   hipchat:
@@ -31,4 +45,5 @@ notifications:
       secure: NSmM7x2n9KdasEzZJ2BZZdXNUqBG3MFnwmvHN7kVRAbdmygD6YDaIBhbjNhTxrYQw2JPJxxa6ehr9xsMDzoCdGygBoKsa1U5kGK942JgoCbJrtbR0K7r8toWPuOg+wPGS0muOVwqRW5iO9AkTQiPcvIP+a1E80vuNH/ZKWPg5JA=
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -f coverage/full.cov
+  # Copy profile.cov to coverage.txt because codecov.io requires this file
+  - test -f build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f build/coverage/full.cov

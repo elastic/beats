@@ -1,4 +1,5 @@
 import subprocess
+
 import jinja2
 import unittest
 import os
@@ -8,6 +9,7 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
+build_path = "../../build/system-tests/"
 
 class Proc(object):
     """
@@ -49,7 +51,7 @@ class Proc(object):
 class TestCase(unittest.TestCase):
 
     def run_packetbeat(self, pcap,
-                       cmd="../packetbeat.test",
+                       cmd="../../packetbeat.test",
                        config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
@@ -69,6 +71,7 @@ class TestCase(unittest.TestCase):
                      "-systemTest",
                      "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                      ])
+
         if extra_args:
             args.extend(extra_args)
 
@@ -82,7 +85,7 @@ class TestCase(unittest.TestCase):
             return proc.wait()
 
     def start_packetbeat(self,
-                         cmd="../packetbeat.test",
+                         cmd="../../packetbeat.test",
                          config="packetbeat.yml",
                          output="packetbeat.log",
                          extra_args=[],
@@ -98,6 +101,7 @@ class TestCase(unittest.TestCase):
                 "-systemTest",
                 "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
                 ]
+
         if extra_args:
             args.extend(extra_args)
 
@@ -123,7 +127,8 @@ class TestCase(unittest.TestCase):
                 jsons.append(self.flatten_object(json.loads(line),
                                                  self.dict_fields))
         self.all_have_fields(jsons, ["@timestamp", "type", "status",
-                                     "shipper", "count"])
+                                     "beat.name", "beat.hostname",
+                                     "count"])
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
@@ -139,16 +144,16 @@ class TestCase(unittest.TestCase):
         )
 
         # create working dir
-        self.working_dir = os.path.join("run", self.id())
+        self.working_dir = os.path.join(build_path + "run", self.id())
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
         try:
             # update the last_run link
-            if os.path.islink("last_run"):
-                os.unlink("last_run")
-            os.symlink("run/{}".format(self.id()), "last_run")
+            if os.path.islink(build_path + "last_run"):
+                os.unlink(build_path + "last_run")
+            os.symlink(build_path + "run/{}".format(self.id()), build_path + "last_run")
         except:
             # symlink is best effort and can fail when
             # running tests in parallel
@@ -229,7 +234,7 @@ class TestCase(unittest.TestCase):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
-    def load_fields(self, fields_doc="../etc/fields.yml"):
+    def load_fields(self, fields_doc="../../etc/fields.yml"):
         """
         Returns a list of fields to expect in the output dictionaries
         and a second list that contains the fields that have a

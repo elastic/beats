@@ -2,12 +2,23 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc1...HEAD)
+## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc2...HEAD)
+
+### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0-rc2](https://github.com/elastic/libbeat/compare/1.0.0-rc1...1.0.0-rc2) 2015-11-17
 
 ### Backward Compatibility Breaks
 
 ### Bugfixes
 - Packetbeat will now exit if a configuration error is detected. #357
+- Fixed an issue handling DNS requests containing no questions. #369
 
 ### Added
 

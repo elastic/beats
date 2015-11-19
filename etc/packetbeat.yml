@@ -137,32 +137,34 @@ protocols:
 #    - process: app
 #      cmdline_grep: gunicorn
 
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
 
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by the beat.
-# You can enable one or multiple outputs by setting enabled option to true.
+# Multiple outputs may be used.
 output:
 
   ### Elasticsearch as output
   elasticsearch:
-
-    # Set to true to enable elasticsearch output
-    enabled: true
-
     # Array of hosts to connect to.
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
     hosts: ["localhost:9200"]
 
-    # Optional protocol and basic auth credentials. These are deprectad
+    # Optional protocol and basic auth credentials. These are deprecated.
     #protocol: "https"
     #username: "admin"
     #password: "s3cr3t"
 
-    # Optional index name. The default is "beatname" and generates
-    # [beatname-]YYYY.MM.DD keys.
+    # Number of workers per Elasticsearch host.
+    #worker: 1
+
+    # Optional index name. The default is "packetbeat" and generates
+    # [packetbeat-]YYYY.MM.DD keys.
     #index: "packetbeat"
 
     # Optional HTTP Path
@@ -183,22 +185,18 @@ output:
     # The number of seconds to wait for new events between two bulk API index requests.
     # If `bulk_max_size` is reached before this interval expires, addition bulk index
     # requests are made.
-    #flush_interval
+    #flush_interval: 1
 
     # Boolean that sets if the topology is kept in Elasticsearch. The default is
     # false. This option makes sense only for Packetbeat.
     #save_topology: false
 
-    #The time to live in seconds for the topology information that is stored in
-    #Elasticsearch. The default is 15 seconds.
-    #topology_expire:
+    # The time to live in seconds for the topology information that is stored in
+    # Elasticsearch. The default is 15 seconds.
+    #topology_expire: 15
 
-    # tls configuration
+    # tls configuration. By default is off.
     #tls:
-      # If disabled is set to true, the tls section will be ignored and the
-      # host its certificate authorities will be used.
-      #disabled: true
-
       # List of root certificates for HTTPS server verifications
       #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -229,22 +227,22 @@ output:
 
   ### Logstash as output
   #logstash:
-    # Uncomment out this option if you want to output to Logstash. The default is false.
-    #enabled: true
-
     # The Logstash hosts
-    #hosts: ["localhost:5044", "logstash:5045"]
+    #hosts: ["localhost:5044"]
+
+    # Number of workers per Logstash host.
+    #worker: 1
 
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name is packetbeat.
+    # Optional index name. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat
+    # top topbeat and for Filebeat to filebeat.
     #index: packetbeat
 
     # Optional TLS. By default is off.
     #tls:
-      #disabled: true
-
       # List of root certificates for HTTPS server verifications
       #certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -266,23 +264,13 @@ output:
       # Configure curve types for ECDHE based cipher suites
       #curve_types: []
 
-      # Configure minimum TLS version allowed for connection to logstash
-      #min_version: 1.0
-
-      # Configure maximum TLS version allowed for connection to logstash
-      #max_version: 1.2
-
 
   ### File as output
   #file:
-    # Enabling file output
-    #enabled: false
-
     # Path to the directory where to save the generated files. The option is mandatory.
     #path: "/tmp/packetbeat"
 
-    # Name of the generated files. The default is `packetbeat` and it generates
-    # files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
+    # Name of the generated files. The default is `packetbeat` and it generates files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
     #filename: packetbeat
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
@@ -297,10 +285,7 @@ output:
 
   ### Console output
   # console:
-    # Enabling console output
-    #enabled: false
-
-    # pretty print json event
+    # Pretty print json event
     #pretty: false
 
 
@@ -331,32 +316,31 @@ shipper:
   # refresh_topology_freq. The default is 15 seconds.
   #topology_expire: 15
 
-  # Configure local GeoIP database support. If no paths are configured
-  # the locations /usr/share/GeoIP/GeoLiteCity.dat and
-  # /usr/local/var/GeoIP/GeoLiteCity.dat are searched for a GeoIP database.
+  # Configure local GeoIP database support.
+  # If no paths are not configured geoip is disabled.
   #geoip:
-    # If paths is empty, GeoIP support will be disabled.
-    #paths: ["/path/to/geoip/data/GeoLiteCity.dat"]
+    #paths:
+    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
+    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
 
 
 ############################# Logging #########################################
 
-#logging:
+# There are three options for the log ouput: syslog, file, stderr.
+# Under Windos systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
+logging:
+
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
   #to_syslog: true
 
-  # Write all logging output to files. Beats automatically rotate files if configurable
+  # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
   # limit is reached.
   #to_files: false
 
-  # Enable debug output for selected components.
-  #selectors: []
-
-  # Set log level
-  #level: error
-
-  #files:
+  # To enable logging to files, to_files option has to be set to true
+  files:
     # The directory where the log files will written to.
     #path: /var/log/mybeat
 
@@ -365,7 +349,18 @@ shipper:
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated
-    #rotateeverybytes: 10485760 # = 10MB
+    rotateeverybytes: 10485760 # = 10MB
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
+
+  # Enable debug output for selected components. To enable all selectors use ["*"]
+  # Other available selectors are beat, publish, service
+  # Multiple selectors can be chained.
+  #selectors: [ ]
+
+  # Sets log level. The default log level is error.
+  # Available log levels are: critical, error, warning, info, debug
+  #level: error
+
+
