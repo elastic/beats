@@ -12,13 +12,13 @@ Filebeat introduces the following major changes:
   changed.
 * Command line options were removed and moved to the configuration file.
 * Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
-* A new Logstash input plugin called https://github.com/logstash-plugins/logstash-input-beats[logstash-input-beats] is required.
+* A new Logstash input plugin called https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[logstash-input-beats] is required.
 
 
 === Migrating to the Logstash Input Beats Plugin
 
 Filebeat requires a new input plugin in Logstash, called
-https://github.com/logstash-plugins/logstash-input-beats[logstash-input-beats].
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[logstash-input-beats].
 For information about getting started with this plugin, see {libbeat}/getting-started.html#logstash-setup[Setting up Logstash].
 
 In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
@@ -90,7 +90,10 @@ with this configuration in Logstash Forwarder:
       ],
 
       # A dictionary of fields to annotate on each event.
-      "fields": { "type": "syslog" }
+      "fields": {
+        "type": "syslog",
+        "service": "example-service"
+      }
     }, {
       # A path of "-" means stdin.
       "paths": [ "-" ],
@@ -116,10 +119,13 @@ filebeat:
       paths:
         - /var/log/messages
         - "/var/log/*.log"
+      document_type: syslog <1>
+      fields:
+        service: example-service
     -
       paths:
         - "-"
-      input_type: stdin <1>
+      input_type: stdin <2>
       document_type: stdin
     -
       paths:
@@ -127,18 +133,18 @@ filebeat:
       document_type: apache
 -------------------------------------------------------------------------------------
 
-<1> The explicit `input_type` field was introduced to differentiate between normal files and
+<1> The `document_type` option controls the output `type` field, which is used by the
+    Elasticsearch output to determine the document type.
+<2> The explicit `input_type` option was introduced to differentiate between normal files and
     stdin. In the future, additional types might be supported.
 
-As you can see, apart from the new optional `document_type` field,
-the remaining options can be migrated mechanically. If no type is defined,
-the default is set to `log`. If Filebeat is used to index into Elasticsearch
-directly, the `document_type` determines the document type to use when indexing.
+As you can see, apart from the new `document_type` and `input_type` options,
+which were before implicitly defined via the `type` custom field, the remaining
+options can be migrated mechanically.
 
 The Filebeat configuration gives you more control over how each prospector behaves
 by allowing you to configure options that were previously global in Logstash Forwarder
-and set them separately for each prospector. See
-<<filebeat-configuration-details>>.
+and set them separately for each prospector. See <<filebeat-configuration-details>>.
 
 ==== Migrating the "network" Section
 
@@ -255,7 +261,10 @@ Logstash Forwarder configuration:
       "paths": [
         "/var/log/*.log"
       ],
-      "fields": { "type": "syslog" }
+      "fields": {
+        "type": "syslog",
+        "service": "test01"
+      }
     }
   ],
   "network": {
@@ -273,8 +282,9 @@ filebeat:
     -
       paths:
         - "/var/log/*.log"
+      document_type: syslog
       fields:
-        type: syslog
+        service: test01
 output:
   elasticsearch:
     enabled: true
@@ -338,6 +348,56 @@ The `config_dir` option specifies the path to the directory that contains additi
 
 |===
 
+
+=== Changes in the output fields
+
+In the default configuration, Filebeat structures its output documents a little
+different from the Logstash Forwarder. This section discusses the differences
+and the options you have in case you want compatibility with the Logstash
+Forwarder.
+
+One such difference is that the custom fields (added from the configuration
+file) are set top level in Logstash Forwarder but are grouped together under a
+`fields` dictionary in Filebeat. If you need the old behavior during the
+migration phase, you can use the <<fields-under-root>> configuration option:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    -
+      paths:
+        - "/var/log/*.log"
+      document_type: syslog
+      fields:
+        service: test01
+      fields_under_root: true
+-------------------------------------------------------------------------------------
+
+Another difference is that while the Logstash Forwarder sends the hostname of
+the server it is running on in the `host` field, Filebeat uses the
+`beat.hostname` field for the same purpose. Because `host` is commonly used in
+the Logstash plugin ecosystem, the Beats input plugin automatically copies
+`beat.hostname` into `host`.
+
+Similarly, the `file` field was renamed to `source`. If you rely on this field
+being named `file` you can rename it by using the mutate filter in Logstash. For
+example:
+
+[source,plain]
+-------------------------------------------------------------------------------------
+filter {
+    mutate {
+        rename => {
+            "source" => "file"
+        }
+    }
+}
+-------------------------------------------------------------------------------------
+
+Finally, the `line` field was removed. This field wasn't correct in case of
+restarts and making it correct would require a performance penalty. We recommend
+using the `offset` field instead.
 
 === Other Changes
 
