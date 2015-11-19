@@ -1,75 +1,81 @@
-== Logtash-Forwarder to Filebeat Migration
+== Migrating from Logstash Forwarder to Filebeat
 
-The following guide should help you to upgrade from the
-https://github.com/elastic/logstash-forwarder[Logstash-Forwarder] to Filebeat.
+Filebeat is based on the Logstash Forwarder source code and replaces Logstash as the method
+to use for tailing log files and forwarding them to Logstash. This guide contains
+information to help you migrate from
+https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to Filebeat.
 
-Filebeat brings the following major changes:
+Filebeat introduces the following major changes:
 
 * The config file was restructured and converted from JSON to YAML.
-* The registry file which stores the state of the currently read files was
+* The registry file, which stores the state of the currently read files, was
   changed.
 * Command line options were removed and moved to the configuration file.
-* Configuration options for outputs are inherited from libbeat. Details can be found https://www.elastic.co/guide/en/beats/libbeat/current/index.html[here]
-* A new input plugin must be used in Logstash.
+* Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
+* A new Logstash input plugin called https://github.com/logstash-plugins/logstash-input-beats[logstash-input-beats] is required.
 
 
-=== Migration Strategy
-
-==== Logstash Side
+=== Migrating to the Logstash Input Beats Plugin
 
 Filebeat requires a new input plugin in Logstash, called
 https://github.com/logstash-plugins/logstash-input-beats[logstash-input-beats].
-In both 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
+For information about getting started with this plugin, see {libbeat}/getting-started.html#logstash-setup[Setting up Logstash].
+
+In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
 parallel with the
 https://github.com/logstash-plugins/logstash-input-lumberjack[logstash-input-lumberjack]
-plugin used by the Logstash-Forwarder.
+plugin used by the Logstash Forwarder.
 
-If you have a large number of servers that you want to migrate from the
-Forwarder to Filebeat, we recommend keeping the Lumberjack plugin and load the
-Beats plugin on the same Logstash instances but set it to a different port. After you migrated
+If you have a large number of servers that you want to migrate from
+Logstash Forwarder to Filebeat, we recommend that you keep the Lumberjack plugin and load the
+Beats plugin on the same Logstash instances, but set up the Beats plugin to use a different port. After you have migrated
 all the machines to Filebeat, you can remove the Lumberjack plugin.
 
-====  Registry File
+===  Updating the Registry File
 
-The registry file stores the state and location from which Filbeat was reading
-last. Under Logstash-Forwarder it was called `.logstash-fowarder`. For Filebeat
-it was renamed to `.filebeat` or `/usr/lib/filebeat/registry` if you install
-from packages or `C:\ProgramData\filebeat\registry` if you run as a Windows
-service.
+The registry file stores the state and location information that Filebeat uses to track
+where it was last reading. Under Logstash Forwarder, this file was called `.logstash-fowarder`. For Filebeat,
+the file was renamed. The name varies depending on the package type:
+
+ * `.filebeat` for `.tar.gz` and `.tgz` archives
+ * `/usr/lib/filebeat/registry` for DEB and RPM packages
+ * `c:\ProgramData\filebeat\registry` for the Windows zip file
 
 For enhancement reasons, especially for Windows,
-the structure of the registry file has been changed. This makes a migration
+the structure of the registry file has changed. This makes migrating the file
 complex and leads to potential errors.
 
-Instead of a migration of the registry file we recommend to start Filebeat on
-the same host and send the log files to a different index.  This will start
-indexing from scratch. In case it is preferred to start at the end of all
-files, the option `tail_files` can be set to true.
+Instead of migrating the registry file, we recommend that you start Filebeat on
+the same host where Logstash Forwarder is running, and send the log files to a
+different index.  This will start indexing from scratch. If you want to start
+reading at the end of all files, you can set the `tail_files` option in the
+Filebeat configuration file to true.
 
-The above will allow to keep the old Logstash-Forwarder running and it can be
-slowly migrated over to Filebeat.
+Using this approach allows you to keep the old Logstash Forwarder running and then
+slowly migrate over to Filebeat.
 
-=== Migrate Your Configuration
+=== Migrating Your Configuration
 
-Logstash-Forwarder uses JSON + comments for its configuration file while
-Filebeat uses YAML for consistency with the other Beats. Like the
-Logstash-Forwarder, Filebeat also accepts reading multiple configuration files
-from a `conf.d` directory with similar restrictions. For Filebeat the additional
-config files must be in a different directory then the main config file. The
-conversion can be done in most cases 1 to 1 on a per file basis.
+Although Filebeat is based on Logstash Forwarder, Filebeat uses YAML for its configuration
+file, rather than the JSON+comments language used by Logstash Forwarder. This means that you
+will need to migrate your existing configuration files to use the YAML syntax. Filebeat has a main
+configuration file called `filebeat.yml`, but Filebeat also accepts reading
+multiple configuration files from a `conf.d` directory and has similar restrictions to Logstash Forwarder.
+If you specify additional config files, you need to place them in a directory other than the directory
+where the main Filebeat config file resides. You specify the location of the config files by using the
+`config_dir` option to configure the path to the directory. In most cases, you can do a one-to-one
+conversion to create a Filebeat config file for each Logstash Forwarder config file.
 
-We recommend to first read the <<filebeat-configuration-details>> section which
-documents the Filebeat options.
+Before migrating your config files, we recommend that you first read the <<filebeat-configuration-details>>
+section to understand the Filebeat options.
 
-
-NOTE:: Logstash-Forwarder has the option of auto-completing environment variables in
+NOTE: Logstash Forwarder has the option of auto completing environment variables in
 the configuration file. This option currently doesn't exist in Filebeat.
 
-==== The "files" Section
+==== Migrating the "files" Section
 
-The "files" section from the Logstash-Forwarder configuration is transformed in
-a "prospectors" section in the Filebeat config. For example, assuming you start
-with this configuration:
+To migrate the `files` section from the Logstash Forwarder configuration, create a  `prospectors` section in the Filebeat config file. For example, assuming that you start
+with this configuration in Logstash Forwarder:
 
 [source,json]
 -------------------------------------------------------------------------------------
@@ -98,7 +104,7 @@ with this configuration:
   ]
 -------------------------------------------------------------------------------------
 
-The equivalent "prospectors" section would look like this:
+The equivalent `prospectors` section would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -113,36 +119,37 @@ filebeat:
     -
       paths:
         - "-"
-      input_type: stdin
-      document_type: stdin <1>
+      input_type: stdin <1>
+      document_type: stdin
     -
       paths:
         - "/var/log/apache/httpd-*.log"
       document_type: apache
 -------------------------------------------------------------------------------------
 
-<1> The explicit type field was introduced to separate between normal files and
-    stdin. In the future, more types might be supported.
+<1> The explicit `input_type` field was introduced to differentiate between normal files and
+    stdin. In the future, additional types might be supported.
 
-As you can see, apart from the new optional `document_type` field which was introduced,
-the rest of the options can be migrated mechanically. In case no type is defined
-the default is to to `log`. If Filebeat is used to index into Elasticsearch
+As you can see, apart from the new optional `document_type` field,
+the remaining options can be migrated mechanically. If no type is defined,
+the default is set to `log`. If Filebeat is used to index into Elasticsearch
 directly, the `document_type` determines the document type to use when indexing.
 
-The Filebeat configuration allows some of the options that are global in the
-Logstash-Forwarder to be configured per prospector. See
+The Filebeat configuration gives you more control over how each prospector behaves
+by allowing you to configure options that were previously global in Logstash Forwarder
+and set them separately for each prospector. See
 <<filebeat-configuration-details>>.
 
-==== The "network" Section
+==== Migrating the "network" Section
 
-Like Logstash-Forwarder, Filebeat can communicate directly with Logstash.
-In addition, Filebeat can also insert log entries directly
-into Elasticsearch. This leads to a little bit more complex "output"
-as can be seen in the example below. The Logstash part of it,
-however, can be easily translated from the equivalent Logstash-Forwarder
+Like Logstash Forwarder, Filebeat can communicate directly with Logstash.
+Filebeat can also insert log entries directly
+into Elasticsearch. This results in an `output` section that is a bit more complex, as
+you can see in the following example. You'll find, however, that you can easily
+translate the Logstash part of the configuration from the equivalent Logstash Forwarder
 configuration.
 
-Assuming you start from the following "network" section:
+The following snippet shows the `network` section of the Logstash Forwarder configuration:
 
 [source,json]
 -------------------------------------------------------------------------------------
@@ -201,19 +208,19 @@ output:
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
-    pick a random host for new connections, similar to the Logstash-Forwarder
-    behavior. Filebeat can optionally do load balancing, see
-    {libbeat}/configuration.html#loadbalance[the configuration option].
-<2> Note that if the `tls` section is missing then TLS is disabled. It is
-    automatically enabled when adding the `tls` section. More TLS options are
-    documented {libbeat}/configuration.html#configuration-output-tls[here].
+    pick a random host for new connections, similar to the Logstash Forwarder
+    behavior. Filebeat can optionally do load balancing. For more details, see the
+    {libbeat}/configuration.html#loadbalance[loadbalance] configuration option.
+<2> Note that if the `tls` section is missing, then TLS is disabled. TLS is
+    automatically enabled when you add the `tls` section. For more information about
+    specific configuration options, see
+    {libbeat}/configuration.html#configuration-output-tls[TLS Options].
 
 
 [[changed-configuration-options]]
 ==== Changed Configuration File Options
 
-With the refactoring of the configuration file, some options were also removed or renamed.
-Below is a list with the changed entries:
+With the refactoring of the configuration file, the following options were removed or renamed:
 
 [cols="2*", options="header"]
 |===
@@ -221,23 +228,24 @@ Below is a list with the changed entries:
 |Action
 
 |`deadTime`
-|`deadTime` was renamed to `ignoreOlder`. In case a file is not changed for `ignoreOlder`, the file handler will be closed. If the file is changed again after ignoreOlder has passed, it is be reopened.
+|`deadTime` was renamed to `ignore_older`. Filebeat keeps the files that it’s reading open until they are older than the timespan specified by `ignore_older`. If a file is changed, Filebeat reopens it.
 
 |`netTimeout`
-|`netTimeout` was removed as it is replaced by the Timeout option in libbeat.
+|`netTimeout` was removed and is replaced by the `timeout` option in libbeat.
 
 |`log-to-syslog` and `syslog`
-|Both options were removed as logging is part of the libbeat config.
-
+|Both options were removed and replaced by logging options in libbeat.
 |===
+
+For more information about these options, see {libbeat}/configuration.html[Beats configuration options].
 
 
 ==== A Complete Example
 
-Let's see a simple but complete example of a logstash-forwarder configuration
+Let's see a simple, but complete example of a Logstash Forwarder configuration
 and its equivalent for Filebeat.
 
-Logstash-Forwarder configuration:
+Logstash Forwarder configuration:
 
 [source,json]
 -------------------------------------------------------------------------------------
@@ -273,23 +281,23 @@ output:
     hosts: ["http://localhost:5043"]
 -------------------------------------------------------------------------------------
 
-=== Command Line Options
+=== Changes to Command Line Options
 
-Most command line options from logstash-forwarder have been removed and
-migrated to config file options. The only mandatory option for Filebeat is `-c`
-with the path to the config file to be loaded. In case you used command line
-options with Logstash-Forwarder, make sure to add your options to the
-configuration file. For the naming changes, check the list below.
+Most command line options available in Logstash Forwarder have been removed and
+migrated to config file options. The only mandatory command line option for
+running  Filebeat is  `-c` followed by the path to the config file. If you used command line
+options with Logstash Forwarder, make sure that you add your options to the
+configuration file. For naming changes, see <<renamed-options>>.
 
-The general concept for the config options is that all options are available as
-part of the config file and only some special options are also available as
-command line option.
+Filebeat does provide command line options that are common to all Beats. For more details about
+these options, see {libbeat}/command-line-options.html[Beats Command Line Options].
 
+[[renamed-options]]
 ==== Renamed Options
 
-The renamed command line options are listed below. Also check
-<<changed-configuration-options>> for configuration file options that were
-either completely removed or moved to libbeat.
+The following command line options have been renamed and moved to the config file. Also see
+<<changed-configuration-options>> for a list of configuration file options that were completely removed or
+replaced by options specified in libbeat.
 
 [cols="3*", options="header"]
 |===
@@ -298,36 +306,34 @@ either completely removed or moved to libbeat.
 |Description
 
 |`-config`
-|`-c`
-|The config options was split up in two part. The base and required config is linked with -c. Additional config files can be linked as part of the config file. Note: Additional config files must be in a different directory than the main config file.
+|`-c` command line option and `config_dir`
+|The config option was split into two parts. You use the `-c` command line option to specify the location of the base (required) config file when you start Filebeat. To use additional config files, you specify the `config_dir` configuration option.
 
-|`-config`
-|`config_dir`
-|Path to directory with additional configuration files
+The `config_dir` option specifies the path to the directory that contains additional configuration files. This option MUST point to a directory other than the directory where the main Filebeat config file resides.
 
 |`-idle-timeout`
 |`idle_timeout`
-|`idle_timeout` was moved to the config file and removed as flag.
+|`idle_timeout` was moved to the config file and removed as a flag.
 
 |`-spool-size`
 |`spool_size`
-|`spool_size` was moved to the config file and removed as flag.
+|`spool_size` was moved to the config file and removed as a flag.
 
 |`-harvester-buff-size`
 |`harvester_buffer_size`
-|`harvester_buffer_size` was moved to the config file and removed as flag. It can now be configured specific for each harvester.
+|`harvester_buffer_size` was moved to the config file and removed as a flag. You can now configure the buffer size separately for each harvester.
 
 |`-tail`
 |`tail_files`
-|`tail_files` was moved to the config file and removed as flag. It can now be configured specific for each prospector.
+|`tail_files` was moved to the config file and removed as a flag. You can now configure this option separately for each prospector.
 
 |`-cpuProfileFile`
 |
-|`cpuProfileFile` option was removed. The profiling options of libbeat can be used instead. For more details on profiling see https://github.com/elastic/libbeat/issues/122
+|`cpuProfileFile` option was removed. You can use the profiling options of libbeat instead. For more details on profiling, see https://github.com/elastic/libbeat/issues/122.
 
 |`-quiet`
 |
-|The `quiet` option was removed. Libbeat is used for logging and the libbeat configuration options have to be used.
+|The `quiet` option was removed. Libbeat is now used for logging, so you must use the libbeat {libbeat}/configuration.html#configuration-logging[logging options] instead.
 
 
 |===
@@ -335,19 +341,18 @@ either completely removed or moved to libbeat.
 
 === Other Changes
 
-The following is a list of implementation changes that we don't expect to
-affect your experience migrating from Logstash-Forwarder but that you should be
-aware of. Please post a GitHub issues if you notice any regression from
-Logstash-Forwarder.
+The following list of implementation changes should not affect your experience migrating
+from Logstash Forwarder, but you should be aware of the changes. Please post GitHub issues
+if you notice any regressions from Logstash Forwarder.
 
 ==== Packaging
 
 The packaging process for Filebeat uses the Beats infrastructure, so some
-things like the init scripts are different from those that the
-Logstash-Forwarder provided. Please post GitHub issues if you hit any issues
+aspects of packaging, such as the init scripts, are different from
+Logstash Forwarder. Please post GitHub issues if you hit any issues
 with the new packages.
 
-One notable change is the name of the registry file depending on the package
+One notable change is the name of the registry file. The name varies depending on the package
 type:
 
  * `.filebeat` for `.tar.gz` and `.tgz` archives
@@ -361,9 +366,9 @@ with Logstash.
 
 ==== TLS Is Off by Default
 
-If you follow the section on migrating the configuration you will have TLS
-enabled, but you must be aware that if the tls section is missing from the
-configuration Filebeat uses an unencrypted connection to talk to Logstash.
+If you follow the section on migrating the configuration, you will have TLS
+enabled. However, you must be aware that if the `tls` section is missing from the
+configuration file, Filebeat uses an unencrypted connection to talk to Logstash.
 
 ==== Logging
 
