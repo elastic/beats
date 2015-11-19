@@ -788,7 +788,7 @@ func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 		return nil
 	}
 
-	// no other check ? make sure gopacket checks are enough
+	// no other check ? are gopacket checks enough?
 	return dnsData
 }
 
