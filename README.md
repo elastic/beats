@@ -45,6 +45,18 @@ System statistics:
     "softirq": 0,
     "steal": 0
   },
+  "cpu0": {
+    "user": 2985331,
+    "user_p": 0,
+    "nice": 0,
+    "system": 1727403,
+    "system_p": 0,
+    "idle": 25915908,
+    "iowait": 0,
+    "irq": 0,
+    "softirq": 0,
+    "steal": 0
+  },
   "load": {
     "load1": 1.52392578125,
     "load5": 1.79736328125,

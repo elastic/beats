@@ -148,6 +148,32 @@ func GetCpuTimes() (*CpuTimes, error) {
 	}, nil
 }
 
+func GetCpuTimesList() ([]CpuTimes, error) {
+
+	cpuList := sigar.CpuList{}
+	err := cpuList.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	cpuTimes := make([]CpuTimes, len(cpuList.List))
+
+	for i, cpu := range cpuList.List {
+		cpuTimes[i] = CpuTimes{
+			User:    cpu.User,
+			Nice:    cpu.Nice,
+			System:  cpu.Sys,
+			Idle:    cpu.Idle,
+			IOWait:  cpu.Wait,
+			Irq:     cpu.Irq,
+			SoftIrq: cpu.SoftIrq,
+			Steal:   cpu.Stolen,
+		}
+	}
+
+	return cpuTimes, nil
+}
+
 func GetMemory() (*MemStat, error) {
 
 	mem := sigar.Mem{}

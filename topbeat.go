@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/elastic/gosigar"
@@ -18,12 +19,13 @@ import (
 type ProcsMap map[int]*Process
 
 type Topbeat struct {
-	period       time.Duration
-	procs        []string
-	procsMap     ProcsMap
-	lastCpuTimes *CpuTimes
-	TbConfig     ConfigSettings
-	events       publisher.Client
+	period           time.Duration
+	procs            []string
+	procsMap         ProcsMap
+	lastCpuTimes     *CpuTimes
+	lastCpuTimesList []CpuTimes
+	TbConfig         ConfigSettings
+	events           publisher.Client
 
 	sysStats  bool
 	procStats bool
@@ -227,6 +229,13 @@ func (t *Topbeat) exportSystemStats() error {
 
 	t.addCpuPercentage(cpu_stat)
 
+	cpu_core_stat, err := GetCpuTimesList()
+	if err != nil {
+		logp.Warn("Getting cpu core times: %v", err)
+		return err
+	}
+	t.addCpuPercentageList(cpu_core_stat)
+
 	mem_stat, err := GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
@@ -248,6 +257,10 @@ func (t *Topbeat) exportSystemStats() error {
 		"cpu":        cpu_stat,
 		"mem":        mem_stat,
 		"swap":       swap_stat,
+	}
+
+	for coreNumber, core := range cpu_core_stat {
+		event["cpu"+strconv.Itoa(coreNumber)] = core
 	}
 
 	t.events.PublishEvent(event)
@@ -339,6 +352,32 @@ func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
 	}
 
 	t.lastCpuTimes = t2
+
+}
+
+func (t *Topbeat) addCpuPercentageList(t2 []CpuTimes) {
+
+	t1 := t.lastCpuTimesList
+
+	if t1 != nil && t2 != nil && len(t1) == len(t2) {
+
+		for i := 0; i < len(t1); i++ {
+			all_delta := t2[i].sum() - t1[i].sum()
+
+			calculate := func(field2 uint64, field1 uint64) float64 {
+
+				perc := 0.0
+				delta := field2 - field1
+				perc = float64(delta) / float64(all_delta)
+				return Round(perc, .5, 2)
+			}
+			t2[i].UserPercent = calculate(t2[i].User, t1[i].User)
+			t2[i].SystemPercent = calculate(t2[i].System, t1[i].System)
+		}
+
+	}
+
+	t.lastCpuTimesList = t2
 
 }
 
