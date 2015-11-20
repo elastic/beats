@@ -21,10 +21,16 @@ class Proc(object):
         self.output = open(outputfile, "wb")
 
     def start(self):
+
+        self.stdin_read, self.stdin_write = os.pipe()
+
         self.proc = subprocess.Popen(
             self.args,
+            stdin=self.stdin_read,
             stdout=self.output,
-            stderr=subprocess.STDOUT)
+            stderr=subprocess.STDOUT,
+            bufsize=0,
+        )
         return self.proc
 
     def wait(self):
@@ -32,6 +38,7 @@ class Proc(object):
 
     def kill_and_wait(self):
         self.proc.terminate()
+        os.close(self.stdin_write)
         return self.proc.wait()
 
     def __del__(self):

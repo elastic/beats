@@ -6,7 +6,7 @@ filebeat:
       paths:
         - {{ path }}
       # Type of the files. Annotated in every documented
-      input: log
+      input_type: {{input_type | default("log") }}
       scan_frequency: {{scan_frequency | default("0.1s") }}
       ignore_older: "{{ignoreOlder}}"
       harvester_buffer_size:

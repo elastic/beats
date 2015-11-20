@@ -73,3 +73,43 @@ class Test(TestCase):
 
         objs = self.read_output()
         assert len(objs) == 5
+
+    def test_stdin(self):
+        """
+        Test stdin input. Checks if reading is continued after the first read.
+        """
+        self.render_config_template(
+            path="\"-\"",
+            input_type="stdin"
+        )
+
+        proc = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.log_contains(
+                "Harvester started for file: -"),
+            max_timeout=10)
+
+
+        iterations1 = 5
+        for n in range(0, iterations1):
+            os.write(proc.stdin_write, "Hello World\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=iterations1),
+            max_timeout=15)
+
+
+        iterations2 = 10
+        for n in range(0, iterations2):
+            os.write(proc.stdin_write, "Hello World\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=iterations1+iterations2),
+            max_timeout=15)
+
+
+        proc.kill_and_wait()
+
+        objs = self.read_output()
+        assert len(objs) == iterations1+iterations2
