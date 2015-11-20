@@ -7,6 +7,16 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0](https://github.com/elastic/libbeat/compare/1.0.0-rc2...1.0.0)
+
+### Backward Compatibility Breaks
+
+### Bugfixes
 - Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
 
 ### Added
