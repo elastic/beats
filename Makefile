@@ -1,5 +1,5 @@
 BEATNAME=winlogbeat
-SYSTEM_TESTS=false
+SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
 include scripts/Makefile

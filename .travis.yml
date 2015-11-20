@@ -4,6 +4,11 @@ language: go
 go:
   - 1.5.1
 
+addons:
+  apt:
+    packages:
+      - python-virtualenv
+
 before_install:
   # This is needed so the package path uses elastic/winlogbeat as its path.
   - mkdir -p $HOME/gopath/src/github.com/elastic/winlogbeat

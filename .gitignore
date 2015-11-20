@@ -5,6 +5,7 @@ winlogbeat
 *.so
 *.swp
 *.swo
+*.pyc
 
 # Folders
 _obj
@@ -26,13 +27,19 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*.out
+*.log
+*.bak
+etc/*.dev.yml
 
 cover/
+/tests/system/env/
+/tests/system/run/
+/tests/system/last_run
 profile.cov
 .idea
 .DS_Store
 /docs/html_docs
-etc/*.dev.yml
-*.out
-*.log
-*.bak
+.vagrant
+
+build/
