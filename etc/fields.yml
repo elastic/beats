@@ -70,10 +70,3 @@ log:
       required: false
       description: >
         Contains user configurable fields.
-
-    - name: fileinfo
-      type: dict
-      required: false
-      description: >
-        Operating System specific file information use to identify the source
-        file. For example on linux an inode might be reported.
