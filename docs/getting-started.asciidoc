@@ -12,7 +12,7 @@ After you have installed these products, you can start <<filebeat-installation>>
 [[filebeat-installation]]
 === Installing Filebeat
 
-To download and install Filebeat, run the following commands. Use the commands that 
+To download and install Filebeat, run the following commands. Use the commands that
 work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
 
 deb:
@@ -45,14 +45,14 @@ tar xzvf filebeat-{version}-darwin.tgz
 NOTE: We also provide 32-bit images that you can get from our
 https://www.elastic.co/downloads/beats/filebeat[download page].
 
-Before starting filebeat, you should look at the configuration options in the configuration 
-file, for example `/etc/filebeat/filebeat.yml`. For more information about these options, 
-see <<filebeat-configuration-details,Configuration>>.
+Before starting filebeat, you should look at the configuration options in the configuration
+file, for example `/etc/filebeat/filebeat.yml`. For more information about these options,
+see <<filebeat-configuration-details>>.
 
 [[filebeat-configuration]]
 === Configuring Filebeat
 
-To configure Filebeat, you edit the _filebeat.yml_ file. Here is a sample of 
+To configure Filebeat, you edit the _filebeat.yml_ file. Here is a sample of
 the _filebeat.yml_ file:
 
 [source,yaml]
@@ -77,8 +77,8 @@ filebeat:
       type: log
 -------------------------------------------------------------------------------------
 
-Filebeat uses predefined default values for most configuration options. For the most basic 
-Filebeat configuration, you can define a single prospector with a single path. For example:  
+Filebeat uses predefined default values for most configuration options. For the most basic
+Filebeat configuration, you can define a single prospector with a single path. For example:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ filebeat:
         - "/var/log/*.log"
 -------------------------------------------------------------------------------------
 
-The prospector in this example harvests all files in the path `/var/log/*.log`, which means 
+The prospector in this example harvests all files in the path `/var/log/*.log`, which means
 that Filebeat will harvest all files in the directory `/var/log/` that end with `.log`. All patterns supported
 by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also supported here.
 
@@ -118,11 +118,10 @@ filebeat:
 -------------------------------------------------------------------------------------
 
 The config file in the example starts two prospectors. The first prospector has two harvesters,
-one harvesting the `system.log` file, and the other harvesting `wifi.log`. The second prospector 
+one harvesting the `system.log` file, and the other harvesting `wifi.log`. The second prospector
 starts a harvester for each file in the apache directory.
 
-
-See <<filebeat-configuration-details,Configuration>> for more details about each configuration option.
+See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[filebeat-template]]
 === Loading the Index Template in Elasticsearch
@@ -154,8 +153,8 @@ where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 === Setting Up Filebeat to Use Logstash
 
-If you want to use Logstash to perform additional processing on the data collected by 
-Filebeat, you need to set up Filebeat to use Logstash. For detailed steps, see 
+If you want to use Logstash to perform additional processing on the data collected by
+Filebeat, you need to set up Filebeat to use Logstash. For detailed steps, see
 {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
 
@@ -184,6 +183,6 @@ mac:
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
 
-Filebeat is now ready to send log files to your defined output. 
+Filebeat is now ready to send log files to your defined output.
 
 Enjoy!

@@ -2,21 +2,25 @@
 [[filebeat-configuration-details]]
 == Configuration Options
 
+Before modifying configuration settings, make sure you've read <<filebeat-configuration>>.
+
 The Filebeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The _etc/filebeat.yml_ file consists of the following sections:
+The file contains config options common to all Beats. These options are described
+in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
 
 * {libbeat}/configuration.html#configuration-shipper[Shipper]
 * {libbeat}/configuration.html#configuration-output[Output]
-* <<configuration-filebeat-options>>
-* {libbeat}/configuration.html#configuration-logging[Logging (optional)]
-* {libbeat}/configuration.html#configuration-run-options[Run options (optional)]
+* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
+* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
 
-The `shipper`, `output`, `logging`, and `runoptions` sections contain configuration options that are common to all Beats, so they are covered in the {libbeat}/configuration.html[Beats Platform Reference].
+The Filebeat config options are described here:
+
+* <<configuration-filebeat-options>>
 
 [[configuration-filebeat-options]]
-=== Prospectors
+=== Filebeat
 
-The `prospectors` section specifies a list of prospectors that Filebeat
+The `filebeat` section specifies a list of `prospectors` that Filebeat
 uses to locate and process log files. Each prospector item begins with a dash (-)
 and specifies prospector-specific configuration options, including
 the list of paths that are crawled to locate log files.
