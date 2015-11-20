@@ -32,7 +32,7 @@ Usage of ./packetbeat:
   -version
       Print version and exit
   -waitstop int
-      Additional seconds to wait befor shutting down
+      Additional seconds to wait before shutting down
 ----------------------------------------------------------------------------
 
 === Packetbeat-Specific Options
