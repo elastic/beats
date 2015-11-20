@@ -1,46 +1,46 @@
 == Command Line Options
 
-The following command line options are available for Packetbeat. 
+The following command line options are available for Packetbeat.
 
 [source,shell]
 ------------------------------------------------------------------------
 $ ./packetbeat -h
 Usage of ./packetbeat:
   -I string
-    	file
-  -N	Disable actual publishing for testing
-  -O	Read packets one at a time (press Enter)
+      file
+  -N  Disable actual publishing for testing
+  -O  Read packets one at a time (press Enter)
   -c string
-    	Configuration file (default "/etc/packetbeat/packetbeat.yml")
+      Configuration file (default "/etc/packetbeat/packetbeat.yml")
+  -configtest
+      Test configuration and exit.
   -cpuprofile string
-    	Write cpu profile to file
+      Write cpu profile to file
   -d string
-    	Enable certain debug selectors
+      Enable certain debug selectors
   -devices
-    	Print the list of devices and exit
+      Print the list of devices and exit
   -dump string
-    	Write all captured packets to this libpcap file
-  -e	Output to stdout and disable syslog/file output
+      Write all captured packets to this libpcap file
+  -e  Log to stderr and disable syslog/file output
   -l int
-    	Loop file. 0 - loop forever (default 1)
+      Loop file. 0 - loop forever (default 1)
   -memprofile string
-    	Write memory profile to this file
-  -t	Read packets as fast as possible, without sleeping
-  -test
-    	Test configuration and exit.
-  -v	Log at INFO level
+      Write memory profile to this file
+  -t  Read packets as fast as possible, without sleeping
+  -v  Log at INFO level
   -version
-    	Print version and exit
+      Print version and exit
   -waitstop int
-    	Additional seconds to wait before shutting down
+      Additional seconds to wait before shutting down
 ----------------------------------------------------------------------------
 
-=== Packetbeat-Specific Options 
+=== Packetbeat-Specific Options
 
 These command line options are specific to Packetbeat. For command line options common to all Beats, see {libbeat}/command-line-options.html[Beats Command Line Options].
 
 *`-I <file>`*::
-Pass a pcap file as input to Packetbeat instead of reading packets from the network. 
+Pass a pcap file as input to Packetbeat instead of reading packets from the network.
 This option is useful only for testing Packetbeat. Example: `-I ~/pcaps/network_traffic.pcap`.
 
 *`-O`*::
@@ -53,7 +53,7 @@ Print the list of devices that are available for sniffing.
 Write all captured packets to a file. This option is useful for troubleshooting Packetbeat.
 
 *`-l <n>`*::
-Read the pcap file `n` number of times. Use this option in combination with the `-I` option. 
+Read the pcap file `n` number of times. Use this option in combination with the `-I` option.
 For an infinite loop, use _0_. The `-l` option is useful only for testing Packetbeat.
 
 *`-t`*::

@@ -16,13 +16,13 @@ Download and install the Kibana 3 fork by issuing the following commands:
 
 [source,shell]
 ----------------------------------------------------------------------
-curl -L -O https://github.com/packetbeat/kibana/releases/download/v3.1.2-pb/kibana-3.1.2-packetbeat.tar.gz 
+curl -L -O https://github.com/packetbeat/kibana/releases/download/v3.1.2-pb/kibana-3.1.2-packetbeat.tar.gz
 tar -xzvf kibana-3.1.2-packetbeat.tar.gz
 ----------------------------------------------------------------------
 
-Kibana 3 is a pure Javascript application running fully in the browser. It
+Kibana 3 is a pure JavaScript application running fully in the browser. It
 doesn't have or need a sever-side part like most web applications. Instead,
-you only needed a web server to serve the Javascript files and the static
+you only needed a web server to serve the JavaScript files and the static
 resources. For example, you can use Python to create a simple web server:
 
 [source,shell]
@@ -37,7 +37,7 @@ in the following screenshot:
 
 image:./images/kibana_connection_failed.png[Kibana connection failed]
 
-This is because 
+This is because
 http://en.wikipedia.org/wiki/Cross-origin_resource_sharing[cross-origin resource sharing (CORS)] is
 disabled by default in recent versions of Elasticsearch to respect the "secure
 by default" philosophy. You can enable CORS by adding the following lines to the

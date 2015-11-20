@@ -1,0 +1,76 @@
+[[release-notes]]
+== Release Notes
+
+[[version-compatibility]]
+=== Version Compatibility
+
+Packetbeat {version} is compatible with:
+
+* Elasticsearch: ???
+* Logstash ???
+* Kibana ???
+
+[[upgrade-instructions]]
+=== Upgrading Packetbeat
+
+Packetbeat {version}
+
+
+[[change-list]]
+=== Change List
+
+==== 1.0
+
+.New Features
+* Feature 1
+* Feature 2
+
+.Enhancement
+* Enhancement 1
+* Enhancement 2
+
+.Bug fixes
+* Bug fix 1
+* Bug fix 2
+
+==== 1.0.0-rc2
+
+.New Features
+* Feature 1
+* Feature 2
+
+.Enhancement
+* Enhancement 1
+* Enhancement 2
+
+.Bug fixes
+* Bug fix 1
+* Bug fix 2
+
+==== 1.0.0-rc1
+
+.New Features
+* Feature 1
+* Feature 2
+
+.Enhancement
+* Enhancement 1
+* Enhancement 2
+
+.Bug fixes
+* Bug fix 1
+* Bug fix 2
+
+==== 1.0.0-Beta2
+
+.New Features
+* Feature 1
+* Feature 2
+
+.Enhancement
+* Enhancement 1
+* Enhancement 2
+
+.Bug fixes
+* Bug fix 1
+* Bug fix 2

@@ -15,12 +15,12 @@ protocols it supports.
 
 In some cases you can even make use of existing libraries for doing the actual
 parsing and decoding of the protocol. If the particular protocol has a Go
-implementation with a liberal enough license, you might be able to use it to 
+implementation with a liberal enough license, you might be able to use it to
 parse and decode individual messages instead of writing your own parser.
 
 Before starting, please also read the
 https://github.com/elastic/packetbeat/blob/master/CONTRIBUTING.md[CONTRIBUTING]
-file on Github.
+file on GitHub.
 
 ==== Cloning and Compiling
 
@@ -52,10 +52,10 @@ create a symlink to the `$GOPATH/src/github.com/elastic/` directory.
 
 We recommend the following work flow for contributing to Packetbeat:
 
-* Fork Packetbeat in Github to your own account
+* Fork Packetbeat in GitHub to your own account
 
 * In the `$GOPATH/src/github.com/elastic/packetbeat` folder, add your fork
-  as a new remote. For example (replace `tsg` with your github account):
+  as a new remote. For example (replace `tsg` with your GitHub account):
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -69,7 +69,7 @@ $ git remote add tsg git@github.com:tsg/packetbeat.git
 $ git checkout -b cool_new_protocol
 ----------------------------------------------------------------------
 
-* Commit as often as you like, push to your private fork with:
+* Commit as often as you like, and then push to your private fork with:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -96,7 +96,7 @@ folder.
 === Protocol Modules
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
-modules can be found in individual folders the
+modules can be found in individual folders in the
 https://github.com/elastic/packetbeat/tree/master/protos[`protos`] directory
 from the repository.
 
@@ -172,13 +172,13 @@ combination.
 <3> The application layer payload (that is, without the IP and TCP/UDP headers) as a
 byte slice.
 
-The objects sent through the `results` channel have the type `common.MapStr`, 
+The objects sent through the `results` channel have the type `common.MapStr`,
 which is essentially a `map[string]interface{}` with a few more convenience
 https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods]
 added.
 
 Besides the `Parse()` function, the TCP layer also calls the `ReceivedFin()` function
-when a TCP stream is closed, and it calls the `GapInStream()` function when packet 
+when a TCP stream is closed, and it calls the `GapInStream()` function when packet
 loss is detected in a TCP stream. The protocol module can use these callbacks to make
 decisions about what to do with partial data that it receives. For example, for the
 HTTP/1.0 protocol, the end of connection is used to know when the message is
@@ -186,7 +186,7 @@ finished.
 
 ==== Registering Your Plugin
 
-To configure your plugin, you need to add a configuration struct to 
+To configure your plugin, you need to add a configuration struct to
 `config/config.go` Protocols struct. This struct will be filled by
 https://gopkg.in/yaml.v2[goyaml] on startup.
 
@@ -258,16 +258,16 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 Once the module is registered, it can be configured, and packets will be processed.
 
 Before implementing all the logic for your new protocol module, it can be
-helpful to first register the module and implement the minimal plugin interface 
+helpful to first register the module and implement the minimal plugin interface
 for printing a debug message on received packets. This way you can test the plugin registration to ensure that it's working correctly.
 
 ==== The TCP Parse Function
 
 For TCP protocols, the `Parse()` function is the heart of the module. As
-mentioned earlier, this function is called for every TCP packet 
+mentioned earlier, this function is called for every TCP packet
 that contains data on the configured ports.
 
-It is important to understand that because TCP is a stream-based protocol, 
+It is important to understand that because TCP is a stream-based protocol,
 the packet boundaries don't necessarily match the application
 layer message boundaries. For example, a packet can contain only a part of the
 message, it can contain a complete message, or it can contain multiple messages.
@@ -296,14 +296,14 @@ is part of. You can use the `tcptuple.Hashable()` function to get a value that
 you can store in a map. The `dir` flag gives you the direction in which the
 packet is flowing inside the TCP stream. The two possible values are
 `TcpDirectionOriginal` if the packet goes in the same direction as the first
-packet from the stream and `TcpDirectionReverse` if the packet goes in 
+packet from the stream and `TcpDirectionReverse` if the packet goes in
 the other direction.
 
-The `private` parameter can be used by the module to store state in the TCP stream. 
+The `private` parameter can be used by the module to store state in the TCP stream.
 The module would typically cast this at runtime to a
 type of its choice, modify it as needed, and then return the modified value.
 The next time the TCP layer calls `Parse()` or another function from the
-`TcpProtocolPlugin` interface, it will call the function with the modified 
+`TcpProtocolPlugin` interface, it will call the function with the modified
 private value.
 
 Here is an example of how the MySQL module handles the private data:
@@ -324,7 +324,7 @@ Here is an example of how the MySQL module handles the private data:
 	return priv
 ----------------------------------------------------------------------
 
-Most modules then use a logic similar to the following to deal with incomplete 
+Most modules then use a logic similar to the following to deal with incomplete
 data (this example is also from MySQL):
 
 
@@ -362,8 +362,8 @@ found in the same packet.
 ==== The UDP ParseUdp Function
 
 If the protocol you are working on is running on top of UDP, then all the
-complexities around extracting messages from packets that the TCP
-parser/decoders have to are not required at all.
+complexities that TCP parser/decoders need to deal with around extracting
+messages from packets are no longer relevant.
 
 For an example, see the `ParseUdp()` function from the DNS module.
 
@@ -574,7 +574,7 @@ structures less verbose, we use the assert package from the
 https://github.com/stretchr/testify[testify] library.
 
 For parser and decoder tests, it's a good practice to have an array with
-test cases containing the inputs and expected outputs. For an example, see the 
+test cases containing the inputs and expected outputs. For an example, see the
 https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
 unit test.
 
@@ -659,7 +659,7 @@ This is the approach taken by the tests in the
 https://github.com/elastic/packetbeat/tree/master/tests[`tests`] directory. The
 tests are written in Python and executed using
 https://nose.readthedocs.org/en/latest/[nose]. Here is a simple example test
-from the MognoDB suite:
+from the MongoDB suite:
 
 
 [source,python]
