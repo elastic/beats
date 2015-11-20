@@ -8,21 +8,20 @@ The following command line options are available for Topbeat. For details about 
 
 $ ./topbeat -h
 Usage of ./topbeat:
-  -N	Disable actual publishing for testing
+  -N  Disable actual publishing for testing
   -c string
-    	Configuration file (default "/etc/topbeat/topbeat.yml")
+      Configuration file (default "/etc/topbeat/topbeat.yml")
+  -configtest
+      Test configuration and exit.
   -cpuprofile string
-    	Write cpu profile to file
+      Write cpu profile to file
   -d string
-    	Enable certain debug selectors
-  -e	Output to stdout and disable syslog/file output
+      Enable certain debug selectors
+  -e  Log to stderr and disable syslog/file output
   -memprofile string
-    	Write memory profile to this file
-  -test
-    	Test configuration and exit.
-  -v	Log at INFO level
+      Write memory profile to this file
+  -v  Log at INFO level
   -version
-    	Print version and exit
-
+      Print version and exit
 ---------------------------------------------------------
 

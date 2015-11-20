@@ -4,6 +4,8 @@
 This page walks you through the steps required for running Topbeat on
 Windows. It assumes your Windows system has Powershell installed.
 
+For information about installing on other platforms, see <<topbeat-getting-started>>.
+
 To install and run Topbeat:
 
 . Download the Topbeat Windows zip file from the
@@ -12,8 +14,8 @@ it on your computer. The location where you extract the file is not important, b
 remember that you shouldn't delete this repository after the installation is
 finished. The exe file and the configuration file will continue to live there.
 
-. If necessary, edit settings in the `topbeat.yml` file. See the
- <<topbeat-configuration>> section.
+. If necessary, edit settings in the `topbeat.yml` file. See
+ <<topbeat-configuration>>.
 
 . Start an Administrator Powershell session (right click the Powershell icon
 and select *Run as Administrator*), and navigate to where you extracted the

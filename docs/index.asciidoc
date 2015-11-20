@@ -1,4 +1,4 @@
-= Topbeat reference
+= Topbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.0.0-rc2
 :version: 1.0.0-rc2
 
@@ -7,12 +7,12 @@ include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::./fields.asciidoc[]
+include::./windows.asciidoc[]
 
-// include::./configuration.asciidoc[]
+include::./configuration.asciidoc[]
 
 include::./command-line.asciidoc[]
 
-include::./windows.asciidoc[]
+include::./fields.asciidoc[]
 
 // include::./troubleshooting.asciidoc[]

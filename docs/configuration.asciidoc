@@ -1,0 +1,66 @@
+[[topbeat-configuration-options]]
+== Configuration Options
+
+Before modifying configuration settings, make sure you've read
+<<topbeat-configuration>>.
+
+The Topbeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The file consists of the following sections:
+
+* <<configuration-input>>
+* {libbeat}/configuration.html#configuration-output[Output]
+* {libbeat}/configuration.html#configuration-shipper[Shipper]
+* {libbeat}/configuration.html#configuration-logging[Logging]
+
+The `output`, `shipper`, and `logging` sections contain configuration options
+that are common to all Beats, so they are covered in the
+{libbeat}/configuration.html[Beats Platform Reference].
+
+[[configuration-input]]
+=== Input
+
+The `input` section specifies how often Topbeat reads server statistics and which
+statistics it captures. Here is an example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+input:
+  # In seconds, defines how often to read server statistics
+  period: 10
+
+  # Regular expression to match the processes that are monitored
+  # By default, all the processes are monitored
+  procs: [".*"]
+
+  # Statistics to collect (all enabled by default)
+  stats:
+    system: true
+    proc: true
+    filesystem: true
+------------------------------------------------------------------------------
+
+==== Options
+
+You can specify the following options in the `input` section:
+
+===== period
+
+How often, in seconds, to read system-wide and per-process statistics from your servers. The default is 10.
+
+===== procs
+
+A list of regular expressions to match all the processes that need to be monitored. By
+default, all the running processes are monitored.
+
+===== stats
+
+The statistics to collect. You can specify the following settings:
+
+* `system: true` to capture system-wide statistics, including statistics about
+system load, CPU usage, memory usage, and swap usage.
+* `proc: true` to capture per-process statistics, such as the process name,
+parent pid, state, pid, CPU usage, and memory usage.
+* `filesystem: true` to capture file system statistics, including details about the
+mounted disks, such as the total and used disk space, and details about each
+disk, such as the device name and the mounting place.
+
