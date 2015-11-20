@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0](https://github.com/elastic/topbeat/compare/1.0.0-rc2..1.0.0) - 2015-11-24
+## [1.0.0](https://github.com/elastic/topbeat/compare/1.0.0-rc2...1.0.0) - 2015-11-24
 
 ### Backward Compatibility Breaks
 
