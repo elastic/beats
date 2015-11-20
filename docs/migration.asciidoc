@@ -92,7 +92,8 @@ with this configuration in Logstash Forwarder:
       # A dictionary of fields to annotate on each event.
       "fields": {
         "type": "syslog",
-        "service": "example-service"
+        "service": "apache",
+        "zone": "us-east-1"
       }
     }, {
       # A path of "-" means stdin.
@@ -121,7 +122,8 @@ filebeat:
         - "/var/log/*.log"
       document_type: syslog <1>
       fields:
-        service: example-service
+        service: apache
+        zone: us-east-1
     -
       paths:
         - "-"
