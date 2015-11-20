@@ -66,14 +66,7 @@ log:
         Content of line read from log file given by source.
 
     - name: fields
-      type: group
+      type: dict
       required: false
       description: >
         Contains user configurable fields.
-
-    - name: fileinfo
-      type: group
-      required: false
-      description: >
-        Operating System specific file information use to identify the source
-        file. For example on linux an inode might be reported.
