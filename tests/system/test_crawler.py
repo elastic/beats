@@ -219,8 +219,8 @@ class Test(TestCase):
         testfile = self.working_dir + "/log/test.log"
         file = open(testfile, 'w')
 
-        iterations = 5
-        for n in range(0, iterations):
+        iterations1 = 5
+        for n in range(0, iterations1):
             file.write("disappearing file")
             file.write("\n")
 
@@ -230,9 +230,7 @@ class Test(TestCase):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 5 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations1), max_timeout=10)
         os.remove(testfile)
 
         #if os.name == 'nt':
@@ -245,8 +243,8 @@ class Test(TestCase):
         # Create new file with same name to see if it is picked up
         file = open(testfile, 'w')
 
-        iterations = 6
-        for n in range(0, iterations):
+        iterations2 = 6
+        for n in range(0, iterations2):
             file.write("new file")
             file.write("\n")
 
@@ -254,9 +252,7 @@ class Test(TestCase):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 6 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations1+iterations2), max_timeout=10)
 
         filebeat.kill_and_wait()
 
