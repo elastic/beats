@@ -90,13 +90,12 @@ required: True
 The content of the line read from the log file.
 
 
-==== fields Fields
+==== fields
 
-Contains user-configurable fields.
+type: dict
 
+required: False
 
-==== fileinfo Fields
-
-Operating system-specific file information used to identify the source file. For example, on Linux this field might report an inode.
+Contains user configurable fields.
 
 
