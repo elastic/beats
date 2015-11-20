@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0...HEAD)
+## [Unreleased](https://github.com/elastic/packetbeat/compare/1.0.0...HEAD)
 
 ### Backward Compatibility Breaks
 
@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0](https://github.com/elastic/libbeat/compare/1.0.0-rc2...1.0.0) 2015-11-24
+## [1.0.0](https://github.com/elastic/packetbeat/compare/1.0.0-rc2...1.0.0) 2015-11-24
 
 ### Backward Compatibility Breaks
 
@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-rc2](https://github.com/elastic/libbeat/compare/1.0.0-rc1...1.0.0-rc2) 2015-11-17
+## [1.0.0-rc2](https://github.com/elastic/packetbeat/compare/1.0.0-rc1...1.0.0-rc2) 2015-11-17
 
 ### Backward Compatibility Breaks
 
@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1) 2015-11-04
+## [1.0.0-rc1](https://github.com/elastic/packetbeat/compare/1.0.0-beta4...1.0.0-rc1) 2015-11-04
 
 ### Backward Compatibility Breaks
 - Rename timestamp field with @timestamp. #343
@@ -47,7 +47,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-beta4](https://github.com/elastic/libbeat/compare/1.0.0-beta3...1.0.0-beta4) 2015-10-21
+## [1.0.0-beta4](https://github.com/elastic/packetbeat/compare/1.0.0-beta3...1.0.0-beta4) 2015-10-21
 
 ### Backward Compatibility Breaks
 - Renamed http module config file option 'strip_authorization' to 'redact_authorization'
