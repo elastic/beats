@@ -1,21 +1,24 @@
 [[packetbeat-configuration]]
 == Configuration Options
 
-The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax. 
-The file consists of the following sections:
+Before modifying configuration settings, make sure you've read
+<<configuring-packetbeat>>.
 
+The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The file consists of the following sections:
 
 * {libbeat}/configuration.html#configuration-shipper[Shipper]
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
-* {libbeat}/configuration.html#configuration-output[Output] 
+* {libbeat}/configuration.html#configuration-output[Output]
 * {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
 
-The `shipper`, `output`, and `runoptions` sections contain configuration options that are common to all 
-Beats, so they are covered in the {libbeat}/configuration.html[Beats Platform Reference].
+The `shipper`, `output`, and `runoptions` sections contain configuration options
+that are common to all Beats, so they are covered in the
+{libbeat}/configuration.html[Beats Platform Reference].
 
-NOTE: Packetbeat maintains a real-time topology map of all the servers in your network. 
+NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.
 
 [[configuration-interfaces]]
@@ -41,7 +44,9 @@ interfaces:
   buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
-==== Options
+==== Sniffing Options
+
+You can specify the following options in the `interfaces` section:
 
 ===== device
 
@@ -57,14 +62,14 @@ interfaces:
 ------------------------------------------------------------------------------
 
 On Linux, you can specify `any` for the device, and Packetbeat captures all
-messages sent or received by the server where Packetbeat is installed. 
+messages sent or received by the server where Packetbeat is installed.
 
 NOTE: When you specify `any` for the device, the interfaces are not set
       to promiscuous mode.
 
 The `device` option also accepts specifying the device by its index in the list of
-devices available for sniffing. To obtain the list of available devices, 
-run Packetbeat with the following command: 
+devices available for sniffing. To obtain the list of available devices,
+run Packetbeat with the following command:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -86,7 +91,7 @@ This command returns a list that looks something like the following:
 8: lo0 (No description available)
 ----------------------------------------------------------------------
 
-The following example sets up sniffing on the 
+The following example sets up sniffing on the
 first interface in the list:
 
 [source,yaml]
@@ -95,16 +100,16 @@ interfaces:
   device: 0
 ------------------------------------------------------------------------------
 
-Specifying the index is especially useful on Windows where device names can be long. 
+Specifying the index is especially useful on Windows where device names can be long.
 
 ===== snaplen
 
 The maximum size of the packets to capture. The
-default is 65535, which is large enough for almost all networks and interface 
-types. If you sniff on a physical network interface, the optimal setting is  
+default is 65535, which is large enough for almost all networks and interface
+types. If you sniff on a physical network interface, the optimal setting is
 the MTU size. On virtual interfaces, however, it's safer to accept the default value.
 
-Example: 
+Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -125,9 +130,9 @@ Packetbeat supports three sniffer types:
    http://www.ntop.org/products/pf_ring/[project]. This setting provides the best
    sniffing speed, but it requires a kernel module, and it's Linux-specific.
 
-The default sniffer type is `pcap`. 
+The default sniffer type is `pcap`.
 
-Here is an example configuration that specifies 
+Here is an example configuration that specifies
 the `af_packet` sniffing type:
 
 [source,yaml]
@@ -137,7 +142,7 @@ interfaces:
   type: af_packet
 ------------------------------------------------------------------------------
 
-On Linux, if you are trying to optimize the CPU usage of Packetbeat, 
+On Linux, if you are trying to optimize the CPU usage of Packetbeat,
 we recommend trying the `af_packet` and `pf_ring` options. Read <<capturing-options>>
 for more details.
 
@@ -164,21 +169,21 @@ interfaces:
 ===== with_vlans
 
 Packetbeat automatically generates a
-https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only 
-the traffic on ports where it expects to find known protocols. 
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on ports where it expects to find known protocols.
 For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
 Packetbeat generates the following BPF filter: `"port 80 or port 3306"`.
 
 However, if the traffic contains https://en.wikipedia.org/wiki/IEEE_802.1Q[VLAN]
-tags, the filter that Packetbeat generates is ineffective because the 
-offset is moved by four bytes. To fix this, you can enable the `with_vlans` option, which 
+tags, the filter that Packetbeat generates is ineffective because the
+offset is moved by four bytes. To fix this, you can enable the `with_vlans` option, which
 generates a BPF filter that looks like this: `"port 80 or port 3306 or (vlan and (port 80 or port 3306))"`.
 
 ===== bpf_filter
 
 Packetbeat automatically generates a
-https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only 
-the traffic on ports where it expects to find known protocols. 
+https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] for capturing only
+the traffic on ports where it expects to find known protocols.
 For example, if you have configured port 80 for HTTP and port 3306 for MySQL,
 Packetbeat generates the following BPF filter: `"port 80 or port 3306"`.
 
@@ -191,7 +196,7 @@ interfaces:
   bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
 ------------------------------------------------------------------------------
 
-NOTE: This setting disables automatic generation of the BPF filter. If 
+NOTE: This setting disables automatic generation of the BPF filter. If
 you use this setting, it's your responsibility to keep the BPF filters in sync with the
 ports defined in the `protocols` section.
 
@@ -199,7 +204,7 @@ ports defined in the `protocols` section.
 [[configuration-protocols]]
 === Protocols
 
-The `protocols` section contains configuration options for each supported protocol, including 
+The `protocols` section contains configuration options for each supported protocol, including
 common options like `ports`, `send_request`, `send_response`, and options that are protocol-specific.
 
 Currently, Packetbeat supports the following protocols:
@@ -246,8 +251,8 @@ The following options are available for all protocols:
 
 ===== ports
 
-The ports where Packetbeat will look to capture traffic for specific 
-protocols. Packetbeat installs a https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF] 
+The ports where Packetbeat will look to capture traffic for specific
+protocols. Packetbeat installs a https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF]
 filter based on the ports specified in this section.
 If a packet doesn't match the filter, very little CPU is required to discard
 the packet. Packetbeat also uses the ports specified here to determine which
@@ -265,7 +270,7 @@ default, only the HTTP headers.
 ===== send_response
 
 If this option is enabled, the raw message of the response (`response` field)
-is sent to Elasticsearch. The default is false.  This option is useful when you 
+is sent to Elasticsearch. The default is false.  This option is useful when you
 want to index the whole request. Note that for HTTP, the body is not included
 by default, only the HTTP headers.
 
@@ -339,13 +344,13 @@ protocols:
 
 ===== hide_keywords
 
-A list of query parameters that Packetbeat will automatically censor in 
+A list of query parameters that Packetbeat will automatically censor in
 the transactions that it saves. The values associated with these parameters are replaced
 by `'xxxxx'`. By default, no changes are made to the HTTP messages.
 
-Packetbeat has this option because, unlike SQL traffic, which typically only contains the 
-hashes of the passwords, HTTP traffic may contain sensitive data. To reduce security risks, 
-you can configure this option to avoid sending the contents of certain HTTP POST 
+Packetbeat has this option because, unlike SQL traffic, which typically only contains the
+hashes of the passwords, HTTP traffic may contain sensitive data. To reduce security risks,
+you can configure this option to avoid sending the contents of certain HTTP POST
 parameters.
 
 WARNING: This option replaces query parameters from GET requests and top-level
@@ -358,12 +363,12 @@ fields.
 
 ===== redact_authorization
 
-When this option is enabled, Packetbeat obscures the value of 
+When this option is enabled, Packetbeat obscures the value of
 `Authorization` and `Proxy-Authorization` HTTP headers, and censors
 those strings in the response.
 
-You should set this option to true for transactions that use Basic Authentication because 
-they may contain the base64 unencrypted username and password. 
+You should set this option to true for transactions that use Basic Authentication because
+they may contain the base64 unencrypted username and password.
 
 ===== send_headers
 
@@ -395,7 +400,7 @@ protocols:
 ===== split_cookie
 
 If the `Cookie` or `Set-Cookie` headers are sent, this option controls whether
-they are split into individual values. For example, with this option set, an 
+they are split into individual values. For example, with this option set, an
 HTTP response might result in the following JSON:
 
 [source,json]
@@ -434,6 +439,9 @@ fields.
 
 ==== Memcache Configuration Options
 
+The `memcache` section specifies configuration options for the memcache
+protocol. Here is a sample configuration section for memcache:
+
 [source,yaml]
 ------------------------------------------------------------------------------
   memcache:
@@ -466,16 +474,16 @@ The possible settings for this option are:
 
 The maximum number of bytes to be copied for each value element.
 
-NOTE: Values will be base64 encoded, so the actual size in the JSON document will be 4 times the value that 
+NOTE: Values will be base64 encoded, so the actual size in the JSON document will be 4 times the value that
 you specify for `maxbytespervalue`.
 
 ===== udptransactiontimeout
 
 The transaction timeout in milliseconds. The defaults is 10000 milliseconds.
 
-NOTE: Quiet messages in UDP binary protocol get responses only if there is an error. 
-The memcache protocol analyzer will wait for the number of milliseconds specified by 
-`udptransactiontimeout` before publishing quiet messages. Non-quiet messages or 
+NOTE: Quiet messages in UDP binary protocol get responses only if there is an error.
+The memcache protocol analyzer will wait for the number of milliseconds specified by
+`udptransactiontimeout` before publishing quiet messages. Non-quiet messages or
 quiet requests with an error response are published immediately.
 
 
@@ -513,18 +521,18 @@ sample configuration section:
 
 ===== transport_type
 
-The Thrift transport type. Currently this option accepts the values `socket`  
-for TSocket, which is the default Thrift transport, and `framed` for the TFramed Thrift 
+The Thrift transport type. Currently this option accepts the values `socket`
+for TSocket, which is the default Thrift transport, and `framed` for the TFramed Thrift
 transport. The default is `socket`.
 
 ===== protocol_type
 
-The Thrift protocol type. Currently the only accepted value is `binary` for 
+The Thrift protocol type. Currently the only accepted value is `binary` for
 the TBinary protocol, which is the default Thrift protocol.
 
 ===== idl_files
 
-The Thrift interface description language (IDL) files for the service that 
+The Thrift interface description language (IDL) files for the service that
 Packetbeat is monitoring. Providing the IDL files is optional, because the Thrift
 messages contain enough information to decode them without having the IDL
 files. However, providing the IDL enables Packetbeat to include parameter and
@@ -533,14 +541,14 @@ exception names.
 ===== string_max_size
 
 The maximum length for strings in parameters or return values. If a string is longer than
-this value, the string is automatically truncated to this length. Packetbeat adds dots 
+this value, the string is automatically truncated to this length. Packetbeat adds dots
 at the end of the string to mark that it was truncated. The default is 200.
 
 ===== collection_max_size
 
-The maximum number of elements in a Thrift list, set, map, or structure. If a collection 
-has more elements than this value, Packetbeat captures only the 
-specified number of elements. Packetbeat adds a fictive last element `...` to the end 
+The maximum number of elements in a Thrift list, set, map, or structure. If a collection
+has more elements than this value, Packetbeat captures only the
+specified number of elements. Packetbeat adds a fictive last element `...` to the end
 of the collection to mark that it was truncated. The default is 15.
 
 ===== capture_reply
@@ -551,13 +559,13 @@ for performance, disk usage, or data retention reasons. The default is true.
 
 ===== obfuscate_strings
 
-If this option is set to true, Packetbeat replaces all strings found in method parameters, 
+If this option is set to true, Packetbeat replaces all strings found in method parameters,
 return codes, or exception structures with the `"*"` string.
 
 ===== drop_after_n_struct_fields
 
-The maximum number of fields that a structure can have before Packetbeat 
-ignores the whole transaction. This is a memory protection mechanism (so that 
+The maximum number of fields that a structure can have before Packetbeat
+ignores the whole transaction. This is a memory protection mechanism (so that
 Packetbeat's memory doesn't grow indefinitely), so you would typically set this
 to a relatively high value. The default is 500.
 
@@ -585,7 +593,7 @@ Packetbeat indexes in the `response` fields.
 The maximum number of documents from the response to index in the `response` field. The
 default is 10. You can set this to 0 to index an unlimited number of documents.
 
-Packetbeat adds a `[...]` line at the end to signify that there were additional documents 
+Packetbeat adds a `[...]` line at the end to signify that there were additional documents
 that weren't saved because of this setting.
 
 ===== max_doc_length
@@ -594,7 +602,7 @@ The maximum number of characters in a single document indexed in the `response`
 field. The default is 5000. You can set this to 0 to index an unlimited number
 of characters per document.
 
-If the document is trimmed because of this setting, Packetbeat adds the string ` ...` 
+If the document is trimmed because of this setting, Packetbeat adds the string `...`
 at the end of the document.
 
 Note that limiting documents in this way means that they are no longer correctly
@@ -603,19 +611,19 @@ formatted JSON objects.
 [[maintaining-topology]]
 === Maintaining the Real-Time State of the Network Topology
 
-One important feature of Packetbeat is that it knows the name of the source and 
-destination servers for each transaction. It does this without needing to maintain 
-a central configuration. Instead, each Beat notes the hostname of the server 
+One important feature of Packetbeat is that it knows the name of the source and
+destination servers for each transaction. It does this without needing to maintain
+a central configuration. Instead, each Beat notes the hostname of the server
 where the Beat runs, and maps the hostname to the list of IP addresses of that server.
 
-Packetbeat stores the topology information in an Elasticsearch index, so to save 
-the network topology, you need to use Elasticsearch as output and set the 
-`save_topology` configuration option to true. 
+Packetbeat stores the topology information in an Elasticsearch index, so to save
+the network topology, you need to use Elasticsearch as output and set the
+`save_topology` configuration option to true.
 
 [[configuration-processes]]
 === Processes (Optional)
 
-This section is optional, but configuring the processes enables Packetbeat 
+This section is optional, but configuring the processes enables Packetbeat
 to show you not only the servers that the traffic is flowing between, but
 also the processes. Packetbeat can even show you the traffic between two
 processes running on the same host, which is particularly useful when you
@@ -656,17 +664,17 @@ procs:
       cmdline_grep: gunicorn
 ------------------------------------------------------------------------------
 
-==== Options
+==== Process Monitoring Options
 
 ===== process
 
-The name of the process as it will appear in the published transactions. The name 
-doesn't have to match the name of the executable, so feel free to choose something 
+The name of the process as it will appear in the published transactions. The name
+doesn't have to match the name of the executable, so feel free to choose something
 more descriptive (for example,  "myapp" instead of "gunicorn").
 
 ===== cmdline_grep
 
-The name used to identify the process at run time. When Packetbeat starts, and then 
+The name used to identify the process at run time. When Packetbeat starts, and then
 periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.

@@ -2,7 +2,7 @@
 == Getting Started
 
 The best way to understand the value of a network packet analytics system like
-Packetbeat is to try it on your own traffic. 
+Packetbeat is to try it on your own traffic.
 
 To get started with your own Packetbeat setup, install and configure these related products:
 
@@ -44,19 +44,19 @@ curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-dar
 tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
-NOTE: We also provide 32-bit images that you can get from our 
+NOTE: We also provide 32-bit images that you can get from our
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
 If you are using Windows, see <<windows-install>>.
 
-
+[[configuring-packetbeat]]
 === Configuring Packetbeat
 
-NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you 
+NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you
 configure Packetbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
-Before starting Packetbeat, edit the configuration file. For rpm and deb, you'll 
-find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac, look in 
+Before starting Packetbeat, you need to edit the configuration file. For rpm and deb, you'll
+find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac, look in
 the archive that you just downloaded.
 
 To configure Packetbeat:
