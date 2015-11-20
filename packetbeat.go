@@ -78,7 +78,7 @@ func init() {
 		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
 		Dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
 		PrintDevices: flag.Bool("devices", false, "Print the list of devices and exit"),
-		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait befor shutting down"),
+		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
 	}
 }
 
