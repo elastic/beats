@@ -1,6 +1,6 @@
-== Using HTTPS and Basic Authentication
+== HTTPS and Basic Authentication
 
-To secure the communication between Packetbeat and Elasticsearch, you can use HTTPS and basic authentication. Here is a 
+To secure the communication between Packetbeat and Elasticsearch, you can use HTTPS and basic authentication. Here is a
 sample configuration:
 
 [source,yaml]
@@ -17,10 +17,10 @@ elasticsearch:
 <1> The username to use for authenticating to Elasticsearch.
 <2> The password to use for authenticating to Elasticsearch.
 <3> This setting enables the HTTPS protocol.
-<4> The IP/port of the Elasticsearch nodes. 
+<4> The IP/port of the Elasticsearch nodes.
 
 
-Elasticsearch doesn't have built in basic authentication, but you can achieve it either by using a web proxy or by using the 
+Elasticsearch doesn't have built-in basic authentication, but you can achieve it either by using a web proxy or by using the
 https://www.elastic.co/products/shield[Shield] commercial plugin.
 
 Packetbeat verifies the validity of the server certificates and only accepts trusted certificates. Creating a correct
@@ -49,8 +49,8 @@ elasticsearch:
 
 
 NOTE: For any given connection, the SSL/TLS certificates must have a subject
-that matches the value specified for `hosts`, or the TLS handshake fails. 
-For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST  
-include `foobar` in the subject (`CN=foobar`) or as a subject alternative name 
+that matches the value specified for `hosts`, or the TLS handshake fails.
+For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST
+include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
 (SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then you can associate the IP address with your hostname in `/etc/hosts`
 (on Unix systems).

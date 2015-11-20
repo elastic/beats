@@ -1,8 +1,10 @@
 [[windows-install]]
 == Installing Packetbeat on Windows
 
-This page walks you through the steps required for running Packetbeat on
+This page walks you through the steps required for installing and running Packetbeat on
 Windows. It assumes your Windows system has Powershell installed.
+
+For information about installing on other platforms, see <<packetbeat-getting-started>>.
 
 To install and run Packetbeat:
 
@@ -42,7 +44,7 @@ interfaces:
   device: 0
 ----------------------------------------------------------------------
 +
-You might want to change other settings in the `packetbeat.yml` file. See 
+You might want to change other settings in the `packetbeat.yml` file. See
  <<packetbeat-configuration>> for details.
 
 === Installing Packetbeat as a Windows Service
