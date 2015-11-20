@@ -144,26 +144,80 @@ func TestReaderPartialWithEncodings(t *testing.T) {
 	}
 }
 
-func TestReadLongLines(t *testing.T) {
-	lineLength := 10 * 1024
-	inputLine := make([]byte, lineLength+1)
-	for i := 0; i < lineLength; i++ {
-		char := rand.Intn('z'-'a') + 'a'
-		inputLine[i] = byte(char)
-	}
-	inputLine[len(inputLine)-1] = '\n'
+func TestReadSingleLongLine(t *testing.T) {
+	testReadLineLengths(t, []int{10 * 1024})
+}
 
-	buffer := bytes.NewBuffer(inputLine)
+func TestReadIncreasingLineLengths(t *testing.T) {
+	lineLengths := []int{200, 400, 800, 1000, 2048, 4069}
+	testReadLineLengths(t, lineLengths)
+}
+
+func TestReadDecreasingLineLengths(t *testing.T) {
+	lineLengths := []int{4096, 2048, 1000, 800, 400, 200}
+	testReadLineLengths(t, lineLengths)
+}
+
+func TestReadRandomLineLengths(t *testing.T) {
+	minLength := 100
+	maxLength := 80000
+	numLines := 100
+
+	lineLengths := make([]int, numLines)
+	for i := 0; i < numLines; i++ {
+		lineLengths[i] = rand.Intn(maxLength-minLength) + minLength
+	}
+
+	testReadLineLengths(t, lineLengths)
+}
+
+func testReadLineLengths(t *testing.T, lineLengths []int) {
+	// create lines + stream buffer
+	var lines [][]byte
+	for _, lineLength := range lineLengths {
+		inputLine := make([]byte, lineLength+1)
+		for i := 0; i < lineLength; i++ {
+			char := rand.Intn('z'-'A') + 'A'
+			inputLine[i] = byte(char)
+		}
+		inputLine[len(inputLine)-1] = '\n'
+		lines = append(lines, inputLine)
+	}
+
+	testReadLines(t, lines)
+}
+
+func testReadLines(t *testing.T, inputLines [][]byte) {
+	var inputStream []byte
+	for _, line := range inputLines {
+		inputStream = append(inputStream, line...)
+	}
+
+	// initialize reader
+	buffer := bytes.NewBuffer(inputStream)
 	reader, err := newLineReader(buffer, Plain, buffer.Len())
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
 
-	// read line from reader
-	bytes, sz, err := reader.next()
+	// read lines
+	var lines [][]byte
+	for range inputLines {
+		bytes, _, err := reader.next()
+		if err != nil {
+			t.Fatalf("failed to read all lines from test: %v", err)
+		}
 
-	assert.Nil(t, err)
-	assert.Equal(t, lineLength+1, sz)
-	assert.Equal(t, len(inputLine), len(bytes))
-	assert.Equal(t, inputLine, bytes)
+		lines = append(lines, bytes)
+	}
+
+	// validate
+	for i := range inputLines {
+		assert.Equal(t, len(inputLines[i]), len(lines[i]))
+		assert.Equal(t, inputLines[i], lines[i])
+	}
+}
+
+func testReadLine(t *testing.T, line []byte) {
+	testReadLines(t, [][]byte{line})
 }
