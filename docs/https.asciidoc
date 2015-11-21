@@ -1,4 +1,4 @@
-== Using HTTPS and Basic Authentication
+== HTTPS and Basic Authentication
 
 To secure the communication between a Beat and Elasticsearch, you can use HTTPS
 and basic authentication. Here is an sample configuration:
@@ -48,9 +48,9 @@ elasticsearch:
 
 
 NOTE: For any given connection, the SSL/TLS certificates must have a subject
-that matches the value specified for `hosts`, or the TLS handshake fails. 
-For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST  
-include `foobar` in the subject (`CN=foobar`) or as a subject alternative name 
+that matches the value specified for `hosts`, or the TLS handshake fails.
+For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST
+include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
 (SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then
 you can associate the IP address with your hostname in `/etc/hosts`
 (on Unix systems).
