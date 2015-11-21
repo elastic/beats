@@ -1,38 +1,38 @@
 [[command-line-options]]
 == Command Line Options
 
-The following command line options are available for all Beats. For additional 
-command line options, see the documentation for your Beat. 
+The following command line options are available for all Beats. For additional
+command line options, see the documentation for your Beat.
 
-*-N*:: 
+*`-N`*::
 Disable the publishing of events to the defined output. This option is useful only
 for testing the Beat.
 
-*-c [file]*:: 
+*`-c <file>`*::
 Pass the location of a configuration file for the Beat.
 
-*-cpuprofile [output file]*:: 
+*`-cpuprofile <output file>`*::
 Write CPU profile data to the specified file. This option is useful for
 troubleshooting the Beat.
 
-*-d [selectors]*:: 
-Enable debugging for the specified selectors. For the selectors, you can specify a comma-separated 
-list of components, or you can use `-d "*"` to enable debugging for all components. For example, 
+*`-d <selectors>`*::
+Enable debugging for the specified selectors. For the selectors, you can specify a comma-separated
+list of components, or you can use `-d "*"` to enable debugging for all components. For example,
 `-d "publish"` displays all the "publish" related messages.
 
-*-e*:: 
+*`-e`*::
 Log to stderr and disable syslog/file output.
 
-*-memprofile [output file]*:: 
+*`-memprofile <output file>`*::
 Write memory profile data to the specified output file. This option is useful for
 troubleshooting the Beat.
 
-*-configtest*:: 
+*`-configtest`*::
 Test the configuration file and then exit. This option is useful for
 troubleshooting the configuration of a Beat.
 
-*-v*:: 
+*`-v`*::
 Enable verbose output to show INFO-level messages.
 
-*-version*:: 
+*`-version`*::
 Display the Beat version and exit.

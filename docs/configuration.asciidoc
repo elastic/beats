@@ -1,13 +1,17 @@
 [[configuration]]
 == Configuration Options
 
-The Beats configuration file uses
-http://yaml.org/[YAML] for its syntax. The file consists of the following sections:
+The Beats configuration file uses http://yaml.org/[YAML] for its syntax. The
+file contains config options common to all Beats as well as Beat-specific
+options. This document describes the sections of the config file that are common
+to all Beats:
 
 * <<configuration-shipper>>
 * <<configuration-output>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
+
+For information about Beat-specific sections, see the documentation for your Beat.
 
 [[configuration-shipper]]
 === Shipper
@@ -157,7 +161,7 @@ https://dev.maxmind.com/geoip/legacy/geolite/[GeoLite City database] is required
 
 
 [[configuration-output]]
-=== Outputs
+=== Output
 
 You can configure multiple outputs for exporting the correlated transactions. Currently the following output types are supported:
 
@@ -174,7 +178,7 @@ network topology.
 
 ==== Elasticsearch Output
 
-When you specify elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
 Example configuration:
 
@@ -279,12 +283,12 @@ output:
     path: /elasticsearch
 ------------------------------------------------------------------------------
 
-In the previous example, the Elasticsearch nodes are available at https://10.45.3.2:9220/elasticsearch and
-https://10.45.3.1:9230/elasticsearch.
+In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
+`https://10.45.3.1:9230/elasticsearch`.
 
 ===== worker
 
-Number of workers per configured host publishing events to Elasticsearch. This
+The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
@@ -309,7 +313,7 @@ The basic authentication password for connecting to Elasticsearch.
 
 The name of the protocol Elasticsearch is reachable on. The options are:
 `http` or `https`. The default is `http`. However, if you specify a URL for
-<<hosts-option>>, the value of protocol is overridden by whatever scheme you
+<<hosts-option>>, the value of `protocol` is overridden by whatever scheme you
 specify in the URL.
 
 [[path-option]]
@@ -336,7 +340,7 @@ events have been published.
 If an event is dropped by the output plugin, each Beat implementation must
 determine whether to drop the event or try sending it again. If the send
 operation doesn't succeed after
-max_retries, the Beat is optionally notified.
+`max_retries`, the Beat is optionally notified.
 
 ===== bulk_max_size
 
@@ -345,7 +349,7 @@ The default is 50.
 
 ===== timeout
 
-The http request timeout in seconds for Elasticsearch request. The default is 90.
+The http request timeout in seconds for the Elasticsearch request. The default is 90.
 
 ===== flush_interval
 
@@ -367,7 +371,7 @@ Elasticsearch. The default is 15 seconds.
 ===== tls
 
 Configuration options for TLS parameters like the certificate authority to use
-for HTTPS-based connections. If the tls section is missing, the host CAs are used for HTTPS connections to
+for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
 See <<configuration-output-tls>> for more information.
@@ -441,8 +445,8 @@ output {
 }
 ------------------------------------------------------------------------------
 
-Events indexed into Elasticsearch with shown Logstash configuration will be
-similar to events directly indexed by Beats into Elasticsearch.
+Events indexed into Elasticsearch with the Logstash configuration shown here
+will be similar to events directly indexed by Beats into Elasticsearch.
 
 Here is an example of how to configure the Beat to use Logstash:
 [source,yaml]
@@ -466,7 +470,7 @@ is used as the default port number.
 
 ===== worker
 
-Number of workers per configured host publishing events to Logstash. This
+The number of workers per configured host publishing events to Logstash. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
@@ -505,7 +509,7 @@ For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (for exampl
 ===== tls
 
 Configuration options for TLS parameters like the root CA for Logstash connections. See
-<<configuration-output-tls>> for more information. If the tls section is missing, a TCP-only connection is assumed. Logstash must also be configured to use TCP for
+<<configuration-output-tls>> for more information. If the `tls` section is missing, a TCP-only connection is assumed. Logstash must also be configured to use TCP for
 Logstash input.
 
 ===== timeout
@@ -523,8 +527,7 @@ events have been published.
 
 If an event is dropped by the output plugin, each Beat implementation must
 determine whether to drop the event or try sending it again. If the send
-operation doesn't succeed after
-max_retries, the Beat is optionally notified.
+operation doesn't succeed after `max_retries`, the Beat is optionally notified.
 
 
 [[redis-output]]
@@ -608,6 +611,10 @@ The interval for reconnecting failed Redis connections. The default is 1 second.
 
 ==== File Output
 
+The File output dumps the transactions into a file where each transaction is in a JSON format.
+Currently, this output is used for testing, but it can be used as input for
+Logstash.
+
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
@@ -625,10 +632,6 @@ output:
     number_of_files: 7
 ------------------------------------------------------------------------------
 
-The file output dumps the transactions into a file where each transaction is in a JSON format.
-Currently, this output is used for testing, but it can be used as input for
-Logstash.
-
 [[path]]
 ===== path
 
@@ -643,7 +646,7 @@ generated by default for Packetbeat would be `packetbeat`, `packetbeat.1`, `pack
 ===== rotate_every_kb
 
 The maximum size in kilobytes of each file. When this size is reached, the files are
-rotated. The default value is 10 MB.
+rotated. The default value is 1000 KB.
 
 ===== number_of_files
 
@@ -653,6 +656,8 @@ is 7 files.
 
 ==== Console Output
 
+The Console output writes events in JSON format to stdout.
+
 [source,yaml]
 ------------------------------------------------------------------------------
 output:
@@ -660,11 +665,9 @@ output:
     pretty: true
 ------------------------------------------------------------------------------
 
-The Console output write events in JSON format to stdout.
-
 ===== pretty
 
-If pretty is set events written to stdout will be nicely formatted. The default is false.
+If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
 
 [[configuration-output-tls]]
 
@@ -672,7 +675,7 @@ If pretty is set events written to stdout will be nicely formatted. The default 
 
 ===== certificate_authorities
 
-The list of root certificates for server verifications. If certificate_authorities is empty or not set, the trusted certificate authorities of the host system are used.
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
 
 [[certificate]]
 
@@ -776,11 +779,11 @@ The following elliptic curve types are available:
 * P-521
 
 [[configuration-logging]]
-=== Logging (optional)
+=== Logging (Optional)
 
 The logging section contains options for configuring the Beats logging output.
 The logging system can write logs to syslog or rotate log files. If logging is
-not explicitly configured, file output is used on Windows system, and syslog
+not explicitly configured, file output is used on Windows systems, and syslog
 output is used on Linux and OS X.
 
 [source,yaml]
@@ -824,9 +827,9 @@ The default log level is error.
 ===== selectors
 
 The list of debugging-only selector tags used by different Beats components. Use `*`
-to enable debug output for all components. For example add 'publish' to display
-all the debug messages related to event publishing. when starting the Beat,
-selectors can be overwritten using the '-d' command line option ('-d' also sets
+to enable debug output for all components. For example add `publish` to display
+all the debug messages related to event publishing. When starting the Beat,
+selectors can be overwritten using the `-d` command line option (`-d` also sets
 the debug log level).
 
 ===== files.path
@@ -847,21 +850,25 @@ The default size limit is 10485760 (10 MB).
 
 ===== files.keepfiles
 
-The number of most recent rotated log files to keep on disc. Older files are
-deleted during log rotation. The default value is 7. The keepfiles options has to be
+The number of most recent rotated log files to keep on disk. Older files are
+deleted during log rotation. The default value is 7. The `keepfiles` options has to be
 in the range of 2 to 1024 files.
 
 ==== Logging Format
 
-The logging format is different for each logging type. In case of syslog, syslog adds the timestamp itself.
-For logging to file, the format RFC3339 is used which is `2006-01-02T15:04:05Z07:00 WARN log-message`.
-First is the timestamp with the time zone, then
-the logging level. As logging to stderr should be mainly used for debugging, additional debug information
-is added here. The format is `2015/11/12 09:03:37.369262 geolite.go:52: WARN log-message`. First is the UTC timestamp
-with the milliseconds, then the name of the caller that sent the log entry followed by the log level.
+The logging format is different for each logging type:
+
+* to syslog: Syslog adds the timestamp itself.
+
+* to file: RFC 3339 format is used for the timestamp: `2006-01-02T15:04:05Z07:00 WARN log-message`. The format includes the timezone followed by the logging level.
+
+* to stderr: UTC format is used for the timestamp: `2015/11/12 09:03:37.369262
+geolite.go:52: WARN log-message`. The format includes the UTC timestamp with
+the milliseconds, then the name of the caller that sent the log entry followed
+by the logging level. This option should be used mainly for debugging.
 
 [[configuration-run-options]]
-=== Run options (optional)
+=== Run Options (Optional)
 
 The Beat can drop privileges after creating the sniffing socket.
 Root access is required for opening the socket, but everything else requires no
