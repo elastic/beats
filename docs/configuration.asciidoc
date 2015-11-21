@@ -668,7 +668,7 @@ If pretty is set events written to stdout will be nicely formatted. The default 
 
 [[configuration-output-tls]]
 
-==== TLS options
+==== TLS Options
 
 ===== certificate_authorities
 
