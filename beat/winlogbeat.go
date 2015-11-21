@@ -54,7 +54,6 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
 	eb.client = b.Events
 
-	// If metrics are enabled, host expvars at http://<bindaddress>/debug/vars.
 	if eb.config.Winlogbeat.Metrics.BindAddress != "" {
 		bindAddress := eb.config.Winlogbeat.Metrics.BindAddress
 		sock, err := net.Listen("tcp", bindAddress)
@@ -62,7 +61,7 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 			return err
 		}
 		go func() {
-			logp.Info("HTTP now available at %s", bindAddress)
+			logp.Info("Metrics available at %s/debug/vars", bindAddress)
 			http.Serve(sock, nil)
 		}()
 	}

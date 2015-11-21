@@ -11,11 +11,13 @@ var (
 	modadvapi32 = syscall.NewLazyDLL("advapi32.dll")
 	modkernel32 = syscall.NewLazyDLL("kernel32.dll")
 
-	procOpenEventLogW  = modadvapi32.NewProc("OpenEventLogW")
-	procCloseEventLog  = modadvapi32.NewProc("CloseEventLog")
-	procReadEventLogW  = modadvapi32.NewProc("ReadEventLogW")
-	procLoadLibraryExW = modkernel32.NewProc("LoadLibraryExW")
-	procFormatMessageW = modkernel32.NewProc("FormatMessageW")
+	procOpenEventLogW              = modadvapi32.NewProc("OpenEventLogW")
+	procCloseEventLog              = modadvapi32.NewProc("CloseEventLog")
+	procReadEventLogW              = modadvapi32.NewProc("ReadEventLogW")
+	procLoadLibraryExW             = modkernel32.NewProc("LoadLibraryExW")
+	procFormatMessageW             = modkernel32.NewProc("FormatMessageW")
+	procClearEventLogW             = modadvapi32.NewProc("ClearEventLogW")
+	procGetNumberOfEventLogRecords = modadvapi32.NewProc("GetNumberOfEventLogRecords")
 )
 
 func openEventLog(uncServerName *uint16, sourceName *uint16) (handle Handle, err error) {
@@ -72,6 +74,30 @@ func formatMessage(flags uint32, source Handle, messageId uint32, languageId uin
 	r0, _, e1 := syscall.Syscall9(procFormatMessageW.Addr(), 7, uintptr(flags), uintptr(source), uintptr(messageId), uintptr(languageId), uintptr(unsafe.Pointer(buffer)), uintptr(bufferSize), uintptr(unsafe.Pointer(arguments)), 0, 0)
 	numChars = uint32(r0)
 	if numChars == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _clearEventLog(eventLog Handle, backupFileName *uint16) (err error) {
+	r1, _, e1 := syscall.Syscall(procClearEventLogW.Addr(), 2, uintptr(eventLog), uintptr(unsafe.Pointer(backupFileName)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _getNumberOfEventLogRecords(eventLog Handle, numberOfRecords *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetNumberOfEventLogRecords.Addr(), 2, uintptr(eventLog), uintptr(unsafe.Pointer(numberOfRecords)), 0)
+	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)
 		} else {

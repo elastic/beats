@@ -129,7 +129,7 @@ func (a SID) String() string {
 
 // EventType identifies the five types of events that can be logged by
 // applications.
-type EventType uint8
+type EventType uint16
 
 // EventType values.
 const (

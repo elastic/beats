@@ -1,6 +1,10 @@
 package eventlog
 
-import "golang.org/x/sys/windows"
+import (
+	"syscall"
+
+	"golang.org/x/sys/windows"
+)
 
 // Flags to use with LoadLibraryEx.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms684179(v=vs.85).aspx
@@ -50,3 +54,28 @@ func freeLibrary(handle Handle) error {
 //sys   readEventLog(eventLog Handle, readFlags uint32, recordOffset uint32, buffer *byte, numberOfBytesToRead uint32, bytesRead *uint32, minNumberOfBytesNeeded *uint32) (err error) = advapi32.ReadEventLogW
 //sys   loadLibraryEx(filename *uint16, file Handle, flags uint32) (handle Handle, err error) = kernel32.LoadLibraryExW
 //sys   formatMessage(flags uint32, source Handle, messageId uint32, languageId uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) = kernel32.FormatMessageW
+//sys   _clearEventLog(eventLog Handle, backupFileName *uint16) (err error) = advapi32.ClearEventLogW
+//sys   _getNumberOfEventLogRecords(eventLog Handle, numberOfRecords *uint32) (err error) = advapi32.GetNumberOfEventLogRecords
+
+func clearEventLog(handle Handle, backupFileName string) error {
+	var name *uint16
+	if backupFileName != "" {
+		var err error
+		name, err = syscall.UTF16PtrFromString(backupFileName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return _clearEventLog(handle, name)
+}
+
+func getNumberOfEventLogRecords(handle Handle) (uint32, error) {
+	var numRecords uint32
+	err := _getNumberOfEventLogRecords(handle, &numRecords)
+	if err != nil {
+		return 0, err
+	}
+
+	return numRecords, nil
+}
