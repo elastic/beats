@@ -61,8 +61,12 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 			return err
 		}
 		go func() {
+			err := http.Serve(sock, nil)
+			if err != nil {
+				logp.Warn("Unable to launch HTTP service for metrics. err=%v", err)
+				return
+			}
 			logp.Info("Metrics available at %s/debug/vars", bindAddress)
-			http.Serve(sock, nil)
 		}()
 	}
 
@@ -98,7 +102,13 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 				wg.Done()
 				return
 			}
-			defer api.Close()
+			defer func() {
+				err := api.Close()
+				if err != nil {
+					logp.Warn("EventLog[%s] Close() error: %v", api.Name(), err)
+					return
+				}
+			}()
 
 			logp.Debug("winlogbeat", "EventLog[%s] opened successfully",
 				api.Name())

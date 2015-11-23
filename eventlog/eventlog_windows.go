@@ -126,7 +126,7 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		if err != nil {
 			continue
 		}
-		computerName, extraDataPtr, err := utf16ToString(singleBuf[56+extraDataPtr:])
+		computerName, _, err := utf16ToString(singleBuf[56+extraDataPtr:])
 		if err != nil {
 			continue
 		}
@@ -134,7 +134,7 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		lr := LogRecord{
 			EventLogName:  el.name,
 			RecordNumber:  event.recordNumber,
-			EventId:       event.eventID,
+			EventID:       event.eventID,
 			EventType:     EventType(event.eventType),
 			EventCategory: "Unknown", // TODO: Lookup category string.
 			TimeGenerated: time.Unix(int64(event.timeGenerated), 0),
@@ -145,12 +145,12 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 
 		if event.userSidLength > 0 {
 			sid := (*windows.SID)(unsafe.Pointer(&singleBuf[event.userSidOffset]))
-			account, domain, accountType, err := sid.LookupAccount("")
-			if err != nil {
+			account, domain, accountType, lookupErr := sid.LookupAccount("")
+			if lookupErr != nil {
 				continue
 			}
 
-			lr.UserSid = &SID{
+			lr.UserSID = &SID{
 				Name:    account,
 				Domain:  domain,
 				SIDType: SIDType(accountType),
@@ -183,7 +183,7 @@ func utf16ToString(b []byte) (string, int, error) {
 
 	offset := len(b)/2 + 2
 	s := make([]uint16, len(b)/2)
-	for i, _ := range s {
+	for i := range s {
 		s[i] = uint16(b[i*2]) + uint16(b[(i*2)+1])<<8
 
 		if s[i] == 0 {
@@ -212,7 +212,7 @@ func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRe
 
 	handles := el.handles.get(lr.SourceName)
 	if handles == nil || len(handles) == 0 {
-		message := fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName,
+		message := fmt.Sprintf(noMessageFile, lr.EventID, lr.SourceName,
 			strings.Join(stringInserts, ", "))
 		return message, nil
 	}
@@ -248,7 +248,7 @@ func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRe
 	}
 
 	if message == "" {
-		message = fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName,
+		message = fmt.Sprintf(noMessageFile, lr.EventID, lr.SourceName,
 			strings.Join(stringInserts, ", "))
 	}
 
@@ -294,7 +294,13 @@ func queryEventMessageFiles(eventLogName, sourceName string) ([]Handle, error) {
 		logp.Debug("eventlog", "Failed to open HKLM\\%s", registryKeyName)
 		return nil, err
 	}
-	defer key.Close()
+	defer func() {
+		err := key.Close()
+		if err != nil {
+			logp.Warn("Failed to close registry key. key=%s err=%v",
+				registryKeyName, err)
+		}
+	}()
 	logp.Debug("eventlog", "RegOpenKey opened handle to HKLM\\%s, %v",
 		registryKeyName, key)
 

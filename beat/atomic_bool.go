@@ -5,7 +5,7 @@ import "sync/atomic"
 type AtomicBool struct{ flag int32 }
 
 func (b *AtomicBool) Set(value bool) {
-	var i int32 = 0
+	var i int32
 	if value {
 		i = 1
 	}

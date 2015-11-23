@@ -8,26 +8,27 @@ import (
 	winlogbeat "github.com/elastic/winlogbeat/beat"
 )
 
+// Version of winlogbeat.
 var Version = "0.0.1"
+
+// Name of this beat.
 var Name = "winlogbeat"
 
-var GlobalBeat *beat.Beat
-
 func main() {
-	// Create Beater object
-	fb := &winlogbeat.Winlogbeat{}
+	// Create Beater.
+	wlb := &winlogbeat.Winlogbeat{}
 
-	// Initialize beat objectefile
-	b := beat.NewBeat(Name, Version, fb)
+	// Initialize beat.
+	b := beat.NewBeat(Name, Version, wlb)
 
-	// Additional command line args are used to overwrite config options
+	// Additional command line arguments are used to overwrite config options.
 	b.CommandLineSetup()
 
-	// Loads base config
+	// Load base config.
 	b.LoadConfig()
 
-	// Configures beat
-	err := fb.Config(b)
+	// Configures beat.
+	err := wlb.Config(b)
 	if err != nil {
 		logp.Critical("Config error: %v", err)
 		os.Exit(1)
