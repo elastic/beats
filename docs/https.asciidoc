@@ -1,7 +1,7 @@
 == HTTPS and Basic Authentication
 
 To secure the communication between a Beat and Elasticsearch, you can use HTTPS
-and basic authentication. Here is an sample configuration:
+and basic authentication. Here is a sample configuration:
 
 [source,yaml]
 ----

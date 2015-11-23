@@ -1,7 +1,7 @@
 [[setup-repositories]]
-== Repositories
+== Repositories for APT and YUM
 
-We have repositories available for APT and YUM based distributions. Note that we
+We have repositories available for APT and YUM-based distributions. Note that we
 provide binary packages, but no source packages.
 
 We use the PGP key https://pgp.mit.edu/pks/lookup?op=vindex&search=0xD27D666CD88E42B4[D88E42B4],
@@ -14,43 +14,47 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 [float]
 === APT
 
-Download and install the Public Signing Key:
+To add the Beats repository for APT:
 
+. Download and install the Public Signing Key:
++
 [source,sh]
 --------------------------------------------------
 curl https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add -
 --------------------------------------------------
 
-Save the repository definition to  +/etc/apt/sources.list.d/beats.list+:
-
+. Save the repository definition to  +/etc/apt/sources.list.d/beats.list+:
++
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
 echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list
 
 --------------------------------------------------
-
++
 [WARNING]
 ==================================================
-Use the `echo` method described above to add the Beats repository.  Do not use `add-apt-repository`
-as it will add a `deb-src` entry as well, but we do not provide a source package.
-If you have added the `deb-src` entry, you will see an error like
+To add the Beats repository, make sure that you use the `echo` method  shown
+in the example. Do not use `add-apt-repository` because it will add a `deb-src`
+entry, but we do not provide a source package.
+
+If you have added the `deb-src` entry by mistake, you will see an error like
 the following:
 
     Unable to find expected entry 'main/source/Sources' in Release file (Wrong sources.list entry or malformed file)
 
-Just delete the `deb-src` entry from the `/etc/apt/sources.list` file and the installation should work as expected.
+Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the installation should work as expected.
 ==================================================
 
-Run apt-get update and the repository is ready for use. For example, you can
-install Filebeat with:
-
+. Run `apt-get update`, and the repository is ready for use. For example, you can
+install Filebeat by running:
++
 [source,sh]
 --------------------------------------------------
 sudo apt-get update && sudo apt-get install filebeat
 --------------------------------------------------
 
-To configure the beat to automatically start during boot, run:
-
+. To configure the beat to start automatically during boot, run:
++
 [source,sh]
 --------------------------------------------------
 sudo update-rc.d filebeat defaults 95 10
@@ -59,16 +63,18 @@ sudo update-rc.d filebeat defaults 95 10
 [float]
 === YUM
 
-Download and install the public signing key:
+To add the Beats repository for YUM:
 
+. Download and install the public signing key:
++
 [source,sh]
 --------------------------------------------------
 sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 --------------------------------------------------
 
-Add the following in your `/etc/yum.repos.d/` directory
-in a file with a `.repo` suffix, for example `beats.repo`
-
+. Create a file with a `.repo` extension (for example, `beats.repo`) in
+your `/etc/yum.repos.d/` directory and add the following lines:
++
 ["source","sh",subs="attributes,callouts"]
 --------------------------------------------------
 [beats]
@@ -78,16 +84,17 @@ enabled=1
 gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
 gpgcheck=1
 --------------------------------------------------
-
-And your repository is ready for use. For example, you can install Filebeat with:
-
++
+Your repository is ready to use. For example, you can install Filebeat by
+running:
++
 [source,sh]
 --------------------------------------------------
 sudo yum install filebeat
 --------------------------------------------------
 
-To configure the beat to automatically start during boot, run:
-
+. To configure the beat to start automatically during boot, run:
++
 [source,sh]
 --------------------------------------------------
 sudo chkconfig --add filebeat

@@ -212,8 +212,8 @@ provided by Logstash.
 ==== Updating the Logstash Input Beats Plugin
 
 The latest version of Logstash might not come with the latest version of the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin].
-You can easily update to the latest version of the input plugin from your Logstash installation:
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats Plugin].
+You can easily update to the latest version of the input plugin from your logstash installation:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -319,12 +319,8 @@ cd beats-dashboards-{Dashboards-version}/
 ----------------------------------------------------------------------
 
 NOTE: If Elasticsearch is not running on `127.0.0.1:9200`, you need to
-specify the Elasticsearch location as an argument to the load.sh command:
-
-[source,shell]
--------------------------------------------------------------------------
-./load.sh http://192.168.33.60:9200
--------------------------------------------------------------------------
+specify the Elasticsearch location as an argument to the `load.sh` command:
+`./load.sh http://192.168.33.60:9200`
 
 The load command uploads the example dashboards, visualizations, and searches
 that you can use. The load command also creates index patterns for each Beat:
