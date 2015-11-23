@@ -27,5 +27,4 @@ func main() {
 	}
 
 	b.Run()
-
 }

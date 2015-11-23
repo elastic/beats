@@ -127,7 +127,8 @@ func (self *Cpu) Get() error {
 }
 
 func (self *CpuList) Get() error {
-	return notImplemented()
+	//return notImplemented()
+	return nil
 }
 
 func (self *FileSystemList) Get() error {
