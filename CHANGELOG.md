@@ -2,7 +2,17 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc2...HEAD)
+## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0...HEAD)
+
+### Backward Compatibility Breaks
+
+### Bugfixes
+
+### Added
+
+### Deprecated
+
+## [1.0.0](https://github.com/elastic/filebeat/compare/1.0.0-rc2...1.0.0) - 2015-11-24
 
 ### Backward Compatibility Breaks
 
@@ -14,7 +24,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-rc2](https://github.com/elastic/libbeat/compare/1.0.0-rc1...1.0.0-rc2) - 2015-11-17
+## [1.0.0-rc2](https://github.com/elastic/filebeat/compare/1.0.0-rc1...1.0.0-rc2) - 2015-11-17
 
 ### Backward Compatibility Breaks
 - Removed utf-16be-bom encoding support. Support will be added with fix for #205
@@ -32,7 +42,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Deprecated
 
-## [1.0.0-rc1](https://github.com/elastic/libbeat/compare/1.0.0-beta4...1.0.0-rc1)
+## [1.0.0-rc1](https://github.com/elastic/filebeat/compare/1.0.0-beta4...1.0.0-rc1)
 
 ### Backward Compatibility Breaks
 - Rename the timestamp field with @timestamp #168
