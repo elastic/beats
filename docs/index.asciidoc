@@ -2,17 +2,16 @@
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 :version: master
 
-
 include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::./fields.asciidoc[]
+include::./windows.asciidoc[]
 
-// include::./configuration.asciidoc[]
+include::./configuration.asciidoc[]
 
 include::./command-line.asciidoc[]
 
-include::./windows.asciidoc[]
+include::./fields.asciidoc[]
 
 // include::./troubleshooting.asciidoc[]
