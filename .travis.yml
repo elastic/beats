@@ -16,6 +16,11 @@ script:
   - make deps
   - make
 
+  # Workaround for what seems to be a Travis bug.
+  # see this build: https://travis-ci.org/elastic/beats-packer/builds/92581404
+  # Should remove this after some time if it gets fixed.
+  - rvm use ruby-2.2.3
+
 deploy:
   provider: s3
   access_key_id: AKIAJN76ZXKCEHHRGBGA
