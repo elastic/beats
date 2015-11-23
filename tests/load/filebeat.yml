@@ -8,7 +8,7 @@ filebeat:
       #fields:
       #  level: debug
       #  review: 1
-      ignore_older: 10m
+      ignore_older: 24h
       scan_frequency: 0s
       harvester_buffer_size: 1000000
 

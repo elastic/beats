@@ -37,7 +37,7 @@ class Test(TestCase):
         # wait for the "Skipping file" log message
         self.wait_until(
             lambda: self.log_contains(
-                "Skipping file (older than ignore older of 1s):"),
+                "Skipping file (older than ignore older of 1s"),
             max_timeout=10)
 
         proc.kill_and_wait()
@@ -73,3 +73,33 @@ class Test(TestCase):
 
         objs = self.read_output()
         assert len(objs) == 5
+
+    def test_rotating_ignore_older_larger_write_rate(self):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            ignoreOlder="1s",
+            scan_frequency="0.1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test.log"
+
+        proc = self.start_filebeat(debug_selectors=['*'])
+        time.sleep(1)
+
+        rotations = 2
+        iterations = 3
+        for r in range(rotations):
+            with open(testfile, 'w', 0) as file:
+                for n in range(iterations):
+                    file.write("hello world {}\n".format(r * iterations + n))
+                    time.sleep(0.1)
+            os.rename(testfile, testfile + str(time.time()))
+
+        lines = rotations * iterations
+        self.wait_until(
+            # allow for events to be send multiple times due to log rotation
+            lambda: self.output_count(lambda x: x >= lines),
+            max_timeout=15)
+
+        proc.kill_and_wait()

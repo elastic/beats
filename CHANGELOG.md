@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file based on the
 ## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0...HEAD)
 
 ### Backward Compatibility Breaks
+- set default ignore_older to 24 hours
 
 ### Bugfixes
 

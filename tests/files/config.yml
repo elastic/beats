@@ -12,7 +12,7 @@ filebeat:
         level: debug
         review: 1
         type: log
-      ignore_older: 10m
+      ignore_older: 24h
       scan_frequency: 10s
       harvester_buffer_size: 5000
       tail_files: false

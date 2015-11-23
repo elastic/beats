@@ -44,7 +44,7 @@ filebeat:
 
       # Ignore files which were modified more then the defined timespan in the past
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-      #ignore_older: 10m
+      #ignore_older: 24h
 
       # Type to be published in the 'type' field. For Elasticsearch output,
       # the type defines the document type these entries should be stored
