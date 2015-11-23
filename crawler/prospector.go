@@ -300,7 +300,10 @@ func (p *Prospector) checkNewFile(newinfo *ProspectorFileStat, file string, outp
 			h.Start()
 		} else {
 			// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-			logp.Debug("prospector", "Skipping file (older than ignore older of %v): %s", p.ProspectorConfig.IgnoreOlderDuration, file)
+			logp.Debug("prospector", "Skipping file (older than ignore older of %v, %v): %s",
+				p.ProspectorConfig.IgnoreOlderDuration,
+				time.Since(newinfo.Fileinfo.ModTime()),
+				file)
 			newinfo.Harvester <- newinfo.Fileinfo.Size()
 		}
 	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {

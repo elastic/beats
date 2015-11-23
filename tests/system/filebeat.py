@@ -199,9 +199,22 @@ class TestCase(unittest.TestCase):
         """
         Returns true if the output has a given number of lines.
         """
+        return self.output_count(
+            lambda x: lines == x,
+            output_file)
+
+    def output_between(self, start, end, output_file="output/filebeat"):
+        return self.output_count(
+            lambda x: start <= x <= end,
+            output_file)
+
+    def output_count(self, pred, output_file="output/filebeat"):
+        """
+        Returns true if the output line count predicate returns true
+        """
         try:
             with open(os.path.join(self.working_dir, output_file), "r") as f:
-                return len([1 for line in f]) == lines
+                return pred(len([1 for line in f]))
         except IOError:
             return False
 

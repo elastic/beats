@@ -90,7 +90,7 @@ If the custom field names conflict with other field names added by Filebeat, the
 
 If this option is specified, Filebeat
 ignores any files that were modified before the specified timespan.
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 10m.
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 24h.
 
 
 ===== scan_frequency
