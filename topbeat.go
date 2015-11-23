@@ -361,18 +361,18 @@ func (t *Topbeat) addCpuPercentageList(t2 []CpuTimes) {
 
 	if t1 != nil && t2 != nil && len(t1) == len(t2) {
 
+		calculate := func(field2 uint64, field1 uint64, all_delta uint64) float64 {
+
+			perc := 0.0
+			delta := field2 - field1
+			perc = float64(delta) / float64(all_delta)
+			return Round(perc, .5, 2)
+		}
+
 		for i := 0; i < len(t1); i++ {
 			all_delta := t2[i].sum() - t1[i].sum()
-
-			calculate := func(field2 uint64, field1 uint64) float64 {
-
-				perc := 0.0
-				delta := field2 - field1
-				perc = float64(delta) / float64(all_delta)
-				return Round(perc, .5, 2)
-			}
-			t2[i].UserPercent = calculate(t2[i].User, t1[i].User)
-			t2[i].SystemPercent = calculate(t2[i].System, t1[i].System)
+			t2[i].UserPercent = calculate(t2[i].User, t1[i].User, all_delta)
+			t2[i].SystemPercent = calculate(t2[i].System, t1[i].System, all_delta)
 		}
 
 	}
