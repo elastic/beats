@@ -5,7 +5,6 @@ All notable changes to this project will be documented in this file based on the
 ## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0...HEAD)
 
 ### Backward Compatibility Breaks
-- set default ignore_older to 24 hours
 
 ### Bugfixes
 
@@ -20,6 +19,7 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 - Fix problem that harvesters stopped reading after some time and filebeat stopped processing events #257
 - Fix line truncating by internal buffers being reused by accident #258
+- Set default ignore_older to 24 hours #282
 
 ### Added
 
