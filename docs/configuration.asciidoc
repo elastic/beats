@@ -671,7 +671,7 @@ If `pretty` is set to true, events written to stdout will be nicely formatted. T
 
 [[configuration-output-tls]]
 
-==== TLS options
+==== TLS Options
 
 ===== certificate_authorities
 
