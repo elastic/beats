@@ -69,7 +69,7 @@ conversion to create a Filebeat config file for each Logstash Forwarder config f
 Before migrating your config files, we recommend that you first read the <<filebeat-configuration-details>>
 section to understand the Filebeat options.
 
-NOTE: Logstash Forwarder has the option of auto completing environment variables in
+NOTE: Logstash Forwarder has the option of autocompleting environment variables in
 the configuration file. This option currently doesn't exist in Filebeat.
 
 ==== Migrating the "files" Section
@@ -341,27 +341,29 @@ The `config_dir` option specifies the path to the directory that contains additi
 
 |`-cpuProfileFile`
 |
-|`cpuProfileFile` option was removed. You can use the profiling options of libbeat instead. For more details on profiling, see https://github.com/elastic/libbeat/issues/122.
+|`cpuProfileFile` was removed. You can use the profiling options of libbeat instead. For more details on profiling, see https://github.com/elastic/libbeat/issues/122.
 
 |`-quiet`
 |
-|The `quiet` option was removed. Libbeat is now used for logging, so you must use the libbeat {libbeat}/configuration.html#configuration-logging[logging options] instead.
+|`quiet` was removed. Libbeat is now used for logging, so you must use the libbeat {libbeat}/configuration.html#configuration-logging[logging options] instead.
 
 
 |===
 
 
-=== Changes in the output fields
+=== Changes to the Output Fields
 
 In the default configuration, Filebeat structures its output documents a little
-different from the Logstash Forwarder. This section discusses the differences
+differently from the Logstash Forwarder. This section discusses the differences
 and the options you have in case you want compatibility with the Logstash
 Forwarder.
 
-One such difference is that the custom fields (added from the configuration
-file) are set top level in Logstash Forwarder but are grouped together under a
-`fields` dictionary in Filebeat. If you need the old behavior during the
-migration phase, you can use the <<fields-under-root>> configuration option:
+==== Custom Fields are Grouped Under a "fields" Dictionary
+
+The custom fields (added from the configuration file) are set as top-level
+fields in Logstash Forwarder but are grouped together under a `fields`
+dictionary in Filebeat. If you need the old behavior during the migration phase,
+you can use the <<fields-under-root>> configuration option:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -376,14 +378,17 @@ filebeat:
       fields_under_root: true
 -------------------------------------------------------------------------------------
 
-Another difference is that while the Logstash Forwarder sends the hostname of
-the server it is running on in the `host` field, Filebeat uses the
-`beat.hostname` field for the same purpose. Because `host` is commonly used in
-the Logstash plugin ecosystem, the Beats input plugin automatically copies
-`beat.hostname` into `host`.
+==== Filebeat uses "beat.hostname" for Sending the Hostname of the Server
 
-Similarly, the `file` field was renamed to `source`. If you rely on this field
-being named `file` you can rename it by using the mutate filter in Logstash. For
+While the Logstash Forwarder sends the hostname of the server it's running on in
+the `host` field, Filebeat uses the `beat.hostname` field for the same purpose.
+Because `host` is commonly used in the Logstash plugin ecosystem, the Beats
+input plugin automatically copies `beat.hostname` into `host`.
+
+==== The "file" Field Was Renamed to "source"
+
+The `file` field was renamed to `source`. If you rely on this field being
+named `file`, you can rename it by using the mutate filter in Logstash. For
 example:
 
 [source,plain]
@@ -397,8 +402,10 @@ filter {
 }
 -------------------------------------------------------------------------------------
 
-Finally, the `line` field was removed. This field wasn't correct in case of
-restarts and making it correct would require a performance penalty. We recommend
+==== The "line" Field Was Removed
+
+The `line` field was removed. This field wasn't correct after restarts, and
+making it correct would have resulted in a performance penalty. We recommend
 using the `offset` field instead.
 
 === Other Changes
