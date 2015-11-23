@@ -16,10 +16,10 @@ script:
   - make deps
   - make
 
-  # Workaround for what seems to be a Travis bug.
-  # see this build: https://travis-ci.org/elastic/beats-packer/builds/92581404
-  # Should remove this after some time if it gets fixed.
-  - rvm use ruby-2.2.3
+# Workaround for Travis bug. Should be removed after this ticket is closed:
+# https://github.com/travis-ci/travis-ci/issues/5145
+before_deploy:
+  - gem install mime-types -v 2.6.2
 
 deploy:
   provider: s3
