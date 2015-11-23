@@ -179,3 +179,26 @@ class Test(TestCase):
         assert "response" in o
         assert "elastic.co" in o["request"]
         assert "include:_spf.google.com" in o["response"]
+    
+    def test_tcp_axfr(self):
+        """
+        Should correctly interpret a TCP AXFR query
+        """
+        self.render_config_template(
+            dns_ports=[53],
+            dns_send_request=True,
+            dns_send_response=True
+        )
+        self.run_packetbeat(pcap="dns_tcp_axfr.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert o["type"] == "dns"
+        assert o["transport"] == "udp"
+        assert o["method"] == "QUERY"
+        assert "request" in o
+        assert "response" in o
+        assert "elastic.co" in o["request"]
+        assert "include:_spf.google.com" in o["response"]
