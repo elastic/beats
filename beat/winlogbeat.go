@@ -27,7 +27,7 @@ type Winlogbeat struct {
 	beat      *beat.Beat                 // Common beat information.
 	config    *config.ConfigSettings     // Configuration settings.
 	eventLogs []eventlog.EventLoggingAPI // Interface to the event logs.
-	stop      AtomicBool                 // Boolean flag to initiate shutdown of main event loop.
+	done      chan struct{}              // Channel to initiate shutdown of main event loop.
 	client    publisher.Client           // Interface to publish event.
 }
 
@@ -53,6 +53,7 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
 	eb.client = b.Events
+	eb.done = make(chan struct{})
 
 	if eb.config.Winlogbeat.Metrics.BindAddress != "" {
 		bindAddress := eb.config.Winlogbeat.Metrics.BindAddress
@@ -61,12 +62,12 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 			return err
 		}
 		go func() {
+			logp.Info("Metrics hosted at http://%s/debug/vars", bindAddress)
 			err := http.Serve(sock, nil)
 			if err != nil {
 				logp.Warn("Unable to launch HTTP service for metrics. err=%v", err)
 				return
 			}
-			logp.Info("Metrics available at %s/debug/vars", bindAddress)
 		}()
 	}
 
@@ -113,7 +114,14 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 			logp.Debug("winlogbeat", "EventLog[%s] opened successfully",
 				api.Name())
 
-			for !eb.stop.Get() {
+		loop:
+			for {
+				select {
+				case <-eb.done:
+					break loop
+				default:
+				}
+
 				records, err := api.Read()
 				if err != nil {
 					logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
@@ -178,9 +186,5 @@ func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 
 func (eb *Winlogbeat) Stop() {
 	logp.Info("Initiating shutdown, please wait.")
-	// TODO: Remove atomic bool and use a channel to signal shutdown. Caution:
-	// Stop() can be invoked more than once on Windows when you Ctrl+C (one
-	// callback for svc shutdown and one for the Ctrl+C) which might cause a
-	// double golang channel close bug.
-	eb.stop.Set(true)
+	close(eb.done)
 }
