@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Bugfixes
 - Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
+- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
 
 ### Added
 
