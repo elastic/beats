@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file based on the
 ## [1.0.0](https://github.com/elastic/topbeat/compare/1.0.0-rc2...1.0.0) - 2015-11-24
 
 ### Backward Compatibility Breaks
+- Change proc type to process #138
 
 ### Bugfixes
 
