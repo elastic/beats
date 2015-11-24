@@ -90,7 +90,6 @@ class Test(TestCase):
                 "Harvester started for file: -"),
             max_timeout=10)
 
-
         iterations1 = 5
         for n in range(0, iterations1):
             os.write(proc.stdin_write, "Hello World\n")
@@ -98,7 +97,6 @@ class Test(TestCase):
         self.wait_until(
             lambda: self.output_has(lines=iterations1),
             max_timeout=15)
-
 
         iterations2 = 10
         for n in range(0, iterations2):

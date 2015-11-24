@@ -16,7 +16,7 @@ func NewHarvester(
 	prospectorCfg config.ProspectorConfig,
 	cfg *config.HarvesterConfig,
 	path string,
-	signal chan int64,
+	stat *FileStat,
 	spooler chan *input.FileEvent,
 ) (*Harvester, error) {
 	encoding, ok := findEncoding(cfg.Encoding)
@@ -28,7 +28,7 @@ func NewHarvester(
 		Path:             path,
 		ProspectorConfig: prospectorCfg,
 		Config:           cfg,
-		FinishChan:       signal,
+		Stat:             stat,
 		SpoolerChan:      spooler,
 		encoding:         encoding,
 		backoff:          prospectorCfg.Harvester.BackoffDuration,
@@ -43,7 +43,7 @@ func (h *Harvester) Harvest() {
 
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
-		h.FinishChan <- h.Offset
+		h.Stat.Return <- h.Offset
 		// Make sure file is closed as soon as harvester exits
 		h.file.Close()
 	}()
