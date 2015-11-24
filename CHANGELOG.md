@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
 
 ### Added
 
