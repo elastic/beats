@@ -5,18 +5,20 @@ Before modifying configuration settings, make sure you've read
 <<configuring-packetbeat>>.
 
 The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The file consists of the following sections:
+The file contains config options common to all Beats. These options are described
+in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
+
 
 * {libbeat}/configuration.html#configuration-shipper[Shipper]
+* {libbeat}/configuration.html#configuration-output[Output]
+* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
+* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
+
+The Packetbeat config options are described here:
+
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
-* {libbeat}/configuration.html#configuration-output[Output]
-* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
-
-The `shipper`, `output`, and `runoptions` sections contain configuration options
-that are common to all Beats, so they are covered in the
-{libbeat}/configuration.html[Beats Platform Reference].
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.
