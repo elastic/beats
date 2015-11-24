@@ -22,12 +22,12 @@ type Beater interface {
 	Stop()
 }
 
-// Extended Beater interface for additional CLI handling before loading the
-// config file
-type CLIBeater interface {
-	Beater
-
-	CLIFlags(*Beat)
+// FlagsHandler (optional) Beater extension for
+// handling flags input on startup. The HandleFlags callback will
+// be called after parsing the command line arguments and handling
+// the '--help' or '--version' flags.
+type FlagsHandler interface {
+	HandleFlags(*Beat)
 }
 
 // Basic beat information
@@ -106,8 +106,8 @@ func (beat *Beat) CommandLineSetup() {
 	}
 
 	// if beater implements CLIFlags for additional CLI handling, call it now
-	if cliExtra, ok := beat.BT.(CLIBeater); ok {
-		cliExtra.CLIFlags(beat)
+	if flagsHandler, ok := beat.BT.(FlagsHandler); ok {
+		flagsHandler.HandleFlags(beat)
 	}
 }
 
