@@ -5,6 +5,13 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
+)
+
+// Debug logging functions for this package.
+var (
+	debugf  = logp.MakeDebug("eventlog")
+	detailf = logp.MakeDebug("eventlog_detail")
 )
 
 // EventLoggingAPI provides an interface to the Event Logging API introduced in
@@ -35,6 +42,7 @@ type eventLog struct {
 	readBuf       []byte       // Re-usable buffer for reading in events.
 	formatBuf     []byte       // Re-usable buffer for formatting messages.
 	handles       *handleCache // Cached mapping of source name to event message file handles.
+	logPrefix     string       // Prefix to add to all log entries.
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -48,6 +56,7 @@ func newEventLog(uncServerPath, eventLogName string) *eventLog {
 		name:          eventLogName,
 		handles: newHandleCache(eventLogName, queryEventMessageFiles,
 			freeLibrary),
+		logPrefix: fmt.Sprintf("EventLog[%s]", eventLogName),
 	}
 	return el
 }

@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	maxEventBufferSize         = 0x7ffff // Maximum buffer size supported by ReadEventLog.
-	maxFormatMessageBufferSize = 1 << 16 // Maximum buffer size supported by FormatMessage.
+	maxEventBufferSize         = 0x7ffff                                 // Maximum buffer size supported by ReadEventLog.
+	maxFormatMessageBufferSize = 1 << 16                                 // Maximum buffer size supported by FormatMessage.
+	winEventLogRecordSize      = int(unsafe.Sizeof(winEventLogRecord{})) // Size in bytes of winEventLogRecord.
 )
 
 const (
@@ -52,7 +53,7 @@ type winEventLogRecord struct {
 	dataLength          uint32 // size of the event-specific data in bytes
 	dataOffset          uint32 // offset of the event-specific information within this event log record, in bytes
 	//
-	// Then follow:
+	// Then follows the extra data.
 	//
 	// TCHAR SourceName[]
 	// TCHAR Computername[]
@@ -79,6 +80,8 @@ func (el *eventLog) Open(recordNumber uint32) error {
 		return err
 	}
 
+	detailf("%s Open(recordNumber=%d) calling openEventLog(uncServerPath=%s, providerName=%s)",
+		el.logPrefix, recordNumber, el.uncServerPath, el.name)
 	handle, err := openEventLog(uncServerPath, providerName)
 	if err != nil {
 		return err
@@ -86,9 +89,9 @@ func (el *eventLog) Open(recordNumber uint32) error {
 
 	numRecords, err := getNumberOfEventLogRecords(handle)
 	if err != nil {
-		logp.Warn("EventLog[%s] Could not obtain total number of records: ", el.name)
+		logp.Warn("%s Could not obtain total number of records: ", el.logPrefix)
 	} else {
-		logp.Info("EventLog[%s] contains %d records", el.name, numRecords)
+		logp.Info("%s contains %d records", el.logPrefix, numRecords)
 	}
 
 	el.handle = handle
@@ -101,9 +104,16 @@ func (el *eventLog) Open(recordNumber uint32) error {
 
 func (el *eventLog) Read() ([]LogRecord, error) {
 	var numBytesRead, minBytesToRead uint32
-	err := readEventLog(el.handle,
-		EVENTLOG_SEQUENTIAL_READ|EVENTLOG_FORWARDS_READ, 0,
-		&el.readBuf[0], uint32(len(el.readBuf)), &numBytesRead, &minBytesToRead)
+
+	// TODO: Use EVENTLOG_SEEK_READ for the first read to resume.
+	err := readEventLog(
+		el.handle,
+		EVENTLOG_SEQUENTIAL_READ|EVENTLOG_FORWARDS_READ,
+		0, // recordOffset
+		&el.readBuf[0],
+		uint32(len(el.readBuf)),
+		&numBytesRead,
+		&minBytesToRead)
 	if err != nil {
 		errno, ok := err.(syscall.Errno)
 		if ok && errno == syscall.ERROR_HANDLE_EOF {
@@ -114,20 +124,25 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		// ERROR_EVENTLOG_FILE_CHANGED.
 		return nil, err
 	}
+	detailf("%s ReadEventLog read %d bytes", el.logPrefix, numBytesRead)
 
 	var records []LogRecord
-	var readPtr uint32
-	for readPtr < numBytesRead {
-		event := (*winEventLogRecord)(unsafe.Pointer(&el.readBuf[readPtr]))
-		singleBuf := el.readBuf[readPtr : readPtr+event.length]
-		readPtr += event.length
+	var readOffset uint32
+	for readOffset < numBytesRead {
+		event := (*winEventLogRecord)(unsafe.Pointer(&el.readBuf[readOffset]))
+		singleBuf := el.readBuf[readOffset : readOffset+event.length]
+		readOffset += event.length
 
-		sourceName, extraDataPtr, err := utf16ToString(singleBuf[56:])
+		sourceName, extraDataOffset, err := utf16ToString(singleBuf[winEventLogRecordSize:])
 		if err != nil {
+			logp.Warn("%s Failed to read sourceName from event "+
+				"data. Skipping event. event=%v, %v", el.logPrefix, event, err)
 			continue
 		}
-		computerName, _, err := utf16ToString(singleBuf[56+extraDataPtr:])
+		computerName, _, err := utf16ToString(singleBuf[winEventLogRecordSize+extraDataOffset:])
 		if err != nil {
+			logp.Warn("%s Failed to read computerName from event "+
+				"data. Skipping event. event=%v, %v", el.logPrefix, event, err)
 			continue
 		}
 
@@ -147,6 +162,9 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 			sid := (*windows.SID)(unsafe.Pointer(&singleBuf[event.userSidOffset]))
 			account, domain, accountType, lookupErr := sid.LookupAccount("")
 			if lookupErr != nil {
+				logp.Warn("%s Failed to lookup account associated "+
+					"with SID. UserSID will be nil. event=%v, %v",
+					el.logPrefix, event, err)
 				continue
 			}
 
@@ -159,18 +177,23 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 
 		message, err := el.formatMessage(event, singleBuf, lr)
 		if err != nil {
-			logp.Warn("Error formatting message.", err)
+			logp.Warn("%s Failed to format message. Skipping event. "+
+				"event=%v, %v", el.logPrefix, event, err)
 			continue
 		}
 		lr.Message = message
-		logp.Debug("eventlog", "LogRecord %s", lr)
+
+		detailf("%s Read log record from buffer[%d:%d] (len=%d). %s",
+			el.logPrefix, readOffset-event.length, readOffset, event.length, lr)
 		records = append(records, lr)
 	}
 
+	debugf("%s Read() is returning %d log records", el.logPrefix, len(records))
 	return records, nil
 }
 
 func (el *eventLog) Close() error {
+	debugf("%s Closing handle", el.logPrefix)
 	return closeEventLog(el.handle)
 }
 
@@ -202,24 +225,35 @@ func utf16ToString(b []byte) (string, int, error) {
 // the template with the parameters and returns the resulting string.
 //
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa363651(v=vs.85).aspx#_win32_description_strings
-func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRecord) (string, error) {
+func (el *eventLog) formatMessage(
+	event *winEventLogRecord,
+	buf []byte,
+	lr LogRecord,
+) (string, error) {
 	// Get string values and addresses of the inserts:
 	stringInserts, stringInsertPtrs, err := getStrings(event, buf)
 	if err != nil {
-		logp.Warn("Failed to get string inserts.", err)
+		logp.Warn("%s Failed to get string inserts for "+
+			"parameterized message. event=%v, %v", el.logPrefix, event, err)
 		return "", err
 	}
+	detailf("%s eventID=%d, recordNumber=%d, String inserts are [%s]. ",
+		el.logPrefix, event.eventID, event.recordNumber,
+		strings.Join(stringInserts, ","))
 
-	handles := el.handles.get(lr.SourceName)
-	if handles == nil || len(handles) == 0 {
-		message := fmt.Sprintf(noMessageFile, lr.EventID, lr.SourceName,
-			strings.Join(stringInserts, ", "))
-		return message, nil
-	}
-
+	var handles []Handle
 	var addr *uintptr
 	if stringInsertPtrs != nil && len(stringInsertPtrs) > 0 {
 		addr = &stringInsertPtrs[0]
+
+		handles = el.handles.get(lr.SourceName)
+		if handles == nil || len(handles) == 0 {
+			detailf("%s Could not get any handles to event message files for "+
+				"sourceName=%s, handles=%v", el.logPrefix, lr.SourceName, handles)
+			message := fmt.Sprintf(noMessageFile, lr.EventID, lr.SourceName,
+				strings.Join(stringInserts, ", "))
+			return message, nil
+		}
 	}
 
 	var message string
@@ -235,16 +269,24 @@ func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRe
 			uint32(len(el.formatBuf)),
 			addr)
 		if err != nil {
-			// Try the next handle to see if a message can be found.
-			logp.Debug("eventlog", "Failed to find message. Trying next handle.")
+			detailf("%s Failed to format message for eventID=%d with event "+
+				"message file handle=%v. Will try next handle if there are more",
+				el.logPrefix, event.eventID, handle)
 			continue
 		}
 
 		message, _, err = utf16ToString(el.formatBuf[:numChars*2])
 		if err != nil {
-			// Found a handle that provides the message.
+			detailf("%s Failed to convert UTF16 buffer[:%d] to string. event=%v",
+				el.logPrefix, numChars*2, event)
 			break
 		}
+
+		// Cleanup windows line endings.
+		message = strings.Replace(message, "\r\n", "\n", -1)
+		message = strings.TrimRight(message, "\n")
+		detailf("%s Formatted message. eventID=%d, recordNumber=%d, message='%s'",
+			el.logPrefix, event.eventID, event.recordNumber, message)
 	}
 
 	if message == "" {
@@ -264,7 +306,6 @@ func getStrings(event *winEventLogRecord, buf []byte) ([]string, []uintptr, erro
 	for i := 0; i < int(event.numStrings); i++ {
 		evtStr, length, err := utf16ToString(buf[offset:])
 		if err != nil {
-			logp.Warn("Failed to convert from UTF16 to string %v", err)
 			return nil, nil, err
 		}
 		inserts[i] = evtStr
@@ -276,23 +317,18 @@ func getStrings(event *winEventLogRecord, buf []byte) ([]string, []uintptr, erro
 }
 
 // queryEventMessageFiles queries the registry to get the value of
-// the EventMessageFile key that points to a DLL or EXE containing templated
+// the EventMessageFile key that points to a DLL or EXE containing parameterized
 // event log messages. If found, it loads the libraries as a datafiles and
-// returns a slice of Handles.
-func queryEventMessageFiles(eventLogName, sourceName string) ([]Handle, error) {
-	// Attempt to find the event message file in the registry and then store
-	// a Handle to it in the cache, or store nil if an event message file does
-	// not exist for the source name.
-
+// returns a slice of Handles to the libraries.
+func queryEventMessageFiles(providerName, sourceName string) ([]Handle, error) {
 	// Open key in registry:
 	registryKeyName := fmt.Sprintf(
 		"SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
-		eventLogName, sourceName)
+		providerName, sourceName)
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE, registryKeyName,
 		registry.QUERY_VALUE)
 	if err != nil {
-		logp.Debug("eventlog", "Failed to open HKLM\\%s", registryKeyName)
-		return nil, err
+		return nil, fmt.Errorf("Failed to open HKLM\\%s", registryKeyName)
 	}
 	defer func() {
 		err := key.Close()
@@ -301,43 +337,45 @@ func queryEventMessageFiles(eventLogName, sourceName string) ([]Handle, error) {
 				registryKeyName, err)
 		}
 	}()
-	logp.Debug("eventlog", "RegOpenKey opened handle to HKLM\\%s, %v",
+	logp.Debug("eventlog", "RegOpenKey opened handle to HKLM\\%s, key=%v",
 		registryKeyName, key)
 
 	// Read value from registry:
 	value, _, err := key.GetStringValue("EventMessageFile")
 	if err != nil {
-		logp.Debug("eventlog", "Failed querying EventMessageFile from HKLM\\%s", registryKeyName)
-		return nil, err
+		return nil, fmt.Errorf("Failed querying EventMessageFile from "+
+			"HKLM\\%s. %v", registryKeyName, err)
 	}
 	value, err = registry.ExpandString(value)
 	if err != nil {
 		return nil, err
 	}
 
-	// Split the value in case there is more than one file specified.
+	// Split the value in case there is more than one file in the value.
 	eventMessageFiles := strings.Split(value, ";")
 	logp.Debug("eventlog", "RegQueryValueEx queried EventMessageFile from "+
-		"HKLM\\%s and got %v", registryKeyName, eventMessageFiles)
+		"HKLM\\%s and got [%s]", registryKeyName,
+		strings.Join(eventMessageFiles, ","))
 
+	// Load the libraries:
 	var handles []Handle
 	for _, eventMessageFile := range eventMessageFiles {
 		sPtr, err := syscall.UTF16PtrFromString(eventMessageFile)
 		if err != nil {
-			logp.Debug("Failed to get UTF16Ptr for '%s' (%v). Skipping",
-				eventMessageFile, err)
+			logp.Debug("eventlog", "Failed to get UTF16Ptr for '%s'. "+
+				"Skipping. %v", eventMessageFile, err)
 			continue
 		}
 		handle, err := loadLibraryEx(sPtr, 0, LOAD_LIBRARY_AS_DATAFILE)
 		if err != nil {
-			logp.Debug("eventlog", "Failed to load library '%s' as data file:"+
-				"%v", eventMessageFile, err)
+			logp.Debug("eventlog", "Failed to load library '%s' as data file. "+
+				"Skipping. %v", eventMessageFile, err)
 			continue
 		}
 		handles = append(handles, handle)
 	}
 
-	logp.Debug("eventlog", "Returning handles %v for sourceName %s",
-		handles, sourceName)
+	logp.Debug("eventlog", "Returning handles %v for sourceName %s", handles,
+		sourceName)
 	return handles, nil
 }
