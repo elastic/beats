@@ -1,4 +1,4 @@
-= Topbeat reference
+= Topbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.0.0
 :version: 1.0.0
 
