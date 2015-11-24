@@ -89,7 +89,7 @@ func (el *eventLog) Open(recordNumber uint32) error {
 
 	numRecords, err := getNumberOfEventLogRecords(handle)
 	if err != nil {
-		logp.Warn("%s Could not obtain total number of records: ", el.logPrefix)
+		logp.Warn("%s Could not obtain total number of records", el.logPrefix)
 	} else {
 		logp.Info("%s contains %d records", el.logPrefix, numRecords)
 	}
