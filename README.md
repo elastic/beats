@@ -19,7 +19,7 @@ You can find the documentation on the [elastic.co](https://www.elastic.co/guide/
 
 There are three types of documents exported:
 - `type: system` for system wide statistics
-- `type: proc` for per process statistics. One per process.
+- `type: process` for per process statistics. One per process.
 - `type: filesystem` for disk usage statistics. One per mount point.
 
 System statistics:
