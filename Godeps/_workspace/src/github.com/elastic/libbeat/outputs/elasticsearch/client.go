@@ -241,14 +241,16 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 }
 
 func (conn *Connection) Ping(timeout time.Duration) (bool, error) {
+	debug("ES Ping(url=%v, timeout=%v)", conn.URL, timeout)
+
 	conn.http.Timeout = timeout
-	resp, err := conn.http.Head(conn.URL)
+	status, _, err := conn.execRequest("HEAD", conn.URL, nil)
 	if err != nil {
+		debug("Ping request failed with: %v", err)
 		return false, err
 	}
-	defer closing(resp.Body)
 
-	status := resp.StatusCode
+	debug("Ping status code: %v", status)
 	return status < 300, nil
 }
 
