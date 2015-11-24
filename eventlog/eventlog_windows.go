@@ -84,6 +84,13 @@ func (el *eventLog) Open(recordNumber uint32) error {
 		return err
 	}
 
+	numRecords, err := getNumberOfEventLogRecords(handle)
+	if err != nil {
+		logp.Warn("EventLog[%s] Could not obtain total number of records: ", el.name)
+	} else {
+		logp.Info("EventLog[%s] contains %d records", el.name, numRecords)
+	}
+
 	el.handle = handle
 	el.recordNumber = recordNumber
 	el.readBuf = make([]byte, maxEventBufferSize)
@@ -178,15 +185,14 @@ func utf16ToString(b []byte) (string, int, error) {
 	s := make([]uint16, len(b)/2)
 	for i, _ := range s {
 		s[i] = uint16(b[i*2]) + uint16(b[(i*2)+1])<<8
-	}
 
-	for i, v := range s {
-		if v == 0 {
+		if s[i] == 0 {
 			s = s[0:i]
 			offset = i*2 + 2
 			break
 		}
 	}
+
 	return string(utf16.Decode(s)), offset, nil
 }
 
@@ -194,27 +200,25 @@ func utf16ToString(b []byte) (string, int, error) {
 // record. Each EventID has a template that is stored in a library. The event
 // contains the parameters used to populate the template. This method evaluates
 // the template with the parameters and returns the resulting string.
+//
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa363651(v=vs.85).aspx#_win32_description_strings
 func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRecord) (string, error) {
-	handles := el.handles.get(lr.SourceName)
-	if handles == nil || len(handles) == 0 {
-		msgParams, err := getStrings(event, buf)
-		if err != nil {
-			return "", err
-		}
-		message := fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName,
-			strings.Join(msgParams, ", "))
-		return message, nil
-	}
-
-	// Get addresses of the string inserts:
-	stringInsertPtrs, err := getStringsPointers(event, buf)
+	// Get string values and addresses of the inserts:
+	stringInserts, stringInsertPtrs, err := getStrings(event, buf)
 	if err != nil {
-		logp.Warn("Failed to get string insert pointers.", err)
+		logp.Warn("Failed to get string inserts.", err)
 		return "", err
 	}
 
+	handles := el.handles.get(lr.SourceName)
+	if handles == nil || len(handles) == 0 {
+		message := fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName,
+			strings.Join(stringInserts, ", "))
+		return message, nil
+	}
+
 	var addr *uintptr
-	if stringInsertPtrs != nil {
+	if stringInsertPtrs != nil && len(stringInsertPtrs) > 0 {
 		addr = &stringInsertPtrs[0]
 	}
 
@@ -244,54 +248,31 @@ func (el *eventLog) formatMessage(event *winEventLogRecord, buf []byte, lr LogRe
 	}
 
 	if message == "" {
-		msgParams, err := getStrings(event, buf)
-		if err != nil {
-			return "", err
-		}
-		message = fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName, strings.Join(msgParams, ", "))
+		message = fmt.Sprintf(noMessageFile, lr.EventId, lr.SourceName,
+			strings.Join(stringInserts, ", "))
 	}
 
 	return message, nil
 }
 
-// getStringsPointers returns an array of pointers to the insert strings
-// contained in the buffer. If the event contains zero strings then (nil, nil)
-// is returned.
-func getStringsPointers(event *winEventLogRecord, buf []byte) ([]uintptr, error) {
-	if event.numStrings == 0 {
-		return nil, nil
-	}
+func getStrings(event *winEventLogRecord, buf []byte) ([]string, []uintptr, error) {
+	inserts := make([]string, event.numStrings)
+	insertPtrs := make([]uintptr, event.numStrings)
 
-	readIndex := event.stringOffset
-	pointers := make([]uintptr, event.numStrings)
-	pointers[0] = uintptr(unsafe.Pointer(&buf[readIndex]))
-	for i := 1; i < len(pointers); i++ {
-		nulIndex := strings.Index(string(buf[readIndex:]), "\x00")
-		if nulIndex == -1 {
-			// TODO: Add more details to error message.
-			return nil, fmt.Errorf("Failed to find null-terminator for string number %d.", i)
-		}
-
-		readIndex += uint32(nulIndex + 1)
-		pointers[i] = uintptr(unsafe.Pointer(&buf[readIndex]))
-	}
-
-	return pointers, nil
-}
-
-func getStrings(event *winEventLogRecord, buf []byte) ([]string, error) {
-	var rtn []string
-	offset := 0
+	bufPtr := uintptr(unsafe.Pointer(&buf[0]))
+	offset := int(event.stringOffset)
 	for i := 0; i < int(event.numStrings); i++ {
-		evtStr, length, err := utf16ToString(buf[int(event.stringOffset)+offset:])
+		evtStr, length, err := utf16ToString(buf[offset:])
 		if err != nil {
 			logp.Warn("Failed to convert from UTF16 to string %v", err)
-			return nil, err
+			return nil, nil, err
 		}
+		inserts[i] = evtStr
+		insertPtrs[i] = bufPtr + uintptr(offset)
 		offset += length
-		rtn = append(rtn, evtStr)
 	}
-	return rtn, nil
+
+	return inserts, insertPtrs, nil
 }
 
 // queryEventMessageFiles queries the registry to get the value of

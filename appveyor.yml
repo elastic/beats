@@ -17,6 +17,7 @@ clone_folder: c:\gopath\src\github.com\elastic\winlogbeat
 install:
   - set PATH=%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
+  - go get github.com/pierrre/gotestcover golang.org/x/tools/cmd/cover
   - set GOPATH=%GOPATH%\src\%PROJ%\Godeps\_workspace;%GOPATH%
   - go version
   - go env
@@ -37,7 +38,8 @@ build_script:
 test_script:
   # Unit tests
   - ps: Add-AppveyorTest "Unit Tests" -Outcome Running
-  - go test -race ./...
+  - mkdir build\coverage
+  - gotestcover -race -coverprofile=build/coverage/integration.cov github.com/elastic/winlogbeat/...
   - ps: Update-AppveyorTest "Unit Tests" -Outcome Passed
   # System tests
   - ps: Add-AppveyorTest "System tests" -Outcome Running
@@ -45,6 +47,17 @@ test_script:
   - ps: cd tests/system
   - nosetests --with-timer
   - ps: Update-AppveyorTest "System tests" -Outcome Passed
+
+after_test: 
+  - cd c:\gopath\src\github.com\elastic\winlogbeat
+  # TODO: Aggregate coverage data from python tests
+  - go tool cover -html=build\coverage\integration.cov -o build\coverage\integration.html
+  - ps: Push-AppveyorArtifact build\coverage\integration.cov
+  - ps: Push-AppveyorArtifact build\coverage\integration.html
+  # Upload coverage report.
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - codecov -X gcov -f "build\coverage\integration.cov"
 
 # Executes for both successful and failed builds
 on_finish:
