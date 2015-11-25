@@ -1,4 +1,4 @@
-package main
+package beat
 
 type TopConfig struct {
 	Period *int64
