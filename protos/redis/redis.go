@@ -49,7 +49,13 @@ type transaction struct {
 }
 
 type redisConnectionData struct {
-	Streams [2]*stream
+	Streams   [2]*stream
+	requests  messageList
+	responses messageList
+}
+
+type messageList struct {
+	head, tail *redisMessage
 }
 
 // Redis protocol plugin
@@ -59,21 +65,12 @@ type Redis struct {
 	SendRequest  bool
 	SendResponse bool
 
-	transactions       *common.Cache
 	transactionTimeout time.Duration
 
 	results publisher.Client
 }
 
 var debug = logp.MakeDebug("redis")
-
-func (redis *Redis) getTransaction(k common.HashableTcpTuple) *transaction {
-	v := redis.transactions.Get(k)
-	if v != nil {
-		return v.(*transaction)
-	}
-	return nil
-}
 
 func (redis *Redis) InitDefaults() {
 	redis.SendRequest = false
@@ -106,10 +103,6 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
 	}
 
-	redis.transactions = common.NewCache(
-		redis.transactionTimeout,
-		protos.DefaultTransactionHashSize)
-	redis.transactions.StartJanitor(redis.transactionTimeout)
 	redis.results = results
 
 	return nil
@@ -134,7 +127,6 @@ func (redis *Redis) Parse(
 	defer logp.Recover("ParseRedis exception")
 
 	conn := ensureRedisConnection(private)
-	debug("redis connection: %p", conn)
 	conn = redis.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -204,13 +196,13 @@ func (redis *Redis) doParse(
 		}
 
 		if st.message.IsRequest {
-			debug("REDIS request message: %s", st.message.Message)
+			debug("REDIS (%p) request message: %s", conn, st.message.Message)
 		} else {
-			debug("REDIS response message: %s", st.message.Message)
+			debug("REDIS (%p) response message: %s", conn, st.message.Message)
 		}
 
 		// all ok, go to next level and reset stream for new message
-		redis.handleRedis(st.message, tcptuple, dir)
+		redis.handleRedis(conn, st.message, tcptuple, dir)
 		st.PrepareForNewMessage()
 	}
 
@@ -221,88 +213,88 @@ func newMessage(ts time.Time) *redisMessage {
 	return &redisMessage{Ts: ts, Bulks: []string{}}
 }
 
-func (redis *Redis) handleRedis(m *redisMessage, tcptuple *common.TcpTuple,
-	dir uint8) {
-
+func (redis *Redis) handleRedis(
+	conn *redisConnectionData,
+	m *redisMessage,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) {
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 
 	if m.IsRequest {
-		redis.receivedRedisRequest(m)
+		conn.requests.append(m) // wait for response
 	} else {
-		redis.receivedRedisResponse(m)
+		conn.responses.append(m)
+		redis.correlate(conn)
 	}
 }
 
-func (redis *Redis) receivedRedisRequest(msg *redisMessage) {
-	tuple := msg.TcpTuple
-	trans := redis.getTransaction(tuple.Hashable())
-	if trans != nil {
-		if trans.Redis != nil {
-			logp.Warn("Two requests without a Response. Dropping old request")
+func (redis *Redis) correlate(conn *redisConnectionData) {
+	// drop responses with missing requests
+	if conn.requests.empty() {
+		for !conn.responses.empty() {
+			logp.Warn("Response from unknown transaction. Ignoring")
+			conn.responses.pop()
 		}
-	} else {
-		trans = &transaction{Type: "redis", tuple: tuple}
-		redis.transactions.Put(tuple.Hashable(), trans)
+		return
 	}
 
-	trans.Redis = common.MapStr{}
-	trans.Method = msg.Method
-	trans.Path = msg.Path
-	trans.Query = msg.Message
-	trans.RequestRaw = msg.Message
-	trans.BytesIn = msg.Size
+	// merge requests with responses into transactions
+	for !conn.responses.empty() && !conn.requests.empty() {
+		requ := conn.requests.pop()
+		resp := conn.responses.pop()
+		trans := newTransaction(requ, resp)
 
-	trans.cmdline = msg.CmdlineTuple
-	trans.ts = msg.Ts
+		debug("REDIS (%p) transaction completed: %s", conn, trans.Redis)
+		redis.publishTransaction(trans)
+	}
+}
+
+func newTransaction(requ, resp *redisMessage) *transaction {
+	trans := &transaction{Type: "redis", tuple: requ.TcpTuple}
+
+	// init from request
+	trans.Redis = common.MapStr{}
+	trans.Method = requ.Method
+	trans.Path = requ.Path
+	trans.Query = requ.Message
+	trans.RequestRaw = requ.Message
+	trans.BytesIn = requ.Size
+
+	trans.cmdline = requ.CmdlineTuple
+	trans.ts = requ.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
-	trans.JsTs = msg.Ts
+	trans.JsTs = requ.Ts
 	trans.Src = common.Endpoint{
-		Ip:   msg.TcpTuple.Src_ip.String(),
-		Port: msg.TcpTuple.Src_port,
-		Proc: string(msg.CmdlineTuple.Src),
+		Ip:   requ.TcpTuple.Src_ip.String(),
+		Port: requ.TcpTuple.Src_port,
+		Proc: string(requ.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   msg.TcpTuple.Dst_ip.String(),
-		Port: msg.TcpTuple.Dst_port,
-		Proc: string(msg.CmdlineTuple.Dst),
+		Ip:   requ.TcpTuple.Dst_ip.String(),
+		Port: requ.TcpTuple.Dst_port,
+		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if requ.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
-}
 
-func (redis *Redis) receivedRedisResponse(msg *redisMessage) {
-	tuple := msg.TcpTuple
-	trans := redis.getTransaction(tuple.Hashable())
-	if trans == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
-		return
-	}
-	// check if the request was received
-	if trans.Redis == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
-		return
-
-	}
-
-	trans.IsError = msg.IsError
-	if msg.IsError {
-		trans.Redis["error"] = msg.Message
+	// init from response
+	trans.IsError = resp.IsError
+	if resp.IsError {
+		trans.Redis["error"] = resp.Message
 	} else {
-		trans.Redis["return_value"] = msg.Message
+		trans.Redis["return_value"] = resp.Message
 	}
 
-	trans.BytesOut = msg.Size
-	trans.ResponseRaw = msg.Message
+	trans.BytesOut = resp.Size
+	trans.ResponseRaw = resp.Message
 
-	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.ResponseTime = int32(resp.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
-	redis.publishTransaction(trans)
-	redis.transactions.Delete(trans.tuple.Hashable())
-
-	debug("Redis transaction completed: %s", trans.Redis)
+	return trans
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
@@ -323,7 +315,6 @@ func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 }
 
 func (redis *Redis) publishTransaction(t *transaction) {
-
 	if redis.results == nil {
 		return
 	}
@@ -354,4 +345,36 @@ func (redis *Redis) publishTransaction(t *transaction) {
 	event["dst"] = &t.Dst
 
 	redis.results.PublishEvent(event)
+}
+
+func (ml *messageList) append(msg *redisMessage) {
+	if ml.tail == nil {
+		ml.head = msg
+	} else {
+		ml.tail.next = msg
+	}
+	msg.next = nil
+	ml.tail = msg
+}
+
+func (ml *messageList) empty() bool {
+	return ml.head == nil
+}
+
+func (ml *messageList) pop() *redisMessage {
+	if ml.head == nil {
+		return nil
+	}
+
+	msg := ml.head
+	ml.head = ml.head.next
+	if ml.head == nil {
+		ml.tail = nil
+	}
+	debug("new head=%p", ml.head)
+	return msg
+}
+
+func (ml *messageList) last() *redisMessage {
+	return ml.tail
 }

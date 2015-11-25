@@ -29,6 +29,8 @@ type redisMessage struct {
 	parseState int
 	start      int
 	end        int
+
+	next *redisMessage
 }
 
 const (
