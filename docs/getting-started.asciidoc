@@ -74,7 +74,7 @@ filebeat:
       # Possible options are:
       # * log: Reads every line of the log file (default)
       # * stdin: Reads the standard in
-      type: log
+      input_type: log
 -------------------------------------------------------------------------------------
 
 Filebeat uses predefined default values for most configuration options. For the most basic
