@@ -266,7 +266,6 @@ func (redis *Redis) InitDefaults() {
 }
 
 func (redis *Redis) setFromConfig(config config.Redis) error {
-
 	redis.Ports = config.Ports
 
 	if config.SendRequest != nil {
@@ -304,7 +303,6 @@ func (stream *RedisStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseOffset = 0
 	stream.message = nil
-	stream.message.Bulks = []string{}
 }
 
 func redisMessageParser(s *RedisStream) (bool, bool) {
@@ -342,14 +340,13 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 			} else {
 
 				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
-
 				if err != nil {
 					logp.Err("Failed to read number of bulk messages: %s", err)
 					return false, false
 				}
-				s.parseOffset = off
-				m.Bulks = []string{}
 
+				s.parseOffset = off
+				m.Bulks = make([]string, 0, m.NumberOfBulks)
 				continue
 			}
 
@@ -536,7 +533,7 @@ func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uin
 		priv.Data[dir] = &RedisStream{
 			tcptuple: tcptuple,
 			data:     pkt.Payload,
-			message:  &RedisMessage{Ts: pkt.Ts},
+			message:  &RedisMessage{Ts: pkt.Ts, Bulks: []string{}},
 		}
 	} else {
 		// concatenate bytes
@@ -564,23 +561,19 @@ func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uin
 			return priv
 		}
 
-		if complete {
-
-			if stream.message.IsRequest {
-				logp.Debug("redis", "REDIS request message: %s", stream.message.Message)
-			} else {
-				logp.Debug("redis", "REDIS response message: %s", stream.message.Message)
-			}
-
-			// all ok, go to next level
-			redis.handleRedis(stream.message, tcptuple, dir)
-
-			// and reset message
-			stream.PrepareForNewMessage()
-		} else {
+		if !complete {
 			// wait for more data
 			break
 		}
+
+		if stream.message.IsRequest {
+			logp.Debug("redis", "REDIS request message: %s", stream.message.Message)
+		} else {
+			logp.Debug("redis", "REDIS response message: %s", stream.message.Message)
+		}
+		// all ok, go to next level and reset stream for new message
+		redis.handleRedis(stream.message, tcptuple, dir)
+		stream.PrepareForNewMessage()
 	}
 
 	return priv
