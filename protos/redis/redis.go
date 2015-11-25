@@ -379,18 +379,30 @@ func redisMessageParser(s *RedisStream) (bool, bool) {
 
 				s.parseOffset = off
 
-				found, line, off = readLine(s.data, s.parseOffset)
-				if !found {
-					logp.Debug("redis", "End of line not found, waiting for more data")
+				// check all content in buffer (length + CRLF)
+				if int64(len(s.data[s.parseOffset:])) < length+2 {
+					logp.Debug("redis", "Message incomplete, waiting for more data")
 					s.parseOffset = starting_offset
 					return true, false
 				}
-				logp.Debug("redis", "line %s: %d", line, off)
 
+				// check content ends with CRLF
+				off = s.parseOffset + int(length)
+				if s.data[off] != '\r' || s.data[off+1] != '\n' {
+					logp.Err("Expected end of line not found")
+					return false, false
+				}
+
+				// extract line
+				line = string(s.data[s.parseOffset:off])
+				off += 2
+
+				logp.Debug("redis", "line %s: %d", line, s.parseOffset)
 				if int64(len(line)) != length {
 					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
 					return false, false
 				}
+
 				value = line
 				s.parseOffset = off
 			}
