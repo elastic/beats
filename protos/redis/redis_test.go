@@ -12,9 +12,9 @@ func TestRedisParser_ArrayRequest(t *testing.T) {
 		"$5\r\n" +
 		"Hello\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -22,14 +22,14 @@ func TestRedisParser_ArrayRequest(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if !stream.message.IsRequest {
+	if !st.message.IsRequest {
 		t.Errorf("Failed to parse Redis request")
 	}
-	if stream.message.Message != "SET key1 Hello" {
-		t.Errorf("Failed to parse Redis request: %s", stream.message.Message)
+	if st.message.Message != "SET key1 Hello" {
+		t.Errorf("Failed to parse Redis request: %s", st.message.Message)
 	}
-	if stream.message.Size != 34 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 34 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }
 
@@ -43,9 +43,9 @@ func TestRedisParser_ArrayResponse(t *testing.T) {
 		"bar\r\n" +
 		":23\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -53,14 +53,14 @@ func TestRedisParser_ArrayResponse(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if st.message.IsRequest {
 		t.Errorf("Failed to parse Redis response")
 	}
-	if stream.message.Message != "[foo, nil, bar, 23]" {
-		t.Errorf("Failed to parse Redis request: %s", stream.message.Message)
+	if st.message.Message != "[foo, nil, bar, 23]" {
+		t.Errorf("Failed to parse Redis request: %s", st.message.Message)
 	}
-	if stream.message.Size != 32 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 32 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }
 
@@ -68,9 +68,9 @@ func TestRedisParser_SimpleString(t *testing.T) {
 
 	message := []byte("+OK\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -78,14 +78,14 @@ func TestRedisParser_SimpleString(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if st.message.IsRequest {
 		t.Errorf("Failed to parse Redis response")
 	}
-	if stream.message.Message != "OK" {
-		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
+	if st.message.Message != "OK" {
+		t.Errorf("Failed to parse Redis response: %s", st.message.Message)
 	}
-	if stream.message.Size != 5 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 5 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }
 
@@ -93,9 +93,9 @@ func TestRedisParser_NilString(t *testing.T) {
 
 	message := []byte("$-1\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -103,14 +103,14 @@ func TestRedisParser_NilString(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if st.message.IsRequest {
 		t.Errorf("Failed to parse Redis response")
 	}
-	if stream.message.Message != "nil" {
-		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
+	if st.message.Message != "nil" {
+		t.Errorf("Failed to parse Redis response: %s", st.message.Message)
 	}
-	if stream.message.Size != 5 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 5 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }
 
@@ -118,9 +118,9 @@ func TestRedisParser_EmptyString(t *testing.T) {
 
 	message := []byte("$0\r\n\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -128,14 +128,14 @@ func TestRedisParser_EmptyString(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if st.message.IsRequest {
 		t.Errorf("Failed to parse Redis response")
 	}
-	if stream.message.Message != "" {
-		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
+	if st.message.Message != "" {
+		t.Errorf("Failed to parse Redis response: %s", st.message.Message)
 	}
-	if stream.message.Size != 6 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 6 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }
 
@@ -143,9 +143,9 @@ func TestRedisParser_EmptyArray(t *testing.T) {
 
 	message := []byte("*0\r\n")
 
-	stream := &RedisStream{data: message, message: new(RedisMessage)}
+	st := &stream{data: message, message: new(redisMessage)}
 
-	ok, complete := redisMessageParser(stream)
+	ok, complete := redisMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -153,13 +153,13 @@ func TestRedisParser_EmptyArray(t *testing.T) {
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
-	if stream.message.IsRequest {
+	if st.message.IsRequest {
 		t.Errorf("Failed to parse Redis response")
 	}
-	if stream.message.Message != "[]" {
-		t.Errorf("Failed to parse Redis response: %s", stream.message.Message)
+	if st.message.Message != "[]" {
+		t.Errorf("Failed to parse Redis response: %s", st.message.Message)
 	}
-	if stream.message.Size != 4 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
+	if st.message.Size != 4 {
+		t.Errorf("Wrong message size %d", st.message.Size)
 	}
 }

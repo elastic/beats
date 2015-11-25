@@ -1,8 +1,6 @@
 package redis
 
 import (
-	"bytes"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,34 +14,7 @@ import (
 	"github.com/elastic/packetbeat/protos/tcp"
 )
 
-const (
-	START = iota
-	BULK_ARRAY
-	SIMPLE_MESSAGE
-)
-
-type RedisMessage struct {
-	Ts            time.Time
-	NumberOfBulks int64
-	Bulks         []string
-
-	TcpTuple     common.TcpTuple
-	CmdlineTuple *common.CmdlineTuple
-	Direction    uint8
-
-	IsRequest bool
-	IsError   bool
-	Message   string
-	Method    string
-	Path      string
-	Size      int
-
-	parseState int
-	start      int
-	end        int
-}
-
-type RedisStream struct {
+type stream struct {
 	tcptuple *common.TcpTuple
 
 	data []byte
@@ -51,10 +22,10 @@ type RedisStream struct {
 	parseOffset   int
 	bytesReceived int
 
-	message *RedisMessage
+	message *redisMessage
 }
 
-type RedisTransaction struct {
+type transaction struct {
 	Type         string
 	tuple        common.TcpTuple
 	Src          common.Endpoint
@@ -73,177 +44,20 @@ type RedisTransaction struct {
 
 	Redis common.MapStr
 
-	Request_raw  string
-	Response_raw string
+	RequestRaw  string
+	ResponseRaw string
 }
 
-// Keep sorted for future command addition
-var RedisCommands = map[string]struct{}{
-	"APPEND":           struct{}{},
-	"AUTH":             struct{}{},
-	"BGREWRITEAOF":     struct{}{},
-	"BGSAVE":           struct{}{},
-	"BITCOUNT":         struct{}{},
-	"BITOP":            struct{}{},
-	"BITPOS":           struct{}{},
-	"BLPOP":            struct{}{},
-	"BRPOP":            struct{}{},
-	"BRPOPLPUSH":       struct{}{},
-	"CLIENT GETNAME":   struct{}{},
-	"CLIENT KILL":      struct{}{},
-	"CLIENT LIST":      struct{}{},
-	"CLIENT PAUSE":     struct{}{},
-	"CLIENT SETNAME":   struct{}{},
-	"CONFIG GET":       struct{}{},
-	"CONFIG RESETSTAT": struct{}{},
-	"CONFIG REWRITE":   struct{}{},
-	"CONFIG SET":       struct{}{},
-	"DBSIZE":           struct{}{},
-	"DEBUG OBJECT":     struct{}{},
-	"DEBUG SEGFAULT":   struct{}{},
-	"DECR":             struct{}{},
-	"DECRBY":           struct{}{},
-	"DEL":              struct{}{},
-	"DISCARD":          struct{}{},
-	"DUMP":             struct{}{},
-	"ECHO":             struct{}{},
-	"EVAL":             struct{}{},
-	"EVALSHA":          struct{}{},
-	"EXEC":             struct{}{},
-	"EXISTS":           struct{}{},
-	"EXPIRE":           struct{}{},
-	"EXPIREAT":         struct{}{},
-	"FLUSHALL":         struct{}{},
-	"FLUSHDB":          struct{}{},
-	"GET":              struct{}{},
-	"GETBIT":           struct{}{},
-	"GETRANGE":         struct{}{},
-	"GETSET":           struct{}{},
-	"HDEL":             struct{}{},
-	"HEXISTS":          struct{}{},
-	"HGET":             struct{}{},
-	"HGETALL":          struct{}{},
-	"HINCRBY":          struct{}{},
-	"HINCRBYFLOAT":     struct{}{},
-	"HKEYS":            struct{}{},
-	"HLEN":             struct{}{},
-	"HMGET":            struct{}{},
-	"HMSET":            struct{}{},
-	"HSCAN":            struct{}{},
-	"HSET":             struct{}{},
-	"HSETINX":          struct{}{},
-	"HVALS":            struct{}{},
-	"INCR":             struct{}{},
-	"INCRBY":           struct{}{},
-	"INCRBYFLOAT":      struct{}{},
-	"INFO":             struct{}{},
-	"KEYS":             struct{}{},
-	"LASTSAVE":         struct{}{},
-	"LINDEX":           struct{}{},
-	"LINSERT":          struct{}{},
-	"LLEN":             struct{}{},
-	"LPOP":             struct{}{},
-	"LPUSH":            struct{}{},
-	"LPUSHX":           struct{}{},
-	"LRANGE":           struct{}{},
-	"LREM":             struct{}{},
-	"LSET":             struct{}{},
-	"LTRIM":            struct{}{},
-	"MGET":             struct{}{},
-	"MIGRATE":          struct{}{},
-	"MONITOR":          struct{}{},
-	"MOVE":             struct{}{},
-	"MSET":             struct{}{},
-	"MSETNX":           struct{}{},
-	"MULTI":            struct{}{},
-	"OBJECT":           struct{}{},
-	"PERSIST":          struct{}{},
-	"PEXPIRE":          struct{}{},
-	"PEXPIREAT":        struct{}{},
-	"PFADD":            struct{}{},
-	"PFCOUNT":          struct{}{},
-	"PFMERGE":          struct{}{},
-	"PING":             struct{}{},
-	"PSETEX":           struct{}{},
-	"PSUBSCRIBE":       struct{}{},
-	"PTTL":             struct{}{},
-	"PUBLISH":          struct{}{},
-	"PUBSUB":           struct{}{},
-	"PUNSUBSCRIBE":     struct{}{},
-	"QUIT":             struct{}{},
-	"RANDOMKEY":        struct{}{},
-	"RENAME":           struct{}{},
-	"RENAMENX":         struct{}{},
-	"RESTORE":          struct{}{},
-	"RPOP":             struct{}{},
-	"RPOPLPUSH":        struct{}{},
-	"RPUSH":            struct{}{},
-	"RPUSHX":           struct{}{},
-	"SADD":             struct{}{},
-	"SAVE":             struct{}{},
-	"SCAN":             struct{}{},
-	"SCARD":            struct{}{},
-	"SCRIPT EXISTS":    struct{}{},
-	"SCRIPT FLUSH":     struct{}{},
-	"SCRIPT KILL":      struct{}{},
-	"SCRIPT LOAD":      struct{}{},
-	"SDIFF":            struct{}{},
-	"SDIFFSTORE":       struct{}{},
-	"SELECT":           struct{}{},
-	"SET":              struct{}{},
-	"SETBIT":           struct{}{},
-	"SETEX":            struct{}{},
-	"SETNX":            struct{}{},
-	"SETRANGE":         struct{}{},
-	"SHUTDOWN":         struct{}{},
-	"SINTER":           struct{}{},
-	"SINTERSTORE":      struct{}{},
-	"SISMEMBER":        struct{}{},
-	"SLAVEOF":          struct{}{},
-	"SLOWLOG":          struct{}{},
-	"SMEMBERS":         struct{}{},
-	"SMOVE":            struct{}{},
-	"SORT":             struct{}{},
-	"SPOP":             struct{}{},
-	"SRANDMEMBER":      struct{}{},
-	"SREM":             struct{}{},
-	"SSCAN":            struct{}{},
-	"STRLEN":           struct{}{},
-	"SUBSCRIBE":        struct{}{},
-	"SUNION":           struct{}{},
-	"SUNIONSTORE":      struct{}{},
-	"SYNC":             struct{}{},
-	"TIME":             struct{}{},
-	"TTL":              struct{}{},
-	"TYPE":             struct{}{},
-	"UNSUBSCRIBE":      struct{}{},
-	"UNWATCH":          struct{}{},
-	"WATCH":            struct{}{},
-	"ZADD":             struct{}{},
-	"ZCARD":            struct{}{},
-	"ZCOUNT":           struct{}{},
-	"ZINCRBY":          struct{}{},
-	"ZINTERSTORE":      struct{}{},
-	"ZRANGE":           struct{}{},
-	"ZRANGEBYSCORE":    struct{}{},
-	"ZRANK":            struct{}{},
-	"ZREM":             struct{}{},
-	"ZREMRANGEBYLEX":   struct{}{},
-	"ZREMRANGEBYRANK":  struct{}{},
-	"ZREMRANGEBYSCORE": struct{}{},
-	"ZREVRANGE":        struct{}{},
-	"ZREVRANGEBYSCORE": struct{}{},
-	"ZREVRANK":         struct{}{},
-	"ZSCAN":            struct{}{},
-	"ZSCORE":           struct{}{},
-	"ZUNIONSTORE":      struct{}{},
+type redisConnectionData struct {
+	Streams [2]*stream
 }
 
+// Redis protocol plugin
 type Redis struct {
 	// config
-	Ports         []int
-	Send_request  bool
-	Send_response bool
+	Ports        []int
+	SendRequest  bool
+	SendResponse bool
 
 	transactions       *common.Cache
 	transactionTimeout time.Duration
@@ -251,17 +65,19 @@ type Redis struct {
 	results publisher.Client
 }
 
-func (redis *Redis) getTransaction(k common.HashableTcpTuple) *RedisTransaction {
+var debug = logp.MakeDebug("redis")
+
+func (redis *Redis) getTransaction(k common.HashableTcpTuple) *transaction {
 	v := redis.transactions.Get(k)
 	if v != nil {
-		return v.(*RedisTransaction)
+		return v.(*transaction)
 	}
 	return nil
 }
 
 func (redis *Redis) InitDefaults() {
-	redis.Send_request = false
-	redis.Send_response = false
+	redis.SendRequest = false
+	redis.SendResponse = false
 	redis.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
@@ -269,10 +85,10 @@ func (redis *Redis) setFromConfig(config config.Redis) error {
 	redis.Ports = config.Ports
 
 	if config.SendRequest != nil {
-		redis.Send_request = *config.SendRequest
+		redis.SendRequest = *config.SendRequest
 	}
 	if config.SendResponse != nil {
-		redis.Send_response = *config.SendResponse
+		redis.SendResponse = *config.SendResponse
 	}
 	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
 		redis.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
@@ -299,278 +115,87 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	return nil
 }
 
-func (stream *RedisStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.parseOffset:]
-	stream.parseOffset = 0
-	stream.message = nil
-}
-
-func redisMessageParser(s *RedisStream) (bool, bool) {
-
-	var err error
-	var value string
-	m := s.message
-
-	iserror := false
-
-	for s.parseOffset < len(s.data) {
-
-		if s.data[s.parseOffset] == '*' {
-			//Arrays
-
-			m.parseState = BULK_ARRAY
-			m.start = s.parseOffset
-			logp.Debug("redis", "start %d", m.start)
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				logp.Debug("redis", "End of line not found, waiting for more data")
-				return true, false
-			}
-			logp.Debug("redis", "line %s: %d", line, off)
-
-			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				//Null array
-				s.parseOffset = off
-				value = "nil"
-			} else if len(line) == 2 && line[1] == '0' {
-				// Empty array
-				s.parseOffset = off
-				value = "[]"
-			} else {
-
-				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
-				if err != nil {
-					logp.Err("Failed to read number of bulk messages: %s", err)
-					return false, false
-				}
-
-				s.parseOffset = off
-				m.Bulks = make([]string, 0, m.NumberOfBulks)
-				continue
-			}
-
-		} else if s.data[s.parseOffset] == '$' {
-			// Bulk Strings
-			if m.parseState == START {
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			starting_offset := s.parseOffset
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				logp.Debug("redis", "End of line not found, waiting for more data")
-				s.parseOffset = starting_offset
-				return true, false
-			}
-			logp.Debug("redis", "line %s: %d", line, off)
-
-			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				// NULL Bulk Reply
-				value = "nil"
-				s.parseOffset = off
-			} else {
-				length, err := strconv.ParseInt(line[1:], 10, 64)
-				if err != nil {
-					logp.Err("Failed to read bulk message: %s", err)
-					return false, false
-				}
-
-				s.parseOffset = off
-
-				// check all content in buffer (length + CRLF)
-				if int64(len(s.data[s.parseOffset:])) < length+2 {
-					logp.Debug("redis", "Message incomplete, waiting for more data")
-					s.parseOffset = starting_offset
-					return true, false
-				}
-
-				// check content ends with CRLF
-				off = s.parseOffset + int(length)
-				if s.data[off] != '\r' || s.data[off+1] != '\n' {
-					logp.Err("Expected end of line not found")
-					return false, false
-				}
-
-				// extract line
-				line = string(s.data[s.parseOffset:off])
-				off += 2
-
-				logp.Debug("redis", "line %s: %d", line, s.parseOffset)
-				if int64(len(line)) != length {
-					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
-					return false, false
-				}
-
-				value = line
-				s.parseOffset = off
-			}
-
-		} else if s.data[s.parseOffset] == ':' {
-			// Integers
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-			n, err := strconv.ParseInt(line[1:], 10, 64)
-
-			if err != nil {
-				logp.Err("Failed to read integer reply: %s", err)
-				return false, false
-			}
-			value = strconv.Itoa(int(n))
-			s.parseOffset = off
-
-		} else if s.data[s.parseOffset] == '+' {
-			// Simple Strings
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-
-			value = line[1:]
-			s.parseOffset = off
-		} else if s.data[s.parseOffset] == '-' {
-			// Errors
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-			iserror = true
-
-			value = line[1:]
-			s.parseOffset = off
-		} else {
-			logp.Debug("redis", "Unexpected message starting with %s", s.data[s.parseOffset:])
-			return false, false
-		}
-
-		// add value
-		if m.NumberOfBulks > 0 {
-			m.NumberOfBulks = m.NumberOfBulks - 1
-			m.Bulks = append(m.Bulks, value)
-
-			if len(m.Bulks) == 1 {
-				logp.Debug("redis", "Value: %s", value)
-				// first word.
-				// check if it's a command
-				if isRedisCommand(value) {
-					logp.Debug("redis", "is request")
-					m.IsRequest = true
-					m.Method = value
-				}
-			}
-
-			if len(m.Bulks) == 2 {
-				// second word. This is usually the path
-				if m.IsRequest {
-					m.Path = value
-				}
-			}
-
-			if m.NumberOfBulks == 0 {
-				// the last bulk received
-				if m.IsRequest {
-					m.Message = strings.Join(m.Bulks, " ")
-				} else {
-					m.Message = "[" + strings.Join(m.Bulks, ", ") + "]"
-				}
-				m.end = s.parseOffset
-				m.Size = m.end - m.start
-				return true, true
-			}
-		} else {
-			m.Message = value
-			m.end = s.parseOffset
-			m.Size = m.end - m.start
-			if iserror {
-				m.IsError = true
-			}
-			return true, true
-		}
-
-	} //end for
-
-	return true, false
-}
-
-func readLine(data []byte, offset int) (bool, string, int) {
-	q := bytes.Index(data[offset:], []byte("\r\n"))
-	if q == -1 {
-		return false, "", 0
-	}
-	return true, string(data[offset : offset+q]), offset + q + 2
-}
-
-type redisPrivateData struct {
-	Data [2]*RedisStream
+func (s *stream) PrepareForNewMessage() {
+	s.data = s.data[s.parseOffset:]
+	s.parseOffset = 0
+	s.message = nil
 }
 
 func (redis *Redis) ConnectionTimeout() time.Duration {
 	return redis.transactionTimeout
 }
 
-func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+func (redis *Redis) Parse(
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseRedis exception")
 
-	priv := redisPrivateData{}
-	if private != nil {
-		var ok bool
-		priv, ok = private.(redisPrivateData)
-		if !ok {
-			priv = redisPrivateData{}
-		}
+	conn := ensureRedisConnection(private)
+	debug("redis connection: %p", conn)
+	conn = redis.doParse(conn, pkt, tcptuple, dir)
+	if conn == nil {
+		return nil
+	}
+	return conn
+}
+
+func ensureRedisConnection(private protos.ProtocolData) *redisConnectionData {
+	if private == nil {
+		return &redisConnectionData{}
 	}
 
-	if priv.Data[dir] == nil {
-		priv.Data[dir] = &RedisStream{
+	priv, ok := private.(*redisConnectionData)
+	if !ok {
+		logp.Warn("redis connection data type error, create new one")
+		return &redisConnectionData{}
+	}
+	if priv == nil {
+		logp.Warn("Unexpected: redis connection data not set, create new one")
+		return &redisConnectionData{}
+	}
+
+	return priv
+}
+
+func (redis *Redis) doParse(
+	conn *redisConnectionData,
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) *redisConnectionData {
+
+	st := conn.Streams[dir]
+	if st == nil {
+		st = &stream{
 			tcptuple: tcptuple,
 			data:     pkt.Payload,
-			message:  &RedisMessage{Ts: pkt.Ts, Bulks: []string{}},
+			message:  newMessage(pkt.Ts),
 		}
+		conn.Streams[dir] = st
 	} else {
-		// concatenate bytes
-		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
-		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		st.data = append(st.data, pkt.Payload...)
+		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("redis", "Stream data too large, dropping TCP stream")
-			priv.Data[dir] = nil
-			return priv
+			conn.Streams[dir] = nil
 		}
+		return conn
 	}
 
-	stream := priv.Data[dir]
-	for len(stream.data) > 0 {
-		if stream.message == nil {
-			stream.message = &RedisMessage{Ts: pkt.Ts}
+	for len(st.data) > 0 {
+		if st.message == nil {
+			st.message = newMessage(pkt.Ts)
 		}
 
-		ok, complete := redisMessageParser(priv.Data[dir])
-
+		ok, complete := redisMessageParser(st)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
-			priv.Data[dir] = nil
-			logp.Debug("redis", "Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
-			return priv
+			conn.Streams[dir] = nil
+			debug("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			return conn
 		}
 
 		if !complete {
@@ -578,25 +203,25 @@ func (redis *Redis) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uin
 			break
 		}
 
-		if stream.message.IsRequest {
-			logp.Debug("redis", "REDIS request message: %s", stream.message.Message)
+		if st.message.IsRequest {
+			debug("REDIS request message: %s", st.message.Message)
 		} else {
-			logp.Debug("redis", "REDIS response message: %s", stream.message.Message)
+			debug("REDIS response message: %s", st.message.Message)
 		}
+
 		// all ok, go to next level and reset stream for new message
-		redis.handleRedis(stream.message, tcptuple, dir)
-		stream.PrepareForNewMessage()
+		redis.handleRedis(st.message, tcptuple, dir)
+		st.PrepareForNewMessage()
 	}
 
-	return priv
+	return conn
 }
 
-func isRedisCommand(key string) bool {
-	_, exists := RedisCommands[strings.ToUpper(key)]
-	return exists
+func newMessage(ts time.Time) *redisMessage {
+	return &redisMessage{Ts: ts, Bulks: []string{}}
 }
 
-func (redis *Redis) handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
+func (redis *Redis) handleRedis(m *redisMessage, tcptuple *common.TcpTuple,
 	dir uint8) {
 
 	m.TcpTuple = *tcptuple
@@ -610,7 +235,7 @@ func (redis *Redis) handleRedis(m *RedisMessage, tcptuple *common.TcpTuple,
 	}
 }
 
-func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
+func (redis *Redis) receivedRedisRequest(msg *redisMessage) {
 	tuple := msg.TcpTuple
 	trans := redis.getTransaction(tuple.Hashable())
 	if trans != nil {
@@ -618,7 +243,7 @@ func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
-		trans = &RedisTransaction{Type: "redis", tuple: tuple}
+		trans = &transaction{Type: "redis", tuple: tuple}
 		redis.transactions.Put(tuple.Hashable(), trans)
 	}
 
@@ -626,7 +251,7 @@ func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 	trans.Method = msg.Method
 	trans.Path = msg.Path
 	trans.Query = msg.Message
-	trans.Request_raw = msg.Message
+	trans.RequestRaw = msg.Message
 	trans.BytesIn = msg.Size
 
 	trans.cmdline = msg.CmdlineTuple
@@ -648,7 +273,7 @@ func (redis *Redis) receivedRedisRequest(msg *RedisMessage) {
 	}
 }
 
-func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
+func (redis *Redis) receivedRedisResponse(msg *redisMessage) {
 	tuple := msg.TcpTuple
 	trans := redis.getTransaction(tuple.Hashable())
 	if trans == nil {
@@ -670,14 +295,14 @@ func (redis *Redis) receivedRedisResponse(msg *RedisMessage) {
 	}
 
 	trans.BytesOut = msg.Size
-	trans.Response_raw = msg.Message
+	trans.ResponseRaw = msg.Message
 
 	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	redis.publishTransaction(trans)
 	redis.transactions.Delete(trans.tuple.Hashable())
 
-	logp.Debug("redis", "Redis transaction completed: %s", trans.Redis)
+	debug("Redis transaction completed: %s", trans.Redis)
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
@@ -697,7 +322,7 @@ func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return private
 }
 
-func (redis *Redis) publishTransaction(t *RedisTransaction) {
+func (redis *Redis) publishTransaction(t *transaction) {
 
 	if redis.results == nil {
 		return
@@ -711,11 +336,11 @@ func (redis *Redis) publishTransaction(t *RedisTransaction) {
 		event["status"] = common.ERROR_STATUS
 	}
 	event["responsetime"] = t.ResponseTime
-	if redis.Send_request {
-		event["request"] = t.Request_raw
+	if redis.SendRequest {
+		event["request"] = t.RequestRaw
 	}
-	if redis.Send_response {
-		event["response"] = t.Response_raw
+	if redis.SendResponse {
+		event["response"] = t.ResponseRaw
 	}
 	event["redis"] = common.MapStr(t.Redis)
 	event["method"] = strings.ToUpper(t.Method)
