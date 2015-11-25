@@ -1,4 +1,4 @@
-package main
+package beat
 
 import (
 	"flag"
@@ -30,10 +30,6 @@ import (
 	"github.com/elastic/packetbeat/protos/udp"
 	"github.com/elastic/packetbeat/sniffer"
 )
-
-// You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
-var Version = "1.0.0"
-var Name = "packetbeat"
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:     new(http.Http),
@@ -82,13 +78,16 @@ func init() {
 	}
 }
 
-func fetchAdditionalCmdLineArgs() CmdLineArgs {
+func New() *Packetbeat {
 
-	return cmdLineArgs
+	pb := &Packetbeat{}
+	pb.CmdLineArgs = cmdLineArgs
+
+	return pb
 }
 
 // Handle custom command line flags
-func (pb *Packetbeat) CliFlags(b *beat.Beat) {
+func (pb *Packetbeat) HandleFlags(b *beat.Beat) {
 	// -devices CLI flag
 	if *pb.CmdLineArgs.PrintDevices {
 		devs, err := sniffer.ListDeviceNames(true)

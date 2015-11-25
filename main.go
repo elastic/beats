@@ -1,41 +1,16 @@
 package main
 
 import (
-	"os"
+	packetbeat "github.com/elastic/packetbeat/beat"
 
 	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/logp"
 )
+
+// You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
+var Version = "1.0.0"
+var Name = "packetbeat"
 
 // Setups and Runs Packetbeat
 func main() {
-
-	// Create Beater object
-	pb := &Packetbeat{}
-
-	// Initi beat objectefile
-	b := beat.NewBeat(Name, Version, pb)
-
-	// Additional command line args are used to overwrite config options
-	pb.CmdLineArgs = fetchAdditionalCmdLineArgs()
-
-	// Base CLI flags
-	b.CommandLineSetup()
-
-	// Beat CLI flags
-	pb.CliFlags(b)
-
-	// Loads base config
-	b.LoadConfig()
-
-	// Configures beat
-	err := pb.Config(b)
-	if err != nil {
-		logp.Critical("Config error: %v", err)
-		os.Exit(1)
-	}
-
-	// Run beat. This calls first beater.Setup,
-	// then beater.Run and beater.Cleanup in the end
-	b.Run()
+	beat.Run(Name, Version, packetbeat.New())
 }
