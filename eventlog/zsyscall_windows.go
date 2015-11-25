@@ -70,8 +70,8 @@ func loadLibraryEx(filename *uint16, file Handle, flags uint32) (handle Handle, 
 	return
 }
 
-func formatMessage(flags uint32, source Handle, messageId uint32, languageId uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) {
-	r0, _, e1 := syscall.Syscall9(procFormatMessageW.Addr(), 7, uintptr(flags), uintptr(source), uintptr(messageId), uintptr(languageId), uintptr(unsafe.Pointer(buffer)), uintptr(bufferSize), uintptr(unsafe.Pointer(arguments)), 0, 0)
+func formatMessage(flags uint32, source Handle, messageID uint32, languageID uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) {
+	r0, _, e1 := syscall.Syscall9(procFormatMessageW.Addr(), 7, uintptr(flags), uintptr(source), uintptr(messageID), uintptr(languageID), uintptr(unsafe.Pointer(buffer)), uintptr(bufferSize), uintptr(unsafe.Pointer(arguments)), 0, 0)
 	numChars = uint32(r0)
 	if numChars == 0 {
 		if e1 != 0 {

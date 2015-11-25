@@ -1,8 +1,3 @@
-// Package provides access to the Event Logging API used in Windows 2000,
-// Windows XP, and Windows Server 2003. This is distinct from the Windows
-// Event Log API that was introduced in Windows Vista and  Windows 2008.
-//
-// TODO: Provide methods to access the newer Windows Event Log API.
 package eventlog
 
 import (
@@ -10,10 +5,18 @@ import (
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/logp"
 )
 
-// Interface to the Event Logging API introduced in Windows 2000 (not the
-// Windows Event Log API that was introduced in Windows Vista).
+// Debug logging functions for this package.
+var (
+	debugf  = logp.MakeDebug("eventlog")
+	detailf = logp.MakeDebug("eventlog_detail")
+)
+
+// EventLoggingAPI provides an interface to the Event Logging API introduced in
+// Windows 2000 (not the Windows Event Log API that was introduced in Windows
+// Vista).
 type EventLoggingAPI interface {
 	// Open the event log. recordNumber is the last successfully read event log
 	// record number. Read will resume from recordNumber + 1. To start reading
@@ -39,6 +42,7 @@ type eventLog struct {
 	readBuf       []byte       // Re-usable buffer for reading in events.
 	formatBuf     []byte       // Re-usable buffer for formatting messages.
 	handles       *handleCache // Cached mapping of source name to event message file handles.
+	logPrefix     string       // Prefix to add to all log entries.
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -52,6 +56,7 @@ func newEventLog(uncServerPath, eventLogName string) *eventLog {
 		name:          eventLogName,
 		handles: newHandleCache(eventLogName, queryEventMessageFiles,
 			freeLibrary),
+		logPrefix: fmt.Sprintf("EventLog[%s]", eventLogName),
 	}
 	return el
 }
@@ -70,23 +75,23 @@ type LogRecord struct {
 	SourceName    string
 	ComputerName  string
 	RecordNumber  uint32
-	EventId       uint32
+	EventID       uint32
 	EventType     EventType
 	EventCategory string
 	TimeGenerated time.Time
 	TimeWritten   time.Time
-	UserSid       *SID
+	UserSID       *SID
 	Message       string
 }
 
 // String returns string representation of LogRecord.
 func (lr LogRecord) String() string {
 	return fmt.Sprintf("LogRecord EventLogName[%s] SourceName[%s] "+
-		"ComputerName[%s] RecordNumber[%d] EventId[%d] EventType[%s] "+
-		"EventCategory[%s] TimeGenerated[%s] TimeWritten[%s] UserSid[%s] "+
+		"ComputerName[%s] RecordNumber[%d] EventID[%d] EventType[%s] "+
+		"EventCategory[%s] TimeGenerated[%s] TimeWritten[%s] UserSID[%s] "+
 		"Message[%s]", lr.EventLogName, lr.SourceName, lr.ComputerName,
-		lr.RecordNumber, lr.EventId, lr.EventType, lr.EventCategory,
-		lr.TimeGenerated, lr.TimeWritten, lr.UserSid, lr.Message)
+		lr.RecordNumber, lr.EventID, lr.EventType, lr.EventCategory,
+		lr.TimeGenerated, lr.TimeWritten, lr.UserSID, lr.Message)
 }
 
 func (lr LogRecord) ToMapStr() common.MapStr {
@@ -95,7 +100,7 @@ func (lr LogRecord) ToMapStr() common.MapStr {
 		"sourceName":    lr.SourceName,
 		"computerName":  lr.ComputerName,
 		"recordNumber":  lr.RecordNumber,
-		"eventId":       lr.EventId,
+		"eventID":       lr.EventID,
 		"eventType":     lr.EventType.String(),
 		"eventCategory": lr.EventCategory,
 		"message":       lr.Message,
@@ -103,18 +108,18 @@ func (lr LogRecord) ToMapStr() common.MapStr {
 		"type":          "eventlog",
 	}
 
-	if lr.UserSid != nil {
-		m["userSid"] = common.MapStr{
-			"name":   lr.UserSid.Name,
-			"domain": lr.UserSid.Domain,
-			"type":   lr.UserSid.SIDType.String(),
+	if lr.UserSID != nil {
+		m["userSID"] = common.MapStr{
+			"name":   lr.UserSID.Name,
+			"domain": lr.UserSID.Domain,
+			"type":   lr.UserSID.SIDType.String(),
 		}
 	}
 
 	return m
 }
 
-// Security Identifier for an account.
+// SID represents the Windows Security Identifier for an account.
 type SID struct {
 	Name    string
 	Domain  string

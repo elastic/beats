@@ -71,6 +71,8 @@ func configureLogp() {
 		if testing.Verbose() {
 			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog"})
 			logp.Info("DEBUG enabled for eventlog.")
+		} else {
+			logp.LogInit(logp.LOG_WARNING, "", false, true, []string{})
 		}
 	})
 }
@@ -97,7 +99,7 @@ func initLog(provider, source, msgFile string) (*elog.Log, error) {
 		if err != nil {
 			errs = append(errs, err)
 		}
-		return nil, err
+		return nil, errs.Err()
 	}
 
 	return log, nil
@@ -141,39 +143,47 @@ func TestRead(t *testing.T) {
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	defer func() {
 		err := uninstallLog(providerName, sourceName, log)
 		if err != nil {
-			t.Error(err)
-			return
+			t.Fatal(err)
 		}
 	}()
 
 	// Publish test messages:
 	for k, m := range messages {
-		log.Report(m.eventType, k, []string{m.message})
+		err = log.Report(m.eventType, k, []string{m.message})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	// Read messages:
 	eventlog := NewEventLoggingAPI(providerName)
-	eventlog.Open(0)
-	defer eventlog.Close()
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	records, err := eventlog.Read()
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 
 	// Validate messages:
 	assert.Len(t, records, len(messages))
 	for _, record := range records {
 		t.Log(record)
-		m, exists := messages[record.EventId]
+		m, exists := messages[record.EventID]
 		if !exists {
-			t.Errorf("Unknown EventId %d Read() from event log. %v", record.EventId, record)
+			t.Errorf("Unknown EventId %d Read() from event log. %v", record.EventID, record)
 			continue
 		}
 		assert.Equal(t, m.eventType, uint16(record.EventType))
@@ -195,34 +205,42 @@ func TestReadUnknownEventId(t *testing.T) {
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	defer func() {
 		err := uninstallLog(providerName, sourceName, log)
 		if err != nil {
-			t.Error(err)
-			return
+			t.Fatal(err)
 		}
 	}()
 
 	var eventID uint32 = 1000
 	msg := "Test Message"
-	log.Success(eventID, msg)
+	err = log.Success(eventID, msg)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Read messages:
 	eventlog := NewEventLoggingAPI(providerName)
-	eventlog.Open(0)
-	defer eventlog.Close()
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	records, err := eventlog.Read()
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 
 	// Verify the error message:
 	assert.Len(t, records, 1)
-	assert.Equal(t, eventID, records[0].EventId)
+	assert.Equal(t, eventID, records[0].EventID)
 	assert.Equal(t, fmt.Sprintf(noMessageFile, eventID, sourceName, msg),
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -239,34 +257,42 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 	log, err := initLog(providerName, sourceName,
 		servicesMsgFile+";"+eventCreateMsgFile)
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	defer func() {
 		err := uninstallLog(providerName, sourceName, log)
 		if err != nil {
-			t.Error(err)
-			return
+			t.Fatal(err)
 		}
 	}()
 
 	var eventID uint32 = 1000
 	msg := "Test Message"
-	log.Success(eventID, msg)
+	err = log.Success(eventID, msg)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Read messages:
 	eventlog := NewEventLoggingAPI(providerName)
-	eventlog.Open(0)
-	defer eventlog.Close()
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	records, err := eventlog.Read()
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 
 	// Verify the error message:
 	assert.Len(t, records, 1)
-	assert.Equal(t, eventID, records[0].EventId)
+	assert.Equal(t, eventID, records[0].EventID)
 	assert.Equal(t, msg, strings.TrimRight(records[0].Message, "\r\n"))
 }
 
@@ -278,14 +304,12 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	defer func() {
 		err := uninstallLog(providerName, sourceName, log)
 		if err != nil {
-			t.Error(err)
-			return
+			t.Fatal(err)
 		}
 	}()
 
@@ -296,21 +320,31 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	var eventID uint32 = 1073748860
 	template := "The %s service entered the %s state."
 	msgs := []string{"Windows Update", "running"}
-	log.Report(elog.Info, eventID, msgs)
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Read messages:
 	eventlog := NewEventLoggingAPI(providerName)
-	eventlog.Open(0)
-	defer eventlog.Close()
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	records, err := eventlog.Read()
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 
 	// Verify the message contents:
 	assert.Len(t, records, 1)
-	assert.Equal(t, eventID, records[0].EventId)
+	assert.Equal(t, eventID, records[0].EventID)
 	assert.Equal(t, fmt.Sprintf(template, msgs[0], msgs[1]),
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -335,3 +369,4 @@ func TestOpenInvalidProvider(t *testing.T) {
 // - Record number rollover (there may not be an issue with this)
 // - Message that requires no string inserts.
 // - Reading from a source name instead of provider name.
+// - Resume reading from a given record number.

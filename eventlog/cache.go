@@ -1,6 +1,7 @@
+package eventlog
+
 // This component of the eventlog package provides a cache for storing Handles
 // to event message files.
-package eventlog
 
 import (
 	"time"

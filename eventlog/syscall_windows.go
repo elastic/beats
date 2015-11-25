@@ -34,8 +34,6 @@ const (
 // Handle to a the OS specific event log.
 type Handle uintptr
 
-const InvalidHandle = ^Handle(0)
-
 // Frees the loaded dynamic-link library (DLL) module and, if necessary,
 // decrements its reference count. When the reference count reaches zero, the
 // module is unloaded from the address space of the calling process and the
@@ -53,7 +51,7 @@ func freeLibrary(handle Handle) error {
 //sys   closeEventLog(eventLog Handle) (err error) = advapi32.CloseEventLog
 //sys   readEventLog(eventLog Handle, readFlags uint32, recordOffset uint32, buffer *byte, numberOfBytesToRead uint32, bytesRead *uint32, minNumberOfBytesNeeded *uint32) (err error) = advapi32.ReadEventLogW
 //sys   loadLibraryEx(filename *uint16, file Handle, flags uint32) (handle Handle, err error) = kernel32.LoadLibraryExW
-//sys   formatMessage(flags uint32, source Handle, messageId uint32, languageId uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) = kernel32.FormatMessageW
+//sys   formatMessage(flags uint32, source Handle, messageID uint32, languageID uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) = kernel32.FormatMessageW
 //sys   _clearEventLog(eventLog Handle, backupFileName *uint16) (err error) = advapi32.ClearEventLogW
 //sys   _getNumberOfEventLogRecords(eventLog Handle, numberOfRecords *uint32) (err error) = advapi32.GetNumberOfEventLogRecords
 
