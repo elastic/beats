@@ -10,7 +10,7 @@ go:
 env:
   - TARGETS="check"
   # - TARGETS="testsuite ES_HOST=elasticsearch-173"
-  - TARGETS="testsuite ES_HOST=elasticsearch-200"
+  - TARGETS="testsuite ES_HOST=elasticsearch-210"
   - TARGETS="crosscompile"
 
 before_install:
