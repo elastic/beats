@@ -47,7 +47,7 @@ NOTE: We also provide 32-bit images that you can get from our
 https://www.elastic.co/downloads/beats/topbeat[download page].
 
 Before starting Topbeat, you should look at the configuration options in the configuration file,
-for example `/etc/topbeat/topbeat.yml`. For more information about these options, see the <<topbeat-configuration-options>>.
+for example `/etc/topbeat/topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
 
 [[topbeat-configuration]]
 === Configuring Topbeat
@@ -175,7 +175,7 @@ image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
 
 ==== Example of a Per Server Overview
 
-To display the statistics coming from a single server, you can use a search query like *shipper: precise32*:
+To display the statistics coming from a single server, you can use a search query like *beat.name: precise32*:
 
 image:./images/topbeat-dashboard-1shipper.png[Topbeat Dashboard page in Kibana for one server]
 
