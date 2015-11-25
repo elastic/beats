@@ -22,6 +22,14 @@ type Beater interface {
 	Stop()
 }
 
+// FlagsHandler (optional) Beater extension for
+// handling flags input on startup. The HandleFlags callback will
+// be called after parsing the command line arguments and handling
+// the '--help' or '--version' flags.
+type FlagsHandler interface {
+	HandleFlags(*Beat)
+}
+
 // Basic beat information
 type Beat struct {
 	Name    string
@@ -55,6 +63,30 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 	return &b
 }
 
+// Initiates and runs a new beat object
+func Run(name string, version string, bt Beater) *Beat {
+	b := NewBeat(name, version, bt)
+
+	// Additional command line args are used to overwrite config options
+	b.CommandLineSetup()
+
+	// Loads base config
+	b.LoadConfig()
+
+	// Configures beat
+	err := bt.Config(b)
+	if err != nil {
+		logp.Critical("Config error: %v", err)
+		os.Exit(1)
+	}
+
+	// Run beat. This calls first beater.Setup,
+	// then beater.Run and beater.Cleanup in the end
+	b.Run()
+
+	return b
+}
+
 // Reads and parses the default command line params
 // To set additional cmd line args use the beat.CmdLine type before calling the function
 func (beat *Beat) CommandLineSetup() {
@@ -71,6 +103,11 @@ func (beat *Beat) CommandLineSetup() {
 	if *printVersion {
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
 		os.Exit(0)
+	}
+
+	// if beater implements CLIFlags for additional CLI handling, call it now
+	if flagsHandler, ok := beat.BT.(FlagsHandler); ok {
+		flagsHandler.HandleFlags(beat)
 	}
 }
 

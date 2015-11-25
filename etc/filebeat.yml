@@ -59,12 +59,12 @@ filebeat:
       # Defines the buffer size every harvester uses when fetching the file
       #harvester_buffer_size: 16384
 
-      # Setting tail_files to true means filebeat starts reading new files at the end
+      # Setting tail_files to true means filebeat starts readding new files at the end
       # instead of the beginning. If this is used in combination with log rotation
       # this can mean that the first entries of a new file are skipped.
       #tail_files: false
 
-      # Backoff values define how aggressively filebeat crawls new files for updates
+      # Backoff values define how agressively filebeat crawls new files for updates
       # The default values can be used in most cases. Backoff defines how long it is waited
       # to check a file again after EOF is reached. Default is 1s which means the file
       # is checked every second if new lines were added. This leads to a near real time crawling.
@@ -72,7 +72,7 @@ filebeat:
       #backoff: 1s
 
       # Max backoff defines what the maximum backoff time is. After having backed off multiple times
-      # from checking the files, the waiting time will never exceed max_backoff independent of the
+      # from checking the files, the waiting time will never exceed max_backoff idenependent of the
       # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
       # file after having backed off multiple times, it takes a maximum of 10s to read the new line
       #max_backoff: 10s
