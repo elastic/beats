@@ -1,4 +1,4 @@
-package main
+package beat
 
 import (
 	"errors"
@@ -32,6 +32,10 @@ type Topbeat struct {
 	fsStats   bool
 
 	done chan struct{}
+}
+
+func New() *Topbeat {
+	return &Topbeat{}
 }
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
