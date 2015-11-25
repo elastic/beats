@@ -55,7 +55,7 @@ after_success:
 
 after_script:
   # Only publish non-pull request builds because credentials are required.
-  - if [ "$TRAVIS_PULL_REQUEST" == "true" ] && [ "$TRAVIS_REPO_SLUG" == "elastic/filebeat" ] && [ -e "build/system-tests/run" ] ; then
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_REPO_SLUG" == "elastic/filebeat" ] && [ -e "build/system-tests/run" ] ; then
       export OUTPUT_FILE="system-test-output_job-$TRAVIS_JOB_NUMBER-$TRAVIS_BUILD_ID.zip";
       zip -r $OUTPUT_FILE build/system-tests/run;
       aws s3 cp $OUTPUT_FILE s3://beats-nightlies/travis-ci/filebeat/$TRAVIS_BUILD_NUMBER/ --acl public-read;
