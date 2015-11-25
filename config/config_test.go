@@ -25,7 +25,7 @@ func TestConfigValidate(t *testing.T) {
 		{
 			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
-					EventLogConfig{Name: "App"},
+					{Name: "App"},
 				},
 			},
 			"", // No Error
@@ -44,7 +44,7 @@ func TestConfigValidate(t *testing.T) {
 		{
 			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
-					EventLogConfig{Name: "App"},
+					{Name: "App"},
 				},
 				Metrics: MetricsConfig{BindAddress: "example.com"},
 			},
@@ -53,7 +53,7 @@ func TestConfigValidate(t *testing.T) {
 		{
 			WinlogbeatConfig{
 				EventLogs: []EventLogConfig{
-					EventLogConfig{},
+					{},
 				},
 			},
 			"1 error: event log is missing a 'name'",
