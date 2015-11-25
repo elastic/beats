@@ -24,6 +24,10 @@ type Filebeat struct {
 	registrar     *Registrar
 }
 
+func New() *Filebeat {
+	return &Filebeat{}
+}
+
 // Config setups up the filebeat configuration by fetch all additional config files
 func (fb *Filebeat) Config(b *beat.Beat) error {
 

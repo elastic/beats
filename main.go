@@ -1,17 +1,12 @@
 package main
 
 import (
-	"os"
-
 	filebeat "github.com/elastic/filebeat/beat"
 	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/logp"
 )
 
 var Version = "1.0.0"
 var Name = "filebeat"
-
-var GlobalBeat *beat.Beat
 
 // The basic model of execution:
 // - prospector: finds files in paths/globs to harvest, starts harvesters
@@ -23,28 +18,5 @@ var GlobalBeat *beat.Beat
 // determine where in each file to restart a harvester.
 
 func main() {
-
-	// Create Beater object
-	fb := &filebeat.Filebeat{}
-
-	// Initi beat objectefile
-	b := beat.NewBeat(Name, Version, fb)
-
-	// Additional command line args are used to overwrite config options
-	b.CommandLineSetup()
-
-	// Loads base config
-	b.LoadConfig()
-
-	// Configures beat
-	err := fb.Config(b)
-	if err != nil {
-		logp.Critical("Config error: %v", err)
-		os.Exit(1)
-	}
-
-	// Run beat. This calls first beater.Setup,
-	// then beater.Run and beater.Cleanup in the end
-	b.Run()
-
+	beat.Run(Name, Version, filebeat.New())
 }
