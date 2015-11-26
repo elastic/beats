@@ -356,6 +356,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (string, bool, boo
 	if depth == 0 && isRedisCommand(content[0]) { // we've got a request
 		p.message.IsRequest = true
 		p.message.Method = content[0]
+		p.message.Path = content[1]
 	}
 
 	var value string
