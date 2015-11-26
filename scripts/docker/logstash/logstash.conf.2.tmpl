@@ -16,6 +16,8 @@ input {
 output {
   elasticsearch {
       hosts => []
+      user => "beats"
+      password => "testing"
       index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
       document_type => "%{[@metadata][type]}"
   }

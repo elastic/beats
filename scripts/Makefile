@@ -182,3 +182,5 @@ write-environment:
 	mkdir -p build
 	echo "ES_HOST=${ES_HOST}" > build/test.env
 	echo "ES_PORT=9200" >> build/test.env
+	echo "ES_USER=beats" >> build/test.env
+	echo "ES_PASS=testing" >> build/test.env

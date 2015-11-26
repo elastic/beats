@@ -19,8 +19,9 @@ elasticsearch-173:
 #  image: elasticsearch:2.0.1
 #  command: elasticsearch -Des.network.host=0.0.0.0
 elasticsearch-210:
-  image: elasticsearch:2.1.0
   command: elasticsearch -Des.network.host=0.0.0.0
+  build: scripts/docker/elasticsearch
+  dockerfile: Dockerfile-2.1.0
 redis:
   image: redis
 # This host name is fixed because of the certificate
