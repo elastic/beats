@@ -26,13 +26,28 @@ readParams() {
   : ${LS_TCP_PORT:=12345}
 }
 
+es_url() {
+    local auth
+
+    auth=""
+    if [ -n "$ES_USER" ]; then
+        auth="$ES_USER"
+        if [ -n "$ES_PASS" ]; then
+            auth="$auth:$ES_PASS"
+        fi
+        auth="$auth@"
+    fi
+
+    echo "http://${auth}${ES_HOST}:${ES_PORT}"
+}
+
 # Wait for elasticsearch to start. It requires that the status be either
 # green or yellow.
 waitForElasticsearch() {
-  echo -n "Waiting on elasticsearch(${ES_HOST}:${ES_PORT}) to start."
+  echo -n "Waiting on elasticsearch($(es_url)) to start."
   for ((i=1;i<=30;i++))
   do
-    health=$(curl --silent "http://${ES_HOST}:${ES_PORT}/_cat/health" | awk '{print $4}')
+    health=$(curl --silent "$(es_url)/_cat/health" | awk '{print $4}')
     if [[ "$health" == "green" ]] || [[ "$health" == "yellow" ]]
     then
       echo
@@ -47,7 +62,7 @@ waitForElasticsearch() {
 
   echo
   echo >&2 'Elasticsearch is not running or is not healthy.'
-  echo >&2 "Address: ${ES_HOST}:${ES_PORT}"
+  echo >&2 "Address: $(es_url)"
   echo >&2 "$health"
   exit 1
 }

@@ -33,7 +33,9 @@ func GetEsHost() string {
 
 func GetTestingElasticsearch() *Client {
 	var address = "http://" + GetEsHost() + ":" + GetEsPort()
-	return NewClient(address, "", nil, "", "")
+	username := os.Getenv("ES_USER")
+	pass := os.Getenv("ES_PASS")
+	return NewClient(address, "", nil, username, pass)
 }
 
 func GetValidQueryResult() QueryResult {
