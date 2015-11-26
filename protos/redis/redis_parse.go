@@ -18,8 +18,6 @@ type parser struct {
 
 type redisMessage struct {
 	Ts time.Time
-	// NumberOfBulks int64
-	// Bulks         []string
 
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
@@ -31,10 +29,6 @@ type redisMessage struct {
 	Method    string
 	Path      string
 	Size      int
-
-	// parseState int
-	// start      int
-	// end        int
 
 	next *redisMessage
 }
