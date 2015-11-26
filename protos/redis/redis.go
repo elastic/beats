@@ -11,18 +11,14 @@ import (
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/packetbeat/protos/applayer"
 	"github.com/elastic/packetbeat/protos/tcp"
 )
 
 type stream struct {
+	applayer.Stream
+	parser   parser
 	tcptuple *common.TcpTuple
-
-	data []byte
-
-	parseOffset   int
-	bytesReceived int
-
-	message *redisMessage
 }
 
 type transaction struct {
@@ -109,9 +105,9 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 }
 
 func (s *stream) PrepareForNewMessage() {
-	s.data = s.data[s.parseOffset:]
-	s.parseOffset = 0
-	s.message = nil
+	parser := &s.parser
+	s.Stream.Reset()
+	parser.reset()
 }
 
 func (redis *Redis) ConnectionTimeout() time.Duration {
@@ -161,27 +157,23 @@ func (redis *Redis) doParse(
 
 	st := conn.Streams[dir]
 	if st == nil {
-		st = &stream{
-			tcptuple: tcptuple,
-			data:     pkt.Payload,
-			message:  newMessage(pkt.Ts),
-		}
+		st = newStream(pkt.Ts, tcptuple)
 		conn.Streams[dir] = st
-	} else {
-		st.data = append(st.data, pkt.Payload...)
-		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("redis", "Stream data too large, dropping TCP stream")
-			conn.Streams[dir] = nil
-		}
-		return conn
+		debug("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 	}
 
-	for len(st.data) > 0 {
-		if st.message == nil {
-			st.message = newMessage(pkt.Ts)
+	if err := st.Append(pkt.Payload); err != nil {
+		debug("%v, dropping TCP stream: ", err)
+		return nil
+	}
+	debug("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+
+	for st.Buf.Len() > 0 {
+		if st.parser.message == nil {
+			st.parser.message = newMessage(pkt.Ts)
 		}
 
-		ok, complete := redisMessageParser(st)
+		ok, complete := st.parser.parse(&st.Buf)
 		if !ok {
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
@@ -195,22 +187,32 @@ func (redis *Redis) doParse(
 			break
 		}
 
-		if st.message.IsRequest {
-			debug("REDIS (%p) request message: %s", conn, st.message.Message)
+		msg := st.parser.message
+		if msg.IsRequest {
+			debug("REDIS (%p) request message: %s", conn, msg.Message)
 		} else {
-			debug("REDIS (%p) response message: %s", conn, st.message.Message)
+			debug("REDIS (%p) response message: %s", conn, msg.Message)
 		}
 
 		// all ok, go to next level and reset stream for new message
-		redis.handleRedis(conn, st.message, tcptuple, dir)
+		redis.handleRedis(conn, msg, tcptuple, dir)
 		st.PrepareForNewMessage()
 	}
 
 	return conn
 }
 
+func newStream(ts time.Time, tcptuple *common.TcpTuple) *stream {
+	s := &stream{
+		tcptuple: tcptuple,
+	}
+	s.parser.message = newMessage(ts)
+	s.Stream.Init(tcp.TCP_MAX_DATA_IN_STREAM)
+	return s
+}
+
 func newMessage(ts time.Time) *redisMessage {
-	return &redisMessage{Ts: ts, Bulks: []string{}}
+	return &redisMessage{Ts: ts}
 }
 
 func (redis *Redis) handleRedis(

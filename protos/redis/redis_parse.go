@@ -1,19 +1,25 @@
 package redis
 
 import (
-	"bytes"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/common"
+	"github.com/elastic/libbeat/common/streambuf"
 	"github.com/elastic/libbeat/logp"
 )
 
+type parser struct {
+	parseOffset int
+	// bytesReceived int
+	message *redisMessage
+}
+
 type redisMessage struct {
-	Ts            time.Time
-	NumberOfBulks int64
-	Bulks         []string
+	Ts time.Time
+	// NumberOfBulks int64
+	// Bulks         []string
 
 	TcpTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
@@ -26,9 +32,9 @@ type redisMessage struct {
 	Path      string
 	Size      int
 
-	parseState int
-	start      int
-	end        int
+	// parseState int
+	// start      int
+	// end        int
 
 	next *redisMessage
 }
@@ -206,215 +212,163 @@ func isRedisCommand(key string) bool {
 	return exists
 }
 
-func redisMessageParser(s *stream) (bool, bool) {
-	var err error
-	var value string
-	m := s.message
-
-	iserror := false
-
-	for s.parseOffset < len(s.data) {
-
-		if s.data[s.parseOffset] == '*' {
-			//Arrays
-
-			m.parseState = BULK_ARRAY
-			m.start = s.parseOffset
-			debug("start %d", m.start)
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				debug("End of line not found, waiting for more data")
-				return true, false
-			}
-			debug("line %s: %d", line, off)
-
-			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				//Null array
-				s.parseOffset = off
-				value = "nil"
-			} else if len(line) == 2 && line[1] == '0' {
-				// Empty array
-				s.parseOffset = off
-				value = "[]"
-			} else {
-
-				m.NumberOfBulks, err = strconv.ParseInt(line[1:], 10, 64)
-				if err != nil {
-					logp.Err("Failed to read number of bulk messages: %s", err)
-					return false, false
-				}
-
-				s.parseOffset = off
-				m.Bulks = make([]string, 0, m.NumberOfBulks)
-				continue
-			}
-
-		} else if s.data[s.parseOffset] == '$' {
-			// Bulk Strings
-			if m.parseState == START {
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			starting_offset := s.parseOffset
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				debug("End of line not found, waiting for more data")
-				s.parseOffset = starting_offset
-				return true, false
-			}
-			debug("line %s: %d", line, off)
-
-			if len(line) == 3 && line[1] == '-' && line[2] == '1' {
-				// NULL Bulk Reply
-				value = "nil"
-				s.parseOffset = off
-			} else {
-				length, err := strconv.ParseInt(line[1:], 10, 64)
-				if err != nil {
-					logp.Err("Failed to read bulk message: %s", err)
-					return false, false
-				}
-
-				s.parseOffset = off
-
-				// check all content in buffer (length + CRLF)
-				if int64(len(s.data[s.parseOffset:])) < length+2 {
-					debug("Message incomplete, waiting for more data")
-					s.parseOffset = starting_offset
-					return true, false
-				}
-
-				// check content ends with CRLF
-				off = s.parseOffset + int(length)
-				if s.data[off] != '\r' || s.data[off+1] != '\n' {
-					logp.Err("Expected end of line not found")
-					return false, false
-				}
-
-				// extract line
-				line = string(s.data[s.parseOffset:off])
-				off += 2
-
-				debug("line %s: %d", line, s.parseOffset)
-				if int64(len(line)) != length {
-					logp.Err("Wrong length of data: %d instead of %d", len(line), length)
-					return false, false
-				}
-
-				value = line
-				s.parseOffset = off
-			}
-
-		} else if s.data[s.parseOffset] == ':' {
-			// Integers
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-			n, err := strconv.ParseInt(line[1:], 10, 64)
-
-			if err != nil {
-				logp.Err("Failed to read integer reply: %s", err)
-				return false, false
-			}
-			value = strconv.Itoa(int(n))
-			s.parseOffset = off
-
-		} else if s.data[s.parseOffset] == '+' {
-			// Simple Strings
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-
-			value = line[1:]
-			s.parseOffset = off
-		} else if s.data[s.parseOffset] == '-' {
-			// Errors
-			if m.parseState == START {
-				// it's not in a bulk message
-				m.parseState = SIMPLE_MESSAGE
-				m.start = s.parseOffset
-			}
-			found, line, off := readLine(s.data, s.parseOffset)
-			if !found {
-				return true, false
-			}
-			iserror = true
-
-			value = line[1:]
-			s.parseOffset = off
-		} else {
-			debug("Unexpected message starting with %s", s.data[s.parseOffset:])
-			return false, false
-		}
-
-		// add value
-		if m.NumberOfBulks > 0 {
-			m.NumberOfBulks = m.NumberOfBulks - 1
-			m.Bulks = append(m.Bulks, value)
-
-			if len(m.Bulks) == 1 {
-				debug("Value: %s", value)
-				// first word.
-				// check if it's a command
-				if isRedisCommand(value) {
-					debug("is request")
-					m.IsRequest = true
-					m.Method = value
-				}
-			}
-
-			if len(m.Bulks) == 2 {
-				// second word. This is usually the path
-				if m.IsRequest {
-					m.Path = value
-				}
-			}
-
-			if m.NumberOfBulks == 0 {
-				// the last bulk received
-				if m.IsRequest {
-					m.Message = strings.Join(m.Bulks, " ")
-				} else {
-					m.Message = "[" + strings.Join(m.Bulks, ", ") + "]"
-				}
-				m.end = s.parseOffset
-				m.Size = m.end - m.start
-				return true, true
-			}
-		} else {
-			m.Message = value
-			m.end = s.parseOffset
-			m.Size = m.end - m.start
-			if iserror {
-				m.IsError = true
-			}
-			return true, true
-		}
-
-	} //end for
-
-	return true, false
+func (p *parser) reset() {
+	p.parseOffset = 0
+	p.message = nil
 }
 
-func readLine(data []byte, offset int) (bool, string, int) {
-	q := bytes.Index(data[offset:], []byte("\r\n"))
-	if q == -1 {
-		return false, "", 0
+func (parser *parser) parse(buf *streambuf.Buffer) (bool, bool) {
+	snapshot := buf.Snapshot()
+
+	content, iserror, ok, complete := parser.dispatch(0, buf)
+	if !ok || !complete {
+		// on error or incomplete message drop all parsing progress, due to
+		// parse not being statefull among multiple calls
+		// => parser needs to restart parsing all content
+		buf.Restore(snapshot)
+		return ok, complete
 	}
-	return true, string(data[offset : offset+q]), offset + q + 2
+
+	parser.message.IsError = iserror
+	parser.message.Size = buf.BufferConsumed()
+	parser.message.Message = content
+	return true, true
+}
+
+func (p *parser) dispatch(depth int, buf *streambuf.Buffer) (string, bool, bool, bool) {
+	if buf.Len() == 0 {
+		return "", false, true, false
+	}
+
+	var value string
+	var iserror, ok, complete bool
+	snapshot := buf.Snapshot()
+
+	switch buf.Bytes()[0] {
+	case '*':
+		value, iserror, ok, complete = p.parseArray(depth, buf)
+	case '$':
+		value, ok, complete = p.parseString(buf)
+	case ':':
+		value, ok, complete = p.parseInt(buf)
+	case '+':
+		value, ok, complete = p.parseSimpleString(buf)
+	case '-':
+		iserror = true
+		value, ok, complete = p.parseSimpleString(buf)
+	default:
+		debug("Unexpected message starting with %s", buf.Bytes()[0])
+		return "", false, false, false
+	}
+
+	if !ok || !complete {
+		buf.Restore(snapshot)
+	}
+	return value, iserror, ok, complete
+}
+
+func (p *parser) parseInt(buf *streambuf.Buffer) (string, bool, bool) {
+	line, err := buf.UntilCRLF()
+	if err != nil {
+		return "", true, false
+	}
+
+	number := string(line[1:])
+	if _, err := strconv.ParseInt(number, 10, 64); err != nil {
+		logp.Err("Failed to read integer reply: %s", err)
+	}
+
+	return number, true, true
+}
+
+func (p *parser) parseSimpleString(buf *streambuf.Buffer) (string, bool, bool) {
+	line, err := buf.UntilCRLF()
+	if err != nil {
+		return "", true, false
+	}
+
+	return string(line[1:]), true, true
+}
+
+func (p *parser) parseString(buf *streambuf.Buffer) (string, bool, bool) {
+	line, err := buf.UntilCRLF()
+	if err != nil {
+		return "", true, false
+	}
+
+	if len(line) == 3 && line[1] == '-' && line[2] == '1' {
+		return "nil", true, true
+	}
+
+	length, err := strconv.ParseInt(string(line[1:]), 10, 64)
+	if err != nil {
+		logp.Err("Failed to read bulk message: %s", err)
+		return "", false, false
+	}
+
+	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
+	if err != nil {
+		if err != streambuf.ErrNoMoreBytes {
+			return "", false, false
+		}
+		return "", true, false
+	}
+
+	return string(content), true, true
+}
+
+func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (string, bool, bool, bool) {
+	line, err := buf.UntilCRLF()
+	if err != nil {
+		debug("End of line not found, waiting for more data")
+		return "", false, false, false
+	}
+	debug("line %s: %d", line, buf.BufferConsumed())
+
+	if len(line) == 3 && line[1] == '-' && line[2] == '1' {
+		return "nil", false, true, true
+	}
+
+	if len(line) == 2 && line[1] == '0' {
+		return "[]", false, true, true
+	}
+
+	count, err := strconv.ParseInt(string(line[1:]), 10, 64)
+	if err != nil {
+		logp.Err("Failed to read number of bulk messages: %s", err)
+		return "", false, false, false
+	}
+	if count < 0 {
+		return "nil", false, true, true
+	}
+
+	content := make([]string, 0, count)
+	// read sub elements
+
+	iserror := false
+	for i := 0; i < int(count); i++ {
+		var value string
+		var ok, complete bool
+
+		value, iserror, ok, complete := p.dispatch(depth+1, buf)
+		if !ok || !complete {
+			debug("Array incomplete")
+			return "", iserror, ok, complete
+		}
+
+		content = append(content, value)
+	}
+
+	if depth == 0 && isRedisCommand(content[0]) { // we've got a request
+		p.message.IsRequest = true
+		p.message.Method = content[0]
+	}
+
+	var value string
+	if depth == 0 && p.message.IsRequest {
+		value = strings.Join(content, " ")
+	} else {
+		value = "[" + strings.Join(content, ", ") + "]"
+	}
+	return value, iserror, true, true
 }
