@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/libbeat/common"
 )
 
-type MongodbMessage struct {
+type mongodbMessage struct {
 	Ts time.Time
 
 	TcpTuple     common.TcpTuple
@@ -39,29 +39,28 @@ type MongodbMessage struct {
 }
 
 // Represent a stream being parsed that contains a mongodb message
-type MongodbStream struct {
+type stream struct {
 	tcptuple *common.TcpTuple
 
-	data []byte
-
-	message *MongodbMessage
+	data    []byte
+	message *mongodbMessage
 }
 
 // Parser moves to next message in stream
-func (stream *MongodbStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.message.messageLength:]
-	stream.message = nil
+func (st *stream) PrepareForNewMessage() {
+	st.data = st.data[st.message.messageLength:]
+	st.message = nil
 }
 
 // The private data of a parser instance
 // is composed of 2 potentially active streams: incoming, outgoing
-type mongodbPrivateData struct {
-	Data [2]*MongodbStream
+type mongodbConnectionData struct {
+	Streams [2]*stream
 }
 
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
-type MongodbTransaction struct {
+type transaction struct {
 	Type         string
 	tuple        common.TcpTuple
 	cmdline      *common.CmdlineTuple

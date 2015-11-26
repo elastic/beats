@@ -14,13 +14,15 @@ import (
 	"github.com/elastic/packetbeat/protos/tcp"
 )
 
+var debugf = logp.MakeDebug("mongodb")
+
 type Mongodb struct {
 	// config
-	Ports          []int
-	Send_request   bool
-	Send_response  bool
-	Max_docs       int
-	Max_doc_length int
+	Ports        []int
+	SendRequest  bool
+	SendResponse bool
+	MaxDocs      int
+	MaxDocLength int
 
 	transactions       *common.Cache
 	transactionTimeout time.Duration
@@ -28,19 +30,19 @@ type Mongodb struct {
 	results publisher.Client
 }
 
-func (mongodb *Mongodb) getTransaction(k common.HashableTcpTuple) *MongodbTransaction {
+func (mongodb *Mongodb) getTransaction(k common.HashableTcpTuple) *transaction {
 	v := mongodb.transactions.Get(k)
 	if v != nil {
-		return v.(*MongodbTransaction)
+		return v.(*transaction)
 	}
 	return nil
 }
 
 func (mongodb *Mongodb) InitDefaults() {
-	mongodb.Send_request = false
-	mongodb.Send_response = false
-	mongodb.Max_docs = 10
-	mongodb.Max_doc_length = 5000
+	mongodb.SendRequest = false
+	mongodb.SendResponse = false
+	mongodb.MaxDocs = 10
+	mongodb.MaxDocLength = 5000
 	mongodb.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
@@ -48,16 +50,16 @@ func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
 	mongodb.Ports = config.Ports
 
 	if config.SendRequest != nil {
-		mongodb.Send_request = *config.SendRequest
+		mongodb.SendRequest = *config.SendRequest
 	}
 	if config.SendResponse != nil {
-		mongodb.Send_response = *config.SendResponse
+		mongodb.SendResponse = *config.SendResponse
 	}
 	if config.Max_docs != nil {
-		mongodb.Max_docs = *config.Max_docs
+		mongodb.MaxDocs = *config.Max_docs
 	}
 	if config.Max_doc_length != nil {
-		mongodb.Max_doc_length = *config.Max_doc_length
+		mongodb.MaxDocLength = *config.Max_doc_length
 	}
 	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
 		mongodb.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
@@ -70,7 +72,7 @@ func (mongodb *Mongodb) GetPorts() []int {
 }
 
 func (mongodb *Mongodb) Init(test_mode bool, results publisher.Client) error {
-	logp.Debug("mongodb", "Init a MongoDB protocol parser")
+	debugf("Init a MongoDB protocol parser")
 
 	mongodb.InitDefaults()
 	if !test_mode {
@@ -93,75 +95,100 @@ func (mongodb *Mongodb) ConnectionTimeout() time.Duration {
 	return mongodb.transactionTimeout
 }
 
-func (mongodb *Mongodb) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
-	logp.Debug("mongodb", "Parse method triggered")
-
+func (mongodb *Mongodb) Parse(
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseMongodb exception")
+	debugf("Parse method triggered")
 
-	// Either fetch or initialize current data struct for this parser
-	priv := mongodbPrivateData{}
-	if private != nil {
-		var ok bool
-		priv, ok = private.(mongodbPrivateData)
-		if !ok {
-			priv = mongodbPrivateData{}
-		}
+	conn := ensureMongodbConnection(private)
+	conn = mongodb.doParse(conn, pkt, tcptuple, dir)
+	if conn == nil {
+		return nil
+	}
+	return conn
+}
+
+func ensureMongodbConnection(private protos.ProtocolData) *mongodbConnectionData {
+	if private == nil {
+		return &mongodbConnectionData{}
 	}
 
-	if priv.Data[dir] == nil {
-		priv.Data[dir] = &MongodbStream{
-			tcptuple: tcptuple,
-			data:     pkt.Payload,
-			message:  &MongodbMessage{Ts: pkt.Ts},
-		}
-	} else {
-		// concatenate bytes
-		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
-		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("mongodb", "Stream data too large, dropping TCP stream")
-			priv.Data[dir] = nil
-			return priv
-		}
+	priv, ok := private.(*mongodbConnectionData)
+	if !ok {
+		logp.Warn("mongodb connection data type error, create new one")
+		return &mongodbConnectionData{}
 	}
-
-	stream := priv.Data[dir]
-	for len(stream.data) > 0 {
-		if stream.message == nil {
-			stream.message = &MongodbMessage{Ts: pkt.Ts}
-		}
-
-		ok, complete := mongodbMessageParser(priv.Data[dir])
-
-		if !ok {
-			// drop this tcp stream. Will retry parsing with the next
-			// segment in it
-			priv.Data[dir] = nil
-			logp.Debug("mongodb", "Ignore Mongodb message. Drop tcp stream. Try parsing with the next segment")
-			return priv
-		}
-
-		if complete {
-
-			logp.Debug("mongodb", "MongoDB message complete")
-
-			// all ok, go to next level
-			mongodb.handleMongodb(stream.message, tcptuple, dir)
-
-			// and reset message
-			stream.PrepareForNewMessage()
-		} else {
-			// wait for more data
-			logp.Debug("mongodb", "MongoDB wait for more data before parsing message")
-			break
-		}
+	if priv == nil {
+		logp.Warn("Unexpected: mongodb connection data not set, create new one")
+		return &mongodbConnectionData{}
 	}
 
 	return priv
 }
 
-func (mongodb *Mongodb) handleMongodb(m *MongodbMessage, tcptuple *common.TcpTuple,
+func (mongodb *Mongodb) doParse(
+	conn *mongodbConnectionData,
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) *mongodbConnectionData {
+	st := conn.Streams[dir]
+	if st == nil {
+		st = newStream(pkt, tcptuple)
+		debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+	} else {
+		// concatenate bytes
+		st.data = append(st.data, pkt.Payload...)
+		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			debugf("Stream data too large, dropping TCP stream")
+			conn.Streams[dir] = nil
+			return conn
+		}
+	}
+
+	for len(st.data) > 0 {
+		if st.message == nil {
+			st.message = &mongodbMessage{Ts: pkt.Ts}
+		}
+
+		ok, complete := mongodbMessageParser(st)
+		if !ok {
+			// drop this tcp stream. Will retry parsing with the next
+			// segment in it
+			conn.Streams[dir] = nil
+			debugf("Ignore Mongodb message. Drop tcp stream. Try parsing with the next segment")
+			return conn
+		}
+
+		if !complete {
+			// wait for more data
+			debugf("MongoDB wait for more data before parsing message")
+			break
+		}
+
+		// all ok, go to next level and reset stream for new message
+		debugf("MongoDB message complete")
+		mongodb.handleMongodb(st.message, tcptuple, dir)
+		st.PrepareForNewMessage()
+	}
+
+	return conn
+}
+
+func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
+	s := &stream{
+		tcptuple: tcptuple,
+		data:     pkt.Payload,
+		message:  &mongodbMessage{Ts: pkt.Ts},
+	}
+	return s
+}
+
+func (mongodb *Mongodb) handleMongodb(m *mongodbMessage, tcptuple *common.TcpTuple,
 	dir uint8) {
 
 	m.TcpTuple = *tcptuple
@@ -169,15 +196,15 @@ func (mongodb *Mongodb) handleMongodb(m *MongodbMessage, tcptuple *common.TcpTup
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
 
 	if m.IsResponse {
-		logp.Debug("mongodb", "MongoDB response message")
+		debugf("MongoDB response message")
 		mongodb.receivedMongodbResponse(m)
 	} else {
-		logp.Debug("mongodb", "MongoDB request message")
+		debugf("MongoDB request message")
 		mongodb.receivedMongodbRequest(m)
 	}
 }
 
-func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
+func (mongodb *Mongodb) receivedMongodbRequest(msg *mongodbMessage) {
 	// Add it to the HT
 	tuple := msg.TcpTuple
 
@@ -187,8 +214,8 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 			logp.Warn("Two requests without a Response. Dropping old request")
 		}
 	} else {
-		logp.Debug("mongodb", "Initialize new transaction from request")
-		trans = &MongodbTransaction{Type: "mongodb", tuple: tuple}
+		debugf("Initialize new transaction from request")
+		trans = &transaction{Type: "mongodb", tuple: tuple}
 		mongodb.transactions.Put(tuple.Hashable(), trans)
 	}
 
@@ -220,7 +247,7 @@ func (mongodb *Mongodb) receivedMongodbRequest(msg *MongodbMessage) {
 	trans.BytesIn = msg.messageLength
 }
 
-func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
+func (mongodb *Mongodb) receivedMongodbResponse(msg *mongodbMessage) {
 
 	trans := mongodb.getTransaction(msg.TcpTuple.Hashable())
 	if trans == nil {
@@ -248,7 +275,7 @@ func (mongodb *Mongodb) receivedMongodbResponse(msg *MongodbMessage) {
 	mongodb.publishTransaction(trans)
 	mongodb.transactions.Delete(trans.tuple.Hashable())
 
-	logp.Debug("mongodb", "Mongodb transaction completed: %s", trans.Mongodb)
+	debugf("Mongodb transaction completed: %s", trans.Mongodb)
 }
 
 func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
@@ -276,7 +303,7 @@ func copy_map_without_key(d map[string]interface{}, key string) map[string]inter
 	return res
 }
 
-func reconstructQuery(t *MongodbTransaction, full bool) (query string) {
+func reconstructQuery(t *transaction, full bool) (query string) {
 	query = t.resource + "." + t.method + "("
 	if len(t.params) > 0 {
 		var err error
@@ -295,7 +322,7 @@ func reconstructQuery(t *MongodbTransaction, full bool) (query string) {
 			params, err = doc2str(t.params)
 		}
 		if err != nil {
-			logp.Debug("mongodb", "Error marshaling params: %v", err)
+			debugf("Error marshaling params: %v", err)
 		} else {
 			query += params
 		}
@@ -313,10 +340,10 @@ func reconstructQuery(t *MongodbTransaction, full bool) (query string) {
 	return
 }
 
-func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
+func (mongodb *Mongodb) publishTransaction(t *transaction) {
 
 	if mongodb.results == nil {
-		logp.Debug("mongodb", "Try to publish transaction with null results")
+		debugf("Try to publish transaction with null results")
 		return
 	}
 
@@ -339,15 +366,15 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	if mongodb.Send_request {
+	if mongodb.SendRequest {
 		event["request"] = reconstructQuery(t, true)
 	}
-	if mongodb.Send_response {
+	if mongodb.SendResponse {
 		if len(t.documents) > 0 {
 			// response field needs to be a string
 			docs := make([]string, 0, len(t.documents))
 			for i, doc := range t.documents {
-				if mongodb.Max_docs > 0 && i >= mongodb.Max_docs {
+				if mongodb.MaxDocs > 0 && i >= mongodb.MaxDocs {
 					docs = append(docs, "[...]")
 					break
 				}
@@ -355,8 +382,8 @@ func (mongodb *Mongodb) publishTransaction(t *MongodbTransaction) {
 				if err != nil {
 					logp.Warn("Failed to JSON marshal document from Mongo: %v (error: %v)", doc, err)
 				} else {
-					if mongodb.Max_doc_length > 0 && len(str) > mongodb.Max_doc_length {
-						str = str[:mongodb.Max_doc_length] + " ..."
+					if mongodb.MaxDocLength > 0 && len(str) > mongodb.MaxDocLength {
+						str = str[:mongodb.MaxDocLength] + " ..."
 					}
 					docs = append(docs, str)
 				}
