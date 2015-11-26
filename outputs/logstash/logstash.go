@@ -100,9 +100,11 @@ func (lj *logstash) init(
 	}
 
 	sendRetries := defaultSendRetries
-	if config.Max_retries != nil {
-		sendRetries = *config.Max_retries
+	if config.MaxRetries != nil {
+		sendRetries = *config.MaxRetries
 	}
+	logp.Info("Max Retries set to: %v", sendRetries)
+
 	maxAttempts := sendRetries + 1
 	if sendRetries < 0 {
 		maxAttempts = 0

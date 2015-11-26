@@ -38,22 +38,26 @@ func (out *fileOutput) init(beat string, config *outputs.MothershipConfig, topol
 	if out.rotator.Name == "" {
 		out.rotator.Name = beat
 	}
+	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
 	// disable bulk support
 	configDisableInt := -1
-	config.Flush_interval = &configDisableInt
+	config.FlushInterval = &configDisableInt
 	config.BulkMaxSize = &configDisableInt
 
-	rotateeverybytes := uint64(config.Rotate_every_kb) * 1024
+	rotateeverybytes := uint64(config.RotateEveryKb) * 1024
 	if rotateeverybytes == 0 {
 		rotateeverybytes = 10 * 1024 * 1024
 	}
+	logp.Info("Rotate every bytes set to: %v", rotateeverybytes)
 	out.rotator.RotateEveryBytes = &rotateeverybytes
 
-	keepfiles := config.Number_of_files
+	keepfiles := config.NumberOfFiles
 	if keepfiles == 0 {
 		keepfiles = 7
 	}
+	logp.Info("Number of files set to: %v", keepfiles)
+
 	out.rotator.KeepFiles = &keepfiles
 
 	err := out.rotator.CreateDirectory()

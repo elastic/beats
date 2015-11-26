@@ -87,8 +87,8 @@ func (out *elasticsearchOutput) init(
 	}
 
 	maxRetries := defaultMaxRetries
-	if config.Max_retries != nil {
-		maxRetries = *config.Max_retries
+	if config.MaxRetries != nil {
+		maxRetries = *config.MaxRetries
 	}
 	maxAttempts := maxRetries + 1 // maximum number of send attempts (-1 = infinite)
 	if maxRetries < 0 {
