@@ -145,11 +145,6 @@ the backoff algorithm is disabled, and the `backoff` value is used for waiting f
 lines. The `backoff` value will be multiplied each time with the `backoff_factor` until
 `max_backoff` is reached. The default is 2.
 
-===== partial_line_waiting
-
-Sometimes Filebeat checks a line before it's completely written. This option specifies
-how long the harvester waits for the system to complete a line before skipping that line. The default is 5s.
-
 ===== force_close_files
 
 By default, Filebeat keeps the files that it’s reading open until the timespan specified by `ignore_older` has elapsed. This behaviour can cause issues when a file is removed. Because the file isn't fully removed until Filebeat closes the file, no new file with the same name can be created during this time.

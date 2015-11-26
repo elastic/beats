@@ -81,20 +81,18 @@ func (h *Harvester) Harvest() {
 	//      timedReader provides timestamp some bytes have actually been read from file
 	lastReadTime := time.Now()
 
-	// remember size of last partial line being sent. Do not publish partial line, if
-	// no new bytes have been processed
-	lastPartialLen := 0
-
 	for {
-		text, bytesRead, isPartial, err := readLine(reader, &timedIn.lastReadTime, h.Config.PartialLineWaitingDuration)
+		// Partial lines return error and are only read on completion
+		text, bytesRead, err := readLine(reader, &timedIn.lastReadTime)
 
 		if err != nil {
 
 			// In case of err = io.EOF returns nil
 			err = h.handleReadlineError(lastReadTime, err)
 
+			// Return in case of error which leads to stopping harvester and closing file
 			if err != nil {
-				logp.Err("File reading error. Stopping harvester. Error: %s", err)
+				logp.Info("Read line error: %s", err)
 				return
 			}
 
@@ -105,18 +103,6 @@ func (h *Harvester) Harvest() {
 
 		// Reset Backoff
 		h.backoff = h.Config.BackoffDuration
-
-		if isPartial {
-			if bytesRead <= lastPartialLen {
-				// drop partial line event, as no new bytes have been consumed from
-				// input stream
-				continue
-			}
-
-			lastPartialLen = bytesRead
-		} else {
-			lastPartialLen = 0
-		}
 
 		// Sends text to spooler
 		event := &input.FileEvent{
@@ -129,11 +115,9 @@ func (h *Harvester) Harvest() {
 			Text:         &text,
 			Fields:       &h.Config.Fields,
 			Fileinfo:     &info,
-			IsPartial:    isPartial,
 		}
-		if !isPartial {
-			h.Offset += int64(bytesRead) // Update offset if complete line has been processed
-		}
+
+		h.Offset += int64(bytesRead) // Update offset if complete line has been processed
 
 		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
 		h.SpoolerChan <- event // ship the new event downstream
@@ -291,11 +275,17 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 	if h.Config.ForceCloseFiles {
 		_, statErr := os.Stat(h.file.Name())
 		if statErr != nil {
-			logp.Info("Unexpected force close specific error reading from %s; error: %s", h.Path, statErr)
+			logp.Info("Force close file: %s; error: %s", h.Path, statErr)
 			// Return directly on windows -> file is closing
 			return fmt.Errorf("Force closing file: %s", h.Path)
 		}
 	}
+
+	if err != io.EOF {
+		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
+	}
+
+	logp.Debug("harvester", "End of file reached: %s; Backoff now.", h.Path)
 
 	// Do nothing in case it is just EOF, keep reading the file after backing off
 	h.backOff()
@@ -303,73 +293,4 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 }
 
 func (h *Harvester) Stop() {
-}
-
-/*** Utility Functions ***/
-
-// isLine checks if the given byte array is a line, means has a line ending \n
-func isLine(line []byte) bool {
-	if line == nil || len(line) == 0 {
-		return false
-	}
-
-	if line[len(line)-1] != '\n' {
-		return false
-	}
-	return true
-}
-
-// lineEndingChars returns the number of line ending chars the given by array has
-// In case of Unix/Linux files, it is -1, in case of Windows mostly -2
-func lineEndingChars(line []byte) int {
-	if !isLine(line) {
-		return 0
-	}
-
-	if line[len(line)-1] == '\n' {
-		if len(line) > 1 && line[len(line)-2] == '\r' {
-			return 2
-		}
-
-		return 1
-	}
-	return 0
-}
-
-// readLine reads a full line into buffer and returns it.
-// In case of partial lines, readLine waits for a maximum of partialLineWaiting seconds for new segments to arrive.
-// This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
-func readLine(
-	reader *lineReader,
-	lastReadTime *time.Time,
-	partialLineWaiting time.Duration,
-) (string, int, bool, error) {
-	for {
-		line, sz, err := reader.next()
-		if err != nil {
-			if err == io.EOF {
-				return "", 0, false, err
-			}
-		}
-
-		if sz != 0 {
-			return readlineString(line, sz, false)
-		}
-
-		// test for no file updates longer than partialLineWaiting
-		if time.Since(*lastReadTime) >= partialLineWaiting {
-			// return all bytes read for current line to be processed.
-			// Line might grow with further read attempts
-			line, sz, err = reader.partial()
-			return readlineString(line, sz, true)
-		}
-
-		// wait for file updates before reading new lines
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func readlineString(bytes []byte, sz int, partial bool) (string, int, bool, error) {
-	s := string(bytes)[:len(bytes)-lineEndingChars(bytes)]
-	return s, sz, partial, nil
 }

@@ -82,12 +82,6 @@ filebeat:
       # The backoff value will be multiplied each time with the backoff_factor until max_backoff is reached
       #backoff_factor: 2
 
-      # Defines the time on how long the harvester will wait for a line to be completed.
-      # Sometimes a lines it not completely written when checked by filebeat. Filebeat
-      # will wait for the time defined below so the system can complete the line.
-      # In case the line is not completed in this time, the line will be skipped.
-      #partial_line_waiting: 5s
-
       # This option closes a file, as soon as the file name changes.
       # This config option is recommended on windows only. Filebeat keeps the files it's reading open. This can cause
       # issues when the file is removed, as the file will not be fully removed until also Filebeat closes

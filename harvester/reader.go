@@ -117,6 +117,7 @@ func (l *lineReader) next() ([]byte, int, error) {
 	bytes, err := l.outBuffer.Collect(l.outBuffer.Len())
 	l.outBuffer.Reset()
 	if err != nil {
+		// This should never happen as otherwise we have a broken state
 		panic(err)
 	}
 
@@ -205,34 +206,4 @@ func (l *lineReader) decode(end int) (int, error) {
 
 	l.byteCount += start
 	return start, err
-}
-
-// partial returns current state of decoded input bytes and amount of bytes
-// processed so far. If decoder has detected an error in input stream, the error
-// will be returned.
-func (l *lineReader) partial() ([]byte, int, error) {
-	// decode all input buffer
-	sz, err := l.decode(l.inBuffer.Len())
-	l.inBuffer.Advance(sz)
-	l.inBuffer.Reset()
-
-	l.inOffset -= sz
-	if l.inOffset < 0 {
-		l.inOffset = 0
-	}
-
-	// return current state of outBuffer, but do not consume any content yet
-	bytes := l.outBuffer.Bytes()
-	sz = l.byteCount
-	return bytes, sz, err
-}
-
-// dropPartial drops current output buffer of decoded characters returning total number
-// of input bytes consumed
-func (l *lineReader) dropPartial() int {
-	l.outBuffer.Advance(l.outBuffer.Len())
-	l.outBuffer.Reset()
-	sz := l.byteCount
-	l.byteCount = 0
-	return sz
 }

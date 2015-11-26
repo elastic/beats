@@ -24,7 +24,6 @@ const (
 	DefaultBackoff                           = 1 * time.Second
 	DefaultBackoffFactor                     = 2
 	DefaultMaxBackoff                        = 10 * time.Second
-	DefaultPartialLineWaiting                = 5 * time.Second
 	DefaultForceCloseFiles                   = false
 )
 
@@ -52,21 +51,19 @@ type ProspectorConfig struct {
 }
 
 type HarvesterConfig struct {
-	InputType                  string `yaml:"input_type"`
-	Fields                     map[string]string
-	FieldsUnderRoot            bool   `yaml:"fields_under_root"`
-	BufferSize                 int    `yaml:"harvester_buffer_size"`
-	TailFiles                  bool   `yaml:"tail_files"`
-	Encoding                   string `yaml:"encoding"`
-	DocumentType               string `yaml:"document_type"`
-	Backoff                    string `yaml:"backoff"`
-	BackoffDuration            time.Duration
-	BackoffFactor              int    `yaml:"backoff_factor"`
-	MaxBackoff                 string `yaml:"max_backoff"`
-	MaxBackoffDuration         time.Duration
-	PartialLineWaiting         string `yaml:"partial_line_wating"`
-	PartialLineWaitingDuration time.Duration
-	ForceCloseFiles            bool `yaml:"force_close_files"`
+	InputType          string `yaml:"input_type"`
+	Fields             map[string]string
+	FieldsUnderRoot    bool   `yaml:"fields_under_root"`
+	BufferSize         int    `yaml:"harvester_buffer_size"`
+	TailFiles          bool   `yaml:"tail_files"`
+	Encoding           string `yaml:"encoding"`
+	DocumentType       string `yaml:"document_type"`
+	Backoff            string `yaml:"backoff"`
+	BackoffDuration    time.Duration
+	BackoffFactor      int    `yaml:"backoff_factor"`
+	MaxBackoff         string `yaml:"max_backoff"`
+	MaxBackoffDuration time.Duration
+	ForceCloseFiles    bool `yaml:"force_close_files"`
 }
 
 // getConfigFiles returns list of config files.
