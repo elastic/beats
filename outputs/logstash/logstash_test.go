@@ -344,9 +344,9 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 			CAs:      []string{certName + ".pem"},
 			Insecure: true,
 		},
-		Timeout:     2,
-		Max_retries: &retries,
-		Hosts:       []string{server.Addr()},
+		Timeout:    2,
+		MaxRetries: &retries,
+		Hosts:      []string{server.Addr()},
 	}
 
 	testConnectionType(t, server, testOutputerFactory(t, "", &config))
@@ -431,9 +431,9 @@ func TestLogstashInvalidTLS(t *testing.T) {
 		TLS: &outputs.TLSConfig{
 			CAs: []string{certName + ".pem"},
 		},
-		Timeout:     1,
-		Max_retries: &retries,
-		Hosts:       []string{server.Addr()},
+		Timeout:    1,
+		MaxRetries: &retries,
+		Hosts:      []string{server.Addr()},
 	}
 
 	var result struct {
