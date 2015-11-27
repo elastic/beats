@@ -1,13 +1,12 @@
 package harvester
 
 import (
+	"io"
 	"os"
-
-	"golang.org/x/text/encoding"
-
 	"time"
 
 	"github.com/elastic/filebeat/config"
+	"github.com/elastic/filebeat/harvester/encoding"
 	"github.com/elastic/filebeat/input"
 )
 
@@ -18,8 +17,8 @@ type Harvester struct {
 	Offset           int64
 	Stat             *FileStat
 	SpoolerChan      chan *input.FileEvent
-	encoding         encoding.Encoding
-	file             *os.File /* the file being watched */
+	encoding         encoding.EncodingFactory
+	file             FileSource /* the file being watched */
 	backoff          time.Duration
 }
 
@@ -30,11 +29,36 @@ type FileStat struct {
 	LastIteration uint32      /* int number of the last iterations in which we saw this file */
 }
 
+type LogSource interface {
+	io.ReadCloser
+	Name() string
+}
+
+type FileSource interface {
+	LogSource
+	Stat() (os.FileInfo, error)
+	Continuable() bool // can we continue processing after EOF?
+}
+
 // Interface for the different harvester types
 type Typer interface {
 	open()
 	read()
 }
+
+// restrict file to minimal interface of FileSource to prevent possible casts
+// to additional interfaces supported by underlying file
+type pipeSource struct{ file *os.File }
+
+func (p pipeSource) Read(b []byte) (int, error) { return p.file.Read(b) }
+func (p pipeSource) Close() error               { return p.file.Close() }
+func (p pipeSource) Name() string               { return p.file.Name() }
+func (p pipeSource) Stat() (os.FileInfo, error) { return p.file.Stat() }
+func (p pipeSource) Continuable() bool          { return false }
+
+type fileSource struct{ *os.File }
+
+func (fileSource) Continuable() bool { return true }
 
 func (h *Harvester) Start() {
 	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)

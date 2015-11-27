@@ -126,6 +126,11 @@ func IsSameFile(path string, info os.FileInfo) bool {
 	return os.SameFile(fileInfo, info)
 }
 
+func IsRegularFile(file *os.File) bool {
+	f := &File{File: file}
+	return f.IsRegularFile()
+}
+
 // Checks if the two files are the same.
 func (f1 *File) IsSameFile(f2 *File) bool {
 	return os.SameFile(f1.FileInfo, f2.FileInfo)

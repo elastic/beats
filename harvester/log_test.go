@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/elastic/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,7 +55,8 @@ func TestReadLine(t *testing.T) {
 
 	// Read only 10 bytes which is not the end of the file
 	timedIn := newTimedReader(readFile)
-	reader, _ := newLineReader(timedIn, Plain, 100)
+	codec, _ := encoding.Plain(file)
+	reader, _ := newLineReader(timedIn, codec, 100)
 
 	// Read third line
 	text, bytesread, isPartial, err := readLine(reader, &timedIn.lastReadTime, 0)

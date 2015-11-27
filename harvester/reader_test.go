@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/elastic/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
 
 	"golang.org/x/text/transform"
@@ -29,13 +30,14 @@ func TestReaderEncodings(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
-		codec, ok := findEncoding(test.encoding)
+		codecFactory, ok := encoding.FindEncoding(test.encoding)
 		if !ok {
 			t.Errorf("can not find encoding '%v'", test.encoding)
 			continue
 		}
 
 		buffer := bytes.NewBuffer(nil)
+		codec, _ := codecFactory(buffer)
 
 		// write with encoding to buffer
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
@@ -90,13 +92,15 @@ func TestReaderPartialWithEncodings(t *testing.T) {
 	for _, test := range tests {
 		t.Logf("test codec: %v", test.encoding)
 
-		codec, ok := findEncoding(test.encoding)
+		codecFactory, ok := encoding.FindEncoding(test.encoding)
 		if !ok {
 			t.Errorf("can not find encoding '%v'", test.encoding)
 			continue
 		}
 
 		buffer := bytes.NewBuffer(nil)
+		codec, _ := codecFactory(buffer)
+
 		writer := transform.NewWriter(buffer, codec.NewEncoder())
 		reader, err := newLineReader(buffer, codec, 1024)
 		if err != nil {
@@ -195,7 +199,8 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
-	reader, err := newLineReader(buffer, Plain, buffer.Len())
+	codec, _ := encoding.Plain(buffer)
+	reader, err := newLineReader(buffer, codec, buffer.Len())
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
