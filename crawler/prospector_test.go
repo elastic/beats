@@ -120,3 +120,54 @@ func TestProspectorInitInvalidIgnoreOlder(t *testing.T) {
 	err := prospector.Init()
 	assert.NotNil(t, err)
 }
+
+func TestProspectorInitInputTypeLog(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		Harvester: config.HarvesterConfig{
+			InputType: "log",
+		},
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	err := prospector.Init()
+	assert.Nil(t, err)
+	assert.Equal(t, "log", prospector.ProspectorConfig.Harvester.InputType)
+}
+
+func TestProspectorInitInputTypeStdin(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		Harvester: config.HarvesterConfig{
+			InputType: "stdin",
+		},
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	err := prospector.Init()
+	assert.Nil(t, err)
+	assert.Equal(t, "stdin", prospector.ProspectorConfig.Harvester.InputType)
+}
+
+func TestProspectorInitInputTypeWrong(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		Harvester: config.HarvesterConfig{
+			InputType: "wrong-type",
+		},
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	err := prospector.Init()
+	assert.Nil(t, err)
+	assert.Equal(t, "log", prospector.ProspectorConfig.Harvester.InputType)
+}

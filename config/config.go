@@ -66,6 +66,17 @@ type HarvesterConfig struct {
 	ForceCloseFiles    bool `yaml:"force_close_files"`
 }
 
+const (
+	LogInputType   = "log"
+	StdinInputType = "stdin"
+)
+
+// List of valid input types
+var ValidInputType = map[string]struct{}{
+	StdinInputType: {},
+	LogInputType:   {},
+}
+
 // getConfigFiles returns list of config files.
 // In case path is a file, it will be directly returned.
 // In case it is a directory, it will fetch all .yml files inside this directory

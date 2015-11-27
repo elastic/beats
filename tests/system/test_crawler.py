@@ -490,10 +490,10 @@ class Test(TestCase):
             f.write("hello world 4\n")
             f.flush()
 
-            self.wait_until(
-                lambda: self.log_contains(
-                    "Processing 2 events"),
-                max_timeout=15)
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=15)
 
         filebeat.kill_and_wait()
 

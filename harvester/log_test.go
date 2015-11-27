@@ -56,7 +56,7 @@ func TestReadLine(t *testing.T) {
 	// Read only 10 bytes which is not the end of the file
 	timedIn := newTimedReader(readFile)
 	codec, _ := encoding.Plain(file)
-	reader, _ := newLineReader(timedIn, codec, 100)
+	reader, _ := encoding.NewLineReader(timedIn, codec, 100)
 
 	// Read third line
 	text, bytesread, err := readLine(reader, &timedIn.lastReadTime)

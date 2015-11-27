@@ -117,7 +117,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 		}
 
 		// skip stdin
-		if *event.Source == "-" {
+		if event.InputType == cfg.StdinInputType {
 			continue
 		}
 

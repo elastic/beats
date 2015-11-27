@@ -42,7 +42,7 @@ func NewHarvester(
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
 
-	encoding, err := h.open()
+	enc, err := h.open()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
 	}
@@ -67,11 +67,11 @@ func (h *Harvester) Harvest() {
 
 	logp.Info("Harvester started for file: %s", h.Path)
 
-	// TODO: newLineReader uses additional buffering to deal with encoding and testing
+	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
 	timedIn := newTimedReader(h.file)
-	reader, err := newLineReader(timedIn, encoding, h.Config.BufferSize)
+	reader, err := encoding.NewLineReader(timedIn, enc, h.Config.BufferSize)
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
 		return
@@ -293,4 +293,39 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 }
 
 func (h *Harvester) Stop() {
+}
+
+const maxConsecutiveEmptyReads = 100
+
+// timedReader keeps track of last time bytes have been read from underlying
+// reader.
+type timedReader struct {
+	reader       io.Reader
+	lastReadTime time.Time // last time we read some data from input stream
+}
+
+func newTimedReader(reader io.Reader) *timedReader {
+	r := &timedReader{
+		reader: reader,
+	}
+	return r
+}
+
+func (r *timedReader) Read(p []byte) (int, error) {
+	var err error
+	n := 0
+
+	for i := maxConsecutiveEmptyReads; i > 0; i-- {
+		n, err = r.reader.Read(p)
+		if n > 0 {
+			r.lastReadTime = time.Now()
+			break
+		}
+
+		if err != nil {
+			break
+		}
+	}
+
+	return n, err
 }

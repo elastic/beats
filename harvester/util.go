@@ -1,6 +1,7 @@
 package harvester
 
 import (
+	"github.com/elastic/filebeat/harvester/encoding"
 	"github.com/elastic/libbeat/logp"
 	"time"
 )
@@ -38,11 +39,11 @@ func lineEndingChars(line []byte) int {
 // In case of partial lines, readLine does return and error and en empty string
 // This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
 func readLine(
-	reader *lineReader,
+	reader *encoding.LineReader,
 	lastReadTime *time.Time,
 ) (string, int, error) {
 	for {
-		line, size, err := reader.next()
+		line, size, err := reader.Next()
 
 		// Full line read to be returned
 		if size != 0 && err == nil {
