@@ -88,66 +88,6 @@ func TestReaderEncodings(t *testing.T) {
 	}
 }
 
-func TestReaderPartialWithEncodings(t *testing.T) {
-	for _, test := range tests {
-		t.Logf("test codec: %v", test.encoding)
-
-		codecFactory, ok := encoding.FindEncoding(test.encoding)
-		if !ok {
-			t.Errorf("can not find encoding '%v'", test.encoding)
-			continue
-		}
-
-		buffer := bytes.NewBuffer(nil)
-		codec, _ := codecFactory(buffer)
-
-		writer := transform.NewWriter(buffer, codec.NewEncoder())
-		reader, err := newLineReader(buffer, codec, 1024)
-		if err != nil {
-			t.Errorf("failed to initialize reader: %v", err)
-			continue
-		}
-
-		var expected []string
-		var partials []string
-		lastString := ""
-		for _, str := range test.strings {
-			writer.Write([]byte(str))
-			lastString += str
-			expected = append(expected, lastString)
-
-			line, sz, err := reader.next()
-			assert.NotNil(t, err)
-			assert.Equal(t, 0, sz)
-			assert.Nil(t, line)
-
-			partial, _, err := reader.partial()
-			partials = append(partials, string(partial))
-			t.Logf("partials: %v", partials)
-		}
-
-		// finish line:
-		writer.Write([]byte{'\n'})
-
-		// finally read line
-		line, _, err := reader.next()
-		assert.Nil(t, err)
-		t.Logf("line: '%v'", line)
-
-		// validate partial lines
-		if len(test.strings) != len(expected) {
-			t.Errorf("number of lines mismatch (expected=%v actual=%v)",
-				len(test.strings), len(partials))
-			continue
-		}
-		for i := range expected {
-			assert.Equal(t, expected[i], partials[i])
-		}
-
-		assert.Equal(t, lastString+"\n", string(line))
-	}
-}
-
 func TestReadSingleLongLine(t *testing.T) {
 	testReadLineLengths(t, []int{10 * 1024})
 }

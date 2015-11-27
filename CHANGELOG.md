@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file based on the
 ## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0...HEAD)
 
 ### Backward Compatibility Breaks
+- Removal of partial_line_waiting config as it was not working as expected. #296
 
 ### Bugfixes
 

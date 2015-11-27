@@ -73,7 +73,6 @@ func TestProspectorInitNotSet(t *testing.T) {
 	assert.Equal(t, config.DefaultBackoff, prospector.ProspectorConfig.Harvester.BackoffDuration)
 	assert.Equal(t, config.DefaultBackoffFactor, prospector.ProspectorConfig.Harvester.BackoffFactor)
 	assert.Equal(t, config.DefaultMaxBackoff, prospector.ProspectorConfig.Harvester.MaxBackoffDuration)
-	assert.Equal(t, config.DefaultPartialLineWaiting, prospector.ProspectorConfig.Harvester.PartialLineWaitingDuration)
 	assert.Equal(t, config.DefaultForceCloseFiles, prospector.ProspectorConfig.Harvester.ForceCloseFiles)
 }
 

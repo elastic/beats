@@ -26,7 +26,6 @@ type FileEvent struct {
 	Text         *string
 	Fields       *map[string]string
 	Fileinfo     *os.FileInfo
-	IsPartial    bool
 
 	fieldsUnderRoot bool
 }
@@ -37,14 +36,10 @@ type FileState struct {
 	FileStateOS *FileStateOS
 }
 
-// Builds and returns the FileState object based on the Event info.
+// GetState builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
-	// do not add total bytes for event if partial line, so reading continues
-	// at current line
-	offset := f.Offset
-	if !f.IsPartial {
-		offset += int64(f.Bytes)
-	}
+	// Add read bytes to current offset to point to the end
+	offset := f.Offset + int64(f.Bytes)
 
 	state := &FileState{
 		Source:      f.Source,
@@ -66,14 +61,10 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
 		"@timestamp": common.Time(f.ReadTime),
 		"source":     f.Source,
-		"offset":     f.Offset,
+		"offset":     f.Offset, // Offset here is the offset before the starting char.
 		"message":    f.Text,
 		"type":       f.DocumentType,
 		"input_type": f.InputType,
-	}
-
-	if f.IsPartial {
-		event["partial"] = true
 	}
 
 	if f.Fields != nil {

@@ -96,9 +96,10 @@ func (p *Prospector) setupHarvesterConfig() error {
 		return err
 	}
 
-	config.PartialLineWaitingDuration, err = getConfigDuration(config.PartialLineWaiting, cfg.DefaultPartialLineWaiting, "partial_line_waiting")
-	if err != nil {
-		return err
+	if config.ForceCloseFiles {
+		logp.Info("force_close_file is enabled")
+	} else {
+		logp.Info("force_close_file is disabled")
 	}
 
 	return nil
@@ -118,7 +119,7 @@ func getConfigDuration(config string, duration time.Duration, name string) (time
 			return 0, err
 		}
 	}
-	logp.Debug("prospector", "Set %s duration to %s", name, duration)
+	logp.Info("Set %s duration to %s", name, duration)
 
 	return duration, nil
 }

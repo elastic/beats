@@ -49,9 +49,10 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
 
-    def test_unfinished_line(self):
+    def test_unfinished_line_and_continue(self):
         """
         Checks that if a line does not have a line ending, is is not read yet.
+        Continuing writing the file must the pick up the line.
         """
 
         self.render_config_template(
@@ -60,7 +61,7 @@ class Test(TestCase):
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.log"
-        file = open(testfile, 'w')
+        file = open(testfile, 'w', 0)
 
         iterations = 80
         for n in range(0, iterations):
@@ -71,23 +72,91 @@ class Test(TestCase):
         # be read as there is no finishing \n or \r
         file.write("unfinished line")
 
-        file.close()
-
         filebeat = self.start_filebeat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 80 events"),
+            lambda: self.output_has(lines=80),
             max_timeout=15)
 
         # Give it more time to make sure it doesn't read the unfinished line
-        time.sleep(2)
-        filebeat.kill_and_wait()
+        # This mus be smaller then partial_line_waiting
+        time.sleep(1)
 
         output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
+
+        # Complete line so it can be picked up
+        file.write("\n")
+        self.wait_until(
+            lambda: self.output_has(lines=81),
+            max_timeout=15)
+
+        # Add one more line to make sure it keeps reading
+        file.write("HelloWorld \n")
+        file.close()
+
+        self.wait_until(
+            lambda: self.output_has(lines=82),
+            max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        output = self.read_output()
+
+        # Check that output file has also the completed lines
+        assert iterations + 2 == len(output)
+
+    def test_partial_line(self):
+        """
+        Checks that partial lines are read as intended
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w', 0)
+
+        # An additional line is written to the log file. This line should not
+        # be read as there is no finishing \n or \r
+        file.write("complete line\n")
+        file.write("unfinished line ")
+
+        filebeat = self.start_filebeat()
+
+        # Check that unfinished line is read after timeout and sent
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=15)
+
+        file.write("extend unfinished line")
+        time.sleep(1)
+
+        # Check that unfinished line is still not read
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=15)
+
+        file.write("\n")
+
+        # Check that unfinished line is now read
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=15)
+
+        file.write("hello world\n")
+
+        # Check that new line is read
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=15)
+
+        filebeat.kill_and_wait()
+
 
     def test_file_renaming(self):
         """
@@ -237,7 +306,7 @@ class Test(TestCase):
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
-                "Unexpected force close specific"),
+                "Force close file"),
             max_timeout=15)
 
         # Create new file with same name to see if it is picked up
