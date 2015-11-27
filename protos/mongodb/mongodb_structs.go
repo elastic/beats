@@ -83,11 +83,23 @@ type transaction struct {
 	documents []interface{}
 }
 
-type opCode string
+type opCode int32
+
+const (
+	opReply      opCode = 1
+	opMsg        opCode = 1000
+	opUpdate     opCode = 2001
+	opInsert     opCode = 2002
+	opReserved   opCode = 2003
+	opQuery      opCode = 2004
+	opGetMore    opCode = 2005
+	opDelete     opCode = 2006
+	opKillCursor opCode = 2007
+)
 
 // List of valid mongodb wire protocol operation codes
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#request-opcodes
-var OpCodes = map[int]opCode{
+var opCodeNames = map[opCode]string{
 	1:    "OP_REPLY",
 	1000: "OP_MSG",
 	2001: "OP_UPDATE",
@@ -99,8 +111,17 @@ var OpCodes = map[int]opCode{
 	2007: "OP_KILL_CURSORS",
 }
 
+func validOpcode(o opCode) bool {
+	_, found := opCodeNames[o]
+	return found
+}
+
+func (o opCode) String() string {
+	return opCodeNames[o]
+}
+
 func awaitsReply(c opCode) bool {
-	return c == "OP_QUERY" || c == "OP_GET_MORE"
+	return c == opQuery || c == opGetMore
 }
 
 // List of mongodb user commands (send throuwh a query of the legacy protocol)

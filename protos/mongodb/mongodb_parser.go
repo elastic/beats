@@ -33,13 +33,15 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	s.message.messageLength = length
 	s.message.requestId, err = d.readInt32()
 	s.message.responseTo, err = d.readInt32()
-	opCode, err := d.readInt32()
+	code, err := d.readInt32()
+	opCode := opCode(code)
 
-	if _, present := OpCodes[opCode]; !present {
+	if !validOpcode(opCode) {
 		logp.Err("Unknown operation code: %v", opCode)
 		return false, false
 	}
-	s.message.opCode = OpCodes[opCode]
+
+	s.message.opCode = opCode
 	s.message.IsResponse = false // default is that the message is a request. If not opReplyParse will set this to false
 	s.message.ExpectsResponse = false
 	debugf("opCode = %v", s.message.opCode)
@@ -48,29 +50,29 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	s.message.event = common.MapStr{}
 
 	switch s.message.opCode {
-	case "OP_REPLY":
+	case opReply:
 		s.message.IsResponse = true
 		return opReplyParse(d, s.message)
-	case "OP_MSG":
+	case opMsg:
 		s.message.method = "msg"
 		return opMsgParse(d, s.message)
-	case "OP_UPDATE":
+	case opUpdate:
 		s.message.method = "update"
 		return opUpdateParse(d, s.message)
-	case "OP_INSERT":
+	case opInsert:
 		s.message.method = "insert"
 		return opInsertParse(d, s.message)
-	case "OP_QUERY":
+	case opQuery:
 		s.message.ExpectsResponse = true
 		return opQueryParse(d, s.message)
-	case "OP_GET_MORE":
+	case opGetMore:
 		s.message.method = "getMore"
 		s.message.ExpectsResponse = true
 		return opGetMoreParse(d, s.message)
-	case "OP_DELETE":
+	case opDelete:
 		s.message.method = "delete"
 		return opDeleteParse(d, s.message)
-	case "OP_KILL_CURSORS":
+	case opKillCursor:
 		s.message.method = "killCursors"
 		return opKillCursorsParse(d, s.message)
 	}
