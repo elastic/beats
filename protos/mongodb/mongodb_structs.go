@@ -22,7 +22,7 @@ type mongodbMessage struct {
 	messageLength int
 	requestId     int
 	responseTo    int
-	opCode        string
+	opCode        opCode
 
 	// deduced from content. Either an operation from the original wire protocol or the name of a command (passed through a query)
 	// List of commands: http://docs.mongodb.org/manual/reference/command/
@@ -83,9 +83,11 @@ type transaction struct {
 	documents []interface{}
 }
 
+type opCode string
+
 // List of valid mongodb wire protocol operation codes
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#request-opcodes
-var OpCodes = map[int]string{
+var OpCodes = map[int]opCode{
 	1:    "OP_REPLY",
 	1000: "OP_MSG",
 	2001: "OP_UPDATE",
@@ -95,6 +97,10 @@ var OpCodes = map[int]string{
 	2005: "OP_GET_MORE",
 	2006: "OP_DELETE",
 	2007: "OP_KILL_CURSORS",
+}
+
+func awaitsReply(c opCode) bool {
+	return c == "OP_QUERY" || c == "OP_GET_MORE"
 }
 
 // List of mongodb user commands (send throuwh a query of the legacy protocol)

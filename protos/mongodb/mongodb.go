@@ -24,18 +24,16 @@ type Mongodb struct {
 	MaxDocs      int
 	MaxDocLength int
 
-	transactions       *common.Cache
+	requests           *common.Cache
+	responses          *common.Cache
 	transactionTimeout time.Duration
 
 	results publisher.Client
 }
 
-func (mongodb *Mongodb) getTransaction(k common.HashableTcpTuple) *transaction {
-	v := mongodb.transactions.Get(k)
-	if v != nil {
-		return v.(*transaction)
-	}
-	return nil
+type transactionKey struct {
+	tcp common.HashableTcpTuple
+	id  int
 }
 
 func (mongodb *Mongodb) InitDefaults() {
@@ -82,10 +80,14 @@ func (mongodb *Mongodb) Init(test_mode bool, results publisher.Client) error {
 		}
 	}
 
-	mongodb.transactions = common.NewCache(
+	mongodb.requests = common.NewCache(
 		mongodb.transactionTimeout,
 		protos.DefaultTransactionHashSize)
-	mongodb.transactions.StartJanitor(mongodb.transactionTimeout)
+	mongodb.requests.StartJanitor(mongodb.transactionTimeout)
+	mongodb.responses = common.NewCache(
+		mongodb.transactionTimeout,
+		protos.DefaultTransactionHashSize)
+	mongodb.responses.StartJanitor(mongodb.transactionTimeout)
 	mongodb.results = results
 
 	return nil
@@ -139,6 +141,7 @@ func (mongodb *Mongodb) doParse(
 	st := conn.Streams[dir]
 	if st == nil {
 		st = newStream(pkt, tcptuple)
+		conn.Streams[dir] = st
 		debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 	} else {
 		// concatenate bytes
@@ -172,7 +175,7 @@ func (mongodb *Mongodb) doParse(
 
 		// all ok, go to next level and reset stream for new message
 		debugf("MongoDB message complete")
-		mongodb.handleMongodb(st.message, tcptuple, dir)
+		mongodb.handleMongodb(conn, st.message, tcptuple, dir)
 		st.PrepareForNewMessage()
 	}
 
@@ -188,8 +191,12 @@ func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
 	return s
 }
 
-func (mongodb *Mongodb) handleMongodb(m *mongodbMessage, tcptuple *common.TcpTuple,
-	dir uint8) {
+func (mongodb *Mongodb) handleMongodb(
+	conn *mongodbConnectionData,
+	m *mongodbMessage,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) {
 
 	m.TcpTuple = *tcptuple
 	m.Direction = dir
@@ -197,85 +204,112 @@ func (mongodb *Mongodb) handleMongodb(m *mongodbMessage, tcptuple *common.TcpTup
 
 	if m.IsResponse {
 		debugf("MongoDB response message")
-		mongodb.receivedMongodbResponse(m)
+		mongodb.onResponse(conn, m)
 	} else {
 		debugf("MongoDB request message")
-		mongodb.receivedMongodbRequest(m)
+		mongodb.onRequest(conn, m)
 	}
 }
 
-func (mongodb *Mongodb) receivedMongodbRequest(msg *mongodbMessage) {
-	// Add it to the HT
-	tuple := msg.TcpTuple
-
-	trans := mongodb.getTransaction(tuple.Hashable())
-	if trans != nil {
-		if trans.Mongodb != nil {
-			logp.Warn("Two requests without a Response. Dropping old request")
-		}
-	} else {
-		debugf("Initialize new transaction from request")
-		trans = &transaction{Type: "mongodb", tuple: tuple}
-		mongodb.transactions.Put(tuple.Hashable(), trans)
+func (mongodb *Mongodb) onRequest(conn *mongodbConnectionData, msg *mongodbMessage) {
+	// publish request only transaction
+	if !awaitsReply(msg.opCode) {
+		mongodb.onTransComplete(msg, nil)
+		return
 	}
 
-	trans.Mongodb = common.MapStr{}
+	id := msg.requestId
+	key := transactionKey{tcp: msg.TcpTuple.Hashable(), id: id}
 
-	trans.event = msg.event
+	// try to find matching response potentially inserted before
+	if v := mongodb.responses.Delete(key); v != nil {
+		resp := v.(*mongodbMessage)
+		mongodb.onTransComplete(msg, resp)
+		return
+	}
 
-	trans.method = msg.method
-
-	trans.cmdline = msg.CmdlineTuple
-	trans.ts = msg.Ts
-	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
-	trans.JsTs = msg.Ts
-	trans.Src = common.Endpoint{
-		Ip:   msg.TcpTuple.Src_ip.String(),
-		Port: msg.TcpTuple.Src_port,
-		Proc: string(msg.CmdlineTuple.Src),
+	// insert into cache for correlation
+	old := mongodb.requests.Put(key, msg)
+	if old != nil {
+		logp.Warn("Two requests without a Response. Dropping old request")
 	}
-	trans.Dst = common.Endpoint{
-		Ip:   msg.TcpTuple.Dst_ip.String(),
-		Port: msg.TcpTuple.Dst_port,
-		Proc: string(msg.CmdlineTuple.Dst),
-	}
-	if msg.Direction == tcp.TcpDirectionReverse {
-		trans.Src, trans.Dst = trans.Dst, trans.Src
-	}
-	trans.params = msg.params
-	trans.resource = msg.resource
-	trans.BytesIn = msg.messageLength
 }
 
-func (mongodb *Mongodb) receivedMongodbResponse(msg *mongodbMessage) {
+func (mongodb *Mongodb) onResponse(conn *mongodbConnectionData, msg *mongodbMessage) {
+	id := msg.responseTo
+	key := transactionKey{tcp: msg.TcpTuple.Hashable(), id: id}
 
-	trans := mongodb.getTransaction(msg.TcpTuple.Hashable())
-	if trans == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
+	// try to find matching request
+	if v := mongodb.requests.Delete(key); v != nil {
+		requ := v.(*mongodbMessage)
+		mongodb.onTransComplete(requ, msg)
 		return
 	}
-	// check if the request was received
-	if trans.Mongodb == nil {
-		logp.Warn("Response from unknown transaction. Ignoring.")
-		return
 
-	}
+	// insert into cache for correlation
+	mongodb.responses.Put(key, msg)
+}
 
-	// Merge request and response events attributes
-	for k, v := range msg.event {
-		trans.event[k] = v
-	}
-
-	trans.error = msg.error
-	trans.documents = msg.documents
-
-	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
-	trans.BytesOut = msg.messageLength
+func (mongodb *Mongodb) onTransComplete(requ, resp *mongodbMessage) {
+	trans := newTransaction(requ, resp)
+	debugf("Mongodb transaction completed: %s", trans.Mongodb)
 
 	mongodb.publishTransaction(trans)
-	mongodb.transactions.Delete(trans.tuple.Hashable())
+}
 
-	debugf("Mongodb transaction completed: %s", trans.Mongodb)
+func newTransaction(requ, resp *mongodbMessage) *transaction {
+	trans := &transaction{Type: "mongodb"}
+
+	// fill request
+	if requ != nil {
+		trans.tuple = requ.TcpTuple
+
+		trans.Mongodb = common.MapStr{}
+		trans.event = requ.event
+		trans.method = requ.method
+
+		trans.cmdline = requ.CmdlineTuple
+		trans.ts = requ.Ts
+		trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
+		trans.JsTs = requ.Ts
+		trans.Src = common.Endpoint{
+			Ip:   requ.TcpTuple.Src_ip.String(),
+			Port: requ.TcpTuple.Src_port,
+			Proc: string(requ.CmdlineTuple.Src),
+		}
+		trans.Dst = common.Endpoint{
+			Ip:   requ.TcpTuple.Dst_ip.String(),
+			Port: requ.TcpTuple.Dst_port,
+			Proc: string(requ.CmdlineTuple.Dst),
+		}
+		if requ.Direction == tcp.TcpDirectionReverse {
+			trans.Src, trans.Dst = trans.Dst, trans.Src
+		}
+		trans.params = requ.params
+		trans.resource = requ.resource
+		trans.BytesIn = requ.messageLength
+	}
+
+	// fill response
+	if resp != nil {
+		if requ == nil {
+			// TODO: reverse tuple?
+			trans.tuple = resp.TcpTuple
+		}
+
+		for k, v := range resp.event {
+			trans.event[k] = v
+		}
+
+		trans.error = resp.error
+		trans.documents = resp.documents
+
+		trans.ResponseTime = int32(resp.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+		trans.BytesOut = resp.messageLength
+
+	}
+
+	return trans
 }
 
 func (mongodb *Mongodb) GapInStream(tcptuple *common.TcpTuple, dir uint8,
