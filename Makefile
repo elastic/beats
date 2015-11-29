@@ -7,10 +7,11 @@ BUILDID?=$(DATE)
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
 	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin \
 	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin \
+	winlogbeat/win \
 	build/upload/build_id.txt latest
 
 .PHONY: packetbeat topbeat filebeat
-packetbeat topbeat filebeat: build/upload
+packetbeat topbeat filebeat winlogbeat: build/upload
 	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
