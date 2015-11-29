@@ -28,6 +28,8 @@ const (
 	// services.exe is used by the Service Control Manager as its event message
 	// file; these tests use it to log messages with more than one parameter.
 	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
+	// netevent.dll has messages that require no message parameters.
+	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
 )
 
 const allLevels = elog.Success | elog.AuditFailure | elog.AuditSuccess | elog.Error | elog.Info | elog.Warning
@@ -362,6 +364,55 @@ func TestOpenInvalidProvider(t *testing.T) {
 		"should automatically open Application.")
 	_, err := el.Read()
 	assert.NoError(t, err)
+}
+
+// Test event messages that require no parameters.
+func TestReadNoParameterMsg(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode.")
+	}
+	configureLogp()
+	log, err := initLog(providerName, sourceName, netEventMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	var eventID uint32 = 2147489654 // 1<<31 + 6006
+	template := "The Event log service was stopped."
+	msgs := []string{}
+	err = log.Report(elog.Info, eventID, msgs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read messages:
+	eventlog := NewEventLoggingAPI(providerName)
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify the message contents:
+	assert.Len(t, records, 1)
+	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, template,
+		strings.TrimRight(records[0].Message, "\r\n"))
 }
 
 // TODO: Add more test cases:

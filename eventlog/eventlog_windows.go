@@ -234,27 +234,20 @@ func (el *eventLog) formatMessage(
 	stringInserts, stringInsertPtrs, err := getStrings(event, buf)
 	if err != nil {
 		logp.Warn("%s Failed to get string inserts for "+
-			"parameterized message. event=%v, %v", el.logPrefix, event, err)
+			"parameterized message. eventID=%d, recordNumber=%d, %v",
+			el.logPrefix, event.eventID, event.recordNumber, err)
 		return "", err
 	}
-	detailf("%s eventID=%d, recordNumber=%d, String inserts are [%s]. ",
-		el.logPrefix, event.eventID, event.recordNumber,
-		strings.Join(stringInserts, ","))
+	detailf("%s String inserts are [%s]. eventID=%d, recordNumber=%d",
+		el.logPrefix, strings.Join(stringInserts, ","), event.eventID,
+		event.recordNumber)
 
-	var handles []Handle
 	var addr *uintptr
 	if stringInsertPtrs != nil && len(stringInsertPtrs) > 0 {
 		addr = &stringInsertPtrs[0]
-
-		handles = el.handles.get(lr.SourceName)
-		if handles == nil || len(handles) == 0 {
-			detailf("%s Could not get any handles to event message files for "+
-				"sourceName=%s, handles=%v", el.logPrefix, lr.SourceName, handles)
-			message := fmt.Sprintf(noMessageFile, lr.EventID, lr.SourceName,
-				strings.Join(stringInserts, ", "))
-			return message, nil
-		}
 	}
+
+	handles := el.handles.get(lr.SourceName)
 
 	var message string
 	for _, handle := range handles {

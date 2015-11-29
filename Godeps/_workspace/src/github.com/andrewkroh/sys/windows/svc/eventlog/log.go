@@ -55,7 +55,11 @@ func (l *Log) Report(etype uint16, eid uint32, msgs []string) error {
 	for _, msg := range msgs {
 		msgPtrs = append(msgPtrs, syscall.StringToUTF16Ptr(msg))
 	}
-	return windows.ReportEvent(l.Handle, etype, 0, eid, 0, uint16(len(msgPtrs)), 0, &msgPtrs[0], nil)
+	var ptr **uint16
+	if len(msgPtrs) > 0 {
+		ptr = &msgPtrs[0]
+	}
+	return windows.ReportEvent(l.Handle, etype, 0, eid, 0, uint16(len(msgPtrs)), 0, ptr, nil)
 }
 
 // Success writes a success event msg with event id eid to the end of event log l.
