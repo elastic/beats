@@ -54,6 +54,7 @@ func freeLibrary(handle Handle) error {
 //sys   formatMessage(flags uint32, source Handle, messageID uint32, languageID uint32, buffer *byte, bufferSize uint32, arguments *uintptr) (numChars uint32, err error) = kernel32.FormatMessageW
 //sys   _clearEventLog(eventLog Handle, backupFileName *uint16) (err error) = advapi32.ClearEventLogW
 //sys   _getNumberOfEventLogRecords(eventLog Handle, numberOfRecords *uint32) (err error) = advapi32.GetNumberOfEventLogRecords
+//sys   _getOldestEventLogRecord(eventLog Handle, oldestRecord *uint32) (err error) = advapi32.GetOldestEventLogRecord
 
 func clearEventLog(handle Handle, backupFileName string) error {
 	var name *uint16
@@ -76,4 +77,14 @@ func getNumberOfEventLogRecords(handle Handle) (uint32, error) {
 	}
 
 	return numRecords, nil
+}
+
+func getOldestEventLogRecord(handle Handle) (uint32, error) {
+	var oldestRecord uint32
+	err := _getOldestEventLogRecord(handle, &oldestRecord)
+	if err != nil {
+		return 0, err
+	}
+
+	return oldestRecord, nil
 }

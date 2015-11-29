@@ -1,6 +1,11 @@
 ###############################################################################
 ############################# Winlogbeat ######################################
 winlogbeat:
+  # The registry file is where Winlogbeat persists its state so that the beat
+  # can resume after shutdown or an outage. The default is .winlogbeat.yaml
+  # in the directory in which it was started.
+  registry_file: .winlogbeat.yaml
+
   # Filter events that are older than this amount of time. This value may be
   # overwritten on a per event_log basis. If omitted then no filtering will
   # occur unless ignore_older is specified with the individual event_log

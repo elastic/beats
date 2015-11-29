@@ -89,13 +89,36 @@ func (el *eventLog) Open(recordNumber uint32) error {
 
 	numRecords, err := getNumberOfEventLogRecords(handle)
 	if err != nil {
-		logp.Warn("%s Could not obtain total number of records", el.logPrefix)
-	} else {
-		logp.Info("%s contains %d records", el.logPrefix, numRecords)
+		return err
 	}
 
+	var oldestRecord, newestRecord uint32
+	if numRecords > 0 {
+		el.recordNumber = recordNumber
+		el.ignoreFirst = true
+
+		oldestRecord, err = getOldestEventLogRecord(handle)
+		if err != nil {
+			return err
+		}
+		newestRecord = oldestRecord + numRecords - 1
+
+		if recordNumber < oldestRecord || recordNumber > newestRecord {
+			el.recordNumber = oldestRecord
+			el.ignoreFirst = false
+		}
+	} else {
+		el.recordNumber = 0
+		el.seek = false
+		el.ignoreFirst = false
+	}
+
+	logp.Info("%s contains %d records. Record number range [%d, %d]. Starting "+
+		"at %d (ignoringFirst=%t)", el.logPrefix, numRecords, oldestRecord,
+		newestRecord, el.recordNumber, el.ignoreFirst)
+
+	el.seek = true
 	el.handle = handle
-	el.recordNumber = recordNumber
 	el.readBuf = make([]byte, maxEventBufferSize)
 	// TODO: Start with this buffer smaller and grow it when needed.
 	el.formatBuf = make([]byte, maxFormatMessageBufferSize)
@@ -105,11 +128,16 @@ func (el *eventLog) Open(recordNumber uint32) error {
 func (el *eventLog) Read() ([]LogRecord, error) {
 	var numBytesRead, minBytesToRead uint32
 
-	// TODO: Use EVENTLOG_SEEK_READ for the first read to resume.
+	var flags uint32 = EVENTLOG_SEQUENTIAL_READ | EVENTLOG_FORWARDS_READ
+	if el.seek {
+		flags = EVENTLOG_SEEK_READ | EVENTLOG_FORWARDS_READ
+		el.seek = false
+	}
+
 	err := readEventLog(
 		el.handle,
-		EVENTLOG_SEQUENTIAL_READ|EVENTLOG_FORWARDS_READ,
-		0, // recordOffset
+		flags,
+		el.recordNumber,
 		&el.readBuf[0],
 		uint32(len(el.readBuf)),
 		&numBytesRead,
@@ -186,6 +214,13 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		detailf("%s Read log record from buffer[%d:%d] (len=%d). %s",
 			el.logPrefix, readOffset-event.length, readOffset, event.length, lr)
 		records = append(records, lr)
+	}
+
+	if el.ignoreFirst && len(records) > 0 {
+		debugf("%s Ignoring first event with record number %d", el.logPrefix,
+			records[0].RecordNumber)
+		records = records[1:]
+		el.ignoreFirst = false
 	}
 
 	debugf("%s Read() is returning %d log records", el.logPrefix, len(records))

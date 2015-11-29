@@ -18,6 +18,7 @@ var (
 	procFormatMessageW             = modkernel32.NewProc("FormatMessageW")
 	procClearEventLogW             = modadvapi32.NewProc("ClearEventLogW")
 	procGetNumberOfEventLogRecords = modadvapi32.NewProc("GetNumberOfEventLogRecords")
+	procGetOldestEventLogRecord    = modadvapi32.NewProc("GetOldestEventLogRecord")
 )
 
 func openEventLog(uncServerName *uint16, sourceName *uint16) (handle Handle, err error) {
@@ -97,6 +98,18 @@ func _clearEventLog(eventLog Handle, backupFileName *uint16) (err error) {
 
 func _getNumberOfEventLogRecords(eventLog Handle, numberOfRecords *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall(procGetNumberOfEventLogRecords.Addr(), 2, uintptr(eventLog), uintptr(unsafe.Pointer(numberOfRecords)), 0)
+	if r1 == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func _getOldestEventLogRecord(eventLog Handle, oldestRecord *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetOldestEventLogRecord.Addr(), 2, uintptr(eventLog), uintptr(unsafe.Pointer(oldestRecord)), 0)
 	if r1 == 0 {
 		if e1 != 0 {
 			err = error(e1)

@@ -69,7 +69,7 @@ var oneTimeLogpInit sync.Once
 func configureLogp() {
 	oneTimeLogpInit.Do(func() {
 		if testing.Verbose() {
-			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog"})
+			logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"eventlog", "eventlog_detail"})
 			logp.Info("DEBUG enabled for eventlog.")
 		} else {
 			logp.LogInit(logp.LOG_WARNING, "", false, true, []string{})
@@ -365,8 +365,16 @@ func TestOpenInvalidProvider(t *testing.T) {
 }
 
 // TODO: Add more test cases:
-// - Log rotation (clear log while reading)
-// - Record number rollover (there may not be an issue with this)
-// - Message that requires no string inserts.
-// - Reading from a source name instead of provider name.
-// - Resume reading from a given record number.
+// - Shall recover from errors caused by log rotation during a read. Based on the
+//   retention policy the log may be cleared when it reaches max size. See Retention:
+//   https://msdn.microsoft.com/en-us/library/windows/desktop/aa363648(v=vs.85).aspx
+// - Record number rollover (there may be an issue with this if ++ is used anywhere)
+// - Reading from a source name instead of provider name (can't be done according to docs).
+// - Persistent read mode shall support specifying a record number (or not specifying a record number).
+// -- Invalid record number based on range (should start at first record).
+// -- Invalid record number based on range timestamp match check (should start at first record).
+// -- Valid record number
+// --- Do not replay first record (it was already reported)
+// -- First read (no saved state) should return the first record (send first reported record).
+// - NewOnly read mode shall seek to end and ignore first.
+// - ReadThenExit read mode shall seek to end, read backwards, honor the EOF, then exit.
