@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 - Removal of partial_line_waiting config as it was not working as expected. #296
 
 ### Bugfixes
+- Fix force_close_files in case renamed file appeared very fast #302
 
 ### Added
 - Validate harvester input_type and make selection fully dependent on input_type definition.
