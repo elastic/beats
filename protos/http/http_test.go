@@ -18,25 +18,25 @@ import (
 
 type testParser struct {
 	payloads []string
-	http     *Http
-	stream   *HttpStream
+	http     *HTTP
+	stream   *stream
 }
 
 var testParserConfig = parserConfig{}
 
-func newTestParser(http *Http, payloads ...string) *testParser {
+func newTestParser(http *HTTP, payloads ...string) *testParser {
 	if http == nil {
 		http = HttpModForTests()
 	}
 	tp := &testParser{
 		http:     http,
 		payloads: payloads,
-		stream:   &HttpStream{data: []byte{}, message: new(HttpMessage)},
+		stream:   &stream{data: []byte{}, message: new(message)},
 	}
 	return tp
 }
 
-func (tp *testParser) parse() (*HttpMessage, bool, bool) {
+func (tp *testParser) parse() (*message, bool, bool) {
 	st := tp.stream
 	if len(tp.payloads) > 0 {
 		st.data = append(st.data, tp.payloads[0]...)
@@ -48,21 +48,21 @@ func (tp *testParser) parse() (*HttpMessage, bool, bool) {
 	return st.message, ok, complete
 }
 
-func HttpModForTests() *Http {
-	var http Http
+func HttpModForTests() *HTTP {
+	var http HTTP
 	results := publisher.ChanClient{make(chan common.MapStr, 10)}
 	http.Init(true, results)
 	return &http
 }
 
-func testParse(http *Http, message string) (*HttpMessage, bool, bool) {
-	tp := newTestParser(http, message)
+func testParse(http *HTTP, data string) (*message, bool, bool) {
+	tp := newTestParser(http, data)
 	return tp.parse()
 }
 
-func testParseStream(http *Http, stream *HttpStream) (bool, bool) {
+func testParseStream(http *HTTP, st *stream) (bool, bool) {
 	parser := newParser(&http.parserConfig)
-	return parser.parse(stream)
+	return parser.parse(st)
 }
 
 func TestHttpParser_simpleResponse(t *testing.T) {
@@ -140,7 +140,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	assert.True(t, isVersion(message.version, 1, 1))
 	assert.Equal(t, 669, int(message.Size))
 	assert.Equal(t, "GET", message.Method)
-	assert.Equal(t, "/", message.RequestUri)
+	assert.Equal(t, "/", message.RequestURI)
 	assert.Equal(t, "www.google.ro", message.Headers["host"])
 }
 
@@ -372,7 +372,7 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 	assert.True(t, complete)
 
 	tp.stream.PrepareForNewMessage()
-	tp.stream.message = &HttpMessage{Ts: time.Now()}
+	tp.stream.message = &message{Ts: time.Now()}
 	_, ok, complete = tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -407,15 +407,15 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 	data := data1 + data2
 	tp := newTestParser(nil, data)
 
-	message, ok, complete := tp.parse()
+	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 2, message.ContentLength)
+	assert.Equal(t, 2, msg.ContentLength)
 	assert.Equal(t, []byte(data1), tp.stream.data[tp.stream.message.start:tp.stream.message.end])
 
 	tp.stream.PrepareForNewMessage()
-	tp.stream.message = &HttpMessage{Ts: time.Now()}
-	message, ok, complete = tp.parse()
+	tp.stream.message = &message{Ts: time.Now()}
+	msg, ok, complete = tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
 }
@@ -444,10 +444,10 @@ func TestHttpParser_301_response(t *testing.T) {
 		"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
 		"</body></html>"
 
-	message, ok, complete := testParse(nil, data)
+	msg, ok, complete := testParse(nil, data)
 	assert.True(t, ok)
 	assert.True(t, complete)
-	assert.Equal(t, 290, message.ContentLength)
+	assert.Equal(t, 290, msg.ContentLength)
 }
 
 func TestEatBodyChunked(t *testing.T) {
@@ -460,57 +460,57 @@ func TestEatBodyChunked(t *testing.T) {
 		[]byte("\n123\r\n03\r\n123\r"),
 		[]byte("\n0\r\n\r\n"),
 	}
-	stream := &HttpStream{
+	st := &stream{
 		data:         msgs[0],
 		parseOffset:  0,
 		bodyReceived: 0,
 		parseState:   stateBodyChunkedStart,
 	}
-	message := &HttpMessage{
-		chunked_length: 5,
-		ContentLength:  0,
+	msg := &message{
+		chunkedLength: 5,
+		ContentLength: 0,
 	}
 	parser := newParser(&testParserConfig)
 
-	cont, ok, complete := parser.parseBodyChunkedStart(stream, message)
+	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != false || ok != true || complete != false {
 		t.Errorf("Wrong return values")
 	}
-	assert.Equal(t, 0, stream.parseOffset)
+	assert.Equal(t, 0, st.parseOffset)
 
-	stream.data = append(stream.data, msgs[1]...)
-	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	st.data = append(st.data, msgs[1]...)
+	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
-	assert.Equal(t, 3, message.chunked_length)
-	assert.Equal(t, 4, stream.parseOffset)
-	assert.Equal(t, stateBodyChunked, stream.parseState)
+	assert.Equal(t, 3, msg.chunkedLength)
+	assert.Equal(t, 4, st.parseOffset)
+	assert.Equal(t, stateBodyChunked, st.parseState)
 
-	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
-	assert.Equal(t, stateBodyChunkedStart, stream.parseState)
-	assert.Equal(t, 9, stream.parseOffset)
+	assert.Equal(t, stateBodyChunkedStart, st.parseState)
+	assert.Equal(t, 9, st.parseOffset)
 
-	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
-	assert.Equal(t, 3, message.chunked_length)
-	assert.Equal(t, 13, stream.parseOffset)
-	assert.Equal(t, stateBodyChunked, stream.parseState)
+	assert.Equal(t, 3, msg.chunkedLength)
+	assert.Equal(t, 13, st.parseOffset)
+	assert.Equal(t, stateBodyChunked, st.parseState)
 
-	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.False(t, cont)
 	assert.True(t, ok)
 	assert.False(t, complete)
-	assert.Equal(t, 13, stream.parseOffset)
-	assert.Equal(t, 0, stream.bodyReceived)
-	assert.Equal(t, stateBodyChunked, stream.parseState)
+	assert.Equal(t, 13, st.parseOffset)
+	assert.Equal(t, 0, st.bodyReceived)
+	assert.Equal(t, stateBodyChunked, st.parseState)
 
-	stream.data = append(stream.data, msgs[2]...)
-	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	st.data = append(st.data, msgs[2]...)
+	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
-	assert.Equal(t, 18, stream.parseOffset)
-	assert.Equal(t, stateBodyChunkedStart, stream.parseState)
+	assert.Equal(t, 18, st.parseOffset)
+	assert.Equal(t, stateBodyChunkedStart, st.parseState)
 
-	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.False(t, cont)
 	assert.True(t, ok)
 	assert.True(t, complete)
@@ -525,57 +525,57 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		[]byte("03\r\n123\r\n0\r\n\r"),
 		[]byte("\n"),
 	}
-	stream := &HttpStream{
+	st := &stream{
 		data:         msgs[0],
 		parseOffset:  0,
 		bodyReceived: 0,
 		parseState:   stateBodyChunkedStart,
 	}
-	message := &HttpMessage{
-		chunked_length: 5,
-		ContentLength:  0,
+	msg := &message{
+		chunkedLength: 5,
+		ContentLength: 0,
 	}
 	parser := newParser(&testParserConfig)
 
-	cont, ok, complete := parser.parseBodyChunkedStart(stream, message)
+	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != true || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != stateBodyChunked {
-		t.Error("Unexpected state", stream.parseState)
+	if st.parseState != stateBodyChunked {
+		t.Error("Unexpected state", st.parseState)
 	}
 
-	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	if cont != true || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != stateBodyChunkedStart {
-		t.Error("Unexpected state", stream.parseState)
+	if st.parseState != stateBodyChunkedStart {
+		t.Error("Unexpected state", st.parseState)
 	}
 
-	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	if cont != false || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != stateBodyChunkedWaitFinalCRLF {
-		t.Error("Unexpected state", stream.parseState)
+	if st.parseState != stateBodyChunkedWaitFinalCRLF {
+		t.Error("Unexpected state", st.parseState)
 	}
 
-	logp.Debug("http", "parseOffset", stream.parseOffset)
+	logp.Debug("http", "parseOffset", st.parseOffset)
 
-	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(stream, message)
+	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {
 		t.Error("Wrong return values", ok, complete)
 
 	}
-	stream.data = append(stream.data, msgs[1]...)
+	st.data = append(st.data, msgs[1]...)
 
-	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(stream, message)
+	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != true {
 		t.Error("Wrong return values", ok, complete)
 	}
-	if message.end != 14 {
-		t.Error("Wrong message end", message.end)
+	if msg.end != 14 {
+		t.Error("Wrong message end", msg.end)
 	}
 }
 
@@ -606,11 +606,11 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 		"username=ME&pass=secret"
 	tp := newTestParser(http, data1)
 
-	message, ok, complete := tp.parse()
+	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
-	msg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
-	path, params, err := http.extractParameters(message, msg)
+	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
+	path, params, err := http.extractParameters(msg, rawMsg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/test", path)
 	assert.False(t, strings.Contains(params, "secret"))
@@ -636,12 +636,12 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 			"username=ME&password=secret\r\n"
 	tp := newTestParser(http, data1)
 
-	message, ok, complete := tp.parse()
+	msg, ok, complete := tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
 
-	msg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
-	path, params, err := http.extractParameters(message, msg)
+	rawMsg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
+	path, params, err := http.extractParameters(msg, rawMsg)
 	assert.Nil(t, err)
 	assert.Equal(t, "/users/login", path)
 	assert.False(t, strings.Contains(params, "secret"))
@@ -667,9 +667,9 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 			"\r\n" +
 			"password=my_secret_pass&Password=my_secret_password_2\r\n")
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	st := &stream{data: data1, message: new(message)}
 
-	ok, complete := testParseStream(http, stream)
+	ok, complete := testParseStream(http, st)
 	if !ok {
 		t.Errorf("Parsing returned error")
 	}
@@ -677,8 +677,8 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	msg := stream.data[stream.message.start:stream.message.end]
-	path, params, err := http.extractParameters(stream.message, msg)
+	msg := st.data[st.message.start:st.message.end]
+	path, params, err := http.extractParameters(st.message, msg)
 	if err != nil {
 		t.Errorf("Faile to parse parameters")
 	}
@@ -717,19 +717,19 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 		"X-Forwarded-For: 10.216.89.132\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
+	st := &stream{data: data, message: new(message)}
 
-	ok, _ := testParseStream(http, stream)
+	ok, _ := testParseStream(http, st)
 
-	msg := stream.data[stream.message.start:]
-	http.hideHeaders(stream.message, msg)
+	msg := st.data[st.message.start:]
+	http.hideHeaders(st.message, msg)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
 	}
 
-	if stream.message.Headers["authorization"] != "*" {
-		t.Errorf("Failed to redact authorization header: " + stream.message.Headers["authorization"])
+	if st.message.Headers["authorization"] != "*" {
+		t.Errorf("Failed to redact authorization header: " + st.message.Headers["authorization"])
 	}
 	authPattern, _ := regexp.Compile(`(?m)^[Aa]uthorization:\*+`)
 	authObscured := authPattern.Match(msg)
@@ -737,8 +737,8 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
 	}
 
-	if stream.message.Headers["proxy-authorization"] != "*" {
-		t.Errorf("Failed to redact proxy authorization header: " + stream.message.Headers["proxy-authorization"])
+	if st.message.Headers["proxy-authorization"] != "*" {
+		t.Errorf("Failed to redact proxy authorization header: " + st.message.Headers["proxy-authorization"])
 	}
 	proxyPattern, _ := regexp.Compile(`(?m)^[Pp]roxy-[Aa]uthorization:\*+`)
 	proxyObscured := proxyPattern.Match(msg)
@@ -763,12 +763,12 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 		"connection: close\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
+	st := &stream{data: data, message: new(message)}
 
-	ok, complete := testParseStream(http, stream)
+	ok, complete := testParseStream(http, st)
 
-	msg := stream.data[stream.message.start:]
-	http.hideHeaders(stream.message, msg)
+	msg := st.data[st.message.start:]
+	http.hideHeaders(st.message, msg)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -799,12 +799,12 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 		"connection: close\r\n" +
 		"\r\n")
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
+	st := &stream{data: data, message: new(message)}
 
-	ok, complete := testParseStream(http, stream)
+	ok, complete := testParseStream(http, st)
 
-	msg := stream.data[stream.message.start:]
-	http.hideHeaders(stream.message, msg)
+	msg := st.data[st.message.start:]
+	http.hideHeaders(st.message, msg)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -908,12 +908,12 @@ func Test_gap_in_headers(t *testing.T) {
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n")
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := testParseStream(http, stream)
+	st := &stream{data: data1, message: new(message)}
+	ok, complete := testParseStream(http, st)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
-	ok, complete = http.messageGap(stream, 5)
+	ok, complete = http.messageGap(st, 5)
 	assert.Equal(t, false, ok)
 	assert.Equal(t, false, complete)
 }
@@ -937,16 +937,16 @@ func Test_gap_in_body(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxx")
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := testParseStream(http, stream)
+	st := &stream{data: data1, message: new(message)}
+	ok, complete := testParseStream(http, st)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
-	ok, complete = http.messageGap(stream, 10)
+	ok, complete = http.messageGap(st, 10)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
-	ok, complete = http.messageGap(stream, 10)
+	ok, complete = http.messageGap(st, 10)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, true, complete)
 }
@@ -969,12 +969,12 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxx")
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := testParseStream(http, stream)
+	st := &stream{data: data1, message: new(message)}
+	ok, complete := testParseStream(http, st)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
-	ok, complete = http.messageGap(stream, 10)
+	ok, complete = http.messageGap(st, 10)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -991,7 +991,7 @@ func testTcpTuple() *common.TcpTuple {
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, http *Http) common.MapStr {
+func expectTransaction(t *testing.T, http *HTTP) common.MapStr {
 	client := http.results.(publisher.ChanClient)
 	select {
 	case trans := <-client.Channel:
@@ -1027,7 +1027,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	req := protos.Packet{Payload: data1}
 	resp := protos.Packet{Payload: data2}
 
-	private := protos.ProtocolData(new(httpPrivateData))
+	private := protos.ProtocolData(new(httpConnectionData))
 
 	private = http.Parse(&req, tcptuple, 0, private)
 	private = http.ReceivedFin(tcptuple, 0, private)

@@ -13,27 +13,27 @@ import (
 )
 
 // Http Message
-type HttpMessage struct {
+type message struct {
 	Ts               time.Time
 	hasContentLength bool
 	headerOffset     int
 	bodyOffset       int
 	version          version
 	connection       string
-	chunked_length   int
-	chunked_body     []byte
+	chunkedLength    int
+	chunkedBody      []byte
 
 	IsRequest    bool
-	TcpTuple     common.TcpTuple
+	TCPTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
 	//Request Info
 	FirstLine    string
-	RequestUri   string
+	RequestURI   string
 	Method       string
 	StatusCode   uint16
 	StatusPhrase string
-	Real_ip      string
+	RealIP       string
 	// Http Headers
 	ContentLength    int
 	ContentType      string
@@ -71,7 +71,7 @@ func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
 }
 
-func (parser *parser) parse(s *HttpStream) (bool, bool) {
+func (parser *parser) parse(s *stream) (bool, bool) {
 	m := s.message
 
 	for s.parseOffset < len(s.data) {
@@ -102,7 +102,7 @@ func (parser *parser) parse(s *HttpStream) (bool, bool) {
 	return true, false
 }
 
-func (*parser) parseHTTPLine(s *HttpStream, m *HttpMessage) (cont, ok, complete bool) {
+func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	m.start = s.parseOffset
 	i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
 	if i == -1 {
@@ -138,7 +138,7 @@ func (*parser) parseHTTPLine(s *HttpStream, m *HttpMessage) (cont, ok, complete 
 		}
 
 		m.Method = string(slices[0])
-		m.RequestUri = string(slices[1])
+		m.RequestURI = string(slices[1])
 
 		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
 			m.IsRequest = true
@@ -148,7 +148,7 @@ func (*parser) parseHTTPLine(s *HttpStream, m *HttpMessage) (cont, ok, complete 
 			debugf("Couldn't understand HTTP version: %s", fline)
 			return false, false, false
 		}
-		debugf("HTTP Method=%s, RequestUri=%s", m.Method, m.RequestUri)
+		debugf("HTTP Method=%s, RequestUri=%s", m.Method, m.RequestURI)
 	}
 
 	m.version.major, m.version.minor, err = parseVersion(version)
@@ -196,7 +196,7 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 	return uint8(major), uint8(minor), nil
 }
 
-func (parser *parser) parseHeaders(s *HttpStream, m *HttpMessage) (cont, ok, complete bool) {
+func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bool) {
 	if len(s.data)-s.parseOffset >= 2 &&
 		bytes.Equal(s.data[s.parseOffset:s.parseOffset+2], []byte("\r\n")) {
 		// EOH
@@ -243,7 +243,7 @@ func (parser *parser) parseHeaders(s *HttpStream, m *HttpMessage) (cont, ok, com
 	return true, true, true
 }
 
-func (parser *parser) parseHeader(m *HttpMessage, data []byte) (bool, bool, int) {
+func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	if m.Headers == nil {
 		m.Headers = make(map[string]string)
 	}
@@ -287,7 +287,7 @@ func (parser *parser) parseHeader(m *HttpMessage, data []byte) (bool, bool, int)
 				m.connection = headerVal
 			}
 			if len(config.RealIPHeader) > 0 && headerName == config.RealIPHeader {
-				m.Real_ip = headerVal
+				m.RealIP = headerVal
 			}
 
 			if config.SendHeaders {
@@ -311,7 +311,7 @@ func (parser *parser) parseHeader(m *HttpMessage, data []byte) (bool, bool, int)
 	return true, false, len(data)
 }
 
-func (*parser) parseBody(s *HttpStream, m *HttpMessage) (ok, complete bool) {
+func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	debugf("eat body: %d", s.parseOffset)
 	if !m.hasContentLength && (m.connection == "close" ||
 		(isVersion(m.version, 1, 0) && m.connection != "keep-alive")) {
@@ -335,21 +335,21 @@ func (*parser) parseBody(s *HttpStream, m *HttpMessage) (ok, complete bool) {
 	}
 }
 
-func (*parser) parseBodyChunkedStart(s *HttpStream, m *HttpMessage) (cont, ok, complete bool) {
+func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete bool) {
 	// read hexa length
 	i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
 	if i == -1 {
 		return false, true, false
 	}
 	line := string(s.data[s.parseOffset : s.parseOffset+i])
-	_, err := fmt.Sscanf(line, "%x", &m.chunked_length)
+	_, err := fmt.Sscanf(line, "%x", &m.chunkedLength)
 	if err != nil {
 		logp.Warn("Failed to understand chunked body start line")
 		return false, false, false
 	}
 
 	s.parseOffset += i + 2 //+ \r\n
-	if m.chunked_length == 0 {
+	if m.chunkedLength == 0 {
 		if len(s.data[s.parseOffset:]) < 2 {
 			s.parseState = stateBodyChunkedWaitFinalCRLF
 			return false, true, false
@@ -370,30 +370,30 @@ func (*parser) parseBodyChunkedStart(s *HttpStream, m *HttpMessage) (cont, ok, c
 	return true, true, false
 }
 
-func (*parser) parseBodyChunked(s *HttpStream, m *HttpMessage) (cont, ok, complete bool) {
+func (*parser) parseBodyChunked(s *stream, m *message) (cont, ok, complete bool) {
 
-	if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived+2 /*\r\n*/ {
+	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived+2 /*\r\n*/ {
 		// Received more data than expected
-		m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:s.parseOffset+m.chunked_length-s.bodyReceived]...)
-		s.parseOffset += (m.chunked_length - s.bodyReceived + 2 /*\r\n*/)
-		m.ContentLength += m.chunked_length
+		m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:s.parseOffset+m.chunkedLength-s.bodyReceived]...)
+		s.parseOffset += (m.chunkedLength - s.bodyReceived + 2 /*\r\n*/)
+		m.ContentLength += m.chunkedLength
 		s.parseState = stateBodyChunkedStart
 		return true, true, false
 	}
 
-	if len(s.data[s.parseOffset:]) >= m.chunked_length-s.bodyReceived {
+	if len(s.data[s.parseOffset:]) >= m.chunkedLength-s.bodyReceived {
 		// we need need to wait for the +2, else we can crash on next call
 		return false, true, false
 	}
 
 	// Received less data than expected
-	m.chunked_body = append(m.chunked_body, s.data[s.parseOffset:]...)
+	m.chunkedBody = append(m.chunkedBody, s.data[s.parseOffset:]...)
 	s.bodyReceived += (len(s.data) - s.parseOffset)
 	s.parseOffset = len(s.data)
 	return false, true, false
 }
 
-func (*parser) parseBodyChunkedWaitFinalCRLF(s *HttpStream, m *HttpMessage) (ok, complete bool) {
+func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complete bool) {
 	if len(s.data[s.parseOffset:]) < 2 {
 		return true, false
 	}
