@@ -36,7 +36,6 @@ func (p *Prospector) Init() error {
 	}
 
 	return nil
-
 }
 
 // Setup Prospector Config
@@ -77,9 +76,11 @@ func (p *Prospector) setupHarvesterConfig() error {
 	}
 
 	// Setup InputType
-	if config.InputType == "" {
+	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
+		logp.Info("Invalid input type set: %v", config.InputType)
 		config.InputType = cfg.DefaultInputType
 	}
+	logp.Info("Input type set to: %v", config.InputType)
 
 	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
 	if err != nil {
@@ -129,27 +130,20 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 
 	p.running = true
 
-	// Handle any "-" (stdin) paths
-	for i, path := range p.ProspectorConfig.Paths {
-
-		logp.Debug("prospector", "Harvest path: %s", path)
-
-		if path == "-" {
-			// Offset and Initial never get used when path is "-"
-			h, err := harvester.NewHarvester(
-				p.ProspectorConfig, &p.ProspectorConfig.Harvester,
-				path, nil, spoolChan)
-			if err != nil {
-				logp.Err("Error initializing harvester: %v", err)
-				return
-			}
-
-			h.Start()
-
-			// Remove it from the file list
-			p.ProspectorConfig.Paths = append(p.ProspectorConfig.Paths[:i], p.ProspectorConfig.Paths[i+1:]...)
-		}
+	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
+	switch p.ProspectorConfig.Harvester.InputType {
+	case cfg.StdinInputType:
+		p.stdinRun(spoolChan)
+		return
+	case cfg.LogInputType:
+		p.logRun(spoolChan)
+		return
 	}
+
+	logp.Info("Invalid prospector type: %v")
+}
+
+func (p *Prospector) logRun(spoolChan chan *input.FileEvent) {
 
 	// Seed last scan time
 	p.lastscan = time.Now()
@@ -169,7 +163,6 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		newlastscan := time.Now()
 
 		for _, path := range p.ProspectorConfig.Paths {
-			// Scan - flag false so new files always start at beginning TODO: is this still working as expected?
 			p.scan(path, spoolChan)
 		}
 
@@ -191,6 +184,38 @@ func (p *Prospector) Run(spoolChan chan *input.FileEvent) {
 		if !p.running {
 			break
 		}
+	}
+}
+
+func (p *Prospector) stdinRun(spoolChan chan *input.FileEvent) {
+	h, err := harvester.NewHarvester(
+		p.ProspectorConfig,
+		&p.ProspectorConfig.Harvester,
+		"-",
+		nil,
+		spoolChan,
+	)
+
+	if err != nil {
+		logp.Err("Error initializing stdin harvester: %v", err)
+		return
+	}
+
+	// This signals we finished considering the previous state
+	event := &input.FileState{
+		Source: nil,
+	}
+	p.registrar.Persist <- event
+
+	h.Start()
+
+	for {
+		if !p.running {
+			break
+		}
+		// Wait time during endless loop
+		oneSecond, _ := time.ParseDuration("1s")
+		time.Sleep(oneSecond)
 	}
 }
 

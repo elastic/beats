@@ -1,8 +1,7 @@
-package harvester
+package encoding
 
 import (
 	"io"
-	"time"
 
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
@@ -10,17 +9,10 @@ import (
 	"github.com/elastic/libbeat/common/streambuf"
 )
 
-// timedReader keeps track of last time bytes have been read from underlying
-// reader.
-type timedReader struct {
-	reader       io.Reader
-	lastReadTime time.Time // last time we read some data from input stream
-}
-
 // lineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
-type lineReader struct {
+type LineReader struct {
 	rawInput   io.Reader
 	codec      encoding.Encoding
 	bufferSize int
@@ -33,40 +25,12 @@ type lineReader struct {
 	decoder   transform.Transformer
 }
 
-const maxConsecutiveEmptyReads = 100
-
-func newTimedReader(reader io.Reader) *timedReader {
-	r := &timedReader{
-		reader: reader,
-	}
-	return r
-}
-
-func (r *timedReader) Read(p []byte) (int, error) {
-	var err error
-	n := 0
-
-	for i := maxConsecutiveEmptyReads; i > 0; i-- {
-		n, err = r.reader.Read(p)
-		if n > 0 {
-			r.lastReadTime = time.Now()
-			break
-		}
-
-		if err != nil {
-			break
-		}
-	}
-
-	return n, err
-}
-
-func newLineReader(
+func NewLineReader(
 	input io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
-) (*lineReader, error) {
-	l := &lineReader{}
+) (*LineReader, error) {
+	l := &LineReader{}
 
 	if err := l.init(input, codec, bufferSize); err != nil {
 		return nil, err
@@ -75,7 +39,7 @@ func newLineReader(
 	return l, nil
 }
 
-func (l *lineReader) init(
+func (l *LineReader) init(
 	input io.Reader,
 	codec encoding.Encoding,
 	bufferSize int,
@@ -97,7 +61,7 @@ func (l *lineReader) init(
 	return nil
 }
 
-func (l *lineReader) next() ([]byte, int, error) {
+func (l *LineReader) Next() ([]byte, int, error) {
 	for {
 		// read next 'potential' line from input buffer/reader
 		err := l.advance()
@@ -127,7 +91,7 @@ func (l *lineReader) next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
-func (l *lineReader) advance() error {
+func (l *LineReader) advance() error {
 	var idx int
 	var err error
 
@@ -182,7 +146,7 @@ func (l *lineReader) advance() error {
 	return err
 }
 
-func (l *lineReader) decode(end int) (int, error) {
+func (l *LineReader) decode(end int) (int, error) {
 	var err error
 	buffer := make([]byte, 1024)
 	inBytes := l.inBuffer.Bytes()

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file based on the
 ### Bugfixes
 
 ### Added
+- Validate harvester input_type and make selection fully dependent on input_type definition.
 
 ### Deprecated
 
