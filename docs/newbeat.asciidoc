@@ -120,7 +120,7 @@ and sends it to the publisher
 The `Beat` parameter received by most of these methods contains data about the
 Beat, such as the name, version, and common configuration options.
 
-For more complex beats, the optional FlagsHandler interface is available.
+For more complex Beats, the optional `FlagsHandler` interface is available.
 
 [source,go]
 ----------------------------------------------------------------------
@@ -129,17 +129,18 @@ type FlagsHandler interface {
 }
 ----------------------------------------------------------------------
 
-The FlagsHandler Beater extension is for handling flags input on startup.
-The HandleFlags callback will be called after parsing the command line
-arguments and handling the '--help' or '--version' flags. Use this interface
-to add additional command line flags to your beat. For an example on how to
-implement HandleFlags, have a look at
-https://github.com/elastic/packetbeat/blob/master/beat/packetbeat.go[packetbeat]
+You can use the `FlagsHandler` interface to add additional command line flags to
+your Beat. The `HandleFlags` callback is called after the Beat parses the
+command line arguments inherited from libbeat and handles the `--help` and
+`--version` flags. For an example of how to implement `HandleFlags`, take a look
+at the
+https://github.com/elastic/packetbeat/blob/master/beat/packetbeat.go[Packetbeat]
+code.
 
-We strongly recommend to only put the main method into the main package.
-This will allow all other parts of your beat to be used as library by
-other beats if needed. This means all your beat specific code goes for example
-into the beat folder and package.
+We strongly recommend that you create a main package that contains only the main
+method. All your Beat-specific code should go in a separate folder and package.
+This will allow other Beats to use the other parts of your Beat as a library, if
+needed.
 
 NOTE: To be consistent with other Beats, you should append `beat` to your Beat name.
 
@@ -342,7 +343,7 @@ func main() {
 }
 ----------------------------------------------------------------------
 
-We recommend to implement a New function that creates your beats object.
+We recommend that you implement a `New` function that creates your Beats object.
 
 === Sharing Your Beat with the Community
 
