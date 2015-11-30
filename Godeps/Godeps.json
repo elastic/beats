@@ -7,7 +7,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/andrewkroh/sys/windows/svc/eventlog",
-			"Rev": "0a5ae398184d4d7b2fcc1a2c0af6f76f0558fd9f"
+			"Rev": "287798fe3e430efeb9318b95ff52353aaa2b59b1"
 		},
 		{
 			"ImportPath": "github.com/elastic/libbeat/beat",
