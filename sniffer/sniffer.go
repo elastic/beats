@@ -10,15 +10,15 @@ import (
 
 	"github.com/elastic/libbeat/logp"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
+
 	"github.com/elastic/packetbeat/config"
 	"github.com/elastic/packetbeat/decoder"
 	"github.com/elastic/packetbeat/protos"
 	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/elastic/packetbeat/protos/udp"
-
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
 )
 
 type SnifferSetup struct {
@@ -27,7 +27,7 @@ type SnifferSetup struct {
 	pfringHandle   *PfringHandle
 	config         *config.InterfacesConfig
 	isAlive        bool
-	dumper         *pcap.Dumper
+	dumper         *Dumper
 
 	Decoder    *decoder.DecoderStruct
 	DataSource gopacket.PacketDataSource
@@ -260,11 +260,9 @@ func (sniffer *SnifferSetup) Init(
 	}
 
 	if sniffer.config.Dumpfile != "" {
-		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
-		if err != nil {
-			return err
-		}
-		sniffer.dumper, err = p.NewDumper(sniffer.config.Dumpfile)
+		sniffer.dumper, err = newPcapDumper(
+			sniffer.config.Dumpfile,
+			sniffer.Datalink(), 65535)
 		if err != nil {
 			return err
 		}
@@ -345,7 +343,7 @@ func (sniffer *SnifferSetup) Run() error {
 		counter++
 
 		if sniffer.dumper != nil {
-			sniffer.dumper.WritePacketData(data, ci)
+			sniffer.dumper.writer.WritePacket(ci, data)
 		}
 		logp.Debug("sniffer", "Packet number: %d", counter)
 
