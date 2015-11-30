@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"net"
 	"regexp"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -17,6 +16,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type testParser struct {
+	payloads []string
+	http     *Http
+	stream   *HttpStream
+}
+
+var testParserConfig = parserConfig{}
+
+func newTestParser(http *Http, payloads ...string) *testParser {
+	if http == nil {
+		http = HttpModForTests()
+	}
+	tp := &testParser{
+		http:     http,
+		payloads: payloads,
+		stream:   &HttpStream{data: []byte{}, message: new(HttpMessage)},
+	}
+	return tp
+}
+
+func (tp *testParser) parse() (*HttpMessage, bool, bool) {
+	st := tp.stream
+	if len(tp.payloads) > 0 {
+		st.data = append(st.data, tp.payloads[0]...)
+		tp.payloads = tp.payloads[1:]
+	}
+
+	parser := newParser(&tp.http.parserConfig)
+	ok, complete := parser.parse(st)
+	return st.message, ok, complete
+}
+
 func HttpModForTests() *Http {
 	var http Http
 	results := publisher.ChanClient{make(chan common.MapStr, 10)}
@@ -24,11 +55,18 @@ func HttpModForTests() *Http {
 	return &http
 }
 
+func testParse(http *Http, message string) (*HttpMessage, bool, bool) {
+	tp := newTestParser(http, message)
+	return tp.parse()
+}
+
+func testParseStream(http *Http, stream *HttpStream) (bool, bool) {
+	parser := newParser(&http.parserConfig)
+	return parser.parse(stream)
+}
+
 func TestHttpParser_simpleResponse(t *testing.T) {
-
-	http := HttpModForTests()
-
-	data := []byte("HTTP/1.1 200 OK\r\n" +
+	data := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
@@ -38,48 +76,21 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 		"Content-Length: 0\r\n" +
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
-		"\r\n")
+		"\r\n"
+	message, ok, complete := testParse(nil, data)
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.IsRequest {
-		t.Errorf("Failed to parse HTTP response")
-	}
-	if stream.message.StatusCode != 200 {
-		t.Errorf("Failed to parse status code: %d", stream.message.StatusCode)
-	}
-	if stream.message.StatusPhrase != "OK" {
-		t.Errorf("Failed to parse response phrase: %s", stream.message.StatusPhrase)
-	}
-	if stream.message.ContentLength != 0 {
-		t.Errorf("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
-	}
-	if stream.message.version_major != 1 {
-		t.Errorf("Failed to parse version major")
-	}
-	if stream.message.version_minor != 1 {
-		t.Errorf("Failed to parse version minor")
-	}
-	if stream.message.Size != 262 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
-	}
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.IsRequest)
+	assert.Equal(t, 200, int(message.StatusCode))
+	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.True(t, isVersion(message.version, 1, 1))
+	assert.Equal(t, 262, int(message.Size))
+	assert.Equal(t, 0, message.ContentLength)
 }
 
 func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
-
-	http := HttpModForTests()
-
-	data := []byte("HTTP/1.1 200 OK\r\n" +
+	data := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"EXPIRES: -1\r\n" +
 		"cACHE-Control: private, max-age=0\r\n" +
@@ -89,321 +100,175 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 		"content-LeNgTh: 0\r\n" +
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
-		"\r\n")
+		"\r\n"
+	message, ok, complete := testParse(nil, data)
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.IsRequest {
-		t.Errorf("Failed to parse HTTP response")
-	}
-	if stream.message.StatusCode != 200 {
-		t.Errorf("Failed to parse status code: %d", stream.message.StatusCode)
-	}
-	if stream.message.StatusPhrase != "OK" {
-		t.Errorf("Failed to parse response phrase: %s", stream.message.StatusPhrase)
-	}
-	if stream.message.ContentLength != 0 {
-		t.Errorf("Failed to parse Content Length: %s", stream.message.Headers["content-length"])
-	}
-	if stream.message.version_major != 1 {
-		t.Errorf("Failed to parse version major")
-	}
-	if stream.message.version_minor != 1 {
-		t.Errorf("Failed to parse version minor")
-	}
-	if stream.message.Size != 262 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
-	}
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.IsRequest)
+	assert.Equal(t, 200, int(message.StatusCode))
+	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.True(t, isVersion(message.version, 1, 1))
+	assert.Equal(t, 262, int(message.Size))
+	assert.Equal(t, 0, message.ContentLength)
 }
 
 func TestHttpParser_simpleRequest(t *testing.T) {
-
 	http := HttpModForTests()
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
-	data := []byte(
-		"GET / HTTP/1.1\r\n" +
-			"Host: www.google.ro\r\n" +
-			"Connection: keep-alive\r\n" +
-			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
-			"Accept: */*\r\n" +
-			"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
-			"Referer: http://www.google.ro/\r\n" +
-			"Accept-Encoding: gzip,deflate,sdch\r\n" +
-			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
-			"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
-			"\r\n" +
-			"garbage")
+	data := "GET / HTTP/1.1\r\n" +
+		"Host: www.google.ro\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.ro/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"garbage"
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
+	message, ok, complete := testParse(http, data)
 
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
-		t.Errorf("The offset is wrong")
-	}
-	if !stream.message.IsRequest {
-		t.Errorf("Failed to parse the HTTP request")
-	}
-	if stream.message.Method != "GET" {
-		t.Errorf("Failed to parse HTTP method: %s", stream.message.Method)
-	}
-	if stream.message.RequestUri != "/" {
-		t.Errorf("Failed to parse HTTP request uri: %s", stream.message.RequestUri)
-	}
-	if stream.message.Headers["host"] != "www.google.ro" {
-		t.Errorf("Failed to parse HTTP Host header: %s", stream.message.Headers["host"])
-	}
-	if stream.message.version_major != 1 {
-		t.Errorf("Failed to parse version major")
-	}
-	if stream.message.version_minor != 1 {
-		t.Errorf("Failed to parse version minor")
-	}
-	if stream.message.Size != 669 {
-		t.Errorf("Wrong message size %d", stream.message.Size)
-	}
-
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.True(t, message.IsRequest)
+	assert.True(t, isVersion(message.version, 1, 1))
+	assert.Equal(t, 669, int(message.Size))
+	assert.Equal(t, "GET", message.Method)
+	assert.Equal(t, "/", message.RequestUri)
+	assert.Equal(t, "www.google.ro", message.Headers["host"])
 }
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
-
 	http := HttpModForTests()
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
-	data := []byte("POST / HTTP/1.1\r\n" +
+	data := "POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
 		"accept: */*\r\n" +
 		"authorization: Company 1\r\n" +
 		"content-length: 0\r\n" +
 		"connection: close\r\n" +
-		"\r\n")
+		"\r\n"
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
+	_, ok, complete := testParse(http, data)
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_splitResponse(t *testing.T) {
-
-	http := HttpModForTests()
-
-	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
-		"Content-Type: text/html; charset=UTF-8\r\n")
+		"Content-Type: text/html; charset=UTF-8\r\n"
+	data2 := "Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	tp := newTestParser(nil, data1, data2)
 
-	data2 := []byte(
-		"Content-Encoding: gzip\r\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data2...)
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
+	_, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	http := HttpModForTests()
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
-	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
-		"Content-En")
+		"Content-En"
+	data2 := "coding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	tp := newTestParser(http, data1, data2)
 
-	data2 := []byte(
-		"coding: gzip\r\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data2...)
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-	if stream.message.StatusCode != 200 {
-		t.Errorf("Failed to parse response code")
-	}
-	if stream.message.StatusPhrase != "OK" {
-		t.Errorf("Failed to parse response phrase")
-	}
-	if stream.message.Headers["content-type"] != "text/html; charset=UTF-8" {
-		t.Errorf("Failed to parse content type")
-	}
-	if stream.message.version_major != 1 {
-		t.Errorf("Failed to parse version major")
-	}
-	if stream.message.version_minor != 1 {
-		t.Errorf("Failed to parse version minor")
-	}
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.False(t, message.IsRequest)
+	assert.Equal(t, 200, int(message.StatusCode))
+	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.True(t, isVersion(message.version, 1, 1))
+	assert.Equal(t, 262, int(message.Size))
+	assert.Equal(t, 0, message.ContentLength)
 }
 
 func TestHttpParser_splitResponse_midHeaderValue(t *testing.T) {
-
-	http := HttpModForTests()
-
-	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
-		"Content-Encoding: g")
+		"Content-Encoding: g"
+	data2 := "zip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	tp := newTestParser(nil, data1, data2)
 
-	data2 := []byte(
-		"zip\r\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data2...)
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
+	_, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_splitResponse_midNewLine(t *testing.T) {
-
-	http := HttpModForTests()
-	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
-		"Content-Encoding: gzip\r")
+		"Content-Encoding: gzip\r"
+	data2 := "\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	tp := newTestParser(nil, data1, data2)
 
-	data2 := []byte(
-		"\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data2...)
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
+	_, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_ResponseWithBody(t *testing.T) {
-	http := HttpModForTests()
-
-	data := []byte("HTTP/1.1 200 OK\r\n" +
+	data := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
@@ -415,116 +280,61 @@ func TestHttpParser_ResponseWithBody(t *testing.T) {
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" +
-		"garbage")
+		"garbage"
+	tp := newTestParser(nil, data)
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.ContentLength != 30 {
-		t.Errorf("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
-	}
-
-	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("garbage")) {
-		t.Errorf("The offset is wrong")
-	}
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 30, message.ContentLength)
+	assert.Equal(t, "garbage", string(tp.stream.data[tp.stream.parseOffset:]))
 }
 
 func TestHttpParser_Response_HTTP_10_without_content_length(t *testing.T) {
-	http := HttpModForTests()
-
-	data := []byte("HTTP/1.0 200 OK\r\n" +
+	data := "HTTP/1.0 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
 		"\r\n" +
-		"test")
+		"test"
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	if stream.message.ContentLength != 4 {
-		t.Errorf("Wrong Content-Length =" + strconv.Itoa(stream.message.ContentLength))
-	}
-
+	message, ok, complete := testParse(nil, data)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, 4, message.ContentLength)
 }
 
 func TestHttpParser_splitResponse_midBody(t *testing.T) {
-	http := HttpModForTests()
-
-	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+	data1 := "HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
 		"Expires: -1\r\n" +
 		"Cache-Control: private, max-age=0\r\n" +
 		"Content-Type: text/html; charset=UTF-8\r\n" +
 		"Content-Encoding: gzip\r\n" +
 		"Server: gws\r\n" +
-		"Content-Length: 3")
-
-	data2 := []byte("0\r\n" +
+		"Content-Length: 3"
+	data2 := "0\r\n" +
 		"X-XSS-Protection: 1; mode=block\r\n" +
 		"X-Frame-Options: SAMEORIGIN\r\n" +
 		"\r\n" +
-		"xxxxxxxxxx")
+		"xxxxxxxxxx"
+	data3 := "xxxxxxxxxxxxxxxxxxxx"
+	tp := newTestParser(nil, data1, data2, data3)
 
-	data3 := []byte("xxxxxxxxxxxxxxxxxxxx")
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	_, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.False(t, complete)
 
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data2...)
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-	if complete {
-		t.Errorf("Not expecting a complete message yet")
-	}
-
-	stream.data = append(stream.data, data3...)
-	ok, complete = http.messageParser(stream)
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.ContentLength != 30 {
-		t.Errorf("Wrong content-length")
-	}
-
-	if !bytes.Equal(stream.data[stream.parseOffset:], []byte("")) {
-		t.Errorf("The offset is wrong")
-	}
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 30, message.ContentLength)
+	assert.Equal(t, []byte(""), tp.stream.data[tp.stream.parseOffset:])
 }
 
 func TestHttpParser_RequestResponse(t *testing.T) {
@@ -532,172 +342,115 @@ func TestHttpParser_RequestResponse(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
-	http := HttpModForTests()
+	data := "GET / HTTP/1.1\r\n" +
+		"Host: www.google.ro\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.ro/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
 
-	data := []byte(
-		"GET / HTTP/1.1\r\n" +
-			"Host: www.google.ro\r\n" +
-			"Connection: keep-alive\r\n" +
-			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
-			"Accept: */*\r\n" +
-			"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
-			"Referer: http://www.google.ro/\r\n" +
-			"Accept-Encoding: gzip,deflate,sdch\r\n" +
-			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
-			"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
-			"\r\n" +
-			"HTTP/1.1 200 OK\r\n" +
-			"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
-			"Expires: -1\r\n" +
-			"Cache-Control: private, max-age=0\r\n" +
-			"Content-Type: text/html; charset=UTF-8\r\n" +
-			"Content-Encoding: gzip\r\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
+	tp := newTestParser(nil, data)
+	_, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 
-	stream := &HttpStream{data: data, message: &HttpMessage{Ts: time.Now()}}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	stream.PrepareForNewMessage()
-	stream.message = &HttpMessage{Ts: time.Now()}
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
+	tp.stream.PrepareForNewMessage()
+	tp.stream.message = &HttpMessage{Ts: time.Now()}
+	_, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_RequestResponseBody(t *testing.T) {
-	http := HttpModForTests()
+	data1 := "GET / HTTP/1.1\r\n" +
+		"Host: www.google.ro\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.ro/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Content-Length: 2\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"xx"
+	data2 := "HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n"
+	data := data1 + data2
+	tp := newTestParser(nil, data)
 
-	data1 := []byte(
-		"GET / HTTP/1.1\r\n" +
-			"Host: www.google.ro\r\n" +
-			"Connection: keep-alive\r\n" +
-			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
-			"Accept: */*\r\n" +
-			"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
-			"Referer: http://www.google.ro/\r\n" +
-			"Accept-Encoding: gzip,deflate,sdch\r\n" +
-			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"Content-Length: 2\r\n" +
-			"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
-			"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
-			"\r\n" +
-			"xx")
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 2, message.ContentLength)
+	assert.Equal(t, []byte(data1), tp.stream.data[tp.stream.message.start:tp.stream.message.end])
 
-	data2 := []byte(
-		"HTTP/1.1 200 OK\r\n" +
-			"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
-			"Expires: -1\r\n" +
-			"Cache-Control: private, max-age=0\r\n" +
-			"Content-Type: text/html; charset=UTF-8\r\n" +
-			"Content-Encoding: gzip\r\n" +
-			"Server: gws\r\n" +
-			"Content-Length: 0\r\n" +
-			"X-XSS-Protection: 1; mode=block\r\n" +
-			"X-Frame-Options: SAMEORIGIN\r\n" +
-			"\r\n")
-
-	data := append(data1, data2...)
-
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.ContentLength != 2 {
-		t.Errorf("Wrong content lenght")
-	}
-
-	if !bytes.Equal(stream.data[stream.message.start:stream.message.end], data1) {
-		t.Errorf("First message not correctly extracted")
-	}
-
-	stream.PrepareForNewMessage()
-	stream.message = &HttpMessage{Ts: time.Now()}
-
-	ok, complete = http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
+	tp.stream.PrepareForNewMessage()
+	tp.stream.message = &HttpMessage{Ts: time.Now()}
+	message, ok, complete = tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestHttpParser_301_response(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http"})
 	}
-	http := HttpModForTests()
 
-	data := []byte(
-		"HTTP/1.1 301 Moved Permanently\r\n" +
-			"Date: Sun, 29 Sep 2013 16:53:59 GMT\r\n" +
-			"Server: Apache\r\n" +
-			"Location: http://www.hotnews.ro/\r\n" +
-			"Vary: Accept-Encoding\r\n" +
-			"Content-Length: 290\r\n" +
-			"Connection: close\r\n" +
-			"Content-Type: text/html; charset=iso-8859-1\r\n" +
-			"\r\n" +
-			"<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n" +
-			"<html><head>\r\n" +
-			"<title>301 Moved Permanently</title>\r\n" +
-			"</head><body>\r\n" +
-			"<h1>Moved Permanently</h1>\r\n" +
-			"<p>The document has moved <a href=\"http://www.hotnews.ro/\">here</a>.</p>\r\n" +
-			"<hr>\r\n" +
-			"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
-			"</body></html>")
+	data := "HTTP/1.1 301 Moved Permanently\r\n" +
+		"Date: Sun, 29 Sep 2013 16:53:59 GMT\r\n" +
+		"Server: Apache\r\n" +
+		"Location: http://www.hotnews.ro/\r\n" +
+		"Vary: Accept-Encoding\r\n" +
+		"Content-Length: 290\r\n" +
+		"Connection: close\r\n" +
+		"Content-Type: text/html; charset=iso-8859-1\r\n" +
+		"\r\n" +
+		"<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n" +
+		"<html><head>\r\n" +
+		"<title>301 Moved Permanently</title>\r\n" +
+		"</head><body>\r\n" +
+		"<h1>Moved Permanently</h1>\r\n" +
+		"<p>The document has moved <a href=\"http://www.hotnews.ro/\">here</a>.</p>\r\n" +
+		"<hr>\r\n" +
+		"<address>Apache Server at hotnews.ro Port 80</address>\r\n" +
+		"</body></html>"
 
-	stream := &HttpStream{data: data, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	if stream.message.ContentLength != 290 {
-		t.Errorf("Expecting content length 290")
-	}
+	message, ok, complete := testParse(nil, data)
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.Equal(t, 290, message.ContentLength)
 }
 
 func TestEatBodyChunked(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
@@ -711,96 +464,59 @@ func TestEatBodyChunked(t *testing.T) {
 		data:         msgs[0],
 		parseOffset:  0,
 		bodyReceived: 0,
-		parseState:   BODY_CHUNKED_START,
+		parseState:   stateBodyChunkedStart,
 	}
 	message := &HttpMessage{
 		chunked_length: 5,
 		ContentLength:  0,
 	}
+	parser := newParser(&testParserConfig)
 
-	cont, ok, complete := state_body_chunked_start(stream, message)
+	cont, ok, complete := parser.parseBodyChunkedStart(stream, message)
 	if cont != false || ok != true || complete != false {
 		t.Errorf("Wrong return values")
 	}
-	if stream.parseOffset != 0 {
-		t.Errorf("Wrong parseOffset")
-	}
+	assert.Equal(t, 0, stream.parseOffset)
 
 	stream.data = append(stream.data, msgs[1]...)
+	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	assert.True(t, cont)
+	assert.Equal(t, 3, message.chunked_length)
+	assert.Equal(t, 4, stream.parseOffset)
+	assert.Equal(t, stateBodyChunked, stream.parseState)
 
-	cont, ok, complete = state_body_chunked_start(stream, message)
-	if cont != true {
-		t.Errorf("Wrong return values")
-	}
-	if message.chunked_length != 3 {
-		t.Errorf("Wrong chunked_length")
-	}
-	if stream.parseOffset != 4 {
-		t.Errorf("Wrong parseOffset")
-	}
-	if stream.parseState != BODY_CHUNKED {
-		t.Errorf("Wrong state")
-	}
+	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	assert.True(t, cont)
+	assert.Equal(t, stateBodyChunkedStart, stream.parseState)
+	assert.Equal(t, 9, stream.parseOffset)
 
-	cont, ok, complete = state_body_chunked(stream, message)
-	if cont != true {
-		t.Errorf("Wrong return values")
-	}
-	if stream.parseState != BODY_CHUNKED_START {
-		t.Errorf("Wrong state")
-	}
-	if stream.parseOffset != 9 {
-		t.Errorf("Wrong parseOffset")
-	}
+	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	assert.True(t, cont)
+	assert.Equal(t, 3, message.chunked_length)
+	assert.Equal(t, 13, stream.parseOffset)
+	assert.Equal(t, stateBodyChunked, stream.parseState)
 
-	cont, ok, complete = state_body_chunked_start(stream, message)
-	if cont != true {
-		t.Errorf("Wrong return values")
-	}
-	if message.chunked_length != 3 {
-		t.Errorf("Wrong chunked_length")
-	}
-	if stream.parseOffset != 13 {
-		t.Errorf("Wrong parseOffset")
-	}
-	if stream.parseState != BODY_CHUNKED {
-		t.Errorf("Wrong state")
-	}
-
-	cont, ok, complete = state_body_chunked(stream, message)
-	if cont != false || ok != true || complete != false {
-		t.Errorf("Wrong return values")
-	}
-	if stream.parseState != BODY_CHUNKED {
-		t.Errorf("Wrong state")
-	}
-	if stream.parseOffset != 13 {
-		t.Errorf("Wrong parseOffset")
-	}
-	if stream.bodyReceived != 0 {
-		t.Errorf("Wrong bodyReceived")
-	}
+	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	assert.False(t, cont)
+	assert.True(t, ok)
+	assert.False(t, complete)
+	assert.Equal(t, 13, stream.parseOffset)
+	assert.Equal(t, 0, stream.bodyReceived)
+	assert.Equal(t, stateBodyChunked, stream.parseState)
 
 	stream.data = append(stream.data, msgs[2]...)
-	cont, ok, complete = state_body_chunked(stream, message)
-	if cont != true {
-		t.Errorf("Wrong return values")
-	}
-	if stream.parseState != BODY_CHUNKED_START {
-		t.Errorf("Wrong state")
-	}
-	if stream.parseOffset != 18 {
-		t.Errorf("Wrong parseOffset")
-	}
+	cont, ok, complete = parser.parseBodyChunked(stream, message)
+	assert.True(t, cont)
+	assert.Equal(t, 18, stream.parseOffset)
+	assert.Equal(t, stateBodyChunkedStart, stream.parseState)
 
-	cont, ok, complete = state_body_chunked_start(stream, message)
-	if cont != false || ok != true || complete != true {
-		t.Error("Wrong return values", cont, ok, complete)
-	}
+	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
+	assert.False(t, cont)
+	assert.True(t, ok)
+	assert.True(t, complete)
 }
 
 func TestEatBodyChunkedWaitCRLF(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
@@ -813,47 +529,48 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		data:         msgs[0],
 		parseOffset:  0,
 		bodyReceived: 0,
-		parseState:   BODY_CHUNKED_START,
+		parseState:   stateBodyChunkedStart,
 	}
 	message := &HttpMessage{
 		chunked_length: 5,
 		ContentLength:  0,
 	}
+	parser := newParser(&testParserConfig)
 
-	cont, ok, complete := state_body_chunked_start(stream, message)
+	cont, ok, complete := parser.parseBodyChunkedStart(stream, message)
 	if cont != true || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != BODY_CHUNKED {
+	if stream.parseState != stateBodyChunked {
 		t.Error("Unexpected state", stream.parseState)
 	}
 
-	cont, ok, complete = state_body_chunked(stream, message)
+	cont, ok, complete = parser.parseBodyChunked(stream, message)
 	if cont != true || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != BODY_CHUNKED_START {
+	if stream.parseState != stateBodyChunkedStart {
 		t.Error("Unexpected state", stream.parseState)
 	}
 
-	cont, ok, complete = state_body_chunked_start(stream, message)
+	cont, ok, complete = parser.parseBodyChunkedStart(stream, message)
 	if cont != false || ok != true || complete != false {
 		t.Error("Wrong return values", cont, ok, complete)
 	}
-	if stream.parseState != BODY_CHUNKED_WAIT_FINAL_CRLF {
+	if stream.parseState != stateBodyChunkedWaitFinalCRLF {
 		t.Error("Unexpected state", stream.parseState)
 	}
 
 	logp.Debug("http", "parseOffset", stream.parseOffset)
 
-	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
+	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(stream, message)
 	if ok != true || complete != false {
 		t.Error("Wrong return values", ok, complete)
 
 	}
 	stream.data = append(stream.data, msgs[1]...)
 
-	ok, complete = state_body_chunked_wait_final_crlf(stream, message)
+	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(stream, message)
 	if ok != true || complete != true {
 		t.Error("Wrong return values", ok, complete)
 	}
@@ -863,58 +580,40 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 }
 
 func TestHttpParser_censorPasswordURL(t *testing.T) {
-
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
 	http := HttpModForTests()
-	http.Hide_keywords = []string{"password", "pass"}
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.HideKeywords = []string{"password", "pass"}
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
-	data1 := []byte(
-		"GET http://localhost:8080/test?password=secret HTTP/1.1\r\n" +
-			"Host: www.google.com\r\n" +
-			"Connection: keep-alive\r\n" +
-			"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
-			"Accept: */*\r\n" +
-			"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
-			"Referer: http://www.google.com/\r\n" +
-			"Accept-Encoding: gzip,deflate,sdch\r\n" +
-			"Accept-Language: en-US,en;q=0.8\r\n" +
-			"Content-Type: application/x-www-form-urlencoded\r\n" +
-			"Content-Length: 23\r\n" +
-			"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
-			"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
-			"\r\n" +
-			"username=ME&pass=secret")
+	data1 := "GET http://localhost:8080/test?password=secret HTTP/1.1\r\n" +
+		"Host: www.google.com\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.com/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Content-Type: application/x-www-form-urlencoded\r\n" +
+		"Content-Length: 23\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"username=ME&pass=secret"
+	tp := newTestParser(http, data1)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	msg := stream.data[stream.message.start:stream.message.end]
-	path, params, err := http.extractParameters(stream.message, msg)
-	if err != nil {
-		t.Errorf("Fail to parse parameters")
-	}
-
-	if path != "/test" {
-		t.Errorf("Wrong path: %s", path)
-	}
-
-	if strings.Contains(params, "secret") {
-		t.Errorf("Failed to censor the password: %s", params)
-	}
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
+	msg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
+	path, params, err := http.extractParameters(message, msg)
+	assert.Nil(t, err)
+	assert.Equal(t, "/test", path)
+	assert.False(t, strings.Contains(params, "secret"))
 }
 
 func TestHttpParser_censorPasswordPOST(t *testing.T) {
@@ -924,56 +623,41 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	}
 
 	http := HttpModForTests()
-	http.Hide_keywords = []string{"password"}
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.HideKeywords = []string{"password"}
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
-	data1 := []byte(
+	data1 :=
 		"POST /users/login HTTP/1.1\r\n" +
 			"HOST: www.example.com\r\n" +
 			"Content-Type: application/x-www-form-urlencoded\r\n" +
 			"Content-Length: 28\r\n" +
 			"\r\n" +
-			"username=ME&password=secret\r\n")
+			"username=ME&password=secret\r\n"
+	tp := newTestParser(http, data1)
 
-	stream := &HttpStream{data: data1, message: new(HttpMessage)}
+	message, ok, complete := tp.parse()
+	assert.True(t, ok)
+	assert.True(t, complete)
 
-	ok, complete := http.messageParser(stream)
-
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
-
-	if !complete {
-		t.Errorf("Expecting a complete message")
-	}
-
-	msg := stream.data[stream.message.start:stream.message.end]
-	path, params, err := http.extractParameters(stream.message, msg)
-	if err != nil {
-		t.Errorf("Fail to parse parameters")
-	}
-
-	if path != "/users/login" {
-		t.Errorf("Wrong path: %s", path)
-	}
-
-	if strings.Contains(params, "secret") {
-		t.Errorf("Failed to censor the password: %s", msg)
-	}
+	msg := tp.stream.data[tp.stream.message.start:tp.stream.message.end]
+	path, params, err := http.extractParameters(message, msg)
+	assert.Nil(t, err)
+	assert.Equal(t, "/users/login", path)
+	assert.False(t, strings.Contains(params, "secret"))
 }
-func TestHttpParser_censorPasswordGET(t *testing.T) {
 
+func TestHttpParser_censorPasswordGET(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
 	http := HttpModForTests()
-	http.Hide_keywords = []string{"password"}
-	http.Send_headers = true
-	http.Send_all_headers = true
-	http.Send_request = false
-	http.Send_response = false
+	http.HideKeywords = []string{"password"}
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
+	http.SendRequest = false
+	http.SendResponse = false
 
 	data1 := []byte(
 		"GET /users/login HTTP/1.1\r\n" +
@@ -985,12 +669,10 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 
 	stream := &HttpStream{data: data1, message: new(HttpMessage)}
 
-	ok, complete := http.messageParser(stream)
-
+	ok, complete := testParseStream(http, stream)
 	if !ok {
 		t.Errorf("Parsing returned error")
 	}
-
 	if !complete {
 		t.Errorf("Expecting a complete message")
 	}
@@ -1018,9 +700,9 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 	}
 
 	http := HttpModForTests()
-	http.Redact_authorization = true
-	http.Send_headers = true
-	http.Send_all_headers = true
+	http.RedactAuthorization = true
+	http.parserConfig.SendHeaders = true
+	http.parserConfig.SendAllHeaders = true
 
 	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
 		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
@@ -1037,7 +719,7 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
-	ok, _ := http.messageParser(stream)
+	ok, _ := testParseStream(http, stream)
 
 	msg := stream.data[stream.message.start:]
 	http.hideHeaders(stream.message, msg)
@@ -1069,9 +751,9 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	http := HttpModForTests()
-	http.Redact_authorization = true
-	http.Send_headers = false
-	http.Send_all_headers = false
+	http.RedactAuthorization = true
+	http.parserConfig.SendHeaders = false
+	http.parserConfig.SendAllHeaders = false
 
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
@@ -1083,7 +765,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
-	ok, complete := http.messageParser(stream)
+	ok, complete := testParseStream(http, stream)
 
 	msg := stream.data[stream.message.start:]
 	http.hideHeaders(stream.message, msg)
@@ -1096,8 +778,8 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	raw_message_obscured := bytes.Index(msg, []byte("uthorization:*"))
-	if raw_message_obscured < 0 {
+	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
+	if rawMessageObscured < 0 {
 		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
@@ -1105,9 +787,9 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	http := HttpModForTests()
-	http.Redact_authorization = true
-	http.Send_headers = false
-	http.Send_all_headers = false
+	http.RedactAuthorization = true
+	http.parserConfig.SendHeaders = false
+	http.parserConfig.SendAllHeaders = false
 
 	data := []byte("POST / HTTP/1.1\r\n" +
 		"user-agent: curl/7.35.0\r\n" + "host: localhost:9000\r\n" +
@@ -1119,7 +801,7 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	stream := &HttpStream{data: data, message: new(HttpMessage)}
 
-	ok, complete := http.messageParser(stream)
+	ok, complete := testParseStream(http, stream)
 
 	msg := stream.data[stream.message.start:]
 	http.hideHeaders(stream.message, msg)
@@ -1227,7 +909,7 @@ func Test_gap_in_headers(t *testing.T) {
 		"Content-Type: text/html; charset=UTF-8\r\n")
 
 	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := http.messageParser(stream)
+	ok, complete := testParseStream(http, stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -1256,7 +938,7 @@ func Test_gap_in_body(t *testing.T) {
 		"xxxxxxxxxxxxxxxxxxxx")
 
 	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := http.messageParser(stream)
+	ok, complete := testParseStream(http, stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -1288,7 +970,7 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 		"xxxxxxxxxxxxxxxxxxxx")
 
 	stream := &HttpStream{data: data1, message: new(HttpMessage)}
-	ok, complete := http.messageParser(stream)
+	ok, complete := testParseStream(http, stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
 
@@ -1388,14 +1070,14 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	// Check if http config is set correctly
 	assert.Equal(t, config.Ports, http.Ports)
 	assert.Equal(t, config.Ports, http.GetPorts())
-	assert.Equal(t, *config.SendRequest, http.Send_request)
-	assert.Equal(t, *config.SendResponse, http.Send_response)
-	assert.Equal(t, config.Hide_keywords, http.Hide_keywords)
-	assert.Equal(t, *config.Redact_authorization, http.Redact_authorization)
-	assert.True(t, http.Send_headers)
-	assert.True(t, http.Send_all_headers)
-	assert.Equal(t, *config.Split_cookie, http.Split_cookie)
-	assert.Equal(t, strings.ToLower(*config.Real_ip_header), http.Real_ip_header)
+	assert.Equal(t, *config.SendRequest, http.SendRequest)
+	assert.Equal(t, *config.SendResponse, http.SendResponse)
+	assert.Equal(t, config.Hide_keywords, http.HideKeywords)
+	assert.Equal(t, *config.Redact_authorization, http.RedactAuthorization)
+	assert.True(t, http.parserConfig.SendHeaders)
+	assert.True(t, http.parserConfig.SendAllHeaders)
+	assert.Equal(t, *config.Split_cookie, http.SplitCookie)
+	assert.Equal(t, strings.ToLower(*config.Real_ip_header), http.parserConfig.RealIPHeader)
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
@@ -1410,11 +1092,10 @@ func TestHttp_configsSettingHeaders(t *testing.T) {
 	http.SetFromConfig(*config)
 
 	// Check if http config is set correctly
-	assert.True(t, http.Send_headers)
-	assert.Equal(t, len(config.Send_headers), len(http.Headers_whitelist))
+	assert.True(t, http.parserConfig.SendHeaders)
+	assert.Equal(t, len(config.Send_headers), len(http.parserConfig.HeadersWhitelist))
 
-	for _, val := range http.Headers_whitelist {
+	for _, val := range http.parserConfig.HeadersWhitelist {
 		assert.True(t, val)
 	}
-
 }
