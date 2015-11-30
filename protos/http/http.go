@@ -73,6 +73,7 @@ type transaction struct {
 	ResponseRaw string
 }
 
+// HTTP application level protocol analyser plugin.
 type HTTP struct {
 	// config
 	Ports               []int
@@ -98,14 +99,14 @@ func (http *HTTP) getTransaction(k common.HashableTcpTuple) *transaction {
 	return nil
 }
 
-func (http *HTTP) InitDefaults() {
+func (http *HTTP) initDefaults() {
 	http.SendRequest = false
 	http.SendResponse = false
 	http.RedactAuthorization = false
 	http.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
-func (http *HTTP) SetFromConfig(config config.Http) (err error) {
+func (http *HTTP) setFromConfig(config config.Http) (err error) {
 
 	http.Ports = config.Ports
 
@@ -149,15 +150,17 @@ func (http *HTTP) SetFromConfig(config config.Http) (err error) {
 	return nil
 }
 
+// GetPorts lists the port numbers the HTTP protocol analyser will handle.
 func (http *HTTP) GetPorts() []int {
 	return http.Ports
 }
 
-func (http *HTTP) Init(test_mode bool, results publisher.Client) error {
-	http.InitDefaults()
+// Init initializes the HTTP protocol analyser.
+func (http *HTTP) Init(testMode bool, results publisher.Client) error {
+	http.initDefaults()
 
-	if !test_mode {
-		err := http.SetFromConfig(config.ConfigSingleton.Protocols.Http)
+	if !testMode {
+		err := http.setFromConfig(config.ConfigSingleton.Protocols.Http)
 		if err != nil {
 			return err
 		}
@@ -222,16 +225,18 @@ func (http *HTTP) messageComplete(tcptuple *common.TcpTuple, dir uint8, st *stre
 	msg := st.data[st.message.start:st.message.end]
 	http.hideHeaders(st.message, msg)
 
-	http.handleHttp(st.message, tcptuple, dir, msg)
+	http.handleHTTP(st.message, tcptuple, dir, msg)
 
 	// and reset message
 	st.PrepareForNewMessage()
 }
 
+// ConnectionTimeout returns the configured HTTP transaction timeout.
 func (http *HTTP) ConnectionTimeout() time.Duration {
 	return http.transactionTimeout
 }
 
+// Parse function is used to process TCP payloads.
 func (http *HTTP) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
@@ -286,6 +291,7 @@ func (http *HTTP) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 	return priv
 }
 
+// ReceivedFin will be called when TCP transaction is terminating.
 func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
@@ -312,7 +318,7 @@ func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 		msg := stream.data[stream.message.start:]
 		http.hideHeaders(stream.message, msg)
 
-		http.handleHttp(stream.message, tcptuple, dir, msg)
+		http.handleHTTP(stream.message, tcptuple, dir, msg)
 
 		// and reset message. Probably not needed, just to be sure.
 		stream.PrepareForNewMessage()
@@ -321,8 +327,8 @@ func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	return httpData
 }
 
-// Called when a gap of nbytes bytes is found in the stream (due to
-// packet loss).
+// GapInStream is called when a gap of nbytes bytes is found in the stream (due
+// to packet loss).
 func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
 
@@ -358,22 +364,22 @@ func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	return private, false
 }
 
-func (http *HTTP) handleHttp(m *message, tcptuple *common.TcpTuple,
-	dir uint8, raw_msg []byte) {
+func (http *HTTP) handleHTTP(m *message, tcptuple *common.TcpTuple,
+	dir uint8, rawMsg []byte) {
 
 	m.TCPTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
-	m.Raw = raw_msg
+	m.Raw = rawMsg
 
 	if m.IsRequest {
-		http.receivedHttpRequest(m)
+		http.receivedHTTPRequest(m)
 	} else {
-		http.receivedHttpResponse(m)
+		http.receivedHTTPResponse(m)
 	}
 }
 
-func (http *HTTP) receivedHttpRequest(msg *message) {
+func (http *HTTP) receivedHTTPRequest(msg *message) {
 
 	trans := http.getTransaction(msg.TCPTuple.Hashable())
 	if trans != nil {
@@ -442,7 +448,7 @@ func (http *HTTP) receivedHttpRequest(msg *message) {
 	}
 }
 
-func (http *HTTP) receivedHttpResponse(msg *message) {
+func (http *HTTP) receivedHTTPResponse(msg *message) {
 
 	// we need to search the request first.
 	tuple := msg.TCPTuple
@@ -605,7 +611,7 @@ func (http *HTTP) hideHeaders(m *message, msg []byte) {
 		if http.RedactAuthorization {
 
 			redactHeaders := []string{"authorization", "proxy-authorization"}
-			auth_text := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
+			authText := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
 
 			authHeaderStartX := m.headerOffset
 			authHeaderEndX := m.bodyOffset
@@ -613,7 +619,7 @@ func (http *HTTP) hideHeaders(m *message, msg []byte) {
 			for authHeaderStartX < m.bodyOffset {
 				debugf("looking for authorization from %d to %d", authHeaderStartX, authHeaderEndX)
 
-				startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], auth_text)
+				startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
 				if startOfHeader >= 0 {
 					authHeaderStartX = authHeaderStartX + startOfHeader
 
@@ -627,7 +633,7 @@ func (http *HTTP) hideHeaders(m *message, msg []byte) {
 
 						debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
 
-						for i := authHeaderStartX + len(auth_text); i < authHeaderEndX; i++ {
+						for i := authHeaderStartX + len(authText); i < authHeaderEndX; i++ {
 							msg[i] = byte('*')
 						}
 					}

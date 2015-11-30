@@ -26,7 +26,7 @@ var testParserConfig = parserConfig{}
 
 func newTestParser(http *HTTP, payloads ...string) *testParser {
 	if http == nil {
-		http = HttpModForTests()
+		http = httpModForTests()
 	}
 	tp := &testParser{
 		http:     http,
@@ -48,9 +48,9 @@ func (tp *testParser) parse() (*message, bool, bool) {
 	return st.message, ok, complete
 }
 
-func HttpModForTests() *HTTP {
+func httpModForTests() *HTTP {
 	var http HTTP
-	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	results := publisher.ChanClient{Channel: make(chan common.MapStr, 10)}
 	http.Init(true, results)
 	return &http
 }
@@ -114,7 +114,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 }
 
 func TestHttpParser_simpleRequest(t *testing.T) {
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
 
@@ -145,7 +145,7 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 }
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
 
@@ -186,7 +186,7 @@ func TestHttpParser_splitResponse(t *testing.T) {
 }
 
 func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
 
@@ -584,7 +584,7 @@ func TestHttpParser_censorPasswordURL(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.HideKeywords = []string{"password", "pass"}
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
@@ -622,7 +622,7 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.HideKeywords = []string{"password"}
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
@@ -652,7 +652,7 @@ func TestHttpParser_censorPasswordGET(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.HideKeywords = []string{"password"}
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
@@ -699,7 +699,7 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http", "httpdetailed"})
 	}
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.RedactAuthorization = true
 	http.parserConfig.SendHeaders = true
 	http.parserConfig.SendAllHeaders = true
@@ -750,7 +750,7 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.RedactAuthorization = true
 	http.parserConfig.SendHeaders = false
 	http.parserConfig.SendAllHeaders = false
@@ -786,7 +786,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	http.RedactAuthorization = true
 	http.parserConfig.SendHeaders = false
 	http.parserConfig.SendAllHeaders = false
@@ -814,8 +814,8 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 		t.Errorf("Expecting a complete message")
 	}
 
-	raw_message_obscured := bytes.Index(msg, []byte("uthorization:*"))
-	if raw_message_obscured < 0 {
+	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
+	if rawMessageObscured < 0 {
 		t.Errorf("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
@@ -900,7 +900,7 @@ func Test_splitCookiesHeader(t *testing.T) {
 // headers, drop the stream.
 func Test_gap_in_headers(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -922,7 +922,7 @@ func Test_gap_in_headers(t *testing.T) {
 // parts of the body, it's ok.
 func Test_gap_in_body(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 
 	data1 := []byte("HTTP/1.1 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -955,7 +955,7 @@ func Test_gap_in_body(t *testing.T) {
 // parts of the body, it's ok.
 func Test_gap_in_body_http1dot0(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 
 	data1 := []byte("HTTP/1.0 200 OK\r\n" +
 		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
@@ -980,7 +980,7 @@ func Test_gap_in_body_http1dot0(t *testing.T) {
 
 }
 
-func testTcpTuple() *common.TcpTuple {
+func testCreateTCPTuple() *common.TcpTuple {
 	t := &common.TcpTuple{
 		Ip_length: 4,
 		Src_ip:    net.IPv4(192, 168, 0, 1), Dst_ip: net.IPv4(192, 168, 0, 2),
@@ -1007,7 +1007,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"http",
 			"httpdetailed"})
 	}
-	http := HttpModForTests()
+	http := httpModForTests()
 
 	data1 := []byte("GET / HTTP/1.0\r\n\r\n")
 
@@ -1023,7 +1023,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxx")
 
-	tcptuple := testTcpTuple()
+	tcptuple := testCreateTCPTuple()
 	req := protos.Packet{Payload: data1}
 	resp := protos.Packet{Payload: data2}
 
@@ -1048,7 +1048,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 
 func TestHttp_configsSettingAll(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	config := new(config.Http)
 
 	// Assign config vars
@@ -1061,11 +1061,11 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	config.Redact_authorization = &trueVar
 	config.Send_all_headers = &trueVar
 	config.Split_cookie = &trueVar
-	realIpHeader := "X-Forwarded-For"
-	config.Real_ip_header = &realIpHeader
+	realIPHeader := "X-Forwarded-For"
+	config.Real_ip_header = &realIPHeader
 
 	// Set config
-	http.SetFromConfig(*config)
+	http.setFromConfig(*config)
 
 	// Check if http config is set correctly
 	assert.Equal(t, config.Ports, http.Ports)
@@ -1082,14 +1082,14 @@ func TestHttp_configsSettingAll(t *testing.T) {
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
 
-	http := HttpModForTests()
+	http := httpModForTests()
 	config := new(config.Http)
 
 	// Assign config vars
 	config.Send_headers = []string{"a", "b", "c"}
 
 	// Set config
-	http.SetFromConfig(*config)
+	http.setFromConfig(*config)
 
 	// Check if http config is set correctly
 	assert.True(t, http.parserConfig.SendHeaders)
