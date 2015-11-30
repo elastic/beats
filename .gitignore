@@ -30,6 +30,7 @@ _testmain.go
 *.out
 *.log
 *.bak
+*.winlogbeat.yaml
 etc/*.dev.yml
 
 cover/

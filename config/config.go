@@ -10,6 +10,10 @@ import (
 	"github.com/joeshaw/multierror"
 )
 
+const (
+	DefaultRegistryFile = ".winlogbeat.yaml"
+)
+
 type Validator interface {
 	Validate() error
 }
@@ -19,9 +23,10 @@ type ConfigSettings struct {
 }
 
 type WinlogbeatConfig struct {
-	IgnoreOlder string           `yaml:"ignore_older"`
-	EventLogs   []EventLogConfig `yaml:"event_logs"`
-	Metrics     MetricsConfig
+	IgnoreOlder  string           `yaml:"ignore_older"`
+	EventLogs    []EventLogConfig `yaml:"event_logs"`
+	Metrics      MetricsConfig    `yaml:"metrics"`
+	RegistryFile string           `yaml:"registry_file"`
 }
 
 // Validates the WinlogbeatConfig data and returns an error describing all

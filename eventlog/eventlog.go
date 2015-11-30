@@ -37,12 +37,15 @@ type EventLoggingAPI interface {
 type eventLog struct {
 	uncServerPath string       // UNC name of remote server.
 	name          string       // Name of the log that is opened.
-	recordNumber  uint32       // Last successfully read record number.
 	handle        Handle       // Handle to the event log.
 	readBuf       []byte       // Re-usable buffer for reading in events.
 	formatBuf     []byte       // Re-usable buffer for formatting messages.
 	handles       *handleCache // Cached mapping of source name to event message file handles.
 	logPrefix     string       // Prefix to add to all log entries.
+
+	recordNumber uint32 // First record number to read.
+	seek         bool   // Read should use seek.
+	ignoreFirst  bool   // Ignore first message returned from a read.
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).

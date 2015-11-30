@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/elastic/libbeat/common"
 	"github.com/elastic/libbeat/logp"
 	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/winlogbeat/checkpoint"
 	"github.com/elastic/winlogbeat/config"
 	"github.com/elastic/winlogbeat/eventlog"
 )
@@ -39,28 +41,40 @@ func init() {
 }
 
 type Winlogbeat struct {
-	beat      *beat.Beat                 // Common beat information.
-	config    *config.ConfigSettings     // Configuration settings.
-	eventLogs []eventlog.EventLoggingAPI // Interface to the event logs.
-	done      chan struct{}              // Channel to initiate shutdown of main event loop.
-	client    publisher.Client           // Interface to publish event.
+	beat       *beat.Beat                 // Common beat information.
+	config     *config.ConfigSettings     // Configuration settings.
+	eventLogs  []eventlog.EventLoggingAPI // Interface to the event logs.
+	done       chan struct{}              // Channel to initiate shutdown of main event loop.
+	client     publisher.Client           // Interface to publish event.
+	checkpoint *checkpoint.Checkpoint     // Persists event log state to disk.
 }
 
 func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	// Read configuration.
 	err := cfgfile.Read(&eb.config, "")
 	if err != nil {
-		logp.Err("Error reading configuration file. %v", err)
-		return err
+		return fmt.Errorf("Error reading configuration file. %v", err)
 	}
 
 	// Validate configuration.
 	err = eb.config.Winlogbeat.Validate()
 	if err != nil {
-		logp.Err("Error validating configuration file. %v", err)
-		return err
+		return fmt.Errorf("Error validating configuration file. %v", err)
 	}
-	debugf("Init winlogbeat. Config: %v", eb.config)
+	debugf("Configuration validated. config=%v", eb.config)
+
+	// Registry file grooming.
+	if eb.config.Winlogbeat.RegistryFile == "" {
+		eb.config.Winlogbeat.RegistryFile = config.DefaultRegistryFile
+	}
+	eb.config.Winlogbeat.RegistryFile, err = filepath.Abs(
+		eb.config.Winlogbeat.RegistryFile)
+	if err != nil {
+		return fmt.Errorf("Error getting absolute path of registry file %s. %v",
+			eb.config.Winlogbeat.RegistryFile, err)
+	}
+	logp.Info("State will be read from and persisted to %s",
+		eb.config.Winlogbeat.RegistryFile)
 
 	return nil
 }
@@ -69,6 +83,12 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
 	eb.client = b.Events
 	eb.done = make(chan struct{})
+
+	var err error
+	eb.checkpoint, err = checkpoint.NewCheckpoint(eb.config.Winlogbeat.RegistryFile, 10, 5*time.Second)
+	if err != nil {
+		return err
+	}
 
 	if eb.config.Winlogbeat.Metrics.BindAddress != "" {
 		bindAddress := eb.config.Winlogbeat.Metrics.BindAddress
@@ -90,9 +110,7 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 }
 
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
-	// TODO: Persist last published RecordNumber for each event log so that
-	// when restarted, winlogbeat resumes from the last read event. This should
-	// provide at-least-once publish semantics.
+	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
 	publishedEvents.Add("total", 0)
@@ -108,6 +126,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 		eventLogAPI := eventlog.NewEventLoggingAPI(eventLogConfig.Name)
 		eb.eventLogs = append(eb.eventLogs, eventLogAPI)
+		state, _ := persistedState[eventLogConfig.Name]
 		ignoreOlder, _ := config.IgnoreOlderDuration(eventLogConfig.IgnoreOlder)
 
 		// Initialize per event log metrics.
@@ -116,10 +135,11 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 		// Start a goroutine for each event log.
 		wg.Add(1)
-		go eb.processEventLog(&wg, eventLogAPI, ignoreOlder)
+		go eb.processEventLog(&wg, eventLogAPI, state, ignoreOlder)
 	}
 
 	wg.Wait()
+	eb.checkpoint.Shutdown()
 	return nil
 }
 
@@ -144,11 +164,12 @@ func (eb *Winlogbeat) Stop() {
 func (eb *Winlogbeat) processEventLog(
 	wg *sync.WaitGroup,
 	api eventlog.EventLoggingAPI,
+	state checkpoint.EventLogState,
 	ignoreOlder time.Duration,
 ) {
 	defer wg.Done()
 
-	err := api.Open(0)
+	err := api.Open(state.RecordNumber)
 	if err != nil {
 		logp.Warn("EventLog[%s] Open() error. No events will be read from "+
 			"this source. %v", api.Name(), err)
@@ -215,6 +236,10 @@ loop:
 			logp.Warn("EventLog[%s] Failed to publish %d events", api.Name(), numEvents)
 			publishedEvents.Add("failures", 1)
 		}
+
+		eb.checkpoint.Persist(api.Name(),
+			records[len(records)-1].RecordNumber,
+			records[len(records)-1].TimeGenerated.UTC())
 	}
 }
 
