@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -30,16 +31,24 @@ type Connection struct {
 }
 
 func NewClient(
-	url, index string, tls *tls.Config,
+	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
 ) *Client {
+	proxy := http.ProxyFromEnvironment
+	if proxyURL != nil {
+		proxy = http.ProxyURL(proxyURL)
+	}
+
 	client := &Client{
 		Connection{
-			URL:      url,
+			URL:      esURL,
 			Username: username,
 			Password: password,
 			http: &http.Client{
-				Transport: &http.Transport{TLSClientConfig: tls},
+				Transport: &http.Transport{
+					TLSClientConfig: tls,
+					Proxy:           proxy,
+				},
 			},
 		},
 		index,

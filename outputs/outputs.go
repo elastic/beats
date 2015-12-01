@@ -16,6 +16,7 @@ type MothershipConfig struct {
 	Protocol          string
 	Username          string
 	Password          string
+	ProxyURL          string `yaml:"proxy_url"`
 	Index             string
 	Path              string
 	Db                int

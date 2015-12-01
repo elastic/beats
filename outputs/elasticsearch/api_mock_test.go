@@ -48,7 +48,7 @@ func TestOneHostSuccessResp(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	client := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
@@ -77,7 +77,7 @@ func TestOneHost500Resp(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	client := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, nil, "", "")
 	err := client.Connect(1 * time.Second)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
@@ -112,7 +112,7 @@ func TestOneHost503Resp(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	client := NewClient(server.URL, "", nil, "", "")
+	client := NewClient(server.URL, "", nil, nil, "", "")
 
 	params := map[string]string{
 		"refresh": "true",
