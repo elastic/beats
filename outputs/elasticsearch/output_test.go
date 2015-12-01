@@ -23,16 +23,16 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 
 	var output elasticsearchOutput
 	output.init("packetbeat", outputs.MothershipConfig{
-		Save_topology:  true,
-		Host:           GetEsHost(),
-		Port:           esPort,
-		Username:       os.Getenv("ES_USER"),
-		Password:       os.Getenv("ES_PASS"),
-		Path:           "",
-		Index:          index,
-		Protocol:       "http",
-		Flush_interval: &flushInterval,
-		BulkMaxSize:    &bulkSize,
+		Save_topology: true,
+		Host:          GetEsHost(),
+		Port:          esPort,
+		Username:      os.Getenv("ES_USER"),
+		Password:      os.Getenv("ES_PASS"),
+		Path:          "",
+		Index:         index,
+		Protocol:      "http",
+		FlushInterval: &flushInterval,
+		BulkMaxSize:   &bulkSize,
 	}, 10)
 
 	return output

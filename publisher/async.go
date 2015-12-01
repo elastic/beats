@@ -77,14 +77,16 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 	config := worker.config
 
 	flushInterval := defaultFlushInterval
-	if config.Flush_interval != nil {
-		flushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
+	if config.FlushInterval != nil {
+		flushInterval = time.Duration(*config.FlushInterval) * time.Millisecond
 	}
+	logp.Info("Flush Interval set to: %v", flushInterval)
 
 	maxBulkSize := defaultBulkSize
 	if config.BulkMaxSize != nil {
 		maxBulkSize = *config.BulkMaxSize
 	}
+	logp.Info("Max Bulk Size set to: %v", maxBulkSize)
 
 	// batching disabled
 	if flushInterval <= 0 || maxBulkSize <= 0 {
