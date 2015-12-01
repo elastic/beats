@@ -99,9 +99,10 @@ func (out *redisOutput) Init(beat string, config outputs.MothershipConfig, topol
 	}
 
 	out.ReconnectInterval = time.Duration(1) * time.Second
-	if config.Reconnect_interval != 0 {
-		out.ReconnectInterval = time.Duration(config.Reconnect_interval) * time.Second
+	if config.ReconnectInterval != 0 {
+		out.ReconnectInterval = time.Duration(config.ReconnectInterval) * time.Second
 	}
+	logp.Info("Reconnect Interval set to: %v", out.ReconnectInterval)
 
 	expSec := 15
 	if topology_expire != 0 {
