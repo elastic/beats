@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/packetbeat/procs"
 	"github.com/elastic/packetbeat/protos"
 
+	"github.com/elastic/packetbeat/protos/tcp"
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
 )
@@ -46,6 +47,7 @@ const (
 // Notes that are added to messages during exceptional conditions.
 const (
 	NonDnsPacketMsg   = "Packet's data could not be decoded as DNS."
+	NonDnsCompleteMsg = "Message's data could not be decoded as DNS."
 	DuplicateQueryMsg = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
@@ -166,7 +168,7 @@ type DnsMessage struct {
 // DnsStream contains DNS data from one side of a TCP transmission. A pair
 // of DnsStream's are used to represent the full conversation.
 type DnsStream struct {
-	tcptuple *common.TcpTuple
+	tcpTuple *common.TcpTuple
 
 	data []byte
 
@@ -318,7 +320,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
-	dnsPkt, err := decodeDnsPacket(pkt.Payload)
+	dnsPkt, err := decodeDnsData(pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
@@ -342,6 +344,10 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	} else /* Response */ {
 		dns.receivedDnsResponse(&dnsTuple, dnsMsg)
 	}
+}
+
+func (dns *Dns) ConnectionTimeout() time.Duration {
+	return dns.transactionTimeout
 }
 
 func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
@@ -690,10 +696,10 @@ func nameToString(name []byte) string {
 	return string(s)
 }
 
-// decodeDnsPacket decodes a byte array into a DNS struct. If an error occurs
+// decodeDnsData decodes a byte array into a DNS struct. If an error occurs
 // then the returnd dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
-func decodeDnsPacket(data []byte) (dns *layers.DNS, err error) {
+func decodeDnsData(data []byte) (dns *layers.DNS, err error) {
 	// Recover from any panics that occur while parsing a packet.
 	defer func() {
 		if r := recover(); r != nil {
@@ -706,4 +712,161 @@ func decodeDnsPacket(data []byte) (dns *layers.DNS, err error) {
 		return nil, err
 	}
 	return d, nil
+}
+
+// TCP implementation
+
+func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	defer logp.Recover("DNS ParseTcp")
+
+	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
+		pkt.Tuple.String(), len(pkt.Payload))
+
+	priv := dnsPrivateData{}
+
+	if private != nil {
+		var ok bool
+		priv, ok = private.(dnsPrivateData)
+		if !ok {
+			priv = dnsPrivateData{}
+		}
+	}
+
+	if priv.Data[dir] == nil {
+		logp.Debug("dns", "priv.Data nil")
+
+		priv.Data[dir] = &DnsStream{
+			tcpTuple: tcpTuple,
+			data:     pkt.Payload,
+			message:  &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple},
+		}
+
+	} else {
+		logp.Debug("dns", "priv.Data not nil")
+		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			logp.Debug("dns", "Stream data too large, dropping DNS stream")
+			priv.Data[dir] = nil
+			return priv
+		}
+	}
+
+	stream := priv.Data[dir]
+	if stream.message == nil {
+		logp.Debug("dns", "stream message nil")
+		stream.message = &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple}
+	} else {
+		logp.Debug("dns", "stream message not nil")
+	}
+
+	// what kind of checks should be done here ?
+	// gopacket decodeDns already check QDCount, ANCount, NScount, ARcount
+	data := dns.messageParser(stream)
+
+	if data == nil {
+		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
+			tcpTuple.String(), len(stream.data))
+
+		// drop this tcp stream. Will retry parsing with the next
+		// segment in it
+		priv.Data[dir] = nil
+		return priv
+	}
+
+	dns.messageComplete(tcpTuple, dir, stream, data)
+
+	return priv
+
+}
+
+// return decoded data so we don't have to do decode twice
+// return nil if failed
+func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
+	dnsData, err := decodeDnsData(s.data)
+
+	if err != nil {
+		return nil
+	}
+
+	// no other check ? are gopacket checks enough?
+	return dnsData
+}
+
+func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream, decodedData *layers.DNS) {
+	dns.handleDns(s.message, tcpTuple, dir, s.data, decodedData)
+
+	s.PrepareForNewMessage()
+}
+
+func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, data []byte, decodedData *layers.DNS) {
+	dnsTuple := DnsTupleFromIpPort(&m.Tuple, TransportTcp, decodedData.ID)
+	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
+	m.Data = decodedData
+	m.Length = len(data)
+
+	if decodedData.QR == Query {
+		dns.receivedDnsRequest(&dnsTuple, m)
+	} else /* Response */ {
+		dns.receivedDnsResponse(&dnsTuple, m)
+	}
+}
+
+func (stream *DnsStream) PrepareForNewMessage() {
+	stream.data = stream.data[stream.parseOffset:] // useful var ?
+	stream.parseOffset = 0                         // useful var ?...
+	stream.message = nil
+}
+
+func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
+	if private == nil {
+		return private
+	}
+	dnsData, ok := private.(dnsPrivateData)
+	if !ok {
+		return private
+	}
+	if dnsData.Data[dir] == nil {
+		return dnsData
+	}
+
+	stream := dnsData.Data[dir]
+	if stream.message != nil {
+		decodedData := dns.messageParser(stream)
+		if decodedData != nil {
+			dns.handleDns(stream.message, tcpTuple, dir, stream.data, decodedData)
+			stream.PrepareForNewMessage()
+		}
+	}
+
+	return dnsData
+}
+
+func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
+	dnsData, ok := private.(dnsPrivateData)
+
+	if !ok {
+		return private, false
+	}
+
+	stream := dnsData.Data[dir]
+
+	if stream == nil || stream.message == nil {
+		return private, false
+	}
+
+	decodedData := dns.messageParser(stream)
+	if decodedData == nil {
+		// cannot create a DnsTuple because we cannot read ID from a failed decodedData
+		// -> no error message in Notes
+
+		//trans := dns.getTransaction(dnsTuple)
+		//trans.Notes = append(trans.Notes, "Packet loss while capturing")
+
+		logp.Debug("dns", "Packet loss, dropping the stream")
+
+		return private, true
+	}
+
+	// ignore the gap
+	return private, false
 }
