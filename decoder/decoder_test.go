@@ -11,6 +11,26 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
+type TestIcmp4Processor struct {
+	icmp4 *layers.ICMPv4
+	pkt   *protos.Packet
+}
+
+func (l *TestIcmp4Processor) ProcessICMPv4(icmp4 *layers.ICMPv4, pkt *protos.Packet) {
+	l.icmp4 = icmp4
+	l.pkt = pkt
+}
+
+type TestIcmp6Processor struct {
+	icmp6 *layers.ICMPv6
+	pkt   *protos.Packet
+}
+
+func (l *TestIcmp6Processor) ProcessICMPv6(icmp6 *layers.ICMPv6, pkt *protos.Packet) {
+	l.icmp6 = icmp6
+	l.pkt = pkt
+}
+
 type TestTcpProcessor struct {
 	tcphdr *layers.TCP
 	pkt    *protos.Packet
@@ -156,9 +176,11 @@ func TestDecodePacketData_ipv6Udp(t *testing.T) {
 
 // Creates a new TestDecoder that handles ethernet packets.
 func newTestDecoder(t *testing.T) (*DecoderStruct, *TestTcpProcessor, *TestUdpProcessor) {
+	icmp4Layer := &TestIcmp4Processor{}
+	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTcpProcessor{}
 	udpLayer := &TestUdpProcessor{}
-	d, err := NewDecoder(layers.LinkTypeEthernet, tcpLayer, udpLayer)
+	d, err := NewDecoder(layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}

@@ -114,17 +114,30 @@ func newProtocols() Protocols {
 	return p
 }
 
-func TestBpfFilter_withoutVlan(t *testing.T) {
+func TestBpfFilterWithoutVlanWithoutIcmp(t *testing.T) {
 	p := newProtocols()
-	filter := p.BpfFilter(false)
+	filter := p.BpfFilter(false, false)
 	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53", filter)
 }
 
-func TestBpfFilter_withVlan(t *testing.T) {
+func TestBpfFilterWithVlanWithoutIcmp(t *testing.T) {
 	p := newProtocols()
-	filter := p.BpfFilter(true)
-	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or (vlan and "+
-		"(tcp port 80 or udp port 5060 or port 53))", filter)
+	filter := p.BpfFilter(true, false)
+	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or "+
+		"(vlan and (tcp port 80 or udp port 5060 or port 53))", filter)
+}
+
+func TestBpfFilterWithoutVlanWithIcmp(t *testing.T) {
+	p := newProtocols()
+	filter := p.BpfFilter(false, true)
+	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or icmp or icmp6", filter)
+}
+
+func TestBpfFilterWithVlanWithIcmp(t *testing.T) {
+	p := newProtocols()
+	filter := p.BpfFilter(true, true)
+	assert.Equal(t, "tcp port 80 or udp port 5060 or port 53 or icmp or icmp6 or "+
+		"(vlan and (tcp port 80 or udp port 5060 or port 53 or icmp or icmp6))", filter)
 }
 
 func TestGetAll(t *testing.T) {

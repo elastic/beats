@@ -23,7 +23,7 @@ type TestProtocols struct {
 	udp map[protos.Protocol]protos.UdpProtocolPlugin
 }
 
-func (p TestProtocols) BpfFilter(with_vlans bool) string {
+func (p TestProtocols) BpfFilter(with_vlans bool, with_icmp bool) string {
 	return "mock bpf filter"
 }
 

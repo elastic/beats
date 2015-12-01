@@ -211,6 +211,7 @@ common options like `ports`, `send_request`, `send_response`, and options that a
 
 Currently, Packetbeat supports the following protocols:
 
+ - ICMP (v4 and v6)
  - DNS
  - HTTP
  - Mysql
@@ -225,6 +226,9 @@ Example configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 protocols:
+  icmp:
+    enabled: true
+
   dns:
     ports: [53]
 
@@ -253,6 +257,8 @@ The following options are available for all protocols:
 
 ===== ports
 
+Exception: For ICMP the option `enabled` has to be used instead.
+
 The ports where Packetbeat will look to capture traffic for specific
 protocols. Packetbeat installs a https://en.wikipedia.org/wiki/Berkeley_Packet_Filter[BPF]
 filter based on the ports specified in this section.
@@ -280,6 +286,13 @@ by default, only the HTTP headers.
 
 The per protocol transaction timeout. Expired transactions will no longer be correlated to incoming responses, but sent to Elasticsearch immediately.
 
+==== ICMP Configuration Options
+
+===== enabled
+
+The ICMP protocol can be enabled/disabled via this option.
+
+If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 
 ==== DNS Configuration Options
 

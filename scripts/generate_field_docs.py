@@ -11,6 +11,7 @@ import yaml
 
 SECTIONS = [
     ("event", "Event"),
+    ("icmp", "ICMP"),
     ("dns", "DNS"),
     ("http", "Http"),
     ("memcache", "Memcache"),

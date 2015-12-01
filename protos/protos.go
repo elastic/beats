@@ -130,7 +130,7 @@ func (p Protocol) String() string {
 }
 
 type Protocols interface {
-	BpfFilter(with_vlans bool) string
+	BpfFilter(with_vlans bool, with_icmp bool) string
 	GetTcp(proto Protocol) TcpProtocolPlugin
 	GetUdp(proto Protocol) UdpProtocolPlugin
 	GetAll() map[Protocol]ProtocolPlugin
@@ -183,7 +183,7 @@ func (protocols ProtocolsStruct) GetAllUdp() map[Protocol]UdpProtocolPlugin {
 // will match against packets for the registered protocols. If with_vlans is
 // true the filter will match against both IEEE 802.1Q VLAN encapsulated
 // and unencapsulated packets
-func (protocols ProtocolsStruct) BpfFilter(with_vlans bool) string {
+func (protocols ProtocolsStruct) BpfFilter(with_vlans bool, with_icmp bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
 	var protos []int
 	for proto := range protocols.all {
@@ -220,6 +220,9 @@ func (protocols ProtocolsStruct) BpfFilter(with_vlans bool) string {
 	}
 
 	filter := strings.Join(expressions, " or ")
+	if with_icmp {
+		filter = fmt.Sprintf("%s or icmp or icmp6", filter)
+	}
 	if with_vlans {
 		filter = fmt.Sprintf("%s or (vlan and (%s))", filter, filter)
 	}
