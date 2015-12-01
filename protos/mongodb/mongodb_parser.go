@@ -11,11 +11,10 @@ import (
 	"labix.org/v2/mgo/bson"
 )
 
-func mongodbMessageParser(s *MongodbStream) (bool, bool) {
+func mongodbMessageParser(s *stream) (bool, bool) {
 	d := newDecoder(s.data)
 
 	length, err := d.readInt32()
-
 	if err != nil {
 		// Not even enough data to parse length of message
 		return true, false
@@ -34,44 +33,46 @@ func mongodbMessageParser(s *MongodbStream) (bool, bool) {
 	s.message.messageLength = length
 	s.message.requestId, err = d.readInt32()
 	s.message.responseTo, err = d.readInt32()
-	opCode, err := d.readInt32()
+	code, err := d.readInt32()
+	opCode := opCode(code)
 
-	if _, present := OpCodes[opCode]; !present {
-		logp.Err("Unknown operation code: %s", opCode)
+	if !validOpcode(opCode) {
+		logp.Err("Unknown operation code: %v", opCode)
 		return false, false
 	}
-	s.message.opCode = OpCodes[opCode]
+
+	s.message.opCode = opCode
 	s.message.IsResponse = false // default is that the message is a request. If not opReplyParse will set this to false
 	s.message.ExpectsResponse = false
-	logp.Debug("mongodb", "opCode = "+s.message.opCode)
+	debugf("opCode = %v", s.message.opCode)
 
 	// then split depending on operation type
 	s.message.event = common.MapStr{}
 
 	switch s.message.opCode {
-	case "OP_REPLY":
+	case opReply:
 		s.message.IsResponse = true
 		return opReplyParse(d, s.message)
-	case "OP_MSG":
+	case opMsg:
 		s.message.method = "msg"
 		return opMsgParse(d, s.message)
-	case "OP_UPDATE":
+	case opUpdate:
 		s.message.method = "update"
 		return opUpdateParse(d, s.message)
-	case "OP_INSERT":
+	case opInsert:
 		s.message.method = "insert"
 		return opInsertParse(d, s.message)
-	case "OP_QUERY":
+	case opQuery:
 		s.message.ExpectsResponse = true
 		return opQueryParse(d, s.message)
-	case "OP_GET_MORE":
+	case opGetMore:
 		s.message.method = "getMore"
 		s.message.ExpectsResponse = true
 		return opGetMoreParse(d, s.message)
-	case "OP_DELETE":
+	case opDelete:
 		s.message.method = "delete"
 		return opDeleteParse(d, s.message)
-	case "OP_KILL_CURSORS":
+	case opKillCursor:
 		s.message.method = "killCursors"
 		return opKillCursorsParse(d, s.message)
 	}
@@ -80,7 +81,7 @@ func mongodbMessageParser(s *MongodbStream) (bool, bool) {
 }
 
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#op-reply
-func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
 	m.event["cursorId"], err = d.readInt64()
 	m.event["startingFrom"], err = d.readInt32()
@@ -88,7 +89,7 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	numberReturned, err := d.readInt32()
 	m.event["numberReturned"] = numberReturned
 
-	logp.Debug("mongodb", "Prepare to read %d document from reply", m.event["numberReturned"])
+	debugf("Prepare to read %d document from reply", m.event["numberReturned"])
 
 	documents := make([]interface{}, numberReturned)
 	for i := 0; i < numberReturned; i++ {
@@ -117,7 +118,7 @@ func opReplyParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opMsgParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	var err error
 	m.event["message"], err = d.readCStr()
 	if err != nil {
@@ -127,7 +128,7 @@ func opMsgParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opUpdateParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opUpdateParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
 	m.event["fullCollectionName"], err = d.readCStr()
 	_, err = d.readInt32() // ignore flags for now
@@ -143,7 +144,7 @@ func opUpdateParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opInsertParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
 	m.event["fullCollectionName"], err = d.readCStr()
 
@@ -194,7 +195,7 @@ func isDatabaseCommand(key string, val interface{}) bool {
 	return false
 }
 
-func opQueryParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
 	fullCollectionName, err := d.readCStr()
 	m.event["fullCollectionName"] = fullCollectionName
@@ -212,9 +213,9 @@ func opQueryParse(d *decoder, m *MongodbMessage) (bool, bool) {
 		m.method = "otherCommand"
 		m.resource = fullCollectionName
 		for key, val := range query {
-			logp.Debug("mongodb", "key=%v val=%s", key, val)
+			debugf("key=%v val=%s", key, val)
 			if isDatabaseCommand(key, val) {
-				logp.Debug("mongodb", "is db command")
+				debugf("is db command")
 				col, ok := val.(string)
 				if ok {
 					// replace $cmd with the actual collection name
@@ -239,7 +240,7 @@ func opQueryParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opGetMoreParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opGetMoreParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
 	m.event["fullCollectionName"], err = d.readCStr()
 	m.event["numberToReturn"], err = d.readInt32()
@@ -252,7 +253,7 @@ func opGetMoreParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opDeleteParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opDeleteParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
 	m.event["fullCollectionName"], err = d.readCStr()
 	_, err = d.readInt32() // ignore flags for now
@@ -267,7 +268,7 @@ func opDeleteParse(d *decoder, m *MongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func opKillCursorsParse(d *decoder, m *MongodbMessage) (bool, bool) {
+func opKillCursorsParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	// TODO ? Or not, content is not very interesting.
 	return true, true
 }
@@ -341,11 +342,11 @@ func (d *decoder) readDocument() (bson.M, error) {
 
 	documentMap := bson.M{}
 
-	logp.Debug("mongodb", "Parse %d bytes document from remaining %d bytes", documentLength, len(d.in)-start)
+	debugf("Parse %d bytes document from remaining %d bytes", documentLength, len(d.in)-start)
 	err = bson.Unmarshal(d.in[start:d.i], documentMap)
 
 	if err != nil {
-		logp.Debug("mongodb", "Unmarshall error %v", err)
+		debugf("Unmarshall error %v", err)
 		return nil, err
 	}
 

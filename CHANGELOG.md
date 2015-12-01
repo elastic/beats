@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file based on the
 - Fix errors redis parser when messages are split in multiple TCP segments. #402
 - Fix errors in redis parser when length prefixed strings contain sequences of CRLF. #402
 - Fix errors in redis parser when dealing with nested arrays. #402
+- Improve MongoDB message correlation. #377
 
 ### Added
 - Added piping support to redis protocol. #402
