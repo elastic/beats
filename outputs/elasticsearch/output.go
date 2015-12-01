@@ -3,6 +3,8 @@ package elasticsearch
 import (
 	"crypto/tls"
 	"errors"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/elastic/libbeat/common"
@@ -155,10 +157,26 @@ func makeClientFactory(
 	config outputs.MothershipConfig,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
-		url, err := getURL(config.Protocol, config.Path, host)
+		esURL, err := getURL(config.Protocol, config.Path, host)
 		if err != nil {
 			logp.Err("Invalid host param set: %s, Error: %v", host, err)
 			return nil, err
+		}
+
+		var proxyURL *url.URL
+		if config.ProxyURL != "" {
+			proxyURL, err = url.Parse(config.ProxyURL)
+			if err != nil || !strings.HasPrefix(proxyURL.Scheme, "http") {
+				// Proxy was bogus. Try prepending "http://" to it and
+				// see if that parses correctly. If not, we fall
+				// through and complain about the original one.
+				proxyURL, err = url.Parse("http://" + config.ProxyURL)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			logp.Info("Using proxy URL: %s", proxyURL)
 		}
 
 		index := beat
@@ -166,7 +184,7 @@ func makeClientFactory(
 			index = config.Index
 		}
 
-		client := NewClient(url, index, tls, config.Username, config.Password)
+		client := NewClient(esURL, index, proxyURL, tls, config.Username, config.Password)
 		return client, nil
 	}
 }
