@@ -33,7 +33,7 @@ import (
 )
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
-	protos.HttpProtocol:     new(http.Http),
+	protos.HttpProtocol:     new(http.HTTP),
 	protos.MemcacheProtocol: new(memcache.Memcache),
 	protos.MysqlProtocol:    new(mysql.Mysql),
 	protos.PgsqlProtocol:    new(pgsql.Pgsql),
