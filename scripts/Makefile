@@ -112,7 +112,7 @@ system-tests: packetbeat.test prepare-tests system-tests-setup
 # Runs the system tests
 .PHONY: system-tests-setup
 system-tests-setup: tests/system/requirements.txt
-	test -d env || virtualenv build/system-tests/env > /dev/null
+	test -d build/system-tests/env || virtualenv build/system-tests/env > /dev/null
 	. build/system-tests/env/bin/activate && pip install -Ur tests/system/requirements.txt > /dev/null
 	touch build/system-tests/env/bin/activate
 
