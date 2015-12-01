@@ -49,6 +49,11 @@ type Winlogbeat struct {
 	checkpoint *checkpoint.Checkpoint     // Persists event log state to disk.
 }
 
+// New returns a new Winlogbeat.
+func New() *Winlogbeat {
+	return &Winlogbeat{}
+}
+
 func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	// Read configuration.
 	err := cfgfile.Read(&eb.config, "")
