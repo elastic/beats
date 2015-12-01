@@ -115,7 +115,7 @@ deb:
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
 curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
-sudo dpkg -i logstash-{LS-version}-1_all.deb
+sudo dpkg -i logstash_{LS-version}-1_all.deb
 ----------------------------------------------------------------------
 
 rpm:
