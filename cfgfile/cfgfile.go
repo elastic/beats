@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"runtime"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -26,7 +28,13 @@ func ChangeDefaultCfgfileFlag(beatName string) error {
 	if cliflag == nil {
 		return fmt.Errorf("Flag -c not found")
 	}
-	cliflag.DefValue = fmt.Sprintf("/etc/%s/%s.yml", beatName, beatName)
+
+	if runtime.GOOS == "windows" {
+		cliflag.DefValue = fmt.Sprintf(`C:\Program Files\%s\%s.yml`,
+			strings.Title(beatName), beatName)
+	} else {
+		cliflag.DefValue = fmt.Sprintf("/etc/%s/%s.yml", beatName, beatName)
+	}
 	return cliflag.Value.Set(cliflag.DefValue)
 }
 
