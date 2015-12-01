@@ -3,7 +3,7 @@
 
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
-your servers and ship it to Elasticsearch or Logstash.  The common parts for 
+your servers and ship it to Elasticsearch or Logstash.  The common parts for
 all Beats are placed in the libbeat library, which contains packages for sending
 data to Elasticsearch and Logstash, for configuration file handling, for signal
 handling, for logging, and more. By using this common framework, you can ensure
@@ -12,7 +12,7 @@ with common tools.
 
 === Getting Ready
 
-All Beats are written in http://golang.org/[Go], so having Go installed and knowing 
+All Beats are written in http://golang.org/[Go], so having Go installed and knowing
 the basics are prerequisites for understanding this guide.
 But don't worry if you aren't a Go expert. Go is a relatively new
 language, and very few people are experts in it. In fact, several
@@ -29,32 +29,32 @@ Topbeat and libbeat and compiling them at the same time is to do:
 go get github.com/elastic/topbeat
 ----------------------------------------------------------------------
 
-In this guide, we use working examples from the https://github.com/elastic/topbeat[Topbeat] 
+In this guide, we use working examples from the https://github.com/elastic/topbeat[Topbeat]
 source code to demonstrate how to implement a Beat. Topbeat is similar to
-the `top` command line tool, but instead of printing the statistics to the screen, 
+the `top` command line tool, but instead of printing the statistics to the screen,
 Topbeat periodically ships them to Elasticsearch for storage.
 
-You can use Topbeat as an example implementation for creating a new Beat. Just copy  
+You can use Topbeat as an example implementation for creating a new Beat. Just copy
 the source files and modify them as necessary for your Beat.
 
 === Overview
 
-At the high level, a simple Beat like Topbeat has two main components: 
+At the high level, a simple Beat like Topbeat has two main components:
 
-* a component that collects the actual data, and 
-* a publisher that sends the data to the specified output, such as Elasticsearch or 
-Logstash. 
+* a component that collects the actual data, and
+* a publisher that sends the data to the specified output, such as Elasticsearch or
+Logstash.
 
-The publisher is already implemented in libbeat, so you typically only have to worry about the logic 
-specific to your Beat (the code that creates the event and sends it to the publisher). 
-Libbeat also offers common services like configuration management, logging, 
-daemonizing, and Windows service handling, and in the future, will offer data processing modules, 
+The publisher is already implemented in libbeat, so you typically only have to worry about the logic
+specific to your Beat (the code that creates the event and sends it to the publisher).
+Libbeat also offers common services like configuration management, logging,
+daemonizing, and Windows service handling, and in the future, will offer data processing modules,
 such as filtering or sampling.
 
 image:./images/beat_overview.png[Beat overview architecture]
 
 The event that you create is a JSON-like object (Golang type `map[string]interface{}`) that
-contains the collected data to send to the publisher. At a minimum, the event object 
+contains the collected data to send to the publisher. At a minimum, the event object
 must contain a `@timestamp` field and a `type` field. Beyond
 that, events can contain any additional fields, and they can be created as often
 as necessary.
@@ -91,8 +91,8 @@ Now that you have the big picture, let's dig into the code.
 
 === Developing the Beat-Specific Code
 
-The Beat-specific code should implement the `Beater` interface defined 
-in libbeat. 
+The Beat-specific code should implement the `Beater` interface defined
+in libbeat.
 
 [source,go]
 ----------------------------------------------------------------------
@@ -111,22 +111,44 @@ This means your Beat should implement the following methods:
 <<config-method, Config>>:: Deals with the configuration file and optionally with
 custom CLI flags
 <<setup-method, Setup>>:: Contains logic that executes before the main loop, usually for initialization
-<<run-method, Run>>:: Contains the main application loop that captures data 
+<<run-method, Run>>:: Contains the main application loop that captures data
 and sends it to the publisher
-<<cleanup-method, Cleanup>>:: Contains logic that executes after the main loop finishes 
+<<cleanup-method, Cleanup>>:: Contains logic that executes after the main loop finishes
 (or is interrupted)
 <<stop-method, Stop>>:: Contains logic that is called when the Beat is signaled to stop
 
 The `Beat` parameter received by most of these methods contains data about the
 Beat, such as the name, version, and common configuration options.
 
+For more complex Beats, the optional `FlagsHandler` interface is available.
+
+[source,go]
+----------------------------------------------------------------------
+type FlagsHandler interface {
+	HandleFlags(*Beat)
+}
+----------------------------------------------------------------------
+
+You can use the `FlagsHandler` interface to add additional command line flags to
+your Beat. The `HandleFlags` callback is called after the Beat parses the
+command line arguments inherited from libbeat and handles the `--help` and
+`--version` flags. For an example of how to implement `HandleFlags`, take a look
+at the
+https://github.com/elastic/packetbeat/blob/master/beat/packetbeat.go[Packetbeat]
+code.
+
+We strongly recommend that you create a main package that contains only the main
+method. All your Beat-specific code should go in a separate folder and package.
+This will allow other Beats to use the other parts of your Beat as a library, if
+needed.
+
 NOTE: To be consistent with other Beats, you should append `beat` to your Beat name.
 
-Let's go through each of the methods in the `Beater` interface and look at a 
+Let's go through each of the methods in the `Beater` interface and look at a
 sample implementation.
 
 [[config-method]]
-==== Config Method 
+==== Config Method
 
 The `Config` method deals with the configuration file and optionally with
 custom CLI flags.
@@ -194,8 +216,8 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 ==== Setup Method
 
 The `Setup` method enables you to execute logic before the main
-loop, usually for initialization. In the Topbeat implementation, this method 
-only assigns the Beat object to the Topbeat object, so it doesn't have to be 
+loop, usually for initialization. In the Topbeat implementation, this method
+only assigns the Beat object to the Topbeat object, so it doesn't have to be
 passed to all sub-functions.
 
 [source,go]
@@ -308,29 +330,22 @@ func (t *Topbeat) Stop() {
 ==== The main Function
 
 If you follow the Topbeat model and put your Beat-specific code in its own type
-that implements the `Beater` interface, the code from your main package is 
+that implements the `Beater` interface, the code from your main package is
 very simple:
 
 [source,go]
 ----------------------------------------------------------------------
+var Version = "1.0.0"
+var Name = "topbeat"
+
 func main() {
-
-	tb := &Topbeat{}
-
-	b := beat.NewBeat(Name, Version, tb)
-
-	b.CommandLineSetup()
-
-	b.LoadConfig()
-
-	tb.Config(b)
-
-	b.Run()
-
+	beat.Run(Name, Version, topbeat.New())
 }
 ----------------------------------------------------------------------
 
+We recommend that you implement a `New` function that creates your Beats object.
+
 === Sharing Your Beat with the Community
 
-When you're done with your new Beat, how about letting everyone know? Open 
+When you're done with your new Beat, how about letting everyone know? Open
 a pull request to add your link <<community-beats, here>>.
