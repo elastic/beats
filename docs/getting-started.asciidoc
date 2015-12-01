@@ -52,10 +52,7 @@ tar xzvf filebeat-{version}-darwin.tgz
 . Download the Filebeat Windows zip file from the
 https://www.elastic.co/downloads/beats/filebeat[downloads page].
 
-. Extract the contents of the zip file to your computer. The location where you
-extract the file is not important, but remember that you shouldn't delete this
-repository after the installation is finished. The exe file and the
-configuration file will continue to live there.
+. Extract the contents of the zip file to your computer, for example, to `C:\Program Files`.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*), and navigate to where you extracted the
 zip file.
