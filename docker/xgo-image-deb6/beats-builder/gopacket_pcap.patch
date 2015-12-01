@@ -1,7 +1,7 @@
-diff --git a/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go b/Godeps/_workspace/src/github.
+diff --git a/vendor/github.com/tsg/gopacket/pcap/pcap.go b/vendor/github.
 index d2465bb..7b23b84 100644
---- a/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go
-+++ b/Godeps/_workspace/src/github.com/tsg/gopacket/pcap/pcap.go
+--- a/vendor/github.com/tsg/gopacket/pcap/pcap.go
++++ b/vendor/github.com/tsg/gopacket/pcap/pcap.go
 @@ -8,12 +8,13 @@
  package pcap
 

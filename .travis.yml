@@ -8,10 +8,10 @@ go:
   - 1.5.1
 
 script:
-  - make pull-images
+  #- make pull-images
   # uncomment to build fresh images
   #- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  #- make images
+  - make images
   #- make push-images
   - make deps
   - make

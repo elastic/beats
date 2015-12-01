@@ -16,12 +16,14 @@ packetbeat topbeat filebeat winlogbeat: build/upload
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
-		github.com/elastic/$@
+		-pkg $@ \
+		github.com/tsg/beats-onerepo
 	# linux builds on debian 6
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
 		-before-build=../xgo-scripts/$@_before_build.sh \
 		-branch $(RELEASE) \
-		github.com/elastic/$@
+		-pkg $@ \
+		github.com/tsg/beats-onerepo
 
 %/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
 	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh

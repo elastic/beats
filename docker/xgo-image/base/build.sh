@@ -25,6 +25,7 @@ set -e
 
 cd $GOPATH/src/$1
 export GOPATH=$GOPATH:`pwd`/Godeps/_workspace
+export GO15VENDOREXPERIMENT=1
 
 # Switch over the code-base to another checkout if requested
 if [ "$REPO_REMOTE" != "" ]; then
