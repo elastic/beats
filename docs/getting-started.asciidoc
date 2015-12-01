@@ -12,10 +12,15 @@ After you have installed these products, you can start <<filebeat-installation>>
 [[filebeat-installation]]
 === Installing Filebeat
 
-To download and install Filebeat, run the following commands. Use the commands that
-work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
+To download and install Filebeat, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, and <<win, win>> for Windows).
 
-deb:
+NOTE: We also provide 32-bit images that you can get from our
+https://www.elastic.co/downloads/beats/filebeat[download page].
+
+[[deb]]
+==== deb:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -23,9 +28,8 @@ curl -L -O https://download.elastic.co/beats/filebeat/filebeat_{version}_amd64.d
 sudo dpkg -i filebeat_{version}_amd64.deb
 ------------------------------------------------
 
-
-
-rpm:
+[[rpm]]
+==== rpm:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -33,8 +37,8 @@ curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-x86_64.
 sudo rpm -vi filebeat-{version}-x86_64.rpm
 ------------------------------------------------
 
-
-mac:
+[[mac]]
+==== mac:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -42,10 +46,28 @@ curl -L -O https://download.elastic.co/beats/filebeat/filebeat-{version}-darwin.
 tar xzvf filebeat-{version}-darwin.tgz
 ------------------------------------------------
 
-NOTE: We also provide 32-bit images that you can get from our
-https://www.elastic.co/downloads/beats/filebeat[download page].
+[[win]]
+==== win:
 
-Before starting filebeat, you should look at the configuration options in the configuration
+. Download the Filebeat Windows zip file from the
+https://www.elastic.co/downloads/beats/filebeat[downloads page].
+
+. Extract the contents of the zip file to your computer. The location where you
+extract the file is not important, but remember that you shouldn't delete this
+repository after the installation is finished. The exe file and the
+configuration file will continue to live there.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*), and navigate to where you extracted the
+zip file.
+
+. Run the following command to install Filebeat as a Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > .\install-service-filebeat.ps1
+----------------------------------------------------------------------
+
+Before starting Filebeat, you should look at the configuration options in the configuration
 file, for example `/etc/filebeat/filebeat.yml`. For more information about these options,
 see <<filebeat-configuration-details>>.
 
@@ -134,19 +156,28 @@ in which way.
 The recommended template file is installed by the Filebeat packages. Load it with the
 following command:
 
-deb or rpm:
+==== deb or rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json
 ----------------------------------------------------------------------
 
-mac:
+==== mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 cd filebeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
+==== win:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS > Invoke-WebRequest -Method Put -InFile filebeat.template.json -Uri http://localhost:9200/_template/filebeat?pretty
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
@@ -160,28 +191,40 @@ Filebeat, you need to set up Filebeat to use Logstash. For detailed steps, see
 
 === Running Filebeat
 
-Run the binary by issuing the following command:
+Run Filebeat by issuing the appropriate command for your platform.
 
-deb:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo /etc/init.d/filebeat start
-----------------------------------------------------------------------
-
-rpm:
+==== deb:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/filebeat start
 ----------------------------------------------------------------------
 
-mac:
+==== rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/filebeat start
+----------------------------------------------------------------------
+
+==== mac:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo ./filebeat -e -c filebeat.yml -d "publish"
 ----------------------------------------------------------------------
+
+==== win:
+
+[source,shell]
+----------------------------------------------------------------------
+PS > Start-Service filebeat
+----------------------------------------------------------------------
+
+By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
+
+NOTE: On Windows, the statistics about system load and swap usage are currently
+not captured.
 
 Filebeat is now ready to send log files to your defined output.
 
