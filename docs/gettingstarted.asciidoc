@@ -15,9 +15,15 @@ After you have installed these products, you can start <<packetbeat-installation
 [[packetbeat-installation]]
 === Installing Packetbeat
 
-To download and install Packetbeat on your application servers, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
+To download and install Packetbeat on your application servers, use the commands
+that work with your system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for
+Redhat/Centos/Fedora, <<mac, mac>> for OS X, and <<win, win>> for Windows).
 
-deb:
+NOTE: We also provide 32-bit images that you can get from our
+https://www.elastic.co/downloads/beats/packetbeat[download page].
+
+[[deb]]
+==== deb:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -26,7 +32,8 @@ curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat_{version}_amd
 sudo dpkg -i packetbeat_{version}_amd64.deb
 ----------------------------------------------------------------------
 
-rpm:
+[[rpm]]
+==== rpm:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -35,8 +42,8 @@ curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-x86
 sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
-
-mac:
+[[mac]]
+==== mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -44,10 +51,33 @@ curl -L -O https://download.elastic.co/beats/packetbeat/packetbeat-{version}-dar
 tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
-NOTE: We also provide 32-bit images that you can get from our
-https://www.elastic.co/downloads/beats/packetbeat[download page].
+[[win]]
+==== win:
 
-If you are using Windows, see <<windows-install>>.
+. Download and install WinPcap from this
+http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
+a driver to enable packet capturing.
+
+. Download the Packetbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/packetbeat[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `packetbeat-<version>-windows` directory to `Packetbeat`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. Run the following commands to install Packetbeat as a Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Packetbeat'
+PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
+----------------------------------------------------------------------
+
+Before starting Packetbeat, you should look at the configuration options in the
+configuration file, for example `C:\Program Files\Packetbeat\packetbeat.yml`. For
+more information about these options, see <<packetbeat-configuration>>.
 
 [[configuring-packetbeat]]
 === Configuring Packetbeat
@@ -56,13 +86,15 @@ NOTE: If you plan to use Logstash, you need to set up Logstash to work with the 
 configure Packetbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
 Before starting Packetbeat, you need to edit the configuration file. For rpm and deb, you'll
-find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac, look in
-the archive that you just downloaded.
+find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
+the archive that you just extracted.
 
 To configure Packetbeat:
 
-. Select the network interface from which to capture the traffic. On
-Linux, Packetbeat supports capturing all messages sent or received by the
+. Select the network interface from which to capture the traffic.
+
+* On
+Linux: Packetbeat supports capturing all messages sent or received by the
 server on which Packetbeat is installed. For this, use `any` as the device:
 +
 [source,yaml]
@@ -72,10 +104,31 @@ interfaces:
   # keyword to sniff on all connected interfaces.
   device: any
 ----------------------------------------------------------------------
-+
-Note that on OS X, capturing from the `any` device doesn't work. You would
+
+* On OS X, capturing from the `any` device doesn't work. You would
 typically use either `lo0` or `en0` depending on which traffic you want to
 capture.
+
+* On Windows, run the following command to list the available network interfaces:
++
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Packetbeat> .\packetbeat.exe -devices
+
+0: \Device\NPF_{113535AD-934A-452E-8D5F-3004797DE286} (Intel(R) PRO/1000 MT Desktop Adapter)
+----------------------------------------------------------------------
++
+In this example, there is only one network card, with the index 0, installed on the system. If
+there are multiple network cards, remember the index of the device you want to use for
+capturing the traffic.
++
+Modify the `device` line to point to the index of the device:
++
+[source,yml]
+----------------------------------------------------------------------
+interfaces:
+  device: 0
+----------------------------------------------------------------------
 
 . In the protocols section, configure the ports on which Packetbeat can find each
 protocol. If you use any non-standard ports, add them here. Otherwise, the
@@ -140,14 +193,14 @@ in which way.
 The recommended template file is installed by the Packetbeat packages. Load it with the
 following command:
 
-deb or rpm:
+==== deb or rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 ----------------------------------------------------------------------
 
-mac:
+==== mac:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -157,30 +210,50 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.j
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
+==== win:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS C:\Program Files\Packetbeat> Invoke-WebRequest -Method Put -InFile packetbeat.template.json -Uri http://localhost:9200/_template/packetbeat?pretty
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
 === Running Packetbeat
 
 Run Packetbeat by issuing the following command:
 
-deb:
+==== deb:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-rpm:
+==== rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-mac:
+==== mac:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
+
+==== win:
+
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Packetbeat> Start-Service packetbeat
+----------------------------------------------------------------------
+
+By default the log files are stored in `C:\ProgramData\packetbeat\Logs`.
+
+=== Testing the Packetbeat Installation
 
 Packetbeat is now ready to capture data from your network traffic. You can test
 that it works by creating a simple HTTP request. For example:
