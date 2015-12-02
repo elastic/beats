@@ -31,6 +31,7 @@ install:
   - cinst mingw >nul
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
+  - go get github.com/pierrre/gotestcover golang.org/x/tools/cmd/cover
   - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
@@ -46,13 +47,14 @@ build_script:
   - appveyor AddCompilationMessage "Starting Compile"
   - ps: cd $env:BEAT
   - go build
-  - appveyor AddCompilationMessage "Compile Success" -FileName "$env:BEAT.exe"
+  - appveyor AddCompilationMessage "Compile Success" -FileName "%BEAT%.exe"
 
 # To run your custom scripts instead of automatic tests
 test_script:
   # Unit tests
   - ps: Add-AppveyorTest "Unit Tests" -Outcome Running
-  - go test ./...
+  - mkdir build\coverage
+  - gotestcover -race -coverprofile=build/coverage/integration.cov github.com/elastic/beats/%BEAT%/...
   - ps: Update-AppveyorTest "Unit Tests" -Outcome Passed
   # System tests
   - ps: Add-AppveyorTest "System tests" -Outcome Running
@@ -60,6 +62,18 @@ test_script:
   - ps: cd tests/system
   - nosetests --with-timer
   - ps: Update-AppveyorTest "System tests" -Outcome Passed
+
+after_test:
+  - ps: cd $env:GOPATH\src\$env:PROJ
+  # TODO: Aggregate coverage data from python tests
+  - go tool cover -html=build\coverage\integration.cov -o build\coverage\integration.html
+  - ps: Push-AppveyorArtifact build\coverage\integration.cov
+  - ps: Push-AppveyorArtifact build\coverage\integration.html
+  # Upload coverage report.
+  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - pip install codecov
+  - ps: cd $env:GOPATH\src\github.com\elastic\beats
+  - codecov -X gcov -f "%BEAT%\build\coverage\integration.cov"
 
 # Executes for both successful and failed builds
 on_finish:
