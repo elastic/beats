@@ -1,7 +1,7 @@
 BEATNAME=topbeat
 SYSTEM_TESTS=true
 
-include scripts/Makefile
+include ../libbeat/scripts/Makefile
 
 .PHONY: install-cfg
 install-cfg:

@@ -2,7 +2,7 @@ BEATNAME=winlogbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
-include scripts/Makefile
+include ../libbeat/scripts/Makefile
 
 .PHONY: gen
 gen:
