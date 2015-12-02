@@ -1,23 +1,23 @@
 ###############################################################################
 ############################# Winlogbeat ######################################
 winlogbeat:
-  # Filter events that are older than this amount of time. This value may be
-  # overwritten on a per event_log basis. If omitted then no filtering will
-  # occur unless ignore_older is specified with the individual event_log
-  # config. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
-  ignore_older: 24h
+  # The registry file is where Winlogbeat persists its state so that the beat
+  # can resume after shutdown or an outage. The default is .winlogbeat.yaml
+  # in the directory in which it was started.
+  #registry_file: .winlogbeat.yaml
 
-  # List of event logs to monitor. If the configuration option is omitted then
-  # winlogbeat will discover the available log through the Windows registry and
-  # monitor them all.
+  # List of event logs to monitor.
+  #
+  # Optionally, ignore_older may be specified to filter events that are older
+  # then the specified amount of time. If omitted then no filtering will
+  # occur. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
   event_logs:
     - name: Application
       ignore_older: 72h 
     - name: Security
     - name: System
-    - name: Internet Explorer
 
-  # Diagnostic etrics that can retrieved through a web interface if a
+  # Diagnostic metrics that can retrieved through a web interface if a
   # bindaddress value (host:port) is specified. The web address will be
   # http://<bindaddress>/debug/vars
   #metrics:

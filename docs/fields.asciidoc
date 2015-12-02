@@ -1,0 +1,139 @@
+
+////
+This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+== Exported Fields
+
+This document describes the fields that are exported by Winlogbeat. They are
+grouped in the following categories:
+
+* <<exported-fields-common>>
+* <<exported-fields-eventlog>>
+
+[[exported-fields-common]]
+=== Common Beat Fields
+
+Contains common fields available in all event types.
+
+
+
+==== beat.name
+
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+==== type
+
+required: True
+
+The name of the log event. This field is set to `eventlog`.
+
+
+==== count
+
+type: int
+
+required: True
+
+Number of event log records represented in the event. This field is always set to 1.
+
+
+[[exported-fields-eventlog]]
+=== Event Log Record Fields
+
+Contains data from a Windows event log record.
+
+
+
+==== computerName
+
+type: string
+
+required: True
+
+The name of the computer that generated the record. When using Windows event forwarding this name can differ from the beat.hostname.
+
+
+==== eventCategory
+
+type: string
+
+required: True
+
+The category for this event. The meaning of this value depends on the event source.
+
+
+==== eventID
+
+type: long
+
+required: True
+
+The event identifier. The value is specific to the source of the event.
+
+
+==== eventLogName
+
+type: string
+
+required: True
+
+Name of the event log from which this record was read. This will be one of names from the `event_logs` collection in the configuration.
+
+
+==== eventType
+
+type: string
+
+required: True
+
+The type of event. There are five types of events that can be logged -- Success, Information, Warning, Error, Audit Success, and Audit Failure.
+
+
+==== message
+
+type: string
+
+required: True
+
+The message from event log record.
+
+
+==== recordNumber
+
+type: long
+
+required: True
+
+The record number of the event log record. The very first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches 4294967295, the next record number will be 0.
+
+
+==== sourceName
+
+type: string
+
+required: True
+
+The source of the event log record (the application or service that logged the record).
+
+
