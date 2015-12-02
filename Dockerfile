@@ -11,23 +11,23 @@ RUN set -x && \
 RUN set -x \
   go get \
 	github.com/pierrre/gotestcover \
-	github.com/tools/godep \
 	github.com/tsg/goautotest \
 	golang.org/x/tools/cmd/cover \
 	golang.org/x/tools/cmd/vet
 
-COPY scripts/docker-entrypoint.sh /entrypoint.sh
+COPY libbeat/scripts/docker-entrypoint.sh /entrypoint.sh
 
 # Setup work environment
-ENV LIBBEAT_PATH /go/src/github.com/elastic/libbeat
+ENV LIBBEAT_PATH /go/src/github.com/elastic/beats/libbeat
+ENV GO15VENDOREXPERIMENT=1
 RUN mkdir -p $LIBBEAT_PATH/coverage
 WORKDIR $LIBBEAT_PATH
 
 RUN mkdir -p /etc/pki/tls/certs
-COPY scripts/docker/logstash/pki/tls/certs/logstash.crt /etc/pki/tls/certs/logstash.crt
+COPY libbeat/scripts/docker/logstash/pki/tls/certs/logstash.crt /etc/pki/tls/certs/logstash.crt
 
 # Create a copy of the respository inside the container.
-COPY . /go/src/github.com/elastic/libbeat
+COPY . /go/src/github.com/elastic/beats/
 
 # It is expected that libbeat from the host is mounted
 # within the container at the WORKDIR location.
