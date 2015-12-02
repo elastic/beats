@@ -1,4 +1,4 @@
-package: github.com/tsg/beats-onerepo/libbeat
+package: github.com/elastic/beats/libbeat
 import:
 - package: github.com/garyburd/redigo
 - package: gopkg.in/yaml.v2

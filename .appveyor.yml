@@ -1,0 +1,74 @@
+# Version format
+version: "{build}"
+
+# Operating system (build VM template)
+os: Windows Server 2012 R2
+
+# Environment variables
+environment:
+  GOROOT: c:\go
+  GOPATH: c:\gopath
+  matrix:
+  - PROJ: github.com\elastic\beats\filebeat
+    BEAT: filebeat
+  - PROJ: github.com\elastic\beats\topbeat
+    BEAT: topbeat
+  - PROJ: github.com\elastic\beats\winlogbeat
+    BEAT: winlogbeat
+
+# Custom clone folder (variables are not expanded here).
+clone_folder: c:\gopath\src\github.com\elastic\beats
+
+# Cache mingw install until appveyor.yml is modified.
+cache:
+- C:\ProgramData\chocolatey\bin -> .appveyor.yml
+- C:\ProgramData\chocolatey\lib -> .appveyor.yml
+- C:\tools\mingw64 -> .appveyor.yml
+
+# Scripts that run after cloning repository
+install:
+  # AppVeyor installed mingw is 32-bit only.
+  - cinst mingw >nul
+  - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
+  - set PATH=%GOPATH%\bin;%PATH%
+  - set GO15VENDOREXPERIMENT=1
+  - go version
+  - go env
+  - python --version
+  - appveyor DownloadFile https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py
+  - python get-pip.py
+  - set PATH=C:\Python27\Scripts;%PATH%
+  - pip install jinja2 nose nose-timer
+
+# To run your custom scripts instead of automatic MSBuild
+build_script:
+  # Compile
+  - appveyor AddCompilationMessage "Starting Compile"
+  - ps: cd $env:BEAT
+  - go build
+  - appveyor AddCompilationMessage "Compile Success" -FileName "$env:BEAT.exe"
+
+# To run your custom scripts instead of automatic tests
+test_script:
+  # Unit tests
+  - ps: Add-AppveyorTest "Unit Tests" -Outcome Running
+  - go test ./...
+  - ps: Update-AppveyorTest "Unit Tests" -Outcome Passed
+  # System tests
+  - ps: Add-AppveyorTest "System tests" -Outcome Running
+  - go test -race -c -cover -covermode=atomic -coverpkg ./...
+  - ps: cd tests/system
+  - nosetests --with-timer
+  - ps: Update-AppveyorTest "System tests" -Outcome Passed
+
+# Executes for both successful and failed builds
+on_finish:
+  - ps: cd $env:GOPATH\src\$env:PROJ
+  - 7z a -r system-tests-output.zip build\system-tests\run
+  - ps: Push-AppveyorArtifact system-tests-output.zip
+
+# To disable deployment
+deploy: off
+
+# Notifications should only be setup using the AppVeyor UI so that
+# forks can be created without inheriting the settings.
