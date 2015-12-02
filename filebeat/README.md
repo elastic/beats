@@ -1,9 +1,3 @@
-[![Jenkins Build Status](http://build-eu-00.elastic.co/job/filebeat/badge/icon)](http://build-eu-00.elastic.co/job/filebeat/)
-[![Travis Build Status](https://travis-ci.org/elastic/filebeat.svg?branch=master)](https://travis-ci.org/elastic/filebeat)
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/lirttsafxqdhwiu1/branch/master?svg=true)](https://ci.appveyor.com/project/elastic-beats/filebeat/branch/master)
-[![codecov.io](http://codecov.io/github/elastic/filebeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/filebeat?branch=master)
-
-
 # Filebeat
 
 Filebeat is an open source file harvester, mostly used to fetch logs files and feed them into logstash.
