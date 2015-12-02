@@ -1,0 +1,24 @@
+[[community-beats]]
+== Community Beats
+
+The open source community has been hard at work developing new Beats. You can check 
+out a few of them here:
+
+[horizontal]
+https://github.com/Ingensi/dockerbeat[dockerbeat]:: Reads docker container 
+statistics and indexes them in Elasticsearch
+https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx
+https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list 
+of targets and stores the round trip time (RTT) in Elasticsearch 
+https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI
+
+Have you created a Beat that's not listed? Open a pull request to add your link 
+here: https://github.com/elastic/libbeat/blob/master/docs/communitybeats.asciidoc
+
+NOTE: Elastic provides no warranty or support for community-sourced Beats.
+
+[[contributing-beats]]
+=== Contributing to Beats
+
+Remember, you can be a Beats developer, too. <<new-beat, Learn how>>
+

@@ -1,0 +1,21 @@
+== Overview
+
+The _Beats_ are open source data shippers that you install as _agents_ on
+your servers to send different types of operational data to
+https://www.elastic.co/products/elasticsearch[Elasticsearch]. Beats can
+send data directly to Elasticsearch or send it to Elasticsearch via Logstash, which
+you can use to enrich or archive the data.
+
+_Packetbeat_, _Topbeat_, and _Filebeat_ are a few examples of _Beats_. Packetbeat
+is a network packet analyzer that ships information about the transactions
+exchanged between your application servers. Topbeat is a server monitoring agent
+that periodically ships system-wide and per-process statistics from your
+servers. And Filebeat ships log files from your servers.
+
+image:./images/beats-platform.png[Beats Platform]
+
+If you have a specific use case to solve, we encourage you to create your own
+Beat. We created an infrastructure to simplify the process. The _libbeat_
+library, written entirely in Golang, offers the API that all Beats use to
+ship data to Elasticsearch, configure the input options, implement logging,
+and more.

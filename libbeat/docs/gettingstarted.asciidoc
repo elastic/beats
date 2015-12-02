@@ -1,0 +1,345 @@
+[[getting-started]]
+== Getting Started
+
+A regular _Beats setup_ consists of:
+
+ * One or more Beats. You install Beats on your servers to capture the data.
+ For installation steps, see the documentation for your Beat.
+ * Elasticsearch for storage and indexing. See <<elasticsearch-installation>>
+ * Optionally Logstash for inserting data into Elasticsearch. See <<logstash-installation>>
+ * Kibana for the UI. See <<kibana-installation>>
+ * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>
+
+NOTE: To get started, you can install Elasticsearch and Kibana on a
+single VM or even on your laptop. The only condition is that the machine must be
+accessible from the servers you want to monitor. As you add more Beats and
+your traffic grows, you'll want to replace the single Elasticsearch instance with
+a cluster. You'll probably also want to automate the installation process.
+
+[[elasticsearch-installation]]
+=== Installing Elasticsearch
+
+https://www.elastic.co/products/elasticsearch[Elasticsearch] is a real-time,
+distributed storage, search, and analytics engine. It can be used for many
+purposes, but one context where it excels is indexing streams of semi-structured
+data, such as logs or decoded network packets.
+
+The binary packages of Elasticsearch have only one dependency: Java. To download and install
+Elasticsearch, run the following commands. Use the commands that work with your system
+(deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X):
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
+sudo dpkg -i elasticsearch-{ES-version}.deb
+sudo /etc/init.d/elasticsearch start
+----------------------------------------------------------------------
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.rpm
+sudo rpm -i elasticsearch-{ES-version}.rpm
+sudo service elasticsearch start
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
+unzip elasticsearch-{ES-version}.zip
+cd elasticsearch-{ES-version}
+./bin/elasticsearch
+----------------------------------------------------------------------
+
+You can learn more about installing, configuring, and running Elasticsearch in
+http://www.elastic.co/guide/en/elasticsearch/guide/current/_installing_elasticsearch.html[Elasticsearch: The Definitive Guide].
+
+
+To test that the Elasticsearch daemon is up and running, try sending an HTTP GET
+request on port 9200:
+
+[source,shell]
+----------------------------------------------------------------------
+curl http://127.0.0.1:9200
+----------------------------------------------------------------------
+
+You should see a response similar to this:
+
+[source,shell]
+----------------------------------------------------------------------
+{
+  "name" : "Banshee",
+  "cluster_name" : "elasticsearch",
+  "version" : {
+    "number" : "2.1.0",
+    "build_hash" : "72cd1f1a3eee09505e036106146dc1949dc5dc87",
+    "build_timestamp" : "2015-11-18T22:40:03Z",
+    "build_snapshot" : false,
+    "lucene_version" : "5.3.1"
+  },
+  "tagline" : "You Know, for Search"
+}
+
+----------------------------------------------------------------------
+
+[[logstash-installation]]
+=== Installing Logstash (Optional)
+
+The simplest architecture for the Beats platform setup consists of one or more Beats,
+Elasticsearch, and Kibana. This architecture is easy to get started
+with and sufficient for networks with low traffic. It also uses the minimum amount of
+servers: a single machine running Elasticsearch and Kibana. The Beats
+insert the transactions directly into the Elasticsearch instance.
+
+This section explains how to use the Beats together with Logstash to provide
+additional buffering. An important advantage to this approach is that you can
+use Logstash to modify the data captured by Beats in any way you like. You can also
+use Logstash's many output plugins to integrate with other systems.
+
+image:./images/beats-logstash.png[Integration with Logstash]
+
+To download and install Logstash, run the following commands. Use the commands that work
+with your system:
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo apt-get install openjdk-7-jre
+curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
+sudo dpkg -i logstash_{LS-version}-1_all.deb
+----------------------------------------------------------------------
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo yum install java-1.7.0-openjdk
+curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}-1.noarch.rpm
+sudo rpm -i logstash-{LS-version}-1.noarch.rpm
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+# install Java, e.g. from: https://www.java.com/en/download/manual.jsp
+curl -L -O https://download.elastic.co/logstash/logstash/logstash-{LS-version}.zip
+unzip logstash-{LS-version}.zip
+----------------------------------------------------------------------
+
+You can learn more about installing, configuring, and running Logstash
+https://www.elastic.co/guide/en/logstash/current/getting-started-with-logstash.html[here].
+
+
+[[logstash-setup]]
+==== Setting Up Logstash
+
+Before setting up Logstash, you need to install the Beat. For installation steps,
+see the documentation for your Beat.
+
+In this setup, the Beat sends events to Logstash. Logstash receives
+these events by using the
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats
+plugin] and then sends the transaction to Elasticsearch by using the
+http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
+output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
+indexing very efficient.
+
+The minimum required Logstash version for this plugin is 1.5.4. If you are using
+Logstash 1.5.4, you must install the Beats input plugin before applying this
+configuration because the plugin is not shipped with 1.5.4. To install
+the required plugin, run the following command inside the logstash directory
+(for deb and rpm installs, the directory is `/opt/logstash`).
+
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/plugin install logstash-input-beats
+----------------------------------------------------------------------
+
+To use this setup, edit the Beats configuration file (for example, `packetbeat.yml`) to disable the Elasticsearch
+output and use the <<logstash-output,Logstash output>> instead:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["127.0.0.1:5044"]
+
+    # configure logstash plugin to loadbalance events between
+    # configured logstash hosts
+    #loadbalance: false
+------------------------------------------------------------------------------
+
+Next configure Logstash to listen on port 5044 for incoming Beats connections
+and to index into Elasticsearch. You configure Logstash by creating a
+configuration file. For example, you can save the following example configuration
+to a file called `config.json`:
+
+[source,ruby]
+------------------------------------------------------------------------------
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => "localhost:9200"
+    sniffing => true
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Logstash uses this configuration to index events in Elasticsearch in the same
+way that the Beat would, but you get additional buffering and other capabilities
+provided by Logstash.
+
+[[logstash-input-update]]
+==== Updating the Logstash Input Beats Plugin
+
+If you are running Logstash 2.0 or earlier, you might not have the latest version of the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin].
+You can easily update to the latest version of the input plugin from your Logstash installation:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/plugin update logstash-input-beats
+----------------------------------------------------------------------
+
+More details about working with input plugins in Logstash are available https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
+
+
+==== Running Logstash
+
+Now you can start Logstash. Use the command that works with your system:
+
+deb:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo /etc/init.d/logstash start
+----------------------------------------------------------------------
+
+rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+sudo service logstash start
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./bin/logstash -f config.json
+----------------------------------------------------------------------
+
+If you installed Logstash as a deb or rpm package, place the config file in the
+expected directory.
+
+NOTE: The default configuration for Beats and Logstash uses plain TCP. For
+encryption you must explicitly enable TLS when you configure Beats and Logstash.
+
+
+[[kibana-installation]]
+=== Installing Kibana
+
+https://www.elastic.co/products/kibana[Kibana] is a visualization application
+that gets its data from Elasticsearch. It provides a customizable and
+user-friendly UI in which you can combine various widget types to create your
+own dashboards. The dashboards can be easily saved, shared, and linked.
+
+For getting started, we recommend installing Kibana on the same
+server as Elasticsearch, but it is not required.
+
+Use the following commands to download and run Kibana:
+
+deb or rpm:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-linux-x64.tar.gz
+tar xzvf kibana-{Kibana-version}-linux-x64.tar.gz
+cd kibana-{Kibana-version}-linux-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O https://download.elastic.co/kibana/kibana/kibana-{Kibana-version}-darwin-x64.tar.gz
+tar xzvf kibana-{Kibana-version}-darwin-x64.tar.gz
+cd kibana-{Kibana-version}-darwin-x64/
+./bin/kibana
+----------------------------------------------------------------------
+
+You can find Kibana binaries for other operating systems on the
+https://www.elastic.co/downloads/kibana[Kibana downloads page].
+
+If Kibana cannot reach the Elasticsearch server, change the URL (IP:PORT) of the Elasticsearch server
+in the Kibana configuration file, `config/kibana.yml`.
+
+To launch the Kibana web interface, point your browser to port 5601. For example, `http://127.0.0.1:5601`.
+
+You can learn more about Kibana in the
+http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
+
+[[load-kibana-dashboards]]
+==== Loading Kibana Dashboards
+
+Kibana has a large set of visualization types that you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
+started and to demonstrate what is possible based on the Beats data.
+
+To load the sample dashboards, follow these steps:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.tar.gz
+tar xzvf beats-dashboards-{Dashboards-version}.tar.gz
+cd beats-dashboards-{Dashboards-version}/
+./load.sh
+----------------------------------------------------------------------
+
+NOTE: If Elasticsearch is not running on `127.0.0.1:9200`, you need to
+specify the Elasticsearch location as an argument to the `load.sh` command:
+`./load.sh http://192.168.33.60:9200`
+
+The load command uploads the example dashboards, visualizations, and searches
+that you can use. The load command also creates index patterns for each Beat:
+
+   - [packetbeat-]YYYY.MM.DD
+   - [topbeat-]YYYY.MM.DD
+   - [filebeat-]YYYY.MM.DD
+
+After loading the dashboards, Kibana raises a `No default index
+pattern` error. You must select or create an index pattern to continue. You can
+resolve the error by refreshing the page in the browser and then setting one of
+the predefined index patterns as the default.
+
+image:./images/kibana-created-indexes.png[Kibana configured indexes]
+
+To open the loaded dashboards, go to the `Dashboard` page and click the
+*Load Saved Dashboard* icon. Select `Packetbeat Dashboard` from the list.
+You can then easily switch between the dashboards by using the `Navigation` widget.
+
+image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
+
+Enjoy!
