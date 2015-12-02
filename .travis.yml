@@ -12,23 +12,30 @@ os:
   - osx
 
 env:
-  - TARGETS="-C libbeat check"
+  - TARGETS="check"
   # - TARGETS="testsuite ES_HOST=elasticsearch-173"
   - TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
+  - TARGETS="-C topbeat testsuite"
+  - TARGETS="-C filebeat testsuite"
+  - TARGETS="-C packetbeat testsuite"
   - TARGETS="-C libbeat crosscompile"
-  - TARGETS="-C topbeat check testsuite"
-  - TARGETS="-C filebeat check testsuite"
   - TARGETS="-C filebeat crosscompile"
-  - TARGETS="-C packetbeat check testsuite"
 
 matrix:
   exclude:
+    - os: osx
+      env: TARGETS="check"
     - os: osx
       env: TARGETS="-C filebeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
+  fast_finish: true
+  allow_failures:
+    - env: TARGETS="-C libbeat crosscompile"
+    - env: TARGETS="-C filebeat crosscompile"
+
 
 addons:
   apt:
@@ -48,11 +55,6 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-# TODO: needed ?
-addonsbefore_install:
-  - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
-
-
 install:
   - true
 
@@ -66,7 +68,7 @@ notifications:
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
-  - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/filebeat/build/coverage/full.cov
+  - test -f filebeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f filebeat/build/coverage/full.cov
   - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
   - test -f topbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f topbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
