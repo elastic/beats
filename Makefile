@@ -1,13 +1,10 @@
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
+PROJECTS=packetbeat topbeat filebeat winlogbeat
 
 # Runs testsuites for all beats
 testsuite:
-	make -C filebeat testsuite
-	make -C packetbeat testsuite
-	make -C topbeat testsuite
-	make -C winlogbeat testsuite
-	make -C libbeat testsuite
+	$(foreach var,$(PROJECTS),make -C $(var) testsuite;)
 
 .PHONY: coverage-report
 coverage-report:
@@ -22,17 +19,14 @@ coverage-report:
 	-tail -q -n +2 ./libbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
-
 clean:
-	make -C filebeat clean
-	make -C packetbeat clean
-	make -C topbeat clean
-	make -C winlogbeat clean
-	make -C libbeat clean
+	$(foreach var,$(PROJECTS),make -C $(var) clean;)
 
 check:
-	make -C filebeat check
-	make -C packetbeat check
-	make -C topbeat check
-	make -C winlogbeat check
-	make -C libbeat check
+	$(foreach var,$(PROJECTS),make -C $(var) check;)
+
+fmt:
+	$(foreach var,$(PROJECTS),make -C $(var) fmt;)
+
+simplify:
+	$(foreach var,$(PROJECTS),make -C $(var) simplify;)
