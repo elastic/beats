@@ -7,7 +7,7 @@ GODEP=$(GOPATH)/bin/godep
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
-ES_HOST?="elasticsearch-200"
+ES_HOST?="elasticsearch-210"
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 TIMEOUT?= 90
@@ -112,7 +112,7 @@ system-tests: topbeat.test prepare-tests system-tests-setup
 # Runs the system tests
 .PHONY: system-tests-setup
 system-tests-setup: tests/system/requirements.txt
-	test -d env || virtualenv build/system-tests/env > /dev/null
+	test -d build/system-tests/env || virtualenv build/system-tests/env > /dev/null
 	. build/system-tests/env/bin/activate && pip install -Ur tests/system/requirements.txt > /dev/null
 	touch build/system-tests/env/bin/activate
 
@@ -169,7 +169,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch-173 elasticsearch-200 logstash
+	docker-compose up -d redis elasticsearch-173 elasticsearch-210 logstash
 
 .PHONY: stop-environment
 stop-environment:
@@ -182,3 +182,5 @@ write-environment:
 	mkdir -p build
 	echo "ES_HOST=${ES_HOST}" > build/test.env
 	echo "ES_PORT=9200" >> build/test.env
+	echo "ES_USER=beats" >> build/test.env
+	echo "ES_PASS=testing" >> build/test.env
