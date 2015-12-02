@@ -1,0 +1,56 @@
+== HTTPS and Basic Authentication
+
+To secure the communication between a Beat and Elasticsearch, you can use HTTPS
+and basic authentication. Here is a sample configuration:
+
+[source,yaml]
+----
+elasticsearch:
+  username: packetbeat <1>
+  password: verysecret <2>
+  protocol: https <3>
+  hosts: ["elasticsearch.example.com:9200"] <4>
+  save_topology: true
+----
+<1> The username to use for authenticating to Elasticsearch.
+<2> The password to use for authenticating to Elasticsearch.
+<3> This setting enables the HTTPS protocol.
+<4> The IP and port of the Elasticsearch nodes.
+
+
+Elasticsearch doesn't have built-in basic authentication, but you can achieve it
+either by using a web proxy or by using the
+https://www.elastic.co/products/shield[Shield] commercial plugin.
+
+The Beat verifies the validity of the server certificates and only accepts trusted
+certificates. Creating a correct SSL/TLS infrastructure is outside the scope of
+this document, but a good guide to follow is the
+https://www.elastic.co/guide/en/shield/current/certificate-authority.html[Running a Certificate Authority]
+appendix from the Shield guide.
+
+By default the Beat uses the list of trusted certificate authorities from the
+operating system where the Beat is running. You can configure a Beat to use a specific list of
+CA certificates instead of the list from the OS. Here is an example:
+
+[source,yaml]
+----
+elasticsearch:
+  username: packetbeat
+  password: verysecret
+  protocol: https
+  hosts: ["elasticsearch.example.com:9200"]
+  save_topology: true
+  certificate_authorities: <1>
+    - /etc/pki/my_root_ca.pem
+    - /etc/pki/my_other_ca.pem
+----
+<1> The list of CA certificates to trust
+
+
+NOTE: For any given connection, the SSL/TLS certificates must have a subject
+that matches the value specified for `hosts`, or the TLS handshake fails.
+For example, if you specify `hosts: ["foobar:9200"]`, the certificate MUST
+include `foobar` in the subject (`CN=foobar`) or as a subject alternative name
+(SAN). Make sure the hostname resolves to the correct IP address. If no DNS is available, then
+you can associate the IP address with your hostname in `/etc/hosts`
+(on Unix systems).
