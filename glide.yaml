@@ -1,0 +1,31 @@
+package: github.com/tsg/beats-onerepo/libbeat
+import:
+- package: github.com/garyburd/redigo
+- package: gopkg.in/yaml.v2
+- package: github.com/nranchev/go-libGeoIP
+- package: golang.org/x/sys
+  subpackages:
+  - /windows/svc
+- package: github.com/stretchr/testify
+  subpackages:
+  - /assert
+- package: github.com/davecgh/go-spew
+  subpackages:
+  - /spew
+- package: github.com/stretchr/objx
+- package: github.com/pmezard/go-difflib
+  subpackages:
+  - /difflib
+- package: github.com/elastic/gosigar
+- package: github.com/samuel/go-parser
+- package: github.com/samuel/go-thrift
+  version: 2187045faa54fce7f5028706ffeb2f2fc342aa7e
+- package: labix.org/v2/mgo
+- package: github.com/tsg/gopacket
+- package: github.com/joeshaw/multierror
+- package: github.com/andrewkroh/sys
+  subpackages:
+  - /windows/svc/eventlog
+- package: golang.org/x/text
+  subpackages:
+  - /encoding
