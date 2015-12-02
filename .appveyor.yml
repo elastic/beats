@@ -28,7 +28,8 @@ cache:
 # Scripts that run after cloning repository
 install:
   # AppVeyor installed mingw is 32-bit only.
-  - cinst mingw >nul
+  - cinst mingw > mingw-install.txt
+  - ps: Push-AppveyorArtifact mingw-install.txt
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
   - go get github.com/pierrre/gotestcover golang.org/x/tools/cmd/cover
