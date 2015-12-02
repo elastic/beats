@@ -1,0 +1,16 @@
+################### Topbeat Configuration Example #########################
+
+############################# Input ############################################
+input:
+  # In seconds, defines how often to read server statistics
+  period: 10
+
+  # Regular expression to match the processes that are monitored
+  # By default, all the processes are monitored
+  procs: [".*"]
+
+  # Statistics to collect (all enabled by default)
+  stats:
+    system: true
+    proc: true
+    filesystem: true
