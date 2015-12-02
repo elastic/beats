@@ -56,8 +56,7 @@ https://www.elastic.co/downloads/beats/filebeat[downloads page].
 
 . Rename the `filebeat-<version>-windows` directory to `Filebeat`.
 
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*), and navigate to where you extracted the
-zip file.
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
 
 . Run the following commands to install Filebeat as a Windows service:
 +
