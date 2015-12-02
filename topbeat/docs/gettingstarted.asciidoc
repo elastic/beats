@@ -1,0 +1,234 @@
+[[topbeat-getting-started]]
+== Getting Started
+
+Topbeat helps you monitor the availability of your website or service by providing system-wide and per-process
+statistics along with a disk usage overview.
+
+To get started with your own Topbeat setup, install and configure these related products:
+
+ * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
+ * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
+ * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+
+After you have installed these products, you can start <<topbeat-installation>>.
+
+
+[[topbeat-installation]]
+=== Installing Topbeat
+
+To download and install Topbeat, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, and <<win, win>> for Windows).
+
+NOTE: We also provide 32-bit images that you can get from our
+https://www.elastic.co/downloads/beats/topbeat[download page].
+
+[[deb]]
+==== deb:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat_{version}_amd64.deb
+sudo dpkg -i topbeat_{version}_amd64.deb
+------------------------------------------------
+
+[[rpm]]
+==== rpm:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-x86_64.rpm
+sudo rpm -vi topbeat-{version}-x86_64.rpm
+------------------------------------------------
+
+[[mac]]
+==== mac:
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-darwin.tgz
+tar xzvf topbeat-{version}-darwin.tgz
+------------------------------------------------
+
+[[win]]
+==== win:
+
+. Download the Topbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/topbeat[downloads page]
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `topbeat-<version>-windows` directory to `Topbeat`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. Run the following commands to install Topbeat as a Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Topbeat'
+PS C:\Program Files\Topbeat> .\install-service-topbeat.ps1
+----------------------------------------------------------------------
+
+Before starting Topbeat, you should look at the configuration options in the configuration file,
+for example `C:\Program Files\topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
+
+[[topbeat-configuration]]
+=== Configuring Topbeat
+
+NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you
+configure Topbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
+
+To configure Topbeat, you edit the _topbeat.yml_ file. Here is a sample of
+the _topbeat.yml_ file:
+
+[source, shell]
+-------------------------------------
+input:
+  period: 10
+  procs: [".*"]
+-------------------------------------
+
+The `period` option defines how often to read system-wide and per-process statistics from your servers. The interval is in seconds.
+By default, it's set to 10 seconds.
+
+The `procs` option defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
+
+If you are not interested in monitoring your processes, you can use:
+
+[source, shell]
+-------------------------------------
+input:
+  period: 10
+  procs: ["^$"]
+-------------------------------------
+
+[[topbeat-template]]
+=== Loading the Index Template in Elasticsearch
+
+Before starting Topbeat, you need to load the
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which lets Elasticsearch know which fields should be analyzed
+in which way.
+
+The recommended template file is installed by the Topbeat packages. Load it with the
+following command:
+
+==== deb or rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/topbeat' -d@/etc/topbeat/topbeat.template.json
+----------------------------------------------------------------------
+
+==== mac:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+cd topbeat-{version}-darwin
+curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
+==== win:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS C:\Program Files\Topbeat> Invoke-WebRequest -Method Put -InFile topbeat.template.json -Uri http://localhost:9200/_template/topbeat?pretty
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
+
+=== Running Topbeat
+
+Run Topbeat by issuing the following command:
+
+==== deb:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/topbeat start
+----------------------------------------------------------------------
+
+==== rpm:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/topbeat start
+----------------------------------------------------------------------
+
+==== mac:
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./topbeat -e -c topbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+==== win:
+
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Topbeat> Start-Service topbeat
+----------------------------------------------------------------------
+
+By default the log files are stored in `C:\ProgramData\topbeat\Logs`.
+
+NOTE: On Windows, statistics about system load and swap usage are currently
+not captured.
+
+=== Testing the Topbeat Installation
+
+To verify that your server's statistics are present in Elasticsearch, issue
+the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/topbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure that you replace `localhost:9200` with the address of your Elasticsearch
+instance.
+
+=== Loading Sample Kibana Dashboards
+
+To make it easier for you to start monitoring your servers in Kibana,
+we have created a few sample dashboards. The dashboards are maintained in this
+https://github.com/elastic/beats-dashboards[GitHub repository], which also
+includes instructions for loading the dashboards.
+
+You can load all of the sample dashboards automatically by following
+{libbeat}/getting-started.html#load-kibana-dashboards[these steps].
+
+image:./images/topbeat-dashboard.png[Topbeat statistics]
+
+These dashboards are provided as examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to meet your needs.
+
+==== Example of a System-Wide Overview
+
+You can configure the `Dashboard` page to show the statistics for all servers or for a
+subset. For example, you might have a dashboard page that shows:
+
+* CPU usage and memory consumption for the top 10 CPU-consuming processes
+running on different servers
+* Free and used disk space for all servers
+* CPU usage per process
+* Memory consumption per process
+
+image:./images/topbeat-dashboard-example.png[Topbeat Dashboard page in Kibana]
+
+==== Example of a Per Server Overview
+
+To display the statistics coming from a single server, you can use a search query like *beat.name: precise32*:
+
+image:./images/topbeat-dashboard-1shipper.png[Topbeat Dashboard page in Kibana for one server]
+
+You can learn more about Kibana in the
+http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
+
+
+Enjoy!
+
