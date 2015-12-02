@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -22,6 +23,7 @@ func NewHarvester(
 	stat *FileStat,
 	spooler chan *input.FileEvent,
 ) (*Harvester, error) {
+	var err error
 	encoding, ok := encoding.FindEncoding(cfg.Encoding)
 	if !ok || encoding == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
@@ -35,6 +37,14 @@ func NewHarvester(
 		SpoolerChan:      spooler,
 		encoding:         encoding,
 		backoff:          prospectorCfg.Harvester.BackoffDuration,
+	}
+	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
+	if err != nil {
+		return h, err
+	}
+	h.IncludeLinesRegexp, err = InitRegexps(cfg.IncludeLines)
+	if err != nil {
+		return h, err
 	}
 	return h, nil
 }
@@ -104,24 +114,50 @@ func (h *Harvester) Harvest() {
 		// Reset Backoff
 		h.backoff = h.Config.BackoffDuration
 
-		// Sends text to spooler
-		event := &input.FileEvent{
-			ReadTime:     lastReadTime,
-			Source:       &h.Path,
-			InputType:    h.Config.InputType,
-			DocumentType: h.Config.DocumentType,
-			Offset:       h.Offset,
-			Bytes:        bytesRead,
-			Text:         &text,
-			Fields:       &h.Config.Fields,
-			Fileinfo:     &info,
+		if h.shouldExportLine(text) {
+
+			// Sends text to spooler
+			event := &input.FileEvent{
+				ReadTime:     lastReadTime,
+				Source:       &h.Path,
+				InputType:    h.Config.InputType,
+				DocumentType: h.Config.DocumentType,
+				Offset:       h.Offset,
+				Bytes:        bytesRead,
+				Text:         &text,
+				Fields:       &h.Config.Fields,
+				Fileinfo:     &info,
+			}
+
+			event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
+			h.SpoolerChan <- event // ship the new event downstream
 		}
 
+		// Set Offset
 		h.Offset += int64(bytesRead) // Update offset if complete line has been processed
-
-		event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
-		h.SpoolerChan <- event // ship the new event downstream
 	}
+}
+
+// shouldExportLine decides if the line is exported or not based on
+// the include_lines and exclude_lines options.
+func (h *Harvester) shouldExportLine(line string) bool {
+	if len(h.IncludeLinesRegexp) > 0 {
+		if !MatchAnyRegexps(h.IncludeLinesRegexp, line) {
+			// drop line
+			logp.Debug("harvester", "Drop line as it does not match any of the include patterns %s", line)
+			return false
+		}
+	}
+	if len(h.ExcludeLinesRegexp) > 0 {
+		if MatchAnyRegexps(h.ExcludeLinesRegexp, line) {
+			// drop line
+			logp.Debug("harvester", "Drop line as it does match one of the exclude patterns%s", line)
+			return false
+		}
+	}
+
+	return true
+
 }
 
 // backOff checks the backoff variable and sleeps for the given time
@@ -295,6 +331,35 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 }
 
 func (h *Harvester) Stop() {
+}
+
+func InitRegexps(exprs []string) ([]*regexp.Regexp, error) {
+
+	result := []*regexp.Regexp{}
+
+	for _, exp := range exprs {
+
+		rexp, err := regexp.CompilePOSIX(exp)
+		if err != nil {
+			logp.Err("Fail to compile the regexp %s: %s", exp, err)
+			return nil, err
+		}
+		result = append(result, rexp)
+	}
+	return result, nil
+}
+
+func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
+
+	for _, rexp := range regexps {
+		if rexp.MatchString(text) {
+			// drop line
+			return true
+
+		}
+	}
+
+	return false
 }
 
 const maxConsecutiveEmptyReads = 100
