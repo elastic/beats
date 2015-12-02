@@ -62,7 +62,7 @@ script:
 notifications:
   hipchat:
     rooms:
-      secure: "ByersLJ715jDSS+bOzAdLQheIM9bNMtVxd3vkpvILuGFMRUBIZ2mFnHdRGi4vv/idft7ZUQmK4ofDF+rcGX+cDKDcfwJUmUoe1SW+ASscyOooNZbUuucyEnsHnaG7QrgcwVk79V417CANvopd9jbYOtBrhGhi+HtVRM94k1Qcgk="
+      secure: "iAQUMLIlghuQjGTvsNoiNU+Fok+IE0MYxhRjC9kwevXZgkY//w/Oa+w3Ol4kKDCQdSFOuPa72C73XOVznrL9Kw3y/gKU07Nf0WXMrq+TjPr/vR6gKGpDqeWe7WXJkhJS4tMjSs+bW0w+rQVo8QwYgsqeEQdDXgCzsfreytya/KA="
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file

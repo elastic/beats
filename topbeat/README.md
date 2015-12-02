@@ -1,9 +1,3 @@
-[![Jenkins Build Status](http://build-eu-00.elastic.co/job/topbeat/badge/icon)](http://build-eu-00.elastic.co/job/topbeat/)
-[![Travis Status](https://travis-ci.org/elastic/topbeat.svg?branch=master)](https://travis-ci.org/elastic/topbeat)
-[![Appveyor status](https://ci.appveyor.com/api/projects/status/k4jnsyt27dcw6s3v?svg=true)](https://ci.appveyor.com/project/elastic-beats/topbeat)
-
-[![codecov.io](http://codecov.io/github/elastic/topbeat/coverage.svg?branch=master)](http://codecov.io/github/elastic/topbeat?branch=master)
-
 # Topbeat
 
 Topbeat is the [Beat](https://www.elastic.co/products/beats) used for
