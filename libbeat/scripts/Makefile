@@ -2,9 +2,9 @@
 ### VARIABLE SETUP ###
 
 ARCH?=$(shell uname -m)
-GODEP=$(GOPATH)/bin/godep
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
+export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 ES_HOST?="elasticsearch-210"
@@ -20,31 +20,26 @@ SYSTEM_TESTS?=false
 
 # Builds beat
 .PHONY: build
-build: deps $(GOFILES)
-	$(GODEP) go build
+build: $(GOFILES)
+	go build
 
 # Create test coverage binary
 .PHONY: libbeat.test
 libbeat.test: $(GOFILES)
-	$(GODEP) go test -c -covermode=atomic -coverpkg ./...
+	go test -c -covermode=atomic -coverpkg ./...
 
 # Cross-compile beat for the OS and architectures listed in
 # crosscompile.bash. The binaries are placed in the ./bin dir.
 .PHONY: crosscompile
-crosscompile: deps $(GOFILES)
+crosscompile: $(GOFILES)
 	mkdir -p ${BUILD_DIR}/bin
-	source ./scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
-
-# Fetch dependencies
-.PHONY: deps
-deps:
-	go get github.com/tools/godep
+	source ../libbeat/scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
 
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
 	gofmt -l . | read && echo "Code differs from gofmt's style" && exit 1 || true
-	godep go vet ./...
+	go vet ./...
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
@@ -80,12 +75,12 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: prepare-tests
 	#go test -short ./...
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic github.com/elastic/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic github.com/elastic/beats/${BEATNAME}/...
 
 # Run integration tests. Unit tests are run as part of the integration tests. It runs all tests with race detection enabled.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	GOPATH=$(shell $(GODEP) path):$(GOPATH) $(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic github.com/elastic/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic github.com/elastic/beats/${BEATNAME}/...
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
@@ -96,7 +91,7 @@ integration-tests-environment:
 	echo "docker ${BEATNAME} test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
 	mkdir -p ${COVERAGE_DIR}; \
-	docker cp $$NAME:/go/src/github.com/elastic/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
+	docker cp $$NAME:/go/src/github.com/elastic/beats/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
 	docker rm $$NAME > /dev/null; \
 	exit $$CODE
 
@@ -112,7 +107,7 @@ system-tests: libbeat.test prepare-tests system-tests-setup
 # Runs the system tests
 .PHONY: system-tests-setup
 system-tests-setup: tests/system/requirements.txt
-	test -d build/system-tests/env || virtualenv build/system-tests/env > /dev/null
+	test -d env || virtualenv build/system-tests/env > /dev/null
 	. build/system-tests/env/bin/activate && pip install -Ur tests/system/requirements.txt > /dev/null
 	touch build/system-tests/env/bin/activate
 
@@ -149,12 +144,12 @@ coverage-report:
 	echo 'mode: atomic' > ./${COVERAGE_DIR}/full.cov
 	# Collects all coverage files and skips top line with mode
 	tail -q -n +2 ./${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
-	$(GODEP) go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
+	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
 update:
-	bash ${GOPATH}/src/github.com/elastic/libbeat/scripts/update.sh ${BEATNAME} github.com/elastic/${BEATNAME}
+	bash ${GOPATH}/src/github.com/elastic/beats/libbeat/scripts/update.sh ${BEATNAME} github.com/elastic/beats/${BEATNAME}
 
 
 
@@ -182,5 +177,3 @@ write-environment:
 	mkdir -p build
 	echo "ES_HOST=${ES_HOST}" > build/test.env
 	echo "ES_PORT=9200" >> build/test.env
-	echo "ES_USER=beats" >> build/test.env
-	echo "ES_PASS=testing" >> build/test.env
