@@ -16,10 +16,15 @@ After you have installed these products, you can start <<topbeat-installation>>.
 [[topbeat-installation]]
 === Installing Topbeat
 
-To download and install Topbeat, run the following commands. Use the commands that work with your system (deb for Debian/Ubuntu, rpm for Redhat/Centos/Fedora, mac for OS X).
+To download and install Topbeat, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, and <<win, win>> for Windows).
 
+NOTE: We also provide 32-bit images that you can get from our
+https://www.elastic.co/downloads/beats/topbeat[download page].
 
-deb:
+[[deb]]
+==== deb:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -27,7 +32,8 @@ curl -L -O https://download.elastic.co/beats/topbeat/topbeat_{version}_amd64.deb
 sudo dpkg -i topbeat_{version}_amd64.deb
 ------------------------------------------------
 
-rpm:
+[[rpm]]
+==== rpm:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -35,7 +41,8 @@ curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-x86_64.rp
 sudo rpm -vi topbeat-{version}-x86_64.rpm
 ------------------------------------------------
 
-mac:
+[[mac]]
+==== mac:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -43,11 +50,28 @@ curl -L -O https://download.elastic.co/beats/topbeat/topbeat-{version}-darwin.tg
 tar xzvf topbeat-{version}-darwin.tgz
 ------------------------------------------------
 
-NOTE: We also provide 32-bit images that you can get from our
-https://www.elastic.co/downloads/beats/topbeat[download page].
+[[win]]
+==== win:
+
+. Download the Topbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/topbeat[downloads page]
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `topbeat-<version>-windows` directory to `Topbeat`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+. Run the following commands to install Topbeat as a Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Topbeat'
+PS C:\Program Files\Topbeat> .\install-service-topbeat.ps1
+----------------------------------------------------------------------
 
 Before starting Topbeat, you should look at the configuration options in the configuration file,
-for example `/etc/topbeat/topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
+for example `C:\Program Files\topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
 
 [[topbeat-configuration]]
 === Configuring Topbeat
@@ -90,14 +114,14 @@ in which way.
 The recommended template file is installed by the Topbeat packages. Load it with the
 following command:
 
-deb or rpm:
+==== deb or rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@/etc/topbeat/topbeat.template.json
 ----------------------------------------------------------------------
 
-mac:
+==== mac:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -107,31 +131,54 @@ curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
+==== win:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS C:\Program Files\Topbeat> Invoke-WebRequest -Method Put -InFile topbeat.template.json -Uri http://localhost:9200/_template/topbeat?pretty
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
+
 === Running Topbeat
 
 Run Topbeat by issuing the following command:
 
-deb:
+==== deb:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/topbeat start
 ----------------------------------------------------------------------
 
-rpm:
+==== rpm:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/topbeat start
 ----------------------------------------------------------------------
 
-mac:
+==== mac:
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo ./topbeat -e -c topbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
+==== win:
+
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Topbeat> Start-Service topbeat
+----------------------------------------------------------------------
+
+By default the log files are stored in `C:\ProgramData\topbeat\Logs`.
+
+NOTE: On Windows, statistics about system load and swap usage are currently
+not captured.
+
+=== Testing the Topbeat Installation
 
 To verify that your server's statistics are present in Elasticsearch, issue
 the following command:
