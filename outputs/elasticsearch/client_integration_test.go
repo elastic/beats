@@ -8,6 +8,10 @@ import (
 )
 
 func TestClientConnect(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode because it requires ES")
+	}
+
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
 
