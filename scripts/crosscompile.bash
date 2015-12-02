@@ -25,9 +25,6 @@
 # nacl and plan9 are currently not compatible
 # If you want to build only a specific platform, set the PLATFORMS variable
 # go-build-all to ignore.
-
-# Linux is the only platform that is supported by gosigar without using cgo therefore
-# it is the only platform that can be cross-compiled without a gcc cross-compiler.
 : ${PLATFORMS:="
 linux-386
 linux-386-387
@@ -40,23 +37,23 @@ linux-ppc64le
 #nacl-386
 #nacl-amd64p32
 #nacl-arm
-#darwin-386
-#darwin-amd64
-#dragonfly-amd64
-#freebsd-386
-#freebsd-amd64
-#freebsd-arm
-#netbsd-386
-#netbsd-amd64
-#netbsd-arm
-#openbsd-386
-#openbsd-amd64
-#openbsd-arm
+darwin-386
+darwin-amd64
+dragonfly-amd64
+freebsd-386
+freebsd-amd64
+freebsd-arm
+netbsd-386
+netbsd-amd64
+netbsd-arm
+openbsd-386
+openbsd-amd64
+openbsd-arm
 #plan9-386
 #plan9-amd64
-#solaris-amd64
-#windows-386
-#windows-amd64
+solaris-amd64
+windows-386
+windows-amd64
 "}
 
 # Build for all platforms. Any failures will be reported at the end.
