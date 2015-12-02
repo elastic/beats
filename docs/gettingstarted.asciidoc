@@ -71,23 +71,23 @@ request on port 9200:
 curl http://127.0.0.1:9200
 ----------------------------------------------------------------------
 
-You should see this response:
+You should see a response similar to this:
 
 [source,shell]
 ----------------------------------------------------------------------
 {
-  "status" : 200,
-  "name" : "Unicorn",
+  "name" : "Banshee",
   "cluster_name" : "elasticsearch",
   "version" : {
-    "number" : "1.4.3",
-    "build_hash" : "36a29a7144cfde87a960ba039091d40856fcb9af",
-    "build_timestamp" : "2015-02-11T14:23:15Z",
+    "number" : "2.1.0",
+    "build_hash" : "72cd1f1a3eee09505e036106146dc1949dc5dc87",
+    "build_timestamp" : "2015-11-18T22:40:03Z",
     "build_snapshot" : false,
-    "lucene_version" : "4.10.3"
+    "lucene_version" : "5.3.1"
   },
   "tagline" : "You Know, for Search"
 }
+
 ----------------------------------------------------------------------
 
 [[logstash-installation]]
@@ -115,7 +115,7 @@ deb:
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
 curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
-sudo dpkg -i logstash-{LS-version}-1_all.deb
+sudo dpkg -i logstash_{LS-version}-1_all.deb
 ----------------------------------------------------------------------
 
 rpm:
@@ -166,7 +166,7 @@ the required plugin, run the following command inside the logstash directory
 ./bin/plugin install logstash-input-beats
 ----------------------------------------------------------------------
 
-To use this setup, edit the Beats configuration file to disable the Elasticsearch
+To use this setup, edit the Beats configuration file (for example, `packetbeat.yml`) to disable the Elasticsearch
 output and use the <<logstash-output,Logstash output>> instead:
 
 [source,yaml]
@@ -211,9 +211,8 @@ provided by Logstash.
 [[logstash-input-update]]
 ==== Updating the Logstash Input Beats Plugin
 
-The latest version of Logstash might not come with the latest version of the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats Plugin].
-You can easily update to the latest version of the input plugin from your logstash installation:
+If you are running Logstash 2.0 or earlier, you might not have the latest version of the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin].
+You can easily update to the latest version of the input plugin from your Logstash installation:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
