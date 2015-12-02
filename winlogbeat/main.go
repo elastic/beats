@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/elastic/libbeat/beat"
-	winlogbeat "github.com/elastic/winlogbeat/beat"
+	"github.com/elastic/beats/libbeat/beat"
+	winlogbeat "github.com/elastic/beats/winlogbeat/beat"
 )
 
 // Version of Winlogbeat.

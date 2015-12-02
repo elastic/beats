@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/tsg/gopacket/layers"
 )
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestBulk(t *testing.T) {
@@ -20,14 +20,14 @@ func TestBulk(t *testing.T) {
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"index": map[string]interface{}{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
 			},
 		},
-		map[string]interface{}{
+		{
 			"field1": "value1",
 		},
 	}
@@ -99,41 +99,41 @@ func TestBulkMoreOperations(t *testing.T) {
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
-		map[string]interface{}{
+		{
 			"index": map[string]interface{}{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "1",
 			},
 		},
-		map[string]interface{}{
+		{
 			"field1": "value1",
 		},
-		map[string]interface{}{
+		{
 			"delete": map[string]interface{}{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "2",
 			},
 		},
-		map[string]interface{}{
+		{
 			"create": map[string]interface{}{
 				"_index": index,
 				"_type":  "type1",
 				"_id":    "3",
 			},
 		},
-		map[string]interface{}{
+		{
 			"field1": "value3",
 		},
-		map[string]interface{}{
+		{
 			"update": map[string]interface{}{
 				"_id":    "1",
 				"_index": index,
 				"_type":  "type1",
 			},
 		},
-		map[string]interface{}{
+		{
 			"doc": map[string]interface{}{
 				"field2": "value2",
 			},

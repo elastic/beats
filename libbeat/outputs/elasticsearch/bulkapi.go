@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // MetaBuilder creates meta data for bulk requests

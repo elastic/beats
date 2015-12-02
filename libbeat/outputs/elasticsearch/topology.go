@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
 type topology struct {

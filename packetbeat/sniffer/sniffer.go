@@ -8,14 +8,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/decoder"
-	"github.com/elastic/packetbeat/protos"
-	"github.com/elastic/packetbeat/protos/icmp"
-	"github.com/elastic/packetbeat/protos/tcp"
-	"github.com/elastic/packetbeat/protos/udp"
+	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/decoder"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/icmp"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/protos/udp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"

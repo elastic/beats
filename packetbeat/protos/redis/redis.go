@@ -4,15 +4,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 
-	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/procs"
-	"github.com/elastic/packetbeat/protos"
-	"github.com/elastic/packetbeat/protos/applayer"
-	"github.com/elastic/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/procs"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 type stream struct {

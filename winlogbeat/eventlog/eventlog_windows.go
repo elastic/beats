@@ -13,7 +13,7 @@ import (
 	"unicode/utf16"
 	"unsafe"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 )

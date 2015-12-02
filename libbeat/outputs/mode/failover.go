@@ -5,9 +5,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // FailOverConnectionMode connects to at most one host by random and swap to

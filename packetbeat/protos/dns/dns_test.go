@@ -24,11 +24,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
 )
@@ -361,7 +361,7 @@ func TestExpireTransaction(t *testing.T) {
 	trans := newTransaction(time.Now(), DnsTuple{}, common.CmdlineTuple{})
 	trans.Request = &DnsMessage{
 		Data: &layers.DNS{
-			Questions: []layers.DNSQuestion{layers.DNSQuestion{}},
+			Questions: []layers.DNSQuestion{{}},
 		},
 	}
 	dns.expireTransaction(trans)

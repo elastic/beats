@@ -5,10 +5,10 @@ import (
 	"net"
 	"testing"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -203,7 +203,7 @@ func TestReconstructQuery(t *testing.T) {
 		Output string
 	}
 	tests := []io{
-		io{
+		{
 			Input: transaction{
 				resource: "test.col",
 				method:   "find",
@@ -218,7 +218,7 @@ func TestReconstructQuery(t *testing.T) {
 			Full:   true,
 			Output: `test.col.find({"me":"you"}).skip(3).limit(2)`,
 		},
-		io{
+		{
 			Input: transaction{
 				resource: "test.col",
 				method:   "insert",
@@ -229,7 +229,7 @@ func TestReconstructQuery(t *testing.T) {
 			Full:   true,
 			Output: `test.col.insert({"documents":"you"})`,
 		},
-		io{
+		{
 			Input: transaction{
 				resource: "test.col",
 				method:   "insert",

@@ -14,19 +14,19 @@ func TestBytes_Ntohs(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  []byte{0, 1},
 			Output: 1,
 		},
-		io{
+		{
 			Input:  []byte{1, 0},
 			Output: 256,
 		},
-		io{
+		{
 			Input:  []byte{1, 2},
 			Output: 258,
 		},
-		io{
+		{
 			Input:  []byte{2, 3},
 			Output: 515,
 		},
@@ -44,23 +44,23 @@ func TestBytes_Ntohl(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  []byte{0, 0, 0, 1},
 			Output: 1,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 1, 0},
 			Output: 256,
 		},
-		io{
+		{
 			Input:  []byte{0, 1, 0, 0},
 			Output: 1 << 16,
 		},
-		io{
+		{
 			Input:  []byte{1, 0, 0, 0},
 			Output: 1 << 24,
 		},
-		io{
+		{
 			Input:  []byte{1, 0, 15, 0},
 			Output: 0x01000f00,
 		},
@@ -78,23 +78,23 @@ func TestBytes_Htohl(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  []byte{0, 0, 0, 1},
 			Output: 1 << 24,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 1, 0},
 			Output: 1 << 16,
 		},
-		io{
+		{
 			Input:  []byte{0, 1, 0, 0},
 			Output: 256,
 		},
-		io{
+		{
 			Input:  []byte{1, 0, 0, 0},
 			Output: 1,
 		},
-		io{
+		{
 			Input:  []byte{1, 0, 15, 0},
 			Output: 0x000f0001,
 		},
@@ -112,39 +112,39 @@ func TestBytes_Ntohll(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  []byte{0, 0, 0, 0, 0, 0, 0, 1},
 			Output: 1,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 0, 0, 0, 0, 1, 0},
 			Output: 256,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 0, 0, 0, 1, 0, 0},
 			Output: 1 << 16,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 0, 0, 1, 0, 0, 0},
 			Output: 1 << 24,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 0, 1, 0, 0, 0, 0},
 			Output: 1 << 32,
 		},
-		io{
+		{
 			Input:  []byte{0, 0, 1, 0, 0, 0, 0, 0},
 			Output: 1 << 40,
 		},
-		io{
+		{
 			Input:  []byte{0, 1, 0, 0, 0, 0, 0, 0},
 			Output: 1 << 48,
 		},
-		io{
+		{
 			Input:  []byte{1, 0, 0, 0, 0, 0, 0, 0},
 			Output: 1 << 56,
 		},
-		io{
+		{
 			Input:  []byte{0, 1, 0, 0, 1, 0, 15, 0},
 			Output: 0x0001000001000f00,
 		},
@@ -162,15 +162,15 @@ func TestIpv4_Ntoa(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  0x7f000001,
 			Output: "127.0.0.1",
 		},
-		io{
+		{
 			Input:  0xc0a80101,
 			Output: "192.168.1.1",
 		},
-		io{
+		{
 			Input:  0,
 			Output: "0.0.0.0",
 		},
@@ -189,22 +189,22 @@ func TestReadString(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input:  []byte{'a', 'b', 'c', 0, 'd', 'e', 'f'},
 			Output: "abc",
 			Err:    nil,
 		},
-		io{
+		{
 			Input:  []byte{0},
 			Output: "",
 			Err:    nil,
 		},
-		io{
+		{
 			Input:  []byte{'a', 'b', 'c'},
 			Output: "",
 			Err:    errors.New("No string found"),
 		},
-		io{
+		{
 			Input:  []byte{},
 			Output: "",
 			Err:    errors.New("No string found"),

@@ -12,8 +12,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 type textCommandType struct {
@@ -565,7 +565,7 @@ func parseKeyArg(buf *streambuf.Buffer) ([]memcacheString, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []memcacheString{memcacheString{str}}, nil
+	return []memcacheString{{str}}, nil
 }
 
 func parseNoReplyArg(buf *streambuf.Buffer) (bool, error) {

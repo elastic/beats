@@ -12,7 +12,7 @@ import (
 
 	"io/ioutil"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/yaml.v2"
 )
 

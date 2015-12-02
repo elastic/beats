@@ -5,8 +5,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 
 	"labix.org/v2/mgo/bson"
 )

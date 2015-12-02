@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	elog "github.com/andrewkroh/sys/windows/svc/eventlog"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 )

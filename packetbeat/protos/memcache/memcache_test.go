@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/libbeat/common"
+	"github.com/elastic/beats/libbeat/common"
 
-	"github.com/elastic/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/config"
 )
 
 type memcacheTest struct {

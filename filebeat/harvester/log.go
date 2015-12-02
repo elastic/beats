@@ -9,10 +9,10 @@ import (
 
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/filebeat/config"
-	"github.com/elastic/filebeat/harvester/encoding"
-	"github.com/elastic/filebeat/input"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func NewHarvester(

@@ -7,29 +7,29 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/common/droppriv"
-	"github.com/elastic/libbeat/filters"
-	"github.com/elastic/libbeat/filters/nop"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/service"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common/droppriv"
+	"github.com/elastic/beats/libbeat/filters"
+	"github.com/elastic/beats/libbeat/filters/nop"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/service"
 
-	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/procs"
-	"github.com/elastic/packetbeat/protos"
-	"github.com/elastic/packetbeat/protos/dns"
-	"github.com/elastic/packetbeat/protos/http"
-	"github.com/elastic/packetbeat/protos/icmp"
-	"github.com/elastic/packetbeat/protos/memcache"
-	"github.com/elastic/packetbeat/protos/mongodb"
-	"github.com/elastic/packetbeat/protos/mysql"
-	"github.com/elastic/packetbeat/protos/pgsql"
-	"github.com/elastic/packetbeat/protos/redis"
-	"github.com/elastic/packetbeat/protos/tcp"
-	"github.com/elastic/packetbeat/protos/thrift"
-	"github.com/elastic/packetbeat/protos/udp"
-	"github.com/elastic/packetbeat/sniffer"
+	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/procs"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/dns"
+	"github.com/elastic/beats/packetbeat/protos/http"
+	"github.com/elastic/beats/packetbeat/protos/icmp"
+	"github.com/elastic/beats/packetbeat/protos/memcache"
+	"github.com/elastic/beats/packetbeat/protos/mongodb"
+	"github.com/elastic/beats/packetbeat/protos/mysql"
+	"github.com/elastic/beats/packetbeat/protos/pgsql"
+	"github.com/elastic/beats/packetbeat/protos/redis"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/protos/thrift"
+	"github.com/elastic/beats/packetbeat/protos/udp"
+	"github.com/elastic/beats/packetbeat/sniffer"
 )
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
@@ -231,7 +231,7 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	logp.Debug("main", "Waiting for the sniffer to finish")
 
 	// Wait for the goroutines to finish
-	for _ = range pb.over {
+	for range pb.over {
 		if !pb.Sniff.IsAlive() {
 			break
 		}

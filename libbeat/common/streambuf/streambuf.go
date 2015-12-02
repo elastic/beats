@@ -16,7 +16,7 @@
 package streambuf
 
 import (
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 
 	"bytes"
 	"errors"

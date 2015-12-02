@@ -1,8 +1,8 @@
 package harvester
 
 import (
-	"github.com/elastic/filebeat/harvester/encoding"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/libbeat/logp"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func lineEndingChars(line []byte) int {
 
 // readLine reads a full line into buffer and returns it.
 // In case of partial lines, readLine does return and error and en empty string
-// This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
+// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
 func readLine(
 	reader *encoding.LineReader,
 	lastReadTime *time.Time,
