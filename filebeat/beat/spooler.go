@@ -3,9 +3,9 @@ package beat
 import (
 	"time"
 
-	cfg "github.com/elastic/filebeat/config"
-	"github.com/elastic/filebeat/input"
-	"github.com/elastic/libbeat/logp"
+	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Spooler struct {

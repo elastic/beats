@@ -1,8 +1,8 @@
 package main
 
 import (
-	filebeat "github.com/elastic/filebeat/beat"
-	"github.com/elastic/libbeat/beat"
+	filebeat "github.com/elastic/beats/filebeat/beat"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 var Version = "1.0.0"

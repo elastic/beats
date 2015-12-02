@@ -3,7 +3,7 @@ package mock
 import (
 	"fmt"
 
-	"github.com/elastic/libbeat/beat"
+	"github.com/elastic/beats/libbeat/beat"
 )
 
 ///*** Mock Beat Setup ***///

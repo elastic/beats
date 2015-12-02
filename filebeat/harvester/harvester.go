@@ -18,9 +18,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/filebeat/config"
-	"github.com/elastic/filebeat/harvester/encoding"
-	"github.com/elastic/filebeat/input"
+	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 type Harvester struct {

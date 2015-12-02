@@ -94,20 +94,20 @@ func Test_extract_documents(t *testing.T) {
 		Output []interface{}
 	}
 	tests := []io{
-		io{
+		{
 			Input: map[string]interface{}{
 				"a":         1,
 				"documents": []interface{}{"a", "b", "c"},
 			},
 			Output: []interface{}{"a", "b", "c"},
 		},
-		io{
+		{
 			Input: map[string]interface{}{
 				"a": 1,
 			},
 			Output: []interface{}{},
 		},
-		io{
+		{
 			Input: map[string]interface{}{
 				"a":         1,
 				"documents": 1,
@@ -129,17 +129,17 @@ func Test_isDatabaseCommand(t *testing.T) {
 		Output bool
 	}
 	tests := []io{
-		io{
+		{
 			Key:    "listCollections",
 			Value:  float64(1),
 			Output: true,
 		},
-		io{
+		{
 			Key:    "listcollections",
 			Value:  float64(1),
 			Output: true,
 		},
-		io{
+		{
 			Key:    "findandmodify",
 			Value:  "restaurants",
 			Output: true,

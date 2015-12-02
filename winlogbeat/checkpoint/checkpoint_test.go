@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/winlogbeat/checkpoint"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/stretchr/testify/assert"
 )
 

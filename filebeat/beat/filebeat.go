@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 
-	cfg "github.com/elastic/filebeat/config"
-	. "github.com/elastic/filebeat/crawler"
-	. "github.com/elastic/filebeat/input"
+	cfg "github.com/elastic/beats/filebeat/config"
+	. "github.com/elastic/beats/filebeat/crawler"
+	. "github.com/elastic/beats/filebeat/input"
 )
 
 // Beater object. Contains all objects needed to run the beat

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
 )
 

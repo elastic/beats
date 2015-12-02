@@ -7,17 +7,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
-	_ "github.com/elastic/libbeat/outputs/console"
-	_ "github.com/elastic/libbeat/outputs/elasticsearch"
-	_ "github.com/elastic/libbeat/outputs/fileout"
-	_ "github.com/elastic/libbeat/outputs/logstash"
-	_ "github.com/elastic/libbeat/outputs/redis"
+	_ "github.com/elastic/beats/libbeat/outputs/console"
+	_ "github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	_ "github.com/elastic/beats/libbeat/outputs/fileout"
+	_ "github.com/elastic/beats/libbeat/outputs/logstash"
+	_ "github.com/elastic/beats/libbeat/outputs/redis"
 )
 
 // command line flags
@@ -136,7 +136,7 @@ func (publisher *PublisherType) Client() Client {
 }
 
 func (publisher *PublisherType) UpdateTopologyPeriodically() {
-	for _ = range publisher.RefreshTopologyTimer {
+	for range publisher.RefreshTopologyTimer {
 		_ = publisher.PublishTopology() // ignore errors
 	}
 }

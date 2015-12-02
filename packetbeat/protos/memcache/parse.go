@@ -5,7 +5,7 @@ package memcache
 import (
 	"time"
 
-	"github.com/elastic/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 const (

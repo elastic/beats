@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/outputs"
-	"github.com/elastic/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -480,7 +480,7 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 
 	ts := time.Now()
 	events := []common.MapStr{
-		common.MapStr{
+		{
 			"@timestamp": common.Time(ts),
 			"host":       "test-host",
 			"type":       "log",
