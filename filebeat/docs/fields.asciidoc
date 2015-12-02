@@ -1,0 +1,101 @@
+
+////
+This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+== Exported Fields
+
+This document describes the fields that are exported by Filebeat. They are
+grouped in the following categories:
+
+* <<exported-fields-env>>
+* <<exported-fields-log>>
+
+[[exported-fields-env]]
+=== Common Fields
+
+Contains common fields available in all event types.
+
+
+
+==== beat.name
+
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
+
+
+==== type
+
+required: True
+
+The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+
+
+==== input_type
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+
+
+[[exported-fields-log]]
+=== Log File Content Fields
+
+Contains log file lines.
+
+
+
+==== source
+
+type: string
+
+required: True
+
+The file from which the line was read. This field contains the full path to the file. For example: `/var/log/system.log`.
+
+
+==== offset
+
+type: long
+
+required: False
+
+The file offset the reported line starts at.
+
+
+==== message
+
+type: string
+
+required: True
+
+The content of the line read from the log file.
+
+
+==== fields
+
+type: dict
+
+required: False
+
+Contains user configurable fields.
+
+

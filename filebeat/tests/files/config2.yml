@@ -1,0 +1,8 @@
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/*.log
+      input: log
+
+  spool_size:
