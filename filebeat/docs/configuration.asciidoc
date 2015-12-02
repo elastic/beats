@@ -65,6 +65,36 @@ One of the following input types:
 
 The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
 
+===== exclude_lines
+
+A list of regular expressions to match the lines that are dropped. It drops the lines that are matching any regular
+expression from the list. By default, no lines are dropped.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+exclude_lines: ["^DBG"]
+-------------------------------------------------------------------------------------
+To exclude the lines starting with "DBG".
+
+===== include_lines
+
+A list of regular expressions to match the lines that are exported. It exports only the lines that are matching any regular expression from the list. By default, all lines are exported.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+include_lines: ["^ERR", "^WARN"]
+-------------------------------------------------------------------------------------
+To include only the lines starting with "ERR" or "WARN".
+
+Note::
+If both `include_lines` and `exclude_lines` are defined, then include_lines is called first. To export all the apache logs except the DBGs, then you can use:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+ include_lines: ["apache"]
+ exclude_lines: ["^DBG"]
+-------------------------------------------------------------------------------------
+
 [[configuration-fields]]
 ===== fields
 
