@@ -323,6 +323,15 @@ An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
 the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
 the API under a custom prefix.
 
+===== proxy_url
+
+The URL of the proxy to use when connecting to the Elasticsearch servers. The
+value may be either a complete URL or a "host[:port]", in which case the "http"
+scheme is assumed. If a value is not specified through the configuration file
+then proxy environment variables are used. See the
+https://golang.org/pkg/net/http/#ProxyFromEnvironment[golang documentation]
+for more information about the environment variables.
+
 ===== index
 
 The index root name to write events to. The default is the Beat name.
