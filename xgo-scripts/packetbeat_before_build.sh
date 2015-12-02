@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PB_PATH=/go/src/github.com/tsg/beats-onerepo/
+PB_PATH=/go/src/github.com/elastic/beats/
 
 if [ -d $PB_PATH ]; then
 	cd $PB_PATH
