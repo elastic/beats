@@ -1,0 +1,46 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+winlogbeat
+*.o
+*.a
+*.so
+*.swp
+*.swo
+*.pyc
+
+# Folders
+_obj
+_test
+coverage
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
+*.test
+*.prof
+*.out
+*.log
+*.bak
+*.winlogbeat.yaml
+etc/*.dev.yml
+
+cover/
+/tests/system/env/
+/tests/system/run/
+/tests/system/last_run
+profile.cov
+.idea
+.DS_Store
+/docs/html_docs
+.vagrant
+
+build/

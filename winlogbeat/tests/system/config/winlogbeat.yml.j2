@@ -1,0 +1,49 @@
+###############################################################################
+############################# Winlogbeat ######################################
+winlogbeat:
+  {% if ignore_older %}
+  ignore_older: {{ignore_older}}
+  {% endif %}
+
+  {% if event_logs %}
+  event_logs:
+    {% for log in event_logs %}
+    - name: {{ log.name }}
+      {% if log.ignore_older %}
+      ignore_older: {{ log.ignore_older }}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
+
+############################# Output ##########################################
+
+output:
+  file:
+    path: {{ output_file_path | default(winlogbeat.working_dir + "/output") }}
+    {% if output_file_filename %}
+    filename: "{{ output_file_filename }}"
+    {% endif %}
+    rotate_every_kb: 1000
+
+############################# Shipper #########################################
+
+shipper:
+ {% if shipper_name %}
+ name: {{ shipper_name }}
+ {% endif %}
+
+ {% if tags %}
+ tags: [
+    {%- if agent_tags -%}
+        {%- for tag in agent_tags -%}
+            "{{ tag }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif -%}]
+ {% endif %}
+
+# vim: set ft=jinja:
