@@ -1,0 +1,222 @@
+
+[[filebeat-configuration-details]]
+== Configuration Options
+
+Before modifying configuration settings, make sure you've read <<filebeat-configuration>>.
+
+The Filebeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The file contains config options common to all Beats. These options are described
+in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
+
+* {libbeat}/configuration.html#configuration-shipper[Shipper]
+* {libbeat}/configuration.html#configuration-output[Output]
+* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
+* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
+
+The Filebeat config options are described here:
+
+* <<configuration-filebeat-options>>
+
+[[configuration-filebeat-options]]
+=== Filebeat
+
+The `filebeat` section specifies a list of `prospectors` that Filebeat
+uses to locate and process log files. Each prospector item begins with a dash (-)
+and specifies prospector-specific configuration options, including
+the list of paths that are crawled to locate log files.
+
+Here is a sample configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+    # Each - is a prospector. Below are the prospector specific configurations
+    -
+      # Paths that should be crawled and fetched. Glob based paths.
+      # For each file found under this path, a harvester is started.
+      paths:
+        - "/var/log/apache/httpd-*.log"
+      # Type to be published in the 'type' field. For Elasticsearch output,
+      # the type defines the document type these entries should be stored
+      # in. Default: log
+      document_type: apache
+    -
+      paths:
+        - /var/log/messages
+        - "/var/log/*.log"
+
+-------------------------------------------------------------------------------------
+
+==== Options
+
+===== paths
+
+A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
+each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+
+===== input_type
+
+One of the following input types:
+
+    * log: Reads every line of the log file (default)
+    * stdin: Reads the standard in
+
+The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
+
+[[configuration-fields]]
+===== fields
+
+Optional fields that you can specify to add additional information to the output. For
+example, you might add fields that you can use for filtering log data. By default,
+the fields that you specify here will be grouped under a `fields` sub-dictionary in the output document. To store the custom fields as top-level fields, set the `fields_under_root` option to true.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+fields:
+    level: debug
+    review: 1
+
+-------------------------------------------------------------------------------------
+[[fields-under-root]]
+===== fields_under_root
+
+If this option is set to true, the custom <<configuration-fields>> are stored as top-level fields
+in the output document instead of being grouped under a `fields` sub-dictionary.
+If the custom field names conflict with other field names added by Filebeat, the custom fields overwrite the other fields.
+
+===== ignore_older
+
+If this option is specified, Filebeat
+ignores any files that were modified before the specified timespan.
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 24h.
+
+
+===== scan_frequency
+
+How often the prospector checks for new files in the
+paths that are specified for harvesting. For example, if you specify a glob like
+`/var/log/*`, the directory is scanned for files using the frequency specified by
+`scan_frequency`. If you specify 0s, the directory is scanned as frequently as
+possible. We recommend that you do not specify 0. The default setting is 10s.
+
+===== document_type
+
+The event type to use for published lines read by harvesters. For Elasticsearch
+output, the value that you specify here is used to set the `type` field in the output
+document. The default value is `log`.
+
+===== harvester_buffer_size
+
+The buffer size every harvester uses when fetching the file. The default is 16384.
+
+
+===== tail_files
+
+If this option is set to true, Filebeat starts reading new files at the end of each file instead of the beginning. When this option is used in combination with log rotation, it's possible that the first log entries in a new file might be skipped. The default setting is false.
+
+NOTE: You can use this setting to avoid indexing old log lines when you run Filebeat on a set of log files for the first time. After the first run, we recommend disabling this option, or you risk losing lines during file rotation.
+
+===== backoff
+
+The backoff options specify how aggressively Filebeat crawls new files for updates.
+You can use the default values in most cases.
+
+The `backoff` option defines how long Filebeat
+waits before checking a file again after EOF is reached. The default is 1s, which means
+the file is checked every second if new lines were added. This enables near real-time crawling. Every time a new line appears in the file, the `backoff` value is reset to the initial
+value. The default is 1s.
+
+===== max_backoff
+
+The maximum time for Filebeat to wait before checking a file again after EOF is
+reached. After having backed off multiple times from checking the file, the wait time
+will never exceed `max_backoff` regardless of what is specified for  `backoff_factor`.
+Because it takes a maximum of 10s to read a new line, specifying 10s for `max_backoff` means that, at the worst, a new line could be added to the log file if Filebeat has
+backed off multiple times. The default is 10s.
+
+===== backoff_factor
+
+This option specifies how fast the waiting time is increased. The bigger the
+backoff factor, the faster the `max_backoff` value is reached. The backoff factor
+increments exponentially. The minimum value allowed is 1. If this value is set to 1,
+the backoff algorithm is disabled, and the `backoff` value is used for waiting for new
+lines. The `backoff` value will be multiplied each time with the `backoff_factor` until
+`max_backoff` is reached. The default is 2.
+
+===== partial_line_waiting
+
+Sometimes Filebeat checks a line before it's completely written. This option specifies
+how long the harvester waits for the system to complete a line before skipping that line. The default is 5s.
+
+===== force_close_files
+
+By default, Filebeat keeps the files that it’s reading open until the timespan specified by `ignore_older` has elapsed. This behaviour can cause issues when a file is removed. Because the file isn't fully removed until Filebeat closes the file, no new file with the same name can be created during this time.
+
+You can force Filebeat to close the file as soon as the file name changes by setting the `force_close_windows_files` option to true. This option is supported on Windows only. The default is false.
+
+Turning on this option can lead to loss of data on rotated files. After file rotation, the beginning of the new file might be skipped because the reading starts at the end of the file. We recommend that you leave this option set to false, and instead specify a lower value for the `ignore_older` option to release files faster.
+
+===== spool_size
+
+The event count spool threshold. This setting forces a network flush if the specified
+value is exceeded.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  spool_size: 1024
+-------------------------------------------------------------------------------------
+
+
+===== idle_timeout
+
+A duration string that specifies how often the spooler is flushed. After the
+`idle_timeout` is reached, the spooler is flushed even if the `spool_size` has not been reached.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  idle_timeout: 5s
+-------------------------------------------------------------------------------------
+
+
+===== registry_file
+
+The name of the registry file. By default, the registry file is put in the current
+working directory. If the working directory changes for subsequent runs of Filebeat, indexing starts from the beginning again.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  registry_file: .filebeat
+-------------------------------------------------------------------------------------
+
+
+===== config_dir
+
+The full Path to the directory that contains additional prospector configuration files.
+Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
+config hierarchy even though only the prospector part of the file is processed. All global
+options, such as `spool_size`, are ignored.
+
+The `config_dir` option MUST point to a directory other than the directory where the  main Filebeat config file resides.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  config_dir: path/to/configs
+-------------------------------------------------------------------------------------
+
+===== encoding
+
+The file encoding to use for reading files that contain international characters.
+See the encoding names http://www.w3.org/TR/encoding/[recommended by the W3C for use in HTML5].
+
+Here are some sample encodings from W3C recommendation:
+
+    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hz-gb-2312,
+    * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
+
+The `plain` encoding is special, because it does not validate or transform any input.

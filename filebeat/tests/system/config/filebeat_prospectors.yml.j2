@@ -1,0 +1,20 @@
+filebeat:
+  prospectors:
+  {% for prospector in prospectors %}
+    -
+      paths:
+        - {{prospector.path}}
+      input: log
+      scan_frequency: 0.5s
+      encoding: {{prospector.encoding | default("plain") }}
+  {% endfor %}
+  idle_timeout: 0.5s
+  registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
+
+output:
+  file:
+    enabled: true
+    path: {{ output_file_path|default(fb.working_dir + "/output") }}
+    filename: "{{ output_file_filename|default("filebeat") }}"
+    rotate_every_kb: 1000
+    #number_of_files: 7
