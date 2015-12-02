@@ -13,7 +13,7 @@ filebeat:
       # Make sure not file is defined twice as this can lead to unexpected behaviour.
       paths:
         - /var/log/*.log
-      # - c:\programdata\elasticsearch\logs\*
+        #- c:\programdata\elasticsearch\logs\*
 
       # Configure the file encoding for reading files with international characters
       # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
@@ -92,22 +92,10 @@ filebeat:
       # but lower the ignore_older value to release files faster.
       #force_close_files: false
 
+    # Additional prospector
     #-
-    #  paths:
-    #    - /var/log/apache/*.log
-    #  type: log
-    #
-    #  # Ignore files which are older then 24 hours
-    #  ignore_older: 24h
-    #
-    #  # Additional fields which can be freely defined
-    #  fields:
-    #    type: apache
-    #    server: localhost
-    #-
-    #  type: stdin
-    #  paths:
-    #    - "-"
+      # Configuration to use stdin input
+      #input_type: stdin
 
   # General filebeat configuration options
   #
@@ -128,5 +116,4 @@ filebeat:
   # the prospector part is processed. All global options like spool_size are ignored.
   # The config_dir MUST point to a different directory then where the main filebeat config file is in.
   #config_dir:
-
 
