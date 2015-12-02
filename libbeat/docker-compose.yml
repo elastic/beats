@@ -1,0 +1,35 @@
+libbeat:
+  build: .
+  links:
+    - redis
+    - elasticsearch-173
+    - elasticsearch-210
+    - logstash
+  environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - LS_HOST=logstash
+    - LS_TCP_PORT=5044
+    - LS_TLS_PORT=5055
+  env_file:
+    - build/test.env
+elasticsearch-173:
+  image: elasticsearch:1.7.3
+#elasticsearch-201:
+#  image: elasticsearch:2.0.1
+#  command: elasticsearch -Des.network.host=0.0.0.0
+elasticsearch-210:
+  command: elasticsearch -Des.network.host=0.0.0.0
+  build: scripts/docker/elasticsearch
+  dockerfile: Dockerfile-2.1.0
+redis:
+  image: redis
+# This host name is fixed because of the certificate
+logstash:
+  build: scripts/docker/logstash
+  dockerfile: Dockerfile-21
+  env_file:
+    - build/test.env
+  links:
+    - elasticsearch-173
+    - elasticsearch-210

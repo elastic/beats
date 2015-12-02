@@ -1,0 +1,900 @@
+[[configuration]]
+== Configuration Options
+
+The Beats configuration file uses http://yaml.org/[YAML] for its syntax. The
+file contains config options common to all Beats as well as Beat-specific
+options. This document describes the sections of the config file that are common
+to all Beats:
+
+* <<configuration-shipper>>
+* <<configuration-output>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
+
+For information about Beat-specific sections, see the documentation for your Beat.
+
+[[configuration-shipper]]
+=== Shipper
+
+The shipper section contains configuration options for the Beat and some
+general settings that control its behaviour.
+
+Here is an example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  #name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  tags: ["service-X", "web-tier"]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  ignore_outgoing: true
+
+  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # The default is 10 seconds.
+  refresh_topology_freq: 10
+
+  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # All the IPs will be deleted afterwards. Note, that the value must be higher than
+  # refresh_topology_freq. The default is 15 seconds.
+  topology_expire: 15
+
+  # Configure local GeoIP database support.
+  # If no paths are not configured geoip is disabled.
+  #geoip:
+    #paths:
+    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
+    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
+------------------------------------------------------------------------------
+
+==== Options
+
+===== name
+
+The name of the Beat. If this option is empty, the `hostname` of the server is
+used. The name is included as the `shipper` field in each published transaction. You can
+use the name to group all transactions sent by a single Beat.
+
+At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information
+is stored in Elasticsearch as a network topology map that maps the IP and port
+of each Beat to the name that you specify here.
+
+When a Beat receives a new request and response (called a transaction), the Beat can query
+Elasticsearch to see if the network topology includes the IP and port of the source
+and destination servers. If this information is available, the `client_server` field in the
+output is set to the name of the Beat running on the source server, and the `server` field is set to the
+name of the Beat running on the destination server.
+
+To use the topology map in Elasticsearch, you must set <<save_topology>>
+to true and enable Elasticsearch as output.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  name: "my-shipper"
+------------------------------------------------------------------------------
+
+===== tags
+
+A list of tags that the Beat includes in the `tags` field of each published
+transaction. Tags make it easy to group servers by different logical properties.
+For example, if you have a cluster of web servers, you can add the "webservers" tag
+to the Beat on each server, and then use filters and queries in the
+Kibana web interface to get visualisations for the whole group of servers.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  tags: ["my-service", "hardware", "test"]
+------------------------------------------------------------------------------
+
+===== ignore_outgoing
+
+If the `ignore_outgoing` option is enabled, the Beat ignores all the
+transactions initiated from the server running the Beat.
+
+This is useful when two Beats publish the same transactions. Because one Beat
+sees the transaction in its outgoing queue and the other sees it in its incoming
+queue, you can end up with duplicate transactions. To remove the duplicates, you
+can enable the `ignore_outgoing` option on one of the servers.
+
+For example, in the following scenario, you see a 3-server architecture
+where a Beat is installed on each server. t1 is the transaction exchanged between
+Server1 and Server2, and t2 is the transaction between Server2 and Server3.
+
+image:./images/option_ignore_outgoing.png[Beats Architecture]
+
+By default, each transaction is indexed twice because Beat2
+sees both transactions. So you would see the following published transactions
+(when `ignore_outgoing` is false):
+
+ - Beat1: t1
+ - Beat2: t1 and t2
+ - Beat3: t2
+
+To avoid duplicates, you can force your Beats to send only the incoming
+transactions and ignore the transactions created by the local server. So you would
+see the following published transactions (when `ignore_outgoing` is true):
+
+ - Beat1: none
+ - Beat2: t1
+ - Beat3: t2
+
+===== refresh_topology_freq
+
+The refresh interval of the topology map in
+seconds. In other words, this setting specifies how often each Beat publishes its
+IP addresses to the topology map. The default is 10 seconds.
+
+===== topology_expire
+
+The expiration time for the topology in seconds. This is
+useful in case a Beat stops publishing its IP addresses. The IP addresses
+are removed automatically from the topology map after expiration. The default
+is 15 seconds.
+
+===== geoip.paths
+
+The paths to search for GeoIP databases. The Beat loads the first installed GeoIP database
+that if finds. Then, for each transaction, the Beat exports the GeoIP location of the client.
+
+The recommended values for geoip.paths are `/usr/share/GeoIP/GeoLiteCity.dat`
+and `/usr/local/var/GeoIP/GeoLiteCity.dat`.
+
+This configuration option is currently used by Packetbeat only.
+
+*Important*: For GeoIP support to function correctly, the
+https://dev.maxmind.com/geoip/legacy/geolite/[GeoLite City database] is required.
+
+
+[[configuration-output]]
+=== Output
+
+You can configure multiple outputs for exporting the correlated transactions. Currently the following output types are supported:
+
+* Elasticsearch
+* Logstash
+* Redis (DEPRECATED)
+* File
+* Console
+
+You can enable one or multiple outputs at a time. The output plugins are
+responsible for sending the transaction data in JSON format to the next step in
+the pipeline. They are also responsible for maintaining the
+network topology.
+
+==== Elasticsearch Output
+
+When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["http://localhost:9200"]
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # Optional index name. The default is packetbeat and generates
+    # [packetbeat-]YYYY.MM.DD keys.
+    index: "packetbeat"
+
+    # List of root certificates for HTTPS server verifications
+    cas: ["/etc/pki/root/ca.pem"]
+
+    # TLS configuration.
+    tls:
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      certificatekey: "/etc/pki/client/cert.key"
+
+------------------------------------------------------------------------------
+
+To enable SSL, just add `https` to all URLs defined under __hosts__.
+
+[source,yaml]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["https://localhost:9200"]
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
+If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
+
+[source,yaml]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["localhost"]
+
+    # Optional http or https. Default is http
+    protocol: "https"
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    save_topology: true
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
+
+[[hosts-option]]
+===== hosts
+
+The list of Elasticsearch nodes to connect to. The events are distributed to
+these nodes in round robin order. If one node becomes unreachable, the event is
+automatically sent to another node. Each Elasticsearch node can be defined as a `URL` or `IP:PORT`.
+For example: `http://192.15.3.2`, `https://es.found.io:9230` or `192.24.3.2:9300`.
+If no port is specified, `9200` is used.
+
+NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken from the
+<<protocol-option>> and <<path-option>> config options.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
+
+    # Optional http or https. Default is http
+    protocol: https
+
+    # HTTP Path at which each Elasticsearch server lives
+    path: /elasticsearch
+------------------------------------------------------------------------------
+
+In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
+`https://10.45.3.1:9230/elasticsearch`.
+
+===== worker
+
+The number of workers per configured host publishing events to Elasticsearch. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
+
+===== host (DEPRECATED)
+
+The host of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
+
+===== port (DEPRECATED)
+
+The port of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
+
+===== username
+
+The basic authentication username for connecting to Elasticsearch.
+
+===== password
+
+The basic authentication password for connecting to Elasticsearch.
+
+[[protocol-option]]
+===== protocol
+
+The name of the protocol Elasticsearch is reachable on. The options are:
+`http` or `https`. The default is `http`. However, if you specify a URL for
+<<hosts-option>>, the value of `protocol` is overridden by whatever scheme you
+specify in the URL.
+
+[[path-option]]
+===== path
+
+An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
+the API under a custom prefix.
+
+===== proxy_url
+
+The URL of the proxy to use when connecting to the Elasticsearch servers. The
+value may be either a complete URL or a "host[:port]", in which case the "http"
+scheme is assumed. If a value is not specified through the configuration file
+then proxy environment variables are used. See the
+https://golang.org/pkg/net/http/#ProxyFromEnvironment[golang documentation]
+for more information about the environment variables.
+
+===== index
+
+The index root name to write events to. The default is the Beat name.
+For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (for example, `packetbeat-2015.04.26`).
+
+===== max_retries
+
+The number of times to try a particular Logstash send attempt. If
+the send operation doesn't succeed after the specified number of retries, the events are
+dropped. The default is 3.
+
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after
+`max_retries`, the Beat is optionally notified.
+
+===== bulk_max_size
+
+The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+The default is 50.
+
+===== timeout
+
+The http request timeout in seconds for the Elasticsearch request. The default is 90.
+
+===== flush_interval
+
+The number of seconds to wait for new events between two bulk API index requests.
+If `bulk_max_size` is reached before this interval expires, additional bulk index
+requests are made.
+
+[[save_topology]]
+===== save_topology
+
+A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
+false. This option is relevant for Packetbeat only.
+
+===== topology_expire
+
+The time to live in seconds for the topology information that is stored in
+Elasticsearch. The default is 15 seconds.
+
+===== tls
+
+Configuration options for TLS parameters like the certificate authority to use
+for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
+Elasticsearch.
+
+See <<configuration-output-tls>> for more information.
+
+
+[[logstash-output]]
+==== Logstash Output
+
+The Logstash output sends the events directly to Logstash by using the lumberjack
+protocol. To use this option, you must <<logstash-setup, install and configure>> the logstash-input-beats
+plugin in Logstash. Logstash allows for additional processing and routing of
+generated events.
+
+Every event sent to Logstash contains additional metadata for indexing and filtering:
+
+[source,json]
+------------------------------------------------------------------------------
+{
+    ...
+    "@metadata": {
+      "beat": "<beat>",
+      "type": "<event type>"
+    }
+}
+------------------------------------------------------------------------------
+
+In Logstash, you can configure the Elasticsearch output plugin to use the
+metadata and event type for indexing.
+
+The following Logstash 1.5 configuration file sets Logstash to use the index and
+document type reported by Beats for indexing events into Elasticsearch.
+The index used will depend on the `@timestamp` field as identified by Logstash.
+
+[source,logstash]
+------------------------------------------------------------------------------
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    host => "localhost"
+    port => "9200"
+    protocol => "http"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Here is the same configuration for Logstash 2.x releases:
+
+[source,logstash]
+------------------------------------------------------------------------------
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Events indexed into Elasticsearch with the Logstash configuration shown here
+will be similar to events directly indexed by Beats into Elasticsearch.
+
+Here is an example of how to configure the Beat to use Logstash:
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["localhost:5044"]
+
+    # index configures '@metadata.beat' field to be used by Logstash for
+    # indexing. By Default the beat name is used (e.g. filebeat, topbeat, packetbeat)
+    index: mybeat
+------------------------------------------------------------------------------
+
+
+[[hosts]]
+===== hosts
+
+The list of known Logstash servers to connect to. All entries in this list can
+contain a port number. If no port number is given, the value specified for <<port>>
+is used as the default port number.
+
+===== worker
+
+The number of workers per configured host publishing events to Logstash. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
+
+[[loadbalance]]
+===== loadbalance
+
+If set to true and multiple Logstash hosts are configured, the output plugin
+load balances published events onto all Logstash hosts. If set to false,
+the output plugin sends all events to only one host (determined at random) and
+will switch to another host if the selected one becomes unresponsive. The default value is false.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["localhost:5044", "localhost:5045"]
+
+    # configure index prefix name
+    index: mybeat
+
+    # configure logstash plugin to loadbalance events between the logstash instances
+    loadbalance: true
+------------------------------------------------------------------------------
+
+[[port]]
+===== port
+
+The default port to use if the port number is not given in <<hosts>>. The default port number
+is 10200.
+
+===== index
+
+The index root name to write events to. The default is the Beat name.
+For example `packetbeat` generates `[packetbeat-]YYYY.MM.DD` indexes (for example, `packetbeat-2015.04.26`).
+
+===== tls
+
+Configuration options for TLS parameters like the root CA for Logstash connections. See
+<<configuration-output-tls>> for more information. If the `tls` section is missing, a TCP-only connection is assumed. Logstash must also be configured to use TCP for
+Logstash input.
+
+===== timeout
+
+The number of seconds to wait for responses from the Logstash server before timing out. The default is 30 (seconds).
+
+===== max_retries
+
+The number of times to try a particular Logstash send attempt. If
+the send operation doesn't succeed after the specified number of retries, the events are
+dropped. The default is 3.
+
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after `max_retries`, the Beat is optionally notified.
+
+
+[[redis-output]]
+==== Redis Output (DEPRECATED)
+
+The Redis output inserts the events in a Redis list. This output plugin is compatible with
+the http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
+so the Redis Output for the Beats is deprecated.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  redis:
+    # Set the host and port where to find Redis.
+    host: "localhost"
+    port: 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # The default is false.
+    save_topology: true
+
+    # Optional index name. The default is packetbeat and generates packetbeat keys.
+    index: "packetbeat"
+
+    # Optional Redis database number where the events are stored
+    # The default is 0.
+    db: 0
+
+    # Optional Redis database number where the topology is stored
+    # The default is 1. It must have a different value than db.
+    db_topology: 1
+
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    # password: ""
+
+    # Optional Redis initial connection timeout in seconds.
+    # The default is 5 seconds.
+    timeout: 5
+
+    # Optional interval for reconnecting to failed Redis connections.
+    # The default is 1 second.
+    reconnect_interval: 1
+------------------------------------------------------------------------------
+
+
+===== host
+
+The host of the Redis server.
+
+===== port
+
+The port of the Redis server.
+
+===== db
+
+The Redis database number where the events are published. The default is 0.
+
+===== db_topology
+
+The Redis database number where the topology information is stored. The default is 1.
+
+===== index
+
+The name of the Redis list where the events are published. The default is
+`packetbeat`.
+
+===== password
+
+The password to authenticate with. The default is no authentication.
+
+===== timeout
+
+The Redis initial connection timeout in seconds. The default is 5 seconds.
+
+===== reconnect_interval
+
+The interval for reconnecting failed Redis connections. The default is 1 second.
+
+==== File Output
+
+The File output dumps the transactions into a file where each transaction is in a JSON format.
+Currently, this output is used for testing, but it can be used as input for
+Logstash.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  file:
+    path: "/tmp/packetbeat"
+    filename: packetbeat
+    rotate_every_kb: 1000
+    number_of_files: 7
+------------------------------------------------------------------------------
+
+[[path]]
+===== path
+
+The path to the directory where the generated files will be saved. This option is
+mandatory.
+
+===== filename
+
+The name of the generated files. The default is set to Beat name. For example, the files
+generated by default for Packetbeat would be `packetbeat`, `packetbeat.1`, `packetbeat.2`, and so on.
+
+===== rotate_every_kb
+
+The maximum size in kilobytes of each file. When this size is reached, the files are
+rotated. The default value is 1000 KB.
+
+===== number_of_files
+
+The maximum number of files to save under <<path>>. When this number of files is reached, the
+oldest file is deleted, and the rest of the files are shifted from last to first. The default
+is 7 files.
+
+==== Console Output
+
+The Console output writes events in JSON format to stdout.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  console:
+    pretty: true
+------------------------------------------------------------------------------
+
+===== pretty
+
+If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+[[configuration-output-tls]]
+
+==== TLS Options
+
+===== certificate_authorities
+
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+
+[[certificate]]
+
+===== certificate: "/etc/pki/client/cert.pem"
+
+The path to the certificate for TLS client authentication. If the certificate
+is not specified, client authentication is not available. The connection
+might fail if the server requests client authentication. If the TLS server does not
+require client authentication, the certificate will be loaded, but not requested or used
+by the server.
+
+When this option is configured, the <<certificate_key>> option is also required.
+
+[[certificate_key]]
+===== certificate_key: "/etc/pki/client/cert.key"
+
+The client certificate key used for client authentication. This option is required if <<certificate>> is specified.
+
+===== min_version
+
+The minimum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+The default value is `1.0`.
+
+===== max_version
+
+The maximum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+The default value is `1.2`.
+
+===== insecure
+
+This option controls whether the client verifies server certificates and host names.
+If insecure is set to true, all server host names and certificates are
+accepted. In this mode, TLS-based connections are susceptible to
+man-in-the-middle attacks. Use this option for testing only.
+
+===== cipher_suites
+
+The list of cipher suites to use. The first entry has the highest priority.
+If this option is omitted, the Go crypto library's default
+suites are used (recommended).
+
+Here is a list of allowed cipher suites and their meanings.
+
+* 3DES:
+  Cipher suites using triple DES
+
+* AES128/256:
+  Cipher suites using AES with 128/256-bit keys.
+
+* CBC:
+  Cipher using Cipher Block Chaining as block cipher mode.
+
+* ECDHE:
+  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
+
+* ECDSA:
+  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
+
+* GCM:
+  Galois/Counter mode is used for symmetric key cryptography.
+
+* RC4:
+  Cipher suites using RC4.
+
+* RSA:
+  Cipher suites using RSA.
+
+* SHA, SHA256, SHA384:
+  Cipher suites using SHA-1, SHA-256 or SHA-384.
+
+The following cipher suites are available:
+
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES128-CBC-SHA
+* RSA-AES256-CBC-SHA
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* ECDHE-ECDSA-AES128-CBC-SHA
+* ECDHE-ECDSA-AES256-CBC-SHA
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-RSA-3DES-CBC3-SHA
+* ECDHE-RSA-AES128-CBC-SHA
+* ECDHE-RSA-AES256-CBC-SHA
+* ECDHE-RSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
+
+===== curve_types
+
+The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
+
+The following elliptic curve types are available:
+
+* P-256
+* P-384
+* P-521
+
+[[configuration-logging]]
+=== Logging (Optional)
+
+The logging section contains options for configuring the Beats logging output.
+The logging system can write logs to syslog or rotate log files. If logging is
+not explicitly configured, file output is used on Windows systems, and syslog
+output is used on Linux and OS X.
+
+[source,yaml]
+------------------------------------------------------------------------------
+logging:
+  level: warning
+
+  # enable file rotation with default configuration
+  to_files: true
+
+  # do not log to syslog
+  to_syslog: false
+
+  files:
+    path: /var/log/mybeat
+    name: mybeat.log
+    keepfiles: 7
+------------------------------------------------------------------------------
+
+In addition to the logging system, the logging output configuration can be
+modified from the <<command-line-options, command line>>.
+
+==== Logging options
+
+===== to_syslog
+
+Sends all logging output to syslog if enabled. For non-Windows systems, the default
+value is true.
+
+===== to_files
+
+Writes all logging output to files subject to file rotation. On Windows systems, the
+default value is true.
+
+===== level
+
+Minimum log level. One of debug, info, warning, error or critical. If debug is
+used, but no selectors are configured, the `*` selector will be used.
+The default log level is error.
+
+===== selectors
+
+The list of debugging-only selector tags used by different Beats components. Use `*`
+to enable debug output for all components. For example add `publish` to display
+all the debug messages related to event publishing. When starting the Beat,
+selectors can be overwritten using the `-d` command line option (`-d` also sets
+the debug log level).
+
+===== files.path
+
+The directory that log files are written to. For Windows
+systems the default path is `C:\\ProgramData\<beat-name>\Logs`. The default for
+non-Windows systems is `/var/log/<beat-name>`.
+
+===== files.name
+
+The name of the file that logs are written to. By default, the name of the Beat
+is used.
+
+===== files.rotateeverybytes
+
+The maximum size of a log file. If the limit is reached, a new log file is generated.
+The default size limit is 10485760 (10 MB).
+
+===== files.keepfiles
+
+The number of most recent rotated log files to keep on disk. Older files are
+deleted during log rotation. The default value is 7. The `keepfiles` options has to be
+in the range of 2 to 1024 files.
+
+==== Logging Format
+
+The logging format is different for each logging type:
+
+* to syslog: Syslog adds the timestamp itself.
+
+* to file: RFC 3339 format is used for the timestamp: `2006-01-02T15:04:05Z07:00 WARN log-message`. The format includes the timezone followed by the logging level.
+
+* to stderr: UTC format is used for the timestamp: `2015/11/12 09:03:37.369262
+geolite.go:52: WARN log-message`. The format includes the UTC timestamp with
+the milliseconds, then the name of the caller that sent the log entry followed
+by the logging level. This option should be used mainly for debugging.
+
+[[configuration-run-options]]
+=== Run Options (Optional)
+
+The Beat can drop privileges after creating the sniffing socket.
+Root access is required for opening the socket, but everything else requires no
+privileges. Therefore, it is recommended that you have the Beat switch users after
+the initialization phase. The `uid` and `gid` settings set the User Id and Group
+Id under which the Beat runs.
+
+WARNING: On Linux, Setuid doesn't change the uid of all threads, so the Go
+         garbage collector will continue to run as root. Also note that process
+         monitoring only works when running as root.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+runoptions:
+  uid=501
+  gid=501
+------------------------------------------------------------------------------
+

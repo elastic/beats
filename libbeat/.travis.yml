@@ -1,0 +1,43 @@
+sudo: required
+services:
+  - docker
+
+language: go
+
+go:
+  - 1.5.1
+
+env:
+  - TARGETS="check"
+  # - TARGETS="testsuite ES_HOST=elasticsearch-173"
+  - TARGETS="testsuite ES_HOST=elasticsearch-210"
+  - TARGETS="crosscompile"
+
+before_install:
+  # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
+  - mkdir -p $HOME/gopath/src/github.com/elastic/libbeat
+  - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/libbeat/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/libbeat
+  - cd $HOME/gopath/src/github.com/elastic/libbeat
+  # Docker-compose installation
+  - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+addonsbefore_install:
+  - ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/libbeat
+
+install:
+  - make
+
+script:
+  - make $TARGETS
+
+notifications:
+  hipchat:
+    rooms:
+      secure: a1I6JFPxezdKC4+TYJwMbl3I0nRo9QieVAG423jJTBL/dkZwxT7kwqG8N3byoGJscpXQdXJoDlM2bs9zmUQnbKWhCn6eUD49e4KUo3d1m2ul4xHNndszyNaE8K18d4bJzlxulULjSvGjV6sl4ewj1HvCjRXkE0jJPtcumTmOwo0TT20+AYEGmK6i3KIJCijsEn5pHN423fD6byMiuPh+HV1yNIzJJHBHqxkrsBvFrIKjUHe6sFt853MgavUqaWwQfVh5PeXvME0UZLkee2ekLyM63JE6RhpD2rVg+vFKU+hP1KKWZZMRkD5Jhy5M4EupPcEzbg2dYHLa4f7rRdin367AggLh+lNB0c2/rxo2yl5P9Oq9GR+AqhObE9nAFWmgD4IprD1uyoflifNG4/3FYIMG5TrJKG3EW0uLZFvamydW2LDOvT2OMwkFAqDawrpWn7045vV6QEKZUWAYSf/VjN2MwHnuCB058OBe+jr2BlJlUBAgPgUWNEDVNqhPY/rbD6hUuRH8pcK4DrxnagGgneJlGfXJ3cMHBIAcoHgrF//0AsM3DJ8WAdKoKTHkPDQb9RLAUyD9N/cMntRzcQsJfclFFB/Nr2rzPxyXwsESaWEPByJ26gZy/Q/Zq+VRbZCpJQru89kdmuoi03wHkCbOmAx7f4p2earoqHJMEk5yfVU=
+
+after_success:
+  # Copy full.cov to coverage.txt because codecov.io requires this file
+  - test -f build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f build/coverage/full.cov

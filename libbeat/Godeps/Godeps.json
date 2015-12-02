@@ -1,0 +1,34 @@
+{
+	"ImportPath": "github.com/elastic/libbeat",
+	"GoVersion": "go1.5.1",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "46806c72355edd62250ac37a8b1a565618b39e22"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "46806c72355edd62250ac37a8b1a565618b39e22"
+		},
+		{
+			"ImportPath": "github.com/nranchev/go-libGeoIP",
+			"Rev": "c78e8bd2dd3599feb21fd30886043979e82fe948"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-45-gbcd32dc",
+			"Rev": "bcd32dcc8b1e09b14f55703dcf891fdd82561143"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "53feefa2559fb8dfa8d81baad31be332c97d6c77"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/windows",
+			"Rev": "342d6a85aa15bcd2ec54803cdffe90d52b6f35a7"
+		}
+	]
+}

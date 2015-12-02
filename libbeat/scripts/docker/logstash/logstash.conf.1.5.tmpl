@@ -1,0 +1,27 @@
+input {
+  beats {
+    port => 5044
+    ssl => false
+  }
+
+  beats {
+    port => 5055
+    ssl => true
+    ssl_certificate => "/etc/pki/tls/certs/logstash.crt"
+    ssl_key => "/etc/pki/tls/private/logstash.key"
+  }
+}
+
+output {
+  elasticsearch {
+      protocol => "http"
+      user => "beats"
+      password => "testing"
+      host => ""
+      port => "9200"
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+      document_type => "%{[@metadata][type]}"
+  }
+
+  # stdout{}
+}
