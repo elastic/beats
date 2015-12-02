@@ -17,9 +17,6 @@ interfaces:
 
 ############################# Protocols #######################################
 protocols:
-  icmp:
-    enabled: true
-
   dns:
     # Configure the ports where to listen for DNS traffic. You can disable
     # the DNS protocol by commenting out the list of ports.
@@ -172,6 +169,9 @@ output:
 
     # Optional HTTP Path
     #path: "/elasticsearch"
+
+    # Proxy server URL
+    # proxy_url: http://proxy:3128
 
     # The number of times a particular Elasticsearch index operation is attempted. If
     # the indexing operation doesn't succeed after this many retries, the events are

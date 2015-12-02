@@ -7,7 +7,7 @@ GODEP=$(GOPATH)/bin/godep
 export PATH := ./bin:$(PATH)
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
-ES_HOST?="elasticsearch-200"
+ES_HOST?="elasticsearch-210"
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 TIMEOUT?= 90
@@ -169,7 +169,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch-173 elasticsearch-200 logstash
+	docker-compose up -d redis elasticsearch-173 elasticsearch-210 logstash
 
 .PHONY: stop-environment
 stop-environment:
@@ -182,3 +182,5 @@ write-environment:
 	mkdir -p build
 	echo "ES_HOST=${ES_HOST}" > build/test.env
 	echo "ES_PORT=9200" >> build/test.env
+	echo "ES_USER=beats" >> build/test.env
+	echo "ES_PASS=testing" >> build/test.env
