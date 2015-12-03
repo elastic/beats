@@ -79,7 +79,6 @@ class Test(TestCase):
         Test stdin input. Checks if reading is continued after the first read.
         """
         self.render_config_template(
-            path="\"-\"",
             input_type="stdin"
         )
 

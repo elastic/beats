@@ -125,8 +125,6 @@ filebeat:
         service: apache
         zone: us-east-1
     -
-      paths:
-        - "-"
       input_type: stdin <2>
       document_type: stdin
     -
