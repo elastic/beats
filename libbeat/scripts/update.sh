@@ -2,11 +2,9 @@
 
 set -e
 
-# Takes first entry in GOPATH in case has multiple entries
-GOPATH=`echo $GOPATH | tr ':' '\n' | head -1`
 BEATNAME=$1
 BEATPATH=$2
-LIBBEAT=${GOPATH}/src/github.com/elastic/beats/libbeat
+LIBBEAT=../libbeat
 
 # Setup
 if [ -z $BEATNAME ]; then
@@ -19,7 +17,7 @@ if [ -z $BEATPATH ]; then
     exit;
 fi
 
-DIR=$GOPATH/src/$BEATPATH
+DIR=../$BEATNAME
 
 if [ ! -d "$DIR" ]; then
   echo "Beat dir does not exist: $DIR"
