@@ -28,7 +28,8 @@ cache:
 # Scripts that run after cloning repository
 install:
   # AppVeyor installed mingw is 32-bit only.
-  - cinst mingw >nul
+  - cinst mingw > mingw-install.txt
+  - ps: Push-AppveyorArtifact mingw-install.txt
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
   - go get github.com/pierrre/gotestcover golang.org/x/tools/cmd/cover
@@ -65,15 +66,16 @@ test_script:
 
 after_test:
   - ps: cd $env:GOPATH\src\$env:PROJ
-  # TODO: Aggregate coverage data from python tests
-  - go tool cover -html=build\coverage\integration.cov -o build\coverage\integration.html
-  - ps: Push-AppveyorArtifact build\coverage\integration.cov
-  - ps: Push-AppveyorArtifact build\coverage\integration.html
+  - python ..\libbeat\scripts\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
+  - python ..\libbeat\scripts\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
+  - go tool cover -html=build\coverage\full.cov -o build\coverage\full.html
+  - ps: Push-AppveyorArtifact build\coverage\full.cov
+  - ps: Push-AppveyorArtifact build\coverage\full.html
   # Upload coverage report.
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - pip install codecov
   - ps: cd $env:GOPATH\src\github.com\elastic\beats
-  - codecov -X gcov -f "%BEAT%\build\coverage\integration.cov"
+  - codecov -X gcov -f "%BEAT%\build\coverage\full.cov"
 
 # Executes for both successful and failed builds
 on_finish:

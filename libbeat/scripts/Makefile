@@ -99,10 +99,7 @@ integration-tests-environment:
 .PHONY: system-tests
 system-tests: libbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
-	# Writes atomic mode on top of file
-	echo 'mode: atomic' > ${COVERAGE_DIR}/system.cov
-	# Collects all system coverage files and skips top line with mode
-	tail -q -n +2 ./build/system-tests/run/**/*.cov >> ${COVERAGE_DIR}/system.cov
+	python ../libbeat/scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-setup
@@ -140,10 +137,7 @@ testsuite:
 # It assumes that some covrage reports already exists, otherwise it will fail
 .PHONY: coverage-report
 coverage-report:
-	# Writes atomic mode on top of file
-	echo 'mode: atomic' > ./${COVERAGE_DIR}/full.cov
-	# Collects all coverage files and skips top line with mode
-	tail -q -n +2 ./${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
+	python ../libbeat/scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 # Update expects the most recent version of libbeat in the GOPATH
