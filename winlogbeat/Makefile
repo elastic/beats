@@ -1,6 +1,7 @@
 BEATNAME=winlogbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
+GOX_OS=windows
 
 include ../libbeat/scripts/Makefile
 
