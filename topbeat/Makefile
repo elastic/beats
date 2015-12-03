@@ -1,6 +1,9 @@
 BEATNAME=topbeat
 SYSTEM_TESTS=true
 
+# Only crosscompile for linux because other OS'es use cgo.
+GOX_OS=linux
+
 include ../libbeat/scripts/Makefile
 
 .PHONY: install-cfg

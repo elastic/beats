@@ -14,6 +14,7 @@ TIMEOUT?= 90
 BEATNAME?=libbeat
 TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
+GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 
 
 ### BUILDING ###
@@ -28,12 +29,13 @@ build: $(GOFILES)
 libbeat.test: $(GOFILES)
 	go test -c -covermode=atomic -coverpkg ./...
 
-# Cross-compile beat for the OS and architectures listed in
-# crosscompile.bash. The binaries are placed in the ./bin dir.
+# Cross-compile beat for the OS'es specified in GOX_OS variable.
+# The binaries are placed in the build/bin directory.
 .PHONY: crosscompile
 crosscompile: $(GOFILES)
+	go get github.com/mitchellh/gox
 	mkdir -p ${BUILD_DIR}/bin
-	source ../libbeat/scripts/crosscompile.bash; OUT='${BUILD_DIR}/bin' go-build-all
+	gox -output="${BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}" -os="${GOX_OS}" ${GOX_FLAGS}
 
 # Checks project and source code if everything is according to standard
 .PHONY: check
