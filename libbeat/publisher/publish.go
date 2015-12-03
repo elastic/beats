@@ -193,6 +193,12 @@ func (publisher *PublisherType) init(
 	publisher.disabled = *publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
+	} else if len(configs) == 0 {
+		logp.Info("No output set. Fall back to standard output elasticsearch on localhost:9200")
+		configs = make(map[string]outputs.MothershipConfig)
+		configs["elasticsearch"] = outputs.MothershipConfig{
+			Hosts: []string{"localhost:9200"},
+		}
 	}
 
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
