@@ -5,12 +5,12 @@ package checkpoint
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sort"
 	"sync"
 	"time"
-
-	"io/ioutil"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/yaml.v2"
@@ -87,6 +87,12 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 		for _, state := range ps.States {
 			c.states[state.Name] = state
 		}
+	}
+
+	// Write the state file to verify we have have permissions.
+	err = c.flush()
+	if err != nil {
+		return nil, err
 	}
 
 	c.wg.Add(1)
@@ -180,9 +186,15 @@ func (c *Checkpoint) persist() bool {
 func (c *Checkpoint) flush() error {
 	tempFile := c.file + ".new"
 	file, err := os.Create(tempFile)
+	if os.IsNotExist(err) {
+		// Try to create directory if it does not exist.
+		if createDirErr := c.createDir(); createDirErr == nil {
+			file, err = os.Create(tempFile)
+		}
+	}
+
 	if err != nil {
-		return fmt.Errorf("Failed to flush state to disk. Could not open %s. %v",
-			tempFile, err)
+		return fmt.Errorf("Failed to flush state to disk. %v", err)
 	}
 
 	// Sort persisted eventLogs by name.
@@ -237,4 +249,11 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	}
 
 	return ps, nil
+}
+
+// createDir creates the directory in which the state file will reside if the
+// directory does not already exist.
+func (c *Checkpoint) createDir() error {
+	dir := filepath.Dir(c.file)
+	return os.MkdirAll(dir, os.FileMode(0750))
 }
