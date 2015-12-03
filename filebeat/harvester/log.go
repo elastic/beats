@@ -142,7 +142,7 @@ func (h *Harvester) backOff() {
 // open does open the file given under h.Path and assigns the file handler to h.file
 func (h *Harvester) open() (encoding.Encoding, error) {
 	// Special handling that "-" means to read from standard input
-	if h.Path == "-" {
+	if h.Config.InputType == config.StdinInputType {
 		return h.openStdin()
 	}
 	return h.openFile()
