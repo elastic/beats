@@ -94,7 +94,7 @@ func (s *Spooler) Run() {
 		case <-ticker.C:
 			// Flush periodically
 			if time.Now().After(s.nextFlushTime) {
-				logp.Debug("spooler", "Flushing spooler because of timemout. Events flushed: %v", len(s.spool))
+				logp.Debug("spooler", "Flushing spooler because of timeout. Events flushed: %v", len(s.spool))
 				s.flush()
 			}
 		}
