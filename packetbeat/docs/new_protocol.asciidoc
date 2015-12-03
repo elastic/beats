@@ -81,18 +81,6 @@ $ git push --set-upstream tsg cool_new_protocol
   the branch after creating the PR. Submitting the PR early gives us more time to
   provide feedback and perhaps help you with it.
 
-==== A Note About Dependencies
-
-Packetbeat uses https://github.com/tools/godep[Godep] for vendoring its
-dependencies. The way Godep works is that it copies the source code of all
-dependencies in the `Godep/_workspace` folder.
-
-Use `godep restore` to install vendored dependencies into your GOPATH. This
-helps with validating code as you type.
-
-If you add a new dependency, you can use `godep get` to add it to the vendored
-folder.
-
 === Protocol Modules
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
