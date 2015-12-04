@@ -25,37 +25,38 @@ type client struct {
 }
 
 // ClientOption allows API users to set additional options when publishing events.
-type ClientOption func(option *publishOptions)
+type ClientOption func(option publishOptions) publishOptions
 
 // Confirm option will block the event publisher until event has been send and ACKed
 // by output plugin or fail is reported.
-func Confirm(options *publishOptions) {
-	options.confirm = true
+func Confirm(o publishOptions) publishOptions {
+	o.confirm = true
+	return o
 }
 
 // Sync option will block the event publisher until an event has been ACKed by
 // the output plugin. If output plugin signals failure, the client will retry
 // until success is signaled.
-func Sync(options *publishOptions) {
-	options.confirm = true
-	options.sync = true
+func Sync(o publishOptions) publishOptions {
+	o.confirm = true
+	o.sync = true
+	return o
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	options, client := c.getClient(opts)
-	return client.PublishEvent(&context{publishOptions: options}, event)
+	return client.PublishEvent(context{publishOptions: options}, event)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
 	options, client := c.getClient(opts)
-	return client.PublishEvents(&context{publishOptions: options}, events)
+	return client.PublishEvents(context{publishOptions: options}, events)
 }
 
 func (c *client) getClient(opts []ClientOption) (publishOptions, eventPublisher) {
-	debug("send event")
-	options := publishOptions{}
+	var options publishOptions
 	for _, opt := range opts {
-		opt(&options)
+		options = opt(options)
 	}
 
 	if options.confirm {

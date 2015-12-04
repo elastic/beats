@@ -12,7 +12,7 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
-const TCP_MAX_DATA_IN_STREAM = 10 * 1e6
+const TCP_MAX_DATA_IN_STREAM = 10 * (1 << 20)
 
 const (
 	TcpDirectionReverse  = 0

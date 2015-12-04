@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file based on the
 ### Added
 - Added piping support to redis protocol. #402
 
+### Improvements
+- Improve redis parser performance. #442
+
 ### Deprecated
 
 ## [1.0.0](https://github.com/elastic/packetbeat/compare/1.0.0-rc2...1.0.0) 2015-11-24
