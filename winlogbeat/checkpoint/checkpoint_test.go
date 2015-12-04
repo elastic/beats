@@ -1,4 +1,4 @@
-package checkpoint_test
+package checkpoint
 
 import (
 	"io/ioutil"
@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/stretchr/testify/assert"
+	"runtime"
 )
 
 // Test that a write is triggered when the maximum number of updates is reached.
 func TestWriteMaxUpdates(t *testing.T) {
-	dir, err := ioutil.TempDir("", "winlogbeat-test")
+	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,27 +24,37 @@ func TestWriteMaxUpdates(t *testing.T) {
 		}
 	}()
 
-	file := filepath.Join(dir, "winlogbeat-test")
-	cp, err := checkpoint.NewCheckpoint(file, 2, time.Hour)
+	file := filepath.Join(dir, "some", "new", "dir", ".winlogbeat.yaml")
+	assert.False(t, fileExists(file), "%s should not exist", file)
+	cp, err := NewCheckpoint(file, 2, time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cp.Shutdown()
 
-	assert.False(t, fileExists(file))
+	// Send update - it's not written to disk but it's in memory.
 	cp.Persist("App", 1, time.Now())
-	time.Sleep(time.Second)
-	assert.False(t, fileExists(file))
+	time.Sleep(500 * time.Millisecond)
+	_, found := cp.States()["App"]
+	assert.True(t, found)
+	ps, err := cp.read()
+	assert.NoError(t, err)
+	assert.Len(t, ps.States, 0)
 
+	// Send update - it is written to disk.
 	cp.Persist("App", 2, time.Now())
-	time.Sleep(time.Second)
-	assert.True(t, fileExists(file))
+	time.Sleep(500 * time.Millisecond)
+	ps, err = cp.read()
+	assert.NoError(t, err)
+	assert.Len(t, ps.States, 1)
+	assert.Equal(t, "App", ps.States[0].Name)
+	assert.Equal(t, uint32(2), ps.States[0].RecordNumber)
 }
 
 // Test that a write is triggered when the maximum time period since the last
 // write is reached.
 func TestWriteTimedFlush(t *testing.T) {
-	dir, err := ioutil.TempDir("", "winlogbeat-test")
+	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,17 +65,75 @@ func TestWriteTimedFlush(t *testing.T) {
 		}
 	}()
 
-	file := filepath.Join(dir, "winlogbeat-test")
-	cp, err := checkpoint.NewCheckpoint(file, 100, time.Second)
+	file := filepath.Join(dir, ".winlogbeat.yaml")
+	assert.False(t, fileExists(file), "%s should not exist", file)
+	cp, err := NewCheckpoint(file, 100, time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cp.Shutdown()
 
-	assert.False(t, fileExists(file))
+	// Send update then wait longer than the flush interval and it should be
+	// on disk.
 	cp.Persist("App", 1, time.Now())
 	time.Sleep(1500 * time.Millisecond)
-	assert.True(t, fileExists(file))
+	ps, err := cp.read()
+	assert.NoError(t, err)
+	assert.Len(t, ps.States, 1)
+	assert.Equal(t, "App", ps.States[0].Name)
+	assert.Equal(t, uint32(1), ps.States[0].RecordNumber)
+}
+
+// Test that createDir creates the directory with 0750 permissions.
+func TestCreateDir(t *testing.T) {
+	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := os.RemoveAll(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	stateDir := filepath.Join(dir, "state", "dir", "does", "not", "exists")
+	file := filepath.Join(stateDir, ".winlogbeat.yaml")
+	cp := &Checkpoint{file: file}
+
+	assert.False(t, fileExists(stateDir), "%s should not exist", file)
+	assert.NoError(t, cp.createDir())
+	assert.True(t, fileExists(stateDir), "%s should exist", file)
+
+	// mkdir on Windows does not pass the POSIX mode to the CreateDirectory
+	// syscall so doesn't test the mode.
+	if runtime.GOOS != "windows" {
+		fileInfo, err := os.Stat(stateDir)
+		assert.NoError(t, err)
+		assert.Equal(t, true, fileInfo.IsDir())
+		assert.Equal(t, os.FileMode(0750), fileInfo.Mode().Perm())
+	}
+}
+
+// Test createDir when the directory already exists to verify that no error is
+// returned.
+func TestCreateDirAlreadyExists(t *testing.T) {
+	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := os.RemoveAll(dir)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	file := filepath.Join(dir, ".winlogbeat.yaml")
+	cp := &Checkpoint{file: file}
+
+	assert.True(t, fileExists(dir), "%s should exist", file)
+	assert.NoError(t, cp.createDir())
 }
 
 // fileExists returns true if the specified file exists.
