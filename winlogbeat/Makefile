@@ -6,7 +6,7 @@ include ../libbeat/scripts/Makefile
 
 .PHONY: gen
 gen:
-	GOOS=windows GOARCH=386 godep go generate -v -x ./...
+	GOOS=windows GOARCH=386 go generate -v -x ./...
 
 .PHONY: gen-docs
 gen-docs:

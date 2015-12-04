@@ -47,8 +47,8 @@ output:
     # Optional HTTP Path
     #path: "/elasticsearch"
 
-    # Proxy server URL
-    # proxy_url: http://proxy:3128
+    # Proxy server url
+    #proxy_url: http://proxy:3128
 
     # The number of times a particular Elasticsearch index operation is attempted. If
     # the indexing operation doesn't succeed after this many retries, the events are
