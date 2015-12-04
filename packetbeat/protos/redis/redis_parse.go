@@ -334,8 +334,12 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (string, bool, boo
 	}
 	if count < 0 {
 		return "nil", false, true, true
+	} else if count == 0 {
+		// should not happen, but handle just in case ParseInt did return 0
+		return "[]", false, true, true
 	}
 
+	// invariant: count > 0
 	content := make([]string, 0, count)
 	// read sub elements
 
@@ -353,17 +357,19 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (string, bool, boo
 		content = append(content, value)
 	}
 
-	if depth == 0 && isRedisCommand(content[0]) { // we've got a request
+	// handle top-level request command
+	if depth == 0 && isRedisCommand(content[0]) {
 		p.message.IsRequest = true
 		p.message.Method = content[0]
-		p.message.Path = content[1]
+		if len(content) > 1 {
+			p.message.Path = content[1]
+		}
+
+		value := strings.Join(content, " ")
+		return value, iserror, true, true
 	}
 
-	var value string
-	if depth == 0 && p.message.IsRequest {
-		value = strings.Join(content, " ")
-	} else {
-		value = "[" + strings.Join(content, ", ") + "]"
-	}
+	// return redis array
+	value := "[" + strings.Join(content, ", ") + "]"
 	return value, iserror, true, true
 }
