@@ -27,10 +27,11 @@ def main(arguments):
     # Write to output.
     args.outfile.write('mode: atomic\n')
     for m in matches:
-        with open(m) as f:
-            for line in f:
-                if not line.startswith('mode:'):
-                    args.outfile.write(line)
+        if os.path.abspath(args.outfile.name) != os.path.abspath(m):
+            with open(m) as f:
+                for line in f:
+                    if not line.startswith('mode:'):
+                        args.outfile.write(line)
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
