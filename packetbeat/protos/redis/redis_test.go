@@ -19,6 +19,19 @@ func parse(content []byte) (*redisMessage, bool, bool) {
 	return st.parser.message, ok, complete
 }
 
+func TestRedisParser_NoArgsRequest(t *testing.T) {
+	message := []byte("*1\r\n" +
+		"$4\r\n" +
+		"INFO\r\n")
+	msg, ok, complete := parse(message)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.True(t, msg.IsRequest)
+	assert.Equal(t, "INFO", msg.Message)
+	assert.Equal(t, len(message), msg.Size)
+}
+
 func TestRedisParser_ArrayRequest(t *testing.T) {
 	message := []byte("*3\r\n" +
 		"$3\r\n" +
