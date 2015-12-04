@@ -4,7 +4,7 @@ set -e
 
 BEATNAME=$1
 BEATPATH=$2
-LIBBEAT=../libbeat
+LIBBEAT=$3
 
 # Setup
 if [ -z $BEATNAME ]; then

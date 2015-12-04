@@ -8,6 +8,7 @@ export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 ES_HOST?="elasticsearch-210"
+BEAT_DIR?=github.com/elastic/beats
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 TIMEOUT?= 90
@@ -75,12 +76,12 @@ prepare-tests:
 .PHONY: unit-tests
 unit-tests: prepare-tests
 	#go test -short ./...
-	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic github.com/elastic/beats/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic ${BEAT_DIR}/${BEATNAME}/...
 
 # Run integration tests. Unit tests are run as part of the integration tests. It runs all tests with race detection enabled.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic github.com/elastic/beats/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic ${BEAT_DIR}/${BEATNAME}/...
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
@@ -91,7 +92,7 @@ integration-tests-environment:
 	echo "docker ${BEATNAME} test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
 	mkdir -p ${COVERAGE_DIR}; \
-	docker cp $$NAME:/go/src/github.com/elastic/beats/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
+	docker cp $$NAME:/go/src/${BEAT_DIR}/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
 	docker rm $$NAME > /dev/null; \
 	exit $$CODE
 
@@ -143,7 +144,7 @@ coverage-report:
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
 update:
-	bash ${GOPATH}/src/github.com/elastic/beats/libbeat/scripts/update.sh ${BEATNAME} github.com/elastic/beats/${BEATNAME}
+	bash ${GOPATH}/src/github.com/elastic/beats/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${GOPATH}/src/github.com/elastic/beats/libbeat
 
 
 
