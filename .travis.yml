@@ -12,14 +12,18 @@ os:
   - osx
 
 env:
-  - TARGETS="check"
-  # - TARGETS="testsuite ES_HOST=elasticsearch-173"
-  - TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
-  - TARGETS="-C topbeat testsuite"
-  - TARGETS="-C filebeat testsuite"
-  - TARGETS="-C packetbeat testsuite"
-  - TARGETS="-C libbeat crosscompile"
-  - TARGETS="-C filebeat crosscompile"
+  matrix:
+    - TARGETS="check"
+    # - TARGETS="testsuite ES_HOST=elasticsearch-173"
+    - TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
+    - TARGETS="-C topbeat testsuite"
+    - TARGETS="-C filebeat testsuite"
+    - TARGETS="-C packetbeat testsuite"
+    - TARGETS="-C libbeat crosscompile"
+    - TARGETS="-C filebeat crosscompile"
+  global:
+    # Cross-compile for amd64 only to speed up testing.
+    - GOX_FLAGS="-arch amd64"
 
 matrix:
   exclude:
