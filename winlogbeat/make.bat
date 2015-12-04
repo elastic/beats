@@ -1,18 +1,20 @@
+@echo off
+
+REM
 REM Batch script to build and test on Windows. You can use this in conjunction
 REM with the Vagrant machine.
 REM
-REM If running inside of Vagrant do this first:
-REM mkdir C:\Gopath\src\github.com\elastic
-REM mklink /d C:\Gopath\src\github.com\elastic\winlogbeat \\vboxsvr\vagrant
 
-REM This is already done inside the Vagrant box.
-REM set PATH=%PATH%;%GOPATH%\bin
-
+echo Building
 go build
-go test -race ./...
+if %errorlevel% neq 0 exit /b %errorlevel%
 
-REM Coverage report:
-REM godep go test -c -cover -coverpkg ./...
+echo Testing
+go test ./...
+if %errorlevel% neq 0 exit /b %errorlevel%
 
+echo System Testing
 go test -c -covermode=atomic -coverpkg ./...
+if %errorlevel% neq 0 exit /b %errorlevel%
 nosetests -w tests\system --process-timeout=30
+if %errorlevel% neq 0 exit /b %errorlevel%
