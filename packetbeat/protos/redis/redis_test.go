@@ -19,67 +19,71 @@ func parse(content []byte) (*redisMessage, bool, bool) {
 	return st.parser.message, ok, complete
 }
 
+var noArgsRequest = []byte("*1\r\n" +
+	"$4\r\n" +
+	"INFO\r\n")
+
 func TestRedisParser_NoArgsRequest(t *testing.T) {
-	message := []byte("*1\r\n" +
-		"$4\r\n" +
-		"INFO\r\n")
-	msg, ok, complete := parse(message)
+	msg, ok, complete := parse(noArgsRequest)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.True(t, msg.IsRequest)
-	assert.Equal(t, "INFO", msg.Message)
-	assert.Equal(t, len(message), msg.Size)
+	assert.Equal(t, "INFO", string(msg.Message))
+	assert.Equal(t, len(noArgsRequest), msg.Size)
 }
+
+var arrayRequest = []byte("*3\r\n" +
+	"$3\r\n" +
+	"SET\r\n" +
+	"$4\r\n" +
+	"key1\r\n" +
+	"$5\r\n" +
+	"Hello\r\n")
 
 func TestRedisParser_ArrayRequest(t *testing.T) {
-	message := []byte("*3\r\n" +
-		"$3\r\n" +
-		"SET\r\n" +
-		"$4\r\n" +
-		"key1\r\n" +
-		"$5\r\n" +
-		"Hello\r\n")
-	msg, ok, complete := parse(message)
+	msg, ok, complete := parse(arrayRequest)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.True(t, msg.IsRequest)
-	assert.Equal(t, "SET key1 Hello", msg.Message)
-	assert.Equal(t, len(message), msg.Size)
+	assert.Equal(t, "SET key1 Hello", string(msg.Message))
+	assert.Equal(t, len(arrayRequest), msg.Size)
 }
+
+var arrayResponse = []byte("*4\r\n" +
+	"$3\r\n" +
+	"foo\r\n" +
+	"$-1\r\n" +
+	"$3\r\n" +
+	"bar\r\n" +
+	":23\r\n")
 
 func TestRedisParser_ArrayResponse(t *testing.T) {
-	message := []byte("*4\r\n" +
-		"$3\r\n" +
-		"foo\r\n" +
-		"$-1\r\n" +
-		"$3\r\n" +
-		"bar\r\n" +
-		":23\r\n")
-	msg, ok, complete := parse(message)
+	msg, ok, complete := parse(arrayResponse)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "[foo, nil, bar, 23]", msg.Message)
-	assert.Equal(t, len(message), msg.Size)
+	assert.Equal(t, "[foo, nil, bar, 23]", string(msg.Message))
+	assert.Equal(t, len(arrayResponse), msg.Size)
 }
 
+var arrayNestedMessage = []byte("*3\r\n" +
+	"*-1\r\n" +
+	"+foo\r\n" +
+	"*2\r\n" +
+	":1\r\n" +
+	"+bar\r\n")
+
 func TestRedisParser_ArrayNested(t *testing.T) {
-	message := []byte("*3\r\n" +
-		"*-1\r\n" +
-		"+foo\r\n" +
-		"*2\r\n" +
-		":1\r\n" +
-		"+bar\r\n")
-	msg, ok, complete := parse(message)
+	msg, ok, complete := parse(arrayNestedMessage)
 
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "[nil, foo, [1, bar]]", msg.Message)
-	assert.Equal(t, len(message), msg.Size)
+	assert.Equal(t, "[nil, foo, [1, bar]]", string(msg.Message))
+	assert.Equal(t, len(arrayNestedMessage), msg.Size)
 }
 
 func TestRedisParser_SimpleString(t *testing.T) {
@@ -89,7 +93,7 @@ func TestRedisParser_SimpleString(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "OK", msg.Message)
+	assert.Equal(t, "OK", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
@@ -100,7 +104,7 @@ func TestRedisParser_NilString(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "nil", msg.Message)
+	assert.Equal(t, "nil", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
@@ -111,7 +115,7 @@ func TestRedisParser_EmptyString(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "", msg.Message)
+	assert.Equal(t, "", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
@@ -123,7 +127,7 @@ func TestRedisParser_LenString(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "12345", msg.Message)
+	assert.Equal(t, "12345", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
@@ -135,7 +139,7 @@ func TestRedisParser_LenStringWithCRLF(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "123\r\n45", msg.Message)
+	assert.Equal(t, "123\r\n45", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
@@ -146,31 +150,67 @@ func TestRedisParser_EmptyArray(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.False(t, msg.IsRequest)
-	assert.Equal(t, "[]", msg.Message)
+	assert.Equal(t, "[]", string(msg.Message))
 	assert.Equal(t, len(message), msg.Size)
 }
 
-func TestRedisParser_Array2Passes(t *testing.T) {
-	part1 := []byte("*3\r\n" +
+var (
+	array2PassesPart1 = []byte("*3\r\n" +
 		"$3\r\n" +
 		"SET\r\n" +
 		"$4\r\n")
-	part2 := []byte("key1\r\n" +
+	array2PassesPart2 = []byte("key1\r\n" +
 		"$5\r\n" +
 		"Hello\r\n")
+)
 
-	st := newTestStream(part1)
+func TestRedisParser_Array2Passes(t *testing.T) {
+	st := newTestStream(array2PassesPart1)
 	ok, complete := st.parser.parse(&st.Buf)
 	assert.True(t, ok)
 	assert.False(t, complete)
 
-	st.Stream.Append(part2)
+	st.Stream.Append(array2PassesPart2)
 	ok, complete = st.parser.parse(&st.Buf)
 	msg := st.parser.message
 
 	assert.True(t, ok)
 	assert.True(t, complete)
 	assert.True(t, msg.IsRequest)
-	assert.Equal(t, "SET key1 Hello", msg.Message)
-	assert.Equal(t, len(part1)+len(part2), msg.Size)
+	assert.Equal(t, "SET key1 Hello", string(msg.Message))
+	assert.Equal(t, len(array2PassesPart1)+len(array2PassesPart2), msg.Size)
+}
+
+func BenchmarkParserNoArgsResult(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parse(noArgsRequest)
+	}
+}
+
+func BenchmarkParserArrayRequest(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parse(arrayRequest)
+	}
+}
+
+func BenchmarkParserArrayResponse(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parse(arrayResponse)
+	}
+}
+
+func BenchmarkParserArrayNested(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parse(arrayNestedMessage)
+	}
+}
+
+func BenchmarkParserArray2Passes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		st := newTestStream(array2PassesPart1)
+		st.parser.parse(&st.Buf)
+
+		st.Stream.Append(array2PassesPart2)
+		st.parser.parse(&st.Buf)
+	}
 }
