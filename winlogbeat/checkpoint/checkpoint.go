@@ -255,5 +255,6 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 // directory does not already exist.
 func (c *Checkpoint) createDir() error {
 	dir := filepath.Dir(c.file)
+	logp.Info("Creating %s if it does not exist.", dir)
 	return os.MkdirAll(dir, os.FileMode(0750))
 }
