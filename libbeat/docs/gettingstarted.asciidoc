@@ -326,7 +326,7 @@ user-friendly UI in which you can combine various widget types to create your
 own dashboards. The dashboards can be easily saved, shared, and linked.
 
 For getting started, we recommend installing Kibana on the same server as
-Elasticsearch, but it is not required. If you install them of different servers,
+Elasticsearch, but it is not required. If you install the products on different servers,
 you'll need to change the URL (IP:PORT) of the Elasticsearch server in the
 Kibana configuration file, `config/kibana.yml`, before starting Kibana.
 
