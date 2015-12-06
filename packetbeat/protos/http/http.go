@@ -464,8 +464,8 @@ func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
 		"http":         details,
 		"bytes_out":    resp.Size,
 		"bytes_in":     requ.Size,
-		"src":          src,
-		"dst":          dst,
+		"src":          &src,
+		"dst":          &dst,
 	}
 
 	if http.SendRequest {
