@@ -496,9 +496,14 @@ func (http *HTTP) collectHeaders(m *message) interface{} {
 		return m.Headers
 	}
 
+	cookie := "cookie"
+	if !m.IsRequest {
+		cookie = "set-cookie"
+	}
+
 	hdrs := map[string]interface{}{}
 	for name, value := range m.Headers {
-		if name == "cookie" {
+		if name == cookie {
 			hdrs[name] = splitCookiesHeader(value)
 		} else {
 			hdrs[name] = value
