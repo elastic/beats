@@ -54,31 +54,6 @@ type messageList struct {
 	head, tail *message
 }
 
-type transaction struct {
-	Type         string
-	tuple        common.TcpTuple
-	Src          common.Endpoint
-	Dst          common.Endpoint
-	RealIP       string
-	ResponseTime int32
-	Ts           int64
-	JsTs         time.Time
-	ts           time.Time
-	cmdline      *common.CmdlineTuple
-	Method       string
-	RequestURI   string
-	Params       string
-	Path         string
-	BytesOut     uint64
-	BytesIn      uint64
-	Notes        []string
-
-	HTTP common.MapStr
-
-	RequestRaw  string
-	ResponseRaw string
-}
-
 // HTTP application level protocol analyser plugin.
 type HTTP struct {
 	// config
@@ -434,149 +409,102 @@ func (http *HTTP) correlate(conn *httpConnectionData) {
 		resp := conn.responses.pop()
 		trans := http.newTransaction(requ, resp)
 
-		debugf("HTTP transaction completed: %s\n", trans.HTTP)
+		debugf("HTTP transaction completed")
 		http.publishTransaction(trans)
 	}
 }
 
-func (http *HTTP) newTransaction(requ, resp *message) *transaction {
-	trans := &transaction{Type: "http", tuple: requ.TCPTuple}
+func (http *HTTP) newTransaction(requ, resp *message) common.MapStr {
+	status := common.OK_STATUS
+	if resp.StatusCode >= 400 {
+		status = common.ERROR_STATUS
+	}
 
-	// init from request
-	trans.ts = requ.Ts
-	trans.Ts = int64(trans.ts.UnixNano() / 1000)
-	trans.JsTs = requ.Ts
-	trans.Src = common.Endpoint{
+	// resp_time in milliseconds
+	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
+
+	path, params, err := http.extractParameters(requ, requ.Raw)
+	if err != nil {
+		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
+	}
+
+	src := common.Endpoint{
 		Ip:   requ.TCPTuple.Src_ip.String(),
 		Port: requ.TCPTuple.Src_port,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
-	trans.Dst = common.Endpoint{
+	dst := common.Endpoint{
 		Ip:   requ.TCPTuple.Dst_ip.String(),
 		Port: requ.TCPTuple.Dst_port,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 	if requ.Direction == tcp.TcpDirectionReverse {
-		trans.Src, trans.Dst = trans.Dst, trans.Src
+		src, dst = dst, src
 	}
 
-	// save Raw message
-	if http.SendRequest {
-		trans.RequestRaw = string(http.cutMessageBody(requ))
-	}
-
-	trans.Method = requ.Method
-	trans.RequestURI = requ.RequestURI
-	trans.BytesIn = requ.Size
-	trans.Notes = requ.Notes
-
-	trans.HTTP = common.MapStr{}
-
-	if http.parserConfig.SendHeaders {
-		if !http.SplitCookie {
-			trans.HTTP["request_headers"] = requ.Headers
-		} else {
-			hdrs := common.MapStr{}
-			for name, value := range requ.Headers {
-				if name == "cookie" {
-					hdrs[name] = splitCookiesHeader(value)
-				} else {
-					hdrs[name] = value
-				}
-			}
-
-			trans.HTTP["request_headers"] = hdrs
-		}
-	}
-
-	trans.RealIP = requ.RealIP
-
-	var err error
-	trans.Path, trans.Params, err = http.extractParameters(requ, requ.Raw)
-	if err != nil {
-		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
-	}
-
-	// init from response
-	response := common.MapStr{
+	details := common.MapStr{
 		"phrase":         resp.StatusPhrase,
 		"code":           resp.StatusCode,
 		"content_length": resp.ContentLength,
 	}
-
 	if http.parserConfig.SendHeaders {
-		if !http.SplitCookie {
-			response["response_headers"] = resp.Headers
-		} else {
-			hdrs := common.MapStr{}
-			for name, value := range resp.Headers {
-				if name == "set-cookie" {
-					hdrs[name] = splitCookiesHeader(value)
-				} else {
-					hdrs[name] = value
-				}
-			}
-
-			response["response_headers"] = hdrs
-		}
+		details["request_headers"] = http.collectHeaders(requ)
+		details["response_headers"] = http.collectHeaders(resp)
 	}
 
-	trans.BytesOut = resp.Size
-	trans.HTTP.Update(response)
-	trans.Notes = append(trans.Notes, resp.Notes...)
+	event := common.MapStr{
+		"@timestamp":   common.Time(requ.Ts),
+		"type":         "http",
+		"status":       status,
+		"responsetime": responseTime,
+		"method":       requ.Method,
+		"path":         path,
+		"params":       params,
+		"query":        fmt.Sprintf("%s %s", requ.Method, path),
+		"http":         details,
+		"bytes_out":    resp.Size,
+		"bytes_in":     requ.Size,
+		"src":          src,
+		"dst":          dst,
+	}
 
-	trans.ResponseTime = int32(resp.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
-
-	// save Raw message
+	if http.SendRequest {
+		event["request"] = string(http.cutMessageBody(requ))
+	}
 	if http.SendResponse {
-		trans.ResponseRaw = string(http.cutMessageBody(resp))
+		event["response"] = string(http.cutMessageBody(resp))
+	}
+	if len(requ.Notes)+len(resp.Notes) > 0 {
+		event["notes"] = append(requ.Notes, resp.Notes...)
+	}
+	if len(requ.RealIP) > 0 {
+		event["real_ip"] = requ.RealIP
 	}
 
-	return trans
+	return event
 }
 
-func (http *HTTP) publishTransaction(t *transaction) {
-
+func (http *HTTP) publishTransaction(event common.MapStr) {
 	if http.results == nil {
 		return
 	}
-
-	event := common.MapStr{}
-
-	event["type"] = "http"
-	code := t.HTTP["code"].(uint16)
-	if code < 400 {
-		event["status"] = common.OK_STATUS
-	} else {
-		event["status"] = common.ERROR_STATUS
-	}
-	event["responsetime"] = t.ResponseTime
-	if http.SendRequest {
-		event["request"] = t.RequestRaw
-	}
-	if http.SendResponse {
-		event["response"] = t.ResponseRaw
-	}
-	event["http"] = t.HTTP
-	if len(t.RealIP) > 0 {
-		event["real_ip"] = t.RealIP
-	}
-	event["method"] = t.Method
-	event["path"] = t.Path
-	event["query"] = fmt.Sprintf("%s %s", t.Method, t.Path)
-	event["params"] = t.Params
-
-	event["bytes_out"] = t.BytesOut
-	event["bytes_in"] = t.BytesIn
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
-
-	if len(t.Notes) > 0 {
-		event["notes"] = t.Notes
-	}
-
 	http.results.PublishEvent(event)
+}
+
+func (http *HTTP) collectHeaders(m *message) interface{} {
+	if !http.SplitCookie {
+		return m.Headers
+	}
+
+	hdrs := map[string]interface{}{}
+	for name, value := range m.Headers {
+		if name == "cookie" {
+			hdrs[name] = splitCookiesHeader(value)
+		} else {
+			hdrs[name] = value
+		}
+	}
+	return hdrs
 }
 
 func splitCookiesHeader(headerVal string) map[string]string {
