@@ -721,8 +721,9 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 
 	ok, _ := testParseStream(http, st)
 
-	msg := st.data[st.message.start:]
-	http.hideHeaders(st.message, msg)
+	st.message.Raw = st.data[st.message.start:]
+	http.hideHeaders(st.message)
+	msg := st.message.Raw
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -767,8 +768,9 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st)
 
-	msg := st.data[st.message.start:]
-	http.hideHeaders(st.message, msg)
+	st.message.Raw = st.data[st.message.start:]
+	http.hideHeaders(st.message)
+	msg := st.message.Raw
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -803,8 +805,9 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	ok, complete := testParseStream(http, st)
 
-	msg := st.data[st.message.start:]
-	http.hideHeaders(st.message, msg)
+	st.message.Raw = st.data[st.message.start:]
+	http.hideHeaders(st.message)
+	msg := st.message.Raw
 
 	if !ok {
 		t.Errorf("Parsing returned error")

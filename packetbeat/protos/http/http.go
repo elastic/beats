@@ -45,7 +45,13 @@ type stream struct {
 }
 
 type httpConnectionData struct {
-	Streams [2]*stream
+	Streams   [2]*stream
+	requests  messageList
+	responses messageList
+}
+
+type messageList struct {
+	head, tail *message
 }
 
 type transaction struct {
@@ -85,18 +91,9 @@ type HTTP struct {
 
 	parserConfig parserConfig
 
-	transactions       *common.Cache
 	transactionTimeout time.Duration
 
 	results publisher.Client
-}
-
-func (http *HTTP) getTransaction(k common.HashableTcpTuple) *transaction {
-	v := http.transactions.Get(k)
-	if v != nil {
-		return v.(*transaction)
-	}
-	return nil
 }
 
 func (http *HTTP) initDefaults() {
@@ -166,10 +163,6 @@ func (http *HTTP) Init(testMode bool, results publisher.Client) error {
 		}
 	}
 
-	http.transactions = common.NewCache(
-		http.transactionTimeout,
-		protos.DefaultTransactionHashSize)
-	http.transactions.StartJanitor(http.transactionTimeout)
 	http.results = results
 
 	return nil
@@ -221,14 +214,15 @@ func (st *stream) PrepareForNewMessage() {
 
 // Called when the parser has identified the boundary
 // of a message.
-func (http *HTTP) messageComplete(tcptuple *common.TcpTuple, dir uint8, st *stream) {
-	msg := st.data[st.message.start:st.message.end]
-	http.hideHeaders(st.message, msg)
+func (http *HTTP) messageComplete(
+	conn *httpConnectionData,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	st *stream,
+) {
+	st.message.Raw = st.data[st.message.start:st.message.end]
 
-	http.handleHTTP(st.message, tcptuple, dir, msg)
-
-	// and reset message
-	st.PrepareForNewMessage()
+	http.handleHTTP(conn, st.message, tcptuple, dir)
 }
 
 // ConnectionTimeout returns the configured HTTP transaction timeout.
@@ -237,94 +231,134 @@ func (http *HTTP) ConnectionTimeout() time.Duration {
 }
 
 // Parse function is used to process TCP payloads.
-func (http *HTTP) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
-
+func (http *HTTP) Parse(
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseHttp exception")
 
-	detailedf("Payload received: [%s]", pkt.Payload)
+	conn := ensureHTTPConnection(private)
+	conn = http.doParse(conn, pkt, tcptuple, dir)
+	if conn == nil {
+		return nil
+	}
+	return conn
+}
 
-	priv := httpConnectionData{}
-	if private != nil {
-		var ok bool
-		priv, ok = private.(httpConnectionData)
-		if !ok {
-			priv = httpConnectionData{}
-		}
+func ensureHTTPConnection(private protos.ProtocolData) *httpConnectionData {
+	conn := getHTTPConnection(private)
+	if conn == nil {
+		conn = &httpConnectionData{}
+	}
+	return conn
+}
+
+func getHTTPConnection(private protos.ProtocolData) *httpConnectionData {
+	if private == nil {
+		return nil
 	}
 
-	if priv.Streams[dir] == nil {
-		priv.Streams[dir] = &stream{
-			tcptuple: tcptuple,
-			data:     pkt.Payload,
-			message:  &message{Ts: pkt.Ts},
-		}
-
-	} else {
-		// concatenate bytes
-		priv.Streams[dir].data = append(priv.Streams[dir].data, pkt.Payload...)
-		if len(priv.Streams[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
-			debugf("Stream data too large, dropping TCP stream")
-			priv.Streams[dir] = nil
-			return priv
-		}
-	}
-	stream := priv.Streams[dir]
-	if stream.message == nil {
-		stream.message = &message{Ts: pkt.Ts}
-	}
-
-	parser := newParser(&http.parserConfig)
-	ok, complete := parser.parse(stream)
+	priv, ok := private.(*httpConnectionData)
 	if !ok {
-		// drop this tcp stream. Will retry parsing with the next
-		// segment in it
-		priv.Streams[dir] = nil
-		return priv
+		logp.Warn("http connection data type error")
+		return nil
 	}
-
-	if complete {
-		// all ok, ship it
-		http.messageComplete(tcptuple, dir, stream)
+	if priv == nil {
+		logp.Warn("Unexpected: http connection data not set")
+		return nil
 	}
 
 	return priv
+}
+
+// Parse function is used to process TCP payloads.
+func (http *HTTP) doParse(
+	conn *httpConnectionData,
+	pkt *protos.Packet,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) *httpConnectionData {
+
+	detailedf("Payload received: [%s]", pkt.Payload)
+
+	st := conn.Streams[dir]
+	if st == nil {
+		st = newStream(pkt, tcptuple)
+		conn.Streams[dir] = st
+	} else {
+		// concatenate bytes
+		st.data = append(st.data, pkt.Payload...)
+		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+			debugf("Stream data too large, dropping TCP stream")
+			conn.Streams[dir] = nil
+			return conn
+		}
+	}
+
+	for len(st.data) > 0 {
+		if st.message == nil {
+			st.message = &message{Ts: pkt.Ts}
+		}
+
+		parser := newParser(&http.parserConfig)
+		ok, complete := parser.parse(st)
+		if !ok {
+			// drop this tcp stream. Will retry parsing with the next
+			// segment in it
+			conn.Streams[dir] = nil
+			return conn
+		}
+
+		if !complete {
+			// wait for more data
+			break
+		}
+
+		// all ok, ship it
+		http.messageComplete(conn, tcptuple, dir, st)
+
+		// and reset stream for next message
+		st.PrepareForNewMessage()
+	}
+
+	return conn
+}
+
+func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *stream {
+	return &stream{
+		tcptuple: tcptuple,
+		data:     pkt.Payload,
+		message:  &message{Ts: pkt.Ts},
+	}
 }
 
 // ReceivedFin will be called when TCP transaction is terminating.
 func (http *HTTP) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	private protos.ProtocolData) protos.ProtocolData {
 
-	if private == nil {
+	conn := getHTTPConnection(private)
+	if conn == nil {
 		return private
-	}
-	httpData, ok := private.(httpConnectionData)
-	if !ok {
-		return private
-	}
-	if httpData.Streams[dir] == nil {
-		return httpData
 	}
 
-	stream := httpData.Streams[dir]
+	stream := conn.Streams[dir]
+	if stream == nil {
+		return conn
+	}
 
 	// send whatever data we got so far as complete. This
 	// is needed for the HTTP/1.0 without Content-Length situation.
-	if stream.message != nil &&
-		len(stream.data[stream.message.start:]) > 0 {
-
-		detailedf("Publish something on connection FIN")
-
-		msg := stream.data[stream.message.start:]
-		http.hideHeaders(stream.message, msg)
-
-		http.handleHTTP(stream.message, tcptuple, dir, msg)
+	if stream.message != nil && len(stream.data[stream.message.start:]) > 0 {
+		stream.message.Raw = stream.data[stream.message.start:]
+		http.handleHTTP(conn, stream.message, tcptuple, dir)
 
 		// and reset message. Probably not needed, just to be sure.
 		stream.PrepareForNewMessage()
 	}
 
-	return httpData
+	return conn
 }
 
 // GapInStream is called when a gap of nbytes bytes is found in the stream (due
@@ -334,14 +368,12 @@ func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 
 	defer logp.Recover("GapInStream(http) exception")
 
-	if private == nil {
+	conn := getHTTPConnection(private)
+	if conn == nil {
 		return private, false
 	}
-	httpData, ok := private.(httpConnectionData)
-	if !ok {
-		return private, false
-	}
-	stream := httpData.Streams[dir]
+
+	stream := conn.Streams[dir]
 	if stream == nil || stream.message == nil {
 		// nothing to do
 		return private, false
@@ -351,83 +383,101 @@ func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	detailedf("messageGap returned ok=%v complete=%v", ok, complete)
 	if !ok {
 		// on errors, drop stream
-		httpData.Streams[dir] = nil
-		return httpData, true
+		conn.Streams[dir] = nil
+		return conn, true
 	}
 
 	if complete {
 		// Current message is complete, we need to publish from here
-		http.messageComplete(tcptuple, dir, stream)
+		http.messageComplete(conn, tcptuple, dir, stream)
 	}
 
 	// don't drop the stream, we can ignore the gap
 	return private, false
 }
 
-func (http *HTTP) handleHTTP(m *message, tcptuple *common.TcpTuple,
-	dir uint8, rawMsg []byte) {
+func (http *HTTP) handleHTTP(
+	conn *httpConnectionData,
+	m *message,
+	tcptuple *common.TcpTuple,
+	dir uint8,
+) {
 
 	m.TCPTuple = *tcptuple
 	m.Direction = dir
 	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IpPort())
-	m.Raw = rawMsg
+	http.hideHeaders(m)
 
 	if m.IsRequest {
-		http.receivedHTTPRequest(m)
+		debugf("Received request with tuple: %s", m.TCPTuple)
+		conn.requests.append(m)
 	} else {
-		http.receivedHTTPResponse(m)
+		debugf("Received response with tuple: %s", m.TCPTuple)
+		conn.responses.append(m)
+		http.correlate(conn)
 	}
 }
 
-func (http *HTTP) receivedHTTPRequest(msg *message) {
-
-	trans := http.getTransaction(msg.TCPTuple.Hashable())
-	if trans != nil {
-		if len(trans.HTTP) != 0 {
-			logp.Warn("Two requests without a response. Dropping old request")
+func (http *HTTP) correlate(conn *httpConnectionData) {
+	// drop responses with missing requests
+	if conn.requests.empty() {
+		for !conn.responses.empty() {
+			logp.Warn("Response from unknown transaction. Ingoring.")
+			conn.responses.pop()
 		}
-	} else {
-		trans = &transaction{Type: "http", tuple: msg.TCPTuple}
-		http.transactions.Put(msg.TCPTuple.Hashable(), trans)
+		return
 	}
 
-	debugf("Received request with tuple: %s", msg.TCPTuple)
+	// merge requests with responses into transactions
+	for !conn.responses.empty() && !conn.requests.empty() {
+		requ := conn.requests.pop()
+		resp := conn.responses.pop()
+		trans := http.newTransaction(requ, resp)
 
-	trans.ts = msg.Ts
+		debugf("HTTP transaction completed: %s\n", trans.HTTP)
+		http.publishTransaction(trans)
+	}
+}
+
+func (http *HTTP) newTransaction(requ, resp *message) *transaction {
+	trans := &transaction{Type: "http", tuple: requ.TCPTuple}
+
+	// init from request
+	trans.ts = requ.Ts
 	trans.Ts = int64(trans.ts.UnixNano() / 1000)
-	trans.JsTs = msg.Ts
+	trans.JsTs = requ.Ts
 	trans.Src = common.Endpoint{
-		Ip:   msg.TCPTuple.Src_ip.String(),
-		Port: msg.TCPTuple.Src_port,
-		Proc: string(msg.CmdlineTuple.Src),
+		Ip:   requ.TCPTuple.Src_ip.String(),
+		Port: requ.TCPTuple.Src_port,
+		Proc: string(requ.CmdlineTuple.Src),
 	}
 	trans.Dst = common.Endpoint{
-		Ip:   msg.TCPTuple.Dst_ip.String(),
-		Port: msg.TCPTuple.Dst_port,
-		Proc: string(msg.CmdlineTuple.Dst),
+		Ip:   requ.TCPTuple.Dst_ip.String(),
+		Port: requ.TCPTuple.Dst_port,
+		Proc: string(requ.CmdlineTuple.Dst),
 	}
-	if msg.Direction == tcp.TcpDirectionReverse {
+	if requ.Direction == tcp.TcpDirectionReverse {
 		trans.Src, trans.Dst = trans.Dst, trans.Src
 	}
 
 	// save Raw message
 	if http.SendRequest {
-		trans.RequestRaw = string(http.cutMessageBody(msg))
+		trans.RequestRaw = string(http.cutMessageBody(requ))
 	}
 
-	trans.Method = msg.Method
-	trans.RequestURI = msg.RequestURI
-	trans.BytesIn = msg.Size
-	trans.Notes = msg.Notes
+	trans.Method = requ.Method
+	trans.RequestURI = requ.RequestURI
+	trans.BytesIn = requ.Size
+	trans.Notes = requ.Notes
 
 	trans.HTTP = common.MapStr{}
 
 	if http.parserConfig.SendHeaders {
 		if !http.SplitCookie {
-			trans.HTTP["request_headers"] = msg.Headers
+			trans.HTTP["request_headers"] = requ.Headers
 		} else {
 			hdrs := common.MapStr{}
-			for name, value := range msg.Headers {
+			for name, value := range requ.Headers {
 				if name == "cookie" {
 					hdrs[name] = splitCookiesHeader(value)
 				} else {
@@ -439,45 +489,27 @@ func (http *HTTP) receivedHTTPRequest(msg *message) {
 		}
 	}
 
-	trans.RealIP = msg.RealIP
+	trans.RealIP = requ.RealIP
 
 	var err error
-	trans.Path, trans.Params, err = http.extractParameters(msg, msg.Raw)
+	trans.Path, trans.Params, err = http.extractParameters(requ, requ.Raw)
 	if err != nil {
 		logp.Warn("http", "Fail to parse HTTP parameters: %v", err)
 	}
-}
 
-func (http *HTTP) receivedHTTPResponse(msg *message) {
-
-	// we need to search the request first.
-	tuple := msg.TCPTuple
-
-	debugf("Received response with tuple: %s", tuple)
-
-	trans := http.getTransaction(tuple.Hashable())
-	if trans == nil {
-		logp.Warn("Response from unknown transaction. Ignoring: %v", tuple)
-		return
-	}
-
-	if trans.HTTP == nil {
-		logp.Warn("Response without a known request. Ignoring.")
-		return
-	}
-
+	// init from response
 	response := common.MapStr{
-		"phrase":         msg.StatusPhrase,
-		"code":           msg.StatusCode,
-		"content_length": msg.ContentLength,
+		"phrase":         resp.StatusPhrase,
+		"code":           resp.StatusCode,
+		"content_length": resp.ContentLength,
 	}
 
 	if http.parserConfig.SendHeaders {
 		if !http.SplitCookie {
-			response["response_headers"] = msg.Headers
+			response["response_headers"] = resp.Headers
 		} else {
 			hdrs := common.MapStr{}
-			for name, value := range msg.Headers {
+			for name, value := range resp.Headers {
 				if name == "set-cookie" {
 					hdrs[name] = splitCookiesHeader(value)
 				} else {
@@ -489,21 +521,18 @@ func (http *HTTP) receivedHTTPResponse(msg *message) {
 		}
 	}
 
-	trans.BytesOut = msg.Size
+	trans.BytesOut = resp.Size
 	trans.HTTP.Update(response)
-	trans.Notes = append(trans.Notes, msg.Notes...)
+	trans.Notes = append(trans.Notes, resp.Notes...)
 
-	trans.ResponseTime = int32(msg.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.ResponseTime = int32(resp.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	// save Raw message
 	if http.SendResponse {
-		trans.ResponseRaw = string(http.cutMessageBody(msg))
+		trans.ResponseRaw = string(http.cutMessageBody(resp))
 	}
 
-	http.publishTransaction(trans)
-	http.transactions.Delete(trans.tuple.Hashable())
-
-	debugf("HTTP transaction completed: %s\n", trans.HTTP)
+	return trans
 }
 
 func (http *HTTP) publishTransaction(t *transaction) {
@@ -604,50 +633,54 @@ func (http *HTTP) shouldIncludeInBody(contenttype string) bool {
 	return false
 }
 
-func (http *HTTP) hideHeaders(m *message, msg []byte) {
+func (http *HTTP) hideHeaders(m *message) {
+	if !m.IsRequest || !http.RedactAuthorization {
+		return
+	}
 
-	if m.IsRequest {
-		// byte64 != encryption, so obscure it in headers in case of Basic Authentication
-		if http.RedactAuthorization {
+	msg := m.Raw
 
-			redactHeaders := []string{"authorization", "proxy-authorization"}
-			authText := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
+	// byte64 != encryption, so obscure it in headers in case of Basic Authentication
 
-			authHeaderStartX := m.headerOffset
-			authHeaderEndX := m.bodyOffset
+	redactHeaders := []string{"authorization", "proxy-authorization"}
+	authText := []byte("uthorization:") // [aA] case insensitive, also catches Proxy-Authorization:
 
-			for authHeaderStartX < m.bodyOffset {
-				debugf("looking for authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+	authHeaderStartX := m.headerOffset
+	authHeaderEndX := m.bodyOffset
 
-				startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
-				if startOfHeader >= 0 {
-					authHeaderStartX = authHeaderStartX + startOfHeader
+	for authHeaderStartX < m.bodyOffset {
+		debugf("looking for authorization from %d to %d", authHeaderStartX, authHeaderEndX)
 
-					endOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], []byte("\r\n"))
-					if endOfHeader >= 0 {
-						authHeaderEndX = authHeaderStartX + endOfHeader
+		startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
+		if startOfHeader >= 0 {
+			authHeaderStartX = authHeaderStartX + startOfHeader
 
-						if authHeaderEndX > m.bodyOffset {
-							authHeaderEndX = m.bodyOffset
-						}
+			endOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], []byte("\r\n"))
+			if endOfHeader >= 0 {
+				authHeaderEndX = authHeaderStartX + endOfHeader
 
-						debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
-
-						for i := authHeaderStartX + len(authText); i < authHeaderEndX; i++ {
-							msg[i] = byte('*')
-						}
-					}
+				if authHeaderEndX > m.bodyOffset {
+					authHeaderEndX = m.bodyOffset
 				}
-				authHeaderStartX = authHeaderEndX + len("\r\n")
-				authHeaderEndX = m.bodyOffset
-			}
-			for _, header := range redactHeaders {
-				if m.Headers[header] != "" {
-					m.Headers[header] = "*"
+
+				debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+
+				for i := authHeaderStartX + len(authText); i < authHeaderEndX; i++ {
+					msg[i] = byte('*')
 				}
 			}
 		}
+		authHeaderStartX = authHeaderEndX + len("\r\n")
+		authHeaderEndX = m.bodyOffset
 	}
+
+	for _, header := range redactHeaders {
+		if m.Headers[header] != "" {
+			m.Headers[header] = "*"
+		}
+	}
+
+	m.Raw = msg
 }
 
 func (http *HTTP) hideSecrets(values url.Values) url.Values {
@@ -698,11 +731,41 @@ func (http *HTTP) extractParameters(m *message, msg []byte) (path string, params
 }
 
 func (http *HTTP) isSecretParameter(key string) bool {
-
 	for _, keyword := range http.HideKeywords {
 		if strings.ToLower(key) == keyword {
 			return true
 		}
 	}
 	return false
+}
+
+func (ml *messageList) append(msg *message) {
+	if ml.tail == nil {
+		ml.head = msg
+	} else {
+		ml.tail.next = msg
+	}
+	msg.next = nil
+	ml.tail = msg
+}
+
+func (ml *messageList) empty() bool {
+	return ml.head == nil
+}
+
+func (ml *messageList) pop() *message {
+	if ml.head == nil {
+		return nil
+	}
+
+	msg := ml.head
+	ml.head = ml.head.next
+	if ml.head == nil {
+		ml.tail = nil
+	}
+	return msg
+}
+
+func (ml *messageList) last() *message {
+	return ml.tail
 }
