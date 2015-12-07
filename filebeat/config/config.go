@@ -63,7 +63,9 @@ type HarvesterConfig struct {
 	BackoffFactor      int    `yaml:"backoff_factor"`
 	MaxBackoff         string `yaml:"max_backoff"`
 	MaxBackoffDuration time.Duration
-	ForceCloseFiles    bool `yaml:"force_close_files"`
+	ForceCloseFiles    bool     `yaml:"force_close_files"`
+	ExcludeLines       []string `yaml:"exclude_lines"`
+	IncludeLines       []string `yaml:"include_lines"`
 }
 
 const (

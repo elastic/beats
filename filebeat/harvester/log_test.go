@@ -111,3 +111,30 @@ func TestLineEndingChars(t *testing.T) {
 	line = []byte("NR ending \n\r")
 	assert.Equal(t, 0, lineEndingChars(line))
 }
+
+func TestExcludeLine(t *testing.T) {
+
+	regexp, err := InitRegexps([]string{"^DBG"})
+
+	assert.Nil(t, err)
+
+	assert.True(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
+	assert.False(t, MatchAnyRegexps(regexp, "ERR: an error message"))
+}
+
+func TestIncludeLine(t *testing.T) {
+
+	regexp, err := InitRegexps([]string{"^ERR", "^WARN"})
+
+	assert.Nil(t, err)
+
+	assert.False(t, MatchAnyRegexps(regexp, "DBG: a debug message"))
+	assert.True(t, MatchAnyRegexps(regexp, "ERR: an error message"))
+	assert.True(t, MatchAnyRegexps(regexp, "WARNING: a simple warning message"))
+}
+
+func TestInitRegexp(t *testing.T) {
+
+	_, err := InitRegexps([]string{"((((("})
+	assert.NotNil(t, err)
+}
