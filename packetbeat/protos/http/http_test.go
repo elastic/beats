@@ -83,7 +83,7 @@ func TestHttpParser_simpleResponse(t *testing.T) {
 	assert.True(t, complete)
 	assert.False(t, message.IsRequest)
 	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.Equal(t, "OK", string(message.StatusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
 	assert.Equal(t, 262, int(message.Size))
 	assert.Equal(t, 0, message.ContentLength)
@@ -107,7 +107,7 @@ func TestHttpParser_simpleResponseCaseInsensitive(t *testing.T) {
 	assert.True(t, complete)
 	assert.False(t, message.IsRequest)
 	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.Equal(t, "OK", string(message.StatusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
 	assert.Equal(t, 262, int(message.Size))
 	assert.Equal(t, 0, message.ContentLength)
@@ -139,9 +139,9 @@ func TestHttpParser_simpleRequest(t *testing.T) {
 	assert.True(t, message.IsRequest)
 	assert.True(t, isVersion(message.version, 1, 1))
 	assert.Equal(t, 669, int(message.Size))
-	assert.Equal(t, "GET", message.Method)
-	assert.Equal(t, "/", message.RequestURI)
-	assert.Equal(t, "www.google.ro", message.Headers["host"])
+	assert.Equal(t, "GET", string(message.Method))
+	assert.Equal(t, "/", string(message.RequestURI))
+	assert.Equal(t, "www.google.ro", string(message.Headers["host"]))
 }
 
 func TestHttpParser_Request_ContentLength_0(t *testing.T) {
@@ -213,7 +213,7 @@ func TestHttpParser_splitResponse_midHeaderName(t *testing.T) {
 	assert.True(t, complete)
 	assert.False(t, message.IsRequest)
 	assert.Equal(t, 200, int(message.StatusCode))
-	assert.Equal(t, "OK", message.StatusPhrase)
+	assert.Equal(t, "OK", string(message.StatusPhrase))
 	assert.True(t, isVersion(message.version, 1, 1))
 	assert.Equal(t, 262, int(message.Size))
 	assert.Equal(t, 0, message.ContentLength)
@@ -725,28 +725,18 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 	http.hideHeaders(st.message)
 	msg := st.message.Raw
 
-	if !ok {
-		t.Errorf("Parsing returned error")
-	}
+	assert.True(t, ok)
+	assert.Equal(t, "*", string(st.message.Headers["authorization"]))
 
-	if st.message.Headers["authorization"] != "*" {
-		t.Errorf("Failed to redact authorization header: " + st.message.Headers["authorization"])
-	}
 	authPattern, _ := regexp.Compile(`(?m)^[Aa]uthorization:\*+`)
 	authObscured := authPattern.Match(msg)
-	if !authObscured {
-		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
-	}
+	assert.True(t, authObscured)
 
-	if st.message.Headers["proxy-authorization"] != "*" {
-		t.Errorf("Failed to redact proxy authorization header: " + st.message.Headers["proxy-authorization"])
-	}
+	assert.Equal(t, "*", string(st.message.Headers["proxy-authorization"]))
+
 	proxyPattern, _ := regexp.Compile(`(?m)^[Pp]roxy-[Aa]uthorization:\*+`)
 	proxyObscured := proxyPattern.Match(msg)
-	if !proxyObscured {
-		t.Errorf("Obscured proxy-authorization string not found: " + string(msg[:]))
-	}
-
+	assert.True(t, proxyObscured)
 }
 
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {

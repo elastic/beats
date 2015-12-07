@@ -160,8 +160,8 @@ func (http *HTTP) messageGap(s *stream, nbytes int) (ok bool, complete bool) {
 		} else {
 			m.Notes = append(m.Notes, "Packet loss while capturing the response")
 		}
-		if !m.hasContentLength && (m.connection == "close" ||
-			(isVersion(m.version, 1, 0) && m.connection != "keep-alive")) {
+		if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
+			(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 			s.bodyReceived += nbytes
 			m.ContentLength += nbytes
@@ -504,7 +504,7 @@ func (http *HTTP) collectHeaders(m *message) interface{} {
 	hdrs := map[string]interface{}{}
 	for name, value := range m.Headers {
 		if name == cookie {
-			hdrs[name] = splitCookiesHeader(value)
+			hdrs[name] = splitCookiesHeader(string(value))
 		} else {
 			hdrs[name] = value
 		}
@@ -554,14 +554,16 @@ func (http *HTTP) cutMessageBody(m *message) []byte {
 	return cutMsg
 }
 
-func (http *HTTP) shouldIncludeInBody(contenttype string) bool {
+func (http *HTTP) shouldIncludeInBody(contenttype []byte) bool {
 	includedBodies := config.ConfigSingleton.Protocols.Http.Include_body_for
 	for _, include := range includedBodies {
-		if strings.Contains(contenttype, include) {
-			debugf("Should Include Body = true Content-Type " + contenttype + " include_body " + include)
+		if bytes.Contains(contenttype, []byte(include)) {
+			debugf("Should Include Body = true Content-Type %s include_body %s",
+				contenttype, include)
 			return true
 		}
-		debugf("Should Include Body = false Content-Type" + contenttype + " include_body " + include)
+		debugf("Should Include Body = false Content-Type %s include_body %s",
+			contenttype, include)
 	}
 	return false
 }
@@ -608,8 +610,8 @@ func (http *HTTP) hideHeaders(m *message) {
 	}
 
 	for _, header := range redactHeaders {
-		if m.Headers[header] != "" {
-			m.Headers[header] = "*"
+		if len(m.Headers[header]) > 0 {
+			m.Headers[header] = []byte("*")
 		}
 	}
 
@@ -617,7 +619,6 @@ func (http *HTTP) hideHeaders(m *message) {
 }
 
 func (http *HTTP) hideSecrets(values url.Values) url.Values {
-
 	params := url.Values{}
 	for key, array := range values {
 		for _, value := range array {
@@ -637,7 +638,7 @@ func (http *HTTP) hideSecrets(values url.Values) url.Values {
 func (http *HTTP) extractParameters(m *message, msg []byte) (path string, params string, err error) {
 	var values url.Values
 
-	u, err := url.Parse(m.RequestURI)
+	u, err := url.Parse(string(m.RequestURI))
 	if err != nil {
 		return
 	}
@@ -646,7 +647,7 @@ func (http *HTTP) extractParameters(m *message, msg []byte) (path string, params
 
 	paramsMap := http.hideSecrets(values)
 
-	if m.ContentLength > 0 && strings.Contains(m.ContentType, "urlencoded") {
+	if m.ContentLength > 0 && bytes.Contains(m.ContentType, []byte("urlencoded")) {
 		values, err = url.ParseQuery(string(msg[m.bodyOffset:]))
 		if err != nil {
 			return
@@ -657,8 +658,6 @@ func (http *HTTP) extractParameters(m *message, msg []byte) (path string, params
 		}
 	}
 	params = paramsMap.Encode()
-
-	detailedf("Parameters: %s", params)
 
 	return
 }

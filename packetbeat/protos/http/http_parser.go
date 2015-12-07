@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -19,7 +18,7 @@ type message struct {
 	headerOffset     int
 	bodyOffset       int
 	version          version
-	connection       string
+	connection       common.NetString
 	chunkedLength    int
 	chunkedBody      []byte
 
@@ -27,20 +26,21 @@ type message struct {
 	TCPTuple     common.TcpTuple
 	CmdlineTuple *common.CmdlineTuple
 	Direction    uint8
+
 	//Request Info
-	FirstLine    string
-	RequestURI   string
-	Method       string
+	RequestURI   common.NetString
+	Method       common.NetString
 	StatusCode   uint16
-	StatusPhrase string
-	RealIP       string
+	StatusPhrase common.NetString
+	RealIP       common.NetString
+
 	// Http Headers
 	ContentLength    int
-	ContentType      string
-	TransferEncoding string
-	Headers          map[string]string
-	Body             string
+	ContentType      common.NetString
+	TransferEncoding common.NetString
+	Headers          map[string]common.NetString
 	Size             uint64
+
 	//Raw Data
 	Raw []byte
 
@@ -68,6 +68,18 @@ type parserConfig struct {
 	SendAllHeaders   bool
 	HeadersWhitelist map[string]bool
 }
+
+var (
+	transferEncodingChunked = []byte("chunked")
+
+	constClose     = []byte("close")
+	constKeepAlive = []byte("keep-alive")
+
+	nameContentLength    = []byte("content-length")
+	nameContentType      = []byte("content-type")
+	nameTransferEncoding = []byte("transfer-encoding")
+	nameConnection       = []byte("connection")
+)
 
 func newParser(config *parserConfig) *parser {
 	return &parser{config: config}
@@ -129,8 +141,6 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			logp.Warn("Failed to understand HTTP response status: %s", fline[9:])
 			return false, false, false
 		}
-		debugf("HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
-
 	} else {
 		// REQUEST
 		slices := bytes.Fields(fline)
@@ -139,18 +149,16 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			return false, false, false
 		}
 
-		m.Method = string(slices[0])
-		m.RequestURI = string(slices[1])
+		m.Method = common.NetString(slices[0])
+		m.RequestURI = common.NetString(slices[1])
 
 		if bytes.Equal(slices[2][:5], []byte("HTTP/")) {
 			m.IsRequest = true
 			version = slices[2][5:]
-			m.FirstLine = string(fline)
 		} else {
 			debugf("Couldn't understand HTTP version: %s", fline)
 			return false, false, false
 		}
-		debugf("HTTP Method=%s, RequestUri=%s", m.Method, m.RequestURI)
 	}
 
 	m.version.major, m.version.minor, err = parseVersion(version)
@@ -159,7 +167,6 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		m.version.major = 1
 		m.version.minor = 0
 	}
-	debugf("HTTP version %d.%d", m.version.major, m.version.minor)
 
 	// ok so far
 	s.parseOffset = i + 2
@@ -169,22 +176,20 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	return true, true, true
 }
 
-func parseResponseStatus(s []byte) (uint16, string, error) {
-	debugf("parseResponseStatus: %s", s)
-
-	p := bytes.Index(s, []byte(" "))
+func parseResponseStatus(s []byte) (uint16, []byte, error) {
+	p := bytes.IndexByte(s, ' ')
 	if p == -1 {
-		return 0, "", errors.New("Not beeing able to identify status code")
+		return 0, nil, errors.New("Not beeing able to identify status code")
 	}
 
-	code, _ := strconv.Atoi(string(s[0:p]))
+	code, _ := parseInt(s[0:p])
 
-	p = bytes.LastIndex(s, []byte(" "))
+	p = bytes.LastIndexByte(s, ' ')
 	if p == -1 {
-		return uint16(code), "", errors.New("Not beeing able to identify status code")
+		return uint16(code), nil, errors.New("Not beeing able to identify status code")
 	}
 	phrase := s[p+1:]
-	return uint16(code), string(phrase), nil
+	return uint16(code), phrase, nil
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
@@ -192,9 +197,11 @@ func parseVersion(s []byte) (uint8, uint8, error) {
 		return 0, 0, errors.New("Invalid version")
 	}
 
-	major, _ := strconv.Atoi(string(s[0]))
-	minor, _ := strconv.Atoi(string(s[2]))
-
+	major := s[0] - '0'
+	minor := s[2] - '0'
+	if major > 1 || minor > 2 {
+		return 0, 0, errors.New("unsupported version")
+	}
 	return uint8(major), uint8(minor), nil
 }
 
@@ -214,7 +221,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 			return false, true, true
 		}
 
-		if m.TransferEncoding == "chunked" {
+		if bytes.Equal(m.TransferEncoding, transferEncodingChunked) {
 			// support for HTTP/1.1 Chunked transfer
 			// Transfer-Encoding overrides the Content-Length
 			debugf("Read chunked body")
@@ -247,7 +254,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 
 func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	if m.Headers == nil {
-		m.Headers = make(map[string]string)
+		m.Headers = make(map[string]common.NetString)
 	}
 	i := bytes.Index(data, []byte(":"))
 	if i == -1 {
@@ -257,8 +264,9 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 	config := parser.config
 
-	detailedf("Data: %s", data)
-	detailedf("Header: %s", data[:i])
+	// enabled if required. Allocs for parameters slow down parser big times
+	//detailedf("Data: %s", data)
+	//detailedf("Header: %s", data[:i])
 
 	// skip folding line
 	for p := i + 1; p < len(data); {
@@ -268,41 +276,46 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			return true, false, 0
 		}
 		p += q
-		detailedf("HV: %s\n", data[i+1:p])
 		if len(data) > p && (data[p+1] == ' ' || data[p+1] == '\t') {
 			p = p + 2
 		} else {
-			headerName := strings.ToLower(string(data[:i]))
-			headerVal := string(bytes.Trim(data[i+1:p], " \t"))
-			debugf("Header: '%s' Value: '%s'\n", headerName, headerVal)
+			var headerNameBuf [140]byte
+			headerName := toLower(headerNameBuf[:], data[:i])
+			headerVal := trim(data[i+1 : p])
+			//debugf("Header: '%s' Value: '%s'\n", headerName, headerVal)
 
 			// Headers we need for parsing. Make sure we always
 			// capture their value
-			if headerName == "content-length" {
-				m.ContentLength, _ = strconv.Atoi(headerVal)
+			if bytes.Equal(headerName, nameContentLength) {
+				m.ContentLength, _ = parseInt(headerVal)
 				m.hasContentLength = true
-			} else if headerName == "content-type" {
+			} else if bytes.Equal(headerName, nameContentType) {
 				m.ContentType = headerVal
-			} else if headerName == "transfer-encoding" {
-				m.TransferEncoding = headerVal
-			} else if headerName == "connection" {
+			} else if bytes.Equal(headerName, nameTransferEncoding) {
+				m.TransferEncoding = common.NetString(headerVal)
+			} else if bytes.Equal(headerName, nameConnection) {
 				m.connection = headerVal
 			}
-			if len(config.RealIPHeader) > 0 && headerName == config.RealIPHeader {
+			if len(config.RealIPHeader) > 0 && bytes.Equal(headerName, []byte(config.RealIPHeader)) {
 				m.RealIP = headerVal
 			}
 
 			if config.SendHeaders {
 				if !config.SendAllHeaders {
-					_, exists := config.HeadersWhitelist[headerName]
+					_, exists := config.HeadersWhitelist[string(headerName)]
 					if !exists {
 						return true, true, p + 2
 					}
 				}
-				if val, ok := m.Headers[headerName]; ok {
-					m.Headers[headerName] = val + ", " + headerVal
+				if val, ok := m.Headers[string(headerName)]; ok {
+					composed := make([]byte, len(val)+len(headerVal)+2)
+					off := copy(composed, val)
+					off = copy(composed[off:], []byte(", "))
+					copy(composed[off:], headerVal)
+
+					m.Headers[string(headerName)] = composed
 				} else {
-					m.Headers[headerName] = headerVal
+					m.Headers[string(headerName)] = headerVal
 				}
 			}
 
@@ -315,8 +328,8 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	debugf("eat body: %d", s.parseOffset)
-	if !m.hasContentLength && (m.connection == "close" ||
-		(isVersion(m.version, 1, 0) && m.connection != "keep-alive")) {
+	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
+		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 		// HTTP/1.0 no content length. Add until the end of the connection
 		debugf("close connection, %d", len(s.data)-s.parseOffset)
@@ -413,4 +426,55 @@ func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complet
 
 func isVersion(v version, major, minor uint8) bool {
 	return v.major == major && v.minor == minor
+}
+
+func trim(buf []byte) []byte {
+	return trimLeft(trimRight(buf))
+}
+
+func trimLeft(buf []byte) []byte {
+	for i, b := range buf {
+		if b != ' ' && b != '\t' {
+			return buf[i:]
+		}
+	}
+	return nil
+}
+
+func trimRight(buf []byte) []byte {
+	for i := len(buf) - 1; i > 0; i-- {
+		b := buf[i]
+		if b != ' ' && b != '\t' {
+			return buf[:i+1]
+		}
+	}
+	return nil
+}
+
+func parseInt(line []byte) (int, error) {
+	buf := streambuf.NewFixed(line)
+	i, err := buf.AsciiInt(false)
+	return int(i), err
+	// TODO: is it an error if 'buf.Len() != 0 {}' ?
+}
+
+func toLower(buf, in []byte) []byte {
+	if len(in) > len(buf) {
+		goto unbufferedToLower
+	}
+
+	for i, b := range in {
+		if b > 127 {
+			goto unbufferedToLower
+		}
+
+		if 'A' <= b && b <= 'Z' {
+			b = b - 'A' + 'a'
+		}
+		buf[i] = b
+	}
+	return buf[:len(in)]
+
+unbufferedToLower:
+	return bytes.ToLower(in)
 }
