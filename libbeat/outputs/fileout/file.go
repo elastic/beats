@@ -16,12 +16,11 @@ func init() {
 type FileOutputPlugin struct{}
 
 func (f FileOutputPlugin) NewOutput(
-	beat string,
 	config *outputs.MothershipConfig,
 	topology_expire int,
 ) (outputs.Outputer, error) {
 	output := &fileOutput{}
-	err := output.init(beat, config, topology_expire)
+	err := output.init(config, topology_expire)
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +31,11 @@ type fileOutput struct {
 	rotator logp.FileRotator
 }
 
-func (out *fileOutput) init(beat string, config *outputs.MothershipConfig, topology_expire int) error {
+func (out *fileOutput) init(config *outputs.MothershipConfig, topology_expire int) error {
 	out.rotator.Path = config.Path
 	out.rotator.Name = config.Filename
 	if out.rotator.Name == "" {
-		out.rotator.Name = beat
+		out.rotator.Name = config.Index
 	}
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 

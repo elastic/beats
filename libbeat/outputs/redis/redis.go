@@ -26,12 +26,11 @@ func init() {
 type RedisOutputPlugin struct{}
 
 func (f RedisOutputPlugin) NewOutput(
-	beat string,
 	config *outputs.MothershipConfig,
 	topology_expire int,
 ) (outputs.Outputer, error) {
 	output := &redisOutput{}
-	err := output.Init(beat, *config, topology_expire)
+	err := output.Init(*config, topology_expire)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +67,7 @@ type message struct {
 	msg   string
 }
 
-func (out *redisOutput) Init(beat string, config outputs.MothershipConfig, topology_expire int) error {
+func (out *redisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
 
 	logp.Warn("Redis Output is deprecated. Please use the Redis Output Plugin from Logstash instead.")
 
@@ -92,11 +91,7 @@ func (out *redisOutput) Init(beat string, config outputs.MothershipConfig, topol
 		out.Timeout = time.Duration(config.Timeout) * time.Second
 	}
 
-	if config.Index != "" {
-		out.Index = config.Index
-	} else {
-		out.Index = beat
-	}
+	out.Index = config.Index
 
 	out.ReconnectInterval = time.Duration(1) * time.Second
 	if config.ReconnectInterval != 0 {

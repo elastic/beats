@@ -17,7 +17,6 @@ func init() {
 type plugin struct{}
 
 func (p plugin) NewOutput(
-	beat string,
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
