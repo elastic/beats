@@ -95,6 +95,7 @@ func (el *eventLog) Open(recordNumber uint32) error {
 	var oldestRecord, newestRecord uint32
 	if numRecords > 0 {
 		el.recordNumber = recordNumber
+		el.seek = true
 		el.ignoreFirst = true
 
 		oldestRecord, err = getOldestEventLogRecord(handle)
@@ -117,7 +118,6 @@ func (el *eventLog) Open(recordNumber uint32) error {
 		"at %d (ignoringFirst=%t)", el.logPrefix, numRecords, oldestRecord,
 		newestRecord, el.recordNumber, el.ignoreFirst)
 
-	el.seek = true
 	el.handle = handle
 	el.readBuf = make([]byte, maxEventBufferSize)
 	// TODO: Start with this buffer smaller and grow it when needed.
@@ -134,23 +134,21 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		el.seek = false
 	}
 
-	err := readEventLog(
-		el.handle,
-		flags,
-		el.recordNumber,
-		&el.readBuf[0],
-		uint32(len(el.readBuf)),
-		&numBytesRead,
-		&minBytesToRead)
+	err := retry(
+		func() error {
+			return readEventLog(
+				el.handle,
+				flags,
+				el.recordNumber,
+				&el.readBuf[0],
+				uint32(len(el.readBuf)),
+				&numBytesRead,
+				&minBytesToRead)
+		},
+		el.readRetryErrorHandler)
 	if err != nil {
-		errno, ok := err.(syscall.Errno)
-		if ok && errno == syscall.ERROR_HANDLE_EOF {
-			// Ignore EOF and return empty.
-			return []LogRecord{}, nil
-		}
-		// TODO: Add special handling for other error conditions like
-		// ERROR_EVENTLOG_FILE_CHANGED.
-		return nil, err
+		debugf("%s ReadEventLog returned error %s", el.logPrefix, err)
+		return readErrorHandler(err)
 	}
 	detailf("%s ReadEventLog read %d bytes", el.logPrefix, numBytesRead)
 
@@ -406,4 +404,41 @@ func queryEventMessageFiles(providerName, sourceName string) ([]Handle, error) {
 	logp.Debug("eventlog", "Returning handles %v for sourceName %s", handles,
 		sourceName)
 	return handles, nil
+}
+
+// readRetryErrorHandler handles errors returned from the readEventLog function
+// by attempting to correct the error through closing and reopening the event
+// log.
+func (el *eventLog) readRetryErrorHandler(err error) error {
+	if errno, ok := err.(syscall.Errno); ok {
+		var reopen bool
+
+		switch errno {
+		case ERROR_EVENTLOG_FILE_CHANGED:
+			debugf("Re-opening event log because event log file was changed")
+			reopen = true
+		case ERROR_EVENTLOG_FILE_CORRUPT:
+			debugf("Re-opening event log because event log file is corrupt")
+			reopen = true
+		}
+
+		if reopen {
+			el.Close()
+			return el.Open(el.recordNumber)
+		}
+	}
+	return err
+}
+
+// readErrorHandler handles errors returned by the readEventLog function.
+func readErrorHandler(err error) ([]LogRecord, error) {
+	if errno, ok := err.(syscall.Errno); ok {
+		switch errno {
+		case syscall.ERROR_HANDLE_EOF,
+			ERROR_EVENTLOG_FILE_CHANGED,
+			ERROR_EVENTLOG_FILE_CORRUPT:
+			return []LogRecord{}, nil
+		}
+	}
+	return nil, err
 }

@@ -415,10 +415,57 @@ func TestReadNoParameterMsg(t *testing.T) {
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
 
+// TestReadWhileCleared tests that the Read method recovers from the event log
+// being cleared or reset while reading.
+func TestReadWhileCleared(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode.")
+	}
+	configureLogp()
+	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	eventlog := NewEventLoggingAPI(providerName)
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	log.Info(1, "Message 1")
+	log.Info(2, "Message 2")
+	lr, err := eventlog.Read()
+	assert.NoError(t, err, "Expected 2 messages but received error")
+	assert.Len(t, lr, 2, "Expected 2 messages")
+
+	assert.NoError(t, clearEventLog(Handle(log.Handle), ""))
+	lr, err = eventlog.Read()
+	assert.NoError(t, err, "Expected 0 messages but received error")
+	assert.Len(t, lr, 0, "Expected 0 message")
+
+	log.Info(3, "Message 3")
+	lr, err = eventlog.Read()
+	assert.NoError(t, err, "Expected 1 message but received error")
+	assert.Len(t, lr, 1, "Expected 1 message")
+	if len(lr) > 0 {
+		assert.Equal(t, uint32(3), lr[0].EventID)
+	}
+}
+
 // TODO: Add more test cases:
-// - Shall recover from errors caused by log rotation during a read. Based on the
-//   retention policy the log may be cleared when it reaches max size. See Retention:
-//   https://msdn.microsoft.com/en-us/library/windows/desktop/aa363648(v=vs.85).aspx
 // - Record number rollover (there may be an issue with this if ++ is used anywhere)
 // - Reading from a source name instead of provider name (can't be done according to docs).
 // - Persistent read mode shall support specifying a record number (or not specifying a record number).
