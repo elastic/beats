@@ -41,16 +41,25 @@ crosscompile: $(GOFILES)
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
-	gofmt -l . | read && echo "Code differs from gofmt's style" && exit 1 || true
+	@gofmt -l . | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
 	go vet ./...
+
+# Runs gofmt -w on the project's source code, modifying any files that do not
+# match its style.
+.PHONY: fmt
+fmt:
+	gofmt -w .
+
+# Runs gofmt -s -w on the project's source code, modifying any files that do not
+# match its style.
+.PHONY: simplify
+simplify:
+	gofmt -s -w .
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
 clean:
-	go fmt ./...
-	gofmt -w .
-	-rm -r build
-	-rm ${BEATNAME} ${BEATNAME}.test
+	rm -rf build ${BEATNAME} ${BEATNAME}.test ${BEATNAME}.exe ${BEATNAME}.test.exe
 
 # Shortcut for continuous integration
 # This should always run before merging.
