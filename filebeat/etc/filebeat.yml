@@ -30,6 +30,16 @@ filebeat:
       # * stdin: Reads the standard in
       input_type: log
 
+      # Exclude lines. A list of regular expressions to match. It drops the lines that are
+      # matching any regular expression from the list. The include_lines is called before
+      # exclude_lines. By default, no lines are dropped. 
+      # exclude_lines: ["^DBG"]
+
+      # Include lines. A list of regular expressions to match. It exports the lines that are
+      # matching any regular expression from the list. The include_lines is called before 
+      # exclude_lines. By default, all the lines are exported.
+      # include_lines: ["^ERR", "^WARN"]
+
       # Optional additional fields. These field can be freely picked
       # to add additional information to the crawled log files for filtering
       #fields:

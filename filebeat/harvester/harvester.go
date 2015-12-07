@@ -16,6 +16,7 @@ package harvester
 import (
 	"io"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/elastic/beats/filebeat/config"
@@ -24,15 +25,17 @@ import (
 )
 
 type Harvester struct {
-	Path             string /* the file path to harvest */
-	ProspectorConfig config.ProspectorConfig
-	Config           *config.HarvesterConfig
-	Offset           int64
-	Stat             *FileStat
-	SpoolerChan      chan *input.FileEvent
-	encoding         encoding.EncodingFactory
-	file             FileSource /* the file being watched */
-	backoff          time.Duration
+	Path               string /* the file path to harvest */
+	ProspectorConfig   config.ProspectorConfig
+	Config             *config.HarvesterConfig
+	Offset             int64
+	Stat               *FileStat
+	SpoolerChan        chan *input.FileEvent
+	encoding           encoding.EncodingFactory
+	file               FileSource /* the file being watched */
+	backoff            time.Duration
+	ExcludeLinesRegexp []*regexp.Regexp
+	IncludeLinesRegexp []*regexp.Regexp
 }
 
 // Contains statistic about file when it was last seend by the prospector

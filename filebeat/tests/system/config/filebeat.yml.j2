@@ -23,6 +23,13 @@ filebeat:
       {% endfor %}
       {% endif %}
       fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
+      {% if include_lines %}
+      include_lines: {{include_lines}}
+      {% endif %}
+      {% if exclude_lines %}
+      exclude_lines: {{exclude_lines}}
+      {% endif %}
+      
   spool_size:
   idle_timeout: 0.1s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}

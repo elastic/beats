@@ -5,7 +5,6 @@ from filebeat import TestCase
 import codecs
 import os
 import time
-import unittest
 
 
 # Additional tests to be added:
@@ -156,7 +155,6 @@ class Test(TestCase):
             max_timeout=15)
 
         filebeat.kill_and_wait()
-
 
     def test_file_renaming(self):
         """
@@ -675,3 +673,167 @@ class Test(TestCase):
         for _, _, text in encodings:
             assert text in lines
             assert text + " 2" in lines
+
+    def test_include_lines(self):
+        """
+        Checks if only the log lines defined by include_lines are exported
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            include_lines=["^ERR", "^WARN"]
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 20
+        for n in range(0, iterations):
+            file.write("DBG: a simple debug message" + str(n))
+            file.write("\n")
+            file.write("ERR: a simple error message" + str(n))
+            file.write("\n")
+            file.write("WARNING: a simple warning message" + str(n))
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.output_has(40),
+            max_timeout=15)
+
+        # TODO: Find better solution when filebeat did crawl the file
+        # Idea: Special flag to filebeat so that filebeat is only doing and
+        # crawl and then finishes
+        filebeat.kill_and_wait()
+
+        output = self.read_output()
+
+        # Check that output file has the same number of lines as the log file
+        assert iterations*2 == len(output)
+
+    def test_default_include_exclude_lines(self):
+        """
+        Checks if all the log lines are exported by default
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 20
+        for n in range(0, iterations):
+            file.write("DBG: a simple debug message" + str(n))
+            file.write("\n")
+            file.write("ERR: a simple error message" + str(n))
+            file.write("\n")
+            file.write("WARNING: a simple warning message" + str(n))
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.output_has(60),
+            max_timeout=15)
+
+        # TODO: Find better solution when filebeat did crawl the file
+        # Idea: Special flag to filebeat so that filebeat is only doing and
+        # crawl and then finishes
+        filebeat.kill_and_wait()
+
+        output = self.read_output()
+
+        # Check that output file has the same number of lines as the log file
+        assert iterations*3 == len(output)
+
+    def test_exclude_lines(self):
+        """
+        Checks if the lines matching exclude_lines regexp are dropped
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            exclude_lines=["^DBG"]
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 20
+        for n in range(0, iterations):
+            file.write("DBG: a simple debug message" + str(n))
+            file.write("\n")
+            file.write("ERR: a simple error message" + str(n))
+            file.write("\n")
+            file.write("WARNING: a simple warning message" + str(n))
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.output_has(40),
+            max_timeout=15)
+
+        # TODO: Find better solution when filebeat did crawl the file
+        # Idea: Special flag to filebeat so that filebeat is only doing and
+        # crawl and then finishes
+        filebeat.kill_and_wait()
+
+        output = self.read_output()
+
+        # Check that output file has the same number of lines as the log file
+        assert iterations*2 == len(output)
+
+    def test_include_exclude_lines(self):
+        """
+        Checks if all the log lines are exported by default
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            exclude_lines=["^DBG"],
+            include_lines=["apache"]
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 20
+        for n in range(0, iterations):
+            file.write("DBG: a simple debug message" + str(n))
+            file.write("\n")
+            file.write("ERR: apache simple error message" + str(n))
+            file.write("\n")
+            file.write("ERR: a simple warning message" + str(n))
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.output_has(20),
+            max_timeout=15)
+
+        # TODO: Find better solution when filebeat did crawl the file
+        # Idea: Special flag to filebeat so that filebeat is only doing and
+        # crawl and then finishes
+        filebeat.kill_and_wait()
+
+        output = self.read_output()
+
+        # Check that output file has the same number of lines as the log file
+        assert iterations == len(output)
