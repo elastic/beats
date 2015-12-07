@@ -176,13 +176,15 @@ system:
           path: mem.actual_used
           type: int
           description: >
-            Actual used memory. Available only on Unix.
+            Actual used memory. It is defined as the "used" memory minus the memory used for disk caches and buffers. 
+            Available only on Unix.
 
         - name: actual_free
           path: mem.actual_free
           type: int
           description: >
-            Actual available memory. Available only on Unix.
+            Actual available memory. It is defined as the "free" memory plus the memory used for disk caches and
+            buffers. Available only on Unix.
 
         - name: actual_used_p
           path: mem.actual_used_p
