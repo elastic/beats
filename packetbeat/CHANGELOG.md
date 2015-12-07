@@ -14,7 +14,8 @@ All notable changes to this project will be documented in this file based on the
 - Improve MongoDB message correlation. #377
 
 ### Added
-- Added piping support to redis protocol. #402
+- Added redis pipelining support. #402
+- Add http pipelining support. #453
 
 ### Deprecated
 
