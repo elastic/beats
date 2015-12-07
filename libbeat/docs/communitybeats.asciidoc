@@ -14,6 +14,7 @@ https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM
+https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status
 
 Have you created a Beat that's not listed? Open a pull request to add your link
 here: https://github.com/elastic/libbeat/blob/master/docs/communitybeats.asciidoc
