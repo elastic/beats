@@ -1103,7 +1103,85 @@ func TestHttp_configsSettingHeaders(t *testing.T) {
 	}
 }
 
-func BenchmarkHttpRequestResponse(b *testing.B) {
+func benchmarkHTTPMessage(b *testing.B, data []byte) {
+	http := httpModForTests()
+	parser := newParser(&http.parserConfig)
+
+	for i := 0; i < b.N; i++ {
+		stream := &stream{data: data, message: new(message)}
+		ok, complete := parser.parse(stream)
+		if !ok || !complete {
+			b.Errorf("failed to parse message")
+		}
+	}
+}
+
+func BenchmarkHTTPSimpleResponse(b *testing.B) {
+	data := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n")
+
+	benchmarkHTTPMessage(b, data)
+}
+
+func BenchmarkHTTPSimpleRequest(b *testing.B) {
+	data := []byte("GET / HTTP/1.1\r\n" +
+		"Host: www.google.ro\r\n" +
+		"Connection: keep-alive\r\n" +
+		"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.75 Safari/537.1\r\n" +
+		"Accept: */*\r\n" +
+		"X-Chrome-Variations: CLa1yQEIj7bJAQiftskBCKS2yQEIp7bJAQiptskBCLSDygE=\r\n" +
+		"Referer: http://www.google.ro/\r\n" +
+		"Accept-Encoding: gzip,deflate,sdch\r\n" +
+		"Accept-Language: en-US,en;q=0.8\r\n" +
+		"Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3\r\n" +
+		"Cookie: PREF=ID=6b67d166417efec4:U=69097d4080ae0e15:FF=0:TM=1340891937:LM=1340891938:S=8t97UBiUwKbESvVX; NID=61=sf10OV-t02wu5PXrc09AhGagFrhSAB2C_98ZaI53-uH4jGiVG_yz9WmE3vjEBcmJyWUogB1ZF5puyDIIiB-UIdLd4OEgPR3x1LHNyuGmEDaNbQ_XaxWQqqQ59mX1qgLQ\r\n" +
+		"\r\n" +
+		"garbage")
+
+	benchmarkHTTPMessage(b, data)
+}
+
+func BenchmarkHTTPSplitResponse(b *testing.B) {
+	data1 := []byte("HTTP/1.1 200 OK\r\n" +
+		"Date: Tue, 14 Aug 2012 22:31:45 GMT\r\n" +
+		"Expires: -1\r\n" +
+		"Cache-Control: private, max-age=0\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n")
+	data2 := []byte("Content-Encoding: gzip\r\n" +
+		"Server: gws\r\n" +
+		"Content-Length: 0\r\n" +
+		"X-XSS-Protection: 1; mode=block\r\n" +
+		"X-Frame-Options: SAMEORIGIN\r\n" +
+		"\r\n")
+
+	http := httpModForTests()
+	parser := newParser(&http.parserConfig)
+
+	for i := 0; i < b.N; i++ {
+		stream := &stream{data: data1, message: new(message)}
+		ok, complete := parser.parse(stream)
+		if !ok || complete {
+			b.Errorf("parse failure. Expected message to be incomplete, but no parse failures")
+		}
+
+		stream.data = append(stream.data, data2...)
+		ok, complete = parser.parse(stream)
+		if !ok || !complete {
+			b.Errorf("failed to parse message")
+		}
+	}
+}
+
+func BenchmarkHttpSimpleTransaction(b *testing.B) {
 	data1 := "GET / HTTP/1.1\r\n" +
 		"Host: www.google.ro\r\n" +
 		"Connection: keep-alive\r\n" +
