@@ -24,7 +24,7 @@ NOTE: We also provide 32-bit images that you can get from our
 https://www.elastic.co/downloads/beats/topbeat[download page].
 
 [[deb]]
-==== deb:
+*deb:*
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -33,7 +33,7 @@ sudo dpkg -i topbeat_{version}_amd64.deb
 ------------------------------------------------
 
 [[rpm]]
-==== rpm:
+*rpm:*
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -42,7 +42,7 @@ sudo rpm -vi topbeat-{version}-x86_64.rpm
 ------------------------------------------------
 
 [[mac]]
-==== mac:
+*mac:*
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
@@ -51,10 +51,10 @@ tar xzvf topbeat-{version}-darwin.tgz
 ------------------------------------------------
 
 [[win]]
-==== win:
+*win:*
 
 . Download the Topbeat Windows zip file from the
-https://www.elastic.co/downloads/beats/topbeat[downloads page]
+https://www.elastic.co/downloads/beats/topbeat[downloads page].
 
 . Extract the contents of the zip file into `C:\Program Files`.
 
@@ -71,7 +71,7 @@ PS C:\Program Files\Topbeat> .\install-service-topbeat.ps1
 ----------------------------------------------------------------------
 
 Before starting Topbeat, you should look at the configuration options in the configuration file,
-for example `C:\Program Files\topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
+for example `C:\Program Files\Topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
 
 [[topbeat-configuration]]
 === Configuring Topbeat
@@ -114,14 +114,14 @@ in which way.
 The recommended template file is installed by the Topbeat packages. Load it with the
 following command:
 
-==== deb or rpm:
+*deb or rpm:*
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@/etc/topbeat/topbeat.template.json
 ----------------------------------------------------------------------
 
-==== mac:
+*mac:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -131,7 +131,7 @@ curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
-==== win:
+*win:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -145,28 +145,27 @@ where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 Run Topbeat by issuing the following command:
 
-==== deb:
+*deb:*
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/topbeat start
+----------------------------------------------------------------------
+*rpm:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/topbeat start
 ----------------------------------------------------------------------
 
-==== rpm:
-
-[source,shell]
-----------------------------------------------------------------------
-sudo /etc/init.d/topbeat start
-----------------------------------------------------------------------
-
-==== mac:
+*mac:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo ./topbeat -e -c topbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
-==== win:
+*win:*
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -190,6 +189,8 @@ curl -XGET 'http://localhost:9200/topbeat-*/_search?pretty'
 
 Make sure that you replace `localhost:9200` with the address of your Elasticsearch
 instance.
+
+On Windows, if you don't have cURL installed, simply point your browser to the URL.
 
 === Loading Sample Kibana Dashboards
 
