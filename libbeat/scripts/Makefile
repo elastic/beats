@@ -49,8 +49,8 @@ check:
 clean:
 	go fmt ./...
 	gofmt -w .
-	-rm -r build
-	-rm ${BEATNAME} ${BEATNAME}.test
+	-rm -rf build
+	-rm -f ${BEATNAME} ${BEATNAME}.test
 
 # Shortcut for continuous integration
 # This should always run before merging.
