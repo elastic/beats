@@ -170,8 +170,8 @@ func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 
 	if publisher.GeoLite != nil {
 		realIP, exists := event["real_ip"]
-		if exists && len(realIP.(string)) > 0 {
-			loc := publisher.GeoLite.GetLocationByIP(realIP.(string))
+		if exists && len(realIP.(common.NetString)) > 0 {
+			loc := publisher.GeoLite.GetLocationByIP(string(realIP.(common.NetString)))
 			if loc != nil && loc.Latitude != 0 && loc.Longitude != 0 {
 				loc := fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 				event["client_location"] = loc
