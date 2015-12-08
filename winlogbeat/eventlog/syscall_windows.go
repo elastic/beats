@@ -31,6 +31,13 @@ const (
 	EVENTLOG_BACKWARDS_READ
 )
 
+// Event Log Error Codes
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms681385(v=vs.85).aspx
+const (
+	ERROR_EVENTLOG_FILE_CORRUPT syscall.Errno = 1500
+	ERROR_EVENTLOG_FILE_CHANGED syscall.Errno = 1503
+)
+
 // Handle to a the OS specific event log.
 type Handle uintptr
 
