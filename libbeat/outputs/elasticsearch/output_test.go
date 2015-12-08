@@ -22,7 +22,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 	}
 
 	var output elasticsearchOutput
-	output.init("packetbeat", outputs.MothershipConfig{
+	output.init(outputs.MothershipConfig{
 		Save_topology: true,
 		Host:          GetEsHost(),
 		Port:          esPort,

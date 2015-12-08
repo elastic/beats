@@ -154,7 +154,7 @@ func newTestLumberjackOutput(
 		t.Fatalf("No logstash output plugin found")
 	}
 
-	output, err := plugin.NewOutput("test", config, 0)
+	output, err := plugin.NewOutput(config, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

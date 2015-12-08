@@ -49,7 +49,6 @@ type elasticsearchOutput struct {
 
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
 func (f elasticsearchOutputPlugin) NewOutput(
-	beat string,
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
@@ -61,7 +60,7 @@ func (f elasticsearchOutputPlugin) NewOutput(
 	}
 
 	output := &elasticsearchOutput{}
-	err := output.init(beat, *config, topologyExpire)
+	err := output.init(*config, topologyExpire)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,6 @@ func (f elasticsearchOutputPlugin) NewOutput(
 }
 
 func (out *elasticsearchOutput) init(
-	beat string,
 	config outputs.MothershipConfig,
 	topologyExpire int,
 ) error {
@@ -78,7 +76,7 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	clients, err := mode.MakeClients(config, makeClientFactory(beat, tlsConfig, config))
+	clients, err := mode.MakeClients(config, makeClientFactory(tlsConfig, config))
 	if err != nil {
 		return err
 	}
@@ -143,16 +141,12 @@ func (out *elasticsearchOutput) init(
 	}
 
 	out.mode = m
-	if config.Index != "" {
-		out.index = config.Index
-	} else {
-		out.index = beat
-	}
+	out.index = config.Index
+
 	return nil
 }
 
 func makeClientFactory(
-	beat string,
 	tls *tls.Config,
 	config outputs.MothershipConfig,
 ) func(string) (mode.ProtocolClient, error) {
@@ -179,12 +173,7 @@ func makeClientFactory(
 			logp.Info("Using proxy URL: %s", proxyURL)
 		}
 
-		index := beat
-		if config.Index != "" {
-			index = config.Index
-		}
-
-		client := NewClient(esURL, index, proxyURL, tls, config.Username, config.Password)
+		client := NewClient(esURL, config.Index, proxyURL, tls, config.Username, config.Password)
 		return client, nil
 	}
 }

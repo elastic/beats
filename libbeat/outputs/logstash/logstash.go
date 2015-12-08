@@ -22,12 +22,11 @@ func init() {
 type logstashOutputPlugin struct{}
 
 func (p logstashOutputPlugin) NewOutput(
-	beat string,
 	config *outputs.MothershipConfig,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &logstash{}
-	err := output.init(beat, *config, topologyExpire)
+	err := output.init(*config, topologyExpire)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,6 @@ var waitRetry = time.Duration(1) * time.Second
 var maxWaitRetry = time.Duration(60) * time.Second
 
 func (lj *logstash) init(
-	beat string,
 	config outputs.MothershipConfig,
 	topologyExpire int,
 ) error {
@@ -128,11 +126,8 @@ func (lj *logstash) init(
 	}
 
 	lj.mode = m
-	if config.Index != "" {
-		lj.index = config.Index
-	} else {
-		lj.index = beat
-	}
+	lj.index = config.Index
+
 	return nil
 }
 
