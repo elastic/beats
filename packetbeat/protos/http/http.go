@@ -71,6 +71,11 @@ type HTTP struct {
 	results publisher.Client
 }
 
+var (
+	isDebug    = false
+	isDetailed = false
+)
+
 func (http *HTTP) initDefaults() {
 	http.SendRequest = false
 	http.SendResponse = false
@@ -138,6 +143,9 @@ func (http *HTTP) Init(testMode bool, results publisher.Client) error {
 		}
 	}
 
+	isDebug = logp.IsDebug("http")
+	isDetailed = logp.IsDebug("httpdetailed")
+
 	http.results = results
 
 	return nil
@@ -154,7 +162,10 @@ func (http *HTTP) messageGap(s *stream, nbytes int) (ok bool, complete bool) {
 		// we know we cannot recover from these
 		return false, false
 	case stateBody:
-		debugf("gap in body: %d", nbytes)
+		if isDebug {
+			debugf("gap in body: %d", nbytes)
+		}
+
 		if m.IsRequest {
 			m.Notes = append(m.Notes, "Packet loss while capturing the request")
 		} else {
@@ -256,7 +267,9 @@ func (http *HTTP) doParse(
 	dir uint8,
 ) *httpConnectionData {
 
-	detailedf("Payload received: [%s]", pkt.Payload)
+	if isDetailed {
+		detailedf("Payload received: [%s]", pkt.Payload)
+	}
 
 	st := conn.Streams[dir]
 	if st == nil {
@@ -266,7 +279,9 @@ func (http *HTTP) doParse(
 		// concatenate bytes
 		st.data = append(st.data, pkt.Payload...)
 		if len(st.data) > tcp.TCP_MAX_DATA_IN_STREAM {
-			debugf("Stream data too large, dropping TCP stream")
+			if isDebug {
+				debugf("Stream data too large, dropping TCP stream")
+			}
 			conn.Streams[dir] = nil
 			return conn
 		}
@@ -355,7 +370,9 @@ func (http *HTTP) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	}
 
 	ok, complete := http.messageGap(stream, nbytes)
-	detailedf("messageGap returned ok=%v complete=%v", ok, complete)
+	if isDetailed {
+		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
+	}
 	if !ok {
 		// on errors, drop stream
 		conn.Streams[dir] = nil
@@ -384,10 +401,14 @@ func (http *HTTP) handleHTTP(
 	http.hideHeaders(m)
 
 	if m.IsRequest {
-		debugf("Received request with tuple: %s", m.TCPTuple)
+		if isDebug {
+			debugf("Received request with tuple: %s", m.TCPTuple)
+		}
 		conn.requests.append(m)
 	} else {
-		debugf("Received response with tuple: %s", m.TCPTuple)
+		if isDebug {
+			debugf("Received response with tuple: %s", m.TCPTuple)
+		}
 		conn.responses.append(m)
 		http.correlate(conn)
 	}
@@ -409,7 +430,9 @@ func (http *HTTP) correlate(conn *httpConnectionData) {
 		resp := conn.responses.pop()
 		trans := http.newTransaction(requ, resp)
 
-		debugf("HTTP transaction completed")
+		if isDebug {
+			debugf("HTTP transaction completed")
+		}
 		http.publishTransaction(trans)
 	}
 }
@@ -546,7 +569,9 @@ func (http *HTTP) cutMessageBody(m *message) []byte {
 		if len(m.chunkedBody) > 0 {
 			cutMsg = append(cutMsg, m.chunkedBody...)
 		} else {
-			debugf("Body to include: [%s]", m.Raw[m.bodyOffset:])
+			if isDebug {
+				debugf("Body to include: [%s]", m.Raw[m.bodyOffset:])
+			}
 			cutMsg = append(cutMsg, m.Raw[m.bodyOffset:]...)
 		}
 	}
@@ -558,12 +583,16 @@ func (http *HTTP) shouldIncludeInBody(contenttype []byte) bool {
 	includedBodies := config.ConfigSingleton.Protocols.Http.Include_body_for
 	for _, include := range includedBodies {
 		if bytes.Contains(contenttype, []byte(include)) {
-			debugf("Should Include Body = true Content-Type %s include_body %s",
-				contenttype, include)
+			if isDebug {
+				debugf("Should Include Body = true Content-Type %s include_body %s",
+					contenttype, include)
+			}
 			return true
 		}
-		debugf("Should Include Body = false Content-Type %s include_body %s",
-			contenttype, include)
+		if isDebug {
+			debugf("Should Include Body = false Content-Type %s include_body %s",
+				contenttype, include)
+		}
 	}
 	return false
 }
@@ -584,7 +613,10 @@ func (http *HTTP) hideHeaders(m *message) {
 	authHeaderEndX := m.bodyOffset
 
 	for authHeaderStartX < m.bodyOffset {
-		debugf("looking for authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+		if isDebug {
+			debugf("looking for authorization from %d to %d",
+				authHeaderStartX, authHeaderEndX)
+		}
 
 		startOfHeader := bytes.Index(msg[authHeaderStartX:m.bodyOffset], authText)
 		if startOfHeader >= 0 {
@@ -598,7 +630,9 @@ func (http *HTTP) hideHeaders(m *message) {
 					authHeaderEndX = m.bodyOffset
 				}
 
-				debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+				if isDebug {
+					debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+				}
 
 				for i := authHeaderStartX + len(authText); i < authHeaderEndX; i++ {
 					msg[i] = byte('*')
@@ -658,6 +692,10 @@ func (http *HTTP) extractParameters(m *message, msg []byte) (path string, params
 		}
 	}
 	params = paramsMap.Encode()
+
+	if isDetailed {
+		detailedf("Parameters: %s", params)
+	}
 
 	return
 }

@@ -72,6 +72,8 @@ type parserConfig struct {
 var (
 	transferEncodingChunked = []byte("chunked")
 
+	constCRLF = []byte("\r\n")
+
 	constClose     = []byte("close")
 	constKeepAlive = []byte("keep-alive")
 
@@ -129,7 +131,9 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	var err error
 	fline := s.data[s.parseOffset:i]
 	if len(fline) < 8 {
-		debugf("First line too small")
+		if isDebug {
+			debugf("First line too small")
+		}
 		return false, false, false
 	}
 	if bytes.Equal(fline[0:5], []byte("HTTP/")) {
@@ -141,11 +145,17 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			logp.Warn("Failed to understand HTTP response status: %s", fline[9:])
 			return false, false, false
 		}
+
+		if isDebug {
+			debugf("HTTP status_code=%d, status_phrase=%s", m.StatusCode, m.StatusPhrase)
+		}
 	} else {
 		// REQUEST
 		slices := bytes.Fields(fline)
 		if len(slices) != 3 {
-			debugf("Couldn't understand HTTP request: %s", fline)
+			if isDebug {
+				debugf("Couldn't understand HTTP request: %s", fline)
+			}
 			return false, false, false
 		}
 
@@ -156,16 +166,23 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			m.IsRequest = true
 			version = slices[2][5:]
 		} else {
-			debugf("Couldn't understand HTTP version: %s", fline)
+			if isDebug {
+				debugf("Couldn't understand HTTP version: %s", fline)
+			}
 			return false, false, false
 		}
 	}
 
 	m.version.major, m.version.minor, err = parseVersion(version)
 	if err != nil {
-		debugf("Failed to understand HTTP version: %v", version)
+		if isDebug {
+			debugf("Failed to understand HTTP version: %v", version)
+		}
 		m.version.major = 1
 		m.version.minor = 0
+	}
+	if isDebug {
+		debugf("HTTP version %d.%d", m.version.major, m.version.minor)
 	}
 
 	// ok so far
@@ -177,6 +194,10 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 }
 
 func parseResponseStatus(s []byte) (uint16, []byte, error) {
+	if isDebug {
+		debugf("parseResponseStatus: %s", s)
+	}
+
 	p := bytes.IndexByte(s, ' ')
 	if p == -1 {
 		return 0, nil, errors.New("Not beeing able to identify status code")
@@ -215,7 +236,9 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		if !m.IsRequest && ((100 <= m.StatusCode && m.StatusCode < 200) || m.StatusCode == 204 || m.StatusCode == 304) {
 			//response with a 1xx, 204 , or 304 status  code is always terminated
 			// by the first empty line after the  header fields
-			debugf("Terminate response, status code %d", m.StatusCode)
+			if isDebug {
+				debugf("Terminate response, status code %d", m.StatusCode)
+			}
 			m.end = s.parseOffset
 			m.Size = uint64(m.end - m.start)
 			return false, true, true
@@ -224,20 +247,26 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		if bytes.Equal(m.TransferEncoding, transferEncodingChunked) {
 			// support for HTTP/1.1 Chunked transfer
 			// Transfer-Encoding overrides the Content-Length
-			debugf("Read chunked body")
+			if isDebug {
+				debugf("Read chunked body")
+			}
 			s.parseState = stateBodyChunkedStart
 			return true, true, true
 		}
 
 		if m.ContentLength == 0 && (m.IsRequest || m.hasContentLength) {
-			debugf("Empty content length, ignore body")
+			if isDebug {
+				debugf("Empty content length, ignore body")
+			}
 			// Ignore body for request that contains a message body but not a Content-Length
 			m.end = s.parseOffset
 			m.Size = uint64(m.end - m.start)
 			return false, true, true
 		}
 
-		debugf("Read body")
+		if isDebug {
+			debugf("Read body")
+		}
 		s.parseState = stateBody
 	} else {
 		ok, hfcomplete, offset := parser.parseHeader(m, s.data[s.parseOffset:])
@@ -265,12 +294,14 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	config := parser.config
 
 	// enabled if required. Allocs for parameters slow down parser big times
-	//detailedf("Data: %s", data)
-	//detailedf("Header: %s", data[:i])
+	if isDetailed {
+		detailedf("Data: %s", data)
+		detailedf("Header: %s", data[:i])
+	}
 
 	// skip folding line
 	for p := i + 1; p < len(data); {
-		q := bytes.Index(data[p:], []byte("\r\n"))
+		q := bytes.Index(data[p:], constCRLF)
 		if q == -1 {
 			// Assuming incomplete
 			return true, false, 0
@@ -282,7 +313,9 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			var headerNameBuf [140]byte
 			headerName := toLower(headerNameBuf[:], data[:i])
 			headerVal := trim(data[i+1 : p])
-			//debugf("Header: '%s' Value: '%s'\n", headerName, headerVal)
+			if isDebug {
+				debugf("Header: '%s' Value: '%s'\n", data[:i], headerVal)
+			}
 
 			// Headers we need for parsing. Make sure we always
 			// capture their value
@@ -327,12 +360,16 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 }
 
 func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
-	debugf("eat body: %d", s.parseOffset)
+	if isDebug {
+		debugf("eat body: %d", s.parseOffset)
+	}
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 		// HTTP/1.0 no content length. Add until the end of the connection
-		debugf("close connection, %d", len(s.data)-s.parseOffset)
+		if isDebug {
+			debugf("close connection, %d", len(s.data)-s.parseOffset)
+		}
 		s.bodyReceived += (len(s.data) - s.parseOffset)
 		m.ContentLength += (len(s.data) - s.parseOffset)
 		s.parseOffset = len(s.data)
@@ -345,14 +382,16 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 	} else {
 		s.bodyReceived += (len(s.data) - s.parseOffset)
 		s.parseOffset = len(s.data)
-		debugf("bodyReceived: %d", s.bodyReceived)
+		if isDebug {
+			debugf("bodyReceived: %d", s.bodyReceived)
+		}
 		return true, false
 	}
 }
 
 func (*parser) parseBodyChunkedStart(s *stream, m *message) (cont, ok, complete bool) {
 	// read hexa length
-	i := bytes.Index(s.data[s.parseOffset:], []byte("\r\n"))
+	i := bytes.Index(s.data[s.parseOffset:], constCRLF)
 	if i == -1 {
 		return false, true, false
 	}
