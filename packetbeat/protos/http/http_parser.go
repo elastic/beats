@@ -200,14 +200,14 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 
 	p := bytes.IndexByte(s, ' ')
 	if p == -1 {
-		return 0, nil, errors.New("Not beeing able to identify status code")
+		return 0, nil, errors.New("Not able to identify status code")
 	}
 
 	code, _ := parseInt(s[0:p])
 
 	p = bytes.LastIndexByte(s, ' ')
 	if p == -1 {
-		return uint16(code), nil, errors.New("Not beeing able to identify status code")
+		return uint16(code), nil, errors.New("Not able to identify status code")
 	}
 	phrase := s[p+1:]
 	return uint16(code), phrase, nil
