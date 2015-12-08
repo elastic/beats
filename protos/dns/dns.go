@@ -786,8 +786,6 @@ func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
-		logp.Debug("dns", "Failed to decode this : %s", s.data)
-		logp.Debug("dns", "Decoded : %s", dnsData)
 		return nil
 	}
 
