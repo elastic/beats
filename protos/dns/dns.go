@@ -706,6 +706,7 @@ func decodeDnsData(data []byte) (dns *layers.DNS, err error) {
 			err = fmt.Errorf("panic: %v", r)
 		}
 	}()
+
 	d := &layers.DNS{}
 	err = d.DecodeFromBytes(data, gopacket.NilDecodeFeedback)
 	if err != nil {
@@ -732,18 +733,22 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 		}
 	}
 
-	if priv.Data[dir] == nil {
-		logp.Debug("dns", "priv.Data nil")
+	payload := make([]byte, 0)
 
+	// Offset is critical
+	if len(pkt.Payload) > 2 {
+		payload = pkt.Payload[2:]
+	}
+
+	if priv.Data[dir] == nil {
 		priv.Data[dir] = &DnsStream{
 			tcpTuple: tcpTuple,
-			data:     pkt.Payload,
+			data:     payload,
 			message:  &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple},
 		}
 
 	} else {
-		logp.Debug("dns", "priv.Data not nil")
-		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
+		priv.Data[dir].data = append(priv.Data[dir].data, payload...)
 		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("dns", "Stream data too large, dropping DNS stream")
 			priv.Data[dir] = nil
@@ -753,10 +758,7 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 
 	stream := priv.Data[dir]
 	if stream.message == nil {
-		logp.Debug("dns", "stream message nil")
 		stream.message = &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple}
-	} else {
-		logp.Debug("dns", "stream message not nil")
 	}
 
 	// what kind of checks should be done here ?
@@ -776,7 +778,6 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	dns.messageComplete(tcpTuple, dir, stream, data)
 
 	return priv
-
 }
 
 // return decoded data so we don't have to do decode twice
@@ -785,6 +786,8 @@ func (dns *Dns) messageParser(s *DnsStream) *layers.DNS {
 	dnsData, err := decodeDnsData(s.data)
 
 	if err != nil {
+		logp.Debug("dns", "Failed to decode this : %s", s.data)
+		logp.Debug("dns", "Decoded : %s", dnsData)
 		return nil
 	}
 

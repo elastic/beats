@@ -196,9 +196,10 @@ class Test(TestCase):
         o = objs[0]
 
         assert o["type"] == "dns"
-        assert o["transport"] == "udp"
+        assert o["transport"] == "tcp"
         assert o["method"] == "QUERY"
-        assert "request" in o
-        assert "response" in o
-        assert "elastic.co" in o["request"]
-        assert "include:_spf.google.com" in o["response"]
+        assert o["query"] == "class IN, type AXFR, etas.com"
+        assert o["dns.question.type"] == "AXFR"
+        assert o["status"] == "OK"
+        assert len(o["dns.answers"]) == 4
+        assert all("etas.com" in x["name"] for x in o["dns.answers"])
