@@ -23,6 +23,9 @@ list of components, or you can use `-d "*"` to enable debugging for all componen
 *`-e`*::
 Log to stderr and disable syslog/file output.
 
+*`-httpprof [<host>]:<port>`*::
+Start http server for profiling. This option is useful for troubleshooting and profiling the Beat.
+
 *`-memprofile <output file>`*::
 Write memory profile data to the specified output file. This option is useful for
 troubleshooting the Beat.
