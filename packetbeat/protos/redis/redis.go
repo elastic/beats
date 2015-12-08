@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"strings"
+	"bytes"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -19,29 +19,6 @@ type stream struct {
 	applayer.Stream
 	parser   parser
 	tcptuple *common.TcpTuple
-}
-
-type transaction struct {
-	Type         string
-	tuple        common.TcpTuple
-	Src          common.Endpoint
-	Dst          common.Endpoint
-	ResponseTime int32
-	Ts           int64
-	JsTs         time.Time
-	ts           time.Time
-	cmdline      *common.CmdlineTuple
-	Method       string
-	Path         string
-	Query        string
-	IsError      bool
-	BytesOut     int
-	BytesIn      int
-
-	Redis common.MapStr
-
-	RequestRaw  string
-	ResponseRaw string
 }
 
 type redisConnectionData struct {
@@ -66,7 +43,10 @@ type Redis struct {
 	results publisher.Client
 }
 
-var debug = logp.MakeDebug("redis")
+var (
+	debugf  = logp.MakeDebug("redis")
+	isDebug = false
+)
 
 func (redis *Redis) InitDefaults() {
 	redis.SendRequest = false
@@ -100,6 +80,8 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	}
 
 	redis.results = results
+
+	isDebug = logp.IsDebug("redis")
 
 	return nil
 }
@@ -159,14 +141,20 @@ func (redis *Redis) doParse(
 	if st == nil {
 		st = newStream(pkt.Ts, tcptuple)
 		conn.Streams[dir] = st
-		debug("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+		if isDebug {
+			debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+		}
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		debug("%v, dropping TCP stream: ", err)
+		if isDebug {
+			debugf("%v, dropping TCP stream: ", err)
+		}
 		return nil
 	}
-	debug("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+	if isDebug {
+		debugf("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+	}
 
 	for st.Buf.Len() > 0 {
 		if st.parser.message == nil {
@@ -178,7 +166,9 @@ func (redis *Redis) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.Streams[dir] = nil
-			debug("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			if isDebug {
+				debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			}
 			return conn
 		}
 
@@ -188,10 +178,12 @@ func (redis *Redis) doParse(
 		}
 
 		msg := st.parser.message
-		if msg.IsRequest {
-			debug("REDIS (%p) request message: %s", conn, msg.Message)
-		} else {
-			debug("REDIS (%p) response message: %s", conn, msg.Message)
+		if isDebug {
+			if msg.IsRequest {
+				debugf("REDIS (%p) request message: %s", conn, msg.Message)
+			} else {
+				debugf("REDIS (%p) response message: %s", conn, msg.Message)
+			}
 		}
 
 		// all ok, go to next level and reset stream for new message
@@ -247,56 +239,70 @@ func (redis *Redis) correlate(conn *redisConnectionData) {
 	for !conn.responses.empty() && !conn.requests.empty() {
 		requ := conn.requests.pop()
 		resp := conn.responses.pop()
-		trans := newTransaction(requ, resp)
 
-		debug("REDIS (%p) transaction completed: %s", conn, trans.Redis)
-		redis.publishTransaction(trans)
+		if redis.results != nil {
+			event := redis.newTransaction(requ, resp)
+			redis.results.PublishEvent(event)
+		}
 	}
 }
 
-func newTransaction(requ, resp *redisMessage) *transaction {
-	trans := &transaction{Type: "redis", tuple: requ.TcpTuple}
+func (redis *Redis) newTransaction(requ, resp *redisMessage) common.MapStr {
+	error := common.OK_STATUS
+	if resp.IsError {
+		error = common.ERROR_STATUS
+	}
 
-	// init from request
-	trans.Redis = common.MapStr{}
-	trans.Method = requ.Method
-	trans.Path = requ.Path
-	trans.Query = requ.Message
-	trans.RequestRaw = requ.Message
-	trans.BytesIn = requ.Size
+	var returnValue map[string]common.NetString
+	if resp.IsError {
+		returnValue = map[string]common.NetString{
+			"error": resp.Message,
+		}
+	} else {
+		returnValue = map[string]common.NetString{
+			"return_value": resp.Message,
+		}
+	}
 
-	trans.cmdline = requ.CmdlineTuple
-	trans.ts = requ.Ts
-	trans.Ts = int64(trans.ts.UnixNano() / 1000) // transactions have microseconds resolution
-	trans.JsTs = requ.Ts
-	trans.Src = common.Endpoint{
+	src := &common.Endpoint{
 		Ip:   requ.TcpTuple.Src_ip.String(),
 		Port: requ.TcpTuple.Src_port,
 		Proc: string(requ.CmdlineTuple.Src),
 	}
-	trans.Dst = common.Endpoint{
+	dst := &common.Endpoint{
 		Ip:   requ.TcpTuple.Dst_ip.String(),
 		Port: requ.TcpTuple.Dst_port,
 		Proc: string(requ.CmdlineTuple.Dst),
 	}
 	if requ.Direction == tcp.TcpDirectionReverse {
-		trans.Src, trans.Dst = trans.Dst, trans.Src
+		src, dst = dst, src
 	}
 
-	// init from response
-	trans.IsError = resp.IsError
-	if resp.IsError {
-		trans.Redis["error"] = resp.Message
-	} else {
-		trans.Redis["return_value"] = resp.Message
+	// resp_time in milliseconds
+	responseTime := int32(resp.Ts.Sub(requ.Ts).Nanoseconds() / 1e6)
+
+	event := common.MapStr{
+		"@timestamp":   common.Time(requ.Ts),
+		"type":         "redis",
+		"status":       error,
+		"responsetime": responseTime,
+		"redis":        returnValue,
+		"method":       common.NetString(bytes.ToUpper(requ.Method)),
+		"resource":     requ.Path,
+		"query":        requ.Message,
+		"bytes_in":     uint64(requ.Size),
+		"bytes_out":    uint64(resp.Size),
+		"src":          src,
+		"dst":          dst,
+	}
+	if redis.SendRequest {
+		event["request"] = requ.Message
+	}
+	if redis.SendResponse {
+		event["response"] = resp.Message
 	}
 
-	trans.BytesOut = resp.Size
-	trans.ResponseRaw = resp.Message
-
-	trans.ResponseTime = int32(resp.Ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
-
-	return trans
+	return event
 }
 
 func (redis *Redis) GapInStream(tcptuple *common.TcpTuple, dir uint8,
@@ -314,39 +320,6 @@ func (redis *Redis) ReceivedFin(tcptuple *common.TcpTuple, dir uint8,
 	// TODO: check if we have pending data that we can send up the stack
 
 	return private
-}
-
-func (redis *Redis) publishTransaction(t *transaction) {
-	if redis.results == nil {
-		return
-	}
-
-	event := common.MapStr{}
-	event["type"] = "redis"
-	if !t.IsError {
-		event["status"] = common.OK_STATUS
-	} else {
-		event["status"] = common.ERROR_STATUS
-	}
-	event["responsetime"] = t.ResponseTime
-	if redis.SendRequest {
-		event["request"] = t.RequestRaw
-	}
-	if redis.SendResponse {
-		event["response"] = t.ResponseRaw
-	}
-	event["redis"] = common.MapStr(t.Redis)
-	event["method"] = strings.ToUpper(t.Method)
-	event["resource"] = t.Path
-	event["query"] = t.Query
-	event["bytes_in"] = uint64(t.BytesIn)
-	event["bytes_out"] = uint64(t.BytesOut)
-
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
-
-	redis.results.PublishEvent(event)
 }
 
 func (ml *messageList) append(msg *redisMessage) {
@@ -373,7 +346,6 @@ func (ml *messageList) pop() *redisMessage {
 	if ml.head == nil {
 		ml.tail = nil
 	}
-	debug("new head=%p", ml.head)
 	return msg
 }
 

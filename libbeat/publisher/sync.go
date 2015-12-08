@@ -32,12 +32,12 @@ func (p *syncPublisher) onMessage(m message) {
 	}
 }
 
-func (c syncClient) PublishEvent(ctx *context, event common.MapStr) bool {
-	return c(message{context: *ctx, event: event})
+func (c syncClient) PublishEvent(ctx context, event common.MapStr) bool {
+	return c(message{context: ctx, event: event})
 }
 
-func (c syncClient) PublishEvents(ctx *context, events []common.MapStr) bool {
-	return c(message{context: *ctx, events: events})
+func (c syncClient) PublishEvents(ctx context, events []common.MapStr) bool {
+	return c(message{context: ctx, events: events})
 }
 
 func (p *syncPublisher) forward(m message) bool {

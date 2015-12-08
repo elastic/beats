@@ -159,22 +159,22 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 
 func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
 	ctx := context{}
-	return t.pub.asyncPublisher.client().PublishEvent(&ctx, event)
+	return t.pub.asyncPublisher.client().PublishEvent(ctx, event)
 }
 
 func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
 	ctx := context{}
-	return t.pub.asyncPublisher.client().PublishEvents(&ctx, events)
+	return t.pub.asyncPublisher.client().PublishEvents(ctx, events)
 }
 
 func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
 	ctx := context{publishOptions: publishOptions{confirm: true}}
-	return t.pub.syncPublisher.client().PublishEvent(&ctx, event)
+	return t.pub.syncPublisher.client().PublishEvent(ctx, event)
 }
 
 func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
 	ctx := context{publishOptions: publishOptions{confirm: true}}
-	return t.pub.syncPublisher.client().PublishEvents(&ctx, events)
+	return t.pub.syncPublisher.client().PublishEvents(ctx, events)
 }
 
 // newTestPublisherWithBulk returns a new testPublisher with bulk message
