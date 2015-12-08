@@ -287,7 +287,9 @@ func (p *parser) dispatch(depth int, buf *streambuf.Buffer) (common.NetString, b
 		iserror = true
 		value, ok, complete = p.parseSimpleString(buf)
 	default:
-		debug("Unexpected message starting with %s", buf.Bytes()[0])
+		if isDebug {
+			debugf("Unexpected message starting with %s", buf.Bytes()[0])
+		}
 		return empty, false, false, false
 	}
 
@@ -346,10 +348,14 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString, bool, bool, bool) {
 	line, err := buf.UntilCRLF()
 	if err != nil {
-		debug("End of line not found, waiting for more data")
+		if isDebug {
+			debugf("End of line not found, waiting for more data")
+		}
 		return empty, false, false, false
 	}
-	debug("line %s: %d", line, buf.BufferConsumed())
+	if isDebug {
+		debugf("line %s: %d", line, buf.BufferConsumed())
+	}
 
 	if len(line) == 3 && line[1] == '-' && line[2] == '1' {
 		return nilStr, false, true, true
@@ -393,7 +399,9 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 		value, iserror, ok, complete := p.dispatch(depth+1, buf)
 		if !ok || !complete {
-			debug("Array incomplete")
+			if isDebug {
+				debugf("Array incomplete")
+			}
 			return empty, iserror, ok, complete
 		}
 
