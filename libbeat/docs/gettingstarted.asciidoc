@@ -364,7 +364,7 @@ contains the extracted files, for example:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-cd C:\Program Files\kibana-{kibana-version}-windows
+cd C:\Program Files\kibana-{Kibana-version}-windows
 ----------------------------------------------------------------------
 
 . Run the following command to start Kibana:
