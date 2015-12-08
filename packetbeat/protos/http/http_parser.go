@@ -49,6 +49,8 @@ type message struct {
 	//Timing
 	start int
 	end   int
+
+	next *message
 }
 
 type version struct {
