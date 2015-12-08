@@ -1,0 +1,347 @@
+
+////////////////////////////////////////////////////////////
+
+=== Beats version HEAD
+https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+==== Added
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Packetbeat*
+
+*Topbeat*
+
+*Filebeat*
+
+*Winlogbeat*
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-1.0.0]]
+=== Beats version 1.0.0
+https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
+
+==== Breaking changes
+
+*Topbeat*
+
+- Change proc type to process #138
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix random panic on shutdown by calling shutdown handler only once. elastic/filebeat#204
+- Fix credentials are not send when pinging an elasticsearch host. elastic/fileabeat#287
+
+*Filebeat*
+
+- Fix problem that harvesters stopped reading after some time and filebeat stopped processing events #257
+- Fix line truncating by internal buffers being reused by accident #258
+- Set default ignore_older to 24 hours #282
+
+
+
+
+[[release-notes-1.0.0-rc2]]
+=== Beats version 1.0.0-rc2
+https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[Check 1.0.0-rc2
+diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The `shipper` output field is renamed to `beat.name`. #285
+- Use of `enabled` as a configuration option for outputs (elasticsearch,
+  logstash, etc.) has been removed. #264
+- Use of `disabled` as a configuration option for tls has been removed. #264
+- The `-test` command line flag was renamed to `-configtest`. #264
+- Disable geoip by default. To enable it uncomment in config file. #305
+
+
+*Filebeat*
+
+- Removed utf-16be-bom encoding support. Support will be added with fix for #205
+- Rename force_close_windows_files to force_close_files and make it available for all platforms.
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Disable logging to stderr after configuration phase. #276
+- Set the default file logging path when not set in config. #275
+- Fix bug silently dropping records based on current window size. elastic/filebeat#226
+- Fix direction field in published events. #300
+- Fix elasticsearch structured errors breaking error handling. #309
+
+*Packetbeat*
+
+- Packetbeat will now exit if a configuration error is detected. #357
+- Fixed an issue handling DNS requests containing no questions. #369
+
+*Topbeat*
+
+- Fix leak of Windows handles. #98
+- Fix memory leak of process information. #104
+
+*Filebeat*
+
+- Filebeat will now exit if a configuration error is detected. #198
+- Fix to enable prospector to harvest existing files that are modified. #199
+- Improve line reading and encoding to better keep track of file offsets based
+  on encoding. #224
+- Set input_type by default to "log"
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Added `beat.hostname` to contain the hostname where the Beat is running on as
+  returned by the operating system. #285
+- Added timestamp for file logging. #291
+
+*Filebeat*
+
+- Handling end of line under windows was improved #233
+
+
+
+[[release-notes-1.0.0-rc1]]
+=== Beats version 1.0.0-rc1
+https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[Check
+1.0.0-rc1 diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Rename timestamp field with @timestamp. #237
+
+*Packetbeat*
+
+- Rename timestamp field with @timestamp. #343
+
+*Topbeat*
+
+- Rename timestamp field with @timestamp for a better integration with
+Logstash. #80
+
+*Filebeat*
+
+- Rename the timestamp field with @timestamp #168
+- Rename tail_on_rotate prospector config to tail_files
+- Removal of line field in event. Line number was not correct and does not add value. #217
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Use stderr for console log output. #219
+- Handle empty event array in publisher. #207
+- Respect '*' debug selector in IsDebug. #226 (elastic/packetbeat#339)
+- Limit number of workers for Elasticsearch output. elastic/packetbeat#226
+- On Windows, remove service related error message when running in the console. #242
+- Fix waitRetry no configured in single output mode configuration. elastic/filebeat#144
+- Use http as the default scheme in the elasticsearch hosts #253
+- Respect max bulk size if bulk publisher (collector) is disabled or sync flag is set.
+- Always evaluate status code from Elasticsearch responses when indexing events. #192
+- Use bulk_max_size configuration option instead of bulk_size. #256
+- Fix max_retries=0 (no retries) configuration option. #266
+- Filename used for file based logging now defaults to beat name. #267
+
+*Packetbeat*
+
+- Close file descriptors used to monitor processes. #337
+- Remove old RPM spec file. It moved to elastic/beats-packer. #334
+
+*Topbeat*
+
+- Don't wait for one period until shutdown #75
+
+*Filebeat*
+
+- Omit 'fields' from event JSON when null. #126
+- Make offset and line value of type long in elasticsearch template to prevent overflow. #140
+- Fix locking files for writing behaviour. #156
+- Introduce 'document_type' config option per prospector to define document type
+  for event stored in elasticsearch. #133
+- Add 'input_type' field to published events reporting the prospector type being used. #133
+- Fix high CPU usage when not connected to Elasticsearch or Logstash. #144
+- Fix issue that files were not crawled anymore when encoding was set to something other then plain. #182
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add Console output plugin. #218
+- Add timestamp to log messages #245
+- Send @metadata.beat to Logstash instead of @metadata.index to prevent
+  possible name clashes and give user full control over index name used for
+  Elasticsearch
+- Add logging messages for bulk publishing in case of error #229
+- Add option to configure number of parallel workers publishing to Elasticsearch
+  or Logstash.
+- Set default bulk size for Elasticsearch output to 50.
+- Set default http timeout for Elasticsearch to 90s.
+- Improve publish retry if sync flag is set by retrying only up to max bulk size
+  events instead of all events to be published.
+
+*Filebeat*
+
+- Introduction of backoff, backoff_factor, max_backoff, partial_line_waiting, force_close_windows_files
+  config variables to make crawling more configurable.
+- All Godeps dependencies were updated to master on 2015-10-21 [#122]
+- Set default value for ignore_older config to 10 minutes. #164
+- Added the fields_under_root setting to optionally store the custom fields top
+level in the output dictionary. #188
+- Add more encodings by using x/text/encodings/htmlindex package to select
+  encoding by name.
+
+
+
+
+[[release-notes-1.0.0-beta4]]
+=== Beats version 1.0.0-beta4
+https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[Check
+1.0.0-beta4 diff]
+
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update tls config options naming from dash to underline #162
+- Feature/output modes: Introduction of PublishEvent(s) to be used by beats #118 #115
+
+*Packetbeat*
+
+- Renamed http module config file option 'strip_authorization' to 'redact_authorization'
+- Save_topology is set to false by default
+- Rename elasticsearch index to [packetbeat-]YYYY.MM.DD
+
+*Topbeat*
+
+- Percentage fields (e.g user_p) are exported as a float between 0 and 1 #34
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Determine Elasticsearch index for an event based on UTC time #81
+- Fixing ES output's defaultDeadTimeout so that it is 60 seconds #103
+- ES outputer: fix timestamp conversion #91
+- Fix TLS insecure config option #239
+- ES outputer: check bulk API per item status code for retransmit on failure.
+
+*Packetbeat*
+
+- Support for lower-case header names when redacting http authorization headers
+- Redact proxy-authorization if redact-authorization is set
+- Fix some multithreading issues #203
+- Fix negative response time #216
+- Fix memcache TCP connection being nil after dropping stream data. #299
+- Add missing DNS protocol configuration to documentation #269
+
+*Topbeat*
+
+- Don't divide the reported memory by an extra 1024 #60
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add logstash output plugin #151
+- Integration tests for Beat -> Logstash -> Elasticsearch added #195 #188 #168 #137 #128 #112
+- Large updates and improvements to the documentation
+- Add direction field to publisher output to indicate inbound/outbound transactions #150
+- Add tls configuration support to elasticsearch and logstash outputers #139
+- All external dependencies were updated to the latest version. Update to Golang 1.5.1 #162
+- Guarantee ES index is based in UTC time zone #164
+- Cache: optional per element timeout #144
+- Make it possible to set hosts in different ways. #135
+- Expose more TLS config options #124
+- Use the Beat name in the default configuration file path #99
+
+*Packetbeat*
+
+- add [.editorconfig file](http://editorconfig.org/)
+- add (experimental/unsupported?) saltstack files
+- Sample config file cleanup
+- Moved common documentation to [libbeat repository](https://github.com/elastic/libbeat)
+- Update build to go 1.5.1
+- Adding device descriptions to the -device output.
+- Generate coverage for system tests
+- Move go-daemon dependency to beats-packer
+- Rename integration tests to system tests
+- Made the `-devices` option more user friendly in case `sudo` is not used.
+  Issue #296.
+- Publish expired DNS transactions #301
+- Update protocol guide to libbeat changes
+- Add protocol registration to new protocol guide
+- Make transaction timeouts configurable #300
+- Add direction field to the exported fields #317
+
+*Topbeat*
+
+- Document fields in a standardized format (etc/fields.yml) #34
+- Updated to use new libbeat Publisher #37 #41
+- Update to go 1.5.1 #43
+- Updated configuration files with comments for all options #65
+- Documentation improvements
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+- Redis output was deprecated #169 #145
+- Host and port configuration options are deprecated. They are replaced by the hosts
+ configuration option. #141
