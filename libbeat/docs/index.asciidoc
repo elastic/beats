@@ -5,6 +5,7 @@
 :Kibana-version: 4.3.0
 :Dashboards-version: 1.0.0
 
+
 include::./overview.asciidoc[]
 
 include::./communitybeats.asciidoc[]
@@ -20,3 +21,5 @@ include::./https.asciidoc[]
 include::./newbeat.asciidoc[]
 
 include::./repositories.asciidoc[]
+
+include::./release.asciidoc[]
