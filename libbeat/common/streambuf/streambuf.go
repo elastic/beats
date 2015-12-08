@@ -108,7 +108,7 @@ func (b *Buffer) Restore(snapshot *Buffer) {
 	b.available = snapshot.available
 }
 
-func (b *Buffer) doAppend(data []byte, retainable bool) error {
+func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	if b.fixed {
 		return b.SetError(ErrOperationNotAllowed)
 	}
@@ -117,13 +117,26 @@ func (b *Buffer) doAppend(data []byte, retainable bool) error {
 	}
 
 	if len(b.data) == 0 {
-		if retainable {
+		retain := retainable && cap(data) > newCap
+		if retain {
 			b.data = data
 		} else {
-			b.data = make([]byte, len(data))
+			if newCap < len(data) {
+				b.data = make([]byte, len(data))
+			} else {
+				b.data = make([]byte, len(data), newCap)
+			}
 			copy(b.data, data)
 		}
 	} else {
+		if newCap > 0 && cap(b.data[b.offset:]) < len(data) {
+			required := cap(b.data) + len(data)
+			if required < newCap {
+				tmp := make([]byte, len(b.data), newCap)
+				copy(tmp, b.data)
+				b.data = tmp
+			}
+		}
 		b.data = append(b.data, data...)
 	}
 	b.available += len(data)
@@ -139,7 +152,11 @@ func (b *Buffer) doAppend(data []byte, retainable bool) error {
 // Append will append the given data to the buffer. If Buffer is fixed
 // ErrOperationNotAllowed will be returned.
 func (b *Buffer) Append(data []byte) error {
-	return b.doAppend(data, true)
+	return b.doAppend(data, true, -1)
+}
+
+func (b *Buffer) AppendWithCapLimits(data []byte, newCap int) error {
+	return b.doAppend(data, true, newCap)
 }
 
 // Fix marks a buffer as fixed. No more data can be added to the buffer and
@@ -161,6 +178,11 @@ func (b *Buffer) Avail(count int) bool {
 // Len returns the number of bytes of the unread portion.
 func (b *Buffer) Len() int {
 	return b.available
+}
+
+// Cap returns the buffer capacity until new memory must be allocated
+func (b *Buffer) Cap() int {
+	return cap(b.data)
 }
 
 // LeftBehind returns the number of bytes a re-entrant but not yet finished
@@ -300,7 +322,7 @@ func (b *Buffer) SetError(err error) error {
 // pointers. If the buffer is in failed state or count bytes are not available
 // an error will be returned.
 func (b *Buffer) Collect(count int) ([]byte, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return nil, b.err
 	}
 
@@ -318,7 +340,7 @@ func (b *Buffer) Collect(count int) ([]byte, error) {
 // If delim is not matched ErrExpectedByteSequenceMismatch will be raised.
 func (b *Buffer) CollectWithSuffix(count int, delim []byte) ([]byte, error) {
 	total := count + len(delim)
-	if b.Failed() {
+	if b.err != nil {
 		return nil, b.err
 	}
 

@@ -15,8 +15,6 @@ type asyncPublisher struct {
 	ws      workerSignal
 }
 
-type asyncClient func(message)
-
 const (
 	defaultFlushInterval = 1000 * time.Millisecond // 1s
 	defaultBulkSize      = 10000
@@ -56,20 +54,16 @@ func (p *asyncPublisher) onMessage(m message) {
 }
 
 func (p *asyncPublisher) client() eventPublisher {
-	return asyncClient(p.send)
+	return p
 }
 
-func (c asyncClient) PublishEvent(ctx *context, event common.MapStr) bool {
-	return c.send(message{context: *ctx, event: event})
+func (p *asyncPublisher) PublishEvent(ctx context, event common.MapStr) bool {
+	p.send(message{context: ctx, event: event})
+	return true
 }
 
-func (c asyncClient) PublishEvents(ctx *context, events []common.MapStr) bool {
-	return c.send(message{context: *ctx, events: events})
-}
-
-func (c asyncClient) send(m message) bool {
-	logp.Debug("publish", "send async event")
-	c(m)
+func (p *asyncPublisher) PublishEvents(ctx context, events []common.MapStr) bool {
+	p.send(message{context: ctx, events: events})
 	return true
 }
 

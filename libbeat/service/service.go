@@ -11,6 +11,9 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/libbeat/logp"
+
+	"net/http"
+	_ "net/http/pprof"
 )
 
 // Handles OS signals that ask the service/daemon to stop.
@@ -36,11 +39,13 @@ func HandleSignals(stopFunction func()) {
 }
 
 // cmdline flags
-var memprofile, cpuprofile *string
+var memprofile, cpuprofile, httpprof *string
+var cpuOut *os.File
 
 func init() {
 	memprofile = flag.String("memprofile", "", "Write memory profile to this file")
 	cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to file")
+	httpprof = flag.String("httpprof", "", "Start pprof http server")
 }
 
 func WithMemProfile() bool {
@@ -54,17 +59,25 @@ func WithCpuProfile() bool {
 func BeforeRun() {
 
 	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
+		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
 		}
-		pprof.StartCPUProfile(f)
+		pprof.StartCPUProfile(cpuOut)
+	}
+
+	if *httpprof != "" {
+		go func() {
+			logp.Info("start pprof endpoint")
+			logp.Info("finished pprof endpoint: %v", http.ListenAndServe(*httpprof, nil))
+		}()
 	}
 }
 
 func Cleanup() {
 	if *cpuprofile != "" {
 		pprof.StopCPUProfile()
+		cpuOut.Close()
 	}
 
 	if *memprofile != "" {

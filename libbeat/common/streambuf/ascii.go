@@ -14,7 +14,7 @@ var ErrExpectedDigit = errors.New("Expected digit")
 // If CRLF was not found yet one of ErrNoMoreBytes or ErrUnexpectedEOB will be
 // reported.
 func (b *Buffer) UntilCRLF() ([]byte, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return nil, b.err
 	}
 
@@ -48,7 +48,7 @@ func (b *Buffer) UntilCRLF() ([]byte, error) {
 // Ignore symbol will advance the read pointer until the first symbol not
 // matching s is found.
 func (b *Buffer) IgnoreSymbol(s uint8) error {
-	if b.Failed() {
+	if b.err != nil {
 		return b.err
 	}
 
@@ -67,7 +67,7 @@ func (b *Buffer) IgnoreSymbol(s uint8) error {
 // true, the collected byte slice will be returned if no more bytes are available
 // for parsing, but s has not matched yet.
 func (b *Buffer) UntilSymbol(s uint8, errOnEnd bool) ([]byte, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return nil, b.err
 	}
 
@@ -92,7 +92,7 @@ func (b *Buffer) UntilSymbol(s uint8, errOnEnd bool) ([]byte, error) {
 
 // AsciiUint will parse unsigned number from Buffer.
 func (b *Buffer) AsciiUint(errOnEnd bool) (uint64, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return 0, b.err
 	}
 	if len(b.data) <= b.mark { // end of buffer
@@ -115,7 +115,7 @@ func (b *Buffer) AsciiUint(errOnEnd bool) (uint64, error) {
 
 // AsciiInt will parse (optionally) signed number from Buffer.
 func (b *Buffer) AsciiInt(errOnEnd bool) (int64, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return 0, b.err
 	}
 	if len(b.data) <= b.mark { // end of buffer
@@ -164,7 +164,7 @@ func (b *Buffer) AsciiInt(errOnEnd bool) (int64, error) {
 // AsciiMatch checks the Buffer it's next byte sequence matched prefix. The
 // read pointer is not advanced by AsciiPrefix.
 func (b *Buffer) AsciiMatch(prefix []byte) (bool, error) {
-	if b.Failed() {
+	if b.err != nil {
 		return false, b.err
 	}
 	if !b.Avail(len(prefix)) {
