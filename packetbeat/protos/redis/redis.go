@@ -43,7 +43,10 @@ type Redis struct {
 	results publisher.Client
 }
 
-var debug = logp.MakeDebug("redis")
+var (
+	debugf  = logp.MakeDebug("redis")
+	isDebug = false
+)
 
 func (redis *Redis) InitDefaults() {
 	redis.SendRequest = false
@@ -77,6 +80,8 @@ func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
 	}
 
 	redis.results = results
+
+	isDebug = logp.IsDebug("redis")
 
 	return nil
 }
@@ -136,14 +141,20 @@ func (redis *Redis) doParse(
 	if st == nil {
 		st = newStream(pkt.Ts, tcptuple)
 		conn.Streams[dir] = st
-		debug("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+		if isDebug {
+			debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+		}
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		debug("%v, dropping TCP stream: ", err)
+		if isDebug {
+			debugf("%v, dropping TCP stream: ", err)
+		}
 		return nil
 	}
-	debug("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+	if isDebug {
+		debugf("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
+	}
 
 	for st.Buf.Len() > 0 {
 		if st.parser.message == nil {
@@ -155,7 +166,9 @@ func (redis *Redis) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.Streams[dir] = nil
-			debug("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			if isDebug {
+				debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
+			}
 			return conn
 		}
 
@@ -165,10 +178,12 @@ func (redis *Redis) doParse(
 		}
 
 		msg := st.parser.message
-		if msg.IsRequest {
-			debug("REDIS (%p) request message: %s", conn, msg.Message)
-		} else {
-			debug("REDIS (%p) response message: %s", conn, msg.Message)
+		if isDebug {
+			if msg.IsRequest {
+				debugf("REDIS (%p) request message: %s", conn, msg.Message)
+			} else {
+				debugf("REDIS (%p) response message: %s", conn, msg.Message)
+			}
 		}
 
 		// all ok, go to next level and reset stream for new message
