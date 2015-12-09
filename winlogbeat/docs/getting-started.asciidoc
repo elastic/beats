@@ -12,11 +12,11 @@ After you have installed these products, you can start <<winlogbeat-installation
 [[winlogbeat-installation]]
 === Installing Winlogbeat
 
-. Download the winlogbeat zip file.
+. Download the Winlogbeat zip file.
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
-icon and select Run As Administrator.
+icon and select Run As Administrator).
 . Run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
@@ -36,7 +36,7 @@ Status   Name               DisplayName
 Stopped  winlogbeat         winlogbeat
 ------------------------------------------------
 
-Before starting winlogbeat, you should look at the configuration options in the
+Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
 For more information about these options, see <<winlogbeat-configuration-details>>.
 
@@ -68,7 +68,7 @@ logging:
   level: info
 --------------------------------------------------------------------------------
 
-Once you save your configuration file, test it with the following command.
+After you save your configuration file, test it with the following command.
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -101,19 +101,19 @@ Winlogbeat, you need to set up Winlogbeat to use Logstash. For detailed steps, s
 
 === Running Winlogbeat
 
-Start the Winlogbeat service with the following command.
+Start the Winlogbeat service with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ----------------------------------------------------------------------
 
-Winlogbeat should now be running. If you used the configuration provided above,
+Winlogbeat should now be running. If you used the configuration described here,
 then you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
 
 You can view the status of the service and control it from the Services
-management console in Windows. The management console can be launched by running
-this command.
+management console in Windows. To launch the management console, run
+this command:
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -122,7 +122,7 @@ PS C:\Program Files\Winlogbeat> services.msc
 
 === Stopping Winlogbeat
 
-Stop the Winlogbeat service with the following command.
+Stop the Winlogbeat service with the following command:
 
 [source,shell]
 ----------------------------------------------------------------------
