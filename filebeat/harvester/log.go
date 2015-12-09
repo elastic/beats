@@ -8,12 +8,11 @@ import (
 	"regexp"
 	"time"
 
-	"golang.org/x/text/transform"
-
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
+	"golang.org/x/text/transform"
 )
 
 func NewHarvester(
@@ -52,26 +51,27 @@ func NewHarvester(
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
 
-	enc, err := h.open()
-	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
-	}
-
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		h.Stat.Return <- h.Offset
+
 		// Make sure file is closed as soon as harvester exits
-		h.file.Close()
+		// If file was never properly opened, it can't be closed
+		if h.file != nil {
+			h.file.Close()
+			logp.Debug("harvester", "Closing file: %s", h.Path)
+		}
 	}()
 
+	enc, err := h.open()
 	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		logp.Err("Stop Harvesting. Unexpected file opening error: %s", err)
 		return
 	}
 
 	info, err := h.file.Stat()
 	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		logp.Err("Stop Harvesting. Unexpected file stat rror: %s", err)
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *Harvester) Harvest() {
 	timedIn := newTimedReader(h.file)
 	reader, err := encoding.NewLineReader(timedIn, enc, h.Config.BufferSize)
 	if err != nil {
-		logp.Err("Stop Harvesting. Unexpected Error: %s", err)
+		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
 	}
 
@@ -189,42 +189,41 @@ func (h *Harvester) openStdin() (encoding.Encoding, error) {
 	return h.encoding(h.file)
 }
 
+// openFile opens a file and checks for the encoding. In case the encoding cannot be detected
+// or the file cannot be opened because for example of failing read permissions, an error
+// is returned and the harvester is closed. The file will be picked up again the next time
+// the file system is scanned
 func (h *Harvester) openFile() (encoding.Encoding, error) {
 	var file *os.File
 	var err error
 	var encoding encoding.Encoding
 
-	// TODO: This is currently end endless retry, should be set to a max?
-	// retry on failure.
-	for {
-		file, err = input.ReadOpen(h.Path)
-		if err == nil {
-			// Check we are not following a rabbit hole (symlinks, etc.)
-			if !input.IsRegularFile(file) {
-				file.Close()
-				return nil, errors.New("Given file is not a regular file.")
-			}
-
-			encoding, err = h.encoding(file)
-			if err == nil {
-				break
-			}
-
-			file.Close()
-			if err != transform.ErrShortSrc {
-				return nil, err
-			}
-			logp.Info("Initialising encoding for '%v' failed due to file being to short")
+	file, err = input.ReadOpen(h.Path)
+	if err == nil {
+		// Check we are not following a rabbit hole (symlinks, etc.)
+		if !input.IsRegularFile(file) {
+			return nil, errors.New("Given file is not a regular file.")
 		}
 
+		encoding, err = h.encoding(file)
+		if err != nil {
+
+			if err == transform.ErrShortSrc {
+				logp.Info("Initialising encoding for '%v' failed due to file being too short", file)
+			} else {
+				logp.Err("Initialising encoding for '%v' failed: %v", file, err)
+			}
+			return nil, err
+		}
+
+	} else {
 		logp.Err("Failed opening %s: %s", h.Path, err)
-		time.Sleep(5 * time.Second)
+		return nil, err
 	}
 
 	// update file offset
 	err = h.initFileOffset(file)
 	if err != nil {
-		file.Close()
 		return nil, err
 	}
 
