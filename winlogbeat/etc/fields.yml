@@ -40,7 +40,7 @@ common:
       type: int
       required: true
       description: >
-        Number of event log records represented in the event. This field is
+        The number of event log records represented in the event. This field is
         always set to 1.
 
 eventlog:
@@ -53,7 +53,7 @@ eventlog:
       required: true
       description: >
         The name of the computer that generated the record. When using Windows
-        event forwarding this name can differ from the beat.hostname.
+        event forwarding, this name can differ from the `beat.hostname`.
 
     - name: eventCategory
       type: string
@@ -72,27 +72,27 @@ eventlog:
       type: string
       required: true
       description: >
-        Name of the event log from which this record was read. This will be one
-        of names from the `event_logs` collection in the configuration.
+        The name of the event log from which this record was read. This value is one
+        of the names from the `event_logs` collection in the configuration.
 
     - name: eventType
       type: string
       required: true
       description: >
-        The type of event. There are five types of events that can be logged --
+        The type of event. There are five types of events that can be logged:
         Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
     - name: message
       type: string
       required: true
       description: >
-        The message from event log record.
+        The message from the event log record.
 
     - name: recordNumber
       type: long
       required: true
       description: >
-        The record number of the event log record. The very first record written
+        The record number of the event log record. The first record written
         to an event log is record number 1, and other records are numbered
         sequentially. If the record number reaches 4294967295, the next record
         number will be 0.
