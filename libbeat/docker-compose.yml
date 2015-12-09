@@ -15,9 +15,6 @@ libbeat:
     - build/test.env
 elasticsearch-173:
   image: elasticsearch:1.7.3
-#elasticsearch-201:
-#  image: elasticsearch:2.0.1
-#  command: elasticsearch -Des.network.host=0.0.0.0
 elasticsearch-210:
   image: elasticsearch:2.1.0
   command: elasticsearch -Des.network.host=0.0.0.0
@@ -25,8 +22,8 @@ redis:
   image: redis
 # This host name is fixed because of the certificate
 logstash:
-  build: scripts/docker/logstash
-  dockerfile: Dockerfile-21
+  build: ../scripts/docker/logstash
+  dockerfile: Dockerfile-2.1.0
   env_file:
     - build/test.env
   links:
