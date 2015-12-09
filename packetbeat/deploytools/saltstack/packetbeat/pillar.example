@@ -1,4 +1,0 @@
-packetbeat:
-  elasticsearch: 192.168.100.136:9200
-  ignore_outgoing: true
-  procs: [ apache2, mysql ] 
