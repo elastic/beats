@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file based on the
 ## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc2...HEAD)
 
 ### Backward Compatibility Breaks
+- Change default directory of the config file to be identical with the binary #419
 
 ### Bugfixes
 - Fix default config file path for Windows. #341
