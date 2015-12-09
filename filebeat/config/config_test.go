@@ -33,7 +33,7 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, "/var/log/s*.log", prospectors[0].Paths[1])
 	assert.Equal(t, "log", prospectors[0].Input)
 	assert.Equal(t, 3, len(prospectors[0].Harvester.Fields))
-	assert.Equal(t, 1, len(prospectors[0].Harvester.Fields["review"]))
+	assert.Equal(t, "1", prospectors[0].Harvester.Fields["review"])
 	assert.Equal(t, "24h", prospectors[0].IgnoreOlder)
 	assert.Equal(t, "10s", prospectors[0].ScanFrequency)
 

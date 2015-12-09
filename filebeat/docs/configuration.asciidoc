@@ -99,7 +99,8 @@ If both `include_lines` and `exclude_lines` are defined, then include_lines is c
 ===== fields
 
 Optional fields that you can specify to add additional information to the output. For
-example, you might add fields that you can use for filtering log data. By default,
+example, you might add fields that you can use for filtering log data. Fields can be
+scalar values, arrays, dictionaries, or any nested combination of these. All scalar values will be interpreted as strings. By default,
 the fields that you specify here will be grouped under a `fields` sub-dictionary in the output document. To store the custom fields as top-level fields, set the `fields_under_root` option to true.
 
 [source,yaml]
