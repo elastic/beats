@@ -66,8 +66,8 @@ test_script:
 
 after_test:
   - ps: cd $env:GOPATH\src\$env:PROJ
-  - python ..\libbeat\scripts\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
-  - python ..\libbeat\scripts\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
+  - python ..\scripts\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
+  - python ..\scripts\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
   - go tool cover -html=build\coverage\full.cov -o build\coverage\full.html
   - ps: Push-AppveyorArtifact build\coverage\full.cov
   - ps: Push-AppveyorArtifact build\coverage\full.html

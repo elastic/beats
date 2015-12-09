@@ -111,7 +111,7 @@ integration-tests-environment:
 .PHONY: system-tests
 system-tests: libbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
-	python ../libbeat/scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
+	python ../scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-setup
@@ -149,7 +149,7 @@ testsuite:
 # It assumes that some covrage reports already exists, otherwise it will fail
 .PHONY: coverage-report
 coverage-report:
-	python ../libbeat/scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
+	python ../scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 # Update expects the most recent version of libbeat in the GOPATH
