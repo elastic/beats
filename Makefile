@@ -19,6 +19,9 @@ coverage-report:
 	-tail -q -n +2 ./libbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
+update:
+	$(foreach var,$(PROJECTS),make -C $(var) update;)
+
 clean:
 	$(foreach var,$(PROJECTS),make -C $(var) clean;)
 
