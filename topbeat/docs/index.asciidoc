@@ -10,6 +10,8 @@ include::./configuration.asciidoc[]
 
 include::./command-line.asciidoc[]
 
+include::./json.asciidoc[]
+
 include::./fields.asciidoc[]
 
 // include::./troubleshooting.asciidoc[]
