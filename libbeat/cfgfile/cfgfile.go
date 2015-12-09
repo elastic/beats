@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"runtime"
-	"strings"
+	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -17,7 +17,7 @@ var testConfig *bool
 func init() {
 	// The default config cannot include the beat name as it is not initialised when this
 	// function is called, but see ChangeDefaultCfgfileFlag
-	configfile = flag.String("c", "/etc/beat/beat.yml", "Configuration file")
+	configfile = flag.String("c", "beat.yml", "Configuration file")
 	testConfig = flag.Bool("configtest", false, "Test configuration and exit.")
 }
 
@@ -29,12 +29,13 @@ func ChangeDefaultCfgfileFlag(beatName string) error {
 		return fmt.Errorf("Flag -c not found")
 	}
 
-	if runtime.GOOS == "windows" {
-		cliflag.DefValue = fmt.Sprintf(`C:\Program Files\%s\%s.yml`,
-			strings.Title(beatName), beatName)
-	} else {
-		cliflag.DefValue = fmt.Sprintf("/etc/%s/%s.yml", beatName, beatName)
+	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return fmt.Errorf("Failed to set default config file location because the absolute path to %s could not be obtained. %v", os.Args[0], err)
 	}
+
+	cliflag.DefValue = filepath.Join(path, beatName + ".yml")
+
 	return cliflag.Value.Set(cliflag.DefValue)
 }
 
