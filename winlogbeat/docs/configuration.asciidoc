@@ -41,11 +41,11 @@ winlogbeat:
 
 ===== registry_file
 
-The name of the file where information is stored that enables Winlogbeat to
-resume monitoring after a restart. By default the file is stored as
-`.winlogbeat.yaml` in the directory in which the Beat was started. It is
-recommended that the value be set to `C:/ProgramData/winlogbeat/.winlogbeat.yaml`
-when the process is being run as a Windows service.
+The name of the file where Winlogbeat stores information that it uses to resume
+monitoring after a restart. By default the file is stored as `.winlogbeat.yaml`
+in the directory where the Beat was started. When you run the process as a
+Windows service, it's recommended that you set the value to
+`C:/ProgramData/winlogbeat/.winlogbeat.yaml`.
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -53,16 +53,16 @@ winlogbeat:
   registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yaml
 --------------------------------------------------------------------------------
 
-NOTE: The forward slashes in the path are automatically changed to back slashes
-for Windows compatibility. Either forward or back slashes may be used. Forward
+NOTE: The forward slashes (/) in the path are automatically changed to backslashes
+(\) for Windows compatibility. You can use either forward or backslashes. Forward
 slashes are easier to work with in YAML because there is no need to escape them.
 
 ===== event_logs
 
-In YAML terminology, `event_logs` is defined as a list of dictionaries. Each
-entry in the list defines an event log to monitor as well as any information to
-be associated with the event log (filter, tags, etc.). Name is the only required
-field for each event log.
+A list of entries (called 'dictionaries' in YAML) that specify which event logs to
+monitor. Each entry in the list defines an event log to monitor as well as any
+information to be associated with the event log (filter, tags, and so on). The
+`name` field is the only required field for each event log.
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -73,18 +73,18 @@ winlogbeat:
 
 ===== event_logs.name
 
-Each dictionary under `event_logs` must have a `name` field. You can get a list
-of available logs by running `Get-EventLog *` in PowerShell. Alternatively, you
-can look at the registry keys found under
-`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\eventlog`.
+The name of the event log to monitor. Each dictionary under `event_logs` must
+have a `name` field. You can get a list of available event logs by running
+`Get-EventLog *` in PowerShell. Alternatively, you can look at the registry keys
+found under `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\eventlog`.
 
 ===== event_logs.ignore_older
 
-The optional `ignore_older` field may be specified to filter events that are
-older then the specified amount of time. Valid time units are "ns",
+If this option is specified, Winlogbeat filters events that are
+older than the specified amount of time. Valid time units are "ns",
 "us" (or "µs"), "ms", "s", "m", "h". This option is useful when you are
 beginning to monitor an event log that contains older records that you would
-like to ignore.
+like to ignore. This field is optional.
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -96,8 +96,11 @@ winlogbeat:
 
 ===== metrics.bindaddress
 
-The optional `metrics.bindaddress` configuration option specifies a hostname and
-port at which the Beat will host an HTTP web service providing metrics.
+The hostname and port where the Beat will host an HTTP web service that provides
+metrics. This field is optional.
+
+The following example specifies that the metrics service is available at
+http://localhost:8128/debug/vars:
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -106,9 +109,7 @@ winlogbeat:
     bindaddress: 'localhost:8123'
 --------------------------------------------------------------------------------
 
-In the example above, the metrics service would be available at
-http://localhost:8128/debug/vars. The metrics are served as a JSON document. The
-metrics include:
+The metrics are served as a JSON document. The metrics include:
 
 - memory stats
 - number of filtered events from each log
