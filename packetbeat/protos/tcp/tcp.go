@@ -30,6 +30,11 @@ type Processor interface {
 	Process(tcphdr *layers.TCP, pkt *protos.Packet)
 }
 
+var (
+	debugf  = logp.MakeDebug("tcp")
+	isDebug = false
+)
+
 func (tcp *Tcp) getId() uint32 {
 	tcp.id += 1
 	return tcp.id
@@ -78,8 +83,10 @@ func (stream *TcpStream) String() string {
 func (stream *TcpStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP, original_dir uint8) {
 	mod := stream.tcp.protocols.GetTcp(stream.protocol)
 	if mod == nil {
-		logp.Debug("tcp", "Ignoring protocol for which we have no module "+
-			"loaded: %s", stream.protocol)
+		if isDebug {
+			debugf("Ignoring protocol for which we have no module loaded: %s",
+				stream.protocol)
+		}
 		return
 	}
 
@@ -130,7 +137,9 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 				timeout = mod.ConnectionTimeout()
 			}
 
-			logp.Debug("tcp", "Stream doesn't exist, creating new")
+			if isDebug {
+				debugf("Stream doesn't exist, creating new")
+			}
 
 			// create
 			stream = &TcpStream{id: tcp.getId(), tuple: &pkt.Tuple, protocol: protocol, tcp: tcp}
@@ -144,25 +153,31 @@ func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
 	tcp_start_seq := tcphdr.Seq
 	tcp_seq := tcp_start_seq + uint32(len(pkt.Payload))
 
-	logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
-		tcp_start_seq, tcp_seq, stream.lastSeq[original_dir], len(pkt.Payload))
+	if isDebug {
+		debugf("pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
+			tcp_start_seq, tcp_seq, stream.lastSeq[original_dir], len(pkt.Payload))
+	}
 
 	if len(pkt.Payload) > 0 &&
 		stream.lastSeq[original_dir] != 0 {
 
 		if tcpSeqBeforeEq(tcp_seq, stream.lastSeq[original_dir]) {
-			logp.Debug("tcp", "Ignoring what looks like a retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
-				tcphdr.Seq, len(pkt.Payload), stream.lastSeq[original_dir])
+			if isDebug {
+				debugf("Ignoring what looks like a retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
+					tcphdr.Seq, len(pkt.Payload), stream.lastSeq[original_dir])
+			}
 			return
 		}
 
 		if tcpSeqBefore(stream.lastSeq[original_dir], tcp_start_seq) {
 			if !created {
-				logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
+				logp.Warn("Gap in tcp stream. last_seq: %d, seq: %d", stream.lastSeq[original_dir], tcp_start_seq)
 				drop := stream.gapInStream(original_dir,
 					int(tcp_start_seq-stream.lastSeq[original_dir]))
 				if drop {
-					logp.Debug("tcp", "Dropping stream because of gap")
+					if isDebug {
+						debugf("Dropping stream because of gap")
+					}
 					tcp.streams.Delete(stream.tuple.Hashable())
 				}
 			}
@@ -195,6 +210,8 @@ func buildPortsMap(plugins map[protos.Protocol]protos.TcpProtocolPlugin) (map[ui
 
 // Creates and returns a new Tcp.
 func NewTcp(p protos.Protocols) (*Tcp, error) {
+	isDebug = logp.IsDebug("tcp")
+
 	portMap, err := buildPortsMap(p.GetAllTcp())
 	if err != nil {
 		return nil, err
@@ -208,7 +225,9 @@ func NewTcp(p protos.Protocols) (*Tcp, error) {
 			protos.DefaultTransactionHashSize),
 	}
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
-	logp.Debug("tcp", "Port map: %v", portMap)
+	if isDebug {
+		debugf("tcp", "Port map: %v", portMap)
+	}
 
 	return tcp, nil
 }
