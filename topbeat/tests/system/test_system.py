@@ -33,7 +33,6 @@ class Test(TestCase):
             "mem.used_p",
             "mem.actual_used_p",
             "swap.used_p",
-            "swap.actual_used_p",
         ]:
             assert type(output[key]) in [float, int]
 
@@ -54,7 +53,5 @@ class Test(TestCase):
             "swap.total",
             "swap.used",
             "swap.free",
-            "swap.actual_used",
-            "swap.actual_free",
         ]:
             assert type(output[key]) is int or type(output[key]) is long
