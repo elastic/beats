@@ -5,7 +5,7 @@ from filebeat import TestCase
 import codecs
 import os
 import time
-
+from nose.plugins.skip import Skip, SkipTest
 
 # Additional tests to be added:
 # * Check what happens when file renamed -> no recrawling should happen
@@ -837,3 +837,65 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
+
+
+    def test_file_no_permission(self):
+        """
+        Checks that filebeat handles files without reading permission well
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile = self.working_dir + "/log/test.log"
+        file = open(testfile, 'w')
+
+        iterations = 3
+        for n in range(0, iterations):
+            file.write("Hello World" + str(n))
+            file.write("\n")
+
+        file.close()
+
+        # Remove reading rights from file
+        os.chmod(testfile, 0o000)
+
+        if os.name == "nt":
+
+            raise SkipTest
+            # TODO: Currently skipping this test on windows as it requires `pip install win32api`
+            # which seems to have windows only dependencies.
+            # To solve this problem a requirements_windows.txt could be introduced which would
+            # then only be used on Windows.
+            #
+            # Below is some additional code to give some indication on how the implementation could
+            # look like.
+
+            from win32 import win32api
+            import win32security
+            import ntsecuritycon as con
+
+            user, domain, type = win32security.LookupAccountName ("", win32api.GetUserName ())
+            sd = win32security.GetFileSecurity (testfile, win32security.DACL_SECURITY_INFORMATION)
+
+            dacl = win32security.ACL ()
+            # Remove all access rights
+            dacl.AddAccessAllowedAce (win32security.ACL_REVISION, 0, user)
+
+            sd.SetSecurityDescriptorDacl (1, dacl, 0)
+            win32security.SetFileSecurity (testfile, win32security.DACL_SECURITY_INFORMATION, sd)
+
+
+        filebeat = self.start_filebeat()
+
+        self.wait_until(
+            lambda: self.log_contains("permission denied"),
+            max_timeout=15)
+
+        filebeat.kill_and_wait()
+
+        os.chmod(testfile, 0o755)
+
+        assert False == os.path.isfile(os.path.join(self.working_dir, "output/filebeat"))
