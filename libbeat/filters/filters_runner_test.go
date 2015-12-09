@@ -3,7 +3,7 @@ package filters
 import (
 	"testing"
 
-	"github.com/elastic/libbeat/common"
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -74,7 +74,7 @@ func TestLoadConfiguredFilters(t *testing.T) {
 
 	tests := []io{
 		// should find configuration by types
-		io{
+		{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
 				"nop1": map[interface{}]interface{}{
@@ -85,18 +85,18 @@ func TestLoadConfiguredFilters(t *testing.T) {
 				},
 			},
 			Output: []o{
-				o{
+				{
 					Name: "nop1",
 					Type: NopFilter,
 				},
-				o{
+				{
 					Name: "nop2",
 					Type: NopFilter,
 				},
 			},
 		},
 		// should work with implicit configuration by name
-		io{
+		{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop", "sample1"},
 				"sample1": map[interface{}]interface{}{
@@ -104,11 +104,11 @@ func TestLoadConfiguredFilters(t *testing.T) {
 				},
 			},
 			Output: []o{
-				o{
+				{
 					Name: "nop",
 					Type: NopFilter,
 				},
-				o{
+				{
 					Name: "sample1",
 					Type: NopFilter,
 				},
@@ -138,7 +138,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop2"},
 				"nop1": map[interface{}]interface{}{
@@ -147,7 +147,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 			},
 			Err: "No such filter type and no corresponding configuration: nop2",
 		},
-		io{
+		{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
 				"nop1": map[interface{}]interface{}{
@@ -156,7 +156,7 @@ func TestLoadConfiguredFiltersNegative(t *testing.T) {
 			},
 			Err: "Couldn't get type for filter: nop1",
 		},
-		io{
+		{
 			Input: map[string]interface{}{
 				"filters": []interface{}{"nop1", "nop"},
 				"nop1": map[interface{}]interface{}{

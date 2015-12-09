@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // TransportClient interfaces adds (re-)connect support to net.Conn.

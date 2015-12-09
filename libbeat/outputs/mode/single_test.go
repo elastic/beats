@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/libbeat/common"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func testSingleSendOneEvent(t *testing.T, events []eventInfo) {

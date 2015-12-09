@@ -5,9 +5,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/protos"
 )
 
 func TestThrift_thriftReadString(t *testing.T) {

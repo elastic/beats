@@ -3,7 +3,7 @@ package filters
 import (
 	"fmt"
 
-	"github.com/elastic/libbeat/common"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // The FilterPlugin interface needs to be implemented

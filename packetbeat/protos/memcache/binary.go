@@ -7,8 +7,8 @@ package memcache
 // init function.
 
 import (
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 type memcacheMagic uint8
@@ -328,7 +328,7 @@ func makeParseBinary(
 
 		if keyLen > 0 {
 			key, _ := buf.Collect(int(keyLen))
-			keys := []memcacheString{memcacheString{key}}
+			keys := []memcacheString{{key}}
 			msg.keys = keys
 		}
 

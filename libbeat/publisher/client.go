@@ -1,6 +1,6 @@
 package publisher
 
-import "github.com/elastic/libbeat/common"
+import "github.com/elastic/beats/libbeat/common"
 
 // Client is used by beats to publish new events.
 type Client interface {

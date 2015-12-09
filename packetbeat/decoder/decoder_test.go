@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket"

@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/packetbeat/config"
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1145,7 +1145,7 @@ func Test_splitCookiesHeader(t *testing.T) {
 	}
 
 	tests := []io{
-		io{
+		{
 			Input: "sessionToken=abc123; Expires=Wed, 09 Jun 2021 10:18:14 GMT",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
@@ -1153,28 +1153,28 @@ func Test_splitCookiesHeader(t *testing.T) {
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken=abc123; invalid",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken=abc123; ",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken=abc123;;;; ",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken=abc123; multiple=a=d=2 ",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
@@ -1182,7 +1182,7 @@ func Test_splitCookiesHeader(t *testing.T) {
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken=\"abc123\"; multiple=\"a=d=2 \"",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
@@ -1190,7 +1190,7 @@ func Test_splitCookiesHeader(t *testing.T) {
 			},
 		},
 
-		io{
+		{
 			Input: "sessionToken\t=   abc123; multiple=a=d=2 ",
 			Output: map[string]string{
 				"sessiontoken": "abc123",
@@ -1198,12 +1198,12 @@ func Test_splitCookiesHeader(t *testing.T) {
 			},
 		},
 
-		io{
+		{
 			Input:  ";",
 			Output: map[string]string{},
 		},
 
-		io{
+		{
 			Input:  "",
 			Output: map[string]string{},
 		},

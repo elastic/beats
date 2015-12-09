@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	filebeat "github.com/elastic/filebeat/beat"
-	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/logp"
+	filebeat "github.com/elastic/beats/filebeat/beat"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 var Version = "1.0.0"

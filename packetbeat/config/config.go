@@ -1,11 +1,11 @@
 package config
 
 import (
-	"github.com/elastic/libbeat/common/droppriv"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/packetbeat/procs"
+	"github.com/elastic/beats/libbeat/common/droppriv"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/procs"
 )
 
 type Config struct {

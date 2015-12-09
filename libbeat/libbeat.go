@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/elastic/libbeat/beat"
-	. "github.com/elastic/libbeat/mock"
+	"github.com/elastic/beats/libbeat/beat"
+	. "github.com/elastic/beats/libbeat/mock"
 )
 
 // Main file is only used for testing.
