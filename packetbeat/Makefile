@@ -34,6 +34,6 @@ benchmark:
 	$(GODEP) go test -short -bench=. ./... -cpu=2
 
 .PHONY: gen
-gen: env
-	. env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
-	. env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
+gen: system-tests-setup
+	. build/system-tests/env/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
+	. build/system-tests/env/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
