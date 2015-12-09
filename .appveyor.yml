@@ -8,10 +8,16 @@ os: Windows Server 2012 R2
 environment:
   GOROOT: c:\go
   GOPATH: c:\gopath
-  PROJ:   github.com\elastic\topbeat
+  matrix:
+  - PROJ: github.com\elastic\beats\filebeat
+    BEAT: filebeat
+  - PROJ: github.com\elastic\beats\topbeat
+    BEAT: topbeat
+  - PROJ: github.com\elastic\beats\winlogbeat
+    BEAT: winlogbeat
 
 # Custom clone folder (variables are not expanded here).
-clone_folder: c:\gopath\src\github.com\elastic\topbeat
+clone_folder: c:\gopath\src\github.com\elastic\beats
 
 # Cache mingw install until appveyor.yml is modified.
 cache:
@@ -22,11 +28,10 @@ cache:
 # Scripts that run after cloning repository
 install:
   # AppVeyor installed mingw is 32-bit only.
-  - cinst mingw
-  - set PATH=C:\tools\mingw64\bin;%PATH%
-  - set PATH=%GOROOT%\bin;%PATH%
+  - cinst mingw >nul
+  - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
-  - set GOPATH=%GOPATH%\src\%PROJ%\Godeps\_workspace;%GOPATH%
+  - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
   - python --version
@@ -39,9 +44,9 @@ install:
 build_script:
   # Compile
   - appveyor AddCompilationMessage "Starting Compile"
+  - ps: cd $env:BEAT
   - go build
-  - appveyor AddCompilationMessage "Compile Success" -FileName "topbeat.exe"
-  - ps: Push-AppveyorArtifact topbeat.exe
+  - appveyor AddCompilationMessage "Compile Success" -FileName "$env:BEAT.exe"
 
 # To run your custom scripts instead of automatic tests
 test_script:
@@ -55,6 +60,12 @@ test_script:
   - ps: cd tests/system
   - nosetests --with-timer
   - ps: Update-AppveyorTest "System tests" -Outcome Passed
+
+# Executes for both successful and failed builds
+on_finish:
+  - ps: cd $env:GOPATH\src\$env:PROJ
+  - 7z a -r system-tests-output.zip build\system-tests\run
+  - ps: Push-AppveyorArtifact system-tests-output.zip
 
 # To disable deployment
 deploy: off

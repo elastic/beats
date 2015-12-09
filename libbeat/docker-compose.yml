@@ -1,5 +1,5 @@
 libbeat:
-  build: .
+  build: ..
   links:
     - redis
     - elasticsearch-173

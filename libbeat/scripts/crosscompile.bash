@@ -92,7 +92,7 @@ function go-alias {
         local GO386=387
         CMD="GOOS=${GOOS} GOARCH=${GOARCH} GO386=${GO386}"
     fi
-    CMD="$CMD godep go"
+    CMD="$CMD go"
     eval "function go-${1} { ( ${CMD} \"\$@\" ) }"
 }
 
