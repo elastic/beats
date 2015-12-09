@@ -1,10 +1,12 @@
 package common
 
 import (
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -183,5 +185,86 @@ func TestString(t *testing.T) {
 	}
 	for _, test := range tests {
 		assert.Equal(t, test.Output, test.Input.String())
+	}
+}
+
+func TestUnmarshalYAML(t *testing.T) {
+	type io struct {
+		InputLines []string
+		Output     MapStr
+	}
+	tests := []io{
+		// should return nil for empty document
+		{
+			InputLines: []string{},
+			Output:     nil,
+		},
+		// should handle scalar values
+		{
+			InputLines: []string{
+				"a: b",
+				"c: true",
+				"123: 456",
+			},
+			Output: MapStr{
+				"a":   "b",
+				"c":   "true",
+				"123": "456",
+			},
+		},
+		// should handle array with scalar values
+		{
+			InputLines: []string{
+				"a:",
+				"  - b",
+				"  - true",
+				"  - 123",
+			},
+			Output: MapStr{
+				"a": []interface{}{"b", "true", "123"},
+			},
+		},
+		// should handle array with nested map
+		{
+			InputLines: []string{
+				"a:",
+				"  - b: c",
+				"    d: true",
+				"    123: 456",
+			},
+			Output: MapStr{
+				"a": []interface{}{
+					MapStr{
+						"b":   "c",
+						"d":   "true",
+						"123": "456",
+					},
+				},
+			},
+		},
+		// should handle nested map
+		{
+			InputLines: []string{
+				"a: ",
+				"  b: c",
+				"  d: true",
+				"  123: 456",
+			},
+			Output: MapStr{
+				"a": MapStr{
+					"b":   "c",
+					"d":   "true",
+					"123": "456",
+				},
+			},
+		},
+	}
+	for _, test := range tests {
+		var actual MapStr
+		if err := yaml.Unmarshal([]byte(strings.Join(test.InputLines, "\n")), &actual); err != nil {
+			assert.Fail(t, "YAML unmarshaling unexpectedly failed: %s", err)
+			continue
+		}
+		assert.Equal(t, test.Output, actual)
 	}
 }
