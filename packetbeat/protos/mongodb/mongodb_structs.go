@@ -7,7 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type MongodbMessage struct {
+type mongodbMessage struct {
 	Ts time.Time
 
 	TcpTuple     common.TcpTuple
@@ -22,7 +22,7 @@ type MongodbMessage struct {
 	messageLength int
 	requestId     int
 	responseTo    int
-	opCode        string
+	opCode        opCode
 
 	// deduced from content. Either an operation from the original wire protocol or the name of a command (passed through a query)
 	// List of commands: http://docs.mongodb.org/manual/reference/command/
@@ -39,29 +39,28 @@ type MongodbMessage struct {
 }
 
 // Represent a stream being parsed that contains a mongodb message
-type MongodbStream struct {
+type stream struct {
 	tcptuple *common.TcpTuple
 
-	data []byte
-
-	message *MongodbMessage
+	data    []byte
+	message *mongodbMessage
 }
 
 // Parser moves to next message in stream
-func (stream *MongodbStream) PrepareForNewMessage() {
-	stream.data = stream.data[stream.message.messageLength:]
-	stream.message = nil
+func (st *stream) PrepareForNewMessage() {
+	st.data = st.data[st.message.messageLength:]
+	st.message = nil
 }
 
 // The private data of a parser instance
 // is composed of 2 potentially active streams: incoming, outgoing
-type mongodbPrivateData struct {
-	Data [2]*MongodbStream
+type mongodbConnectionData struct {
+	Streams [2]*stream
 }
 
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
-type MongodbTransaction struct {
+type transaction struct {
 	Type         string
 	tuple        common.TcpTuple
 	cmdline      *common.CmdlineTuple
@@ -84,9 +83,23 @@ type MongodbTransaction struct {
 	documents []interface{}
 }
 
+type opCode int32
+
+const (
+	opReply      opCode = 1
+	opMsg        opCode = 1000
+	opUpdate     opCode = 2001
+	opInsert     opCode = 2002
+	opReserved   opCode = 2003
+	opQuery      opCode = 2004
+	opGetMore    opCode = 2005
+	opDelete     opCode = 2006
+	opKillCursor opCode = 2007
+)
+
 // List of valid mongodb wire protocol operation codes
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#request-opcodes
-var OpCodes = map[int]string{
+var opCodeNames = map[opCode]string{
 	1:    "OP_REPLY",
 	1000: "OP_MSG",
 	2001: "OP_UPDATE",
@@ -96,6 +109,19 @@ var OpCodes = map[int]string{
 	2005: "OP_GET_MORE",
 	2006: "OP_DELETE",
 	2007: "OP_KILL_CURSORS",
+}
+
+func validOpcode(o opCode) bool {
+	_, found := opCodeNames[o]
+	return found
+}
+
+func (o opCode) String() string {
+	return opCodeNames[o]
+}
+
+func awaitsReply(c opCode) bool {
+	return c == opQuery || c == opGetMore
 }
 
 // List of mongodb user commands (send throuwh a query of the legacy protocol)

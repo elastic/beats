@@ -10,9 +10,9 @@ func TestMongodbParser_messageNotEvenStarted(t *testing.T) {
 	var data []byte
 	data = append(data, 0)
 
-	stream := &MongodbStream{data: data, message: new(MongodbMessage)}
+	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(stream)
+	ok, complete := mongodbMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -26,9 +26,9 @@ func TestMongodbParser_mesageNotFinished(t *testing.T) {
 	var data []byte
 	addInt32(data, 100) // length = 100
 
-	stream := &MongodbStream{data: data, message: new(MongodbMessage)}
+	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(stream)
+	ok, complete := mongodbMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -46,9 +46,9 @@ func TestMongodbParser_simpleRequest(t *testing.T) {
 	data = addInt32(data, 1000) // opCode = 1000 = OP_MSG
 	data = addCStr(data, "a message")
 
-	stream := &MongodbStream{data: data, message: new(MongodbMessage)}
+	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(stream)
+	ok, complete := mongodbMessageParser(st)
 
 	if !ok {
 		t.Errorf("Parsing returned error")
@@ -65,9 +65,9 @@ func TestMongodbParser_unknownOpCode(t *testing.T) {
 	data = addInt32(data, 0)    // responseTo = 0
 	data = addInt32(data, 5555) // opCode = 5555 = not a valid code
 
-	stream := &MongodbStream{data: data, message: new(MongodbMessage)}
+	st := &stream{data: data, message: new(mongodbMessage)}
 
-	ok, complete := mongodbMessageParser(stream)
+	ok, complete := mongodbMessageParser(st)
 
 	if ok {
 		t.Errorf("Parsing should have returned an error")

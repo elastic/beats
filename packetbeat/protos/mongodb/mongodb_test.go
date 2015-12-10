@@ -100,7 +100,7 @@ func TestSimpleFindLimit1(t *testing.T) {
 	req := protos.Packet{Payload: req_data}
 	resp := protos.Packet{Payload: resp_data}
 
-	private := protos.ProtocolData(new(mongodbPrivateData))
+	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
 	private = mongodb.Parse(&resp, tcptuple, 1, private)
@@ -121,8 +121,8 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	}
 
 	mongodb := MongodbModForTests()
-	mongodb.Send_request = true
-	mongodb.Send_response = true
+	mongodb.SendRequest = true
+	mongodb.SendResponse = true
 
 	// request and response from tests/pcaps/mongo_one_row.pcap
 	req_data, err := hex.DecodeString(
@@ -174,7 +174,7 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 	tcptuple := testTcpTuple()
 	req := protos.Packet{Payload: req_data}
 
-	private := protos.ProtocolData(new(mongodbPrivateData))
+	private := protos.ProtocolData(new(mongodbConnectionData))
 
 	private = mongodb.Parse(&req, tcptuple, 0, private)
 
@@ -198,13 +198,13 @@ func TestSimpleFindLimit1_split(t *testing.T) {
 
 func TestReconstructQuery(t *testing.T) {
 	type io struct {
-		Input  MongodbTransaction
+		Input  transaction
 		Full   bool
 		Output string
 	}
 	tests := []io{
 		{
-			Input: MongodbTransaction{
+			Input: transaction{
 				resource: "test.col",
 				method:   "find",
 				event: map[string]interface{}{
@@ -219,7 +219,7 @@ func TestReconstructQuery(t *testing.T) {
 			Output: `test.col.find({"me":"you"}).skip(3).limit(2)`,
 		},
 		{
-			Input: MongodbTransaction{
+			Input: transaction{
 				resource: "test.col",
 				method:   "insert",
 				params: map[string]interface{}{
@@ -230,7 +230,7 @@ func TestReconstructQuery(t *testing.T) {
 			Output: `test.col.insert({"documents":"you"})`,
 		},
 		{
-			Input: MongodbTransaction{
+			Input: transaction{
 				resource: "test.col",
 				method:   "insert",
 				params: map[string]interface{}{
@@ -256,15 +256,15 @@ func TestMaxDocs(t *testing.T) {
 	}
 
 	// more docs than configured
-	trans := MongodbTransaction{
+	trans := transaction{
 		documents: []interface{}{
 			1, 2, 3, 4, 5, 6, 7, 8,
 		},
 	}
 
 	mongodb := MongodbModForTests()
-	mongodb.Send_response = true
-	mongodb.Max_docs = 3
+	mongodb.SendResponse = true
+	mongodb.MaxDocs = 3
 
 	mongodb.publishTransaction(&trans)
 
@@ -273,7 +273,7 @@ func TestMaxDocs(t *testing.T) {
 	assert.Equal(t, "1\n2\n3\n[...]", res["response"])
 
 	// exactly the same number of docs
-	trans = MongodbTransaction{
+	trans = transaction{
 		documents: []interface{}{
 			1, 2, 3,
 		},
@@ -284,7 +284,7 @@ func TestMaxDocs(t *testing.T) {
 	assert.Equal(t, "1\n2\n3", res["response"])
 
 	// less docs
-	trans = MongodbTransaction{
+	trans = transaction{
 		documents: []interface{}{
 			1, 2,
 		},
@@ -295,12 +295,12 @@ func TestMaxDocs(t *testing.T) {
 	assert.Equal(t, "1\n2", res["response"])
 
 	// unlimited
-	trans = MongodbTransaction{
+	trans = transaction{
 		documents: []interface{}{
 			1, 2, 3, 4,
 		},
 	}
-	mongodb.Max_docs = 0
+	mongodb.MaxDocs = 0
 	mongodb.publishTransaction(&trans)
 	res = expectTransaction(t, mongodb)
 	assert.Equal(t, "1\n2\n3\n4", res["response"])
@@ -312,7 +312,7 @@ func TestMaxDocSize(t *testing.T) {
 	}
 
 	// more docs than configured
-	trans := MongodbTransaction{
+	trans := transaction{
 		documents: []interface{}{
 			"1234567",
 			"123",
@@ -321,8 +321,8 @@ func TestMaxDocSize(t *testing.T) {
 	}
 
 	mongodb := MongodbModForTests()
-	mongodb.Send_response = true
-	mongodb.Max_doc_length = 5
+	mongodb.SendResponse = true
+	mongodb.MaxDocLength = 5
 
 	mongodb.publishTransaction(&trans)
 
