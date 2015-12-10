@@ -169,6 +169,78 @@ type: int
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
+=== cpus Fields
+
+This group contains cpu usage per core statistics.
+
+
+=== cpui Fields
+
+This group contains cpu usage statistics of the core i, where i is the core number
+
+
+==== cpus.cpui.user
+
+type: int
+
+The amount of CPU time spent in user space on core i.
+
+
+==== cpus.cpui.user_p
+
+type: float
+
+The percentage of CPU time spent in user space on core i.
+
+
+==== cpus.cpui.nice
+
+type: int
+
+The amount of CPU time spent on low-priority processes on core i.
+
+
+==== cpus.cpui.system
+
+type: int
+
+The amount of CPU time spent in kernel space on core i.
+
+
+==== cpus.cpui.system_p
+
+type: float
+
+The percentage of CPU time spent in kernel space on core i.
+
+
+==== cpus.cpui.idle
+
+type: int
+
+The amount of CPU time spent idle on core i.
+
+
+==== cpus.cpui.iowait
+
+type: int
+
+The amount of CPU time spent in wait (on disk) on core i.
+
+
+==== cpus.cpui.softirq
+
+type: int
+
+The amount of CPU time spent servicing and handling software interrupts on core i.
+
+==== cpus.cpui.steal
+
+type: int
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core i. Available only on Unix.
+
+
 === mem Fields
 
 This group contains statistics related to the memory usage on the system.

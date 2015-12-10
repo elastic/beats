@@ -27,9 +27,10 @@ type Topbeat struct {
 	TbConfig         ConfigSettings
 	events           publisher.Client
 
-	sysStats  bool
-	procStats bool
-	fsStats   bool
+	sysStats   bool
+	procStats  bool
+	fsStats    bool
+	cpuPerCore bool
 
 	done chan struct{}
 }
@@ -72,6 +73,11 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	} else {
 		tb.fsStats = true
 	}
+	if tb.TbConfig.Input.Stats.CpuPerCore != nil {
+		tb.cpuPerCore = *tb.TbConfig.Input.Stats.CpuPerCore
+	} else {
+		tb.cpuPerCore = false
+	}
 
 	if !tb.sysStats && !tb.procStats && !tb.fsStats {
 		return errors.New("Invalid statistics configuration")
@@ -83,6 +89,7 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	logp.Debug("topbeat", "System statistics %t\n", tb.sysStats)
 	logp.Debug("topbeat", "Process statistics %t\n", tb.procStats)
 	logp.Debug("topbeat", "File system statistics %t\n", tb.fsStats)
+	logp.Debug("topbeat", "Cpu usage per core %t\n", tb.cpuPerCore)
 
 	return nil
 }
@@ -263,8 +270,14 @@ func (t *Topbeat) exportSystemStats() error {
 		"swap":       swap_stat,
 	}
 
-	for coreNumber, core := range cpu_core_stat {
-		event["cpu"+strconv.Itoa(coreNumber)] = core
+	if t.cpuPerCore {
+
+		cpus := common.MapStr{}
+
+		for coreNumber, stat := range cpu_core_stat {
+			cpus["cpu"+strconv.Itoa(coreNumber)] = stat
+		}
+		event["cpus"] = cpus
 	}
 
 	t.events.PublishEvent(event)

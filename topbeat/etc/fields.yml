@@ -143,6 +143,74 @@ system:
             was servicing another processor.
             Available only on Unix.
 
+    - name: cpus
+      type: group
+      description: This group contains cpu usage per core statistics.
+      fields:
+        - name: cpui
+          type: group
+          description: This group contains cpu usage statistics of the core i, where 0<i<n and n is the number of cores.
+          fields:
+
+          - name: user
+            path: cpus.cpui.user
+            type: int
+            description: >
+             The amount of CPU time spent in user space on core i.
+
+          - name: user_p
+            path: cpus.cpui.user_p
+            type: float
+            description: >
+              The percentage of CPU time spent in user space on core i.
+
+          - name: nice
+            path: cpus.cpui.nice
+            type: int
+            description: >
+              The amount of CPU time spent on low-priority processes on core i.
+
+
+          - name: system
+            path: cpus.cpui.system
+            type: int
+            description: >
+              The amount of CPU time spent in kernel space on core i.
+
+          - name: system_p
+            path: cpus.cpui.system_p
+            type: float
+            description: >
+              The percentage of CPU time spent in kernel space on core i.
+
+          - name: idle
+            path: cpus.cpui.idle
+            type: int
+            description: >
+              The amount of CPU time spent idle on core i.
+
+          - name: iowait
+            path: cpus.cpui.iowait
+            type: int
+            description: >
+              The amount of CPU time spent in wait (on disk) on core i.
+
+          - name: softirq
+            path: cpus.cpui.softirq
+            type: int
+            description:
+              The amount of CPU time spent servicing and handling software interrupts on core i.
+
+
+          - name: steal
+            path: cpus.cpui.steal
+            type: int
+            description: >
+              The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+              was servicing another processor on core i.
+              Available only on Unix.
+
+
 
     - name: mem
       type: group
