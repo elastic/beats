@@ -235,11 +235,10 @@ class Test(TestCase):
             max_timeout=15)
         os.remove(testfile)
 
-        #if os.name == 'nt':
         # Wait until error shows up on windows
         self.wait_until(
             lambda: self.log_contains(
-                "Unexpected force close specific"),
+                "Force closing file"),
             max_timeout=15)
 
         # Create new file with same name to see if it is picked up
@@ -270,6 +269,65 @@ class Test(TestCase):
         # from scratch
         output = self.read_output()
         assert len(output) == 5 + 6
+
+    def test_force_close(self):
+        """
+        Checks that a file is closed in case it is rotated
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/test.log",
+            force_close_files="true",
+            scan_frequency="0.1s"
+        )
+        os.mkdir(self.working_dir + "/log/")
+
+        testfile1 = self.working_dir + "/log/test.log"
+        testfile2 = self.working_dir + "/log/test.log.rotated"
+        file = open(testfile1, 'w')
+
+        iterations1 = 5
+        for n in range(0, iterations1):
+            file.write("rotation file")
+            file.write("\n")
+
+        file.close()
+
+        filebeat = self.start_filebeat()
+
+        # Let it read the file
+        self.wait_until(
+            lambda: self.output_has(lines=iterations1), max_timeout=10)
+
+        os.rename(testfile1, testfile2)
+
+        file = open(testfile1, 'w', 0)
+        file.write("Hello World\n")
+        file.close()
+
+        # Wait until error shows up on windows
+        self.wait_until(
+            lambda: self.log_contains(
+                "Force close file"),
+            max_timeout=15)
+
+        # Let it read the file
+        self.wait_until(
+            lambda: self.output_has(lines=iterations1+1), max_timeout=10)
+
+        filebeat.kill_and_wait()
+
+        data = self.get_dot_filebeat()
+
+        # Make sure new file was picked up. As it has the same file name,
+        # only one entry exists
+        assert len(data) == 1
+
+        # Make sure output has 11 entries, the new file was started
+        # from scratch
+        output = self.read_output()
+        #assert len(output) == 5 + 6
+
 
     def test_new_line_on_existing_file(self):
         """
@@ -497,11 +555,11 @@ class Test(TestCase):
             # golang, python, sample text
             ("plain", "ascii", u"I can eat glass"),
             ("utf-8", "utf_8",
-                u"ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
+             u"ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
             ("utf-16be", "utf_16_be",
-                u"Pot să mănânc sticlă și ea nu mă rănește."),
+             u"Pot să mănânc sticlă și ea nu mă rănește."),
             ("utf-16le", "utf_16_le",
-                u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
+             u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
             ("latin1", "latin1",
              u"I kå Glas frässa, ond des macht mr nix!"),
             ("BIG5", "big5", u"我能吞下玻璃而不傷身體。"),
