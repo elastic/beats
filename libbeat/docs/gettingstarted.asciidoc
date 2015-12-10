@@ -318,8 +318,9 @@ cd beats-dashboards-{Dashboards-version}/
 ----------------------------------------------------------------------
 
 NOTE: If Elasticsearch is not running on `127.0.0.1:9200`, you need to
-specify the Elasticsearch location as an argument to the `load.sh` command:
-`./load.sh http://192.168.33.60:9200`
+specify the Elasticsearch location as an argument to the `load.sh` command.
+For example: `./load.sh -url http://192.168.33.60:9200`. Use the
+`-help` option to see other available options.
 
 The load command uploads the example dashboards, visualizations, and searches
 that you can use. The load command also creates index patterns for each Beat:
