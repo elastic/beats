@@ -36,6 +36,13 @@ type MemStat struct {
 	ActualUsedPercent float64 `json:"actual_used_p"`
 }
 
+type SwapStat struct {
+	Total       uint64  `json:"total"`
+	Used        uint64  `json:"used"`
+	Free        uint64  `json:"free"`
+	UsedPercent float64 `json:"used_p"`
+}
+
 type ProcMemStat struct {
 	Size       uint64  `json:"size"`
 	Rss        uint64  `json:"rss"`
@@ -191,7 +198,7 @@ func GetMemory() (*MemStat, error) {
 	}, nil
 }
 
-func GetSwap() (*MemStat, error) {
+func GetSwap() (*SwapStat, error) {
 
 	swap := sigar.Swap{}
 	err := swap.Get()
@@ -199,7 +206,7 @@ func GetSwap() (*MemStat, error) {
 		return nil, err
 	}
 
-	return &MemStat{
+	return &SwapStat{
 		Total: swap.Total,
 		Used:  swap.Used,
 		Free:  swap.Free,

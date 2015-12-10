@@ -252,7 +252,7 @@ func (t *Topbeat) exportSystemStats() error {
 		logp.Warn("Getting swap details: %v", err)
 		return err
 	}
-	t.addMemPercentage(swap_stat)
+	t.addSwapPercentage(swap_stat)
 
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
@@ -325,6 +325,15 @@ func (t *Topbeat) addMemPercentage(m *MemStat) {
 
 	actual_perc := float64(m.ActualUsed) / float64(m.Total)
 	m.ActualUsedPercent = Round(actual_perc, .5, 2)
+}
+
+func (t *Topbeat) addSwapPercentage(s *SwapStat) {
+	if s.Total == 0 {
+		return
+	}
+
+	perc := float64(s.Used) / float64(s.Total)
+	s.UsedPercent = Round(perc, .5, 2)
 }
 
 func addFileSystemUsedPercentage(f *FileSystemStat) {
