@@ -18,8 +18,16 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
+- Fix panic on nil in redis protocol parser. #384
+- Fix errors redis parser when messages are split in multiple TCP segments. #402
+- Fix errors in redis parser when length prefixed strings contain sequences of CRLF. #402
+- Fix errors in redis parser when dealing with nested arrays. #402
 
 ### Added
+- Added redis pipelining support. #402
+
+### Improvements
+- Improve redis parser performance. #442
 
 ### Deprecated
 
