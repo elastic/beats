@@ -34,7 +34,7 @@ func ChangeDefaultCfgfileFlag(beatName string) error {
 		return fmt.Errorf("Failed to set default config file location because the absolute path to %s could not be obtained. %v", os.Args[0], err)
 	}
 
-	cliflag.DefValue = filepath.Join(path, beatName + ".yml")
+	cliflag.DefValue = filepath.Join(path, beatName+".yml")
 
 	return cliflag.Value.Set(cliflag.DefValue)
 }
