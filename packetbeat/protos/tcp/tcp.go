@@ -179,14 +179,17 @@ func (tcp *Tcp) getStream(pkt *protos.Packet) (stream TcpStream, created bool) {
 		return TcpStream{}, false
 	}
 
-	timeout := time.Duration(0)
+	var timeout time.Duration
 	mod := tcp.protocols.GetTcp(protocol)
 	if mod != nil {
 		timeout = mod.ConnectionTimeout()
 	}
 
 	if isDebug {
-		debugf("Connection doesn't exist, creating new")
+		t := pkt.Tuple
+		debugf("Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
+			t.Src_ip.String(), t.Src_port,
+			t.Dst_ip.String(), t.Dst_port)
 	}
 
 	conn := &TcpConnection{
