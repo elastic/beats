@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/filebeat/config"
-	"github.com/elastic/filebeat/input"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func NewHarvester(
@@ -303,7 +303,7 @@ func lineEndingChars(line []byte) int {
 
 // readLine reads a full line into buffer and returns it.
 // In case of partial lines, readLine waits for a maximum of partialLineWaiting seconds for new segments to arrive.
-// This could potentialy be improved / replaced by https://github.com/elastic/libbeat/tree/master/common/streambuf
+// This could potentialy be improved / replaced by https://github.com/elastic/beats/libbeat/tree/master/common/streambuf
 func readLine(
 	reader *lineReader,
 	lastReadTime *time.Time,

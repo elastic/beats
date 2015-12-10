@@ -3,7 +3,7 @@ package beat
 import (
 	"testing"
 
-	cfg "github.com/elastic/filebeat/config"
+	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )

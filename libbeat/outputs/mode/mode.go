@@ -6,8 +6,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration

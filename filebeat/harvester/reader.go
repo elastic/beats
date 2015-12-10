@@ -7,7 +7,7 @@ import (
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/transform"
 
-	"github.com/elastic/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/common/streambuf"
 )
 
 // timedReader keeps track of last time bytes have been read from underlying

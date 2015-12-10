@@ -6,11 +6,11 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/outputs"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/libbeat/service"
+	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/service"
 )
 
 // Beater interface that every beat must use

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -103,7 +103,7 @@ func Test_buildPortsMap(t *testing.T) {
 	// The protocols named here are not necessarily UDP. They are just used
 	// for testing purposes.
 	config_tests := []configTest{
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
 				protos.HttpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
@@ -112,7 +112,7 @@ func Test_buildPortsMap(t *testing.T) {
 				8080: protos.HttpProtocol,
 			},
 		},
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
@@ -128,7 +128,7 @@ func Test_buildPortsMap(t *testing.T) {
 		},
 
 		// should ignore duplicate ports in the same protocol
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
@@ -159,7 +159,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	// The protocols named here are not necessarily UDP. They are just used
 	// for testing purposes.
 	tests := []errTest{
-		errTest{
+		{
 			// Should raise error on duplicate port
 			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},

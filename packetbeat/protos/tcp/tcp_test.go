@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/publisher"
-	"github.com/elastic/packetbeat/protos"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
@@ -62,7 +62,7 @@ func Test_configToPortsMap(t *testing.T) {
 	}
 
 	config_tests := []configTest{
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
@@ -71,7 +71,7 @@ func Test_configToPortsMap(t *testing.T) {
 				8080: protos.HttpProtocol,
 			},
 		},
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
@@ -87,7 +87,7 @@ func Test_configToPortsMap(t *testing.T) {
 		},
 
 		// should ignore duplicate ports in the same protocol
-		configTest{
+		{
 			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
@@ -115,7 +115,7 @@ func Test_configToPortsMap_negative(t *testing.T) {
 	}
 
 	tests := []errTest{
-		errTest{
+		{
 			// should raise error on duplicate port
 			Input: map[protos.Protocol]protos.TcpProtocolPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},

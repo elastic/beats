@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/libbeat/common"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type SocketInfo struct {
@@ -145,7 +145,7 @@ func NewProcess(proc *ProcessesWatcher, name string, grepper string,
 
 func (p *Process) RefreshPids() {
 	logp.Debug("procs", "In RefreshPids")
-	for _ = range p.RefreshPidsTimer {
+	for range p.RefreshPidsTimer {
 		logp.Debug("procs", "In RefreshPids tick")
 		var err error
 		p.Pids, err = FindPidsByCmdlineGrep(p.proc.proc_prefix, p.Grepper)

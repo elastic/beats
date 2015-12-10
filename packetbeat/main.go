@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/libbeat/beat"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Setups and Runs Packetbeat

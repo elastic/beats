@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func ElasticsearchMock(code int, body []byte) *httptest.Server {

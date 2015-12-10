@@ -3,7 +3,7 @@ BEATNAME=packetbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
-include scripts/Makefile
+include ../libbeat/scripts/Makefile
 
 .PHONY: with_pfring
 with_pfring:

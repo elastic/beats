@@ -1,7 +1,7 @@
 package outputs
 
 import (
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 	"sync/atomic"
 )
 

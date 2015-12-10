@@ -10,7 +10,7 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Handles OS signals that ask the service/daemon to stop.

@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/libbeat/cfgfile"
-	"github.com/elastic/libbeat/logp"
+	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Defaults for config variables which are not set

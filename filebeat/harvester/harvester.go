@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/text/encoding"
 
-	"github.com/elastic/filebeat/config"
-	"github.com/elastic/filebeat/input"
+	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/input"
 	"time"
 )
 

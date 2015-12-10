@@ -4,7 +4,7 @@ BEATNAME=filebeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 
-include scripts/Makefile
+include ../libbeat/scripts/Makefile
 
 # This is called by the beats-packer to obtain the configuration file and
 # default template
