@@ -40,7 +40,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "win2012", primary: true do |win2012|
     # Windows Server 2012 R2
-    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2015-12-07_2214.box"
+    win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2015-12-10_1222.box"
     win2012.vm.guest = :windows
 
     # Communicator for windows boxes
