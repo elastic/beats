@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/config"
 	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/winlogbeat/eventlog/wineventlog"
 )
 
 // Metrics that can retrieved through the expvar web interface. Metrics must be
@@ -40,9 +41,12 @@ func init() {
 	expvar.Publish("uptime", expvar.Func(uptime))
 }
 
+type eventLogFactory func(name string) eventlog.EventLoggingAPI
+
 type Winlogbeat struct {
 	beat       *beat.Beat                 // Common beat information.
 	config     *config.ConfigSettings     // Configuration settings.
+	produce    eventLogFactory            // Factory for event logs.
 	eventLogs  []eventlog.EventLoggingAPI // Interface to the event logs.
 	done       chan struct{}              // Channel to initiate shutdown of main event loop.
 	client     publisher.Client           // Interface to publish event.
@@ -115,6 +119,12 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 }
 
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
+	var err error
+	eb.produce, err = factory()
+	if err != nil {
+		return err
+	}
+
 	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
@@ -129,7 +139,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	for _, eventLogConfig := range eb.config.Winlogbeat.EventLogs {
 		debugf("Initializing EventLog[%s]", eventLogConfig.Name)
 
-		eventLogAPI := eventlog.NewEventLoggingAPI(eventLogConfig.Name)
+		eventLogAPI := eb.produce(eventLogConfig.Name)
 		eb.eventLogs = append(eb.eventLogs, eventLogAPI)
 		state, _ := persistedState[eventLogConfig.Name]
 		ignoreOlder, _ := config.IgnoreOlderDuration(eventLogConfig.IgnoreOlder)
@@ -246,6 +256,29 @@ loop:
 			records[len(records)-1].RecordNumber,
 			records[len(records)-1].TimeGenerated.UTC())
 	}
+}
+
+// factory returns an eventLogFactory based on the runtime operating system. If
+// a factory is not available for the OS then and error is returned.
+func factory() (eventLogFactory, error) {
+	ok, err := wineventlog.IsAvailable()
+	if ok {
+		debugf("Using Windows Event Log API")
+		f := func(name string) eventlog.EventLoggingAPI {
+			return wineventlog.New(name, 100)
+		}
+		return f, nil
+	}
+	debugf("Windows Event Log API is not available. %v", err)
+
+	ok, err = eventlog.IsAvailable()
+	if ok {
+		debugf("Using Event Logging API")
+		return eventlog.NewEventLoggingAPI, nil
+	}
+	debugf("Event Logging API is not available. %v", err)
+
+	return nil, fmt.Errorf("No event log API is available.")
 }
 
 // uptime returns a map of uptime related metrics.

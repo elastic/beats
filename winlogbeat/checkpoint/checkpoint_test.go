@@ -4,11 +4,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"runtime"
 )
 
 // Test that a write is triggered when the maximum number of updates is reached.
@@ -48,7 +48,7 @@ func TestWriteMaxUpdates(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, ps.States, 1)
 	assert.Equal(t, "App", ps.States[0].Name)
-	assert.Equal(t, uint32(2), ps.States[0].RecordNumber)
+	assert.Equal(t, uint64(2), ps.States[0].RecordNumber)
 }
 
 // Test that a write is triggered when the maximum time period since the last
@@ -81,7 +81,7 @@ func TestWriteTimedFlush(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, ps.States, 1)
 	assert.Equal(t, "App", ps.States[0].Name)
-	assert.Equal(t, uint32(1), ps.States[0].RecordNumber)
+	assert.Equal(t, uint64(1), ps.States[0].RecordNumber)
 }
 
 // Test that createDir creates the directory with 0750 permissions.
