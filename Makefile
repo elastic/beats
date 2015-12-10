@@ -1,6 +1,8 @@
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-PROJECTS=packetbeat topbeat filebeat winlogbeat
+BEATS=packetbeat topbeat filebeat winlogbeat
+PROJECTS=libbeat ${BEATS}
+
 
 # Runs testsuites for all beats
 testsuite:
@@ -20,7 +22,7 @@ coverage-report:
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 update:
-	$(foreach var,$(PROJECTS),make -C $(var) update;)
+	$(foreach var,$(BEATS),make -C $(var) update;)
 
 clean:
 	$(foreach var,$(PROJECTS),make -C $(var) clean;)
