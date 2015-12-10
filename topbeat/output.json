@@ -1,0 +1,209 @@
+type: system 
+
+{
+  "_index": "topbeat-2015.12.10",
+  "_type": "system",
+  "_id": "AVGL4gp3-qPEyihyAYjW",
+  "_score": null,
+  "_source": {
+    "@timestamp": "2015-12-10T12:33:45.584Z",
+    "beat": {
+      "hostname": "mar",
+      "name": "mar"
+    },
+    "count": 1,
+    "cpu": {
+      "user": 1124477,
+      "user_p": 0,
+      "nice": 0,
+      "system": 937191,
+      "system_p": 0,
+      "idle": 12901569,
+      "iowait": 0,
+      "irq": 0,
+      "softirq": 0,
+      "steal": 0
+    },
+    "cpus": {
+      "cpu0": {
+        "user": 373170,
+        "user_p": 0,
+        "nice": 0,
+        "system": 463408,
+        "system_p": 0,
+        "idle": 2904305,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      },
+      "cpu1": {
+        "user": 183293,
+        "user_p": 0,
+        "nice": 0,
+        "system": 87867,
+        "system_p": 0,
+        "idle": 3469625,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      },
+      "cpu2": {
+        "user": 376911,
+        "user_p": 0,
+        "nice": 0,
+        "system": 296693,
+        "system_p": 0,
+        "idle": 3067182,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      },
+      "cpu3": {
+        "user": 191103,
+        "user_p": 0,
+        "nice": 0,
+        "system": 89223,
+        "system_p": 0,
+        "idle": 3460457,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      }
+    },
+    "load": {
+      "load1": 1.66357421875,
+      "load5": 1.81396484375,
+      "load15": 1.78466796875
+    },
+    "mem": {
+      "total": 17179869184,
+      "used": 14505914368,
+      "free": 2673954816,
+      "used_p": 0.84,
+      "actual_used": 10005078016,
+      "actual_free": 7174791168,
+      "actual_used_p": 0.58
+    },
+    "swap": {
+      "total": 0,
+      "used": 0,
+      "free": 0,
+      "used_p": 0,
+      "actual_used": 0,
+      "actual_free": 0,
+      "actual_used_p": 0
+    },
+    "type": "system"
+  },
+  "fields": {
+    "@timestamp": [
+      1449750825584
+    ]
+  },
+  "highlight": {
+    "type": [
+      "@kibana-highlighted-field@system@/kibana-highlighted-field@"
+    ]
+  },
+  "sort": [
+    1449750825584
+  ]
+}
+
+type: process
+
+
+{
+  "_index": "topbeat-2015.12.10",
+  "_type": "process",
+  "_id": "AVGL44HJ-qPEyihyAY4q",
+  "_score": null,
+  "_source": {
+    "@timestamp": "2015-12-10T12:35:20.684Z",
+    "beat": {
+      "hostname": "mar",
+      "name": "mar"
+    },
+    "count": 1,
+    "proc": {
+      "cpu": {
+        "user": 3397,
+        "user_p": 0,
+        "system": 2972,
+        "total": 6369,
+        "start_time": "17:48"
+      },
+      "mem": {
+        "size": 2532204544,
+        "rss": 3616768,
+        "rss_p": 0,
+        "share": 0
+      },
+      "name": "cfprefsd",
+      "pid": 228,
+      "ppid": 1,
+      "state": "running"
+    },
+    "type": "process"
+  },
+  "fields": {
+    "@timestamp": [
+      1449750920684
+    ]
+  },
+  "highlight": {
+    "type": [
+      "@kibana-highlighted-field@process@/kibana-highlighted-field@"
+    ]
+  },
+  "sort": [
+    1449750920684
+  ]
+}
+
+type: filesystem
+
+{
+  "_index": "topbeat-2015.12.10",
+  "_type": "filesystem",
+  "_id": "AVGL5B4F-qPEyihyAZDq",
+  "_score": null,
+  "_source": {
+    "@timestamp": "2015-12-10T12:36:00.678Z",
+    "beat": {
+      "hostname": "mar",
+      "name": "mar"
+    },
+    "count": 1,
+    "fs": {
+      "device_name": "/dev/disk1",
+      "total": 249779191808,
+      "used": 207223169024,
+      "used_p": 0.83,
+      "free": 42556022784,
+      "avail": 42293878784,
+      "files": 60981246,
+      "free_files": 10325654,
+      "mount_point": "/"
+    },
+    "type": "filesystem"
+  },
+  "fields": {
+    "@timestamp": [
+      1449750960678
+    ]
+  },
+  "highlight": {
+    "type": [
+      "@kibana-highlighted-field@filesystem@/kibana-highlighted-field@"
+    ]
+  },
+  "sort": [
+    1449750960678
+  ]
+}
+

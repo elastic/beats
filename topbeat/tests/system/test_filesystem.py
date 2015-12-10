@@ -14,7 +14,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             system_stats=False,
-            proc_stats=False,
+            process_stats=False,
             filesystem_stats=True
         )
         topbeat = self.start_topbeat()

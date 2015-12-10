@@ -36,9 +36,19 @@ input:
 
   # Statistics to collect (all enabled by default)
   stats:
+    # per system statistics, by default is true
     system: true
-    proc: true
+
+    # per process statistics, by default is true
+    process: true
+
+    # file system information, by default is true
     filesystem: true
+
+    # cpu usage per core, by default is false
+    cpu_per_core: false
+
+
 ------------------------------------------------------------------------------
 
 ==== Options
@@ -58,11 +68,32 @@ default, all the running processes are monitored.
 
 The statistics to collect. You can specify the following settings:
 
-* `system: true` to capture system-wide statistics, including statistics about
+* `system` to export system-wide statistics, including statistics about
 system load, CPU usage, memory usage, and swap usage.
-* `proc: true` to capture per-process statistics, such as the process name,
+* `process` to export per-process statistics, such as the process name,
 parent pid, state, pid, CPU usage, and memory usage.
-* `filesystem: true` to capture file system statistics, including details about the
+* `filesystem` to export file system statistics, including details about the
 mounted disks, such as the total and used disk space, and details about each
 disk, such as the device name and the mounting place.
+* `cpu_per_core` to export the cpu usage per core. By default is false and it makes sense only if `system: true`. 
+The details are grouped under `cpus`. For each core of the server, few details are exported like:
+
+[source,json]
+----------------------------------------------------------------------------------
+    "cpus": {
+      "cpu0": {
+        "user": 373170,
+        "user_p": 0,
+        "nice": 0,
+        "system": 463408,
+        "system_p": 0,
+        "idle": 2904305,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      },
+      ...
+  }
+----------------------------------------------------------------------------------
 

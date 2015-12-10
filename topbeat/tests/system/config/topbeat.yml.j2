@@ -15,8 +15,9 @@ input:
   # Statistics to collect (all enabled by default)
   stats:
     system: {{ "false" if system_stats == false else "true" }}
-    proc: {{ "false" if proc_stats == false else "true" }}
+    process: {{ "false" if process_stats == false else "true" }}
     filesystem: {{ "false" if filesystem_stats == false else "true" }}
+    cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
 
 ############################# Output ##########################################
 
