@@ -13,8 +13,6 @@ environment:
     BEAT: filebeat
   - PROJ: github.com\elastic\beats\topbeat
     BEAT: topbeat
-  - PROJ: github.com\elastic\beats\winlogbeat
-    BEAT: winlogbeat
 
 # Custom clone folder (variables are not expanded here).
 clone_folder: c:\gopath\src\github.com\elastic\beats
