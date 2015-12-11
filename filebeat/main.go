@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var Version = "1.0.0"
+var Version = "1.0.1"
 var Name = "filebeat"
 
 var GlobalBeat *beat.Beat
