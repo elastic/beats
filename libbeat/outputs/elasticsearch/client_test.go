@@ -1,7 +1,6 @@
 package elasticsearch
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 
@@ -10,7 +9,8 @@ import (
 )
 
 func readStatusItem(in []byte) (int, string, error) {
-	code, msg, err := itemStatus(in)
+	reader := newJSONReader(in)
+	code, msg, err := itemStatus(reader)
 	return code, string(msg), err
 }
 
@@ -24,7 +24,7 @@ func TestESNoErrorStatus(t *testing.T) {
 }
 
 func TestES1StyleErrorStatus(t *testing.T) {
-	response := json.RawMessage(`{"create": {"status": 400, "error": "test error"}}`)
+	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
 	code, msg, err := readStatusItem(response)
 
 	assert.Nil(t, err)
@@ -33,7 +33,7 @@ func TestES1StyleErrorStatus(t *testing.T) {
 }
 
 func TestES2StyleErrorStatus(t *testing.T) {
-	response := json.RawMessage(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
+	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
 	code, msg, err := readStatusItem(response)
 
 	assert.Nil(t, err)
@@ -44,8 +44,7 @@ func TestES2StyleErrorStatus(t *testing.T) {
 func TestCollectPublishFailsNone(t *testing.T) {
 	N := 100
 	item := `{"create": {"status": 200}},`
-	items := strings.Repeat(item, N)
-	response := []byte(`{"items": [` + items[:len(items)-1] + `]}`)
+	response := []byte(`{"items": [` + strings.Repeat(item, N) + `]}`)
 
 	event := common.MapStr{"field": 1}
 	events := make([]common.MapStr, N)
@@ -53,8 +52,8 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = event
 	}
 
-	bs, _ := readBulkResult(response)
-	res := bulkCollectPublishFails(bs, events)
+	reader := newJSONReader(response)
+	res := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -71,8 +70,8 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := common.MapStr{"field": 2}
 	events := []common.MapStr{event, eventFail, event}
 
-	bs, _ := readBulkResult(response)
-	res := bulkCollectPublishFails(bs, events)
+	reader := newJSONReader(response)
+	res := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
@@ -91,8 +90,8 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := common.MapStr{"field": 2}
 	events := []common.MapStr{event, event, event}
 
-	bs, _ := readBulkResult(response)
-	res := bulkCollectPublishFails(bs, events)
+	reader := newJSONReader(response)
+	res := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 }
@@ -108,13 +107,12 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 
 	event := common.MapStr{"field": 1}
 	events := []common.MapStr{event, event, event}
-	bs, err := readBulkResult(response)
-	if err != nil {
-		b.Fatalf("test setup failed with: %v", err)
-	}
 
+	reader := newJSONReader(response)
+	snapshot := reader.Snapshot()
 	for i := 0; i < b.N; i++ {
-		res := bulkCollectPublishFails(bs, events)
+		reader.Restore(snapshot)
+		res := bulkCollectPublishFails(reader, events)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -133,10 +131,12 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	event := common.MapStr{"field": 1}
 	eventFail := common.MapStr{"field": 2}
 	events := []common.MapStr{event, eventFail, event}
-	bs, _ := readBulkResult(response)
 
+	reader := newJSONReader(response)
+	snapshot := reader.Snapshot()
 	for i := 0; i < b.N; i++ {
-		res := bulkCollectPublishFails(bs, events)
+		reader.Restore(snapshot)
+		res := bulkCollectPublishFails(reader, events)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -154,10 +154,12 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 
 	event := common.MapStr{"field": 2}
 	events := []common.MapStr{event, event, event}
-	bs, _ := readBulkResult(response)
 
+	reader := newJSONReader(response)
+	snapshot := reader.Snapshot()
 	for i := 0; i < b.N; i++ {
-		res := bulkCollectPublishFails(bs, events)
+		reader.Restore(snapshot)
+		res := bulkCollectPublishFails(reader, events)
 		if len(res) != 3 {
 			b.Fail()
 		}
