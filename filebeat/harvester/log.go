@@ -247,11 +247,15 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 			return fmt.Errorf("Stop harvesting as file is older then ignore_older: %s; Last change was: %s ", h.Path, age)
 		}
 
-		// On windows, check if the file name exists (see #93)
 		if h.Config.ForceCloseFiles {
+
+			// Check if the file name exists (see #93)
 			_, statErr := os.Stat(h.file.Name())
-			if statErr != nil {
-				logp.Info("Unexpected force close specific error reading from %s; error: %s", h.Path, statErr)
+
+			// Error means file does not exist. If no error, check if same file. If not close as rotated.
+			if statErr != nil || !input.IsSameFile(h.file.Name(), info) {
+				logp.Info("Force close file: %s; error: %s", h.Path, statErr)
+
 				// Return directly on windows -> file is closing
 				return fmt.Errorf("Force closing file: %s", h.Path)
 			}

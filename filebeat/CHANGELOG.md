@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 - set default ignore_older to 24 hours
 
 ### Bugfixes
+- Fix force_close_files in case renamed file appeared very fast #302
 
 ### Added
 
