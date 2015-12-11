@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/libbeat/compare/1.0.0-rc2...HEAD)
+## [1.0.1](https://github.com/elastic/libbeat/compare/1.0.0-rc2...1.0.1)
 
 ### Backward Compatibility Breaks
 - Change default directory of the config file to be identical with the binary #419
