@@ -23,7 +23,7 @@ NOTE: We also provide 32-bit images that you can get from our
 https://www.elastic.co/downloads/beats/packetbeat[download page].
 
 [[deb]]
-==== deb:
+*deb:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ sudo dpkg -i packetbeat_{version}_amd64.deb
 ----------------------------------------------------------------------
 
 [[rpm]]
-==== rpm:
+*rpm:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -43,7 +43,7 @@ sudo rpm -vi packetbeat-{version}-x86_64.rpm
 ----------------------------------------------------------------------
 
 [[mac]]
-==== mac:
+*mac:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -52,7 +52,7 @@ tar xzvf packetbeat-{version}-darwin.tgz
 ----------------------------------------------------------------------
 
 [[win]]
-==== win:
+*win:*
 
 . Download and install WinPcap from this
 http://www.winpcap.org/install/default.htm[page]. WinPcap is a library that uses
@@ -193,14 +193,14 @@ in which way.
 The recommended template file is installed by the Packetbeat packages. Load it with the
 following command:
 
-==== deb or rpm:
+*deb or rpm:*
 
 [source,shell]
 ----------------------------------------------------------------------
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 ----------------------------------------------------------------------
 
-==== mac:
+*mac:*
 
 [source,shell]
 ----------------------------------------------------------------------
@@ -210,7 +210,7 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.j
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
-==== win:
+*win:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -223,28 +223,28 @@ where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 Run Packetbeat by issuing the following command:
 
-==== deb:
+*deb:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-==== rpm:
+*rpm:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo /etc/init.d/packetbeat start
 ----------------------------------------------------------------------
 
-==== mac:
+*mac:*
 
 [source,shell]
 ----------------------------------------------------------------------
 sudo ./packetbeat -e -c packetbeat.yml -d "publish"
 ----------------------------------------------------------------------
 
-==== win:
+*win:*
 
 [source,shell]
 ----------------------------------------------------------------------
