@@ -2,13 +2,12 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/filebeat/compare/1.0.0...HEAD)
+## [1.0.1](https://github.com/elastic/beats/compare/1.0.0...1.0.1)
 
 ### Backward Compatibility Breaks
-- set default ignore_older to 24 hours
 
 ### Bugfixes
-- Fix force_close_files in case renamed file appeared very fast #302
+- Fix force_close_files in case renamed file appeared very fast elastic/filebeat#302
 
 ### Added
 
@@ -17,6 +16,7 @@ All notable changes to this project will be documented in this file based on the
 ## [1.0.0](https://github.com/elastic/filebeat/compare/1.0.0-rc2...1.0.0) - 2015-11-24
 
 ### Backward Compatibility Breaks
+- set default ignore_older to 24 hours
 
 ### Bugfixes
 - Fix problem that harvesters stopped reading after some time and filebeat stopped processing events #257

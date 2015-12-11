@@ -16,9 +16,9 @@ packetbeat:
     - installed
     - sources:
 {% if grains['os_family'] == 'RedHat' %}
-      - packetbeat: https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-x86_64.rpm
+      - packetbeat: https://download.elastic.co/beats/packetbeat/packetbeat-1.0.1-x86_64.rpm
 {% elif grains['os_family'] == 'Debian' %}
-      - packetbeat: https://download.elastic.co/beats/packetbeat/packetbeat_1.0.0_amd64.deb
+      - packetbeat: https://download.elastic.co/beats/packetbeat/packetbeat_1.0.1_amd64.deb
 {% endif %}
   service:
     - running
