@@ -2,14 +2,20 @@
 All notable changes to this project will be documented in this file based on the
 [Keep a Changelog](http://keepachangelog.com/) Standard.
 
-## [Unreleased](https://github.com/elastic/packetbeat/compare/1.0.0...HEAD)
+## [1.0.1](https://github.com/elastic/beats/compare/1.0.0...1.0.1)
 
 ### Backward Compatibility Breaks
 
 ### Bugfixes
 - Improve MongoDB message correlation. #377
+- Fix panic on nil in redis protocol parser. #384
+- Fix errors redis parser when messages are split in multiple TCP segments. #402
+- Fix errors in redis parser when length prefixed strings contain sequences of CRLF. #402
+- Fix errors in redis parser when dealing with nested arrays. #402
 
 ### Added
+- Added redis pipelining support. #402
+- Improve redis parser performance. #442
 
 ### Deprecated
 
@@ -18,16 +24,10 @@ All notable changes to this project will be documented in this file based on the
 ### Backward Compatibility Breaks
 
 ### Bugfixes
-- Fix panic on nil in redis protocol parser. #384
-- Fix errors redis parser when messages are split in multiple TCP segments. #402
-- Fix errors in redis parser when length prefixed strings contain sequences of CRLF. #402
-- Fix errors in redis parser when dealing with nested arrays. #402
 
 ### Added
-- Added redis pipelining support. #402
 
 ### Improvements
-- Improve redis parser performance. #442
 
 ### Deprecated
 
