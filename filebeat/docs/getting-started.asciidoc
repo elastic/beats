@@ -52,7 +52,7 @@ tar xzvf filebeat-{version}-darwin.tgz
 . Download the Filebeat Windows zip file from the
 https://www.elastic.co/downloads/beats/filebeat[downloads page].
 
-. Extract the contents of the zip file into `C:\Program Files`.
+. Extract the contents of the zip file into `C:\`.
 
 . Rename the `filebeat-<version>-windows` directory to `Filebeat`.
 
@@ -62,12 +62,12 @@ https://www.elastic.co/downloads/beats/filebeat[downloads page].
 +
 [source,shell]
 ----------------------------------------------------------------------
-PS > cd 'C:\Program Files\Filebeat'
-PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
+PS > cd 'C:\Filebeat'
+PS C:\Filebeat> .\install-service-filebeat.ps1
 ----------------------------------------------------------------------
 
 Before starting Filebeat, you should look at the configuration options in the configuration
-file, for example `C:\Program Files\Filebeat\filebeat.yml`. For more information about these options,
+file, for example `C:\Filebeat\filebeat.yml`. For more information about these options,
 see <<filebeat-configuration-details>>.
 
 [[filebeat-configuration]]
@@ -176,7 +176,7 @@ where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS C:\Program Files\Filebeat> Invoke-WebRequest -Method Put -InFile filebeat.template.json -Uri http://localhost:9200/_template/filebeat?pretty
+PS C:\Filebeat> Invoke-WebRequest -Method Put -InFile filebeat.template.json -Uri http://localhost:9200/_template/filebeat?pretty
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
@@ -217,7 +217,7 @@ sudo ./filebeat -e -c filebeat.yml -d "publish"
 
 [source,shell]
 ----------------------------------------------------------------------
-PS C:\Program Files\Filebeat> Start-Service filebeat
+PS C:\Filebeat> Start-Service filebeat
 ----------------------------------------------------------------------
 
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
