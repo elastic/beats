@@ -1,4 +1,5 @@
 sudo: required
+dist: trusty
 services:
   - docker
 
@@ -49,6 +50,9 @@ addons:
       - geoip-database
 
 before_install:
+  # Temporary work-around a travis bug https://github.com/travis-ci/travis-ci/issues/5285
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -O http://cz.archive.ubuntu.com/ubuntu/pool/main/libp/libpcap/libpcap0.8-dev_1.5.3-2_amd64.deb;  sudo dpkg -i libpcap0.8-dev_1.5.3-2_amd64.deb; fi
+  #- sudo apt-get install libpcap-dev
   # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
   - mkdir -p $HOME/gopath/src/github.com/elastic/beats/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/beats/
