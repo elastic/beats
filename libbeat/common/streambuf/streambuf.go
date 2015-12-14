@@ -65,8 +65,11 @@ type Buffer struct {
 // buffer. Usage of Init is optional as zero value Buffer is already in valid state.
 func (b *Buffer) Init(d []byte, fixed bool) {
 	b.data = d
-	b.available = len(d)
+	b.err = nil
 	b.fixed = fixed
+	b.mark = 0
+	b.offset = 0
+	b.available = len(d)
 }
 
 // New creates new extensible buffer from data slice being retained by the buffer.
