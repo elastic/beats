@@ -147,67 +147,67 @@ system:
       type: group
       description: This group contains cpu usage per core statistics.
       fields:
-        - name: cpui
+        - name: cpuX
           type: group
-          description: This group contains cpu usage statistics of the core i, where 0<i<n and n is the number of cores.
+          description: This group contains cpu usage statistics of the core X, where 0<X<N and N is the number of cores.
           fields:
 
           - name: user
-            path: cpus.cpui.user
+            path: cpus.cpuX.user
             type: int
             description: >
-             The amount of CPU time spent in user space on core i.
+             The amount of CPU time spent in user space on core X.
 
           - name: user_p
-            path: cpus.cpui.user_p
+            path: cpus.cpuX.user_p
             type: float
             description: >
-              The percentage of CPU time spent in user space on core i.
+              The percentage of CPU time spent in user space on core X.
 
           - name: nice
-            path: cpus.cpui.nice
+            path: cpus.cpuX.nice
             type: int
             description: >
-              The amount of CPU time spent on low-priority processes on core i.
+              The amount of CPU time spent on low-priority processes on core X.
 
 
           - name: system
-            path: cpus.cpui.system
+            path: cpus.cpuX.system
             type: int
             description: >
-              The amount of CPU time spent in kernel space on core i.
+              The amount of CPU time spent in kernel space on core X.
 
           - name: system_p
-            path: cpus.cpui.system_p
+            path: cpus.cpuX.system_p
             type: float
             description: >
-              The percentage of CPU time spent in kernel space on core i.
+              The percentage of CPU time spent in kernel space on core X.
 
           - name: idle
-            path: cpus.cpui.idle
+            path: cpus.cpuX.idle
             type: int
             description: >
-              The amount of CPU time spent idle on core i.
+              The amount of CPU time spent idle on core X.
 
           - name: iowait
-            path: cpus.cpui.iowait
+            path: cpus.cpuX.iowait
             type: int
             description: >
-              The amount of CPU time spent in wait (on disk) on core i.
+              The amount of CPU time spent in wait (on disk) on core X.
 
           - name: softirq
-            path: cpus.cpui.softirq
+            path: cpus.cpuX.softirq
             type: int
             description:
-              The amount of CPU time spent servicing and handling software interrupts on core i.
+              The amount of CPU time spent servicing and handling software interrupts on core X.
 
 
           - name: steal
-            path: cpus.cpui.steal
+            path: cpus.cpuX.steal
             type: int
             description: >
               The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-              was servicing another processor on core i.
+              was servicing another processor on core X.
               Available only on Unix.
 
 

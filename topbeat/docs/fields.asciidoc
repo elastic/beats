@@ -174,71 +174,71 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 This group contains cpu usage per core statistics.
 
 
-=== cpui Fields
+=== cpuX Fields
 
-This group contains cpu usage statistics of the core i, where i is the core number
+This group contains cpu usage statistics of the core X, where 0<X<N and N is the number of cores.
 
 
-==== cpus.cpui.user
+==== cpus.cpuX.user
 
 type: int
 
-The amount of CPU time spent in user space on core i.
+The amount of CPU time spent in user space on core X.
 
 
-==== cpus.cpui.user_p
+==== cpus.cpuX.user_p
 
 type: float
 
-The percentage of CPU time spent in user space on core i.
+The percentage of CPU time spent in user space on core X.
 
 
-==== cpus.cpui.nice
-
-type: int
-
-The amount of CPU time spent on low-priority processes on core i.
-
-
-==== cpus.cpui.system
+==== cpus.cpuX.nice
 
 type: int
 
-The amount of CPU time spent in kernel space on core i.
+The amount of CPU time spent on low-priority processes on core X.
 
 
-==== cpus.cpui.system_p
+==== cpus.cpuX.system
+
+type: int
+
+The amount of CPU time spent in kernel space on core X.
+
+
+==== cpus.cpuX.system_p
 
 type: float
 
-The percentage of CPU time spent in kernel space on core i.
+The percentage of CPU time spent in kernel space on core X.
 
 
-==== cpus.cpui.idle
-
-type: int
-
-The amount of CPU time spent idle on core i.
-
-
-==== cpus.cpui.iowait
+==== cpus.cpuX.idle
 
 type: int
 
-The amount of CPU time spent in wait (on disk) on core i.
+The amount of CPU time spent idle on core X.
 
 
-==== cpus.cpui.softirq
-
-type: int
-
-The amount of CPU time spent servicing and handling software interrupts on core i.
-
-==== cpus.cpui.steal
+==== cpus.cpuX.iowait
 
 type: int
 
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core i. Available only on Unix.
+The amount of CPU time spent in wait (on disk) on core X.
+
+
+==== cpus.cpuX.softirq
+
+type: int
+
+The amount of CPU time spent servicing and handling software interrupts on core X.
+
+==== cpus.cpuX.steal
+
+type: int
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
 === mem Fields
