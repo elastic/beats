@@ -11,9 +11,19 @@ input:
 
   # Statistics to collect (all enabled by default)
   stats:
+    # per system statistics, by default is true
     system: true
+
+    # per process statistics, by default is true
     proc: true
+
+    # file system information, by default is true
     filesystem: true
+
+    # cpu usage per core, by default is false
+    cpu_per_core: false
+
+
 ###############################################################################
 ############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features

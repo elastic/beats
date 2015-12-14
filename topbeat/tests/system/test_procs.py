@@ -15,7 +15,7 @@ class Test(TestCase):
         """
         self.render_config_template(
             system_stats=False,
-            proc_stats=True,
+            process_stats=True,
             filesystem_stats=False,
             proc_patterns=["topbeat.test"]  # monitor itself
         )
