@@ -115,7 +115,7 @@ protocols:
 ############################# Processes #######################################
 
 # Configure the processes to be monitored and how to find them. If a process is
-# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
+# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
 # `client_proc` fields.
 # The processes can be found by searching their command line by a given string.
 #
