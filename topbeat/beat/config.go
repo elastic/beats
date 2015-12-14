@@ -4,9 +4,10 @@ type TopConfig struct {
 	Period *int64
 	Procs  *[]string
 	Stats  struct {
-		System     *bool
-		Proc       *bool
-		Filesystem *bool
+		System     *bool `yaml:"system"`
+		Proc       *bool `yaml:"process"`
+		Filesystem *bool `yaml:"filesystem"`
+		CpuPerCore *bool `yaml:"cpu_per_core"`
 	}
 }
 
