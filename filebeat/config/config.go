@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -52,7 +53,7 @@ type ProspectorConfig struct {
 
 type HarvesterConfig struct {
 	InputType          string `yaml:"input_type"`
-	Fields             map[string]string
+	Fields             common.MapStr
 	FieldsUnderRoot    bool   `yaml:"fields_under_root"`
 	BufferSize         int    `yaml:"harvester_buffer_size"`
 	TailFiles          bool   `yaml:"tail_files"`

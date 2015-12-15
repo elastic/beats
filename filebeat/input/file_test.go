@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -114,7 +115,7 @@ func TestFileEventToMapStr(t *testing.T) {
 
 func TestFieldsUnderRoot(t *testing.T) {
 	event := FileEvent{
-		Fields: &map[string]string{
+		Fields: &common.MapStr{
 			"hello": "world",
 		},
 	}
