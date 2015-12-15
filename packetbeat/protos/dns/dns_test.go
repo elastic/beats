@@ -977,7 +977,7 @@ func TestGapResponse(t *testing.T) {
 	close(client.Channel)
 	mapStr := <-client.Channel
 	assert.NotNil(t, mapStr, "One result should have been published.")
-	assert.Equal(t, mapStr["notes"], "Response packet's data could not be decoded as DNS")
+	assert.Equal(t, mapStr["notes"], "Response packet's data could not be decoded as DNS.")
 	assert.Nil(t, mapStr["answers"])
 }
 
@@ -1029,7 +1029,7 @@ func TestFinResponse(t *testing.T) {
 	close(client.Channel)
 	mapStr := <-client.Channel
 	assert.NotNil(t, mapStr, "One result should have been published.")
-	assert.Equal(t, mapStr["notes"], "Response packet's data could not be decoded as DNS")
+	assert.Equal(t, mapStr["notes"], "Response packet's data could not be decoded as DNS.")
 	assert.Nil(t, mapStr["answers"])
 }
 
