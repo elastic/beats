@@ -1,9 +1,9 @@
 [[beats-reference]]
 = Beats Platform Reference
-:ES-version: 2.1.0
-:LS-version: 2.1.0
-:Kibana-version: 4.3.0
-:Dashboards-version: 1.0.0
+:ES-version: 2.1.1
+:LS-version: 2.1.1
+:Kibana-version: 4.3.1
+:Dashboards-version: 1.0.1
 
 
 include::./overview.asciidoc[]
