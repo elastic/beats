@@ -175,7 +175,7 @@ func TestGapInStreamShouldDropState(t *testing.T) {
 
 	tp := &TestProtocol{Ports: []int{ServerPort}}
 	tp.gap = func(t *common.TcpTuple, d uint8, n int, p protos.ProtocolData) (protos.ProtocolData, bool) {
-		fmt.Println("lost: %v\n", n)
+		fmt.Printf("lost: %v\n", n)
 		gap += n
 		return p, true // drop state
 	}
