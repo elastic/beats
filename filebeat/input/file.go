@@ -24,7 +24,7 @@ type FileEvent struct {
 	Offset       int64
 	Bytes        int
 	Text         *string
-	Fields       *map[string]string
+	Fields       *common.MapStr
 	Fileinfo     *os.FileInfo
 
 	fieldsUnderRoot bool

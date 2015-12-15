@@ -85,3 +85,52 @@ func (m MapStr) String() string {
 	}
 	return string(bytes)
 }
+
+// UnmarshalYAML helps out with the YAML unmarshalling when the target
+// variable is a MapStr. The default behavior is to unmarshal nested
+// maps to map[interface{}]interface{} values, and such values can't
+// be marshalled as JSON.
+//
+// The keys of map[interface{}]interface{} maps will be converted to
+// strings with a %v format string, as will any scalar values that
+// aren't already strings (i.e. numbers and boolean values).
+//
+// Since we want to modify the receiver it needs to be a pointer.
+func (ms *MapStr) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var result map[interface{}]interface{}
+	err := unmarshal(&result)
+	if err != nil {
+		panic(err)
+	}
+	*ms = cleanUpInterfaceMap(result)
+	return nil
+}
+
+func cleanUpInterfaceArray(in []interface{}) []interface{} {
+	result := make([]interface{}, len(in))
+	for i, v := range in {
+		result[i] = cleanUpMapValue(v)
+	}
+	return result
+}
+
+func cleanUpInterfaceMap(in map[interface{}]interface{}) MapStr {
+	result := make(MapStr)
+	for k, v := range in {
+		result[fmt.Sprintf("%v", k)] = cleanUpMapValue(v)
+	}
+	return result
+}
+
+func cleanUpMapValue(v interface{}) interface{} {
+	switch v := v.(type) {
+	case []interface{}:
+		return cleanUpInterfaceArray(v)
+	case map[interface{}]interface{}:
+		return cleanUpInterfaceMap(v)
+	case string:
+		return v
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
