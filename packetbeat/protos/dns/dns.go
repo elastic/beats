@@ -47,7 +47,8 @@ const (
 const (
 	NonDnsPacketMsg         = "Packet's data could not be decoded as DNS."
 	NonDnsCompleteMsg       = "Message's data could not be decoded as DNS."
-	NonDnsResponsePacketMsg = "Response packet's data could not be decoded as DNS"
+	NonDnsResponsePacketMsg = "Response packet's data could not be decoded as DNS."
+	EmptyPacket             = "Packet's data is null."
 	DuplicateQueryMsg       = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
@@ -745,6 +746,10 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 	// Offset is critical
 	if len(pkt.Payload) > DecodeOffset {
 		payload = pkt.Payload[DecodeOffset:]
+	} else {
+		logp.Debug("dns", EmptyPacket+" addresses %s",
+			tcpTuple.String())
+		return priv
 	}
 
 	stream := priv.Data[dir]
@@ -866,6 +871,10 @@ func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, pr
 func (dns *Dns) publishDecodeFailureNotes(dnsData dnsPrivateData) {
 	streamOrigin := dnsData.Data[tcp.TcpDirectionOriginal]
 	streamReverse := dnsData.Data[tcp.TcpDirectionReverse]
+
+	if streamOrigin == nil || streamReverse == nil {
+		return
+	}
 
 	dataOrigin, err := decodeDnsData(streamOrigin.data)
 	tupleReverse := streamReverse.message.Tuple
