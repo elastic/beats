@@ -916,17 +916,57 @@ func parseTcpRequestResponse(t testing.TB, dns *Dns, q DnsTestMessage) {
 	assertMapStrData(t, m, q)
 }
 
-// Verify that the split lone request packet is parsed.
-func TestParseTcpSplitRequest(t *testing.T) {
-	stream := &DnsStream{data: sophosTxtTcp.request[2:10], message: new(DnsMessage)}
-	_, err := decodeDnsData(stream.data)
+// Verify that the split lone request packet is decoded.
+func TestDecodeTcpSplitRequest(t *testing.T) {
+	stream := &DnsStream{data: sophosTxtTcp.request[:10], message: new(DnsMessage)}
+	_, err := decodeDnsData(TransportTcp, stream.data)
 
 	assert.NotNil(t, err, "Not expecting a complete message yet")
 
 	stream.data = append(stream.data, sophosTxtTcp.request[10:]...)
-	_, err = decodeDnsData(stream.data)
+	_, err = decodeDnsData(TransportTcp, stream.data)
 
 	assert.Nil(t, err, "Message should be complete")
+}
+
+// Verify that the split lone request packet is parsed.
+func TestParseTcpSplitResponse(t *testing.T) {
+	dns := newDns(testing.Verbose())
+	tcpQuery := elasticATcp
+
+	q := tcpQuery.request
+	r0 := tcpQuery.response[:10]
+	r1 := tcpQuery.response[10:]
+
+	tcptuple := testTcpTuple()
+	private := protos.ProtocolData(new(dnsPrivateData))
+
+	packet := newPacket(forward, q)
+	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
+
+	packet = newPacket(reverse, r0)
+	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
+
+	packet = newPacket(reverse, r1)
+	private = dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
+	assert.Empty(t, dns.transactions.Size(), "There should be no transaction.")
+
+	m := expectResult(t, dns)
+	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
+	assert.Equal(t, len(tcpQuery.request), mapValue(t, m, "bytes_in"))
+	assert.Equal(t, len(tcpQuery.response), mapValue(t, m, "bytes_out"))
+	assert.NotNil(t, mapValue(t, m, "responsetime"))
+
+	if assert.ObjectsAreEqual("NOERROR", mapValue(t, m, "dns.response_code")) {
+		assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
+	} else {
+		assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
+	}
+
+	assert.Nil(t, mapValue(t, m, "notes"))
+	assertMapStrData(t, m, tcpQuery)
 }
 
 func TestGapRequestDrop(t *testing.T) {
