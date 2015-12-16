@@ -137,6 +137,7 @@ func (s *SingleConnectionMode) publish(
 		}
 		if s.maxAttempts > 0 && fails == s.maxAttempts {
 			// max number of attempts reached
+			messagesDropped.Add(1)
 			break
 		}
 

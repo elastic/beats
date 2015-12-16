@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"expvar"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +15,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
 )
 
 type Client struct {
@@ -104,9 +110,10 @@ func (client *Client) PublishEvents(
 	}
 
 	// check response for transient errors
-	events = bulkCollectPublishFails(res, events)
-	if len(events) > 0 {
-		return events, mode.ErrTempBulkFailure
+	failed_events := bulkCollectPublishFails(res, events)
+	ackedEvents.Add(int64(len(events) - len(failed_events)))
+	if len(failed_events) > 0 {
+		return failed_events, mode.ErrTempBulkFailure
 	}
 
 	return nil, nil

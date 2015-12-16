@@ -117,6 +117,7 @@ func (m *LoadBalancerMode) PublishEvent(
 
 func (m *LoadBalancerMode) publishEventsMessage(msg eventsMessage) error {
 	if ok := m.forwardEvent(m.work, msg); !ok {
+		messagesDropped.Add(1)
 		outputs.SignalFailed(msg.signaler, nil)
 	}
 	return nil
@@ -200,6 +201,7 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 
 				if m.maxAttempts > 0 && msg.attemptsLeft <= 0 {
 					// no more attempts left => drop
+					messagesDropped.Add(1)
 					outputs.SignalFailed(msg.signaler, err)
 					return
 				}
@@ -231,6 +233,7 @@ func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
 	logp.Info("Error publishing events (retrying): %s", err)
 
 	if ok := m.forwardEvent(m.retries, msg); !ok {
+		messagesDropped.Add(1)
 		outputs.SignalFailed(msg.signaler, err)
 	}
 }
