@@ -11,4 +11,4 @@ Here's how Filebeat works: When you start Filebeat, it starts one or more prospe
 image:./images/filebeat.png[Beats design]
 
 Filebeat is a https://www.elastic.co/products/beats[Beat], and it is based on the libbeat framework.
-The general configuration options for libbeat and how to setup Elasticsearch, Logstash, and Kibana are covered in the {libbeat}/index.html[Beats Platform Reference].
+General information about libbeat and setting up Elasticsearch, Logstash, and Kibana are covered in the {libbeat}/index.html[Beats Platform Reference].

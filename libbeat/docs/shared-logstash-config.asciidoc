@@ -1,0 +1,34 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+If you want to use Logstash to perform additional processing on the data collected by
+{beatname_uc}, you need to configure {beatname_uc} to use Logstash.
+
+To do this, you edit the {beatname_uc} configuration file to disable the Elasticsearch
+output and use the Logstash output instead:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["127.0.0.1:5044"]
+
+    # configure logstash plugin to loadbalance events between
+    # configured logstash hosts
+    #loadbalance: false
+------------------------------------------------------------------------------
+
+In this configuration, `hosts` specifies the Logstash server and the port (`5044`)
+where Logstash is configured to listen for incoming Beats connections.
+
+To use this configuration, you must also
+{libbeat}/getting-started.html#logstash-setup[set up Logstash] to receive events
+from Beats.

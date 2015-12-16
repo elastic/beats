@@ -76,9 +76,6 @@ for example `C:\Program Files\Topbeat\topbeat.yml`. For more information about t
 [[topbeat-configuration]]
 === Configuring Topbeat
 
-NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you
-configure Topbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
-
 To configure Topbeat, you edit the _topbeat.yml_ file. Here is a sample of
 the _topbeat.yml_ file:
 
@@ -102,6 +99,10 @@ input:
   period: 10
   procs: ["^$"]
 -------------------------------------
+
+=== Configuring Topbeat to Use Logstash
+
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[topbeat-template]]
 === Loading the Index Template in Elasticsearch
