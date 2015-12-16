@@ -48,7 +48,7 @@ const (
 	NonDnsPacketMsg         = "Packet's data could not be decoded as DNS."
 	NonDnsCompleteMsg       = "Message's data could not be decoded as DNS."
 	NonDnsResponsePacketMsg = "Response packet's data could not be decoded as DNS."
-	EmptyPacket             = "Packet's data is null."
+	EmptyMsg                = "Message's data is empty."
 	DuplicateQueryMsg       = "Another query with the same DNS ID from this client " +
 		"was received so this query was closed without receiving a response."
 	OrphanedResponseMsg = "Response was received without an associated query."
@@ -323,7 +323,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
-	dnsPkt, err := decodeDnsData(pkt.Payload)
+	dnsPkt, err := decodeDnsData(TransportUdp, pkt.Payload)
 	if err != nil {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
@@ -388,11 +388,6 @@ func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 }
 
 func (dns *Dns) publishTransaction(t *DnsTransaction) {
-	var offset int
-	if t.Transport == TransportTcp {
-		offset = DecodeOffset
-	}
-
 	if dns.results == nil {
 		return
 	}
@@ -416,8 +411,8 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	event["dns"] = dnsEvent
 
 	if t.Request != nil && t.Response != nil {
-		event["bytes_in"] = t.Request.Length + offset
-		event["bytes_out"] = t.Response.Length + offset
+		event["bytes_in"] = t.Request.Length
+		event["bytes_out"] = t.Response.Length
 		event["responsetime"] = int32(t.Response.Ts.Sub(t.ts).Nanoseconds() / 1e6)
 		event["method"] = dnsOpCodeToString(t.Request.Data.OpCode)
 		if len(t.Request.Data.Questions) > 0 {
@@ -438,7 +433,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 			event["response"] = dnsToString(t.Response.Data)
 		}
 	} else if t.Request != nil {
-		event["bytes_in"] = t.Request.Length + offset
+		event["bytes_in"] = t.Request.Length
 		event["method"] = dnsOpCodeToString(t.Request.Data.OpCode)
 		if len(t.Request.Data.Questions) > 0 {
 			event["query"] = dnsQuestionToString(t.Request.Data.Questions[0])
@@ -451,7 +446,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 			event["request"] = dnsToString(t.Request.Data)
 		}
 	} else if t.Response != nil {
-		event["bytes_out"] = t.Response.Length + offset
+		event["bytes_out"] = t.Response.Length
 		event["method"] = dnsOpCodeToString(t.Response.Data.OpCode)
 		if len(t.Response.Data.Questions) > 0 {
 			event["query"] = dnsQuestionToString(t.Response.Data.Questions[0])
@@ -707,7 +702,12 @@ func nameToString(name []byte) string {
 // decodeDnsData decodes a byte array into a DNS struct. If an error occurs
 // then the returnd dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
-func decodeDnsData(data []byte) (dns *layers.DNS, err error) {
+func decodeDnsData(transport Transport, data []byte) (dns *layers.DNS, err error) {
+	var offset int
+	if transport == TransportTcp {
+		offset = DecodeOffset
+	}
+
 	// Recover from any panics that occur while parsing a packet.
 	defer func() {
 		if r := recover(); r != nil {
@@ -716,7 +716,7 @@ func decodeDnsData(data []byte) (dns *layers.DNS, err error) {
 	}()
 
 	d := &layers.DNS{}
-	err = d.DecodeFromBytes(data, gopacket.NilDecodeFeedback)
+	err = d.DecodeFromBytes(data[offset:], gopacket.NilDecodeFeedback)
 	if err != nil {
 		return nil, err
 	}
@@ -741,45 +741,47 @@ func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, 
 		}
 	}
 
-	var payload []byte
+	payload := pkt.Payload
 
-	// Offset is critical
-	if len(pkt.Payload) > DecodeOffset {
-		payload = pkt.Payload[DecodeOffset:]
-	} else {
-		logp.Debug("dns", EmptyPacket+" addresses %s",
-			tcpTuple.String())
-		return priv
-	}
+	stream := &priv.Data[dir]
 
-	stream := priv.Data[dir]
-	if stream == nil {
-		stream = &DnsStream{
+	if *stream == nil {
+		*stream = &DnsStream{
 			tcpTuple: tcpTuple,
 			data:     payload,
 			message:  &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple},
 		}
+		if len(payload) <= DecodeOffset {
+			logp.Debug("dns", EmptyMsg+" addresses %s",
+				tcpTuple.String())
+
+			return priv
+		}
 	} else {
-		stream.data = append(stream.data, payload...)
-		if len(stream.data) > tcp.TCP_MAX_DATA_IN_STREAM {
+		(*stream).data = append((*stream).data, payload...)
+		dataLength := len((*stream).data)
+		if dataLength > tcp.TCP_MAX_DATA_IN_STREAM {
 			logp.Debug("dns", "Stream data too large, dropping DNS stream")
-			stream = nil
+			return priv
+		}
+		if dataLength <= DecodeOffset {
+			logp.Debug("dns", EmptyMsg+" addresses %s",
+				tcpTuple.String())
 			return priv
 		}
 	}
 
-	priv.Data[dir] = stream
-	data, err := decodeDnsData(stream.data)
+	data, err := decodeDnsData(TransportTcp, (*stream).data)
 
 	if err != nil {
 		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-			tcpTuple.String(), len(stream.data))
+			tcpTuple.String(), len((*stream).data))
 
 		// wait for decoding with the next segment
 		return priv
 	}
-	dns.messageComplete(tcpTuple, dir, stream, data)
 
+	dns.messageComplete(tcpTuple, dir, *stream, data)
 	return priv
 }
 
@@ -819,7 +821,8 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 	}
 	stream := dnsData.Data[dir]
 	if stream.message != nil {
-		decodedData, err := decodeDnsData(stream.data)
+		decodedData, err := decodeDnsData(TransportTcp, stream.data)
+
 		if err == nil {
 			dns.messageComplete(tcpTuple, dir, stream, decodedData)
 		} else /*Failed decode */ {
@@ -848,7 +851,7 @@ func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, pr
 		return private, false
 	}
 
-	decodedData, err := decodeDnsData(stream.data)
+	decodedData, err := decodeDnsData(TransportTcp, stream.data)
 
 	// Add Notes if the failed stream is the response
 	if err != nil {
@@ -876,7 +879,7 @@ func (dns *Dns) publishDecodeFailureNotes(dnsData dnsPrivateData) {
 		return
 	}
 
-	dataOrigin, err := decodeDnsData(streamOrigin.data)
+	dataOrigin, err := decodeDnsData(TransportTcp, streamOrigin.data)
 	tupleReverse := streamReverse.message.Tuple
 
 	if err == nil {
