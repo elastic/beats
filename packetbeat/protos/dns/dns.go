@@ -4,15 +4,6 @@
 // RFC 4035 (DNS Security Extensions), but since those specifications only
 // add backwards compatible features there will be no issues handling the
 // messages.
-//
-// Future Additions:
-//   * Publish a message when Query packets are received that cannot be decoded.
-//   * Add EDNS and DNSSEC support (consider using miekg/dns instead
-//     of gopacket).
-//   * Consider adding ICMP support to
-//       - correlate ICMP type 3, code 4 (datagram too big) with DNS messages,
-//       - correlate ICMP type 3, code 13 (administratively prohibited) or
-//         ICMP type 3, code 3 (port unreachable) with blocked DNS messages.
 
 package dns
 
@@ -27,9 +18,7 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -43,18 +32,6 @@ const (
 	Response = true
 )
 
-// Notes that are added to messages during exceptional conditions.
-const (
-	NonDnsPacketMsg         = "Packet's data could not be decoded as DNS."
-	NonDnsCompleteMsg       = "Message's data could not be decoded as DNS."
-	NonDnsResponsePacketMsg = "Response packet's data could not be decoded as DNS."
-	EmptyMsg                = "Message's data is empty."
-	DuplicateQueryMsg       = "Another query with the same DNS ID from this client " +
-		"was received so this query was closed without receiving a response."
-	OrphanedResponseMsg = "Response was received without an associated query."
-	NoResponse          = "No response to this query was received."
-)
-
 // Transport protocol.
 type Transport uint8
 
@@ -62,8 +39,6 @@ const (
 	TransportTcp = iota
 	TransportUdp
 )
-
-const DecodeOffset = 2
 
 var TransportNames = []string{
 	"tcp",
@@ -159,33 +134,32 @@ func (t *DnsTuple) RevHashable() HashableDnsTuple {
 	return t.revRaw
 }
 
-// DnsMessage contains a single DNS message.
-type DnsMessage struct {
-	Ts           time.Time          // Time when the message was received.
-	Tuple        common.IpPortTuple // Source and destination addresses of packet.
-	CmdlineTuple *common.CmdlineTuple
-	Data         *layers.DNS // Parsed DNS packet data.
-	Length       int         // Length of the DNS message in bytes.
+type Dns struct {
+	// Configuration data.
+	Ports               []int
+	Send_request        bool
+	Send_response       bool
+	Include_authorities bool
+	Include_additionals bool
+
+	// Cache of active DNS transactions. The map key is the HashableDnsTuple
+	// associated with the request.
+	transactions       *common.Cache
+	transactionTimeout time.Duration
+
+	results publisher.Client // Channel where results are pushed.
 }
 
-// DnsStream contains DNS data from one side of a TCP transmission. A pair
-// of DnsStream's are used to represent the full conversation.
-type DnsStream struct {
-	tcpTuple *common.TcpTuple
-
-	data []byte
-
-	parseOffset   int
-	bytesReceived int
-
-	message *DnsMessage
-}
-
-// dnsPrivateData contains two DnsStream's that hold data from a complete TCP
-// transmission. Element zero contains the response data. Element one contains
-// the request data.
-type dnsPrivateData struct {
-	Data [2]*DnsStream
+// getTransaction returns the transaction associated with the given
+// HashableDnsTuple. The lookup key should be the HashableDnsTuple associated
+// with the request (src is the requestor). Nil is returned if the entry
+// does not exist.
+func (dns *Dns) getTransaction(k HashableDnsTuple) *DnsTransaction {
+	v := dns.transactions.Get(k)
+	if v != nil {
+		return v.(*DnsTransaction)
+	}
+	return nil
 }
 
 type DnsTransaction struct {
@@ -218,34 +192,6 @@ func newTransaction(ts time.Time, tuple DnsTuple, cmd common.CmdlineTuple) *DnsT
 		Proc: string(cmd.Dst),
 	}
 	return trans
-}
-
-type Dns struct {
-	// Configuration data.
-	Ports               []int
-	Send_request        bool
-	Send_response       bool
-	Include_authorities bool
-	Include_additionals bool
-
-	// Cache of active DNS transactions. The map key is the HashableDnsTuple
-	// associated with the request.
-	transactions       *common.Cache
-	transactionTimeout time.Duration
-
-	results publisher.Client // Channel where results are pushed.
-}
-
-// getTransaction returns the transaction associated with the given
-// HashableDnsTuple. The lookup key should be the HashableDnsTuple associated
-// with the request (src is the requestor). Nil is returned if the entry
-// does not exist.
-func (dns *Dns) getTransaction(k HashableDnsTuple) *DnsTransaction {
-	v := dns.transactions.Get(k)
-	if v != nil {
-		return v.(*DnsTransaction)
-	}
-	return nil
 }
 
 // deleteTransaction deletes an entry from the transaction map and returns
@@ -317,38 +263,6 @@ func (dns *Dns) GetPorts() []int {
 	return dns.Ports
 }
 
-func (dns *Dns) ParseUdp(pkt *protos.Packet) {
-	defer logp.Recover("Dns ParseUdp")
-
-	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
-		pkt.Tuple.String(), len(pkt.Payload))
-
-	dnsPkt, err := decodeDnsData(TransportUdp, pkt.Payload)
-	if err != nil {
-		// This means that malformed requests or responses are being sent or
-		// that someone is attempting to the DNS port for non-DNS traffic. Both
-		// are issues that a monitoring system should report.
-		logp.Debug("dns", NonDnsPacketMsg+" addresses %s, length %d",
-			pkt.Tuple.String(), len(pkt.Payload))
-		return
-	}
-
-	dnsTuple := DnsTupleFromIpPort(&pkt.Tuple, TransportUdp, dnsPkt.ID)
-	dnsMsg := &DnsMessage{
-		Ts:           pkt.Ts,
-		Tuple:        pkt.Tuple,
-		CmdlineTuple: procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple),
-		Data:         dnsPkt,
-		Length:       len(pkt.Payload),
-	}
-
-	if dnsMsg.Data.QR == Query {
-		dns.receivedDnsRequest(&dnsTuple, dnsMsg)
-	} else /* Response */ {
-		dns.receivedDnsResponse(&dnsTuple, dnsMsg)
-	}
-}
-
 func (dns *Dns) ConnectionTimeout() time.Duration {
 	return dns.transactionTimeout
 }
@@ -360,8 +274,8 @@ func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
-		trans.Notes = append(trans.Notes, DuplicateQueryMsg)
-		logp.Debug("dns", DuplicateQueryMsg+" %s", tuple)
+		trans.Notes = append(trans.Notes, DuplicateQueryMsg.Error())
+		logp.Debug("dns", DuplicateQueryMsg.Error()+" %s", tuple)
 		dns.publishTransaction(trans)
 		dns.deleteTransaction(trans.tuple.Hashable())
 	}
@@ -378,8 +292,8 @@ func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
 	if trans == nil {
 		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
-		trans.Notes = append(trans.Notes, OrphanedResponseMsg)
-		logp.Debug("dns", OrphanedResponseMsg+" %s", tuple)
+		trans.Notes = append(trans.Notes, OrphanedResponse.Error())
+		logp.Debug("dns", OrphanedResponse.Error()+" %s", tuple)
 	}
 
 	trans.Response = msg
@@ -463,8 +377,8 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 }
 
 func (dns *Dns) expireTransaction(t *DnsTransaction) {
-	t.Notes = append(t.Notes, NoResponse)
-	logp.Debug("dns", NoResponse+" %s", t.tuple.String())
+	t.Notes = append(t.Notes, NoResponse.Error())
+	logp.Debug("dns", NoResponse.Error()+" %s", t.tuple.String())
 	dns.publishTransaction(t)
 }
 
@@ -702,7 +616,7 @@ func nameToString(name []byte) string {
 // decodeDnsData decodes a byte array into a DNS struct. If an error occurs
 // then the returnd dns pointer will be nil. This method recovers from panics
 // and is concurrency-safe.
-func decodeDnsData(transport Transport, data []byte) (dns *layers.DNS, err error) {
+func decodeDnsData(transport Transport, rawData []byte) (dns *layers.DNS, err error) {
 	var offset int
 	if transport == TransportTcp {
 		offset = DecodeOffset
@@ -716,187 +630,9 @@ func decodeDnsData(transport Transport, data []byte) (dns *layers.DNS, err error
 	}()
 
 	d := &layers.DNS{}
-	err = d.DecodeFromBytes(data[offset:], gopacket.NilDecodeFeedback)
+	err = d.DecodeFromBytes(rawData[offset:], gopacket.NilDecodeFeedback)
 	if err != nil {
-		return nil, err
+		return nil, NonDnsMsg
 	}
 	return d, nil
-}
-
-// TCP implementation
-
-func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
-	defer logp.Recover("DNS ParseTcp")
-
-	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
-		pkt.Tuple.String(), len(pkt.Payload))
-
-	priv := dnsPrivateData{}
-
-	if private != nil {
-		var ok bool
-		priv, ok = private.(dnsPrivateData)
-		if !ok {
-			priv = dnsPrivateData{}
-		}
-	}
-
-	payload := pkt.Payload
-
-	stream := &priv.Data[dir]
-
-	if *stream == nil {
-		*stream = &DnsStream{
-			tcpTuple: tcpTuple,
-			data:     payload,
-			message:  &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple},
-		}
-		if len(payload) <= DecodeOffset {
-			logp.Debug("dns", EmptyMsg+" addresses %s",
-				tcpTuple.String())
-
-			return priv
-		}
-	} else {
-		(*stream).data = append((*stream).data, payload...)
-		dataLength := len((*stream).data)
-		if dataLength > tcp.TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("dns", "Stream data too large, dropping DNS stream")
-			return priv
-		}
-		if dataLength <= DecodeOffset {
-			logp.Debug("dns", EmptyMsg+" addresses %s",
-				tcpTuple.String())
-			return priv
-		}
-	}
-
-	data, err := decodeDnsData(TransportTcp, (*stream).data)
-
-	if err != nil {
-		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-			tcpTuple.String(), len((*stream).data))
-
-		// wait for decoding with the next segment
-		return priv
-	}
-
-	dns.messageComplete(tcpTuple, dir, *stream, data)
-	return priv
-}
-
-func (dns *Dns) messageComplete(tcpTuple *common.TcpTuple, dir uint8, s *DnsStream, decodedData *layers.DNS) {
-	dns.handleDns(s.message, tcpTuple, dir, s.data, decodedData)
-
-	s.PrepareForNewMessage()
-}
-
-func (dns *Dns) handleDns(m *DnsMessage, tcpTuple *common.TcpTuple, dir uint8, data []byte, decodedData *layers.DNS) {
-	dnsTuple := DnsTupleFromIpPort(&m.Tuple, TransportTcp, decodedData.ID)
-	m.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcpTuple.IpPort())
-	m.Data = decodedData
-	m.Length = len(data)
-
-	if decodedData.QR == Query {
-		dns.receivedDnsRequest(&dnsTuple, m)
-	} else /* Response */ {
-		dns.receivedDnsResponse(&dnsTuple, m)
-	}
-}
-
-func (stream *DnsStream) PrepareForNewMessage() {
-	stream.message = nil
-}
-
-func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
-	if private == nil {
-		return private
-	}
-	dnsData, ok := private.(dnsPrivateData)
-	if !ok {
-		return private
-	}
-	if dnsData.Data[dir] == nil {
-		return dnsData
-	}
-	stream := dnsData.Data[dir]
-	if stream.message != nil {
-		decodedData, err := decodeDnsData(TransportTcp, stream.data)
-
-		if err == nil {
-			dns.messageComplete(tcpTuple, dir, stream, decodedData)
-		} else /*Failed decode */ {
-			if dir == tcp.TcpDirectionReverse {
-				dns.publishDecodeFailureNotes(dnsData)
-				stream.PrepareForNewMessage()
-			}
-			logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-				tcpTuple.String(), len(stream.data))
-		}
-	}
-
-	return dnsData
-}
-
-func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-	dnsData, ok := private.(dnsPrivateData)
-
-	if !ok {
-		return private, false
-	}
-
-	stream := dnsData.Data[dir]
-
-	if stream == nil || stream.message == nil {
-		return private, false
-	}
-
-	decodedData, err := decodeDnsData(TransportTcp, stream.data)
-
-	// Add Notes if the failed stream is the response
-	if err != nil {
-		if dir == tcp.TcpDirectionReverse {
-			dns.publishDecodeFailureNotes(dnsData)
-		}
-
-		// drop the stream because it is binary and it would be rare to have a decodable message later
-		logp.Debug("dns", NonDnsCompleteMsg+" addresses %s, length %d",
-			tcpTuple.String(), len(stream.data))
-		return private, true
-	}
-
-	// publish and ignore the gap. No case should reach this code though ...
-	dns.messageComplete(tcpTuple, dir, stream, decodedData)
-	return private, false
-}
-
-// Add Notes to the query stream about a failure to decode the response
-func (dns *Dns) publishDecodeFailureNotes(dnsData dnsPrivateData) {
-	streamOrigin := dnsData.Data[tcp.TcpDirectionOriginal]
-	streamReverse := dnsData.Data[tcp.TcpDirectionReverse]
-
-	if streamOrigin == nil || streamReverse == nil {
-		return
-	}
-
-	dataOrigin, err := decodeDnsData(TransportTcp, streamOrigin.data)
-	tupleReverse := streamReverse.message.Tuple
-
-	if err == nil {
-		dnsTupleReverse := DnsTupleFromIpPort(&tupleReverse, TransportTcp, dataOrigin.ID)
-		hashDnsTupleOrigin := (&dnsTupleReverse).RevHashable()
-
-		trans := dns.deleteTransaction(hashDnsTupleOrigin)
-
-		if trans == nil { // happens when a Gap is followed by Fin
-			return
-		}
-
-		trans.Notes = append(trans.Notes, NonDnsResponsePacketMsg)
-
-		dns.publishTransaction(trans)
-		dns.deleteTransaction(hashDnsTupleOrigin)
-	} else {
-		logp.Debug("dns", "Unabled to decode response with adresses %s has no associated query", streamReverse.tcpTuple.String())
-	}
 }
