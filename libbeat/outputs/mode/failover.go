@@ -183,6 +183,7 @@ func (f *FailOverConnectionMode) publish(
 		}
 		if f.maxAttempts > 0 && fails == f.maxAttempts {
 			// max number of attempts reached
+			messagesDropped.Add(1)
 			break
 		}
 

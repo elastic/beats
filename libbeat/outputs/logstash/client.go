@@ -6,12 +6,18 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"expvar"
 	"io"
 	"net"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
 )
 
 // lumberjackClient implements the ProtocolClient interface to be used
@@ -132,6 +138,8 @@ func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) 
 			return l.onFail(int(ackSeq), err)
 		}
 	}
+
+	ackedEvents.Add(int64(len(events)))
 
 	// success: increase window size by factor 1.5 until max window size
 	// (window size grows exponentially)
