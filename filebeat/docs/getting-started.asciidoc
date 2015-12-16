@@ -74,7 +74,7 @@ see <<filebeat-configuration-details>>.
 === Configuring Filebeat
 
 To configure Filebeat, you edit the _filebeat.yml_ file. Here is a sample of
-the _filebeat.yml_ file:
+`filebeat` section of the _filebeat.yml_ file:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -144,6 +144,10 @@ starts a harvester for each file in the apache directory.
 
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
+=== Configuring Filebeat to Use Logstash
+
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+
 [[filebeat-template]]
 === Loading the Index Template in Elasticsearch
 
@@ -178,13 +182,6 @@ PS C:\Program Files\Filebeat> Invoke-WebRequest -Method Put -InFile filebeat.tem
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
-
-=== Setting Up Filebeat to Use Logstash
-
-If you want to use Logstash to perform additional processing on the data collected by
-Filebeat, you need to set up Filebeat to use Logstash. For detailed steps, see
-{libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
-
 
 === Running Filebeat
 

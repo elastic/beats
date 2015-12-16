@@ -5,17 +5,13 @@
 Before modifying configuration settings, make sure you've read <<filebeat-configuration>>.
 
 The Filebeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The file contains config options common to all Beats. These options are described
-in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
-
-* {libbeat}/configuration.html#configuration-shipper[Shipper]
-* {libbeat}/configuration.html#configuration-output[Output]
-* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
-* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
-
-The Filebeat config options are described here:
+The configuration options are described in the following sections:
 
 * <<configuration-filebeat-options>>
+* <<configuration-output>>
+* <<configuration-shipper>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
 
 [[configuration-filebeat-options]]
 === Filebeat
@@ -248,3 +244,12 @@ Here are some sample encodings from W3C recommendation:
     * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
 
 The `plain` encoding is special, because it does not validate or transform any input.
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shipperconfig.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../libbeat/docs/runconfig.asciidoc[]
+

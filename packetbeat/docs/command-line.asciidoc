@@ -35,9 +35,8 @@ Usage of ./packetbeat:
       Additional seconds to wait before shutting down
 ----------------------------------------------------------------------------
 
-=== Packetbeat-Specific Options
-
-These command line options are specific to Packetbeat. For command line options common to all Beats, see {libbeat}/command-line-options.html[Beats Command Line Options].
+=== Packet-Beat Specific Options
+These command line options are specific to Packetbeat:
 
 *`-I <file>`*::
 Pass a pcap file as input to Packetbeat instead of reading packets from the network.
@@ -61,6 +60,12 @@ Read the packets from the pcap file as fast as possible without sleeping. Use th
 
 *`-waitstop <n>`*::
 Wait an additional `n` seconds before exiting.
+
+=== Other Options
+
+These command line options from libbeat are also available for Packetbeat:
+
+include::../../libbeat/docs/shared-command-line.asciidoc[]
 
 
 

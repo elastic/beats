@@ -216,11 +216,10 @@ output:
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
     pick a random host for new connections, similar to the Logstash Forwarder
     behavior. Filebeat can optionally do load balancing. For more details, see the
-    {libbeat}/configuration.html#loadbalance[loadbalance] configuration option.
+    <<loadbalance>> configuration option.
 <2> Note that if the `tls` section is missing, then TLS is disabled. TLS is
     automatically enabled when you add the `tls` section. For more information about
-    specific configuration options, see
-    {libbeat}/configuration.html#configuration-output-tls[TLS Options].
+    specific configuration options, see <<configuration-output-tls>>.
 
 
 [[changed-configuration-options]]
@@ -243,7 +242,7 @@ With the refactoring of the configuration file, the following options were remov
 |Both options were removed and replaced by logging options in libbeat.
 |===
 
-For more information about these options, see {libbeat}/configuration.html[Beats configuration options].
+For more information about these options, see <<filebeat-configuration-details>>.
 
 
 ==== A Complete Example
@@ -300,7 +299,7 @@ options with Logstash Forwarder, make sure that you add your options to the
 configuration file. For naming changes, see <<renamed-options>>.
 
 Filebeat does provide command line options that are common to all Beats. For more details about
-these options, see {libbeat}/command-line-options.html[Beats Command Line Options].
+these options, see <<filebeat-command-line>>.
 
 [[renamed-options]]
 ==== Renamed Options
@@ -343,7 +342,7 @@ The `config_dir` option specifies the path to the directory that contains additi
 
 |`-quiet`
 |
-|`quiet` was removed. Libbeat is now used for logging, so you must use the libbeat {libbeat}/configuration.html#configuration-logging[logging options] instead.
+|`quiet` was removed. Libbeat is now used for logging, so you must use the libbeat <<configuration-logging, logging options>> instead.
 
 
 |===
