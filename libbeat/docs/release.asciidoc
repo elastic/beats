@@ -1,10 +1,12 @@
 :beats-dir: ../../../beats
 
+[[release-notes]]
 == Release notes
 
 --
 This section summarizes the changes in each release.
 
+* <<release-notes-1.0.1>>
 * <<release-notes-1.0.0>>
 * <<release-notes-1.0.0-rc2>>
 * <<release-notes-1.0.0-rc1>>
