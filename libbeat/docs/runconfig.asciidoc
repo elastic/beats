@@ -1,0 +1,34 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/runconfig.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-run-options]]
+=== Run Options (Optional)
+
+The Beat can drop privileges after creating the sniffing socket.
+Root access is required for opening the socket, but everything else requires no
+privileges. Therefore, it is recommended that you have the Beat switch users after
+the initialization phase. The `uid` and `gid` settings set the User Id and Group
+Id under which the Beat runs.
+
+WARNING: On Linux, Setuid doesn't change the uid of all threads, so the Go
+         garbage collector will continue to run as root. Also note that process
+         monitoring only works when running as root.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+runoptions:
+  uid=501
+  gid=501
+------------------------------------------------------------------------------
+

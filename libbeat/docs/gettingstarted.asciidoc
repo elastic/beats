@@ -179,9 +179,6 @@ Don't start Logstash yet. You need to set a couple of configuration options firs
 [[logstash-setup]]
 ==== Setting Up Logstash
 
-Before setting up Logstash, you need to install the Beat. For installation steps,
-see the documentation for your Beat.
-
 In this setup, the Beat sends events to Logstash. Logstash receives
 these events by using the
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats
@@ -210,20 +207,6 @@ the required plugin, run the following command inside the logstash directory
 bin\plugin install logstash-input-beats
 ----------------------------------------------------------------------
 
-To use this setup, edit the Beats configuration file (for example, `packetbeat.yml`) to disable the Elasticsearch
-output and use the <<logstash-output,Logstash output>> instead:
-
-[source,yaml]
-------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["127.0.0.1:5044"]
-
-    # configure logstash plugin to loadbalance events between
-    # configured logstash hosts
-    #loadbalance: false
-------------------------------------------------------------------------------
-
 Next configure Logstash to listen on port 5044 for incoming Beats connections
 and to index into Elasticsearch. You configure Logstash by creating a
 configuration file. For example, you can save the following example configuration
@@ -251,6 +234,8 @@ output {
 Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities
 provided by Logstash.
+
+To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for your Beat.
 
 [[logstash-input-update]]
 ==== Updating the Logstash Input Beats Plugin

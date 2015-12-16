@@ -1,0 +1,640 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/outputconfig.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-output]]
+=== Output
+
+You can configure multiple outputs for exporting the correlated transactions. Currently the following output types are supported:
+
+* <<elasticsearch-output,Elasticsearch>>
+* <<logstash-output,Logstash>>
+* <<redis-output,Redis (DEPRECATED)>>
+* <<file-output,File>>
+* <<console-output,Console>>
+
+You can enable one or multiple outputs at a time. The output plugins are
+responsible for sending the transaction data in JSON format to the next step in
+the pipeline. They are also responsible for maintaining the
+network topology.
+
+[[elasticsearch-output]]
+==== Elasticsearch Output
+
+When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["http://localhost:9200"]
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    # save_topology: false
+
+    # Optional index name. The default is "{beatname_lc}" and generates
+    # [{beatname_lc}-]YYYY.MM.DD keys.
+    index: "{beatname_lc}"
+
+    # tls configuration. By default is off.
+    tls:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      certificatekey: "/etc/pki/client/cert.key"
+
+------------------------------------------------------------------------------
+
+To enable SSL, just add `https` to all URLs defined under __hosts__.
+
+["source","yaml",subs="attributes,callouts"]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["https://localhost:9200"]
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    # save_topology: false
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
+If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
+
+[source,yaml]
+------------------------------------------------------------------------------
+
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["localhost"]
+
+    # Optional http or https. Default is http
+    protocol: "https"
+
+    # Comment this option if you don't want to store the topology in
+    # Elasticsearch. The default is false.
+    # This option makes sense only for Packetbeat
+    # save_topology: false
+
+    # HTTP basic auth
+    username: "admin"
+    password: "s3cr3t"
+
+------------------------------------------------------------------------------
+
+
+[[hosts-option]]
+===== hosts
+
+The list of Elasticsearch nodes to connect to. The events are distributed to
+these nodes in round robin order. If one node becomes unreachable, the event is
+automatically sent to another node. Each Elasticsearch node can be defined as a `URL` or `IP:PORT`.
+For example: `http://192.15.3.2`, `https://es.found.io:9230` or `192.24.3.2:9300`.
+If no port is specified, `9200` is used.
+
+NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken from the
+<<protocol-option>> and <<path-option>> config options.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    # The Elasticsearch cluster
+    hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
+
+    # Optional http or https. Default is http
+    protocol: https
+
+    # HTTP Path at which each Elasticsearch server lives
+    path: /elasticsearch
+------------------------------------------------------------------------------
+
+In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
+`https://10.45.3.1:9230/elasticsearch`.
+
+===== worker
+
+The number of workers per configured host publishing events to Elasticsearch. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
+
+===== host (DEPRECATED)
+
+The host of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
+
+===== port (DEPRECATED)
+
+The port of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
+
+===== username
+
+The basic authentication username for connecting to Elasticsearch.
+
+===== password
+
+The basic authentication password for connecting to Elasticsearch.
+
+[[protocol-option]]
+===== protocol
+
+The name of the protocol Elasticsearch is reachable on. The options are:
+`http` or `https`. The default is `http`. However, if you specify a URL for
+<<hosts-option>>, the value of `protocol` is overridden by whatever scheme you
+specify in the URL.
+
+[[path-option]]
+===== path
+
+An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
+the cases where Elasticsearch listens behind an HTTP reverse proxy that exports
+the API under a custom prefix.
+
+===== index
+
+The index root name to write events to. The default is the Beat name.
+For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
+"{beatname_lc}-2015.04.26").
+
+===== max_retries
+
+The number of times to try a particular Logstash send attempt. If
+the send operation doesn't succeed after the specified number of retries, the events are
+dropped. The default is 3.
+
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after
+`max_retries`, the Beat is optionally notified.
+
+===== bulk_max_size
+
+The maximum number of events to bulk in a single Elasticsearch bulk API index request.
+The default is 50.
+
+===== timeout
+
+The http request timeout in seconds for the Elasticsearch request. The default is 90.
+
+===== flush_interval
+
+The number of seconds to wait for new events between two bulk API index requests.
+If `bulk_max_size` is reached before this interval expires, additional bulk index
+requests are made.
+
+[[save_topology]]
+===== save_topology
+
+A Boolean that specifies whether the topology is kept in Elasticsearch. The default is
+false.
+
+This option is relevant for Packetbeat only.
+
+===== topology_expire
+
+The time to live in seconds for the topology information that is stored in
+Elasticsearch. The default is 15 seconds.
+
+===== tls
+
+Configuration options for TLS parameters like the certificate authority to use
+for HTTPS-based connections. If the `tls` section is missing, the host CAs are used for HTTPS connections to
+Elasticsearch.
+
+See <<configuration-output-tls>> for more information.
+
+
+[[logstash-output]]
+==== Logstash Output
+
+The Logstash output sends the events directly to Logstash by using the lumberjack
+protocol. To use this option, you must {libbeat}/getting-started.html#logstash-setup[install and configure] the logstash-input-beats
+plugin in Logstash. Logstash allows for additional processing and routing of
+generated events.
+
+Every event sent to Logstash contains additional metadata for indexing and filtering:
+
+[source,json]
+------------------------------------------------------------------------------
+{
+    ...
+    "@metadata": {
+      "beat": "<beat>",
+      "type": "<event type>"
+    }
+}
+------------------------------------------------------------------------------
+
+In Logstash, you can configure the Elasticsearch output plugin to use the
+metadata and event type for indexing.
+
+The following *Logstash 1.5* configuration file sets Logstash to use the index and
+document type reported by Beats for indexing events into Elasticsearch.
+The index used will depend on the `@timestamp` field as identified by Logstash.
+
+[source,logstash]
+------------------------------------------------------------------------------
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    host => "localhost"
+    port => "9200"
+    protocol => "http"
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Here is the same configuration for *Logstash 2.x* releases:
+
+[source,logstash]
+------------------------------------------------------------------------------
+
+input {
+  beats {
+    port => 5044
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}
+------------------------------------------------------------------------------
+
+Events indexed into Elasticsearch with the Logstash configuration shown here
+will be similar to events directly indexed by Beats into Elasticsearch.
+
+Here is an example of how to configure the Beat to use Logstash:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["localhost:5044"]
+
+    # index configures '@metadata.beat' field to be used by Logstash for
+    # indexing. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat to
+    # topbeat and for Filebeat to filebeat.
+    index: {beatname_lc}
+------------------------------------------------------------------------------
+
+
+[[hosts]]
+===== hosts
+
+The list of known Logstash servers to connect to. All entries in this list can
+contain a port number. If no port number is given, the value specified for <<port>>
+is used as the default port number.
+
+===== worker
+
+The number of workers per configured host publishing events to Logstash. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
+
+[[loadbalance]]
+===== loadbalance
+
+If set to true and multiple Logstash hosts are configured, the output plugin
+load balances published events onto all Logstash hosts. If set to false,
+the output plugin sends all events to only one host (determined at random) and
+will switch to another host if the selected one becomes unresponsive. The default value is false.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["localhost:5044", "localhost:5045"]
+
+    # configure logstash plugin to loadbalance events between the logstash instances
+    loadbalance: true
+
+    # configure index prefix name
+    index: {beatname_lc}
+------------------------------------------------------------------------------
+
+[[port]]
+===== port
+
+The default port to use if the port number is not given in <<hosts>>. The default port number
+is 10200.
+
+===== index
+
+The index root name to write events to. The default is the Beat name.
+For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
+"{beatname_lc}-2015.04.26").
+
+===== tls
+
+Configuration options for TLS parameters like the root CA for Logstash connections. See
+<<configuration-output-tls>> for more information. If the `tls` section is missing, a TCP-only connection is assumed. Logstash must also be configured to use TCP for
+Logstash input.
+
+===== timeout
+
+The number of seconds to wait for responses from the Logstash server before timing out. The default is 30 (seconds).
+
+===== max_retries
+
+The number of times to try a particular Logstash send attempt. If
+the send operation doesn't succeed after the specified number of retries, the events are
+dropped. The default is 3.
+
+A value of 0 disables retrying and a value <0 will enable infinite retry until
+events have been published.
+
+If an event is dropped by the output plugin, each Beat implementation must
+determine whether to drop the event or try sending it again. If the send
+operation doesn't succeed after `max_retries`, the Beat is optionally notified.
+
+
+[[redis-output]]
+==== Redis Output (DEPRECATED)
+
+The Redis output inserts the events in a Redis list. This output plugin is compatible with
+the http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
+so the Redis Output for the Beats is deprecated.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output:
+  redis:
+    # Set the host and port where to find Redis.
+    host: "localhost"
+    port: 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # The default is false.
+    save_topology: true
+
+    # Optional index name. The default is {beatname_lc} and generates {beatname_lc} keys.
+    index: "{beatname_lc}"
+
+    # Optional Redis database number where the events are stored
+    # The default is 0.
+    db: 0
+
+    # Optional Redis database number where the topology is stored
+    # The default is 1. It must have a different value than db.
+    db_topology: 1
+
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    # password: ""
+
+    # Optional Redis initial connection timeout in seconds.
+    # The default is 5 seconds.
+    timeout: 5
+
+    # Optional interval for reconnecting to failed Redis connections.
+    # The default is 1 second.
+    reconnect_interval: 1
+------------------------------------------------------------------------------
+
+
+===== host
+
+The host of the Redis server.
+
+===== port
+
+The port of the Redis server.
+
+===== db
+
+The Redis database number where the events are published. The default is 0.
+
+===== db_topology
+
+The Redis database number where the topology information is stored. The default is 1.
+
+===== index
+
+The name of the Redis list where the events are published. The default is
+"{beatname_lc}".
+
+===== password
+
+The password to authenticate with. The default is no authentication.
+
+===== timeout
+
+The Redis initial connection timeout in seconds. The default is 5 seconds.
+
+===== reconnect_interval
+
+The interval for reconnecting failed Redis connections. The default is 1 second.
+
+[[file-output]]
+==== File Output
+
+The File output dumps the transactions into a file where each transaction is in a JSON format.
+Currently, this output is used for testing, but it can be used as input for
+Logstash.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output:
+
+  # File as output
+  # Options:
+  # path: where to save the files
+  # filename: name of the files
+  # rotate_every_kb: maximum size of the files in path
+  # number of files: maximum number of files in path
+  file:
+    path: "/tmp/{beatname_lc}"
+    filename: {beatname_lc}
+    rotate_every_kb: 1000
+    number_of_files: 7
+------------------------------------------------------------------------------
+
+[[path]]
+===== path
+
+The path to the directory where the generated files will be saved. This option is
+mandatory.
+
+===== filename
+
+The name of the generated files. The default is set to the Beat name. For example, the files
+generated by default for {beatname_uc} would be "{beatname_lc}", "{beatname_lc}.1", "{beatname_lc}.2", and so on.
+
+===== rotate_every_kb
+
+The maximum size in kilobytes of each file. When this size is reached, the files are
+rotated. The default value is 1000 KB.
+
+===== number_of_files
+
+The maximum number of files to save under <<path>>. When this number of files is reached, the
+oldest file is deleted, and the rest of the files are shifted from last to first. The default
+is 7 files.
+
+[[console-output]]
+==== Console Output
+
+The Console output writes events in JSON format to stdout.
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  console:
+    pretty: true
+------------------------------------------------------------------------------
+
+===== pretty
+
+If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+[[configuration-output-tls]]
+
+==== TLS Options
+
+===== certificate_authorities
+
+The list of root certificates for server verifications. If `certificate_authorities` is empty or not set, the trusted certificate authorities of the host system are used.
+
+[[certificate]]
+
+===== certificate: "/etc/pki/client/cert.pem"
+
+The path to the certificate for TLS client authentication. If the certificate
+is not specified, client authentication is not available. The connection
+might fail if the server requests client authentication. If the TLS server does not
+require client authentication, the certificate will be loaded, but not requested or used
+by the server.
+
+When this option is configured, the <<certificate_key>> option is also required.
+
+[[certificate_key]]
+===== certificate_key: "/etc/pki/client/cert.key"
+
+The client certificate key used for client authentication. This option is required if <<certificate>> is specified.
+
+===== min_version
+
+The minimum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+The default value is `1.0`.
+
+===== max_version
+
+The maximum SSL/TLS version allowed for the encrypted connections. The value must be one of the following:
+`SSL-3.0` for SSL 3, `1.0` for TLS 1.0, `1.1` for TLS 1.1 and `1.2` for TLS 1.2.
+
+The default value is `1.2`.
+
+===== insecure
+
+This option controls whether the client verifies server certificates and host names.
+If insecure is set to true, all server host names and certificates are
+accepted. In this mode, TLS-based connections are susceptible to
+man-in-the-middle attacks. Use this option for testing only.
+
+===== cipher_suites
+
+The list of cipher suites to use. The first entry has the highest priority.
+If this option is omitted, the Go crypto library's default
+suites are used (recommended).
+
+Here is a list of allowed cipher suites and their meanings.
+
+* 3DES:
+  Cipher suites using triple DES
+
+* AES128/256:
+  Cipher suites using AES with 128/256-bit keys.
+
+* CBC:
+  Cipher using Cipher Block Chaining as block cipher mode.
+
+* ECDHE:
+  Cipher suites using Elliptic Curve Diffie-Hellman (DH) ephemeral key exchange.
+
+* ECDSA:
+  Cipher suites using Elliptic Curve Digital Signature Algorithm for authentication.
+
+* GCM:
+  Galois/Counter mode is used for symmetric key cryptography.
+
+* RC4:
+  Cipher suites using RC4.
+
+* RSA:
+  Cipher suites using RSA.
+
+* SHA, SHA256, SHA384:
+  Cipher suites using SHA-1, SHA-256 or SHA-384.
+
+The following cipher suites are available:
+
+* RSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* RSA-3DES-CBC3-SHA
+* RSA-AES128-CBC-SHA
+* RSA-AES256-CBC-SHA
+* ECDHE-ECDSA-RC4-128-SHA (disabled by default - RC4 not recommended)
+* ECDHE-ECDSA-AES128-CBC-SHA
+* ECDHE-ECDSA-AES256-CBC-SHA
+* ECDHE-RSA-RC4-128-SHA (disabled by default- RC4 not recommended)
+* ECDHE-RSA-3DES-CBC3-SHA
+* ECDHE-RSA-AES128-CBC-SHA
+* ECDHE-RSA-AES256-CBC-SHA
+* ECDHE-RSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-ECDSA-AES128-GCM-SHA256 (TLS 1.2 only)
+* ECDHE-RSA-AES256-GCM-SHA384 (TLS 1.2 only)
+* ECDHE-ECDSA-AES256-GCM-SHA384 (TLS 1.2 only)
+
+===== curve_types
+
+The list of curve types for ECDHE (Elliptic Curve Diffie-Hellman ephemeral key exchange).
+
+The following elliptic curve types are available:
+
+* P-256
+* P-384
+* P-521
