@@ -82,9 +82,6 @@ more information about these options, see <<packetbeat-configuration>>.
 [[configuring-packetbeat]]
 === Configuring Packetbeat
 
-NOTE: If you plan to use Logstash, you need to set up Logstash to work with the Beat before you
-configure Packetbeat. For detailed steps, see {libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
-
 Before starting Packetbeat, you need to edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
 the archive that you just extracted.
@@ -181,6 +178,9 @@ output:
     #save_topology: false
 ----------------------------------------------------------------------
 
+=== Configuring Packetbeat to Use Logstash
+
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[packetbeat-template]]
 === Loading the Index Template in Elasticsearch
