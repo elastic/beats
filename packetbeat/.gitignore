@@ -1,13 +1,6 @@
 /packetbeat
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
-*.swp
-*.swo
-*.swn
-packetbeat.test
 *.dev.yml
 
 /docs/html_docs
@@ -36,5 +29,4 @@ _testmain.go
 .idea
 
 *.test
-.DS_Store
 

@@ -1,16 +1,10 @@
 /etc/filebeat.dev.yml
 .idea
-.DS_Store
 .vagrant
 .filebeat
 /docs/html_docs
-*.swp
-*.swo
 
 filebeat
-filebeat.test
-filebeat.exe
-filebeat.test.exe
 
 build
 /tests/load/logs
