@@ -5,17 +5,13 @@
 Before modifying configuration settings, make sure you've read <<winlogbeat-configuration>>.
 
 The Winlogbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The file contains config options common to all Beats. These options are described
-in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
-
-* {libbeat}/configuration.html#configuration-shipper[Shipper]
-* {libbeat}/configuration.html#configuration-output[Output]
-* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
-* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
-
-The Winlogbeat config options are described here:
+The configuration options are described in the following sections:
 
 * <<configuration-winlogbeat-options>>
+* <<configuration-output>>
+* <<configuration-shipper>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
 
 [[configuration-winlogbeat-options]]
 === Winlogbeat
@@ -118,3 +114,11 @@ The metrics are served as a JSON document. The metrics include:
 - total number of filtered events
 - total number of successfully published events
 - uptime
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shipperconfig.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../libbeat/docs/runconfig.asciidoc[]
