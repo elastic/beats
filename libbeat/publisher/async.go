@@ -17,7 +17,7 @@ type asyncPublisher struct {
 
 const (
 	defaultFlushInterval = 1000 * time.Millisecond // 1s
-	defaultBulkSize      = 10000
+	defaultBulkSize      = 200
 )
 
 func newAsyncPublisher(pub *PublisherType) *asyncPublisher {

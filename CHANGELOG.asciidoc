@@ -57,6 +57,29 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.0.1]]
+=== Beats version 1.0.1 https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.1 diff]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Reduced the output bulk size default from 10k to 200. This avoids high
+  memory usage in case Logstash is not available or slow to process request. {pull}550[550]
+
+*Filebeat*
+
+- Fix force_close_files in case renamed file appeared very fast. https://github.com/elastic/filebeat/pull/302[302]
+
+*Packetbeat*
+
+- Improve MongoDB message correlation. {issue}377[377]
+- Improve redis parser performance. {issue}442[422]
+- Fix panic on nil in redis protocol parser. {issue}384[384]
+- Fix errors redis parser when messages are split in multiple TCP segments. {issue}402[402]
+- Fix errors in redis parser when length prefixed strings contain sequences of CRLF. {issue}#402[402]
+- Fix errors in redis parser when dealing with nested arrays. {issue}402[402]
+
 [[release-notes-1.0.0]]
 === Beats version 1.0.0
 https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
