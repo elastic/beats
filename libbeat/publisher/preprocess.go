@@ -140,6 +140,13 @@ func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 		event["client_proc"] = src.Proc
 		event["client_server"] = srcServer
 		delete(event, "src")
+
+		// check if it's outgoing transaction (as client)
+		if publisher.IsPublisherIP(src.Ip) {
+			//outgoing transaction
+			event["direction"] = "out"
+		}
+
 	}
 	dst, ok := event["dst"].(*common.Endpoint)
 	if ok {
@@ -150,18 +157,15 @@ func updateEventAddresses(publisher *PublisherType, event common.MapStr) bool {
 		event["server"] = dstServer
 		delete(event, "dst")
 
-		//get the direction of the transaction: outgoing (as client)/incoming (as server)
+		//check if it's incoming transaction (as server)
 		if publisher.IsPublisherIP(dst.Ip) {
 			// incoming transaction
 			event["direction"] = "in"
-		} else {
-			//outgoing transaction
-			event["direction"] = "out"
 		}
+
 	}
 
-	if publisher.IgnoreOutgoing && dstServer != "" &&
-		dstServer != publisher.name {
+	if publisher.IgnoreOutgoing && event["direction"] == "out" {
 		// duplicated transaction -> ignore it
 		debug("Ignore duplicated transaction on %s: %s -> %s",
 			publisher.name, srcServer, dstServer)
