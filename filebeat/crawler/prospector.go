@@ -52,6 +52,10 @@ func (p *Prospector) setupProspectorConfig() error {
 	if err != nil {
 		return err
 	}
+	config.ExcludeFilesRegexp, err = harvester.InitRegexps(config.ExcludeFiles)
+	if err != nil {
+		return err
+	}
 
 	// Init File Stat list
 	p.prospectorList = make(map[string]harvester.FileStat)
@@ -219,11 +223,26 @@ func (p *Prospector) stdinRun(spoolChan chan *input.FileEvent) {
 	}
 }
 
+func (p *Prospector) isFileExcluded(file string) bool {
+
+	config := &p.ProspectorConfig
+
+	if len(config.ExcludeFilesRegexp) > 0 {
+
+		if harvester.MatchAnyRegexps(config.ExcludeFilesRegexp, file) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Scans the specific path which can be a glob (/**/**/*.log)
 // For all found files it is checked if a harvester should be started
 func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 
 	logp.Debug("prospector", "scan path %s", path)
+	logp.Debug("prospector", "exclude_files: %s", p.ProspectorConfig.ExcludeFiles)
 	// Evaluate the path as a wildcards/shell glob
 	matches, err := filepath.Glob(path)
 	if err != nil {
@@ -236,6 +255,12 @@ func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 	// Check any matched files to see if we need to start a harvester
 	for _, file := range matches {
 		logp.Debug("prospector", "Check file for harvesting: %s", file)
+
+		// check if the file is in the exclude_files list
+		if p.isFileExcluded(file) {
+			logp.Debug("prospector", "Exclude file: %s", file)
+			continue
+		}
 
 		// Stat the file, following any symlinks.
 		fileinfo, err := os.Stat(file)

@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+- Add exclude_files configuration option {pull}563[563]
 
 *Winlogbeat*
 
