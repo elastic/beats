@@ -13,6 +13,8 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
+var debugf = logp.MakeDebug("decoder")
+
 type DecoderStruct struct {
 	decoders         map[gopacket.LayerType]gopacket.DecodingLayer
 	linkLayerDecoder gopacket.DecodingLayer
@@ -87,7 +89,7 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
-	logp.Info("decode packet data")
+	debugf("decode packet data")
 
 	for len(data) > 0 {
 		err := current.DecodeFromBytes(data, d)
