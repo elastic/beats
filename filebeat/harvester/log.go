@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"regexp"
 	"time"
 
 	"github.com/elastic/beats/filebeat/config"
@@ -330,35 +329,6 @@ func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error
 }
 
 func (h *Harvester) Stop() {
-}
-
-func InitRegexps(exprs []string) ([]*regexp.Regexp, error) {
-
-	result := []*regexp.Regexp{}
-
-	for _, exp := range exprs {
-
-		rexp, err := regexp.CompilePOSIX(exp)
-		if err != nil {
-			logp.Err("Fail to compile the regexp %s: %s", exp, err)
-			return nil, err
-		}
-		result = append(result, rexp)
-	}
-	return result, nil
-}
-
-func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
-
-	for _, rexp := range regexps {
-		if rexp.MatchString(text) {
-			// drop line
-			return true
-
-		}
-	}
-
-	return false
 }
 
 const maxConsecutiveEmptyReads = 100

@@ -91,6 +91,16 @@ If both `include_lines` and `exclude_lines` are defined, then include_lines is c
  exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
+===== exclude_files
+
+A list of regular expressions to match the files to be ignored. By default no file is excluded. 
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+  exclude_files: [".gz$"]
+-------------------------------------------------------------------------------------
+To ignore all the files with the `gz` extension.
+
 [[configuration-fields]]
 ===== fields
 

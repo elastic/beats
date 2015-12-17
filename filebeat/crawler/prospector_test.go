@@ -171,3 +171,23 @@ func TestProspectorInitInputTypeWrong(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "log", prospector.ProspectorConfig.Harvester.InputType)
 }
+
+func TestProspectorFileExclude(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		ExcludeFiles: []string{"\\.gz$"},
+		Harvester: config.HarvesterConfig{
+			BufferSize: 0,
+		},
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	prospector.Init()
+
+	assert.True(t, prospector.isFileExcluded("/tmp/log/logw.gz"))
+	assert.False(t, prospector.isFileExcluded("/tmp/log/logw.log"))
+
+}
