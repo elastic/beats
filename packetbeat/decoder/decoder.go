@@ -13,6 +13,8 @@ import (
 	"github.com/tsg/gopacket/layers"
 )
 
+var debugf = logp.MakeDebug("decoder")
+
 type DecoderStruct struct {
 	decoders         map[gopacket.LayerType]gopacket.DecodingLayer
 	linkLayerDecoder gopacket.DecodingLayer
@@ -58,7 +60,7 @@ func NewDecoder(
 	}
 	d.AddLayers(defaultLayerTypes)
 
-	logp.Debug("pcapread", "Layer type: %s", datalink.String())
+	debugf("Layer type: %s", datalink.String())
 
 	switch datalink {
 	case layers.LinkTypeLinuxSLL:
@@ -87,7 +89,7 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
-	logp.Info("decode packet data")
+	debugf("decode packet data")
 
 	for len(data) > 0 {
 		err := current.DecodeFromBytes(data, d)
@@ -138,43 +140,43 @@ func (d *DecoderStruct) process(
 ) error {
 	switch layerType {
 	case layers.LayerTypeIPv4:
-		logp.Debug("ip", "IPv4 packet")
+		debugf("IPv4 packet")
 		packet.Tuple.Src_ip = d.ip4.SrcIP
 		packet.Tuple.Dst_ip = d.ip4.DstIP
 		packet.Tuple.Ip_length = 4
 	case layers.LayerTypeIPv6:
-		logp.Debug("ip", "IPv6 packet")
+		debugf("IPv6 packet")
 		packet.Tuple.Src_ip = d.ip6.SrcIP
 		packet.Tuple.Dst_ip = d.ip6.DstIP
 		packet.Tuple.Ip_length = 16
 	case layers.LayerTypeICMPv4:
-		logp.Debug("ip", "ICMPv4 packet")
+		debugf("ICMPv4 packet")
 		packet.Payload = d.icmp4.Payload
 
 		packet.Tuple.ComputeHashebles()
 		d.icmp4Proc.ProcessICMPv4(&d.icmp4, packet)
 	case layers.LayerTypeICMPv6:
-		logp.Debug("ip", "ICMPv6 packet")
+		debugf("ICMPv6 packet")
 		packet.Payload = d.icmp6.Payload
 
 		packet.Tuple.ComputeHashebles()
 		d.icmp6Proc.ProcessICMPv6(&d.icmp6, packet)
 	case layers.LayerTypeUDP:
-		logp.Debug("ip", "UDP packet")
+		debugf("UDP packet")
 		packet.Tuple.Src_port = uint16(d.udp.SrcPort)
 		packet.Tuple.Dst_port = uint16(d.udp.DstPort)
 		packet.Payload = d.udp.Payload
 		packet.Tuple.ComputeHashebles()
 		d.udpProc.Process(packet)
 	case layers.LayerTypeTCP:
-		logp.Debug("ip", "TCP packet")
+		debugf("TCP packet")
 		packet.Tuple.Src_port = uint16(d.tcp.SrcPort)
 		packet.Tuple.Dst_port = uint16(d.tcp.DstPort)
 		packet.Payload = d.tcp.Payload
 
 		if len(packet.Payload) == 0 && !d.tcp.FIN {
 			// We have no use for this atm.
-			logp.Debug("pcapread", "Ignore empty non-FIN packet")
+			debugf("Ignore empty non-FIN packet")
 			break
 		}
 		packet.Tuple.ComputeHashebles()
