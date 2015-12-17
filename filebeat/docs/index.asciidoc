@@ -1,6 +1,8 @@
 = Filebeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 :version: master
+:beatname_lc: filebeat
+:beatname_uc: Filebeat
 
 include::./overview.asciidoc[]
 

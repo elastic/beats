@@ -5,20 +5,15 @@ Before modifying configuration settings, make sure you've read
 <<configuring-packetbeat>>.
 
 The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The file contains config options common to all Beats. These options are described
-in the following sections of the {libbeat}/configuration.html[Beats Platform Reference]:
-
-
-* {libbeat}/configuration.html#configuration-shipper[Shipper]
-* {libbeat}/configuration.html#configuration-output[Output]
-* {libbeat}/configuration.html#configuration-logging[Logging (Optional)]
-* {libbeat}/configuration.html#configuration-run-options[Run Options (Optional)]
-
-The Packetbeat config options are described here:
+The configuration options are described in the following sections:
 
 * <<configuration-interfaces>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
+* <<configuration-output>>
+* <<configuration-shipper>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.
@@ -693,3 +688,11 @@ The name used to identify the process at run time. When Packetbeat starts, and t
 periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
+
+include::../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shipperconfig.asciidoc[]
+
+include::../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../libbeat/docs/runconfig.asciidoc[]
