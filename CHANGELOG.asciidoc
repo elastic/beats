@@ -59,7 +59,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 [[release-notes-1.0.1]]
 === Beats version 1.0.1
-https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.0 diff]
+https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.1 diff]
 
 ==== Bugfixes
 
