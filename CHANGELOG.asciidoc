@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Affecting all Beats*
 
 *Packetbeat*
+- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
 
 *Topbeat*
 
