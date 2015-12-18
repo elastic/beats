@@ -1,12 +1,5 @@
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 topbeat
-*.o
-*.a
-*.so
-*.swp
-*.swo
-*.pyc
-
 
 *.dev.yml
 
@@ -26,9 +19,6 @@ _cgo_export.*
 
 _testmain.go
 
-*.exe
-*.test
-*.prof
 
 /cover/
 /coverage/
@@ -37,7 +27,6 @@ _testmain.go
 /tests/system/last_run
 profile.cov
 .idea
-.DS_Store
 /docs/html_docs
 
 build
