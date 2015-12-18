@@ -75,6 +75,10 @@ After you save your configuration file, test it with the following command.
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest
 ----------------------------------------------------------------------
 
+=== Configuring Winlogbeat to Use Logstash
+
+include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+
 [[winlogbeat-template]]
 === Loading the Index Template in Elasticsearch
 
@@ -92,12 +96,6 @@ PS C:\Program Files\Winlogbeat> Invoke-WebRequest -Method Put -InFile winlogbeat
 ----------------------------------------------------------------------
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
-
-=== Setting Up Winlogbeat to Use Logstash
-
-If you want to use Logstash to perform additional processing on the data collected by
-Winlogbeat, you need to set up Winlogbeat to use Logstash. For detailed steps, see
-{libbeat}/getting-started.html#logstash-setup[Setting Up Logstash].
 
 === Running Winlogbeat
 

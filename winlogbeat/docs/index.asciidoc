@@ -1,0 +1,16 @@
+= Winlogbeat Reference
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:version: master
+:beatname_lc: winlogbeat
+:beatname_uc: Winlogbeat
+
+include::./overview.asciidoc[]
+
+include::./getting-started.asciidoc[]
+
+include::./configuration.asciidoc[]
+
+include::./command-line.asciidoc[]
+
+include::./fields.asciidoc[]
+
