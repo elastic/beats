@@ -1,3 +1,4 @@
+[[winlogbeat-command-line-options]]
 == Command Line Options
 
 Winlogbeat does not have any Winlogbeat-specific command line options. Instead,
@@ -5,8 +6,7 @@ you configure the behavior of Winlogbeat by specifying options in the
 configuration file.
 
 The following command line options from libbeat are also available for
-Winlogbeat. For details about each option, see
-{libbeat}/command-line-options.html[Beats Command Line Options].
+Winlogbeat. 
 
 To start Winlogbeat, you must use the `-c config\path` option to specify a
 Windows path to the configuration file.
@@ -31,3 +31,5 @@ Usage of ./winlogbeat:
   -version
     	Print version and exit
 --------------------------------------------------------------------------------
+
+include::../../libbeat/docs/shared-command-line.asciidoc[]

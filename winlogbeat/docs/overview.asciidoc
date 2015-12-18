@@ -18,6 +18,6 @@ on your system. For example, you can capture events such as:
 * system events
 
 Winlogbeat is a https://www.elastic.co/products/beats[Beat], and it is based on
-the libbeat framework. The general configuration options for libbeat and how to
-setup Elasticsearch, Logstash, and Kibana are covered in the
+the libbeat framework. General information about libbeat and how to
+set up Elasticsearch, Logstash, and Kibana are covered in the
 {libbeat}/index.html[Beats Platform Reference].
