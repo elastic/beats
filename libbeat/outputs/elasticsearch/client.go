@@ -19,7 +19,9 @@ import (
 
 // Metrics that can retrieved through the expvar web interface.
 var (
-	ackedEvents = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
+	ackedEvents            = expvar.NewInt("libbeatEsPublishedAndAckedEvents")
+	eventsNotAcked         = expvar.NewInt("libbeatEsPublishedButNotAckedEvents")
+	publishEventsCallCount = expvar.NewInt("libbeatEsPublishEventsCallCount")
 )
 
 type Client struct {
@@ -84,6 +86,8 @@ func (client *Client) Clone() *Client {
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
+	publishEventsCallCount.Add(1)
+
 	if !client.connected {
 		return events, ErrNotConnected
 	}
@@ -112,6 +116,7 @@ func (client *Client) PublishEvents(
 	// check response for transient errors
 	failed_events := bulkCollectPublishFails(res, events)
 	ackedEvents.Add(int64(len(events) - len(failed_events)))
+	eventsNotAcked.Add(int64(len(failed_events)))
 	if len(failed_events) > 0 {
 		return failed_events, mode.ErrTempBulkFailure
 	}

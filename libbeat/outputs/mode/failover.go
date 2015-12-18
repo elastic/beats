@@ -183,13 +183,13 @@ func (f *FailOverConnectionMode) publish(
 		}
 		if f.maxAttempts > 0 && fails == f.maxAttempts {
 			// max number of attempts reached
-			messagesDropped.Add(1)
 			break
 		}
 
 		time.Sleep(f.waitRetry)
 	}
 
+	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
 }
