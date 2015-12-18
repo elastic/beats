@@ -137,7 +137,6 @@ func (s *SingleConnectionMode) publish(
 		}
 		if s.maxAttempts > 0 && fails == s.maxAttempts {
 			// max number of attempts reached
-			messagesDropped.Add(1)
 			break
 		}
 
@@ -152,6 +151,7 @@ func (s *SingleConnectionMode) publish(
 		time.Sleep(backoff)
 	}
 
+	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
 }
