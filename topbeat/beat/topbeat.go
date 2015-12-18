@@ -83,7 +83,7 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 		return errors.New("Invalid statistics configuration")
 	}
 
-	logp.Debug("topbeat", "Init toppbeat")
+	logp.Debug("topbeat", "Init topbeat")
 	logp.Debug("topbeat", "Follow processes %q\n", tb.procs)
 	logp.Debug("topbeat", "Period %v\n", tb.period)
 	logp.Debug("topbeat", "System statistics %t\n", tb.sysStats)
