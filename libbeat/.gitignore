@@ -1,14 +1,5 @@
-
-
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
-*.swp
-*.swo
-*.swn
 libbeat
-libbeat.test
 
 # Folders
 _obj
@@ -30,12 +21,7 @@ _cgo_export.*
 
 _testmain.go
 
-*.exe
-
-*.test
-
 # IDE / OS specific files
-.DS_Store
 .idea
 .jenkins
 
