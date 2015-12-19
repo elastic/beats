@@ -93,7 +93,7 @@ If both `include_lines` and `exclude_lines` are defined, then include_lines is c
 
 ===== exclude_files
 
-A list of regular expressions to match the files to be ignored. By default no file is excluded. 
+A list of regular expressions to match the files to be ignored. By default no file is excluded.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -147,6 +147,51 @@ document. The default value is `log`.
 ===== harvester_buffer_size
 
 The buffer size every harvester uses when fetching the file. The default is 16384.
+
+===== max_bytes
+
+Maximum number of bytes a single log event can have. All bytes after max_bytes are discarded and not sent.
+This is especially useful for multiline log messages which can get large. The default is 10MB (10485760).
+
+===== multiline
+
+Mutiline can be used for log messages spanning multiple lines. This is common for Java Stack Traces
+or C-Line Continuation. The following example combines all lines following a line start with a `[`.
+This could for example be a Java Stack Trace.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+multiline:
+    pattern: ^\[
+    match: after
+    negate: true
+-------------------------------------------------------------------------------------
+
+====== pattern
+
+The regexp pattern that has to be matched. The example pattern matches all lines starting with [
+
+====== negate
+
+Defines if the pattern set under pattern should be negated or not. Default is false.
+
+====== match
+
+Match must be set to "after" or "before". It is used to define if lines should be
+appended to a pattern that was (not) matched before or after or as long as a
+pattern is not matched based on negate.
+
+NOTE: After is the equivalent to previous and before is the equivalent to to next in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash].
+
+====== max_lines
+
+The maximum number of lines that are combined to one event. In case there are more the max_lines the additional
+lines are discarded. Default is set to 500.
+
+====== timeout
+
+After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event.
+Default is set to 5s.
 
 
 ===== tail_files
