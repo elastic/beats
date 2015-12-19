@@ -152,6 +152,8 @@ func (p *Prospector) logRun(spoolChan chan *input.FileEvent) {
 	// Seed last scan time
 	p.lastscan = time.Now()
 
+	logp.Debug("prospector", "exclude_files: %s", p.ProspectorConfig.ExcludeFiles)
+
 	// Now let's do one quick scan to pick up new files
 	for _, path := range p.ProspectorConfig.Paths {
 		p.scan(path, spoolChan)
@@ -242,7 +244,7 @@ func (p *Prospector) isFileExcluded(file string) bool {
 func (p *Prospector) scan(path string, output chan *input.FileEvent) {
 
 	logp.Debug("prospector", "scan path %s", path)
-	logp.Debug("prospector", "exclude_files: %s", p.ProspectorConfig.ExcludeFiles)
+
 	// Evaluate the path as a wildcards/shell glob
 	matches, err := filepath.Glob(path)
 	if err != nil {

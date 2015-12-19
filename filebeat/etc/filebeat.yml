@@ -32,11 +32,11 @@ filebeat:
 
       # Exclude lines. A list of regular expressions to match. It drops the lines that are
       # matching any regular expression from the list. The include_lines is called before
-      # exclude_lines. By default, no lines are dropped. 
+      # exclude_lines. By default, no lines are dropped.
       # exclude_lines: ["^DBG"]
 
       # Include lines. A list of regular expressions to match. It exports the lines that are
-      # matching any regular expression from the list. The include_lines is called before 
+      # matching any regular expression from the list. The include_lines is called before
       # exclude_lines. By default, all the lines are exported.
       # include_lines: ["^ERR", "^WARN"]
 
@@ -72,6 +72,35 @@ filebeat:
 
       # Defines the buffer size every harvester uses when fetching the file
       #harvester_buffer_size: 16384
+
+      # Maximum number of bytes a single log event can have
+      # All bytes after max_bytes are discarded and not sent. The default is 10MB.
+      # This is especially useful for multiline log messages which can get large.
+      #max_bytes: 10485760
+
+      # Mutiline can be used for log messages spanning multiple lines. This is common
+      # for Java Stack Traces or C-Line Continuation
+      #multiline:
+
+        # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
+        #pattern: ^\[
+
+        # Defines if the pattern set under pattern should be negated or not. Default is false.
+        #negate: false
+
+        # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+        # that was (not) matched before or after or as long as a pattern is not matched based on negate.
+        # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+        #match: after
+
+        # The maximum number of lines that are combined to one event.
+        # In case there are more the max_lines the additional lines are discarded.
+        # Default is 500
+        #max_lines: 500
+
+        # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+        # Default is 5s.
+        #timeout: 5s
 
       # Setting tail_files to true means filebeat starts readding new files at the end
       # instead of the beginning. If this is used in combination with log rotation
