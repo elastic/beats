@@ -19,7 +19,7 @@ implementation with a liberal enough license, you might be able to use it to
 parse and decode individual messages instead of writing your own parser.
 
 Before starting, please also read the
-https://github.com/elastic/packetbeat/blob/master/CONTRIBUTING.md[CONTRIBUTING]
+https://github.com/elastic/beats/blob/master/packetbeat/CONTRIBUTING.md[CONTRIBUTING]
 file on GitHub.
 
 ==== Cloning and Compiling
@@ -33,14 +33,14 @@ following commands:
 ----------------------------------------------------------------------
 $ mkdir -p $GOPATH/src/github.com/elastic
 $ cd $GOPATH/src/github.com/elastic
-$ git clone https://github.com/elastic/packetbeat.git
+$ git clone https://github.com/elastic/beats.git
 ----------------------------------------------------------------------
 
 Then you can compile it with:
 
 [source,shell]
 ----------------------------------------------------------------------
-$ cd packetbeat
+$ cd beats
 $ make
 ----------------------------------------------------------------------
 
@@ -52,14 +52,14 @@ create a symlink to the `$GOPATH/src/github.com/elastic/` directory.
 
 We recommend the following work flow for contributing to Packetbeat:
 
-* Fork Packetbeat in GitHub to your own account
+* Fork Beats in GitHub to your own account
 
-* In the `$GOPATH/src/github.com/elastic/packetbeat` folder, add your fork
+* In the `$GOPATH/src/github.com/elastic/beats` folder, add your fork
   as a new remote. For example (replace `tsg` with your GitHub account):
 
 [source,shell]
 ----------------------------------------------------------------------
-$ git remote add tsg git@github.com:tsg/packetbeat.git
+$ git remote add tsg git@github.com:tsg/beats.git
 ----------------------------------------------------------------------
 
 * Create a new branch for your work:
@@ -85,7 +85,7 @@ $ git push --set-upstream tsg cool_new_protocol
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
 modules can be found in individual folders in the
-https://github.com/elastic/packetbeat/tree/master/protos[`protos`] directory
+https://github.com/elastic/beats/tree/master/packetbeat/protos[`protos`] directory
 from the repository.
 
 Before starting, we recommend reading through the source code of some of the
@@ -563,7 +563,7 @@ https://github.com/stretchr/testify[testify] library.
 
 For parser and decoder tests, it's a good practice to have an array with
 test cases containing the inputs and expected outputs. For an example, see the
-https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
+https://github.com/elastic/beats/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
 unit test.
 
 You can also have unit tests that treat the whole module as a black box, calling
@@ -629,7 +629,7 @@ keeping the output clean on a normal run.
 is passed from one call to the next like the TCP layer would do.
 
 <4> The
-https://github.com/elastic/packetbeat/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1182[`expectTransaction`]
+https://github.com/elastic/beats/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1182[`expectTransaction`]
 function tries to read from the `results` channel and causes errors in the test case if
 there's no transaction present.
 
@@ -644,7 +644,7 @@ files as input and checking the results in the files created by using the "file"
 output plugin.
 
 This is the approach taken by the tests in the
-https://github.com/elastic/packetbeat/tree/master/tests[`tests`] directory. The
+https://github.com/elastic/beats/tree/master/packetbeat/tests/system[`tests/system`] directory. The
 tests are written in Python and executed using
 https://nose.readthedocs.org/en/latest/[nose]. Here is a simple example test
 from the MongoDB suite:
