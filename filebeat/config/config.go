@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -49,6 +50,8 @@ type ProspectorConfig struct {
 	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
 	Harvester             HarvesterConfig `yaml:",inline"`
+	ExcludeFiles          []string        `yaml:"exclude_files"`
+	ExcludeFilesRegexp    []*regexp.Regexp
 }
 
 type HarvesterConfig struct {

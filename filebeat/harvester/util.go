@@ -1,9 +1,11 @@
 package harvester
 
 import (
+	"regexp"
+	"time"
+
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/libbeat/logp"
-	"time"
 )
 
 // isLine checks if the given byte array is a line, means has a line ending \n
@@ -59,4 +61,33 @@ func readLine(
 func readlineString(bytes []byte, size int) (string, int, error) {
 	s := string(bytes)[:len(bytes)-lineEndingChars(bytes)]
 	return s, size, nil
+}
+
+// InitRegexps initializes a list of compiled regular expressions.
+func InitRegexps(exprs []string) ([]*regexp.Regexp, error) {
+
+	result := []*regexp.Regexp{}
+
+	for _, exp := range exprs {
+
+		rexp, err := regexp.CompilePOSIX(exp)
+		if err != nil {
+			logp.Err("Fail to compile the regexp %s: %s", exp, err)
+			return nil, err
+		}
+		result = append(result, rexp)
+	}
+	return result, nil
+}
+
+// MatchAnyRegexps checks if the text matches any of the regular expressions
+func MatchAnyRegexps(regexps []*regexp.Regexp, text string) bool {
+
+	for _, rexp := range regexps {
+		if rexp.MatchString(text) {
+			return true
+		}
+	}
+
+	return false
 }

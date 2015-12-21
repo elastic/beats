@@ -29,7 +29,10 @@ filebeat:
       {% if exclude_lines %}
       exclude_lines: {{exclude_lines}}
       {% endif %}
-      
+      {% if exclude_files %}
+      exclude_files: {{exclude_files}}
+      {% endif %}
+     
   spool_size:
   idle_timeout: 0.1s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
