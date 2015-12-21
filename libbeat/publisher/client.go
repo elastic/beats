@@ -1,6 +1,15 @@
 package publisher
 
-import "github.com/elastic/beats/libbeat/common"
+import (
+	"expvar"
+
+	"github.com/elastic/beats/libbeat/common"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	publishedEvents = expvar.NewInt("libbeatPublishedEvents")
+)
 
 // Client is used by beats to publish new events.
 type Client interface {
@@ -45,11 +54,13 @@ func Sync(o publishOptions) publishOptions {
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 	options, client := c.getClient(opts)
+	publishedEvents.Add(1)
 	return client.PublishEvent(context{publishOptions: options}, event)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
 	options, client := c.getClient(opts)
+	publishedEvents.Add(int64(len(events)))
 	return client.PublishEvents(context{publishOptions: options}, events)
 }
 

@@ -6,12 +6,20 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"expvar"
 	"io"
 	"net"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	ackedEvents            = expvar.NewInt("libbeatLogstashPublishedAndAckedEvents")
+	eventsNotAcked         = expvar.NewInt("libbeatLogstashPublishedButNotAckedEvents")
+	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
 )
 
 // lumberjackClient implements the ProtocolClient interface to be used
@@ -73,15 +81,20 @@ func (l *lumberjackClient) PublishEvent(event common.MapStr) error {
 func (l *lumberjackClient) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
+	publishEventsCallCount.Add(1)
+	totalNumberOfEvents := len(events)
 	for len(events) > 0 {
 		n, err := l.publishWindowed(events)
 
 		logp.Debug("logstash", "%v events out of %v events sent to logstash. Continue sending ...", n, len(events))
 		events = events[n:]
 		if err != nil {
+			eventsNotAcked.Add(int64(len(events)))
+			ackedEvents.Add(int64(totalNumberOfEvents - len(events)))
 			return events, err
 		}
 	}
+	ackedEvents.Add(int64(totalNumberOfEvents))
 	return nil, nil
 }
 

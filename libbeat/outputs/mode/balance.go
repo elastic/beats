@@ -117,7 +117,7 @@ func (m *LoadBalancerMode) PublishEvent(
 
 func (m *LoadBalancerMode) publishEventsMessage(msg eventsMessage) error {
 	if ok := m.forwardEvent(m.work, msg); !ok {
-		outputs.SignalFailed(msg.signaler, nil)
+		dropping(msg)
 	}
 	return nil
 }
@@ -200,7 +200,7 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 
 				if m.maxAttempts > 0 && msg.attemptsLeft <= 0 {
 					// no more attempts left => drop
-					outputs.SignalFailed(msg.signaler, err)
+					dropping(msg)
 					return
 				}
 
@@ -231,7 +231,7 @@ func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
 	logp.Info("Error publishing events (retrying): %s", err)
 
 	if ok := m.forwardEvent(m.retries, msg); !ok {
-		outputs.SignalFailed(msg.signaler, err)
+		dropping(msg)
 	}
 }
 
@@ -258,4 +258,11 @@ func (m *LoadBalancerMode) forwardEvent(
 		}
 	}
 	return false
+}
+
+// dropping is called when a message is dropped. It updates the
+// relevant counters and sends a failed signal.
+func dropping(msg eventsMessage) {
+	messagesDropped.Add(1)
+	outputs.SignalFailed(msg.signaler, nil)
 }

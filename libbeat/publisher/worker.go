@@ -1,10 +1,16 @@
 package publisher
 
 import (
+	"expvar"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	messagesInWorkerQueues = expvar.NewInt("libbeatMessagesInWorkerQueues")
 )
 
 type worker interface {
@@ -54,6 +60,7 @@ func (p *messageWorker) run() {
 		case <-p.ws.done:
 			return
 		case m := <-p.queue:
+			messagesInWorkerQueues.Add(-1)
 			p.handler.onMessage(m)
 		}
 	}
@@ -67,6 +74,7 @@ func (p *messageWorker) shutdown() {
 
 func (p *messageWorker) send(m message) {
 	p.queue <- m
+	messagesInWorkerQueues.Add(1)
 }
 
 func (ws *workerSignal) stop() {
