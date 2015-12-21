@@ -4,10 +4,16 @@ package mode
 
 import (
 	"errors"
+	"expvar"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
+)
+
+// Metrics that can retrieved through the expvar web interface.
+var (
+	messagesDropped = expvar.NewInt("libbeatMessagesDropped")
 )
 
 // ErrNoHostsConfigured indicates missing host or hosts configuration

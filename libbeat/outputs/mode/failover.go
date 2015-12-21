@@ -189,6 +189,7 @@ func (f *FailOverConnectionMode) publish(
 		time.Sleep(f.waitRetry)
 	}
 
+	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
 }

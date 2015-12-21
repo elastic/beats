@@ -151,6 +151,7 @@ func (s *SingleConnectionMode) publish(
 		time.Sleep(backoff)
 	}
 
+	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
 }
