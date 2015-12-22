@@ -198,7 +198,7 @@ operation doesn't succeed after
 ===== bulk_max_size
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-The default is 200.
+The default is 50.
 
 ===== timeout
 
