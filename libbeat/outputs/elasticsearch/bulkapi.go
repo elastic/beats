@@ -162,9 +162,5 @@ func bulkEncode(metaBuilder MetaBuilder, body []interface{}) bytes.Buffer {
 }
 
 func readBulkResult(obj []byte) (BulkResult, error) {
-	if obj == nil {
-		return BulkResult{}, nil
-	}
-
 	return BulkResult{obj}, nil
 }
