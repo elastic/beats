@@ -10,7 +10,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"unicode/utf16"
 	"unsafe"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -64,7 +63,18 @@ type winEventLogRecord struct {
 	// DWORD Length;
 }
 
-func (el *eventLog) Open(recordNumber uint32) error {
+// IsAvailable returns nil if the Event Logging API is supported by this
+// operating system. If not supported then an error is returned.
+func IsAvailable() (bool, error) {
+	err := modadvapi32.Load()
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (el *eventLog) Open(recordNumber uint64) error {
 	// If uncServerPath is nil the local computer is used.
 	var uncServerPath *uint16
 	var err error
@@ -94,7 +104,7 @@ func (el *eventLog) Open(recordNumber uint32) error {
 
 	var oldestRecord, newestRecord uint32
 	if numRecords > 0 {
-		el.recordNumber = recordNumber
+		el.recordNumber = uint32(recordNumber)
 		el.seek = true
 		el.ignoreFirst = true
 
@@ -104,7 +114,7 @@ func (el *eventLog) Open(recordNumber uint32) error {
 		}
 		newestRecord = oldestRecord + numRecords - 1
 
-		if recordNumber < oldestRecord || recordNumber > newestRecord {
+		if el.recordNumber < oldestRecord || el.recordNumber > newestRecord {
 			el.recordNumber = oldestRecord
 			el.ignoreFirst = false
 		}
@@ -159,27 +169,26 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 		singleBuf := el.readBuf[readOffset : readOffset+event.length]
 		readOffset += event.length
 
-		sourceName, extraDataOffset, err := utf16ToString(singleBuf[winEventLogRecordSize:])
+		sourceName, extraDataOffset, err := UTF16BytesToString(singleBuf[winEventLogRecordSize:])
 		if err != nil {
 			logp.Warn("%s Failed to read sourceName from event "+
 				"data. Skipping event. event=%v, %v", el.logPrefix, event, err)
 			continue
 		}
-		computerName, _, err := utf16ToString(singleBuf[winEventLogRecordSize+extraDataOffset:])
+		computerName, _, err := UTF16BytesToString(singleBuf[winEventLogRecordSize+extraDataOffset:])
 		if err != nil {
 			logp.Warn("%s Failed to read computerName from event "+
 				"data. Skipping event. event=%v, %v", el.logPrefix, event, err)
 			continue
 		}
 
+		// TODO: Lookup EventCategory string.
 		lr := LogRecord{
 			EventLogName:  el.name,
-			RecordNumber:  event.recordNumber,
+			RecordNumber:  uint64(event.recordNumber),
 			EventID:       event.eventID,
-			EventType:     EventType(event.eventType),
-			EventCategory: "Unknown", // TODO: Lookup category string.
+			EventType:     EventType(event.eventType).String(),
 			TimeGenerated: time.Unix(int64(event.timeGenerated), 0),
-			TimeWritten:   time.Unix(int64(event.timeWritten), 0),
 			SourceName:    sourceName,
 			ComputerName:  computerName,
 		}
@@ -228,28 +237,6 @@ func (el *eventLog) Read() ([]LogRecord, error) {
 func (el *eventLog) Close() error {
 	debugf("%s Closing handle", el.logPrefix)
 	return closeEventLog(el.handle)
-}
-
-// UTF16ToString returns the UTF-8 encoding of the UTF-16 sequence s,
-// with a terminating NUL removed.
-func utf16ToString(b []byte) (string, int, error) {
-	if len(b)%2 != 0 {
-		return "", 0, fmt.Errorf("Must have even length byte slice")
-	}
-
-	offset := len(b)/2 + 2
-	s := make([]uint16, len(b)/2)
-	for i := range s {
-		s[i] = uint16(b[i*2]) + uint16(b[(i*2)+1])<<8
-
-		if s[i] == 0 {
-			s = s[0:i]
-			offset = i*2 + 2
-			break
-		}
-	}
-
-	return string(utf16.Decode(s)), offset, nil
 }
 
 // formatMessage builds the message text that is associated with an event log
@@ -301,7 +288,7 @@ func (el *eventLog) formatMessage(
 			continue
 		}
 
-		message, _, err = utf16ToString(el.formatBuf[:numChars*2])
+		message, _, err = UTF16BytesToString(el.formatBuf[:numChars*2])
 		if err != nil {
 			detailf("%s Failed to convert UTF16 buffer[:%d] to string. event=%v",
 				el.logPrefix, numChars*2, event)
@@ -330,7 +317,7 @@ func getStrings(event *winEventLogRecord, buf []byte) ([]string, []uintptr, erro
 	bufPtr := uintptr(unsafe.Pointer(&buf[0]))
 	offset := int(event.stringOffset)
 	for i := 0; i < int(event.numStrings); i++ {
-		evtStr, length, err := utf16ToString(buf[offset:])
+		evtStr, length, err := UTF16BytesToString(buf[offset:])
 		if err != nil {
 			return nil, nil, err
 		}
@@ -424,7 +411,7 @@ func (el *eventLog) readRetryErrorHandler(err error) error {
 
 		if reopen {
 			el.Close()
-			return el.Open(el.recordNumber)
+			return el.Open(uint64(el.recordNumber))
 		}
 	}
 	return err

@@ -42,7 +42,7 @@ type PersistedState struct {
 // EventLogState represents the state of an individual event log.
 type EventLogState struct {
 	Name         string    `yaml:"name"`
-	RecordNumber uint32    `yaml:"record_number"`
+	RecordNumber uint64    `yaml:"record_number"`
 	Timestamp    time.Time `yaml:"timestamp"`
 }
 
@@ -156,7 +156,7 @@ func (c *Checkpoint) States() map[string]EventLogState {
 }
 
 // Persist queues the given event log state information to be written to disk.
-func (c *Checkpoint) Persist(name string, recordNumber uint32, ts time.Time) {
+func (c *Checkpoint) Persist(name string, recordNumber uint64, ts time.Time) {
 	c.save <- EventLogState{
 		Name:         name,
 		RecordNumber: recordNumber,

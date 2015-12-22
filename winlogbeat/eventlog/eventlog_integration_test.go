@@ -188,7 +188,7 @@ func TestRead(t *testing.T) {
 			t.Errorf("Unknown EventId %d Read() from event log. %v", record.EventID, record)
 			continue
 		}
-		assert.Equal(t, m.eventType, uint16(record.EventType))
+		assert.Equal(t, EventType(m.eventType).String(), record.EventType)
 		assert.Equal(t, m.message, strings.TrimRight(record.Message, "\r\n"))
 	}
 

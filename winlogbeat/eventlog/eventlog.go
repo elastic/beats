@@ -3,6 +3,7 @@ package eventlog
 import (
 	"fmt"
 	"time"
+	"unicode/utf16"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -21,7 +22,7 @@ type EventLoggingAPI interface {
 	// Open the event log. recordNumber is the last successfully read event log
 	// record number. Read will resume from recordNumber + 1. To start reading
 	// from the first event specify a recordNumber of 0.
-	Open(recordNumber uint32) error
+	Open(recordNumber uint64) error
 
 	// Read records from the event log.
 	Read() ([]LogRecord, error)
@@ -77,12 +78,11 @@ type LogRecord struct {
 	EventLogName  string
 	SourceName    string
 	ComputerName  string
-	RecordNumber  uint32
+	RecordNumber  uint64
 	EventID       uint32
-	EventType     EventType
+	EventType     string
 	EventCategory string
 	TimeGenerated time.Time
-	TimeWritten   time.Time
 	UserSID       *SID
 	Message       string
 }
@@ -91,24 +91,27 @@ type LogRecord struct {
 func (lr LogRecord) String() string {
 	return fmt.Sprintf("LogRecord EventLogName[%s] SourceName[%s] "+
 		"ComputerName[%s] RecordNumber[%d] EventID[%d] EventType[%s] "+
-		"EventCategory[%s] TimeGenerated[%s] TimeWritten[%s] UserSID[%s] "+
+		"EventCategory[%s] TimeGenerated[%s] UserSID[%s] "+
 		"Message[%s]", lr.EventLogName, lr.SourceName, lr.ComputerName,
 		lr.RecordNumber, lr.EventID, lr.EventType, lr.EventCategory,
-		lr.TimeGenerated, lr.TimeWritten, lr.UserSID, lr.Message)
+		lr.TimeGenerated, lr.UserSID, lr.Message)
 }
 
 func (lr LogRecord) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"eventLogName":  lr.EventLogName,
-		"sourceName":    lr.SourceName,
-		"computerName":  lr.ComputerName,
-		"recordNumber":  lr.RecordNumber,
-		"eventID":       lr.EventID,
-		"eventType":     lr.EventType.String(),
-		"eventCategory": lr.EventCategory,
-		"message":       lr.Message,
-		"@timestamp":    common.Time(lr.TimeGenerated),
-		"type":          "eventlog",
+		"eventLogName": lr.EventLogName,
+		"sourceName":   lr.SourceName,
+		"computerName": lr.ComputerName,
+		"recordNumber": lr.RecordNumber,
+		"eventID":      lr.EventID,
+		"eventType":    lr.EventType,
+		"message":      lr.Message,
+		"@timestamp":   common.Time(lr.TimeGenerated),
+		"type":         "eventlog",
+	}
+
+	if lr.EventCategory != "" {
+		m["eventCategory"] = lr.EventCategory
 	}
 
 	if lr.UserSID != nil {
@@ -200,4 +203,26 @@ var sidTypeToString = map[SIDType]string{
 // String returns string representation of SIDType.
 func (st SIDType) String() string {
 	return sidTypeToString[st]
+}
+
+// UTF16BytesToString returns the Unicode code point sequence represented
+// by the UTF-16 buffer b.
+func UTF16BytesToString(b []byte) (string, int, error) {
+	if len(b)%2 != 0 {
+		return "", 0, fmt.Errorf("Must have even length byte slice")
+	}
+
+	offset := len(b)/2 + 2
+	s := make([]uint16, len(b)/2)
+	for i := range s {
+		s[i] = uint16(b[i*2]) + uint16(b[(i*2)+1])<<8
+
+		if s[i] == 0 {
+			s = s[0:i]
+			offset = i*2 + 2
+			break
+		}
+	}
+
+	return string(utf16.Decode(s)), offset, nil
 }
