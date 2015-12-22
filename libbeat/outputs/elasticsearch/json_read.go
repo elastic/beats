@@ -78,22 +78,19 @@ const (
 	dictFieldStateEnd
 )
 
+var stateNames = map[state]string{
+	failedState:       "failed",
+	startState:        "start",
+	arrState:          "array",
+	arrStateNext:      "arrayNext",
+	dictState:         "dict",
+	dictFieldState:    "dictValue",
+	dictFieldStateEnd: "dictNext",
+}
+
 func (s state) String() string {
-	switch s {
-	case failedState:
-		return "failed"
-	case startState:
-		return "start"
-	case arrState:
-		return "array"
-	case arrStateNext:
-		return "arrayNext"
-	case dictState:
-		return "dict"
-	case dictFieldState:
-		return "dictValue"
-	case dictFieldStateEnd:
-		return "dictNext"
+	if name, ok := stateNames[s]; ok {
+		return name
 	}
 	return "unknown"
 }
