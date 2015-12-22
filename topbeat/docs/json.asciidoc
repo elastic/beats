@@ -1,0 +1,137 @@
+[[topbeat-json-structure]]
+== Exported JSON Documents
+
+Topbeat exports the following types of JSON documents based on the statistics
+that it's configured to capture:
+
+   * `type: system` for system-wide statistics
+   * `type: process` for per-process statistics
+   * `type: filesystem` for disk usage statistics
+
+By default, Topbeat captures all three types of statistics. As you can see in
+the following examples, the content of the JSON document varies depending on the
+type.
+
+See <<exported-fields>> for information about each field.
+
+[[system-wide-statistics-json]]
+=== System-Wide Statistics
+
+Topbeat exports one JSON document for the system. For example:
+
+[source,json]
+----------------------------------------------------------------------
+{
+  "@timestamp": "2015-12-09T22:47:13.635Z",
+  "beat": {
+    "hostname": "MacBook-Pro.local",
+    "name": "MacBook-Pro.local"
+  },
+  "count": 1,
+  "cpu": {
+    "user": 7903339,
+    "user_p": 0,
+    "nice": 0,
+    "system": 5303038,
+    "system_p": 0,
+    "idle": 212278877,
+    "iowait": 0,
+    "irq": 0,
+    "softirq": 0,
+    "steal": 0
+  },
+  "load": {
+    "load1": 9.3935546875,
+    "load5": 6.6884765625,
+    "load15": 4.72509765625
+  },
+  "mem": {
+    "total": 17179869184,
+    "used": 16909348864,
+    "free": 270520320,
+    "used_p": 0.98,
+    "actual_used": 10321580032,
+    "actual_free": 6858289152,
+    "actual_used_p": 0.6
+  },
+  "swap": {
+    "total": 0,
+    "used": 0,
+    "free": 0,
+    "used_p": 0,
+    "actual_used": 0,
+    "actual_free": 0,
+    "actual_used_p": 0
+  },
+  "type": "system"
+}
+----------------------------------------------------------------------
+
+[[per-process-statistics-json]]
+=== Per-Process Statistics
+
+Topbeat exports one document per process. For example:
+
+[source,json]
+----------------------------------------------------------------------
+{
+  "@timestamp": "2015-12-09T22:47:13.635Z",
+  "beat": {
+    "hostname": "MacBook-Pro.local",
+    "name": "MacBook-Pro.local"
+  },
+  "count": 1,
+  "proc": {
+    "cpu": {
+      "user": 6,
+      "user_p": 0,
+      "system": 9,
+      "total": 15,
+      "start_time": "14:47"
+    },
+    "mem": {
+      "size": 587185876992,
+      "rss": 5709824,
+      "rss_p": 0,
+      "share": 0
+    },
+    "name": "topbeat",
+    "pid": 13802,
+    "ppid": 13801,
+    "state": "running"
+  },
+  "type": "process"
+}
+----------------------------------------------------------------------
+
+[[disk-usage-statistics]]
+=== Disk Usage Statistics
+
+Topbeat exports one document per mount point. For example:
+
+[source,json]
+
+
+----------------------------------------------------------------------
+{
+  "@timestamp": "2015-12-09T22:47:13.663Z",
+  "beat": {
+    "hostname": "MacBook-Pro.local",
+    "name": "MacBook-Pro.local"
+  },
+  "count": 1,
+  "fs": {
+    "device_name": "/dev/disk1",
+    "total": 249779191808,
+    "used": 42408587264,
+    "used_p": 0.17,
+    "free": 207370604544,
+    "avail": 207108460544,
+    "files": 60981246,
+    "free_files": 50563589,
+    "mount_point": "/"
+  },
+  "type": "filesystem"
+}
+----------------------------------------------------------------------
+
