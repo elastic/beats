@@ -63,6 +63,30 @@ func (b *Buffer) IgnoreSymbol(s uint8) error {
 	return b.bufferEndError()
 }
 
+// IgnoreSymbols will advance the read pointer until the first symbol not matching
+// set of symbols is found
+func (b *Buffer) IgnoreSymbols(syms []byte) error {
+	if b.err != nil {
+		return b.err
+	}
+
+	data := b.data[b.offset:]
+	for i, byte := range data {
+		for _, other := range syms {
+			if byte == other {
+				goto next
+			}
+		}
+		// no match
+		b.Advance(b.offset + i - b.mark)
+		return nil
+
+	next:
+	}
+	b.offset += len(data)
+	return b.bufferEndError()
+}
+
 // UntilSymbol collects all bytes until symbol s is found. If errOnEnd is set to
 // true, the collected byte slice will be returned if no more bytes are available
 // for parsing, but s has not matched yet.

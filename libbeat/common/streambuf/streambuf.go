@@ -65,8 +65,11 @@ type Buffer struct {
 // buffer. Usage of Init is optional as zero value Buffer is already in valid state.
 func (b *Buffer) Init(d []byte, fixed bool) {
 	b.data = d
-	b.available = len(d)
+	b.err = nil
 	b.fixed = fixed
+	b.mark = 0
+	b.offset = 0
+	b.available = len(d)
 }
 
 // New creates new extensible buffer from data slice being retained by the buffer.
@@ -386,11 +389,25 @@ func (b *Buffer) IndexByte(byte byte) int {
 		return -1
 	}
 
-	idx := bytes.IndexByte(b.data[b.mark:], byte)
+	idx := bytes.IndexByte(b.data[b.offset:], byte)
 	if idx < 0 {
 		return -1
 	}
-	return idx + b.mark
+	return idx + (b.offset - b.mark)
+}
+
+// IndexByteFrom returns offset of byte in unpressed buffer starting at off.
+// Returns -1 if byte not in buffer
+func (b *Buffer) IndexByteFrom(off int, byte byte) int {
+	if b.err != nil {
+		return -1
+	}
+
+	idx := bytes.IndexByte(b.data[b.offset+off:], byte)
+	if idx < 0 {
+		return -1
+	}
+	return idx + (b.offset - b.mark) + off
 }
 
 // CollectUntil collects all bytes until delim was found (including delim).
@@ -426,4 +443,40 @@ func (b *Buffer) CollectUntilByte(delim byte) ([]byte, error) {
 	data := b.data[b.mark:end]
 	b.Advance(len(data))
 	return data, nil
+}
+
+// CollectWhile collects all bytes until predicate returns false
+func (b *Buffer) CollectWhile(pred func(byte) bool) ([]byte, error) {
+	if b.err != nil {
+		return nil, b.err
+	}
+
+	data := b.data[b.offset:]
+	for i, byte := range data {
+		if !pred(byte) {
+			end := b.offset + i + 1
+			data := b.data[b.mark:end]
+			b.Advance(len(data))
+			return data, nil
+		}
+	}
+
+	b.offset = b.mark + b.available
+	return nil, b.bufferEndError()
+}
+
+func (b *Buffer) PeekByte() (byte, error) {
+	return b.PeekByteFrom(0)
+}
+
+func (b *Buffer) PeekByteFrom(off int) (byte, error) {
+	if b.err != nil {
+		return 0, b.err
+	}
+
+	if !b.Avail(off + 1) {
+		return 0, b.bufferEndError()
+	}
+
+	return b.data[b.mark+off], nil
 }
