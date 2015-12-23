@@ -18,8 +18,9 @@ func TestGetClient(t *testing.T) {
 		},
 	}
 	asyncClient := c.publisher.asyncPublisher.client()
-	confirmClient := c.publisher.syncPublisher.client()
 	syncClient := c.publisher.syncPublisher.client()
+	guaranteedClient := asyncClient
+	guaranteedSyncClient := syncClient
 
 	var testCases = []struct {
 		in  []ClientOption
@@ -28,8 +29,8 @@ func TestGetClient(t *testing.T) {
 		// Add new client options here:
 		{[]ClientOption{}, asyncClient},
 		{[]ClientOption{Sync}, syncClient},
-		{[]ClientOption{Confirm}, confirmClient},
-		{[]ClientOption{Confirm, Sync}, syncClient},
+		{[]ClientOption{Guaranteed}, guaranteedClient},
+		{[]ClientOption{Guaranteed, Sync}, guaranteedSyncClient},
 	}
 
 	for _, test := range testCases {

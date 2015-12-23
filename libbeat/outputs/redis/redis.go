@@ -252,17 +252,36 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 
 func (out *redisOutput) PublishEvent(
 	signal outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return out.BulkPublish(signal, ts, []common.MapStr{event})
+	return out.BulkPublish(signal, opts, []common.MapStr{event})
 }
 
 func (out *redisOutput) BulkPublish(
 	signal outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
+	if !opts.Guaranteed {
+		err := out.doBulkPublish(events)
+		outputs.Signal(signal, err)
+		return err
+	}
+
+	for {
+		err := out.doBulkPublish(events)
+		if err == nil {
+			outputs.SignalCompleted(signal)
+			return nil
+		}
+
+		// TODO: add backoff
+		time.Sleep(1)
+	}
+}
+
+func (out *redisOutput) doBulkPublish(events []common.MapStr) error {
 	if !out.connected {
 		logp.Debug("output_redis", "Droping pkt ...")
 		return errors.New("Not connected")
@@ -278,12 +297,10 @@ func (out *redisOutput) BulkPublish(
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
 			logp.Err("Fail to convert the event to JSON: %s", err)
-			outputs.SignalCompleted(signal)
 			return err
 		}
 
 		_, err = out.Conn.Do(command, out.Index, string(jsonEvent))
-		outputs.Signal(signal, err)
 		out.onFail(err)
 		return err
 	}
@@ -296,20 +313,18 @@ func (out *redisOutput) BulkPublish(
 		}
 		err = out.Conn.Send(command, out.Index, string(jsonEvent))
 		if err != nil {
-			outputs.SignalFailed(signal, err)
 			out.onFail(err)
 			return err
 		}
 	}
 	if err := out.Conn.Flush(); err != nil {
-		outputs.Signal(signal, err)
 		out.onFail(err)
 		return err
 	}
 	_, err := out.Conn.Receive()
-	outputs.Signal(signal, err)
 	out.onFail(err)
 	return err
+
 }
 
 func (out *redisOutput) onFail(err error) {

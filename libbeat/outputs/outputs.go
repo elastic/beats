@@ -1,8 +1,6 @@
 package outputs
 
 import (
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -36,9 +34,14 @@ type MothershipConfig struct {
 	CompressionLevel  *int `yaml:"compression_level"`
 }
 
+type Options struct {
+	Guaranteed bool
+}
+
 type Outputer interface {
 	// Publish event
-	PublishEvent(trans Signaler, ts time.Time, event common.MapStr) error
+
+	PublishEvent(trans Signaler, opts Options, event common.MapStr) error
 }
 
 type TopologyOutputer interface {
@@ -53,7 +56,7 @@ type TopologyOutputer interface {
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	BulkPublish(trans Signaler, ts time.Time, event []common.MapStr) error
+	BulkPublish(trans Signaler, opts Options, event []common.MapStr) error
 }
 
 type OutputBuilder interface {
@@ -130,12 +133,12 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 
 func (b *bulkOutputAdapter) BulkPublish(
 	signal Signaler,
-	ts time.Time,
+	opts Options,
 	events []common.MapStr,
 ) error {
 	signal = NewSplitSignaler(signal, len(events))
 	for _, evt := range events {
-		err := b.PublishEvent(signal, ts, evt)
+		err := b.PublishEvent(signal, opts, evt)
 		if err != nil {
 			return err
 		}

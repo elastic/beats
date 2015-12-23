@@ -1,7 +1,7 @@
 package publisher
 
 import (
-	"time"
+	"errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,6 +14,10 @@ type outputWorker struct {
 	config      outputs.MothershipConfig
 	maxBulkSize int
 }
+
+var (
+	errSendFailed = errors.New("failed send attempt")
+)
 
 func newOutputWorker(
 	config outputs.MothershipConfig,
@@ -48,21 +52,7 @@ func (o *outputWorker) onMessage(m message) {
 
 func (o *outputWorker) onEvent(ctx *context, event common.MapStr) {
 	debug("output worker: publish single event")
-	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
-
-	if !ctx.sync {
-		_ = o.out.PublishEvent(ctx.signal, ts, event)
-		return
-	}
-
-	signal := outputs.NewSyncSignal()
-	for {
-		o.out.PublishEvent(signal, ts, event)
-		if signal.Wait() {
-			outputs.SignalCompleted(ctx.signal)
-			break
-		}
-	}
+	o.out.PublishEvent(ctx.signal, outputs.Options{ctx.guaranteed}, event)
 }
 
 func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
@@ -72,13 +62,8 @@ func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
 		return
 	}
 
-	var sync *outputs.SyncSignal
-	if ctx.sync {
-		sync = outputs.NewSyncSignal()
-	}
-
 	if o.maxBulkSize < 0 || len(events) <= o.maxBulkSize {
-		o.sendBulk(sync, ctx, events)
+		o.sendBulk(ctx, events)
 		return
 	}
 
@@ -90,29 +75,19 @@ func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
 		if sz > len(events) {
 			sz = len(events)
 		}
-		o.sendBulk(sync, ctx, events[:sz])
+		o.sendBulk(ctx, events[:sz])
 		events = events[sz:]
 	}
 }
 
 func (o *outputWorker) sendBulk(
-	sync *outputs.SyncSignal,
 	ctx *context,
 	events []common.MapStr,
 ) {
 	debug("output worker: publish %v events", len(events))
-	ts := time.Time(events[0]["@timestamp"].(common.Time)).UTC()
 
-	if sync == nil {
-		err := o.out.BulkPublish(ctx.signal, ts, events)
-		if err != nil {
-			logp.Info("Error bulk publishing events: %s", err)
-		}
-		return
+	err := o.out.BulkPublish(ctx.signal, outputs.Options{ctx.guaranteed}, events)
+	if err != nil {
+		logp.Info("Error bulk publishing events: %s", err)
 	}
-
-	for done := false; !done; done = sync.Wait() {
-		o.out.BulkPublish(sync, ts, events)
-	}
-	outputs.SignalCompleted(ctx.signal)
 }

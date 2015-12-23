@@ -106,9 +106,10 @@ func (f *FailOverConnectionMode) connect(active int) error {
 // connection by random.
 func (f *FailOverConnectionMode) PublishEvents(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
-	return f.publish(signaler, func() (bool, bool) {
+	return f.publish(signaler, opts, func() (bool, bool) {
 		// loop until all events have been send in case client supports partial sends
 		for len(events) > 0 {
 			var err error
@@ -130,9 +131,10 @@ func (f *FailOverConnectionMode) PublishEvents(
 // PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
 func (f *FailOverConnectionMode) PublishEvent(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return f.publish(signaler, func() (bool, bool) {
+	return f.publish(signaler, opts, func() (bool, bool) {
 		if err := f.conns[f.active].PublishEvent(event); err != nil {
 			logp.Info("Error publishing events (retrying): %s", err)
 			return false, false
@@ -151,6 +153,7 @@ func (f *FailOverConnectionMode) PublishEvent(
 // to maxAttempts send attempts without any progress might be executed.
 func (f *FailOverConnectionMode) publish(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	send func() (ok bool, resetFail bool),
 ) error {
 	fails := 0
@@ -159,7 +162,7 @@ func (f *FailOverConnectionMode) publish(
 	// TODO: we want back off support here? Fail over normally will try another
 	// connection.
 
-	for !f.closed && (f.maxAttempts == 0 || fails < f.maxAttempts) {
+	for !f.closed && (!opts.Guaranteed || f.maxAttempts == 0 || fails < f.maxAttempts) {
 		ok := false
 		resetFail := false
 
@@ -181,7 +184,7 @@ func (f *FailOverConnectionMode) publish(
 		if resetFail {
 			fails = 0
 		}
-		if f.maxAttempts > 0 && fails == f.maxAttempts {
+		if !opts.Guaranteed && (f.maxAttempts > 0 && fails == f.maxAttempts) {
 			// max number of attempts reached
 			break
 		}

@@ -252,7 +252,7 @@ loop:
 
 		// Publish events.
 		numEvents := int64(len(events))
-		ok := eb.client.PublishEvents(events, publisher.Sync)
+		ok := eb.client.PublishEvents(events, publisher.Sync, publisher.Guaranteed)
 		if ok {
 			publishedEvents.Add("total", numEvents)
 			publishedEvents.Add(api.Name(), numEvents)
