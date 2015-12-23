@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"expvar"
 	"fmt"
 	"io"
@@ -27,6 +28,8 @@ var (
 type Client struct {
 	Connection
 	index string
+
+	json jsonReader
 }
 
 type Connection struct {
@@ -38,6 +41,19 @@ type Connection struct {
 	connected bool
 }
 
+var (
+	nameItems  = []byte("items")
+	nameStatus = []byte("status")
+	nameError  = []byte("error")
+)
+
+var (
+	errExpectedItemObject    = errors.New("expected item response object")
+	errExpectedStatusCode    = errors.New("expected item status code")
+	errUnexpectedEmptyObject = errors.New("empty object")
+	errExcpectedObjectEnd    = errors.New("expected end of object")
+)
+
 func NewClient(
 	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
@@ -48,7 +64,7 @@ func NewClient(
 	}
 
 	client := &Client{
-		Connection{
+		Connection: Connection{
 			URL:      esURL,
 			Username: username,
 			Password: password,
@@ -59,14 +75,14 @@ func NewClient(
 				},
 			},
 		},
-		index,
+		index: index,
 	}
 	return client
 }
 
 func (client *Client) Clone() *Client {
 	newClient := &Client{
-		Connection{
+		Connection: Connection{
 			URL:      client.URL,
 			Username: client.Username,
 			Password: client.Password,
@@ -75,7 +91,7 @@ func (client *Client) Clone() *Client {
 			},
 			connected: false,
 		},
-		client.index,
+		index: client.index,
 	}
 	return newClient
 }
@@ -114,7 +130,8 @@ func (client *Client) PublishEvents(
 	}
 
 	// check response for transient errors
-	failed_events := bulkCollectPublishFails(res, events)
+	client.json.init(res.raw)
+	failed_events := bulkCollectPublishFails(&client.json, events)
 	ackedEvents.Add(int64(len(events) - len(failed_events)))
 	eventsNotAcked.Add(int64(len(failed_events)))
 	if len(failed_events) > 0 {
@@ -163,17 +180,47 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 // event failed due to some error in the event itself (e.g. does not respect mapping),
 // the event will be dropped.
 func bulkCollectPublishFails(
-	res *BulkResult,
+	reader *jsonReader,
 	events []common.MapStr,
 ) []common.MapStr {
-	failed := events[:0]
-	for i, rawItem := range res.Items {
-		status, msg, err := itemStatus(rawItem)
+	if err := reader.expectDict(); err != nil {
+		logp.Err("Failed to parse bulk respose: expected JSON object")
+		return nil
+	}
+
+	// find 'items' field in response
+	for {
+		kind, name, err := reader.nextFieldName()
 		if err != nil {
-			logp.Info("Failed to parse bulk reponse for item (%i): %v", i, err)
-			// add index if response parse error as we can not determine success/fail
-			failed = append(failed, events[i])
-			continue
+			logp.Err("Failed to parse bulk response")
+			return nil
+		}
+
+		if kind == dictEnd {
+			logp.Err("Failed to parse bulk response: no 'items' field in response")
+			return nil
+		}
+
+		// found items array -> continue
+		if bytes.Equal(name, nameItems) {
+			break
+		}
+
+		reader.ignoreNext()
+	}
+
+	// check items field is an array
+	if err := reader.expectArray(); err != nil {
+		logp.Err("Failed to parse bulk respose: expected items array")
+		return nil
+	}
+
+	count := len(events)
+	failed := events[:0]
+	for i := 0; i < count; i++ {
+		status, msg, err := itemStatus(reader)
+		if err != nil {
+			return nil
 		}
 
 		if status < 300 {
@@ -186,35 +233,88 @@ func bulkCollectPublishFails(
 			continue
 		}
 
-		debug("Failed to insert data(%v): %v", i, events[i])
 		logp.Info("Bulk item insert failed (i=%v, status=%v): %v", i, status, msg)
 		failed = append(failed, events[i])
 	}
+
 	return failed
 }
 
-func itemStatus(m json.RawMessage) (int, string, error) {
-	var item map[string]struct {
-		Status int             `json:"status"`
-		Error  json.RawMessage `json:"error"`
+func itemStatus(reader *jsonReader) (int, []byte, error) {
+	// skip outer dictionary
+	if err := reader.expectDict(); err != nil {
+		return 0, nil, errExpectedItemObject
 	}
 
-	err := json.Unmarshal(m, &item)
+	// find first field in outer dictionary (e.g. 'create')
+	kind, _, err := reader.nextFieldName()
 	if err != nil {
 		logp.Err("Failed to parse bulk response item: %s", err)
-		return 0, "", err
+		return 0, nil, err
+	}
+	if kind == dictEnd {
+		err = errUnexpectedEmptyObject
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
 	}
 
-	for _, r := range item {
-		if len(r.Error) > 0 {
-			return r.Status, string(r.Error), nil
+	// parse actual item response code and error message
+	status, msg, err := itemStatusInner(reader)
+
+	// close dictionary. Expect outer dictionary to have only one element
+	kind, _, err = reader.step()
+	if err != nil {
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
+	}
+	if kind != dictEnd {
+		err = errExcpectedObjectEnd
+		logp.Err("Failed to parse bulk response item: %s", err)
+		return 0, nil, err
+	}
+
+	return status, msg, nil
+}
+
+func itemStatusInner(reader *jsonReader) (int, []byte, error) {
+	if err := reader.expectDict(); err != nil {
+		return 0, nil, errExpectedItemObject
+	}
+
+	status := -1
+	var msg []byte
+	for {
+		kind, name, err := reader.nextFieldName()
+		if err != nil {
+			logp.Err("Failed to parse bulk response item: %s", err)
 		}
-		return r.Status, "", nil
+		if kind == dictEnd {
+			break
+		}
+
+		switch {
+		case bytes.Equal(name, nameStatus): // name == "status"
+			status, err = reader.nextInt()
+			if err != nil {
+				logp.Err("Failed to parse bulk reponse item: %s", err)
+				return 0, nil, err
+			}
+
+		case bytes.Equal(name, nameError): // name == "error"
+			msg, err = reader.ignoreNext() // collect raw string for "error" field
+			if err != nil {
+				return 0, nil, err
+			}
+
+		default: // ignore unknown fields
+			reader.ignoreNext()
+		}
 	}
 
-	err = ErrResponseRead
-	logp.Err("%v", err)
-	return 0, "", err
+	if status < 0 {
+		return 0, nil, errExpectedStatusCode
+	}
+	return status, msg, nil
 }
 
 func (client *Client) PublishEvent(event common.MapStr) error {
