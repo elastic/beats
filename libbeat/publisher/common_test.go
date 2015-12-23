@@ -168,12 +168,12 @@ func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
 }
 
 func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
-	ctx := context{publishOptions: publishOptions{confirm: true}}
+	ctx := context{publishOptions: publishOptions{guaranteed: true}}
 	return t.pub.syncPublisher.client().PublishEvent(ctx, event)
 }
 
 func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
-	ctx := context{publishOptions: publishOptions{confirm: true}}
+	ctx := context{publishOptions: publishOptions{guaranteed: true}}
 	return t.pub.syncPublisher.client().PublishEvents(ctx, events)
 }
 

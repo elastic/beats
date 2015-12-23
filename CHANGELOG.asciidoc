@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Some publisher options refactoring in libbeat {pull}684[684]
 
 *Packetbeat*
 

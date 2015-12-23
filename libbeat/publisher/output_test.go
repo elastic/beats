@@ -2,7 +2,6 @@ package publisher
 
 import (
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -18,7 +17,7 @@ var _ outputs.Outputer = &testOutputer{}
 
 // PublishEvent writes events to a channel then calls Completed on trans.
 // It always returns nil.
-func (t *testOutputer) PublishEvent(trans outputs.Signaler, ts time.Time,
+func (t *testOutputer) PublishEvent(trans outputs.Signaler, opts outputs.Options,
 	event common.MapStr) error {
 	t.events <- event
 	outputs.SignalCompleted(trans)

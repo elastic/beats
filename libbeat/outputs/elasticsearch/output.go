@@ -180,16 +180,16 @@ func makeClientFactory(
 
 func (out *elasticsearchOutput) PublishEvent(
 	signaler outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return out.mode.PublishEvent(signaler, event)
+	return out.mode.PublishEvent(signaler, opts, event)
 }
 
 func (out *elasticsearchOutput) BulkPublish(
 	trans outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
-	return out.mode.PublishEvents(trans, events)
+	return out.mode.PublishEvents(trans, opts, events)
 }
