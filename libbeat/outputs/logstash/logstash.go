@@ -150,24 +150,24 @@ func makeClientFactory(
 //       send/receive overhead per event for other implementors too.
 func (lj *logstash) PublishEvent(
 	signaler outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
 	lj.addMeta(event)
-	return lj.mode.PublishEvent(signaler, event)
+	return lj.mode.PublishEvent(signaler, opts, event)
 }
 
 // BulkPublish implements the BulkOutputer interface pushing a bulk of events
 // via lumberjack.
 func (lj *logstash) BulkPublish(
 	trans outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
 	for _, event := range events {
 		lj.addMeta(event)
 	}
-	return lj.mode.PublishEvents(trans, events)
+	return lj.mode.PublishEvents(trans, opts, events)
 }
 
 // addMeta adapts events to be compatible with logstash forwarer messages by renaming

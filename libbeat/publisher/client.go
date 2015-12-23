@@ -13,12 +13,12 @@ var (
 
 // Client is used by beats to publish new events.
 type Client interface {
-	// PublishEvent publishes one event with given options. If Confirm option is set,
+	// PublishEvent publishes one event with given options. If Sync option is set,
 	// PublishEvent will block until output plugins report success or failure state
 	// being returned by this method.
 	PublishEvent(event common.MapStr, opts ...ClientOption) bool
 
-	// PublishEvents publishes multiple events with given options. If Confirm
+	// PublishEvents publishes multiple events with given options. If Guaranteed
 	// option is set, PublishEvent will block until output plugins report
 	// success or failure state being returned by this method.
 	PublishEvents(events []common.MapStr, opts ...ClientOption) bool
@@ -36,18 +36,16 @@ type client struct {
 // ClientOption allows API users to set additional options when publishing events.
 type ClientOption func(option publishOptions) publishOptions
 
-// Confirm option will block the event publisher until event has been send and ACKed
-// by output plugin or fail is reported.
-func Confirm(o publishOptions) publishOptions {
-	o.confirm = true
+// Guaranteed option will retry publishing the event, until send attempt have
+// been ACKed by output plugin.
+func Guaranteed(o publishOptions) publishOptions {
+	o.guaranteed = true
 	return o
 }
 
 // Sync option will block the event publisher until an event has been ACKed by
-// the output plugin. If output plugin signals failure, the client will retry
-// until success is signaled.
+// the output plugin or failed.
 func Sync(o publishOptions) publishOptions {
-	o.confirm = true
 	o.sync = true
 	return o
 }
@@ -70,7 +68,7 @@ func (c *client) getClient(opts []ClientOption) (publishOptions, eventPublisher)
 		options = opt(options)
 	}
 
-	if options.confirm {
+	if options.guaranteed {
 		return options, c.publisher.syncPublisher.client()
 	}
 	return options, c.publisher.asyncPublisher.client()
