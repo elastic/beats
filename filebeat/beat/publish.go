@@ -49,12 +49,13 @@ func (pub *logPublisher) start() {
 					pubEvents[i] = event.ToMapStr()
 				}
 
-				pub.client.PublishEvents(pubEvents, publisher.Sync)
+				pub.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
 
 				pub.active.append(&eventsBatch{
 					flag:   1,
 					events: events,
 				})
+
 			case <-ticker.C:
 			}
 
