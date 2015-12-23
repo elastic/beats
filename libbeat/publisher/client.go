@@ -4,6 +4,7 @@ import (
 	"expvar"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -34,44 +35,55 @@ type client struct {
 }
 
 // ClientOption allows API users to set additional options when publishing events.
-type ClientOption func(option publishOptions) publishOptions
+type ClientOption func(option context) context
 
 // Guaranteed option will retry publishing the event, until send attempt have
 // been ACKed by output plugin.
-func Guaranteed(o publishOptions) publishOptions {
+func Guaranteed(o context) context {
 	o.guaranteed = true
 	return o
 }
 
 // Sync option will block the event publisher until an event has been ACKed by
 // the output plugin or failed.
-func Sync(o publishOptions) publishOptions {
+func Sync(o context) context {
 	o.sync = true
 	return o
 }
 
+func Signal(signaler outputs.Signaler) ClientOption {
+	return func(ctx context) context {
+		if ctx.signal == nil {
+			ctx.signal = signaler
+		} else {
+			ctx.signal = outputs.NewCompositeSignaler(ctx.signal, signaler)
+		}
+		return ctx
+	}
+}
+
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	options, client := c.getClient(opts)
+	ctx, client := c.getClient(opts)
 	publishedEvents.Add(1)
-	return client.PublishEvent(context{publishOptions: options}, event)
+	return client.PublishEvent(ctx, event)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	options, client := c.getClient(opts)
+	ctx, client := c.getClient(opts)
 	publishedEvents.Add(int64(len(events)))
-	return client.PublishEvents(context{publishOptions: options}, events)
+	return client.PublishEvents(ctx, events)
 }
 
-func (c *client) getClient(opts []ClientOption) (publishOptions, eventPublisher) {
-	var options publishOptions
+func (c *client) getClient(opts []ClientOption) (context, eventPublisher) {
+	var ctx context
 	for _, opt := range opts {
-		options = opt(options)
+		ctx = opt(ctx)
 	}
 
-	if options.guaranteed {
-		return options, c.publisher.syncPublisher.client()
+	if ctx.sync {
+		return ctx, c.publisher.syncPublisher.client()
 	}
-	return options, c.publisher.asyncPublisher.client()
+	return ctx, c.publisher.asyncPublisher.client()
 }
 
 // PublishEvent will publish the event on the channel. Options will be ignored.

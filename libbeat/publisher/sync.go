@@ -42,7 +42,15 @@ func (c syncClient) PublishEvents(ctx context, events []common.MapStr) bool {
 
 func (p *syncPublisher) forward(m message) bool {
 	sync := outputs.NewSyncSignal()
+	signal := m.context.signal
 	m.context.signal = sync
 	p.send(m)
-	return sync.Wait()
+	if sync.Wait() {
+		outputs.SignalCompleted(signal)
+		return true
+	}
+	if signal != nil {
+		signal.Failed()
+	}
+	return false
 }
