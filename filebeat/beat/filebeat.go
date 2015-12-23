@@ -125,7 +125,7 @@ func Publish(beat *beat.Beat, fb *Filebeat) {
 			pubEvents = append(pubEvents, event.ToMapStr())
 		}
 
-		beat.Events.PublishEvents(pubEvents, publisher.Sync)
+		beat.Events.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
 
 		logp.Info("Events sent: %d", len(events))
 

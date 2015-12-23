@@ -31,6 +31,8 @@ type mockLSServer struct {
 	handshake func(net.Conn)
 }
 
+var testOptions = outputs.Options{}
+
 func newMockTLSServer(t *testing.T, to time.Duration, cert string) *mockLSServer {
 	tcpListener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
@@ -394,7 +396,7 @@ func testConnectionType(
 		output := makeOutputer()
 
 		signal := outputs.NewSyncSignal()
-		output.PublishEvent(signal, time.Now(), testEvent())
+		output.PublishEvent(signal, testOptions, testEvent())
 		result.signal = signal.Wait()
 	}()
 
@@ -472,7 +474,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 		output := newTestLumberjackOutput(t, "", &config)
 
 		signal := outputs.NewSyncSignal()
-		output.PublishEvent(signal, time.Now(), testEvent())
+		output.PublishEvent(signal, testOptions, testEvent())
 		result.signal = signal.Wait()
 	}()
 
