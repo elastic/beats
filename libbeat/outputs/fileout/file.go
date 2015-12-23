@@ -2,7 +2,6 @@ package fileout
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -74,7 +73,7 @@ func (out *fileOutput) init(config *outputs.MothershipConfig, topology_expire in
 
 func (out *fileOutput) PublishEvent(
 	trans outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
 	jsonEvent, err := json.Marshal(event)
@@ -88,9 +87,12 @@ func (out *fileOutput) PublishEvent(
 
 	err = out.rotator.WriteLine(jsonEvent)
 	if err != nil {
-		logp.Err("Error when writing line to file: %s", err)
+		if opts.Guaranteed {
+			logp.Critical("Unable to write events to file: %s", err)
+		} else {
+			logp.Err("Error when writing line to file: %s", err)
+		}
 	}
-
 	outputs.Signal(trans, err)
 	return err
 }

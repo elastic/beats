@@ -12,6 +12,8 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
+var testOptions = outputs.Options{}
+
 func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearchOutput {
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
@@ -117,7 +119,7 @@ func TestOneEvent(t *testing.T) {
 		},
 	})
 
-	err := output.PublishEvent(nil, ts, event)
+	err := output.PublishEvent(nil, testOptions, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -189,7 +191,7 @@ func TestEvents(t *testing.T) {
 		},
 	})
 
-	err := output.PublishEvent(nil, ts, event)
+	err := output.PublishEvent(nil, testOptions, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -199,7 +201,7 @@ func TestEvents(t *testing.T) {
 	r["response"] = 0
 	event["redis"] = r
 
-	err = output.PublishEvent(nil, ts, event)
+	err = output.PublishEvent(nil, testOptions, event)
 	if err != nil {
 		t.Errorf("Failed to publish the event: %s", err)
 	}
@@ -259,7 +261,7 @@ func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 		r["response"] = "value" + strconv.Itoa(i)
 		event["redis"] = r
 
-		err := output.PublishEvent(nil, ts, event)
+		err := output.PublishEvent(nil, testOptions, event)
 		if err != nil {
 			t.Errorf("Failed to publish the event: %s", err)
 		}
