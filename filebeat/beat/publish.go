@@ -18,6 +18,8 @@ type logPublisher struct {
 	active batchList
 }
 
+// eventsBatch is used to store sorted list of actively published log lines.
+// Implements `outputs.Signalerr` interface for marking batch as finished
 type eventsBatch struct {
 	next   *eventsBatch
 	flag   int32
@@ -27,6 +29,9 @@ type eventsBatch struct {
 type batchList struct {
 	head, tail *eventsBatch
 }
+
+func (b *eventsBatch) Completed() { atomic.StoreInt32(&b.flag, 1) }
+func (b *eventsBatch) Failed()    { atomic.StoreInt32(&b.flag, 1) }
 
 func newLogPublisher(in, out chan []*input.FileEvent, client publisher.Client) *logPublisher {
 	return &logPublisher{
@@ -49,13 +54,14 @@ func (pub *logPublisher) start() {
 					pubEvents[i] = event.ToMapStr()
 				}
 
-				pub.client.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
-
-				pub.active.append(&eventsBatch{
-					flag:   1,
+				batch := &eventsBatch{
+					flag:   0,
 					events: events,
-				})
+				}
+				pub.client.PublishEvents(pubEvents,
+					publisher.Signal(batch), publisher.Guaranteed)
 
+				pub.active.append(batch)
 			case <-ticker.C:
 			}
 
