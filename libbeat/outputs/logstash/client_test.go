@@ -63,6 +63,14 @@ type mockTransport struct {
 	control chan mockTransportCommand
 }
 
+func newLumberjackTestClient(conn TransportClient) *lumberjackClient {
+	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 5*time.Second)
+	if err != nil {
+		panic(err)
+	}
+	return c
+}
+
 func newClientTestDriver(client mode.ProtocolClient) *testClientDriver {
 	driver := &testClientDriver{
 		client:  client,
@@ -300,8 +308,7 @@ const testMaxWindowSize = 64
 
 func TestSendZero(t *testing.T) {
 	transp := newMockTransport()
-	client := newClientTestDriver(
-		newLumberjackClient(transp, testMaxWindowSize, 5*time.Second))
+	client := newClientTestDriver(newLumberjackTestClient(transp))
 
 	client.Publish(make([]common.MapStr, 0))
 
@@ -315,8 +322,7 @@ func TestSendZero(t *testing.T) {
 
 func TestSimpleEvent(t *testing.T) {
 	transp := newMockTransport()
-	client := newClientTestDriver(
-		newLumberjackClient(transp, testMaxWindowSize, 5*time.Second))
+	client := newClientTestDriver(newLumberjackTestClient(transp))
 
 	event := common.MapStr{"name": "me", "line": 10}
 	client.Publish([]common.MapStr{event})
@@ -348,8 +354,7 @@ func TestSimpleEvent(t *testing.T) {
 
 func TestStructuredEvent(t *testing.T) {
 	transp := newMockTransport()
-	client := newClientTestDriver(
-		newLumberjackClient(transp, testMaxWindowSize, 5*time.Second))
+	client := newClientTestDriver(newLumberjackTestClient(transp))
 	event := common.MapStr{
 		"name": "test",
 		"struct": common.MapStr{

@@ -33,6 +33,7 @@ type MothershipConfig struct {
 	Pretty            *bool `yaml:"pretty"`
 	TLS               *TLSConfig
 	Worker            int
+	CompressionLevel  *int `yaml:"compression_level"`
 }
 
 type Outputer interface {
