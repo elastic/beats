@@ -36,6 +36,10 @@ type lumberjackClient struct {
 	maxWindowSize   int
 	timeout         time.Duration
 	countTimeoutErr int
+	compressLevel   int
+
+	// json encodings output buffer
+	eventsBuffer *bytes.Buffer
 }
 
 const (
@@ -61,15 +65,29 @@ var (
 
 func newLumberjackClient(
 	conn TransportClient,
+	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
-) *lumberjackClient {
+) (*lumberjackClient, error) {
+
+	// validate by creating and discarding zlib writer with configured level
+	if compressLevel > 0 {
+		tmp := bytes.NewBuffer(nil)
+		w, err := zlib.NewWriterLevel(tmp, compressLevel)
+		if err != nil {
+			return nil, err
+		}
+		w.Close()
+	}
+
 	return &lumberjackClient{
 		TransportClient: conn,
 		windowSize:      defaultStartMaxWindowSize,
 		timeout:         timeout,
 		maxWindowSize:   maxWindowSize,
-	}
+		eventsBuffer:    bytes.NewBuffer(nil),
+		compressLevel:   compressLevel,
+	}, nil
 }
 
 func (l *lumberjackClient) Connect(timeout time.Duration) error {
@@ -118,18 +136,16 @@ func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) 
 	}
 
 	batchSize := len(events)
-
-	logp.Debug("logstash", "Try to publish %v events to logstash with window size %v", batchSize, l.windowSize)
+	debug("Try to publish %v events to logstash with window size %v",
+		len(events), l.windowSize)
 
 	// prepare message payload
 	if batchSize > l.windowSize {
 		events = events[:l.windowSize]
 	}
-	count, payload, err := l.compressEvents(events)
-	if err != nil {
-		return 0, err
-	}
 
+	// serialize all raw events into output buffer, removing all events encoding failed for
+	count, err := l.serializeEvents(events)
 	if count == 0 {
 		// encoding of all events failed. Let's stop here and report all events
 		// as exported so no one tries to send/encode the same events once again
@@ -139,12 +155,16 @@ func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) 
 	}
 
 	// send window size:
-	if err = l.sendWindowSize(count); err != nil {
+	if err := l.sendWindowSize(count); err != nil {
 		return l.onFail(0, err)
 	}
 
-	// send payload
-	if err = l.sendCompressed(payload); err != nil {
+	if l.compressLevel > 0 {
+		err = l.sendCompressed(l.eventsBuffer.Bytes())
+	} else {
+		_, err = l.Write(l.eventsBuffer.Bytes())
+	}
+	if err != nil {
 		return l.onFail(0, err)
 	}
 
@@ -227,29 +247,36 @@ func (l *lumberjackClient) shrinkWindow() {
 	}
 }
 
-func (l *lumberjackClient) compressEvents(
-	events []common.MapStr,
-) (uint32, []byte, error) {
-	buf := bytes.NewBuffer(nil)
+func (l *lumberjackClient) serializeEvents(events []common.MapStr) (uint32, error) {
+	l.eventsBuffer.Reset()
 
-	// compress events
-	compressor, _ := zlib.NewWriterLevel(buf, 3) // todo make compression level configurable?
+	if l.compressLevel > 0 {
+		w, _ := zlib.NewWriterLevel(l.eventsBuffer, l.compressLevel)
+		count, err := l.doSerializeEvents(w, events)
+		if err != nil {
+			return 0, err
+		}
+		if err := w.Close(); err != nil {
+			debug("Finalizing zlib compression failed with: %s", err)
+			return 0, err
+		}
+		return count, nil
+	}
+
+	return l.doSerializeEvents(l.eventsBuffer, events)
+}
+
+func (l *lumberjackClient) doSerializeEvents(out io.Writer, events []common.MapStr) (uint32, error) {
 	var sequence uint32
 	for _, event := range events {
 		sequence++
-		err := l.writeDataFrame(event, sequence, compressor)
+		err := l.writeDataFrame(event, sequence, out)
 		if err != nil {
 			logp.Critical("failed to encode event: %v", err)
 			sequence-- //forget this last broken event and continue
 		}
 	}
-	if err := compressor.Close(); err != nil {
-		debug("Finalizing zlib compression failed with: %s", err)
-		return 0, nil, err
-	}
-	payload := buf.Bytes()
-
-	return sequence, payload, nil
+	return sequence, nil
 }
 
 func (l *lumberjackClient) readACK() (uint32, error) {
@@ -289,6 +316,7 @@ func (l *lumberjackClient) sendCompressed(payload []byte) error {
 	if err := l.SetDeadline(time.Now().Add(l.timeout)); err != nil {
 		return err
 	}
+
 	if _, err := l.Write(codeCompressed); err != nil {
 		return err
 	}
@@ -296,8 +324,8 @@ func (l *lumberjackClient) sendCompressed(payload []byte) error {
 		return err
 	}
 
-	_, err := l.Write(payload)
-	return err
+	l.Write(payload)
+	return nil
 }
 
 func (l *lumberjackClient) writeDataFrame(
