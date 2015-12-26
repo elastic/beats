@@ -35,11 +35,7 @@ type ConnectionMode interface {
 	PublishEvent(trans outputs.Signaler, opts outputs.Options, event common.MapStr) error
 }
 
-// ProtocolClient interface is a output plugin specific client implementation
-// for encoding and publishing events. A ProtocolClient must be able to connection
-// to it's sink and indicate connection failures in order to be reconnected byte
-// the output plugin.
-type ProtocolClient interface {
+type Connectable interface {
 	// Connect establishes a connection to the clients sink.
 	// The connection attempt shall report an error if no connection could been
 	// established within the given time interval. A timeout value of 0 == wait
@@ -54,6 +50,14 @@ type ProtocolClient interface {
 	// IsConnected returns false, an output plugin might try to re-establish the
 	// connection by calling Connect.
 	IsConnected() bool
+}
+
+// ProtocolClient interface is a output plugin specific client implementation
+// for encoding and publishing events. A ProtocolClient must be able to connection
+// to it's sink and indicate connection failures in order to be reconnected byte
+// the output plugin.
+type ProtocolClient interface {
+	Connectable
 
 	// PublishEvents sends events to the clients sink. On failure or timeout err
 	// must be set. If connection has been lost, IsConnected must return false
