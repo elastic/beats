@@ -1,6 +1,6 @@
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
-BEATS=packetbeat topbeat filebeat winlogbeat
+BEATS=packetbeat topbeat filebeat winlogbeat metricbeat
 PROJECTS=libbeat ${BEATS}
 
 # Runs complete testsuites (unit, system, integration) for all beats,

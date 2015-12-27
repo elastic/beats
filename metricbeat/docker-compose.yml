@@ -1,0 +1,36 @@
+beat:
+  build: .
+  links:
+    - apache
+    - elasticsearch
+    - mysql
+    - redis
+  environment:
+    - APACHE_HOST=apache
+    - APACHE_PORT=80
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - MYSQL_DSN=root:test@tcp(mysql:3306)/
+    - MYSQL_HOST=mysql
+    - MYSQL_PORT=3306
+    - TEST_ENVIRONMENT=false
+  working_dir: /go/src/github.com/elastic/beats/metricbeat
+  volumes:
+    - ..:/go/src/github.com/elastic/beats/
+  command: make
+  entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
+elasticsearch:
+  image: elasticsearch:2.1.0
+  command: elasticsearch -Des.network.host=0.0.0.0
+
+# Modules
+apache:
+  build: tests/environments/apache
+
+mysql:
+  image: mysql:5.7.10
+  environment:
+    - MYSQL_ROOT_PASSWORD=test
+
+redis:
+  image: redis:3.0.6
