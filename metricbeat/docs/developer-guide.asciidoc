@@ -1,0 +1,28 @@
+= Add a module
+
+* Basic files
+* Configuration
+* Define MetricSets in advance
+
+= Add a MetricSet
+
+* Which files are needed
+* Recommendation to put data transformation in a separate file
+* Add config
+* add docs
+* Update list.go file
+* Interface functions: what is recommended -> examples
+
+= Create your own beat based on Metricbeat
+
+* List include in main file
+* Define structure
+
+= Test framework
+
+* unit tests
+* integration tests
+* system tests
+
+= Notes
+* Write about dynamic definition of an index
