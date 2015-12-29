@@ -17,7 +17,6 @@ import (
 	"io"
 	"os"
 	"regexp"
-	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -33,7 +32,6 @@ type Harvester struct {
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
 	file               FileSource /* the file being watched */
-	backoff            time.Duration
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
 }
