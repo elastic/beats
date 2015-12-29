@@ -67,9 +67,19 @@ type HarvesterConfig struct {
 	BackoffFactor      int    `yaml:"backoff_factor"`
 	MaxBackoff         string `yaml:"max_backoff"`
 	MaxBackoffDuration time.Duration
-	ForceCloseFiles    bool     `yaml:"force_close_files"`
-	ExcludeLines       []string `yaml:"exclude_lines"`
-	IncludeLines       []string `yaml:"include_lines"`
+	ForceCloseFiles    bool             `yaml:"force_close_files"`
+	ExcludeLines       []string         `yaml:"exclude_lines"`
+	IncludeLines       []string         `yaml:"include_lines"`
+	MaxBytes           *int             `yaml:"max_bytes"`
+	Multiline          *MultilineConfig `yaml:"multiline"`
+}
+
+type MultilineConfig struct {
+	Pattern  string `yaml:"pattern"`
+	Negate   bool   `yaml:"negate"`
+	Match    string `yaml:"match"`
+	MaxLines *int   `yaml:"max_lines"`
+	Timeout  string `yaml:"timeout"`
 }
 
 const (
@@ -157,5 +167,4 @@ func (config *Config) FetchConfigs() {
 	if len(config.Filebeat.Prospectors) == 0 {
 		log.Fatalf("No paths given. What files do you want me to watch?")
 	}
-
 }
