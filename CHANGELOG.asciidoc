@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix logstash window size of 1 not increasing. {pull}598[598]
 
 *Packetbeat*
 

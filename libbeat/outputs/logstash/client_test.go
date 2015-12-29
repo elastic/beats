@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 
 	"github.com/stretchr/testify/assert"
@@ -396,4 +397,61 @@ func TestStructuredEvent(t *testing.T) {
 	assert.Equal(t, 1.0, msg.doc.get("struct.field1"))
 	assert.Equal(t, true, msg.doc.get("struct.field2"))
 	assert.Equal(t, 2.0, msg.doc.get("struct.field5.sub1"))
+}
+
+func enableLogging(selectors []string) {
+	logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+}
+
+func TestGrowWindowSizeUpToBatchSizes(t *testing.T) {
+	batchSize := 114
+	windowSize := 1024
+	testGrowWindowSize(t, 10, 0, windowSize, batchSize, batchSize)
+}
+
+func TestGrowWindowSizeUpToMax(t *testing.T) {
+	batchSize := 114
+	windowSize := 64
+	testGrowWindowSize(t, 10, 0, windowSize, batchSize, windowSize)
+}
+
+func TestGrowWindowSizeOf1(t *testing.T) {
+	batchSize := 114
+	windowSize := 1024
+	testGrowWindowSize(t, 1, 0, windowSize, batchSize, batchSize)
+}
+
+func TestGrowWindowSizeToMaxOKOnly(t *testing.T) {
+	batchSize := 114
+	windowSize := 1024
+	maxOK := 71
+	testGrowWindowSize(t, 1, maxOK, windowSize, batchSize, maxOK)
+}
+
+func testGrowWindowSize(t *testing.T,
+	initial, maxOK, windowSize, batchSize, expected int,
+) {
+	enableLogging([]string{"logstash"})
+	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	c.windowSize = initial
+	c.maxOkWindowSize = maxOK
+	for i := 0; i < 100; i++ {
+		c.tryGrowWindowSize(batchSize)
+	}
+
+	assert.Equal(t, expected, c.windowSize)
+	assert.Equal(t, expected, c.maxOkWindowSize)
+}
+
+func TestShrinkWindowSizeNeverZero(t *testing.T) {
+	enableLogging([]string{"logstash"})
+
+	windowSize := 124
+	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	c.windowSize = windowSize
+	for i := 0; i < 100; i++ {
+		c.shrinkWindow()
+	}
+
+	assert.Equal(t, 1, c.windowSize)
 }
