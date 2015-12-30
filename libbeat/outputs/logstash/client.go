@@ -79,6 +79,7 @@ func (l *client) PublishEvent(event common.MapStr) error {
 	return err
 }
 
+/*
 func (l *client) AsyncPublishEvent(
 	cb func(error),
 	event common.MapStr,
@@ -87,6 +88,7 @@ func (l *client) AsyncPublishEvent(
 		cb(err)
 	}, []common.MapStr{event})
 }
+*/
 
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
@@ -110,6 +112,7 @@ func (l *client) PublishEvents(
 	return nil, nil
 }
 
+/*
 func (l *client) AsyncPublishEvents(
 	cb func([]common.MapStr, error),
 	events []common.MapStr,
@@ -120,6 +123,7 @@ func (l *client) AsyncPublishEvents(
 
 	return nil
 }
+*/
 
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
@@ -138,7 +142,6 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 		events = events[:l.windowSize]
 	}
 
-	// TODO: use protocol to send
 	count, err := l.sendEvents(events)
 	if err != nil {
 		if err == errAllEventsEncoding {
@@ -147,15 +150,8 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 		return l.onFail(0, err)
 	}
 
-	// wait for ACK (accept partial ACK to reset timeout)
-	// reset timeout timer for every ACK received.
-	var ackSeq uint32
-	for ackSeq < count {
-		// read until all acks
-		ackSeq, err = l.recvACK()
-		if err != nil {
-			return l.onFail(int(ackSeq), err)
-		}
+	if seq, err := l.awaitACK(count); err != nil {
+		return l.onFail(int(seq), err)
 	}
 
 	l.tryGrowWindowSize(batchSize)
