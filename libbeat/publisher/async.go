@@ -31,7 +31,7 @@ func newAsyncPublisher(pub *PublisherType) *asyncPublisher {
 	}
 
 	p.outputs = outputs
-	p.messageWorker.init(&pub.wsPublisher, 1000, newPreprocessor(pub, p))
+	p.messageWorker.init(&pub.wsPublisher, defaultChanSize, newPreprocessor(pub, p))
 	return p
 }
 
@@ -89,5 +89,5 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 
 	debug("create bulk processing worker (interval=%v, bulk size=%v)",
 		flushInterval, maxBulkSize)
-	return newBulkWorker(ws, 1000, worker, flushInterval, maxBulkSize)
+	return newBulkWorker(ws, defaultChanSize, worker, flushInterval, maxBulkSize)
 }
