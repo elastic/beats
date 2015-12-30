@@ -110,9 +110,7 @@ func (c *asyncClient) AsyncPublishEvents(
 	cb func([]common.MapStr, error),
 	events []common.MapStr,
 ) error {
-	if !c.IsConnected() {
-		return ErrNotConnected
-	}
+	publishEventsCallCount.Add(1)
 
 	i := 1
 	for len(events) > 0 {
@@ -337,10 +335,13 @@ func (c *asyncClient) ackPartialsLoop(first ackMessage) (bool, error) {
 
 func (c *asyncClient) awaitACK(batchSize int, count uint32) (uint32, error) {
 	seq, err := c.protocol.awaitACK(count)
+	ackedEvents.Add(int64(seq))
+
 	if err != nil {
-		c.tryGrowWindow(batchSize)
-	} else {
+		eventsNotAcked.Add(int64(batchSize) - int64(seq))
 		c.shrinkWindow()
+	} else {
+		c.tryGrowWindow(batchSize)
 	}
 	return seq, err
 }
