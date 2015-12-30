@@ -121,6 +121,22 @@ func (p *protocol) recvACK() (uint32, error) {
 	return seq, nil
 }
 
+// wait for ACK (accept partial ACK to reset timeout)
+// reset timeout timer for every ACK received.
+func (p *protocol) awaitACK(count uint32) (uint32, error) {
+	var ackSeq uint32
+	var err error
+
+	// read until all acks
+	for ackSeq < count {
+		ackSeq, err = p.recvACK()
+		if err != nil {
+			return ackSeq, err
+		}
+	}
+	return ackSeq, nil
+}
+
 func (p *protocol) sendWindowSize(window uint32) error {
 	conn := p.conn
 
