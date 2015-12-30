@@ -1,3 +1,7 @@
+Please post all questions and issue first on
+[https://discuss.elastic.co/c/beats](https://discuss.elastic.co/c/beats)
+before opening a Github Issue.
+
 # Contributing to Beats
 
 The Beats are open source and we love to receive contributions from our
