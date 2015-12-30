@@ -1,7 +1,10 @@
 package logstash
 
 import (
+	"io"
 	"math"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -11,13 +14,17 @@ import (
 type asyncClient struct {
 	TransportClient
 	*protocol
+	mutex sync.Mutex
 
-	windowSize      int
+	windowSize      int32
 	maxOkWindowSize int // max window size sending was successful for
 	maxWindowSize   int
+
 	countTimeoutErr int
 
-	ch chan ackMessage
+	ch   chan ackMessage
+	done chan struct{}
+	wg   sync.WaitGroup
 }
 
 type ackMessage struct {
@@ -53,19 +60,41 @@ func newAsyncLumberjackClient(
 	return &asyncClient{
 		TransportClient: conn,
 		protocol:        p,
-		windowSize:      defaultStartMaxWindowSize,
+		windowSize:      int32(defaultStartMaxWindowSize),
 		maxWindowSize:   maxWindowSize,
 	}, nil
 }
 
 func (c *asyncClient) Connect(timeout time.Duration) error {
 	logp.Debug("logstash", "connect (async)")
-	return c.TransportClient.Connect(timeout)
+	err := c.TransportClient.Connect(timeout)
+	if err == nil {
+		c.startACK()
+	}
+	return err
 }
 
 func (c *asyncClient) Close() error {
 	logp.Debug("logstash", "close (async) connection")
-	return c.TransportClient.Close()
+	c.stopACK()
+	return c.closeTransport()
+}
+
+func (c *asyncClient) IsConnected() bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	return c.TransportClient.IsConnected()
+}
+
+func (c *asyncClient) closeTransport() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.TransportClient.IsConnected() {
+		return c.TransportClient.Close()
+	}
+	return nil
 }
 
 func (c *asyncClient) AsyncPublishEvent(
@@ -119,10 +148,12 @@ func (c *asyncClient) publishWindowed(
 	debug("Try to publish %v events to logstash with window size %v",
 		len(events), c.windowSize)
 
+	windowSize := int(atomic.LoadInt32(&c.windowSize))
+
 	// prepare message payload
-	if batchSize > c.windowSize {
+	if batchSize > windowSize {
 		partial = true
-		events = events[:c.windowSize]
+		events = events[:windowSize]
 	}
 
 	count, err := c.sendEvents(events)
@@ -148,7 +179,7 @@ func (c *asyncClient) publishWindowed(
 			// encoding of all events failed. If events have not been split, asynchronously
 			// confirm publish ok
 			if !partial {
-				go func() { cb(nil, nil) }()
+				go cb(nil, nil)
 				return len(events), nil, nil
 			}
 
@@ -183,48 +214,101 @@ func (c *asyncClient) publishWindowed(
 		count:  count,
 	}
 
-	c.tryGrowWindow(batchSize)
 	return len(events), nil, nil
 }
 
+func (c *asyncClient) startACK() {
+	c.ch = make(chan ackMessage, 1)
+	c.done = make(chan struct{})
+	c.wg.Add(1)
+	go c.ackLoop()
+}
+
+func (c *asyncClient) stopACK() {
+	close(c.done)
+	close(c.ch)
+	c.wg.Wait()
+}
+
 func (c *asyncClient) ackLoop() {
+	defer c.wg.Done()
+
 	for {
 		var err error
-		msg := <-c.ch
+		var msg ackMessage
 
+		select {
+		case msg = <-c.ch:
+		case <-c.done:
+			c.drainACKLoop(false, true, io.EOF)
+			return
+		}
+
+		inPartial := false
 		switch msg.tag {
 		case tagComplete:
 			// just wait for ack
-			seq, err := c.awaitACK(msg.count)
+			var seq uint32
+			seq, err = c.awaitACK(len(msg.events), msg.count)
 			msg.cb(msg.events[seq:], err)
 
 		case tagSubset:
-			err = c.ackPartialsLoop(msg)
+			var end bool
+			end, err = c.ackPartialsLoop(msg)
+			inPartial = !end
 
 		case tagError:
 			err = msg.err
-			msg.cb(msg.events, msg.err)
+			msg.cb(msg.events, err)
 
 		default:
 			panic("wrong message type received")
 		}
 
+		// on error close and propagate error to all
+		// messages left in queue, until worker
+		// is stopped by client
 		if err != nil {
-			logp.Info("logstash publish error: %v", err)
-			c.Close() // close connection
+			c.closeTransport()
+			c.drainACKLoop(inPartial, true, err)
+			return
+		}
+
+	}
+}
+
+func (c *asyncClient) drainACKLoop(partial, reported bool, err error) {
+	for msg := range c.ch {
+		switch msg.tag {
+		case tagComplete, tagLast:
+			if !partial || !reported {
+				msg.cb(msg.events, err)
+			} else {
+				partial = false
+				reported = false
+			}
+
+		case tagError:
+			msg.cb(msg.events, msg.err)
+
+		case tagSubset:
+			partial = true
+			if !reported {
+				msg.cb(msg.events, err)
+				reported = true
+			}
 		}
 	}
 }
 
-func (c *asyncClient) ackPartialsLoop(first ackMessage) error {
+func (c *asyncClient) ackPartialsLoop(first ackMessage) (bool, error) {
 	current := first
 	for {
 		// wait for ACK first:
-		seq, err := c.awaitACK(current.count)
+		seq, err := c.awaitACK(len(current.events), current.count)
 		if err != nil {
-			// ackFailedPartialsLoop tries to close the connection
-			c.ackFailedPartialsLoop(current, seq, err)
-			return nil
+			current.cb(current.events[seq:], err)
+			return false, err
 		}
 
 		current = <-c.ch
@@ -234,69 +318,79 @@ func (c *asyncClient) ackPartialsLoop(first ackMessage) error {
 
 		case tagComplete:
 			// await last ack and signal completion
-			seq, err := c.awaitACK(current.count)
+			seq, err := c.awaitACK(len(current.events), current.count)
 			current.cb(current.events[seq:], err)
-			return err
+			return true, err
 
 		case tagLast:
 			// last message in partial send loop, but not expecting any ACK
 			current.cb(current.events, nil)
-			return nil
+			return true, nil
 
 		case tagError:
 			// signal error and break partial loop
 			current.cb(current.events, err)
-			return current.err
+			return true, current.err
 		}
 	}
 }
 
-func (c *asyncClient) ackFailedPartialsLoop(
-	failed ackMessage,
-	seq uint32,
-	err error,
-) {
-	// signal error and consume all partial messages
-	failed.cb(failed.events, err)
-
-	// ignore all message already in queue for partial send
-	for {
-		msg := <-c.ch
-		if msg.tag != tagSubset {
-			return
-		}
+func (c *asyncClient) awaitACK(batchSize int, count uint32) (uint32, error) {
+	seq, err := c.protocol.awaitACK(count)
+	if err != nil {
+		c.tryGrowWindow(batchSize)
+	} else {
+		c.shrinkWindow()
 	}
+	return seq, err
 }
 
 func (c *asyncClient) tryGrowWindow(batchSize int) {
-	// increase window size by factor 1.5 until max window size
-	// (window size grows exponentially)
-	// TODO: use duration until ACK to estimate an ok max window size value
-	if c.windowSize < batchSize {
-		if c.maxOkWindowSize < c.windowSize {
+	windowSize := int(c.windowSize)
+
+	if windowSize <= batchSize {
+		if c.maxOkWindowSize < windowSize {
 			logp.Debug("logstash", "update max ok window size: %v < %v", c.maxOkWindowSize, c.windowSize)
-			c.maxOkWindowSize = c.windowSize
+			c.maxOkWindowSize = windowSize
 
-			newWindowSize := int(math.Ceil(1.5 * float64(c.windowSize)))
-			logp.Debug("logstash", "increate window size to: %v", newWindowSize)
+			newWindowSize := int(math.Ceil(1.5 * float64(windowSize)))
+			logp.Debug("logstash", "increase window size to: %v", newWindowSize)
 
-			if c.windowSize < batchSize && batchSize < newWindowSize {
+			if windowSize <= batchSize && batchSize < newWindowSize {
 				logp.Debug("logstash", "set to batchSize: %v", batchSize)
 				newWindowSize = batchSize
 			}
 			if newWindowSize > c.maxWindowSize {
 				logp.Debug("logstash", "set to max window size: %v", c.maxWindowSize)
-				newWindowSize = c.maxWindowSize
+				newWindowSize = int(c.maxWindowSize)
 			}
-			c.windowSize = newWindowSize
-		} else if c.windowSize < c.maxOkWindowSize {
+
+			windowSize = newWindowSize
+		} else if windowSize < c.maxOkWindowSize {
 			logp.Debug("logstash", "update current window size: %v", c.windowSize)
 
-			c.windowSize = int(math.Ceil(1.5 * float64(c.windowSize)))
-			if c.windowSize > c.maxOkWindowSize {
+			windowSize = int(math.Ceil(1.5 * float64(windowSize)))
+			if windowSize > c.maxOkWindowSize {
 				logp.Debug("logstash", "set to max ok window size: %v", c.maxOkWindowSize)
-				c.windowSize = c.maxOkWindowSize
+				windowSize = c.maxOkWindowSize
 			}
 		}
+
+		atomic.StoreInt32(&c.windowSize, int32(windowSize))
 	}
+}
+
+func (c *asyncClient) shrinkWindow() {
+	windowSize := int(c.windowSize)
+	orig := windowSize
+
+	windowSize = windowSize / 2
+	if windowSize < minWindowSize {
+		windowSize = minWindowSize
+		if windowSize == orig {
+			return
+		}
+	}
+
+	atomic.StoreInt32(&c.windowSize, int32(windowSize))
 }
