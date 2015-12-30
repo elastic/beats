@@ -1,13 +1,8 @@
 package logstash
 
 import (
-	"bytes"
-	"compress/zlib"
-	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"expvar"
-	"io"
 	"math"
 	"net"
 	"time"
@@ -23,20 +18,20 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
 )
 
-// lumberjackClient implements the ProtocolClient interface to be used
+// client implements the ProtocolClient interface to be used
 // with different mode. The client implements slow start with low window sizes +
 // window size backoff in case of long running transactions.
 //
 // it is suggested to use lumberjack in conjunction with roundRobinConnectionMode
 // if logstash becomes unresponsive
-type lumberjackClient struct {
+type client struct {
 	TransportClient
+	*protocol
+
 	windowSize      int
 	maxOkWindowSize int // max window size sending was successful for
 	maxWindowSize   int
-	timeout         time.Duration
 	countTimeoutErr int
-	compressLevel   int
 }
 
 const (
@@ -47,17 +42,7 @@ const (
 
 // errors
 var (
-	// ErrProtocolError is returned if an protocol error was detected in the
-	// conversation with lumberjack server.
-	ErrProtocolError = errors.New("lumberjack protocol error")
-)
-
-var (
-	codeVersion byte = '2'
-
-	codeWindowSize    = []byte{codeVersion, 'W'}
-	codeJSONDataFrame = []byte{codeVersion, 'J'}
-	codeCompressed    = []byte{codeVersion, 'C'}
+	ErrNotConnected = errors.New("lumberjack client is not connected")
 )
 
 func newLumberjackClient(
@@ -65,45 +50,38 @@ func newLumberjackClient(
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
-) (*lumberjackClient, error) {
-
-	// validate by creating and discarding zlib writer with configured level
-	if compressLevel > 0 {
-		tmp := bytes.NewBuffer(nil)
-		w, err := zlib.NewWriterLevel(tmp, compressLevel)
-		if err != nil {
-			return nil, err
-		}
-		w.Close()
+) (*client, error) {
+	p, err := newClientProcol(conn, timeout, compressLevel)
+	if err != nil {
+		return nil, err
 	}
 
-	return &lumberjackClient{
+	return &client{
 		TransportClient: conn,
+		protocol:        p,
 		windowSize:      defaultStartMaxWindowSize,
-		timeout:         timeout,
 		maxWindowSize:   maxWindowSize,
-		compressLevel:   compressLevel,
 	}, nil
 }
 
-func (l *lumberjackClient) Connect(timeout time.Duration) error {
+func (l *client) Connect(timeout time.Duration) error {
 	logp.Debug("logstash", "connect")
 	return l.TransportClient.Connect(timeout)
 }
 
-func (l *lumberjackClient) Close() error {
+func (l *client) Close() error {
 	logp.Debug("logstash", "close connection")
 	return l.TransportClient.Close()
 }
 
-func (l *lumberjackClient) PublishEvent(event common.MapStr) error {
+func (l *client) PublishEvent(event common.MapStr) error {
 	_, err := l.PublishEvents([]common.MapStr{event})
 	return err
 }
 
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
-func (l *lumberjackClient) PublishEvents(
+func (l *client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
 	publishEventsCallCount.Add(1)
@@ -126,7 +104,7 @@ func (l *lumberjackClient) PublishEvents(
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
 // failure).
-func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) {
+func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 	if len(events) == 0 {
 		return 0, nil
 	}
@@ -140,50 +118,23 @@ func (l *lumberjackClient) publishWindowed(events []common.MapStr) (int, error) 
 		events = events[:l.windowSize]
 	}
 
-	// serialize all raw events into output buffer, removing all events encoding failed for
-	count, payload, err := l.serializeEvents(events)
+	count, err := l.sendEvents(events)
 	if err != nil {
-		return 0, err
-	}
-
-	if count == 0 {
-		// encoding of all events failed. Let's stop here and report all events
-		// as exported so no one tries to send/encode the same events once again
-		// The compress/encode function already prints critical per failed encoding
-		// failure.
-		return len(events), nil
-	}
-
-	// send window size:
-	if err = l.sendWindowSize(count); err != nil {
-		return l.onFail(0, err)
-	}
-
-	if l.compressLevel > 0 {
-		err = l.sendCompressed(payload)
-	} else {
-		_, err = l.Write(payload)
-	}
-	if err != nil {
-		return l.onFail(0, err)
-	}
-
-	// wait for ACK (accept partial ACK to reset timeout)
-	// reset timeout timer for every ACK received.
-	var ackSeq uint32
-	for ackSeq < count {
-		// read until all acks
-		ackSeq, err = l.readACK()
-		if err != nil {
-			return l.onFail(int(ackSeq), err)
+		if err == errAllEventsEncoding {
+			return len(events), nil
 		}
+		return l.onFail(0, err)
+	}
+
+	if seq, err := l.awaitACK(count); err != nil {
+		return l.onFail(int(seq), err)
 	}
 
 	l.tryGrowWindowSize(batchSize)
 	return len(events), nil
 }
 
-func (l *lumberjackClient) onFail(n int, err error) (int, error) {
+func (l *client) onFail(n int, err error) (int, error) {
 	l.shrinkWindow()
 
 	// if timeout error, back off and ignore error
@@ -210,7 +161,7 @@ func (l *lumberjackClient) onFail(n int, err error) (int, error) {
 // Increase window size by factor 1.5 until max window size
 // (window size grows exponentially)
 // TODO: use duration until ACK to estimate an ok max window size value
-func (l *lumberjackClient) tryGrowWindowSize(batchSize int) {
+func (l *client) tryGrowWindowSize(batchSize int) {
 	if l.windowSize <= batchSize {
 		if l.maxOkWindowSize < l.windowSize {
 			logp.Debug("logstash", "update max ok window size: %v < %v", l.maxOkWindowSize, l.windowSize)
@@ -240,131 +191,9 @@ func (l *lumberjackClient) tryGrowWindowSize(batchSize int) {
 	}
 }
 
-func (l *lumberjackClient) shrinkWindow() {
+func (l *client) shrinkWindow() {
 	l.windowSize = l.windowSize / 2
 	if l.windowSize < minWindowSize {
 		l.windowSize = minWindowSize
 	}
-}
-
-func (l *lumberjackClient) serializeEvents(
-	events []common.MapStr,
-) (uint32, []byte, error) {
-	buf := bytes.NewBuffer(nil)
-
-	if l.compressLevel > 0 {
-		w, _ := zlib.NewWriterLevel(buf, l.compressLevel)
-		count, err := l.doSerializeEvents(w, events)
-		if err != nil {
-			return 0, nil, err
-		}
-		if err := w.Close(); err != nil {
-			debug("Finalizing zlib compression failed with: %s", err)
-			return 0, nil, err
-		}
-		return count, buf.Bytes(), nil
-	}
-
-	count, err := l.doSerializeEvents(buf, events)
-	return count, buf.Bytes(), err
-}
-
-func (l *lumberjackClient) doSerializeEvents(out io.Writer, events []common.MapStr) (uint32, error) {
-	var sequence uint32
-	for _, event := range events {
-		sequence++
-		err := l.writeDataFrame(event, sequence, out)
-		if err != nil {
-			logp.Critical("failed to encode event: %v", err)
-			sequence-- //forget this last broken event and continue
-		}
-	}
-	return sequence, nil
-}
-
-func (l *lumberjackClient) readACK() (uint32, error) {
-	if err := l.SetDeadline(time.Now().Add(l.timeout)); err != nil {
-		return 0, err
-	}
-
-	response := make([]byte, 6)
-	ackbytes := 0
-	for ackbytes < 6 {
-		n, err := l.Read(response[ackbytes:])
-		if err != nil {
-			return 0, err
-		}
-		ackbytes += n
-	}
-
-	isACK := response[0] == codeVersion && response[1] == 'A'
-	if !isACK {
-		return 0, ErrProtocolError
-	}
-	seq := binary.BigEndian.Uint32(response[2:])
-	return seq, nil
-}
-
-func (l *lumberjackClient) sendWindowSize(window uint32) error {
-	if err := l.SetDeadline(time.Now().Add(l.timeout)); err != nil {
-		return err
-	}
-	if _, err := l.Write(codeWindowSize); err != nil {
-		return err
-	}
-	return writeUint32(l, window)
-}
-
-func (l *lumberjackClient) sendCompressed(payload []byte) error {
-	if err := l.SetDeadline(time.Now().Add(l.timeout)); err != nil {
-		return err
-	}
-
-	if _, err := l.Write(codeCompressed); err != nil {
-		return err
-	}
-	if err := writeUint32(l, uint32(len(payload))); err != nil {
-		return err
-	}
-
-	_, err := l.Write(payload)
-	return err
-}
-
-func (l *lumberjackClient) writeDataFrame(
-	event common.MapStr,
-	seq uint32,
-	out io.Writer,
-) error {
-	// Write JSON Data Frame:
-	// version: uint8 = '2'
-	// code: uint8 = 'J'
-	// seq: uint32
-	// payloadLen (bytes): uint32
-	// payload: JSON document
-
-	jsonEvent, err := json.Marshal(event)
-	if err != nil {
-		debug("Fail to convert the event to JSON: %s", err)
-		return err
-	}
-
-	if _, err := out.Write(codeJSONDataFrame); err != nil { // version + code
-		return err
-	}
-	if err := writeUint32(out, seq); err != nil {
-		return err
-	}
-	if err := writeUint32(out, uint32(len(jsonEvent))); err != nil {
-		return err
-	}
-	if _, err := out.Write(jsonEvent); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func writeUint32(out io.Writer, v uint32) error {
-	return binary.Write(out, binary.BigEndian, v)
 }
