@@ -99,7 +99,7 @@ func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 func (p *protocol) recvACK() (uint32, error) {
 	conn := p.conn
 
-	if err := conn.SetDeadline(time.Now().Add(p.timeout)); err != nil {
+	if err := conn.SetReadDeadline(time.Now().Add(p.timeout)); err != nil {
 		return 0, err
 	}
 
@@ -140,7 +140,7 @@ func (p *protocol) awaitACK(count uint32) (uint32, error) {
 func (p *protocol) sendWindowSize(window uint32) error {
 	conn := p.conn
 
-	if err := conn.SetDeadline(time.Now().Add(p.timeout)); err != nil {
+	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
 		return err
 	}
 	if _, err := conn.Write(codeWindowSize); err != nil {
@@ -152,7 +152,7 @@ func (p *protocol) sendWindowSize(window uint32) error {
 func (p *protocol) sendCompressed(payload []byte) error {
 	conn := p.conn
 
-	if err := conn.SetDeadline(time.Now().Add(p.timeout)); err != nil {
+	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
 		return err
 	}
 

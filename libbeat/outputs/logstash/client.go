@@ -79,17 +79,6 @@ func (l *client) PublishEvent(event common.MapStr) error {
 	return err
 }
 
-/*
-func (l *client) AsyncPublishEvent(
-	cb func(error),
-	event common.MapStr,
-) error {
-	return l.AsyncPublishEvents(func(_ []common.MapStr, err error) {
-		cb(err)
-	}, []common.MapStr{event})
-}
-*/
-
 // PublishEvents sends all events to logstash. On error a slice with all events
 // not published or confirmed to be processed by logstash will be returned.
 func (l *client) PublishEvents(
@@ -111,19 +100,6 @@ func (l *client) PublishEvents(
 	ackedEvents.Add(int64(totalNumberOfEvents))
 	return nil, nil
 }
-
-/*
-func (l *client) AsyncPublishEvents(
-	cb func([]common.MapStr, error),
-	events []common.MapStr,
-) error {
-	if !l.IsConnected() {
-		return ErrNotConnected
-	}
-
-	return nil
-}
-*/
 
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
