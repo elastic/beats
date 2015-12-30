@@ -86,6 +86,10 @@ type Topology struct {
 	Ip   string `json:"ip"`
 }
 
+const (
+	defaultChanSize = 1000
+)
+
 func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
 }
@@ -211,7 +215,7 @@ func (publisher *PublisherType) init(
 			debug("Create output worker")
 
 			outputers = append(outputers,
-				newOutputWorker(config, output, &publisher.wsOutput, 1000))
+				newOutputWorker(config, output, &publisher.wsOutput, defaultChanSize))
 
 			if !config.Save_topology {
 				continue

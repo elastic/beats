@@ -14,7 +14,7 @@ type syncClient func(message) bool
 
 func newSyncPublisher(pub *PublisherType) *syncPublisher {
 	s := &syncPublisher{pub: pub}
-	s.messageWorker.init(&pub.wsPublisher, 1000, newPreprocessor(pub, s))
+	s.messageWorker.init(&pub.wsPublisher, defaultChanSize, newPreprocessor(pub, s))
 	return s
 }
 
