@@ -2,7 +2,6 @@ package harvester
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -58,8 +57,6 @@ func newLogFileReader(
 }
 
 func (r *logFileReader) Read(buf []byte) (int, error) {
-	fmt.Println("call Read")
-
 	if r.truncated {
 		var offset int64
 		if seeker, ok := r.fs.(io.Seeker); ok {
@@ -76,21 +73,16 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 	for {
 		n, err := r.fs.Read(buf)
 		if n > 0 {
-			fmt.Printf("did read(%v): '%s'\n", n, buf[:n])
-
 			r.offset += int64(n)
 			r.lastTimeRead = time.Now()
 		}
 		if err == nil {
 			// reset backoff
 			r.backoff = r.config.backoffDuration
-			fmt.Printf("return size: %v\n", n)
 			return n, nil
 		}
 
 		continuable := r.fs.Continuable()
-		fmt.Printf("error: %v, continuable: %v\n", err, continuable)
-
 		if err == io.EOF && !continuable {
 			logp.Info("Reached end of file: %s", r.fs.Name())
 			return n, err
