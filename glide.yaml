@@ -1,4 +1,4 @@
-package: github.com/elastic/beats/libbeat
+package: github.com/elastic/beats
 import:
 - package: github.com/garyburd/redigo
 - package: gopkg.in/yaml.v2
@@ -27,6 +27,7 @@ import:
   subpackages:
   - /windows/svc/eventlog
 - package: golang.org/x/text
+  version: 9b5a19ab9a1fb7658b57cda176d68f4aa84748b0
   subpackages:
   - /encoding
 - package: github.com/satori/go.uuid
