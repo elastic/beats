@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
@@ -37,6 +38,7 @@ type Beat struct {
 	Config  *BeatConfig
 	BT      Beater
 	Events  publisher.Client
+	UUID    string
 }
 
 // Basic configuration of every beat
@@ -58,6 +60,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		Version: version,
 		Name:    name,
 		BT:      bt,
+		UUID:    common.UUID(),
 	}
 
 	return &b
