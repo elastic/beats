@@ -1,6 +1,7 @@
 package logstash
 
 import (
+	"bufio"
 	"bytes"
 	"compress/zlib"
 	"encoding/binary"
@@ -18,8 +19,6 @@ type protocol struct {
 	conn          net.Conn
 	timeout       time.Duration
 	compressLevel int
-
-	eventsBuffer *bytes.Buffer
 }
 
 var (
@@ -58,19 +57,19 @@ func newClientProcol(
 		conn:          conn,
 		timeout:       timeout,
 		compressLevel: compressLevel,
-		eventsBuffer:  bytes.NewBuffer(nil),
 	}, nil
 }
 
 func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 	conn := p.conn
+	out := bufio.NewWriterSize(conn, 4096)
 
 	if len(events) == 0 {
 		return 0, nil
 	}
 
 	// serialize all raw events into output buffer, removing all events encoding failed for
-	count, err := p.serializeEvents(events)
+	count, payload, err := p.serializeEvents(events)
 	if count == 0 {
 		// encoding of all events failed. Let's stop here and report all events
 		// as exported so no one tries to send/encode the same events once again
@@ -79,17 +78,28 @@ func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 		return 0, errAllEventsEncoding
 	}
 
+	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
+		return 0, err
+	}
+
 	// send window size:
-	if err := p.sendWindowSize(count); err != nil {
+	if err := p.sendWindowSize(out, count); err != nil {
 		return 0, err
 	}
 
 	if p.compressLevel > 0 {
-		err = p.sendCompressed(p.eventsBuffer.Bytes())
+		err = p.sendCompressed(out, payload)
 	} else {
-		_, err = conn.Write(p.eventsBuffer.Bytes())
+		err = write(out, payload)
 	}
 	if err != nil {
+		return 0, err
+	}
+
+	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
+		return 0, err
+	}
+	if err := out.Flush(); err != nil {
 		return 0, err
 	}
 
@@ -133,65 +143,53 @@ func (p *protocol) awaitACK(count uint32) (uint32, error) {
 		if err != nil {
 			return ackSeq, err
 		}
+
+		debug("received ack: %v", ackSeq)
+	}
+	if ackSeq > count {
+		logp.Warn("invalid ack sequence received(%v): %v ", count, ackSeq)
+		ackSeq = count
 	}
 	return ackSeq, nil
 }
 
-func (p *protocol) sendWindowSize(window uint32) error {
-	conn := p.conn
-
-	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
+func (p *protocol) sendWindowSize(out io.Writer, window uint32) error {
+	if err := write(out, codeWindowSize); err != nil {
 		return err
 	}
-	if _, err := conn.Write(codeWindowSize); err != nil {
+	if err := writeUint32(out, window); err != nil {
 		return err
 	}
-	return writeUint32(conn, window)
-}
-
-func (p *protocol) sendCompressed(payload []byte) error {
-	conn := p.conn
-
-	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
-		return err
-	}
-
-	if _, err := conn.Write(codeCompressed); err != nil {
-		return err
-	}
-
-	if err := writeUint32(conn, uint32(len(payload))); err != nil {
-		return err
-	}
-
-	for len(payload) > 0 {
-		n, err := conn.Write(payload)
-		payload = payload[n:]
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
-func (p *protocol) serializeEvents(events []common.MapStr) (uint32, error) {
-	p.eventsBuffer.Reset()
+func (p *protocol) sendCompressed(out io.Writer, payload []byte) error {
+	if err := write(out, codeCompressed); err != nil {
+		return err
+	}
+	if err := writeUint32(out, uint32(len(payload))); err != nil {
+		return err
+	}
+	return write(out, payload)
+}
 
+func (p *protocol) serializeEvents(events []common.MapStr) (uint32, []byte, error) {
+	buf := bytes.NewBuffer(nil)
 	if p.compressLevel > 0 {
-		w, _ := zlib.NewWriterLevel(p.eventsBuffer, p.compressLevel)
+		w, _ := zlib.NewWriterLevel(buf, p.compressLevel)
 		count, err := p.doSerializeEvents(w, events)
 		if err != nil {
-			return 0, err
+			return 0, nil, err
 		}
 		if err := w.Close(); err != nil {
 			debug("Finalizing zlib compression failed with: %s", err)
-			return 0, err
+			return 0, nil, err
 		}
-		return count, nil
+		return count, buf.Bytes(), nil
 	}
 
-	return p.doSerializeEvents(p.eventsBuffer, events)
+	count, err := p.doSerializeEvents(buf, events)
+	return count, buf.Bytes(), err
 }
 
 func (p *protocol) doSerializeEvents(out io.Writer, events []common.MapStr) (uint32, error) {
@@ -225,7 +223,7 @@ func (p *protocol) serializeDataFrame(
 		return err
 	}
 
-	if _, err := out.Write(codeJSONDataFrame); err != nil { // version + code
+	if err := write(out, codeJSONDataFrame); err != nil { // version + code
 		return err
 	}
 	if err := writeUint32(out, seq); err != nil {
@@ -234,10 +232,21 @@ func (p *protocol) serializeDataFrame(
 	if err := writeUint32(out, uint32(len(jsonEvent))); err != nil {
 		return err
 	}
-	if _, err := out.Write(jsonEvent); err != nil {
+	if err := write(out, jsonEvent); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func write(out io.Writer, data []byte) error {
+	for len(data) > 0 {
+		n, err := out.Write(data)
+		if err != nil {
+			return err
+		}
+		data = data[n:]
+	}
 	return nil
 }
 
