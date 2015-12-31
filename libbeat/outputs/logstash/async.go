@@ -116,6 +116,7 @@ func (c *asyncClient) AsyncPublishEvents(
 	for len(events) > 0 {
 		n, err, sigErr := c.publishWindowed(i, cb, events)
 		debug("%v events out of %v events sent to logstash. Continue sending ...", n, len(events))
+		events = events[n:]
 
 		if err != nil {
 			if err != errAllEventsEncoding {
@@ -165,6 +166,7 @@ func (c *asyncClient) publishWindowed(
 			// send failed with some events already to be confirmed by ACK state machine
 			// -> send error to state machine to merge ACK receive status with error
 			c.ch <- ackMessage{
+				cb:     cb,
 				tag:    tagError,
 				err:    err,
 				events: allEvents,
@@ -189,6 +191,7 @@ func (c *asyncClient) publishWindowed(
 		// being finished
 		if !partial {
 			c.ch <- ackMessage{
+				cb:     cb,
 				tag:    tagLast,
 				err:    err,
 				events: nil,
@@ -335,6 +338,8 @@ func (c *asyncClient) ackPartialsLoop(first ackMessage) (bool, error) {
 
 func (c *asyncClient) awaitACK(batchSize int, count uint32) (uint32, error) {
 	seq, err := c.protocol.awaitACK(count)
+	debug("awaitACK(%v) => %v, %v", count, seq, err)
+
 	ackedEvents.Add(int64(seq))
 
 	if err != nil {
