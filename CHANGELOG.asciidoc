@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+- Update builds to Golang version 1.5.2
 
 *Packetbeat*
 
