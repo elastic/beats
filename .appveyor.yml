@@ -8,6 +8,7 @@ os: Windows Server 2012 R2
 environment:
   GOROOT: c:\go
   GOPATH: c:\gopath
+  PYWIN_DL: https://downloads.sourceforge.net/project/pywin32/pywin32/Build%20219/pywin32-219.win32-py2.7.exe
   matrix:
   - PROJ: github.com\elastic\beats\filebeat
     BEAT: filebeat
@@ -24,6 +25,7 @@ cache:
 - C:\ProgramData\chocolatey\bin -> .appveyor.yml
 - C:\ProgramData\chocolatey\lib -> .appveyor.yml
 - C:\tools\mingw64 -> .appveyor.yml
+- C:\pywin_inst.exe -> .appveyor.yml
 
 # Scripts that run after cloning repository
 install:
@@ -36,11 +38,16 @@ install:
   - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
+  # Download the PyWin32 installer if it is not cached.
+  - ps: >-
+      if(!(Test-Path "C:\pywin_inst.exe")) {
+        (new-object net.webclient).DownloadFile("$env:PYWIN_DL", 'C:/pywin_inst.exe')
+      }
+  - set PYTHONPATH=C:\Python27
+  - set PATH=%PYTHONPATH%;%PYTHONPATH%\Scripts;%PATH%
   - python --version
-  - appveyor DownloadFile https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py
-  - python get-pip.py
-  - set PATH=C:\Python27\Scripts;%PATH%
   - pip install jinja2 nose nose-timer
+  - easy_install C:/pywin_inst.exe
 
 # To run your custom scripts instead of automatic MSBuild
 build_script:
