@@ -19,9 +19,10 @@ env:
     - TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
     - TARGETS="-C topbeat testsuite"
     - TARGETS="-C filebeat testsuite"
+    - TARGETS="-C winlogbeat testsuite"
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
-    - TARGETS="-C filebeat crosscompile"
+    - TARGETS="-C winlogbeat crosscompile"
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
@@ -34,6 +35,10 @@ matrix:
       env: TARGETS="-C filebeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat crosscompile"
+    - os: osx
+      env: TARGETS="-C winlogbeat testsuite"
+    - os: osx
+      env: TARGETS="-C winlogbeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
   fast_finish: true
