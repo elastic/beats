@@ -1,14 +1,16 @@
-import subprocess
 import jinja2
-import unittest
+import json
 import os
 import shutil
-import json
+import signal
+import subprocess
+import sys
 import time
+import unittest
+
 from datetime import datetime, timedelta
 
 build_path = "../../build/system-tests/"
-
 
 class Proc(object):
     """
@@ -22,27 +24,44 @@ class Proc(object):
         self.output = open(outputfile, "wb")
 
     def start(self):
-        self.proc = subprocess.Popen(
-            self.args,
-            stdout=self.output,
-            stderr=subprocess.STDOUT)
+        if sys.platform.startswith("win"):
+            self.proc = subprocess.Popen(
+                self.args,
+                stdout=self.output,
+                stderr=subprocess.STDOUT,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        else:
+            self.proc = subprocess.Popen(
+                    self.args,
+                    stdout=self.output,
+                    stderr=subprocess.STDOUT)
         return self.proc
+
+    def kill(self):
+        if sys.platform.startswith("win"):
+            # proc.terminate on Windows does not initiate a graceful shutdown
+            # through the processes signal handlers it just kills it hard. So
+            # this sends a SIGBREAK. You cannot sends a SIGINT (CTRL_C_EVENT)
+            # to a process group in Windows, otherwise Ctrl+C would be sent.
+            self.proc.send_signal(signal.CTRL_BREAK_EVENT)
+        else:
+            self.proc.terminate()
 
     def wait(self):
         return self.proc.wait()
 
     def kill_and_wait(self):
-        self.proc.terminate()
+        self.kill()
         return self.proc.wait()
 
     def __del__(self):
         try:
-            self.output.close()
+            self.proc.terminate()
+            self.proc.kill()
         except:
             pass
         try:
-            self.proc.terminate()
-            self.proc.kill()
+            self.output.close()
         except:
             pass
 
