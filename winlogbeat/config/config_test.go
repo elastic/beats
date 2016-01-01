@@ -103,6 +103,18 @@ func TestConfigValidate(t *testing.T) {
 			"Invalid ignore_older value ('24') for event_log 'System' " +
 				"(time: missing unit in duration 24)",
 		},
+		{
+			EventLogConfig{Name: "System", API: "eventlogging"},
+			"",
+		},
+		{
+			EventLogConfig{Name: "System", API: "wineventlog"},
+			"",
+		},
+		{
+			EventLogConfig{Name: "System", API: "invalid"},
+			"Invalid api value ('invalid') for event_log 'System'",
+		},
 	}
 
 	for _, test := range testCases {
