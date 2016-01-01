@@ -48,13 +48,13 @@ check:
 # match its style.
 .PHONY: fmt
 fmt:
-	gofmt -w .
+	gofmt -l -w .
 
 # Runs gofmt -s -w on the project's source code, modifying any files that do not
 # match its style.
 .PHONY: simplify
 simplify:
-	gofmt -s -w .
+	gofmt -l -s -w .
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
