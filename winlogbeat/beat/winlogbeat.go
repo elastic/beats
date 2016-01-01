@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/config"
 	"github.com/elastic/beats/winlogbeat/eventlog"
-	"github.com/elastic/beats/winlogbeat/eventlog/wineventlog"
 )
 
 // Metrics that can retrieved through the expvar web interface. Metrics must be
@@ -26,6 +25,10 @@ var (
 	publishedEvents = expvar.NewMap("publishedEvents")
 	ignoredEvents   = expvar.NewMap("ignoredEvents")
 )
+
+func init() {
+	expvar.Publish("uptime", expvar.Func(uptime))
+}
 
 // Debug logging functions for this package.
 var (
@@ -37,20 +40,18 @@ var (
 // Time the application was started.
 var startTime = time.Now().UTC()
 
-func init() {
-	expvar.Publish("uptime", expvar.Func(uptime))
+type log struct {
+	config.EventLogConfig
+	eventLog eventlog.EventLog
 }
 
-type eventLogFactory func(name string) eventlog.EventLoggingAPI
-
 type Winlogbeat struct {
-	beat       *beat.Beat                 // Common beat information.
-	config     *config.ConfigSettings     // Configuration settings.
-	produce    eventLogFactory            // Factory for event logs.
-	eventLogs  []eventlog.EventLoggingAPI // Interface to the event logs.
-	done       chan struct{}              // Channel to initiate shutdown of main event loop.
-	client     publisher.Client           // Interface to publish event.
-	checkpoint *checkpoint.Checkpoint     // Persists event log state to disk.
+	beat       *beat.Beat             // Common beat information.
+	config     *config.Settings       // Configuration settings.
+	eventLogs  []log                  // List of all event logs being monitored.
+	done       chan struct{}          // Channel to initiate shutdown of main event loop.
+	client     publisher.Client       // Interface to publish event.
+	checkpoint *checkpoint.Checkpoint // Persists event log state to disk.
 }
 
 // New returns a new Winlogbeat.
@@ -94,7 +95,8 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.done = make(chan struct{})
 
 	var err error
-	eb.checkpoint, err = checkpoint.NewCheckpoint(eb.config.Winlogbeat.RegistryFile, 10, 5*time.Second)
+	eb.checkpoint, err = checkpoint.NewCheckpoint(
+		eb.config.Winlogbeat.RegistryFile, 10, 5*time.Second)
 	if err != nil {
 		return err
 	}
@@ -119,12 +121,6 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 }
 
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
-	var err error
-	eb.produce, err = factory()
-	if err != nil {
-		return err
-	}
-
 	persistedState := eb.checkpoint.States()
 
 	// Initialize metrics.
@@ -132,25 +128,39 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	publishedEvents.Add("failures", 0)
 	ignoredEvents.Add("total", 0)
 
-	var wg sync.WaitGroup
-
 	// TODO: If no event_logs are specified in the configuration, use the
 	// Windows registry to discover the available event logs.
+	eb.eventLogs = make([]log, 0, len(eb.config.Winlogbeat.EventLogs))
 	for _, eventLogConfig := range eb.config.Winlogbeat.EventLogs {
 		debugf("Initializing EventLog[%s]", eventLogConfig.Name)
 
-		eventLogAPI := eb.produce(eventLogConfig.Name)
-		eb.eventLogs = append(eb.eventLogs, eventLogAPI)
-		state, _ := persistedState[eventLogConfig.Name]
-		ignoreOlder, _ := config.IgnoreOlderDuration(eventLogConfig.IgnoreOlder)
+		eventLog, err := eventlog.New(eventlog.Config{
+			Name: eventLogConfig.Name,
+			API:  eventLogConfig.API,
+		})
+		if err != nil {
+			return fmt.Errorf("Failed to create new event log for %s. %v",
+				eventLogConfig.Name, err)
+		}
 
 		// Initialize per event log metrics.
 		publishedEvents.Add(eventLogConfig.Name, 0)
 		ignoredEvents.Add(eventLogConfig.Name, 0)
 
+		eb.eventLogs = append(eb.eventLogs, log{
+			EventLogConfig: eventLogConfig,
+			eventLog:       eventLog,
+		})
+	}
+
+	var wg sync.WaitGroup
+	for _, log := range eb.eventLogs {
+		state, _ := persistedState[log.Name]
+		ignoreOlder, _ := config.IgnoreOlderDuration(log.IgnoreOlder)
+
 		// Start a goroutine for each event log.
 		wg.Add(1)
-		go eb.processEventLog(&wg, eventLogAPI, state, ignoreOlder)
+		go eb.processEventLog(&wg, log.eventLog, state, ignoreOlder)
 	}
 
 	wg.Wait()
@@ -178,7 +188,7 @@ func (eb *Winlogbeat) Stop() {
 
 func (eb *Winlogbeat) processEventLog(
 	wg *sync.WaitGroup,
-	api eventlog.EventLoggingAPI,
+	api eventlog.EventLog,
 	state checkpoint.EventLogState,
 	ignoreOlder time.Duration,
 ) {
@@ -246,9 +256,11 @@ loop:
 		if ok {
 			publishedEvents.Add("total", numEvents)
 			publishedEvents.Add(api.Name(), numEvents)
-			logp.Info("EventLog[%s] Successfully published %d events", api.Name(), numEvents)
+			logp.Info("EventLog[%s] Successfully published %d events",
+				api.Name(), numEvents)
 		} else {
-			logp.Warn("EventLog[%s] Failed to publish %d events", api.Name(), numEvents)
+			logp.Warn("EventLog[%s] Failed to publish %d events",
+				api.Name(), numEvents)
 			publishedEvents.Add("failures", 1)
 		}
 
@@ -256,29 +268,6 @@ loop:
 			records[len(records)-1].RecordNumber,
 			records[len(records)-1].TimeGenerated.UTC())
 	}
-}
-
-// factory returns an eventLogFactory based on the runtime operating system. If
-// a factory is not available for the OS then and error is returned.
-func factory() (eventLogFactory, error) {
-	ok, err := wineventlog.IsAvailable()
-	if ok {
-		debugf("Using Windows Event Log API")
-		f := func(name string) eventlog.EventLoggingAPI {
-			return wineventlog.New(name, 100)
-		}
-		return f, nil
-	}
-	debugf("Windows Event Log API is not available. %v", err)
-
-	ok, err = eventlog.IsAvailable()
-	if ok {
-		debugf("Using Event Logging API")
-		return eventlog.NewEventLoggingAPI, nil
-	}
-	debugf("Event Logging API is not available. %v", err)
-
-	return nil, fmt.Errorf("No event log API is available.")
 }
 
 // uptime returns a map of uptime related metrics.

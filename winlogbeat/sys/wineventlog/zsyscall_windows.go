@@ -52,8 +52,8 @@ func _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, 
 	return
 }
 
-func _EvtCreateBookmark(bookmarkXml *uint16) (handle EvtHandle, err error) {
-	r0, _, e1 := syscall.Syscall(procEvtCreateBookmark.Addr(), 1, uintptr(unsafe.Pointer(bookmarkXml)), 0, 0)
+func _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) {
+	r0, _, e1 := syscall.Syscall(procEvtCreateBookmark.Addr(), 1, uintptr(unsafe.Pointer(bookmarkXML)), 0, 0)
 	handle = EvtHandle(r0)
 	if handle == 0 {
 		if e1 != 0 {
