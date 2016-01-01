@@ -4,11 +4,8 @@ import (
 	"syscall"
 )
 
-// NullHandle is a convenience constant for the zero value of a syscall.Handle.
-const NullHandle = syscall.Handle(0)
-
-// NullEvtHandle is a convenience constant for the zero value of a EvtHandle.
-const NullEvtHandle = EvtHandle(0)
+// EvtHandle is a handle to the event log.
+type EvtHandle uintptr
 
 // Event log error codes.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
@@ -201,7 +198,7 @@ func (e EvtSystemPropertyID) String() string {
 // Windows API calls
 //sys   _EvtOpenLog(session EvtHandle, path *uint16, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenLog
 //sys   _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, query *uint16, bookmark EvtHandle, context uintptr, callback syscall.Handle, flags EvtSubscribeFlag) (handle EvtHandle, err error) = wevtapi.EvtSubscribe
-//sys   _EvtCreateBookmark(bookmarkXml *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
+//sys   _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
 //sys   _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) = wevtapi.EvtUpdateBookmark
 //sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths *uint16, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
 //sys   _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32, propertyCount *uint32) (err error) = wevtapi.EvtRender
