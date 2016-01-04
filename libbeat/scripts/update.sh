@@ -3,8 +3,6 @@
 set -e
 
 BEATNAME=$1
-BEATPATH=$2
-LIBBEAT=$3
 
 # Setup
 if [ -z $BEATNAME ]; then
@@ -12,22 +10,20 @@ if [ -z $BEATNAME ]; then
     exit;
 fi
 
-if [ -z $BEATPATH ]; then
-    echo "beat path must be set"
-    exit;
-fi
+BEATPATH=../$BEATNAME
 
-DIR=../$BEATNAME
-
-if [ ! -d "$DIR" ]; then
-  echo "Beat dir does not exist: $DIR"
+if [ ! -d "$BEATPATH" ]; then
+  echo "Beat dir does not exist: $BEATPATH"
   exit;
 fi
 
-echo "Beat name: $BEATNAME"
-echo "Beat path: $DIR"
+LIBPATH=../libbeat
 
-cd $DIR
+echo "Beat name: $BEATNAME"
+echo "Beat path: $BEATPATH"
+echo "libbeat path: $LIBPATH"
+
+cd $BEATPATH
 
 
 echo "Start modifying beat"
@@ -35,4 +31,4 @@ echo "Start modifying beat"
 # Update config
 echo "Update config file"
 rm -f etc/$BEATNAME.yml
-cat etc/beat.yml ${LIBBEAT}/etc/libbeat.yml | sed -e "s/beatname/$BEATNAME/g" > etc/$BEATNAME.yml
+cat etc/beat.yml ${LIBPATH}/etc/libbeat.yml | sed -e "s/beatname/$BEATNAME/g" > etc/$BEATNAME.yml
