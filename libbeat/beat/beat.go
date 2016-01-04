@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/service"
+
+	"github.com/satori/go.uuid"
 )
 
 // Beater interface that every beat must use
@@ -37,6 +39,7 @@ type Beat struct {
 	Config  *BeatConfig
 	BT      Beater
 	Events  publisher.Client
+	UUID    uuid.UUID
 }
 
 // Basic configuration of every beat
@@ -58,6 +61,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		Version: version,
 		Name:    name,
 		BT:      bt,
+		UUID:    uuid.NewV4(),
 	}
 
 	return &b
