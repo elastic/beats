@@ -1,5 +1,11 @@
 
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
 ////////////////////////////////////////////////////////////
+// Template, add newest changes here
 
 === Beats version HEAD
 https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
@@ -64,14 +70,10 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 ////////////////////////////////////////////////////////////
 
 [[release-notes-1.0.1]]
-=== Beats version 1.0.1 https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.1 diff]
+=== Beats version 1.0.1
+https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.0 diff]
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
-- Reduced the output bulk size default from 10k to 200. This avoids high
-  memory usage in case Logstash is not available or slow to process request. {pull}550[550]
 
 *Filebeat*
 
