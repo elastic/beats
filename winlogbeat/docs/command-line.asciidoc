@@ -6,10 +6,7 @@ you configure the behavior of Winlogbeat by specifying options in the
 configuration file.
 
 The following command line options from libbeat are also available for
-Winlogbeat. 
-
-To start Winlogbeat, you must use the `-c config\path` option to specify a
-Windows path to the configuration file.
+Winlogbeat.
 
 [source,shell]
 --------------------------------------------------------------------------------
@@ -17,7 +14,7 @@ $ winlogbeat -h
 Usage of ./winlogbeat:
   -N	Disable actual publishing for testing
   -c string
-    	Configuration file (default "/etc/winlogbeat/winlogbeat.yml")
+    	Configuration file (defaults to winlogbeat.yml in the same dir as winlogbeat.exe)
   -configtest
     	Test configuration and exit.
   -cpuprofile string
@@ -25,6 +22,8 @@ Usage of ./winlogbeat:
   -d string
     	Enable certain debug selectors
   -e	Log to stderr and disable syslog/file output
+  -httpprof string
+    	Start pprof http server
   -memprofile string
     	Write memory profile to this file
   -v	Log at INFO level

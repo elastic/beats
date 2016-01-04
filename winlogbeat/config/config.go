@@ -5,23 +5,32 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joeshaw/multierror"
 )
 
 const (
-	DefaultRegistryFile = ".winlogbeat.yaml"
+	// DefaultRegistryFile specifies the default filename of the registry file.
+	DefaultRegistryFile = ".winlogbeat.yml"
 )
 
+// Validator is the interface for configuration data that can be validating.
+//
+// Validate reads the configuration and validates all fields. An error
+// describing all problems is returned (versus returning an error only for the
+// first problem encountered).
 type Validator interface {
 	Validate() error
 }
 
-type ConfigSettings struct {
+// Settings is the root of the Winlogbeat configuration data hierarchy.
+type Settings struct {
 	Winlogbeat WinlogbeatConfig
 }
 
+// WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
 	IgnoreOlder  string           `yaml:"ignore_older"`
 	EventLogs    []EventLogConfig `yaml:"event_logs"`
@@ -29,8 +38,8 @@ type WinlogbeatConfig struct {
 	RegistryFile string           `yaml:"registry_file"`
 }
 
-// Validates the WinlogbeatConfig data and returns an error describing all
-// problems or nil if there are none.
+// Validate validates the WinlogbeatConfig data and returns an error describing
+// all problems or nil if there are none.
 func (ebc WinlogbeatConfig) Validate() error {
 	var errs multierror.Errors
 	if _, err := IgnoreOlderDuration(ebc.IgnoreOlder); err != nil {
@@ -56,11 +65,12 @@ func (ebc WinlogbeatConfig) Validate() error {
 	return errs.Err()
 }
 
+// MetricsConfig holds the configuration data for the HTTP metric service.
 type MetricsConfig struct {
 	BindAddress string // Bind address for the metric service. Format is host:port.
 }
 
-// Validates the MetricsConfig data and returns an error describing any
+// Validate validates the MetricsConfig data and returns an error describing any
 // problems or nil.
 func (mc MetricsConfig) Validate() error {
 	if mc.BindAddress == "" {
@@ -92,24 +102,39 @@ func (mc MetricsConfig) Validate() error {
 	return nil
 }
 
+// EventLogConfig holds the configuration data that specifies which event logs
+// to monitor.
 type EventLogConfig struct {
 	Name        string
 	IgnoreOlder string `yaml:"ignore_older"`
+	API         string
 }
 
-// Validates the EventLogConfig data and returns an error describing any
-// problems or nil.
+// Validate validates the EventLogConfig data and returns an error describing
+// any problems or nil.
 func (elc EventLogConfig) Validate() error {
+	var errs multierror.Errors
 	if elc.Name == "" {
-		return fmt.Errorf("event log is missing a 'name'")
+		err := fmt.Errorf("event log is missing a 'name'")
+		errs = append(errs, err)
 	}
 
 	if _, err := IgnoreOlderDuration(elc.IgnoreOlder); err != nil {
-		return fmt.Errorf("Invalid ignore_older value ('%s') for event_log "+
+		err := fmt.Errorf("Invalid ignore_older value ('%s') for event_log "+
 			"'%s' (%v)", elc.IgnoreOlder, elc.Name, err)
+		errs = append(errs, err)
 	}
 
-	return nil
+	switch strings.ToLower(elc.API) {
+	case "", "eventlogging", "wineventlog":
+		break
+	default:
+		err := fmt.Errorf("Invalid api value ('%s') for event_log '%s'",
+			elc.API, elc.Name)
+		errs = append(errs, err)
+	}
+
+	return errs.Err()
 }
 
 // IgnoreOlderDuration returns the parsed value of the IgnoreOlder string. If

@@ -12,6 +12,9 @@ winlogbeat:
       {% if log.ignore_older %}
       ignore_older: {{ log.ignore_older }}
       {% endif %}
+      {% if log.api %}
+      api: {{ log.api }}
+      {% endif %}
     {% endfor %}
   {% endif %}
 
