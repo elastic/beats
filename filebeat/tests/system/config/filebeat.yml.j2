@@ -16,23 +16,39 @@ filebeat:
       backoff_factor: 1
       max_backoff: 0.1s
       force_close_files: {{force_close_files}}
+
       {% if fields %}
       fields:
       {% for k,v in fields.items() %}
         {{k}}: {{v}}
       {% endfor %}
       {% endif %}
+
       fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
+
       {% if include_lines %}
       include_lines: {{include_lines}}
       {% endif %}
+
       {% if exclude_lines %}
       exclude_lines: {{exclude_lines}}
       {% endif %}
+
       {% if exclude_files %}
       exclude_files: {{exclude_files}}
       {% endif %}
-     
+
+      max_bytes: {{ max_bytes|default(10485760) }}
+
+      {% if multiline %}
+      multiline:
+        pattern: {{pattern}}
+        negate: {{negate}}
+        match: {{match}}
+        timeout: 1s
+        max_lines: {{ max_lines|default(500) }}
+      {% endif %}
+
   spool_size:
   idle_timeout: 0.1s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}

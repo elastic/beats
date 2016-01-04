@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/text/transform"
+)
+
+const (
+	defaultMaxBytes = 10 * (1 << 20) // 10MB
 )
 
 func NewHarvester(
@@ -34,7 +38,6 @@ func NewHarvester(
 		Stat:             stat,
 		SpoolerChan:      spooler,
 		encoding:         encoding,
-		backoff:          prospectorCfg.Harvester.BackoffDuration,
 	}
 	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
 	if err != nil {
@@ -47,9 +50,42 @@ func NewHarvester(
 	return h, nil
 }
 
+func createLineReader(
+	in FileSource,
+	codec encoding.Encoding,
+	bufferSize int,
+	maxBytes int,
+	readerConfig logFileReaderConfig,
+	mlrConfig *config.MultilineConfig,
+) (processor.LineProcessor, error) {
+	var p processor.LineProcessor
+	var err error
+
+	fileReader, err := newLogFileReader(in, readerConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err = processor.NewLineSource(fileReader, codec, bufferSize)
+	if err != nil {
+		return nil, err
+	}
+
+	if mlrConfig != nil {
+		p, err = processor.NewMultiline(p, maxBytes, mlrConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		return processor.NewStripNewline(p), nil
+	}
+
+	p = processor.NewStripNewline(p)
+	return processor.NewLimitProcessor(p, maxBytes), nil
+}
+
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
-
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		h.Stat.Return <- h.Offset
@@ -79,45 +115,53 @@ func (h *Harvester) Harvest() {
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	timedIn := newTimedReader(h.file)
-	reader, err := encoding.NewLineReader(timedIn, enc, h.Config.BufferSize)
+	config := h.Config
+	readerConfig := logFileReaderConfig{
+		forceClose:         config.ForceCloseFiles,
+		maxInactive:        h.ProspectorConfig.IgnoreOlderDuration,
+		backoffDuration:    config.BackoffDuration,
+		maxBackoffDuration: config.MaxBackoffDuration,
+		backoffFactor:      config.BackoffFactor,
+	}
+
+	maxBytes := defaultMaxBytes
+	if config.MaxBytes != nil {
+		maxBytes = *config.MaxBytes
+	}
+
+	reader, err := createLineReader(
+		h.file, enc, config.BufferSize, maxBytes, readerConfig, config.Multiline)
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
 	}
 
-	// XXX: lastReadTime handling last time a full line was read only?
-	//      timedReader provides timestamp some bytes have actually been read from file
-	lastReadTime := time.Now()
-
 	for {
 		// Partial lines return error and are only read on completion
-		text, bytesRead, err := readLine(reader, &timedIn.lastReadTime)
-
+		ts, text, bytesRead, err := readLine(reader)
 		if err != nil {
+			if err == errFileTruncate {
+				seeker, ok := h.file.(io.Seeker)
+				if !ok {
+					logp.Err("can not seek source")
+					return
+				}
 
-			// In case of err = io.EOF returns nil
-			err = h.handleReadlineError(lastReadTime, err)
+				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
 
-			// Return in case of error which leads to stopping harvester and closing file
-			if err != nil {
-				logp.Info("Read line error: %s", err)
-				return
+				h.Offset = 0
+				seeker.Seek(h.Offset, os.SEEK_SET)
+				continue
 			}
 
-			continue
+			logp.Info("Read line error: %s", err)
+			return
 		}
 
-		lastReadTime = time.Now()
-
-		// Reset Backoff
-		h.backoff = h.Config.BackoffDuration
-
 		if h.shouldExportLine(text) {
-
 			// Sends text to spooler
 			event := &input.FileEvent{
-				ReadTime:     lastReadTime,
+				ReadTime:     ts,
 				Source:       &h.Path,
 				InputType:    h.Config.InputType,
 				DocumentType: h.Config.DocumentType,
@@ -157,21 +201,6 @@ func (h *Harvester) shouldExportLine(line string) bool {
 
 	return true
 
-}
-
-// backOff checks the backoff variable and sleeps for the given time
-// It also recalculate and sets the next backoff duration
-func (h *Harvester) backOff() {
-	// Wait before trying to read file which reached EOF again
-	time.Sleep(h.backoff)
-
-	// Increment backoff up to maxBackoff
-	if h.backoff < h.Config.MaxBackoffDuration {
-		h.backoff = h.backoff * time.Duration(h.Config.BackoffFactor)
-		if h.backoff > h.Config.MaxBackoffDuration {
-			h.backoff = h.Config.MaxBackoffDuration
-		}
-	}
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file
@@ -250,7 +279,6 @@ func (h *Harvester) initFileOffset(file *os.File) error {
 	} else {
 		// get offset from file in case of encoding factory was
 		// required to read some data.
-
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
 		h.Offset = offset
 	}
@@ -258,110 +286,7 @@ func (h *Harvester) initFileOffset(file *os.File) error {
 	return err
 }
 
-// handleReadlineError handles error which are raised during reading file.
-//
-// If error is EOF, it will check for:
-// * File truncated
-// * Older then ignore_older
-// * General file error
-//
-// If none of the above cases match, no error will be returned and file is kept open
-//
-// In case of a general error, the error itself is returned
-func (h *Harvester) handleReadlineError(lastTimeRead time.Time, err error) error {
-	if err != io.EOF || !h.file.Continuable() {
-		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
-		return err
-	}
-
-	// Refetch fileinfo to check if the file was truncated or disappeared.
-	// Errors if the file was removed/rotated after reading and before
-	// calling the stat function
-	info, statErr := h.file.Stat()
-	if statErr != nil {
-		logp.Err("Unexpected error reading from %s; error: %s", h.Path, statErr)
-		return statErr
-	}
-
-	// Handle fails if file was truncated
-	if info.Size() < h.Offset {
-		seeker, ok := h.file.(io.Seeker)
-		if !ok {
-			logp.Err("Can not seek source")
-			return err
-		}
-
-		logp.Debug("harvester", "File was truncated as offset (%s) > size (%s). Begin reading file from offset 0: %s", h.Offset, info.Size(), h.Path)
-
-		h.Offset = 0
-		seeker.Seek(h.Offset, os.SEEK_SET)
-		return nil
-	}
-
-	age := time.Since(lastTimeRead)
-	if age > h.ProspectorConfig.IgnoreOlderDuration {
-		// If the file hasn't change for longer the ignore_older, harvester stops
-		// and file handle will be closed.
-		return fmt.Errorf("Stop harvesting as file is older then ignore_older: %s; Last change was: %s ", h.Path, age)
-	}
-
-	if h.Config.ForceCloseFiles {
-		// Check if the file name exists (see #93)
-		_, statErr := os.Stat(h.file.Name())
-
-		// Error means file does not exist. If no error, check if same file. If not close as rotated.
-		if statErr != nil || !input.IsSameFile(h.file.Name(), info) {
-			logp.Info("Force close file: %s; error: %s", h.Path, statErr)
-			// Return directly on windows -> file is closing
-			return fmt.Errorf("Force closing file: %s", h.Path)
-		}
-	}
-
-	if err != io.EOF {
-		logp.Err("Unexpected state reading from %s; error: %s", h.Path, err)
-	}
-
-	logp.Debug("harvester", "End of file reached: %s; Backoff now.", h.Path)
-
-	// Do nothing in case it is just EOF, keep reading the file after backing off
-	h.backOff()
-	return nil
-}
-
 func (h *Harvester) Stop() {
 }
 
 const maxConsecutiveEmptyReads = 100
-
-// timedReader keeps track of last time bytes have been read from underlying
-// reader.
-type timedReader struct {
-	reader       io.Reader
-	lastReadTime time.Time // last time we read some data from input stream
-}
-
-func newTimedReader(reader io.Reader) *timedReader {
-	r := &timedReader{
-		reader: reader,
-	}
-	return r
-}
-
-func (r *timedReader) Read(p []byte) (int, error) {
-	var err error
-	n := 0
-
-	for i := maxConsecutiveEmptyReads; i > 0; i-- {
-		n, err = r.reader.Read(p)
-		if n > 0 {
-			r.lastReadTime = time.Now()
-			break
-		}
-
-		if err != nil {
-			break
-		}
-	}
-
-	return n, err
-}
