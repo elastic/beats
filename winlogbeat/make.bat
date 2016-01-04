@@ -5,16 +5,30 @@ REM Batch script to build and test on Windows. You can use this in conjunction
 REM with the Vagrant machine.
 REM
 
+go get github.com/pierrre/gotestcover
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 echo Building
 go build
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo Testing
-go test ./...
+mkdir build\coverage
+gotestcover -race -coverprofile=build/coverage/integration.cov github.com/elastic/beats/winlogbeat/...
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo System Testing
 go test -c -covermode=atomic -coverpkg ./...
 if %errorlevel% neq 0 exit /b %errorlevel%
-nosetests -w tests\system --process-timeout=30
+nosetests -v -w tests\system --process-timeout=30
 if %errorlevel% neq 0 exit /b %errorlevel%
+
+echo Aggregating Coverage Reports
+python ..\scripts\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
+if %errorlevel% neq 0 exit /b %errorlevel%
+python ..\scripts\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
+if %errorlevel% neq 0 exit /b %errorlevel%
+go tool cover -html=build\coverage\full.cov -o build\coverage\full.html
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+echo Success

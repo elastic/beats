@@ -8,25 +8,30 @@ import (
 	"io"
 	"reflect"
 	"runtime"
-	"strings"
 	"syscall"
 	"time"
 	"unsafe"
 
-	"github.com/elastic/beats/winlogbeat/eventlog"
+	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 	"golang.org/x/sys/windows"
 )
 
 // Errors
 var (
-	ErrorEvtVarTypeNULL = errors.New("NULL event variant data")
+	// ErrorEvtVarTypeNull is an error that means the content of the EVT_VARIANT
+	// data is null.
+	ErrorEvtVarTypeNull = errors.New("Null EVT_VARIANT data")
 )
 
+// bookmarkTemplate is a parameterized string that requires two parameters,
+// the channel name and the record ID. The formatted string can be used to open
+// a new event log subscription and resume from the given record ID.
 const bookmarkTemplate = `<BookmarkList><Bookmark Channel="%s" RecordId="%d" ` +
 	`IsCurrent="True"/></BookmarkList>`
 
-// IsAvailable returns nil if the Windows Event Log API is supported by this
-// operating system. If not supported then an error is returned.
+// IsAvailable returns true if the Windows Event Log API is supported by this
+// operating system. If not supported then false is returned with the
+// accompanying error.
 func IsAvailable() (bool, error) {
 	err := modwevtapi.Load()
 	if err != nil {
@@ -38,7 +43,7 @@ func IsAvailable() (bool, error) {
 
 // Channels returns a list of channels that are registered on the computer.
 func Channels() ([]string, error) {
-	handle, err := _EvtOpenChannelEnum(NullEvtHandle, 0)
+	handle, err := _EvtOpenChannelEnum(0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +93,7 @@ func Subscribe(
 	if channelPath != "" {
 		cp, err = syscall.UTF16PtrFromString(channelPath)
 		if err != nil {
-			return NullEvtHandle, err
+			return 0, err
 		}
 	}
 
@@ -96,14 +101,14 @@ func Subscribe(
 	if query != "" {
 		q, err = syscall.UTF16PtrFromString(query)
 		if err != nil {
-			return NullEvtHandle, err
+			return 0, err
 		}
 	}
 
 	eventHandle, err := _EvtSubscribe(session, uintptr(event), cp, q, bookmark,
-		uintptr(0), NullHandle, flags)
+		0, 0, flags)
 	if err != nil {
-		return NullEvtHandle, err
+		return 0, err
 	}
 
 	return eventHandle, nil
@@ -119,6 +124,9 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 	err := _EvtNext(subscription, uint32(len(eventHandles)),
 		&eventHandles[0], 0, 0, &numRead)
 	if err != nil {
+		// Munge ERROR_INVALID_OPERATION to ERROR_NO_MORE_ITEMS when no handles
+		// were read. This happens you call the method and there are no events
+		// to read (i.e. polling).
 		if err == ERROR_INVALID_OPERATION && numRead == 0 {
 			return nil, ERROR_NO_MORE_ITEMS
 		}
@@ -128,39 +136,40 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 	return eventHandles[:numRead], nil
 }
 
+// RenderEvent reads the event data associated with the EvtHandle and renders
+// the data so that it can used.
 func RenderEvent(
-	h EvtHandle,
+	eventHandle EvtHandle,
 	systemContext EvtHandle,
 	lang uint32,
 	renderBuf []byte,
-	pubHandleProvider func(string) EvtHandle,
-) (Event, int, error) {
+	pubHandleProvider func(string) uintptr,
+) (Event, error) {
 	var err error
 
 	// Create a render context for local machine.
-	if systemContext == NullEvtHandle {
+	if systemContext == 0 {
 		systemContext, err = _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 		if err != nil {
-			return Event{}, 0, err
+			return Event{}, err
 		}
 	}
 
 	var bufferUsed, propertyCount uint32
-	err = _EvtRender(systemContext, h, EvtRenderEventValues,
+	err = _EvtRender(systemContext, eventHandle, EvtRenderEventValues,
 		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed,
 		&propertyCount)
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return Event{}, eventlogging.InsufficientBufferError{err, int(bufferUsed)}
+	}
 	if err != nil {
-		if isInsufficientBuffer(err) {
-			return Event{}, int(bufferUsed), err
-		}
-
-		return Event{}, 0, err
+		return Event{}, err
 	}
 
 	// Validate bufferUsed set by Windows.
 	if int(bufferUsed) > len(renderBuf) {
-		return Event{}, 0, fmt.Errorf("Bytes used (%d) is greater than the buffer "+
-			"size (%d)", bufferUsed, len(renderBuf))
+		return Event{}, fmt.Errorf("Bytes used (%d) is greater than the "+
+			"buffer size (%d)", bufferUsed, len(renderBuf))
 	}
 
 	// Ignore any additional unknown properties that might exist.
@@ -171,28 +180,22 @@ func RenderEvent(
 	var e Event
 	err = parseRenderEventBuffer(renderBuf[:bufferUsed], &e)
 	if err != nil {
-		return Event{}, 0, err
+		return Event{}, err
 	}
 
-	publisherHandle := NullEvtHandle
+	var publisherHandle uintptr
 	if pubHandleProvider != nil {
 		publisherHandle = pubHandleProvider(e.ProviderName)
 	}
 
 	// Populate strings that must be looked up.
-	var requiredSize int
-	requiredSize, err = populateStrings(h, publisherHandle, lang, renderBuf, &e)
-	if err != nil {
-		if isInsufficientBuffer(err) {
-			return Event{}, requiredSize, err
-		}
+	populateStrings(eventHandle, EvtHandle(publisherHandle), lang, renderBuf, &e)
 
-		return Event{}, 0, err
-	}
-
-	return e, 0, nil
+	return e, nil
 }
 
+// parseRenderEventBuffer parses the system context data from buffer. This
+// function can be used on the data written by the EvtRender system call.
 func parseRenderEventBuffer(buffer []byte, evt *Event) error {
 	reader := bytes.NewReader(buffer)
 
@@ -227,7 +230,7 @@ func parseRenderEventBuffer(buffer []byte, evt *Event) error {
 		case EvtSystemEventRecordId:
 			err = binary.Read(reader, binary.LittleEndian, &evt.RecordID)
 		case EvtSystemTimeCreated:
-			evt.TimeCreated, err = readFiletime(buffer, reader)
+			evt.TimeCreated, err = readFiletime(reader)
 		case EvtSystemActivityID:
 			evt.ActivityID, err = readGUID(buffer, reader)
 		case EvtSystemRelatedActivityID:
@@ -246,75 +249,68 @@ func parseRenderEventBuffer(buffer []byte, evt *Event) error {
 	return nil
 }
 
+// populateStrings populates the string fields of the Event that require
+// formatting (Message, Level, Task, Opcode, and Keywords). It attempts to
+// populate each field even if an error occurs. Any errors that occur are
+// written to the Event (see MessageErr, LevelErr, TaskErr, OpcodeErr, and
+// KeywordsErr).
 func populateStrings(
 	eventHandle EvtHandle,
 	providerHandle EvtHandle,
 	lang uint32,
 	buffer []byte,
 	event *Event,
-) (int, error) {
-	strs, size, err := FormatEventString(EvtFormatMessageEvent,
+) {
+	var strs []string
+	strs, event.MessageErr = FormatEventString(EvtFormatMessageEvent,
 		eventHandle, event.ProviderName, providerHandle, lang, buffer)
 	if len(strs) > 0 {
 		event.Message = strs[0]
 	}
-	if err != nil && !isRecoverable(err) {
-		return size, err
-	}
+	// TODO: Populate the MessageInserts when there is a MessageErr.
 
-	strs, size, err = FormatEventString(EvtFormatMessageLevel,
+	strs, event.LevelErr = FormatEventString(EvtFormatMessageLevel,
 		eventHandle, event.ProviderName, providerHandle, lang, buffer)
 	if len(strs) > 0 {
 		event.Level = strs[0]
 	}
-	if err != nil && !isRecoverable(err) {
-		return size, err
-	}
 
-	strs, size, err = FormatEventString(EvtFormatMessageTask,
+	strs, event.TaskErr = FormatEventString(EvtFormatMessageTask,
 		eventHandle, event.ProviderName, providerHandle, lang, buffer)
 	if len(strs) > 0 {
 		event.Task = strs[0]
 	}
-	if err != nil && !isRecoverable(err) {
-		return size, err
-	}
 
-	strs, size, err = FormatEventString(EvtFormatMessageOpcode,
+	strs, event.OpcodeErr = FormatEventString(EvtFormatMessageOpcode,
 		eventHandle, event.ProviderName, providerHandle, lang, buffer)
 	if len(strs) > 0 {
 		event.Opcode = strs[0]
 	}
-	if err != nil && !isRecoverable(err) {
-		return size, err
-	}
 
-	event.Keywords, size, err = FormatEventString(EvtFormatMessageKeyword,
-		eventHandle, event.ProviderName, providerHandle, lang, buffer)
-	if err != nil && !isRecoverable(err) {
-		return size, err
-	}
-
-	return 0, nil
+	event.Keywords, event.KeywordsError = FormatEventString(
+		EvtFormatMessageKeyword, eventHandle, event.ProviderName,
+		providerHandle, lang, buffer)
 }
 
+// CreateBookmark creates a new handle to a bookmark. Close must be called on
+// returned EvtHandle when finished with the handle.
 func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 	xml := fmt.Sprintf(bookmarkTemplate, channel, recordID)
 	p, err := syscall.UTF16PtrFromString(xml)
 	if err != nil {
-		return NullEvtHandle, err
+		return 0, err
 	}
 
 	h, err := _EvtCreateBookmark(p)
 	if err != nil {
-		return NullEvtHandle, err
+		return 0, err
 	}
 
 	return h, nil
 }
 
-// OpenPublisherMetadata opens a handle to the publisher's metadata. The handle
-// needs to be closed when finished.
+// OpenPublisherMetadata opens a handle to the publisher's metadata. Close must be called on
+// returned EvtHandle when finished with the handle.
 func OpenPublisherMetadata(
 	session EvtHandle,
 	publisherName string,
@@ -345,7 +341,8 @@ func Close(h EvtHandle) error {
 // publisherHandle is a handle to the publisher's metadata as provided by
 // EvtOpenPublisherMetadata.
 // lang is the language ID.
-// buffer is optional and if not provided it will be allocated.
+// buffer is optional and if not provided it will be allocated. If the provided
+// buffer is not large enough then an InsufficientBufferError will be returned.
 func FormatEventString(
 	messageFlag EvtFormatMessageFlag,
 	eventHandle EvtHandle,
@@ -353,18 +350,18 @@ func FormatEventString(
 	publisherHandle EvtHandle,
 	lang uint32,
 	buffer []byte,
-) ([]string, int, error) {
+) ([]string, error) {
 	p, err := syscall.UTF16PtrFromString(publisher)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
-	if ph == NullEvtHandle {
-		ph, err = _EvtOpenPublisherMetadata(NullEvtHandle, p, nil, lang, 0)
+	if ph == 0 {
+		ph, err = _EvtOpenPublisherMetadata(0, p, nil, lang, 0)
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		defer _EvtClose(ph)
 	}
@@ -375,8 +372,8 @@ func FormatEventString(
 		err = _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 			0, nil, &bufferUsed)
 		bufferUsed *= 2 // It returns the number of utf-16 chars.
-		if err != nil && !isInsufficientBuffer(err) {
-			return nil, 0, err
+		if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
+			return nil, err
 		}
 
 		buffer = make([]byte, bufferUsed)
@@ -386,11 +383,11 @@ func FormatEventString(
 	err = _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
 	bufferUsed *= 2 // It returns the number of utf-16 chars.
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return nil, eventlogging.InsufficientBufferError{err, int(bufferUsed)}
+	}
 	if err != nil {
-		if isInsufficientBuffer(err) {
-			return nil, int(bufferUsed), err
-		}
-		return nil, 0, err
+		return nil, err
 	}
 
 	var value string
@@ -398,65 +395,25 @@ func FormatEventString(
 	var size int
 	var values []string
 	for {
-		value, size, err = eventlog.UTF16BytesToString(buffer[offset:bufferUsed])
+		value, size, err = eventlogging.UTF16BytesToString(buffer[offset:bufferUsed])
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		offset += size
-		values = append(values, removeWindowsLineEndings(value))
+		values = append(values, eventlogging.RemoveWindowsLineEndings(value))
 
 		if offset >= int(bufferUsed) {
 			break
 		}
 	}
 
-	return values, 0, nil
-}
-
-// isInsufficientBuffer returns true iff the error is ERROR_INSUFFICIENT_BUFFER.
-func isInsufficientBuffer(err error) bool {
-	if err == nil {
-		return false
-	}
-	errno, ok := err.(syscall.Errno)
-	return ok && errno == syscall.ERROR_INSUFFICIENT_BUFFER
-}
-
-func isRecoverable(err error) bool {
-	if err == nil {
-		return true
-	}
-	errno, ok := err.(syscall.Errno)
-	if !ok {
-		return false
-	}
-
-	switch errno {
-	case ERROR_EVT_MESSAGE_NOT_FOUND, ERROR_EVT_MESSAGE_ID_NOT_FOUND:
-		//fmt.Printf("Error Errno=%d MSG NOT FOUND\n", errno)
-		return true
-	case syscall.ERROR_FILE_NOT_FOUND:
-		//fmt.Printf("Error Errno=%d FILE NOT FOUND\n", errno)
-		return true
-	case ERROR_EVT_UNRESOLVED_VALUE_INSERT,
-		ERROR_EVT_UNRESOLVED_PARAMETER_INSERT:
-		//fmt.Printf("Error Errno=%d UNRESOLVED\n", errno)
-		return false
-	}
-
-	return false
-}
-
-// removeWindowsLineEndings replaces CRLF with LF and trims any newline
-// character that may exist at the end of the string.
-func removeWindowsLineEndings(s string) string {
-	s = strings.Replace(s, "\r\n", "\n", -1)
-	return strings.TrimRight(s, "\n")
+	return values, nil
 }
 
 // offset reads a pointer value from the reader then calculates an offset from
 // the start of the buffer to the pointer location. If the pointer value is
 // NULL or is outside of the bounds of the buffer then an error is returned.
+// reader will be advanced by the size of a uintptr.
 func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	// Handle 32 and 64-bit pointer size differences.
 	var dataPtr uint64
@@ -479,7 +436,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	}
 
 	if dataPtr == 0 {
-		return 0, ErrorEvtVarTypeNULL
+		return 0, ErrorEvtVarTypeNull
 	}
 
 	bufferPtr := uint64(reflect.ValueOf(&buffer[0]).Pointer())
@@ -494,20 +451,24 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	return offset, nil
 }
 
+// readString reads a pointer using the reader then parses the UTF-16 string
+// that the pointer addresses within the buffer.
 func readString(buffer []byte, reader io.Reader) (string, error) {
 	offset, err := offset(buffer, reader)
 	if err != nil {
 		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNULL {
+		if err == ErrorEvtVarTypeNull {
 			return "", nil
 		}
 		return "", err
 	}
-	str, _, err := eventlog.UTF16BytesToString(buffer[offset:])
+	str, _, err := eventlogging.UTF16BytesToString(buffer[offset:])
 	return str, err
 }
 
-func readFiletime(buffer []byte, reader io.Reader) (*time.Time, error) {
+// readFiletime reads a Windows Filetime struct and converts it to a
+// time.Time value with a UTC timezone.
+func readFiletime(reader io.Reader) (*time.Time, error) {
 	var filetime syscall.Filetime
 	err := binary.Read(reader, binary.LittleEndian, &filetime.LowDateTime)
 	if err != nil {
@@ -521,11 +482,13 @@ func readFiletime(buffer []byte, reader io.Reader) (*time.Time, error) {
 	return &t, nil
 }
 
-func readSID(buffer []byte, reader io.Reader) (*eventlog.SID, error) {
+// readSID reads a pointer using the reader then parses the Windows SID
+// data that the pointer addresses within the buffer.
+func readSID(buffer []byte, reader io.Reader) (*eventlogging.SID, error) {
 	offset, err := offset(buffer, reader)
 	if err != nil {
 		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNULL {
+		if err == ErrorEvtVarTypeNull {
 			return nil, nil
 		}
 		return nil, err
@@ -536,18 +499,20 @@ func readSID(buffer []byte, reader io.Reader) (*eventlog.SID, error) {
 		return nil, err
 	}
 
-	return &eventlog.SID{
+	return &eventlogging.SID{
 		Name:    account,
 		Domain:  domain,
-		SIDType: eventlog.SIDType(accountType),
+		SIDType: eventlogging.SIDType(accountType),
 	}, nil
 }
 
+// readGUID reads a pointer using the reader then parses the Windows GUID
+// data that the pointer addresses within the buffer.
 func readGUID(buffer []byte, reader io.ReadSeeker) (string, error) {
 	offset, err := offset(buffer, reader)
 	if err != nil {
 		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNULL {
+		if err == ErrorEvtVarTypeNull {
 			return "", nil
 		}
 		return "", err
@@ -583,6 +548,7 @@ func readGUID(buffer []byte, reader io.ReadSeeker) (string, error) {
 	return guidStr, nil
 }
 
+// StringFromGUID returns a displayable GUID string from the GUID struct.
 func StringFromGUID(guid *syscall.GUID) (string, error) {
 	if guid == nil {
 		return "", nil

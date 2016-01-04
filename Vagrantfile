@@ -34,6 +34,11 @@ $Shortcut = $WshShell.CreateShortcut("$Home\\Desktop\\Beats Shell.lnk")
 $Shortcut.TargetPath = "cmd.exe"
 $Shortcut.Arguments = "/K cd /d C:\\Gopath\\src\\github.com\\elastic\\beats"
 $Shortcut.Save()
+
+echo "Disable automatic updates"
+$AUSettigns = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
+$AUSettigns.NotificationLevel = 1
+$AUSettigns.Save()
 SCRIPT
 
 Vagrant.configure(2) do |config|
