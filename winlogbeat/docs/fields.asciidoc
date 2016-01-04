@@ -46,7 +46,8 @@ The timestamp when the event log record was generated.
 
 required: True
 
-The name of the log event. This field is set to `eventlog`.
+The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
+The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating system. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
 
 ==== count
@@ -74,11 +75,11 @@ required: True
 The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
 
 
-==== eventCategory
+==== category
 
 type: string
 
-required: True
+required: False
 
 The category for this event. The meaning of this value depends on the event source.
 
@@ -101,27 +102,45 @@ required: True
 The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
 
-==== eventType
+==== level
 
 type: string
 
 required: True
 
-The type of event. There are five types of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
+The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
 
 ==== message
 
 type: string
 
-required: True
+required: False
 
 The message from the event log record.
 
 
+==== messageError
+
+type: string
+
+required: False
+
+The error that occurred while reading and formatting the message from the log. This field is mutually exclusive with `message`.
+
+
+==== messageInserts
+
+type: list
+
+required: False
+
+The raw message data logged by an application. Normally this data is inserted into parameterized string to create `message`, but in case of an error Winlogbeat attempts to provide this raw data. This field is mutually exclusive with `message`.
+
+
 ==== recordNumber
 
-type: long
+type: string
 
 required: True
 
@@ -135,5 +154,32 @@ type: string
 required: True
 
 The source of the event log record (the application or service that logged the record).
+
+
+==== user.name
+
+type: string
+
+required: False
+
+The name of the user associated with this event.
+
+
+==== user.domain
+
+type: string
+
+required: False
+
+The domain that the user associated with this event is a member of.
+
+
+==== user.type
+
+type: string
+
+required: False
+
+The type of user account associated with this event.
 
 

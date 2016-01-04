@@ -53,6 +53,8 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 
 *Winlogbeat*
+- Added support for reading event logs using the Windows Event Log API {pull}576[576]
+- Modified the event schema to clarify the field meanings. {pull}607[607]
 
 
 ==== Deprecated
