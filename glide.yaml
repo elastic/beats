@@ -29,3 +29,4 @@ import:
 - package: golang.org/x/text
   subpackages:
   - /encoding
+- package: github.com/satori/go.uuid

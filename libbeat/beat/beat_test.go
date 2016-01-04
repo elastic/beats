@@ -3,9 +3,8 @@ package beat
 import (
 	"testing"
 
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 func Test_NewBeat(t *testing.T) {
@@ -17,7 +16,8 @@ func Test_NewBeat(t *testing.T) {
 	assert.Equal(t, "0.9", b.Version)
 
 	// UUID4 should be 36 chars long
-	assert.Equal(t, 36, len(b.UUID))
+	assert.Equal(t, 16, len(b.UUID))
+	assert.Equal(t, 36, len(b.UUID.String()))
 }
 
 func Test_NewBeat_UUI(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_NewBeat_UUI(t *testing.T) {
 	b := NewBeat("testbeat", "0.9", tb)
 
 	// Make sure the UUID's are different
-	assert.NotEqual(t, b.UUID, common.UUID())
+	assert.NotEqual(t, b.UUID, uuid.NewV4())
 }
 
 // Test beat object
