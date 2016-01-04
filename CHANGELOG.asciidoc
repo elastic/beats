@@ -44,6 +44,8 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Filebeat*
 
 *Winlogbeat*
+- Added support for reading event logs using the Windows Event Log API {pull}576[576]
+- Modified the event schema to clarify the field meanings. {pull}607[607]
 
 
 ==== Deprecated
