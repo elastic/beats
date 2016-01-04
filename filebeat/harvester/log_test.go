@@ -1,12 +1,13 @@
 package harvester
 
 import (
-	"io"
+	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/stretchr/testify/assert"
@@ -54,62 +55,35 @@ func TestReadLine(t *testing.T) {
 	assert.NotNil(t, h)
 
 	// Read only 10 bytes which is not the end of the file
-	timedIn := newTimedReader(readFile)
 	codec, _ := encoding.Plain(file)
-	reader, _ := encoding.NewLineReader(timedIn, codec, 100)
+	readConfig := logFileReaderConfig{
+		maxInactive:        500 * time.Millisecond,
+		backoffDuration:    100 * time.Millisecond,
+		maxBackoffDuration: 1 * time.Second,
+		backoffFactor:      2,
+	}
+	reader, _ := createLineReader(fileSource{readFile}, codec, 100, 1000, readConfig, nil)
 
 	// Read third line
-	text, bytesread, err := readLine(reader, &timedIn.lastReadTime)
-
+	_, text, bytesread, err := readLine(reader)
+	fmt.Printf("received line: '%s'\n", text)
 	assert.Nil(t, err)
 	assert.Equal(t, text, firstLineString[0:len(firstLineString)-1])
 	assert.Equal(t, bytesread, len(firstLineString))
 
 	// read second line
-	text, bytesread, err = readLine(reader, &timedIn.lastReadTime)
-
+	_, text, bytesread, err = readLine(reader)
+	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, text, secondLineString[0:len(secondLineString)-1])
 	assert.Equal(t, bytesread, len(secondLineString))
 	assert.Nil(t, err)
 
 	// Read third line, which doesn't exist
-	text, bytesread, err = readLine(reader, &timedIn.lastReadTime)
+	_, text, bytesread, err = readLine(reader)
+	fmt.Printf("received line: '%s'\n", text)
 	assert.Equal(t, "", text)
 	assert.Equal(t, bytesread, 0)
-	assert.Equal(t, err, io.EOF)
-}
-
-func TestIsLine(t *testing.T) {
-	notLine := []byte("This is not a line")
-	assert.False(t, isLine(notLine))
-
-	notLine = []byte("This is not a line\n\r")
-	assert.False(t, isLine(notLine))
-
-	notLine = []byte("This is \n not a line")
-	assert.False(t, isLine(notLine))
-
-	line := []byte("This is a line \n")
-	assert.True(t, isLine(line))
-
-	line = []byte("This is a line\r\n")
-	assert.True(t, isLine(line))
-}
-
-func TestLineEndingChars(t *testing.T) {
-
-	line := []byte("Not ending line")
-	assert.Equal(t, 0, lineEndingChars(line))
-
-	line = []byte("N ending \n")
-	assert.Equal(t, 1, lineEndingChars(line))
-
-	line = []byte("RN ending \r\n")
-	assert.Equal(t, 2, lineEndingChars(line))
-
-	// This is an invalid option
-	line = []byte("NR ending \n\r")
-	assert.Equal(t, 0, lineEndingChars(line))
+	assert.Equal(t, err, errInactive)
 }
 
 func TestExcludeLine(t *testing.T) {
