@@ -191,7 +191,7 @@ shipper:
 ############################# Logging #########################################
 
 # There are three options for the log ouput: syslog, file, stderr.
-# Under Windos systems, the log files are per default sent to the file output,
+# Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 logging:
 
