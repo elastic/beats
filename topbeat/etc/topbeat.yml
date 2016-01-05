@@ -123,6 +123,9 @@ output:
     # Number of workers per Logstash host.
     #worker: 1
 
+    # Set gzip compression level.
+    #compression_level: 3
+
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
