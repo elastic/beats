@@ -268,14 +268,14 @@ func (dns *Dns) ConnectionTimeout() time.Duration {
 }
 
 func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
-	logp.Debug("dns", "Processing query. %s", tuple)
+	logp.Debug("dns", "Processing query. %s", tuple.String())
 
 	trans := dns.deleteTransaction(tuple.Hashable())
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
 		trans.Notes = append(trans.Notes, DuplicateQueryMsg.Error())
-		logp.Debug("dns", DuplicateQueryMsg.Error()+" %s", tuple)
+		logp.Debug("dns", "%s %s", DuplicateQueryMsg.Error(), tuple.String())
 		dns.publishTransaction(trans)
 		dns.deleteTransaction(trans.tuple.Hashable())
 	}
@@ -286,14 +286,14 @@ func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
 }
 
 func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
-	logp.Debug("dns", "Processing response. %s", tuple)
+	logp.Debug("dns", "Processing response. %s", tuple.String())
 
 	trans := dns.getTransaction(tuple.RevHashable())
 	if trans == nil {
 		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
 		trans.Notes = append(trans.Notes, OrphanedResponse.Error())
-		logp.Debug("dns", OrphanedResponse.Error()+" %s", tuple)
+		logp.Debug("dns", "%s %s", OrphanedResponse.Error(), tuple.String())
 	}
 
 	trans.Response = msg
@@ -378,7 +378,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 
 func (dns *Dns) expireTransaction(t *DnsTransaction) {
 	t.Notes = append(t.Notes, NoResponse.Error())
-	logp.Debug("dns", NoResponse.Error()+" %s", t.tuple.String())
+	logp.Debug("dns", "%s %s", NoResponse.Error(), t.tuple.String())
 	dns.publishTransaction(t)
 }
 
