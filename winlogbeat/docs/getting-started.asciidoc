@@ -51,7 +51,7 @@ the _winlogbeat.yml_ file:
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yaml
+  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
 
   event_logs:
     - name: Application
