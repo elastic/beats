@@ -24,7 +24,7 @@ Here is a sample configuration:
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yaml
+  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
   event_logs:
     - name: Application
       ignore_older: 72h
@@ -38,15 +38,15 @@ winlogbeat:
 ===== registry_file
 
 The name of the file where Winlogbeat stores information that it uses to resume
-monitoring after a restart. By default the file is stored as `.winlogbeat.yaml`
+monitoring after a restart. By default the file is stored as `.winlogbeat.yml`
 in the directory where the Beat was started. When you run the process as a
 Windows service, it's recommended that you set the value to
-`C:/ProgramData/winlogbeat/.winlogbeat.yaml`.
+`C:/ProgramData/winlogbeat/.winlogbeat.yml`.
 
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yaml
+  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
 --------------------------------------------------------------------------------
 
 NOTE: The forward slashes (/) in the path are automatically changed to backslashes
