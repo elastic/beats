@@ -174,3 +174,60 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert 1 == len(output)
         assert output[0]["message"] == "line in log file"
+
+    def test_rotating_ignore_older_low_write_rate(self):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            ignoreOlder="1s",
+            scan_frequency="0.1s",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test.log"
+
+        proc = self.start_filebeat(debug_selectors=['*'])
+
+        # wait for first  "Start next scan" log message
+        self.wait_until(
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
+
+        lines = 0
+
+        # write first line
+        lines += 1
+        with open(testfile, 'a') as file:
+            file.write("Line {}\n".format(lines))
+
+        # wait for log to be read
+        self.wait_until(
+            lambda: self.output_has(lines=lines),
+            max_timeout=15)
+
+        # log rotate
+        os.rename(testfile, testfile + ".1")
+        open(testfile, 'w').close()
+
+        # wait for file to be closed due to ignore_older
+        self.wait_until(
+            lambda: self.log_contains(
+                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            max_timeout=10)
+
+        # wait a bit longer (on 1.0.1 this would cause the harvester
+        # to get in a state that resulted in it watching the wrong
+        # inode for changes)
+        time.sleep(2)
+
+        # write second line
+        lines += 1
+        with open(testfile, 'a') as file:
+            file.write("Line {}\n".format(lines))
+
+        self.wait_until(
+            # allow for events to be send multiple times due to log rotation
+            lambda: self.output_count(lambda x: x >= lines),
+            max_timeout=5)
+
+        proc.kill_and_wait()
