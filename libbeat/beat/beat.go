@@ -57,6 +57,9 @@ func init() {
 
 // Initiates a new beat object
 func NewBeat(name string, version string, bt Beater) *Beat {
+	if version == "" {
+		version = defaultBeatVersion
+	}
 	b := Beat{
 		Version: version,
 		Name:    name,
