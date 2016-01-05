@@ -1,3 +1,25 @@
+/*
+
+Beat provides the basic environment for each beat.
+
+Each beat implementation has to implement the beater interface.
+
+
+# Start / Stop / Exit a Beat
+
+A beat is start by calling the Run(name string, version string, bt Beater) function an passing the beater object.
+This will create new beat and will Start the beat in its own go process. The Run function is blocked until
+the Beat.exit channel is closed. This can be done through calling Beat.Exit(). This happens for example when CTRL-C
+is pressed.
+
+A beat can be stopped and started again through beat.Stop and beat.Start. When starting a beat again, it is important to
+run it again in it's own go process. To allow a beat to be properly reastarted, it is important that Beater.Stop() properly
+closes all channels and go processes.
+
+In case a beat should not run as a long running process, the beater implementation must make sure to call Beat.Exit()
+when the task is completed to stop the beat.
+
+*/
 package beat
 
 import (
@@ -40,6 +62,8 @@ type Beat struct {
 	BT      Beater
 	Events  publisher.Client
 	UUID    uuid.UUID
+
+	exit chan struct{}
 }
 
 // Basic configuration of every beat
@@ -51,6 +75,7 @@ type BeatConfig struct {
 
 var printVersion *bool
 
+// Channel that is closed as soon as the beat should exit
 func init() {
 	printVersion = flag.Bool("version", false, "Print version and exit")
 }
@@ -65,15 +90,40 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		Name:    name,
 		BT:      bt,
 		UUID:    uuid.NewV4(),
+
+		exit: make(chan struct{}),
 	}
 
 	return &b
 }
 
 // Initiates and runs a new beat object
-func Run(name string, version string, bt Beater) *Beat {
+func Run(name string, version string, bt Beater) {
+
 	b := NewBeat(name, version, bt)
 
+	// Runs beat inside a go process
+	go func() {
+		b.Start()
+
+		// If start finishes, exit has to be called. This requires start to be blocking
+		// which is currently the default.
+		b.Exit()
+	}()
+
+	// Waits until beats channel is closed
+	for {
+		select {
+		case <-b.exit:
+			b.Stop()
+			logp.Info("Exit beat completed")
+			return
+		}
+	}
+
+}
+
+func (b *Beat) Start() error {
 	// Additional command line args are used to overwrite config options
 	b.CommandLineSetup()
 
@@ -81,7 +131,7 @@ func Run(name string, version string, bt Beater) *Beat {
 	b.LoadConfig()
 
 	// Configures beat
-	err := bt.Config(b)
+	err := b.BT.Config(b)
 	if err != nil {
 		logp.Critical("Config error: %v", err)
 		os.Exit(1)
@@ -89,9 +139,7 @@ func Run(name string, version string, bt Beater) *Beat {
 
 	// Run beat. This calls first beater.Setup,
 	// then beater.Run and beater.Cleanup in the end
-	b.Run()
-
-	return b
+	return b.Run()
 }
 
 // Reads and parses the default command line params
@@ -154,7 +202,7 @@ func (b *Beat) LoadConfig() {
 
 // Run calls the beater Setup and Run methods. In case of errors
 // during the setup phase, it exits the process.
-func (b *Beat) Run() {
+func (b *Beat) Run() error {
 
 	// Setup beater object
 	err := b.BT.Setup(b)
@@ -173,7 +221,7 @@ func (b *Beat) Run() {
 	// Callback is called if the processes is asked to stop.
 	// This needs to be called before the main loop is started so that
 	// it can register the signals that stop or query (on Windows) the loop.
-	service.HandleSignals(b.BT.Stop)
+	service.HandleSignals(b.Exit)
 
 	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
@@ -192,9 +240,18 @@ func (b *Beat) Run() {
 	if err != nil {
 		logp.Err("Cleanup returned an error: %v", err)
 	}
+	return err
 }
 
 // Stop calls the beater Stop action.
+// It can happen that this function is called more then once.
 func (beat *Beat) Stop() {
+	logp.Info("Stopping Beat")
 	beat.BT.Stop()
+}
+
+// Exiting beat -> shutdown
+func (b *Beat) Exit() {
+	logp.Info("Start exiting beat")
+	close(b.exit)
 }
