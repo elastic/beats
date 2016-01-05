@@ -24,7 +24,7 @@ func TestWriteMaxUpdates(t *testing.T) {
 		}
 	}()
 
-	file := filepath.Join(dir, "some", "new", "dir", ".winlogbeat.yaml")
+	file := filepath.Join(dir, "some", "new", "dir", ".winlogbeat.yml")
 	assert.False(t, fileExists(file), "%s should not exist", file)
 	cp, err := NewCheckpoint(file, 2, time.Hour)
 	if err != nil {
@@ -65,7 +65,7 @@ func TestWriteTimedFlush(t *testing.T) {
 		}
 	}()
 
-	file := filepath.Join(dir, ".winlogbeat.yaml")
+	file := filepath.Join(dir, ".winlogbeat.yml")
 	assert.False(t, fileExists(file), "%s should not exist", file)
 	cp, err := NewCheckpoint(file, 100, time.Second)
 	if err != nil {
@@ -98,7 +98,7 @@ func TestCreateDir(t *testing.T) {
 	}()
 
 	stateDir := filepath.Join(dir, "state", "dir", "does", "not", "exists")
-	file := filepath.Join(stateDir, ".winlogbeat.yaml")
+	file := filepath.Join(stateDir, ".winlogbeat.yml")
 	cp := &Checkpoint{file: file}
 
 	assert.False(t, fileExists(stateDir), "%s should not exist", file)
@@ -129,7 +129,7 @@ func TestCreateDirAlreadyExists(t *testing.T) {
 		}
 	}()
 
-	file := filepath.Join(dir, ".winlogbeat.yaml")
+	file := filepath.Join(dir, ".winlogbeat.yml")
 	cp := &Checkpoint{file: file}
 
 	assert.True(t, fileExists(dir), "%s should exist", file)
