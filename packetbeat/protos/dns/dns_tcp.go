@@ -87,6 +87,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 
 	if stream == nil {
 		stream = newStream(pkt, tcpTuple)
+		conn.Data[dir] = stream
 	} else {
 		if stream.message == nil { // nth message of the same stream
 			stream.message = &DnsMessage{Ts: pkt.Ts, Tuple: pkt.Tuple}
@@ -99,12 +100,9 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 			return conn
 		}
 	}
-	conn.Data[dir] = stream
-	decodedData, err := conn.Data[dir].handleTcpRawData()
+	decodedData, err := stream.handleTcpRawData()
 
 	if err != nil {
-		logp.Debug("dns", err.Error()+" addresses %s, length %d",
-			tcpTuple.String(), len(stream.rawData))
 
 		if err == IncompleteMsg {
 			logp.Debug("dns", "Waiting for more raw data")
@@ -115,6 +113,9 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 			dns.publishResponseError(conn, err)
 		}
 
+		logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
+			tcpTuple.String(), len(stream.rawData))
+
 		// This means that malformed requests or responses are being sent...
 		// TODO: publish the situation also if Request
 		conn.Data[dir] = nil
@@ -122,7 +123,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 	}
 
 	dns.messageComplete(conn, tcpTuple, dir, decodedData)
-	conn.Data[dir].PrepareForNewMessage()
+	stream.PrepareForNewMessage()
 	return conn
 }
 
@@ -175,19 +176,19 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 		return conn
 	}
 
-	decodedData, err := conn.Data[dir].handleTcpRawData()
+	decodedData, err := stream.handleTcpRawData()
 
 	if err == nil {
 		dns.messageComplete(conn, tcpTuple, dir, decodedData)
 		return conn
 	}
 
-	logp.Debug("dns", err.Error()+" addresses %s, length %d",
-		tcpTuple.String(), len(stream.rawData))
-
 	if dir == tcp.TcpDirectionReverse {
 		dns.publishResponseError(conn, err)
 	}
+
+	logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
+		tcpTuple.String(), len(stream.rawData))
 
 	return conn
 }
@@ -206,7 +207,7 @@ func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, pr
 		return private, false
 	}
 
-	decodedData, err := conn.Data[dir].handleTcpRawData()
+	decodedData, err := stream.handleTcpRawData()
 
 	if err == nil {
 		dns.messageComplete(conn, tcpTuple, dir, decodedData)
@@ -217,9 +218,8 @@ func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, pr
 		dns.publishResponseError(conn, err)
 	}
 
-	logp.Debug("dns", err.Error()+" addresses %s, length %d",
+	logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
 		tcpTuple.String(), len(stream.rawData))
-
 	logp.Debug("dns", "Dropping the stream %s", tcpTuple.String())
 
 	// drop the stream because it is binary Data and it would be unexpected to have a decodable message later
@@ -261,7 +261,7 @@ func (dns *Dns) publishResponseError(conn *dnsConnectionData, err error) {
 }
 
 // Manages data length prior to decoding the data and manages errors after decoding
-func (stream *DnsStream) handleTcpRawData() (dns *layers.DNS, err error) {
+func (stream *DnsStream) handleTcpRawData() (*layers.DNS, error) {
 	rawData := stream.rawData
 	messageLength := len(rawData)
 
@@ -292,10 +292,10 @@ func (stream *DnsStream) handleTcpRawData() (dns *layers.DNS, err error) {
 		return nil, IncompleteMsg
 	}
 
-	decodedData, err_ := decodeDnsData(TransportTcp, rawData[:stream.parseOffset])
+	decodedData, err := decodeDnsData(TransportTcp, rawData[:stream.parseOffset])
 
-	if err_ != nil {
-		return nil, err_
+	if err != nil {
+		return nil, err
 	}
 
 	return decodedData, nil

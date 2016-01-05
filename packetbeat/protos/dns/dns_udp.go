@@ -18,7 +18,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		// This means that malformed requests or responses are being sent or
 		// that someone is attempting to the DNS port for non-DNS traffic. Both
 		// are issues that a monitoring system should report.
-		logp.Debug("dns", err.Error())
+		logp.Debug("dns", "%s", err.Error())
 		return
 	}
 
