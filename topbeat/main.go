@@ -6,10 +6,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-// You can overwrite these, e.g.: go build -ldflags "-X main.Version 1.0.0-beta3"
-var Version = "1.2.0"
 var Name = "topbeat"
 
 func main() {
-	beat.Run(Name, Version, topbeat.New())
+	beat.Run(Name, "", topbeat.New())
 }
