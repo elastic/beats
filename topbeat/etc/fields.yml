@@ -287,6 +287,21 @@ system:
           type: float
           description: >
             The percentage of used swap memory.
+        - name: actual_used
+          path: swap.actual_used
+          type: int
+          description: >
+            Actual used swap memory. Available only on Unix.
+        - name: actual_free
+          path: swap.actual_free
+          type: int
+          description: >
+            Actual available swap memory. Available only on Unix.
+        - name: actual_used_p
+          path: swap.actual_used_p
+          type: float
+          description: >
+            The percentage of actual used swap memory.
 
 process:
   type: group
@@ -333,11 +348,12 @@ process:
               description: >
                 The amount of CPU time the process spent in user space.
 
-            - name: user_p
-              path: proc.cpu.user_p
+            - name: total_p
+              path: proc.cpu.total_p
               type: float
               description: >
-                The percentage of CPU time the process spent in user space.
+                The percentage of CPU time spent by the process since the last update. Its value is similar with the
+                %CPU value of the process displayed by the top command on unix systems.
 
             - name: system
               path: proc.cpu.system

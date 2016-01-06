@@ -436,7 +436,7 @@ func (t *Topbeat) addProcCpuPercentage(proc *Process) {
 
 		t.procsMap[proc.Pid] = proc
 
-		proc.Cpu.UserPercent = Round(perc, .5, 2)
+		proc.Cpu.TotalPercent = Round(perc, .5, 4)
 
 	}
 }

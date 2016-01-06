@@ -43,7 +43,7 @@ class Test(TestCase):
             assert type(output[key]) is int
 
         for key in [
-            "proc.cpu.user_p",
+            "proc.cpu.total_p",
             "proc.mem.rss_p",
         ]:
             assert type(output[key]) in [int, float]
