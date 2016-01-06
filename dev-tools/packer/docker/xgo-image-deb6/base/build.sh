@@ -19,7 +19,11 @@
 echo "Fetching main repository $1..."
 mkdir -p $GOPATH/src/`dirname $1`
 cd $GOPATH/src/`dirname $1`
-git clone https://$1.git
+if [ "$SOURCE" != "" ]; then
+        rsync --exclude ".git" -a $SOURCE/ `basename $1`/
+else
+        git clone https://$1.git
+fi
 
 set -e
 

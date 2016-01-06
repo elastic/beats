@@ -24,7 +24,7 @@ RUN \
   apt-get install -y automake autogen build-essential ca-certificates \
     gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-multilib gcc-mingw-w64 \
     clang llvm-dev  libtool libxml2-dev uuid-dev libssl-dev pkg-config \
-    patch make xz-utils cpio wget unzip git mercurial bzr --no-install-recommends
+    patch make xz-utils cpio wget unzip git mercurial bzr rsync --no-install-recommends
 
 # Configure the container for OSX cross compilation
 ENV OSX_SDK_PATH https://github.com/trevd/android_platform_build2/raw/master/osxsdks10.6.tar.gz
