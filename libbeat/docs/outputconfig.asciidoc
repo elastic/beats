@@ -326,6 +326,12 @@ The list of known Logstash servers to connect to. All entries in this list can
 contain a port number. If no port number is given, the value specified for <<port>>
 is used as the default port number.
 
+===== compression_level
+
+Set gzip compression level. Setting this value to values <=0 disables compression.
+The compression level must be in the range of 1 (best-speed) to 9 (best compression).
+The default value is 3.
+
 ===== worker
 
 The number of workers per configured host publishing events to Logstash. This
