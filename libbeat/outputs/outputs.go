@@ -17,6 +17,7 @@ type MothershipConfig struct {
 	ProxyURL          string `yaml:"proxy_url"`
 	Index             string
 	Path              string
+	Template          Template
 	Db                int
 	Db_topology       int
 	Timeout           int
@@ -32,6 +33,12 @@ type MothershipConfig struct {
 	TLS               *TLSConfig
 	Worker            int
 	CompressionLevel  *int `yaml:"compression_level"`
+}
+
+type Template struct {
+	Name      string
+	Path      string
+	Overwrite bool
 }
 
 type Options struct {
