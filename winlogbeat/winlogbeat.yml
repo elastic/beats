@@ -53,6 +53,20 @@ output:
     # [winlogbeat-]YYYY.MM.DD keys.
     #index: "winlogbeat"
 
+    # A template is used to set the mapping in elasticsearch
+    # By default template loading is disabled an not template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones
+    #template:
+
+      # Template name. By default the template name is the same as the winlogbeat
+      #name: "winlogbeat"
+
+      # Path to template file
+      #path: "winlogbeat.template.json"
+
+      # Overwrite existing template
+      #overwrite: false
+
     # Optional HTTP Path
     #path: "/elasticsearch"
 
