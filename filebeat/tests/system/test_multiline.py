@@ -23,7 +23,9 @@ class Test(TestCase):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        shutil.copy2("../files/logs/elasticsearch-multiline-log.log", os.path.abspath(self.working_dir) + "/log/elasticsearch-multiline-log.log")
+        self.copy_files(["logs/elasticsearch-multiline-log.log"],
+                        source_dir="../files",
+                        target_dir="log")
 
         proc = self.start_filebeat()
 
@@ -48,11 +50,13 @@ class Test(TestCase):
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             pattern="\\\\$",
-            match="after"
+            match="before"
         )
 
         os.mkdir(self.working_dir + "/log/")
-        shutil.copy2("../files/logs/multiline-c-log.log", os.path.abspath(self.working_dir) + "/log/multiline-c-log.log")
+        self.copy_files(["logs/multiline-c-log.log"],
+                        source_dir="../files",
+                        target_dir="log")
 
         proc = self.start_filebeat()
 
@@ -83,7 +87,9 @@ class Test(TestCase):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        shutil.copy2("../files/logs/elasticsearch-multiline-log.log", os.path.abspath(self.working_dir) + "/log/elasticsearch-multiline-log.log")
+        self.copy_files(["logs/elasticsearch-multiline-log.log"],
+                        source_dir="../files",
+                        target_dir="log")
 
         proc = self.start_filebeat()
 
@@ -162,7 +168,9 @@ class Test(TestCase):
         )
 
         os.mkdir(self.working_dir + "/log/")
-        shutil.copy2("../files/logs/elasticsearch-multiline-log.log", os.path.abspath(self.working_dir) + "/log/elasticsearch-multiline-log.log")
+        self.copy_files(["logs/elasticsearch-multiline-log.log"],
+                        source_dir="../files",
+                        target_dir="log")
 
         proc = self.start_filebeat()
 

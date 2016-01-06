@@ -137,10 +137,14 @@ class TestCase(unittest.TestCase):
                                      "beat.name", "beat.hostname", "count"])
         return jsons
 
-    def copy_files(self, files, source_dir="files/"):
+    def copy_files(self, files, source_dir="files/", target_dir=""):
+        if target_dir:
+            target_dir = os.path.join(self.working_dir, target_dir)
+        else:
+            target_dir = self.working_dir
         for file_ in files:
             shutil.copy(os.path.join(source_dir, file_),
-                        self.working_dir)
+                        target_dir)
 
     def setUp(self):
 
