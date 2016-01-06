@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import os
+import argparse
+
+pattern = '''const defaultBeatVersion = "'''
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Prints the current version at stdout.")
+    parser.parse_args()
+
+    dir = os.path.dirname(os.path.realpath(__file__))
+    with open(dir + "/../libbeat/beat/version.go", "r") as f:
+        for line in f:
+            if line.startswith(pattern):
+                print(line[len(pattern):-2])  # -2 for \n and the final quote
+
+if __name__ == "__main__":
+    main()
