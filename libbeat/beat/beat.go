@@ -180,7 +180,7 @@ func (b *Beat) Run() {
 	// Run beater specific stuff
 	err = b.BT.Run(b)
 	if err != nil {
-		logp.Critical("Run returned an error: %v", err)
+		logp.Critical("Running the beat returned an error: %v", err)
 	}
 
 	service.Cleanup()

@@ -2,7 +2,6 @@ package beat
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -49,16 +48,6 @@ func (fb *Filebeat) Setup(b *beat.Beat) error {
 }
 
 func (fb *Filebeat) Run(b *beat.Beat) error {
-
-	defer func() {
-		p := recover()
-		if p == nil {
-			return
-		}
-
-		fmt.Printf("recovered panic: %v", p)
-		os.Exit(1)
-	}()
 
 	var err error
 
