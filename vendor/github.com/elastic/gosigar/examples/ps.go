@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/gosigar"
+	"github.com/elastic/gosigar"
 )
 
 func main() {

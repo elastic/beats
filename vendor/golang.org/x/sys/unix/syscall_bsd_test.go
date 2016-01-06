@@ -33,3 +33,10 @@ func TestGetfsstat(t *testing.T) {
 		}
 	}
 }
+
+func TestSysctlRaw(t *testing.T) {
+	_, err := unix.SysctlRaw("kern.proc.pid", unix.Getpid())
+	if err != nil {
+		t.Fatal(err)
+	}
+}
