@@ -13,7 +13,6 @@ class Test(TestCase):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
         )
         os.mkdir(self.working_dir + "/log/")
 
