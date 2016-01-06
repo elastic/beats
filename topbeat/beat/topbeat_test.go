@@ -146,5 +146,5 @@ func TestProcCpuPercentage(t *testing.T) {
 	beat.procsMap[p1.Pid] = &p1
 
 	beat.addProcCpuPercentage(&p2)
-	assert.Equal(t, p2.Cpu.UserPercent, 3.46)
+	assert.Equal(t, p2.Cpu.TotalPercent, 3.459)
 }
