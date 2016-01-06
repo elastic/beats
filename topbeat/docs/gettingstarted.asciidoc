@@ -143,6 +143,11 @@ PS C:\Program Files\Topbeat> Invoke-WebRequest -Method Put -InFile topbeat.templ
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
+NOTE: If you've already used Topbeat to index data into Elasticsearch,
+the index may contain old documents. After you load the index template,
+you can delete the old documents from `topbeat-*` to force Kibana to look
+at the newest documents. Use this command:
+`curl -XDELETE 'http://localhost:9200/topbeat-*'`.
 
 === Running Topbeat
 
