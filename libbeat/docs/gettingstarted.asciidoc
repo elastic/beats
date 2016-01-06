@@ -9,6 +9,9 @@ A regular _Beats setup_ consists of:
  * Optionally Logstash for inserting data into Elasticsearch. See <<logstash-installation>>.
  * Kibana for the UI. See <<kibana-installation>>.
  * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>.
+  
+See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 
+about supported operating systems and product compatibility.
 
 NOTE: To get started, you can install Elasticsearch and Kibana on a
 single VM or even on your laptop. The only condition is that the machine must be
