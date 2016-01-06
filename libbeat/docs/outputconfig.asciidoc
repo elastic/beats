@@ -183,17 +183,14 @@ For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for 
 
 ===== max_retries
 
-The number of times to try a particular Logstash send attempt. If
-the send operation doesn't succeed after the specified number of retries, the events are
-dropped. The default is 3.
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
+events are published.
 
-A value of 0 disables retrying and a value <0 will enable infinite retry until
-events have been published.
+Set `max_retries` to a value less than 0 to retry until all events are published. 
 
-If an event is dropped by the output plugin, each Beat implementation must
-determine whether to drop the event or try sending it again. If the send
-operation doesn't succeed after
-`max_retries`, the Beat is optionally notified.
+The default is 3.
 
 ===== bulk_max_size
 
@@ -377,17 +374,14 @@ The number of seconds to wait for responses from the Logstash server before timi
 
 ===== max_retries
 
-The number of times to try a particular Logstash send attempt. If
-the send operation doesn't succeed after the specified number of retries, the events are
-dropped. The default is 3.
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
+events are published.
 
-A value of 0 disables retrying and a value <0 will enable infinite retry until
-events have been published.
+Set `max_retries` to a value less than 0 to retry until all events are published. 
 
-If an event is dropped by the output plugin, each Beat implementation must
-determine whether to drop the event or try sending it again. If the send
-operation doesn't succeed after `max_retries`, the Beat is optionally notified.
-
+The default is 3.
 
 [[redis-output]]
 ==== Redis Output (DEPRECATED)
