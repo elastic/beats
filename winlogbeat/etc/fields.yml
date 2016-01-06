@@ -128,20 +128,28 @@ eventlog:
         The source of the event log record (the application or service that
         logged the record).
 
+    - name: user.identifier
+      type: string
+      required: false
+      example: S-1-5-21-3541430928-2051711210-1391384369-1001
+      description: >
+        The Windows security identifier (SID) of the account associated with
+        this event.
+
     - name: user.name
       type: string
       required: false
       description: >
-        The name of the user associated with this event.
+        The name of the account associated with this event.
 
     - name: user.domain
       type: string
       required: false
       description: >
-        The domain that the user associated with this event is a member of.
+        The domain that the account associated with this event is a member of.
 
     - name: user.type
       type: string
       required: false
       description: >
-        The type of user account associated with this event.
+        The type of account associated with this event.
