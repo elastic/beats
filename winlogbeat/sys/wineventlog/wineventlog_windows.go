@@ -494,15 +494,22 @@ func readSID(buffer []byte, reader io.Reader) (*eventlogging.SID, error) {
 		return nil, err
 	}
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[offset]))
-	account, domain, accountType, err := sid.LookupAccount("")
+	identifier, err := sid.String()
 	if err != nil {
 		return nil, err
 	}
 
+	account, domain, accountType, err := sid.LookupAccount("")
+	if err != nil {
+		// Ignore the error and return a partially populated SID.
+		return &eventlogging.SID{Identifier: identifier}, nil
+	}
+
 	return &eventlogging.SID{
-		Name:    account,
-		Domain:  domain,
-		SIDType: eventlogging.SIDType(accountType),
+		Identifier: identifier,
+		Name:       account,
+		Domain:     domain,
+		Type:       eventlogging.SIDType(accountType),
 	}, nil
 }
 
