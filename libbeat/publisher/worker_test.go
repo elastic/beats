@@ -13,7 +13,7 @@ func TestMessageWorkerSend(t *testing.T) {
 	ws := &workerSignal{}
 	ws.Init()
 	mh := &testMessageHandler{msgs: make(chan message, 10), response: true}
-	mw := newMessageWorker(ws, 10, mh)
+	mw := newMessageWorker(ws, 10, 0, mh)
 
 	// Send an event.
 	s1 := newTestSignaler()
