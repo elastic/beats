@@ -7,10 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"bytes"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"io/ioutil"
 )
 
 var debug = logp.MakeDebug("elasticsearch")
@@ -77,6 +79,7 @@ func (out *elasticsearchOutput) init(
 	}
 
 	clients, err := mode.MakeClients(config, makeClientFactory(tlsConfig, config))
+
 	if err != nil {
 		return err
 	}
@@ -117,6 +120,8 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
+	loadTemplate(config.Template, clients)
+
 	if config.Save_topology {
 		err := out.EnableTTL()
 		if err != nil {
@@ -144,6 +149,46 @@ func (out *elasticsearchOutput) init(
 	out.index = config.Index
 
 	return nil
+}
+
+// loadTemplate checks if the index mapping template should be loaded
+// In case template loading is enabled, template is written to index
+func loadTemplate(config outputs.Template, clients []mode.ProtocolClient) {
+	// Check if template should be loaded
+	// Not being able to load the template will output an error but will not stop execution
+	if config.Name != "" && len(clients) > 0 {
+
+		// Always takes the first client
+		esClient := clients[0].(*Client)
+
+		logp.Info("Loading template enabled. Trying to load template: %v", config.Path)
+
+		exists := esClient.CheckTemplate(config.Name)
+
+		// Check if template already exist or should be overwritten
+		if !exists || config.Overwrite {
+
+			if config.Overwrite {
+				logp.Info("Existing template will be overwritten, as overwrite is enabled.")
+			}
+
+			// Load template from file
+			content, err := ioutil.ReadFile(config.Path)
+			if err != nil {
+				logp.Err("Could not load template from file path: %s; Error: %s", config.Path, err)
+			} else {
+				reader := bytes.NewReader(content)
+				err = esClient.LoadTemplate(config.Name, reader)
+
+				if err != nil {
+					logp.Err("Could not load template: %v", err)
+				}
+			}
+		} else {
+			logp.Info("Template already exists and will not be overwritten.")
+		}
+
+	}
 }
 
 func makeClientFactory(
