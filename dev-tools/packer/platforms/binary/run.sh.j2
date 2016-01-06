@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+mkdir /{{.beat_name}}-{{.version}}-{{.bin_arch}}
+cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}
+cp {{.beat_name}}-binary.yml /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-{{.bin_arch}}/
+
+mkdir -p upload/{{.beat_name}}
+tar czvf upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz /{{.beat_name}}-{{.version}}-{{.bin_arch}}
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz"
+
+cd upload/{{.beat_name}}
+sha1sum {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz > {{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz.sha1.txt
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.bin_arch}}.tar.gz.sha1.txt"

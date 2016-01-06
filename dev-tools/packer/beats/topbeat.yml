@@ -1,0 +1,4 @@
+beat_name: topbeat
+beat_url: 'https://github.com/elastic/topbeat'
+beat_repo: 'github.com/elastic/topbeat'
+beat_description: Like the top command but outputing periodically Logstash, Elasticsearch or file

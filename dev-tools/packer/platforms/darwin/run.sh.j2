@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+mkdir /{{.beat_name}}-{{.version}}-darwin
+cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}
+cp {{.beat_name}}-darwin.yml /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}.yml
+cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-darwin/
+
+mkdir -p upload/{{.beat_name}}
+tar czvf upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-darwin.tgz /{{.beat_name}}-{{.version}}-darwin
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-darwin.tgz"
+
+cd upload/{{.beat_name}}
+sha1sum {{.beat_name}}-{{.version}}-darwin.tgz > {{.beat_name}}-{{.version}}-darwin.tgz.sha1.txt
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-darwin.tgz.sha1.txt"
