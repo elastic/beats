@@ -91,7 +91,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start up spooler
 	go fb.Spooler.Run()
 
-	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
+	err = crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
+	if err != nil {
+		return err
+	}
 
 	// Publishes event to output
 	go Publish(b, fb)
