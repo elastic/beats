@@ -35,7 +35,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Filebeat*
 - Add exclude_files configuration option {pull}563[563]
-- Stop filebeat if filebeat is started without any prospectors defined {pull}644[644]
+- Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
 
 *Winlogbeat*
 

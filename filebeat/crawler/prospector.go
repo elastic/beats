@@ -60,6 +60,10 @@ func (p *Prospector) setupProspectorConfig() error {
 	// Init File Stat list
 	p.prospectorList = make(map[string]harvester.FileStat)
 
+	if config.Harvester.InputType == cfg.LogInputType && len(config.Paths) == 0 {
+		return fmt.Errorf("No paths were defined for prospector")
+	}
+
 	return nil
 }
 
