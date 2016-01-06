@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# this is executed in the docker fpm image
+set -e
+cd /build
+
+# the init scripts needs to have the right name
+cp ${RUNID}.init /tmp/{{.beat_name}}.init
+
+# create script to reload systemd config
+echo "#!/bin/bash\nsystemctl daemon-reload 2> /dev/null || true" > /tmp/systemd-daemon-reload.sh
+
+# create rpm
+fpm --force -s dir -t rpm \
+        -n {{.beat_name}} -v {{.rpm_version}} \
+        --architecture {{.rpm_arch}} \
+        --vendor "Elastic" \
+        --license "ASL 2.0" \
+        --description "{{.beat_description}}" \
+        --url {{.beat_url}} \
+        --rpm-init /tmp/{{.beat_name}}.init \
+        --after-install /tmp/systemd-daemon-reload.sh \
+        --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml \
+        {{.beat_name}}-linux-{{.arch}}=/usr/bin/{{.beat_name}} \
+        {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
+        {{.beat_name}}.template.json=/etc/{{.beat_name}}/{{.beat_name}}.template.json \
+        ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
+        god-linux-{{.arch}}=/usr/bin/{{.beat_name}}-god
+
+
+# rename so that the filename respects semver rules
+mkdir -p upload/{{.beat_name}}
+mv {{.beat_name}}-{{.rpm_version}}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm"
+
+# create sha1 file
+cd upload/{{.beat_name}}
+sha1sum {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm > {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1.txt
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1.txt"
