@@ -185,6 +185,12 @@ PS C:\Program Files\Filebeat> Invoke-WebRequest -Method Put -InFile filebeat.tem
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
+NOTE: If you've already used Filebeat to index data into Elasticsearch,
+the index may contain old documents. After you load the index template,
+you can delete the old documents from `filebeat-*` to force Kibana to look
+at the newest documents. Use this command:
+`curl -XDELETE 'http://localhost:9200/filebeat-*'`.
+
 === Running Filebeat
 
 Run Filebeat by issuing the appropriate command for your platform.
