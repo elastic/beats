@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
+- Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631] 
 
 *Filebeat*
 

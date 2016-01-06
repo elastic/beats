@@ -402,11 +402,11 @@ type: int
 The amount of CPU time the process spent in user space.
 
 
-==== proc.cpu.user_p
+==== proc.cpu.total_p
 
 type: float
 
-The percentage of CPU time the process spent in user space.
+The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
 
 
 ==== proc.cpu.system

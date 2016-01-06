@@ -51,11 +51,11 @@ type ProcMemStat struct {
 }
 
 type ProcCpuTime struct {
-	User        uint64  `json:"user"`
-	UserPercent float64 `json:"user_p"`
-	System      uint64  `json:"system"`
-	Total       uint64  `json:"total"`
-	Start       string  `json:"start_time"`
+	User         uint64  `json:"user"`
+	System       uint64  `json:"system"`
+	Total        uint64  `json:"total"`
+	TotalPercent float64 `json:"total_p"`
+	Start        string  `json:"start_time"`
 }
 
 type Process struct {
@@ -99,7 +99,7 @@ func (m *ProcMemStat) String() string {
 }
 
 func (t *ProcCpuTime) String() string {
-	return fmt.Sprintf("started at %s, %d total %.2f%%CPU, %d us, %d sys", t.Start, t.Total, t.UserPercent, t.User, t.System)
+	return fmt.Sprintf("started at %s, %d total %.2f%%CPU, %d us, %d sys", t.Start, t.Total, t.TotalPercent, t.User, t.System)
 
 }
 
