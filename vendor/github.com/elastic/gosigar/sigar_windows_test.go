@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	sigar "github.com/cloudfoundry/gosigar"
+	sigar "github.com/elastic/gosigar"
 )
 
 var _ = Describe("SigarWindows", func() {

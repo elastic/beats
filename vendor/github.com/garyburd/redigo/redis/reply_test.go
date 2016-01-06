@@ -57,6 +57,16 @@ var replyTests = []struct {
 		ve([]string(nil), redis.ErrNil),
 	},
 	{
+		"byteslices([v1, v2])",
+		ve(redis.ByteSlices([]interface{}{[]byte("v1"), []byte("v2")}, nil)),
+		ve([][]byte{[]byte("v1"), []byte("v2")}, nil),
+	},
+	{
+		"byteslices(nil)",
+		ve(redis.ByteSlices(nil, nil)),
+		ve([][]byte(nil), redis.ErrNil),
+	},
+	{
 		"values([v1, v2])",
 		ve(redis.Values([]interface{}{[]byte("v1"), []byte("v2")}, nil)),
 		ve([]interface{}{[]byte("v1"), []byte("v2")}, nil),

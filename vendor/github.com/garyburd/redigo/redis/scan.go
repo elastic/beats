@@ -259,7 +259,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		switch {
-		case f.PkgPath != "":
+		case f.PkgPath != "" && !f.Anonymous:
 			// Ignore unexported fields.
 		case f.Anonymous:
 			// TODO: Handle pointers. Requires change to decoder and

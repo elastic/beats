@@ -273,6 +273,36 @@ func Strings(reply interface{}, err error) ([]string, error) {
 	return nil, fmt.Errorf("redigo: unexpected type for Strings, got type %T", reply)
 }
 
+// ByteSlices is a helper that converts an array command reply to a [][]byte.
+// If err is not equal to nil, then ByteSlices returns nil, err. Nil array
+// items are stay nil. ByteSlices returns an error if an array item is not a
+// bulk string or nil.
+func ByteSlices(reply interface{}, err error) ([][]byte, error) {
+	if err != nil {
+		return nil, err
+	}
+	switch reply := reply.(type) {
+	case []interface{}:
+		result := make([][]byte, len(reply))
+		for i := range reply {
+			if reply[i] == nil {
+				continue
+			}
+			p, ok := reply[i].([]byte)
+			if !ok {
+				return nil, fmt.Errorf("redigo: unexpected element type for ByteSlices, got type %T", reply[i])
+			}
+			result[i] = p
+		}
+		return result, nil
+	case nil:
+		return nil, ErrNil
+	case Error:
+		return nil, reply
+	}
+	return nil, fmt.Errorf("redigo: unexpected type for ByteSlices, got type %T", reply)
+}
+
 // Ints is a helper that converts an array command reply to a []int. If
 // err is not equal to nil, then Ints returns nil, err.
 func Ints(reply interface{}, err error) ([]int, error) {

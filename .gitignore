@@ -5,6 +5,8 @@
 
 # Files
 .DS_Store
+/glide.lock
+/beats.iml
 
 # Editor swap files
 *.swp
