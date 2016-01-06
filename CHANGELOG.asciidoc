@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 - Make logstash output compression level configurable. {pull}630[630]
 
 *Packetbeat*
+- Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]
 
 *Topbeat*
 - Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
