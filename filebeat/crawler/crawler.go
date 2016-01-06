@@ -27,18 +27,22 @@ type Crawler struct {
 	running   bool
 }
 
-func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *input.FileEvent) {
+func (crawler *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
 
 	pendingProspectorCnt := 0
 	crawler.running = true
 
-	// Prospect the globs/paths given on the command line and launch harvesters
-	for _, fileconfig := range files {
+	if len(prospectorConfigs) == 0 {
+		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
+	}
 
-		logp.Debug("prospector", "File Configs: %v", fileconfig.Paths)
+	// Prospect the globs/paths given on the command line and launch harvesters
+	for _, prospectorConfig := range prospectorConfigs {
+
+		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
 
 		prospector := &Prospector{
-			ProspectorConfig: fileconfig,
+			ProspectorConfig: prospectorConfig,
 			registrar:        crawler.Registrar,
 		}
 
@@ -76,6 +80,8 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 	}
 
 	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
+
+	return nil
 }
 
 func (crawler *Crawler) Stop() {
