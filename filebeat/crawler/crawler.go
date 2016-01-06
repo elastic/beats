@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
@@ -48,9 +47,7 @@ func (crawler *Crawler) Start(prospectorConfigs []config.ProspectorConfig, event
 
 		err := prospector.Init()
 		if err != nil {
-			logp.Critical("Error in initing prospector: %s", err)
-			fmt.Printf("Error in initing prospector: %s", err)
-			os.Exit(1)
+			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
 
 		go prospector.Run(eventChan)
