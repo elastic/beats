@@ -231,3 +231,21 @@ class Test(TestCase):
             max_timeout=5)
 
         proc.kill_and_wait()
+
+    def test_shutdown_no_prospectors(self):
+        self.render_config_template(
+                prospectors=False,
+        )
+
+        proc = self.start_filebeat(debug_selectors=['*'])
+
+        # wait for first  "Start next scan" log message
+        self.wait_until(
+            lambda: self.log_contains(
+                "No prospectors defined"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.log_contains(
+                 "shutting down"),
+            max_timeout=10)

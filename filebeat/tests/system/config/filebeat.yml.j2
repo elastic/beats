@@ -1,6 +1,10 @@
 ############################# Filebeat ######################################
 filebeat:
   prospectors:
+    {% if prospectors is not defined %}
+    {% set prospectors = true %}
+    {% endif %}
+    {% if prospectors %}
     -
       # Paths that should be crawled and fetched
       {% if path %}paths:
@@ -48,7 +52,7 @@ filebeat:
         timeout: 1s
         max_lines: {{ max_lines|default(500) }}
       {% endif %}
-
+    {% endif %}
   spool_size:
   idle_timeout: 0.1s
   registry_file: {{ fb.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
