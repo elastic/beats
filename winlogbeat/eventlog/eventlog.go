@@ -95,21 +95,32 @@ func (r Record) ToMapStr() common.MapStr {
 	}
 
 	if r.User != nil {
-		m["user"] = common.MapStr{
-			"name":   r.User.Name,
-			"domain": r.User.Domain,
-			"type":   r.User.Type,
+		user := common.MapStr{
+			"identifier": r.User.Identifier,
+		}
+		m["user"] = user
+
+		// Optional fields.
+		if r.User.Name != "" {
+			user["name"] = r.User.Name
+		}
+		if r.User.Domain != "" {
+			user["domain"] = r.User.Domain
+		}
+		if r.User.Type != "" {
+			user["type"] = r.User.Type
 		}
 	}
 
 	return m
 }
 
-// User contain information about a Windows user.
+// User contains information about a Windows account.
 type User struct {
-	Name   string // User name
-	Domain string // Domain that the user is a member of
-	Type   string // Type of account (e.g. User, Computer, Service)
+	Identifier string // Unique identifier used by Windows to ID the account.
+	Name       string // User name
+	Domain     string // Domain that the user is a member of
+	Type       string // Type of account (e.g. User, Computer, Service)
 }
 
 // String returns a string representation of Record.

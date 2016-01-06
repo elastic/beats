@@ -87,7 +87,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for _, h := range handles {
 		e, err := sys.RenderEvent(h, 0, 0, l.renderBuf, nil)
 		if err != nil {
-			logp.Err("%s Error rendering event. %v", l.logPrefix, err)
+			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
 			continue
 		}
 
@@ -110,9 +110,10 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 		if e.UserSID != nil {
 			r.User = &User{
-				Name:   e.UserSID.Name,
-				Domain: e.UserSID.Domain,
-				Type:   e.UserSID.SIDType.String(),
+				Identifier: e.UserSID.Identifier,
+				Name:       e.UserSID.Name,
+				Domain:     e.UserSID.Domain,
+				Type:       e.UserSID.Type.String(),
 			}
 		}
 
