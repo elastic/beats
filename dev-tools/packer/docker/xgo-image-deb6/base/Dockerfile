@@ -24,7 +24,7 @@ RUN \
   apt-get install -y automake autogen build-essential ca-certificates \
     gcc-multilib \
     clang llvm-dev  libtool libxml2-dev uuid-dev libssl-dev pkg-config \
-    patch make xz-utils cpio wget unzip git mercurial bzr --no-install-recommends
+    patch make xz-utils cpio wget unzip git mercurial bzr rsync --no-install-recommends
 
 # Inject the Go package downloader and tool-chain bootstrapper
 ADD bootstrap.sh /bootstrap.sh
