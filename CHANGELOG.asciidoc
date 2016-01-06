@@ -49,7 +49,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
-- group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
+- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
