@@ -12,6 +12,7 @@ const (
 	flushInterval time.Duration = 10 * time.Millisecond
 	maxBatchSize                = 10
 	queueSize                   = 4 * maxBatchSize
+	bulkQueueSize               = 1
 )
 
 // Send a single event to the bulkWorker and verify that the event
@@ -23,7 +24,7 @@ func TestBulkWorkerSendSingle(t *testing.T) {
 	}
 	ws := newWorkerSignal()
 	defer ws.stop()
-	bw := newBulkWorker(ws, queueSize, mh, flushInterval, maxBatchSize)
+	bw := newBulkWorker(ws, queueSize, bulkQueueSize, mh, flushInterval, maxBatchSize)
 
 	s := newTestSignaler()
 	m := testMessage(s, testEvent())
@@ -46,7 +47,7 @@ func TestBulkWorkerSendBatch(t *testing.T) {
 	}
 	ws := newWorkerSignal()
 	defer ws.stop()
-	bw := newBulkWorker(ws, queueSize, mh, time.Duration(time.Hour), maxBatchSize)
+	bw := newBulkWorker(ws, queueSize, 0, mh, time.Duration(time.Hour), maxBatchSize)
 
 	events := make([]common.MapStr, maxBatchSize)
 	for i := range events {
@@ -76,7 +77,7 @@ func TestBulkWorkerSendBatchGreaterThanMaxBatchSize(t *testing.T) {
 	}
 	ws := newWorkerSignal()
 	defer ws.stop()
-	bw := newBulkWorker(ws, queueSize, mh, flushInterval, maxBatchSize)
+	bw := newBulkWorker(ws, queueSize, 0, mh, flushInterval, maxBatchSize)
 
 	// Send
 	events := make([]common.MapStr, maxBatchSize+1)
