@@ -7,7 +7,7 @@ export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
-ES_HOST?="elasticsearch-210"
+ES_HOST?="elasticsearch"
 BEAT_DIR?=github.com/elastic/beats
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
@@ -170,7 +170,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch-173 elasticsearch-210 logstash
+	docker-compose up -d redis elasticsearch logstash
 
 .PHONY: stop-environment
 stop-environment:
