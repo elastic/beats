@@ -51,6 +51,7 @@ shipper:
     #paths:
     #  - "/usr/share/GeoIP/GeoLiteCity.dat"
     #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
+
 ------------------------------------------------------------------------------
 
 ==== Options
@@ -142,6 +143,15 @@ The expiration time for the topology in seconds. This is
 useful in case a Beat stops publishing its IP addresses. The IP addresses
 are removed automatically from the topology map after expiration. The default
 is 15 seconds.
+
+===== queue_size
+
+Configure internal queue sizes for single events in processing pipeline. Default
+value is 1000.
+
+===== bulk_queue_size
+
+(DO NOT TOUCH) Configure internal queue size for bulk events in processing pipeline. Default value is 0.
 
 ===== geoip.paths
 

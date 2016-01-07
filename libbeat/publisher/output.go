@@ -20,6 +20,7 @@ func newOutputWorker(
 	out outputs.Outputer,
 	ws *workerSignal,
 	hwm int,
+	bulkHWM int,
 ) *outputWorker {
 	maxBulkSize := defaultBulkSize
 	if config.BulkMaxSize != nil {
@@ -31,14 +32,13 @@ func newOutputWorker(
 		config:      config,
 		maxBulkSize: maxBulkSize,
 	}
-	o.messageWorker.init(ws, hwm, o)
+	o.messageWorker.init(ws, hwm, bulkHWM, o)
 	return o
 }
 
 func (o *outputWorker) onStop() {}
 
 func (o *outputWorker) onMessage(m message) {
-
 	if m.event != nil {
 		o.onEvent(&m.context, m.event)
 	} else {
