@@ -12,8 +12,13 @@ libbeat:
     - LS_TLS_PORT=5055
     - ES_USER=beats
     - ES_PASS=testing
+    # Setup work environment
+    - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
   env_file:
     - build/test.env
+  working_dir: /go/src/github.com/elastic/beats/libbeat
+  command: make
+  entrypoint: /entrypoint.sh
 elasticsearch:
   build: ../scripts/docker/elasticsearch
   dockerfile: Dockerfile-2.2.0
