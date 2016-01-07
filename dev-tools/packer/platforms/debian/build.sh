@@ -3,8 +3,8 @@
 set -e
 
 # executed from the top directory
-runid=debian-$BEAT-$RELEASE-$ARCH
-cat beats/$BEAT.yml archs/$ARCH.yml releases/$RELEASE.yml > build/settings-$runid.yml
+runid=debian-$BEAT-$ARCH
+cat beats/$BEAT.yml archs/$ARCH.yml version.yml > build/settings-$runid.yml
 gotpl platforms/debian/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
 gotpl platforms/debian/init.j2 < build/settings-$runid.yml > build/$runid.init
 gotpl platforms/centos/systemd.j2 < build/settings-$runid.yml > build/$runid.service

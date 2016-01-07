@@ -3,9 +3,9 @@
 set -e
 
 # executed from the top directory
-runid=windows-$BEAT-$RELEASE-$ARCH
+runid=windows-$BEAT-$ARCH
 
-cat beats/$BEAT.yml archs/$ARCH.yml releases/$RELEASE.yml > build/settings-$runid.yml
+cat beats/$BEAT.yml archs/$ARCH.yml version.yml > build/settings-$runid.yml
 gotpl platforms/windows/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
 gotpl platforms/windows/install-service.ps1.j2 < build/settings-$runid.yml > build/install-service-$BEAT.ps1
 gotpl platforms/windows/uninstall-service.ps1.j2 < build/settings-$runid.yml > build/uninstall-service-$BEAT.ps1
