@@ -17,7 +17,7 @@ const (
 	DefaultRegistryFile                      = ".filebeat"
 	DefaultIgnoreOlderDuration time.Duration = 24 * time.Hour
 	DefaultScanFrequency       time.Duration = 10 * time.Second
-	DefaultSpoolSize           uint64        = 1024
+	DefaultSpoolSize           uint64        = 2048
 	DefaultIdleTimeout         time.Duration = 5 * time.Second
 	DefaultHarvesterBufferSize int           = 16 << 10 // 16384
 	DefaultInputType                         = "log"

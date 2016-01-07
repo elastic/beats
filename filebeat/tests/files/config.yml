@@ -25,7 +25,7 @@ filebeat:
       fields:
       input: stdin
       # Paths is not required
-  spool_size: 1024
+  spool_size: 2048
   idle_timeout: 5s
   config_dir: "/prospectorConfigs/"
 
