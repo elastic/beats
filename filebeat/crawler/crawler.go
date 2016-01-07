@@ -28,53 +28,35 @@ type Crawler struct {
 
 func (crawler *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
 
-	pendingProspectorCnt := 0
 	crawler.running = true
 
 	if len(prospectorConfigs) == 0 {
 		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
 	}
 
+	var prospectors []*Prospector
+
+	logp.Info("Loading Prospectors: %v", len(prospectorConfigs))
+
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range prospectorConfigs {
 
 		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
 
-		prospector := &Prospector{
-			ProspectorConfig: prospectorConfig,
-			registrar:        crawler.Registrar,
-		}
+		prospector, err := NewProspector(prospectorConfig, crawler.Registrar, eventChan)
+		prospectors = append(prospectors, prospector)
 
-		err := prospector.Init()
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
-
-		go prospector.Run(eventChan)
-		pendingProspectorCnt++
 	}
+	logp.Info("Loading Prospectors completed")
 
-	// Now determine which states we need to persist by pulling the events from the prospectors
-	// When we hit a nil source a prospector had finished so we decrease the expected events
-	logp.Debug("prospector", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
-
-	for event := range crawler.Registrar.Persist {
-		if event.Source == nil {
-
-			pendingProspectorCnt--
-			if pendingProspectorCnt == 0 {
-				logp.Debug("prospector", "No pending prospectors. Finishing setup")
-				break
-			}
-			continue
-		}
-		crawler.Registrar.State[*event.Source] = event
-		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
-
-		if !crawler.running {
-			break
-		}
+	logp.Info("Running Prospectors")
+	for _, prospector := range prospectors {
+		go prospector.Run()
 	}
+	logp.Info("All prospectors are running")
 
 	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
 
