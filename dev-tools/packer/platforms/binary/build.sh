@@ -3,9 +3,9 @@
 set -e
 
 # executed from the top directory
-runid=binary-$BEAT-$RELEASE-$ARCH
+runid=binary-$BEAT-$ARCH
 
-cat beats/$BEAT.yml archs/$ARCH.yml releases/$RELEASE.yml > build/settings-$runid.yml
+cat beats/$BEAT.yml archs/$ARCH.yml version.yml > build/settings-$runid.yml
 gotpl platforms/binary/run.sh.j2 < build/settings-$runid.yml > build/run-$runid.sh
 chmod +x build/run-$runid.sh
 

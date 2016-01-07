@@ -1,5 +1,3 @@
-RELEASE?=master
-BRANCH?=master
 DATE:=$(shell date +%y%m%d%H%M%S)
 BUILDID?=$(DATE)
 
@@ -16,35 +14,33 @@ packetbeat topbeat filebeat winlogbeat: build/upload
 	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/$@_before_build.sh \
-		-branch $(BRANCH) \
 		-pkg $@ \
 		-source ../../.. \
 		github.com/elastic/beats
 	# linux builds on debian 6
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
 		-before-build=../xgo-scripts/$@_before_build.sh \
-		-branch $(BRANCH) \
 		-pkg $@ \
 		-source ../../.. \
 		github.com/elastic/beats
 
 %/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
-	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/debian/build.sh
 
 %/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
-	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/centos/build.sh
 
 %/darwin: %
-	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/darwin/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/darwin/build.sh
 
 %/win: %
-	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/windows/build.sh
 
 %/bin: %
-	ARCH=386 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
-	ARCH=amd64 RELEASE=$(RELEASE) BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) ./platforms/binary/build.sh
 
 .PHONY: deps
 deps:
