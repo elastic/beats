@@ -15,8 +15,7 @@ os:
 env:
   matrix:
     - TARGETS="check"
-    # - TARGETS="testsuite ES_HOST=elasticsearch-173"
-    - TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
+    - TARGETS="-C libbeat testsuite"
     - TARGETS="-C topbeat testsuite"
     - TARGETS="-C filebeat testsuite"
     - TARGETS="-C winlogbeat testsuite"
@@ -40,7 +39,7 @@ matrix:
     - os: osx
       env: TARGETS="-C winlogbeat crosscompile"
     - os: osx
-      env: TARGETS="-C libbeat testsuite ES_HOST=elasticsearch-210"
+      env: TARGETS="-C libbeat testsuite"
   fast_finish: true
   allow_failures:
     - env: TARGETS="-C libbeat crosscompile"
