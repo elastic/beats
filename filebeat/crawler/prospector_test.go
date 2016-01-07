@@ -124,6 +124,7 @@ func TestProspectorInitInvalidIgnoreOlder(t *testing.T) {
 func TestProspectorInitInputTypeLog(t *testing.T) {
 
 	prospectorConfig := config.ProspectorConfig{
+		Paths: []string{"testpath1", "testpath2"},
 		Harvester: config.HarvesterConfig{
 			InputType: "log",
 		},
@@ -136,6 +137,23 @@ func TestProspectorInitInputTypeLog(t *testing.T) {
 	err := prospector.Init()
 	assert.Nil(t, err)
 	assert.Equal(t, "log", prospector.ProspectorConfig.Harvester.InputType)
+}
+
+func TestProspectorInitInputTypeLogError(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		Harvester: config.HarvesterConfig{
+			InputType: "log",
+		},
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	err := prospector.Init()
+	// Error should be returned because no path is set
+	assert.Error(t, err)
 }
 
 func TestProspectorInitInputTypeStdin(t *testing.T) {
