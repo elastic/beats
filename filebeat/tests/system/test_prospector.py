@@ -185,7 +185,7 @@ class Test(TestCase):
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test.log"
 
-        proc = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_filebeat(debug_selectors=['*'])
 
         # wait for first  "Start next scan" log message
         self.wait_until(
@@ -230,14 +230,17 @@ class Test(TestCase):
             lambda: self.output_count(lambda x: x >= lines),
             max_timeout=5)
 
-        proc.kill_and_wait()
+        filebeat.kill_and_wait()
 
     def test_shutdown_no_prospectors(self):
+        """
+        In case no prospectors are defined, filebeat must shut down and report an error
+        """
         self.render_config_template(
                 prospectors=False,
         )
 
-        proc = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_filebeat(debug_selectors=['*'])
 
         # wait for first  "Start next scan" log message
         self.wait_until(
@@ -249,3 +252,60 @@ class Test(TestCase):
             lambda: self.log_contains(
                  "shutting down"),
             max_timeout=10)
+
+        filebeat.kill_and_wait()
+
+
+    def test_no_paths_defined(self):
+        """
+        In case a prospector is defined but doesn't contain any paths, prospector must return error which
+        leads to shutdown of filebeat because of configuration error
+        """
+        self.render_config_template(
+        )
+
+        filebeat = self.start_filebeat(debug_selectors=['*'])
+
+        # wait for first  "Start next scan" log message
+        self.wait_until(
+                lambda: self.log_contains(
+                        "No paths were defined for prospector"),
+                max_timeout=10)
+
+        self.wait_until(
+                lambda: self.log_contains(
+                        "shutting down"),
+                max_timeout=10)
+
+        filebeat.kill_and_wait()
+
+
+    def test_files_added_late(self):
+        """
+        Tests that prospectors stay running even though no harvesters are started yet
+        """
+        self.render_config_template(
+                path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+
+        filebeat = self.start_filebeat(debug_selectors=['*'])
+
+        # wait until events are sent for the first time
+        self.wait_until(
+                lambda: self.log_contains(
+                        "Events flushed"),
+                max_timeout=10)
+
+        testfile = self.working_dir + "/log/test.log"
+        with open(testfile, 'a') as file:
+            file.write("Hello World1\n")
+            file.write("Hello World2\n")
+
+        # wait for log to be read
+        self.wait_until(
+                lambda: self.output_has(lines=2),
+                max_timeout=15)
+
+        filebeat.kill_and_wait()
