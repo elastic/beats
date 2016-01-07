@@ -208,6 +208,9 @@ shipper:
   # refresh_topology_freq. The default is 15 seconds.
   #topology_expire: 15
 
+  # Internal queue size for single events in processing pipeline
+  #queue_size: 1000
+
   # Configure local GeoIP database support.
   # If no paths are not configured geoip is disabled.
   #geoip:

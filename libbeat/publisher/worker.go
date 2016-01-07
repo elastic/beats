@@ -18,9 +18,10 @@ type worker interface {
 }
 
 type messageWorker struct {
-	queue   chan message
-	ws      *workerSignal
-	handler messageHandler
+	queue     chan message
+	bulkQueue chan message
+	ws        *workerSignal
+	handler   messageHandler
 }
 
 type message struct {
@@ -39,14 +40,15 @@ type messageHandler interface {
 	onStop()
 }
 
-func newMessageWorker(ws *workerSignal, hwm int, h messageHandler) *messageWorker {
+func newMessageWorker(ws *workerSignal, hwm, bulkHWM int, h messageHandler) *messageWorker {
 	p := &messageWorker{}
-	p.init(ws, hwm, h)
+	p.init(ws, hwm, bulkHWM, h)
 	return p
 }
 
-func (p *messageWorker) init(ws *workerSignal, hwm int, h messageHandler) {
+func (p *messageWorker) init(ws *workerSignal, hwm, bulkHWM int, h messageHandler) {
 	p.queue = make(chan message, hwm)
+	p.bulkQueue = make(chan message, bulkHWM)
 	p.ws = ws
 	p.handler = h
 	ws.wg.Add(1)
@@ -62,6 +64,9 @@ func (p *messageWorker) run() {
 		case m := <-p.queue:
 			messagesInWorkerQueues.Add(-1)
 			p.handler.onMessage(m)
+		case m := <-p.bulkQueue:
+			messagesInWorkerQueues.Add(-1)
+			p.handler.onMessage(m)
 		}
 	}
 }
@@ -69,11 +74,16 @@ func (p *messageWorker) run() {
 func (p *messageWorker) shutdown() {
 	p.handler.onStop()
 	stopQueue(p.queue)
+	stopQueue(p.bulkQueue)
 	p.ws.wg.Done()
 }
 
 func (p *messageWorker) send(m message) {
-	p.queue <- m
+	if m.event != nil {
+		p.queue <- m
+	} else {
+		p.bulkQueue <- m
+	}
 	messagesInWorkerQueues.Add(1)
 }
 

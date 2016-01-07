@@ -20,18 +20,17 @@ const (
 	defaultBulkSize      = 200
 )
 
-func newAsyncPublisher(pub *PublisherType) *asyncPublisher {
-
+func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int) *asyncPublisher {
 	p := &asyncPublisher{pub: pub}
 	p.ws.Init()
 
 	var outputs []worker
 	for _, out := range pub.Output {
-		outputs = append(outputs, asyncOutputer(&p.ws, out))
+		outputs = append(outputs, asyncOutputer(&p.ws, hwm, bulkHWM, out))
 	}
 
 	p.outputs = outputs
-	p.messageWorker.init(&pub.wsPublisher, 1000, newPreprocessor(pub, p))
+	p.messageWorker.init(&pub.wsPublisher, hwm, bulkHWM, newPreprocessor(pub, p))
 	return p
 }
 
@@ -67,7 +66,7 @@ func (p *asyncPublisher) PublishEvents(ctx context, events []common.MapStr) bool
 	return true
 }
 
-func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
+func asyncOutputer(ws *workerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
 	config := worker.config
 
 	flushInterval := defaultFlushInterval
@@ -89,5 +88,5 @@ func asyncOutputer(ws *workerSignal, worker *outputWorker) worker {
 
 	debug("create bulk processing worker (interval=%v, bulk size=%v)",
 		flushInterval, maxBulkSize)
-	return newBulkWorker(ws, 1000, worker, flushInterval, maxBulkSize)
+	return newBulkWorker(ws, hwm, bulkHWM, worker, flushInterval, maxBulkSize)
 }
