@@ -2,8 +2,7 @@ libbeat:
   build: ..
   links:
     - redis
-    - elasticsearch-173
-    - elasticsearch-210
+    - elasticsearch
     - logstash
   environment:
     - REDIS_HOST=redis
@@ -11,12 +10,13 @@ libbeat:
     - LS_HOST=logstash
     - LS_TCP_PORT=5044
     - LS_TLS_PORT=5055
+    - ES_USER=beats
+    - ES_PASS=testing
   env_file:
     - build/test.env
-elasticsearch-173:
-  image: elasticsearch:1.7.3
-elasticsearch-210:
-  image: elasticsearch:2.1.0
+elasticsearch:
+  build: ../scripts/docker/elasticsearch
+  dockerfile: Dockerfile-2.2.0
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis
@@ -27,5 +27,7 @@ logstash:
   env_file:
     - build/test.env
   links:
-    - elasticsearch-173
-    - elasticsearch-210
+    - elasticsearch
+  environment:
+    - ES_USER=beats
+    - ES_PASS=testing
