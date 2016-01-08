@@ -1,3 +1,7 @@
+Please post all questions and issues first on
+[https://discuss.elastic.co/c/beats](https://discuss.elastic.co/c/beats)
+before opening a Github Issue.
+
 # Contributing to Beats
 
 The Beats are open source and we love to receive contributions from our
@@ -43,7 +47,12 @@ a working Beat that you'd like to share with others, open a PR to add it to our
 list of [community
 Beats](https://github.com/tsg/beats-onerepo/blob/master/libbeat/docs/communitybeats.asciidoc).
 
+
 ## Setting up your dev environment
+
+The Beats are Go programs, so install the latest version of
+[golang](http://golang.org/) if you don't have it already. The current Go version
+used for development is Golang 1.5.2.
 
 The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already.
