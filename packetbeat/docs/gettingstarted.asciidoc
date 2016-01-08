@@ -19,8 +19,14 @@ To download and install Packetbeat on your application servers, use the commands
 that work with your system (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for
 Redhat/Centos/Fedora, <<mac, mac>> for OS X, and <<win, win>> for Windows).
 
-NOTE: We also provide 32-bit images that you can get from our
-https://www.elastic.co/downloads/beats/packetbeat[download page].
+.Other Installation Options
+[NOTE]
+===============================
+We also provide 32-bit images that you can get from our
+https://www.elastic.co/downloads/beats/packetbeat[download page]. 
+
+Or you can install Packetbeat from our {libbeat}/setup-repositories.html[repositories] using apt or yum.
+===============================
 
 [[deb]]
 *deb:*
