@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/tsg/gopacket/layers"
@@ -27,7 +28,7 @@ type Tcp struct {
 }
 
 type Processor interface {
-	Process(tcphdr *layers.TCP, pkt *protos.Packet)
+	Process(flow *flows.FlowID, hdr *layers.TCP, pkt *protos.Packet)
 }
 
 var (
@@ -113,14 +114,20 @@ func (stream *TcpStream) gapInStream(nbytes int) (drop bool) {
 	return drop
 }
 
-func (tcp *Tcp) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
+func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
 	// This Recover should catch all exceptions in
 	// protocol modules.
 	defer logp.Recover("Process tcp exception")
 
+	debugf("tcp flow id: %p", id)
+
 	stream, created := tcp.getStream(pkt)
 	if stream.conn == nil {
 		return
+	}
+
+	if id != nil {
+		id.AddConnectionID(uint64(stream.conn.id))
 	}
 	conn := stream.conn
 
