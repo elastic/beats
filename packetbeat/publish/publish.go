@@ -14,13 +14,19 @@ type Transactions interface {
 	PublishTransaction(common.MapStr) bool
 }
 
+type Flows interface {
+	PublishFlows([]common.MapStr) bool
+}
+
 type PacketbeatPublisher struct {
 	pub    *publisher.PublisherType
 	client publisher.Client
 
-	wg     sync.WaitGroup
-	events chan common.MapStr
-	done   chan struct{}
+	wg   sync.WaitGroup
+	done chan struct{}
+
+	trans chan common.MapStr
+	flows chan []common.MapStr
 }
 
 type ChanTransactions struct {
@@ -34,20 +40,32 @@ func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
 
 var debugf = logp.MakeDebug("publish")
 
-func NewPublisher(pub *publisher.PublisherType, hwm int) *PacketbeatPublisher {
+func NewPublisher(pub *publisher.PublisherType, hwm, bulkHWM int) *PacketbeatPublisher {
 	return &PacketbeatPublisher{
 		pub:    pub,
 		client: pub.Client(),
 		done:   make(chan struct{}),
-		events: make(chan common.MapStr, hwm),
+		trans:  make(chan common.MapStr, hwm),
+		flows:  make(chan []common.MapStr, bulkHWM),
 	}
 }
 
 func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
 	select {
-	case t.events <- event:
+	case t.trans <- event:
 		return true
 	default:
+		// drop event if queue is full
+		return false
+	}
+}
+
+func (t *PacketbeatPublisher) PublishFlows(event []common.MapStr) bool {
+	select {
+	case t.flows <- event:
+		return true
+	case <-t.done:
+		// drop event, if worker has been stopped
 		return false
 	}
 }
@@ -56,13 +74,25 @@ func (t *PacketbeatPublisher) Start() {
 	t.wg.Add(1)
 	go func() {
 		defer t.wg.Done()
-
 		for {
 			select {
-			case event := <-t.events:
-				t.onEvent(event)
 			case <-t.done:
 				return
+			case event := <-t.trans:
+				t.onTransaction(event)
+			}
+		}
+	}()
+
+	t.wg.Add(1)
+	go func() {
+		defer t.wg.Done()
+		for {
+			select {
+			case <-t.done:
+				return
+			case events := <-t.flows:
+				t.onFlow(events)
 			}
 		}
 	}()
@@ -73,19 +103,35 @@ func (t *PacketbeatPublisher) Stop() {
 	t.wg.Wait()
 }
 
-func (t *PacketbeatPublisher) onEvent(event common.MapStr) {
+func (t *PacketbeatPublisher) onTransaction(event common.MapStr) {
 	if err := validateEvent(event); err != nil {
 		logp.Warn("Dropping invalid event: %v", err)
 		return
 	}
 
-	debugf("on event")
-
-	if !updateEventAddresses(t.pub, event) {
+	if !normalizeTransAddr(t.pub, event) {
 		return
 	}
 
 	t.client.PublishEvent(event)
+}
+
+func (t *PacketbeatPublisher) onFlow(events []common.MapStr) {
+	pub := events[:0]
+	for _, event := range events {
+		if err := validateEvent(event); err != nil {
+			logp.Warn("Dropping invalid event: %v", err)
+			continue
+		}
+
+		if !addGeoIPToFlow(t.pub, event) {
+			continue
+		}
+
+		pub = append(pub, event)
+	}
+
+	t.client.PublishEvents(pub)
 }
 
 // filterEvent validates an event for common required fields with types.
@@ -119,10 +165,12 @@ func validateEvent(event common.MapStr) error {
 	return nil
 }
 
-func updateEventAddresses(pub *publisher.PublisherType, event common.MapStr) bool {
+func normalizeTransAddr(pub *publisher.PublisherType, event common.MapStr) bool {
+	debugf("normalize address for: %v", event)
+
 	var srcServer, dstServer string
 	src, ok := event["src"].(*common.Endpoint)
-
+	debugf("has src: %v", ok)
 	if ok {
 		// check if it's outgoing transaction (as client)
 		isOutgoing := pub.IsPublisherIP(src.Ip)
@@ -146,6 +194,7 @@ func updateEventAddresses(pub *publisher.PublisherType, event common.MapStr) boo
 	}
 
 	dst, ok := event["dst"].(*common.Endpoint)
+	debugf("has dst: %v", ok)
 	if ok {
 		dstServer = pub.GetServerName(dst.Ip)
 		event["ip"] = dst.Ip
@@ -181,6 +230,45 @@ func updateEventAddresses(pub *publisher.PublisherType, event common.MapStr) boo
 				}
 			}
 		}
+	}
+
+	return true
+}
+
+func addGeoIPToFlow(pub *publisher.PublisherType, event common.MapStr) bool {
+	if pub.GeoLite == nil {
+		return true
+	}
+
+	ipFieldNames := [][]string{
+		{"ip4_source", "ip4_source_location"},
+		{"ip4_dest", "ip4_dest_location"},
+		{"outter_ip4_source", "outter_ip4_source_location"},
+		{"outter_ip4_dest", "outter_ip4_dest_location"},
+		{"ip6_source", "ip6_source_location"},
+		{"ip6_dest", "ip6_dest_location"},
+		{"outter_ip6_source", "outter_ip6_source_location"},
+		{"outter_ip6_dest", "outter_ip6_dest_location"},
+	}
+
+	for _, name := range ipFieldNames {
+		ip, exists := event[name[0]]
+		if !exists {
+			continue
+		}
+
+		str, ok := ip.(string)
+		if !ok {
+			logp.Warn("IP address must be string")
+			return false
+		}
+
+		loc := pub.GeoLite.GetLocationByIP(str)
+		if loc == nil || loc.Latitude == 0 || loc.Longitude == 0 {
+			continue
+		}
+
+		event[name[1]] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 	}
 
 	return true
