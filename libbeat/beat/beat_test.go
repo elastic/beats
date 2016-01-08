@@ -20,7 +20,7 @@ func Test_NewBeat(t *testing.T) {
 	assert.Equal(t, 36, len(b.UUID.String()))
 }
 
-func Test_NewBeat_UUI(t *testing.T) {
+func Test_NewBeat_UUID(t *testing.T) {
 
 	tb := &TestBeater{}
 	b := NewBeat("testbeat", "0.9", tb)

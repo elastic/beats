@@ -1,4 +1,4 @@
-Please post all questions and issue first on
+Please post all questions and issues first on
 [https://discuss.elastic.co/c/beats](https://discuss.elastic.co/c/beats)
 before opening a Github Issue.
 
