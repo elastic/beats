@@ -136,6 +136,12 @@ eventlog:
         The Windows security identifier (SID) of the account associated with
         this event.
 
+
+        If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
+        `user.domain`, and `user.type` fields will be omitted from the event.
+        If you discover Winlogbeat not resolving SIDs, review the log for
+        clues as to what the problem may be.
+
     - name: user.name
       type: string
       required: false
