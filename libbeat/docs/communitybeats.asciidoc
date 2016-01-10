@@ -18,6 +18,7 @@ https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM
+https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios Checks and Performance Data
 
 Have you created a Beat that's not listed? Open a pull request to add your link
 here: https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc
