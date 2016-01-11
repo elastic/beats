@@ -66,7 +66,7 @@ Contains data from a Windows event log record.
 
 
 
-==== computerName
+==== computer_name
 
 type: string
 
@@ -84,7 +84,7 @@ required: False
 The category for this event. The meaning of this value depends on the event source.
 
 
-==== eventID
+==== event_id
 
 type: long
 
@@ -93,7 +93,7 @@ required: True
 The event identifier. The value is specific to the source of the event.
 
 
-==== eventLogName
+==== log_name
 
 type: string
 
@@ -120,7 +120,7 @@ required: False
 The message from the event log record.
 
 
-==== messageError
+==== message_error
 
 type: string
 
@@ -129,7 +129,7 @@ required: False
 The error that occurred while reading and formatting the message from the log. This field is mutually exclusive with `message`.
 
 
-==== messageInserts
+==== message_inserts
 
 type: list
 
@@ -138,16 +138,16 @@ required: False
 The raw message data logged by an application. Normally this data is inserted into parameterized string to create `message`, but in case of an error Winlogbeat attempts to provide this raw data. This field is mutually exclusive with `message`.
 
 
-==== recordNumber
+==== record_number
 
 type: string
 
 required: True
 
-The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches 4294967295, the next record number will be 0.
+The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for Window Event Log API), the next record number will be 0.
 
 
-==== sourceName
+==== source_name
 
 type: string
 
@@ -165,6 +165,8 @@ example: S-1-5-21-3541430928-2051711210-1391384369-1001
 required: False
 
 The Windows security identifier (SID) of the account associated with this event.
+
+If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
 
 
 ==== user.name
