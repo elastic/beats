@@ -1,0 +1,43 @@
+# This should test the environment with the latest snapshots
+beat:
+  build: .
+  links:
+    - elasticsearch
+    - logstash
+    - kibana
+  environment:
+    - LS_HOST=logstash
+  container_name: beat
+
+elasticsearch:
+  build: ./docker/elasticsearch
+  dockerfile: Dockerfile-2.2.0
+  command: elasticsearch -Des.network.host=0.0.0.0
+  ports:
+    - "9200:9200"
+  container_name: elasticsearch
+
+logstash:
+  build: ./docker/logstash
+  dockerfile: Dockerfile-2.2.0
+  ports:
+    - "5044:5044"
+    - "5055:5055"
+  links:
+    - elasticsearch
+  container_name: logstash
+  environment:
+    - ES_HOST=elasticsearch
+
+kibana:
+  build: ./docker/kibana
+  dockerfile: Dockerfile-4.4.0
+  links:
+    - elasticsearch
+  environment:
+    - ELASTICSEARCH_URL=http://elasticsearch:9200/
+  ports:
+    - "5601:5601"
+  container_name: kibana
+
+
