@@ -28,7 +28,7 @@ redis:
 # This host name is fixed because of the certificate
 logstash:
   build: ../scripts/docker/logstash
-  dockerfile: Dockerfile-2.1.0
+  dockerfile: Dockerfile-2.2.0
   env_file:
     - build/test.env
   links:
