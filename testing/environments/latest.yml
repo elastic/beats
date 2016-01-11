@@ -1,0 +1,35 @@
+# This is the latest stable release
+beat:
+  build: .
+  links:
+    - elasticsearch
+    - logstash
+    - kibana
+  environment:
+    - LS_HOST=logstash
+  container_name: beat
+
+elasticsearch:
+  image: elasticsearch:latest
+  ports:
+    - "9200:9200"
+  container_name: elasticsearch
+
+logstash:
+  image: logstash:latest
+  links:
+    - elasticsearch
+  ports:
+    - "5044:5044"
+    - "5055:5055"
+  container_name: logstash
+
+kibana:
+  image: kibana:latest
+  links:
+    - elasticsearch
+  environment:
+    - ELASTICSEARCH_URL=http://elasticsearch:9200/
+  ports:
+    - "5601:5601"
+  container_name: kibana
