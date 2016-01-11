@@ -48,6 +48,7 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 	if err != nil {
 		return err
 	}
+	defer sys.Close(bookmark)
 
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
@@ -81,6 +82,11 @@ func (l *winEventLog) Read() ([]Record, error) {
 		logp.Warn("%s EventHandles returned error %v Errno: %d", l.logPrefix, err)
 		return nil, err
 	}
+	defer func() {
+		for _, h := range handles {
+			sys.Close(h)
+		}
+	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
 	var records []Record
