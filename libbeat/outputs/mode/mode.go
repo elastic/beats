@@ -28,17 +28,13 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
+	PublishEvents(trans outputs.Signaler, opts outputs.Options, events []common.MapStr) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(trans outputs.Signaler, event common.MapStr) error
+	PublishEvent(trans outputs.Signaler, opts outputs.Options, event common.MapStr) error
 }
 
-// ProtocolClient interface is a output plugin specific client implementation
-// for encoding and publishing events. A ProtocolClient must be able to connection
-// to it's sink and indicate connection failures in order to be reconnected byte
-// the output plugin.
-type ProtocolClient interface {
+type Connectable interface {
 	// Connect establishes a connection to the clients sink.
 	// The connection attempt shall report an error if no connection could been
 	// established within the given time interval. A timeout value of 0 == wait
@@ -53,6 +49,14 @@ type ProtocolClient interface {
 	// IsConnected returns false, an output plugin might try to re-establish the
 	// connection by calling Connect.
 	IsConnected() bool
+}
+
+// ProtocolClient interface is a output plugin specific client implementation
+// for encoding and publishing events. A ProtocolClient must be able to connection
+// to it's sink and indicate connection failures in order to be reconnected byte
+// the output plugin.
+type ProtocolClient interface {
+	Connectable
 
 	// PublishEvents sends events to the clients sink. On failure or timeout err
 	// must be set. If connection has been lost, IsConnected must return false
@@ -66,6 +70,16 @@ type ProtocolClient interface {
 	PublishEvent(event common.MapStr) error
 }
 
+// AsyncProtocolClient interface is a output plugin specfic client implementation
+// for asynchronous encoding and publishing events.
+type AsyncProtocolClient interface {
+	Connectable
+
+	AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error
+
+	AsyncPublishEvent(cb func(error), event common.MapStr) error
+}
+
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
 	ErrTempBulkFailure = errors.New("temporary bulk send failure")
@@ -77,7 +91,7 @@ func MakeClients(
 	config outputs.MothershipConfig,
 	newClient func(string) (ProtocolClient, error),
 ) ([]ProtocolClient, error) {
-	hosts := readHostList(config)
+	hosts := ReadHostList(config)
 	if len(hosts) == 0 {
 		return nil, ErrNoHostsConfigured
 	}
@@ -97,7 +111,31 @@ func MakeClients(
 	return clients, nil
 }
 
-func readHostList(config outputs.MothershipConfig) []string {
+func MakeAsyncClients(
+	config outputs.MothershipConfig,
+	newClient func(string) (AsyncProtocolClient, error),
+) ([]AsyncProtocolClient, error) {
+	hosts := ReadHostList(config)
+	if len(hosts) == 0 {
+		return nil, ErrNoHostsConfigured
+	}
+
+	clients := make([]AsyncProtocolClient, 0, len(hosts))
+	for _, host := range hosts {
+		client, err := newClient(host)
+		if err != nil {
+			// on error destroy all client instance created
+			for _, client := range clients {
+				_ = client.Close() // ignore error
+			}
+			return nil, err
+		}
+		clients = append(clients, client)
+	}
+	return clients, nil
+}
+
+func ReadHostList(config outputs.MothershipConfig) []string {
 	var lst []string
 
 	// TODO: remove config.Host
