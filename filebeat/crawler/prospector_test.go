@@ -204,8 +204,9 @@ func TestProspectorFileExclude(t *testing.T) {
 	}
 
 	prospector.Init()
+	prospectorer := prospector.prospectorer.(*ProspectorLog)
 
-	assert.True(t, prospector.isFileExcluded("/tmp/log/logw.gz"))
-	assert.False(t, prospector.isFileExcluded("/tmp/log/logw.log"))
+	assert.True(t, prospectorer.isFileExcluded("/tmp/log/logw.gz"))
+	assert.False(t, prospectorer.isFileExcluded("/tmp/log/logw.log"))
 
 }
