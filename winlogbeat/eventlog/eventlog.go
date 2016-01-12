@@ -66,27 +66,27 @@ func (r Record) String() string {
 // ToMapStr returns a new MapStr containing the data from this Record.
 func (r Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"@timestamp":   common.Time(r.TimeGenerated),
-		"eventLogName": r.EventLogName,
-		"sourceName":   r.SourceName,
-		"computerName": r.ComputerName,
+		"@timestamp":    common.Time(r.TimeGenerated),
+		"log_name":      r.EventLogName,
+		"source_name":   r.SourceName,
+		"computer_name": r.ComputerName,
 		// Use a string to represent this uint64 data because its value can
 		// be outside the range represented by a Java long.
-		"recordNumber": strconv.FormatUint(r.RecordNumber, 10),
-		"eventID":      r.EventID,
-		"level":        r.Level,
-		"type":         r.API,
+		"record_number": strconv.FormatUint(r.RecordNumber, 10),
+		"event_id":      r.EventID,
+		"level":         r.Level,
+		"type":          r.API,
 	}
 
 	if r.Message != "" {
 		m["message"] = r.Message
 	} else {
 		if len(r.MessageInserts) > 0 {
-			m["messageInserts"] = r.MessageInserts
+			m["message_inserts"] = r.MessageInserts
 		}
 
 		if r.MessageErr != nil {
-			m["messageError"] = r.MessageErr.Error()
+			m["message_error"] = r.MessageErr.Error()
 		}
 	}
 

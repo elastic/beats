@@ -93,11 +93,11 @@ class Test(TestCase):
         assert len(events) == 1
         evt = events[0]
         assert evt["type"] == api
-        assert evt["eventID"] == eventID
+        assert evt["event_id"] == eventID
         assert evt["level"] == "Information"
-        assert evt["eventLogName"] == self.providerName
-        assert evt["sourceName"] == self.applicationName
-        assert evt["computerName"].lower() == win32api.GetComputerName().lower()
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
@@ -116,8 +116,8 @@ class Test(TestCase):
         """
         evt = self.read_unknown_event_id("eventlogging")
 
-        assert "messageInserts" in evt
-        assert evt["messageError"].lower() == ("The system cannot find "
+        assert "message_inserts" in evt
+        assert evt["message_error"].lower() == ("The system cannot find "
             "message text for message number 1111 in the message file for "
             "C:\\Windows\\system32\\EventCreate.exe.").lower()
 
@@ -130,7 +130,7 @@ class Test(TestCase):
 
         # TODO: messageInserts has not been implemented for wineventlog.
         # assert "messageInserts" in evt
-        assert evt["messageError"] == ("the message resource is present but "
+        assert evt["message_error"] == ("the message resource is present but "
             "the message is not found in the string/message table")
 
     def read_unknown_event_id(self, api):
@@ -153,11 +153,11 @@ class Test(TestCase):
         assert len(events) == 1
         evt = events[0]
         assert evt["type"] == api
-        assert evt["eventID"] == eventID
+        assert evt["event_id"] == eventID
         assert evt["level"] == "Information"
-        assert evt["eventLogName"] == self.providerName
-        assert evt["sourceName"] == self.applicationName
-        assert evt["computerName"].lower() == win32api.GetComputerName().lower()
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
@@ -207,11 +207,11 @@ class Test(TestCase):
         assert len(events) == 1
         evt = events[0]
         assert evt["type"] == api
-        assert evt["eventID"] == eventID
+        assert evt["event_id"] == eventID
         assert evt["level"] == "Information"
-        assert evt["eventLogName"] == self.providerName
-        assert evt["sourceName"] == self.applicationName
-        assert evt["computerName"].lower() == win32api.GetComputerName().lower()
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == accountIdentifier
         assert "user.name" not in evt
         assert "user.type" not in evt
