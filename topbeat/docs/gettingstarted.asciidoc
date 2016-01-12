@@ -64,7 +64,7 @@ https://www.elastic.co/downloads/beats/topbeat[downloads page].
 
 . Rename the `topbeat-<version>-windows` directory to `Topbeat`.
 
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*). If you are running Windows XP, you may need to download and install PowerShell.
 
 . Run the following commands to install Topbeat as a Windows service:
 +
