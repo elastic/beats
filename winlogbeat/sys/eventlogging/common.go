@@ -1,18 +1,21 @@
 package eventlogging
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // SID represents the Windows Security Identifier for an account.
 type SID struct {
-	Name    string
-	Domain  string
-	SIDType SIDType
+	Identifier string
+	Name       string
+	Domain     string
+	Type       SIDType
 }
 
 // String returns string representation of SID.
 func (a SID) String() string {
-	return fmt.Sprintf("SID Name[%s] Domain[%s] SIDType[%s]",
-		a.Name, a.Domain, a.SIDType)
+	return fmt.Sprintf("SID Identifier[%s] Name[%s] Domain[%s] Type[%s]",
+		a.Identifier, a.Name, a.Domain, a.Type)
 }
 
 // SIDType identifies the type of a security identifier (SID).

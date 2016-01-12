@@ -393,15 +393,22 @@ func parseSID(record eventLogRecord, buffer []byte) (*SID, error) {
 	}
 
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[record.userSidOffset]))
-	account, domain, accountType, err := sid.LookupAccount("")
+	identifier, err := sid.String()
 	if err != nil {
 		return nil, err
 	}
 
+	account, domain, accountType, err := sid.LookupAccount("")
+	if err != nil {
+		// Ignore the error and return a partially populated SID.
+		return &SID{Identifier: identifier}, nil
+	}
+
 	return &SID{
-		Name:    account,
-		Domain:  domain,
-		SIDType: SIDType(accountType),
+		Identifier: identifier,
+		Name:       account,
+		Domain:     domain,
+		Type:       SIDType(accountType),
 	}, nil
 }
 

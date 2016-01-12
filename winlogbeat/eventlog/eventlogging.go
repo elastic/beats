@@ -142,9 +142,10 @@ func (l *eventLogging) Read() ([]Record, error) {
 
 		if e.UserSID != nil {
 			r.User = &User{
-				Name:   e.UserSID.Name,
-				Domain: e.UserSID.Domain,
-				Type:   e.UserSID.SIDType.String(),
+				Identifier: e.UserSID.Identifier,
+				Name:       e.UserSID.Name,
+				Domain:     e.UserSID.Domain,
+				Type:       e.UserSID.Type.String(),
 			}
 		}
 

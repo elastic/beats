@@ -116,7 +116,8 @@ func Subscribe(
 
 // EventHandles reads the event handles from a subscription. It attempt to read
 // at most maxHandles. ErrorNoMoreHandles is returned when there are no more
-// handles available to return.
+// handles available to return. Close must be called on each returned EvtHandle
+// when finished with the handle.
 func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 	eventHandles := make([]EvtHandle, maxHandles)
 	var numRead uint32
@@ -153,6 +154,7 @@ func RenderEvent(
 		if err != nil {
 			return Event{}, err
 		}
+		defer _EvtClose(systemContext)
 	}
 
 	var bufferUsed, propertyCount uint32
@@ -309,8 +311,8 @@ func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 	return h, nil
 }
 
-// OpenPublisherMetadata opens a handle to the publisher's metadata. Close must be called on
-// returned EvtHandle when finished with the handle.
+// OpenPublisherMetadata opens a handle to the publisher's metadata. Close must
+// be called on returned EvtHandle when finished with the handle.
 func OpenPublisherMetadata(
 	session EvtHandle,
 	publisherName string,
@@ -494,15 +496,22 @@ func readSID(buffer []byte, reader io.Reader) (*eventlogging.SID, error) {
 		return nil, err
 	}
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[offset]))
-	account, domain, accountType, err := sid.LookupAccount("")
+	identifier, err := sid.String()
 	if err != nil {
 		return nil, err
 	}
 
+	account, domain, accountType, err := sid.LookupAccount("")
+	if err != nil {
+		// Ignore the error and return a partially populated SID.
+		return &eventlogging.SID{Identifier: identifier}, nil
+	}
+
 	return &eventlogging.SID{
-		Name:    account,
-		Domain:  domain,
-		SIDType: eventlogging.SIDType(accountType),
+		Identifier: identifier,
+		Name:       account,
+		Domain:     domain,
+		Type:       eventlogging.SIDType(accountType),
 	}, nil
 }
 

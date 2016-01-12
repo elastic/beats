@@ -9,6 +9,9 @@ A regular _Beats setup_ consists of:
  * Optionally Logstash for inserting data into Elasticsearch. See <<logstash-installation>>.
  * Kibana for the UI. See <<kibana-installation>>.
  * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>.
+  
+See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 
+about supported operating systems and product compatibility.
 
 NOTE: To get started, you can install Elasticsearch and Kibana on a
 single VM or even on your laptop. The only condition is that the machine must be
@@ -240,10 +243,10 @@ To use this setup, you'll also need to configure your Beat to use Logstash. For 
 [[logstash-input-update]]
 ==== Updating the Logstash Input Beats Plugin
 
-If you are running Logstash 2.0 or earlier, you might not have the latest
-version of the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin].
-You can easily update to the latest
-version of the input plugin from your Logstash installation:
+Plugins have their own release cycle and are often released independent of
+Logstash’s core release cycle. To ensure that you have the latest version of
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin], 
+run the following command from your Logstash installation:
 
 *deb, rpm, and mac:*
 
@@ -259,7 +262,10 @@ version of the input plugin from your Logstash installation:
 bin\plugin update logstash-input-beats
 ----------------------------------------------------------------------
 
-More details about working with input plugins in Logstash are available https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
+Keep in mind that you can update to the latest version of the plugin without
+having to upgrade to a newer version of Logstash. More details about working
+with input plugins in Logstash are available
+https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
 
 
 ==== Running Logstash

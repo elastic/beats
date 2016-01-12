@@ -12,9 +12,9 @@ type syncPublisher struct {
 
 type syncClient func(message) bool
 
-func newSyncPublisher(pub *PublisherType) *syncPublisher {
+func newSyncPublisher(pub *PublisherType, hwm, bulkHWM int) *syncPublisher {
 	s := &syncPublisher{pub: pub}
-	s.messageWorker.init(&pub.wsPublisher, defaultChanSize, newPreprocessor(pub, s))
+	s.messageWorker.init(&pub.wsPublisher, hwm, bulkHWM, newPreprocessor(pub, s))
 	return s
 }
 

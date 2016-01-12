@@ -48,6 +48,7 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 	if err != nil {
 		return err
 	}
+	defer sys.Close(bookmark)
 
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
@@ -81,13 +82,18 @@ func (l *winEventLog) Read() ([]Record, error) {
 		logp.Warn("%s EventHandles returned error %v Errno: %d", l.logPrefix, err)
 		return nil, err
 	}
+	defer func() {
+		for _, h := range handles {
+			sys.Close(h)
+		}
+	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
 	var records []Record
 	for _, h := range handles {
 		e, err := sys.RenderEvent(h, 0, 0, l.renderBuf, nil)
 		if err != nil {
-			logp.Err("%s Error rendering event. %v", l.logPrefix, err)
+			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
 			continue
 		}
 
@@ -110,9 +116,10 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 		if e.UserSID != nil {
 			r.User = &User{
-				Name:   e.UserSID.Name,
-				Domain: e.UserSID.Domain,
-				Type:   e.UserSID.SIDType.String(),
+				Identifier: e.UserSID.Identifier,
+				Name:       e.UserSID.Name,
+				Domain:     e.UserSID.Domain,
+				Type:       e.UserSID.Type.String(),
 			}
 		}
 

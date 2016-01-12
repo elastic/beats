@@ -56,7 +56,7 @@ eventlog:
   description: >
     Contains data from a Windows event log record.
   fields:
-    - name: computerName
+    - name: computer_name
       type: string
       required: true
       description: >
@@ -70,13 +70,13 @@ eventlog:
         The category for this event. The meaning of this value depends on the
         event source.
 
-    - name: eventID
+    - name: event_id
       type: long
       required: true
       description: >
         The event identifier. The value is specific to the source of the event.
 
-    - name: eventLogName
+    - name: log_name
       type: string
       required: true
       description: >
@@ -96,14 +96,14 @@ eventlog:
       description: >
         The message from the event log record.
 
-    - name: messageError
+    - name: message_error
       type: string
       required: false
       description: >
         The error that occurred while reading and formatting the message from
         the log. This field is mutually exclusive with `message`.
 
-    - name: messageInserts
+    - name: message_inserts
       type: list
       required: false
       description: >
@@ -112,36 +112,51 @@ eventlog:
         an error Winlogbeat attempts to provide this raw data. This field is
         mutually exclusive with `message`.
 
-    - name: recordNumber
+    - name: record_number
       type: string
       required: true
       description: >
         The record number of the event log record. The first record written
         to an event log is record number 1, and other records are numbered
-        sequentially. If the record number reaches 4294967295, the next record
-        number will be 0.
+        sequentially. If the record number reaches the maximum value (2^32^
+        for the Event Logging API and 2^64^ for Window Event Log API), the next
+        record number will be 0.
 
-    - name: sourceName
+    - name: source_name
       type: string
       required: true
       description: >
         The source of the event log record (the application or service that
         logged the record).
 
+    - name: user.identifier
+      type: string
+      required: false
+      example: S-1-5-21-3541430928-2051711210-1391384369-1001
+      description: >
+        The Windows security identifier (SID) of the account associated with
+        this event.
+
+
+        If Winlogbeat cannot resolve the SID to a name, then the `user.name`,
+        `user.domain`, and `user.type` fields will be omitted from the event.
+        If you discover Winlogbeat not resolving SIDs, review the log for
+        clues as to what the problem may be.
+
     - name: user.name
       type: string
       required: false
       description: >
-        The name of the user associated with this event.
+        The name of the account associated with this event.
 
     - name: user.domain
       type: string
       required: false
       description: >
-        The domain that the user associated with this event is a member of.
+        The domain that the account associated with this event is a member of.
 
     - name: user.type
       type: string
       required: false
       description: >
-        The type of user account associated with this event.
+        The type of account associated with this event.
