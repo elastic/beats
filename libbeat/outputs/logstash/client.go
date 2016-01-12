@@ -96,16 +96,6 @@ func (l *lumberjackClient) Close() error {
 	return l.TransportClient.Close()
 }
 
-func (l *lumberjackClient) Connect(timeout time.Duration) error {
-	logp.Debug("logstash", "connect")
-	return l.TransportClient.Connect(timeout)
-}
-
-func (l *lumberjackClient) Close() error {
-	logp.Debug("logstash", "close connection")
-	return l.TransportClient.Close()
-}
-
 func (l *lumberjackClient) PublishEvent(event common.MapStr) error {
 	_, err := l.PublishEvents([]common.MapStr{event})
 	return err
