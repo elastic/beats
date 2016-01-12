@@ -11,11 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/decoder"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/icmp"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/protos/udp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -30,9 +26,16 @@ type SnifferSetup struct {
 	isAlive        bool
 	dumper         *pcap.Dumper
 
-	Decoder    *decoder.DecoderStruct
+	// Decoder    *decoder.DecoderStruct
+	worker     Worker
 	DataSource gopacket.PacketDataSource
 }
+
+type Worker interface {
+	OnPacket(data []byte, ci *gopacket.CaptureInfo)
+}
+
+type WorkerFactory func(layers.LinkType) (Worker, error)
 
 // Computes the block_size and the num_blocks in such a way that the
 // allocated mmap buffer is close to but smaller than target_size_mb.
@@ -236,13 +239,7 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(
-	test_mode bool,
-	icmp4 icmp.ICMPv4Processor,
-	icmp6 icmp.ICMPv6Processor,
-	tcp tcp.Processor,
-	udp udp.Processor,
-) error {
+func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory) error {
 	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
 		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
 		with_icmp := config.ConfigSingleton.Protocols.Icmp.Enabled
@@ -258,7 +255,7 @@ func (sniffer *SnifferSetup) Init(
 		}
 	}
 
-	sniffer.Decoder, err = decoder.NewDecoder(sniffer.Datalink(), icmp4, icmp6, tcp, udp)
+	sniffer.worker, err = factory(sniffer.Datalink())
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}
@@ -353,7 +350,7 @@ func (sniffer *SnifferSetup) Run() error {
 		}
 		logp.Debug("sniffer", "Packet number: %d", counter)
 
-		sniffer.Decoder.DecodePacketData(data, &ci)
+		sniffer.worker.OnPacket(data, &ci)
 	}
 
 	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)

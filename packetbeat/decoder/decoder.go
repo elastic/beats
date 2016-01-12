@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/icmp"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -38,10 +39,17 @@ type DecoderStruct struct {
 	icmp6Proc icmp.ICMPv6Processor
 	tcpProc   tcp.Processor
 	udpProc   udp.Processor
+
+	flows *flows.Flows
+
+	// hold current flow ID
+	flowID              flows.FlowID // buffer flowID among many calls
+	flowIDBufferBacking [flows.SizeFlowIDMax]byte
 }
 
 // Creates and returns a new DecoderStruct.
 func NewDecoder(
+	flows *flows.Flows,
 	datalink layers.LinkType,
 	icmp4 icmp.ICMPv4Processor,
 	icmp6 icmp.ICMPv6Processor,
@@ -49,6 +57,7 @@ func NewDecoder(
 	udp udp.Processor,
 ) (*DecoderStruct, error) {
 	d := DecoderStruct{
+		flows:     flows,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
@@ -111,6 +120,8 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
+	d.flowID.Reset(d.flowIDBufferBacking[:])
+
 	debugf("decode packet data")
 
 	processed := false
@@ -144,8 +155,12 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 		currentType = nextType
 	}
 
-	// TODO: handle flow information for ip4/ip6 layers only,
-	//       if processed == false
+	// add flow stats
+	if d.flowID.Flags() != 0 {
+		flow := d.flows.Get(&d.flowID)
+		flow.Stats.Packets++
+		flow.Stats.Bytes += uint64(ci.Length)
+	}
 }
 
 func (d *DecoderStruct) process(
@@ -153,38 +168,51 @@ func (d *DecoderStruct) process(
 	layerType gopacket.LayerType,
 ) (bool, error) {
 	switch layerType {
+	case layers.LayerTypeEthernet:
+		d.flowID.AddEth(d.eth.SrcMAC, d.eth.DstMAC)
+
 	case layers.LayerTypeDot1Q:
+		d1q := &d.d1q[d.stD1Q.i]
 		d.stD1Q.next()
+		d.flowID.AddVLan(d1q.VLANIdentifier)
 
 	case layers.LayerTypeIPv4:
 		debugf("IPv4 packet")
 		ip4 := &d.ip4[d.stIP4.i]
 		d.stIP4.next()
 
+		d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
+
 		packet.Tuple.Src_ip = ip4.SrcIP
 		packet.Tuple.Dst_ip = ip4.DstIP
 		packet.Tuple.Ip_length = 4
+
 	case layers.LayerTypeIPv6:
 		debugf("IPv6 packet")
 		ip6 := &d.ip6[d.stIP6.i]
 		d.stIP6.next()
 
+		d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
+
 		packet.Tuple.Src_ip = ip6.SrcIP
 		packet.Tuple.Dst_ip = ip6.DstIP
 		packet.Tuple.Ip_length = 16
+
 	case layers.LayerTypeICMPv4:
 		debugf("ICMPv4 packet")
-
 		d.onICMPv4(packet)
 		return true, nil
+
 	case layers.LayerTypeICMPv6:
 		debugf("ICMPv6 packet")
 		d.onICMPv6(packet)
 		return true, nil
+
 	case layers.LayerTypeUDP:
 		debugf("UDP packet")
 		d.onUDP(packet)
 		return true, nil
+
 	case layers.LayerTypeTCP:
 		debugf("TCP packet")
 		d.onTCP(packet)
@@ -198,34 +226,37 @@ func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
 	packet.Payload = d.icmp4.Payload
 	packet.Tuple.ComputeHashebles()
 
-	// TODO: handle flow
-	d.icmp4Proc.ProcessICMPv4(&d.icmp4, packet)
+	d.icmp4Proc.ProcessICMPv4(&d.flowID, &d.icmp4, packet)
 }
 
 func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
 	packet.Payload = d.icmp6.Payload
 	packet.Tuple.ComputeHashebles()
 
-	// TODO: handle flow
-	d.icmp6Proc.ProcessICMPv6(&d.icmp6, packet)
+	d.icmp6Proc.ProcessICMPv6(&d.flowID, &d.icmp6, packet)
 }
 
 func (d *DecoderStruct) onUDP(packet *protos.Packet) {
-	packet.Tuple.Src_port = uint16(d.udp.SrcPort)
-	packet.Tuple.Dst_port = uint16(d.udp.DstPort)
+	src := uint16(d.udp.SrcPort)
+	dst := uint16(d.udp.DstPort)
+	d.flowID.AddTCP(src, dst)
+
+	packet.Tuple.Src_port = src
+	packet.Tuple.Dst_port = dst
 	packet.Payload = d.udp.Payload
 	packet.Tuple.ComputeHashebles()
 
-	// TODO: handle flow
-	d.udpProc.Process(packet)
+	d.udpProc.Process(&d.flowID, packet)
 }
 
 func (d *DecoderStruct) onTCP(packet *protos.Packet) {
-	packet.Tuple.Src_port = uint16(d.tcp.SrcPort)
-	packet.Tuple.Dst_port = uint16(d.tcp.DstPort)
-	packet.Payload = d.tcp.Payload
+	src := uint16(d.tcp.SrcPort)
+	dst := uint16(d.tcp.DstPort)
+	d.flowID.AddTCP(src, dst)
 
-	// TODO: handle flow
+	packet.Tuple.Src_port = src
+	packet.Tuple.Dst_port = dst
+	packet.Payload = d.tcp.Payload
 
 	if len(packet.Payload) == 0 && !d.tcp.FIN {
 		// We have no use for this atm.
@@ -233,5 +264,5 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 		return
 	}
 	packet.Tuple.ComputeHashebles()
-	d.tcpProc.Process(&d.tcp, packet)
+	d.tcpProc.Process(&d.flowID, &d.tcp, packet)
 }

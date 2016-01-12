@@ -9,17 +9,18 @@ import (
 	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/tsg/gopacket/layers"
 )
 
 type ICMPv4Processor interface {
-	ProcessICMPv4(tcphdr *layers.ICMPv4, pkt *protos.Packet)
+	ProcessICMPv4(flowID *flows.FlowID, hdr *layers.ICMPv4, pkt *protos.Packet)
 }
 
 type ICMPv6Processor interface {
-	ProcessICMPv6(tcphdr *layers.ICMPv6, pkt *protos.Packet)
+	ProcessICMPv6(flowID *flows.FlowID, hdr *layers.ICMPv6, pkt *protos.Packet)
 }
 
 type Icmp struct {
@@ -104,10 +105,15 @@ func (icmp *Icmp) setFromConfig(config config.Icmp) (err error) {
 	return nil
 }
 
-func (icmp *Icmp) ProcessICMPv4(icmp4 *layers.ICMPv4, pkt *protos.Packet) {
+func (icmp *Icmp) ProcessICMPv4(
+	flowID *flows.FlowID,
+	icmp4 *layers.ICMPv4,
+	pkt *protos.Packet,
+) {
 	typ := uint8(icmp4.TypeCode >> 8)
 	code := uint8(icmp4.TypeCode)
 	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer)
+	flowID.AddICMPv4(id)
 	tuple := icmpTuple{
 		IcmpVersion: 4,
 		SrcIp:       pkt.Tuple.Src_ip,
@@ -124,10 +130,15 @@ func (icmp *Icmp) ProcessICMPv4(icmp4 *layers.ICMPv4, pkt *protos.Packet) {
 	icmp.processMessage(&tuple, &msg)
 }
 
-func (icmp *Icmp) ProcessICMPv6(icmp6 *layers.ICMPv6, pkt *protos.Packet) {
+func (icmp *Icmp) ProcessICMPv6(
+	flowID *flows.FlowID,
+	icmp6 *layers.ICMPv6,
+	pkt *protos.Packet,
+) {
 	typ := uint8(icmp6.TypeCode >> 8)
 	code := uint8(icmp6.TypeCode)
 	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
+	flowID.AddICMPv6(id)
 	tuple := icmpTuple{
 		IcmpVersion: 6,
 		SrcIp:       pkt.Tuple.Src_ip,

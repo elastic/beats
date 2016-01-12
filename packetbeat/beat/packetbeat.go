@@ -14,8 +14,10 @@ import (
 	"github.com/elastic/beats/libbeat/filters/nop"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/service"
+	"github.com/elastic/packetbeat/decoder"
 
 	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/dns"
@@ -160,26 +162,6 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 		protos.Protos.Register(proto, plugin)
 	}
 
-	var err error
-
-	icmpProc, err := icmp.NewIcmp(false, b.Events)
-	if err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
-	}
-
-	tcpProc, err := tcp.NewTcp(&protos.Protos)
-	if err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
-	}
-
-	udpProc, err := udp.NewUdp(&protos.Protos)
-	if err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
-	}
-
 	pb.over = make(chan bool)
 
 	/*
@@ -197,7 +179,26 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	*/
 
 	logp.Debug("main", "Initializing sniffer")
-	err = pb.Sniff.Init(false, icmpProc, icmpProc, tcpProc, udpProc)
+	err := pb.Sniff.Init(false, func(dl gopacket.LinkType) sniffer.Worker {
+		flows := flows.NewFlows()
+
+		icmp, err := icmp.NewIcmp(false, b.Events)
+		if err != nil {
+			return nil, err
+		}
+
+		tcp, err := tcp.NewTcp(&protos.Protos)
+		if err != nil {
+			return nil, err
+		}
+
+		udp, err := udp.NewUdp(&protos.Protos)
+		if err != nil {
+			return nil, err
+		}
+
+		return decoder.NewDecoder(flows, dl, icmp, icmp, tcp, udp)
+	})
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)
 		os.Exit(1)
