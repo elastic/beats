@@ -276,7 +276,7 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 		"type":       "log",
 		"message":    "hello world",
 	}
-	ls.PublishEvent(nil, time.Now(), event)
+	ls.PublishEvent(nil, testOptions, event)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -313,7 +313,7 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 			"type":       "log",
 			"message":    fmt.Sprintf("hello world - %v", i),
 		}
-		ls.PublishEvent(nil, time.Now(), event)
+		ls.PublishEvent(nil, testOptions, event)
 	}
 
 	// wait for logstash event flush + elasticsearch
@@ -384,7 +384,7 @@ func testSendMultipleBatchesViaLogstash(
 
 	for _, batch := range batches {
 		sig := outputs.NewSyncSignal()
-		ls.BulkPublish(sig, time.Now(), batch)
+		ls.BulkPublish(sig, testOptions, batch)
 		ok := sig.Wait()
 		assert.Equal(t, true, ok)
 	}
@@ -432,10 +432,10 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 		"message":    "hello world",
 	}
 
-	es.PublishEvent(nil, ts, event)
+	es.PublishEvent(nil, testOptions, event)
 	waitUntilTrue(timeout, checkIndex(es, 1))
 
-	ls.PublishEvent(nil, ts, event)
+	ls.PublishEvent(nil, testOptions, event)
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 
 	// search value in logstash elasticsearch index
@@ -487,10 +487,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 			"message":    "hello world",
 		},
 	}
-	es.BulkPublish(nil, ts, events)
+	es.BulkPublish(nil, testOptions, events)
 	waitUntilTrue(timeout, checkIndex(es, 1))
 
-	ls.BulkPublish(nil, ts, events)
+	ls.BulkPublish(nil, testOptions, events)
 	waitUntilTrue(timeout, checkIndex(ls, 1))
 
 	// search value in logstash elasticsearch index

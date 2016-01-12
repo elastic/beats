@@ -5,9 +5,9 @@ import (
 	"io"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,7 +47,7 @@ func event(k, v string) common.MapStr {
 func run(c *console, events ...common.MapStr) (string, error) {
 	return withStdout(func() {
 		for _, event := range events {
-			c.PublishEvent(nil, time.Now(), event)
+			c.PublishEvent(nil, outputs.Options{}, event)
 		}
 	})
 }

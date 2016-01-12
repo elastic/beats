@@ -68,6 +68,13 @@ func NewLoadBalancerMode(
 	maxAttempts int,
 	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*LoadBalancerMode, error) {
+
+	// maxAttempts signals infinite retry. Convert to -1, so attempts left and
+	// and infinite retry can be more easily distinguished by load balancer
+	if maxAttempts == 0 {
+		maxAttempts = -1
+	}
+
 	m := &LoadBalancerMode{
 		timeout:      timeout,
 		maxWaitRetry: maxWaitRetry,
@@ -94,28 +101,33 @@ func (m *LoadBalancerMode) Close() error {
 // PublishEvents forwards events to some load balancing worker.
 func (m *LoadBalancerMode) PublishEvents(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
-	return m.publishEventsMessage(eventsMessage{
-		attemptsLeft: m.maxAttempts,
-		signaler:     signaler,
-		events:       events,
-	})
+	return m.publishEventsMessage(opts,
+		eventsMessage{signaler: signaler, events: events})
 }
 
 // PublishEvent forwards the event to some load balancing worker.
 func (m *LoadBalancerMode) PublishEvent(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return m.publishEventsMessage(eventsMessage{
-		attemptsLeft: m.maxAttempts,
-		signaler:     signaler,
-		event:        event,
-	})
+	return m.publishEventsMessage(opts,
+		eventsMessage{signaler: signaler, event: event})
 }
 
-func (m *LoadBalancerMode) publishEventsMessage(msg eventsMessage) error {
+func (m *LoadBalancerMode) publishEventsMessage(
+	opts outputs.Options,
+	msg eventsMessage,
+) error {
+	maxAttempts := m.maxAttempts
+	if opts.Guaranteed {
+		maxAttempts = -1
+	}
+	msg.attemptsLeft = maxAttempts
+
 	if ok := m.forwardEvent(m.work, msg); !ok {
 		dropping(msg)
 	}
@@ -170,7 +182,9 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 	if msg.event != nil {
 		if err := client.PublishEvent(msg.event); err != nil {
-			msg.attemptsLeft--
+			if msg.attemptsLeft > 0 {
+				msg.attemptsLeft--
+			}
 			m.onFail(msg, err)
 			return
 		}
@@ -184,10 +198,12 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 
 			events, err = client.PublishEvents(events)
 			if err != nil {
-				msg.attemptsLeft--
+				if msg.attemptsLeft > 0 {
+					msg.attemptsLeft--
+				}
 
 				// reset attempt count if subset of messages has been processed
-				if len(events) < total {
+				if len(events) < total && msg.attemptsLeft >= 0 {
 					msg.attemptsLeft = m.maxAttempts
 				}
 
@@ -198,7 +214,7 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 					return
 				}
 
-				if m.maxAttempts > 0 && msg.attemptsLeft <= 0 {
+				if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
 					// no more attempts left => drop
 					dropping(msg)
 					return
@@ -239,7 +255,7 @@ func (m *LoadBalancerMode) forwardEvent(
 	ch chan eventsMessage,
 	msg eventsMessage,
 ) bool {
-	if m.maxAttempts == 0 {
+	if msg.attemptsLeft < 0 {
 		select {
 		case ch <- msg:
 			return true

@@ -37,8 +37,8 @@ type context struct {
 }
 
 type publishOptions struct {
-	confirm bool
-	sync    bool
+	guaranteed bool
+	sync       bool
 }
 
 type TransactionalEventPublisher interface {
