@@ -236,8 +236,9 @@ See <<configuration-output-tls>> for more information.
 ==== Logstash Output
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
-protocol. To use this option, you must {libbeat}/getting-started.html#logstash-setup[install and configure] the logstash-input-beats
-plugin in Logstash. Logstash allows for additional processing and routing of
+protocol, which runs over TCP. To use this option, you must
+{libbeat}/getting-started.html#logstash-setup[install and configure] the Beats input
+plugin for Logstash. Logstash allows for additional processing and routing of
 generated events.
 
 Every event sent to Logstash contains additional metadata for indexing and filtering:
@@ -374,8 +375,8 @@ For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for 
 ===== tls
 
 Configuration options for TLS parameters like the root CA for Logstash connections. See
-<<configuration-output-tls>> for more information. If the `tls` section is missing, a TCP-only connection is assumed. Logstash must also be configured to use TCP for
-Logstash input.
+<<configuration-output-tls>> for more information. To use TLS, you must also configure the 
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] to use SSL/TLS.
 
 ===== timeout
 
@@ -399,7 +400,7 @@ operation doesn't succeed after `max_retries`, the Beat is optionally notified.
 ==== Redis Output (DEPRECATED)
 
 The Redis output inserts the events in a Redis list. This output plugin is compatible with
-the http://logstash.net/docs/1.4.2/inputs/redis[Redis input plugin] from Logstash,
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash,
 so the Redis Output for the Beats is deprecated.
 
 Example configuration:
