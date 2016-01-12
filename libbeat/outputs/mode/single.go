@@ -63,9 +63,10 @@ func (s *SingleConnectionMode) Close() error {
 // unavailable. On failure PublishEvents tries to reconnect.
 func (s *SingleConnectionMode) PublishEvents(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	events []common.MapStr,
 ) error {
-	return s.publish(signaler, func() (bool, bool) {
+	return s.publish(signaler, opts, func() (bool, bool) {
 		for len(events) > 0 {
 			var err error
 
@@ -86,9 +87,10 @@ func (s *SingleConnectionMode) PublishEvents(
 // PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
 func (s *SingleConnectionMode) PublishEvent(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return s.publish(signaler, func() (bool, bool) {
+	return s.publish(signaler, opts, func() (bool, bool) {
 		if err := s.conn.PublishEvent(event); err != nil {
 			logp.Info("Error publishing event (retrying): %s", err)
 			return false, false
@@ -107,13 +109,14 @@ func (s *SingleConnectionMode) PublishEvent(
 // to maxAttempts send attempts without any progress might be executed.
 func (s *SingleConnectionMode) publish(
 	signaler outputs.Signaler,
+	opts outputs.Options,
 	send func() (ok bool, resetFail bool),
 ) error {
 	fails := 0
 	var backoffCount uint
 	var err error
 
-	for !s.closed && (s.maxAttempts == 0 || fails < s.maxAttempts) {
+	for !s.closed && (!opts.Guaranteed || s.maxAttempts == 0 || fails < s.maxAttempts) {
 		ok := false
 		resetFail := false
 
@@ -135,7 +138,7 @@ func (s *SingleConnectionMode) publish(
 		if resetFail {
 			fails = 0
 		}
-		if s.maxAttempts > 0 && fails == s.maxAttempts {
+		if !opts.Guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
 			// max number of attempts reached
 			break
 		}

@@ -32,7 +32,7 @@ func TestIndex(t *testing.T) {
 	}
 	_, resp, err := client.Index(index, "test", "1", params, body)
 	if err != nil {
-		t.Errorf("Index() returns error: %s", err)
+		t.Fatalf("Index() returns error: %s", err)
 	}
 	if !resp.Created {
 		t.Errorf("Index() fails: %s", resp)
