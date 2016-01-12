@@ -1,0 +1,12 @@
+[Unit]
+Description={{.beat_name}}
+Documentation=https://www.elastic.co/guide/en/beats/{{.beat_name}}/current/index.html
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/{{.beat_name}} -c /etc/{{.beat_name}}/{{.beat_name}}.yml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+version: "1.2.0-nightly${BUILDID}"
+rpm_version: "1.2.0~nightly${BUILDID}"
+deb_version: "1.2.0~nightly${BUILDID}"

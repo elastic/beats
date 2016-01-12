@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+# Expect wrapper for rpm-s3 that provides the GPG signing password
+# when prompted.
+
+spawn rpm-s3 \
+        -vv \
+        --sign \
+        --region=external-1 \
+        --keep=500 \
+        --visibility=public-read \
+        --bucket=$env(BUCKET) \
+        --repopath=$env(PREFIX)/yum/el/$env(arch) \
+        {*}$argv
+expect {
+  "Enter passphrase: " {
+    send -- "$env(PASS)\r"
+    exp_continue
+  }
+}
