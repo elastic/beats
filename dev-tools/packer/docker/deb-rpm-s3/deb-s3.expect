@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+# Expect wrapper for deb-s3 that provides the GPG signing password
+# when prompted.
+
+spawn deb-s3 upload \
+        --sign \
+        --preserve_versions \
+        --bucket "$env(BUCKET)" \
+        --prefix "$env(PREFIX)/apt" \
+        --arch $env(arch) \
+        {*}$argv
+expect {
+  "Enter passphrase: " {
+    send -- "$env(PASS)\r"
+    exp_continue
+  }
+}

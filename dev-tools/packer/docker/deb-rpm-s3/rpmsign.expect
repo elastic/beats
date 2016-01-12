@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+# Expect wrapper for 'rpm --resign' that provides the GPG signing password
+# when prompted.
+#
+# Set password in PASS environment variable prior to running
+# this expect script.
+#
+# Example usage:
+#  expect rpmsign.expect example.rpm
+#
+#  expect rpmsign.expect example.rpm other.rpm
+
+spawn rpm --resign \
+  --define "_signature gpg" \
+  --define "_gpg_name Elasticsearch (Elasticsearch Signing Key) <dev_ops@elasticsearch.org>" \
+  {*}$argv
+expect -exact "Enter pass phrase: "
+send -- "$env(PASS)\r"
+expect eof
