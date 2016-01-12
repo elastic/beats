@@ -66,27 +66,27 @@ func (r Record) String() string {
 // ToMapStr returns a new MapStr containing the data from this Record.
 func (r Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"@timestamp":   common.Time(r.TimeGenerated),
-		"eventLogName": r.EventLogName,
-		"sourceName":   r.SourceName,
-		"computerName": r.ComputerName,
+		"@timestamp":    common.Time(r.TimeGenerated),
+		"log_name":      r.EventLogName,
+		"source_name":   r.SourceName,
+		"computer_name": r.ComputerName,
 		// Use a string to represent this uint64 data because its value can
 		// be outside the range represented by a Java long.
-		"recordNumber": strconv.FormatUint(r.RecordNumber, 10),
-		"eventID":      r.EventID,
-		"level":        r.Level,
-		"type":         r.API,
+		"record_number": strconv.FormatUint(r.RecordNumber, 10),
+		"event_id":      r.EventID,
+		"level":         r.Level,
+		"type":          r.API,
 	}
 
 	if r.Message != "" {
 		m["message"] = r.Message
 	} else {
 		if len(r.MessageInserts) > 0 {
-			m["messageInserts"] = r.MessageInserts
+			m["message_inserts"] = r.MessageInserts
 		}
 
 		if r.MessageErr != nil {
-			m["messageError"] = r.MessageErr.Error()
+			m["message_error"] = r.MessageErr.Error()
 		}
 	}
 
@@ -95,21 +95,32 @@ func (r Record) ToMapStr() common.MapStr {
 	}
 
 	if r.User != nil {
-		m["user"] = common.MapStr{
-			"name":   r.User.Name,
-			"domain": r.User.Domain,
-			"type":   r.User.Type,
+		user := common.MapStr{
+			"identifier": r.User.Identifier,
+		}
+		m["user"] = user
+
+		// Optional fields.
+		if r.User.Name != "" {
+			user["name"] = r.User.Name
+		}
+		if r.User.Domain != "" {
+			user["domain"] = r.User.Domain
+		}
+		if r.User.Type != "" {
+			user["type"] = r.User.Type
 		}
 	}
 
 	return m
 }
 
-// User contain information about a Windows user.
+// User contains information about a Windows account.
 type User struct {
-	Name   string // User name
-	Domain string // Domain that the user is a member of
-	Type   string // Type of account (e.g. User, Computer, Service)
+	Identifier string // Unique identifier used by Windows to ID the account.
+	Name       string // User name
+	Domain     string // Domain that the user is a member of
+	Type       string // Type of account (e.g. User, Computer, Service)
 }
 
 // String returns a string representation of Record.

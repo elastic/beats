@@ -12,6 +12,7 @@ type bulkWorker struct {
 	ws     *workerSignal
 
 	queue       chan message
+	bulkQueue   chan message
 	flushTicker *time.Ticker
 
 	maxBatchSize int
@@ -20,7 +21,8 @@ type bulkWorker struct {
 }
 
 func newBulkWorker(
-	ws *workerSignal, hwm int, output worker,
+	ws *workerSignal, hwm int, bulkHWM int,
+	output worker,
 	flushInterval time.Duration,
 	maxBatchSize int,
 ) *bulkWorker {
@@ -28,6 +30,7 @@ func newBulkWorker(
 		output:       output,
 		ws:           ws,
 		queue:        make(chan message, hwm),
+		bulkQueue:    make(chan message, bulkHWM),
 		flushTicker:  time.NewTicker(flushInterval),
 		maxBatchSize: maxBatchSize,
 		events:       make([]common.MapStr, 0, maxBatchSize),
@@ -40,7 +43,11 @@ func newBulkWorker(
 }
 
 func (b *bulkWorker) send(m message) {
-	b.queue <- m
+	if m.events == nil {
+		b.queue <- m
+	} else {
+		b.bulkQueue <- m
+	}
 }
 
 func (b *bulkWorker) run() {
@@ -51,16 +58,9 @@ func (b *bulkWorker) run() {
 		case <-b.ws.done:
 			return
 		case m := <-b.queue:
-			if m.event != nil { // single event
-				b.onEvent(m.context.signal, m.event)
-			} else { // batch of events
-				b.onEvents(m.context.signal, m.events)
-			}
-
-			// buffer full?
-			if len(b.events) == cap(b.events) {
-				b.publish()
-			}
+			b.onEvent(m.context.signal, m.event)
+		case m := <-b.bulkQueue:
+			b.onEvents(m.context.signal, m.events)
 		case <-b.flushTicker.C:
 			if len(b.events) > 0 {
 				b.publish()
@@ -74,6 +74,10 @@ func (b *bulkWorker) onEvent(signal outputs.Signaler, event common.MapStr) {
 	if signal != nil {
 		b.pending = append(b.pending, signal)
 	}
+
+	if len(b.events) == cap(b.events) {
+		b.publish()
+	}
 }
 
 func (b *bulkWorker) onEvents(signal outputs.Signaler, events []common.MapStr) {
@@ -81,11 +85,10 @@ func (b *bulkWorker) onEvents(signal outputs.Signaler, events []common.MapStr) {
 		// split up bulk to match required bulk sizes.
 		// If input events have been split up bufferFull will be set and
 		// bulk request will be published.
-		bufferFull := false
 		spaceLeft := cap(b.events) - len(b.events)
 		consume := len(events)
+		bufferFull := spaceLeft <= consume
 		if spaceLeft < consume {
-			bufferFull = true
 			consume = spaceLeft
 			if signal != nil {
 				// creating cascading signaler chain for
@@ -113,6 +116,7 @@ func (b *bulkWorker) publish() {
 		context: context{
 			signal: outputs.NewCompositeSignaler(b.pending...),
 		},
+		event:  nil,
 		events: b.events,
 	})
 
@@ -123,5 +127,6 @@ func (b *bulkWorker) publish() {
 func (b *bulkWorker) shutdown() {
 	b.flushTicker.Stop()
 	stopQueue(b.queue)
+	stopQueue(b.bulkQueue)
 	b.ws.wg.Done()
 }

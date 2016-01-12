@@ -29,15 +29,21 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 - Fix logstash window size of 1 not increasing. {pull}598[598]
+- Fix logging issue with file based output where newlines could be misplaced
+  during concurrent logging {pull}650[650]
+- Reduce memory usage by separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
+- Set default default bulk_max_size value to 2048 {pull}628[628]
 
 *Packetbeat*
 - Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 
 *Topbeat*
 
 *Filebeat*
 - Add exclude_files configuration option {pull}563[563]
 - Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
+- Set spool_size default value to 2048 {pull}628[628]
 
 *Winlogbeat*
 
@@ -46,6 +52,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 - Update builds to Golang version 1.5.2
+- Make logstash output compression level configurable. {pull}630[630]
 
 *Packetbeat*
 - Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]

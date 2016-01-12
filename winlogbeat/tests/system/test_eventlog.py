@@ -16,6 +16,8 @@ Contains tests for reading from the Windows Event Log (both APIs).
 class Test(TestCase):
     providerName = "WinlogbeatTestPython"
     applicationName = "SystemTest"
+    sid = None
+    sidString = None
 
     def setUp(self):
         super(Test, self).setUp()
@@ -33,16 +35,29 @@ class Test(TestCase):
         win32evtlog.ClearEventLog(hlog, None)
         win32evtlog.CloseEventLog(hlog)
 
-    def write_event_log(self, message, eventID):
-        ph = win32api.GetCurrentProcess()
-        th = win32security.OpenProcessToken(ph, win32con.TOKEN_READ)
-        my_sid = win32security.GetTokenInformation(th, win32security.TokenUser)[0]
+    def write_event_log(self, message, eventID, sid = None):
+        if sid == None:
+            sid = self.get_sid()
 
         level= win32evtlog.EVENTLOG_INFORMATION_TYPE
         descr = [message]
 
         win32evtlogutil.ReportEvent(self.applicationName, eventID,
-            eventType=level, strings=descr, sid=my_sid)
+            eventType=level, strings=descr, sid=sid)
+
+    def get_sid(self):
+        if self.sid == None:
+            ph = win32api.GetCurrentProcess()
+            th = win32security.OpenProcessToken(ph, win32con.TOKEN_READ)
+            self.sid = win32security.GetTokenInformation(th, win32security.TokenUser)[0]
+
+        return self.sid
+
+    def get_sid_string(self):
+        if self.sidString == None:
+            self.sidString = win32security.ConvertSidToStringSid(self.get_sid())
+
+        return self.sidString
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_eventlogging_read_one_event(self):
@@ -78,11 +93,12 @@ class Test(TestCase):
         assert len(events) == 1
         evt = events[0]
         assert evt["type"] == api
-        assert evt["eventID"] == eventID
+        assert evt["event_id"] == eventID
         assert evt["level"] == "Information"
-        assert evt["eventLogName"] == self.providerName
-        assert evt["sourceName"] == self.applicationName
-        assert evt["computerName"].lower() == win32api.GetComputerName().lower()
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
         assert "user.domain" in evt
@@ -100,8 +116,8 @@ class Test(TestCase):
         """
         evt = self.read_unknown_event_id("eventlogging")
 
-        assert "messageInserts" in evt
-        assert evt["messageError"].lower() == ("The system cannot find "
+        assert "message_inserts" in evt
+        assert evt["message_error"].lower() == ("The system cannot find "
             "message text for message number 1111 in the message file for "
             "C:\\Windows\\system32\\EventCreate.exe.").lower()
 
@@ -114,7 +130,7 @@ class Test(TestCase):
 
         # TODO: messageInserts has not been implemented for wineventlog.
         # assert "messageInserts" in evt
-        assert evt["messageError"] == ("the message resource is present but "
+        assert evt["message_error"] == ("the message resource is present but "
             "the message is not found in the string/message table")
 
     def read_unknown_event_id(self, api):
@@ -137,11 +153,12 @@ class Test(TestCase):
         assert len(events) == 1
         evt = events[0]
         assert evt["type"] == api
-        assert evt["eventID"] == eventID
+        assert evt["event_id"] == eventID
         assert evt["level"] == "Information"
-        assert evt["eventLogName"] == self.providerName
-        assert evt["sourceName"] == self.applicationName
-        assert evt["computerName"].lower() == win32api.GetComputerName().lower()
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
         assert "user.domain" in evt
@@ -152,3 +169,56 @@ class Test(TestCase):
 
         return evt
 
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_eventlogging_read_unknown_sid(self):
+        """
+        Event Logging - Read event with unknown SID
+        """
+        self.read_unknown_sid("eventlogging")
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_wineventlog_read_unknown_sid(self):
+        """
+        Win Event Log - Read event with unknown SID
+        """
+        self.read_unknown_sid("wineventlog")
+
+    def read_unknown_sid(self, api):
+        # Fake SID that was made up.
+        accountIdentifier = "S-1-5-21-3623811015-3361044348-30300820-1013"
+        sid = win32security.ConvertStringSidToSid(accountIdentifier)
+
+        msg = "Unknown SID of " + accountIdentifier
+        eventID = 40
+        self.write_event_log(msg, eventID, sid)
+
+        # Run Winlogbeat
+        self.render_config_template(
+            event_logs=[
+                {"name": self.providerName, "api": api}
+            ]
+        )
+        proc = self.start_winlogbeat()
+        self.wait_until(lambda: self.output_has(1))
+        proc.kill()
+
+        # Verify output
+        events = self.read_output()
+        assert len(events) == 1
+        evt = events[0]
+        assert evt["type"] == api
+        assert evt["event_id"] == eventID
+        assert evt["level"] == "Information"
+        assert evt["log_name"] == self.providerName
+        assert evt["source_name"] == self.applicationName
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["user.identifier"] == accountIdentifier
+        assert "user.name" not in evt
+        assert "user.type" not in evt
+        assert "user.domain" not in evt
+        assert evt["message"] == msg
+
+        exit_code = proc.wait()
+        assert exit_code == 0
+
+        return evt
