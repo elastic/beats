@@ -92,7 +92,7 @@ Per process statistics:
   "proc": {
     "cpu": {
       "user": 1,
-      "user_p": 0,
+      "total_p": 0,
       "system": 1,
       "total": 2,
       "start_time": "15:59"
