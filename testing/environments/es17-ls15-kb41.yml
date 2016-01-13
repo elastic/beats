@@ -1,35 +1,11 @@
 # This is the environment with the last major releases
-beat:
-  build: .
-  links:
-    - elasticsearch
-    - logstash
-    - kibana
-  environment:
-    - LS_HOST=logstash
-  container_name: beat
+# It extends the base.yml environment
 
 elasticsearch:
   image: elasticsearch:1.7
-  ports:
-    - "9200:9200"
-  container_name: elasticsearch
 
 logstash:
   image: logstash:1.5
-  links:
-    - elasticsearch
-  ports:
-    - "5044:5044"
-    - "5055:5055"
-  container_name: logstash
 
 kibana:
   image: kibana:4.1
-  links:
-    - elasticsearch
-  environment:
-    - ELASTICSEARCH_URL=http://elasticsearch:9200/
-  ports:
-    - "5601:5601"
-  container_name: kibana

@@ -9,13 +9,14 @@ GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 ES_HOST?="elasticsearch"
 BEAT_DIR?=github.com/elastic/beats
-BUILD_DIR=build
+BUILD_DIR?=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 TIMEOUT?= 90
 BEATNAME?=libbeat
 TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
+DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
 
 
 ### BUILDING ###
@@ -99,8 +100,8 @@ integration-tests: prepare-tests
 integration-tests-environment:
 	make prepare-tests
 	make build-image
-	NAME=$$(docker-compose run -d ${BEATNAME} make integration-tests | awk 'END{print}') || exit 1; \
-	echo "docker ${BEATNAME} test container: '$$NAME'"; \
+	NAME=$$(${DOCKER_COMPOSE} run -d beat make integration-tests | awk 'END{print}') || exit 1; \
+	echo "docker beat test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
 	mkdir -p ${COVERAGE_DIR}; \
 	docker cp $$NAME:/go/src/${BEAT_DIR}/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
@@ -164,22 +165,24 @@ update:
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	docker-compose build
+	${DOCKER_COMPOSE} build
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	docker-compose up -d redis elasticsearch logstash
+	${DOCKER_COMPOSE} up -d redis elasticsearch logstash
 
 .PHONY: stop-environment
 stop-environment:
-	-docker-compose stop
-	-docker-compose rm -f
+	-${DOCKER_COMPOSE} stop
+	-${DOCKER_COMPOSE} rm -f
 	-docker ps -a  | grep ${BEATNAME} | grep Exited | awk '{print $$1}' | xargs docker rm
 
 .PHONY: write-environment
 write-environment:
-	mkdir -p build
-	echo "ES_HOST=${ES_HOST}" > build/test.env
-	echo "ES_PORT=9200" >> build/test.env
+	mkdir -p ${BUILD_DIR}
+	echo "ES_HOST=${ES_HOST}" > ${BUILD_DIR}/test.env
+	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
+	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
+	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
