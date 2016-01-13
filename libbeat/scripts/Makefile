@@ -11,6 +11,7 @@ ES_HOST?="elasticsearch"
 BEAT_DIR?=github.com/elastic/beats
 BUILD_DIR=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
+PROCESSES?= 4
 TIMEOUT?= 90
 BEATNAME?=libbeat
 TEST_ENVIRONMENT?=false
@@ -70,7 +71,7 @@ ci:
 	make testsuite
 
 ### Testing ###
-# All tests are always run with coverage reporting enabled
+# Unless stated otherwise, all tests are always run with coverage reporting enabled.
 
 
 # Prepration for tests
@@ -82,12 +83,16 @@ prepare-tests:
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
 
-# Runs the unit tests
+# Runs the unit tests with coverage
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	#go test -short ./...
 	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic ${BEAT_DIR}/${BEATNAME}/...
+
+# Runs the unit tests without coverage reports.
+.PHONY: unit
+unit:
+	go test -short ./...
 
 # Run integration tests. Unit tests are run as part of the integration tests. It runs all tests with race detection enabled.
 .PHONY: integration-tests
@@ -113,7 +118,11 @@ system-tests: libbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ../scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
-# Runs the system tests
+# Runs system tests without coverage reports and in parallel
+.PHONY: fast-system-tests
+fast-system-tests: libbeat.test system-tests-setup
+	. build/system-tests/env/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
+
 .PHONY: system-tests-setup
 system-tests-setup: tests/system/requirements.txt
 	test -d env || virtualenv build/system-tests/env > /dev/null
@@ -126,6 +135,13 @@ system-tests-setup: tests/system/requirements.txt
 benchmark-tests:
 	# No benchmark tests exist so far
 	#go test -short -bench=. ./...
+
+# Runs unit and system tests without coverage reports
+.PHONY: test
+test: unit
+	if [ $(SYSTEM_TESTS) = true ]; then \
+		 make fast-system-tests; \
+	fi
 
 # Runs all tests and generates the coverage reports
 .PHONY: testsuite
