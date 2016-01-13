@@ -60,9 +60,7 @@ ENV ES_HOME=/usr/share/elasticsearch
 ENV PATH=$ES_HOME/bin/shield:$ES_HOME/bin:$PATH
 
 RUN rm -fR /etc/elasticsearch && \
-    ln -s $ES_HOME/config /etc/elasticsearch && \
-    plugin -Des.plugins.staging=true install license && \
-    plugin -Des.plugins.staging=true install shield
+    ln -s $ES_HOME/config /etc/elasticsearch
 
 COPY docker-entrypoint-shield.sh /
 
