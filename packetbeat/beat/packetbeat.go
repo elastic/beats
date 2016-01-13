@@ -186,7 +186,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	logp.Debug("main", "Initializing sniffer")
 	err := pb.Sniff.Init(false, func(dl layers.LinkType) (sniffer.Worker, error) {
-		flows, err := flows.NewFlows(&pb.PbConfig.Flows)
+		flows, err := flows.NewFlows(b.Events, &pb.PbConfig.Flows)
 		if err != nil {
 			return nil, err
 		}

@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 type flowsProcessor struct {
+	pub publisher.Client
+
 	table    *flowMetaTable
 	counters *counterReg
 	timeout  time.Duration
@@ -21,6 +24,7 @@ var (
 )
 
 func newFlowsWorker(
+	pub publisher.Client,
 	table *flowMetaTable,
 	counters *counterReg,
 	timeout, period time.Duration,
@@ -45,6 +49,7 @@ func newFlowsWorker(
 	}
 
 	processor := &flowsProcessor{
+		pub:      pub,
 		table:    table,
 		counters: counters,
 		timeout:  timeout,
@@ -156,6 +161,7 @@ func (fw *flowsProcessor) flush(w *worker) {
 		return
 	}
 
+	fw.pub.PublishEvents(fw.events)
 	fw.events = nil
 }
 

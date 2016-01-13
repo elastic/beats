@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/config"
 )
 
@@ -71,7 +72,7 @@ type flowList struct {
 	head, tail *Flow
 }
 
-func NewFlows(config *config.Flows) (*Flows, error) {
+func NewFlows(pub publisher.Client, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil
@@ -99,7 +100,7 @@ func NewFlows(config *config.Flows) (*Flows, error) {
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(table, counter, timeout, period)
+	worker, err := newFlowsWorker(pub, table, counter, timeout, period)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err
