@@ -14,9 +14,10 @@ import (
 	"github.com/elastic/beats/libbeat/filters/nop"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/service"
-	"github.com/elastic/packetbeat/decoder"
+	"github.com/tsg/gopacket/layers"
 
 	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/packetbeat/decoder"
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -55,6 +56,11 @@ type Packetbeat struct {
 	CmdLineArgs CmdLineArgs
 	Sniff       *sniffer.SnifferSetup
 	over        chan bool
+
+	services []interface {
+		Start()
+		Stop()
+	}
 }
 
 type CmdLineArgs struct {
@@ -179,8 +185,11 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	*/
 
 	logp.Debug("main", "Initializing sniffer")
-	err := pb.Sniff.Init(false, func(dl gopacket.LinkType) sniffer.Worker {
-		flows := flows.NewFlows()
+	err := pb.Sniff.Init(false, func(dl layers.LinkType) (sniffer.Worker, error) {
+		flows, err := flows.NewFlows(&pb.PbConfig.Flows)
+		if err != nil {
+			return nil, err
+		}
 
 		icmp, err := icmp.NewIcmp(false, b.Events)
 		if err != nil {
@@ -197,6 +206,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 			return nil, err
 		}
 
+		pb.services = append(pb.services, flows)
 		return decoder.NewDecoder(flows, dl, icmp, icmp, tcp, udp)
 	})
 	if err != nil {
@@ -214,6 +224,11 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 }
 
 func (pb *Packetbeat) Run(b *beat.Beat) error {
+
+	// start services
+	for _, service := range pb.services {
+		service.Start()
+	}
 
 	// run the sniffer in background
 	go func() {
@@ -241,6 +256,11 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	waitShutdown := pb.CmdLineArgs.WaitShutdown
 	if waitShutdown != nil && *waitShutdown > 0 {
 		time.Sleep(time.Duration(*waitShutdown) * time.Second)
+	}
+
+	// kill services
+	for _, service := range pb.services {
+		service.Stop()
 	}
 
 	return nil

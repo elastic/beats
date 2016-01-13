@@ -123,7 +123,9 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	if stream.conn == nil {
 		return
 	}
-	id.AddConnectionID(uint64(stream.conn.id))
+	if id != nil {
+		id.AddConnectionID(uint64(stream.conn.id))
+	}
 	conn := stream.conn
 
 	tcp_start_seq := tcphdr.Seq

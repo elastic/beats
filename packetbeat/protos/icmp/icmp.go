@@ -113,7 +113,10 @@ func (icmp *Icmp) ProcessICMPv4(
 	typ := uint8(icmp4.TypeCode >> 8)
 	code := uint8(icmp4.TypeCode)
 	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer)
-	flowID.AddICMPv4(id)
+	if flowID != nil {
+		flowID.AddICMPv4(id)
+	}
+
 	tuple := icmpTuple{
 		IcmpVersion: 4,
 		SrcIp:       pkt.Tuple.Src_ip,
@@ -138,7 +141,9 @@ func (icmp *Icmp) ProcessICMPv6(
 	typ := uint8(icmp6.TypeCode >> 8)
 	code := uint8(icmp6.TypeCode)
 	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
-	flowID.AddICMPv6(id)
+	if flowID != nil {
+		flowID.AddICMPv6(id)
+	}
 	tuple := icmpTuple{
 		IcmpVersion: 6,
 		SrcIp:       pkt.Tuple.Src_ip,

@@ -214,7 +214,7 @@ func TestProcess_emptyPayload(t *testing.T) {
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
 	emptyPkt := &protos.Packet{Ts: time.Now(), Tuple: tuple, Payload: []byte{}}
-	test.udp.Process(emptyPkt)
+	test.udp.Process(nil, emptyPkt)
 	assert.Nil(t, test.plugin.pkt)
 }
 
@@ -227,6 +227,6 @@ func TestProcess_nonEmptyPayload(t *testing.T) {
 		net.ParseIP("10.0.0.1"), 34898)
 	payload := []byte{1}
 	pkt := &protos.Packet{Ts: time.Now(), Tuple: tuple, Payload: payload}
-	test.udp.Process(pkt)
+	test.udp.Process(nil, pkt)
 	assert.Equal(t, pkt, test.plugin.pkt)
 }

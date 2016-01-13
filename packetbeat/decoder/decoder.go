@@ -40,7 +40,9 @@ type DecoderStruct struct {
 	tcpProc   tcp.Processor
 	udpProc   udp.Processor
 
-	flows *flows.Flows
+	flows       *flows.Flows
+	statPackets *flows.Int
+	statBytes   *flows.Int
 
 	// hold current flow ID
 	flowID              flows.FlowID // buffer flowID among many calls
@@ -63,6 +65,18 @@ func NewDecoder(
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
 	d.stIP6.init(&d.ip6[0], &d.ip6[1])
+
+	if flows != nil {
+		var err error
+		d.statPackets, err = flows.NewInt("net_packets_total")
+		if err != nil {
+			return nil, err
+		}
+		d.statBytes, err = flows.NewInt("net_bytes_total")
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	defaultLayerTypes := []gopacket.DecodingLayer{
 		&d.sll,             // LinuxSLL
@@ -110,7 +124,7 @@ func (d *DecoderStruct) AddLayers(layers []gopacket.DecodingLayer) {
 	}
 }
 
-func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) {
+func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	defer logp.Recover("packet decoding failed")
 
 	d.truncated = false
@@ -120,11 +134,17 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
-	d.flowID.Reset(d.flowIDBufferBacking[:])
-
 	debugf("decode packet data")
-
 	processed := false
+
+	if d.flows != nil {
+		d.flowID.Reset(d.flowIDBufferBacking[:])
+
+		// supress flow stats snapshots while processing packet
+		d.flows.Lock()
+		defer d.flows.Unlock()
+	}
+
 	for len(data) > 0 {
 		err := current.DecodeFromBytes(data, d)
 		if err != nil {
@@ -155,11 +175,11 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 		currentType = nextType
 	}
 
-	// add flow stats
-	if d.flowID.Flags() != 0 {
+	// add flow s.tats
+	if d.flows != nil && d.flowID.Flags() != 0 {
 		flow := d.flows.Get(&d.flowID)
-		flow.Stats.Packets++
-		flow.Stats.Bytes += uint64(ci.Length)
+		d.statPackets.Add(flow, 1)
+		d.statBytes.Add(flow, int64(ci.Length))
 	}
 }
 
@@ -167,21 +187,29 @@ func (d *DecoderStruct) process(
 	packet *protos.Packet,
 	layerType gopacket.LayerType,
 ) (bool, error) {
+	withFlow := d.flows != nil
+
 	switch layerType {
 	case layers.LayerTypeEthernet:
-		d.flowID.AddEth(d.eth.SrcMAC, d.eth.DstMAC)
+		if withFlow {
+			d.flowID.AddEth(d.eth.SrcMAC, d.eth.DstMAC)
+		}
 
 	case layers.LayerTypeDot1Q:
 		d1q := &d.d1q[d.stD1Q.i]
 		d.stD1Q.next()
-		d.flowID.AddVLan(d1q.VLANIdentifier)
+		if withFlow {
+			d.flowID.AddVLan(d1q.VLANIdentifier)
+		}
 
 	case layers.LayerTypeIPv4:
 		debugf("IPv4 packet")
 		ip4 := &d.ip4[d.stIP4.i]
 		d.stIP4.next()
 
-		d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
+		if withFlow {
+			d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
+		}
 
 		packet.Tuple.Src_ip = ip4.SrcIP
 		packet.Tuple.Dst_ip = ip4.DstIP
@@ -192,7 +220,9 @@ func (d *DecoderStruct) process(
 		ip6 := &d.ip6[d.stIP6.i]
 		d.stIP6.next()
 
-		d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
+		if withFlow {
+			d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
+		}
 
 		packet.Tuple.Src_ip = ip6.SrcIP
 		packet.Tuple.Dst_ip = ip6.DstIP
@@ -226,33 +256,55 @@ func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
 	packet.Payload = d.icmp4.Payload
 	packet.Tuple.ComputeHashebles()
 
-	d.icmp4Proc.ProcessICMPv4(&d.flowID, &d.icmp4, packet)
+	id := &d.flowID
+	if d.flows == nil {
+		id = nil
+	}
+
+	d.icmp4Proc.ProcessICMPv4(id, &d.icmp4, packet)
 }
 
 func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
 	packet.Payload = d.icmp6.Payload
 	packet.Tuple.ComputeHashebles()
 
-	d.icmp6Proc.ProcessICMPv6(&d.flowID, &d.icmp6, packet)
+	id := &d.flowID
+	if d.flows == nil {
+		id = nil
+	}
+
+	d.icmp6Proc.ProcessICMPv6(id, &d.icmp6, packet)
 }
 
 func (d *DecoderStruct) onUDP(packet *protos.Packet) {
 	src := uint16(d.udp.SrcPort)
 	dst := uint16(d.udp.DstPort)
-	d.flowID.AddTCP(src, dst)
+
+	id := &d.flowID
+	if d.flows == nil {
+		id = nil
+	} else {
+		d.flowID.AddTCP(src, dst)
+	}
 
 	packet.Tuple.Src_port = src
 	packet.Tuple.Dst_port = dst
 	packet.Payload = d.udp.Payload
 	packet.Tuple.ComputeHashebles()
 
-	d.udpProc.Process(&d.flowID, packet)
+	d.udpProc.Process(id, packet)
 }
 
 func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 	src := uint16(d.tcp.SrcPort)
 	dst := uint16(d.tcp.DstPort)
-	d.flowID.AddTCP(src, dst)
+
+	id := &d.flowID
+	if d.flows == nil {
+		id = nil
+	} else {
+		d.flowID.AddTCP(src, dst)
+	}
 
 	packet.Tuple.Src_port = src
 	packet.Tuple.Dst_port = dst
@@ -264,5 +316,5 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 		return
 	}
 	packet.Tuple.ComputeHashebles()
-	d.tcpProc.Process(&d.flowID, &d.tcp, packet)
+	d.tcpProc.Process(id, &d.tcp, packet)
 }
