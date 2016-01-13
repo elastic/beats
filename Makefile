@@ -3,9 +3,20 @@ COVERAGE_DIR=${BUILD_DIR}/coverage
 BEATS=packetbeat topbeat filebeat winlogbeat
 PROJECTS=libbeat ${BEATS}
 
-# Runs testsuites for all beats
+# Runs complete testsuites (unit, system, integration) for all beats,
+# with coverage and race detection.
 testsuite:
 	$(foreach var,$(PROJECTS),make -C $(var) testsuite || exit 1;)
+
+# Runs unit and system tests without coverage and race detection.
+.PHONY: test
+test:
+	$(foreach var,$(PROJECTS),make -C $(var) test || exit 1;)
+
+# Runs unit tests without coverage and race detection.
+.PHONY: unit
+unit:
+	$(foreach var,$(PROJECTS),make -C $(var) unit || exit 1;)
 
 .PHONY: coverage-report
 coverage-report:
