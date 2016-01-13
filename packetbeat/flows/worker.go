@@ -66,17 +66,26 @@ func newFlowsWorker(
 			nTimeout--
 			nPeriod--
 
-			handleTimeout := nTimeout <= 0
-			handleReports := reportPeriodically && nPeriod <= 0
-			if handleTimeout || handleReports {
-				processor.execute(w, handleTimeout, handleReports)
+			handleTimeout := nTimeout == 0
+			handleReports := reportPeriodically && nPeriod == 0
+			if handleTimeout {
+				nTimeout = ticksTimeout
 			}
+			if handleReports {
+				nPeriod = ticksPeriod
+			}
+
+			processor.execute(w, handleTimeout, handleReports)
 			return nil
 		})
 	}), nil
 }
 
 func (fw *flowsProcessor) execute(w *worker, handleTimeout, handleReports bool) {
+	if !handleTimeout && !handleReports {
+		return
+	}
+
 	// get counter names snapshot if reports must be generated
 	var intNames []string
 	var floatNames []string
