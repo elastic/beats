@@ -400,7 +400,9 @@ func TestStructuredEvent(t *testing.T) {
 }
 
 func enableLogging(selectors []string) {
-	logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+	}
 }
 
 func TestGrowWindowSizeUpToBatchSizes(t *testing.T) {
@@ -432,7 +434,8 @@ func testGrowWindowSize(t *testing.T,
 	initial, maxOK, windowSize, batchSize, expected int,
 ) {
 	enableLogging([]string{"logstash"})
-	c := newLumberjackClient(nil, windowSize, 1*time.Second)
+	c, err := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	assert.NoError(t, err)
 	c.windowSize = initial
 	c.maxOkWindowSize = maxOK
 	for i := 0; i < 100; i++ {
@@ -447,7 +450,8 @@ func TestShrinkWindowSizeNeverZero(t *testing.T) {
 	enableLogging([]string{"logstash"})
 
 	windowSize := 124
-	c := newLumberjackClient(nil, windowSize, 1*time.Second)
+	c, err := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	assert.NoError(t, err)
 	c.windowSize = windowSize
 	for i := 0; i < 100; i++ {
 		c.shrinkWindow()
