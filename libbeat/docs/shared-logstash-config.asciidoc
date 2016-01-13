@@ -13,7 +13,8 @@ If you want to use Logstash to perform additional processing on the data collect
 {beatname_uc}, you need to configure {beatname_uc} to use Logstash.
 
 To do this, you edit the {beatname_uc} configuration file to disable the Elasticsearch
-output and use the Logstash output instead:
+output by commenting it out and enable the Logstash output by uncommenting the 
+logstash section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
