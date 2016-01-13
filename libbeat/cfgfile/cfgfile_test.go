@@ -1,6 +1,7 @@
 package cfgfile
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -36,4 +37,33 @@ func TestRead(t *testing.T) {
 
 	// Chat that it is integer
 	assert.Equal(t, 9200, config.Output.Elasticsearch.Port)
+}
+
+func TestExpandEnv(t *testing.T) {
+	var tests = []struct {
+		in  string
+		out string
+	}{
+		// Environment variables can be specified as ${env} or $env.
+		{"x$y", "xy"},
+		{"x${y}", "xy"},
+
+		// Environment variables are case-sensitive. Neither are replaced.
+		{"x$Y", "x"},
+		{"x${Y}", "x"},
+
+		// Defaults can only be specified when using braces.
+		{"x${Z:D}", "xD"},
+		{"x${Z:A B C D}", "xA B C D"}, // Spaces are allowed in the default.
+		{"x${Z:}", "x"},
+
+		// Defaults don't work unless braces are used.
+		{"x$y:D", "xy:D"},
+	}
+
+	for _, test := range tests {
+		os.Setenv("y", "y")
+		output := expandEnv([]byte(test.in))
+		assert.Equal(t, test.out, string(output), "Input: %s", test.in)
+	}
 }
