@@ -66,15 +66,13 @@ func (rotator *FileRotator) WriteLine(line []byte) error {
 			return err
 		}
 	}
+
+	line = append(line, '\n')
 	_, err := rotator.current.Write(line)
 	if err != nil {
 		return err
 	}
-	_, err = rotator.current.Write([]byte("\n"))
-	if err != nil {
-		return err
-	}
-	rotator.current_size += uint64(len(line) + 1)
+	rotator.current_size += uint64(len(line))
 
 	return nil
 }

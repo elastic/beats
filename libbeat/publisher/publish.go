@@ -79,6 +79,10 @@ type ShipperConfig struct {
 	Topology_expire       int
 	Tags                  []string
 	Geoip                 common.Geoip
+
+	// internal publisher queue sizes
+	QueueSize     *int `yaml:"queue_size"`
+	BulkQueueSize *int `yaml:"bulk_queue_size"`
 }
 
 type Topology struct {
@@ -87,7 +91,8 @@ type Topology struct {
 }
 
 const (
-	defaultChanSize = 1000
+	defaultChanSize     = 1000
+	defaultBulkChanSize = 0
 )
 
 func init() {
@@ -195,6 +200,16 @@ func (publisher *PublisherType) init(
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
+	hwm := defaultChanSize
+	if shipper.QueueSize != nil && *shipper.QueueSize > 0 {
+		hwm = *shipper.QueueSize
+	}
+
+	bulkHWM := defaultBulkChanSize
+	if shipper.BulkQueueSize != nil && *shipper.BulkQueueSize >= 0 {
+		bulkHWM = *shipper.BulkQueueSize
+	}
+
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
 	publisher.wsOutput.Init()
@@ -215,7 +230,8 @@ func (publisher *PublisherType) init(
 			debug("Create output worker")
 
 			outputers = append(outputers,
-				newOutputWorker(config, output, &publisher.wsOutput, defaultChanSize))
+				newOutputWorker(config, output, &publisher.wsOutput,
+					hwm, bulkHWM))
 
 			if !config.Save_topology {
 				continue
@@ -293,8 +309,8 @@ func (publisher *PublisherType) init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.asyncPublisher = newAsyncPublisher(publisher)
-	publisher.syncPublisher = newSyncPublisher(publisher)
+	publisher.asyncPublisher = newAsyncPublisher(publisher, hwm, bulkHWM)
+	publisher.syncPublisher = newSyncPublisher(publisher, hwm, bulkHWM)
 
 	return nil
 }

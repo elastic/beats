@@ -143,7 +143,7 @@ filebeat:
   # General filebeat configuration options
   #
   # Event count spool threshold - forces network flush if exceeded
-  #spool_size: 1024
+  #spool_size: 2048
 
   # Defines how often the spooler is flushed. After idle_timeout the spooler is
   # Flush even though spool_size is not reached.
