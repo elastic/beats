@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,10 +50,12 @@ func Read(out interface{}, path string) error {
 	}
 
 	filecontent, err := ioutil.ReadFile(path)
-
 	if err != nil {
 		return fmt.Errorf("Failed to read %s: %v. Exiting.", path, err)
 	}
+
+	filecontent = expandEnv(filecontent)
+
 	if err = yaml.Unmarshal(filecontent, out); err != nil {
 		return fmt.Errorf("YAML config parsing failed on %s: %v. Exiting.", path, err)
 	}
@@ -61,4 +65,28 @@ func Read(out interface{}, path string) error {
 
 func IsTestConfig() bool {
 	return *testConfig
+}
+
+// expandEnv replaces ${var} or $var in config according to the values of the
+// current environment variables. The replacement is case-sensitive. References
+// to undefined variables are replaced by the empty string. A default value
+// can be given by using the form ${var:default value}.
+func expandEnv(config []byte) []byte {
+	return []byte(os.Expand(string(config), func(key string) string {
+		keyAndDefault := strings.SplitN(key, ":", 2)
+		key = keyAndDefault[0]
+
+		v := os.Getenv(key)
+		if v == "" && len(keyAndDefault) == 2 {
+			// Set value to the default.
+			v = keyAndDefault[1]
+			logp.Info("Replacing config environment variable '${%s}' with "+
+				"default '%s'", key, keyAndDefault[1])
+		} else {
+			logp.Info("Replacing config environment variable '${%s}' with '%s'",
+				key, v)
+		}
+
+		return v
+	}))
 }
