@@ -182,7 +182,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		}
 
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.afpacketHandle)
-	case "pfring":
+	case "pfring", "pf_ring":
 		sniffer.pfringHandle, err = NewPfringHandle(
 			sniffer.config.Device,
 			sniffer.config.Snaplen,
@@ -371,7 +371,7 @@ func (sniffer *SnifferSetup) Close() error {
 		sniffer.pcapHandle.Close()
 	case "af_packet":
 		sniffer.afpacketHandle.Close()
-	case "pfring":
+	case "pfring", "pf_ring":
 		sniffer.pfringHandle.Close()
 	}
 	return nil

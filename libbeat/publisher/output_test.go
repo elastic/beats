@@ -31,7 +31,7 @@ func TestOutputWorker(t *testing.T) {
 		outputs.MothershipConfig{},
 		outputer,
 		newWorkerSignal(),
-		1)
+		1, 0)
 
 	ow.onStop() // Noop
 

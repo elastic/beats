@@ -143,7 +143,7 @@ filebeat:
   # General filebeat configuration options
   #
   # Event count spool threshold - forces network flush if exceeded
-  #spool_size: 1024
+  #spool_size: 2048
 
   # Defines how often the spooler is flushed. After idle_timeout the spooler is
   # Flush even though spool_size is not reached.
@@ -259,6 +259,9 @@ output:
     # Number of workers per Logstash host.
     #worker: 1
 
+    # Set gzip compression level.
+    #compression_level: 3
+
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
@@ -341,6 +344,9 @@ shipper:
   # All the IPs will be deleted afterwards. Note, that the value must be higher than
   # refresh_topology_freq. The default is 15 seconds.
   #topology_expire: 15
+
+  # Internal queue size for single events in processing pipeline
+  #queue_size: 1000
 
   # Configure local GeoIP database support.
   # If no paths are not configured geoip is disabled.
