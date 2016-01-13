@@ -14,6 +14,8 @@ libbeat:
     - ES_PASS=testing
     # Setup work environment
     - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
+    # TODO: Set to true as soon as stable release is out
+    - SHIELD=false
   env_file:
     - build/test.env
   working_dir: /go/src/github.com/elastic/beats/libbeat
@@ -21,7 +23,7 @@ libbeat:
   entrypoint: /entrypoint.sh
 elasticsearch:
   build: ../testing/environments/docker/elasticsearch
-  dockerfile: Dockerfile-2.2.0-shield
+  dockerfile: Dockerfile-2.2.0
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis

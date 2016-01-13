@@ -38,11 +38,13 @@ es_url() {
         auth="$auth@"
     fi
 
-    code=$(curl --write-out "%{http_code}\n" --silent --output /dev/null "http://${ES_HOST}:${ES_PORT}/")
+    if [ $SHIELD == "true" ]; then
+        code=$(curl --write-out "%{http_code}\n" --silent --output /dev/null "http://${ES_HOST}:${ES_PORT}/")
 
-    if [ $code != 401 ]; then
-        echo "Shield does not seem to be running"
-        exit 1
+        if [ $code != 401 ]; then
+            echo "Shield does not seem to be running"
+            exit 1
+        fi
     fi
     echo "http://${auth}${ES_HOST}:${ES_PORT}"
 }
