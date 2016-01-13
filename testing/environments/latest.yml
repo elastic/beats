@@ -25,7 +25,8 @@ logstash:
   container_name: logstash
 
 kibana:
-  image: kibana:latest
+  build: docker/kibana/
+  dockerfile: Dockerfile-4.3.1
   links:
     - elasticsearch
   environment:
