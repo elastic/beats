@@ -29,6 +29,8 @@ ENV PATH /opt/kibana/bin:$PATH
 
 COPY ./docker-entrypoint.sh /
 
+RUN gosu kibana kibana plugin --install elastic/sense
+
 EXPOSE 5601
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["kibana"]
