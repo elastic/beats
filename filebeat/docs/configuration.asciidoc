@@ -151,7 +151,7 @@ The buffer size every harvester uses when fetching the file. The default is 1638
 
 ===== max_bytes
 
-The maximum number of bytes that a single log event can have. All bytes after `max_bytes` are discarded and not sent.
+The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent.
 This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
 
 ===== multiline
@@ -199,7 +199,7 @@ You specify the following settings under `multiline` to control how Filebeat com
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`max_lines`*:: The maximum number of lines that can be combined into a single log message. If
+*`max_lines`*:: The maximum number of lines that can be combined into one event. If
 the multiline message contains more than `max_lines`, any additional
 lines are discarded. The default is 500.
 
