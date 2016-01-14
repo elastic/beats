@@ -22,7 +22,7 @@ type logFileReader struct {
 
 type logFileReaderConfig struct {
 	forceClose         bool
-	maxInactive        time.Duration
+	closeOlder         time.Duration
 	backoffDuration    time.Duration
 	maxBackoffDuration time.Duration
 	backoffFactor      int
@@ -112,7 +112,7 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 		}
 
 		age := time.Since(r.lastTimeRead)
-		if age > r.config.maxInactive {
+		if age > r.config.closeOlder {
 			// If the file hasn't change for longer then maxInactive, harvester stops
 			// and file handle will be closed.
 			return n, errInactive

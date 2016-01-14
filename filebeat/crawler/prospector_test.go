@@ -93,6 +93,23 @@ func TestProspectorInitScanFrequency0(t *testing.T) {
 	assert.Equal(t, zero, prospector.ProspectorConfig.ScanFrequencyDuration)
 }
 
+func TestProspectorInitCloseOlder0(t *testing.T) {
+
+	prospectorConfig := config.ProspectorConfig{
+		CloseOlder: "0",
+	}
+
+	prospector := Prospector{
+		ProspectorConfig: prospectorConfig,
+	}
+
+	prospector.Init()
+
+	var zero time.Duration = 0
+	// 0 expected
+	assert.Equal(t, zero, prospector.ProspectorConfig.CloseOlderDuration)
+}
+
 func TestProspectorInitInvalidScanFrequency(t *testing.T) {
 
 	prospectorConfig := config.ProspectorConfig{
