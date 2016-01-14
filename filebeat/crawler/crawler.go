@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
@@ -22,19 +23,16 @@ import (
 
 type Crawler struct {
 	// Registrar object to persist the state
-	Registrar *Registrar
-	running   bool
+	Registrar   *Registrar
+	prospectors []*Prospector
+	wg          sync.WaitGroup
 }
 
-func (crawler *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
-
-	crawler.running = true
+func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
 
 	if len(prospectorConfigs) == 0 {
 		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
 	}
-
-	var prospectors []*Prospector
 
 	logp.Info("Loading Prospectors: %v", len(prospectorConfigs))
 
@@ -43,26 +41,34 @@ func (crawler *Crawler) Start(prospectorConfigs []config.ProspectorConfig, event
 
 		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
 
-		prospector, err := NewProspector(prospectorConfig, crawler.Registrar, eventChan)
-		prospectors = append(prospectors, prospector)
+		prospector, err := NewProspector(prospectorConfig, c.Registrar, eventChan)
+		c.prospectors = append(c.prospectors, prospector)
 
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
 	}
-	logp.Info("Loading Prospectors completed")
 
-	logp.Info("Running Prospectors")
-	for _, prospector := range prospectors {
-		go prospector.Run()
+	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))
+
+	c.wg = sync.WaitGroup{}
+	for _, prospector := range c.prospectors {
+		c.wg.Add(1)
+		go prospector.Run(&c.wg)
 	}
-	logp.Info("All prospectors are running")
 
-	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
+	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.State))
 
 	return nil
 }
 
-func (crawler *Crawler) Stop() {
-	// TODO: Properly stop prospectors and harvesters
+func (c *Crawler) Stop() {
+	logp.Info("Stopping Crawler")
+
+	logp.Info("Stopping %v prospectors", len(c.prospectors))
+	for _, prospector := range c.prospectors {
+		prospector.Stop()
+	}
+	c.wg.Wait()
+	logp.Info("Crawler stopped")
 }

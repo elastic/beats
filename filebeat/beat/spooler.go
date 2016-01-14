@@ -10,7 +10,7 @@ import (
 
 type Spooler struct {
 	Filebeat      *Filebeat
-	running       bool
+	exit          chan struct{}
 	nextFlushTime time.Time
 	spool         []*input.FileEvent
 	Channel       chan *input.FileEvent
@@ -19,7 +19,7 @@ type Spooler struct {
 func NewSpooler(filebeat *Filebeat) *Spooler {
 	spooler := &Spooler{
 		Filebeat: filebeat,
-		running:  false,
+		exit:     make(chan struct{}),
 	}
 
 	config := &spooler.Filebeat.FbConfig.Filebeat
@@ -66,9 +66,6 @@ func (s *Spooler) Run() {
 
 	config := &s.Filebeat.FbConfig.Filebeat
 
-	// Enable running
-	s.running = true
-
 	// Sets up ticket channel
 	ticker := time.NewTicker(config.IdleTimeoutDuration / 2)
 
@@ -78,11 +75,10 @@ func (s *Spooler) Run() {
 
 	// Loops until running is set to false
 	for {
-		if !s.running {
-			break
-		}
-
 		select {
+
+		case <-s.exit:
+			break
 		case event := <-s.Channel:
 			s.spool = append(s.spool, event)
 
@@ -99,16 +95,17 @@ func (s *Spooler) Run() {
 			}
 		}
 	}
-
-	logp.Info("Stopping spooler")
-
-	// Flush again before exiting spooler and closes channel
-	s.flush()
-	close(s.Channel)
 }
 
 // Stop stops the spooler. Flushes events before stopping
 func (s *Spooler) Stop() {
+	logp.Info("Stopping spooler")
+	close(s.exit)
+
+	// Flush again before exiting spooler and closes channel
+	logp.Info("Spooler last flush spooler")
+	s.flush()
+	close(s.Channel)
 }
 
 // flush flushes all event and sends them to the publisher

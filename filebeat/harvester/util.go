@@ -17,7 +17,6 @@ func readLine(reader processor.LineProcessor) (time.Time, string, int, error) {
 
 		// Full line read to be returned
 		if l.Bytes != 0 && err == nil {
-			logp.Debug("harvester", "full line read")
 			return l.Ts, string(l.Content), l.Bytes, err
 		}
 
