@@ -1,6 +1,25 @@
 
 ### VARIABLE SETUP ###
 
+BEATNAME?=libbeat
+BEAT_DIR?=github.com/elastic/beats
+ES_BEATS?=..
+GOPACKAGES?=${BEAT_DIR}/${BEATNAME}/...
+
+# Makefile for a custom beat that includes this libbeat/scripts/Makefile:
+# if glide is used to manage vendor dependencies,
+#     BEATNAME=mybeat
+#     BEAT_DIR=github.com/mybeat
+#     ES_BEATS=./vendor/github.com/elastic/beats
+#     GOPACKAGES=$(shell glide novendor)
+#     include $(ES_BEATS)/libbeat/scripts/Makefile
+# else
+#     BEATNAME=mybeat
+#     BEAT_DIR=github.com/mybeat
+#     ES_BEATS=$(GOPATH)/src/github.com/elastic/beats
+#     GOPACKAGES=$(shell go list ${BEAT_DIR}/... | grep -v /vendor/)
+#     include $(ES_BEATS)/libbeat/scripts/Makefile
+
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
@@ -8,12 +27,10 @@ export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 SHELL=/bin/bash
 ES_HOST?="elasticsearch"
-BEAT_DIR?=github.com/elastic/beats
 BUILD_DIR?=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 PROCESSES?= 4
 TIMEOUT?= 90
-BEATNAME?=libbeat
 TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
@@ -88,7 +105,7 @@ prepare-tests:
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic ${BEAT_DIR}/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic ${GOPACKAGES}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
@@ -98,7 +115,7 @@ unit:
 # Run integration tests. Unit tests are run as part of the integration tests. It runs all tests with race detection enabled.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic ${BEAT_DIR}/${BEATNAME}/...
+	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic ${GOPACKAGES}
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
@@ -117,7 +134,7 @@ integration-tests-environment:
 .PHONY: system-tests
 system-tests: libbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
-	python ../scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
+	python ${ES_BEATS}/scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
@@ -163,11 +180,12 @@ testsuite:
 	make coverage-report
 
 # Generates a coverage report from the existing coverage files
-# It assumes that some covrage reports already exists, otherwise it will fail
 .PHONY: coverage-report
 coverage-report:
-	python ../scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
+	python ${ES_BEATS}/scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
+	test ! -s ./${COVERAGE_DIR}/unit.cov   || go tool cover -html=./${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
+	test ! -s ./${COVERAGE_DIR}/system.cov || go tool cover -html=./${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
