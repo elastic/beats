@@ -126,8 +126,27 @@ If the custom field names conflict with other field names added by Filebeat, the
 ===== ignore_older
 
 If this option is specified, Filebeat
-ignores any files that were modified before the specified timespan.
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 24h.
+ignores any files that were modified before the specified timespan. This is disabled by default.
+
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 0, which means disable.
+Commenting out the config has the same affect as setting it to 0.
+
+Files which were falling under ignore_older and are updated again, will start
+from the offset the file was at when it was last ignored by ignore_older. As an example:
+A file was not modified for 90 hours and the offset is at 200. Now a new line is added and
+the last modification date is updated. After scan_frequency detects the change the crawling
+starts at the offset 200. In case the file was falling under ignore_older already when filebeat
+was started, the first 200 lines are never sent. In case filebeat was started earlier, the 200
+chars were already sent and it now continues at the old offset.
+
+
+===== close_older
+
+After a file was not modified for the duration of close_older, the file handle will be closed.
+After closing the file, a file change will only be detected after scan_frequency instead of almost
+instant.
+
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 1h.
 
 
 ===== scan_frequency

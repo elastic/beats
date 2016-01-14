@@ -112,6 +112,11 @@ func (p *Prospector) setupProspectorConfig() error {
 		return err
 	}
 
+	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlderDuration, "close_older")
+	if err != nil {
+		return err
+	}
+
 	config.ScanFrequencyDuration, err = getConfigDuration(config.ScanFrequency, cfg.DefaultScanFrequency, "scan_frequency")
 	if err != nil {
 		return err
