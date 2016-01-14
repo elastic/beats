@@ -36,6 +36,13 @@ type FileState struct {
 	FileStateOS *FileStateOS
 }
 
+// NewFile create new File object
+func NewFile(fileInfo os.FileInfo) File {
+	return File{
+		FileInfo: fileInfo,
+	}
+}
+
 // GetState builds and returns the FileState object based on the Event info.
 func (f *FileEvent) GetState() *FileState {
 	// Add read bytes to current offset to point to the end
