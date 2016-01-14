@@ -199,7 +199,7 @@ You specify the following settings under `multiline` to control how Filebeat com
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-*`max_lines`*:: The maximum number of lines that can be combined into one event. If
+*`max_lines`*:: The maximum number of lines that can be combined into a single log message. If
 the multiline message contains more than `max_lines`, any additional
 lines are discarded. The default is 500.
 
