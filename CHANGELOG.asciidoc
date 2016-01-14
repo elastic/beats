@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Affecting all Beats*
 - Update builds to Golang version 1.5.2
 - Make logstash output compression level configurable. {pull}630[630]
+- Add ability to override configuration settings using environment variables {issue}114[114]
 
 *Packetbeat*
 - Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]
