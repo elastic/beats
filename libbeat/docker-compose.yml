@@ -1,4 +1,4 @@
-libbeat:
+beat:
   build: ..
   links:
     - redis
@@ -10,8 +10,6 @@ libbeat:
     - LS_HOST=logstash
     - LS_TCP_PORT=5044
     - LS_TLS_PORT=5055
-    - ES_USER=beats
-    - ES_PASS=testing
     # Setup work environment
     - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
     # TODO: Set to true as soon as stable release is out
@@ -35,6 +33,4 @@ logstash:
     - build/test.env
   links:
     - elasticsearch
-  environment:
-    - ES_USER=beats
-    - ES_PASS=testing
+
