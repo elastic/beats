@@ -19,8 +19,10 @@ type Filebeat struct {
 	FbConfig *cfg.Config
 	// Channel from harvesters to spooler
 	publisherChan chan []*FileEvent
-	Spooler       *Spooler
+	spooler       *Spooler
 	registrar     *Registrar
+	cralwer       *Crawler
+	done          chan struct{}
 }
 
 func New() *Filebeat {
@@ -44,6 +46,8 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 }
 
 func (fb *Filebeat) Setup(b *beat.Beat) error {
+	fb.done = make(chan struct{})
+
 	return nil
 }
 
@@ -61,7 +65,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	crawl := &Crawler{
+	fb.cralwer = &Crawler{
 		Registrar: fb.registrar,
 	}
 
@@ -69,8 +73,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.registrar.LoadState()
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
-	fb.Spooler = NewSpooler(fb)
-	err = fb.Spooler.Config()
+	fb.spooler = NewSpooler(fb)
+	err = fb.spooler.Config()
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
@@ -78,9 +82,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Start up spooler
-	go fb.Spooler.Run()
+	go fb.spooler.Run()
 
-	err = crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
+	// registrar records last acknowledged positions in all files.
+	go fb.registrar.Run()
+
+	err = fb.cralwer.Start(fb.FbConfig.Filebeat.Prospectors, fb.spooler.Channel)
 	if err != nil {
 		return err
 	}
@@ -88,8 +95,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Publishes event to output
 	go Publish(b, fb)
 
-	// registrar records last acknowledged positions in all files.
-	fb.registrar.Run()
+	// Blocks progressing
+	select {
+	case <-fb.done:
+	}
 
 	return nil
 }
@@ -101,17 +110,18 @@ func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 // Stop is called on exit for cleanup
 func (fb *Filebeat) Stop() {
 
-	// Stop harvesters
-	// Stop prospectors
+	logp.Info("Stopping filebeat")
+	// Stop crawler -> stop prospectors -> stop harvesters
+	fb.cralwer.Stop()
 
 	// Stopping spooler will flush items
-	fb.Spooler.Stop()
+	fb.spooler.Stop()
 
 	// Stopping registrar will write last state
 	fb.registrar.Stop()
 
-	// Close channels
-	//close(fb.publisherChan)
+	// Stop Filebeat
+	close(fb.done)
 }
 
 func Publish(beat *beat.Beat, fb *Filebeat) {

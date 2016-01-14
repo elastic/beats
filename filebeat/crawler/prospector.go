@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -15,7 +16,7 @@ type Prospector struct {
 	prospectorer     Prospectorer
 	channel          chan *input.FileEvent
 	registrar        *Registrar
-	running          bool
+	done             chan struct{}
 }
 
 type Prospectorer interface {
@@ -28,6 +29,7 @@ func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, 
 		ProspectorConfig: prospectorConfig,
 		registrar:        registrar,
 		channel:          channel,
+		done:             make(chan struct{}),
 	}
 
 	err := prospector.Init()
@@ -61,6 +63,7 @@ func (p *Prospector) Init() error {
 	case cfg.LogInputType:
 		prospectorer, err = NewProspectorLog(p.ProspectorConfig, p.channel, p.registrar)
 		prospectorer.Init()
+
 	default:
 		return fmt.Errorf("Invalid prospector type: %v", p.ProspectorConfig.Harvester.InputType)
 	}
@@ -71,21 +74,32 @@ func (p *Prospector) Init() error {
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run() {
+func (p *Prospector) Run(wg *sync.WaitGroup) {
 
-	p.running = true
+	// TODO: Defer the wg.Done() call to block shutdown
+	// Currently there are 2 cases where shutting down the prospector could be blocked:
+	// 1. reading from file
+	// 2. forwarding event to spooler
+	// As this is not implemented yet, no blocking on prospector shutdown is done.
+	wg.Done()
+
 	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
 
 	for {
-		p.prospectorer.Run(p.channel)
-		if !p.running {
-			break
+		select {
+		case <-p.done:
+			logp.Info("Prospector stopped")
+			return
+		default:
+			logp.Info("Run prospector")
+			p.prospectorer.Run(p.channel)
 		}
 	}
 }
 
 func (p *Prospector) Stop() {
-	// TODO: Stopping is currently not implemented
+	logp.Info("Stopping Prospector")
+	close(p.done)
 }
 
 // Setup Prospector Config

@@ -18,7 +18,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
-- Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631] 
+- Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
 
 *Filebeat*
 
@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Filebeat*
 - Add exclude_files configuration option {pull}563[563]
 - Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
+- Improve shutdown of crawler and prospector to wait for clean completion {pull}720[720]
 - Set spool_size default value to 2048 {pull}628[628]
 
 *Winlogbeat*
