@@ -112,15 +112,12 @@ func Run(name string, version string, bt Beater) {
 	}()
 
 	// Waits until beats channel is closed
-	for {
-		select {
-		case <-b.exit:
-			b.Stop()
-			logp.Info("Exit beat completed")
-			return
-		}
+	select {
+	case <-b.exit:
+		b.Stop()
+		logp.Info("Exit beat completed")
+		return
 	}
-
 }
 
 func (b *Beat) Start() error {
