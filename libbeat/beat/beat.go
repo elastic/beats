@@ -104,7 +104,14 @@ func Run(name string, version string, bt Beater) {
 
 	// Runs beat inside a go process
 	go func() {
-		b.Start()
+		err := b.Start()
+
+		if err != nil {
+			// TODO: detect if logging was already fully setup or not
+			fmt.Printf("Start error: %v\n", err)
+			logp.Critical("Start error: %v", err)
+			os.Exit(1)
+		}
 
 		// If start finishes, exit has to be called. This requires start to be blocking
 		// which is currently the default.
@@ -120,18 +127,31 @@ func Run(name string, version string, bt Beater) {
 	}
 }
 
+// Start starts the Beat by parsing and interpreting the command line flags,
+// loading and parsing the configuration file, and running the Beat. This
+// method blocks until the Beat exits. If an error occurs while initializing
+// or running the Beat it will be returned.
 func (b *Beat) Start() error {
 	// Additional command line args are used to overwrite config options
-	b.CommandLineSetup()
+	err, exit := b.CommandLineSetup()
+	if err != nil {
+		return err
+	}
+
+	if exit {
+		return nil
+	}
 
 	// Loads base config
-	b.LoadConfig()
+	err = b.LoadConfig()
+	if err != nil {
+		return err
+	}
 
 	// Configures beat
-	err := b.BT.Config(b)
+	err = b.BT.Config(b)
 	if err != nil {
-		logp.Critical("Config error: %v", err)
-		os.Exit(1)
+		return err
 	}
 
 	// Run beat. This calls first beater.Setup,
@@ -141,43 +161,43 @@ func (b *Beat) Start() error {
 
 // Reads and parses the default command line params
 // To set additional cmd line args use the beat.CmdLine type before calling the function
-func (beat *Beat) CommandLineSetup() {
+// The second return param is to detect if system should exit. True if should exit
+// Exit can also be without error
+func (beat *Beat) CommandLineSetup() (error, bool) {
 
 	// The -c flag is treated separately because it needs the Beat name
 	err := cfgfile.ChangeDefaultCfgfileFlag(beat.Name)
 	if err != nil {
-		fmt.Printf("Failed to fix the -c flag: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to fix the -c flag: %v\n", err), true
 	}
 
 	flag.Parse()
 
 	if *printVersion {
 		fmt.Printf("%s version %s (%s)\n", beat.Name, beat.Version, runtime.GOARCH)
-		os.Exit(0)
+		return nil, true
 	}
 
 	// if beater implements CLIFlags for additional CLI handling, call it now
 	if flagsHandler, ok := beat.BT.(FlagsHandler); ok {
 		flagsHandler.HandleFlags(beat)
 	}
+
+	return nil, false
 }
 
 // LoadConfig inits the config file and reads the default config information
 // into Beat.Config. It exists the processes in case of errors.
-func (b *Beat) LoadConfig() {
+func (b *Beat) LoadConfig() error {
 
 	err := cfgfile.Read(&b.Config, "")
 	if err != nil {
-		// logging not yet initialized, so using fmt.Printf
-		fmt.Printf("Loading config file error: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("loading config file error: %v\n", err)
 	}
 
 	err = logp.Init(b.Name, &b.Config.Logging)
 	if err != nil {
-		fmt.Printf("Error initializing logging: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("error initializing logging: %v\n", err)
 	}
 
 	// Disable stderr logging if requested by cmdline flag
@@ -187,14 +207,14 @@ func (b *Beat) LoadConfig() {
 
 	pub, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper)
 	if err != nil {
-		fmt.Printf("Error Initialising publisher: %v\n", err)
-		logp.Critical(err.Error())
-		os.Exit(1)
+		return fmt.Errorf("error Initialising publisher: %v\n", err)
 	}
 
 	b.Events = pub.Client()
 
 	logp.Info("Init Beat: %s; Version: %s", b.Name, b.Version)
+
+	return nil
 }
 
 // Run calls the beater Setup and Run methods. In case of errors
@@ -204,14 +224,14 @@ func (b *Beat) Run() error {
 	// Setup beater object
 	err := b.BT.Setup(b)
 	if err != nil {
-		logp.Critical("Setup returned an error: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("setup returned an error: %v", err)
 	}
 
 	// Up to here was the initialization, now about running
 	if cfgfile.IsTestConfig() {
-		// all good, exit with 0
-		os.Exit(0)
+		logp.Info("Testing configuration file")
+		// all good, exit
+		return nil
 	}
 	service.BeforeRun()
 
