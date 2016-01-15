@@ -4,13 +4,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 type worker struct {
 	wg   sync.WaitGroup
 	done chan struct{}
 	run  func(*worker)
+}
+
+type spool struct {
+	pub    publisher.Client
+	events []common.MapStr
 }
 
 func newWorker(fn func(w *worker)) *worker {
@@ -65,6 +72,27 @@ func (w *worker) periodicaly(tick time.Duration, fn func() error) {
 			return
 		}
 	}
+}
+
+func (s *spool) init(pub publisher.Client, sz int) {
+	s.pub = pub
+	s.events = make([]common.MapStr, 0, sz)
+}
+
+func (s *spool) publish(event common.MapStr) {
+	s.events = append(s.events, event)
+	if len(s.events) == cap(s.events) {
+		s.flush()
+	}
+}
+
+func (s *spool) flush() {
+	if len(s.events) == 0 {
+		return
+	}
+
+	s.pub.PublishEvents(s.events)
+	s.events = make([]common.MapStr, 0, cap(s.events))
 }
 
 func gcd(a, b int64) int64 {

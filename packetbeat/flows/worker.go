@@ -1,7 +1,10 @@
 package flows
 
 import (
+	"encoding/base64"
+	"encoding/binary"
 	"errors"
+	"net"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -9,13 +12,10 @@ import (
 )
 
 type flowsProcessor struct {
-	pub publisher.Client
-
+	spool    spool
 	table    *flowMetaTable
 	counters *counterReg
 	timeout  time.Duration
-
-	events []common.MapStr
 }
 
 var (
@@ -48,12 +48,13 @@ func newFlowsWorker(
 		ticksPeriod = int(period / tickDuration)
 	}
 
+	defaultBatchSize := 1024
 	processor := &flowsProcessor{
-		pub:      pub,
 		table:    table,
 		counters: counters,
 		timeout:  timeout,
 	}
+	processor.spool.init(pub, defaultBatchSize)
 
 	return newWorker(func(w *worker) {
 		defer w.finished()
@@ -130,7 +131,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
 		}
 	}
 
-	fw.flush(w)
+	fw.spool.flush()
 }
 
 func (fw *flowsProcessor) report(
@@ -139,33 +140,89 @@ func (fw *flowsProcessor) report(
 	flow *biFlow,
 	intNames, floatNames []string,
 ) {
-	defaultBatchSize := 1024
-
-	event := createEvent(ts, flow, intNames, floatNames)
-	if event == nil {
-		return
+	if event := createEvent(ts, flow, intNames, floatNames); event != nil {
+		fw.spool.publish(event)
 	}
-
-	if fw.events == nil {
-		fw.events = make([]common.MapStr, 0, defaultBatchSize)
-	}
-
-	fw.events = append(fw.events, event)
-	if len(fw.events) == cap(fw.events) {
-		fw.flush(w)
-	}
-}
-
-func (fw *flowsProcessor) flush(w *worker) {
-	if fw.events == nil {
-		return
-	}
-
-	fw.pub.PublishEvents(fw.events)
-	fw.events = nil
 }
 
 func createEvent(ts time.Time, f *biFlow, intNames, floatNames []string) common.MapStr {
-	// TODO: create event
-	return nil
+	event := common.MapStr{
+		"@timestamp": common.Time(ts),
+		"type":       "flow",
+	}
+
+	// add ethernet layer meta data
+	if src, dst, ok := f.id.EthAddr(); ok {
+		event["mac_source"] = net.HardwareAddr(src).String()
+		event["mac_dest"] = net.HardwareAddr(dst).String()
+	}
+
+	// add vlan
+	if vlan := f.id.OutterVLan(); vlan != nil {
+		event["outter_vlan"] = binary.LittleEndian.Uint16(vlan)
+	}
+	if vlan := f.id.VLan(); vlan != nil {
+		event["vlan"] = binary.LittleEndian.Uint16(vlan)
+	}
+
+	// ipv4 layer meta data
+	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
+		event["outter_ip4_source"] = net.IP(src).String()
+		event["outter_ip4_dest"] = net.IP(dst).String()
+	}
+	if src, dst, ok := f.id.IPv4Addr(); ok {
+		event["ip4_source"] = net.IP(src).String()
+		event["ip4_dest"] = net.IP(dst).String()
+	}
+
+	// ipv6 layer meta data
+	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
+		event["outter_ip6_source"] = net.IP(src).String()
+		event["outter_ip6_dest"] = net.IP(dst).String()
+	}
+	if src, dst, ok := f.id.IPv6Addr(); ok {
+		event["ip6_source"] = net.IP(src).String()
+		event["ip6_dest"] = net.IP(dst).String()
+	}
+
+	// udp layer meta data
+	if src, dst, ok := f.id.UDPAddr(); ok {
+		event["port_source"] = binary.LittleEndian.Uint16(src)
+		event["port_dest"] = binary.LittleEndian.Uint16(dst)
+		event["transp"] = "udp"
+	}
+
+	// tcp layer meta data
+	if src, dst, ok := f.id.TCPAddr(); ok {
+		event["port_source"] = binary.LittleEndian.Uint16(src)
+		event["port_dest"] = binary.LittleEndian.Uint16(dst)
+		event["transp"] = "tcp"
+	}
+
+	if id := f.id.ConnectionID(); id != nil {
+		event["connection_id"] = base64.StdEncoding.EncodeToString(id)
+	}
+
+	if f.stats[0] != nil {
+		event["stats_source"] = encodeStats(f.stats[0], intNames, floatNames)
+	}
+	if f.stats[1] != nil {
+		event["stats_dest"] = encodeStats(f.stats[1], intNames, floatNames)
+	}
+
+	return event
+}
+
+func encodeStats(stats *flowStats, ints, floats []string) map[string]interface{} {
+	report := make(map[string]interface{})
+
+	for i, name := range ints {
+		report[name] = stats.ints[i]
+	}
+
+	for i, name := range floats {
+		report[name] = stats.floats[i]
+	}
+
+	return report
 }

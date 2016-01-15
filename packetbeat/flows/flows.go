@@ -17,7 +17,7 @@ type Flows struct {
 }
 
 type biFlow struct {
-	key    string
+	id     rawFlowID
 	killed uint32
 	ts     time.Time
 
@@ -162,12 +162,12 @@ func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
 	bf := t.table[string(id.flowID)]
 	if bf == nil || !bf.isAlive() {
 		bf = &biFlow{
-			key: string(id.flowID),
+			id:  id.rawFlowID.clone(),
 			ts:  time.Now(),
 			dir: id.dir,
 		}
 
-		t.table[bf.key] = bf
+		t.table[string(bf.id.flowID)] = bf
 		t.flows.append(bf)
 	} else if bf.dir != id.dir {
 		dir = flowDirReversed
@@ -185,7 +185,7 @@ func (t *flowTable) remove(f *biFlow) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	delete(t.table, f.key)
+	delete(t.table, string(f.id.flowID))
 	t.flows.remove(f)
 }
 
