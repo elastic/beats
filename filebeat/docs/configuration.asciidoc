@@ -83,7 +83,7 @@ The following example configures Filebeat to export any lines that start with "E
 include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
-NOTE: If both `include_lines` and `exclude_lines` are defined, `include_lines` is called first. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
+NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ This setting is especially useful for multiline log messages, which can get larg
 
 ===== multiline
 
-Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in Java stack traces and C line continuation. 
+Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces. 
 
 The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`). 
 
@@ -169,7 +169,7 @@ multiline:
 
 -------------------------------------------------------------------------------------
 
-Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. You can use this configuration to handle a Java stack trace that contains multiline messages like:
+Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event: 
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
@@ -205,6 +205,33 @@ lines are discarded. The default is 500.
 
 *`timeout`*:: After the specified timeout, Filebeat sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
+Here's an example configuration that shows the regular expression for a slightly more complex example: 
+
+["source","sh",subs="attributes,callouts"]
+-------------------------------------------------------------------------------------
+multiline:
+    pattern: "^[[:space:]]+(at|...)|^Caused by:"
+    negate: false
+    match: after
+-------------------------------------------------------------------------------------
+
+In this example, the pattern matches the following lines:
+
+* a line that begins with spaces followed by the word `at` or `...`
+* a line that begins with the words `Caused by:`
+
+You could use this configuration to join the following lines from a Java stack trace into a single event: 
+
+["source","sh",subs="attributes,callouts"]
+-------------------------------------------------------------------------------------
+Exception in thread "main" java.lang.IllegalStateException: A book has a null property
+       at com.example.myproject.Author.getBookIds(Author.java:38)
+       at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
+Caused by: java.lang.NullPointerException
+       at com.example.myproject.Book.getId(Book.java:22)
+       at com.example.myproject.Author.getBookIds(Author.java:35)
+       ... 1 more
+-------------------------------------------------------------------------------------
 
 ===== tail_files
 
