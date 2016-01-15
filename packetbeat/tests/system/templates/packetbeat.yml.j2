@@ -136,27 +136,6 @@ protocols:
 {% if mongodb_max_docs is not none %}    max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}    max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
-############################# Filters #########################################
-
-{% if filter_plugins -%}
-filter:
-  filters: [
-      {%- for filter in filter_plugins -%}
-          "{{ filter }}"
-          {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  ]
-
-  {% if filter_config -%}
-  {%- for name, dict in filter_config.items() %}
-  {{name}}:
-    {%- for key, val in dict.items() %}
-    {{key}}: "{{val}}"
-    {%- endfor %}
-  {% endfor %}
-  {%- endif -%}
-{%- endif %}
-
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by packetbeat.
