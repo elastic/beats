@@ -44,9 +44,23 @@ func newFlowsWorker(
 	ticksPeriod := -1
 	if period > 0 {
 		tickDuration = time.Duration(gcd(int64(timeout), int64(period)))
+		if tickDuration < oneSecond {
+			tickDuration = oneSecond
+		}
+
 		ticksTimeout = int(timeout / tickDuration)
+		if ticksTimeout == 0 {
+			ticksTimeout = 1
+		}
+
 		ticksPeriod = int(period / tickDuration)
+		if ticksPeriod == 0 {
+			ticksPeriod = 1
+		}
 	}
+
+	debugf("new flows worker. timeout=%v, period=%v, tick=%v, ticksTO=%v, ticksP=%v",
+		timeout, period, tickDuration, ticksTimeout, ticksPeriod)
 
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
@@ -60,8 +74,11 @@ func newFlowsWorker(
 		defer w.finished()
 
 		// round time to nearest 10 seconds for alignment
-		aligned := time.Unix((time.Now().Unix()+9/10)*10, 0)
-		if cont := w.sleep(aligned.Sub(time.Now())); !cont {
+		aligned := time.Unix(((time.Now().Unix()+9)/10)*10, 0)
+		waitStart := aligned.Sub(time.Now())
+
+		debugf("worker wait start(%v): %v", aligned, waitStart)
+		if cont := w.sleep(waitStart); !cont {
 			return
 		}
 
@@ -71,6 +88,7 @@ func newFlowsWorker(
 		w.periodicaly(tickDuration, func() error {
 			nTimeout--
 			nPeriod--
+			debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
 
 			handleTimeout := nTimeout == 0
 			handleReports := reportPeriodically && nPeriod == 0
@@ -92,15 +110,13 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
 		return
 	}
 
+	debugf("exec tick, timeout=%v, report=%v", checkTimeout, handleReports)
+
 	// get counter names snapshot if reports must be generated
-	var intNames []string
-	var floatNames []string
-	if handleReports {
-		fw.counters.mutex.Lock()
-		intNames = fw.counters.ints.getNames()
-		floatNames = fw.counters.floats.getNames()
-		fw.counters.mutex.Unlock()
-	}
+	fw.counters.mutex.Lock()
+	intNames := fw.counters.ints.getNames()
+	floatNames := fw.counters.floats.getNames()
+	fw.counters.mutex.Unlock()
 
 	fw.table.Lock()
 	defer fw.table.Unlock()
@@ -115,17 +131,21 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
 
+			debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
+
 			reportFlow := handleReports
 			if checkTimeout {
 				if ts.Sub(flow.ts) > fw.timeout {
-					reportFlow = true
+					debugf("kill flow")
 
+					reportFlow = true
 					flow.kill() // mark flow as killed
 					table.remove(flow)
 				}
 			}
 
-			if !reportFlow {
+			if reportFlow {
+				debugf("report flow")
 				fw.report(w, ts, flow, intNames, floatNames)
 			}
 		}
@@ -141,6 +161,7 @@ func (fw *flowsProcessor) report(
 	intNames, floatNames []string,
 ) {
 	if event := createEvent(ts, flow, intNames, floatNames); event != nil {
+		debugf("add event: %v", event)
 		fw.spool.publish(event)
 	}
 }

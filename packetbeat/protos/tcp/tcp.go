@@ -119,10 +119,13 @@ func (tcp *Tcp) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	// protocol modules.
 	defer logp.Recover("Process tcp exception")
 
+	debugf("tcp flow id: %p", id)
+
 	stream, created := tcp.getStream(pkt)
 	if stream.conn == nil {
 		return
 	}
+
 	if id != nil {
 		id.AddConnectionID(uint64(stream.conn.id))
 	}

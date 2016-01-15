@@ -138,7 +138,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	processed := false
 
 	if d.flows != nil {
-		d.flowID.Reset(d.flowIDBufferBacking[:])
+		d.flowID.Reset(d.flowIDBufferBacking[:0])
 
 		// supress flow stats snapshots while processing packet
 		d.flows.Lock()
@@ -176,6 +176,8 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	}
 
 	// add flow s.tats
+	debugf("flow id flags: %v", d.flowID.Flags())
+
 	if d.flows != nil && d.flowID.Flags() != 0 {
 		flow := d.flows.Get(&d.flowID)
 		d.statPackets.Add(flow, 1)
@@ -303,7 +305,7 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 	if d.flows == nil {
 		id = nil
 	} else {
-		d.flowID.AddTCP(src, dst)
+		id.AddTCP(src, dst)
 	}
 
 	packet.Tuple.Src_port = src

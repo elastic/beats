@@ -118,10 +118,12 @@ func (f *FlowID) Reset(buf []byte) {
 }
 
 func (f *FlowID) AddEth(src, dst net.HardwareAddr) {
+	debugf("flowid: add eth")
 	f.addID(&f.offEth, EthFlow, src, dst, flowDirUnset)
 }
 
 func (f *FlowID) AddIPv4(src, dst net.IP) {
+	debugf("flowid: add ipv4")
 	f.addMultLayerID(
 		&f.offIPv4, &f.offOutterIPv4,
 		IPv4Flow, OutterIPv4Flow,
@@ -129,6 +131,7 @@ func (f *FlowID) AddIPv4(src, dst net.IP) {
 }
 
 func (f *FlowID) AddIPv6(src, dst net.IP) {
+	debugf("flowid: add ipv6")
 	f.addMultLayerID(
 		&f.offIPv6, &f.offOutterIPv6,
 		IPv6Flow, OutterIPv6Flow,
@@ -136,6 +139,7 @@ func (f *FlowID) AddIPv6(src, dst net.IP) {
 }
 
 func (f *FlowID) AddVLan(id uint16) {
+	debugf("flowid: add vlan")
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addMultLayerID(
@@ -145,38 +149,52 @@ func (f *FlowID) AddVLan(id uint16) {
 }
 
 func (f *FlowID) AddICMPv4Request(id uint16) {
+	debugf("flowid: add icmp4 request")
+
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addID(&f.offICMPv4, ICMPv4Flow, tmp[:], nil, flowDirForward)
 }
 
 func (f *FlowID) AddICMPv4Response(id uint16) {
+	debugf("flowid: add icmp4 response")
+
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addID(&f.offICMPv4, ICMPv4Flow, tmp[:], nil, flowDirReversed)
 }
 
 func (f *FlowID) AddICMPv6Request(id uint16) {
+	debugf("flowid: add icmp6 request")
+
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addID(&f.offICMPv6, ICMPv6Flow, tmp[:], nil, flowDirForward)
 }
 
 func (f *FlowID) AddICMPv6Response(id uint16) {
+	debugf("flowid: add icmp6 response")
+
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
 	f.addID(&f.offICMPv6, ICMPv6Flow, tmp[:], nil, flowDirReversed)
 }
 
 func (f *FlowID) AddUDP(src, dst uint16) {
+	debugf("flowid: add udp")
+
 	f.addWithPorts(&f.offUDP, UDPFlow, src, dst)
 }
 
 func (f *FlowID) AddTCP(src, dst uint16) {
+	debugf("flowid: add tcp")
+
 	f.addWithPorts(&f.offTCP, TCPFlow, src, dst)
 }
 
 func (f *FlowID) AddConnectionID(id uint64) {
+	debugf("flowid: add tcp connection id")
+
 	var tmp [8]byte
 	binary.LittleEndian.PutUint64(tmp[:], id)
 	f.addID(&f.offID, ConnectionID, tmp[:], nil, flowDirUnset)
@@ -219,7 +237,7 @@ func (f *FlowID) addID(
 ) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
-	if *off < 0 {
+	if *off == offUnset {
 		*off = uint8(len(f.flowID))
 		f.flowID = append(append(f.flowID, a...), b...)
 		f.flags |= flag

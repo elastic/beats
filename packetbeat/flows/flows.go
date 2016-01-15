@@ -72,6 +72,8 @@ type flowList struct {
 	head, tail *biFlow
 }
 
+var debugf = logp.MakeDebug("flows")
+
 func NewFlows(pub publisher.Client, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
@@ -114,25 +116,31 @@ func NewFlows(pub publisher.Client, config *config.Flows) (*Flows, error) {
 }
 
 func (f *Flows) Lock() {
+	debugf("lock flows")
 	f.table.Lock()
 }
 
 func (f *Flows) Unlock() {
+	debugf("unlock flows")
 	f.table.Unlock()
 }
 
 func (f *Flows) Get(id *FlowID) *Flow {
+	debugf("get flow")
 	if id.flow.stats == nil {
+		debugf("lookup flow: %v => %v", id.flowIDMeta, id.flowID)
 		id.flow = f.table.get(id, f.counterReg)
 	}
 	return &id.flow
 }
 
 func (f *Flows) Start() {
+	debugf("start flows worker")
 	f.worker.Start()
 }
 
 func (f *Flows) Stop() {
+	debugf("stop flows worker")
 	f.worker.Stop()
 }
 
@@ -161,6 +169,8 @@ func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
 	dir := flowDirForward
 	bf := t.table[string(id.flowID)]
 	if bf == nil || !bf.isAlive() {
+		debugf("create new flow")
+
 		bf = &biFlow{
 			id:  id.rawFlowID.clone(),
 			ts:  time.Now(),
