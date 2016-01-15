@@ -5,20 +5,21 @@ The open source community has been hard at work developing new Beats. You can ch
 out a few of them here:
 
 [horizontal]
+https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status
 https://github.com/Ingensi/dockerbeat[dockerbeat]:: Reads docker container
 statistics and indexes them in Elasticsearch
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash, Elasticsearch.
+https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter]
+https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash, Elasticsearch. Supports all HTTP methods and proxies.
+https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios Checks and Performance Data
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx
+https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI
-https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM
-https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status
-https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM
-https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios Checks and Performance Data
 
 Have you created a Beat that's not listed? Open a pull request to add your link
 here: https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc
