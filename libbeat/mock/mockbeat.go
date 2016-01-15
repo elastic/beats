@@ -1,21 +1,18 @@
 package mock
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/beat"
 )
 
 ///*** Mock Beat Setup ***///
 
-var Version = "0.0.1"
+var Version = "9.9.9"
 var Name = "mockbeat"
 
 type Mockbeat struct {
 }
 
 func (mb *Mockbeat) Config(b *beat.Beat) error {
-	fmt.Print("hello world")
 	return nil
 }
 
