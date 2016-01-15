@@ -41,8 +41,8 @@ type DecoderStruct struct {
 	udpProc   udp.Processor
 
 	flows       *flows.Flows
-	statPackets *flows.Int
-	statBytes   *flows.Int
+	statPackets *flows.Uint
+	statBytes   *flows.Uint
 
 	// hold current flow ID
 	flowID              flows.FlowID // buffer flowID among many calls
@@ -68,11 +68,11 @@ func NewDecoder(
 
 	if flows != nil {
 		var err error
-		d.statPackets, err = flows.NewInt("net_packets_total")
+		d.statPackets, err = flows.NewUint("net_packets_total")
 		if err != nil {
 			return nil, err
 		}
-		d.statBytes, err = flows.NewInt("net_bytes_total")
+		d.statBytes, err = flows.NewUint("net_bytes_total")
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +181,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	if d.flows != nil && d.flowID.Flags() != 0 {
 		flow := d.flows.Get(&d.flowID)
 		d.statPackets.Add(flow, 1)
-		d.statBytes.Add(flow, int64(ci.Length))
+		d.statBytes.Add(flow, uint64(ci.Length))
 	}
 }
 

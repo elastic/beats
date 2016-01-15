@@ -115,6 +115,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
 	// get counter names snapshot if reports must be generated
 	fw.counters.mutex.Lock()
 	intNames := fw.counters.ints.getNames()
+	uintNames := fw.counters.uints.getNames()
 	floatNames := fw.counters.floats.getNames()
 	fw.counters.mutex.Unlock()
 
@@ -146,7 +147,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
 
 			if reportFlow {
 				debugf("report flow")
-				fw.report(w, ts, flow, intNames, floatNames)
+				fw.report(w, ts, flow, intNames, uintNames, floatNames)
 			}
 		}
 	}
@@ -158,15 +159,18 @@ func (fw *flowsProcessor) report(
 	w *worker,
 	ts time.Time,
 	flow *biFlow,
-	intNames, floatNames []string,
+	intNames, uintNames, floatNames []string,
 ) {
-	if event := createEvent(ts, flow, intNames, floatNames); event != nil {
+	if event := createEvent(ts, flow, intNames, uintNames, floatNames); event != nil {
 		debugf("add event: %v", event)
 		fw.spool.publish(event)
 	}
 }
 
-func createEvent(ts time.Time, f *biFlow, intNames, floatNames []string) common.MapStr {
+func createEvent(
+	ts time.Time, f *biFlow,
+	intNames, uintNames, floatNames []string,
+) common.MapStr {
 	event := common.MapStr{
 		"@timestamp": common.Time(ts),
 		"type":       "flow",
@@ -225,20 +229,27 @@ func createEvent(ts time.Time, f *biFlow, intNames, floatNames []string) common.
 	}
 
 	if f.stats[0] != nil {
-		event["stats_source"] = encodeStats(f.stats[0], intNames, floatNames)
+		event["stats_source"] = encodeStats(f.stats[0], intNames, uintNames, floatNames)
 	}
 	if f.stats[1] != nil {
-		event["stats_dest"] = encodeStats(f.stats[1], intNames, floatNames)
+		event["stats_dest"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
 	}
 
 	return event
 }
 
-func encodeStats(stats *flowStats, ints, floats []string) map[string]interface{} {
+func encodeStats(
+	stats *flowStats,
+	ints, uints, floats []string,
+) map[string]interface{} {
 	report := make(map[string]interface{})
 
 	for i, name := range ints {
 		report[name] = stats.ints[i]
+	}
+
+	for i, name := range uints {
+		report[name] = stats.uints[i]
 	}
 
 	for i, name := range floats {

@@ -8,6 +8,10 @@ type Int struct {
 	i int
 }
 
+type Uint struct {
+	i int
+}
+
 type Float struct {
 	i int
 }
@@ -16,6 +20,7 @@ type counterReg struct {
 	mutex sync.Mutex
 
 	ints   counterTypeReg
+	uints  counterTypeReg
 	floats counterTypeReg
 }
 
@@ -25,6 +30,7 @@ type counterTypeReg struct {
 
 type flowStats struct {
 	ints   []int64
+	uints  []uint64
 	floats []float64
 }
 
@@ -37,6 +43,20 @@ func (c *Int) Add(f *Flow, delta int64) {
 
 func (c *Int) Set(f *Flow, value int64) {
 	ints := f.stats.ints
+	if c.i < len(ints) {
+		ints[c.i] = value
+	}
+}
+
+func (c *Uint) Add(f *Flow, delta uint64) {
+	ints := f.stats.uints
+	if c.i < len(ints) {
+		ints[c.i] += delta
+	}
+}
+
+func (c *Uint) Set(f *Flow, value uint64) {
+	ints := f.stats.uints
 	if c.i < len(ints) {
 		ints[c.i] = value
 	}
@@ -65,6 +85,17 @@ func (c *counterReg) newInt(name string) (*Int, error) {
 		return nil, err
 	}
 	return &Int{i}, nil
+}
+
+func (c *counterReg) newUint(name string) (*Uint, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	i, err := c.ints.reg(name)
+	if err != nil {
+		return nil, err
+	}
+	return &Uint{i}, nil
 }
 
 func (c *counterReg) newFloat(name string) (*Float, error) {
@@ -104,5 +135,6 @@ func (s *flowStats) init(reg *counterReg) {
 	defer reg.mutex.Unlock()
 
 	s.ints = make([]int64, len(reg.ints.names))
+	s.uints = make([]uint64, len(reg.uints.names))
 	s.floats = make([]float64, len(reg.floats.names))
 }

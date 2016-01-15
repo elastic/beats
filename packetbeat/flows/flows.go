@@ -148,6 +148,10 @@ func (f *Flows) NewInt(name string) (*Int, error) {
 	return f.counterReg.newInt(name)
 }
 
+func (f *Flows) NewUint(name string) (*Uint, error) {
+	return f.counterReg.newUint(name)
+}
+
 func (f *Flows) NewFloat(name string) (*Float, error) {
 	return f.counterReg.newFloat(name)
 }
