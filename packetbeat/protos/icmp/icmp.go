@@ -113,24 +113,32 @@ func (icmp *Icmp) ProcessICMPv4(
 	typ := uint8(icmp4.TypeCode >> 8)
 	code := uint8(icmp4.TypeCode)
 	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer)
-	if flowID != nil {
-		flowID.AddICMPv4(id)
-	}
 
-	tuple := icmpTuple{
+	tuple := &icmpTuple{
 		IcmpVersion: 4,
 		SrcIp:       pkt.Tuple.Src_ip,
 		DstIp:       pkt.Tuple.Dst_ip,
 		Id:          id,
 		Seq:         seq,
 	}
-	msg := icmpMessage{
+	msg := &icmpMessage{
 		Ts:     pkt.Ts,
 		Type:   typ,
 		Code:   code,
 		Length: len(icmp4.BaseLayer.Payload),
 	}
-	icmp.processMessage(&tuple, &msg)
+
+	if isRequest(tuple, msg) {
+		if flowID != nil {
+			flowID.AddICMPv4Request(id)
+		}
+		icmp.processRequest(tuple, msg)
+	} else {
+		if flowID != nil {
+			flowID.AddICMPv4Response(id)
+		}
+		icmp.processRequest(tuple, msg)
+	}
 }
 
 func (icmp *Icmp) ProcessICMPv6(
@@ -141,30 +149,30 @@ func (icmp *Icmp) ProcessICMPv6(
 	typ := uint8(icmp6.TypeCode >> 8)
 	code := uint8(icmp6.TypeCode)
 	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
-	if flowID != nil {
-		flowID.AddICMPv6(id)
-	}
-	tuple := icmpTuple{
+	tuple := &icmpTuple{
 		IcmpVersion: 6,
 		SrcIp:       pkt.Tuple.Src_ip,
 		DstIp:       pkt.Tuple.Dst_ip,
 		Id:          id,
 		Seq:         seq,
 	}
-	msg := icmpMessage{
+	msg := &icmpMessage{
 		Ts:     pkt.Ts,
 		Type:   typ,
 		Code:   code,
 		Length: len(icmp6.BaseLayer.Payload),
 	}
-	icmp.processMessage(&tuple, &msg)
-}
 
-func (icmp *Icmp) processMessage(tuple *icmpTuple, msg *icmpMessage) {
 	if isRequest(tuple, msg) {
+		if flowID != nil {
+			flowID.AddICMPv6Request(id)
+		}
 		icmp.processRequest(tuple, msg)
 	} else {
-		icmp.processResponse(tuple, msg)
+		if flowID != nil {
+			flowID.AddICMPv6Response(id)
+		}
+		icmp.processRequest(tuple, msg)
 	}
 }
 

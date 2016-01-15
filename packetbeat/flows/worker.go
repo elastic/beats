@@ -86,8 +86,8 @@ func newFlowsWorker(
 	}), nil
 }
 
-func (fw *flowsProcessor) execute(w *worker, handleTimeout, handleReports bool) {
-	if !handleTimeout && !handleReports {
+func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports bool) {
+	if !checkTimeout && !handleReports {
 		return
 	}
 
@@ -110,12 +110,12 @@ func (fw *flowsProcessor) execute(w *worker, handleTimeout, handleReports bool) 
 	//       processing.
 
 	for table := fw.table.tables.head; table != nil; table = table.next {
-		var next *Flow
+		var next *biFlow
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
 
 			reportFlow := handleReports
-			if handleTimeout {
+			if checkTimeout {
 				if ts.Sub(flow.ts) > fw.timeout {
 					reportFlow = true
 
@@ -136,7 +136,7 @@ func (fw *flowsProcessor) execute(w *worker, handleTimeout, handleReports bool) 
 func (fw *flowsProcessor) report(
 	w *worker,
 	ts time.Time,
-	flow *Flow,
+	flow *biFlow,
 	intNames, floatNames []string,
 ) {
 	defaultBatchSize := 1024
@@ -165,7 +165,7 @@ func (fw *flowsProcessor) flush(w *worker) {
 	fw.events = nil
 }
 
-func createEvent(ts time.Time, f *Flow, intNames, floatNames []string) common.MapStr {
+func createEvent(ts time.Time, f *biFlow, intNames, floatNames []string) common.MapStr {
 	// TODO: create event
 	return nil
 }

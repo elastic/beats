@@ -16,18 +16,18 @@ type Flows struct {
 	counterReg *counterReg
 }
 
-type Flow struct {
+type biFlow struct {
+	key    string
 	killed uint32
-	id     *FlowID
-	stats  flowStats
 	ts     time.Time
 
-	prev, next *Flow
+	dir        flowDirection
+	stats      [2]*flowStats
+	prev, next *biFlow
 }
 
-type FlowStats struct {
-	Packets uint64
-	Bytes   uint64
+type Flow struct {
+	stats *flowStats
 }
 
 // Table with single produce and single consumer workers.
@@ -52,7 +52,7 @@ type flowMetaTable struct {
 // Shared flow table.
 type flowTable struct {
 	mutex sync.Mutex
-	table map[string]*Flow
+	table map[string]*biFlow
 
 	// linked list used to delete flows while iterating
 	prev, next *flowTable
@@ -69,7 +69,7 @@ type flowTableList struct {
 
 type flowList struct {
 	// iterable list of flows for deleting flows during iteration phase
-	head, tail *Flow
+	head, tail *biFlow
 }
 
 func NewFlows(pub publisher.Client, config *config.Flows) (*Flows, error) {
@@ -122,15 +122,10 @@ func (f *Flows) Unlock() {
 }
 
 func (f *Flows) Get(id *FlowID) *Flow {
-	if id.flow == nil {
-		flow, isNew := f.table.get(id)
-		if isNew {
-			flow.stats.init(f.counterReg)
-		}
-		flow.ts = time.Now()
-		id.flow = flow
+	if id.flow.stats == nil {
+		id.flow = f.table.get(id, f.counterReg)
 	}
-	return id.flow
+	return &id.flow
 }
 
 func (f *Flows) Start() {
@@ -149,52 +144,56 @@ func (f *Flows) NewFloat(name string) (*Float, error) {
 	return f.counterReg.newFloat(name)
 }
 
-func (t *flowMetaTable) get(id *FlowID) (*Flow, bool) {
+func (t *flowMetaTable) get(id *FlowID, counter *counterReg) Flow {
 	sub := t.table[id.flowIDMeta]
-	if sub != nil {
-		return sub.get(id)
+	if sub == nil {
+		sub = &flowTable{table: make(map[string]*biFlow)}
+		t.table[id.flowIDMeta] = sub
+		t.tables.append(sub)
 	}
-
-	sub = &flowTable{
-		table: make(map[string]*Flow),
-		next:  nil,
-	}
-
-	t.tables.append(sub)
-
-	return sub.get(id)
+	return sub.get(id, counter)
 }
 
-func (t *flowTable) get(id *FlowID) (*Flow, bool) {
+func (t *flowTable) get(id *FlowID, counter *counterReg) Flow {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	flow := t.table[string(id.flowID)]
-	if flow != nil && flow.alive() {
-		return flow, false
+	dir := flowDirForward
+	bf := t.table[string(id.flowID)]
+	if bf == nil || !bf.isAlive() {
+		bf = &biFlow{
+			key: string(id.flowID),
+			ts:  time.Now(),
+			dir: id.dir,
+		}
+
+		t.table[bf.key] = bf
+		t.flows.append(bf)
+	} else if bf.dir != id.dir {
+		dir = flowDirReversed
 	}
 
-	newID := id.Clone()
-	flow = &Flow{id: newID}
-	t.flows.append(flow)
-
-	t.table[string(newID.flowID)] = flow
-	return flow, true
+	stats := bf.stats[dir]
+	if stats == nil {
+		stats = newFlowStats(counter)
+		bf.stats[dir] = stats
+	}
+	return Flow{stats}
 }
 
-func (t *flowTable) remove(f *Flow) {
+func (t *flowTable) remove(f *biFlow) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	delete(t.table, string(f.id.flowID))
+	delete(t.table, f.key)
 	t.flows.remove(f)
 }
 
-func (f *Flow) kill() {
+func (f *biFlow) kill() {
 	atomic.StoreUint32(&f.killed, 1)
 }
 
-func (f *Flow) alive() bool {
+func (f *biFlow) isAlive() bool {
 	return atomic.LoadUint32(&f.killed) == 0
 }
 
@@ -210,7 +209,7 @@ func (l *flowTableList) append(t *flowTable) {
 	l.tail = t
 }
 
-func (l *flowList) append(f *Flow) {
+func (l *flowList) append(f *biFlow) {
 	f.prev = l.tail
 	f.next = nil
 
@@ -222,7 +221,7 @@ func (l *flowList) append(f *Flow) {
 	l.tail = f
 }
 
-func (l *flowList) remove(f *Flow) {
+func (l *flowList) remove(f *biFlow) {
 	if f.next != nil {
 		f.next.prev = f.prev
 	} else {

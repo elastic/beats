@@ -91,6 +91,12 @@ func (reg *counterTypeReg) getNames() []string {
 	return reg.names
 }
 
+func newFlowStats(reg *counterReg) *flowStats {
+	s := &flowStats{}
+	s.init(reg)
+	return s
+}
+
 func (s *flowStats) init(reg *counterReg) {
 	reg.mutex.Lock()
 	defer reg.mutex.Unlock()

@@ -9,25 +9,27 @@ import (
 type FlowID struct {
 	flowID []byte
 	flowIDMeta
-	flow *Flow // remember associated flow for faster lookup
+
+	dir  flowDirection
+	flow Flow // remember associated flow for faster lookup
 }
 
 type flowIDMeta struct {
 	flags FlowIDFlag
 
 	// offsets into flowID
-	offEth        int8
-	offOutterVlan int8
-	offVlan       int8
-	offOutterIPv4 int8
-	offIPv4       int8
-	offOutterIPv6 int8
-	offIPv6       int8
-	offICMPv4     int8
-	offICMPv6     int8
-	offUDP        int8
-	offTCP        int8
-	offID         int8
+	offEth        uint8
+	offOutterVlan uint8
+	offVlan       uint8
+	offOutterIPv4 uint8
+	offIPv4       uint8
+	offOutterIPv6 uint8
+	offIPv6       uint8
+	offICMPv4     uint8
+	offICMPv6     uint8
+	offUDP        uint8
+	offTCP        uint8
+	offID         uint8
 }
 
 type FlowIDFlag uint16
@@ -48,6 +50,7 @@ const (
 )
 
 const (
+	SizeChecksum     = 4         // checksum
 	SizeEthFlowID    = 6 + 6     // source + dest mac address
 	SizeVlanFlowID   = 2         // raw vlan id
 	SizeIPv4FlowID   = 4 + 4     // source + dest ip
@@ -57,7 +60,7 @@ const (
 	SizeUDPFlowID    = 2 + 2     // source + dest port
 	SizeConnectionID = 8         // 64bit internal connection id
 
-	SizeFlowIDMax = SizeEthFlowID +
+	SizeFlowIDMax int = SizeChecksum + SizeEthFlowID +
 		2*(SizeVlanFlowID+SizeIPv4FlowID+SizeIPv6FlowID) +
 		SizeICMPFlowID +
 		SizeTCPFlowID +
@@ -65,22 +68,44 @@ const (
 		SizeConnectionID
 )
 
+const offUnset uint8 = 0xff
+
+var flowIDEmptyMeta = flowIDMeta{
+	flags: 0,
+
+	offEth:        offUnset,
+	offOutterVlan: offUnset,
+	offVlan:       offUnset,
+	offOutterIPv4: offUnset,
+	offIPv4:       offUnset,
+	offOutterIPv6: offUnset,
+	offIPv6:       offUnset,
+	offICMPv4:     offUnset,
+	offICMPv6:     offUnset,
+	offUDP:        offUnset,
+	offTCP:        offUnset,
+	offID:         offUnset,
+}
+
+type flowDirection int8
+
+const (
+	flowDirUnset flowDirection = iota - 1
+	flowDirForward
+	flowDirReversed
+)
+
+func init() {
+	if SizeFlowIDMax > 255 {
+		panic("SizeFlowIDMax exceeds size limit")
+	}
+}
+
 func (f *FlowID) Reset(buf []byte) {
 	f.flowID = buf
-	f.flags = 0
-	f.offEth = -1
-	f.offOutterVlan = -1
-	f.offVlan = -1
-	f.offOutterIPv4 = -1
-	f.offIPv4 = -1
-	f.offOutterIPv6 = -1
-	f.offIPv6 = -1
-	f.offICMPv4 = -1
-	f.offICMPv6 = -1
-	f.offUDP = -1
-	f.offTCP = -1
-	f.offID = -1
-	f.flow = nil
+	f.flowIDMeta = flowIDEmptyMeta
+	f.dir = flowDirUnset
+	f.flow.stats = nil
 }
 
 func (f *FlowID) Clone() *FlowID {
@@ -132,7 +157,7 @@ func (f *FlowID) Eth() []byte {
 }
 
 func (f *FlowID) AddEth(src, dst net.HardwareAddr) {
-	f.addSimpleID(&f.offEth, EthFlow, src, dst)
+	f.addID(&f.offEth, EthFlow, src, dst, flowDirUnset)
 }
 
 func (f *FlowID) OutterVLan() []byte {
@@ -146,7 +171,10 @@ func (f *FlowID) VLan() []byte {
 func (f *FlowID) AddVLan(id uint16) {
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
-	f.addID(&f.offVlan, &f.offOutterVlan, VLanFlow, OutterVlanFlow, tmp[:], nil)
+	f.addMultLayerID(
+		&f.offVlan, &f.offOutterVlan,
+		VLanFlow, OutterVlanFlow,
+		tmp[:], nil, flowDirUnset)
 }
 
 func (f *FlowID) OutterIPv4() []byte {
@@ -158,7 +186,10 @@ func (f *FlowID) IPv4() []byte {
 }
 
 func (f *FlowID) AddIPv4(src, dst net.IP) {
-	f.addID(&f.offIPv4, &f.offOutterIPv4, IPv4Flow, OutterIPv4Flow, src, dst)
+	f.addMultLayerID(
+		&f.offIPv4, &f.offOutterIPv4,
+		IPv4Flow, OutterIPv4Flow,
+		src, dst, flowDirUnset)
 }
 
 func (f *FlowID) OutterIPv6() []byte {
@@ -170,27 +201,42 @@ func (f *FlowID) IPv6() []byte {
 }
 
 func (f *FlowID) AddIPv6(src, dst net.IP) {
-	f.addID(&f.offIPv6, &f.offOutterIPv6, IPv6Flow, OutterIPv6Flow, src, dst)
+	f.addMultLayerID(
+		&f.offIPv6, &f.offOutterIPv6,
+		IPv6Flow, OutterIPv6Flow,
+		src, dst, flowDirUnset)
 }
 
 func (f *FlowID) ICMPv4() []byte {
 	return f.extractID(f.offICMPv4, SizeICMPFlowID)
 }
 
-func (f *FlowID) AddICMPv4(id uint16) {
+func (f *FlowID) AddICMPv4Request(id uint16) {
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
-	f.addSimpleID(&f.offICMPv4, ICMPv4Flow, tmp[:], nil)
+	f.addID(&f.offICMPv4, ICMPv4Flow, tmp[:], nil, flowDirForward)
+}
+
+func (f *FlowID) AddICMPv4Response(id uint16) {
+	var tmp [2]byte
+	binary.LittleEndian.PutUint16(tmp[:], id)
+	f.addID(&f.offICMPv4, ICMPv4Flow, tmp[:], nil, flowDirReversed)
 }
 
 func (f *FlowID) ICMPv6() []byte {
 	return f.extractID(f.offICMPv6, SizeICMPFlowID)
 }
 
-func (f *FlowID) AddICMPv6(id uint16) {
+func (f *FlowID) AddICMPv6Request(id uint16) {
 	var tmp [2]byte
 	binary.LittleEndian.PutUint16(tmp[:], id)
-	f.addSimpleID(&f.offICMPv6, ICMPv6Flow, tmp[:], nil)
+	f.addID(&f.offICMPv6, ICMPv6Flow, tmp[:], nil, flowDirForward)
+}
+
+func (f *FlowID) AddICMPv6Response(id uint16) {
+	var tmp [2]byte
+	binary.LittleEndian.PutUint16(tmp[:], id)
+	f.addID(&f.offICMPv6, ICMPv6Flow, tmp[:], nil, flowDirReversed)
 }
 
 func (f *FlowID) UDP() []byte {
@@ -216,31 +262,39 @@ func (f *FlowID) ConnectionID() []byte {
 func (f *FlowID) AddConnectionID(id uint64) {
 	var tmp [8]byte
 	binary.LittleEndian.PutUint64(tmp[:], id)
-	f.addSimpleID(&f.offID, ConnectionID, tmp[:], nil)
+	f.addID(&f.offID, ConnectionID, tmp[:], nil, flowDirUnset)
 }
 
-func (f *FlowID) addWithPorts(off *int8, flag FlowIDFlag, src, dst uint16) {
+func (f *FlowID) addWithPorts(
+	off *uint8,
+	flag FlowIDFlag,
+	src, dst uint16,
+) {
 	var a, b [2]byte
 	binary.LittleEndian.PutUint16(a[:], src)
 	binary.LittleEndian.PutUint16(b[:], dst)
-	f.addSimpleID(off, flag, a[:], b[:])
+	f.addID(off, flag, a[:], b[:], flowDirUnset)
 }
 
-func (f *FlowID) extractID(off, sz int8) []byte {
-	if off < 0 {
+func (f *FlowID) extractID(off, sz uint8) []byte {
+	if off == offUnset {
 		return nil
 	}
-	return f.flowID[off : off+sz]
+
+	{
+		off := int(off)
+		sz := int(sz)
+		return f.flowID[off : off+sz]
+	}
 }
 
-func (f *FlowID) addID(
-	off, outterOff *int8,
+func (f *FlowID) addMultLayerID(
+	off, outterOff *uint8,
 	flag, outterFlag FlowIDFlag,
 	a, b []byte,
+	hint flowDirection,
 ) {
-	if bytes.Compare(a, b) > 0 {
-		a, b = b, a
-	}
+	a, b = f.sortAddr(a, b, hint)
 
 	flags := f.flags & (flag | outterFlag)
 	switch flags {
@@ -251,33 +305,59 @@ func (f *FlowID) addID(
 
 	case flag:
 		*outterOff = *off
-		*off = int8(len(f.flowID))
+		*off = uint8(len(f.flowID))
 		f.flowID = append(append(f.flowID, a...), b...)
 		f.flags |= outterFlag
 
 	default:
-		*off = int8(len(f.flowID))
+		*off = uint8(len(f.flowID))
 		f.flowID = append(append(f.flowID, a...), b...)
 		f.flags |= flag
 
 	}
 }
 
-func (f *FlowID) addSimpleID(
-	off *int8,
+func (f *FlowID) addID(
+	off *uint8,
 	flag FlowIDFlag,
 	a, b []byte,
+	hint flowDirection,
 ) {
-	if bytes.Compare(a, b) > 0 {
-		a, b = b, a
-	}
+	a, b = f.sortAddr(a, b, hint)
 
 	if *off < 0 {
-		*off = int8(len(f.flowID))
+		*off = uint8(len(f.flowID))
 		f.flowID = append(append(f.flowID, a...), b...)
 		f.flags |= flag
 	} else {
 		la := copy(f.flowID[(*off):], a)
 		copy(f.flowID[la+int(*off):], b)
 	}
+}
+
+func (f *FlowID) sortAddr(a, b []byte, hint flowDirection) ([]byte, []byte) {
+	if b == nil {
+		if f.dir == flowDirUnset {
+			f.dir = hint
+		}
+		return a, b
+	}
+
+	switch f.dir {
+	case flowDirForward:
+		return a, b
+	case flowDirReversed:
+		return b, a
+	}
+
+	switch bytes.Compare(a, b) {
+	case -1:
+		f.dir = flowDirForward
+	case 1:
+		f.dir = flowDirReversed
+		a, b = b, a
+	case 0:
+		f.dir = hint
+	}
+	return a, b
 }
