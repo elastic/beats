@@ -10,8 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common/droppriv"
-	"github.com/elastic/beats/libbeat/filters"
-	"github.com/elastic/beats/libbeat/filters/nop"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/service"
 
@@ -41,10 +39,6 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.ThriftProtocol:   new(thrift.Thrift),
 	protos.MongodbProtocol:  new(mongodb.Mongodb),
 	protos.DnsProtocol:      new(dns.Dns),
-}
-
-var EnabledFilterPlugins map[filters.Filter]filters.FilterPlugin = map[filters.Filter]filters.FilterPlugin{
-	filters.NopFilter: new(nop.Nop),
 }
 
 // Beater object. Contains all objects needed to run the beat
@@ -181,20 +175,6 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	}
 
 	pb.over = make(chan bool)
-
-	/*
-		logp.Debug("main", "Initializing filters")
-		_, err = filters.FiltersRun(
-			config.ConfigSingleton.Filter,
-			EnabledFilterPlugins,
-			b.Events,
-			b.Stop)
-
-		if err != nil {
-			logp.Critical("%v", err)
-			os.Exit(1)
-		}
-	*/
 
 	logp.Debug("main", "Initializing sniffer")
 	err = pb.Sniff.Init(false, icmpProc, icmpProc, tcpProc, udpProc)
