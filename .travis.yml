@@ -74,9 +74,9 @@ script:
   - make $TARGETS
 
 notifications:
-  hipchat:
+  slack:
     rooms:
-      secure: "iAQUMLIlghuQjGTvsNoiNU+Fok+IE0MYxhRjC9kwevXZgkY//w/Oa+w3Ol4kKDCQdSFOuPa72C73XOVznrL9Kw3y/gKU07Nf0WXMrq+TjPr/vR6gKGpDqeWe7WXJkhJS4tMjSs+bW0w+rQVo8QwYgsqeEQdDXgCzsfreytya/KA="
+      secure: "e25J5puEA31dOooTI4T+K+zrTs8XeWIGq2cgmiPt9u/g7eqWeQj1UJnVsr8GOu1RPDyuJZJHXqfrvuOYJTdHzXbwjD0JTbwwVVZMkkZW2SWZHG46HCXPiucjWXEr3hXJKBJDDpIx6VxrN7r17dejv1biQ8QuEFZfiB1H8kbH/ho="
 
 after_success:
   # Copy full.cov to coverage.txt because codecov.io requires this file
