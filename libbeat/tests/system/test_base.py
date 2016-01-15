@@ -18,8 +18,18 @@ class Test(TestCase):
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
-        exit_code = self.run_mockbeat()
-        assert exit_code == 0
+        mockbeat = self.start_mockbeat()
+        self.wait_until(lambda: self.log_contains("MockBeat: waiting to be done"))
+
+        exit_code = mockbeat.kill_and_wait()
+
+        assert self.log_contains("MockBeat: Stop")
+        assert self.log_contains("MockBeat: returning from Run function")
+        assert self.log_contains("MockBeat: Cleanup")
+        assert self.did_not_panic()
+
+        print exit_code
+        assert exit_code == 0, "Exit code was %d" % exit_code
 
 
     def test_no_config(self):
@@ -79,15 +89,9 @@ class Test(TestCase):
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
             exit_code = proc.wait()
-            assert exit_code == 0
+            assert exit_code == 0, "Exit code was %d" % exit_code
 
-        mockbeat = self.start_mockbeat()
-        self.wait_until(lambda: self.log_contains("MockBeat: waiting to be done"))
-
-        mockbeat.kill_and_wait()
-
-        assert self.log_contains("MockBeat: Stop")
-        assert self.log_contains("MockBeat: returning from Run function")
-        assert self.log_contains("MockBeat: Cleanup")
-        self.did_not_panic()
+        assert True == self.log_contains("mockbeat")
+        assert True == self.log_contains("version")
+        assert True == self.log_contains("9.9.9")
 
