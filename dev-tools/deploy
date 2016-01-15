@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+import os
+import argparse
+from subprocess import check_call
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Builds all the Beats artifacts")
+    parser.parse_args()
+
+    dir = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(dir + "/packer")
+    check_call("make clean", shell=True)
+    check_call("make images", shell=True)
+    check_call("make", shell=True)
+
+if __name__ == "__main__":
+    main()

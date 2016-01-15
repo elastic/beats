@@ -2,9 +2,15 @@
 import os
 import argparse
 
-template = '''package beat
+template_go = '''package beat
 
 const defaultBeatVersion = "{}"
+'''
+
+template_packer = '''
+version: "{version}"
+rpm_version: "{rpm_version}"
+deb_version: "{deb_version}"
 '''
 
 
@@ -17,7 +23,15 @@ def main():
 
     dir = os.path.dirname(os.path.realpath(__file__))
     with open(dir + "/../libbeat/beat/version.go", "w") as f:
-        f.write(template.format(args.version))
+        f.write(template_go.format(args.version))
+
+    version = args.version
+    with open(dir + "/packer/version.yml", "w") as f:
+        f.write(template_packer.format(
+            version=version,
+            rpm_version=version.replace("-", "~"),
+            deb_version=version.replace("-", "~")
+        ))
 
 if __name__ == "__main__":
     main()
