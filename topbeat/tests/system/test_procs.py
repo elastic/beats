@@ -17,7 +17,7 @@ class Test(TestCase):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            proc_patterns=["topbeat.test"]  # monitor itself
+            proc_patterns=["(?i)topbeat.test"]  # monitor itself
         )
         topbeat = self.start_topbeat()
         self.wait_until(lambda: self.output_has(lines=1))
@@ -26,7 +26,8 @@ class Test(TestCase):
         output = self.read_output()[0]
 
         print output["proc.name"]
-        assert re.match("topbeat.test(.exe)?", output["proc.name"])
+        assert re.match("(?i)topbeat.test(.exe)?", output["proc.name"])
+        assert re.match("(?i).*topbeat.test(.exe)? -e -c", output["proc.cmdline"])
         assert isinstance(output["proc.state"], basestring)
         assert isinstance(output["proc.cpu.start_time"], basestring)
 

@@ -1,7 +1,10 @@
 package sigar_test
 
 import (
+	"math"
 	"os"
+	"strings"
+	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -30,3 +33,27 @@ var _ = Describe("SigarWindows", func() {
 		})
 	})
 })
+
+func TestProcArgs(t *testing.T) {
+	args := sigar.ProcArgs{}
+	err := args.Get(os.Getpid())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(args.List) == 0 {
+		t.Fatalf("Expected at least one arg")
+	}
+}
+
+func TestProcArgsUnknown(t *testing.T) {
+	args := sigar.ProcArgs{}
+	err := args.Get(math.MaxInt32)
+	if err == nil {
+		t.Fatal("Expected process not found")
+	}
+
+	if !strings.Contains(err.Error(), "Process not found") {
+		t.Fatal("Expected error containing 'Process not found'")
+	}
+}
