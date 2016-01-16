@@ -207,20 +207,26 @@ func (t *Topbeat) exportProcStats() error {
 
 			newProcs[process.Pid] = process
 
+			proc := common.MapStr{
+				"pid":   process.Pid,
+				"ppid":  process.Ppid,
+				"name":  process.Name,
+				"state": process.State,
+				"mem":   process.Mem,
+				"cpu":   process.Cpu,
+			}
+
+			if process.CmdLine != "" {
+				proc["cmdline"] = process.CmdLine
+			}
+
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"type":       "process",
-				"proc": common.MapStr{
-					"pid":     process.Pid,
-					"ppid":    process.Ppid,
-					"name":    process.Name,
-					"state":   process.State,
-					"cmdline": process.CmdLine,
-					"mem":     process.Mem,
-					"cpu":     process.Cpu,
-				},
-				"count": 1,
+				"count":      1,
+				"proc":       proc,
 			}
+
 			t.events.PublishEvent(event)
 		}
 	}

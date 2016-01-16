@@ -50,6 +50,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
+- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
+- Add the command line used to start processes {issue}533[533]
 
 *Filebeat*
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
