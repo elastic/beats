@@ -21,16 +21,16 @@ original Packetbeat authors.
 
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, a simple way of getting the source code for
-Topbeat and libbeat and compiling them at the same time is to do:
+your preferred workspace location, a simple way of getting the source code for the 
+Beats, including Topbeat and libbeat, and compiling them at the same time is to do:
 
 [source,shell]
 ----------------------------------------------------------------------
-go get github.com/elastic/topbeat
+go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
-In this guide, we use working examples from the https://github.com/elastic/topbeat[Topbeat]
-source code to demonstrate how to implement a Beat. Topbeat is similar to
+In this guide, we use working examples from the Tobeat source code in https://github.com/elastic/beats[GitHub]
+to demonstrate how to implement a Beat. Topbeat is similar to
 the `top` command line tool, but instead of printing the statistics to the screen,
 Topbeat periodically ships them to Elasticsearch for storage.
 
@@ -133,8 +133,7 @@ You can use the `FlagsHandler` interface to add additional command line flags to
 your Beat. The `HandleFlags` callback is called after the Beat parses the
 command line arguments inherited from libbeat and handles the `--help` and
 `--version` flags. For an example of how to implement `HandleFlags`, take a look
-at the
-https://github.com/elastic/packetbeat/blob/master/beat/packetbeat.go[Packetbeat]
+at the https://github.com/elastic/beats/blob/master/packetbeat/beat/packetbeat.go[Packetbeat]
 code.
 
 We strongly recommend that you create a main package that contains only the main
