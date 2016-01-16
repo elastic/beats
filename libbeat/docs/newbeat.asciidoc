@@ -21,7 +21,7 @@ original Packetbeat authors.
 
 After you have https://golang.org/doc/install[installed Go] and set up the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location, a simple way of getting the source code for the 
+your preferred workspace location, a simple way of getting the source code for 
 Beats, including Topbeat and libbeat, and compiling them at the same time is to do:
 
 [source,shell]
@@ -29,7 +29,7 @@ Beats, including Topbeat and libbeat, and compiling them at the same time is to 
 go get github.com/elastic/beats
 ----------------------------------------------------------------------
 
-In this guide, we use working examples from the Tobeat source code in https://github.com/elastic/beats[GitHub]
+In this guide, we use working examples from the Topbeat source code in https://github.com/elastic/beats[GitHub]
 to demonstrate how to implement a Beat. Topbeat is similar to
 the `top` command line tool, but instead of printing the statistics to the screen,
 Topbeat periodically ships them to Elasticsearch for storage.
