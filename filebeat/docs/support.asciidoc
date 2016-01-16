@@ -1,7 +1,7 @@
 
 == Getting Support
 If you have an issue with Filebeat, contact us in the https://discuss.elastic.co/c/beats/filebeat[Filebeat forum].
-If you want to contribute to Filebeat, check out our https://github.com/elastic/filebeat[Github repository].
+If you want to contribute to Filebeat, check out our https://github.com/elastic/beats[Github repository].
 
 === Known Issues
 ==== Network Volumes
