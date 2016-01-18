@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/libbeat/service"
 
 	"github.com/satori/go.uuid"
+	"sync"
 )
 
 // Beater interface that every beat must use
@@ -248,27 +249,33 @@ func (b *Beat) Run() error {
 		logp.Critical("Running the beat returned an error: %v", err)
 	}
 
-	service.Cleanup()
-
-	logp.Info("Cleaning up %s before shutting down.", b.Name)
-
-	// Call beater cleanup function
-	err = b.BT.Cleanup(b)
-	if err != nil {
-		logp.Err("Cleanup returned an error: %v", err)
-	}
 	return err
 }
 
 // Stop calls the beater Stop action.
 // It can happen that this function is called more then once.
-func (beat *Beat) Stop() {
+func (b *Beat) Stop() {
 	logp.Info("Stopping Beat")
-	beat.BT.Stop()
+	b.BT.Stop()
+
+	service.Cleanup()
+
+	logp.Info("Cleaning up %s before shutting down.", b.Name)
+
+	// Call beater cleanup function
+	err := b.BT.Cleanup(b)
+	if err != nil {
+		logp.Err("Cleanup returned an error: %v", err)
+	}
 }
+
+var callback sync.Once
 
 // Exiting beat -> shutdown
 func (b *Beat) Exit() {
-	logp.Info("Start exiting beat")
-	close(b.exit)
+
+	callback.Do(func() {
+		logp.Info("Start exiting beat")
+		close(b.exit)
+	})
 }
