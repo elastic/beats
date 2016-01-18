@@ -39,7 +39,7 @@ func (p ProspectorStdin) Init() {
 	p.started = false
 }
 
-func (prospector ProspectorStdin) Run(spoolChan chan *input.FileEvent) {
+func (prospector ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !prospector.started {

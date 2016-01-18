@@ -20,7 +20,7 @@ type Prospector struct {
 }
 
 type Prospectorer interface {
-	Run(spoolChan chan *input.FileEvent)
+	Run()
 	Init()
 }
 
@@ -92,7 +92,7 @@ func (p *Prospector) Run(wg *sync.WaitGroup) {
 			return
 		default:
 			logp.Info("Run prospector")
-			p.prospectorer.Run(p.channel)
+			p.prospectorer.Run()
 		}
 	}
 }
