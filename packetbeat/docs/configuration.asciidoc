@@ -285,7 +285,7 @@ The per protocol transaction timeout. Expired transactions will no longer be cor
 
 ===== enabled
 
-The ICMP protocol can be enabled/disabled via this option.
+The ICMP protocol can be enabled/disabled via this option. The default is false.
 
 If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 
