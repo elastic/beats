@@ -81,6 +81,13 @@ class Test(TestCase):
             exit_code = proc.wait()
             assert exit_code == 0
 
-        assert True == self.log_contains("mockbeat")
-        assert True == self.log_contains("version")
-        assert True == self.log_contains("9.9.9")
+        mockbeat = self.start_mockbeat()
+        self.wait_until(lambda: self.log_contains("MockBeat: waiting to be done"))
+
+        mockbeat.kill_and_wait()
+
+        assert self.log_contains("MockBeat: Stop")
+        assert self.log_contains("MockBeat: Exit Run function")
+        assert self.log_contains("MockBeat: Cleanup")
+        self.did_not_panic()
+
