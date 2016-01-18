@@ -55,3 +55,5 @@ class Test(TestCase):
             "swap.free",
         ]:
             assert type(output[key]) is int or type(output[key]) is long
+
+        assert self.did_not_panic()

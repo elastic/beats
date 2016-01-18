@@ -157,6 +157,9 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
+    def did_not_panic(self):
+        return self.log_contains("panic: ") == False
+
     def output_has(self, lines, output_file="output/topbeat"):
         """
         Returns true if the output has a given number of lines.
