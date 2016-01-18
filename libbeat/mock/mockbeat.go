@@ -1,10 +1,7 @@
 package mock
 
 import (
-<<<<<<< 1c78fdee3801b54c25f098683ae5b09c37e625d4
-=======
 	"github.com/elastic/beats/libbeat/logp"
->>>>>>> libbeat: test lifecycle
 	"github.com/elastic/beats/libbeat/beat"
 )
 
