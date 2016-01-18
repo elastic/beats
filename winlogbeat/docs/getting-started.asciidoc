@@ -16,7 +16,7 @@ After you have installed these products, you can start <<winlogbeat-installation
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
-icon and select Run As Administrator).
+icon and select Run As Administrator). If you are running Windows XP, you may need to download and install PowerShell.
 . Run the following commands to install the service.
 
 ["source","sh",subs="attributes,callouts"]
@@ -36,7 +36,9 @@ Status   Name               DisplayName
 Stopped  winlogbeat         winlogbeat
 ------------------------------------------------
 
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy RemoteSigned -File .\install-service-winlogbeat.ps1`. 
+NOTE: If script execution is disabled on your system, you need to set the
+execution policy for the current session to allow the script to run. For example:
+`PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
 
 Before starting Winlogbeat, you should look at the configuration options in the
 configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
@@ -70,11 +72,15 @@ logging:
   level: info
 --------------------------------------------------------------------------------
 
+For instructions on how to obtain a list of available event logs see the
+configuration details for
+<<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
+
 After you save your configuration file, test it with the following command.
 
 [source,shell]
 ----------------------------------------------------------------------
-PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest
+PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest -e
 ----------------------------------------------------------------------
 
 === Configuring Winlogbeat to Use Logstash

@@ -47,7 +47,6 @@ a working Beat that you'd like to share with others, open a PR to add it to our
 list of [community
 Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc).
 
-
 ## Setting up your dev environment
 
 The Beats are Go programs, so install the latest version of
