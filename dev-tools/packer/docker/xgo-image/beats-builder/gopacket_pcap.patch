@@ -1,8 +1,8 @@
-diff --git a/vendor/github.com/tsg/gopacket/pcap/pcap.go b/vendor/github.
+diff --git a/vendor/github.com/tsg/gopacket/pcap/pcap.go b/vendor/github.com/tsg/gopacket/pcap/pcap.go
 index d2465bb..7b23b84 100644
 --- a/vendor/github.com/tsg/gopacket/pcap/pcap.go
 +++ b/vendor/github.com/tsg/gopacket/pcap/pcap.go
-@@ -8,12 +8,13 @@
+@@ -8,13 +8,14 @@
  package pcap
 
  /*
@@ -11,6 +11,7 @@ index d2465bb..7b23b84 100644
 +#cgo linux,amd64 LDFLAGS: /libpcap/amd64/usr/lib/x86_64-linux-gnu/libpcap.a
  #cgo freebsd LDFLAGS: -lpcap
  #cgo darwin LDFLAGS: -lpcap
+ #cgo solaris LDFLAGS: -lpcap
 -#cgo windows CFLAGS: -I C:/WpdPack/Include
 -#cgo windows,386 LDFLAGS: -L C:/WpdPack/Lib -lwpcap
 -#cgo windows,amd64 LDFLAGS: -L C:/WpdPack/Lib/x64 -lwpcap
