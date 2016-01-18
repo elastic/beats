@@ -137,7 +137,7 @@ func (icmp *Icmp) ProcessICMPv4(
 		if flowID != nil {
 			flowID.AddICMPv4Response(id)
 		}
-		icmp.processRequest(tuple, msg)
+		icmp.processResponse(tuple, msg)
 	}
 }
 
@@ -172,7 +172,7 @@ func (icmp *Icmp) ProcessICMPv6(
 		if flowID != nil {
 			flowID.AddICMPv6Response(id)
 		}
-		icmp.processRequest(tuple, msg)
+		icmp.processResponse(tuple, msg)
 	}
 }
 
