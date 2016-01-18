@@ -31,3 +31,7 @@ import:
   subpackages:
   - /encoding
 - package: github.com/satori/go.uuid
+- package: github.com/StackExchange/wmi
+  version: eec6e56e5cee331875c5647cf9bbea94fe53c682
+- package: github.com/go-ole/go-ole
+  version: v1.2.0

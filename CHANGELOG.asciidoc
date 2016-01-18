@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Topbeat*
 - Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
+- Add the command line used to start processes {issue}533[533]
 
 *Filebeat*
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
