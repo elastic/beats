@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/StackExchange/wmi"
 )
 
 var (
@@ -54,7 +56,8 @@ type PROCESS_MEMORY_COUNTERS_EX struct {
 }
 
 // PROCESSENTRY32 is the Windows API structure that contains a process's
-// information.
+// information. Do not modify or reorder.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms684839(v=vs.85).aspx
 type PROCESSENTRY32 struct {
 	Size              uint32
 	CntUsage          uint32
@@ -66,6 +69,14 @@ type PROCESSENTRY32 struct {
 	PriorityClassBase int32
 	Flags             uint32
 	ExeFile           [MAX_PATH]uint16
+}
+
+// Win32_Process represents a process on the Windows operating system. If
+// additional fields are added here (that match the Windows struct) they will
+// automatically be populated when calling getWin32Process.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa394372(v=vs.85).aspx
+type Win32_Process struct {
+	CommandLine string
 }
 
 func init() {
@@ -397,7 +408,16 @@ func (self *ProcTime) Get(pid int) error {
 }
 
 func (self *ProcArgs) Get(pid int) error {
-	return notImplemented()
+	process, err := getWin32Process(int32(pid))
+	if err != nil {
+		return fmt.Errorf("could not get CommandLine: %v", err)
+	}
+
+	var args []string
+	args = append(args, process.CommandLine)
+	self.List = args
+
+	return nil
 }
 
 func (self *ProcExe) Get(pid int) error {
@@ -433,4 +453,20 @@ func (self *FileSystemUsage) Get(path string) error {
 func notImplemented() error {
 	panic("Not Implemented")
 	return nil
+}
+
+// getWin32Process gets information about the process with the given process ID.
+// It uses a WMI query to get the information from the local system.
+func getWin32Process(pid int32) (Win32_Process, error) {
+	var dst []Win32_Process
+	query := fmt.Sprintf("WHERE ProcessId = %d", pid)
+	q := wmi.CreateQuery(&dst, query)
+	err := wmi.Query(q, &dst)
+	if err != nil {
+		return Win32_Process{}, fmt.Errorf("could not get Win32_Process %s: %v", query, err)
+	}
+	if len(dst) < 1 {
+		return Win32_Process{}, fmt.Errorf("could not get Win32_Process %s: Process not found", query)
+	}
+	return dst[0], nil
 }

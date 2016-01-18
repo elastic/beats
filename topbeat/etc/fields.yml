@@ -338,6 +338,13 @@ process:
           description: >
             The process parent pid.
 
+        - name: cmdline
+          path: proc.cmdline
+          type: string
+          description: >
+            The full command-line used to start the process, including the
+            arguments separated by space.
+
         - name: cpu
           type: group
           description: CPU-specific statistics per process.
