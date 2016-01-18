@@ -45,13 +45,13 @@ type DecoderStruct struct {
 	statBytes   *flows.Uint
 
 	// hold current flow ID
-	flowID              flows.FlowID // buffer flowID among many calls
+	flowID              *flows.FlowID // buffer flowID among many calls
 	flowIDBufferBacking [flows.SizeFlowIDMax]byte
 }
 
 // Creates and returns a new DecoderStruct.
 func NewDecoder(
-	flows *flows.Flows,
+	f *flows.Flows,
 	datalink layers.LinkType,
 	icmp4 icmp.ICMPv4Processor,
 	icmp6 icmp.ICMPv6Processor,
@@ -59,23 +59,24 @@ func NewDecoder(
 	udp udp.Processor,
 ) (*DecoderStruct, error) {
 	d := DecoderStruct{
-		flows:     flows,
+		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
 	d.stIP6.init(&d.ip6[0], &d.ip6[1])
 
-	if flows != nil {
+	if f != nil {
 		var err error
-		d.statPackets, err = flows.NewUint("net_packets_total")
+		d.statPackets, err = f.NewUint("net_packets_total")
 		if err != nil {
 			return nil, err
 		}
-		d.statBytes, err = flows.NewUint("net_bytes_total")
+		d.statBytes, err = f.NewUint("net_bytes_total")
 		if err != nil {
 			return nil, err
 		}
+		d.flowID = &flows.FlowID{}
 	}
 
 	defaultLayerTypes := []gopacket.DecodingLayer{
@@ -137,7 +138,7 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	debugf("decode packet data")
 	processed := false
 
-	if d.flows != nil {
+	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
 
 		// supress flow stats snapshots while processing packet
@@ -176,10 +177,12 @@ func (d *DecoderStruct) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	}
 
 	// add flow s.tats
-	debugf("flow id flags: %v", d.flowID.Flags())
+	if d.flowID != nil {
+		debugf("flow id flags: %v", d.flowID.Flags())
+	}
 
-	if d.flows != nil && d.flowID.Flags() != 0 {
-		flow := d.flows.Get(&d.flowID)
+	if d.flowID != nil && d.flowID.Flags() != 0 {
+		flow := d.flows.Get(d.flowID)
 		d.statPackets.Add(flow, 1)
 		d.statBytes.Add(flow, uint64(ci.Length))
 	}
@@ -189,7 +192,7 @@ func (d *DecoderStruct) process(
 	packet *protos.Packet,
 	layerType gopacket.LayerType,
 ) (bool, error) {
-	withFlow := d.flows != nil
+	withFlow := d.flowID != nil
 
 	switch layerType {
 	case layers.LayerTypeEthernet:
@@ -257,36 +260,22 @@ func (d *DecoderStruct) process(
 func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
 	packet.Payload = d.icmp4.Payload
 	packet.Tuple.ComputeHashebles()
-
-	id := &d.flowID
-	if d.flows == nil {
-		id = nil
-	}
-
-	d.icmp4Proc.ProcessICMPv4(id, &d.icmp4, packet)
+	d.icmp4Proc.ProcessICMPv4(d.flowID, &d.icmp4, packet)
 }
 
 func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
 	packet.Payload = d.icmp6.Payload
 	packet.Tuple.ComputeHashebles()
-
-	id := &d.flowID
-	if d.flows == nil {
-		id = nil
-	}
-
-	d.icmp6Proc.ProcessICMPv6(id, &d.icmp6, packet)
+	d.icmp6Proc.ProcessICMPv6(d.flowID, &d.icmp6, packet)
 }
 
 func (d *DecoderStruct) onUDP(packet *protos.Packet) {
 	src := uint16(d.udp.SrcPort)
 	dst := uint16(d.udp.DstPort)
 
-	id := &d.flowID
-	if d.flows == nil {
-		id = nil
-	} else {
-		d.flowID.AddTCP(src, dst)
+	id := d.flowID
+	if id != nil {
+		d.flowID.AddUDP(src, dst)
 	}
 
 	packet.Tuple.Src_port = src
@@ -301,10 +290,8 @@ func (d *DecoderStruct) onTCP(packet *protos.Packet) {
 	src := uint16(d.tcp.SrcPort)
 	dst := uint16(d.tcp.DstPort)
 
-	id := &d.flowID
-	if d.flows == nil {
-		id = nil
-	} else {
+	id := d.flowID
+	if id != nil {
 		id.AddTCP(src, dst)
 	}
 

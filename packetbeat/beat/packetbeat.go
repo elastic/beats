@@ -186,9 +186,14 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	logp.Debug("main", "Initializing sniffer")
 	err := pb.Sniff.Init(false, func(dl layers.LinkType) (sniffer.Worker, error) {
-		flows, err := flows.NewFlows(b.Events, &pb.PbConfig.Flows)
-		if err != nil {
-			return nil, err
+		var f *flows.Flows
+		var err error
+
+		if pb.PbConfig.Flows != nil {
+			f, err = flows.NewFlows(b.Events, pb.PbConfig.Flows)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		icmp, err := icmp.NewIcmp(false, b.Events)
@@ -206,8 +211,15 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 			return nil, err
 		}
 
-		pb.services = append(pb.services, flows)
-		return decoder.NewDecoder(flows, dl, icmp, icmp, tcp, udp)
+		worker, err := decoder.NewDecoder(f, dl, icmp, icmp, tcp, udp)
+		if err != nil {
+			return nil, err
+		}
+
+		if f != nil {
+			pb.services = append(pb.services, f)
+		}
+		return worker, nil
 	})
 	if err != nil {
 		logp.Critical("Initializing sniffer failed: %v", err)

@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	Interfaces InterfacesConfig
-	Flows      Flows
+	Flows      *Flows
 	Protocols  Protocols
 	Output     map[string]outputs.MothershipConfig
 	Shipper    publisher.ShipperConfig
