@@ -254,7 +254,7 @@ class TestCase(unittest.TestCase):
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
 
-    def did_not_panic(self, output_file="output/filebeat"):
+    def did_not_panic(self):
         return self.log_contains("panic: ") == False
 
     def flatten_object(self, obj, dict_fields, prefix=""):
