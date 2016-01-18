@@ -1,8 +1,8 @@
 package mock
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 ///*** Mock Beat Setup ***///
@@ -11,7 +11,7 @@ var Version = "9.9.9"
 var Name = "mockbeat"
 
 type Mockbeat struct {
-	done     chan bool
+	done chan bool
 }
 
 func (mb *Mockbeat) Config(b *beat.Beat) error {
@@ -30,12 +30,11 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 	logp.Info("MockBeat: Run")
 
 	defer func() {
-		logp.Info( "MockBeat: returning from Run function")
+		logp.Info("MockBeat: returning from Run function")
 	}()
 
-
-	logp.Info( "MockBeat: waiting to be done")
-	<- mb.done
+	logp.Info("MockBeat: waiting to be done")
+	<-mb.done
 
 	return nil
 }

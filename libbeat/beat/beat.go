@@ -66,7 +66,6 @@ type Beat struct {
 	exit chan ExitStatus
 }
 
-
 type ExitStatus struct {
 	BeaterHasStarted bool
 	Error            error
@@ -125,7 +124,7 @@ func Run(name string, version string, bt Beater) error {
 
 	// Waits until beats channel is closed
 	select {
-	case exitStatus := <- b.exit:
+	case exitStatus := <-b.exit:
 		if exitStatus.BeaterHasStarted {
 			b.Stop()
 		}
