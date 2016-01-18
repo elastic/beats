@@ -33,7 +33,7 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 	logp.Info("MockBeat: Run")
 
 	defer func() {
-		logp.Info( "MockBeat: Exiting Run function")
+		logp.Info( "MockBeat: returning from Run function")
 	}()
 
 

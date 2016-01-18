@@ -87,7 +87,7 @@ class Test(TestCase):
         mockbeat.kill_and_wait()
 
         assert self.log_contains("MockBeat: Stop")
-        assert self.log_contains("MockBeat: Exit Run function")
+        assert self.log_contains("MockBeat: returning from Run function")
         assert self.log_contains("MockBeat: Cleanup")
         self.did_not_panic()
 
