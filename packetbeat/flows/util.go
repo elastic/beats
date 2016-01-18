@@ -34,6 +34,7 @@ func (w *worker) Start() {
 
 func (w *worker) Stop() {
 	close(w.done)
+	w.wg.Wait()
 }
 
 func (w *worker) finished() {
