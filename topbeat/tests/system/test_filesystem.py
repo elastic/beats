@@ -1,5 +1,5 @@
 from topbeat import TestCase
-
+import numbers
 
 """
 Contains tests for ide statistics.
@@ -32,7 +32,7 @@ class Test(TestCase):
         for key in [
             "fs.used_p",
         ]:
-            assert type(output[key]) is float
+            assert isinstance(output[key], numbers.Number)
 
         for key in [
             "fs.avail",
