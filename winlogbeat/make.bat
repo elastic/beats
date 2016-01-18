@@ -24,9 +24,9 @@ nosetests -v -w tests\system --process-timeout=30
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo Aggregating Coverage Reports
-python ..\scripts\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
+python ..\dev-tools\aggregate_coverage.py -o build\coverage\system.cov .\build\system-tests\run
 if %errorlevel% neq 0 exit /b %errorlevel%
-python ..\scripts\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
+python ..\dev-tools\aggregate_coverage.py -o build\coverage\full.cov .\build\coverage
 if %errorlevel% neq 0 exit /b %errorlevel%
 go tool cover -html=build\coverage\full.cov -o build\coverage\full.html
 if %errorlevel% neq 0 exit /b %errorlevel%

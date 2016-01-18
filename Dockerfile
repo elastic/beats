@@ -15,7 +15,7 @@ RUN set -x \
 	golang.org/x/tools/cmd/cover \
 	golang.org/x/tools/cmd/vet
 
-COPY scripts/docker-entrypoint.sh /entrypoint.sh
+COPY libbeat/scripts/docker-entrypoint.sh /entrypoint.sh
 
 ENV GO15VENDOREXPERIMENT=1
 
