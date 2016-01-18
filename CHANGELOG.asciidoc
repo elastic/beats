@@ -52,7 +52,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
-- Update builds to Golang version 1.5.2
+- Update builds to Golang version 1.5.3
 - Make logstash output compression level configurable. {pull}630[630]
 - Add ability to override configuration settings using environment variables {issue}114[114]
 - Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
