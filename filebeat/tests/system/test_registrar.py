@@ -80,6 +80,9 @@ class Test(TestCase):
             assert len(data[logFileAbs]) == 3
             assert len(data[logFileAbs]['FileStateOS']) == 2
 
+        # Check that the application did not panic
+        assert self.did_not_panic()
+
     def test_registrar_files(self):
         """
         Check that multiple files are put into registrar file
@@ -125,6 +128,9 @@ class Test(TestCase):
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
 
+        # Check that the application did not panic
+        assert self.did_not_panic()
+
     def test_custom_registry_file_location(self):
         """
         Check that when a custom registry file is used, the path
@@ -153,3 +159,6 @@ class Test(TestCase):
         filebeat.kill_and_wait()
 
         assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))
+
+        # Check that the application did not panic
+        assert self.did_not_panic()

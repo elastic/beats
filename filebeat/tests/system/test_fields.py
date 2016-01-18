@@ -28,6 +28,9 @@ class Test(TestCase):
         doc = output[0]
         assert doc["fields.hello"] == "world"
 
+        # Check that the application did not panic
+        assert self.did_not_panic()
+
     def test_custom_fields_under_root(self):
         """
         Tests that custom fields show up in the output dict under
@@ -58,6 +61,9 @@ class Test(TestCase):
         assert doc["timestamp"] == "2"
         assert "fields" not in doc
 
+        # Check that the application did not panic
+        assert self.did_not_panic()
+
     def test_beat_fields(self):
         """
         Checks that it's possible to set a custom shipper name. Also
@@ -79,3 +85,6 @@ class Test(TestCase):
         doc = output[0]
         assert doc["beat.name"] == "testShipperName"
         assert doc["beat.hostname"] == socket.gethostname()
+
+        # Check that the application did not panic
+        assert self.did_not_panic()
