@@ -67,12 +67,59 @@ winlogbeat:
     - name: Application
 --------------------------------------------------------------------------------
 
+[[configuration-winlogbeat-options-event_logs-name]]
 ===== event_logs.name
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
 have a `name` field. You can get a list of available event logs by running
-`Get-EventLog *` in PowerShell. Alternatively, you can look at the registry keys
-found under `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\eventlog`.
+`Get-EventLog *` in PowerShell.  Here is a sample of the output from the command:
+
+[source,sh]
+--------------------------------------------------------------------------------
+PS C:\Users\vagrant> Get-EventLog *
+
+  Max(K) Retain OverflowAction        Entries Log
+  ------ ------ --------------        ------- ---
+  20,480      0 OverwriteAsNeeded          75 Application
+  20,480      0 OverwriteAsNeeded           0 HardwareEvents
+     512      7 OverwriteOlder              0 Internet Explorer
+  20,480      0 OverwriteAsNeeded           0 Key Management Service
+  20,480      0 OverwriteAsNeeded       1,609 Security
+  20,480      0 OverwriteAsNeeded       1,184 System
+  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
+--------------------------------------------------------------------------------
+
+Channel names can also be specified if running on Windows Vista or newer.
+A channel is a named stream of events that transports events from an event
+source to an event log. Most channels are tied to specific event publishers.
+Here is an example showing how to list all channels using PowerShell.
+
+[source,sh]
+--------------------------------------------------------------------------------
+PS C:\> Get-WinEvent -ListLog * | Format-List -Property LogName
+LogName : Application
+LogName : HardwareEvents
+LogName : Internet Explorer
+LogName : Key Management Service
+LogName : Security
+LogName : System
+LogName : Windows PowerShell
+LogName : ForwardedEvents
+LogName : Microsoft-Management-UI/Admin
+LogName : Microsoft-Rdms-UI/Admin
+LogName : Microsoft-Rdms-UI/Operational
+LogName : Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
+...
+--------------------------------------------------------------------------------
+
+You must specify the full name of the channel in the configuration file.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat:
+  event_logs:
+    - name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
+--------------------------------------------------------------------------------
 
 ===== event_logs.ignore_older
 
