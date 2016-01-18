@@ -17,6 +17,10 @@ interfaces:
 
 ############################# Protocols #######################################
 protocols:
+  icmp:
+    # Enable ICMPv4 and ICMPv6 monitoring. Default: false
+    enabled: true
+
   dns:
     # Configure the ports where to listen for DNS traffic. You can disable
     # the DNS protocol by commenting out the list of ports.
