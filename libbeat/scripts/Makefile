@@ -134,7 +134,7 @@ integration-tests-environment:
 .PHONY: system-tests
 system-tests: libbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
-	python ${ES_BEATS}/scripts/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
+	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
@@ -182,7 +182,7 @@ testsuite:
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
 coverage-report:
-	python ${ES_BEATS}/scripts/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
+	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 	test ! -s ./${COVERAGE_DIR}/unit.cov   || go tool cover -html=./${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
 	test ! -s ./${COVERAGE_DIR}/system.cov || go tool cover -html=./${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
