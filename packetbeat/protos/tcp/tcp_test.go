@@ -198,9 +198,9 @@ func TestGapInStreamShouldDropState(t *testing.T) {
 		net.ParseIP(ClientIp), uint16(rand.Intn(65535)))
 
 	hdr := &layers.TCP{}
-	tcp.Process(hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data1})
+	tcp.Process(nil, hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data1})
 	hdr.Seq += uint32(len(data1) + 10)
-	tcp.Process(hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data2})
+	tcp.Process(nil, hdr, &protos.Packet{Ts: time.Now(), Tuple: addr, Payload: data2})
 
 	// validate
 	assert.Equal(t, 10, gap)
@@ -227,7 +227,7 @@ func BenchmarkParallelProcess(b *testing.B) {
 					net.ParseIP(ClientIp), uint16(rand.Intn(65535))),
 				Payload: []byte{1, 2, 3, 4},
 			}
-			tcp.Process(&layers.TCP{}, pkt)
+			tcp.Process(nil, &layers.TCP{}, pkt)
 		}
 	})
 }
