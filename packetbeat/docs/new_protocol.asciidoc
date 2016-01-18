@@ -84,9 +84,8 @@ $ git push --set-upstream tsg cool_new_protocol
 === Protocol Modules
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
-modules can be found in individual folders in the
-https://github.com/elastic/beats/tree/master/packetbeat/protos[`protos`] directory
-from the repository.
+modules can be found in individual folders in the `beats/packetbeat/protos` directory
+in the https://github.com/elastic/beats[Beats GitHub repository].
 
 Before starting, we recommend reading through the source code of some of the
 existing modules. For TCP based protocols, the MySQL or HTTP ones are good
@@ -94,14 +93,14 @@ models to follow. For UDP protocols, you can look at the DNS module.
 
 All protocol modules implement the `TcpProtocolPlugin` or the
 `UdpProtocolPlugin` (or both) from the following listing (found in
-`protos/protos.go`).
+`beats/packetbeat/protos/protos.go`).
 
 [source,go]
 ----------------------------------------------------------------------
 // Functions to be exported by a protocol plugin
 type ProtocolPlugin interface {
 	// Called to initialize the Plugin
-	Init(test_mode bool, results chan common.MapStr) error
+	Init(test_mode bool, results publisher.Client) error
 
 	// Called to return the configured ports
 	GetPorts() []int
@@ -138,7 +137,7 @@ type UdpProtocolPlugin interface {
 
 At the high level, the protocols plugins receive raw packet data via the
 `Parse()` or `ParseUdp()` methods and produce objects that will be indexed into
-Elasticsearch via the `results` channel.
+Elasticsearch.
 
 The `Parse()` and `ParseUdp()` methods are called for every packet that is
 sniffed and is using one of the ports of the protocol as defined by the
@@ -160,10 +159,8 @@ combination.
 <3> The application layer payload (that is, without the IP and TCP/UDP headers) as a
 byte slice.
 
-The objects sent through the `results` channel have the type `common.MapStr`,
-which is essentially a `map[string]interface{}` with a few more convenience
-https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods]
-added.
+The objects are sent using the `publisher.Client` interface defined in the
+`beats/libbeat/publisher` directory in the https://github.com/elastic/beats[Beats GitHub repository].
 
 Besides the `Parse()` function, the TCP layer also calls the `ReceivedFin()` function
 when a TCP stream is closed, and it calls the `GapInStream()` function when packet
@@ -174,13 +171,14 @@ finished.
 
 ==== Registering Your Plugin
 
-To configure your plugin, you need to add a configuration struct to
-`config/config.go` Protocols struct. This struct will be filled by
+To configure your plugin, you need to add a configuration struct to the
+Protocols struct in `config/config.go`. This struct will be filled by
 https://gopkg.in/yaml.v2[goyaml] on startup.
 
 [source,go]
 ----------------------------------------------------------------------
 type Protocols struct {
+	Icmp     Icmp
 	Dns      Dns
 	Http     Http
 	Memcache Memcache
@@ -260,7 +258,7 @@ the packet boundaries don't necessarily match the application
 layer message boundaries. For example, a packet can contain only a part of the
 message, it can contain a complete message, or it can contain multiple messages.
 
-If you see a packet in the middle of the stream, you have no guaranties that it's
+If you see a packet in the middle of the stream, you have no guaranties that its
 first byte is the beginning of a message. However, if the packet is the first
 seen in a given TCP stream, then you can assume it is the beginning of the message.
 
@@ -288,7 +286,7 @@ packet from the stream and `TcpDirectionReverse` if the packet goes in
 the other direction.
 
 The `private` parameter can be used by the module to store state in the TCP stream.
-The module would typically cast this at runtime to a
+The module would typically cast this at run time to a
 type of its choice, modify it as needed, and then return the modified value.
 The next time the TCP layer calls `Parse()` or another function from the
 `TcpProtocolPlugin` interface, it will call the function with the modified
@@ -379,43 +377,38 @@ the request from memory on a timer, otherwise we risk leaking memory.
 ==== Sending the Result
 
 After the correlation step, you should have an JSON-like object that can be sent
-to Elasticsearch for indexing. The way you do that is by publishing it
-through the `results` publisher client, which is received by the `Init`
+to Elasticsearch for indexing. You send the object by publishing it
+through the publisher client interface, which is received by the `Init`
 function. The publisher client accepts structures of type `common.MapStr`, which
-is essentially a `map[string][interface{}` with a few more convenience
-https://github.com/elastic/libbeat/blob/fae9cf861b58f09cf578245e45415899f4151d32/common/mapstr.go[methods]
-added.
-
-As an example, here is the relevant code from the REDIS module:
+is essentially a `map[string]interface{}` with a few more convenience methods
+added (see the `beats/libbeat/common` package in the https://github.com/elastic/beats[Beats GitHub repository]).
+ 
+As an example, here is the relevant code from the Redis module:
 
 [source,go]
 ----------------------------------------------------------------------
-	event := common.MapStr{}
-	event["type"] = "redis"
-	if !t.IsError {
-		event["status"] = common.OK_STATUS
-	} else {
-		event["status"] = common.ERROR_STATUS
+    event := common.MapStr{
+		"@timestamp":   common.Time(requ.Ts),
+		"type":         "redis",
+		"status":       error,
+		"responsetime": responseTime,
+		"redis":        returnValue,
+		"method":       common.NetString(bytes.ToUpper(requ.Method)),
+		"resource":     requ.Path,
+		"query":        requ.Message,
+		"bytes_in":     uint64(requ.Size),
+		"bytes_out":    uint64(resp.Size),
+		"src":          src,
+		"dst":          dst,
 	}
-	event["responsetime"] = t.ResponseTime
-	if redis.Send_request {
-		event["request"] = t.Request_raw
+	if redis.SendRequest {
+		event["request"] = requ.Message
 	}
-	if redis.Send_response {
-		event["response"] = t.Response_raw
+	if redis.SendResponse {
+		event["response"] = resp.Message
 	}
-	event["redis"] = common.MapStr(t.Redis)
-	event["method"] = strings.ToUpper(t.Method)
-	event["resource"] = t.Path
-	event["query"] = t.Query
-	event["bytes_in"] = uint64(t.BytesIn)
-	event["bytes_out"] = uint64(t.BytesOut)
-
-	event["@timestamp"] = common.Time(t.ts)
-	event["src"] = &t.Src
-	event["dst"] = &t.Dst
-
-	redis.results.PublishEvent(event)
+    
+    return event
 ----------------------------------------------------------------------
 
 The following fields are required and their presence will be checked by
@@ -424,11 +417,10 @@ system tests:
  * `@timestamp`. Set this to the timestamp of the first packet from the message
    and cast it to `common.Time` like in the example.
  * `type`. Set this to the protocol name.
- * `count`. This is reserved for future sampling support. Set it to 1.
  * `status`. The status of the transactions. Use either `common.OK_STATUS` or
    `common.ERROR_STATUS`. If the protocol doesn't have responses or a meaning of
    status code, use OK.
- * `path`. This should represent what is requested, with the exact meaning
+ * `resource`. This should represent what is requested, with the exact meaning
    depending on the protocol. For HTTP, this is the URL.  For SQL databases,
    this is the table name. For key-value stores, this is the key. If nothing
    seems to make sense to put in this field, use the empty string.
@@ -440,9 +432,10 @@ system tests:
 In libbeat you also find some helpers for implementing parsers for binary and
 text-based protocols. The `Bytes_*` functions are the most low-level helpers
 for binary protocols that use network byte order. These functions can be found in the
-`libbeat/common` module. In addition to these very low-level helpers, a stream
+`beats/libbeat/common` module in the https://github.com/elastic/beats[Beats GitHub repository].
+In addition to these very low-level helpers, a stream
 buffer for parsing TCP-based streams, or simply UDP packets with integrated
-error handling, is provided by `libbeat/common/streambuf`. The following example
+error handling, is provided by `beats/libbeat/common/streambuf`. The following example
 demonstrates using the stream buffer for parsing the Memcache protocol UDP header:
 
 [source,go]
@@ -513,11 +506,11 @@ for memcache.
 
 The stream buffer also implements a number of interfaces defined in the standard "io" package
 and can easily be used to serialize some packets for testing parsers (see
-`protos/memcache/binary_test.go`).
+`beats/packetbeat/protos/memcache/binary_test.go`).
 
 ===== Module Helpers
 
-Packetbeat provides the module `packetbeat/protos/applayer` with
+Packetbeat provides the module `beats/packetbeat/protos/applayer` with
 common definitions among all application layer protocols. For example using the
 Transaction type from `applayer` guarantees that the final document will have all common required fields defined. Just embed the `applayer.Transaction` with your own
 application layer transaction type to make use of it. Here is an example from the memcache protocol:
@@ -563,14 +556,13 @@ https://github.com/stretchr/testify[testify] library.
 
 For parser and decoder tests, it's a good practice to have an array with
 test cases containing the inputs and expected outputs. For an example, see the
-https://github.com/elastic/beats/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1012[`Test_splitCookiesHeaders`]
-unit test.
+`Test_splitCookiesHeader` unit test in `beats/packetbeat/protos/http/http_test.go`
+in the https://github.com/elastic/beats[Beats GitHub repository].
 
 You can also have unit tests that treat the whole module as a black box, calling
-its interface functions, then reading the result from the `results` channel and
-checking it. This pattern is especially useful for checking corner cases related
-to packet boundaries or correlation issues. Here is an example from the HTTP
-module:
+its interface functions, then reading the result and checking it. This pattern 
+is especially useful for checking corner cases related to packet boundaries or 
+correlation issues. Here is an example from the HTTP module:
 
 [source,go]
 ----------------------------------------------------------------------
@@ -595,11 +587,11 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 		"\r\n" +
 		"xxxxxxxxxxxxxxxxxxxx")
 
-	tcptuple := testTcpTuple()
+	tcptuple := testCreateTCPTuple()
 	req := protos.Packet{Payload: data1}
 	resp := protos.Packet{Payload: data2}
 
-	private := protos.ProtocolData(new(httpPrivateData))
+	private := protos.ProtocolData(new(httpConnectionData))
 
 	private = http.Parse(&req, tcptuple, 0, private) <3>
 	private = http.ReceivedFin(tcptuple, 0, private)
@@ -628,10 +620,8 @@ keeping the output clean on a normal run.
 <3> Call the interface functions exported by the module. The `private` structure
 is passed from one call to the next like the TCP layer would do.
 
-<4> The
-https://github.com/elastic/beats/blob/b9173ae034581205ed4853c6fb040ea5357a5c28/protos/http/http_test.go#L1182[`expectTransaction`]
-function tries to read from the `results` channel and causes errors in the test case if
-there's no transaction present.
+<4> The `expectTransaction` function tries to read from the publisher queue and
+causes errors in the test case if there's no transaction present.
 
 To check the coverage of your unit tests, run the `make cover` command at the
 top of the repository.
@@ -643,8 +633,8 @@ objects, a convenient way of testing its functionality is by providing PCAP
 files as input and checking the results in the files created by using the "file"
 output plugin.
 
-This is the approach taken by the tests in the
-https://github.com/elastic/beats/tree/master/packetbeat/tests/system[`tests/system`] directory. The
+This is the approach taken by the tests in the `beats/packetbeat/tests/system` directory
+in the https://github.com/elastic/beats[Beats GitHub repository]. The
 tests are written in Python and executed using
 https://nose.readthedocs.org/en/latest/[nose]. Here is a simple example test
 from the MongoDB suite:
@@ -674,13 +664,13 @@ your protocol plugin has options in the configuration file, you should add them
 to the template.
 
 <2> The `run_packetbeat` function receives the PCAP file to run. It looks for
-the PCAP file in the `tests/pcaps` folder. The `debug_selectors` array controls
+the PCAP file in the `beats/packetbeat/tests/system/pcaps` folder. The `debug_selectors` array controls
 which log lines to be included. You can use `debug_selectors=["*"]` to enable
 all debug messages.
 
 <3> After the run, the test reads the output files and checks the result.
 
-Tip: To generate the PCAP files, you can use Packetbeat. The `-dump` CLI
+TIP: To generate the PCAP files, you can use Packetbeat. The `-dump` CLI
 flag will dump to disk all the packets sniffed from the network that match the
 BPF filter.
 
