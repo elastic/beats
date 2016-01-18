@@ -70,7 +70,6 @@ class TestCase(unittest.TestCase):
 
         args.extend(["-e",
                      "-c", os.path.join(self.working_dir, config),
-                     "-t",
                      "-systemTest",
                      "-v",
                      "-d", "*",

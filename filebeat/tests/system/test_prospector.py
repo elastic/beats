@@ -261,7 +261,7 @@ class Test(TestCase):
 
         filebeat = self.start_filebeat(debug_selectors=['*'])
 
-        # wait for first  "Start next scan" log message
+        # wait for first  "No prospectors defined" log message
         self.wait_until(
             lambda: self.log_contains(
                 "No prospectors defined"),
