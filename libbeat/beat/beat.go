@@ -121,6 +121,7 @@ func Run(name string, version string, bt Beater) {
 	// Waits until beats channel is closed
 	select {
 	case <-b.exit:
+		b.Stop()
 		logp.Info("Exit beat completed")
 		return
 	}
@@ -237,7 +238,7 @@ func (b *Beat) Run() error {
 	// Callback is called if the processes is asked to stop.
 	// This needs to be called before the main loop is started so that
 	// it can register the signals that stop or query (on Windows) the loop.
-	service.HandleSignals(b.Stop)
+	service.HandleSignals(b.Exit)
 
 	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
