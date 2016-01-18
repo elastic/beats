@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+import sys
+import argparse
+from subprocess import check_call, call, check_output
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Creates a PR for merging two branches")
+    parser.add_argument("from_branch",
+                        help="From branch (e.g 1.1)")
+    parser.add_argument("to_branch",
+                        help="To branch (e.g master)")
+    parser.add_argument("--yes", action="store_true",
+                        help="Assume yes. Warning: discards local changes.")
+    parser.add_argument("--continue", action="store_true",
+                        help="Continue after fixing merging errors.")
+    args = parser.parse_args()
+
+    if not vars(args)["continue"]:
+        if not args.yes and raw_input("This will destroy all local changes. " +
+                                      "Continue? [y/n]: ") != "y":
+            return 1
+        call("git branch -d automatic_merge_branch > /dev/null", shell=True)
+        check_call("git reset --hard", shell=True)
+        check_call("git clean -dfx", shell=True)
+        check_call("git fetch", shell=True)
+
+        check_call("git checkout {}".format(args.from_branch), shell=True)
+        check_call("git pull", shell=True)
+
+        check_call("git checkout {}".format(args.to_branch), shell=True)
+        check_call("git pull", shell=True)
+        check_call("git checkout -b automatic_merge_branch", shell=True)
+        if call("git merge {}".format(args.from_branch), shell=True) != 0:
+            print("Looks like you have merge errors.")
+            print("Fix them, commit, then run: {} --continue"
+                  .format(" ".join(sys.argv)))
+            return 1
+
+    if len(check_output("git status -s", shell=True).strip()) > 0:
+        print("Looks like you have uncommitted changes")
+        return 1
+
+    if len(check_output("git log HEAD...{}".format(args.to_branch),
+                        shell=True).strip()) == 0:
+        print("No commit to push")
+        return 1
+
+    print("Ready to push branch.")
+    remote = raw_input("To which remote should I push? (your fork): ")
+    call("git push {} :automatic_merge_branch > /dev/null".format(remote),
+         shell=True)
+    check_call("git push --set-upstream {} automatic_merge_branch"
+               .format(remote), shell=True)
+    print("Done. Go to Github and open the PR")
+
+if __name__ == "__main__":
+    sys.exit(main())
