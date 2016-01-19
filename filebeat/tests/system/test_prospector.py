@@ -1,4 +1,4 @@
-from filebeat import TestCase
+from filebeat import BaseTest
 import os
 import time
 
@@ -7,7 +7,7 @@ Tests for the prospector functionality.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_ignore_old_files(self):
         """
@@ -32,7 +32,7 @@ class Test(TestCase):
         # sleep for more than ignore older
         time.sleep(2)
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         # wait for the "Skipping file" log message
         self.wait_until(
@@ -62,7 +62,7 @@ class Test(TestCase):
             file.write("\n")  # 1 char
         file.close()
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -82,7 +82,7 @@ class Test(TestCase):
             input_type="stdin"
         )
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -102,13 +102,13 @@ class Test(TestCase):
             os.write(proc.stdin_write, "Hello World\n")
 
         self.wait_until(
-            lambda: self.output_has(lines=iterations1+iterations2),
+            lambda: self.output_has(lines=iterations1 + iterations2),
             max_timeout=15)
 
         proc.kill_and_wait()
 
         objs = self.read_output()
-        assert len(objs) == iterations1+iterations2
+        assert len(objs) == iterations1 + iterations2
 
     def test_rotating_ignore_older_larger_write_rate(self):
         self.render_config_template(
@@ -120,7 +120,7 @@ class Test(TestCase):
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test.log"
 
-        proc = self.start_filebeat(debug_selectors=['*'])
+        proc = self.start_beat()
         time.sleep(1)
 
         rotations = 2
@@ -158,7 +158,7 @@ class Test(TestCase):
         file.write("line in log file\n")
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(lines=1),
@@ -186,7 +186,7 @@ class Test(TestCase):
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test.log"
 
-        filebeat = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_beat()
 
         # wait for first  "Start next scan" log message
         self.wait_until(
@@ -238,10 +238,10 @@ class Test(TestCase):
         In case no prospectors are defined, filebeat must shut down and report an error
         """
         self.render_config_template(
-                prospectors=False,
+            prospectors=False,
         )
 
-        filebeat = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_beat()
 
         # wait for first  "Start next scan" log message
         self.wait_until(
@@ -251,11 +251,10 @@ class Test(TestCase):
 
         self.wait_until(
             lambda: self.log_contains(
-                 "shutting down"),
+                "shutting down"),
             max_timeout=10)
 
         filebeat.kill_and_wait()
-
 
     def test_no_paths_defined(self):
         """
@@ -265,39 +264,38 @@ class Test(TestCase):
         self.render_config_template(
         )
 
-        filebeat = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_beat()
 
         # wait for first  "Start next scan" log message
         self.wait_until(
-                lambda: self.log_contains(
-                        "No paths were defined for prospector"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "No paths were defined for prospector"),
+            max_timeout=10)
 
         self.wait_until(
-                lambda: self.log_contains(
-                        "shutting down"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "shutting down"),
+            max_timeout=10)
 
         filebeat.kill_and_wait()
-
 
     def test_files_added_late(self):
         """
         Tests that prospectors stay running even though no harvesters are started yet
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/*",
+            path=os.path.abspath(self.working_dir) + "/log/*",
         )
 
         os.mkdir(self.working_dir + "/log/")
 
-        filebeat = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_beat()
 
         # wait until events are sent for the first time
         self.wait_until(
-                lambda: self.log_contains(
-                        "Events flushed"),
-                max_timeout=10)
+            lambda: self.log_contains(
+                "Events flushed"),
+            max_timeout=10)
 
         testfile = self.working_dir + "/log/test.log"
         with open(testfile, 'a') as file:
@@ -306,8 +304,8 @@ class Test(TestCase):
 
         # wait for log to be read
         self.wait_until(
-                lambda: self.output_has(lines=2),
-                max_timeout=15)
+            lambda: self.output_has(lines=2),
+            max_timeout=15)
 
         filebeat.kill_and_wait()
 
@@ -326,7 +324,7 @@ class Test(TestCase):
         os.mkdir(self.working_dir + "/log/")
         testfile = self.working_dir + "/log/test.log"
 
-        filebeat = self.start_filebeat(debug_selectors=['*'])
+        filebeat = self.start_beat()
 
         # wait for first  "Start next scan" log message
         self.wait_until(

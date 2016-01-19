@@ -1,4 +1,4 @@
-from filebeat import TestCase
+from filebeat import BaseTest
 import os
 import socket
 
@@ -7,7 +7,8 @@ Tests for the custom fields functionality.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
+
     def test_custom_fields(self):
         """
         Tests that custom fields show up in the output dict.
@@ -20,7 +21,7 @@ class Test(TestCase):
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.kill_and_wait()
 
@@ -46,7 +47,7 @@ class Test(TestCase):
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.kill_and_wait()
 
@@ -71,7 +72,7 @@ class Test(TestCase):
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.kill_and_wait()
 

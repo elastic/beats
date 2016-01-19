@@ -1,4 +1,4 @@
-from filebeat import TestCase
+from filebeat import BaseTest
 
 import os
 
@@ -8,7 +8,7 @@ import os
 # * Check what happens when registrar file is deleted
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_registrar_file_content(self):
         """
@@ -28,7 +28,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -105,7 +105,7 @@ class Test(TestCase):
         file1.close()
         file2.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -138,7 +138,7 @@ class Test(TestCase):
         testfile = self.working_dir + "/log/test.log"
         with open(testfile, 'w') as f:
             f.write("hello world\n")
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(
             lambda: self.log_contains(
                 "Processing 1 events"),
