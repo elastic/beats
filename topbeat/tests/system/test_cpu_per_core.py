@@ -43,5 +43,3 @@ class Test(TestCase):
 
         ]:
             assert type(output[key]) in [int, float]
-
-        assert self.did_not_panic()

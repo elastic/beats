@@ -48,5 +48,3 @@ class Test(TestCase):
             "proc.mem.rss_p",
         ]:
             assert type(output[key]) in [int, float]
-
-        assert self.did_not_panic()
