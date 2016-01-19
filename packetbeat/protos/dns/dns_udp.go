@@ -22,7 +22,7 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		return
 	}
 
-	dnsTuple := DnsTupleFromIpPort(&pkt.Tuple, TransportUdp, dnsPkt.ID)
+	dnsTuple := DnsTupleFromIpPort(&pkt.Tuple, TransportUdp, dnsPkt.Id)
 	dnsMsg := &DnsMessage{
 		Ts:           pkt.Ts,
 		Tuple:        pkt.Tuple,
@@ -31,9 +31,9 @@ func (dns *Dns) ParseUdp(pkt *protos.Packet) {
 		Length:       len(pkt.Payload),
 	}
 
-	if dnsMsg.Data.QR == Query {
-		dns.receivedDnsRequest(&dnsTuple, dnsMsg)
-	} else /* Response */ {
+	if dnsMsg.Data.Response {
 		dns.receivedDnsResponse(&dnsTuple, dnsMsg)
+	} else /* Query */ {
+		dns.receivedDnsRequest(&dnsTuple, dnsMsg)
 	}
 }

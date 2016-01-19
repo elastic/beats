@@ -223,7 +223,7 @@ func assertFlags(t testing.TB, m common.MapStr, flags []string) {
 		case "aa":
 			key = "dns.flags.authoritative"
 		case "ra":
-			key = "dns.flags.recursion_allowed"
+			key = "dns.flags.recursion_available"
 		case "rd":
 			key = "dns.flags.recursion_desired"
 		case "tc":
@@ -250,11 +250,4 @@ func assertAddress(t testing.TB, expected common.IpPortTuple, endpoint interface
 
 	assert.Equal(t, expected.Src_ip.String(), e.Ip)
 	assert.Equal(t, expected.Src_port, e.Port)
-}
-
-// Verify that nameToString encodes non-printable characters.
-func Test_nameToString_encodesNonPrintable(t *testing.T) {
-	name := "\n \r \t \" \\ \u2318.dnstunnel.com"
-	escapedName := "\\n \\r \\t \\\" \\\\ \\226\\140\\152.dnstunnel.com"
-	assert.Equal(t, escapedName, nameToString([]byte(name)))
 }

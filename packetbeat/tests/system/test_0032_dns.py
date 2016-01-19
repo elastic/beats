@@ -22,7 +22,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
-        assert o["query"] == "class IN, type A, google.com"
+        assert o["query"] == "class IN, type A, google.com."
         assert o["dns.question.type"] == "A"
         assert o["status"] == "OK"
         assert len(o["dns.answers"]) == 16
@@ -44,7 +44,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
-        assert o["query"] == "class IN, type A, nothing.elastic.co"
+        assert o["query"] == "class IN, type A, nothing.elastic.co."
         assert o["dns.question.type"] == "A"
         assert o["status"] == "Error"
         assert o["dns.response_code"] == "NXDOMAIN"
@@ -68,7 +68,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
-        assert o["query"] == "class IN, type MX, elastic.co"
+        assert o["query"] == "class IN, type MX, elastic.co."
         assert o["dns.question.type"] == "MX"
         assert o["status"] == "OK"
 
@@ -88,7 +88,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
-        assert o["query"] == "class IN, type NS, elastic.co"
+        assert o["query"] == "class IN, type NS, elastic.co."
         assert o["dns.question.type"] == "NS"
         assert o["status"] == "OK"
 
@@ -109,7 +109,7 @@ class Test(BaseTest):
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
         assert o["ip"] == "8.8.8.8"
-        assert o["query"] == "class IN, type TXT, elastic.co"
+        assert o["query"] == "class IN, type TXT, elastic.co."
         assert o["dns.question.type"] == "TXT"
         assert o["status"] == "OK"
         assert len(o["dns.answers"]) == 2
@@ -198,7 +198,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "tcp"
         assert o["method"] == "QUERY"
-        assert o["query"] == "class IN, type AXFR, etas.com"
+        assert o["query"] == "class IN, type AXFR, etas.com."
         assert o["dns.question.type"] == "AXFR"
         assert o["status"] == "OK"
         assert len(o["dns.answers"]) == 4
