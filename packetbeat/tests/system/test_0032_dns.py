@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for the DNS protocol.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
     def test_A(self):
         """
         Should correctly interpret an A query to google.com

@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for parsing WSGI traffic.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_long_answer(self):
         self.render_config_template(

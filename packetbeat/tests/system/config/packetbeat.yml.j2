@@ -26,7 +26,7 @@ shipper:
   geoip:
     paths: [
         {%- for path in geoip_paths -%}
-            "{{ pb.working_dir + '/' + path }}"
+            "{{ beat.working_dir + '/' + path }}"
             {%- if not loop.last %}, {% endif -%}
         {%- endfor -%}
     ]
@@ -121,7 +121,7 @@ protocols:
 {%- if thrift_idl_files %}
     idl_files: [
         {%- for file in thrift_idl_files -%}
-                "{{ pb.working_dir + '/' + file }}"
+                "{{ beat.working_dir + '/' + file }}"
                 {%- if not loop.last %}, {% endif -%}
         {%- endfor -%}
     ]
@@ -159,7 +159,7 @@ output:
   # number of files: maximum number of files in path
   file:
     enabled: true
-    path: "{{ output_file_path|default(pb.working_dir + "/output") }}"
+    path: "{{ output_file_path|default(beat.working_dir + "/output") }}"
     filename: "{{ output_file_filename|default("packetbeat") }}"
     rotate_every_kb: 1000
     #number_of_files: 7
