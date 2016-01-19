@@ -63,27 +63,27 @@ The value that you specify here is used as the `input_type` for each event publi
 
 ===== exclude_lines
 
-A list of regular expressions to match the lines that are dropped. It drops the lines that are matching any regular
-expression from the list. By default, no lines are dropped.
+A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped.
+
+The following example configures Filebeat to drop any lines that start with "DBG".
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
-To exclude the lines starting with "DBG".
 
 ===== include_lines
 
-A list of regular expressions to match the lines that are exported. It exports only the lines that are matching any regular expression from the list. By default, all lines are exported.
+A list of regular expressions to match the lines that you want Filebeat to include. Filebeat exports only the lines that match a regular expression in the list. By default, all lines are exported.
+
+The following example configures Filebeat to export any lines that start with "ERR" or "WARN":
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
-To include only the lines starting with "ERR" or "WARN".
 
-Note::
-If both `include_lines` and `exclude_lines` are defined, then include_lines is called first. To export all the apache logs except the DBGs, then you can use:
+NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -93,13 +93,14 @@ If both `include_lines` and `exclude_lines` are defined, then include_lines is c
 
 ===== exclude_files
 
-A list of regular expressions to match the files to be ignored. By default no file is excluded.
+A list of regular expressions to match the files that you want Filebeat to ignore. By default no files are excluded.
+
+The following example configures Filebeat to ignore all the files that have a `gz` extension:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
   exclude_files: [".gz$"]
 -------------------------------------------------------------------------------------
-To ignore all the files with the `gz` extension.
 
 [[configuration-fields]]
 ===== fields
@@ -169,49 +170,87 @@ The buffer size every harvester uses when fetching the file. The default is 1638
 
 ===== max_bytes
 
-Maximum number of bytes a single log event can have. All bytes after max_bytes are discarded and not sent.
-This is especially useful for multiline log messages which can get large. The default is 10MB (10485760).
+The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent.
+This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
 
 ===== multiline
 
-Mutiline can be used for log messages spanning multiple lines. This is common for Java Stack Traces
-or C-Line Continuation. The following example combines all lines following a line start with a `[`.
-This could for example be a Java Stack Trace.
+Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces. 
+
+The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`). 
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 multiline:
     pattern: ^\[
-    match: after
     negate: true
+    match: after
+
 -------------------------------------------------------------------------------------
 
-====== pattern
+Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event: 
 
-The regexp pattern that has to be matched. The example pattern matches all lines starting with [
+["source","sh",subs="attributes,callouts"]
+-------------------------------------------------------------------------------------
+[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+-------------------------------------------------------------------------------------
 
-====== negate
+You specify the following settings under `multiline` to control how Filebeat combines the lines in the message:
 
-Defines if the pattern set under pattern should be negated or not. Default is false.
+*`pattern`*:: Specifies the regular expression pattern to match. 
 
-====== match
+*`negate`*:: Defines whether the pattern is negated. The default is `false`.
 
-Match must be set to "after" or "before". It is used to define if lines should be
-appended to a pattern that was (not) matched before or after or as long as a
-pattern is not matched based on negate.
+*`match`*:: Specifies how Filebeat combines matching lines into an event. The settings are `after` or `before`. The behavior of these settings depends on what you specify for `negate`:
++
+[options="header"]
+|=======================
+|Setting for `negate` | Setting for `match` | Result
+|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match. 
+|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match. 
+|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match. 
+|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match. 
+|=======================
++
+NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
 
-NOTE: After is the equivalent to previous and before is the equivalent to to next in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash].
+*`max_lines`*:: The maximum number of lines that can be combined into one event. If
+the multiline message contains more than `max_lines`, any additional
+lines are discarded. The default is 500.
 
-====== max_lines
+*`timeout`*:: After the specified timeout, Filebeat sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
-The maximum number of lines that are combined to one event. In case there are more the max_lines the additional
-lines are discarded. Default is set to 500.
+Here's an example configuration that shows the regular expression for a slightly more complex example: 
 
-====== timeout
+["source","sh",subs="attributes,callouts"]
+-------------------------------------------------------------------------------------
+multiline:
+    pattern: "^[[:space:]]+(at|...)|^Caused by:"
+    negate: false
+    match: after
+-------------------------------------------------------------------------------------
 
-After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event.
-Default is set to 5s.
+In this example, the pattern matches the following lines:
 
+* a line that begins with spaces followed by the word `at` or `...`
+* a line that begins with the words `Caused by:`
+
+You could use this configuration to join the following lines from a Java stack trace into a single event: 
+
+["source","sh",subs="attributes,callouts"]
+-------------------------------------------------------------------------------------
+Exception in thread "main" java.lang.IllegalStateException: A book has a null property
+       at com.example.myproject.Author.getBookIds(Author.java:38)
+       at com.example.myproject.Bootstrap.main(Bootstrap.java:14)
+Caused by: java.lang.NullPointerException
+       at com.example.myproject.Book.getId(Book.java:22)
+       at com.example.myproject.Author.getBookIds(Author.java:35)
+       ... 1 more
+-------------------------------------------------------------------------------------
 
 ===== tail_files
 
@@ -294,7 +333,7 @@ filebeat:
 
 ===== config_dir
 
-The full Path to the directory that contains additional prospector configuration files.
+The full path to the directory that contains additional prospector configuration files.
 Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat
 config hierarchy even though only the prospector part of the file is processed. All global
 options, such as `spool_size`, are ignored.

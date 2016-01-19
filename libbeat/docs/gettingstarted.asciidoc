@@ -1,5 +1,7 @@
 [[getting-started]]
-== Getting Started
+== Getting Started with Beats and the Elastic Stack
+
+Looking for an "ELK tutorial" that shows how to set up the Elastic stack for Beats? You've come to the right place.
 
 A regular _Beats setup_ consists of:
 
