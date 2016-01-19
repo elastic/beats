@@ -1,14 +1,13 @@
-from filebeat import TestCase
+from filebeat import BaseTest
 import os
-import socket
-import shutil
 
 """
 Tests for the multiline log messages
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
+
     def test_java_elasticsearch_log(self):
         """
         Test that multi lines for java logs works.
@@ -27,7 +26,7 @@ class Test(TestCase):
                         source_dir="../files",
                         target_dir="log")
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         # wait for the "Skipping file" log message
         self.wait_until(
@@ -58,7 +57,7 @@ class Test(TestCase):
                         source_dir="../files",
                         target_dir="log")
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         # wait for the "Skipping file" log message
         self.wait_until(
@@ -91,7 +90,7 @@ class Test(TestCase):
                         source_dir="../files",
                         target_dir="log")
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(lines=20),
@@ -102,10 +101,12 @@ class Test(TestCase):
         output = self.read_output()
 
         # Checks line 3 is sent
-        assert True == self.log_contains("MetaDataMappingService.java:388", "output/filebeat")
+        assert True == self.log_contains(
+            "MetaDataMappingService.java:388", "output/filebeat")
 
         # Checks line 4 is not sent anymore
-        assert False == self.log_contains("InternalClusterService.java:388", "output/filebeat")
+        assert False == self.log_contains(
+            "InternalClusterService.java:388", "output/filebeat")
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
@@ -132,7 +133,7 @@ class Test(TestCase):
         file.write("  First Line\n")
         file.write("  Second Line\n")
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(lines=1),
@@ -172,7 +173,7 @@ class Test(TestCase):
                         source_dir="../files",
                         target_dir="log")
 
-        proc = self.start_filebeat()
+        proc = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(lines=20),

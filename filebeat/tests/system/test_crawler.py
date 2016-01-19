@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from filebeat import TestCase
+from filebeat import BaseTest
 
 import codecs
 import os
@@ -10,7 +10,10 @@ from nose.plugins.skip import Skip, SkipTest
 # Additional tests to be added:
 # * Check what happens when file renamed -> no recrawling should happen
 # * Check if file descriptor is "closed" when file disappears
-class Test(TestCase):
+
+
+class Test(BaseTest):
+
     def test_fetched_lines(self):
         """
         Checks if all lines are read from the log file.
@@ -31,7 +34,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -71,7 +74,7 @@ class Test(TestCase):
         # be read as there is no finishing \n or \r
         file.write("unfinished line")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(lines=80),
@@ -125,7 +128,7 @@ class Test(TestCase):
         file.write("complete line\n")
         file.write("unfinished line ")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         # Check that unfinished line is read after timeout and sent
         self.wait_until(
@@ -176,7 +179,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -230,7 +233,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         # Let it read the file
         self.wait_until(
@@ -293,7 +296,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         # Let it read the file
         self.wait_until(
@@ -318,7 +321,7 @@ class Test(TestCase):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1+iterations2), max_timeout=10)
+            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
 
         filebeat.kill_and_wait()
 
@@ -356,7 +359,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         # Let it read the file
         self.wait_until(
@@ -376,7 +379,7 @@ class Test(TestCase):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1+1), max_timeout=10)
+            lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
         filebeat.kill_and_wait()
 
@@ -390,7 +393,6 @@ class Test(TestCase):
         # from scratch
         output = self.read_output()
         #assert len(output) == 5 + 6
-
 
     def test_new_line_on_existing_file(self):
         """
@@ -407,7 +409,7 @@ class Test(TestCase):
         with open(testfile, 'w') as f:
             f.write("hello world\n")
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains(
@@ -443,7 +445,7 @@ class Test(TestCase):
 
         testfile = self.working_dir + "/log/test.log"
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         # Write initial file
         with open(testfile, 'w') as f:
@@ -466,7 +468,7 @@ class Test(TestCase):
                 f.flush()
 
                 self.wait_until(
-                    lambda: self.output_has( lines_written + 1),
+                    lambda: self.output_has(lines_written + 1),
                     max_timeout=15)
 
         filebeat.kill_and_wait()
@@ -492,7 +494,7 @@ class Test(TestCase):
             f.write("hello world\n")
             f.flush()
 
-            filebeat = self.start_filebeat()
+            filebeat = self.start_beat()
 
             self.wait_until(
                 lambda: self.log_contains(
@@ -534,7 +536,7 @@ class Test(TestCase):
             f.write("hello world 2\n")
             f.flush()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(
             lambda: self.log_contains(
                 "Start next scan"),
@@ -545,7 +547,6 @@ class Test(TestCase):
             f.write("hello world 3\n")
             f.write("hello world 4\n")
             f.flush()
-
 
         self.wait_until(
             lambda: self.output_has(lines=2),
@@ -571,7 +572,7 @@ class Test(TestCase):
 
         testfile = self.working_dir + "/log/test.log"
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(
             lambda: self.log_contains(
                 "Start next scan"),
@@ -651,7 +652,7 @@ class Test(TestCase):
         )
 
         # run filebeat
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=len(encodings)),
                         max_timeout=15)
 
@@ -662,7 +663,7 @@ class Test(TestCase):
                 f.write(text + " 2" + "\n")
 
         # wait again
-        self.wait_until(lambda: self.output_has(lines=len(encodings)*2),
+        self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
                         max_timeout=15)
         filebeat.kill_and_wait()
 
@@ -699,7 +700,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(40),
@@ -713,7 +714,7 @@ class Test(TestCase):
         output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert iterations*2 == len(output)
+        assert iterations * 2 == len(output)
 
     def test_default_include_exclude_lines(self):
         """
@@ -739,7 +740,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(60),
@@ -753,7 +754,7 @@ class Test(TestCase):
         output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert iterations*3 == len(output)
+        assert iterations * 3 == len(output)
 
     def test_exclude_lines(self):
         """
@@ -780,7 +781,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(40),
@@ -794,7 +795,7 @@ class Test(TestCase):
         output = self.read_output()
 
         # Check that output file has the same number of lines as the log file
-        assert iterations*2 == len(output)
+        assert iterations * 2 == len(output)
 
     def test_include_exclude_lines(self):
         """
@@ -822,7 +823,7 @@ class Test(TestCase):
 
         file.close()
 
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.output_has(20),
@@ -837,7 +838,6 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
-
 
     def test_file_no_permission(self):
         """
@@ -877,18 +877,20 @@ class Test(TestCase):
             import win32security
             import ntsecuritycon as con
 
-            user, domain, type = win32security.LookupAccountName ("", win32api.GetUserName ())
-            sd = win32security.GetFileSecurity (testfile, win32security.DACL_SECURITY_INFORMATION)
+            user, domain, type = win32security.LookupAccountName(
+                "", win32api.GetUserName())
+            sd = win32security.GetFileSecurity(
+                testfile, win32security.DACL_SECURITY_INFORMATION)
 
-            dacl = win32security.ACL ()
+            dacl = win32security.ACL()
             # Remove all access rights
-            dacl.AddAccessAllowedAce (win32security.ACL_REVISION, 0, user)
+            dacl.AddAccessAllowedAce(win32security.ACL_REVISION, 0, user)
 
-            sd.SetSecurityDescriptorDacl (1, dacl, 0)
-            win32security.SetFileSecurity (testfile, win32security.DACL_SECURITY_INFORMATION, sd)
+            sd.SetSecurityDescriptorDacl(1, dacl, 0)
+            win32security.SetFileSecurity(
+                testfile, win32security.DACL_SECURITY_INFORMATION, sd)
 
-
-        filebeat = self.start_filebeat()
+        filebeat = self.start_beat()
 
         self.wait_until(
             lambda: self.log_contains("permission denied"),
@@ -898,4 +900,5 @@ class Test(TestCase):
 
         os.chmod(testfile, 0o755)
 
-        assert False == os.path.isfile(os.path.join(self.working_dir, "output/filebeat"))
+        assert False == os.path.isfile(
+            os.path.join(self.working_dir, "output/filebeat"))
