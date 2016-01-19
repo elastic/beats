@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -60,7 +60,7 @@ func newDns(verbose bool) *Dns {
 	}
 
 	dns := &Dns{}
-	err := dns.Init(true, publisher.ChanClient{make(chan common.MapStr, 100)})
+	err := dns.Init(true, &publish.ChanTransactions{make(chan common.MapStr, 100)})
 	if err != nil {
 		return nil
 	}
@@ -84,7 +84,7 @@ func newPacket(t common.IpPortTuple, payload []byte) *protos.Packet {
 // expectResult returns one MapStr result from the Dns results channel. If
 // no result is available then the test fails.
 func expectResult(t testing.TB, dns *Dns) common.MapStr {
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	select {
 	case result := <-client.Channel:
 		return result

@@ -9,12 +9,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var debugf = logp.MakeDebug("http")
@@ -68,7 +68,7 @@ type HTTP struct {
 
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 }
 
 var (
@@ -133,7 +133,7 @@ func (http *HTTP) GetPorts() []int {
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *HTTP) Init(testMode bool, results publisher.Client) error {
+func (http *HTTP) Init(testMode bool, results publish.Transactions) error {
 	http.initDefaults()
 
 	if !testMode {
@@ -511,7 +511,7 @@ func (http *HTTP) publishTransaction(event common.MapStr) {
 	if http.results == nil {
 		return
 	}
-	http.results.PublishEvent(event)
+	http.results.PublishTransaction(event)
 }
 
 func (http *HTTP) collectHeaders(m *message) interface{} {

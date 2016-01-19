@@ -32,11 +32,12 @@ type FlagsHandler interface {
 
 // Basic beat information
 type Beat struct {
-	Name    string
-	Version string
-	Config  *BeatConfig
-	BT      Beater
-	Events  publisher.Client
+	Name      string
+	Version   string
+	Config    *BeatConfig
+	BT        Beater
+	Publisher *publisher.PublisherType
+	Events    publisher.Client
 }
 
 // Basic configuration of every beat
@@ -140,6 +141,7 @@ func (b *Beat) LoadConfig() {
 		os.Exit(1)
 	}
 
+	b.Publisher = pub
 	b.Events = pub.Client()
 
 	logp.Info("Init Beat: %s; Version: %s", b.Name, b.Version)

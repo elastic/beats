@@ -7,17 +7,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"time"
 )
 
 func MysqlModForTests() *Mysql {
 	var mysql Mysql
-	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	mysql.Init(true, results)
 	return &mysql
 }
@@ -464,7 +464,7 @@ func testTcpTuple() *common.TcpTuple {
 
 // Helper function to read from the Publisher Queue
 func expectTransaction(t *testing.T, mysql *Mysql) common.MapStr {
-	client := mysql.results.(publisher.ChanClient)
+	client := mysql.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
 		return trans

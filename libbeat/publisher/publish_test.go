@@ -55,12 +55,6 @@ func TestPublisherTypeGetServerName(t *testing.T) {
 	assert.Equal(t, hostOnNetwork, pt.GetServerName("172.0.0.1"))
 }
 
-// Test the PublisherType Client() method.
-func TestPublisherTypeClient(t *testing.T) {
-	pt := &PublisherType{}
-	assert.NotNil(t, pt.Client())
-}
-
 // Test the PublisherType UpdateTopologyPeriodically() method.
 func TestPublisherTypeUpdateTopologyPeriodically(t *testing.T) {
 	// Setup.
