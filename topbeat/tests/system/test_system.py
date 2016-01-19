@@ -1,4 +1,5 @@
-from topbeat import TestCase
+from topbeat import BaseTest
+
 import os
 
 
@@ -7,7 +8,7 @@ Contains tests for system wide statistics.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
     def test_system_wide(self):
         """
         Checks that system wide stats are found in the output and
@@ -18,7 +19,8 @@ class Test(TestCase):
             process_stats=False,
             filesystem_stats=False
         )
-        topbeat = self.start_topbeat()
+
+        topbeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         topbeat.kill_and_wait()
         output = self.read_output()[0]
