@@ -1,61 +1,58 @@
-from mockbeat import TestCase
+from base import BaseTest
 
 import os
 import shutil
 import subprocess
 
 
-# Additional tests to be added:
-# * Check what happens when file renamed -> no recrawling should happen
-# * Check if file descriptor is "closed" when file disappears
-class Test(TestCase):
+class Test(BaseTest):
+
     def test_base(self):
         """
         Basic test with exiting Mockbeat normally
         """
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
-        exit_code = self.run_mockbeat()
+        exit_code = self.run_beat()
         assert exit_code == 0
-
 
     def test_no_config(self):
         """
         Tests starting without a config
         """
-        exit_code = self.run_mockbeat()
+        exit_code = self.run_beat()
 
         assert exit_code == 1
-        assert True == self.log_contains("loading config file error")
-        assert True == self.log_contains("Failed to read")
-
+        assert self.log_contains("loading config file error") is True
+        assert self.log_contains("Failed to read") is True
 
     def test_invalid_config(self):
         """
         Checks stop on invalid config
         """
-        shutil.copy("../files/invalid.yml", os.path.join(self.working_dir, "invalid.yml"))
+        shutil.copy("../files/invalid.yml",
+                    os.path.join(self.working_dir, "invalid.yml"))
 
-        exit_code = self.run_mockbeat(config="invalid.yml")
+        exit_code = self.run_beat(config="invalid.yml")
 
         assert exit_code == 1
-        assert True == self.log_contains("loading config file error")
-        assert True == self.log_contains("YAML config parsing failed")
-
+        assert self.log_contains("loading config file error") is True
+        assert self.log_contains("YAML config parsing failed") is True
 
     def test_config_test(self):
         """
         Checks if -configtest works as expected
         """
-        shutil.copy("../../etc/libbeat.yml", os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy("../../etc/libbeat.yml",
+                    os.path.join(self.working_dir, "libbeat.yml"))
 
-        exit_code = self.run_mockbeat(config="libbeat.yml", extra_args=["-configtest"])
+        exit_code = self.run_beat(
+            config="libbeat.yml", extra_args=["-configtest"])
 
         assert exit_code == 0
-        assert True == self.log_contains("Testing configuration file")
+        assert self.log_contains("Testing configuration file") is True
 
     def test_version(self):
         """
@@ -72,15 +69,16 @@ class Test(TestCase):
                      os.path.join(self.working_dir, "coverage.cov")
                      ])
 
-        assert False == self.log_contains("loading config file error")
+        assert self.log_contains("loading config file error") is False
 
-        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") as outputfile:
+        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") \
+                as outputfile:
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
             exit_code = proc.wait()
             assert exit_code == 0
 
-        assert True == self.log_contains("mockbeat")
-        assert True == self.log_contains("version")
-        assert True == self.log_contains("9.9.9")
+        assert self.log_contains("mockbeat") is True
+        assert self.log_contains("version") is True
+        assert self.log_contains("9.9.9") is True
