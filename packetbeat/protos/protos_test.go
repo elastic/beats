@@ -114,6 +114,16 @@ func newProtocols() Protocols {
 	return p
 }
 
+func TestBpfFilterWithoutVlanOnlyIcmp(t *testing.T) {
+	p := ProtocolsStruct{}
+	p.all = make(map[Protocol]ProtocolPlugin)
+	p.tcp = make(map[Protocol]TcpProtocolPlugin)
+	p.udp = make(map[Protocol]UdpProtocolPlugin)
+
+	filter := p.BpfFilter(false, true)
+	assert.Equal(t, "icmp or icmp6", filter)
+}
+
 func TestBpfFilterWithoutVlanWithoutIcmp(t *testing.T) {
 	p := newProtocols()
 	filter := p.BpfFilter(false, false)
