@@ -62,7 +62,7 @@ output:
   # rotate_every_kb: maximum size of the files in path
   # number of files: maximum number of files in path
   file:
-    path: {{ output_file_path|default(fb.working_dir + "/output") }}
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("mockbeat") }}"
     rotate_every_kb: 1000
     #number_of_files: 7
