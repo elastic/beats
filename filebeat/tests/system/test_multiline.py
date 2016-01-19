@@ -190,3 +190,4 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
+

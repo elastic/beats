@@ -1,34 +1,25 @@
-from mockbeat import TestCase
+from filebeat import TestCase
 
 import os
 import shutil
 import subprocess
 
 
-# Additional tests to be added:
-# * Check what happens when file renamed -> no recrawling should happen
-# * Check if file descriptor is "closed" when file disappears
+
 class Test(TestCase):
     def test_base(self):
         """
-        Basic test with exiting Mockbeat normally
+        Basic test with exiting filebeat normally
         """
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
-        mockbeat = self.start_mockbeat()
-        self.wait_until(lambda: self.log_contains("MockBeat: waiting to be done"))
+        filebeat = self.start_filebeat()
+        self.wait_until(lambda: self.log_contains("Start running"))
 
-        exit_code = mockbeat.kill_and_wait()
-
-        assert self.log_contains("MockBeat: Stop")
-        assert self.log_contains("MockBeat: returning from Run function")
-        assert self.log_contains("MockBeat: Cleanup")
-        assert self.did_not_panic()
-
-        print exit_code
+        exit_code = filebeat.kill_and_wait()
         assert exit_code == 0, "Exit code was %d" % exit_code
 
 
@@ -36,7 +27,7 @@ class Test(TestCase):
         """
         Tests starting without a config
         """
-        exit_code = self.run_mockbeat()
+        exit_code = self.run_filebeat(check_exit_code=False)
 
         assert exit_code == 1
         assert True == self.log_contains("loading config file error")
@@ -49,7 +40,7 @@ class Test(TestCase):
         """
         shutil.copy("../files/invalid.yml", os.path.join(self.working_dir, "invalid.yml"))
 
-        exit_code = self.run_mockbeat(config="invalid.yml")
+        exit_code = self.run_filebeat(config="invalid.yml", check_exit_code=False)
 
         assert exit_code == 1
         assert True == self.log_contains("loading config file error")
@@ -60,18 +51,17 @@ class Test(TestCase):
         """
         Checks if -configtest works as expected
         """
-        shutil.copy("../../etc/libbeat.yml", os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy("../../etc/filebeat.yml", os.path.join(self.working_dir, "filebeat.yml"))
 
-        exit_code = self.run_mockbeat(config="libbeat.yml", extra_args=["-configtest"])
+        self.run_filebeat(config="filebeat.yml", extra_args=["-configtest"])
 
-        assert exit_code == 0
         assert True == self.log_contains("Testing configuration file")
 
     def test_version(self):
         """
         Checks if version param works
         """
-        args = ["../../libbeat.test"]
+        args = ["../../filebeat.test"]
 
         args.extend(["-version",
                      "-e",
@@ -84,14 +74,15 @@ class Test(TestCase):
 
         assert False == self.log_contains("loading config file error")
 
-        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") as outputfile:
+        with open(os.path.join(self.working_dir, "filebeat.log"), "wb") as outputfile:
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
             exit_code = proc.wait()
             assert exit_code == 0, "Exit code was %d" % exit_code
 
-        assert True == self.log_contains("mockbeat")
+        assert True == self.log_contains("filebeat")
         assert True == self.log_contains("version")
-        assert True == self.log_contains("9.9.9")
+
+
 

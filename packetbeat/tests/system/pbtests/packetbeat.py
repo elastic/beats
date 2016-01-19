@@ -23,18 +23,39 @@ class Proc(object):
         self.output = open(outputfile, "wb")
 
     def start(self):
+
+        self.stdin_read, self.stdin_write = os.pipe()
+
         self.proc = subprocess.Popen(
-            self.args,
-            stdout=self.output,
-            stderr=subprocess.STDOUT)
+                self.args,
+                stdin=self.stdin_read,
+                stdout=self.output,
+                stderr=subprocess.STDOUT,
+                bufsize=0,
+        )
         return self.proc
 
-    def wait(self):
-        return self.proc.wait()
+    def wait(self, check_exit_code=True, check_panic=True):
+        exit_code = self.proc.wait()
+        if check_exit_code and exit_code != 0:
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        if check_panic and self.did_panic():
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        return exit_code
 
-    def kill_and_wait(self):
+    def kill_and_wait(self, check_exit_code=True, check_panic=True):
         self.proc.terminate()
-        return self.proc.wait()
+        os.close(self.stdin_write)
+        return self.wait(check_exit_code, check_panic)
+
+    def did_panic(self):
+        try:
+            for line in self.output:
+                if line.find("panic: ") >= 0:
+                    return True
+            return False
+        except IOError:
+            return False
 
     def __del__(self):
         try:
@@ -55,7 +76,9 @@ class TestCase(unittest.TestCase):
                        config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
-                       debug_selectors=[]):
+                       debug_selectors=[],
+                       check_exit_code=True,
+                       check_panic=True):
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -78,11 +101,9 @@ class TestCase(unittest.TestCase):
         if debug_selectors:
             args.extend(["-d", ",".join(debug_selectors)])
 
-        with open(os.path.join(self.working_dir, output), "wb") as outputfile:
-            proc = subprocess.Popen(args,
-                                    stdout=outputfile,
-                                    stderr=subprocess.STDOUT)
-            return proc.wait()
+        proc = Proc(args, os.path.join(self.working_dir, output))
+        proc.start()
+        return proc.wait(check_exit_code, check_panic)
 
     def start_packetbeat(self,
                          cmd="../../packetbeat.test",
@@ -191,6 +212,9 @@ class TestCase(unittest.TestCase):
                 return False
         except IOError:
             return False
+
+    def did_panic(self):
+        return self.log_contains("panic: ")
 
     def output_has(self, lines, output_file="output/packetbeat"):
         """

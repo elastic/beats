@@ -25,7 +25,6 @@ package beat
 import (
 	"flag"
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -35,6 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/service"
 
 	"github.com/satori/go.uuid"
+	"sync"
 )
 
 // Beater interface that every beat must use
@@ -63,7 +63,12 @@ type Beat struct {
 	Events  publisher.Client
 	UUID    uuid.UUID
 
-	exit chan struct{}
+	exit chan ExitStatus
+}
+
+type ExitStatus struct {
+	BeaterHasStarted bool
+	Error            error
 }
 
 // Basic configuration of every beat
@@ -91,39 +96,40 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 		UUID:    uuid.NewV4(),
 
-		exit: make(chan struct{}),
+		exit: make(chan ExitStatus),
 	}
 
 	return &b
 }
 
 // Initiates and runs a new beat object
-func Run(name string, version string, bt Beater) {
+func Run(name string, version string, bt Beater) error {
 
 	b := NewBeat(name, version, bt)
 
 	// Runs beat inside a go process
 	go func() {
-		err := b.Start()
+		err, beaterHasStarted := b.Start()
 
 		if err != nil {
 			// TODO: detect if logging was already fully setup or not
 			fmt.Printf("Start error: %v\n", err)
 			logp.Critical("Start error: %v", err)
-			os.Exit(1)
 		}
 
 		// If start finishes, exit has to be called. This requires start to be blocking
 		// which is currently the default.
-		b.Exit()
+		b.Exit(beaterHasStarted, err)
 	}()
 
 	// Waits until beats channel is closed
 	select {
-	case <-b.exit:
-		b.Stop()
+	case exitStatus := <-b.exit:
+		if exitStatus.BeaterHasStarted {
+			b.Stop()
+		}
 		logp.Info("Exit beat completed")
-		return
+		return exitStatus.Error
 	}
 }
 
@@ -131,27 +137,27 @@ func Run(name string, version string, bt Beater) {
 // loading and parsing the configuration file, and running the Beat. This
 // method blocks until the Beat exits. If an error occurs while initializing
 // or running the Beat it will be returned.
-func (b *Beat) Start() error {
+func (b *Beat) Start() (error, bool) {
 	// Additional command line args are used to overwrite config options
 	err, exit := b.CommandLineSetup()
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	if exit {
-		return nil
+		return nil, false
 	}
 
 	// Loads base config
 	err = b.LoadConfig()
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	// Configures beat
 	err = b.BT.Config(b)
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	// Run beat. This calls first beater.Setup,
@@ -219,26 +225,26 @@ func (b *Beat) LoadConfig() error {
 
 // Run calls the beater Setup and Run methods. In case of errors
 // during the setup phase, it exits the process.
-func (b *Beat) Run() error {
+func (b *Beat) Run() (error, bool) {
 
 	// Setup beater object
 	err := b.BT.Setup(b)
 	if err != nil {
-		return fmt.Errorf("setup returned an error: %v", err)
+		return fmt.Errorf("setup returned an error: %v", err), false
 	}
 
 	// Up to here was the initialization, now about running
 	if cfgfile.IsTestConfig() {
 		logp.Info("Testing configuration file")
 		// all good, exit
-		return nil
+		return nil, false
 	}
 	service.BeforeRun()
 
 	// Callback is called if the processes is asked to stop.
 	// This needs to be called before the main loop is started so that
 	// it can register the signals that stop or query (on Windows) the loop.
-	service.HandleSignals(b.Exit)
+	service.HandleSignals(b.OnSignal)
 
 	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
@@ -248,27 +254,36 @@ func (b *Beat) Run() error {
 		logp.Critical("Running the beat returned an error: %v", err)
 	}
 
+	return err, true
+}
+
+// Stop calls the beater Stop action.
+// It can happen that this function is called more then once.
+func (b *Beat) Stop() {
+	logp.Info("Stopping Beat")
+	b.BT.Stop()
+
 	service.Cleanup()
 
 	logp.Info("Cleaning up %s before shutting down.", b.Name)
 
 	// Call beater cleanup function
-	err = b.BT.Cleanup(b)
+	err := b.BT.Cleanup(b)
 	if err != nil {
 		logp.Err("Cleanup returned an error: %v", err)
 	}
-	return err
 }
 
-// Stop calls the beater Stop action.
-// It can happen that this function is called more then once.
-func (beat *Beat) Stop() {
-	logp.Info("Stopping Beat")
-	beat.BT.Stop()
-}
+var callback sync.Once
 
 // Exiting beat -> shutdown
-func (b *Beat) Exit() {
-	logp.Info("Start exiting beat")
-	close(b.exit)
+func (b *Beat) OnSignal() {
+	b.Exit(true, nil)
+}
+func (b *Beat) Exit(beaterHasStarted bool, err error) {
+
+	callback.Do(func() {
+		logp.Info("Start exiting beat with error: %v", err)
+		b.exit <- ExitStatus{beaterHasStarted, err}
+	})
 }

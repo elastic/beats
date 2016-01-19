@@ -48,6 +48,7 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
 
+
     def test_unfinished_line_and_continue(self):
         """
         Checks that if a line does not have a line ending, is is not read yet.
@@ -608,6 +609,7 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == 3
 
+
     def test_encodings(self):
         """
         Tests that several common encodings work.
@@ -837,6 +839,7 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
+
 
 
     def test_file_no_permission(self):

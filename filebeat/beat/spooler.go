@@ -79,13 +79,15 @@ func (s *Spooler) Run() {
 
 		case <-s.exit:
 			break
-		case event := <-s.Channel:
-			s.spool = append(s.spool, event)
+		case event, ok := <-s.Channel:
+			if ok {
+				s.spool = append(s.spool, event)
 
-			// Spooler is full -> flush
-			if len(s.spool) == cap(s.spool) {
-				logp.Debug("spooler", "Flushing spooler because spooler full. Events flushed: %v", len(s.spool))
-				s.flush()
+				// Spooler is full -> flush
+				if len(s.spool) == cap(s.spool) {
+					logp.Debug("spooler", "Flushing spooler because spooler full. Events flushed: %v", len(s.spool))
+					s.flush()
+				}
 			}
 		case <-ticker.C:
 			// Flush periodically

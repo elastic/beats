@@ -243,7 +243,7 @@ class Test(TestCase):
 
         filebeat = self.start_filebeat(debug_selectors=['*'])
 
-        # wait for first  "Start next scan" log message
+        # wait for first  "No prospectors defined" log message
         self.wait_until(
             lambda: self.log_contains(
                 "No prospectors defined"),
@@ -254,7 +254,8 @@ class Test(TestCase):
                  "shutting down"),
             max_timeout=10)
 
-        filebeat.kill_and_wait()
+        exit_code = filebeat.kill_and_wait(check_exit_code=False)
+        assert exit_code == 1
 
 
     def test_no_paths_defined(self):
@@ -278,7 +279,8 @@ class Test(TestCase):
                         "shutting down"),
                 max_timeout=10)
 
-        filebeat.kill_and_wait()
+        exit_code = filebeat.kill_and_wait(check_exit_code=False)
+        assert exit_code == 1
 
 
     def test_files_added_late(self):
@@ -363,3 +365,4 @@ class Test(TestCase):
                 max_timeout=5)
 
         filebeat.kill_and_wait()
+

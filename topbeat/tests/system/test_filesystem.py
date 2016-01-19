@@ -18,7 +18,7 @@ class Test(TestCase):
             filesystem_stats=True
         )
         topbeat = self.start_topbeat()
-        self.wait_until(lambda: self.output_has(lines=1))
+        self.wait_until(lambda: self.output_has_at_least(lines=1))
         topbeat.kill_and_wait()
 
         output = self.read_output()[0]

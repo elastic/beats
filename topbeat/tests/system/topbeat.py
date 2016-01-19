@@ -1,14 +1,15 @@
 import subprocess
+
 import jinja2
 import unittest
 import os
 import shutil
 import json
 import time
+import yaml
 from datetime import datetime, timedelta
 
 build_path = "../../build/system-tests/"
-
 
 class Proc(object):
     """
@@ -22,18 +23,39 @@ class Proc(object):
         self.output = open(outputfile, "wb")
 
     def start(self):
+
+        self.stdin_read, self.stdin_write = os.pipe()
+
         self.proc = subprocess.Popen(
-            self.args,
-            stdout=self.output,
-            stderr=subprocess.STDOUT)
+                self.args,
+                stdin=self.stdin_read,
+                stdout=self.output,
+                stderr=subprocess.STDOUT,
+                bufsize=0,
+        )
         return self.proc
 
-    def wait(self):
-        return self.proc.wait()
+    def wait(self, check_exit_code=True, check_panic=True):
+        exit_code = self.proc.wait()
+        if check_exit_code and exit_code != 0:
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        if check_panic and self.did_panic():
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        return exit_code
 
-    def kill_and_wait(self):
+    def kill_and_wait(self, check_exit_code=True, check_panic=True):
         self.proc.terminate()
-        return self.proc.wait()
+        os.close(self.stdin_write)
+        return self.wait(check_exit_code, check_panic)
+
+    def did_panic(self):
+        try:
+            for line in self.output:
+                if line.find("panic: ") >= 0:
+                    return True
+            return False
+        except IOError:
+            return False
 
     def __del__(self):
         try:
@@ -49,26 +71,61 @@ class Proc(object):
 
 class TestCase(unittest.TestCase):
 
+    def run_topbeat(self,
+                       cmd="../../topbeat.test",
+                       config="topbeat.yml",
+                       output="topbeat.log",
+                       extra_args=[],
+                       debug_selectors=[],
+                       check_exit_code=True,
+                       check_panic=True):
+        """
+        Executes topbeat
+        Waits for the process to finish before returning to
+        the caller.
+        """
+
+        args = [cmd]
+
+        args.extend(["-e",
+                     "-c", os.path.join(self.working_dir, config),
+                     "-v",
+                     "-systemTest",
+                     "-test.coverprofile",
+                     os.path.join(self.working_dir, "coverage.cov")
+                     ])
+
+        if extra_args:
+            args.extend(extra_args)
+
+        if debug_selectors:
+            args.extend(["-d", ",".join(debug_selectors)])
+
+        proc = Proc(args, os.path.join(self.working_dir, output))
+        proc.start()
+        return proc.wait(check_exit_code, check_panic)
+
     def start_topbeat(self,
-                      cmd="../../topbeat.test",
-                      config="topbeat.yml",
-                      output="topbeat.log",
-                      extra_args=[],
-                      debug_selectors=[]):
+                         cmd="../../topbeat.test",
+                         config="topbeat.yml",
+                         output="topbeat.log",
+                         extra_args=[],
+                         debug_selectors=[]):
         """
         Starts topbeat and returns the process handle. The
-        caller is responsible for stopping / waiting the
+        caller is responsible for stopping / waiting for the
         Proc instance.
         """
         args = [cmd,
                 "-e",
                 "-c", os.path.join(self.working_dir, config),
-                "-systemTest",
                 "-v",
                 "-d", "*",
+                "-systemTest",
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov")
                 ]
+
         if extra_args:
             args.extend(extra_args)
 
@@ -96,6 +153,7 @@ class TestCase(unittest.TestCase):
         self.all_have_fields(jsons, ["@timestamp", "type",
                                      "beat.name", "beat.hostname",
                                      "count"])
+
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -106,7 +164,7 @@ class TestCase(unittest.TestCase):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader("config")
+                loader=jinja2.FileSystemLoader("config")
         )
 
         # create working dir
@@ -119,12 +177,13 @@ class TestCase(unittest.TestCase):
             # update the last_run link
             if os.path.islink(build_path + "last_run"):
                 os.unlink(build_path + "last_run")
-            os.symlink(build_path + "run/{}".format(self.id()),
-                       build_path + "last_run")
+            os.symlink(build_path + "run/{}".format(self.id()), build_path + "last_run")
         except:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
+
+        self.expected_fields, self.dict_fields = self.load_fields()
 
     def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
         """
@@ -157,11 +216,26 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
+    def did_panic(self):
+        return self.log_contains("panic: ")
+
     def output_has(self, lines, output_file="output/topbeat"):
         """
         Returns true if the output has a given number of lines.
         """
         try:
+            print "open %s" %  os.path.abspath(os.path.join(self.working_dir, output_file))
+            with open(os.path.join(self.working_dir, output_file), "r") as f:
+                return len([1 for line in f]) == lines
+        except IOError:
+            return False
+
+    def output_has_at_least(self, lines, output_file="output/topbeat"):
+        """
+        Returns true if the output has a given number of lines.
+        """
+        try:
+            print "open %s" %  os.path.abspath(os.path.join(self.working_dir, output_file))
             with open(os.path.join(self.working_dir, output_file), "r") as f:
                 return len([1 for line in f]) >= lines
         except IOError:
@@ -198,6 +272,40 @@ class TestCase(unittest.TestCase):
                 if key not in dict_fields and key not in expected_fields:
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
+
+    def load_fields(self, fields_doc="../../etc/fields.yml"):
+        """
+        Returns a list of fields to expect in the output dictionaries
+        and a second list that contains the fields that have a
+        dictionary type.
+
+        Reads these lists from the fields documentation.
+        """
+        def extract_fields(doc_list):
+            fields = []
+            dictfields = []
+            for field in doc_list:
+                if field.get("type") == "group":
+                    subfields, subdictfields = extract_fields(field["fields"])
+                    fields.extend(subfields)
+                    dictfields.extend(subdictfields)
+                else:
+                    fields.append(field["name"])
+                    if field.get("type") == "dict":
+                        dictfields.append(field["name"])
+            return fields, dictfields
+
+        with open(fields_doc, "r") as f:
+            doc = yaml.load(f)
+            fields = []
+            dictfields = []
+            for key, value in doc.items():
+                if isinstance(value, dict) and \
+                                value.get("type") == "group":
+                    subfields, subdictfields = extract_fields(value["fields"])
+                    fields.extend(subfields)
+                    dictfields.extend(subdictfields)
+            return fields, dictfields
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
