@@ -231,11 +231,17 @@ func (protocols ProtocolsStruct) BpfFilter(with_vlans bool, with_icmp bool) stri
 
 func (protos ProtocolsStruct) Register(proto Protocol, plugin ProtocolPlugin) {
 	protos.all[proto] = plugin
+	var success bool = false
 	if tcp, ok := plugin.(TcpProtocolPlugin); ok {
 		protos.tcp[proto] = tcp
+		success = true
 	}
 	if udp, ok := plugin.(UdpProtocolPlugin); ok {
 		protos.udp[proto] = udp
+		success = true;
+	}
+	if(!success){
+		logp.Warn("Protocol (%s) register failed, port: %v",proto.String(),plugin.GetPorts())
 	}
 }
 
