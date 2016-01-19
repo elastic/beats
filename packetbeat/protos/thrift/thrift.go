@@ -12,12 +12,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type ThriftMessage struct {
@@ -154,7 +154,7 @@ type Thrift struct {
 	transactionTimeout time.Duration
 
 	PublishQueue chan *ThriftTransaction
-	results      publisher.Client
+	results      publish.Transactions
 	Idl          *ThriftIdl
 }
 
@@ -241,7 +241,7 @@ func (thrift *Thrift) GetPorts() []int {
 	return thrift.Ports
 }
 
-func (thrift *Thrift) Init(test_mode bool, results publisher.Client) error {
+func (thrift *Thrift) Init(test_mode bool, results publish.Transactions) error {
 
 	thrift.InitDefaults()
 
@@ -1131,7 +1131,7 @@ func (thrift *Thrift) publishTransactions() {
 		event["dst"] = &t.Dst
 
 		if thrift.results != nil {
-			thrift.results.PublishEvent(event)
+			thrift.results.PublishTransaction(event)
 		}
 
 		logp.Debug("thrift", "Published event")

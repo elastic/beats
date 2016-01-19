@@ -14,7 +14,7 @@ class Test(TestCase):
         self.render_config_template(
             redis_ports=[6380]
         )
-        self.run_packetbeat(pcap="redis_session.pcap")
+        self.run_packetbeat(pcap="redis_session.pcap", debug_selectors=["*"])
 
         objs = self.read_output()
         assert all([o["type"] == "redis" for o in objs])

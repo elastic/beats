@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
@@ -25,14 +25,14 @@ const (
 type TestProtocol struct {
 	Ports []int
 
-	init  func(testMode bool, results publisher.Client) error
+	init  func(testMode bool, results publish.Transactions) error
 	parse func(*protos.Packet, *common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData
 	onFin func(*common.TcpTuple, uint8, protos.ProtocolData) protos.ProtocolData
 	gap   func(*common.TcpTuple, uint8, int, protos.ProtocolData) (protos.ProtocolData, bool)
 }
 
 var _ protos.ProtocolPlugin = &TestProtocol{
-	init: func(m bool, r publisher.Client) error { return nil },
+	init: func(m bool, r publish.Transactions) error { return nil },
 	parse: func(p *protos.Packet, t *common.TcpTuple, d uint8, priv protos.ProtocolData) protos.ProtocolData {
 		return priv
 	},
@@ -44,7 +44,7 @@ var _ protos.ProtocolPlugin = &TestProtocol{
 	},
 }
 
-func (proto *TestProtocol) Init(test_mode bool, results publisher.Client) error {
+func (proto *TestProtocol) Init(test_mode bool, results publish.Transactions) error {
 	return proto.init(test_mode, results)
 }
 

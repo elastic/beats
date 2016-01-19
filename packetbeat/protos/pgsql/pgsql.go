@@ -6,12 +6,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type PgsqlMessage struct {
@@ -99,7 +99,7 @@ type Pgsql struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -148,7 +148,7 @@ func (pgsql *Pgsql) GetPorts() []int {
 	return pgsql.Ports
 }
 
-func (pgsql *Pgsql) Init(test_mode bool, results publisher.Client) error {
+func (pgsql *Pgsql) Init(test_mode bool, results publish.Transactions) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
@@ -940,7 +940,7 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 		event["notes"] = t.Notes
 	}
 
-	pgsql.results.PublishEvent(event)
+	pgsql.results.PublishTransaction(event)
 }
 
 func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,
