@@ -4,6 +4,7 @@ import (
 	"expvar"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
@@ -32,6 +33,9 @@ type ChanClient struct {
 
 type client struct {
 	publisher *PublisherType
+
+	beatMeta common.MapStr
+	tags     []string
 }
 
 // ClientOption allows API users to set additional options when publishing events.
@@ -62,16 +66,44 @@ func Signal(signaler outputs.Signaler) ClientOption {
 	}
 }
 
+func newClient(pub *PublisherType) *client {
+	return &client{
+		publisher: pub,
+		beatMeta: common.MapStr{
+			"name":     pub.name,
+			"hostname": pub.hostname,
+		},
+		tags: pub.tags,
+	}
+}
+
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
+	c.annotateEvent(event)
+
 	ctx, client := c.getClient(opts)
 	publishedEvents.Add(1)
 	return client.PublishEvent(ctx, event)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
+	for _, event := range events {
+		c.annotateEvent(event)
+	}
+
 	ctx, client := c.getClient(opts)
 	publishedEvents.Add(int64(len(events)))
 	return client.PublishEvents(ctx, events)
+}
+
+func (c *client) annotateEvent(event common.MapStr) {
+	event["beat"] = c.beatMeta
+	if len(c.tags) > 0 {
+		event["tags"] = c.tags
+	}
+
+	if logp.IsDebug("publish") {
+		PrintPublishEvent(event)
+	}
 }
 
 func (c *client) getClient(opts []ClientOption) (context, eventPublisher) {

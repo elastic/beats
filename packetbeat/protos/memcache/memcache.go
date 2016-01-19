@@ -9,17 +9,17 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // memcache types
 type Memcache struct {
 	Ports   protos.PortsConfig
-	results publisher.Client
+	results publish.Transactions
 	config  parserConfig
 
 	udpMemcache
@@ -101,7 +101,7 @@ type memcacheStat struct {
 var debug = logp.MakeDebug("memcache")
 
 // Called to initialize the Plugin
-func (mc *Memcache) Init(testMode bool, results publisher.Client) error {
+func (mc *Memcache) Init(testMode bool, results publish.Transactions) error {
 	debug("init memcache plugin")
 	return mc.InitWithConfig(
 		config.ConfigSingleton.Protocols.Memcache,
@@ -120,7 +120,7 @@ func (mc *Memcache) InitDefaults() {
 func (mc *Memcache) InitWithConfig(
 	config config.Memcache,
 	testMode bool,
-	results publisher.Client,
+	results publish.Transactions,
 ) error {
 	mc.InitDefaults()
 	if !testMode {
@@ -175,7 +175,7 @@ func (mc *Memcache) onTransaction(t *transaction) {
 	event := common.MapStr{}
 	t.Event(event)
 	debug("publish event: %s", event)
-	mc.results.PublishEvent(event)
+	mc.results.PublishTransaction(event)
 }
 
 func newMessage(ts time.Time) *message {

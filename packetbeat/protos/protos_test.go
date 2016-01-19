@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +16,7 @@ type TestProtocol struct {
 
 type TcpProtocol TestProtocol
 
-func (proto *TcpProtocol) Init(test_mode bool, results publisher.Client) error {
+func (proto *TcpProtocol) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
@@ -43,7 +43,7 @@ func (proto *TcpProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 type UdpProtocol TestProtocol
 
-func (proto *UdpProtocol) Init(test_mode bool, results publisher.Client) error {
+func (proto *UdpProtocol) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
@@ -57,7 +57,7 @@ func (proto *UdpProtocol) ParseUdp(pkt *Packet) {
 
 type TcpUdpProtocol TestProtocol
 
-func (proto *TcpUdpProtocol) Init(test_mode bool, results publisher.Client) error {
+func (proto *TcpUdpProtocol) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 

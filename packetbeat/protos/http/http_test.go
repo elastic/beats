@@ -10,9 +10,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -50,7 +50,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 
 func httpModForTests() *HTTP {
 	var http HTTP
-	results := publisher.ChanClient{Channel: make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
 	http.Init(true, results)
 	return &http
 }
@@ -985,7 +985,7 @@ func testCreateTCPTuple() *common.TcpTuple {
 
 // Helper function to read from the Publisher Queue
 func expectTransaction(t *testing.T, http *HTTP) common.MapStr {
-	client := http.results.(publisher.ChanClient)
+	client := http.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
 		return trans
@@ -1202,7 +1202,7 @@ func BenchmarkHttpSimpleTransaction(b *testing.B) {
 	req := protos.Packet{Payload: []byte(data1)}
 	resp := protos.Packet{Payload: []byte(data2)}
 
-	client := http.results.(publisher.ChanClient)
+	client := http.results.(*publish.ChanTransactions)
 
 	for i := 0; i < b.N; i++ {
 		private := protos.ProtocolData(&httpConnectionData{})

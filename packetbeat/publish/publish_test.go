@@ -1,12 +1,22 @@
-package publisher
+package publish
 
 import (
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 )
+
+func testEvent() common.MapStr {
+	event := common.MapStr{}
+	event["@timestamp"] = common.Time(time.Now())
+	event["type"] = "test"
+	event["src"] = &common.Endpoint{}
+	event["dst"] = &common.Endpoint{}
+	return event
+}
 
 // Test that FilterEvent detects events that do not contain the required fields
 // and returns error.
@@ -23,36 +33,34 @@ func TestFilterEvent(t *testing.T) {
 			m := testEvent()
 			m["@timestamp"] = time.Now()
 			return m
-		}, "Invalid '@timestamp'"},
+		}, "invalid '@timestamp'"},
 
 		{func() common.MapStr {
 			m := testEvent()
 			delete(m, "@timestamp")
 			return m
-		}, "Missing '@timestamp'"},
+		}, "missing '@timestamp'"},
 
 		{func() common.MapStr {
 			m := testEvent()
 			delete(m, "type")
 			return m
-		}, "Missing 'type'"},
+		}, "missing 'type'"},
 
 		{func() common.MapStr {
 			m := testEvent()
 			m["type"] = 123
 			return m
-		}, "Invalid 'type'"},
+		}, "invalid 'type'"},
 	}
 
 	for _, test := range testCases {
-		assert.Regexp(t, test.err, filterEvent(test.f()))
+		assert.Regexp(t, test.err, validateEvent(test.f()))
 	}
 }
 
 func TestDirectionOut(t *testing.T) {
-	publisher := PublisherType{}
-
-	publisher.ipaddrs = []string{"192.145.2.4"}
+	publisher := newTestPublisher([]string{"192.145.2.4"})
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -71,15 +79,13 @@ func TestDirectionOut(t *testing.T) {
 		},
 	}
 
-	assert.True(t, updateEventAddresses(&publisher, event))
+	assert.True(t, updateEventAddresses(publisher, event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "out")
 }
 
 func TestDirectionIn(t *testing.T) {
-	publisher := PublisherType{}
-
-	publisher.ipaddrs = []string{"192.145.2.5"}
+	publisher := newTestPublisher([]string{"192.145.2.5"})
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -98,15 +104,19 @@ func TestDirectionIn(t *testing.T) {
 		},
 	}
 
-	assert.True(t, updateEventAddresses(&publisher, event))
+	assert.True(t, updateEventAddresses(publisher, event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	assert.True(t, event["direction"] == "in")
 }
 
-func TestNoDirection(t *testing.T) {
-	publisher := PublisherType{}
+func newTestPublisher(ips []string) *publisher.PublisherType {
+	p := &publisher.PublisherType{}
+	p.IpAddrs = ips
+	return p
+}
 
-	publisher.ipaddrs = []string{"192.145.2.6"}
+func TestNoDirection(t *testing.T) {
+	publisher := newTestPublisher([]string{"192.145.2.6"})
 
 	event := common.MapStr{
 		"src": &common.Endpoint{
@@ -125,7 +135,7 @@ func TestNoDirection(t *testing.T) {
 		},
 	}
 
-	assert.True(t, updateEventAddresses(&publisher, event))
+	assert.True(t, updateEventAddresses(publisher, event))
 	assert.True(t, event["client_ip"] == "192.145.2.4")
 	_, ok := event["direction"]
 	assert.False(t, ok)
