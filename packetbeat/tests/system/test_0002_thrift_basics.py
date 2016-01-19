@@ -1,7 +1,7 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def tutorial_asserts(self, objs):
         assert len(objs) == 17

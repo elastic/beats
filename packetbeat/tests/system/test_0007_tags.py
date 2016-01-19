@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for tags handling.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_tags(self):
         """

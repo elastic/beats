@@ -1,4 +1,4 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 import os
 
 """
@@ -7,7 +7,7 @@ return codes.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_ok_config(self):
         """
