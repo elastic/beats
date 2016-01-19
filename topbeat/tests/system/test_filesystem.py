@@ -1,4 +1,4 @@
-from topbeat import TestCase
+from topbeat import BaseTest
 import numbers
 
 """
@@ -6,7 +6,7 @@ Contains tests for ide statistics.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
     def test_filesystems(self):
         """
         Checks that system wide stats are found in the output and
@@ -17,8 +17,8 @@ class Test(TestCase):
             process_stats=False,
             filesystem_stats=True
         )
-        topbeat = self.start_topbeat()
-        self.wait_until(lambda: self.output_has(lines=1))
+        topbeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains(msg="output worker: publish"))
         topbeat.kill_and_wait()
 
         output = self.read_output()[0]
