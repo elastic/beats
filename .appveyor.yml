@@ -49,7 +49,7 @@ install:
   - set PYTHONPATH=C:\Python27
   - set PATH=%PYTHONPATH%;%PYTHONPATH%\Scripts;%PATH%
   - python --version
-  - pip install jinja2 nose nose-timer
+  - pip install jinja2 nose nose-timer PyYAML
   - easy_install C:/pywin_inst.exe
 
 # To run your custom scripts instead of automatic MSBuild

@@ -23,10 +23,15 @@ class Proc(object):
         self.output = open(outputfile, "wb")
 
     def start(self):
+        self.stdin_read, self.stdin_write = os.pipe()
+
         self.proc = subprocess.Popen(
             self.args,
+            stdin=self.stdin_read,
             stdout=self.output,
-            stderr=subprocess.STDOUT)
+            stderr=subprocess.STDOUT,
+            bufsize=0,
+        )
         return self.proc
 
     def wait(self):
@@ -34,6 +39,7 @@ class Proc(object):
 
     def kill_and_wait(self):
         self.proc.terminate()
+        os.close(self.stdin_write)
         return self.proc.wait()
 
     def __del__(self):
@@ -322,3 +328,27 @@ class TestCase(unittest.TestCase):
             else:
                 result[prefix + key] = value
         return result
+
+    def copy_files(self, files, source_dir="files/", target_dir=""):
+        if target_dir:
+            target_dir = os.path.join(self.working_dir, target_dir)
+        else:
+            target_dir = self.working_dir
+        for file_ in files:
+            shutil.copy(os.path.join(source_dir, file_),
+                        target_dir)
+
+    def output_count(self, pred, output_file=None):
+        """
+        Returns true if the output line count predicate returns true
+        """
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file), "r") as f:
+                return pred(len([1 for line in f]))
+        except IOError:
+            return False
