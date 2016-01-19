@@ -34,6 +34,6 @@ class Test(TestCase):
             ]
         )
         proc = self.start_winlogbeat(extra_args=["-configtest"])
-        exit_code = proc.wait()
+        exit_code = proc.wait(check_exit_code=False)
         assert exit_code == 1
         assert self.log_contains("Invalid top level ignore_older value '1 hour'")
