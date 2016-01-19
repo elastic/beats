@@ -44,6 +44,24 @@ protocols:
     # send_request:  true
     # send_response: true
 
+  amqp:
+    # Configure the ports where to listen for AMQP traffic. You can disable
+    # the AMQP protocol by commenting out the list of ports.
+    ports: [5672]
+    # Truncate messages that are published and avoid huge messages being
+    # indexed.
+    # Default: 1000
+    #max_body_length: 1000
+    # Hide the header fields in header frames.
+    # Default: false
+    #parse_headers: false
+    # Hide the additional arguments of method frames.
+    # Default: false
+    #parse_arguments: false
+    # See all methods relative to connection negociation between server and
+    # client.
+    #hide_connection_information: false
+
   http:
     # Configure the ports where to listen for HTTP traffic. You can disable
     # the HTTP protocol by commenting out the list of ports.
@@ -394,5 +412,3 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
-
-

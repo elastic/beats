@@ -58,7 +58,11 @@ build: $(GOFILES)
 # Create test coverage binary
 .PHONY: buildbeat.test
 buildbeat.test: $(GOFILES)
+<<<<<<< HEAD
 	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
+=======
+	go test -c -covermode=atomic -coverpkg ${GOPACKAGES_COMMA_SEP}
+>>>>>>> amqp protocol
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
 # The binaries are placed in the build/bin directory.
@@ -71,7 +75,11 @@ crosscompile: $(GOFILES)
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
+<<<<<<< HEAD
 	@gofmt -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from gofmt's style" && false)
+=======
+	@gofmt -l ${GOFILES_NOVENDOR} | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
+>>>>>>> amqp protocol
 	go vet ${GOPACKAGES}
 
 # Runs gofmt -w on the project's source code, modifying any files that do not
@@ -137,12 +145,18 @@ integration-tests-environment:
 
 # Runs the system tests
 .PHONY: system-tests
+<<<<<<< HEAD
 system-tests: buildbeat.test prepare-tests python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+=======
+system-tests: buildbeat.test prepare-tests system-tests-setup
+	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+>>>>>>> amqp protocol
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
+<<<<<<< HEAD
 fast-system-tests: buildbeat.test python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
 
@@ -155,6 +169,17 @@ python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	else \
 		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
+=======
+fast-system-tests: buildbeat.test system-tests-setup
+	. build/system-tests/env/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
+
+.PHONY: system-tests-setup
+system-tests-setup: tests/system/requirements.txt
+	test -d env || virtualenv build/system-tests/env > /dev/null
+	. build/system-tests/env/bin/activate && pip install -Ur tests/system/requirements.txt > /dev/null
+	touch build/system-tests/env/bin/activate
+
+>>>>>>> amqp protocol
 
 # Run benchmark tests
 .PHONY: benchmark-tests
