@@ -33,13 +33,27 @@ class Proc(object):
         )
         return self.proc
 
-    def wait(self):
-        return self.proc.wait()
+    def wait(self, check_exit_code=True, check_panic=True):
+        exit_code = self.proc.wait()
+        if check_exit_code and exit_code != 0:
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        if check_panic and self.did_panic():
+            raise Exception("Application exited with code %d, expected 0" % exit_code)
+        return exit_code
 
-    def kill_and_wait(self):
+    def kill_and_wait(self, check_exit_code=True, check_panic=True):
         self.proc.terminate()
         os.close(self.stdin_write)
-        return self.proc.wait()
+        return self.wait(check_exit_code, check_panic)
+
+    def did_panic(self):
+        try:
+            for line in self.output:
+                if line.find("panic: ") >= 0:
+                    return True
+            return False
+        except IOError:
+            return False
 
     def __del__(self):
         try:
@@ -59,7 +73,9 @@ class TestCase(unittest.TestCase):
                      config="filebeat.yml",
                      output="filebeat.log",
                      extra_args=[],
-                     debug_selectors=[]):
+                     debug_selectors=[],
+                     check_exit_code=True,
+                     check_panic=True):
         """
         Executes filebeat
         Waits for the process to finish before returning to
@@ -82,11 +98,9 @@ class TestCase(unittest.TestCase):
         if debug_selectors:
             args.extend(["-d", ",".join(debug_selectors)])
 
-        with open(os.path.join(self.working_dir, output), "wb") as outputfile:
-            proc = subprocess.Popen(args,
-                                    stdout=outputfile,
-                                    stderr=subprocess.STDOUT)
-            return proc.wait()
+        proc = Proc(args, os.path.join(self.working_dir, output))
+        proc.start()
+        return proc.wait(check_exit_code, check_panic)
 
     def start_filebeat(self,
                        cmd="../../filebeat.test",
@@ -198,6 +212,9 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
+    def did_panic(self):
+        return self.log_contains("panic: ")
+
     def output_has(self, lines, output_file="output/filebeat"):
         """
         Returns true if the output has a given number of lines.
@@ -252,9 +269,6 @@ class TestCase(unittest.TestCase):
                 if key not in dict_fields and key not in expected_fields:
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
-
-    def did_not_panic(self):
-        return self.log_contains("panic: ") == False
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}

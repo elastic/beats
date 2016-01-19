@@ -20,11 +20,6 @@ class Test(TestCase):
         self.wait_until(lambda: self.log_contains("Start running"))
 
         exit_code = filebeat.kill_and_wait()
-
-
-        assert self.did_not_panic()
-
-        print exit_code
         assert exit_code == 0, "Exit code was %d" % exit_code
 
 
@@ -32,7 +27,7 @@ class Test(TestCase):
         """
         Tests starting without a config
         """
-        exit_code = self.run_filebeat()
+        exit_code = self.run_filebeat(check_exit_code=False)
 
         assert exit_code == 1
         assert True == self.log_contains("loading config file error")
@@ -45,7 +40,7 @@ class Test(TestCase):
         """
         shutil.copy("../files/invalid.yml", os.path.join(self.working_dir, "invalid.yml"))
 
-        exit_code = self.run_filebeat(config="invalid.yml")
+        exit_code = self.run_filebeat(config="invalid.yml", check_exit_code=False)
 
         assert exit_code == 1
         assert True == self.log_contains("loading config file error")
@@ -58,9 +53,8 @@ class Test(TestCase):
         """
         shutil.copy("../../etc/filebeat.yml", os.path.join(self.working_dir, "filebeat.yml"))
 
-        exit_code = self.run_filebeat(config="filebeat.yml", extra_args=["-configtest"])
+        self.run_filebeat(config="filebeat.yml", extra_args=["-configtest"])
 
-        assert exit_code == 0
         assert True == self.log_contains("Testing configuration file")
 
     def test_version(self):

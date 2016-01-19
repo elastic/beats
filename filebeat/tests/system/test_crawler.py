@@ -48,8 +48,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_unfinished_line_and_continue(self):
         """
@@ -110,9 +108,6 @@ class Test(TestCase):
         # Check that output file has also the completed lines
         assert iterations + 2 == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_partial_line(self):
         """
         Checks that partial lines are read as intended
@@ -161,9 +156,6 @@ class Test(TestCase):
             max_timeout=15)
 
         filebeat.kill_and_wait()
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_file_renaming(self):
         """
@@ -218,9 +210,6 @@ class Test(TestCase):
 
         # Make sure all 11 lines were read
         assert len(output) == 11
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_file_disappear(self):
         """
@@ -279,9 +268,6 @@ class Test(TestCase):
         output = self.read_output()
 
         assert len(output) == 5 + 6
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_file_disappear_appear(self):
         """
@@ -348,9 +334,6 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == 5 + 6
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_force_close(self):
         """
         Checks that a file is closed in case it is rotated
@@ -409,9 +392,6 @@ class Test(TestCase):
         output = self.read_output()
         #assert len(output) == 5 + 6
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
 
     def test_new_line_on_existing_file(self):
         """
@@ -450,9 +430,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
         assert len(output) == 3
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_multiple_appends(self):
         """
@@ -499,9 +476,6 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == (3 * 20 + sum(range(0, 3)) + 1)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_new_line_on_open_file(self):
         """
         Checks that filebeat follows future writes to the same
@@ -541,9 +515,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
         assert len(output) == 3
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_tail_files(self):
         """
@@ -587,9 +558,6 @@ class Test(TestCase):
         # the end
         output = self.read_output()
         assert len(output) == 2
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_utf8(self):
         """
@@ -641,8 +609,6 @@ class Test(TestCase):
         output = self.read_output()
         assert len(output) == 3
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_encodings(self):
         """
@@ -710,9 +676,6 @@ class Test(TestCase):
             assert text in lines
             assert text + " 2" in lines
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_include_lines(self):
         """
         Checks if only the log lines defined by include_lines are exported
@@ -754,9 +717,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations*2 == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_default_include_exclude_lines(self):
         """
         Checks if all the log lines are exported by default
@@ -796,9 +756,6 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert iterations*3 == len(output)
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_exclude_lines(self):
         """
@@ -840,9 +797,6 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert iterations*2 == len(output)
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_include_exclude_lines(self):
         """
@@ -886,8 +840,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert iterations == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
 
     def test_file_no_permission(self):
@@ -950,6 +902,3 @@ class Test(TestCase):
         os.chmod(testfile, 0o755)
 
         assert False == os.path.isfile(os.path.join(self.working_dir, "output/filebeat"))
-
-        # Check that the application did not panic
-        assert self.did_not_panic()

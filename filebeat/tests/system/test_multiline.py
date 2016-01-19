@@ -41,9 +41,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_c_style_log(self):
         """
         Test that multi lines for c style log works
@@ -63,9 +60,6 @@ class Test(TestCase):
 
         proc = self.start_filebeat()
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
         # wait for the "Skipping file" log message
         self.wait_until(
             lambda: self.output_has(lines=4),
@@ -77,9 +71,6 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert 4 == len(output)
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_max_lines(self):
         """
@@ -118,9 +109,6 @@ class Test(TestCase):
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_timeout(self):
         """
@@ -166,9 +154,6 @@ class Test(TestCase):
         output = self.read_output()
         assert 3 == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_max_bytes(self):
         """
         Test the maximum number of bytes that is sent
@@ -206,5 +191,3 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
 
-        # Check that the application did not panic
-        assert self.did_not_panic()

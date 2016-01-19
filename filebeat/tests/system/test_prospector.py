@@ -42,9 +42,6 @@ class Test(TestCase):
 
         proc.kill_and_wait()
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_not_ignore_old_files(self):
         """
         Should not ignore files there were modified more recent than
@@ -76,9 +73,6 @@ class Test(TestCase):
 
         objs = self.read_output()
         assert len(objs) == 5
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_stdin(self):
         """
@@ -116,9 +110,6 @@ class Test(TestCase):
         objs = self.read_output()
         assert len(objs) == iterations1+iterations2
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_rotating_ignore_older_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -148,9 +139,6 @@ class Test(TestCase):
             max_timeout=15)
 
         proc.kill_and_wait()
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_exclude_files(self):
 
@@ -186,9 +174,6 @@ class Test(TestCase):
         # Check that output file has the same number of lines as the log file
         assert 1 == len(output)
         assert output[0]["message"] == "line in log file"
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
 
     def test_rotating_ignore_older_low_write_rate(self):
         self.render_config_template(
@@ -248,9 +233,6 @@ class Test(TestCase):
 
         filebeat.kill_and_wait()
 
-        # Check that the application did not panic
-        assert self.did_not_panic()
-
     def test_shutdown_no_prospectors(self):
         """
         In case no prospectors are defined, filebeat must shut down and report an error
@@ -272,10 +254,8 @@ class Test(TestCase):
                  "shutting down"),
             max_timeout=10)
 
-        filebeat.kill_and_wait()
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
+        exit_code = filebeat.kill_and_wait(check_exit_code=False)
+        assert exit_code == 1
 
 
     def test_no_paths_defined(self):
@@ -299,10 +279,8 @@ class Test(TestCase):
                         "shutting down"),
                 max_timeout=10)
 
-        filebeat.kill_and_wait()
-
-        # Check that the application did not panic
-        assert self.did_not_panic()
+        exit_code = filebeat.kill_and_wait(check_exit_code=False)
+        assert exit_code == 1
 
 
     def test_files_added_late(self):
