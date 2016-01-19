@@ -238,10 +238,10 @@ func (protos ProtocolsStruct) Register(proto Protocol, plugin ProtocolPlugin) {
 	}
 	if udp, ok := plugin.(UdpProtocolPlugin); ok {
 		protos.udp[proto] = udp
-		success = true;
+		success = true
 	}
-	if(!success){
-		logp.Warn("Protocol (%s) register failed, port: %v",proto.String(),plugin.GetPorts())
+	if !success {
+		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
 	}
 }
 
