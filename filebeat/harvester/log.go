@@ -118,7 +118,7 @@ func (h *Harvester) Harvest() {
 	config := h.Config
 	readerConfig := logFileReaderConfig{
 		forceClose:         config.ForceCloseFiles,
-		maxInactive:        h.ProspectorConfig.IgnoreOlderDuration,
+		closeOlder:         h.ProspectorConfig.CloseOlderDuration,
 		backoffDuration:    config.BackoffDuration,
 		maxBackoffDuration: config.MaxBackoffDuration,
 		backoffFactor:      config.BackoffFactor,

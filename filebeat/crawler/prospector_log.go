@@ -152,10 +152,7 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 
 	logp.Debug("prospector", "Start harvesting unknown file: %s", h.Path)
 
-	// Check for unmodified time, but only if the file modification time is before the last scan started
-	// This ensures we don't skip genuine creations with dead times less than 10s
-	if h.Stat.Fileinfo.ModTime().Before(p.lastscan) &&
-		time.Since(h.Stat.Fileinfo.ModTime()) > p.config.IgnoreOlderDuration {
+	if p.checkOldFile(h) {
 
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", h.Path)
 		// Call crawler if there if there exists a state for the given file
@@ -184,6 +181,30 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 	}
 }
 
+// checkOldFile returns true if the given file is currently not harvested
+// and the last time was modified before ignore_older
+func (p ProspectorLog) checkOldFile(h *harvester.Harvester) bool {
+
+	// Resuming never needed if ignore_older disabled
+	if p.config.IgnoreOlderDuration == 0 {
+		return false
+	}
+
+	modTime := h.Stat.Fileinfo.ModTime()
+
+	// Make sure modification time is before the last scan started to not pick it up twice
+	if !modTime.Before(p.lastscan) {
+		return false
+	}
+
+	// Only should be checked if older then ignore_older
+	if time.Since(modTime) <= p.config.IgnoreOlderDuration {
+		return false
+	}
+
+	return true
+}
+
 // checkExistingFile checks if a harvester has to be started for a already known file
 // For existing files the following options exist:
 // * Last reading position is 0, no harvester has to be started as old harvester probably still busy
@@ -195,6 +216,7 @@ func (p ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s", h.Path)
 
+	// We assume it is the same file, but it wasn't
 	if !oldFile.IsSameFile(newFile) {
 
 		logp.Debug("prospector", "File previously found: %s", h.Path)
