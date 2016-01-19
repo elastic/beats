@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for extracting the real-ip from an HTTP header.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_x_forward_for(self):
         self.render_config_template(

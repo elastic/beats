@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 import re
 
 """
 Tests for removing base64-encoded authentication information
 """
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_http_auth_headers(self):
         self.render_config_template(
