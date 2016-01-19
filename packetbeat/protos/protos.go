@@ -219,10 +219,11 @@ func (protocols ProtocolsStruct) BpfFilter(with_vlans bool, with_icmp bool) stri
 		}
 	}
 
-	filter := strings.Join(expressions, " or ")
 	if with_icmp {
-		filter = fmt.Sprintf("%s or icmp or icmp6", filter)
+		expressions = append(expressions, "icmp", "icmp6")
 	}
+
+	filter := strings.Join(expressions, " or ")
 	if with_vlans {
 		filter = fmt.Sprintf("%s or (vlan and (%s))", filter, filter)
 	}
