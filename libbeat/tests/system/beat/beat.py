@@ -1,14 +1,14 @@
 import subprocess
+
 import jinja2
 import unittest
 import os
 import shutil
 import json
 import time
+import yaml
 from datetime import datetime, timedelta
 
-
-build_path = "../../build/system-tests/"
 
 class Proc(object):
     """
@@ -17,6 +17,7 @@ class Proc(object):
     sure to stop the process and close the output file when
     the object gets collected.
     """
+
     def __init__(self, args, outputfile):
         self.args = args
         self.output = open(outputfile, "wb")
@@ -49,16 +50,31 @@ class Proc(object):
 
 class TestCase(unittest.TestCase):
 
-    def run_mockbeat(self, cmd="../../libbeat.test",
-                     config="mockbeat.yml",
-                     output="mockbeat.log",
-                     extra_args=[],
-                     debug_selectors=[]):
+    @classmethod
+    def setUpClass(self):
+        self.beat_name = "beat"
+        self.build_path = "../../build/system-tests/"
+        self.beat_path = "../../" + self.beat_name + ".test"
+
+    def run_beat(self, cmd=None,
+                 config=None,
+                 output=None,
+                 extra_args=[]):
         """
-        Executes mockbeat
+        Executes beat
         Waits for the process to finish before returning to
         the caller.
         """
+
+        # Init defaults
+        if cmd is None:
+            cmd = self.beat_path
+
+        if config is None:
+            config = self.beat_name + ".yml"
+
+        if output is None:
+            output = self.beat_name + ".log"
 
         args = [cmd]
 
@@ -67,14 +83,12 @@ class TestCase(unittest.TestCase):
                      "-systemTest",
                      "-v",
                      "-d", "*",
-                     "-test.coverprofile",
-                     os.path.join(self.working_dir, "coverage.cov")
+                     "-test.coverprofile", os.path.join(
+                         self.working_dir, "coverage.cov")
                      ])
+
         if extra_args:
             args.extend(extra_args)
-
-        if debug_selectors:
-            args.extend(["-d", ",".join(debug_selectors)])
 
         with open(os.path.join(self.working_dir, output), "wb") as outputfile:
             proc = subprocess.Popen(args,
@@ -82,52 +96,75 @@ class TestCase(unittest.TestCase):
                                     stderr=subprocess.STDOUT)
             return proc.wait()
 
-    def start_mockbeat(self,
-                       cmd="../../libbeat.test",
-                       config="mockbeat.yml",
-                       output="mockbeat.log",
-                       extra_args=[],
-                       debug_selectors=[]):
+    def start_beat(self,
+                   cmd=None,
+                   config=None,
+                   output=None,
+                   extra_args=[]):
         """
-        Starts mockbeat and returns the process handle. The
+        Starts beat and returns the process handle. The
         caller is responsible for stopping / waiting for the
         Proc instance.
         """
+
+        # Init defaults
+        if cmd is None:
+            cmd = self.beat_path
+
+        if config is None:
+            config = self.beat_name + ".yml"
+
+        if output is None:
+            output = self.beat_name + ".log"
+
         args = [cmd,
                 "-e",
                 "-c", os.path.join(self.working_dir, config),
                 "-systemTest",
                 "-v",
                 "-d", "*",
-                "-test.coverprofile",
-                os.path.join(self.working_dir, "coverage.cov")
+                "-test.coverprofile", os.path.join(
+                    self.working_dir, "coverage.cov")
                 ]
+
         if extra_args:
             args.extend(extra_args)
-
-        if debug_selectors:
-            args.extend(["-d", ",".join(debug_selectors)])
 
         proc = Proc(args, os.path.join(self.working_dir, output))
         proc.start()
         return proc
 
-    def render_config_template(self, template="mockbeat.yml.j2",
-                               output="mockbeat.yml", **kargs):
+    def render_config_template(self, template=None,
+                               output=None, **kargs):
+
+        # Init defaults
+        if template is None:
+            template = self.beat_name + ".yml.j2"
+
+        if output is None:
+            output = self.beat_name + ".yml"
+
         template = self.template_env.get_template(template)
-        kargs["fb"] = self
+
+        kargs["beat"] = self
         output_str = template.render(**kargs)
         with open(os.path.join(self.working_dir, output), "wb") as f:
             f.write(output_str)
 
-    def read_output(self, output_file="output/mockbeat"):
+    def read_output(self, output_file=None):
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
                                                  []))
         self.all_have_fields(jsons, ["@timestamp", "type",
-                                     "shipper", "count"])
+                                     "beat.name", "beat.hostname",
+                                     "count"])
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
@@ -142,16 +179,17 @@ class TestCase(unittest.TestCase):
         )
 
         # create working dir
-        self.working_dir = os.path.join(build_path + "run", self.id())
+        self.working_dir = os.path.join(self.build_path + "run", self.id())
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
 
         try:
             # update the last_run link
-            if os.path.islink(build_path + "last_run"):
-                os.unlink(build_path + "last_run")
-            os.symlink(build_path + "run/{}".format(self.id()), build_path + "last_run")
+            if os.path.islink(self.build_path + "last_run"):
+                os.unlink(self.build_path + "last_run")
+            os.symlink(self.build_path + "run/{}".format(self.id()),
+                       self.build_path + "last_run")
         except:
             # symlink is best effort and can fail when
             # running tests in parallel
@@ -174,11 +212,16 @@ class TestCase(unittest.TestCase):
                                 "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
 
-    def log_contains(self, msg, logfile="mockbeat.log"):
+    def log_contains(self, msg, logfile=None):
         """
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
+
+        # Init defaults
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
         try:
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
@@ -188,10 +231,15 @@ class TestCase(unittest.TestCase):
         except IOError:
             return False
 
-    def output_has(self, lines, output_file="output/mockbeat"):
+    def output_has(self, lines, output_file=None):
         """
         Returns true if the output has a given number of lines.
         """
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
         try:
             with open(os.path.join(self.working_dir, output_file), "r") as f:
                 return len([1 for line in f]) == lines
@@ -229,6 +277,40 @@ class TestCase(unittest.TestCase):
                 if key not in dict_fields and key not in expected_fields:
                     raise Exception("Unexpected key '{}' found"
                                     .format(key))
+
+    def load_fields(self, fields_doc="../../etc/fields.yml"):
+        """
+        Returns a list of fields to expect in the output dictionaries
+        and a second list that contains the fields that have a
+        dictionary type.
+
+        Reads these lists from the fields documentation.
+        """
+        def extract_fields(doc_list):
+            fields = []
+            dictfields = []
+            for field in doc_list:
+                if field.get("type") == "group":
+                    subfields, subdictfields = extract_fields(field["fields"])
+                    fields.extend(subfields)
+                    dictfields.extend(subdictfields)
+                else:
+                    fields.append(field["name"])
+                    if field.get("type") == "dict":
+                        dictfields.append(field["name"])
+            return fields, dictfields
+
+        with open(fields_doc, "r") as f:
+            doc = yaml.load(f)
+            fields = []
+            dictfields = []
+            for key, value in doc.items():
+                if isinstance(value, dict) and \
+                        value.get("type") == "group":
+                    subfields, subdictfields = extract_fields(value["fields"])
+                    fields.extend(subfields)
+                    dictfields.extend(subdictfields)
+            return fields, dictfields
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
