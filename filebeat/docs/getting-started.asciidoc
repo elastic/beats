@@ -60,7 +60,7 @@ https://www.elastic.co/downloads/beats/filebeat[downloads page].
 
 . Rename the `filebeat-<version>-windows` directory to `Filebeat`.
 
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*). If you are running Windows XP, you may need to download and install PowerShell.
 
 . Run the following commands to install Filebeat as a Windows service:
 +
@@ -70,7 +70,7 @@ PS > cd 'C:\Program Files\Filebeat'
 PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
 ----------------------------------------------------------------------
 
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy RemoteSigned -File .\install-service-filebeat.ps1`. 
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1`. 
 
 Before starting Filebeat, you should look at the configuration options in the configuration
 file, for example `C:\Program Files\Filebeat\filebeat.yml`. For more information about these options,
