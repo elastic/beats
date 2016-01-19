@@ -42,9 +42,9 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
 
 		if prospector, err := NewProspector(prospectorConfig, c.Registrar, eventChan); err != nil {
-			c.prospectors = append(c.prospectors, prospector)
+			return fmt.Errorf("Error in initing prospector: %v", err)
 		} else {
-			return fmt.Errorf("Error in initing prospector: %s", err)
+			c.prospectors = append(c.prospectors, prospector)
 		}
 	}
 
