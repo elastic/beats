@@ -1,9 +1,7 @@
 import yaml
 import sys
 
-
 def document_fields(output, section, sections):
-
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
     output.write("=== {} Fields\n\n".format(section["name"]))

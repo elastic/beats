@@ -27,6 +27,33 @@
         "client_location": {
           "type": "geo_point"
         },
+        "ip4_dest_location": {
+          "type": "geo_point"
+        },
+        "ip4_source_location": {
+          "type": "geo_point"
+        },
+        "ip6_dest_location": {
+          "type": "geo_point"
+        },
+        "ip6_source_location": {
+          "type": "geo_point"
+        },
+        "last_time": {
+          "type": "date"
+        },
+        "outter_ip4_dest_location": {
+          "type": "geo_point"
+        },
+        "outter_ip4_source_location": {
+          "type": "geo_point"
+        },
+        "outter_ip6_dest_location": {
+          "type": "geo_point"
+        },
+        "outter_ip6_source_location": {
+          "type": "geo_point"
+        },
         "params": {
           "index": "analyzed",
           "norms": {
@@ -52,6 +79,9 @@
             "enabled": false
           },
           "type": "string"
+        },
+        "start_time": {
+          "type": "date"
         }
       }
     }

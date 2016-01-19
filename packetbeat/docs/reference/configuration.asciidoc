@@ -9,6 +9,7 @@ The configuration options are described in the following sections. After changin
 configuration settings, you need to restart Packetbeat to pick up the changes.
 
 * <<configuration-interfaces>>
+* <<configuration-flows>>
 * <<configuration-protocols>>
 * <<configuration-processes>>
 * <<elasticsearch-output>>
