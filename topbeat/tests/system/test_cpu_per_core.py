@@ -1,4 +1,4 @@
-from topbeat import TestCase
+from topbeat import BaseTest
 
 import os
 
@@ -7,7 +7,7 @@ Contains tests for ide statistics.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
     def test_cpu_per_core(self):
         """
         Checks that cpu usage per core statistics are exported
@@ -23,7 +23,7 @@ class Test(TestCase):
             filesystem_stats=False,
             cpu_per_core=True
         )
-        topbeat = self.start_topbeat()
+        topbeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         topbeat.kill_and_wait()
 

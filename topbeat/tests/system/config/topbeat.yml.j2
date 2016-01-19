@@ -31,7 +31,7 @@ output:
     enabled: true
 
     # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ output_file_path|default(topbeat.working_dir + "/output") }}
+    path: {{ output_file_path|default(beat.working_dir + "/output") }}
 
 
     # Name of the generated files. The default is `topbeat` and it generates
