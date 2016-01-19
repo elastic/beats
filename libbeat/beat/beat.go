@@ -25,8 +25,8 @@ package beat
 import (
 	"flag"
 	"fmt"
-	"os"
 	"runtime"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
@@ -63,7 +63,9 @@ type Beat struct {
 	Events  publisher.Client
 	UUID    uuid.UUID
 
-	exit chan struct{}
+	exit     chan struct{}
+	error    error
+	callback sync.Once
 }
 
 // Basic configuration of every beat
@@ -98,7 +100,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 }
 
 // Initiates and runs a new beat object
-func Run(name string, version string, bt Beater) {
+func Run(name string, version string, bt Beater) error {
 
 	b := NewBeat(name, version, bt)
 
@@ -110,7 +112,7 @@ func Run(name string, version string, bt Beater) {
 			// TODO: detect if logging was already fully setup or not
 			fmt.Printf("Start error: %v\n", err)
 			logp.Critical("Start error: %v", err)
-			os.Exit(1)
+			b.error = err
 		}
 
 		// If start finishes, exit has to be called. This requires start to be blocking
@@ -123,7 +125,7 @@ func Run(name string, version string, bt Beater) {
 	case <-b.exit:
 		b.Stop()
 		logp.Info("Exit beat completed")
-		return
+		return b.error
 	}
 }
 
@@ -248,27 +250,31 @@ func (b *Beat) Run() error {
 		logp.Critical("Running the beat returned an error: %v", err)
 	}
 
-	service.Cleanup()
-
-	logp.Info("Cleaning up %s before shutting down.", b.Name)
-
-	// Call beater cleanup function
-	err = b.BT.Cleanup(b)
-	if err != nil {
-		logp.Err("Cleanup returned an error: %v", err)
-	}
 	return err
 }
 
 // Stop calls the beater Stop action.
 // It can happen that this function is called more then once.
-func (beat *Beat) Stop() {
+func (b *Beat) Stop() {
 	logp.Info("Stopping Beat")
-	beat.BT.Stop()
+	b.BT.Stop()
+
+	service.Cleanup()
+
+	logp.Info("Cleaning up %s before shutting down.", b.Name)
+
+	// Call beater cleanup function
+	err := b.BT.Cleanup(b)
+	if err != nil {
+		logp.Err("Cleanup returned an error: %v", err)
+	}
 }
 
 // Exiting beat -> shutdown
 func (b *Beat) Exit() {
-	logp.Info("Start exiting beat")
-	close(b.exit)
+
+	b.callback.Do(func() {
+		logp.Info("Start exiting beat")
+		close(b.exit)
+	})
 }
