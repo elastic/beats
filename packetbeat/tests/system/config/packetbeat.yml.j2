@@ -55,6 +55,11 @@ protocols:
 {% if dns_send_request %}    send_request: true{% endif %}
 {% if dns_send_response %}    send_response: true{% endif %}
 
+  amqp:
+    ports: [{{ amqp_ports|default([5672])|join(", ") }}]
+{% if amqp_send_request %}    send_request: true{% endif %}
+{% if amqp_send_response %}    send_response: true{% endif %}
+
   http:
     ports: [{{ http_ports|default([80])|join(", ") }}]
 {% if http_send_request %}    send_request: true{% endif %}

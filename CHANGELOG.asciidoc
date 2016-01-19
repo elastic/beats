@@ -14,6 +14,9 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 - Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
+- Some publisher options refactoring in libbeat {pull}684[684]
+- Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
+- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
@@ -41,6 +44,10 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Harden pgsql parser. {issue}565[565]
 
 *Packetbeat*
+- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
+- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
+- Check column length in pgsql parser. {issue}565{565
 
 *Topbeat*
 
@@ -56,6 +63,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 *Affecting all Beats*
 - Update builds to Golang version 1.5.3
+- Make logstash output compression level configurable. {pull}630[630]
 - Add ability to override configuration settings using environment variables {issue}114[114]
 - Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
 - Add ability to create Elasticsearch mapping on startup {pull}639[639]

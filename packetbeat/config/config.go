@@ -35,6 +35,7 @@ type InterfacesConfig struct {
 
 type Protocols struct {
 	Icmp     Icmp
+	Amqp     Amqp
 	Dns      Dns
 	Http     Http
 	Memcache Memcache
@@ -57,6 +58,14 @@ type Icmp struct {
 	SendRequest        *bool `yaml:"send_request"`
 	SendResponse       *bool `yaml:"send_response"`
 	TransactionTimeout *int  `yaml:"transaction_timeout"`
+}
+
+type Amqp struct {
+	ProtocolCommon              `yaml:",inline"`
+	ParseHeaders               *bool `yaml:"parse_headers"`
+	ParseArguments             *bool `yaml:"parse_arguments"`
+	MaxBodyLength             *int `yaml:"max_body_length"`
+	HideConnectionInformation *bool `yaml:"hide_connection_information"`
 }
 
 type Dns struct {

@@ -18,6 +18,7 @@
 #
 # solaris
 # -------------------
+<<<<<<< HEAD
 #   - Use gmake instead of make.
 #
 # freebsd
@@ -25,6 +26,10 @@
 #   - Use gmake instead of make.
 #   - Folder syncing doesn't work well. Consider copying the files into the box or
 #     cloning the project inside the box.
+=======
+# More development boxes can be added to this file and you can run commands
+# like "vagrant up solaris" or "vagrant up winxp" to start them.
+>>>>>>> amqp protocol
 
 # Provisioning for Windows PowerShell
 $winPsProvision = <<SCRIPT
@@ -59,6 +64,10 @@ Vagrant.configure(2) do |config|
 
   # Windows Server 2012 R2
   config.vm.define "win2012", primary: true do |win2012|
+<<<<<<< HEAD
+=======
+    # Windows Server 2012 R2
+>>>>>>> amqp protocol
     win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-01-20_0057.box"
     win2012.vm.guest = :windows
 
