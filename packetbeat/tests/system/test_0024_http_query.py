@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for checking that HTTP query is filled.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_http_post(self):
         """

@@ -1,0 +1,118 @@
+import os
+import sys
+import subprocess
+import json
+import jinja2
+import shutil
+
+sys.path.append('../../../libbeat/tests/system')
+
+from beat.beat import TestCase
+from beat.beat import Proc
+
+class BaseTest(TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        self.beat_name = "packetbeat"
+        self.build_path = "../../build/system-tests/"
+        self.beat_path = "../../packetbeat.test"
+
+    def run_packetbeat(self, pcap,
+                       cmd="../../packetbeat.test",
+                       config="packetbeat.yml",
+                       output="packetbeat.log",
+                       extra_args=[],
+                       debug_selectors=[]):
+        """
+        Executes packetbeat on an input pcap file.
+        Waits for the process to finish before returning to
+        the caller.
+        """
+
+        args = [cmd]
+
+        args.extend(["-e",
+                     "-I", os.path.join("pcaps", pcap),
+                     "-c", os.path.join(self.working_dir, config),
+                     "-t",
+                     "-systemTest",
+                     "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                     ])
+
+        if extra_args:
+            args.extend(extra_args)
+
+        if debug_selectors:
+            args.extend(["-d", ",".join(debug_selectors)])
+
+        with open(os.path.join(self.working_dir, output), "wb") as outputfile:
+            proc = subprocess.Popen(args,
+                                    stdout=outputfile,
+                                    stderr=subprocess.STDOUT)
+            return proc.wait()
+
+    def start_packetbeat(self,
+                         cmd="../../packetbeat.test",
+                         config="packetbeat.yml",
+                         output="packetbeat.log",
+                         extra_args=[],
+                         debug_selectors=[]):
+        """
+        Starts packetbeat and returns the process handle. The
+        caller is responsible for stopping / waiting for the
+        Proc instance.
+        """
+        args = [cmd,
+                "-e",
+                "-c", os.path.join(self.working_dir, config),
+                "-systemTest",
+                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
+                ]
+
+        if extra_args:
+            args.extend(extra_args)
+
+        if debug_selectors:
+            args.extend(["-d", ",".join(debug_selectors)])
+
+        proc = Proc(args, os.path.join(self.working_dir, output))
+        proc.start()
+        return proc
+
+    def read_output(self, output_file="output/packetbeat"):
+        jsons = []
+        with open(os.path.join(self.working_dir, output_file), "r") as f:
+            for line in f:
+                jsons.append(self.flatten_object(json.loads(line),
+                                                 self.dict_fields))
+        self.all_have_fields(jsons, ["@timestamp", "type", "status",
+                                     "beat.name", "beat.hostname",
+                                     "count"])
+        self.all_fields_are_expected(jsons, self.expected_fields)
+        return jsons
+
+
+    def setUp(self):
+
+        self.template_env = jinja2.Environment(
+                loader=jinja2.FileSystemLoader("config")
+        )
+
+        # create working dir
+        self.working_dir = os.path.join(self.build_path + "run", self.id())
+        if os.path.exists(self.working_dir):
+            shutil.rmtree(self.working_dir)
+        os.makedirs(self.working_dir)
+
+        try:
+            # update the last_run link
+            if os.path.islink(self.build_path + "last_run"):
+                os.unlink(self.build_path + "last_run")
+            os.symlink(self.build_path + "run/{}".format(self.id()), self.build_path + "last_run")
+        except:
+            # symlink is best effort and can fail when
+            # running tests in parallel
+            pass
+
+        self.expected_fields, self.dict_fields = self.load_fields()

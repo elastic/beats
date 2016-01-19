@@ -1,7 +1,7 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_2_pings(self):
         self.render_config_template()
