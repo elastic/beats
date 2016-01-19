@@ -1,7 +1,7 @@
 package main
 
 import (
-	topbeat "github.com/elastic/beats/topbeat/beat"
+	topbeat "github.com/dr-toboggan/beats/topbeat/beat"
 
 	"github.com/elastic/beats/libbeat/beat"
 )
