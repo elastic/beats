@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 - Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
 
 *Filebeat*
+- Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
 
 *Winlogbeat*
 
@@ -66,6 +67,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Filebeat*
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
+- Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
 
 *Winlogbeat*
 - Added support for reading event logs using the Windows Event Log API {pull}576[576]
