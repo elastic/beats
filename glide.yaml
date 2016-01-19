@@ -35,3 +35,4 @@ import:
   version: f3e2bae1e0cb5aef83e319133eabfee30013a4a5
 - package: github.com/go-ole/go-ole
   version: v1.2.0
+- package: github.com/miekg/dns
