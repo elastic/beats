@@ -15,10 +15,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -147,7 +147,7 @@ type Dns struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client // Channel where results are pushed.
+	results publish.Transactions // Channel where results are pushed.
 }
 
 // getTransaction returns the transaction associated with the given
@@ -235,7 +235,7 @@ func (dns *Dns) setFromConfig(config config.Dns) error {
 	return nil
 }
 
-func (dns *Dns) Init(test_mode bool, results publisher.Client) error {
+func (dns *Dns) Init(test_mode bool, results publish.Transactions) error {
 	dns.initDefaults()
 	if !test_mode {
 		dns.setFromConfig(config.ConfigSingleton.Protocols.Dns)
@@ -373,7 +373,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 		}
 	}
 
-	dns.results.PublishEvent(event)
+	dns.results.PublishTransaction(event)
 }
 
 func (dns *Dns) expireTransaction(t *DnsTransaction) {

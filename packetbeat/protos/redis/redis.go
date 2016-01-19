@@ -6,13 +6,13 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type stream struct {
@@ -40,7 +40,7 @@ type Redis struct {
 
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 }
 
 var (
@@ -73,7 +73,7 @@ func (redis *Redis) GetPorts() []int {
 	return redis.Ports
 }
 
-func (redis *Redis) Init(test_mode bool, results publisher.Client) error {
+func (redis *Redis) Init(test_mode bool, results publish.Transactions) error {
 	redis.InitDefaults()
 	if !test_mode {
 		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
@@ -242,7 +242,7 @@ func (redis *Redis) correlate(conn *redisConnectionData) {
 
 		if redis.results != nil {
 			event := redis.newTransaction(requ, resp)
-			redis.results.PublishEvent(event)
+			redis.results.PublishTransaction(event)
 		}
 	}
 }
