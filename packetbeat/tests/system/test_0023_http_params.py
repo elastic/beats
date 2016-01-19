@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for checking if the parameters from HTTP request are parsed correctly.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_http_post(self):
         """
