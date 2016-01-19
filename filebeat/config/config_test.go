@@ -1,6 +1,7 @@
 package config
 
-import (
+import
+(
 	"path/filepath"
 	"testing"
 
@@ -82,10 +83,15 @@ func TestGetConfigFiles_Dir(t *testing.T) {
 	files, err := getConfigFiles(absPath)
 
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(files))
+	assert.Condition(t, func() bool { return len(files) >= 2 })
 
-	assert.Equal(t, filepath.Join(absPath, "/config.yml"), files[0])
-	assert.Equal(t, filepath.Join(absPath, "/config2.yml"), files[1])
+	m := make(map[string]bool)
+	for _, filename := range files {
+		m[filename] = true
+	}
+
+	assert.True(t, m[filepath.Join(absPath, "/config.yml")])
+	assert.True(t, m[filepath.Join(absPath, "/config2.yml")])
 }
 
 func TestGetConfigFiles_EmptyDir(t *testing.T) {
@@ -119,10 +125,10 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.NotNil(t, absPath)
 	assert.Nil(t, err)
 
-	files, err := getConfigFiles(absPath)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 2, len(files))
+	files := []string {
+		filepath.Join(absPath, "/config.yml"),
+		filepath.Join(absPath, "/config2.yml"),
+	}
 
 	config := &Config{}
 	mergeConfigFiles(files, config)
