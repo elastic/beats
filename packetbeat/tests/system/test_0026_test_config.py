@@ -15,9 +15,7 @@ class Test(TestCase):
         status 0 but not actually process any packets.
         """
         self.render_config_template()
-        exit_code = self.run_packetbeat(pcap="http_post.pcap",
-                                        extra_args=["-configtest"])
-        assert exit_code == 0
+        self.run_packetbeat(pcap="http_post.pcap", extra_args=["-configtest"])
 
         assert not os.path.isfile(
             os.path.join(self.working_dir, "output/packetbeat"))
@@ -31,6 +29,5 @@ class Test(TestCase):
             iface_device="NoSuchDevice"
         )
         proc = self.start_packetbeat(extra_args=["-configtest"])
-        exit_code = proc.wait()
-        print exit_code
+        exit_code = proc.wait(check_exit_code=False)
         assert exit_code == 1
