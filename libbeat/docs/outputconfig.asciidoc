@@ -203,8 +203,7 @@ The default is 3.
 
 ===== bulk_max_size
 
-The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-The default is 50.
+The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
 
 If the Beat sends single events, the events are collected into batches. If the Beat publishes
 a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
@@ -351,6 +350,7 @@ is used as the default port number.
 
 The gzip compression level. Setting this value to values less than or equal to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
 The default value is 3.
 
 ===== worker
