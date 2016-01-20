@@ -191,7 +191,7 @@ http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.ht
 output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
 indexing very efficient.
 
-The minimum required Logstash version for the Beats input plugin is 1.5.4. If you are using
+The Beats input plugin requires Logstash 1.5.4 or later. If you are using
 Logstash 1.5.4, you must install the Beats input plugin before applying this
 configuration because the plugin is not shipped with 1.5.4. To install
 the required plugin, run the following command inside the logstash directory
