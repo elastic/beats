@@ -1,6 +1,6 @@
 import sys
 import unittest
-from winlogbeat import TestCase
+from winlogbeat import BaseTest
 
 if sys.platform.startswith("win"):
     import win32api
@@ -13,7 +13,8 @@ if sys.platform.startswith("win"):
 Contains tests for reading from the Windows Event Log (both APIs).
 """
 
-class Test(TestCase):
+
+class Test(BaseTest):
     providerName = "WinlogbeatTestPython"
     applicationName = "SystemTest"
     sid = None
@@ -27,7 +28,8 @@ class Test(TestCase):
 
     def tearDown(self):
         super(Test, self).tearDown()
-        win32evtlogutil.RemoveSourceFromRegistry(self.applicationName, self.providerName)
+        win32evtlogutil.RemoveSourceFromRegistry(
+            self.applicationName, self.providerName)
         self.clear_event_log()
 
     def clear_event_log(self):
@@ -35,27 +37,29 @@ class Test(TestCase):
         win32evtlog.ClearEventLog(hlog, None)
         win32evtlog.CloseEventLog(hlog)
 
-    def write_event_log(self, message, eventID, sid = None):
+    def write_event_log(self, message, eventID, sid=None):
         if sid == None:
             sid = self.get_sid()
 
-        level= win32evtlog.EVENTLOG_INFORMATION_TYPE
+        level = win32evtlog.EVENTLOG_INFORMATION_TYPE
         descr = [message]
 
         win32evtlogutil.ReportEvent(self.applicationName, eventID,
-            eventType=level, strings=descr, sid=sid)
+                                    eventType=level, strings=descr, sid=sid)
 
     def get_sid(self):
         if self.sid == None:
             ph = win32api.GetCurrentProcess()
             th = win32security.OpenProcessToken(ph, win32con.TOKEN_READ)
-            self.sid = win32security.GetTokenInformation(th, win32security.TokenUser)[0]
+            self.sid = win32security.GetTokenInformation(
+                th, win32security.TokenUser)[0]
 
         return self.sid
 
     def get_sid_string(self):
         if self.sidString == None:
-            self.sidString = win32security.ConvertSidToStringSid(self.get_sid())
+            self.sidString = win32security.ConvertSidToStringSid(
+                self.get_sid())
 
         return self.sidString
 
@@ -84,7 +88,7 @@ class Test(TestCase):
                 {"name": self.providerName, "api": api}
             ]
         )
-        proc = self.start_winlogbeat()
+        proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
         proc.kill()
 
@@ -97,7 +101,8 @@ class Test(TestCase):
         assert evt["level"] == "Information"
         assert evt["log_name"] == self.providerName
         assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["computer_name"].lower(
+        ) == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
@@ -118,8 +123,8 @@ class Test(TestCase):
 
         assert "message_inserts" in evt
         assert evt["message_error"].lower() == ("The system cannot find "
-            "message text for message number 1111 in the message file for "
-            "C:\\Windows\\system32\\EventCreate.exe.").lower()
+                                                "message text for message number 1111 in the message file for "
+                                                "C:\\Windows\\system32\\EventCreate.exe.").lower()
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_wineventlog_read_unknown_event_id(self):
@@ -131,11 +136,11 @@ class Test(TestCase):
         # TODO: messageInserts has not been implemented for wineventlog.
         # assert "messageInserts" in evt
         assert evt["message_error"] == ("the message resource is present but "
-            "the message is not found in the string/message table")
+                                        "the message is not found in the string/message table")
 
     def read_unknown_event_id(self, api):
         msg = "Unknown Event ID Testcase"
-        eventID=1111
+        eventID = 1111
         self.write_event_log(msg, eventID)
 
         # Run Winlogbeat
@@ -144,7 +149,7 @@ class Test(TestCase):
                 {"name": self.providerName, "api": api}
             ]
         )
-        proc = self.start_winlogbeat()
+        proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
         proc.kill()
 
@@ -157,7 +162,8 @@ class Test(TestCase):
         assert evt["level"] == "Information"
         assert evt["log_name"] == self.providerName
         assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["computer_name"].lower(
+        ) == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == self.get_sid_string()
         assert evt["user.name"] == win32api.GetUserName()
         assert "user.type" in evt
@@ -198,7 +204,7 @@ class Test(TestCase):
                 {"name": self.providerName, "api": api}
             ]
         )
-        proc = self.start_winlogbeat()
+        proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
         proc.kill()
 
@@ -211,7 +217,8 @@ class Test(TestCase):
         assert evt["level"] == "Information"
         assert evt["log_name"] == self.providerName
         assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert evt["computer_name"].lower(
+        ) == win32api.GetComputerName().lower()
         assert evt["user.identifier"] == accountIdentifier
         assert "user.name" not in evt
         assert "user.type" not in evt
