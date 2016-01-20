@@ -60,18 +60,20 @@ class Proc(object):
         return self.proc.wait()
 
     def kill_and_wait(self):
-        self.proc.terminate()
+        self.kill()
         os.close(self.stdin_write)
         return self.proc.wait()
 
     def __del__(self):
-        try:
-            self.output.close()
-        except:
-            pass
+        # Ensure the process is stopped.
         try:
             self.proc.terminate()
             self.proc.kill()
+        except:
+            pass
+        # Ensure the output is closed.
+        try:
+            self.output.close()
         except:
             pass
 
