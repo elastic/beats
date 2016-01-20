@@ -384,27 +384,90 @@ overwhelming at the beginning, so we have created a couple of
 https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
 started and to demonstrate what is possible based on the Beats data.
 
-To load the sample dashboards, follow these steps:
-
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.tar.gz
-tar xzvf beats-dashboards-{Dashboards-version}.tar.gz
-cd beats-dashboards-{Dashboards-version}/
-./load.sh
-----------------------------------------------------------------------
-
-NOTE: If Elasticsearch is not running on `127.0.0.1:9200`, you need to
-specify the Elasticsearch location as an argument to the `load.sh` command.
-For example: `./load.sh -url http://192.168.33.60:9200`. Use the
-`-help` option to see other available options.
-
-The load command uploads the example dashboards, visualizations, and searches
+To load the sample dashboards, you run a load script. The load script
+uploads the example dashboards, visualizations, and searches
 that you can use. The load command also creates index patterns for each Beat:
 
    - [packetbeat-]YYYY.MM.DD
    - [topbeat-]YYYY.MM.DD
    - [filebeat-]YYYY.MM.DD
+   
+Use the following commands to run the script:
+
+*deb, rpm, and mac:*
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip
+unzip beats-dashboards-{Dashboards-version}.zip
+cd beats-dashboards-{Dashboards-version}/
+./load.sh -url http://localhost:9200
+----------------------------------------------------------------------
+
+Replace `localhost:9200` with the location where Elasticsearch is running.
+For example, `./load.sh -url http://192.168.33.60:9200`. For more command-line options,
+see <<dashboard-load-options>>.
+
+*win:*
+
+. Download the Beats dashboards from 
+http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip. 
+
+. Extract the contents of the archive.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell. 
+
+. Run the following commands to load the dashboards:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS > cd beats-dashboards-{Dashboards-version}
+PS > .\load.ps1 -url http://localhost:9200
+----------------------------------------------------------------------
++
+Replace `localhost:9200` with the location where Elasticsearch is running. For example,
+`.\load.ps1 -url http://192.168.33.60:9200`. For more command-line options,
+see <<dashboard-load-options>>.
++
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://localhost:9200`.
+
+[[dashboard-load-options]]
+===== Dashboard Load Options
+
+You can specify the following options when you run the load script (`load.sh` or
+`load.ps1`) to load Kibana dashboards. If you specify no options, the script
+assumes that Elasticsearch is running at `http://localhost:9200`.
+
+[[horizontal]]
+*`-h | -help`*::
+Print the help menu.
+
+*`-l | -url <Elasticsearch_url>`*::
+The URL of the server where Elasticsearch is running. For example,
+`-url http://192.168.33.60:9200`.
+
+*`-u | -user <username>:<password>`*::
+The username and password for authenticating to Elasticsearch using Basic
+Authentication. Specify the username and password separated by a colon
+(for example, `-user admin:secret`). By default no username and password are
+used.
+
+*`-i | -index <index_pattern>`*::
+The Kibana index pattern where you want to save the Beats dashboards,
+visualizations, and index patterns. You can use this option to upload the Beats
+dashboards into multiple Kibana installations. For example: 
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./load.sh -url http://localhost:9200 -index .kibana_env1
+./load.sh -url http://localhost:9200 -index .kibana_env2
+./load.sh -url http://localhost:9200 -index .kibana_env3
+----------------------------------------------------------------------
+
+[[view-kibana-dashboards]]
+==== Opening the Beats Dashboards in Kibana
 
 After loading the dashboards, Kibana raises a `No default index
 pattern` error. You must select or create an index pattern to continue. You can
