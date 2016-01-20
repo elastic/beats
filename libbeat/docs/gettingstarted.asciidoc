@@ -186,13 +186,12 @@ Don't start Logstash yet. You need to set a couple of configuration options firs
 
 In this setup, the Beat sends events to Logstash. Logstash receives
 these events by using the
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats
-plugin] and then sends the transaction to Elasticsearch by using the
+https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] and then sends the transaction to Elasticsearch by using the
 http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html[Elasticsearch
-output plugin]. The Elasticsearch plugin of Logstash uses the bulk API, making
+output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
 indexing very efficient.
 
-The minimum required Logstash version for this plugin is 1.5.4. If you are using
+The minimum required Logstash version for the Beats input plugin is 1.5.4. If you are using
 Logstash 1.5.4, you must install the Beats input plugin before applying this
 configuration because the plugin is not shipped with 1.5.4. To install
 the required plugin, run the following command inside the logstash directory
@@ -243,11 +242,11 @@ provided by Logstash.
 To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for your Beat.
 
 [[logstash-input-update]]
-==== Updating the Logstash Input Beats Plugin
+==== Updating the Beats Input Plugin for Logstash
 
 Plugins have their own release cycle and are often released independent of
 Logstash’s core release cycle. To ensure that you have the latest version of
-the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Logstash Input Beats plugin], 
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash], 
 run the following command from your Logstash installation:
 
 *deb, rpm, and mac:*

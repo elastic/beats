@@ -146,12 +146,12 @@ is 15 seconds.
 
 ===== queue_size
 
-Configure internal queue sizes for single events in processing pipeline. Default
+The internal queue size for single events in the processing pipeline. The default
 value is 1000.
 
 ===== bulk_queue_size
 
-(DO NOT TOUCH) Configure internal queue size for bulk events in processing pipeline. Default value is 0.
+(DO NOT TOUCH) The internal queue size for bulk events in the processing pipeline. The default value is 0.
 
 ===== geoip.paths
 
