@@ -28,6 +28,7 @@ ARCH?=$(shell uname -m)
 export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 SHELL=/bin/bash
 ES_HOST?="elasticsearch"
 BUILD_DIR?=build
@@ -63,20 +64,20 @@ crosscompile: $(GOFILES)
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
-	@gofmt -l . | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
-	go vet ./...
+	@gofmt -l ${GOFILES_NOVENDOR} | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
+	go vet ${GOPACKAGES}
 
 # Runs gofmt -w on the project's source code, modifying any files that do not
 # match its style.
 .PHONY: fmt
 fmt:
-	gofmt -l -w .
+	gofmt -l -w ${GOFILES_NOVENDOR}
 
 # Runs gofmt -s -w on the project's source code, modifying any files that do not
 # match its style.
 .PHONY: simplify
 simplify:
-	gofmt -l -s -w .
+	gofmt -l -s -w ${GOFILES_NOVENDOR}
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
