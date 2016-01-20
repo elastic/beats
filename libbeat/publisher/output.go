@@ -50,15 +50,15 @@ func (o *outputWorker) onMessage(m message) {
 	}
 }
 
-func (o *outputWorker) onEvent(ctx *context, event common.MapStr) {
+func (o *outputWorker) onEvent(ctx *Context, event common.MapStr) {
 	debug("output worker: publish single event")
-	o.out.PublishEvent(ctx.signal, outputs.Options{ctx.guaranteed}, event)
+	o.out.PublishEvent(ctx.Signal, outputs.Options{ctx.Guaranteed}, event)
 }
 
-func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
+func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
 	if len(events) == 0 {
 		debug("output worker: no events to publish")
-		outputs.SignalCompleted(ctx.signal)
+		outputs.SignalCompleted(ctx.Signal)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
 
 	// start splitting bulk request
 	splits := (len(events) + (o.maxBulkSize - 1)) / o.maxBulkSize
-	ctx.signal = outputs.NewSplitSignaler(ctx.signal, splits)
+	ctx.Signal = outputs.NewSplitSignaler(ctx.Signal, splits)
 	for len(events) > 0 {
 		sz := o.maxBulkSize
 		if sz > len(events) {
@@ -81,12 +81,12 @@ func (o *outputWorker) onBulk(ctx *context, events []common.MapStr) {
 }
 
 func (o *outputWorker) sendBulk(
-	ctx *context,
+	ctx *Context,
 	events []common.MapStr,
 ) {
 	debug("output worker: publish %v events", len(events))
 
-	err := o.out.BulkPublish(ctx.signal, outputs.Options{ctx.guaranteed}, events)
+	err := o.out.BulkPublish(ctx.Signal, outputs.Options{ctx.Guaranteed}, events)
 	if err != nil {
 		logp.Info("Error bulk publishing events: %s", err)
 	}
