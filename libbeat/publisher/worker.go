@@ -25,7 +25,7 @@ type messageWorker struct {
 }
 
 type message struct {
-	context context
+	context Context
 	event   common.MapStr
 	events  []common.MapStr
 }
@@ -105,6 +105,6 @@ func (ws *workerSignal) Init() {
 func stopQueue(qu chan message) {
 	close(qu)
 	for msg := range qu { // clear queue and send fail signal
-		outputs.SignalFailed(msg.context.signal, nil)
+		outputs.SignalFailed(msg.context.Signal, nil)
 	}
 }

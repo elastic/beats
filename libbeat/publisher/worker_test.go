@@ -17,12 +17,12 @@ func TestMessageWorkerSend(t *testing.T) {
 
 	// Send an event.
 	s1 := newTestSignaler()
-	m1 := message{context: context{signal: s1}}
+	m1 := message{context: Context{Signal: s1}}
 	mw.send(m1)
 
 	// Send another event.
 	s2 := newTestSignaler()
-	m2 := message{context: context{signal: s2}}
+	m2 := message{context: Context{Signal: s2}}
 	mw.send(m2)
 
 	// Verify that the messageWorker pushed to two messages to the
@@ -47,10 +47,10 @@ func TestMessageWorkerSend(t *testing.T) {
 // Test that stopQueue invokes the Failed callback on all events in the queue.
 func TestMessageWorkerStopQueue(t *testing.T) {
 	s1 := newTestSignaler()
-	m1 := message{context: context{signal: s1}}
+	m1 := message{context: Context{Signal: s1}}
 
 	s2 := newTestSignaler()
-	m2 := message{context: context{signal: s2}}
+	m2 := message{context: Context{Signal: s2}}
 
 	qu := make(chan message, 2)
 	qu <- m1

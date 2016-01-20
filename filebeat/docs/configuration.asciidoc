@@ -307,6 +307,13 @@ filebeat:
 -------------------------------------------------------------------------------------
 
 
+===== publish_async
+
+If enabled, the publisher pipeline in filebeat operates in async mode preparing
+a new batch of lines while waiting for ACK. This option can improve load-balancing
+throughput at the cost of increased memory usage. The default value is false.
+
+
 ===== idle_timeout
 
 A duration string that specifies how often the spooler is flushed. After the

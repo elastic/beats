@@ -36,9 +36,9 @@ func (mh *testMessageHandler) send(m message) {
 
 func (mh *testMessageHandler) acknowledgeMessage(m message) {
 	if mh.response == CompletedResponse {
-		outputs.SignalCompleted(m.context.signal)
+		outputs.SignalCompleted(m.context.Signal)
 	} else {
-		outputs.SignalFailed(m.context.signal, nil)
+		outputs.SignalFailed(m.context.Signal, nil)
 	}
 }
 
@@ -158,22 +158,22 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 }
 
 func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
-	ctx := context{}
+	ctx := Context{}
 	return t.pub.asyncPublisher.client().PublishEvent(ctx, event)
 }
 
 func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
-	ctx := context{}
+	ctx := Context{}
 	return t.pub.asyncPublisher.client().PublishEvents(ctx, events)
 }
 
 func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
-	ctx := context{publishOptions: publishOptions{guaranteed: true}}
+	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
 	return t.pub.syncPublisher.client().PublishEvent(ctx, event)
 }
 
 func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
-	ctx := context{publishOptions: publishOptions{guaranteed: true}}
+	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
 	return t.pub.syncPublisher.client().PublishEvents(ctx, events)
 }
 
@@ -190,9 +190,9 @@ func newTestPublisherNoBulk(response OutputResponse) *testPublisher {
 }
 
 func testMessage(s *testSignaler, event common.MapStr) message {
-	return message{context: context{signal: s}, event: event}
+	return message{context: Context{Signal: s}, event: event}
 }
 
 func testBulkMessage(s *testSignaler, events []common.MapStr) message {
-	return message{context: context{signal: s}, events: events}
+	return message{context: Context{Signal: s}, events: events}
 }
