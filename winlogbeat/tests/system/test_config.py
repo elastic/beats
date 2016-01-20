@@ -1,12 +1,12 @@
-from winlogbeat import TestCase
-
+from winlogbeat import BaseTest
 
 """
 Contains tests for config parsing.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
+
     def test_valid_config(self):
         """
         With -configtest and an error in the configuration, it should
@@ -15,10 +15,10 @@ class Test(TestCase):
         self.render_config_template(
             ignore_older="1h",
             event_logs=[
-              {"name": "Application", "ignore_older": "48h"}
+                {"name": "Application", "ignore_older": "48h"}
             ]
         )
-        proc = self.start_winlogbeat(extra_args=["-configtest"])
+        proc = self.start_beat(extra_args=["-configtest"])
         exit_code = proc.wait()
         assert exit_code == 0
 
@@ -30,10 +30,11 @@ class Test(TestCase):
         self.render_config_template(
             ignore_older="1 hour",
             event_logs=[
-              {"name": "Application"}
+                {"name": "Application"}
             ]
         )
-        proc = self.start_winlogbeat(extra_args=["-configtest"])
+        proc = self.start_beat(extra_args=["-configtest"])
         exit_code = proc.wait()
         assert exit_code == 1
-        assert self.log_contains("Invalid top level ignore_older value '1 hour'")
+        assert self.log_contains(
+            "Invalid top level ignore_older value '1 hour'")

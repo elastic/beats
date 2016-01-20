@@ -26,7 +26,7 @@ winlogbeat:
 
 output:
   file:
-    path: {{ output_file_path | default(winlogbeat.working_dir + "/output") }}
+    path: {{ output_file_path | default(beat.working_dir + "/output") }}
     {% if output_file_filename %}
     filename: "{{ output_file_filename }}"
     {% endif %}
