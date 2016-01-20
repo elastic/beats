@@ -6,9 +6,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	. "github.com/elastic/beats/filebeat/crawler"
@@ -94,7 +92,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	crawl.Start(fb.FbConfig.Filebeat.Prospectors, fb.Spooler.Channel)
 
 	// Publishes event to output
-	go Publish(b, fb)
+	pub := newPublisher(fb.FbConfig.Filebeat.PublishAsync,
+		fb.publisherChan, fb.registrar.Channel, b.Events)
+	pub.Start()
 
 	// registrar records last acknowledged positions in all files.
 	fb.registrar.Run()
@@ -120,24 +120,4 @@ func (fb *Filebeat) Stop() {
 
 	// Close channels
 	//close(fb.publisherChan)
-}
-
-func Publish(beat *beat.Beat, fb *Filebeat) {
-	logp.Info("Start sending events to output")
-
-	// Receives events from spool during flush
-	for events := range fb.publisherChan {
-
-		pubEvents := make([]common.MapStr, 0, len(events))
-		for _, event := range events {
-			pubEvents = append(pubEvents, event.ToMapStr())
-		}
-
-		beat.Events.PublishEvents(pubEvents, publisher.Sync, publisher.Guaranteed)
-
-		logp.Info("Events sent: %d", len(events))
-
-		// Tell the registrar that we've successfully sent these events
-		fb.registrar.Channel <- events
-	}
 }

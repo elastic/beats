@@ -31,6 +31,15 @@ type ChanClient struct {
 	Channel chan common.MapStr
 }
 
+type ExtChanClient struct {
+	Channel chan PublishMessage
+}
+
+type PublishMessage struct {
+	Context Context
+	Events  []common.MapStr
+}
+
 type client struct {
 	publisher *PublisherType
 
@@ -39,28 +48,28 @@ type client struct {
 }
 
 // ClientOption allows API users to set additional options when publishing events.
-type ClientOption func(option context) context
+type ClientOption func(option Context) Context
 
 // Guaranteed option will retry publishing the event, until send attempt have
 // been ACKed by output plugin.
-func Guaranteed(o context) context {
-	o.guaranteed = true
+func Guaranteed(o Context) Context {
+	o.Guaranteed = true
 	return o
 }
 
 // Sync option will block the event publisher until an event has been ACKed by
 // the output plugin or failed.
-func Sync(o context) context {
-	o.sync = true
+func Sync(o Context) Context {
+	o.Sync = true
 	return o
 }
 
 func Signal(signaler outputs.Signaler) ClientOption {
-	return func(ctx context) context {
-		if ctx.signal == nil {
-			ctx.signal = signaler
+	return func(ctx Context) Context {
+		if ctx.Signal == nil {
+			ctx.Signal = signaler
 		} else {
-			ctx.signal = outputs.NewCompositeSignaler(ctx.signal, signaler)
+			ctx.Signal = outputs.NewCompositeSignaler(ctx.Signal, signaler)
 		}
 		return ctx
 	}
@@ -106,13 +115,9 @@ func (c *client) annotateEvent(event common.MapStr) {
 	}
 }
 
-func (c *client) getClient(opts []ClientOption) (context, eventPublisher) {
-	var ctx context
-	for _, opt := range opts {
-		ctx = opt(ctx)
-	}
-
-	if ctx.sync {
+func (c *client) getClient(opts []ClientOption) (Context, eventPublisher) {
+	ctx := makeContext(opts)
+	if ctx.Sync {
 		return ctx, c.publisher.syncPublisher.client()
 	}
 	return ctx, c.publisher.asyncPublisher.client()
@@ -132,4 +137,26 @@ func (c ChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) 
 		c.Channel <- event
 	}
 	return true
+}
+
+// PublishEvent will publish the event on the channel. Options will be ignored.
+// Always returns true.
+func (c ExtChanClient) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
+	c.Channel <- PublishMessage{makeContext(opts), []common.MapStr{event}}
+	return true
+}
+
+// PublishEvents publishes all event on the configured channel. Options will be ignored.
+// Always returns true.
+func (c ExtChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
+	c.Channel <- PublishMessage{makeContext(opts), events}
+	return true
+}
+
+func makeContext(opts []ClientOption) Context {
+	var ctx Context
+	for _, opt := range opts {
+		ctx = opt(ctx)
+	}
+	return ctx
 }

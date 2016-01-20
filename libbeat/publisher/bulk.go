@@ -58,9 +58,9 @@ func (b *bulkWorker) run() {
 		case <-b.ws.done:
 			return
 		case m := <-b.queue:
-			b.onEvent(m.context.signal, m.event)
+			b.onEvent(m.context.Signal, m.event)
 		case m := <-b.bulkQueue:
-			b.onEvents(m.context.signal, m.events)
+			b.onEvents(m.context.Signal, m.events)
 		case <-b.flushTicker.C:
 			if len(b.events) > 0 {
 				b.publish()
@@ -113,8 +113,8 @@ func (b *bulkWorker) onEvents(signal outputs.Signaler, events []common.MapStr) {
 func (b *bulkWorker) publish() {
 	// TODO: remember/merge and forward context options to output worker
 	b.output.send(message{
-		context: context{
-			signal: outputs.NewCompositeSignaler(b.pending...),
+		context: Context{
+			Signal: outputs.NewCompositeSignaler(b.pending...),
 		},
 		event:  nil,
 		events: b.events,

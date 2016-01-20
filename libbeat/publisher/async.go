@@ -39,12 +39,12 @@ func (p *asyncPublisher) client() eventPublisher {
 	return p
 }
 
-func (p *asyncPublisher) PublishEvent(ctx context, event common.MapStr) bool {
+func (p *asyncPublisher) PublishEvent(ctx Context, event common.MapStr) bool {
 	p.send(message{context: ctx, event: event})
 	return true
 }
 
-func (p *asyncPublisher) PublishEvents(ctx context, events []common.MapStr) bool {
+func (p *asyncPublisher) PublishEvents(ctx Context, events []common.MapStr) bool {
 	p.send(message{context: ctx, events: events})
 	return true
 }
@@ -52,16 +52,16 @@ func (p *asyncPublisher) PublishEvents(ctx context, events []common.MapStr) bool
 func (p *asyncPublisher) send(m message) {
 	if p.pub.disabled {
 		debug("publisher disabled")
-		outputs.SignalCompleted(m.context.signal)
+		outputs.SignalCompleted(m.context.Signal)
 		return
 	}
 
 	// m.signal is not set yet. But a async client type supporting signals might
 	// be implemented in the future.
-	// If m.signal is nil, NewSplitSignaler will return nil -> signaler will
+	// If m.Signal is nil, NewSplitSignaler will return nil -> signaler will
 	// only set if client did send one
-	if m.context.signal != nil && len(p.outputs) > 1 {
-		m.context.signal = outputs.NewSplitSignaler(m.context.signal, len(p.outputs))
+	if m.context.Signal != nil && len(p.outputs) > 1 {
+		m.context.Signal = outputs.NewSplitSignaler(m.context.Signal, len(p.outputs))
 	}
 	for _, o := range p.outputs {
 		o.send(m)
