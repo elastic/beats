@@ -27,18 +27,18 @@ var debug = logp.MakeDebug("publish")
 
 // EventPublisher provides the interface for beats to publish events.
 type eventPublisher interface {
-	PublishEvent(ctx context, event common.MapStr) bool
-	PublishEvents(ctx context, events []common.MapStr) bool
+	PublishEvent(ctx Context, event common.MapStr) bool
+	PublishEvents(ctx Context, events []common.MapStr) bool
 }
 
-type context struct {
+type Context struct {
 	publishOptions
-	signal outputs.Signaler
+	Signal outputs.Signaler
 }
 
 type publishOptions struct {
-	guaranteed bool
-	sync       bool
+	Guaranteed bool
+	Sync       bool
 }
 
 type TransactionalEventPublisher interface {
