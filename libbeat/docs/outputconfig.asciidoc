@@ -326,8 +326,8 @@ is used as the default port number.
 
 ===== compression_level
 
-Set gzip compression level. Setting this value to values <=0 disables compression.
-The compression level must be in the range of 1 (best-speed) to 9 (best compression).
+The gzip compression level. Setting this value to values less than or equal to 0 disables compression.
+The compression level must be in the range of 1 (best speed) to 9 (best compression).
 The default value is 3.
 
 ===== worker
