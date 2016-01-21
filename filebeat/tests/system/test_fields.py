@@ -23,7 +23,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
         doc = output[0]
@@ -49,7 +49,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
         doc = output[0]
@@ -74,7 +74,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
         doc = output[0]

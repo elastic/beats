@@ -1,22 +1,18 @@
+import sys
+import unittest
 from topbeat import BaseTest
 
-import os
-
 """
-Contains tests for ide statistics.
+Contains tests for CPU statistics.
 """
-
 
 class Test(BaseTest):
+    @unittest.skipIf(sys.platform.startswith("win"), "CPU core stats require unix")
     def test_cpu_per_core(self):
         """
         Checks that cpu usage per core statistics are exported
         when the config option is enabled.
         """
-        # the test applies only for Unix systems
-        if os.name == "nt":
-            return
-
         self.render_config_template(
             system_stats=True,
             process_stats=False,
@@ -25,7 +21,7 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
-        topbeat.kill_and_wait()
+        topbeat.check_kill_and_wait()
 
         output = self.read_output()[0]
 

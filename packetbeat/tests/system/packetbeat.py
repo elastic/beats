@@ -23,7 +23,8 @@ class BaseTest(TestCase):
                        config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
-                       debug_selectors=[]):
+                       debug_selectors=[],
+                       exit_code=0):
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -50,7 +51,9 @@ class BaseTest(TestCase):
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
-            return proc.wait()
+            actual_exit_code = proc.wait()
+            assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
+            return actual_exit_code
 
     def start_packetbeat(self,
                          cmd="../../packetbeat.test",

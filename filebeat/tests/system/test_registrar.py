@@ -41,7 +41,7 @@ class Test(BaseTest):
             lambda: os.path.isfile(os.path.join(self.working_dir,
                                                 ".filebeat")),
             max_timeout=1)
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Check that file exist
         data = self.get_dot_filebeat()
@@ -117,7 +117,7 @@ class Test(BaseTest):
             lambda: os.path.isfile(os.path.join(self.working_dir,
                                                 ".filebeat")),
             max_timeout=1)
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Check that file exist
         data = self.get_dot_filebeat()
@@ -150,6 +150,6 @@ class Test(BaseTest):
                                                 "a/b/c/registry")),
 
             max_timeout=1)
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))

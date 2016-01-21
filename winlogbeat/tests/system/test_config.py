@@ -18,9 +18,7 @@ class Test(BaseTest):
                 {"name": "Application", "ignore_older": "48h"}
             ]
         )
-        proc = self.start_beat(extra_args=["-configtest"])
-        exit_code = proc.wait()
-        assert exit_code == 0
+        self.start_beat(extra_args=["-configtest"]).check_wait()
 
     def test_invalid_ignore_older(self):
         """
@@ -33,8 +31,6 @@ class Test(BaseTest):
                 {"name": "Application"}
             ]
         )
-        proc = self.start_beat(extra_args=["-configtest"])
-        exit_code = proc.wait()
-        assert exit_code == 1
+        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
         assert self.log_contains(
             "Invalid top level ignore_older value '1 hour'")
