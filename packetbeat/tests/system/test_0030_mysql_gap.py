@@ -1,11 +1,11 @@
-from pbtests.packetbeat import TestCase
+from packetbeat import BaseTest
 
 """
 Tests for MySQL messages with gaps (packet loss) in them.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
 
     def test_gap_in_large_file(self):
         """

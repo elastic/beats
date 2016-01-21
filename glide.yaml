@@ -27,11 +27,11 @@ import:
   subpackages:
   - /windows/svc/eventlog
 - package: golang.org/x/text
-  version: 9b5a19ab9a1fb7658b57cda176d68f4aa84748b0
+  version: f024ad8118c1182f0c9c976f0fa8e56b39ef821b
   subpackages:
   - /encoding
 - package: github.com/satori/go.uuid
 - package: github.com/StackExchange/wmi
-  version: eec6e56e5cee331875c5647cf9bbea94fe53c682
+  version: f3e2bae1e0cb5aef83e319133eabfee30013a4a5
 - package: github.com/go-ole/go-ole
   version: v1.2.0

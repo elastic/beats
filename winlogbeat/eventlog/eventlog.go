@@ -76,6 +76,7 @@ func (r Record) ToMapStr() common.MapStr {
 		"event_id":      r.EventID,
 		"level":         r.Level,
 		"type":          r.API,
+		"count":         1,
 	}
 
 	if r.Message != "" {

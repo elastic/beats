@@ -1,17 +1,18 @@
 package pgsql
 
 import (
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type PgsqlMessage struct {
@@ -87,6 +88,10 @@ const (
 	CancelRequest
 )
 
+var (
+	errInvalidLength = errors.New("invalid length")
+)
+
 type Pgsql struct {
 
 	// config
@@ -99,7 +104,7 @@ type Pgsql struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *Pgsql, m *PgsqlMessage, tcp *common.TcpTuple,
@@ -148,7 +153,7 @@ func (pgsql *Pgsql) GetPorts() []int {
 	return pgsql.Ports
 }
 
-func (pgsql *Pgsql) Init(test_mode bool, results publisher.Client) error {
+func (pgsql *Pgsql) Init(test_mode bool, results publish.Transactions) error {
 
 	pgsql.InitDefaults()
 	if !test_mode {
@@ -253,7 +258,7 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 	}
 }
 
-func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
+func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) error {
 	m := s.message
 
 	// read field count (int16)
@@ -269,6 +274,12 @@ func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
 		// read column length (int32)
 		column_length := int32(common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
 		s.parseOffset += 4
+
+		if column_length > 0 && int(column_length) > len(s.data[s.parseOffset:]) {
+			logp.Err("Pgsql invalid column_length=%v, buffer_length=%v, i=%v",
+				column_length, len(s.data[s.parseOffset:]), i)
+			return errInvalidLength
+		}
 
 		// read column value (byten)
 		column_value := []byte{}
@@ -301,6 +312,8 @@ func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
 	if len(m.Rows) < pgsql.maxStoreRows {
 		m.Rows = append(m.Rows, row)
 	}
+
+	return nil
 }
 
 func pgsqlErrorParser(s *PgsqlStream) {
@@ -607,7 +620,9 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					// skip length size
 					s.parseOffset += 4
 
-					pgsql.pgsqlRowsParser(s)
+					if err := pgsql.pgsqlRowsParser(s); err != nil {
+						return false, false
+					}
 
 				} else {
 					// wait for more
@@ -940,7 +955,7 @@ func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
 		event["notes"] = t.Notes
 	}
 
-	pgsql.results.PublishEvent(event)
+	pgsql.results.PublishTransaction(event)
 }
 
 func (pgsql *Pgsql) removeTransaction(transList []*PgsqlTransaction,

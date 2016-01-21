@@ -182,8 +182,10 @@ func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 }
 
 func (eb *Winlogbeat) Stop() {
-	logp.Info("Initiating shutdown, please wait.")
-	close(eb.done)
+	logp.Info("Stopping Winlogbeat")
+	if eb.done != nil {
+		close(eb.done)
+	}
 }
 
 func (eb *Winlogbeat) processEventLog(

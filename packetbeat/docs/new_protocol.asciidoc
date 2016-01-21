@@ -100,7 +100,7 @@ All protocol modules implement the `TcpProtocolPlugin` or the
 // Functions to be exported by a protocol plugin
 type ProtocolPlugin interface {
 	// Called to initialize the Plugin
-	Init(test_mode bool, results publisher.Client) error
+	Init(test_mode bool, results publish.Transactions) error
 
 	// Called to return the configured ports
 	GetPorts() []int

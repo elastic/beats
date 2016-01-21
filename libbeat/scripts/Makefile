@@ -20,11 +20,15 @@ GOPACKAGES?=${BEAT_DIR}/${BEATNAME}/...
 #     GOPACKAGES=$(shell go list ${BEAT_DIR}/... | grep -v /vendor/)
 #     include $(ES_BEATS)/libbeat/scripts/Makefile
 
+space:=$() #
+comma:=,
+
 ARCH?=$(shell uname -m)
 # Hidden directory to install dependencies for jenkins
 export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 SHELL=/bin/bash
 ES_HOST?="elasticsearch"
 BUILD_DIR?=build
@@ -35,7 +39,7 @@ TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
-
+GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 
 ### BUILDING ###
 
@@ -45,9 +49,9 @@ build: $(GOFILES)
 	go build
 
 # Create test coverage binary
-.PHONY: libbeat.test
-libbeat.test: $(GOFILES)
-	go test -c -covermode=atomic -coverpkg ./...
+.PHONY: buildbeat.test
+buildbeat.test: $(GOFILES)
+	go test -c -covermode=atomic -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
 # The binaries are placed in the build/bin directory.
@@ -60,20 +64,20 @@ crosscompile: $(GOFILES)
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
-	@gofmt -l . | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
-	go vet ./...
+	@gofmt -l ${GOFILES_NOVENDOR} | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
+	go vet ${GOPACKAGES}
 
 # Runs gofmt -w on the project's source code, modifying any files that do not
 # match its style.
 .PHONY: fmt
 fmt:
-	gofmt -l -w .
+	gofmt -l -w ${GOFILES_NOVENDOR}
 
 # Runs gofmt -s -w on the project's source code, modifying any files that do not
 # match its style.
 .PHONY: simplify
 simplify:
-	gofmt -l -s -w .
+	gofmt -l -s -w ${GOFILES_NOVENDOR}
 
 # Cleans up directory and source code with gofmt
 .PHONY: clean
@@ -132,13 +136,13 @@ integration-tests-environment:
 
 # Runs the system tests
 .PHONY: system-tests
-system-tests: libbeat.test prepare-tests system-tests-setup
+system-tests: buildbeat.test prepare-tests system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
-fast-system-tests: libbeat.test system-tests-setup
+fast-system-tests: buildbeat.test system-tests-setup
 	. build/system-tests/env/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
 
 .PHONY: system-tests-setup
