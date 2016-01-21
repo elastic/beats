@@ -90,7 +90,7 @@ class Test(BaseTest):
         )
         proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
-        proc.kill()
+        proc.check_kill_and_wait()
 
         # Verify output
         events = self.read_output()
@@ -108,9 +108,6 @@ class Test(BaseTest):
         assert "user.type" in evt
         assert "user.domain" in evt
         assert evt["message"] == msg
-
-        exit_code = proc.wait()
-        assert exit_code == 0
 
         return evt
 
@@ -151,7 +148,7 @@ class Test(BaseTest):
         )
         proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
-        proc.kill()
+        proc.check_kill_and_wait()
 
         # Verify output
         events = self.read_output()
@@ -169,9 +166,6 @@ class Test(BaseTest):
         assert "user.type" in evt
         assert "user.domain" in evt
         assert "message" not in evt
-
-        exit_code = proc.wait()
-        assert exit_code == 0
 
         return evt
 
@@ -206,7 +200,7 @@ class Test(BaseTest):
         )
         proc = self.start_beat()
         self.wait_until(lambda: self.output_has(1))
-        proc.kill()
+        proc.check_kill_and_wait()
 
         # Verify output
         events = self.read_output()
@@ -224,8 +218,5 @@ class Test(BaseTest):
         assert "user.type" not in evt
         assert "user.domain" not in evt
         assert evt["message"] == msg
-
-        exit_code = proc.wait()
-        assert exit_code == 0
 
         return evt

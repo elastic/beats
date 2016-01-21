@@ -40,7 +40,7 @@ class Test(BaseTest):
                 "Skipping file (older than ignore older of 1s"),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
     def test_not_ignore_old_files(self):
         """
@@ -69,7 +69,7 @@ class Test(BaseTest):
                 "Processing 5 events"),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         objs = self.read_output()
         assert len(objs) == 5
@@ -105,7 +105,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=iterations1 + iterations2),
             max_timeout=15)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
@@ -138,7 +138,7 @@ class Test(BaseTest):
             lambda: self.output_count(lambda x: x >= lines),
             max_timeout=15)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
     def test_exclude_files(self):
 
@@ -167,7 +167,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -231,7 +231,7 @@ class Test(BaseTest):
             lambda: self.output_count(lambda x: x >= lines),
             max_timeout=5)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
     def test_shutdown_no_prospectors(self):
         """
@@ -254,7 +254,7 @@ class Test(BaseTest):
                 "shutting down"),
             max_timeout=10)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
     def test_no_paths_defined(self):
         """
@@ -277,7 +277,7 @@ class Test(BaseTest):
                 "shutting down"),
             max_timeout=10)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
     def test_files_added_late(self):
         """
@@ -307,7 +307,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=2),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
     def test_close_older(self):
         """
@@ -360,4 +360,4 @@ class Test(BaseTest):
                 lambda: self.output_count(lambda x: x >= lines),
                 max_timeout=5)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()

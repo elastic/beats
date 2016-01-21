@@ -33,7 +33,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=20),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -64,7 +64,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=4),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -96,7 +96,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=20),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -150,7 +150,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=3),
             max_timeout=10)
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         output = self.read_output()
         assert 3 == len(output)
@@ -179,7 +179,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=20),
             max_timeout=10)
 
-        proc.kill_and_wait()
+        proc.check_kill_and_wait()
 
         output = self.read_output()
 

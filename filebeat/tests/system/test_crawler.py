@@ -44,7 +44,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -81,7 +81,7 @@ class Test(BaseTest):
             max_timeout=15)
 
         # Give it more time to make sure it doesn't read the unfinished line
-        # This mus be smaller then partial_line_waiting
+        # This must be smaller then partial_line_waiting
         time.sleep(1)
 
         output = self.read_output()
@@ -103,7 +103,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=82),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -157,7 +157,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=3),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
     def test_file_renaming(self):
         """
@@ -206,7 +206,7 @@ class Test(BaseTest):
                 "Processing 6 events"),
             max_timeout=20)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -259,7 +259,7 @@ class Test(BaseTest):
                 "Processing 6 events"),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         data = self.get_dot_filebeat()
 
@@ -323,7 +323,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         data = self.get_dot_filebeat()
 
@@ -381,7 +381,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=iterations1 + 1), max_timeout=10)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         data = self.get_dot_filebeat()
 
@@ -426,7 +426,7 @@ class Test(BaseTest):
                 "Processing 2 events"),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
@@ -471,7 +471,7 @@ class Test(BaseTest):
                     lambda: self.output_has(lines_written + 1),
                     max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
@@ -511,7 +511,7 @@ class Test(BaseTest):
                     "Processing 2 events"),
                 max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Check that output file has the same number of lines as the log file
         output = self.read_output()
@@ -552,7 +552,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=2),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Make sure output has only 2 and not 4 lines, means it started at
         # the end
@@ -603,7 +603,7 @@ class Test(BaseTest):
                     "Processing 2 events"),
                 max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # Make sure output has 3
         output = self.read_output()
@@ -665,7 +665,7 @@ class Test(BaseTest):
         # wait again
         self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
                         max_timeout=15)
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         # check that all outputs are present in the JSONs in UTF-8
         # encoding
@@ -709,7 +709,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -749,7 +749,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -790,7 +790,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -832,7 +832,7 @@ class Test(BaseTest):
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
         # crawl and then finishes
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         output = self.read_output()
 
@@ -896,7 +896,7 @@ class Test(BaseTest):
             lambda: self.log_contains("permission denied"),
             max_timeout=15)
 
-        filebeat.kill_and_wait()
+        filebeat.check_kill_and_wait()
 
         os.chmod(testfile, 0o755)
 

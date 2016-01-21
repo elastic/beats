@@ -22,7 +22,7 @@ class Test(BaseTest):
 
         topbeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
-        topbeat.kill_and_wait()
+        topbeat.check_kill_and_wait()
         output = self.read_output()[0]
 
         if os.name != "nt":
