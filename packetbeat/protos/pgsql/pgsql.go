@@ -1,6 +1,7 @@
 package pgsql
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -85,6 +86,10 @@ const (
 	SSLRequest = iota
 	StartupMessage
 	CancelRequest
+)
+
+var (
+	errInvalidLength = errors.New("invalid length")
 )
 
 type Pgsql struct {
@@ -253,7 +258,7 @@ func pgsqlFieldsParser(s *PgsqlStream) {
 	}
 }
 
-func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
+func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) error {
 	m := s.message
 
 	// read field count (int16)
@@ -269,6 +274,12 @@ func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
 		// read column length (int32)
 		column_length := int32(common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
 		s.parseOffset += 4
+
+		if column_length > 0 && int(column_length) > len(s.data[s.parseOffset:]) {
+			logp.Err("Pgsql invalid column_length=%v, buffer_length=%v, i=%v",
+				column_length, len(s.data[s.parseOffset:]), i)
+			return errInvalidLength
+		}
 
 		// read column value (byten)
 		column_value := []byte{}
@@ -301,6 +312,8 @@ func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) {
 	if len(m.Rows) < pgsql.maxStoreRows {
 		m.Rows = append(m.Rows, row)
 	}
+
+	return nil
 }
 
 func pgsqlErrorParser(s *PgsqlStream) {
@@ -607,7 +620,9 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					// skip length size
 					s.parseOffset += 4
 
-					pgsql.pgsqlRowsParser(s)
+					if err := pgsql.pgsqlRowsParser(s); err != nil {
+						return false, false
+					}
 
 				} else {
 					// wait for more
