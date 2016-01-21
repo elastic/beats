@@ -32,6 +32,9 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Set default bulk_max_size value to 2048 {pull}628[628]
 
 *Packetbeat*
+- Fix the condition that determines whether the direction of the transaction is set to "outgoing". Packetbeat uses the 
+  direction field to determine which transactions to drop when dropping outgoing transactions. {pull}557[557]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 
 *Topbeat*
 
