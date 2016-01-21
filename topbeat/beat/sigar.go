@@ -64,6 +64,7 @@ type Process struct {
 	Ppid    int          `json:"ppid"`
 	Name    string       `json:"name"`
 	State   string       `json:"state"`
+	Username  string     `json:"username"`
 	CmdLine string       `json:"cmdline"`
 	Mem     *ProcMemStat `json:"mem"`
 	Cpu     *ProcCpuTime `json:"cpu"`
@@ -277,6 +278,7 @@ func GetProcess(pid int) (*Process, error) {
 		Ppid:    state.Ppid,
 		Name:    state.Name,
 		State:   getProcState(byte(state.State)),
+		Username:  state.Username,
 		CmdLine: cmdLine,
 		Mem: &ProcMemStat{
 			Size:  mem.Size,

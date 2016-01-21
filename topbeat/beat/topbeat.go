@@ -212,6 +212,7 @@ func (t *Topbeat) exportProcStats() error {
 				"ppid":  process.Ppid,
 				"name":  process.Name,
 				"state": process.State,
+				"username": process.Username,
 				"mem":   process.Mem,
 				"cpu":   process.Cpu,
 			}
