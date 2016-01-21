@@ -33,7 +33,7 @@ func TestGetCpuTimes(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.True(t, (cpu_stat.User > 0))
-	assert.True(t, (cpu_stat.System > 0))
+	assert.True(t, (cpu_stat.Sys > 0))
 
 }
 
@@ -97,14 +97,14 @@ func TestGetProcess(t *testing.T) {
 
 		// Memory Checks
 		assert.True(t, (process.Mem.Size >= 0))
-		assert.True(t, (process.Mem.Rss >= 0))
+		assert.True(t, (process.Mem.Resident >= 0))
 		assert.True(t, (process.Mem.Share >= 0))
 
 		// CPU Checks
-		assert.True(t, (len(process.Cpu.Start) > 0))
+		assert.True(t, (process.Cpu.StartTime > 0))
 		assert.True(t, (process.Cpu.Total >= 0))
 		assert.True(t, (process.Cpu.User >= 0))
-		assert.True(t, (process.Cpu.System >= 0))
+		assert.True(t, (process.Cpu.Sys >= 0))
 
 		assert.True(t, (process.ctime.Unix() <= time.Now().Unix()))
 
