@@ -66,8 +66,17 @@ type Beat struct {
 
 	exit     chan struct{}
 	error    error
+	state    int8
 	callback sync.Once
 }
+
+// Defaults for config variables which are not set
+const (
+	StopState   = 0
+	ConfigState = 1
+	SetupState  = 2
+	RunState    = 3
+)
 
 // Basic configuration of every beat
 type BeatConfig struct {
@@ -94,7 +103,8 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 		BT:      bt,
 		UUID:    uuid.NewV4(),
 
-		exit: make(chan struct{}),
+		exit:  make(chan struct{}),
+		state: StopState,
 	}
 
 	return &b
@@ -156,6 +166,7 @@ func (b *Beat) Start() error {
 	if err != nil {
 		return err
 	}
+	b.state = ConfigState
 
 	// Run beat. This calls first beater.Setup,
 	// then beater.Run and beater.Cleanup in the end
@@ -230,6 +241,7 @@ func (b *Beat) Run() error {
 	if err != nil {
 		return fmt.Errorf("setup returned an error: %v", err)
 	}
+	b.state = SetupState
 
 	// Up to here was the initialization, now about running
 	if cfgfile.IsTestConfig() {
@@ -246,6 +258,7 @@ func (b *Beat) Run() error {
 
 	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
+	b.state = RunState
 	// Run beater specific stuff
 	err = b.BT.Run(b)
 	if err != nil {
@@ -259,17 +272,24 @@ func (b *Beat) Run() error {
 // It can happen that this function is called more then once.
 func (b *Beat) Stop() {
 	logp.Info("Stopping Beat")
-	b.BT.Stop()
+
+	if b.state == RunState {
+		b.BT.Stop()
+	}
 
 	service.Cleanup()
 
 	logp.Info("Cleaning up %s before shutting down.", b.Name)
 
-	// Call beater cleanup function
-	err := b.BT.Cleanup(b)
-	if err != nil {
-		logp.Err("Cleanup returned an error: %v", err)
+	if b.state > StopState {
+		// Call beater cleanup function
+		err := b.BT.Cleanup(b)
+		if err != nil {
+			logp.Err("Cleanup returned an error: %v", err)
+		}
 	}
+
+	b.state = StopState
 }
 
 // Exiting beat -> shutdown
