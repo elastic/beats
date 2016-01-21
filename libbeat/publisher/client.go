@@ -110,21 +110,33 @@ func newClient(pub *PublisherType) *client {
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	c.annotateEvent(event)
-
+	publishEvent := c.filterEvent(event)
+	if publishEvent == nil {
+		return false
+	}
 	ctx, client := c.getClient(opts)
 	publishedEvents.Add(1)
-	return client.PublishEvent(ctx, event)
+	return client.PublishEvent(ctx, *publishEvent)
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
+	// optimization: shares the backing array and capacity
+	publishEvents := events[:0]
+
 	for _, event := range events {
-		c.annotateEvent(event)
+		publishEvent := c.filterEvent(event)
+		if publishEvent != nil {
+			publishEvents = append(publishEvents, *publishEvent)
+		}
 	}
 
 	ctx, client := c.getClient(opts)
-	publishedEvents.Add(int64(len(events)))
-	return client.PublishEvents(ctx, events)
+	if len(publishEvents) == 0 {
+		logp.Debug("filter", "No events to publish")
+		return true
+	}
+	publishedEvents.Add(int64(len(publishEvents)))
+	return client.PublishEvents(ctx, publishEvents)
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'
@@ -156,10 +168,26 @@ func (c *client) annotateEvent(event common.MapStr) {
 		}
 		delete(event, common.EventMetadataKey)
 	}
+}
+
+func (c *client) filterEvent(event common.MapStr) *common.MapStr {
+
+	// make sure the event has the configured fields
+	c.annotateEvent(event)
+
+	// filter the event by applying the configured rules
+	publishEvent, drop := c.publisher.Filters.Filter(event)
+	if drop {
+		if logp.IsDebug("publish") {
+			logp.Debug("publish", "Drop: %s", event.StringToPrint())
+		}
+		return nil
+	}
 
 	if logp.IsDebug("publish") {
-		PrintPublishEvent(event)
+		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
 	}
+	return &publishEvent
 }
 
 func (c *client) getClient(opts []ClientOption) (Context, eventPublisher) {

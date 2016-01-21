@@ -32,6 +32,7 @@ import (
 	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/service"
@@ -84,6 +85,7 @@ type BeatConfig struct {
 	Output  map[string]*ucfg.Config
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
+	Filter  []filter.FilterConfig
 }
 
 var printVersion *bool
@@ -229,13 +231,20 @@ func (b *Beat) LoadConfig() error {
 
 	pub, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper)
 	if err != nil {
-		return fmt.Errorf("error Initialising publisher: %v\n", err)
+		return fmt.Errorf("error initializing publisher: %v\n", err)
+	}
+
+	filters, err := filter.New(b.Config.Filter)
+	if err != nil {
+		return fmt.Errorf("error initializing filters: %v\n", err)
 	}
 
 	b.Publisher = pub
+	pub.RegisterFilter(filters)
 	b.Events = pub.Client()
 
 	logp.Info("Init Beat: %s; Version: %s", b.Name, b.Version)
+	logp.Info("Filter %v", filters)
 
 	return nil
 }
