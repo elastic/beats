@@ -1,5 +1,6 @@
+from topbeat import BaseTest
+
 import re
-from topbeat import TestCase
 
 
 """
@@ -7,7 +8,7 @@ Contains tests for per process statistics.
 """
 
 
-class Test(TestCase):
+class Test(BaseTest):
     def test_procs(self):
         """
         Checks that the per proc stats are found in the output and
@@ -19,7 +20,7 @@ class Test(TestCase):
             filesystem_stats=False,
             proc_patterns=["(?i)topbeat.test"]  # monitor itself
         )
-        topbeat = self.start_topbeat()
+        topbeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=1))
         topbeat.kill_and_wait()
 

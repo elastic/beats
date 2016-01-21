@@ -15,9 +15,9 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -232,7 +232,7 @@ func TestParseTcp_zeroLengthMsgRequest(t *testing.T) {
 
 	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
@@ -271,7 +271,7 @@ func TestParseTcp_emptyPacket(t *testing.T) {
 
 	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
@@ -297,7 +297,7 @@ func TestParseTcp_requestPacket(t *testing.T) {
 
 	dns.Parse(packet, tcptuple, tcp.TcpDirectionOriginal, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
@@ -456,7 +456,7 @@ func TestGap_requestDrop(t *testing.T) {
 
 	dns.ReceivedFin(tcptuple, tcp.TcpDirectionOriginal, private)
 
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	mapStr := <-client.Channel
 	assert.Nil(t, mapStr, "No result should have been published.")
@@ -506,7 +506,7 @@ func TestGapFin_validMessage(t *testing.T) {
 	dns.ReceivedFin(tcptuple, tcp.TcpDirectionReverse, private)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
 
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	mapStr := <-client.Channel
 	assert.Nil(t, mapStr, "No result should have been published.")
@@ -593,7 +593,7 @@ func benchmarkTcp(b *testing.B, q DnsTestMessage) {
 		packet = newPacket(reverse, q.response)
 		dns.Parse(packet, tcptuple, tcp.TcpDirectionReverse, private)
 
-		client := dns.results.(publisher.ChanClient)
+		client := dns.results.(*publish.ChanTransactions)
 		<-client.Channel
 	}
 }
@@ -611,7 +611,7 @@ func BenchmarkParallelTcpParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messagesTcp)
 	dns := newDns(false)
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 
 	// Drain the results channel while the test is running.
 	go func() {

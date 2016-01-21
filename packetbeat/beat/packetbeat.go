@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/protos/thrift"
 	"github.com/elastic/beats/packetbeat/protos/udp"
+	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/elastic/beats/packetbeat/sniffer"
 )
 
@@ -45,6 +46,7 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 type Packetbeat struct {
 	PbConfig    config.Config
 	CmdLineArgs CmdLineArgs
+	Pub         *publish.PacketbeatPublisher
 	Sniff       *sniffer.SnifferSetup
 	over        chan bool
 }
@@ -60,6 +62,10 @@ type CmdLineArgs struct {
 }
 
 var cmdLineArgs CmdLineArgs
+
+const (
+	defaultQueueSize = 2048
+)
 
 func init() {
 	cmdLineArgs = CmdLineArgs{
@@ -144,9 +150,16 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	pb.Sniff = new(sniffer.SnifferSetup)
 
+	queueSize := defaultQueueSize
+	if pb.PbConfig.Shipper.QueueSize != nil {
+		queueSize = *pb.PbConfig.Shipper.QueueSize
+	}
+	pb.Pub = publish.NewPublisher(b.Publisher, queueSize)
+	pb.Pub.Start()
+
 	logp.Debug("main", "Initializing protocol plugins")
 	for proto, plugin := range EnabledProtocolPlugins {
-		err := plugin.Init(false, b.Events)
+		err := plugin.Init(false, pb.Pub)
 		if err != nil {
 			logp.Critical("Initializing plugin %s failed: %v", proto, err)
 			os.Exit(1)
@@ -156,7 +169,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	var err error
 
-	icmpProc, err := icmp.NewIcmp(false, b.Events)
+	icmpProc, err := icmp.NewIcmp(false, pb.Pub)
 	if err != nil {
 		logp.Critical(err.Error())
 		os.Exit(1)
@@ -232,6 +245,10 @@ func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
 		time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
 		logp.Debug("main", "Streams and transactions should all be expired now.")
 	}
+
+	// TODO:
+	// pb.TransPub.Stop()
+
 	return nil
 }
 

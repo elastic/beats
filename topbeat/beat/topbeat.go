@@ -225,6 +225,7 @@ func (t *Topbeat) exportProcStats() error {
 				"@timestamp": common.Time(time.Now()),
 				"type":       "process",
 				"proc":       proc,
+				"count":      1,
 			}
 
 			t.events.PublishEvent(event)
@@ -276,6 +277,7 @@ func (t *Topbeat) exportSystemStats() error {
 		"cpu":        cpu_stat,
 		"mem":        mem_stat,
 		"swap":       swap_stat,
+		"count":      1,
 	}
 
 	if t.cpuPerCore {
@@ -318,6 +320,7 @@ func collectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
 			"@timestamp": common.Time(time.Now()),
 			"type":       "filesystem",
 			"fs":         fsStat,
+			"count":      1,
 		}
 		events = append(events, event)
 	}

@@ -5,6 +5,8 @@ import unittest
 import os
 import shutil
 import json
+import signal
+import sys
 import time
 import yaml
 from datetime import datetime, timedelta
@@ -25,31 +27,53 @@ class Proc(object):
     def start(self):
         self.stdin_read, self.stdin_write = os.pipe()
 
-        self.proc = subprocess.Popen(
-            self.args,
-            stdin=self.stdin_read,
-            stdout=self.output,
-            stderr=subprocess.STDOUT,
-            bufsize=0,
-        )
+        if sys.platform.startswith("win"):
+            self.proc = subprocess.Popen(
+                self.args,
+                stdin=self.stdin_read,
+                stdout=self.output,
+                stderr=subprocess.STDOUT,
+                bufsize=0,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        else:
+            self.proc = subprocess.Popen(
+                self.args,
+                stdin=self.stdin_read,
+                stdout=self.output,
+                stderr=subprocess.STDOUT,
+                bufsize=0,
+            )
         return self.proc
+
+    def kill(self):
+        if sys.platform.startswith("win"):
+            # proc.terminate on Windows does not initiate a graceful shutdown
+            # through the processes signal handlers it just kills it hard. So
+            # this sends a SIGBREAK. You cannot sends a SIGINT (CTRL_C_EVENT)
+            # to a process group in Windows, otherwise Ctrl+C would be
+            # sent.
+            self.proc.send_signal(signal.CTRL_BREAK_EVENT)
+        else:
+            self.proc.terminate()
 
     def wait(self):
         return self.proc.wait()
 
     def kill_and_wait(self):
-        self.proc.terminate()
+        self.kill()
         os.close(self.stdin_write)
         return self.proc.wait()
 
     def __del__(self):
-        try:
-            self.output.close()
-        except:
-            pass
+        # Ensure the process is stopped.
         try:
             self.proc.terminate()
             self.proc.kill()
+        except:
+            pass
+        # Ensure the output is closed.
+        try:
+            self.output.close()
         except:
             pass
 

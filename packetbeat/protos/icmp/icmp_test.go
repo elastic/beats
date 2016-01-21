@@ -7,9 +7,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -43,7 +43,7 @@ func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"icmp", "icmpdetailed"})
 	}
 
-	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	icmp, err := NewIcmp(true, results)
 	if err != nil {
 		b.Error("Failed to create ICMP processor")
@@ -62,7 +62,7 @@ func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 		icmp.ProcessICMPv4(icmpRequestData, packetRequestData)
 		icmp.ProcessICMPv4(icmpResponseData, packetResponseData)
 
-		client := icmp.results.(publisher.ChanClient)
+		client := icmp.results.(*publish.ChanTransactions)
 		<-client.Channel
 	}
 }

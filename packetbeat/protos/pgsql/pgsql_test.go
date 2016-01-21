@@ -8,15 +8,15 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 func PgsqlModForTests() *Pgsql {
 	var pgsql Pgsql
-	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	pgsql.Init(true, results)
 	return &pgsql
 }
@@ -293,7 +293,7 @@ func testTcpTuple() *common.TcpTuple {
 
 // Helper function to read from the Publisher Queue
 func expectTransaction(t *testing.T, pgsql *Pgsql) common.MapStr {
-	client := pgsql.results.(publisher.ChanClient)
+	client := pgsql.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
 		return trans
