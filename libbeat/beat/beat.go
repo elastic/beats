@@ -28,13 +28,13 @@ import (
 	"runtime"
 	"sync"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/service"
-
-	"github.com/satori/go.uuid"
 )
 
 // Beater interface that every beat must use
@@ -56,12 +56,13 @@ type FlagsHandler interface {
 
 // Basic beat information
 type Beat struct {
-	Name    string
-	Version string
-	Config  *BeatConfig
-	BT      Beater
-	Events  publisher.Client
-	UUID    uuid.UUID
+	Name      string
+	Version   string
+	Config    *BeatConfig
+	BT        Beater
+	Publisher *publisher.PublisherType
+	Events    publisher.Client
+	UUID      uuid.UUID
 
 	exit     chan struct{}
 	error    error
@@ -212,6 +213,7 @@ func (b *Beat) LoadConfig() error {
 		return fmt.Errorf("error Initialising publisher: %v\n", err)
 	}
 
+	b.Publisher = pub
 	b.Events = pub.Client()
 
 	logp.Info("Init Beat: %s; Version: %s", b.Name, b.Version)
