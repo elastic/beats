@@ -6,10 +6,10 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/tsg/gopacket/layers"
 )
@@ -33,7 +33,7 @@ type Icmp struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 }
 
 const (
@@ -49,7 +49,7 @@ const (
 	orphanedResponseMsg = "Response was received without an associated request."
 )
 
-func NewIcmp(testMode bool, results publisher.Client) (*Icmp, error) {
+func NewIcmp(testMode bool, results publish.Transactions) (*Icmp, error) {
 	icmp := &Icmp{}
 	icmp.initDefaults()
 
@@ -316,5 +316,5 @@ func (icmp *Icmp) publishTransaction(trans *icmpTransaction) {
 		// }
 	}
 
-	icmp.results.PublishEvent(event)
+	icmp.results.PublishTransaction(event)
 }

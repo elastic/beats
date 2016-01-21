@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Affecting all Beats*
 - Some publisher options refactoring in libbeat {pull}684[684]
 - Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
+- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
 
