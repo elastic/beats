@@ -145,11 +145,11 @@ system:
 
     - name: cpus
       type: group
-      description: This group contains cpu usage per core statistics.
+      description: This group contains CPU usage per core statistics.
       fields:
         - name: cpuX
           type: group
-          description: This group contains cpu usage statistics of the core X, where 0<X<N and N is the number of cores.
+          description: This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
           fields:
 
           - name: user
@@ -244,14 +244,14 @@ system:
           path: mem.actual_used
           type: int
           description: >
-            Actual used memory. It is defined as the "used" memory minus the memory used for disk caches and buffers. 
+            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. 
             Available only on Unix.
 
         - name: actual_free
           path: mem.actual_free
           type: int
           description: >
-            Actual available memory. It is defined as the "free" memory plus the memory used for disk caches and
+            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
             buffers. Available only on Unix.
 
         - name: actual_used_p
