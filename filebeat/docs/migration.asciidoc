@@ -38,7 +38,7 @@ where it was last reading. Under Logstash Forwarder, this file was called `.logs
 the file was renamed. The name varies depending on the package type:
 
  * `.filebeat` for `.tar.gz` and `.tgz` archives
- * `/usr/lib/filebeat/registry` for DEB and RPM packages
+ * `/var/lib/filebeat/registry` for DEB and RPM packages
  * `c:\ProgramData\filebeat\registry` for the Windows zip file
 
 For enhancement reasons, especially for Windows,
