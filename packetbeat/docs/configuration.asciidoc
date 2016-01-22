@@ -274,7 +274,7 @@ default, only the HTTP headers.
 
 If this option is enabled, the raw message of the response (`response` field)
 is sent to Elasticsearch. The default is false.  This option is useful when you
-want to index the whole request. Note that for HTTP, the body is not included
+want to index the whole response. Note that for HTTP, the body is not included
 by default, only the HTTP headers.
 
 ===== transaction_timeout
