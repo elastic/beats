@@ -18,8 +18,8 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
-- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available'`.
-  Former SOA field `ttl` becomes `minimum'`. {pull}803[803]
+- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
+  Former SOA field `ttl` becomes `minimum`. {pull}803[803]
 - The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot. {pull}803[803]
 
 *Topbeat*
