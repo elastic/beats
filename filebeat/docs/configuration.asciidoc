@@ -133,11 +133,12 @@ You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 24
 
 ===== scan_frequency
 
-How often the prospector checks for new files in the
-paths that are specified for harvesting. For example, if you specify a glob like
-`/var/log/*`, the directory is scanned for files using the frequency specified by
-`scan_frequency`. If you specify 0s, the directory is scanned as frequently as
-possible. We recommend that you do not specify 0. The default setting is 10s.
+How often the prospector checks for new files in the paths that are specified
+for harvesting. For example, if you specify a glob like `/var/log/*`, the
+directory is scanned for files using the frequency specified by
+`scan_frequency`. Specify 1s to scan the directory as frequently as possible
+without causing Filebeat to scan too frequently. The default setting is
+10s.
 
 ===== document_type
 
