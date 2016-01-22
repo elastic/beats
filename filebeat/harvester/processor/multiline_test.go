@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -69,16 +70,13 @@ func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...strin
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
-	var lines []string
-	var sizes []int
+	var lines []Line
 	for {
 		line, err := reader.Next()
 		if err != nil {
 			break
 		}
-
-		lines = append(lines, string(line.Content))
-		sizes = append(sizes, line.Bytes)
+		lines = append(lines, line)
 	}
 
 	if len(lines) != len(expected) {
@@ -86,9 +84,11 @@ func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...strin
 	}
 
 	for i, line := range lines {
-		expected := expected[i]
-		assert.Equal(t, line, expected)
-		assert.Equal(t, sizes[i], len(expected))
+		var tsZero time.Time
+
+		assert.NotEqual(t, tsZero, line.Ts)
+		assert.Equal(t, expected[i], string(line.Content))
+		assert.Equal(t, len(expected[i]), int(line.Bytes))
 	}
 }
 
