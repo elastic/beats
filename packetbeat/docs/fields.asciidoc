@@ -109,7 +109,7 @@ Messages from Packetbeat itself. This field usually contains error messages for 
 
 
 [[exported-fields-icmp]]
-=== ICMP fields
+=== ICMP Fields
 
 ICMP specific event fields.
 
@@ -117,6 +117,12 @@ ICMP specific event fields.
 ==== icmp.version
 
 The version of the ICMP protocol.
+
+==== icmp.request.message
+
+type: string
+
+A human readable form of the request.
 
 ==== icmp.request.type
 
@@ -129,6 +135,12 @@ The request type.
 type: int
 
 The request code.
+
+==== icmp.response.message
+
+type: string
+
+A human readable form of the response.
 
 ==== icmp.response.type
 
