@@ -102,7 +102,7 @@ func NewMultiline(
 	mlr := &MultiLine{
 		reader:   r,
 		pred:     matcher,
-		state:    (*MultiLine).readNext,
+		state:    (*MultiLine).readFirst,
 		maxBytes: maxBytes,
 		maxLines: maxLines,
 	}
@@ -114,9 +114,34 @@ func (mlr *MultiLine) Next() (Line, error) {
 	return mlr.state(mlr)
 }
 
+func (mlr *MultiLine) readFirst() (Line, error) {
+	for {
+		l, err := mlr.reader.Next()
+		if err == nil {
+			if l.Bytes == 0 {
+				continue
+			}
+
+			mlr.startNewLine(l)
+			mlr.state = (*MultiLine).readNext
+			return mlr.readNext()
+		}
+
+		// no lines buffered -> ignore timeout
+		if err == errMultilineTimeout {
+			continue
+		}
+
+		// something is wrong here
+		return l, err
+	}
+
+}
+
 func (mlr *MultiLine) readNext() (Line, error) {
 	for {
 		l, err := mlr.reader.Next()
+
 		if err != nil {
 			// handle multiline timeout signal
 			if err == errMultilineTimeout {
@@ -128,6 +153,7 @@ func (mlr *MultiLine) readNext() (Line, error) {
 				// return collected multiline event and
 				// empty buffer for new multiline event
 				l := mlr.pushLine()
+				mlr.reset()
 				return l, nil
 			}
 
@@ -179,7 +205,7 @@ func (mlr *MultiLine) readFailed() (Line, error) {
 	// return error and reset line reader
 	err := mlr.err
 	mlr.err = nil
-	mlr.state = (*MultiLine).readNext
+	mlr.reset()
 	return Line{}, err
 }
 
@@ -221,6 +247,10 @@ func (mlr *MultiLine) addLine(l Line) {
 
 	mlr.last = l.Content
 	mlr.readBytes += l.Bytes
+}
+
+func (mlr *MultiLine) reset() {
+	mlr.state = (*MultiLine).readFirst
 }
 
 // matchers
