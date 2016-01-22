@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/gosigar"
+	"github.com/eonarheim/gosigar"
 )
 
 type SystemLoad struct {
@@ -64,6 +64,7 @@ type Process struct {
 	Ppid    int          `json:"ppid"`
 	Name    string       `json:"name"`
 	State   string       `json:"state"`
+	UserId  string       `json:"user_id"`
 	CmdLine string       `json:"cmdline"`
 	Mem     *ProcMemStat `json:"mem"`
 	Cpu     *ProcCpuTime `json:"cpu"`
@@ -276,6 +277,7 @@ func GetProcess(pid int) (*Process, error) {
 		Pid:     pid,
 		Ppid:    state.Ppid,
 		Name:    state.Name,
+		UserId:  state.UserId,
 		State:   getProcState(byte(state.State)),
 		CmdLine: cmdLine,
 		Mem: &ProcMemStat{
