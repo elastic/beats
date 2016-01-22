@@ -198,35 +198,6 @@ func getQueryMethod(q string) string {
 	return method
 }
 
-func isSpecialPgsqlCommand(data []byte) (bool, int) {
-
-	if len(data) < 8 {
-		// 8 bytes required
-		return false, 0
-	}
-
-	// read length
-	length := int(common.Bytes_Ntohl(data[0:4]))
-
-	// read command identifier
-	code := int(common.Bytes_Ntohl(data[4:8]))
-
-	if length == 16 && code == 80877102 {
-		// Cancel Request
-		logp.Debug("pgsqldetailed", "Cancel Request, length=%d", length)
-		return true, CancelRequest
-	} else if length == 8 && code == 80877103 {
-		// SSL Request
-		logp.Debug("pgsqldetailed", "SSL Request, length=%d", length)
-		return true, SSLRequest
-	} else if code == 196608 {
-		// Startup Message
-		logp.Debug("pgsqldetailed", "Startup Message, length=%d", length)
-		return true, StartupMessage
-	}
-	return false, 0
-}
-
 type pgsqlPrivateData struct {
 	Data [2]*PgsqlStream
 }
