@@ -56,6 +56,9 @@ func TestPgsqlParser_simpleRequest(t *testing.T) {
 
 // Test parsing a response with data attached
 func TestPgsqlParser_dataResponse(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
+	}
 
 	pgsql := PgsqlModForTests()
 	data := []byte(
@@ -215,6 +218,10 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 
 // Test parsing an error response
 func TestPgsqlParser_errorResponse(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"pgsql", "pgsqldetailed"})
+	}
+
 	pgsql := PgsqlModForTests()
 	data := []byte(
 		"4500000088534552524f5200433235503032004d63757272656e74207472616e73616374696f6e2069732061626f727465642c20636f6d6d616e64732069676e6f72656420756e74696c20656e64206f66207472616e73616374696f6e20626c6f636b0046706f7374677265732e63004c3932310052657865635f73696d706c655f71756572790000")
