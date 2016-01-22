@@ -92,6 +92,11 @@ var (
 	errInvalidLength = errors.New("invalid length")
 )
 
+var (
+	debugf    = logp.MakeDebug("pgsql")
+	detailedf = logp.MakeDebug("pgsqldetailed")
+)
+
 type Pgsql struct {
 
 	// config
@@ -180,21 +185,6 @@ func (stream *PgsqlStream) PrepareForNewMessage() {
 	stream.message = nil
 }
 
-// Parse a list of commands separated by semicolon from the query
-func pgsqlQueryParser(query string) []string {
-	array := strings.Split(query, ";")
-
-	queries := []string{}
-
-	for _, q := range array {
-		qt := strings.TrimSpace(q)
-		if len(qt) > 0 {
-			queries = append(queries, qt)
-		}
-	}
-	return queries
-}
-
 // Extract the method from a SQL query
 func getQueryMethod(q string) string {
 
@@ -206,146 +196,6 @@ func getQueryMethod(q string) string {
 		method = strings.ToUpper(q)
 	}
 	return method
-}
-
-func pgsqlFieldsParser(s *PgsqlStream) {
-	m := s.message
-
-	// read field count (int16)
-	field_count := int(common.Bytes_Ntohs(s.data[s.parseOffset : s.parseOffset+2]))
-	s.parseOffset += 2
-	logp.Debug("pgsqldetailed", "Row Description field count=%d", field_count)
-
-	fields := []string{}
-	fields_format := []byte{}
-
-	for i := 0; i < field_count; i++ {
-		// read field name (null terminated string)
-		field_name, err := common.ReadString(s.data[s.parseOffset:])
-		if err != nil {
-			logp.Err("Fail to read the column field")
-		}
-		fields = append(fields, field_name)
-		m.NumberOfFields += 1
-		s.parseOffset += len(field_name) + 1
-
-		// read Table OID (int32)
-		s.parseOffset += 4
-
-		// read Column Index (int16)
-		s.parseOffset += 2
-
-		// read Type OID (int32)
-		s.parseOffset += 4
-
-		// read column length (int16)
-		s.parseOffset += 2
-
-		// read type modifier (int32)
-		s.parseOffset += 4
-
-		// read format (int16)
-		format := common.Bytes_Ntohs(s.data[s.parseOffset : s.parseOffset+2])
-		fields_format = append(fields_format, byte(format))
-		s.parseOffset += 2
-
-		logp.Debug("pgsqldetailed", "Field name=%s, format=%d", field_name, format)
-	}
-	m.Fields = fields
-	m.FieldsFormat = fields_format
-	if m.NumberOfFields != field_count {
-		logp.Err("Missing fields from RowDescription. Expected %d. Received %d", field_count, m.NumberOfFields)
-	}
-}
-
-func (pgsql *Pgsql) pgsqlRowsParser(s *PgsqlStream) error {
-	m := s.message
-
-	// read field count (int16)
-	field_count := int(common.Bytes_Ntohs(s.data[s.parseOffset : s.parseOffset+2]))
-	s.parseOffset += 2
-	logp.Debug("pgsqldetailed", "DataRow field count=%d", field_count)
-
-	row := []string{}
-	var row_len int
-
-	for i := 0; i < field_count; i++ {
-
-		// read column length (int32)
-		column_length := int32(common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
-		s.parseOffset += 4
-
-		if column_length > 0 && int(column_length) > len(s.data[s.parseOffset:]) {
-			logp.Err("Pgsql invalid column_length=%v, buffer_length=%v, i=%v",
-				column_length, len(s.data[s.parseOffset:]), i)
-			return errInvalidLength
-		}
-
-		// read column value (byten)
-		column_value := []byte{}
-
-		if m.FieldsFormat[i] == 0 {
-			// field value in text format
-			if column_length > 0 {
-				column_value = s.data[s.parseOffset : s.parseOffset+int(column_length)]
-			} else if column_length == -1 {
-				column_value = nil
-			}
-		}
-
-		if row_len < pgsql.maxRowLength {
-			if row_len+len(column_value) > pgsql.maxRowLength {
-				column_value = column_value[:pgsql.maxRowLength-row_len]
-			}
-			row = append(row, string(column_value))
-			row_len += len(column_value)
-		}
-
-		if column_length > 0 {
-			s.parseOffset += int(column_length)
-		}
-
-		logp.Debug("pgsqldetailed", "Value %s, length=%d", string(column_value), column_length)
-
-	}
-	m.NumberOfRows += 1
-	if len(m.Rows) < pgsql.maxStoreRows {
-		m.Rows = append(m.Rows, row)
-	}
-
-	return nil
-}
-
-func pgsqlErrorParser(s *PgsqlStream) {
-
-	m := s.message
-
-	for len(s.data[s.parseOffset:]) > 0 {
-		// read field type(byte1)
-		field_type := s.data[s.parseOffset]
-		s.parseOffset += 1
-
-		if field_type == 0 {
-			break
-		}
-
-		// read field value(string)
-		field_value, err := common.ReadString(s.data[s.parseOffset:])
-		if err != nil {
-			logp.Err("Fail to read the column field")
-		}
-		s.parseOffset += len(field_value) + 1
-
-		if field_type == 'M' {
-			m.ErrorInfo = field_value
-		} else if field_type == 'C' {
-			m.ErrorCode = field_value
-		} else if field_type == 'S' {
-			m.ErrorSeverity = field_value
-		}
-
-	}
-	logp.Debug("pgsqldetailed", "%s %s %s", m.ErrorSeverity, m.ErrorCode, m.ErrorInfo)
 }
 
 func isSpecialPgsqlCommand(data []byte) (bool, int) {
@@ -375,296 +225,6 @@ func isSpecialPgsqlCommand(data []byte) (bool, int) {
 		return true, StartupMessage
 	}
 	return false, 0
-}
-
-func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
-
-	m := s.message
-	for s.parseOffset < len(s.data) {
-		switch s.parseState {
-		case PgsqlStartState:
-			if len(s.data[s.parseOffset:]) < 5 {
-				logp.Warn("Postgresql Message too short. %X (length=%d). Wait for more.", s.data[s.parseOffset:], len(s.data[s.parseOffset:]))
-				return true, false
-			}
-
-			is_special, command := isSpecialPgsqlCommand(s.data[s.parseOffset:])
-
-			if is_special {
-				// In case of Commands: StartupMessage, SSLRequest, CancelRequest that don't have
-				// their type in the first byte
-
-				// read length
-				length := int(common.Bytes_Ntohl(s.data[s.parseOffset : s.parseOffset+4]))
-
-				// ignore command
-				if len(s.data[s.parseOffset:]) >= length {
-
-					if command == SSLRequest {
-						// if SSLRequest is received, expect for one byte reply (S or N)
-						m.start = s.parseOffset
-						s.parseOffset += length
-						m.end = s.parseOffset
-						m.isSSLRequest = true
-						m.Size = uint64(m.end - m.start)
-
-						return true, true
-					}
-					s.parseOffset += length
-				} else {
-					// wait for more
-					logp.Debug("pgsqldetailed", "Wait for more data 1")
-					return true, false
-				}
-
-			} else {
-				// In case of Commands that have their type in the first byte
-
-				// read type
-				typ := byte(s.data[s.parseOffset])
-
-				if s.expectSSLResponse {
-					// SSLRequest was received in the other stream
-					if typ == 'N' || typ == 'S' {
-						// one byte reply to SSLRequest
-						logp.Debug("pgsqldetailed", "Reply for SSLRequest %c", typ)
-						m.start = s.parseOffset
-						s.parseOffset += 1
-						m.end = s.parseOffset
-						m.isSSLResponse = true
-						m.Size = uint64(m.end - m.start)
-
-						return true, true
-					}
-				}
-
-				// read length
-				length := int(common.Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
-
-				if length < 4 {
-					// length should include the size of itself (int32)
-					logp.Debug("pgsqldetailed", "Invalid pgsql command length.")
-					return false, false
-				}
-
-				logp.Debug("pgsqldetailed", "Pgsql type %c, length=%d", typ, length)
-
-				if typ == 'Q' {
-					// SimpleQuery
-					m.start = s.parseOffset
-					m.IsRequest = true
-
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						s.parseOffset += 1 //type
-						s.parseOffset += length
-						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
-
-						m.Query = string(s.data[m.start+5 : m.end-1]) //without string termination
-
-						m.toExport = true
-						logp.Debug("pgsqldetailed", "Simple Query: %s", m.Query)
-						return true, true
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more data 2")
-						return true, false
-					}
-				} else if typ == 'T' {
-					// RowDescription
-
-					m.start = s.parseOffset
-					m.IsRequest = false
-					m.IsOK = true
-					m.toExport = true
-
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						s.parseOffset += 1 //type
-						s.parseOffset += 4 //length
-
-						pgsqlFieldsParser(s)
-						logp.Debug("pgsqldetailed", "Fields: %s", m.Fields)
-
-						s.parseState = PgsqlGetDataState
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more data 3")
-						return true, false
-					}
-
-				} else if typ == 'I' {
-					// EmptyQueryResponse, appears as a response for empty queries
-					// substitutes CommandComplete
-
-					logp.Debug("pgsqldetailed", "EmptyQueryResponse")
-					m.start = s.parseOffset
-					m.IsOK = true
-					m.IsRequest = false
-					m.toExport = true
-					s.parseOffset += 5 // type + length
-					m.end = s.parseOffset
-					m.Size = uint64(m.end - m.start)
-
-					return true, true
-
-				} else if typ == 'E' {
-					// ErrorResponse
-
-					logp.Debug("pgsqldetailed", "ErrorResponse")
-					m.start = s.parseOffset
-					m.IsRequest = false
-					m.IsError = true
-					m.toExport = true
-
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						s.parseOffset += 1 //type
-						s.parseOffset += 4 //length
-
-						pgsqlErrorParser(s)
-
-						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
-
-						return true, true
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more data 4")
-						return true, false
-					}
-				} else if typ == 'C' {
-					// CommandComplete -> Successful response
-
-					m.start = s.parseOffset
-					m.IsRequest = false
-					m.IsOK = true
-					m.toExport = true
-
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						s.parseOffset += 1 //type
-
-						name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
-						logp.Debug("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
-
-						s.parseOffset += length
-						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
-
-						return true, true
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more data 5")
-						return true, false
-					}
-				} else if typ == 'Z' {
-					// ReadyForQuery -> backend ready for a new query cycle
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						m.start = s.parseOffset
-						s.parseOffset += 1 // type
-						s.parseOffset += length
-						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
-
-						return true, true
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more 5b")
-						return true, false
-					}
-				} else {
-					// TODO: add info from NoticeResponse in case there are warning messages for a query
-					// ignore command
-					if len(s.data[s.parseOffset:]) >= length+1 {
-						s.parseOffset += 1 //type
-						s.parseOffset += length
-						m.end = s.parseOffset
-						m.Size = uint64(m.end - m.start)
-
-						// ok and complete, but ignore
-						m.toExport = false
-						return true, true
-					} else {
-						// wait for more
-						logp.Debug("pgsqldetailed", "Wait for more data 6")
-						return true, false
-					}
-				}
-			}
-
-			break
-
-		case PgsqlGetDataState:
-
-			// The response to queries that return row sets contains:
-			// RowDescription
-			// zero or more DataRow
-			// CommandComplete
-			// ReadyForQuery
-
-			if len(s.data[s.parseOffset:]) < 5 {
-				logp.Warn("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
-				return true, false
-			}
-
-			// read type
-			typ := byte(s.data[s.parseOffset])
-
-			// read message length
-			length := int(common.Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
-
-			if typ == 'D' {
-				// DataRow
-
-				if len(s.data[s.parseOffset:]) >= length+1 {
-					// skip type
-					s.parseOffset += 1
-					// skip length size
-					s.parseOffset += 4
-
-					if err := pgsql.pgsqlRowsParser(s); err != nil {
-						return false, false
-					}
-
-				} else {
-					// wait for more
-					logp.Debug("pgsqldetailed", "Wait for more data 7")
-					return true, false
-				}
-
-			} else if typ == 'C' {
-				// CommandComplete
-
-				if len(s.data[s.parseOffset:]) >= length+1 {
-
-					// skip type
-					s.parseOffset += 1
-
-					name := string(s.data[s.parseOffset+4 : s.parseOffset+length-1]) //without \0
-					logp.Debug("pgsqldetailed", "CommandComplete length=%d, tag=%s", length, name)
-
-					s.parseOffset += length
-					m.end = s.parseOffset
-					m.Size = uint64(m.end - m.start)
-
-					s.parseState = PgsqlStartState
-
-					logp.Debug("pgsqldetailed", "Rows: %s", m.Rows)
-
-					return true, true
-				} else {
-					// wait for more
-					logp.Debug("pgsqldetailed", "Wait for more data 8")
-					return true, false
-				}
-			} else {
-				// shouldn't happen
-				logp.Debug("pgsqldetailed", "Skip command of type %c", typ)
-				s.parseState = PgsqlStartState
-			}
-			break
-		}
-	}
-
-	return true, false
 }
 
 type pgsqlPrivateData struct {
@@ -701,7 +261,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 		priv.Data[dir].data = append(priv.Data[dir].data, pkt.Payload...)
 		logp.Debug("pgsqldetailed", "Len data: %d cap data: %d", len(priv.Data[dir].data), cap(priv.Data[dir].data))
 		if len(priv.Data[dir].data) > tcp.TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("pgsql", "Stream data too large, dropping TCP stream")
+			debugf("Stream data too large, dropping TCP stream")
 			priv.Data[dir] = nil
 			return priv
 		}
@@ -725,7 +285,7 @@ func (pgsql *Pgsql) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple,
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			priv.Data[dir] = nil
-			logp.Debug("pgsql", "Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
+			debugf("Ignore Postgresql message. Drop tcp stream. Try parsing with the next segment")
 			return priv
 		}
 
@@ -792,7 +352,7 @@ func (pgsql *Pgsql) GapInStream(tcptuple *common.TcpTuple, dir uint8,
 	// next layer but mark it as incomplete.
 	stream := pgsqlData.Data[dir]
 	if messageHasEnoughData(stream.message) {
-		logp.Debug("pgsql", "Message not complete, but sending to the next layer")
+		debugf("Message not complete, but sending to the next layer")
 		m := stream.message
 		m.toExport = true
 		m.end = stream.parseOffset
@@ -917,7 +477,7 @@ func (pgsql *Pgsql) receivedPgsqlResponse(msg *PgsqlMessage) {
 
 	pgsql.publishTransaction(trans)
 
-	logp.Debug("pgsql", "Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
+	debugf("Postgres transaction completed: %s\n%s", trans.Pgsql, trans.Response_raw)
 }
 
 func (pgsql *Pgsql) publishTransaction(t *PgsqlTransaction) {
