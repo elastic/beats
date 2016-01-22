@@ -449,7 +449,18 @@ func rrToMapStr(records []mkdns.RR) []common.MapStr {
 		switch x := rr.(type) {
 		default:
 			// We don't have special handling for this type
-			logp.Debug("dns", "Unsupported RR type %s", dnsTypeToString(rrType))
+			logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
+			unsupportedRR := new(mkdns.RFC3597)
+			err := unsupportedRR.ToRFC3597(x)
+			if err == nil {
+				rData, err := hexStringToString(unsupportedRR.Rdata)
+				mapStr["data"] = rData
+				if err != nil {
+					logp.Debug("dns", "%s", err.Error())
+				}
+			} else {
+				logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
+			}
 		case *mkdns.A:
 			mapStr["data"] = x.A.String()
 		case *mkdns.AAAA:
@@ -465,15 +476,20 @@ func rrToMapStr(records []mkdns.RR) []common.MapStr {
 			mapStr["data"] = x.Ptr
 		case *mkdns.RFC3597:
 			// Miekg/dns lib doesn't handle this type
+			//TODO: write a test for this.
 			logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
-			mapStr["data"] = x.Rdata
+			rData, err := hexStringToString(x.Rdata)
+			mapStr["data"] = rData
+			if err != nil {
+				logp.Debug("dns", "%s", err.Error())
+			}
 		case *mkdns.SOA:
 			mapStr["rname"] = x.Mbox
 			mapStr["serial"] = x.Serial
 			mapStr["refresh"] = x.Refresh
 			mapStr["retry"] = x.Retry
 			mapStr["expire"] = x.Expire
-			mapStr["minttl"] = x.Minttl
+			mapStr["minimum"] = x.Minttl
 			mapStr["data"] = x.Ns
 		case *mkdns.SRV:
 			mapStr["priority"] = x.Priority
@@ -505,7 +521,18 @@ func dnsResourceRecordToString(rr mkdns.RR) string {
 	switch x := rr.(type) {
 	default:
 		// We don't have special handling for this type
-		logp.Debug("dns", "Unsupported RR type %s", dnsTypeToString(rrType))
+		logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
+		unsupportedRR := new(mkdns.RFC3597)
+		err := unsupportedRR.ToRFC3597(x)
+		if err == nil {
+			rData, err := hexStringToString(unsupportedRR.Rdata)
+			data = rData
+			if err != nil {
+				logp.Debug("dns", "%s", err.Error())
+			}
+		} else {
+			logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
+		}
 	case *mkdns.A:
 		data = x.A.String()
 	case *mkdns.AAAA:
@@ -521,7 +548,11 @@ func dnsResourceRecordToString(rr mkdns.RR) string {
 	case *mkdns.RFC3597:
 		// Miekg/dns lib doesn't handle this type
 		logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
-		data = x.Rdata
+		rData, err := hexStringToString(x.Rdata)
+		data = rData
+		if err != nil {
+			logp.Debug("dns", "%s", err.Error())
+		}
 	case *mkdns.SOA:
 		data = fmt.Sprintf("mname %s, rname %s, serial %d, refresh %d, "+
 			"retry %d, expire %d, minimum %d", x.Ns, x.Mbox,
