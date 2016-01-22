@@ -3,6 +3,7 @@
 package dns
 
 import (
+	"encoding/hex"
 	"fmt"
 	"strconv"
 
@@ -51,4 +52,38 @@ func dnsClassToString(c uint16) string {
 		return strconv.Itoa(int(c))
 	}
 	return s
+}
+
+// hexStringToString converts an hexadeciaml string to string. Bytes
+// below 32 or above 126 are represented as an escaped base10 integer (\DDD).
+// Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds
+// will be converted to \t, \r and \n respectively.
+// Example:
+func hexStringToString(hexString string) (string, error) {
+	bytes, err := hex.DecodeString(hexString)
+	if err != nil {
+		return hexString, err
+	}
+
+	var s []byte
+	for _, value := range bytes {
+		switch value {
+		default:
+			if value < 32 || value >= 127 {
+				// Unprintable characters are written as \\DDD (e.g. \\012).
+				s = append(s, []byte(fmt.Sprintf("\\%03d", int(value)))...)
+			} else {
+				s = append(s, value)
+			}
+		case '"', '\\':
+			s = append(s, '\\', value)
+		case '\t':
+			s = append(s, '\\', 't')
+		case '\r':
+			s = append(s, '\\', 'r')
+		case '\n':
+			s = append(s, '\\', 'n')
+		}
+	}
+	return string(s), nil
 }

@@ -109,7 +109,7 @@ Messages from Packetbeat itself. This field usually contains error messages for 
 
 
 [[exported-fields-icmp]]
-=== ICMP fields
+=== ICMP Fields
 
 ICMP specific event fields.
 
@@ -117,6 +117,12 @@ ICMP specific event fields.
 ==== icmp.version
 
 The version of the ICMP protocol.
+
+==== icmp.request.message
+
+type: string
+
+A human readable form of the request.
 
 ==== icmp.request.type
 
@@ -129,6 +135,12 @@ The request type.
 type: int
 
 The request code.
+
+==== icmp.response.message
+
+type: string
+
+A human readable form of the response.
 
 ==== icmp.response.type
 
@@ -169,7 +181,7 @@ type: bool
 A DNS flag specifying that the responding server is an authority for the domain name used in the question.
 
 
-==== dns.flags.recursion_allowed
+==== dns.flags.recursion_available
 
 type: bool
 
@@ -181,6 +193,20 @@ A DNS flag specifying whether recursive query support is available in the name s
 type: bool
 
 A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
+
+
+==== dns.flags.authentic_data
+
+type: bool
+
+A DNS flag specifying that the recursive server considers the response authentic.
+
+
+==== dns.flags.checking_disabled
+
+type: bool
+
+A DNS flag specifying that the client disables the server signature validation of the query.
 
 
 ==== dns.flags.truncated_response
