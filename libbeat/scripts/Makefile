@@ -188,8 +188,9 @@ testsuite:
 coverage-report:
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ./${COVERAGE_DIR}/full.cov ./${COVERAGE_DIR}
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
-	test ! -s ./${COVERAGE_DIR}/unit.cov   || go tool cover -html=./${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
+	test ! -s ./${COVERAGE_DIR}/integration.cov   || go tool cover -html=./${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
 	test ! -s ./${COVERAGE_DIR}/system.cov || go tool cover -html=./${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
+	test ! -s ./${COVERAGE_DIR}/unit.cov   || go tool cover -html=./${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
