@@ -8,6 +8,7 @@ out some of them here:
 https://github.com/radoondas/apachebeat[apachebeat]:: Reads status from Apache HTTPD server-status.
 https://github.com/Ingensi/dockerbeat[dockerbeat]:: Reads docker container
 statistics and indexes them in Elasticsearch.
+https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from Elasticsearch cluster and index them to Elasticsearch.
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
