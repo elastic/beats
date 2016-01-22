@@ -7,7 +7,7 @@ class Test(BaseTest):
 
     def test_base(self):
         """
-        Basic test with exiting Modbeat normally
+        Basic test with exiting {{cookiecutter.beat|capitalize}} normally
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/*"

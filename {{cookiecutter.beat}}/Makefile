@@ -1,4 +1,4 @@
-BEATNAME= {{cookiecutter.beat}}
+BEATNAME={{cookiecutter.beat}}
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 

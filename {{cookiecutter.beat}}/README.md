@@ -6,7 +6,7 @@ To get running with your beat, run the following commands:
 
 ```
 glide init
-glide update
+glide update --no-recursive
 make update
 make
 ```
