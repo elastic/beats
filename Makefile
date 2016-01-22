@@ -1,0 +1,2 @@
+setup:
+	pip install cookiecutter
