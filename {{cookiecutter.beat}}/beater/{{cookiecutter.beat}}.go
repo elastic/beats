@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 
-	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config"
+	"{{cookiecutter.beat_path}}{{cookiecutter.beat}}/config"
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
@@ -30,7 +30,6 @@ func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
 
-
 	return nil
 }
 
@@ -40,8 +39,9 @@ func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	fmt.Println("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
-	
+
 	<-bt.done
+
 	return nil
 }
 
