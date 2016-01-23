@@ -6,17 +6,17 @@ PROJECTS=libbeat ${BEATS}
 # Runs complete testsuites (unit, system, integration) for all beats,
 # with coverage and race detection.
 testsuite:
-	$(foreach var,$(PROJECTS),make -C $(var) testsuite || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
 
 # Runs unit and system tests without coverage and race detection.
 .PHONY: test
 test:
-	$(foreach var,$(PROJECTS),make -C $(var) test || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) test || exit 1;)
 
 # Runs unit tests without coverage and race detection.
 .PHONY: unit
 unit:
-	$(foreach var,$(PROJECTS),make -C $(var) unit || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
 
 .PHONY: coverage-report
 coverage-report:
@@ -32,16 +32,16 @@ coverage-report:
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
 update:
-	$(foreach var,$(BEATS),make -C $(var) update || exit 1;)
+	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
 
 clean:
-	$(foreach var,$(PROJECTS),make -C $(var) clean || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
 
 check:
-	$(foreach var,$(PROJECTS),make -C $(var) check || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 
 fmt:
-	$(foreach var,$(PROJECTS),make -C $(var) fmt || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 
 simplify:
-	$(foreach var,$(PROJECTS),make -C $(var) simplify || exit 1;)
+	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) simplify || exit 1;)
