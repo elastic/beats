@@ -29,7 +29,7 @@ export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
-SHELL=/bin/bash
+SHELL=bash
 ES_HOST?="elasticsearch"
 BUILD_DIR?=build
 COVERAGE_DIR=${BUILD_DIR}/coverage
@@ -88,9 +88,9 @@ clean:
 # This should always run before merging.
 .PHONY: ci
 ci:
-	make
-	make check
-	make testsuite
+	$(MAKE)
+	$(MAKE) check
+	$(MAKE) testsuite
 
 ### Testing ###
 # Unless stated otherwise, all tests are always run with coverage reporting enabled.
@@ -124,8 +124,8 @@ integration-tests: prepare-tests
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
 integration-tests-environment:
-	make prepare-tests
-	make build-image
+	$(MAKE) prepare-tests
+	$(MAKE) build-image
 	NAME=$$(${DOCKER_COMPOSE} run -d beat make integration-tests | awk 'END{print}') || exit 1; \
 	echo "docker beat test container: '$$NAME'"; \
 	docker attach $$NAME; CODE=$$?;\
@@ -162,7 +162,7 @@ benchmark-tests:
 .PHONY: test
 test: unit
 	if [ $(SYSTEM_TESTS) = true ]; then \
-		 make fast-system-tests; \
+		 $(MAKE) fast-system-tests; \
 	fi
 
 # Runs all tests and generates the coverage reports
@@ -170,18 +170,18 @@ test: unit
 testsuite:
 	# Setups environment if TEST_ENVIRONMENT is set to true
 	if [ $(TEST_ENVIRONMENT) = true ]; then \
-		 make integration-tests-environment; \
+		 $(MAKE) integration-tests-environment; \
 	else \
-		make integration-tests; \
+		$(MAKE) integration-tests; \
 	fi
 
 	# Runs system tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
-		 make system-tests; \
+		 $(MAKE) system-tests; \
 	fi
 
-	make benchmark-tests
-	make coverage-report
+	$(MAKE) benchmark-tests
+	$(MAKE) coverage-report
 
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
