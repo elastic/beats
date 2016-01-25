@@ -195,7 +195,7 @@ coverage-report:
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
 update:
-	bash ${GOPATH}/src/github.com/elastic/beats/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${GOPATH}/src/github.com/elastic/beats/libbeat
+	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
 
 
 
