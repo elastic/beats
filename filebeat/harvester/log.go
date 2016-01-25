@@ -88,7 +88,9 @@ func createLineReader(
 func (h *Harvester) Harvest() {
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
-		h.Stat.Return <- h.Offset
+		if h.Stat != nil {
+			h.Stat.Return <- h.Offset
+		}
 
 		// Make sure file is closed as soon as harvester exits
 		// If file was never properly opened, it can't be closed
