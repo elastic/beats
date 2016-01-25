@@ -51,7 +51,7 @@ build: $(GOFILES)
 # Create test coverage binary
 .PHONY: buildbeat.test
 buildbeat.test: $(GOFILES)
-	go test -c -covermode=atomic -coverpkg ${GOPACKAGES_COMMA_SEP}
+	go test -c -race -covermode=atomic -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
 # The binaries are placed in the build/bin directory.

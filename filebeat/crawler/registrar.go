@@ -19,7 +19,6 @@ type Registrar struct {
 	State map[string]*FileState
 	// Channel used by the prospector and crawler to send FileStates to be persisted
 	Persist chan *input.FileState
-	running bool
 
 	Channel chan []*FileEvent
 	done    chan struct{}
@@ -82,8 +81,6 @@ func (r *Registrar) LoadState() {
 func (r *Registrar) Run() {
 	logp.Info("Starting Registrar")
 
-	r.running = true
-
 	// Writes registry on shutdown
 	defer r.writeRegistry()
 
@@ -112,9 +109,6 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 
 	// Take the last event found for each file source
 	for _, event := range events {
-		if !r.running {
-			break
-		}
 
 		// skip stdin
 		if event.InputType == cfg.StdinInputType {
@@ -127,7 +121,6 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 
 func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
-	r.running = false
 	close(r.done)
 	// Note: don't block using waitGroup, cause this method is run by async signal handler
 }
