@@ -151,6 +151,9 @@ filebeat:
   # Event count spool threshold - forces network flush if exceeded
   #spool_size: 2048
 
+  # Enable async publisher pipeline in filebeat (Experimental!)
+  #publish_async: false
+
   # Defines how often the spooler is flushed. After idle_timeout the spooler is
   # Flush even though spool_size is not reached.
   #idle_timeout: 5s
