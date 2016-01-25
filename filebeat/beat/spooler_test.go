@@ -2,6 +2,7 @@ package beat
 
 import (
 	"testing"
+	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/stretchr/testify/assert"
@@ -9,47 +10,27 @@ import (
 )
 
 func TestNewSpoolerDefaultConfig(t *testing.T) {
-
 	var config cfg.FilebeatConfig
 	// Read from empty yaml config
 	yaml.Unmarshal([]byte(""), &config)
-	fbConfig := &cfg.Config{Filebeat: config}
+	spooler := NewSpooler(config, nil)
 
-	fb := &Filebeat{FbConfig: fbConfig}
-	spooler := NewSpooler(fb)
-	err := spooler.Config()
-	assert.Nil(t, err)
-
-	assert.Equal(t, cfg.DefaultSpoolSize, fb.FbConfig.Filebeat.SpoolSize)
-	assert.Equal(t, cfg.DefaultIdleTimeout, fb.FbConfig.Filebeat.IdleTimeoutDuration)
+	assert.Equal(t, cfg.DefaultSpoolSize, spooler.spoolSize)
+	assert.Equal(t, cfg.DefaultIdleTimeout, spooler.idleTimeout)
 }
 
 func TestNewSpoolerSpoolSize(t *testing.T) {
-
 	spoolSize := uint64(19)
 	config := cfg.FilebeatConfig{SpoolSize: spoolSize}
+	spooler := NewSpooler(config, nil)
 
-	fbConfig := &cfg.Config{Filebeat: config}
-
-	fb := &Filebeat{FbConfig: fbConfig}
-	spooler := NewSpooler(fb)
-	err := spooler.Config()
-	assert.Nil(t, err)
-
-	assert.Equal(t, spoolSize, fb.FbConfig.Filebeat.SpoolSize)
+	assert.Equal(t, spoolSize, spooler.spoolSize)
 }
 
 func TestNewSpoolerIdleTimeout(t *testing.T) {
+	var config cfg.FilebeatConfig
+	yaml.Unmarshal([]byte("idle_timeout: 10s"), &config)
+	spooler := NewSpooler(config, nil)
 
-	idleTimoeout := "10s"
-	config := cfg.FilebeatConfig{IdleTimeout: idleTimoeout}
-
-	fbConfig := &cfg.Config{Filebeat: config}
-
-	fb := &Filebeat{FbConfig: fbConfig}
-	spooler := NewSpooler(fb)
-	err := spooler.Config()
-	assert.Nil(t, err)
-
-	assert.Equal(t, idleTimoeout, fb.FbConfig.Filebeat.IdleTimeout)
+	assert.Equal(t, time.Duration(10*time.Second), spooler.idleTimeout)
 }
