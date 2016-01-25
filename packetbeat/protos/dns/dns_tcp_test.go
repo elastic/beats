@@ -40,9 +40,9 @@ var (
 		rcode:       "NOERROR",
 		q_class:     "IN",
 		q_type:      "A",
-		q_name:      "elastic.co",
+		q_name:      "elastic.co.",
 		answers:     []string{"54.201.204.244", "54.200.185.88"},
-		authorities: []string{"NS-835.AWSDNS-40.NET", "NS-1183.AWSDNS-19.ORG", "NS-2007.AWSDNS-58.CO.UK", "NS-66.AWSDNS-08.COM"},
+		authorities: []string{"NS-835.AWSDNS-40.NET.", "NS-1183.AWSDNS-19.ORG.", "NS-2007.AWSDNS-58.CO.UK.", "NS-66.AWSDNS-08.COM."},
 		request: []byte{
 			0x00, 0x1c, 0x2d, 0x9a, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65,
 			0x6c, 0x61, 0x73, 0x74, 0x69, 0x63, 0x02, 0x63, 0x6f, 0x00, 0x00, 0x01, 0x00, 0x01,
@@ -70,8 +70,8 @@ var (
 		rcode:   "NOERROR",
 		q_class: "IN",
 		q_type:  "AXFR",
-		q_name:  "etas.com",
-		answers: []string{"training2003p", "training2003p", "1.1.1.1", "training2003p"},
+		q_name:  "etas.com.",
+		answers: []string{"training2003p.", "training2003p.", "1.1.1.1", "training2003p."},
 		request: []byte{
 			0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x65,
 			0x74, 0x61, 0x73, 0x03, 0x63, 0x6f, 0x6d, 0x00, 0x00, 0xfc, 0x00, 0x01, 0x4d, 0x53,
@@ -100,9 +100,9 @@ var (
 		rcode:       "NOERROR",
 		q_class:     "IN",
 		q_type:      "PTR",
-		q_name:      "131.252.30.192.in-addr.arpa",
-		answers:     []string{"github.com"},
-		authorities: []string{"ns1.p16.dynect.net", "ns3.p16.dynect.net", "ns4.p16.dynect.net", "ns2.p16.dynect.net"},
+		q_name:      "131.252.30.192.in-addr.arpa.",
+		answers:     []string{"github.com."},
+		authorities: []string{"ns1.p16.dynect.net.", "ns3.p16.dynect.net.", "ns4.p16.dynect.net.", "ns2.p16.dynect.net."},
 		request: []byte{
 			0x00, 0x2d, 0x1a, 0x6e, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x31,
 			0x33, 0x31, 0x03, 0x32, 0x35, 0x32, 0x02, 0x33, 0x30, 0x03, 0x31, 0x39, 0x32, 0x07, 0x69, 0x6e,
@@ -131,7 +131,7 @@ var (
 		q_type:  "TXT",
 		q_name: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
-			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net",
+			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net.",
 		request: []byte{
 			0x00, 0xed, 0x88, 0xc1, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33,
 			0x3f, 0x31, 0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34,

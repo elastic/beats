@@ -18,6 +18,9 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
+- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
+  Former SOA field `ttl` becomes `minimum`. {pull}803[803]
+- The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot. {pull}803[803]
 
 *Topbeat*
 - Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
@@ -64,6 +67,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 *Packetbeat*
 - Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]
+- Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]
 
 *Topbeat*
 - Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
