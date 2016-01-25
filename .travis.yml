@@ -25,6 +25,7 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
+    - DOCKER_COMPOSE_VERSION: 1.5.2
 
 matrix:
   exclude:
@@ -54,16 +55,14 @@ addons:
       - geoip-database
 
 before_install:
-  # Temporary work-around a travis bug https://github.com/travis-ci/travis-ci/issues/5285
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -O http://cz.archive.ubuntu.com/ubuntu/pool/main/libp/libpcap/libpcap0.8-dev_1.5.3-2_amd64.deb;  sudo dpkg -i libpcap0.8-dev_1.5.3-2_amd64.deb; fi
-  #- sudo apt-get install libpcap-dev
-  # Redo the travis setup but with the elastic/libbeat path. This is needed so the package path is correct
+  # Redo the travis setup but with the elastic/beats path. This is needed so the package path is correct also for forks
   - mkdir -p $HOME/gopath/src/github.com/elastic/beats/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/beats/
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/github.com/elastic/beats/
   - cd $HOME/gopath/src/github.com/elastic/beats/
   # Docker-compose installation
-  - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - sudo rm /usr/local/bin/docker-compose || true
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
