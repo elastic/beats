@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 
-	"{{cookiecutter.beat_path}}/config"
+	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config"
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
