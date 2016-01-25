@@ -12,23 +12,22 @@ Filebeat introduces the following major changes:
   changed.
 * Command line options were removed and moved to the configuration file.
 * Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
-* A new Logstash input plugin called https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[logstash-input-beats] is required.
+* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] is required.
 
 
-=== Migrating to the Logstash Input Beats Plugin
+=== Migrating to the Beats Input Plugin for Logstash
 
-Filebeat requires a new input plugin in Logstash, called
-https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[logstash-input-beats].
+Filebeat requires the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
 For information about getting started with this plugin, see {libbeat}/getting-started.html#logstash-setup[Setting up Logstash].
 
 In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
 parallel with the
-https://github.com/logstash-plugins/logstash-input-lumberjack[logstash-input-lumberjack]
+https://github.com/logstash-plugins/logstash-input-lumberjack[Lumberjack]
 plugin used by the Logstash Forwarder.
 
 If you have a large number of servers that you want to migrate from
 Logstash Forwarder to Filebeat, we recommend that you keep the Lumberjack plugin and load the
-Beats plugin on the same Logstash instances, but set up the Beats plugin to use a different port. After you have migrated
+Beats input plugin on the same Logstash instances, but set up the Beats input plugin to use a different port. After you have migrated
 all the machines to Filebeat, you can remove the Lumberjack plugin.
 
 ===  Updating the Registry File
