@@ -13,5 +13,7 @@ class Test(BaseTest):
                 path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
-        exit_code = self.run_beat()
+        {{cookiecutter.beat|lower}}_proc = self.start_beat()
+        self.wait_until( lambda: self.log_contains("{{cookiecutter.beat}} is running"))
+        exit_code = {{cookiecutter.beat|lower}}_proc.kill_and_wait()
         assert exit_code == 0
