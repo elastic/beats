@@ -21,7 +21,6 @@ def main():
         if not args.yes and raw_input("This will destroy all local changes. " +
                                       "Continue? [y/n]: ") != "y":
             return 1
-        call("git branch -d automatic_merge_branch > /dev/null", shell=True)
         check_call("git reset --hard", shell=True)
         check_call("git clean -dfx", shell=True)
         check_call("git fetch", shell=True)
@@ -31,6 +30,7 @@ def main():
 
         check_call("git checkout {}".format(args.to_branch), shell=True)
         check_call("git pull", shell=True)
+        call("git branch -D automatic_merge_branch > /dev/null", shell=True)
         check_call("git checkout -b automatic_merge_branch", shell=True)
         if call("git merge {}".format(args.from_branch), shell=True) != 0:
             print("Looks like you have merge errors.")
