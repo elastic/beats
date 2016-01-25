@@ -26,8 +26,15 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix logging issue with file-based output where newlines could be misplaced
+  during concurrent logging {pull}650[650]
+- Reduce memory usage by having separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
+- Set default bulk_max_size value to 2048 {pull}628[628]
 
 *Packetbeat*
+- Fix the condition that determines whether the direction of the transaction is set to "outgoing". Packetbeat uses the 
+  direction field to determine which transactions to drop when dropping outgoing transactions. {pull}557[557]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 
 *Topbeat*
 
@@ -43,10 +50,14 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
 
 *Winlogbeat*
+- Add support for reading event logs using the Windows Event Log API {pull}576[576]
+- Modify the event schema to clarify the field meanings. {pull}607[607]
+
 
 ==== Deprecated
 
