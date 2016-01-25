@@ -3,6 +3,7 @@ package sigar_test
 import (
 	"math"
 	"os"
+	"os/user"
 	"strings"
 	"testing"
 
@@ -30,6 +31,18 @@ var _ = Describe("SigarWindows", func() {
 
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(usage.Total).Should(BeNumerically(">", 0))
+		})
+	})
+
+	Describe("Process", func() {
+		It("gets the current process user name", func() {
+			proc := sigar.ProcState{}
+			err := proc.Get(os.Getpid())
+			user, usererr := user.Current()
+
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(usererr).ShouldNot(HaveOccurred())
+			Ω(proc.Username).Should(Equal(user.Username))
 		})
 	})
 })

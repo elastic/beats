@@ -5,7 +5,7 @@ os:
   - osx
 
 go:
-  - 1.5.1
+  - 1.5.3
 
 env:
   global:
@@ -24,6 +24,8 @@ install:
   - go get -v -t -d
 
 script:
+  - gofmt -l . | read && echo "Code differs from gofmt's style. Run 'gofmt -w .'" 1>&2 && exit 1 || true
+  - go vet
   - go build
   - go test
 

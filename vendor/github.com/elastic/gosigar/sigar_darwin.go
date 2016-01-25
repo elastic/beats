@@ -20,6 +20,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"os/user"
+	"strconv"
 	"syscall"
 	"time"
 	"unsafe"
@@ -255,6 +257,15 @@ func (self *ProcState) Get(pid int) error {
 	self.Priority = int(info.ptinfo.pti_priority)
 
 	self.Nice = int(info.pbsd.pbi_nice)
+
+	// Get process username. Fallback to UID if username is not available.
+	uid := strconv.Itoa(int(info.pbsd.pbi_uid))
+	user, err := user.LookupId(uid)
+	if err == nil && user.Username != "" {
+		self.Username = user.Username
+	} else {
+		self.Username = uid
+	}
 
 	return nil
 }
