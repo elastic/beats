@@ -30,7 +30,6 @@ func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
 
-	<-bt.done
 
 	return nil
 }
@@ -41,6 +40,8 @@ func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 	fmt.Println("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
+	
+	<-bt.done
 	return nil
 }
 
