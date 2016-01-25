@@ -3,8 +3,5 @@
   "github_name": "your-github-name",
   "beat": "{{ cookiecutter.project_name|lower }}",
   "beat_path": "github.com/{{ cookiecutter.github_name|lower }}/{{cookiecutter.beat}}",
-  "full_name": "Firstname Lastname",
-  "_copy_without_render": [
-    "*.j2"
-  ]
+  "full_name": "Firstname Lastname"
 }
