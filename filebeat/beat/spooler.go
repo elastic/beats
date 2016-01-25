@@ -1,6 +1,7 @@
 package beat
 
 import (
+	"sync"
 	"time"
 
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -9,23 +10,23 @@ import (
 )
 
 type Spooler struct {
-	Filebeat      *Filebeat
-	exit          chan struct{}
-	nextFlushTime time.Time
-	spool         []*input.FileEvent
-	Channel       chan *input.FileEvent
+	Filebeat           *Filebeat
+	exit               chan struct{}
+	nextFlushTime      time.Time
+	nextFlushTimeMutex *sync.Mutex
+	spool              []*input.FileEvent
+	Channel            chan *input.FileEvent
 }
 
 func NewSpooler(filebeat *Filebeat) *Spooler {
 	spooler := &Spooler{
-		Filebeat: filebeat,
-		exit:     make(chan struct{}),
+		Filebeat:           filebeat,
+		exit:               make(chan struct{}),
+		nextFlushTimeMutex: &sync.Mutex{},
 	}
 
-	config := &spooler.Filebeat.FbConfig.Filebeat
-
 	// Set the next flush time
-	spooler.nextFlushTime = time.Now().Add(config.IdleTimeoutDuration)
+	spooler.setNextFlushTime()
 	spooler.Channel = make(chan *input.FileEvent, 16)
 
 	return spooler
@@ -91,7 +92,7 @@ func (s *Spooler) Run() {
 			}
 		case <-ticker.C:
 			// Flush periodically
-			if time.Now().After(s.nextFlushTime) {
+			if time.Now().After(s.getNextFlushTime()) {
 				logp.Debug("spooler", "Flushing spooler because of timeout. Events flushed: %v", len(s.spool))
 				s.flush()
 			}
@@ -101,6 +102,7 @@ func (s *Spooler) Run() {
 
 // Stop stops the spooler. Flushes events before stopping
 func (s *Spooler) Stop() {
+
 	logp.Info("Stopping spooler")
 	close(s.exit)
 
@@ -112,6 +114,7 @@ func (s *Spooler) Stop() {
 
 // flush flushes all event and sends them to the publisher
 func (s *Spooler) flush() {
+
 	// Checks if any new objects
 	if len(s.spool) > 0 {
 
@@ -125,5 +128,20 @@ func (s *Spooler) flush() {
 		// send
 		s.Filebeat.publisherChan <- tmpCopy
 	}
+
+	s.setNextFlushTime()
+}
+
+func (s *Spooler) setNextFlushTime() {
+	s.nextFlushTimeMutex.Lock()
+	defer s.nextFlushTimeMutex.Unlock()
+
 	s.nextFlushTime = time.Now().Add(s.Filebeat.FbConfig.Filebeat.IdleTimeoutDuration)
+}
+
+func (s *Spooler) getNextFlushTime() time.Time {
+	s.nextFlushTimeMutex.Lock()
+	defer s.nextFlushTimeMutex.Unlock()
+
+	return s.nextFlushTime
 }
