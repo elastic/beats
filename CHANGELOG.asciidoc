@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -26,20 +26,12 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix logging issue with file based output where newlines could be misplaced
-  during concurrent logging {pull}650[650]
-- Reduce memory usage by separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
-- Set default default bulk_max_size value to 2048 {pull}628[628]
 
 *Packetbeat*
-- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
-- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 
 *Topbeat*
 
 *Filebeat*
-- Add exclude_files configuration option {pull}563[563]
-- Set spool_size default value to 2048 {pull}628[628]
 
 *Winlogbeat*
 
@@ -47,21 +39,14 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
-- Make logstash output compression level configurable. {pull}630[630]
 
 *Packetbeat*
-- Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]
 
 *Topbeat*
-- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
-- Add multiline support for combining multiple related lines into one event. {issue}461[461]
 
 *Winlogbeat*
-- Added support for reading event logs using the Windows Event Log API {pull}576[576]
-- Modified the event schema to clarify the field meanings. {pull}607[607]
-
 
 ==== Deprecated
 
@@ -77,9 +62,55 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.1.0]]
+=== Beats version 1.1.0
+https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix logging issue with file based output where newlines could be misplaced
+  during concurrent logging {pull}650[650]
+- Reduce memory usage by separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
+- Set default default bulk_max_size value to 2048 {pull}628[628]
+
+*Packetbeat*
+
+- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
+- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
+
+*Filebeat*
+
+- Set spool_size default value to 2048 {pull}628[628]
+
+==== Added
+
+*Affecting all Beats*
+
+- Make logstash output compression level configurable. {pull}630[630]
+
+*Packetbeat*
+
+- Add support for capturing DNS over TCP network traffic. {pull}486[486] {pull}554[554]
+
+*Topbeat*
+
+- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
+
+*Filebeat*
+
+- Add multiline support for combining multiple related lines into one event. {issue}461[461]
+- Add `exclude_lines` and `include_lines` options for regexp based line filtering. {pull}430[430]
+- Add `exclude_files` configuration option. {pull}563[563]
+
+*Winlogbeat*
+
+- First public release of Winlogbeat
+
 [[release-notes-1.0.1]]
 === Beats version 1.0.1
-https://github.com/elastic/beats/compare/1.0.0...1.0.1[Check 1.0.0 diff]
+https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[Check 1.0.1 diff]
 
 ==== Bugfixes
 
