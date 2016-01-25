@@ -42,7 +42,7 @@ func TestOutputWorker(t *testing.T) {
 	}
 
 	for _, m := range testCases {
-		sig := m.context.signal.(*testSignaler)
+		sig := m.context.Signal.(*testSignaler)
 		ow.onMessage(m)
 		assert.True(t, sig.wait())
 

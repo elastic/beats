@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/1.0.0...master[Check the HEAD diff]
 *Filebeat*
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 
 *Winlogbeat*
 - Added support for reading event logs using the Windows Event Log API {pull}576[576]
