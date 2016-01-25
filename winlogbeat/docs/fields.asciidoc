@@ -47,7 +47,7 @@ The timestamp when the event log record was generated.
 required: True
 
 The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
-The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating system. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
+The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
 
 ==== count
@@ -81,7 +81,7 @@ type: string
 
 required: False
 
-The category for this event. The meaning of this value depends on the event source.
+The category for this event. The meaning of this value depends on the source of the event.
 
 
 ==== event_id
@@ -135,7 +135,7 @@ type: list
 
 required: False
 
-The raw message data logged by an application. Normally this data is inserted into parameterized string to create `message`, but in case of an error Winlogbeat attempts to provide this raw data. This field is mutually exclusive with `message`.
+The raw message data logged by an application. Normally this data is inserted into a parameterized string to create `message`, but in case of an error, Winlogbeat attempts to provide this raw data. This field is mutually exclusive with `message`.
 
 
 ==== record_number
@@ -144,7 +144,7 @@ type: string
 
 required: True
 
-The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for Window Event Log API), the next record number will be 0.
+The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
 
 ==== source_name

@@ -72,8 +72,8 @@ logging:
   level: info
 --------------------------------------------------------------------------------
 
-For instructions on how to obtain a list of available event logs see the
-configuration details for
+To obtain a list of available event logs, run `Get-EventLog *` in PowerShell. For more
+information about this command, see the configuration details for 
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
 After you save your configuration file, test it with the following command.

@@ -65,6 +65,8 @@ The value that you specify here is used as the `input_type` for each event publi
 
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped.
 
+If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `exclude_lines`. 
+
 The following example configures Filebeat to drop any lines that start with "DBG".
 
 [source,yaml]
@@ -75,6 +77,8 @@ exclude_lines: ["^DBG"]
 ===== include_lines
 
 A list of regular expressions to match the lines that you want Filebeat to include. Filebeat exports only the lines that match a regular expression in the list. By default, all lines are exported.
+
+If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `include_lines`. 
 
 The following example configures Filebeat to export any lines that start with "ERR" or "WARN":
 
@@ -152,11 +156,12 @@ You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 1h
 
 ===== scan_frequency
 
-How often the prospector checks for new files in the
-paths that are specified for harvesting. For example, if you specify a glob like
-`/var/log/*`, the directory is scanned for files using the frequency specified by
-`scan_frequency`. If you specify 0s, the directory is scanned as frequently as
-possible. We recommend that you do not specify 0. The default setting is 10s.
+How often the prospector checks for new files in the paths that are specified
+for harvesting. For example, if you specify a glob like `/var/log/*`, the
+directory is scanned for files using the frequency specified by
+`scan_frequency`. Specify 1s to scan the directory as frequently as possible
+without causing Filebeat to scan too frequently. The default setting is
+10s.
 
 ===== document_type
 
@@ -173,6 +178,7 @@ The buffer size every harvester uses when fetching the file. The default is 1638
 The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent.
 This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
 
+[[multiline]]
 ===== multiline
 
 Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces. 
