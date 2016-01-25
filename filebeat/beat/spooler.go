@@ -9,115 +9,134 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+var debugf = logp.MakeDebug("spooler")
+
+// channelSize is the number of events Channel can buffer before blocking will occur.
+const channelSize = 16
+
+// Spooler aggregates the events and sends the aggregated data to the publisher.
 type Spooler struct {
-	Filebeat           *Filebeat
-	exit               chan struct{}
-	nextFlushTime      time.Time
-	nextFlushTimeMutex *sync.Mutex
-	spool              []*input.FileEvent
-	Channel            chan *input.FileEvent
+	Channel chan *input.FileEvent // Channel is the input to the Spooler.
+
+	// Config
+	idleTimeout time.Duration // How often to flush the spooler if spoolSize is not reached.
+	spoolSize   uint64        // Maximum number of events that are stored before a flush occurs.
+
+	exit          chan struct{}             // Channel used to signal shutdown.
+	nextFlushTime time.Time                 // Scheduled time of the next flush.
+	publisher     chan<- []*input.FileEvent // Channel used to publish events.
+	spool         []*input.FileEvent        // FileEvents being held by the Spooler.
+	wg            sync.WaitGroup            // WaitGroup used to control the shutdown.
 }
 
-func NewSpooler(filebeat *Filebeat) *Spooler {
-	spooler := &Spooler{
-		Filebeat:           filebeat,
-		exit:               make(chan struct{}),
-		nextFlushTimeMutex: &sync.Mutex{},
+// NewSpooler creates and returns a new Spooler. The returned Spooler must be
+// started by calling Start before it can be used.
+func NewSpooler(
+	config cfg.FilebeatConfig,
+	publisher chan<- []*input.FileEvent,
+) *Spooler {
+	spoolSize := config.SpoolSize
+	if spoolSize <= 0 {
+		spoolSize = cfg.DefaultSpoolSize
+		debugf("Spooler will use the default spool_size of %d", spoolSize)
 	}
 
-	// Set the next flush time
-	spooler.setNextFlushTime()
-	spooler.Channel = make(chan *input.FileEvent, 16)
+	idleTimeout := config.IdleTimeout
+	if idleTimeout <= 0 {
+		idleTimeout = cfg.DefaultIdleTimeout
+		debugf("Spooler will use the default idle_timeout of %s", idleTimeout)
+	}
 
-	return spooler
+	return &Spooler{
+		Channel:       make(chan *input.FileEvent, channelSize),
+		idleTimeout:   idleTimeout,
+		spoolSize:     spoolSize,
+		exit:          make(chan struct{}),
+		nextFlushTime: time.Now().Add(idleTimeout),
+		publisher:     publisher,
+		spool:         make([]*input.FileEvent, 0, spoolSize),
+	}
 }
 
-func (spooler *Spooler) Config() error {
-	config := &spooler.Filebeat.FbConfig.Filebeat
-
-	// Set default pool size if value not set
-	if config.SpoolSize == 0 {
-		config.SpoolSize = cfg.DefaultSpoolSize
-	}
-
-	// Set default idle timeout if not set
-	if config.IdleTimeout == "" {
-		logp.Debug("spooler", "Set idleTimeoutDuration to %s", cfg.DefaultIdleTimeout)
-		// Set it to default
-		config.IdleTimeoutDuration = cfg.DefaultIdleTimeout
-	} else {
-		var err error
-
-		config.IdleTimeoutDuration, err = time.ParseDuration(config.IdleTimeout)
-
-		if err != nil {
-			logp.Warn("Failed to parse idle timeout duration '%s'. Error was: %v", config.IdleTimeout, err)
-			return err
-		}
-	}
-
-	return nil
+// Start starts the Spooler. Stop must be called to stop the Spooler.
+func (s *Spooler) Start() {
+	s.wg.Add(1)
+	go s.run()
 }
 
-// Run runs the spooler
-// It heartbeats periodically. If the last flush was longer than
-// 'IdleTimeoutDuration' time ago, then we'll force a flush to prevent us from
-// holding on to spooled events for too long.
-func (s *Spooler) Run() {
+// run queues events that it reads from Channel and flushes them when either the
+// queue reaches its capacity (which is spoolSize) or a timeout period elapses.
+func (s *Spooler) run() {
+	defer s.wg.Done()
 
-	config := &s.Filebeat.FbConfig.Filebeat
+	ticker := time.NewTicker(s.idleTimeout / 2)
 
-	// Sets up ticket channel
-	ticker := time.NewTicker(config.IdleTimeoutDuration / 2)
+	logp.Info("Starting spooler: spool_size: %v; idle_timeout: %s",
+		s.spoolSize, s.idleTimeout)
 
-	s.spool = make([]*input.FileEvent, 0, config.SpoolSize)
-
-	logp.Info("Starting spooler: spool_size: %v; idle_timeout: %s", config.SpoolSize, config.IdleTimeoutDuration)
-
-	// Loops until running is set to false
+loop:
 	for {
 		select {
-
 		case <-s.exit:
-			break
-		case event, ok := <-s.Channel:
-			if ok {
-				s.spool = append(s.spool, event)
-
-				// Spooler is full -> flush
-				if len(s.spool) == cap(s.spool) {
-					logp.Debug("spooler", "Flushing spooler because spooler full. Events flushed: %v", len(s.spool))
-					s.flush()
-				}
+			ticker.Stop()
+			break loop
+		case event := <-s.Channel:
+			if event != nil {
+				s.queue(event)
 			}
 		case <-ticker.C:
-			// Flush periodically
-			if time.Now().After(s.getNextFlushTime()) {
-				logp.Debug("spooler", "Flushing spooler because of timeout. Events flushed: %v", len(s.spool))
-				s.flush()
-			}
+			s.timedFlush()
 		}
+	}
+
+	// Drain any events that may remain in Channel.
+	for e := range s.Channel {
+		s.queue(e)
+	}
+	debugf("Flushing events from spooler at shutdown")
+	s.flush()
+}
+
+// Stop stops this Spooler. This method blocks until all events have been
+// flushed to the publisher. The method should only be invoked one time after
+// Start has been invoked.
+func (s *Spooler) Stop() {
+	logp.Info("Stopping spooler")
+
+	// Signal to the run method that it should stop.
+	close(s.exit)
+
+	// Stop accepting writes. Any events in the channel will be flushed.
+	close(s.Channel)
+
+	// Wait for the flush to complete.
+	s.wg.Wait()
+	debugf("Spooler has stopped")
+}
+
+// queue queues a single event to be spooled. If the queue reaches spoolSize
+// while calling this method then all events in the queue will be flushed to
+// the publisher.
+func (s *Spooler) queue(event *input.FileEvent) {
+	s.spool = append(s.spool, event)
+	if len(s.spool) == cap(s.spool) {
+		debugf("Flushing spooler because spooler full. Events flushed: %v", len(s.spool))
+		s.flush()
 	}
 }
 
-// Stop stops the spooler. Flushes events before stopping
-func (s *Spooler) Stop() {
-
-	logp.Info("Stopping spooler")
-	close(s.exit)
-
-	// Flush again before exiting spooler and closes channel
-	logp.Info("Spooler last flush spooler")
-	s.flush()
-	close(s.Channel)
+// timedFlush flushes the events in the queue if a flush has not occurred
+// for a period of time greater than idleTimeout.
+func (s *Spooler) timedFlush() {
+	if time.Now().After(s.nextFlushTime) {
+		debugf("Flushing spooler because of timeout. Events flushed: %v", len(s.spool))
+		s.flush()
+	}
 }
 
-// flush flushes all event and sends them to the publisher
+// flush flushes all events to the publisher.
 func (s *Spooler) flush() {
-
-	// Checks if any new objects
 	if len(s.spool) > 0 {
-
 		// copy buffer
 		tmpCopy := make([]*input.FileEvent, len(s.spool))
 		copy(tmpCopy, s.spool)
@@ -126,22 +145,7 @@ func (s *Spooler) flush() {
 		s.spool = s.spool[:0]
 
 		// send
-		s.Filebeat.publisherChan <- tmpCopy
+		s.publisher <- tmpCopy
 	}
-
-	s.setNextFlushTime()
-}
-
-func (s *Spooler) setNextFlushTime() {
-	s.nextFlushTimeMutex.Lock()
-	defer s.nextFlushTimeMutex.Unlock()
-
-	s.nextFlushTime = time.Now().Add(s.Filebeat.FbConfig.Filebeat.IdleTimeoutDuration)
-}
-
-func (s *Spooler) getNextFlushTime() time.Time {
-	s.nextFlushTimeMutex.Lock()
-	defer s.nextFlushTimeMutex.Unlock()
-
-	return s.nextFlushTime
+	s.nextFlushTime = time.Now().Add(s.idleTimeout)
 }

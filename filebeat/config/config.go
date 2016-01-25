@@ -35,13 +35,12 @@ type Config struct {
 }
 
 type FilebeatConfig struct {
-	Prospectors         []ProspectorConfig
-	SpoolSize           uint64 `yaml:"spool_size"`
-	PublishAsync        bool   `yaml:"publish_async"`
-	IdleTimeout         string `yaml:"idle_timeout"`
-	IdleTimeoutDuration time.Duration
-	RegistryFile        string `yaml:"registry_file"`
-	ConfigDir           string `yaml:"config_dir"`
+	Prospectors  []ProspectorConfig
+	SpoolSize    uint64        `yaml:"spool_size"`
+	PublishAsync bool          `yaml:"publish_async"`
+	IdleTimeout  time.Duration `yaml:"idle_timeout"`
+	RegistryFile string        `yaml:"registry_file"`
+	ConfigDir    string        `yaml:"config_dir"`
 }
 
 type ProspectorConfig struct {
