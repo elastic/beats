@@ -10,11 +10,11 @@ include ../libbeat/scripts/Makefile
 install-cfg:
 	cp etc/topbeat.template.json $(PREFIX)/topbeat.template.json
 	# linux
-	cp etc/topbeat.yml $(PREFIX)/topbeat-linux.yml
+	cp topbeat.yml $(PREFIX)/topbeat-linux.yml
 	# binary
-	cp etc/topbeat.yml $(PREFIX)/topbeat-binary.yml
+	cp topbeat.yml $(PREFIX)/topbeat-binary.yml
 	# darwin
-	cp etc/topbeat.yml $(PREFIX)/topbeat-darwin.yml
+	cp topbeat.yml $(PREFIX)/topbeat-darwin.yml
 	# win
-	cp etc/topbeat.yml $(PREFIX)/topbeat-win.yml
+	cp topbeat.yml $(PREFIX)/topbeat-win.yml
 
