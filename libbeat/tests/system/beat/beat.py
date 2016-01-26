@@ -59,10 +59,20 @@ class Proc(object):
     def wait(self):
         return self.proc.wait()
 
+    def check_wait(self, exit_code=0):
+        actual_exit_code = self.wait()
+        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
+        return actual_exit_code
+
     def kill_and_wait(self):
         self.kill()
         os.close(self.stdin_write)
         return self.proc.wait()
+
+    def check_kill_and_wait(self, exit_code=0):
+        self.kill()
+        os.close(self.stdin_write)
+        return self.check_wait()
 
     def __del__(self):
         # Ensure the process is stopped.

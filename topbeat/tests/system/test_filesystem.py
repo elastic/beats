@@ -2,7 +2,7 @@ from topbeat import BaseTest
 import numbers
 
 """
-Contains tests for ide statistics.
+Contains tests for filesystem statistics.
 """
 
 
@@ -19,7 +19,7 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(lambda: self.log_contains(msg="output worker: publish"))
-        topbeat.kill_and_wait()
+        topbeat.check_kill_and_wait()
 
         output = self.read_output()[0]
 
