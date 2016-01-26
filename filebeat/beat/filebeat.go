@@ -71,8 +71,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.registrar.LoadState()
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
-	fb.spooler = NewSpooler(fb)
-	err = fb.spooler.Config()
+	fb.spooler = NewSpooler(fb.FbConfig.Filebeat, fb.publisherChan)
 
 	if err != nil {
 		logp.Err("Could not init spooler: %v", err)
@@ -80,7 +79,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Start up spooler
-	go fb.spooler.Run()
+	fb.spooler.Start()
 
 	// registrar records last acknowledged positions in all files.
 	go fb.registrar.Run()

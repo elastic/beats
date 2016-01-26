@@ -41,6 +41,12 @@ GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 
+# Conditionally enable the race detector when RACE_DETECTOR=1.
+ifeq ($(RACE_DETECTOR),1)
+    RACE=-race
+endif
+
+
 ### BUILDING ###
 
 # Builds beat
@@ -51,7 +57,7 @@ build: $(GOFILES)
 # Create test coverage binary
 .PHONY: buildbeat.test
 buildbeat.test: $(GOFILES)
-	go test -c -race -covermode=atomic -coverpkg ${GOPACKAGES_COMMA_SEP}
+	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
 # The binaries are placed in the build/bin directory.
@@ -109,17 +115,17 @@ prepare-tests:
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short -covermode=atomic ${GOPACKAGES}
+	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short ${GOPACKAGES}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
 unit:
-	go test -short ./...
+	go test $(RACE) -short ./...
 
-# Run integration tests. Unit tests are run as part of the integration tests. It runs all tests with race detection enabled.
+# Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -race -coverprofile=${COVERAGE_DIR}/integration.cov -covermode=atomic ${GOPACKAGES}
+	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment
