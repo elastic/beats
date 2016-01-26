@@ -12,12 +12,12 @@ include ../libbeat/scripts/Makefile
 install-cfg:
 	cp etc/filebeat.template.json $(PREFIX)/filebeat.template.json
 	# linux
-	cp etc/filebeat.yml $(PREFIX)/filebeat-linux.yml
+	cp filebeat.yml $(PREFIX)/filebeat-linux.yml
 	sed -i 's@#registry_file: .filebeat@registry_file: /var/lib/filebeat/registry@' $(PREFIX)/filebeat-linux.yml
 	# binary
-	cp etc/filebeat.yml $(PREFIX)/filebeat-binary.yml
+	cp filebeat.yml $(PREFIX)/filebeat-binary.yml
 	# darwin
-	cp etc/filebeat.yml $(PREFIX)/filebeat-darwin.yml
+	cp filebeat.yml $(PREFIX)/filebeat-darwin.yml
 	# win
-	cp etc/filebeat.yml $(PREFIX)/filebeat-win.yml
+	cp filebeat.yml $(PREFIX)/filebeat-win.yml
 	sed -i 's@#registry_file: .filebeat@registry_file: "C:/ProgramData/filebeat/registry"@' $(PREFIX)/filebeat-win.yml
