@@ -32,14 +32,15 @@ type SwapStat struct {
 }
 
 type Process struct {
-	Pid     int    `json:"pid"`
-	Ppid    int    `json:"ppid"`
-	Name    string `json:"name"`
-	State   string `json:"state"`
-	CmdLine string `json:"cmdline"`
-	Mem     sigar.ProcMem
-	Cpu     sigar.ProcTime
-	ctime   time.Time
+	Pid      int    `json:"pid"`
+	Ppid     int    `json:"ppid"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	State    string `json:"state"`
+	CmdLine  string `json:"cmdline"`
+	Mem      sigar.ProcMem
+	Cpu      sigar.ProcTime
+	ctime    time.Time
 }
 
 type FileSystemStat struct {
@@ -174,13 +175,14 @@ func GetProcess(pid int) (*Process, error) {
 	cmdLine := strings.Join(args.List, " ")
 
 	proc := Process{
-		Pid:     pid,
-		Ppid:    state.Ppid,
-		Name:    state.Name,
-		State:   getProcState(byte(state.State)),
-		CmdLine: cmdLine,
-		Mem:     mem,
-		Cpu:     cpu,
+		Pid:      pid,
+		Ppid:     state.Ppid,
+		Name:     state.Name,
+		State:    getProcState(byte(state.State)),
+		Username: state.Username,
+		CmdLine:  cmdLine,
+		Mem:      mem,
+		Cpu:      cpu,
 	}
 	proc.ctime = time.Now()
 

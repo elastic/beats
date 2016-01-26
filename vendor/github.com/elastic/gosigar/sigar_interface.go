@@ -106,6 +106,7 @@ const (
 
 type ProcState struct {
 	Name      string
+	Username  string
 	State     RunState
 	Ppid      int
 	Tty       int
