@@ -11,6 +11,7 @@ def main():
 
     dir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(dir + "/packer")
+    check_call("make deps", shell=True)
     check_call("make clean", shell=True)
     check_call("make images", shell=True)
     check_call("make", shell=True)
