@@ -10,6 +10,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -218,6 +220,22 @@ func (self *ProcState) Get(pid int) error {
 
 	self.Processor, _ = strconv.Atoi(fields[36])
 
+	// Read /proc/[pid]/status to get the uid, then lookup uid to get username.
+	status, err := getProcStatus(pid)
+	if err != nil {
+		return fmt.Errorf("failed to read process status for pid %d. %v", pid, err)
+	}
+	uids, err := getUIDs(status)
+	if err != nil {
+		return fmt.Errorf("failed to read process status for pid %d. %v", pid, err)
+	}
+	user, err := user.LookupId(uids[0])
+	if err == nil {
+		self.Username = user.Username
+	} else {
+		self.Username = uids[0]
+	}
+
 	return nil
 }
 
@@ -392,4 +410,36 @@ func readProcFile(pid int, name string) ([]byte, error) {
 	}
 
 	return contents, err
+}
+
+// getProcStatus reads /proc/[pid]/status which contains process status
+// information in human readable form.
+func getProcStatus(pid int) (map[string]string, error) {
+	status := make(map[string]string, 42)
+	path := filepath.Join(Procd, strconv.Itoa(pid), "status")
+	err := readFile(path, func(line string) bool {
+		fields := strings.SplitN(line, ":", 2)
+		if len(fields) == 2 {
+			status[fields[0]] = strings.TrimSpace(fields[1])
+		}
+
+		return true
+	})
+	return status, err
+}
+
+// getUIDs reads the "Uid" value from status and splits it into four values --
+// real, effective, saved set, and  file system UIDs.
+func getUIDs(status map[string]string) ([]string, error) {
+	uidLine, ok := status["Uid"]
+	if !ok {
+		return nil, fmt.Errorf("Uid not found in proc status")
+	}
+
+	uidStrs := strings.Fields(uidLine)
+	if len(uidStrs) != 4 {
+		return nil, fmt.Errorf("Uid line ('%s') did not contain four values", uidLine)
+	}
+
+	return uidStrs, nil
 }

@@ -278,6 +278,12 @@ func (self *ProcState) Get(pid int) error {
 	if err != nil {
 		return err
 	}
+
+	self.Username, err = GetProcCredName(pid)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -304,6 +310,47 @@ func GetProcName(pid int) (string, error) {
 
 	return filepath.Base(CarrayToString(nameProc)), nil
 
+}
+
+func GetProcCredName(pid int) (string, error) {
+	var err error
+
+	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
+
+	if err != nil {
+		return "", fmt.Errorf("OpenProcess fails with %v", err)
+	}
+
+	defer syscall.CloseHandle(handle)
+
+	var token syscall.Token
+
+	// Find process token via win32
+	err = syscall.OpenProcessToken(handle, syscall.TOKEN_QUERY, &token)
+
+	if err != nil {
+		return "", fmt.Errorf("Error opening process token %v", err)
+	}
+
+	// Find the token user
+	tokenUser, err := token.GetTokenUser()
+	if err != nil {
+		return "", fmt.Errorf("Error getting token user %v", err)
+	}
+
+	// Close token to prevent handle leaks
+	err = token.Close()
+	if err != nil {
+		return "", fmt.Errorf("Error failed to closed process token")
+	}
+
+	// look up domain account by sid
+	account, domain, _, err := tokenUser.User.Sid.LookupAccount("localhost")
+	if err != nil {
+		return "", fmt.Errorf("Error looking up sid %v", err)
+	}
+
+	return fmt.Sprintf("%s\\%s", domain, account), nil
 }
 
 func GetProcStatus(pid int) (RunState, error) {
