@@ -15,15 +15,15 @@ with_pfring:
 install-cfg:
 	cp etc/packetbeat.template.json $(PREFIX)/packetbeat.template.json
 	# linux
-	cp etc/packetbeat.yml $(PREFIX)/packetbeat-linux.yml
+	cp packetbeat.yml $(PREFIX)/packetbeat-linux.yml
 	# binary
-	cp etc/packetbeat.yml $(PREFIX)/packetbeat-binary.yml
+	cp packetbeat.yml $(PREFIX)/packetbeat-binary.yml
 	# darwin
-	cp etc/packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
+	cp packetbeat.yml $(PREFIX)/packetbeat-darwin.yml
 	sed -i.bk 's/device: any/device: en0/' $(PREFIX)/packetbeat-darwin.yml
 	rm $(PREFIX)/packetbeat-darwin.yml.bk
 	# win
-	cp etc/packetbeat.yml $(PREFIX)/packetbeat-win.yml
+	cp packetbeat.yml $(PREFIX)/packetbeat-win.yml
 	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
 	rm $(PREFIX)/packetbeat-win.yml.bk
 
