@@ -40,6 +40,7 @@ SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
+PYTHON_ENV=${BUILD_DIR}/python-env/
 
 ### BUILDING ###
 
@@ -136,20 +137,20 @@ integration-tests-environment:
 
 # Runs the system tests
 .PHONY: system-tests
-system-tests: buildbeat.test prepare-tests system-tests-setup
-	. build/system-tests/env/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
+system-tests: buildbeat.test prepare-tests python-env
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
-fast-system-tests: buildbeat.test system-tests-setup
-	. build/system-tests/env/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
+fast-system-tests: buildbeat.test python-env
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
 
-.PHONY: system-tests-setup
-system-tests-setup: tests/system/requirements.txt
-	test -d env || virtualenv build/system-tests/env > /dev/null
-	. build/system-tests/env/bin/activate && pip install -Ur tests/system/requirements.txt > /dev/null
-	touch build/system-tests/env/bin/activate
+# Sets up the virtual python environment
+.PHONY: python-env
+python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
+	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt
 
 
 # Run benchmark tests
