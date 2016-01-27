@@ -24,12 +24,12 @@ const (
 )
 
 type Logger struct {
-	toSyslog            bool
-	toStderr            bool
-	toFile              bool
-	level               Priority
-	selectors           map[string]bool
-	debug_all_selectors bool
+	toSyslog          bool
+	toStderr          bool
+	toFile            bool
+	level             Priority
+	selectors         map[string]bool
+	debugAllSelectors bool
 
 	logger  *log.Logger
 	syslog  [LOG_DEBUG + 1]*log.Logger
@@ -40,7 +40,7 @@ var _log Logger
 
 func debugMessage(calldepth int, selector, format string, v ...interface{}) {
 	if _log.level >= LOG_DEBUG {
-		if !_log.debug_all_selectors {
+		if !_log.debugAllSelectors {
 			selected := _log.selectors[selector]
 			if !selected {
 				return
@@ -76,7 +76,7 @@ func MakeDebug(selector string) func(string, ...interface{}) {
 }
 
 func IsDebug(selector string) bool {
-	return _log.debug_all_selectors || _log.selectors[selector]
+	return _log.debugAllSelectors || _log.selectors[selector]
 }
 
 func msg(level Priority, prefix string, format string, v ...interface{}) {
@@ -125,7 +125,7 @@ func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugS
 	for _, selector := range debugSelectors {
 		_log.selectors[selector] = true
 		if selector == "*" {
-			_log.debug_all_selectors = true
+			_log.debugAllSelectors = true
 		}
 	}
 

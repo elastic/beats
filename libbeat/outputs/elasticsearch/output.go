@@ -122,7 +122,7 @@ func (out *elasticsearchOutput) init(
 
 	loadTemplate(config.Template, clients)
 
-	if config.Save_topology {
+	if config.SaveTopology {
 		err := out.EnableTTL()
 		if err != nil {
 			logp.Err("Fail to set _ttl mapping: %s", err)
