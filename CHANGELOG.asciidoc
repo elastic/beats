@@ -13,9 +13,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Some publisher options refactoring in libbeat {pull}684[684]
 - Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
-- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
@@ -34,7 +32,6 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix logstash window size of 1 not increasing. {pull}598[598]
 
 *Packetbeat*
 - Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
@@ -109,6 +106,16 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 *Packetbeat*
 
 - Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
+- Fix logging issue with file-based output where newlines could be misplaced
+  during concurrent logging {pull}650[650]
+- Reduce memory usage by having separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
+- Set default bulk_max_size value to 2048 {pull}628[628]
+- Fix logstash window size of 1 not increasing. {pull}598[598]
+
+*Packetbeat*
+
+- Fix the condition that determines whether the direction of the transaction is set to "outgoing". Packetbeat uses the
+  direction field to determine which transactions to drop when dropping outgoing transactions. {pull}557[557]
 - Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 
 *Filebeat*
@@ -120,6 +127,8 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 *Affecting all Beats*
 
 - Make logstash output compression level configurable. {pull}630[630]
+- Some publisher options refactoring in libbeat {pull}684[684]
+- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
 
@@ -128,12 +137,14 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 *Topbeat*
 
 - Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
+- Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
 
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add `exclude_lines` and `include_lines` options for regexp based line filtering. {pull}430[430]
 - Add `exclude_files` configuration option. {pull}563[563]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 
 *Winlogbeat*
 
