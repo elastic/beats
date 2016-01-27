@@ -15,7 +15,9 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
-        exit_code = self.run_beat()
+        proc = self.start_beat()
+        self.wait_until( lambda: self.log_contains("Init Beat"))
+        exit_code = proc.kill_and_wait()
         assert exit_code == 0
 
     def test_no_config(self):
