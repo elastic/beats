@@ -380,6 +380,13 @@ type: string
 The full command-line used to start the process, including the arguments separated by space.
 
 
+==== proc.username
+
+type: string
+
+The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
+
+
 [float]
 === cpu Fields
 
