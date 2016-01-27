@@ -80,6 +80,7 @@ type PgsqlStream struct {
 const (
 	PgsqlStartState = iota
 	PgsqlGetDataState
+	PgsqlExtendedQuery
 )
 
 const (
@@ -570,6 +571,58 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 						logp.Debug("pgsqldetailed", "Wait for more 5b")
 						return true, false
 					}
+				} else if typ == 'P' {
+					// Ready for query -> Parse for an extened query request
+
+					m.start = s.parseOffset
+					m.IsRequest = true
+
+					if len(s.data[s.parseOffset:]) >= length+1 {
+						s.parseOffset += 1 //type
+						s.parseOffset += length
+						m.end = s.parseOffset
+						m.Size = uint64(m.end - m.start)
+						m.toExport = true
+
+						sql_text, err := common.ReadString(s.data[m.start+6:])
+						if err != nil {
+							logp.Debug("pgsqldetailed", "Invalid extended query request")
+							return false, false
+						}
+						m.Query = sql_text
+						logp.Debug("pgsqldetailed", "Parse in an extended query request: %s", m.Query)
+
+						// Ignore SET statement
+						if strings.HasPrefix(m.Query, "SET ") {
+							m.toExport = false
+						}
+
+						s.parseState = PgsqlExtendedQuery
+					} else {
+						// wait for more
+						logp.Debug("pgsqldetailed", "Wait for more data")
+						return true, false
+					}
+				} else if typ == '1' {
+					// Sync -> Parse completion for an extened query response
+
+					m.start = s.parseOffset
+					m.IsRequest = false
+					m.IsOK = true
+					m.toExport = true
+
+					if len(s.data[s.parseOffset:]) >= length+1 {
+						s.parseOffset += 1 //type
+						s.parseOffset += 4 //length
+
+						logp.Debug("pgsqldetailed", "Parse completion in an extended query response")
+
+						s.parseState = PgsqlGetDataState
+					} else {
+						// wait for more
+						logp.Debug("pgsqldetailed", "Wait for more data")
+						return true, false
+					}
 				} else {
 					// TODO: add info from NoticeResponse in case there are warning messages for a query
 					// ignore command
@@ -655,6 +708,117 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 					logp.Debug("pgsqldetailed", "Wait for more data 8")
 					return true, false
 				}
+			} else if typ == '2' {
+				// Parse completion -> Bind completion for an extened query response
+
+				if len(s.data[s.parseOffset:]) >= length+1 {
+					// skip type
+					s.parseOffset += 1
+					// skip length size
+					s.parseOffset += 4
+
+					s.parseState = PgsqlStartState
+
+				} else {
+					// wait for more
+					logp.Debug("pgsqldetailed", "Wait for more data")
+					return true, false
+				}
+			} else {
+				// shouldn't happen
+				logp.Debug("pgsqldetailed", "Skip command of type %c", typ)
+				s.parseState = PgsqlStartState
+			}
+			break
+		case PgsqlExtendedQuery:
+
+			// An extened query request contains:
+			// Parse
+			// Bind
+			// Describe
+			// Execute
+			// Sync
+
+			if len(s.data[s.parseOffset:]) < 5 {
+				logp.Warn("Postgresql Message too short (length=%d). Wait for more.", len(s.data[s.parseOffset:]))
+				return true, false
+			}
+
+			// read type
+			typ := byte(s.data[s.parseOffset])
+
+			// read message length
+			length := int(common.Bytes_Ntohl(s.data[s.parseOffset+1 : s.parseOffset+5]))
+
+			if typ == 'B' {
+				// Parse -> Bind
+
+				if len(s.data[s.parseOffset:]) >= length+1 {
+					// skip type
+					s.parseOffset += 1
+					// skip length size
+					s.parseOffset += length
+
+					//TODO: pgsql.pgsqlBindParser(s)
+
+				} else {
+					// wait for more
+					logp.Debug("pgsqldetailed", "Wait for more data")
+					return true, false
+				}
+
+			} else if typ == 'D' {
+				// Bind -> Describe
+
+				if len(s.data[s.parseOffset:]) >= length+1 {
+					// skip type
+					s.parseOffset += 1
+					// skip length size
+					s.parseOffset += length
+
+				} else {
+					// wait for more
+					logp.Debug("pgsqldetailed", "Wait for more data")
+					return true, false
+				}
+
+			} else if typ == 'E' {
+				// Bind(or Describe) -> Execute
+
+				if len(s.data[s.parseOffset:]) >= length+1 {
+					// skip type
+					s.parseOffset += 1
+					// skip length size
+					s.parseOffset += length
+
+					//TODO: pgsql.pgsqlExecuteParser(s)
+
+				} else {
+					// wait for more
+					logp.Debug("pgsqldetailed", "Wait for more data")
+					return true, false
+				}
+
+			} else if typ == 'S' {
+				// Execute -> Sync
+
+				if len(s.data[s.parseOffset:]) >= length+1 {
+					// skip type
+					s.parseOffset += 1
+					// skip length size
+					s.parseOffset += length
+					m.end = s.parseOffset
+					m.Size = uint64(m.end - m.start)
+
+					s.parseState = PgsqlStartState
+
+					return true, true
+				} else {
+					// wait for more
+					logp.Debug("pgsqldetailed", "Wait for more data")
+					return true, false
+				}
+
 			} else {
 				// shouldn't happen
 				logp.Debug("pgsqldetailed", "Skip command of type %c", typ)
