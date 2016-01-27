@@ -16,8 +16,6 @@ include::./configuration.asciidoc[]
 
 include::./command-line.asciidoc[]
 
-include::./https.asciidoc[]
-
 include::./newbeat.asciidoc[]
 
 include::./repositories.asciidoc[]
