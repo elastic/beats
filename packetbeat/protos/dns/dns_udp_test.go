@@ -23,9 +23,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
 )
@@ -194,7 +194,7 @@ func TestParseUdp_emptyPacket(t *testing.T) {
 	packet := newPacket(forward, []byte{})
 	dns.ParseUdp(packet)
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
@@ -216,7 +216,7 @@ func TestParseUdp_requestPacket(t *testing.T) {
 	packet := newPacket(forward, elasticA.request)
 	dns.ParseUdp(packet)
 	assert.Equal(t, 1, dns.transactions.Size(), "There should be one transaction.")
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 	close(client.Channel)
 	assert.Nil(t, <-client.Channel, "No result should have been published.")
 }
@@ -333,7 +333,7 @@ func benchmarkUdp(b *testing.B, q DnsTestMessage) {
 		packet = newPacket(reverse, q.response)
 		dns.ParseUdp(packet)
 
-		client := dns.results.(publisher.ChanClient)
+		client := dns.results.(*publish.ChanTransactions)
 		<-client.Channel
 	}
 }
@@ -351,7 +351,7 @@ func BenchmarkParallelUdpParse(b *testing.B) {
 	rand.Seed(22)
 	numMessages := len(messages)
 	dns := newDns(false)
-	client := dns.results.(publisher.ChanClient)
+	client := dns.results.(*publish.ChanTransactions)
 
 	// Drain the results channal while the test is running.
 	go func() {

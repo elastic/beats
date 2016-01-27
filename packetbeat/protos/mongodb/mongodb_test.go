@@ -7,8 +7,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ import (
 // in tests. It publishes the transactions in the results channel.
 func MongodbModForTests() *Mongodb {
 	var mongodb Mongodb
-	results := publisher.ChanClient{make(chan common.MapStr, 10)}
+	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
 	mongodb.Init(true, results)
 	return &mongodb
 }
@@ -35,7 +35,7 @@ func testTcpTuple() *common.TcpTuple {
 // Helper function to read from the results Queue. Raises
 // an error if nothing is found in the queue.
 func expectTransaction(t *testing.T, mongodb *Mongodb) common.MapStr {
-	client := mongodb.results.(publisher.ChanClient)
+	client := mongodb.results.(*publish.ChanTransactions)
 	select {
 	case trans := <-client.Channel:
 		return trans

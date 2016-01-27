@@ -28,10 +28,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(trans outputs.Signaler, events []common.MapStr) error
+	PublishEvents(trans outputs.Signaler, opts outputs.Options, events []common.MapStr) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(trans outputs.Signaler, event common.MapStr) error
+	PublishEvent(trans outputs.Signaler, opts outputs.Options, event common.MapStr) error
 }
 
 // ProtocolClient interface is a output plugin specific client implementation

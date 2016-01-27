@@ -6,43 +6,53 @@ import (
 )
 
 type syncPublisher struct {
-	messageWorker
 	pub *PublisherType
 }
 
 type syncClient func(message) bool
 
 func newSyncPublisher(pub *PublisherType, hwm, bulkHWM int) *syncPublisher {
-	s := &syncPublisher{pub: pub}
-	s.messageWorker.init(&pub.wsPublisher, hwm, bulkHWM, newPreprocessor(pub, s))
-	return s
+	return &syncPublisher{pub: pub}
 }
 
 func (p *syncPublisher) client() eventPublisher {
-	return syncClient(p.forward)
+	return p
 }
 
-func (p *syncPublisher) onStop() {}
+func (p *syncPublisher) PublishEvent(ctx Context, event common.MapStr) bool {
+	msg := message{context: ctx, event: event}
+	return p.send(msg)
+}
 
-func (p *syncPublisher) onMessage(m message) {
-	signal := outputs.NewSplitSignaler(m.context.signal, len(p.pub.Output))
-	m.context.signal = signal
+func (p *syncPublisher) PublishEvents(ctx Context, events []common.MapStr) bool {
+	msg := message{context: ctx, events: events}
+	return p.send(msg)
+}
+
+func (p *syncPublisher) send(m message) bool {
+	if p.pub.disabled {
+		debug("publisher disabled")
+		outputs.SignalCompleted(m.context.Signal)
+		return true
+	}
+
+	signal := m.context.Signal
+	sync := outputs.NewSyncSignal()
+	if len(p.pub.Output) > 1 {
+		m.context.Signal = outputs.NewSplitSignaler(sync, len(p.pub.Output))
+	} else {
+		m.context.Signal = sync
+	}
+
 	for _, o := range p.pub.Output {
 		o.send(m)
 	}
-}
 
-func (c syncClient) PublishEvent(ctx context, event common.MapStr) bool {
-	return c(message{context: ctx, event: event})
-}
-
-func (c syncClient) PublishEvents(ctx context, events []common.MapStr) bool {
-	return c(message{context: ctx, events: events})
-}
-
-func (p *syncPublisher) forward(m message) bool {
-	sync := outputs.NewSyncSignal()
-	m.context.signal = sync
-	p.send(m)
-	return sync.Wait()
+	ok := sync.Wait()
+	if ok {
+		outputs.SignalCompleted(signal)
+	} else if signal != nil {
+		signal.Failed()
+	}
+	return ok
 }

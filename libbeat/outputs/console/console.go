@@ -3,7 +3,6 @@ package console
 import (
 	"encoding/json"
 	"os"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -47,7 +46,7 @@ func writeBuffer(buf []byte) error {
 
 func (c *console) PublishEvent(
 	s outputs.Signaler,
-	ts time.Time,
+	opts outputs.Options,
 	event common.MapStr,
 ) error {
 	var jsonEvent []byte
@@ -74,6 +73,9 @@ func (c *console) PublishEvent(
 	outputs.SignalCompleted(s)
 	return nil
 fail:
+	if opts.Guaranteed {
+		logp.Critical("Unable to publish events to console: %v", err)
+	}
 	outputs.SignalFailed(s, err)
 	return err
 }
