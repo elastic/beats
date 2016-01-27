@@ -6,9 +6,8 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 [[exported-fields]]
 == Exported Fields
 
-This document describes the fields that are exported by 
-Topbeat. They are grouped in the
-following categories:
+This document describes the fields that are exported by Topbeat. They are
+grouped in the following categories:
 
 * <<exported-fields-env>>
 * <<exported-fields-system>>
@@ -68,260 +67,260 @@ Contains system-wide statistics. These statistics are the details that you can g
 
 
 
-=== load Fields
+==== load Fields
 
 The system load average. The load average is the average number  of jobs in the run queue.
 
 
 
-==== load.load1
+===== load.load1
 
 type: float
 
 The load average over 1 minute. 
 
 
-==== load.load5
+===== load.load5
 
 type: float
 
 The load average over 5 minutes.
 
 
-==== load.load15
+===== load.load15
 
 type: float
 
 The load average over 15 minutes. 
 
 
-=== cpu Fields
+==== cpu Fields
 
 This group contains statistics related to CPU usage.
 
 
-==== cpu.user
+===== cpu.user
 
 type: int
 
 The amount of CPU time spent in user space.
 
 
-==== cpu.user_p
+===== cpu.user_p
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.  For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== cpu.nice
+===== cpu.nice
 
 type: int
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== cpu.system
+===== cpu.system
 
 type: int
 
 The amount of CPU time spent in kernel space.
 
 
-==== cpu.system_p
+===== cpu.system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== cpu.idle
+===== cpu.idle
 
 type: int
 
 The amount of CPU time spent idle.
 
 
-==== cpu.iowait
+===== cpu.iowait
 
 type: int
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== cpu.irq
+===== cpu.irq
 
 type: int
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== cpu.softirq
+===== cpu.softirq
 
 type: int
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== cpu.steal
+===== cpu.steal
 
 type: int
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-=== cpus Fields
+==== cpus Fields
 
 This group contains CPU usage per core statistics.
 
 
-=== cpuX Fields
+===== cpuX Fields
 
 This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
 
 
-==== cpus.cpuX.user
+====== cpus.cpuX.user
 
 type: int
 
 The amount of CPU time spent in user space on core X.
 
 
-==== cpus.cpuX.user_p
+====== cpus.cpuX.user_p
 
 type: float
 
 The percentage of CPU time spent in user space on core X.
 
 
-==== cpus.cpuX.nice
+====== cpus.cpuX.nice
 
 type: int
 
 The amount of CPU time spent on low-priority processes on core X.
 
 
-==== cpus.cpuX.system
+====== cpus.cpuX.system
 
 type: int
 
 The amount of CPU time spent in kernel space on core X.
 
 
-==== cpus.cpuX.system_p
+====== cpus.cpuX.system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space on core X.
 
 
-==== cpus.cpuX.idle
+====== cpus.cpuX.idle
 
 type: int
 
 The amount of CPU time spent idle on core X.
 
 
-==== cpus.cpuX.iowait
+====== cpus.cpuX.iowait
 
 type: int
 
 The amount of CPU time spent in wait (on disk) on core X.
 
 
-==== cpus.cpuX.softirq
+====== cpus.cpuX.softirq
 
 type: int
 
 The amount of CPU time spent servicing and handling software interrupts on core X.
 
-==== cpus.cpuX.steal
+====== cpus.cpuX.steal
 
 type: int
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
-=== mem Fields
+==== mem Fields
 
 This group contains statistics related to the memory usage on the system.
 
 
-==== mem.total
+===== mem.total
 
 type: int
 
 Total memory.
 
 
-==== mem.used
+===== mem.used
 
 type: int
 
 Used memory.
 
 
-==== mem.free
+===== mem.free
 
 type: int
 
 Available memory.
 
 
-==== mem.used_p
+===== mem.used_p
 
 type: float
 
 The percentage of used memory.
 
 
-==== mem.actual_used
+===== mem.actual_used
 
 type: int
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.  Available only on Unix.
 
 
-==== mem.actual_free
+===== mem.actual_free
 
 type: int
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== mem.actual_used_p
+===== mem.actual_used_p
 
 type: float
 
 The percentage of actual used memory.
 
 
-=== swap Fields
+==== swap Fields
 
 This group contains statistics related to the swap memory usage on the system.
 
 
-==== swap.total
+===== swap.total
 
 type: int
 
 Total swap memory.
 
 
-==== swap.used
+===== swap.used
 
 type: int
 
 Used swap memory.
 
 
-==== swap.free
+===== swap.free
 
 type: int
 
 Available swap memory.
 
 
-==== swap.used_p
+===== swap.used_p
 
 type: float
 
@@ -335,121 +334,121 @@ Per-process statistics that you can get by running the *top* or *ps* command on 
 
 
 
-=== proc Fields
+==== proc Fields
 
 Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name, pid, and ppid.
 
 
 
-==== proc.name
+===== proc.name
 
 type: string
 
 The process name.
 
 
-==== proc.state
+===== proc.state
 
 type: string
 
 The process state. For example: "running"
 
 
-==== proc.pid
+===== proc.pid
 
 type: int
 
 The process pid.
 
 
-==== proc.ppid
+===== proc.ppid
 
 type: int
 
 The process parent pid.
 
 
-==== proc.cmdline
+===== proc.cmdline
 
 type: string
 
 The full command-line used to start the process, including the arguments separated by space.
 
 
-==== proc.username
+===== proc.username
 
 type: string
 
 The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
 
 
-=== cpu Fields
+===== cpu Fields
 
 CPU-specific statistics per process.
 
 
-==== proc.cpu.user
+====== proc.cpu.user
 
 type: int
 
 The amount of CPU time the process spent in user space.
 
 
-==== proc.cpu.total_p
+====== proc.cpu.total_p
 
 type: float
 
 The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
 
 
-==== proc.cpu.system
+====== proc.cpu.system
 
 type: int
 
 The amount of CPU time the process spent in kernel space.
 
 
-==== proc.cpu.total
+====== proc.cpu.total
 
 type: int
 
 The total CPU time spent by the process.
 
 
-==== proc.cpu.start_time
+====== proc.cpu.start_time
 
 type: string
 
 The time when the process was started. Example: "17:45".
 
 
-=== mem Fields
+===== mem Fields
 
 Memory-specific statistics per process.
 
 
-==== proc.mem.size
+====== proc.mem.size
 
 type: int
 
 The total virtual memory the process has.
 
 
-==== proc.mem.rss
+====== proc.mem.rss
 
 type: int
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
-==== proc.mem.rss_p
+====== proc.mem.rss_p
 
 type: float
 
 The percentage of memory the process occupied in main memory (RAM).
 
 
-==== proc.mem.share
+====== proc.mem.share
 
 type: int
 
@@ -463,62 +462,62 @@ File system-related statistics that you can get by using the *df* command on Uni
 
 
 
-=== fs Fields
+==== fs Fields
 
 Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as  the device name and the mounting place.
 
 
 
-==== fs.avail
+===== fs.avail
 
 type: int
 
 The available disk space in bytes.
 
 
-==== fs.device_name
+===== fs.device_name
 
 type: string
 
 The disk name. For example: `/dev/disk1`
 
 
-==== fs.mount_point
+===== fs.mount_point
 
 type: string
 
 The mounting point. For example: `/`
 
 
-==== fs.files
+===== fs.files
 
 type: int
 
 The total number of file nodes in the file system. 
 
 
-==== fs.free_files
+===== fs.free_files
 
 type: int
 
 The number of free file nodes in the file system.
 
 
-==== fs.total
+===== fs.total
 
 type: int
 
 The total disk space in bytes.
 
 
-==== fs.used
+===== fs.used
 
 type: int
 
 The used disk space in bytes.
 
 
-==== fs.used_p
+===== fs.used_p
 
 type: float
 
