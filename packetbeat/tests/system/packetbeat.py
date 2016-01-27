@@ -10,6 +10,16 @@ sys.path.append('../../../libbeat/tests/system')
 from beat.beat import TestCase
 from beat.beat import Proc
 
+TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
+                         "beat.name", "beat.hostname",
+                         "count"]
+
+FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
+                         "beat.name", "beat.hostname",
+                         "count"]
+
+
+
 class BaseTest(TestCase):
 
     @classmethod
@@ -24,7 +34,8 @@ class BaseTest(TestCase):
                        output="packetbeat.log",
                        extra_args=[],
                        debug_selectors=[],
-                       exit_code=0):
+                       exit_code=0,
+                       wait_stop=0):
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -33,13 +44,15 @@ class BaseTest(TestCase):
 
         args = [cmd]
 
-        args.extend(["-e",
-                     "-I", os.path.join("pcaps", pcap),
-                     "-c", os.path.join(self.working_dir, config),
-                     "-t",
-                     "-systemTest",
-                     "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov")
-                     ])
+        args.extend([
+            "-e",
+            "-I", os.path.join("pcaps", pcap),
+            "-c", os.path.join(self.working_dir, config),
+            "-t",
+            "-systemTest",
+            "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
+            "-waitstop", str(wait_stop),
+        ])
 
         if extra_args:
             args.extend(extra_args)
@@ -83,15 +96,17 @@ class BaseTest(TestCase):
         proc.start()
         return proc
 
-    def read_output(self, output_file="output/packetbeat"):
+    def read_output(self,
+                    output_file="output/packetbeat",
+                    types=None,
+                    required_fields=None):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                jsons.append(self.flatten_object(json.loads(line),
-                                                 self.dict_fields))
-        self.all_have_fields(jsons, ["@timestamp", "type", "status",
-                                     "beat.name", "beat.hostname",
-                                     "count"])
+                document = self.flatten_object(json.loads(line), self.dict_fields)
+                if not types or document["type"] in types:
+                    jsons.append(document)
+        self.all_have_fields(jsons, required_fields or TRANS_REQUIRED_FIELDS)
         self.all_fields_are_expected(jsons, self.expected_fields)
         return jsons
 
