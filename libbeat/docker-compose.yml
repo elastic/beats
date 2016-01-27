@@ -16,6 +16,8 @@ beat:
     - SHIELD=false
   env_file:
     - build/test.env
+  volumes:
+    - ..:/go/src/github.com/elastic/beats/
   working_dir: /go/src/github.com/elastic/beats/libbeat
   command: make
   entrypoint: /entrypoint.sh
