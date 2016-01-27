@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix logstash window size of 1 not increasing. {pull}598[598]
 
 *Packetbeat*
 
@@ -75,6 +74,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
   during concurrent logging {pull}650[650]
 - Reduce memory usage by having separate queue sizes for single events and bulk events. {pull}649[649] {issue}516[516]
 - Set default bulk_max_size value to 2048 {pull}628[628]
+- Fix logstash window size of 1 not increasing. {pull}598[598]
 
 *Packetbeat*
 
@@ -91,6 +91,8 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 *Affecting all Beats*
 
 - Make logstash output compression level configurable. {pull}630[630]
+- Some publisher options refactoring in libbeat {pull}684[684]
+- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 
 *Packetbeat*
 
@@ -105,6 +107,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add `exclude_lines` and `include_lines` options for regexp based line filtering. {pull}430[430]
 - Add `exclude_files` configuration option. {pull}563[563]
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 
 *Winlogbeat*
 

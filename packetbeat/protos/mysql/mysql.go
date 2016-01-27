@@ -8,12 +8,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 // Packet types
@@ -123,7 +123,7 @@ type Mysql struct {
 	transactions       *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 
 	// function pointer for mocking
 	handleMysql func(mysql *Mysql, m *MysqlMessage, tcp *common.TcpTuple,
@@ -172,7 +172,7 @@ func (mysql *Mysql) GetPorts() []int {
 	return mysql.Ports
 }
 
-func (mysql *Mysql) Init(test_mode bool, results publisher.Client) error {
+func (mysql *Mysql) Init(test_mode bool, results publish.Transactions) error {
 
 	mysql.InitDefaults()
 	if !test_mode {
@@ -870,7 +870,7 @@ func (mysql *Mysql) publishTransaction(t *MysqlTransaction) {
 	event["src"] = &t.Src
 	event["dst"] = &t.Dst
 
-	mysql.results.PublishEvent(event)
+	mysql.results.PublishTransaction(event)
 }
 
 func read_lstring(data []byte, offset int) ([]byte, int, bool, error) {

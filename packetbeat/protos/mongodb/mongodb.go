@@ -7,11 +7,11 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var debugf = logp.MakeDebug("mongodb")
@@ -28,7 +28,7 @@ type Mongodb struct {
 	responses          *common.Cache
 	transactionTimeout time.Duration
 
-	results publisher.Client
+	results publish.Transactions
 }
 
 type transactionKey struct {
@@ -69,7 +69,7 @@ func (mongodb *Mongodb) GetPorts() []int {
 	return mongodb.Ports
 }
 
-func (mongodb *Mongodb) Init(test_mode bool, results publisher.Client) error {
+func (mongodb *Mongodb) Init(test_mode bool, results publish.Transactions) error {
 	debugf("Init a MongoDB protocol parser")
 
 	mongodb.InitDefaults()
@@ -426,5 +426,5 @@ func (mongodb *Mongodb) publishTransaction(t *transaction) {
 		}
 	}
 
-	mongodb.results.PublishEvent(event)
+	mongodb.results.PublishTransaction(event)
 }
