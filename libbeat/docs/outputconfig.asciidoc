@@ -203,8 +203,21 @@ The default is 3.
 
 ===== bulk_max_size
 
-The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-The default is 50.
+The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
+
+If the Beat sends single events, the events are collected into batches. If the Beat publishes
+a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
+split. 
+
+Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
+However big batch sizes can also increase processing times, which might result in
+API errors, killed connections, timed-out publishing requests, and, ultimately, lower
+throughput.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
+Beats that publish single events (such as Packetbeat and Topbeat) send each event directly to
+Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
+spooler size.
 
 ===== timeout
 
@@ -337,6 +350,7 @@ is used as the default port number.
 
 The gzip compression level. Setting this value to values less than or equal to 0 disables compression.
 The compression level must be in the range of 1 (best speed) to 9 (best compression).
+
 The default value is 3.
 
 ===== worker
@@ -398,6 +412,24 @@ events are published.
 Set `max_retries` to a value less than 0 to retry until all events are published. 
 
 The default is 3.
+
+===== bulk_max_size
+
+The maximum number of events to bulk in a single Logstash request. The default is 2048.
+
+If the Beat sends single events, the events are collected into batches. If the Beat publishes
+a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
+split.
+
+Specifying a larger batch size can improve performance by lowering the overhead of sending events. 
+However big batch sizes can also increase processing times, which might result in
+API errors, killed connections, timed-out publishing requests, and, ultimately, lower
+throughput.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. When buffering is disabled,
+Beats that publish single events (such as Packetbeat and Topbeat) send each event directly to
+Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
+spooler size.
 
 [[redis-output]]
 ==== Redis Output (DEPRECATED)
@@ -478,6 +510,15 @@ The Redis initial connection timeout in seconds. The default is 5 seconds.
 
 The interval for reconnecting failed Redis connections. The default is 1 second.
 
+===== bulk_max_size
+
+The maximum number of events to buffer internally during publishing. The default is 2048. 
+
+Specifying a larger batch size may add some latency and buffering during publishing. However, for Redis output, this 
+setting does not affect how events are published.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. 
+
 [[file-output]]
 ==== File Output
 
@@ -539,6 +580,15 @@ output:
 ===== pretty
 
 If `pretty` is set to true, events written to stdout will be nicely formatted. The default is false.
+
+===== bulk_max_size
+
+The maximum number of events to buffer internally during publishing. The default is 2048.
+
+Specifying a larger batch size may add some latency and buffering during publishing. However, for Console output, this 
+setting does not affect how events are published.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. 
 
 [[configuration-output-tls]]
 

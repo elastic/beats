@@ -16,7 +16,7 @@ include::./fields.asciidoc[]
 
 include::./capturing.asciidoc[]
 
-include::./https.asciidoc[]
+include::../../libbeat/docs/https.asciidoc[]
 
 include::./thrift.asciidoc[]
 
