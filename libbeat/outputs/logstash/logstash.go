@@ -112,6 +112,10 @@ func makeTLSClient(port int, tls *tls.Config) func(string) (TransportClient, err
 	}
 }
 
+func (lj *logstash) Close() error {
+	return lj.mode.Close()
+}
+
 // TODO: update Outputer interface to support multiple events for batch-like
 //       processing (e.g. for filebeat). Batch like processing might reduce
 //       send/receive overhead per event for other implementors too.

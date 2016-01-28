@@ -204,6 +204,10 @@ func makeClientFactory(
 	}
 }
 
+func (out *elasticsearchOutput) Close() error {
+	return out.mode.Close()
+}
+
 func (out *elasticsearchOutput) PublishEvent(
 	signaler outputs.Signaler,
 	opts outputs.Options,

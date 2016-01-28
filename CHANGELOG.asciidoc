@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Add experimental Kafka output. {pull}942[942]
 - Add config file option to configure GOMAXPROCS. {pull}969[969]
 - Added a `fields` and `fields_under_root` as options available under the `shipper` configuration {pull}1092[1092]
+- Ensure proper shutdown of libbeat. {pull}1075[1075]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]

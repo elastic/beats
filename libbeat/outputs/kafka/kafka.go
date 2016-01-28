@@ -109,6 +109,10 @@ func (k *kafka) init(cfg *ucfg.Config) error {
 	return nil
 }
 
+func (k *kafka) Close() error {
+	return k.mode.Close()
+}
+
 func (k *kafka) PublishEvent(
 	signal outputs.Signaler,
 	opts outputs.Options,
