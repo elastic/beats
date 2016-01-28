@@ -162,7 +162,8 @@ func (f *FailOverConnectionMode) publish(
 	// TODO: we want back off support here? Fail over normally will try another
 	// connection.
 
-	for !f.closed && (!opts.Guaranteed || f.maxAttempts == 0 || fails < f.maxAttempts) {
+	guaranteed := opts.Guaranteed || f.maxAttempts == 0
+	for !f.closed && (guaranteed || fails < f.maxAttempts) {
 		ok := false
 		resetFail := false
 
@@ -176,22 +177,26 @@ func (f *FailOverConnectionMode) publish(
 			goto sendFail
 		}
 
+		debug("send completed")
 		outputs.SignalCompleted(signaler)
 		return nil
 
 	sendFail:
 		fails++
 		if resetFail {
+			debug("reset fails")
 			fails = 0
 		}
-		if !opts.Guaranteed && (f.maxAttempts > 0 && fails == f.maxAttempts) {
+		if !guaranteed && (f.maxAttempts > 0 && fails == f.maxAttempts) {
 			// max number of attempts reached
+			debug("max number of attempts reached")
 			break
 		}
 
 		time.Sleep(f.waitRetry)
 	}
 
+	debug("messages dropped")
 	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
