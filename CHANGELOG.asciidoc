@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Update builds to Golang version 1.5.3
 - Add ability to override configuration settings using environment variables {issue}114[114]
 - Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
+- Add ability to create Elasticsearch mapping on startup {pull}639[639]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]

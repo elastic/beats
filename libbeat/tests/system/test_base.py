@@ -12,7 +12,6 @@ class Test(BaseTest):
         Basic test with exiting Mockbeat normally
         """
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
         exit_code = self.run_beat()

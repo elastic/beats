@@ -171,6 +171,20 @@ output:
     # [packetbeat-]YYYY.MM.DD keys.
     #index: "packetbeat"
 
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is disabled and no template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones
+    #template:
+
+      # Template name. By default the template name is packetbeat.
+      #name: "packetbeat"
+
+      # Path to template file
+      #path: "packetbeat.template.json"
+
+      # Overwrite existing template
+      #overwrite: false
+
     # Optional HTTP Path
     #path: "/elasticsearch"
 
