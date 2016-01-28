@@ -2,10 +2,8 @@ package publisher
 
 import (
 	"expvar"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -20,7 +18,7 @@ type worker interface {
 type messageWorker struct {
 	queue     chan message
 	bulkQueue chan message
-	ws        *workerSignal
+	ws        *common.WorkerSignal
 	handler   messageHandler
 }
 
@@ -30,28 +28,23 @@ type message struct {
 	events  []common.MapStr
 }
 
-type workerSignal struct {
-	done chan struct{}
-	wg   sync.WaitGroup
-}
-
 type messageHandler interface {
 	onMessage(m message)
 	onStop()
 }
 
-func newMessageWorker(ws *workerSignal, hwm, bulkHWM int, h messageHandler) *messageWorker {
+func newMessageWorker(ws *common.WorkerSignal, hwm, bulkHWM int, h messageHandler) *messageWorker {
 	p := &messageWorker{}
 	p.init(ws, hwm, bulkHWM, h)
 	return p
 }
 
-func (p *messageWorker) init(ws *workerSignal, hwm, bulkHWM int, h messageHandler) {
+func (p *messageWorker) init(ws *common.WorkerSignal, hwm, bulkHWM int, h messageHandler) {
 	p.queue = make(chan message, hwm)
 	p.bulkQueue = make(chan message, bulkHWM)
 	p.ws = ws
 	p.handler = h
-	ws.wg.Add(1)
+	defer p.ws.WorkerStart()
 	go p.run()
 }
 
@@ -59,52 +52,35 @@ func (p *messageWorker) run() {
 	defer p.shutdown()
 	for {
 		select {
-		case <-p.ws.done:
+		case <-p.ws.Done:
 			return
 		case m := <-p.queue:
-			messagesInWorkerQueues.Add(-1)
-			p.handler.onMessage(m)
+			p.onEvent(m)
 		case m := <-p.bulkQueue:
-			messagesInWorkerQueues.Add(-1)
-			p.handler.onMessage(m)
+			p.onEvent(m)
 		}
 	}
 }
 
 func (p *messageWorker) shutdown() {
 	p.handler.onStop()
-	stopQueue(p.queue)
-	stopQueue(p.bulkQueue)
-	p.ws.wg.Done()
+	close(p.queue)
+	close(p.bulkQueue)
+	p.ws.WorkerFinished()
+}
+
+func (p *messageWorker) onEvent(m message) {
+	messagesInWorkerQueues.Add(-1)
+	p.handler.onMessage(m)
+	p.ws.DoneEvent()
 }
 
 func (p *messageWorker) send(m message) {
+	p.ws.AddEvent(1)
 	if m.event != nil {
 		p.queue <- m
 	} else {
 		p.bulkQueue <- m
 	}
 	messagesInWorkerQueues.Add(1)
-}
-
-func (ws *workerSignal) stop() {
-	close(ws.done)
-	ws.wg.Wait()
-}
-
-func newWorkerSignal() *workerSignal {
-	w := &workerSignal{}
-	w.Init()
-	return w
-}
-
-func (ws *workerSignal) Init() {
-	ws.done = make(chan struct{})
-}
-
-func stopQueue(qu chan message) {
-	close(qu)
-	for msg := range qu { // clear queue and send fail signal
-		outputs.SignalFailed(msg.context.Signal, nil)
-	}
 }

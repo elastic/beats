@@ -64,6 +64,11 @@ func (out *fileOutput) init(config config) error {
 	return nil
 }
 
+// Implement Outputer
+func (out *fileOutput) Close() error {
+	return nil
+}
+
 func (out *fileOutput) PublishEvent(
 	trans outputs.Signaler,
 	opts outputs.Options,

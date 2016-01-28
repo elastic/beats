@@ -11,28 +11,23 @@ import (
 type asyncPublisher struct {
 	outputs []worker
 	pub     *PublisherType
-	ws      workerSignal
 }
 
 const (
 	defaultBulkSize = 2048
 )
 
-func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int) *asyncPublisher {
+func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int, ws *common.WorkerSignal) *asyncPublisher {
 	p := &asyncPublisher{pub: pub}
-	p.ws.Init()
 
 	var outputs []worker
 	for _, out := range pub.Output {
-		outputs = append(outputs, asyncOutputer(&p.ws, hwm, bulkHWM, out))
+		outputs = append(outputs, asyncOutputer(ws, hwm, bulkHWM, out))
 	}
 
 	p.outputs = outputs
 	return p
 }
-
-// onStop will send stop signal to message batching workers
-func (p *asyncPublisher) onStop() { p.ws.stop() }
 
 func (p *asyncPublisher) client() eventPublisher {
 	return p
@@ -67,7 +62,7 @@ func (p *asyncPublisher) send(m message) {
 	}
 }
 
-func asyncOutputer(ws *workerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
+func asyncOutputer(ws *common.WorkerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
 	config := worker.config
 
 	flushInterval := time.Duration(config.FlushInterval) * time.Second

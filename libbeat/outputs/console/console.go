@@ -45,6 +45,11 @@ func writeBuffer(buf []byte) error {
 	return nil
 }
 
+// Implement Outputer
+func (c *console) Close() error {
+	return nil
+}
+
 func (c *console) PublishEvent(
 	s outputs.Signaler,
 	opts outputs.Options,
