@@ -328,27 +328,6 @@ type: float
 The percentage of used swap memory.
 
 
-==== swap.actual_used
-
-type: int
-
-Actual used swap memory. Available only on Unix.
-
-
-==== swap.actual_free
-
-type: int
-
-Actual available swap memory. Available only on Unix.
-
-
-==== swap.actual_used_p
-
-type: float
-
-The percentage of actual used swap memory.
-
-
 [[exported-fields-process]]
 === Per-Process Statistics Fields
 
