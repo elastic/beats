@@ -18,6 +18,7 @@ type MothershipConfig struct {
 	Index             string
 	Path              string
 	Template          Template
+	Params            map[string]string `yaml:"parameters"`
 	Db                int
 	Db_topology       int
 	Timeout           int
