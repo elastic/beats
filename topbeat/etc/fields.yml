@@ -287,21 +287,6 @@ system:
           type: float
           description: >
             The percentage of used swap memory.
-        - name: actual_used
-          path: swap.actual_used
-          type: int
-          description: >
-            Actual used swap memory. Available only on Unix.
-        - name: actual_free
-          path: swap.actual_free
-          type: int
-          description: >
-            Actual available swap memory. Available only on Unix.
-        - name: actual_used_p
-          path: swap.actual_used_p
-          type: float
-          description: >
-            The percentage of actual used swap memory.
 
 process:
   type: group
