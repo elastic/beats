@@ -116,7 +116,9 @@ func (s *SingleConnectionMode) publish(
 	var backoffCount uint
 	var err error
 
-	for !s.closed && (!opts.Guaranteed || s.maxAttempts == 0 || fails < s.maxAttempts) {
+	guaranteed := opts.Guaranteed || s.maxAttempts == 0
+	for !s.closed && (guaranteed || fails < s.maxAttempts) {
+
 		ok := false
 		resetFail := false
 
@@ -130,16 +132,20 @@ func (s *SingleConnectionMode) publish(
 			goto sendFail
 		}
 
+		debug("send completed")
 		outputs.SignalCompleted(signaler)
 		return nil
 
 	sendFail:
 		fails++
 		if resetFail {
+			debug("reset fails")
 			fails = 0
 		}
-		if !opts.Guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
+
+		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
 			// max number of attempts reached
+			debug("max number of attempts reached")
 			break
 		}
 
@@ -154,6 +160,7 @@ func (s *SingleConnectionMode) publish(
 		time.Sleep(backoff)
 	}
 
+	debug("messages dropped")
 	messagesDropped.Add(1)
 	outputs.SignalFailed(signaler, err)
 	return nil
