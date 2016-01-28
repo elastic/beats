@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSyncPublishEventSuccess(t *testing.T) {
+	enableLogging([]string{"*"})
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	event := testEvent()
 
@@ -64,10 +64,6 @@ func TestSyncPublishEventsFailed(t *testing.T) {
 
 // Test that PublishEvent returns true when publishing is disabled.
 func TestSyncPublisherDisabled(t *testing.T) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
-
 	testPub := newTestPublisherNoBulk(FailedResponse)
 	testPub.pub.disabled = true
 	event := testEvent()

@@ -179,6 +179,8 @@ func (pgsql *Pgsql) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
+func (stream *Pgsql) Flush() {} // To implement ProtocolPlugin
+
 func (stream *PgsqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.message.end:]
 	stream.parseState = PgsqlStartState

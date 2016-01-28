@@ -33,8 +33,6 @@ Usage of ./packetbeat:
   -v  Log at INFO level
   -version
       Print version and exit
-  -waitstop int
-      Additional seconds to wait before shutting down
 ----------------------------------------------------------------------------
 
 ==== Packet-Beat Specific Options
@@ -59,9 +57,6 @@ For an infinite loop, use _0_. The `-l` option is useful only for testing Packet
 
 *`-t`*::
 Read the packets from the pcap file as fast as possible without sleeping. Use this option in combination with the `-I` option. The `-t` option is useful only for testing Packetbeat.
-
-*`-waitstop <n>`*::
-Wait an additional `n` seconds before exiting.
 
 ==== Other Options
 

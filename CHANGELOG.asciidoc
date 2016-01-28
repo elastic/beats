@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
   Former SOA field `ttl` becomes `minimum`. {pull}803[803]
 - The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot. {pull}803[803]
+- Remove the waitstop CLI option. At shutdown, Packetbeat now waits for all events to be published and outputed. {pull}1057[1057]
 
 *Topbeat*
 - Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]

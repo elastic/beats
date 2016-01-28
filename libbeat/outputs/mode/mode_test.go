@@ -26,6 +26,18 @@ func enableLogging(selectors []string) {
 	}
 }
 
+// wait for f to execute. If the function f does not end
+// within one second the method returns the error.
+func wait(f func(), err error) error {
+	ch := make(chan error, 1)
+	go func() {
+		f()
+		ch <- nil
+	}()
+	time.AfterFunc(time.Second, func() { ch <- err })
+	return <-ch
+}
+
 func (c *mockClient) Connect(timeout time.Duration) error {
 	return c.connect(timeout)
 }
@@ -215,7 +227,18 @@ func testMode(
 	expectedSignals []bool,
 	collectedEvents *[][]common.MapStr,
 ) {
-	defer mode.Close()
+	defer func() {
+		closeFunc := func() {
+			err := mode.Close()
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		err := wait(closeFunc, errors.New("Failed to close connectionMode"))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	if events == nil {
 		return

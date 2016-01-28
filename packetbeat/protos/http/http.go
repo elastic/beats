@@ -151,6 +151,8 @@ func (http *HTTP) Init(testMode bool, results publish.Transactions) error {
 	return nil
 }
 
+func (http *HTTP) Flush() {} // To implement ProtocolPlugin
+
 // messageGap is called when a gap of size `nbytes` is found in the
 // tcp stream. Decides if we can ignore the gap or it's a parser error
 // and we need to drop the stream.
@@ -418,7 +420,7 @@ func (http *HTTP) correlate(conn *httpConnectionData) {
 	// drop responses with missing requests
 	if conn.requests.empty() {
 		for !conn.responses.empty() {
-			logp.Warn("Response from unknown transaction. Ingoring.")
+			logp.Warn("Response from unknown transaction. Ignoring.")
 			conn.responses.pop()
 		}
 		return

@@ -253,14 +253,8 @@ func (dns *Dns) Init(test_mode bool, results publish.Transactions) error {
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
 		protos.DefaultTransactionHashSize,
-		func(k common.Key, v common.Value) {
-			trans, ok := v.(*DnsTransaction)
-			if !ok {
-				logp.Err("Expired value is not a *DnsTransaction.")
-				return
-			}
-			dns.expireTransaction(trans)
-		})
+		dns.removalListener,
+	)
 	dns.transactions.StartJanitor(dns.transactionTimeout)
 
 	dns.results = results
@@ -385,10 +379,28 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 	dns.results.PublishTransaction(event)
 }
 
+func (dns *Dns) removalListener(k common.Key, v common.Value) {
+	trans, ok := v.(*DnsTransaction)
+	if !ok {
+		logp.Err("Expired value is not a *DnsTransaction.")
+		return
+	}
+	dns.expireTransaction(trans)
+}
+
 func (dns *Dns) expireTransaction(t *DnsTransaction) {
 	t.Notes = append(t.Notes, NoResponse.Error())
 	logp.Debug("dns", "%s %s", NoResponse.Error(), t.tuple.String())
 	dns.publishTransaction(t)
+}
+
+func (dns *Dns) Flush() {
+	dns.transactions.StopJanitor()
+	dns.transactions.CleanUp()
+
+	for k, v := range dns.transactions.Entries() {
+		dns.removalListener(k, v)
+	}
 }
 
 // Adds the DNS message data to the supplied MapStr.

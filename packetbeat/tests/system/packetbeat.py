@@ -51,7 +51,6 @@ class BaseTest(TestCase):
             "-t",
             "-systemTest",
             "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
-            "-waitstop", str(wait_stop),
         ])
 
         if extra_args:
