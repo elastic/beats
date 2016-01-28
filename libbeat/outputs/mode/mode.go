@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
@@ -69,6 +70,10 @@ type ProtocolClient interface {
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
 	ErrTempBulkFailure = errors.New("temporary bulk send failure")
+)
+
+var (
+	debug = logp.MakeDebug("output")
 )
 
 // MakeClients will create a list from of ProtocolClient instances from

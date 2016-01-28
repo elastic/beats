@@ -204,6 +204,7 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 
 				// reset attempt count if subset of messages has been processed
 				if len(events) < total && msg.attemptsLeft >= 0 {
+					debug("reset fails")
 					msg.attemptsLeft = m.maxAttempts
 				}
 
@@ -279,6 +280,7 @@ func (m *LoadBalancerMode) forwardEvent(
 // dropping is called when a message is dropped. It updates the
 // relevant counters and sends a failed signal.
 func dropping(msg eventsMessage) {
+	debug("messages dropped")
 	messagesDropped.Add(1)
 	outputs.SignalFailed(msg.signaler, nil)
 }
