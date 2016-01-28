@@ -130,7 +130,7 @@ func (m *AsyncLoadBalancerMode) publishEventsMessage(
 	debug("publish events with attempts=%v", msg.attemptsLeft)
 
 	if ok := m.forwardEvent(m.work, msg); !ok {
-		dropping(msg)
+		m.dropping(msg)
 	}
 	return nil
 }
@@ -253,7 +253,7 @@ func handlePublishEventsResult(
 
 			if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
 				// no more attempts left => drop
-				dropping(msg)
+				m.dropping(msg)
 				return
 			}
 
@@ -268,7 +268,7 @@ func handlePublishEventsResult(
 			debug("add non-published events back into pipeline: %v", len(events))
 			msg.events = events
 			if ok := m.forwardEvent(m.retries, msg); !ok {
-				dropping(msg)
+				m.dropping(msg)
 			}
 			return
 		}
@@ -284,7 +284,7 @@ func (m *AsyncLoadBalancerMode) onFail(async bool, msg eventsMessage, err error)
 		logp.Info("Error publishing events (retrying): %s", err)
 
 		if ok := m.forwardEvent(m.retries, msg); !ok {
-			dropping(msg)
+			m.dropping(msg)
 		}
 	}
 
@@ -325,4 +325,12 @@ func (m *AsyncLoadBalancerMode) forwardEvent(
 		}
 	}
 	return false
+}
+
+// dropping is called when a message is dropped. It updates the
+// relevant counters and sends a failed signal.
+func (m *AsyncLoadBalancerMode) dropping(msg eventsMessage) {
+	debug("messages dropped")
+	messagesDropped.Add(1)
+	outputs.SignalFailed(msg.signaler, nil)
 }
