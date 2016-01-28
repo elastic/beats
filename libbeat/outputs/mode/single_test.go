@@ -22,7 +22,7 @@ func testSingleSendOneEvent(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestSingleSendOneEvent(t *testing.T) {
@@ -48,7 +48,7 @@ func testSingleConnectFailConnectAndSend(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		100*time.Millisecond,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestSingleConnectFailConnectAndSend(t *testing.T) {
@@ -74,7 +74,7 @@ func testSingleConnectionFail(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(false), &collected)
+	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
 
 func TestSingleConnectionFail(t *testing.T) {
@@ -99,7 +99,7 @@ func testSingleSendFlaky(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestSingleSendFlaky(t *testing.T) {
@@ -124,7 +124,7 @@ func testSingleSendFlakyFail(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(false), &collected)
+	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
 
 func TestSingleSendFlakyFail(t *testing.T) {
@@ -149,7 +149,7 @@ func testSingleSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestSingleSendFlakyInfAttempts(t *testing.T) {
@@ -158,4 +158,29 @@ func TestSingleSendFlakyInfAttempts(t *testing.T) {
 
 func TestSingleSendMultiFlakyInfAttempts(t *testing.T) {
 	testSingleSendFlakyInfAttempts(t, multiEvent(10, testEvent))
+}
+
+func testSingleSendFlakyGuaranteed(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(50, collectPublish(&collected)),
+		},
+		3,
+		0,
+		100*time.Millisecond,
+		1*time.Second,
+	)
+	testMode(t, mode, testGuaranteed, events, signals(true), &collected)
+}
+
+func TestSingleSendFlakyGuaranteed(t *testing.T) {
+	testSingleSendFlakyGuaranteed(t, singleEvent(testEvent))
+}
+
+func TestSingleSendMultiFlakyGuaranteed(t *testing.T) {
+	testSingleSendFlakyGuaranteed(t, multiEvent(10, testEvent))
 }
