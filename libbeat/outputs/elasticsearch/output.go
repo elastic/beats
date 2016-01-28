@@ -218,7 +218,14 @@ func makeClientFactory(
 			logp.Info("Using proxy URL: %s", proxyURL)
 		}
 
-		client := NewClient(esURL, config.Index, proxyURL, tls, config.Username, config.Password)
+		params := config.Params
+		if len(params) == 0 {
+			params = nil
+		}
+		client := NewClient(
+			esURL, config.Index, proxyURL, tls,
+			config.Username, config.Password,
+			params)
 		return client, nil
 	}
 }

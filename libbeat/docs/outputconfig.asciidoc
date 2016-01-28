@@ -160,6 +160,10 @@ The basic authentication username for connecting to Elasticsearch.
 
 The basic authentication password for connecting to Elasticsearch.
 
+===== parameters
+
+Dictionary of HTTP parameters to pass within the url with index operations.
+
 [[protocol-option]]
 ===== protocol
 

@@ -27,7 +27,8 @@ var (
 
 type Client struct {
 	Connection
-	index string
+	index  string
+	params map[string]string
 
 	json jsonReader
 }
@@ -57,6 +58,7 @@ var (
 func NewClient(
 	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
+	params map[string]string,
 ) *Client {
 	proxy := http.ProxyFromEnvironment
 	if proxyURL != nil {
@@ -75,7 +77,8 @@ func NewClient(
 				},
 			},
 		},
-		index: index,
+		index:  index,
+		params: params,
 	}
 	return client
 }
@@ -109,7 +112,7 @@ func (client *Client) PublishEvents(
 	}
 
 	// new request to store all events into
-	request, err := client.startBulkRequest("", "", nil)
+	request, err := client.startBulkRequest("", "", client.params)
 	if err != nil {
 		logp.Err("Failed to perform any bulk index operations: %s", err)
 		return events, err
@@ -328,7 +331,8 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 
 	// insert the events one by one
-	status, _, err := client.Index(index, event["type"].(string), "", nil, event)
+	status, _, err := client.Index(
+		index, event["type"].(string), "", client.params, event)
 	if err != nil {
 		logp.Warn("Fail to insert a single event: %s", err)
 		if err == ErrJSONEncodeFailed {
