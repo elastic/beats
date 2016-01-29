@@ -21,6 +21,11 @@ output:
     #username: "admin"
     #password: "s3cr3t"
 
+    # Dictionary of HTTP parameters to pass within the url with index operations.
+    #parameters:
+      #param1: value1
+      #param2: value2
+
     # Number of workers per Elasticsearch host.
     #worker: 1
 
