@@ -111,7 +111,7 @@ func (filters *FilterList) String() string {
 
 func NoDataEvent(event common.MapStr) bool {
 
-	return len(event) <= len(ReadOnlyFields)
+	return len(event) == len(ReadOnlyFields)
 }
 
 /* IncludeFields methods */

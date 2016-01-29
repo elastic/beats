@@ -16,7 +16,6 @@ type Config struct {
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    logp.Logging
-	Filter     map[string]interface{}
 }
 
 type InterfacesConfig struct {
