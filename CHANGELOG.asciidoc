@@ -68,13 +68,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
 - Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 
-*Packetbeat*
-
-*Topbeat*
-
-*Filebeat*
-
 *Winlogbeat*
+- Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
 
 ==== Deprecated
 
