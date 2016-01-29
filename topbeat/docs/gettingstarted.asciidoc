@@ -136,8 +136,6 @@ cd topbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/topbeat' -d@topbeat.template.json
 ----------------------------------------------------------------------
 
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
-
 *win:*
 
 ["source","sh",subs="attributes,callouts"]
