@@ -21,7 +21,7 @@ func LoadGeoIPData(config Geoip) *libgeo.GeoIP {
 		geoipPaths = *config.Paths
 	}
 	if len(geoipPaths) == 0 {
-		logp.Info("GeoIP disabled: No paths were set under output.geoip.paths")
+		logp.Info("GeoIP disabled: No paths were set under shipper.geoip.paths")
 		// disabled
 		return nil
 	}

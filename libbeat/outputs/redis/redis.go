@@ -82,8 +82,8 @@ func (out *redisOutput) Init(config outputs.MothershipConfig, topology_expire in
 	}
 
 	out.DbTopology = 1
-	if config.Db_topology != 0 {
-		out.DbTopology = config.Db_topology
+	if config.DbTopology != 0 {
+		out.DbTopology = config.DbTopology
 	}
 
 	out.Timeout = 5 * time.Second

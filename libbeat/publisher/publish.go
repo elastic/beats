@@ -239,7 +239,7 @@ func (publisher *PublisherType) init(
 					hwm,
 					bulkHWM))
 
-			if !config.Save_topology {
+			if !config.SaveTopology {
 				continue
 			}
 

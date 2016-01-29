@@ -6,11 +6,11 @@ import (
 )
 
 type MothershipConfig struct {
-	Save_topology     bool
+	SaveTopology      bool `yaml:"save_topology"`
 	Host              string
 	Port              int
 	Hosts             []string
-	LoadBalance       *bool
+	LoadBalance       *bool `yaml:"loadbalance"`
 	Protocol          string
 	Username          string
 	Password          string
@@ -20,7 +20,7 @@ type MothershipConfig struct {
 	Template          Template
 	Params            map[string]string `yaml:"parameters"`
 	Db                int
-	Db_topology       int
+	DbTopology        int `yaml:"db_topology"`
 	Timeout           int
 	ReconnectInterval int    `yaml:"reconnect_interval"`
 	Filename          string `yaml:"filename"`

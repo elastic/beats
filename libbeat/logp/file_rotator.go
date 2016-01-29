@@ -125,19 +125,19 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// shift all files from last to first
-	for file_no := *rotator.KeepFiles - 1; file_no >= 0; file_no-- {
-		if !rotator.FileExists(file_no) {
+	for fileNo := *rotator.KeepFiles - 1; fileNo >= 0; fileNo-- {
+		if !rotator.FileExists(fileNo) {
 			// file doesn't exist, don't rotate
 			continue
 		}
-		file_path := rotator.FilePath(file_no)
+		file_path := rotator.FilePath(fileNo)
 
-		if rotator.FileExists(file_no + 1) {
+		if rotator.FileExists(fileNo + 1) {
 			// next file exists, something is strange
-			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(file_no+1))
+			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
 		}
 
-		err := os.Rename(file_path, rotator.FilePath(file_no+1))
+		err := os.Rename(file_path, rotator.FilePath(fileNo+1))
 		if err != nil {
 			return err
 		}
