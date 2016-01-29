@@ -14,7 +14,9 @@ class Test(BaseTest):
         self.render_config_template(
         )
 
-        exit_code = self.run_beat()
+        proc = self.start_beat()
+        self.wait_until( lambda: self.log_contains("Init Beat"))
+        exit_code = proc.kill_and_wait()
         assert exit_code == 0
 
     def test_no_config(self):
@@ -48,7 +50,7 @@ class Test(BaseTest):
                     os.path.join(self.working_dir, "libbeat.yml"))
 
         exit_code = self.run_beat(
-            config="libbeat.yml", extra_args=["-configtest"])
+                config="libbeat.yml", extra_args=["-configtest"])
 
         assert exit_code == 0
         assert self.log_contains("Testing configuration file") is True
