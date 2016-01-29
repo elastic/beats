@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-	err := beat.Run(mock.Name, mock.Version, &mock.Mockbeat{})
-	if err != nil {
+	if err := beat.Run(mock.Name, mock.Version, mock.New()); err != nil {
 		os.Exit(1)
 	}
 }

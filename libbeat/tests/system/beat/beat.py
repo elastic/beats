@@ -72,7 +72,7 @@ class Proc(object):
     def check_kill_and_wait(self, exit_code=0):
         self.kill()
         os.close(self.stdin_write)
-        return self.check_wait()
+        return self.check_wait(exit_code=exit_code)
 
     def __del__(self):
         # Ensure the process is stopped.
