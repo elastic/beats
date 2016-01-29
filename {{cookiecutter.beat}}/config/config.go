@@ -4,5 +4,5 @@
 package config
 
 type {{cookiecutter.beat|capitalize}}Config struct {
-
+	Period string `yaml:"period"`
 }
