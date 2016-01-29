@@ -208,13 +208,11 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packe
 
 *mac:*
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 cd packetbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
-
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 *win:*
 
