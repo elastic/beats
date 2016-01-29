@@ -113,7 +113,7 @@ You should see a response similar to this:
   "name" : "Banshee",
   "cluster_name" : "elasticsearch",
   "version" : {
-    "number" : "2.1.0",
+    "number" : "2.2.0",
     "build_hash" : "72cd1f1a3eee09505e036106146dc1949dc5dc87",
     "build_timestamp" : "2015-11-18T22:40:03Z",
     "build_snapshot" : false,
@@ -227,7 +227,6 @@ input {
 output {
   elasticsearch {
     hosts => "localhost:9200"
-    sniffing => true
     manage_template => false
     index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
     document_type => "%{[@metadata][type]}"
