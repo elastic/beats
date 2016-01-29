@@ -1,14 +1,17 @@
 package main
 
 import (
-	packetbeat "github.com/elastic/beats/packetbeat/beat"
+	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/packetbeat/beater"
 )
 
 var Name = "packetbeat"
 
 // Setups and Runs Packetbeat
 func main() {
-	beat.Run(Name, "", packetbeat.New())
+	if err := beat.Run(Name, "", beater.New()); err != nil {
+		os.Exit(1)
+	}
 }

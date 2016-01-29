@@ -4,15 +4,14 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
-	winlogbeat "github.com/elastic/beats/winlogbeat/beat"
+	"github.com/elastic/beats/winlogbeat/beater"
 )
 
 // Name of this beat.
 var Name = "winlogbeat"
 
 func main() {
-	err := beat.Run(Name, "", winlogbeat.New())
-	if err != nil {
+	if err := beat.Run(Name, "", beater.New()); err != nil {
 		os.Exit(1)
 	}
 }

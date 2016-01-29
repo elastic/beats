@@ -64,10 +64,11 @@ type Beat struct {
 	Events    publisher.Client
 	UUID      uuid.UUID
 
-	exit     chan struct{}
-	error    error
-	state    int8
-	callback sync.Once
+	exit       chan struct{}
+	error      error
+	state      int8
+	stateMutex sync.Mutex
+	callback   sync.Once
 }
 
 // Defaults for config variables which are not set
@@ -166,7 +167,7 @@ func (b *Beat) Start() error {
 	if err != nil {
 		return err
 	}
-	b.state = ConfigState
+	b.setState(ConfigState)
 
 	// Run beat. This calls first beater.Setup,
 	// then beater.Run and beater.Cleanup in the end
@@ -241,7 +242,7 @@ func (b *Beat) Run() error {
 	if err != nil {
 		return fmt.Errorf("setup returned an error: %v", err)
 	}
-	b.state = SetupState
+	b.setState(SetupState)
 
 	// Up to here was the initialization, now about running
 	if cfgfile.IsTestConfig() {
@@ -258,7 +259,7 @@ func (b *Beat) Run() error {
 
 	logp.Info("%s sucessfully setup. Start running.", b.Name)
 
-	b.state = RunState
+	b.setState(RunState)
 	// Run beater specific stuff
 	err = b.BT.Run(b)
 	if err != nil {
@@ -273,7 +274,7 @@ func (b *Beat) Run() error {
 func (b *Beat) Stop() {
 	logp.Info("Stopping Beat")
 
-	if b.state == RunState {
+	if b.getState() == RunState {
 		b.BT.Stop()
 	}
 
@@ -281,7 +282,7 @@ func (b *Beat) Stop() {
 
 	logp.Info("Cleaning up %s before shutting down.", b.Name)
 
-	if b.state > StopState {
+	if b.getState() > StopState {
 		// Call beater cleanup function
 		err := b.BT.Cleanup(b)
 		if err != nil {
@@ -289,7 +290,7 @@ func (b *Beat) Stop() {
 		}
 	}
 
-	b.state = StopState
+	b.setState(StopState)
 }
 
 // Exiting beat -> shutdown
@@ -299,4 +300,18 @@ func (b *Beat) Exit() {
 		logp.Info("Start exiting beat")
 		close(b.exit)
 	})
+}
+
+// Updates the state
+func (b *Beat) setState(state int8) {
+	b.stateMutex.Lock()
+	defer b.stateMutex.Unlock()
+	b.state = state
+}
+
+// Fetches the state
+func (b *Beat) getState() int8 {
+	b.stateMutex.Lock()
+	defer b.stateMutex.Unlock()
+	return b.state
 }

@@ -1,13 +1,16 @@
 package main
 
 import (
-	topbeat "github.com/elastic/beats/topbeat/beat"
+	"os"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/topbeat/beater"
 )
 
 var Name = "topbeat"
 
 func main() {
-	beat.Run(Name, "", topbeat.New())
+	if err := beat.Run(Name, "", beater.New()); err != nil {
+		os.Exit(1)
+	}
 }
