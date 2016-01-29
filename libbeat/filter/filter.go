@@ -140,13 +140,13 @@ func (f *IncludeFields) Filter(event common.MapStr) (common.MapStr, error) {
 	for _, field := range f.Fields {
 		hasKey, err := event.HasKey(field)
 		if err != nil {
-			return filtered, fmt.Errorf("Fail to check the key %s", field)
+			return filtered, fmt.Errorf("Fail to check the key %s: %s", field, err)
 		}
 
 		if hasKey {
 			errorOnCopy := event.CopyTo(filtered, field)
 			if errorOnCopy != nil {
-				return filtered, fmt.Errorf("Fail to copy key %s", field)
+				return filtered, fmt.Errorf("Fail to copy key %s: %s", field, err)
 			}
 		}
 	}
@@ -177,7 +177,7 @@ func (f *DropFields) Filter(event common.MapStr) (common.MapStr, error) {
 	for _, field := range f.Fields {
 		err := event.Delete(field)
 		if err != nil {
-			return event, fmt.Errorf("Fail to delete key %s", field)
+			return event, fmt.Errorf("Fail to delete key %s: %s", field, err)
 		}
 
 	}
