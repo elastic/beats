@@ -64,7 +64,7 @@ type mockTransport struct {
 	control chan mockTransportCommand
 }
 
-func newLumberjackTestClient(conn TransportClient) *lumberjackClient {
+func newLumberjackTestClient(conn TransportClient) *client {
 	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 5*time.Second)
 	if err != nil {
 		panic(err)
