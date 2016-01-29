@@ -1,4 +1,4 @@
-package beat
+package beater
 
 import (
 	"expvar"
