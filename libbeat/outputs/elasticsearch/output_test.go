@@ -25,7 +25,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 
 	var output elasticsearchOutput
 	output.init(outputs.MothershipConfig{
-		Save_topology: true,
+		SaveTopology:  true,
 		Host:          GetEsHost(),
 		Port:          esPort,
 		Username:      os.Getenv("ES_USER"),
