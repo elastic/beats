@@ -126,11 +126,13 @@ var testEvent = common.MapStr{
 	"msg": "hello world",
 }
 
-var testOpts = outputs.Options{}
+var testNoOpts = outputs.Options{}
+var testGuaranteed = outputs.Options{Guaranteed: true}
 
 func testMode(
 	t *testing.T,
 	mode ConnectionMode,
+	opts outputs.Options,
 	events []eventInfo,
 	expectedSignals []bool,
 	collectedEvents *[][]common.MapStr,
@@ -157,14 +159,14 @@ func testMode(
 	for _, pubEvents := range events {
 		if pubEvents.single {
 			for _, event := range pubEvents.events {
-				_ = mode.PublishEvent(signal, testOpts, event)
+				_ = mode.PublishEvent(signal, opts, event)
 				if expectedSignals[idx] {
 					expectedEvents = append(expectedEvents, []common.MapStr{event})
 				}
 				idx++
 			}
 		} else {
-			_ = mode.PublishEvents(signal, testOpts, pubEvents.events)
+			_ = mode.PublishEvents(signal, opts, pubEvents.events)
 			if expectedSignals[idx] {
 				expectedEvents = append(expectedEvents, pubEvents.events)
 			}

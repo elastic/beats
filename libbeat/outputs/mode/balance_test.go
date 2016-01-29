@@ -22,7 +22,7 @@ func TestLoadBalancerStartStop(t *testing.T) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, nil, nil, nil)
+	testMode(t, mode, testNoOpts, nil, nil, nil)
 }
 
 func testLoadBalancerFailSendWithoutActiveConnections(
@@ -48,7 +48,7 @@ func testLoadBalancerFailSendWithoutActiveConnections(
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(false), nil)
+	testMode(t, mode, testNoOpts, events, signals(false), nil)
 }
 
 func TestLoadBalancerFailSendWithoutActiveConnections(t *testing.T) {
@@ -75,7 +75,7 @@ func testLoadBalancerOKSend(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestLoadBalancerOKSend(t *testing.T) {
@@ -108,7 +108,7 @@ func testLoadBalancerFlakyConnectionOkSend(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestLoadBalancerFlakyConnectionOkSend(t *testing.T) {
@@ -141,7 +141,7 @@ func testLoadBalancerFlakyFail(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(false), &collected)
+	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
 
 func TestLoadBalancerFlakyFail(t *testing.T) {
@@ -168,7 +168,7 @@ func testLoadBalancerTemporayFailure(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestLoadBalancerTemporayFailure(t *testing.T) {
@@ -201,7 +201,7 @@ func testLoadBalancerTempFlakyFail(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(false), &collected)
+	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
 
 func TestLoadBalancerTempFlakyFail(t *testing.T) {
@@ -234,7 +234,7 @@ func testLoadBalancerFlakyInfAttempts(t *testing.T, events []eventInfo) {
 		1*time.Millisecond,
 		1*time.Second,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestLoadBalancerFlakyInfAttempts(t *testing.T) {
@@ -267,7 +267,7 @@ func testLoadBalancerTempFlakyInfAttempts(t *testing.T, events []eventInfo) {
 		100*time.Millisecond,
 		1*time.Millisecond,
 	)
-	testMode(t, mode, events, signals(true), &collected)
+	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
 
 func TestLoadBalancerTempFlakyInfAttempts(t *testing.T) {
@@ -276,4 +276,70 @@ func TestLoadBalancerTempFlakyInfAttempts(t *testing.T) {
 
 func TestLoadBalancerMultiTempFlakyInfAttempts(t *testing.T) {
 	testLoadBalancerTempFlakyInfAttempts(t, multiEvent(10, testEvent))
+}
+
+func testLoadBalancerFlakyGuaranteed(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(50, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailStart(50, collectPublish(&collected)),
+			},
+		},
+		3,
+		1*time.Nanosecond,
+		1*time.Millisecond,
+		1*time.Second,
+	)
+	testMode(t, mode, testGuaranteed, events, signals(true), &collected)
+}
+
+func TestLoadBalancerFlakyGuaranteed(t *testing.T) {
+	testLoadBalancerFlakyGuaranteed(t, singleEvent(testEvent))
+}
+
+func TestLoadBalancerMultiFlakyGuaranteed(t *testing.T) {
+	testLoadBalancerFlakyGuaranteed(t, multiEvent(10, testEvent))
+}
+
+func testLoadBalancerTempFlakyGuaranteed(t *testing.T, events []eventInfo) {
+	var collected [][]common.MapStr
+	mode, _ := NewLoadBalancerMode(
+		[]ProtocolClient{
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailWith(50, ErrTempBulkFailure, collectPublish(&collected)),
+			},
+			&mockClient{
+				connected: true,
+				close:     closeOK,
+				connect:   connectOK,
+				publish:   publishFailWith(50, ErrTempBulkFailure, collectPublish(&collected)),
+			},
+		},
+		3,
+		1*time.Nanosecond,
+		100*time.Millisecond,
+		1*time.Millisecond,
+	)
+	testMode(t, mode, testGuaranteed, events, signals(true), &collected)
+}
+
+func TestLoadBalancerTempFlakyGuaranteed(t *testing.T) {
+	testLoadBalancerTempFlakyGuaranteed(t, singleEvent(testEvent))
+}
+
+func TestLoadBalancerMultiTempFlakyGuaranteed(t *testing.T) {
+	testLoadBalancerTempFlakyGuaranteed(t, multiEvent(10, testEvent))
 }
