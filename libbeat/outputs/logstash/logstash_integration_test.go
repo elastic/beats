@@ -130,7 +130,7 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 		config.TLS = &outputs.TLSConfig{
 			Insecure: false,
 			CAs: []string{
-				"/etc/pki/tls/certs/logstash.crt",
+				"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 			},
 		}
 	}
