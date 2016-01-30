@@ -1,5 +1,5 @@
 beat:
-  build: ..
+  build: .
   links:
     - redis
     - elasticsearch
@@ -20,7 +20,7 @@ beat:
     - ..:/go/src/github.com/elastic/beats/
   working_dir: /go/src/github.com/elastic/beats/libbeat
   command: make
-  entrypoint: /entrypoint.sh
+  entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 elasticsearch:
   build: ../testing/environments/docker/elasticsearch
   dockerfile: Dockerfile-2.2.0
