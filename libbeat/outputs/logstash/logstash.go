@@ -113,13 +113,19 @@ func (lj *logstash) init(
 	}
 
 	var m mode.ConnectionMode
-	if loadBalance && pipelining {
+	if pipelining {
 		logp.Info("load balanced pipelining mode")
 
 		clients, err := mode.MakeAsyncClients(config, makeAsyncClientFactory(
 			maxWindowSize, compressLevel, timeout, makeTransp))
 		if err != nil {
 			return err
+		}
+
+		if !balanced {
+			clients = []mode.AsyncProtocolClient{
+				mode.NewAsyncFailoverClient(clients),
+			}
 		}
 
 		m, err = mode.NewAsyncLoadBalancerMode(clients, maxAttempts,
@@ -136,18 +142,20 @@ func (lj *logstash) init(
 			return err
 		}
 
+		if !balanced {
+			clients = []mode.ProtocolClient{
+				mode.NewFailoverClient(clients),
+			}
+		}
+
 		if len(clients) == 1 {
 			m, err = mode.NewSingleConnectionMode(clients[0],
 				maxAttempts, waitRetry, timeout, maxWaitRetry)
 		} else {
-			loadBalance := config.LoadBalance != nil && *config.LoadBalance
-			if loadBalance {
-				m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-					waitRetry, timeout, maxWaitRetry)
-			} else {
-				m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
-			}
+			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
+				waitRetry, timeout, maxWaitRetry)
 		}
+
 		if err != nil {
 			return err
 		}

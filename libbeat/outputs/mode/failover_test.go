@@ -27,7 +27,8 @@ func testFailoverSend(t *testing.T, events []eventInfo) {
 		},
 		3,
 		0,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
@@ -60,7 +61,8 @@ func testFailoverConnectFailAndSend(t *testing.T, events []eventInfo) {
 		},
 		3,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
@@ -93,7 +95,8 @@ func testFailoverConnectionFail(t *testing.T, events []eventInfo) {
 		},
 		3,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
@@ -125,7 +128,8 @@ func testFailoverSendFlaky(t *testing.T, events []eventInfo) {
 		},
 		3,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
@@ -157,7 +161,8 @@ func testFailoverSendFlakyFail(t *testing.T, events []eventInfo) {
 		},
 		3,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(false), &collected)
 }
@@ -189,7 +194,8 @@ func testFailoverSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
 		},
 		0,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testNoOpts, events, signals(true), &collected)
 }
@@ -221,7 +227,8 @@ func testFailoverSendFlakyGuaranteed(t *testing.T, events []eventInfo) {
 		},
 		3,
 		1*time.Millisecond,
-		100*time.Millisecond,
+		1*time.Millisecond,
+		4*time.Millisecond,
 	)
 	testMode(t, mode, testGuaranteed, events, signals(true), &collected)
 }
