@@ -115,7 +115,7 @@ func TestFileEventToMapStr(t *testing.T) {
 
 func TestFieldsUnderRoot(t *testing.T) {
 	event := FileEvent{
-		Fields: &common.MapStr{
+		Fields: common.MapStr{
 			"hello": "world",
 		},
 	}
