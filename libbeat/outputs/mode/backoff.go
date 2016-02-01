@@ -13,6 +13,7 @@ type backoff struct {
 func newBackoff(done <-chan struct{}, init, max time.Duration) *backoff {
 	return &backoff{
 		duration: init,
+		done:     done,
 		init:     init,
 		max:      max,
 	}
@@ -23,11 +24,14 @@ func (b *backoff) Reset() {
 }
 
 func (b *backoff) Wait() bool {
+
 	backoff := b.duration
 	b.duration *= 2
 	if b.duration > b.max {
 		b.duration = b.max
 	}
+
+	debug("backoff: wait for %v", b.duration)
 
 	select {
 	case <-b.done:

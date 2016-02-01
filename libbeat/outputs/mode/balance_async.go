@@ -158,7 +158,9 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 			case <-m.done:
 				return
 			case msg = <-m.retries: // receive message from other failed worker
+				debug("events from retries queue")
 			case msg = <-m.work: // receive message from publisher
+				debug("events from worker worker queue")
 			}
 
 			err := m.onMessage(client, msg)
