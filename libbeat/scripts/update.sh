@@ -29,10 +29,13 @@ echo "Beat path: $DIR"
 
 cd $DIR
 
-
 echo "Start modifying beat"
 
 # Update config
 echo "Update config file"
 rm -f etc/$BEATNAME.yml
 cat etc/beat.yml ${LIBBEAT}/etc/libbeat.yml | sed -e "s/beatname/$BEATNAME/g" > $BEATNAME.yml
+
+# Update fields
+echo "Update fields"
+python ./scripts/field_docs.py ./etc/fields.yml ./docs/fields.asciidoc

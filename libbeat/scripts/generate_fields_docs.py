@@ -1,21 +1,6 @@
-#!/usr/bin/env python
-
-"""
-This script generates markdown documentation from the fields yml file.
-
-Usage: python generate_field_docs.py file.yml file.asciidoc
-"""
-
-import sys
 import yaml
 
-SECTIONS = [
-    ("common", "Common Beat"),
-    ("eventlog", "Event Log Record"),
-]
-
-
-def document_fields(output, section, level=3):
+def document_fields(output, section, SECTIONS, level=3):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
@@ -36,7 +21,7 @@ def document_fields(output, section, level=3):
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
-            document_fields(output, field, level + 1)
+            document_fields(output, field, SECTIONS, level + 1)
         else:
             document_field(output, field, level + 1)
 
@@ -61,7 +46,9 @@ def document_field(output, field, level):
         output.write("{}\n\n".format(field["description"]))
 
 
-def fields_to_asciidoc(input, output):
+def fields_to_asciidoc(input, output, SECTIONS, beat):
+
+    dict = {'beat': beat}
 
     output.write("""
 ////
@@ -71,10 +58,10 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 [[exported-fields]]
 == Exported Fields
 
-This document describes the fields that are exported by Winlogbeat. They are
+This document describes the fields that are exported by {beat}. They are
 grouped in the following categories:
 
-""")
+""".format(**dict))
 
     for doc, _ in SECTIONS:
         output.write("* <<exported-fields-{}>>\n".format(doc))
@@ -89,7 +76,11 @@ grouped in the following categories:
                 if section["type"] == "group":
                     section["name"] = name
                     section["anchor"] = doc
-                    document_fields(output, section)
+                    document_fields(output, section, SECTIONS)
+
+
+
+
 
 
 if __name__ == "__main__":
