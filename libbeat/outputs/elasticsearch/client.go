@@ -166,9 +166,8 @@ func bulkEncodePublishRequest(
 }
 
 func eventBulkMeta(index string, event common.MapStr) bulkMeta {
-	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
-	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
-		ts.Year(), ts.Month(), ts.Day())
+
+	index = getIndex(event, index)
 	meta := bulkMeta{
 		Index: bulkMetaIndex{
 			Index:   index,
@@ -176,6 +175,29 @@ func eventBulkMeta(index string, event common.MapStr) bulkMeta {
 		},
 	}
 	return meta
+}
+
+// getIndex returns the full index name
+// Index is either defined in the config as part of the output
+// or can be overload by the event through setting index
+func getIndex(event common.MapStr, index string) string {
+
+	ts := time.Time(event["@timestamp"].(common.Time)).UTC()
+
+	// Check for dynamic index
+	if _, ok := event["beat"]; ok {
+		beatMeta := event["beat"].(common.MapStr)
+		// Check if index is set dynamically
+		if dynamicIndex, ok := beatMeta["index"]; ok {
+			index = dynamicIndex.(string)
+		}
+	}
+
+	// Append timestamp to index
+	index = fmt.Sprintf("%s-%d.%02d.%02d", index,
+		ts.Year(), ts.Month(), ts.Day())
+
+	return index
 }
 
 // bulkCollectPublishFails checks per item errors returning all events
@@ -325,9 +347,7 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 		return ErrNotConnected
 	}
 
-	ts := time.Time(event["@timestamp"].(common.Time))
-	index := fmt.Sprintf("%s-%d.%02d.%02d",
-		client.index, ts.Year(), ts.Month(), ts.Day())
+	index := getIndex(event, client.index)
 	logp.Debug("output_elasticsearch", "Publish event: %s", event)
 
 	// insert the events one by one
