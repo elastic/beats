@@ -133,13 +133,7 @@ integration-tests: prepare-tests
 integration-tests-environment:
 	$(MAKE) prepare-tests
 	$(MAKE) build-image
-	NAME=$$(${DOCKER_COMPOSE} run -d beat make integration-tests | awk 'END{print}') || exit 1; \
-	echo "docker beat test container: '$$NAME'"; \
-	docker attach $$NAME; CODE=$$?;\
-	mkdir -p ${COVERAGE_DIR}; \
-	docker cp $$NAME:/go/src/${BEAT_DIR}/${BEATNAME}/${COVERAGE_DIR}/integration.cov $(shell pwd)/${COVERAGE_DIR}/; \
-	docker rm $$NAME > /dev/null; \
-	exit $$CODE
+	${DOCKER_COMPOSE} run beat make integration-tests
 
 # Runs the system tests
 .PHONY: system-tests
