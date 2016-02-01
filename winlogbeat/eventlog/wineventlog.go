@@ -6,13 +6,14 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 	sys "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 	"golang.org/x/sys/windows"
 )
 
 const (
 	// defaultMaxNumRead is the maximum number of event Read will return.
-	defaultMaxNumRead = 50
+	defaultMaxNumRead = 100
 
 	// renderBufferSize is the size in bytes of the buffer used to render events.
 	renderBufferSize = 1 << 14
@@ -33,7 +34,9 @@ type winEventLog struct {
 	subscription sys.EvtHandle // Handle to the subscription.
 	maxRead      int           // Maximum number returned in one Read.
 
-	renderBuf []byte // Buffer used for rendering event.
+	renderBuf []byte             // Buffer used for rendering event.
+	systemCtx sys.EvtHandle      // System render context.
+	cache     *messageFilesCache // Cached mapping of source name to event message file handles.
 
 	logPrefix string // String to prefix on log messages.
 }
@@ -91,7 +94,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 	var records []Record
 	for _, h := range handles {
-		e, err := sys.RenderEvent(h, 0, 0, l.renderBuf, nil)
+		e, err := sys.RenderEvent(h, l.systemCtx, 0, l.renderBuf, l.cache.get)
 		if err != nil {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
 			continue
@@ -138,11 +141,34 @@ func (l *winEventLog) Close() error {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(c Config) (EventLog, error) {
+	eventMetadataHandle := func(providerName, sourceName string) eventlogging.MessageFiles {
+		mf := eventlogging.MessageFiles{SourceName: sourceName}
+		h, err := sys.OpenPublisherMetadata(0, providerName, 0)
+		if err != nil {
+			mf.Err = err
+			return mf
+		}
+
+		mf.Handles = []eventlogging.FileHandle{eventlogging.FileHandle{Handle: uintptr(h)}}
+		return mf
+	}
+
+	freeHandle := func(handle uintptr) error {
+		return sys.Close(sys.EvtHandle(handle))
+	}
+
+	ctx, err := sys.CreateRenderContext(nil, sys.EvtRenderContextSystem)
+	if err != nil {
+		return nil, err
+	}
+
 	return &winEventLog{
 		channelName:  c.Name,
 		remoteServer: c.RemoteAddress,
 		maxRead:      defaultMaxNumRead,
 		renderBuf:    make([]byte, renderBufferSize),
+		systemCtx:    ctx,
+		cache:        newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", c.Name),
 	}, nil
 }

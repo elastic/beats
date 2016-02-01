@@ -144,7 +144,7 @@ func RenderEvent(
 	systemContext EvtHandle,
 	lang uint32,
 	renderBuf []byte,
-	pubHandleProvider func(string) uintptr,
+	pubHandleProvider func(string) eventlogging.MessageFiles,
 ) (Event, error) {
 	var err error
 
@@ -187,7 +187,12 @@ func RenderEvent(
 
 	var publisherHandle uintptr
 	if pubHandleProvider != nil {
-		publisherHandle = pubHandleProvider(e.ProviderName)
+		messageFiles := pubHandleProvider(e.ProviderName)
+		if messageFiles.Err == nil {
+			// There is only ever a single handle when using the Windows Event
+			// Log API.
+			publisherHandle = messageFiles.Handles[0].Handle
+		}
 	}
 
 	// Populate strings that must be looked up.
@@ -309,6 +314,17 @@ func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 	}
 
 	return h, nil
+}
+
+// Create a render context. Close must be called on returned EvtHandle when
+// finished with the handle.
+func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
+	context, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
+	if err != nil {
+		return 0, err
+	}
+
+	return context, nil
 }
 
 // OpenPublisherMetadata opens a handle to the publisher's metadata. Close must
