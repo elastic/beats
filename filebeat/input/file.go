@@ -24,7 +24,7 @@ type FileEvent struct {
 	Offset       int64
 	Bytes        int
 	Text         *string
-	Fields       *common.MapStr
+	Fields       common.MapStr
 	Fileinfo     *os.FileInfo
 
 	fieldsUnderRoot bool
@@ -77,7 +77,7 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 
 	if f.Fields != nil {
 		if f.fieldsUnderRoot {
-			for key, value := range *f.Fields {
+			for key, value := range f.Fields {
 				// in case of conflicts, overwrite
 				_, found := event[key]
 				if found {

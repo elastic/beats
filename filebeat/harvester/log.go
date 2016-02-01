@@ -170,7 +170,7 @@ func (h *Harvester) Harvest() {
 				Offset:       h.Offset,
 				Bytes:        bytesRead,
 				Text:         &text,
-				Fields:       &h.Config.Fields,
+				Fields:       h.Config.Fields,
 				Fileinfo:     &info,
 			}
 
