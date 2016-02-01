@@ -40,7 +40,7 @@ SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
-PYTHON_ENV=${BUILD_DIR}/python-env/
+PYTHON_ENV?=${BUILD_DIR}/python-env/
 
 # Conditionally enable the race detector when RACE_DETECTOR=1.
 ifeq ($(RACE_DETECTOR),1)
