@@ -8,9 +8,6 @@ elasticsearch:
 logstash:
   build: ./docker/logstash
   dockerfile: Dockerfile-2.2.0
-  ports:
-    - "5044:5044"
-    - "5055:5055"
 
 kibana:
   build: ./docker/kibana
