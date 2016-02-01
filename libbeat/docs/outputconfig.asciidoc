@@ -435,6 +435,13 @@ Beats that publish single events (such as Packetbeat and Topbeat) send each even
 Elasticsearch. Beats that publish data in batches (such as Filebeat) send events in batches based on the
 spooler size.
 
+===== pipelined
+
+If enabled logstash output will send another bulk of events to logstash while
+waiting for ACK from last bulk. This option can reduce network latencies and
+improve throughput, but will increase memory usage and bandwidth usage in case
+of failures. The default is false.
+
 [[redis-output]]
 ==== Redis Output (DEPRECATED)
 
