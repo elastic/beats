@@ -5,7 +5,8 @@ elasticsearch:
   image: elasticsearch:1.7
 
 logstash:
-  image: logstash:1.5
+  build: ./docker/logstash
+  dockerfile: Dockerfile-1.5.5
 
 kibana:
   image: kibana:4.1

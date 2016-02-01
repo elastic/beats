@@ -23,6 +23,8 @@ logstash:
     - "5044:5044"
     - "5055:5055"
   container_name: logstash
+  environment:
+    - ES_HOST=elasticsearch
 
 kibana:
   image: kibana:latest

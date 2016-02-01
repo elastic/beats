@@ -1,4 +1,3 @@
-# FROM logstash:2
 FROM java:8-jre
 
 ENV LS_VERSION 2
