@@ -44,7 +44,7 @@ const (
 	logstashDefaultTimeout   = 30 * time.Second
 	logstasDefaultMaxTimeout = 90 * time.Second
 	defaultSendRetries       = 3
-	defaultMaxWindowSize     = 1024
+	defaultMaxWindowSize     = 2048
 	defaultCompressionLevel  = 3
 )
 
@@ -120,7 +120,8 @@ func (lj *logstash) init(
 			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
 				waitRetry, timeout, maxWaitRetry)
 		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
+			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts,
+				waitRetry, timeout, maxWaitRetry)
 		}
 	}
 	if err != nil {
