@@ -3,6 +3,10 @@
 
 package config
 
+type Config struct {
+	{{cookiecutter.beat|capitalize}} {{cookiecutter.beat|capitalize}}Config
+}
+
 type {{cookiecutter.beat|capitalize}}Config struct {
 	Period string `yaml:"period"`
 }

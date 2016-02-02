@@ -13,9 +13,9 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	BeaterConfig *config.{{cookiecutter.beat|capitalize}}Config
-	done         chan struct{}
-	period       time.Duration
+	Configuration  *config.Config
+	done           chan struct{}
+	period         time.Duration
 }
 
 // Creates beater
@@ -30,7 +30,7 @@ func New() *{{cookiecutter.beat|capitalize}} {
 func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
 	// Load beater configuration
-	err := cfgfile.Read(&bt.BeaterConfig, "")
+	err := cfgfile.Read(&bt.Configuration, "")
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
@@ -41,12 +41,12 @@ func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 
 	// Setting default period if not set
-	if bt.BeaterConfig.Period == "" {
-		bt.BeaterConfig.Period = "1s"
+	if bt.Configuration.{{cookiecutter.beat|capitalize}}.Period == "" {
+		bt.Configuration.{{cookiecutter.beat|capitalize}}.Period = "1s"
 	}
 
 	var err error
-	bt.period, err = time.ParseDuration(bt.BeaterConfig.Period)
+	bt.period, err = time.ParseDuration(bt.Configuration.{{cookiecutter.beat|capitalize}}.Period)
 	if err != nil {
 		return err
 	}
@@ -59,21 +59,21 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 
 	ticker := time.NewTicker(bt.period)
 	counter := 1
-
 	for {
 		select {
 		case <-bt.done:
 			return nil
 		case <-ticker.C:
-			event := common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"type":       b.Name,
-				"counter":    counter,
-			}
-			b.Events.PublishEvent(event)
-			logp.Info("Event sent")
-			counter++
 		}
+
+		event := common.MapStr{
+			"@timestamp": common.Time(time.Now()),
+			"type":       b.Name,
+			"counter":    counter,
+		}
+		b.Events.PublishEvent(event)
+		logp.Info("Event sent")
+		counter++
 	}
 
 	return nil
