@@ -1,10 +1,12 @@
 import yaml
+import sys
 
-def document_fields(output, section, SECTIONS, level=3):
+
+def document_fields(output, section, SECTIONS):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
-    output.write("{} {} Fields\n\n".format(level*'=', section["name"]))
+    output.write("=== {} Fields\n\n".format(section["name"]))
 
     if "description" in section:
         output.write("{}\n\n".format(section["description"]))
@@ -21,17 +23,17 @@ def document_fields(output, section, SECTIONS, level=3):
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
-            document_fields(output, field, SECTIONS, level + 1)
+            document_fields(output, field, SECTIONS)
         else:
-            document_field(output, field, level + 1)
+            document_field(output, field)
 
 
-def document_field(output, field, level):
+def document_field(output, field):
 
     if "path" not in field:
         field["path"] = field["name"]
 
-    output.write("{} {}\n\n".format(level*'=', field["path"]))
+    output.write("==== {}\n\n".format(field["path"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -77,11 +79,6 @@ grouped in the following categories:
                     section["name"] = name
                     section["anchor"] = doc
                     document_fields(output, section, SECTIONS)
-
-
-
-
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
