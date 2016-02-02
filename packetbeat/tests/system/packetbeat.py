@@ -15,8 +15,8 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.beat_name = "packetbeat"
-        self.build_path = "../../build/system-tests/"
-        self.beat_path = "../../packetbeat.test"
+        super(BaseTest, self).setUpClass()
+
 
     def run_packetbeat(self, pcap,
                        cmd="../../packetbeat.test",
