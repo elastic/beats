@@ -88,7 +88,7 @@ more information about these options, see <<packetbeat-configuration>>.
 [[configuring-packetbeat]]
 === Configuring Packetbeat
 
-Before starting Packetbeat, you need to edit the configuration file. For rpm and deb, you'll
+To configure Packetbeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/packetbeat/packetbeat.yml`. For mac and win, look in
 the archive that you just extracted.
 
@@ -102,9 +102,9 @@ server on which Packetbeat is installed. For this, use `any` as the device:
 +
 [source,yaml]
 ----------------------------------------------------------------------
+# Select the network interfaces to sniff the data. You can use the "any"
+# keyword to sniff on all connected interfaces.
 interfaces:
-  # Select on which network interfaces to sniff. You can use the "any"
-  # keyword to sniff on all connected interfaces.
   device: any
 ----------------------------------------------------------------------
 
@@ -140,9 +140,12 @@ default values should do just fine.
 [source,yaml]
 ----------------------------------------------------------------------
 protocols:
-  # Configure which protocols to monitor and on which ports are they
-  # running. You can disable a given protocol by commenting out its
-  # configuration.
+  dns:
+    ports: [53]
+    
+    include_authorities: true
+    include_additionals: true
+    
   http:
     ports: [80, 8080, 8081, 5000, 8002]
 
@@ -151,15 +154,18 @@ protocols:
 
   mysql:
     ports: [3306]
+    
+  pgsql:
+    ports: [5432]
 
   redis:
     ports: [6379]
 
-  pgsql:
-    ports: [5432]
-
   thrift:
     ports: [9090]
+    
+  mongodb:
+    ports: [27017]
 ----------------------------------------------------------------------
 +
 . Set the IP address and port where Packetbeat can find the Elasticsearch
@@ -167,23 +173,18 @@ installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
 output:
-
+  ### Elasticsearch as output
   elasticsearch:
-    # Uncomment out this option if you want to output to Elasticsearch. The
-    # default is false.
-    enabled: true
-
-    # Set the host and port where to find Elasticsearch.
-    host: 192.168.1.42
-    port: 9200
-
-    # Uncomment this option and set it to true if you want to store the topology in
-    # Elasticsearch. Default behavior if this setting is left out of the
-    # config file is equivalent to setting "save_topology" to "false"
-    #save_topology: false
+    # Array of hosts to connect to.
+     hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
++
+If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
+[[config-filebeat-logstash]]
 === Configuring Packetbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
@@ -208,13 +209,11 @@ curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packe
 
 *mac:*
 
-[source,shell]
+["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 cd packetbeat-{version}-darwin
 curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@packetbeat.template.json
 ----------------------------------------------------------------------
-
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
 *win:*
 
