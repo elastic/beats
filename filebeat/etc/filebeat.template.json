@@ -25,12 +25,15 @@
           "type": "date"
         },
         "message": {
-          "type": "string",
-          "index": "analyzed"
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
         },
         "offset": {
-          "type": "long",
-          "doc_values": "true"
+          "doc_values": "true",
+          "type": "long"
         }
       }
     }

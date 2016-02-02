@@ -62,6 +62,9 @@ log:
 
     - name: message
       type: string
+      index: analyzed
+      doc_values: true
+      ignore_above: 0
       required: true
       description: >
         The content of the line read from the log file.
@@ -71,3 +74,7 @@ log:
       required: false
       description: >
         Contains user configurable fields.
+
+sections:
+  - ["env", "Common"]
+  - ["log", "Log File Content"]

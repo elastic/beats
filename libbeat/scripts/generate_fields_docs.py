@@ -2,7 +2,7 @@ import yaml
 import sys
 
 
-def document_fields(output, section, SECTIONS):
+def document_fields(output, section, sections):
 
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
@@ -18,12 +18,15 @@ def document_fields(output, section, SECTIONS):
     for field in section["fields"]:
 
         if "type" in field and field["type"] == "group":
-            for sec, name in SECTIONS:
+
+            for value in sections:
+                sec = value[0]
+                name = value[1]
                 if sec == field["name"]:
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
-            document_fields(output, field, SECTIONS)
+            document_fields(output, field, sections)
         else:
             document_field(output, field)
 
@@ -48,7 +51,7 @@ def document_field(output, field):
         output.write("{}\n\n".format(field["description"]))
 
 
-def fields_to_asciidoc(input, output, SECTIONS, beat):
+def fields_to_asciidoc(input, output, beat):
 
     dict = {'beat': beat}
 
@@ -65,31 +68,42 @@ grouped in the following categories:
 
 """.format(**dict))
 
-    for doc, _ in SECTIONS:
+
+    docs = yaml.load(input)
+    sections = docs["sections"]
+
+    for doc, _ in sections:
         output.write("* <<exported-fields-{}>>\n".format(doc))
     output.write("\n")
 
-    docs = yaml.load(input)
+    for value in sections:
 
-    for doc, name in SECTIONS:
+        doc = value[0]
+        name = value[1]
+
         if doc in docs:
             section = docs[doc]
             if "type" in section:
                 if section["type"] == "group":
                     section["name"] = name
                     section["anchor"] = doc
-                    document_fields(output, section, SECTIONS)
+                    document_fields(output, section, sections)
+
 
 if __name__ == "__main__":
+
     if len(sys.argv) != 3:
-        print "Usage: %s file.yml file.asciidoc" % sys.argv[0]
+        print "Usage: %s beatpath beatname" % sys.argv[0]
         sys.exit(1)
 
-    input = open(sys.argv[1], 'r')
-    output = open(sys.argv[2], 'w')
+    beat_path = sys.argv[1]
+    beat_name = sys.argv[2]
+
+    input = open(beat_path + "/etc/fields.yml", 'r')
+    output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(input, output)
+        fields_to_asciidoc(input, output, beat_name.title())
     finally:
         input.close()
         output.close()

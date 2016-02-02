@@ -36,6 +36,10 @@ echo "Update config file"
 rm -f etc/$BEATNAME.yml
 cat etc/beat.yml ${LIBBEAT}/etc/libbeat.yml | sed -e "s/beatname/$BEATNAME/g" > $BEATNAME.yml
 
+
 # Update fields
 echo "Update fields"
-python ./scripts/field_docs.py ./etc/fields.yml ./docs/fields.asciidoc
+python ${LIBBEAT}/scripts/generate_fields_docs.py $(pwd) ${BEATNAME}
+
+# Update templates
+python ${LIBBEAT}/scripts/generate_template.py $(pwd) ${BEATNAME}
