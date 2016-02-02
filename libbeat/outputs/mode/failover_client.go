@@ -54,7 +54,7 @@ func (f *failOverClient) IsConnected() bool {
 }
 
 func (f *failOverClient) Close() error {
-	return close(f)
+	return closeActive(f)
 }
 
 func (f *failOverClient) PublishEvents(events []common.MapStr) ([]common.MapStr, error) {
@@ -92,7 +92,7 @@ func (f *asyncFailOverClient) IsConnected() bool {
 }
 
 func (f *asyncFailOverClient) Close() error {
-	return close(f)
+	return closeActive(f)
 }
 
 func (f *asyncFailOverClient) AsyncPublishEvents(
@@ -148,7 +148,7 @@ func connect(lst clientList, to time.Duration) error {
 	return conn.Connect(to)
 }
 
-func close(lst clientList) error {
+func closeActive(lst clientList) error {
 	active := lst.Active()
 	if active < 0 {
 		return nil
