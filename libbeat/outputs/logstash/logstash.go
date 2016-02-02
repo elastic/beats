@@ -122,7 +122,7 @@ func (lj *logstash) init(
 			return err
 		}
 
-		if !balanced {
+		if !loadBalance {
 			clients = []mode.AsyncProtocolClient{
 				mode.NewAsyncFailoverClient(clients),
 			}
@@ -142,7 +142,7 @@ func (lj *logstash) init(
 			return err
 		}
 
-		if !balanced {
+		if !loadBalance {
 			clients = []mode.ProtocolClient{
 				mode.NewFailoverClient(clients),
 			}
