@@ -1,8 +1,6 @@
 package logstash
 
 // TODO:
-//  - test window increase for multiple sends
-//  - test window decrease on timeout
 //  - test with connection timeout
 
 import (
@@ -30,6 +28,20 @@ const (
 	driverCmdPublish
 )
 
+type testClientDriver struct {
+	client  mode.ProtocolClient
+	ch      chan testDriverCommand
+	returns []testClientReturn
+}
+
+type testClient interface {
+	Stop()
+	Publish(events []common.MapStr)
+	Returns() []testClientReturn
+}
+
+type clientFactory func(TransportClient) testClient
+
 type testClientReturn struct {
 	n   int
 	err error
@@ -38,12 +50,6 @@ type testClientReturn struct {
 type testDriverCommand struct {
 	code   int
 	events []common.MapStr
-}
-
-type testClientDriver struct {
-	client  mode.ProtocolClient
-	ch      chan testDriverCommand
-	returns []testClientReturn
 }
 
 const (
@@ -101,12 +107,20 @@ func newClientTestDriver(client mode.ProtocolClient) *testClientDriver {
 	return driver
 }
 
+func makeTestClient(conn TransportClient) testClient {
+	return newClientTestDriver(newLumberjackTestClient(conn))
+}
+
 func (t *testClientDriver) Stop() {
 	t.ch <- testDriverCommand{code: driverCmdQuit}
 }
 
 func (t *testClientDriver) Publish(events []common.MapStr) {
 	t.ch <- testDriverCommand{code: driverCmdPublish, events: events}
+}
+
+func (t *testClientDriver) Returns() []testClientReturn {
+	return t.returns
 }
 
 func (a mockAddr) Network() string { return "fake" }
@@ -305,25 +319,33 @@ func sendAck(transp *mockTransport, seq uint32) {
 	transp.sendBytes(buf.Bytes())
 }
 
+func enableLogging(selectors []string) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+	}
+}
+
 const testMaxWindowSize = 64
 
-func TestSendZero(t *testing.T) {
+func testSendZero(t *testing.T, factory clientFactory) {
 	transp := newMockTransport()
-	client := newClientTestDriver(newLumberjackTestClient(transp))
+	client := factory(transp)
 
 	client.Publish(make([]common.MapStr, 0))
 
 	client.Stop()
 	transp.Close()
 
-	assert.Equal(t, 1, len(client.returns))
-	assert.Equal(t, 0, client.returns[0].n)
-	assert.Nil(t, client.returns[0].err)
+	returns := client.Returns()
+	assert.Equal(t, 1, len(returns))
+	assert.Equal(t, 0, returns[0].n)
+	assert.Nil(t, returns[0].err)
 }
 
-func TestSimpleEvent(t *testing.T) {
+func testSimpleEvent(t *testing.T, factory clientFactory) {
+	enableLogging([]string{"*"})
 	transp := newMockTransport()
-	client := newClientTestDriver(newLumberjackTestClient(transp))
+	client := factory(transp)
 
 	event := common.MapStr{"name": "me", "line": 10}
 	client.Publish([]common.MapStr{event})
@@ -353,9 +375,9 @@ func TestSimpleEvent(t *testing.T) {
 	assert.Equal(t, 10.0, msg.doc["line"])
 }
 
-func TestStructuredEvent(t *testing.T) {
+func testStructuredEvent(t *testing.T, factory clientFactory) {
 	transp := newMockTransport()
-	client := newClientTestDriver(newLumberjackTestClient(transp))
+	client := factory(transp)
 	event := common.MapStr{
 		"name": "test",
 		"struct": common.MapStr{
@@ -399,63 +421,14 @@ func TestStructuredEvent(t *testing.T) {
 	assert.Equal(t, 2.0, msg.doc.get("struct.field5.sub1"))
 }
 
-func enableLogging(selectors []string) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
-	}
+func TestClientSendZero(t *testing.T) {
+	testSendZero(t, makeTestClient)
 }
 
-func TestGrowWindowSizeUpToBatchSizes(t *testing.T) {
-	batchSize := 114
-	windowSize := 1024
-	testGrowWindowSize(t, 10, 0, windowSize, batchSize, batchSize)
+func TestClientSimpleEvent(t *testing.T) {
+	testSimpleEvent(t, makeTestClient)
 }
 
-func TestGrowWindowSizeUpToMax(t *testing.T) {
-	batchSize := 114
-	windowSize := 64
-	testGrowWindowSize(t, 10, 0, windowSize, batchSize, windowSize)
-}
-
-func TestGrowWindowSizeOf1(t *testing.T) {
-	batchSize := 114
-	windowSize := 1024
-	testGrowWindowSize(t, 1, 0, windowSize, batchSize, batchSize)
-}
-
-func TestGrowWindowSizeToMaxOKOnly(t *testing.T) {
-	batchSize := 114
-	windowSize := 1024
-	maxOK := 71
-	testGrowWindowSize(t, 1, maxOK, windowSize, batchSize, maxOK)
-}
-
-func testGrowWindowSize(t *testing.T,
-	initial, maxOK, windowSize, batchSize, expected int,
-) {
-	enableLogging([]string{"logstash"})
-	c, err := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
-	assert.NoError(t, err)
-	c.windowSize = initial
-	c.maxOkWindowSize = maxOK
-	for i := 0; i < 100; i++ {
-		c.tryGrowWindowSize(batchSize)
-	}
-
-	assert.Equal(t, expected, c.windowSize)
-	assert.Equal(t, expected, c.maxOkWindowSize)
-}
-
-func TestShrinkWindowSizeNeverZero(t *testing.T) {
-	enableLogging([]string{"logstash"})
-
-	windowSize := 124
-	c, err := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
-	assert.NoError(t, err)
-	c.windowSize = windowSize
-	for i := 0; i < 100; i++ {
-		c.shrinkWindow()
-	}
-
-	assert.Equal(t, 1, c.windowSize)
+func TestClientStructuredEvent(t *testing.T) {
+	testStructuredEvent(t, makeTestClient)
 }
