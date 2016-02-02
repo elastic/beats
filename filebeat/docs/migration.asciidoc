@@ -117,8 +117,8 @@ filebeat:
     # Each - is a prospector. Below are the prospector specific configurations
     -
       paths:
-        - /var/log/messages
-        - "/var/log/*.log"
+        - /system/var/log/messages
+        - "/system/var/log/*.log"
       document_type: syslog <1>
       fields:
         service: apache
@@ -128,7 +128,7 @@ filebeat:
       document_type: stdin
     -
       paths:
-        - "/var/log/apache/httpd-*.log"
+        - "/system/var/log/apache2/httpd-*.log"
       document_type: apache
 -------------------------------------------------------------------------------------
 
@@ -190,26 +190,23 @@ The equivalent in Filebeat would look like this:
 -------------------------------------------------------------------------------------
 output:
   logstash:
-    enabled: true
-
-    # The list of downstream Logstash servers. <1>
+    # The Logstash hosts. <1>
     hosts:
       - localhost:5043
+      
+    # Network timeout in seconds.
+    timeout: 15
 
     tls: <2>
-      # The path to your SSL client certificate.
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: 
+        - ./logstash-forwarder.crt
+        
+      # Certificate for TLS client authentication
       certificate: ./logstash-forwarder.crt
 
-      # The path to your SSL client certificate key.
-      certificate_key: ./logstash-forwarder.key
-
-      # The path to your trusted SSL CA file. This is used
-      # to authenticate your downstream server.
-      certificate_authorities:
-        - ./logstash-forwarder.crt
-
-      # Network timeout in seconds.
-      timeout: 15
+      # Client Certificate Key
+      certificate_key: ./logstash-forwarder.key    
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
@@ -285,7 +282,6 @@ filebeat:
         service: test01
 output:
   elasticsearch:
-    enabled: true
     hosts: ["http://localhost:5043"]
 -------------------------------------------------------------------------------------
 

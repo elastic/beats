@@ -82,8 +82,12 @@ for example `C:\Program Files\Topbeat\topbeat.yml`. For more information about t
 [[topbeat-configuration]]
 === Configuring Topbeat
 
-To configure Topbeat, you edit the _topbeat.yml_ file. Here is a sample of
-the _topbeat.yml_ file:
+To configure Topbeat, you edit the configuration file. For rpm and deb, you'll
+find the configuration file at `/etc/topbeat/topbeat.yml`. For mac and win, look in
+the archive that you just extracted.
+
+Here is a sample of the `topbeat.yml` file. Topbeat uses predefined
+default values for most configuration options. 
 
 [source, shell]
 -------------------------------------
@@ -92,13 +96,18 @@ input:
   procs: [".*"]
 -------------------------------------
 
-The `period` option defines how often to read system-wide and per-process statistics from your servers. The interval is in seconds.
+To configure Topbeat:
+
+. Set the following options to specify how often Topbeat reads
+statistics and control which processes it monitors:
++
+* The `period` option defines how often to read system-wide and per-process statistics from your servers. The interval is in seconds.
 By default, it's set to 10 seconds.
 
-The `procs` option defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
-
-If you are not interested in monitoring your processes, you can use:
-
+* The `procs` option defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
++
+If you are not interested in monitoring processes, you can use:
++
 [source, shell]
 -------------------------------------
 input:
@@ -106,6 +115,22 @@ input:
   procs: ["^$"]
 -------------------------------------
 
+. If you are sending output to Elasticsearch, set the IP address and port where Topbeat can find the Elasticsearch installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+output:
+  ### Elasticsearch as output
+  elasticsearch:
+    # Array of hosts to connect to.
+     hosts: ["192.168.1.42:9200"]
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
+
+[[config-filebeat-logstash]]
 === Configuring Topbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]

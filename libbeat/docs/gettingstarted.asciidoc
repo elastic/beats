@@ -110,18 +110,17 @@ You should see a response similar to this:
 [source,shell]
 ----------------------------------------------------------------------
 {
-  "name" : "Banshee",
+  "name" : "Angela Del Toro",
   "cluster_name" : "elasticsearch",
   "version" : {
     "number" : "2.2.0",
-    "build_hash" : "72cd1f1a3eee09505e036106146dc1949dc5dc87",
-    "build_timestamp" : "2015-11-18T22:40:03Z",
+    "build_hash" : "8ff36d139e16f8720f2947ef62c8167a888992fe",
+    "build_timestamp" : "2016-01-27T13:32:39Z",
     "build_snapshot" : false,
-    "lucene_version" : "5.3.1"
+    "lucene_version" : "5.4.1"
   },
   "tagline" : "You Know, for Search"
 }
-
 ----------------------------------------------------------------------
 
 [[logstash-installation]]
@@ -403,12 +402,11 @@ Use the following commands to run the script:
 curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip
 unzip beats-dashboards-{Dashboards-version}.zip
 cd beats-dashboards-{Dashboards-version}/
-./load.sh -url http://localhost:9200
+./load.sh
 ----------------------------------------------------------------------
 
-Replace `localhost:9200` with the location where Elasticsearch is running.
-For example, `./load.sh -url http://192.168.33.60:9200`. For more command-line options,
-see <<dashboard-load-options>>.
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
+to specify a different location. For example: `./load.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
 
 *win:*
 
@@ -426,47 +424,41 @@ to download and install PowerShell.
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 PS > cd beats-dashboards-{Dashboards-version}
-PS > .\load.ps1 -url http://localhost:9200
+PS > .\load.ps1
 ----------------------------------------------------------------------
 +
-Replace `localhost:9200` with the location where Elasticsearch is running. For example,
-`.\load.ps1 -url http://192.168.33.60:9200`. For more command-line options,
-see <<dashboard-load-options>>.
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
+to specify a different location. For example: `.\load.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
 +
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://localhost:9200`.
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://192.168.33.60:9200`.
 
 [[dashboard-load-options]]
-===== Dashboard Load Options
+===== Other Dashboard Load Options
+When you load the dashboards, you can also specify:
 
-You can specify the following options when you run the load script (`load.sh` or
-`load.ps1`) to load Kibana dashboards. If you specify no options, the script
-assumes that Elasticsearch is running at `http://localhost:9200`.
-
-[[horizontal]]
-*`-h | -help`*::
-Print the help menu.
-
-*`-l | -url <Elasticsearch_url>`*::
-The URL of the server where Elasticsearch is running. For example,
-`-url http://192.168.33.60:9200`.
-
-*`-u | -user <username>:<password>`*::
-The username and password for authenticating to Elasticsearch using Basic
-Authentication. Specify the username and password separated by a colon
-(for example, `-user admin:secret`). By default no username and password are
-used.
-
-*`-i | -index <index_pattern>`*::
-The Kibana index pattern where you want to save the Beats dashboards,
-visualizations, and index patterns. You can use this option to upload the Beats
-dashboards into multiple Kibana installations. For example: 
+* The Kibana index pattern where you want to load the dashboards in Elasticsearch. For example:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./load.sh -url http://localhost:9200 -index .kibana_env1
-./load.sh -url http://localhost:9200 -index .kibana_env2
-./load.sh -url http://localhost:9200 -index .kibana_env3
+./load.sh -url http://test.com:9200 -index .kibana_env
 ----------------------------------------------------------------------
+
+* The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./load.sh -url https://xyz.found.io -u user:password <1>
+
+./load.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
+
+./load.sh -url https://user:password@xyz.found.io <3>
+----------------------------------------------------------------------
++
+<1> Specify the username and password separated by a colon.
+<2> Use a file to avoid polluting the bash history with the password.
+<3> Put the username and password in the URL.
+
+These options are also available when you run `.\load.ps` on Windows.
 
 [[view-kibana-dashboards]]
 ==== Opening the Beats Dashboards in Kibana
