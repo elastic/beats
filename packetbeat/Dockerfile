@@ -20,8 +20,8 @@ ENV PYTHON_ENV=/tmp/python-env
 
 
 RUN test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
-COPY ./tests/system/requirements.txt /tmp/requirements.txt
-RUN . ${PYTHON_ENV}/bin/activate && pip install -Ur /tmp/requirements.txt
+RUN . ${PYTHON_ENV}/bin/activate && pip install nose jinja2 PyYAML nose-timer
 
-# Libbeat specific
-RUN mkdir -p /etc/pki/tls/certs
+# Packetbeat specifics
+RUN apt-get install -y libpcap-dev geoip-database && apt-get clean
+

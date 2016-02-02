@@ -92,9 +92,21 @@ class TestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.beat_name = "beat"
-        self.build_path = "../../build/system-tests/"
-        self.beat_path = "../../" + self.beat_name + ".test"
+
+        # Create build path
+        build_dir = "../../build"
+        if 'BUILD_DIR' in os.environ.keys() and os.environ['BUILD_DIR'] != '':
+            build_dir = os.environ['BUILD_DIR']
+        self.build_path = build_dir + "/system-tests/"
+
+        # Path to test binary
+        if not hasattr(self, 'beat_name'):
+            self.beat_name = "beat"
+
+        # Path to test binary
+        if not hasattr(self, 'beat_path'):
+            self.beat_path = "../../" + self.beat_name + ".test"
+
 
     def run_beat(self, cmd=None,
                  config=None,
