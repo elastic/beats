@@ -117,8 +117,8 @@ filebeat:
     # Each - is a prospector. Below are the prospector specific configurations
     -
       paths:
-        - /system/var/log/messages
-        - "/system/var/log/*.log"
+        - /var/log/messages
+        - "/var/log/*.log"
       document_type: syslog <1>
       fields:
         service: apache
@@ -128,7 +128,7 @@ filebeat:
       document_type: stdin
     -
       paths:
-        - "/system/var/log/apache2/httpd-*.log"
+        - "/var/log/apache2/httpd-*.log"
       document_type: apache
 -------------------------------------------------------------------------------------
 

@@ -96,8 +96,7 @@ filebeat:
       # Paths that should be crawled and fetched. Glob based paths.
       # For each file found under this path, a harvester is started.
       paths:
-        - "/private/var/log/*.log"
-        - "/Users/Shared/testlogs/*.log"
+        - "/var/log/*.log"
         #- c:\programdata\elasticsearch\logs\*
 
       # Type of the files. Based on this the way the file is read is decided.
@@ -121,16 +120,16 @@ filebeat:
   prospectors:
     -
       paths:
-        - "/private/var/log/*.log"
+        - "/var/log/*.log"
 -------------------------------------------------------------------------------------
 +
-The prospector in this example harvests all files in the path `/private/var/log/*.log`, which means
-that Filebeat will harvest all files in the directory `/private/var/log/` that end with `.log`. All patterns supported
+The prospector in this example harvests all files in the path `/var/log/*.log`, which means
+that Filebeat will harvest all files in the directory `/var/log/` that end with `.log`. All patterns supported
 by https://golang.org/pkg/path/filepath/#Glob[Golang Glob] are also supported here.
 +
 To fetch all files from a predefined level of subdirectories, the following pattern can be used:
-`/private/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/private/var/log`. It does not
-fetch log files from the `/private/var/log` folder itself. Currently it is not possible to recursively
+`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
+fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
 +
 A config file can contain multiple prospectors and multiple paths per prospector
@@ -145,11 +144,11 @@ filebeat:
   prospectors:
     -
       paths:
-        - /private/var/log/system.log
-        - /private/var/log/wifi.log
+        - /var/log/system.log
+        - /var/log/wifi.log
     -
       paths:
-        - "/private/var/log/apache2/*"
+        - "/var/log/apache2/*"
 -------------------------------------------------------------------------------------
 +
 The config file in the example starts two prospectors. The first prospector has two harvesters,
