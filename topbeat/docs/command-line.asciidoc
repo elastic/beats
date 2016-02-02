@@ -2,6 +2,7 @@
 == Command Line Options
 
 The following command line options from libbeat are also available for Topbeat.
+To use these options, you need to start Topbeat in the foreground.
 
 [source,shell]
 ---------------------------------------------------------
