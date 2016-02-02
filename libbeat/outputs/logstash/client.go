@@ -3,7 +3,6 @@ package logstash
 import (
 	"errors"
 	"expvar"
-	"math"
 	"net"
 	"time"
 
@@ -28,9 +27,7 @@ type client struct {
 	TransportClient
 	*protocol
 
-	windowSize      int
-	maxOkWindowSize int // max window size sending was successful for
-	maxWindowSize   int
+	win             window
 	countTimeoutErr int
 }
 
@@ -56,12 +53,12 @@ func newLumberjackClient(
 		return nil, err
 	}
 
-	return &client{
+	c := &client{
 		TransportClient: conn,
 		protocol:        p,
-		windowSize:      defaultStartMaxWindowSize,
-		maxWindowSize:   maxWindowSize,
-	}, nil
+	}
+	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	return c, nil
 }
 
 func (l *client) Connect(timeout time.Duration) error {
@@ -110,12 +107,13 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 	}
 
 	batchSize := len(events)
+	windowSize := l.win.get()
 	debug("Try to publish %v events to logstash with window size %v",
-		batchSize, l.windowSize)
+		batchSize, windowSize)
 
 	// prepare message payload
-	if batchSize > l.windowSize {
-		events = events[:l.windowSize]
+	if batchSize > windowSize {
+		events = events[:windowSize]
 	}
 
 	outEvents, err := l.sendEvents(events)
@@ -131,12 +129,12 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 		return l.onFail(int(seq), err)
 	}
 
-	l.tryGrowWindowSize(batchSize)
+	l.win.tryGrowWindow(batchSize)
 	return len(events), nil
 }
 
 func (l *client) onFail(n int, err error) (int, error) {
-	l.shrinkWindow()
+	l.win.shrinkWindow()
 
 	// if timeout error, back off and ignore error
 	nerr, ok := err.(net.Error)
@@ -157,44 +155,4 @@ func (l *client) onFail(n int, err error) (int, error) {
 	// mode might try to publish again with reduce window size or ask another
 	// client to send events
 	return n, nil
-}
-
-// Increase window size by factor 1.5 until max window size
-// (window size grows exponentially)
-// TODO: use duration until ACK to estimate an ok max window size value
-func (l *client) tryGrowWindowSize(batchSize int) {
-	if l.windowSize <= batchSize {
-		if l.maxOkWindowSize < l.windowSize {
-			logp.Debug("logstash", "update max ok window size: %v < %v", l.maxOkWindowSize, l.windowSize)
-			l.maxOkWindowSize = l.windowSize
-
-			newWindowSize := int(math.Ceil(1.5 * float64(l.windowSize)))
-			logp.Debug("logstash", "increase window size to: %v", newWindowSize)
-
-			if l.windowSize <= batchSize && batchSize < newWindowSize {
-				logp.Debug("logstash", "set to batchSize: %v", batchSize)
-				newWindowSize = batchSize
-			}
-			if newWindowSize > l.maxWindowSize {
-				logp.Debug("logstash", "set to max window size: %v", l.maxWindowSize)
-				newWindowSize = l.maxWindowSize
-			}
-			l.windowSize = newWindowSize
-		} else if l.windowSize < l.maxOkWindowSize {
-			logp.Debug("logstash", "update current window size: %v", l.windowSize)
-
-			l.windowSize = int(math.Ceil(1.5 * float64(l.windowSize)))
-			if l.windowSize > l.maxOkWindowSize {
-				logp.Debug("logstash", "set to max ok window size: %v", l.maxOkWindowSize)
-				l.windowSize = l.maxOkWindowSize
-			}
-		}
-	}
-}
-
-func (l *client) shrinkWindow() {
-	l.windowSize = l.windowSize / 2
-	if l.windowSize < minWindowSize {
-		l.windowSize = minWindowSize
-	}
 }
