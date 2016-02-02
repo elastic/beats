@@ -80,3 +80,4 @@ class Test(BaseTest):
         doc = output[0]
         assert doc["beat.name"] == "testShipperName"
         assert doc["beat.hostname"] == socket.gethostname()
+        assert "fields" not in doc
