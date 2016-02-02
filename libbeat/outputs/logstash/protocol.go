@@ -64,10 +64,11 @@ func newClientProcol(
 
 func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 	conn := p.conn
-
 	if len(events) == 0 {
 		return 0, nil
 	}
+
+	debug("send events")
 
 	// serialize all raw events into output buffer, removing all events encoding failed for
 	count, err := p.serializeEvents(events)
@@ -76,10 +77,12 @@ func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 		// as exported so no one tries to send/encode the same events once again
 		// The compress/encode function already prints critical per failed encoding
 		// failure.
+		debug("no events serializable")
 		return 0, errAllEventsEncoding
 	}
 
 	// send window size:
+	debug("send window size")
 	if err := p.sendWindowSize(count); err != nil {
 		return 0, err
 	}
@@ -87,12 +90,14 @@ func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 	if p.compressLevel > 0 {
 		err = p.sendCompressed(p.eventsBuffer.Bytes())
 	} else {
+		debug("write events")
 		_, err = conn.Write(p.eventsBuffer.Bytes())
 	}
 	if err != nil {
 		return 0, err
 	}
 
+	debug("did send %v events", count)
 	return count, nil
 }
 
@@ -150,12 +155,15 @@ func (p *protocol) sendWindowSize(window uint32) error {
 }
 
 func (p *protocol) sendCompressed(payload []byte) error {
+	debug("send compressed")
+
 	conn := p.conn
 
 	if err := conn.SetWriteDeadline(time.Now().Add(p.timeout)); err != nil {
 		return err
 	}
 
+	debug("write compressed header")
 	if _, err := conn.Write(codeCompressed); err != nil {
 		return err
 	}
@@ -164,6 +172,7 @@ func (p *protocol) sendCompressed(payload []byte) error {
 		return err
 	}
 
+	debug("send payload")
 	for len(payload) > 0 {
 		n, err := conn.Write(payload)
 		payload = payload[n:]

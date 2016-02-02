@@ -2,9 +2,7 @@ package logstash
 
 import (
 	"io"
-	"math"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -16,11 +14,7 @@ type asyncClient struct {
 	*protocol
 	mutex sync.Mutex
 
-	windowSize      int32
-	maxOkWindowSize int // max window size sending was successful for
-	maxWindowSize   int
-
-	countTimeoutErr int
+	win window
 
 	ch   chan ackMessage
 	done chan struct{}
@@ -57,12 +51,12 @@ func newAsyncLumberjackClient(
 		return nil, err
 	}
 
-	return &asyncClient{
+	c := &asyncClient{
 		TransportClient: conn,
 		protocol:        p,
-		windowSize:      int32(defaultStartMaxWindowSize),
-		maxWindowSize:   maxWindowSize,
-	}, nil
+	}
+	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	return c, nil
 }
 
 func (c *asyncClient) Connect(timeout time.Duration) error {
@@ -112,6 +106,11 @@ func (c *asyncClient) AsyncPublishEvents(
 ) error {
 	publishEventsCallCount.Add(1)
 
+	if len(events) == 0 {
+		cb(nil, nil)
+		return nil
+	}
+
 	i := 1
 	for len(events) > 0 {
 		n, err, sigErr := c.publishWindowed(i, cb, events)
@@ -145,9 +144,9 @@ func (c *asyncClient) publishWindowed(
 	batchSize := len(events)
 	partial := false
 	debug("Try to publish %v events to logstash with window size %v",
-		len(events), c.windowSize)
+		len(events), c.win.windowSize)
 
-	windowSize := int(atomic.LoadInt32(&c.windowSize))
+	windowSize := c.win.get()
 
 	// prepare message payload
 	if batchSize > windowSize {
@@ -208,6 +207,8 @@ func (c *asyncClient) publishWindowed(
 	if partial {
 		tag = tagSubset
 	}
+
+	debug("send message to ack worker")
 	c.ch <- ackMessage{
 		tag:    tag,
 		cb:     cb,
@@ -344,59 +345,9 @@ func (c *asyncClient) awaitACK(batchSize int, count uint32) (uint32, error) {
 
 	if err != nil {
 		eventsNotAcked.Add(int64(batchSize) - int64(seq))
-		c.shrinkWindow()
+		c.win.shrinkWindow()
 	} else {
-		c.tryGrowWindow(batchSize)
+		c.win.tryGrowWindow(batchSize)
 	}
 	return seq, err
-}
-
-func (c *asyncClient) tryGrowWindow(batchSize int) {
-	windowSize := int(c.windowSize)
-
-	if windowSize <= batchSize {
-		if c.maxOkWindowSize < windowSize {
-			logp.Debug("logstash", "update max ok window size: %v < %v", c.maxOkWindowSize, c.windowSize)
-			c.maxOkWindowSize = windowSize
-
-			newWindowSize := int(math.Ceil(1.5 * float64(windowSize)))
-			logp.Debug("logstash", "increase window size to: %v", newWindowSize)
-
-			if windowSize <= batchSize && batchSize < newWindowSize {
-				logp.Debug("logstash", "set to batchSize: %v", batchSize)
-				newWindowSize = batchSize
-			}
-			if newWindowSize > c.maxWindowSize {
-				logp.Debug("logstash", "set to max window size: %v", c.maxWindowSize)
-				newWindowSize = int(c.maxWindowSize)
-			}
-
-			windowSize = newWindowSize
-		} else if windowSize < c.maxOkWindowSize {
-			logp.Debug("logstash", "update current window size: %v", c.windowSize)
-
-			windowSize = int(math.Ceil(1.5 * float64(windowSize)))
-			if windowSize > c.maxOkWindowSize {
-				logp.Debug("logstash", "set to max ok window size: %v", c.maxOkWindowSize)
-				windowSize = c.maxOkWindowSize
-			}
-		}
-
-		atomic.StoreInt32(&c.windowSize, int32(windowSize))
-	}
-}
-
-func (c *asyncClient) shrinkWindow() {
-	windowSize := int(c.windowSize)
-	orig := windowSize
-
-	windowSize = windowSize / 2
-	if windowSize < minWindowSize {
-		windowSize = minWindowSize
-		if windowSize == orig {
-			return
-		}
-	}
-
-	atomic.StoreInt32(&c.windowSize, int32(windowSize))
 }
