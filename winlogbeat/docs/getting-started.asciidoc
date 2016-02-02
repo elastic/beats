@@ -12,7 +12,8 @@ After you have installed these products, you can start <<winlogbeat-installation
 [[winlogbeat-installation]]
 === Installing Winlogbeat
 
-. Download the Winlogbeat zip file.
+. Download the Winlogbeat zip file from the
+https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
