@@ -322,7 +322,7 @@ event:
         - name: dns.answers.ttl
           description: >
             The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should 
+            before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
@@ -365,7 +365,7 @@ event:
         - name: dns.answers.ttl
           description: >
             The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should 
+            before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
@@ -402,7 +402,7 @@ event:
         - name: dns.additionals.ttl
           description: >
             The time interval in seconds that this resource record may be cached
-            before it should be discarded. Zero values mean that the data should 
+            before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
@@ -426,7 +426,7 @@ event:
         - name: http.request_headers
           type: dict
           description: >
-            A map containing the captured header fields from the request. 
+            A map containing the captured header fields from the request.
             Which headers to capture is configurable. If headers with the same
             header name are present in the message, they will be separated by
             commas.
@@ -434,7 +434,7 @@ event:
         - name: http.response_headers
           type: dict
           description: >
-            A map containing the captured header fields from the response. 
+            A map containing the captured header fields from the response.
             Which headers to capture is configurable. If headers with the
             same header name are present in the message, they will be separated
             by commas.
@@ -451,8 +451,8 @@ event:
         - name: memcache.protocol_type
           type: string
           description: >
-            The memcache protocol implementation. The value can be "binary" 
-            for binary-based, "text" for text-based, or "unknown" for an unknown 
+            The memcache protocol implementation. The value can be "binary"
+            for binary-based, "text" for text-based, or "unknown" for an unknown
             memcache protocol type.
 
         - name: memcache.request.line
@@ -675,7 +675,7 @@ event:
         - name: memcache.response.stats
           type: list
           description: >
-            The list of statistic values returned. Each entry is a dictionary with the 
+            The list of statistic values returned. Each entry is a dictionary with the
             fields "name" and "value".
 
         - name: memcache.response.version
@@ -934,3 +934,18 @@ measurements:
         DOM to be loaded. In terms of the W3 Navigation Timing API, this is
         the difference between `domContentLoadedEnd` and
         `domContentLoadedStart`.
+
+sections:
+  - ["event", "Event"]
+  - ["icmp", "ICMP"]
+  - ["dns", "DNS"]
+  - ["http", "Http"]
+  - ["memcache", "Memcache"]
+  - ["mysql", "Mysql"]
+  - ["pgsql", "PostgreSQL"]
+  - ["thrift", "Thrift-RPC"]
+  - ["redis", "Redis"]
+  - ["mongodb", "MongoDb"]
+  - ["measurements", "Measurements"]
+  - ["env", "Environmental"]
+  - ["raw", "Raw"]
