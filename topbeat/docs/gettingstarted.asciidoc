@@ -98,8 +98,7 @@ input:
 
 To configure Topbeat:
 
-. Set the following options to specify how often Topbeat reads
-statistics and control which processes it monitors:
+. Set the following options to specify how often Topbeat reads statistics and specify which processes it monitors:
 +
 * The `period` option defines how often to read system-wide and per-process statistics from your servers. The interval is in seconds.
 By default, it's set to 10 seconds.
