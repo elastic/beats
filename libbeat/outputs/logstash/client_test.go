@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/mode"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,12 +22,6 @@ const (
 	driverCmdQuit = iota
 	driverCmdPublish
 )
-
-type testClientDriver struct {
-	client  mode.ProtocolClient
-	ch      chan testDriverCommand
-	returns []testClientReturn
-}
 
 type testClient interface {
 	Stop()
@@ -72,51 +65,6 @@ func newLumberjackTestClient(conn TransportClient) *client {
 		panic(err)
 	}
 	return c
-}
-
-func newClientTestDriver(client mode.ProtocolClient) *testClientDriver {
-	driver := &testClientDriver{
-		client:  client,
-		ch:      make(chan testDriverCommand),
-		returns: nil,
-	}
-
-	go func() {
-		for {
-			cmd, ok := <-driver.ch
-			if !ok {
-				return
-			}
-
-			switch cmd.code {
-			case driverCmdQuit:
-				close(driver.ch)
-				return
-			case driverCmdPublish:
-				events, err := driver.client.PublishEvents(cmd.events)
-				n := len(cmd.events) - len(events)
-				driver.returns = append(driver.returns, testClientReturn{n, err})
-			}
-		}
-	}()
-
-	return driver
-}
-
-func makeTestClient(conn TransportClient) testClient {
-	return newClientTestDriver(newLumberjackTestClient(conn))
-}
-
-func (t *testClientDriver) Stop() {
-	t.ch <- testDriverCommand{code: driverCmdQuit}
-}
-
-func (t *testClientDriver) Publish(events []common.MapStr) {
-	t.ch <- testDriverCommand{code: driverCmdPublish, events: events}
-}
-
-func (t *testClientDriver) Returns() []testClientReturn {
-	return t.returns
 }
 
 func (a mockAddr) Network() string { return "fake" }
@@ -317,16 +265,4 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	assert.Equal(t, 1.0, msg.doc.get("struct.field1"))
 	assert.Equal(t, true, msg.doc.get("struct.field2"))
 	assert.Equal(t, 2.0, msg.doc.get("struct.field5.sub1"))
-}
-
-func TestClientSendZero(t *testing.T) {
-	testSendZero(t, makeTestClient)
-}
-
-func TestClientSimpleEvent(t *testing.T) {
-	testSimpleEvent(t, makeTestClient)
-}
-
-func TestClientStructuredEvent(t *testing.T) {
-	testStructuredEvent(t, makeTestClient)
 }
