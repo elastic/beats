@@ -122,14 +122,8 @@ func (lj *logstash) init(
 			return err
 		}
 
-		if !loadBalance {
-			clients = []mode.AsyncProtocolClient{
-				mode.NewAsyncFailoverClient(clients),
-			}
-		}
-
-		m, err = mode.NewAsyncLoadBalancerMode(clients, maxAttempts,
-			waitRetry, timeout, maxWaitRetry)
+		m, err = mode.NewAsyncConnectionMode(clients, !loadBalance,
+			maxAttempts, waitRetry, timeout, maxWaitRetry)
 		if err != nil {
 			return err
 		}
@@ -142,20 +136,8 @@ func (lj *logstash) init(
 			return err
 		}
 
-		if !loadBalance {
-			clients = []mode.ProtocolClient{
-				mode.NewFailoverClient(clients),
-			}
-		}
-
-		if len(clients) == 1 {
-			m, err = mode.NewSingleConnectionMode(clients[0],
-				maxAttempts, waitRetry, timeout, maxWaitRetry)
-		} else {
-			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		}
-
+		m, err = mode.NewConnectionMode(clients, !loadBalance,
+			maxAttempts, waitRetry, timeout, maxWaitRetry)
 		if err != nil {
 			return err
 		}

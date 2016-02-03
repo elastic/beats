@@ -32,12 +32,11 @@ var (
 	errNoActiveConnection = errors.New("No active connection")
 )
 
-func NewFailoverClient(clients []ProtocolClient) ProtocolClient {
-	if len(clients) == 1 {
-		return clients[0]
+func NewFailoverClient(clients []ProtocolClient) []ProtocolClient {
+	if len(clients) <= 1 {
+		return clients
 	}
-
-	return &failOverClient{conns: clients, active: -1}
+	return []ProtocolClient{&failOverClient{conns: clients, active: -1}}
 }
 
 func (f *failOverClient) Active() int           { return f.active }
@@ -71,11 +70,13 @@ func (f *failOverClient) PublishEvent(event common.MapStr) error {
 	return f.conns[f.active].PublishEvent(event)
 }
 
-func NewAsyncFailoverClient(clients []AsyncProtocolClient) AsyncProtocolClient {
-	if len(clients) == 1 {
-		return clients[0]
+func NewAsyncFailoverClient(clients []AsyncProtocolClient) []AsyncProtocolClient {
+	if len(clients) <= 1 {
+		return clients
 	}
-	return &asyncFailOverClient{conns: clients, active: -1}
+	return []AsyncProtocolClient{
+		&asyncFailOverClient{conns: clients, active: -1},
+	}
 }
 
 func (f *asyncFailOverClient) Active() int           { return f.active }
