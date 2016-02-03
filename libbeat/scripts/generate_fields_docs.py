@@ -70,7 +70,23 @@ grouped in the following categories:
 
 
     docs = yaml.load(input)
+
+    # fields file is empty
+    if docs is None:
+        print "fields.yml file is empty. fields.asciidoc cannot be generated."
+        return
+
+    # If no sections are defined, docs can't be generated
+    if "sections" not in docs.keys():
+        print "Sections is not defined in fields.yml. fields.asciidoc cannot be generated."
+        return
+
     sections = docs["sections"]
+
+    # Check if sections is define
+    if sections is None:
+        print "No sections are defined in fields.yml. fields.asciidoc cannot be generated."
+        return
 
     for doc, _ in sections:
         output.write("* <<exported-fields-{}>>\n".format(doc))
