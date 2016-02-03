@@ -89,6 +89,8 @@ func (l *client) PublishEvents(
 		logp.Debug("logstash", "%v events out of %v events sent to logstash. Continue sending ...", n, len(events))
 		events = events[n:]
 		if err != nil {
+			logp.Err("Failed to publish events caused by: ", err)
+
 			eventsNotAcked.Add(int64(len(events)))
 			ackedEvents.Add(int64(totalNumberOfEvents - len(events)))
 			return events, err

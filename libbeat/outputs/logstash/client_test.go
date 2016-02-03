@@ -4,12 +4,8 @@ package logstash
 //  - test with connection timeout
 
 import (
-	"compress/zlib"
-	"encoding/json"
-	"errors"
 	"io"
 	"net"
-	"strings"
 	"testing"
 	"time"
 
@@ -201,104 +197,6 @@ func (m *mockTransport) RemoteAddr() net.Addr { return mockAddr("server") }
 func (m *mockTransport) SetDeadline(t time.Time) error      { return nil }
 func (m *mockTransport) SetReadDeadline(t time.Time) error  { return nil }
 func (m *mockTransport) SetWriteDeadline(t time.Time) error { return nil }
-
-type message struct {
-	code   uint8
-	size   uint32
-	seq    uint32
-	events []*message
-	doc    document
-}
-
-type document map[string]interface{}
-
-func (d document) get(path string) interface{} {
-	doc := d
-	elems := strings.Split(path, ".")
-	for i := 0; i < len(elems)-1; i++ {
-		doc = doc[elems[i]].(map[string]interface{})
-	}
-	return doc[elems[len(elems)-1]]
-}
-
-func readMessage(buf *streambuf.Buffer) (*message, error) {
-	if !buf.Avail(2) {
-		return nil, nil
-	}
-
-	version, _ := buf.ReadNetUint8At(0)
-	if version != '2' {
-		return nil, errors.New("version error")
-	}
-
-	code, _ := buf.ReadNetUint8At(1)
-	switch code {
-	case 'W':
-		if !buf.Avail(6) {
-			return nil, nil
-		}
-		size, _ := buf.ReadNetUint32At(2)
-		buf.Advance(6)
-		buf.Reset()
-		return &message{code: code, size: size}, buf.Err()
-	case 'C':
-		if !buf.Avail(6) {
-			return nil, nil
-		}
-		len, _ := buf.ReadNetUint32At(2)
-		if !buf.Avail(int(len) + 6) {
-			return nil, nil
-		}
-		buf.Advance(6)
-
-		tmp, _ := buf.Collect(int(len))
-		buf.Reset()
-
-		dataBuf := streambuf.New(nil)
-		// decompress data
-		decomp, err := zlib.NewReader(streambuf.NewFixed(tmp))
-		if err != nil {
-			return nil, err
-		}
-		// dataBuf.ReadFrom(streambuf.NewFixed(tmp))
-		dataBuf.ReadFrom(decomp)
-		decomp.Close()
-
-		// unpack data
-		dataBuf.Fix()
-		var events []*message
-		for dataBuf.Len() > 0 {
-			version, _ := dataBuf.ReadNetUint8()
-			if version != '2' {
-				return nil, errors.New("version error 2")
-			}
-
-			code, _ := dataBuf.ReadNetUint8()
-			if code != 'J' {
-				return nil, errors.New("expected json data frame")
-			}
-
-			seq, _ := dataBuf.ReadNetUint32()
-			payloadLen, _ := dataBuf.ReadNetUint32()
-			jsonRaw, _ := dataBuf.Collect(int(payloadLen))
-
-			var doc interface{}
-			err = json.Unmarshal(jsonRaw, &doc)
-			if err != nil {
-				return nil, err
-			}
-
-			events = append(events, &message{
-				code: code,
-				seq:  seq,
-				doc:  doc.(map[string]interface{}),
-			})
-		}
-		return &message{code: 'C', events: events}, nil
-	default:
-		return nil, errors.New("unknown code")
-	}
-}
 
 func recvMessage(buf *streambuf.Buffer, transp *mockTransport) (*message, error) {
 	for {
