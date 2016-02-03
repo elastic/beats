@@ -1,0 +1,10 @@
+beat:
+  build: .
+  environment:
+    - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
+    # Puts build dir outside of shared file system to prevent issues
+    # This means artifacts are not shared locally
+    - BUILD_DIR=/tmp/build
+  volumes:
+    - ..:/go/src/github.com/elastic/beats/
+  working_dir: /go/src/github.com/elastic/beats/packetbeat
