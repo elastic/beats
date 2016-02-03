@@ -1,0 +1,11 @@
+package: .
+import:
+- package: github.com/elastic/beats
+  version: b82c2a0c0e24b51f59d6f5a82ef098c105485a48
+  subpackages:
+  - /libbeat/beat
+  - libbeat/cfgfile
+  - libbeat/common
+  - libbeat/logp
+- package: {{cookiecutter.beat_path}}/{{cookiecutter.beat}}/beater
+- package: {{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config

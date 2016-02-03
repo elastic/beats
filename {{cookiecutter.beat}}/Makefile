@@ -4,7 +4,6 @@ SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS=./vendor/github.com/elastic/beats
 GOPACKAGES=$(shell glide novendor)
-BEAT_DIR={{cookiecutter.beat_path}}
 PREFIX?=.
 
 # Path to the libbeat Makefile
