@@ -34,7 +34,7 @@ env:
         a sample rate of 1/10, the count is 10. The count is used by the
         UIs to return estimated values. Reserved for future usage.
       required: true
- 
+
     - name: beat.name
       description: >
         Name of the Beat sending the events. If the shipper name is set
@@ -53,15 +53,15 @@ system:
   fields:
     - name: load
       type: group
-      description: > 
-        The system load average. The load average is the average number 
+      description: >
+        The system load average. The load average is the average number
         of jobs in the run queue.
       fields:
         - name: load1
           path: load.load1
           type: float
           description: >
-            The load average over 1 minute. 
+            The load average over 1 minute.
 
         - name: load5
           path: load.load5
@@ -73,11 +73,11 @@ system:
           path: load.load15
           type: float
           description: >
-            The load average over 15 minutes. 
+            The load average over 15 minutes.
 
     - name: cpu
       type: group
-      description: This group contains statistics related to CPU usage. 
+      description: This group contains statistics related to CPU usage.
       fields:
         - name: user
           path: cpu.user
@@ -89,7 +89,7 @@ system:
           path: cpu.user_p
           type: float
           description: >
-            The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. 
+            The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
             For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
         - name: nice
@@ -244,7 +244,7 @@ system:
           path: mem.actual_used
           type: int
           description: >
-            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. 
+            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
             Available only on Unix.
 
         - name: actual_free
@@ -410,7 +410,7 @@ filesystem:
     - name: fs
       type: group
       description: >
-        Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as 
+        Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as
         the device name and the mounting place.
       fields:
         - name: avail
@@ -418,7 +418,7 @@ filesystem:
           type: int
           description: >
             The available disk space in bytes.
-  
+
         - name: device_name
           path: fs.device_name
           type: string
@@ -435,7 +435,7 @@ filesystem:
           path: fs.files
           type: int
           description: >
-            The total number of file nodes in the file system. 
+            The total number of file nodes in the file system.
 
         - name: free_files
           path: fs.free_files
@@ -460,3 +460,9 @@ filesystem:
           type: float
           description: >
             The percentage of used disk space.
+
+sections:
+  - ["env", "Common"]
+  - ["system", "System-Wide Statistics"]
+  - ["process", "Per-Process Statistics"]
+  - ["filesystem", "File System Statistics"]

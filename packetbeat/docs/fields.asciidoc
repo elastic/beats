@@ -269,7 +269,7 @@ The class of DNS data contained in this resource record.
 
 type: int
 
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should  not be cached.
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
 ==== dns.answers.data
@@ -320,7 +320,7 @@ An array containing a dictionary about each answer section returned by the serve
 
 type: int
 
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should  not be cached.
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
 ==== dns.answers.data
@@ -364,7 +364,7 @@ The class of DNS data contained in this resource record.
 
 type: int
 
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should  not be cached.
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
 
 ==== dns.additionals.data
@@ -394,14 +394,14 @@ The HTTP status phrase.
 
 type: dict
 
-A map containing the captured header fields from the request.  Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
+A map containing the captured header fields from the request. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
 
 ==== http.response_headers
 
 type: dict
 
-A map containing the captured header fields from the response.  Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
+A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
 
 ==== http.content_length
@@ -421,7 +421,7 @@ Memcached-specific event fields
 
 type: string
 
-The memcache protocol implementation. The value can be "binary"  for binary-based, "text" for text-based, or "unknown" for an unknown  memcache protocol type.
+The memcache protocol implementation. The value can be "binary" for binary-based, "text" for text-based, or "unknown" for an unknown memcache protocol type.
 
 
 ==== memcache.request.line
@@ -701,7 +701,7 @@ The CAS (compare-and-swap) identifier to be used with CAS-based updates (if pres
 
 type: list
 
-The list of statistic values returned. Each entry is a dictionary with the  fields "name" and "value".
+The list of statistic values returned. Each entry is a dictionary with the fields "name" and "value".
 
 
 ==== memcache.response.version
