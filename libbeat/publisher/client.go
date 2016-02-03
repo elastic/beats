@@ -105,6 +105,15 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 }
 
 func (c *client) annotateEvent(event common.MapStr) {
+
+	// Check if index was set dynamically
+	if _, ok := event["beat"]; ok {
+		beatTemp := event["beat"].(common.MapStr)
+		if _, ok := beatTemp["index"]; ok {
+			c.beatMeta["index"] = beatTemp["index"]
+		}
+	}
+
 	event["beat"] = c.beatMeta
 	if len(c.tags) > 0 {
 		event["tags"] = c.tags
