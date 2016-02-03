@@ -119,7 +119,7 @@ func testElasticsearchIndex(test string) string {
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	windowSize := integrationTestWindowSize
 
-	config := &outputs.MothershipConfig{
+	config := outputs.MothershipConfig{
 		Hosts:       []string{getLogstashHost()},
 		TLS:         nil,
 		Index:       testLogstashIndex(test),
@@ -135,7 +135,7 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 		}
 	}
 
-	lumberjack := newTestLumberjackOutput(t, test, config)
+	lumberjack := newTestLumberjackOutput(t, config)
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
