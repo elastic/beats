@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"time"
@@ -143,6 +144,11 @@ func (p *protocol) awaitACK(count uint32) (uint32, error) {
 		if err != nil {
 			return ackSeq, err
 		}
+	}
+
+	if ackSeq > count {
+		return count, fmt.Errorf(
+			"invalid sequence number received (seq=%v, expected=%v)", ackSeq, count)
 	}
 	return ackSeq, nil
 }
