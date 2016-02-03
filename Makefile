@@ -4,15 +4,14 @@ PYTHON_ENV=${BUILD_DIR}/python-env/
 
 .PHONY: test
 test: python-env
-	mkdir -p build/src
+	mkdir -p build/src/beatpath
 	cp -r \{\{cookiecutter.beat\}\} build
 	cp tests/cookiecutter.json build/
-	. build/python-env/bin/activate; cookiecutter --no-input -o build/src -f  build
+	. build/python-env/bin/activate; cookiecutter --no-input -o build/src/beatpath -f  build
 
-	cd build/src/testbeat; \
+	cd build/src/beatpath/testbeat; \
 	export GOPATH=${PWD}/build; \
 	export GO15VENDOREXPERIMENT=1; \
-	glide init; \
 	glide update --no-recursive ; \
 	make update; \
 	make

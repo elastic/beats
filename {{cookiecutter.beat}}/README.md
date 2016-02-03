@@ -8,7 +8,6 @@ Ensure that this folder is at the following location:
 ## To get running with {{cookiecutter.beat|capitalize}}, run the following commands:
 
 ```
-glide init
 glide update --no-recursive
 make update
 make
@@ -65,7 +64,7 @@ make
 git init
 git add .
 git commit
-git remote set-url origin https://{{cookiecutter.beat_path}}{{cookiecutter.beat}}
+git remote set-url origin https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 git push origin master
 ```
 
@@ -74,7 +73,7 @@ git push origin master
 ```
 mkdir -p ${GOPATH}/{{cookiecutter.beat_path}}
 cd ${GOPATH}/{{cookiecutter.beat_path}}
-git clone https://{{cookiecutter.beat_path}}{{cookiecutter.beat}}
+git clone https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 ```
 
 

@@ -2,6 +2,6 @@
   "project_name": "Testbeat",
   "github_name": "ruflin",
   "beat": "{{ cookiecutter.project_name|lower }}",
-  "beat_path": "",
+  "beat_path": "beatpath",
   "full_name": "Nicolas Ruflin"
 }

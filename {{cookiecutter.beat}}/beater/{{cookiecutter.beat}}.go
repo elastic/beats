@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
-	"{{cookiecutter.beat_path}}{{cookiecutter.beat}}/config"
+	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config"
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
