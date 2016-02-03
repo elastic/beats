@@ -24,8 +24,19 @@ def fields_to_es_template(input, output, index):
     # Custom properties
     docs = yaml.load(input)
 
+    # No fields defined, can't generate template
+    if docs is None:
+        print "fields.yml is empty. Cannot generate template."
+        return
+
     # Remove sections as only needed for docs
-    del docs["sections"]
+    if "sections" in docs.keys():
+        del docs["sections"]
+
+    # Each template needs defaults
+    if "defaults" not in docs.keys():
+        print "No defaults are defined. Each template needs at least defaults defined."
+        return
 
     defaults = docs["defaults"]
 
