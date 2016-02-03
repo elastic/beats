@@ -1,8 +1,10 @@
 package elasticsearch
 
 import (
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
@@ -112,6 +114,37 @@ func TestCollectPublishFailAll(t *testing.T) {
 	res := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
+}
+
+func TestGetIndexStandard(t *testing.T) {
+
+	time := time.Now().UTC()
+	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
+
+	event := common.MapStr{
+		"@timestamp": common.Time(time),
+		"field":      1,
+	}
+
+	index := getIndex(event, "beatname")
+	assert.Equal(t, index, "beatname-"+extension)
+}
+
+func TestGetIndexOverwrite(t *testing.T) {
+
+	time := time.Now().UTC()
+	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
+
+	event := common.MapStr{
+		"@timestamp": common.Time(time),
+		"field":      1,
+		"beat": common.MapStr{
+			"name":  "testbeat",
+			"index": "dynamicindex",
+		},
+	}
+	index := getIndex(event, "beatname")
+	assert.Equal(t, index, "dynamicindex-"+extension)
 }
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
