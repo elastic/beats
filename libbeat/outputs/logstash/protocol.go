@@ -63,6 +63,10 @@ func newClientProcol(
 	}, nil
 }
 
+func (p *protocol) Close() error {
+	return p.conn.Close()
+}
+
 func (p *protocol) sendEvents(events []common.MapStr) ([]common.MapStr, error) {
 	conn := p.conn
 	if len(events) == 0 {
