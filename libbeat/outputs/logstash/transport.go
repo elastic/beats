@@ -21,7 +21,7 @@ type TransportClient interface {
 type tcpClient struct {
 	hostport  string
 	connected bool
-	net.Conn
+	conn      net.Conn
 }
 
 type tlsClient struct {
@@ -45,7 +45,7 @@ func (c *tcpClient) Connect(timeout time.Duration) error {
 
 	// TODO: address lookup copied from logstash-forwarded. Really required?
 	addresses, err := net.LookupHost(host)
-	c.Conn = nil
+	c.conn = nil
 	if err != nil {
 		logp.Warn("DNS lookup failure \"%s\": %s", host, err)
 		return err
@@ -72,7 +72,7 @@ func (c *tcpClient) Connect(timeout time.Duration) error {
 		return err
 	}
 
-	c.Conn = conn
+	c.conn = conn
 	c.connected = true
 	return nil
 }
@@ -82,8 +82,79 @@ func (c *tcpClient) IsConnected() bool {
 }
 
 func (c *tcpClient) Close() error {
-	err := c.Conn.Close()
+	err := c.conn.Close()
 	c.connected = false
+	return err
+}
+
+func (c *tcpClient) Read(b []byte) (int, error) {
+	if !c.connected {
+		return 0, ErrNotConnected
+	}
+
+	n, err := c.conn.Read(b)
+	if err != nil {
+		c.Close()
+	}
+	return n, err
+}
+
+func (c *tcpClient) Write(b []byte) (int, error) {
+	if !c.connected {
+		return 0, ErrNotConnected
+	}
+
+	n, err := c.conn.Write(b)
+	if err != nil {
+		c.Close()
+	}
+	return n, err
+}
+
+func (c *tcpClient) LocalAddr() net.Addr {
+	if !c.connected {
+		return nil
+	}
+	return c.conn.LocalAddr()
+}
+
+func (c *tcpClient) RemoteAddr() net.Addr {
+	if !c.connected {
+		return nil
+	}
+	return c.conn.RemoteAddr()
+}
+
+func (c *tcpClient) SetDeadline(t time.Time) error {
+	if !c.connected {
+		return ErrNotConnected
+	}
+	err := c.conn.SetDeadline(t)
+	if err != nil {
+		c.Close()
+	}
+	return err
+}
+
+func (c *tcpClient) SetReadDeadline(t time.Time) error {
+	if !c.connected {
+		return ErrNotConnected
+	}
+	err := c.conn.SetReadDeadline(t)
+	if err != nil {
+		c.Close()
+	}
+	return err
+}
+
+func (c *tcpClient) SetWriteDeadline(t time.Time) error {
+	if !c.connected {
+		return ErrNotConnected
+	}
+	err := c.conn.SetWriteDeadline(t)
+	if err != nil {
+		c.Close()
+	}
 	return err
 }
 
@@ -106,7 +177,7 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 
 	tlsconfig := c.tls
 	tlsconfig.ServerName = host
-	socket := tls.Client(c.Conn, &tlsconfig)
+	socket := tls.Client(c.conn, &tlsconfig)
 	if err := socket.SetDeadline(time.Now().Add(timeout)); err != nil {
 		_ = socket.Close()
 		return c.onFail(err)
@@ -116,14 +187,14 @@ func (c *tlsClient) Connect(timeout time.Duration) error {
 		return c.onFail(err)
 	}
 
-	c.Conn = socket
+	c.conn = socket
 	c.connected = true
 	return nil
 }
 
 func (c *tlsClient) onFail(err error) error {
 	logp.Err("SSL client failed to connect with: %v", err)
-	c.Conn = nil
+	c.conn = nil
 	c.connected = false
 	return err
 }
