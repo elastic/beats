@@ -35,7 +35,8 @@ type ackMessage struct {
 type tag uint8
 
 const (
-	tagComplete tag = iota
+	tagUndefined tag = iota
+	tagComplete
 	tagSubset
 	tagLast
 	tagError
@@ -246,8 +247,8 @@ func (c *asyncClient) startACK() {
 
 func (c *asyncClient) stopACK() {
 	close(c.done)
-	close(c.ch)
 	c.wg.Wait()
+	close(c.ch)
 }
 
 func (c *asyncClient) ackLoop() {
@@ -297,7 +298,17 @@ func (c *asyncClient) ackLoop() {
 }
 
 func (c *asyncClient) drainACKLoop(partial, reported bool, err error) {
-	for msg := range c.ch {
+	debug("drainACKLoop")
+
+	for {
+		var msg ackMessage
+
+		select {
+		case msg = <-c.ch:
+		default:
+			return
+		}
+
 		switch msg.tag {
 		case tagComplete, tagLast:
 			if !partial || !reported {
@@ -377,7 +388,6 @@ func doCallback(msg ackMessage, seq uint32, err error) {
 func (c *asyncClient) awaitACK(batchSize int, count uint32) (uint32, error) {
 	seq, err := c.protocol.awaitACK(count)
 	debug("awaitACK(%v) => %v, %v", count, seq, err)
-
 	ackedEvents.Add(int64(seq))
 
 	if err != nil {
