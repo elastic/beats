@@ -27,12 +27,11 @@ var (
 	errNoActiveConnection = errors.New("No active connection")
 )
 
-func NewFailoverClient(clients []ProtocolClient) ProtocolClient {
-	if len(clients) == 1 {
-		return clients[0]
+func NewFailoverClient(clients []ProtocolClient) []ProtocolClient {
+	if len(clients) <= 1 {
+		return clients
 	}
-
-	return &failOverClient{conns: clients, active: -1}
+	return []ProtocolClient{&failOverClient{conns: clients, active: -1}}
 }
 
 func (f *failOverClient) Active() int           { return f.active }

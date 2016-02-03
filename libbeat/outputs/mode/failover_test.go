@@ -10,7 +10,7 @@ import (
 
 func testFailoverSend(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -25,6 +25,7 @@ func testFailoverSend(t *testing.T, events []eventInfo) {
 				publish:   collectPublish(&collected),
 			},
 		},
+		true,
 		3,
 		0,
 		1*time.Millisecond,
@@ -44,7 +45,7 @@ func TestFailoverSendMultiple(t *testing.T) {
 func testFailoverConnectFailAndSend(t *testing.T, events []eventInfo) {
 	errFail := errors.New("fail connect")
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -59,6 +60,7 @@ func testFailoverConnectFailAndSend(t *testing.T, events []eventInfo) {
 				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
 			},
 		},
+		true,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -78,7 +80,7 @@ func TestFailoverConnectFailConnectAndSendMultiple(t *testing.T) {
 func testFailoverConnectionFail(t *testing.T, events []eventInfo) {
 	errFail := errors.New("fail connect")
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -93,6 +95,7 @@ func testFailoverConnectionFail(t *testing.T, events []eventInfo) {
 				publish:   publishTimeoutEvery(2, collectPublish(&collected)),
 			},
 		},
+		true,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -111,7 +114,7 @@ func TestFailoverConnectionFailMulti(t *testing.T) {
 
 func testFailoverSendFlaky(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -126,6 +129,7 @@ func testFailoverSendFlaky(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(1, collectPublish(&collected)),
 			},
 		},
+		true,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -144,7 +148,7 @@ func TestFailoverSendMultiFlaky(t *testing.T) {
 
 func testFailoverSendFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -159,6 +163,7 @@ func testFailoverSendFlakyFail(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(2, collectPublish(&collected)),
 			},
 		},
+		true,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -177,7 +182,7 @@ func TestFailoverSendMultiFlakyFail(t *testing.T) {
 
 func testFailoverSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -192,6 +197,7 @@ func testFailoverSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(50, collectPublish(&collected)),
 			},
 		},
+		true,
 		0,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -210,7 +216,7 @@ func TestFailoverSendMultiFlakyInfAttempts(t *testing.T) {
 
 func testFailoverSendFlakyGuaranteed(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewFailOverConnectionMode(
+	mode, _ := NewConnectionMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -225,6 +231,7 @@ func testFailoverSendFlakyGuaranteed(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(50, collectPublish(&collected)),
 			},
 		},
+		true,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,

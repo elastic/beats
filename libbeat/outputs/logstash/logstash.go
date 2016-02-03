@@ -110,20 +110,9 @@ func (lj *logstash) init(
 		maxAttempts = 0
 	}
 
-	var m mode.ConnectionMode
-	if len(clients) == 1 {
-		m, err = mode.NewSingleConnectionMode(clients[0],
-			maxAttempts, waitRetry, timeout, maxWaitRetry)
-	} else {
-		loadBalance := config.LoadBalance != nil && *config.LoadBalance
-		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		}
-	}
+	loadBalance := config.LoadBalance != nil && *config.LoadBalance
+	m, err := mode.NewConnectionMode(clients, !loadBalance,
+		maxAttempts, waitRetry, timeout, maxWaitRetry)
 	if err != nil {
 		return err
 	}
