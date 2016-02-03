@@ -80,6 +80,24 @@ var (
 	debug = logp.MakeDebug("output")
 )
 
+func NewConnectionMode(
+	clients []ProtocolClient,
+	failover bool,
+	maxAttempts int,
+	waitRetry, timeout, maxWaitRetry time.Duration,
+) (ConnectionMode, error) {
+	if failover {
+		clients = NewFailoverClient(clients)
+	}
+
+	if len(clients) == 1 {
+		return NewSingleConnectionMode(clients[0], maxAttempts,
+			waitRetry, timeout, maxWaitRetry)
+	}
+	return NewLoadBalancerMode(clients, maxAttempts,
+		waitRetry, timeout, maxWaitRetry)
+}
+
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
 func MakeClients(
