@@ -92,6 +92,9 @@ eventlog:
 
     - name: message
       type: string
+      index: analyzed
+      doc_values: true
+      ignore_above: 0
       required: false
       description: >
         The message from the event log record.
@@ -160,3 +163,7 @@ eventlog:
       required: false
       description: >
         The type of account associated with this event.
+
+sections:
+  - ["common", "Common Beat"]
+  - ["eventlog", "Event Log Record"]
