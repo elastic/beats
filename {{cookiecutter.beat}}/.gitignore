@@ -3,6 +3,6 @@
 /build
 
 .DS_Store
-{{cookiecutter.beat}}
-{{cookiecutter.beat}}.test
+/{{cookiecutter.beat}}
+/{{cookiecutter.beat}}.test
 *.pyc
