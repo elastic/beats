@@ -1,7 +1,8 @@
 [[command-line-options]]
 == Command Line Options
 
-The following command line options are available for all Beats. For additional
-command line options, see the documentation for your Beat.
+The following command line options are available for all Beats. To use these
+options, you need to start the Beat in the foreground. For additional command
+line options, see the documentation for your Beat.
 
 include::./shared-command-line.asciidoc[]

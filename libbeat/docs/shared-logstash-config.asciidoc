@@ -22,9 +22,8 @@ output:
   logstash:
     hosts: ["127.0.0.1:5044"]
 
-    # configure logstash plugin to loadbalance events between
-    # configured logstash hosts
-    #loadbalance: false
+    # Optional load balance the events between the Logstash hosts
+    #loadbalance: true
 ------------------------------------------------------------------------------
 
 In this configuration, `hosts` specifies the Logstash server and the port (`5044`)
