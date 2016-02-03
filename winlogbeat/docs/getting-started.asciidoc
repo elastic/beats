@@ -12,7 +12,8 @@ After you have installed these products, you can start <<winlogbeat-installation
 [[winlogbeat-installation]]
 === Installing Winlogbeat
 
-. Download the Winlogbeat zip file.
+. Download the Winlogbeat zip file from the
+https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
 . Extract the contents into `C:\Program Files`.
 . Rename the `winlogbeat-<version>` directory to `Winlogbeat`.
 . Open a PowerShell prompt as an Administrator (right-click on the PowerShell
@@ -47,8 +48,8 @@ For more information about these options, see <<winlogbeat-configuration-details
 [[winlogbeat-configuration]]
 === Configuring Winlogbeat
 
-To configure Winlogbeat, you edit the _winlogbeat.yml_ file. Here is a sample of
-the _winlogbeat.yml_ file:
+To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. Here is a sample of
+the `winlogbeat.yml` file:
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -72,17 +73,44 @@ logging:
   level: info
 --------------------------------------------------------------------------------
 
+To configure Winlogbeat:
+
+. In the `event_logs` section, specify the event logs that you want to monitor. By
+default, Winlogbeat is set to monitor application, security, and system logs: 
++
+[source,yaml]
+----------------------------------------------------------------------
+  event_logs:
+    - name: Application
+    - name: Security
+    - name: System
+----------------------------------------------------------------------
++
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell. For more
 information about this command, see the configuration details for 
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
-After you save your configuration file, test it with the following command.
+. If you are sending output to Elasticsearch, set the IP address and port where
+Winlogbeat can find the Elasticsearch installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
+. After you save your configuration file, test it with the following command.
++
 [source,shell]
 ----------------------------------------------------------------------
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest -e
 ----------------------------------------------------------------------
 
+[[config-filebeat-logstash]]
 === Configuring Winlogbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
