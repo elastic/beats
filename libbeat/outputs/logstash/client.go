@@ -118,7 +118,8 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 		events = events[:l.windowSize]
 	}
 
-	count, err := l.sendEvents(events)
+	outEvents, err := l.sendEvents(events)
+	count := uint32(len(outEvents))
 	if err != nil {
 		if err == errAllEventsEncoding {
 			return len(events), nil

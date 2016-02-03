@@ -62,29 +62,34 @@ func newClientProcol(
 	}, nil
 }
 
-func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
+func (p *protocol) Close() error {
+	return p.conn.Close()
+}
+
+func (p *protocol) sendEvents(events []common.MapStr) ([]common.MapStr, error) {
 	conn := p.conn
 	if len(events) == 0 {
-		return 0, nil
+		return nil, nil
 	}
 
 	debug("send events")
 
 	// serialize all raw events into output buffer, removing all events encoding failed for
-	count, err := p.serializeEvents(events)
+	outEvents, err := p.serializeEvents(events)
+	count := uint32(len(outEvents))
 	if count == 0 {
 		// encoding of all events failed. Let's stop here and report all events
 		// as exported so no one tries to send/encode the same events once again
 		// The compress/encode function already prints critical per failed encoding
 		// failure.
 		debug("no events serializable")
-		return 0, errAllEventsEncoding
+		return nil, errAllEventsEncoding
 	}
 
 	// send window size:
 	debug("send window size")
 	if err := p.sendWindowSize(count); err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if p.compressLevel > 0 {
@@ -94,11 +99,11 @@ func (p *protocol) sendEvents(events []common.MapStr) (uint32, error) {
 		_, err = conn.Write(p.eventsBuffer.Bytes())
 	}
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	debug("did send %v events", count)
-	return count, nil
+	return outEvents, nil
 }
 
 func (p *protocol) recvACK() (uint32, error) {
@@ -184,36 +189,56 @@ func (p *protocol) sendCompressed(payload []byte) error {
 	return nil
 }
 
-func (p *protocol) serializeEvents(events []common.MapStr) (uint32, error) {
+func (p *protocol) serializeEvents(events []common.MapStr) ([]common.MapStr, error) {
 	p.eventsBuffer.Reset()
 
 	if p.compressLevel > 0 {
 		w, _ := zlib.NewWriterLevel(p.eventsBuffer, p.compressLevel)
-		count, err := p.doSerializeEvents(w, events)
+		outEvents, err := p.doSerializeEvents(w, events)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 		if err := w.Close(); err != nil {
 			debug("Finalizing zlib compression failed with: %s", err)
-			return 0, err
+			return nil, err
 		}
-		return count, nil
+		return outEvents, nil
 	}
 
 	return p.doSerializeEvents(p.eventsBuffer, events)
 }
 
-func (p *protocol) doSerializeEvents(out io.Writer, events []common.MapStr) (uint32, error) {
+func (p *protocol) doSerializeEvents(out io.Writer, events []common.MapStr) ([]common.MapStr, error) {
 	var sequence uint32
+
+	okEvents := events
 	for _, event := range events {
 		sequence++
 		err := p.serializeDataFrame(out, event, sequence)
 		if err != nil {
 			logp.Critical("failed to encode event: %v", err)
-			sequence-- //forget this last broken event and continue
+			sequence--
+			goto failedLoop
 		}
 	}
-	return sequence, nil
+	return okEvents, nil
+
+failedLoop:
+	// on serialization error continue serializing remaining events and collect
+	// serializable events only
+	okEvents = events[:sequence]
+	restEvents := events[sequence+1:]
+	for _, event := range restEvents {
+		sequence++
+		err := p.serializeDataFrame(out, event, sequence)
+		if err != nil {
+			logp.Critical("failed to encode event: %v", err)
+			sequence--
+			continue
+		}
+		okEvents = append(okEvents, event)
+	}
+	return okEvents, nil
 }
 
 func (p *protocol) serializeDataFrame(
