@@ -16,6 +16,18 @@ type testAsyncDriver struct {
 	wg      sync.WaitGroup
 }
 
+func TestAsyncSendZero(t *testing.T) {
+	testSendZero(t, makeAsyncTestClient)
+}
+
+func TestAsyncSimpleEvent(t *testing.T) {
+	testSimpleEvent(t, makeAsyncTestClient)
+}
+
+func TestAsyncStructuredEvent(t *testing.T) {
+	testStructuredEvent(t, makeAsyncTestClient)
+}
+
 func makeAsyncTestClient(conn TransportClient) testClient {
 	return newAsyncTestDriver(newAsyncTestClient(conn))
 }
@@ -84,16 +96,4 @@ func (t *testAsyncDriver) Publish(events []common.MapStr) {
 
 func (t *testAsyncDriver) Returns() []testClientReturn {
 	return t.returns
-}
-
-func TestAsyncSendZero(t *testing.T) {
-	testSendZero(t, makeAsyncTestClient)
-}
-
-func TestAsyncSimpleEvent(t *testing.T) {
-	testSimpleEvent(t, makeAsyncTestClient)
-}
-
-func TestAsyncStructuredEvent(t *testing.T) {
-	testStructuredEvent(t, makeAsyncTestClient)
 }
