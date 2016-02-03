@@ -3,11 +3,9 @@ package logstash
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -25,82 +23,17 @@ import (
 )
 
 type mockLSServer struct {
-	net.Listener
-	timeout   time.Duration
-	err       error
-	handshake func(net.Conn)
+	*mockServer
 }
 
 var testOptions = outputs.Options{}
 
 func newMockTLSServer(t *testing.T, to time.Duration, cert string) *mockLSServer {
-	tcpListener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		t.Fatalf("failed to generate TCP listener")
-	}
-
-	tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
-		Certificate:    cert + ".pem",
-		CertificateKey: cert + ".key",
-	})
-	if err != nil {
-		t.Fatalf("failed to load certificate")
-	}
-
-	listener := tls.NewListener(tcpListener, tlsConfig)
-
-	server := &mockLSServer{Listener: listener, timeout: to}
-	server.handshake = func(client net.Conn) {
-		if server.err != nil {
-			return
-		}
-
-		server.clientDeadline(client, server.timeout)
-		if server.err != nil {
-			return
-		}
-
-		tlsConn, ok := client.(*tls.Conn)
-		if !ok {
-			server.err = errors.New("no tls connection")
-			return
-		}
-
-		server.err = tlsConn.Handshake()
-	}
-
-	return server
+	return &mockLSServer{newMockServerTLS(t, to, cert)}
 }
 
 func newMockTCPServer(t *testing.T, to time.Duration) *mockLSServer {
-	tcpListener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		t.Fatalf("failed to generate TCP listener")
-	}
-
-	server := &mockLSServer{Listener: tcpListener, timeout: to}
-	server.handshake = func(client net.Conn) {}
-	return server
-}
-
-func (m *mockLSServer) Addr() string {
-	return m.Listener.Addr().String()
-}
-
-func (m *mockLSServer) accept() net.Conn {
-	if m.err != nil {
-		return nil
-	}
-
-	client, err := m.Listener.Accept()
-	m.err = err
-	return client
-}
-
-func (m *mockLSServer) clientDeadline(client net.Conn, to time.Duration) {
-	if m.err == nil {
-		m.err = client.SetDeadline(time.Now().Add(to))
-	}
+	return &mockLSServer{newMockServerTCP(t, to, "")}
 }
 
 func (m *mockLSServer) readMessage(buf *streambuf.Buffer, client net.Conn) *message {
