@@ -9,10 +9,6 @@ include ../libbeat/scripts/Makefile
 gen:
 	GOOS=windows GOARCH=386 go generate -v -x ./...
 
-.PHONY: gen-docs
-gen-docs:
-	python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
-
 # This is called by the beats-packer to obtain the configuration file and
 # default template
 .PHONY: install-cfg

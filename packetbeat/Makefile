@@ -32,8 +32,3 @@ install-cfg:
 .PHONY: benchmark
 benchmark:
 	$(GODEP) go test -short -bench=. ./... -cpu=2
-
-.PHONY: gen
-gen: python-env
-	. ${PYTHON_ENV}/bin/activate && python scripts/generate_template.py   etc/fields.yml etc/packetbeat.template.json
-	. ${PYTHON_ENV}/bin/activate && python scripts/generate_field_docs.py etc/fields.yml docs/fields.asciidoc
