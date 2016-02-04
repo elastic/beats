@@ -34,11 +34,12 @@ func (w EventWalker) Map(v reflect.Value) error {
 }
 
 func CheckEvent(event MapStr) error {
-	logp.Info("checking event")
 	var walker EventWalker
 
 	if err := reflectwalk.Walk(event, walker); err != nil {
+		logp.Err("checking event ... ERROR %s", err)
 		return err
 	}
+	logp.Info("checking event ... OK")
 	return nil
 }
