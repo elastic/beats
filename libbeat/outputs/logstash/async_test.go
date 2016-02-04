@@ -28,7 +28,11 @@ func TestAsyncStructuredEvent(t *testing.T) {
 	testStructuredEvent(t, makeAsyncTestClient)
 }
 
-func makeAsyncTestClient(conn TransportClient) testClient {
+func TestAsyncCloseAfterWindowSize(t *testing.T) {
+	testCloseAfterWindowSize(t, makeAsyncTestClient)
+}
+
+func makeAsyncTestClient(conn TransportClient) testClientDriver {
 	return newAsyncTestDriver(newAsyncTestClient(conn))
 }
 
@@ -37,6 +41,7 @@ func newAsyncTestClient(conn TransportClient) *asyncClient {
 	if err != nil {
 		panic(err)
 	}
+	c.startACK()
 	return c
 }
 
@@ -46,8 +51,6 @@ func newAsyncTestDriver(client mode.AsyncProtocolClient) *testAsyncDriver {
 		ch:      make(chan testDriverCommand, 1),
 		returns: nil,
 	}
-
-	client.Connect(100 * time.Millisecond)
 
 	resp := make(chan testClientReturn, 1)
 
@@ -67,7 +70,8 @@ func newAsyncTestDriver(client mode.AsyncProtocolClient) *testAsyncDriver {
 			case driverCmdPublish:
 				cb := func(events []common.MapStr, err error) {
 					n := len(cmd.events) - len(events)
-					resp <- testClientReturn{n, err}
+					ret := testClientReturn{n, err}
+					resp <- ret
 				}
 
 				err := driver.client.AsyncPublishEvents(cb, cmd.events)
@@ -88,6 +92,7 @@ func (t *testAsyncDriver) Stop() {
 	t.ch <- testDriverCommand{code: driverCmdQuit}
 	t.wg.Wait()
 	close(t.ch)
+	t.client.Close()
 }
 
 func (t *testAsyncDriver) Publish(events []common.MapStr) {

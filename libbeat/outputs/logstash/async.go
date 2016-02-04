@@ -112,7 +112,10 @@ func (c *asyncClient) AsyncPublishEvents(
 ) error {
 	publishEventsCallCount.Add(1)
 
+	debug("AsyncPublishEvents")
+
 	if len(events) == 0 {
+		debug("send nil")
 		cb(nil, nil)
 		return nil
 	}
@@ -235,10 +238,12 @@ func (c *asyncClient) publishWindowed(
 		}
 	}
 
+	debug("return sender")
 	return len(events), nil, nil
 }
 
 func (c *asyncClient) startACK() {
+	debug("start async ACK handler")
 	c.ch = make(chan ackMessage, 1)
 	c.done = make(chan struct{})
 	c.wg.Add(1)
@@ -249,10 +254,12 @@ func (c *asyncClient) stopACK() {
 	close(c.done)
 	c.wg.Wait()
 	close(c.ch)
+	debug("stopped async ACK handler")
 }
 
 func (c *asyncClient) ackLoop() {
 	defer c.wg.Done()
+	defer debug("finished ackLoop")
 
 	for {
 		var err error
@@ -292,13 +299,15 @@ func (c *asyncClient) ackLoop() {
 		if err != nil {
 			c.closeTransport()
 			c.drainACKLoop(inPartial, true, err)
+			debug("return ackLoop due to error")
 			return
 		}
 	}
 }
 
 func (c *asyncClient) drainACKLoop(partial, reported bool, err error) {
-	debug("drainACKLoop")
+	debug("drainACKLoop, p=%v, r=%v, err='%v'", partial, reported, err)
+	defer debug("finished drainACKLoop")
 
 	for {
 		var msg ackMessage
