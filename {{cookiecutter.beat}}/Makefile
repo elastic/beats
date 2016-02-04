@@ -9,12 +9,6 @@ PREFIX?=.
 # Path to the libbeat Makefile
 include $(ES_BEATS)/libbeat/scripts/Makefile
 
-
-.PHONY: generate
-generate:
-	python scripts/generate_template.py    etc/fields.yml    etc/{{cookiecutter.beat}}.template.json
-	python scripts/generate_field_docs.py  etc/fields.yml    etc/{{cookiecutter.beat}}.asciidoc
-
 .PHONY: install-cfg
 install-cfg:
 	mkdir -p $(PREFIX)
