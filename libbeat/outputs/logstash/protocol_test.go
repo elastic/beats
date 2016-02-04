@@ -132,7 +132,7 @@ func readWindowSize(buf *streambuf.Buffer) (uint32, error) {
 
 func readMessage(buf *streambuf.Buffer) (*message, error) {
 	if !buf.Avail(2) {
-		return nil, nil
+		return nil, streambuf.ErrNoMoreBytes
 	}
 
 	version, _ := buf.ReadNetUint8At(0)
@@ -144,7 +144,7 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 	switch code {
 	case 'W':
 		if !buf.Avail(6) {
-			return nil, nil
+			return nil, streambuf.ErrNoMoreBytes
 		}
 		size, _ := buf.ReadNetUint32At(2)
 		buf.Advance(6)
@@ -152,11 +152,11 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 		return &message{code: code, size: size}, buf.Err()
 	case 'C':
 		if !buf.Avail(6) {
-			return nil, nil
+			return nil, streambuf.ErrNoMoreBytes
 		}
 		len, _ := buf.ReadNetUint32At(2)
 		if !buf.Avail(int(len) + 6) {
-			return nil, nil
+			return nil, streambuf.ErrNoMoreBytes
 		}
 		buf.Advance(6)
 
@@ -169,7 +169,6 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 		if err != nil {
 			return nil, err
 		}
-		// dataBuf.ReadFrom(streambuf.NewFixed(tmp))
 		dataBuf.ReadFrom(decomp)
 		decomp.Close()
 
@@ -267,8 +266,8 @@ func TestProtocolCloseAfterWindowSize(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create connection: %v", err)
 	}
-	defer client.conn.Close()
-	defer transp.conn.Close()
+	// defer client.conn.Close()
+	// defer transp.conn.Close()
 
 	transp.sendEvents([]common.MapStr{common.MapStr{
 		"message": "hello world",
