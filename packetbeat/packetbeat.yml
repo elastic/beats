@@ -265,6 +265,9 @@ output:
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
+    # Pipelined publishing to Logstash host
+    #pipelined: false
+
     # Optional index name. The default index name depends on the each beat.
     # For Packetbeat, the default is set to packetbeat, for Topbeat
     # top topbeat and for Filebeat to filebeat.

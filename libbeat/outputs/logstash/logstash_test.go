@@ -3,11 +3,9 @@ package logstash
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -25,82 +23,17 @@ import (
 )
 
 type mockLSServer struct {
-	net.Listener
-	timeout   time.Duration
-	err       error
-	handshake func(net.Conn)
+	*mockServer
 }
 
 var testOptions = outputs.Options{}
 
 func newMockTLSServer(t *testing.T, to time.Duration, cert string) *mockLSServer {
-	tcpListener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		t.Fatalf("failed to generate TCP listener")
-	}
-
-	tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
-		Certificate:    cert + ".pem",
-		CertificateKey: cert + ".key",
-	})
-	if err != nil {
-		t.Fatalf("failed to load certificate")
-	}
-
-	listener := tls.NewListener(tcpListener, tlsConfig)
-
-	server := &mockLSServer{Listener: listener, timeout: to}
-	server.handshake = func(client net.Conn) {
-		if server.err != nil {
-			return
-		}
-
-		server.clientDeadline(client, server.timeout)
-		if server.err != nil {
-			return
-		}
-
-		tlsConn, ok := client.(*tls.Conn)
-		if !ok {
-			server.err = errors.New("no tls connection")
-			return
-		}
-
-		server.err = tlsConn.Handshake()
-	}
-
-	return server
+	return &mockLSServer{newMockServerTLS(t, to, cert)}
 }
 
 func newMockTCPServer(t *testing.T, to time.Duration) *mockLSServer {
-	tcpListener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		t.Fatalf("failed to generate TCP listener")
-	}
-
-	server := &mockLSServer{Listener: tcpListener, timeout: to}
-	server.handshake = func(client net.Conn) {}
-	return server
-}
-
-func (m *mockLSServer) Addr() string {
-	return m.Listener.Addr().String()
-}
-
-func (m *mockLSServer) accept() net.Conn {
-	if m.err != nil {
-		return nil
-	}
-
-	client, err := m.Listener.Accept()
-	m.err = err
-	return client
-}
-
-func (m *mockLSServer) clientDeadline(client net.Conn, to time.Duration) {
-	if m.err == nil {
-		m.err = client.SetDeadline(time.Now().Add(to))
-	}
+	return &mockLSServer{newMockServerTCP(t, to, "")}
 }
 
 func (m *mockLSServer) readMessage(buf *streambuf.Buffer, client net.Conn) *message {
@@ -137,26 +70,24 @@ func testLogstashIndex(test string) string {
 	return fmt.Sprintf("beat-logstash-int-%v-%d", test, os.Getpid())
 }
 
+func defaultTestConfig(test string) outputs.MothershipConfig {
+	return outputs.MothershipConfig{
+		TLS:   nil,
+		Hosts: []string{getLogstashHost()},
+		Index: testLogstashIndex(test),
+	}
+}
+
 func newTestLumberjackOutput(
 	t *testing.T,
-	test string,
-	config *outputs.MothershipConfig,
+	config outputs.MothershipConfig,
 ) outputs.BulkOutputer {
-	if config == nil {
-		config = &outputs.MothershipConfig{
-			TLS:   nil,
-			Hosts: []string{getLogstashHost()},
-			Index: testLogstashIndex(test),
-		}
-
-	}
-
 	plugin := outputs.FindOutputPlugin("logstash")
 	if plugin == nil {
 		t.Fatalf("No logstash output plugin found")
 	}
 
-	output, err := plugin.NewOutput(config, 0)
+	output, err := plugin.NewOutput(&config, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
@@ -166,11 +97,10 @@ func newTestLumberjackOutput(
 
 func testOutputerFactory(
 	t *testing.T,
-	test string,
-	config *outputs.MothershipConfig,
+	config outputs.MothershipConfig,
 ) func() outputs.BulkOutputer {
 	return func() outputs.BulkOutputer {
-		return newTestLumberjackOutput(t, test, config)
+		return newTestLumberjackOutput(t, config)
 	}
 }
 
@@ -300,17 +230,28 @@ func genCertsForIPIfMIssing(
 	return nil
 }
 
-func TestLogstashTCP(t *testing.T) {
-	timeout := 2 * time.Second
-	server := newMockTCPServer(t, timeout)
+var testTrue = true
 
-	// create lumberjack output client
-	config := outputs.MothershipConfig{
-		Timeout: 2,
-		Hosts:   []string{server.Addr()},
+func testLogstashTCP(t *testing.T, config outputs.MothershipConfig) {
+}
+
+func TestLogstashTCP(t *testing.T) {
+	run := func(pipelined bool) {
+		timeout := 2 * time.Second
+		server := newMockTCPServer(t, timeout)
+
+		// create lumberjack output client
+		config := outputs.MothershipConfig{
+			Timeout:   2,
+			TLS:       nil,
+			Hosts:     []string{server.Addr()},
+			Pipelined: &pipelined,
+		}
+		testConnectionType(t, server, testOutputerFactory(t, config))
 	}
 
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	run(false)
+	run(true)
 }
 
 func TestLogstashTLS(t *testing.T) {
@@ -319,17 +260,23 @@ func TestLogstashTLS(t *testing.T) {
 
 	timeout := 2 * time.Second
 	genCertsForIPIfMIssing(t, ip, certName)
-	server := newMockTLSServer(t, timeout, certName)
 
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs: []string{certName + ".pem"},
-		},
-		Timeout: 2,
-		Hosts:   []string{server.Addr()},
+	run := func(pipelined bool) {
+		server := newMockTLSServer(t, timeout, certName)
+		config := outputs.MothershipConfig{
+			TLS: &outputs.TLSConfig{
+				CAs: []string{certName + ".pem"},
+			},
+			Timeout:   2,
+			Hosts:     []string{server.Addr()},
+			Pipelined: &pipelined,
+		}
+
+		testConnectionType(t, server, testOutputerFactory(t, config))
 	}
 
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	run(false)
+	run(true)
 }
 
 func TestLogstashInvalidTLSInsecure(t *testing.T) {
@@ -338,20 +285,27 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 
 	timeout := 2 * time.Second
 	genCertsForIPIfMIssing(t, ip, certName)
-	server := newMockTLSServer(t, timeout, certName)
 
 	retries := 1
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs:      []string{certName + ".pem"},
-			Insecure: true,
-		},
-		Timeout:    2,
-		MaxRetries: &retries,
-		Hosts:      []string{server.Addr()},
+
+	run := func(pipelined bool) {
+		server := newMockTLSServer(t, timeout, certName)
+		config := outputs.MothershipConfig{
+			TLS: &outputs.TLSConfig{
+				CAs:      []string{certName + ".pem"},
+				Insecure: true,
+			},
+			Timeout:    2,
+			MaxRetries: &retries,
+			Hosts:      []string{server.Addr()},
+			Pipelined:  &pipelined,
+		}
+
+		testConnectionType(t, server, testOutputerFactory(t, config))
 	}
 
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	run(false)
+	run(true)
 }
 
 func testConnectionType(
@@ -426,63 +380,70 @@ func TestLogstashInvalidTLS(t *testing.T) {
 
 	timeout := 2 * time.Second
 	genCertsForIPIfMIssing(t, ip, certName)
-	server := newMockTLSServer(t, timeout, certName)
 
-	retries := 0
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs: []string{certName + ".pem"},
-		},
-		Timeout:    1,
-		MaxRetries: &retries,
-		Hosts:      []string{server.Addr()},
-	}
+	run := func(pipelined bool) {
+		server := newMockTLSServer(t, timeout, certName)
 
-	var result struct {
-		err           error
-		handshakeFail bool
-		signal        bool
-	}
-
-	var wg struct {
-		ready  sync.WaitGroup
-		finish sync.WaitGroup
-	}
-
-	wg.ready.Add(1)  // server signaling readiness to client worker
-	wg.finish.Add(2) // server/client signaling test end
-
-	// server loop
-	go func() {
-		defer wg.finish.Done()
-		wg.ready.Done()
-
-		client := server.accept()
-		if server.err != nil {
-			t.Fatalf("server error: %v", server.err)
+		retries := 0
+		config := outputs.MothershipConfig{
+			TLS: &outputs.TLSConfig{
+				CAs: []string{certName + ".pem"},
+			},
+			Timeout:    1,
+			MaxRetries: &retries,
+			Hosts:      []string{server.Addr()},
+			Pipelined:  &pipelined,
 		}
 
-		server.handshake(client)
-		result.handshakeFail = server.err != nil
-	}()
+		var result struct {
+			err           error
+			handshakeFail bool
+			signal        bool
+		}
 
-	// client loop
-	go func() {
-		defer wg.finish.Done()
-		wg.ready.Wait()
+		var wg struct {
+			ready  sync.WaitGroup
+			finish sync.WaitGroup
+		}
 
-		output := newTestLumberjackOutput(t, "", &config)
+		wg.ready.Add(1)  // server signaling readiness to client worker
+		wg.finish.Add(2) // server/client signaling test end
 
-		signal := outputs.NewSyncSignal()
-		output.PublishEvent(signal, testOptions, testEvent())
-		result.signal = signal.Wait()
-	}()
+		// server loop
+		go func() {
+			defer wg.finish.Done()
+			wg.ready.Done()
 
-	// wait shutdown
-	wg.finish.Wait()
-	server.Close()
+			client := server.accept()
+			if server.err != nil {
+				t.Fatalf("server error: %v", server.err)
+			}
 
-	// validate output
-	assert.True(t, result.handshakeFail)
-	assert.False(t, result.signal)
+			server.handshake(client)
+			result.handshakeFail = server.err != nil
+		}()
+
+		// client loop
+		go func() {
+			defer wg.finish.Done()
+			wg.ready.Wait()
+
+			output := newTestLumberjackOutput(t, config)
+
+			signal := outputs.NewSyncSignal()
+			output.PublishEvent(signal, testOptions, testEvent())
+			result.signal = signal.Wait()
+		}()
+
+		// wait shutdown
+		wg.finish.Wait()
+		server.Close()
+
+		// validate output
+		assert.True(t, result.handshakeFail)
+		assert.False(t, result.signal)
+	}
+
+	run(false)
+	run(true)
 }

@@ -44,7 +44,7 @@ const (
 	logstashDefaultTimeout   = 30 * time.Second
 	logstasDefaultMaxTimeout = 90 * time.Second
 	defaultSendRetries       = 3
-	defaultMaxWindowSize     = 1024
+	defaultMaxWindowSize     = 2048
 	defaultCompressionLevel  = 3
 )
 
@@ -78,27 +78,6 @@ func (lj *logstash) init(
 		compressLevel = *config.CompressionLevel
 	}
 
-	var clients []mode.ProtocolClient
-	var err error
-	if useTLS {
-		var tlsConfig *tls.Config
-		tlsConfig, err = outputs.LoadTLSConfig(config.TLS)
-		if err != nil {
-			return err
-		}
-
-		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
-				makeTLSClient(defaultPort, tlsConfig)))
-	} else {
-		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
-				makeTCPClient(defaultPort)))
-	}
-	if err != nil {
-		return err
-	}
-
 	sendRetries := defaultSendRetries
 	if config.MaxRetries != nil {
 		sendRetries = *config.MaxRetries
@@ -110,21 +89,58 @@ func (lj *logstash) init(
 		maxAttempts = 0
 	}
 
-	var m mode.ConnectionMode
-	if len(clients) == 1 {
-		m, err = mode.NewSingleConnectionMode(clients[0],
-			maxAttempts, waitRetry, timeout, maxWaitRetry)
-	} else {
-		loadBalance := config.LoadBalance != nil && *config.LoadBalance
-		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
-		}
+	pipelining := false
+	if config.Pipelined != nil {
+		pipelining = *config.Pipelined
 	}
-	if err != nil {
-		return err
+
+	loadBalance := false
+	if config.LoadBalance != nil {
+		loadBalance = *config.LoadBalance
+	} else if len(config.Hosts) <= 1 {
+		loadBalance = config.Worker > 1
+	}
+
+	var makeTransp func(string) (TransportClient, error)
+	if useTLS {
+		tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return err
+		}
+		makeTransp = makeTLSClient(defaultPort, tlsConfig)
+	} else {
+		makeTransp = makeTCPClient(defaultPort)
+	}
+
+	var m mode.ConnectionMode
+	if pipelining {
+		logp.Info("load balanced pipelining mode")
+
+		clients, err := mode.MakeAsyncClients(config, makeAsyncClientFactory(
+			maxWindowSize, compressLevel, timeout, makeTransp))
+		if err != nil {
+			return err
+		}
+
+		m, err = mode.NewAsyncConnectionMode(clients, !loadBalance,
+			maxAttempts, waitRetry, timeout, maxWaitRetry)
+		if err != nil {
+			return err
+		}
+	} else {
+		logp.Info("disabled pipelining")
+
+		clients, err := mode.MakeClients(config,
+			makeClientFactory(maxWindowSize, compressLevel, timeout, makeTransp))
+		if err != nil {
+			return err
+		}
+
+		m, err = mode.NewConnectionMode(clients, !loadBalance,
+			maxAttempts, waitRetry, timeout, maxWaitRetry)
+		if err != nil {
+			return err
+		}
 	}
 
 	lj.mode = m
@@ -145,6 +161,21 @@ func makeClientFactory(
 			return nil, err
 		}
 		return newLumberjackClient(transp, compressLevel, maxWindowSize, timeout)
+	}
+}
+
+func makeAsyncClientFactory(
+	maxWindowSize int,
+	compressLevel int,
+	timeout time.Duration,
+	makeTransp func(string) (TransportClient, error),
+) func(string) (mode.AsyncProtocolClient, error) {
+	return func(host string) (mode.AsyncProtocolClient, error) {
+		trans, err := makeTransp(host)
+		if err != nil {
+			return nil, err
+		}
+		return newAsyncLumberjackClient(trans, compressLevel, maxWindowSize, timeout)
 	}
 }
 

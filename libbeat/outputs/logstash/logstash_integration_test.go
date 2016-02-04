@@ -116,14 +116,15 @@ func testElasticsearchIndex(test string) string {
 	return fmt.Sprintf("beat-es-int-%v-%d", test, os.Getpid())
 }
 
-func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
+func newTestLogstashOutput(t *testing.T, test string, tls, pipelined bool) *testOutputer {
 	windowSize := integrationTestWindowSize
 
-	config := &outputs.MothershipConfig{
+	config := outputs.MothershipConfig{
 		Hosts:       []string{getLogstashHost()},
 		TLS:         nil,
 		Index:       testLogstashIndex(test),
 		BulkMaxSize: &windowSize,
+		Pipelined:   &pipelined,
 	}
 	if tls {
 		config.Hosts = []string{getLogstashTLSHost()}
@@ -135,7 +136,7 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 		}
 	}
 
-	lumberjack := newTestLumberjackOutput(t, test, config)
+	lumberjack := newTestLumberjackOutput(t, config)
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
@@ -255,19 +256,27 @@ func checkAll(checks ...func() bool) func() bool {
 }
 
 func TestSendMessageViaLogstashTCP(t *testing.T) {
-	testSendMessageViaLogstash(t, "basic-tcp", false)
+	testSendMessageViaLogstash(t, "basic-tcp", false, false)
 }
 
 func TestSendMessageViaLogstashTLS(t *testing.T) {
-	testSendMessageViaLogstash(t, "basic-tls", true)
+	testSendMessageViaLogstash(t, "basic-tls", true, false)
 }
 
-func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
+func TestPipelinedSendMessageViaLogstashTCP(t *testing.T) {
+	testSendMessageViaLogstash(t, "basic-async-tcp", false, true)
+}
+
+func TestPipelinedSendMessageViaLogstashTLS(t *testing.T) {
+	testSendMessageViaLogstash(t, "basic-async-tls", true, true)
+}
+
+func testSendMessageViaLogstash(t *testing.T, name string, tls, pipelined bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	ls := newTestLogstashOutput(t, name, tls)
+	ls := newTestLogstashOutput(t, name, tls, pipelined)
 	defer ls.Cleanup()
 
 	event := common.MapStr{
@@ -292,19 +301,27 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 }
 
 func TestSendMultipleViaLogstashTCP(t *testing.T) {
-	testSendMultipleViaLogstash(t, "multiple-tcp", false)
+	testSendMultipleViaLogstash(t, "multiple-tcp", false, false)
 }
 
 func TestSendMultipleViaLogstashTLS(t *testing.T) {
-	testSendMultipleViaLogstash(t, "multiple-tls", true)
+	testSendMultipleViaLogstash(t, "multiple-tls", true, false)
 }
 
-func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
+func TestPipelinedSendMultipleViaLogstashTCP(t *testing.T) {
+	testSendMultipleViaLogstash(t, "multiple-async-tcp", false, true)
+}
+
+func TestPipelinedSendMultipleViaLogstashTLS(t *testing.T) {
+	testSendMultipleViaLogstash(t, "multiple-async-tls", true, true)
+}
+
+func testSendMultipleViaLogstash(t *testing.T, name string, tls, pipelined bool) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	ls := newTestLogstashOutput(t, name, tls)
+	ls := newTestLogstashOutput(t, name, tls, pipelined)
 	defer ls.Cleanup()
 	for i := 0; i < 10; i++ {
 		event := common.MapStr{
@@ -330,27 +347,43 @@ func testSendMultipleViaLogstash(t *testing.T, name string, tls bool) {
 }
 
 func TestSendMultipleBigBatchesViaLogstashTCP(t *testing.T) {
-	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tcp", false)
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tcp", false, false)
 }
 
 func TestSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
-	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tls", true)
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-big-tls", true, false)
 }
 
-func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls bool) {
-	testSendMultipleBatchesViaLogstash(t, name, 15, 4*integrationTestWindowSize, tls)
+func TestPipelinedSendMultipleBigBatchesViaLogstashTCP(t *testing.T) {
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-async-big-tcp", false, true)
+}
+
+func TestPipelinedSendMultipleBigBatchesViaLogstashTLS(t *testing.T) {
+	testSendMultipleBigBatchesViaLogstash(t, "multiple-async-big-tls", true, true)
+}
+
+func testSendMultipleBigBatchesViaLogstash(t *testing.T, name string, tls, pipelined bool) {
+	testSendMultipleBatchesViaLogstash(t, name, 15, 4*integrationTestWindowSize, tls, pipelined)
 }
 
 func TestSendMultipleSmallBatchesViaLogstashTCP(t *testing.T) {
-	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tcp", false)
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tcp", false, false)
 }
 
 func TestSendMultipleSmallBatchesViaLogstashTLS(t *testing.T) {
-	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tls", true)
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-small-tls", true, false)
 }
 
-func testSendMultipleSmallBatchesViaLogstash(t *testing.T, name string, tls bool) {
-	testSendMultipleBatchesViaLogstash(t, name, 15, integrationTestWindowSize/2, tls)
+func TestPipelinedSendMultipleSmallBatchesViaLogstashTCP(t *testing.T) {
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-async-small-tcp", false, true)
+}
+
+func TestPipelinedSendMultipleSmallBatchesViaLogstashTLS(t *testing.T) {
+	testSendMultipleSmallBatchesViaLogstash(t, "multiple-async-small-tls", true, true)
+}
+
+func testSendMultipleSmallBatchesViaLogstash(t *testing.T, name string, tls, pipelined bool) {
+	testSendMultipleBatchesViaLogstash(t, name, 15, integrationTestWindowSize/2, tls, pipelined)
 }
 
 func testSendMultipleBatchesViaLogstash(
@@ -358,13 +391,13 @@ func testSendMultipleBatchesViaLogstash(
 	name string,
 	numBatches int,
 	batchSize int,
-	tls bool,
+	tls, pipelined bool,
 ) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
-	ls := newTestLogstashOutput(t, name, tls)
+	ls := newTestLogstashOutput(t, name, tls, pipelined)
 	defer ls.Cleanup()
 
 	batches := make([][]common.MapStr, 0, numBatches)
@@ -404,21 +437,33 @@ func testSendMultipleBatchesViaLogstash(
 }
 
 func TestLogstashElasticOutputPluginCompatibleMessageTCP(t *testing.T) {
-	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tcp", false)
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tcp", false, false)
 }
 
 func TestLogstashElasticOutputPluginCompatibleMessageTLS(t *testing.T) {
-	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tls", true)
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-tls", true, false)
 }
 
-func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string, tls bool) {
+func TestPipelinedLogstashElasticOutputPluginCompatibleMessageTCP(t *testing.T) {
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-async-tcp", false, true)
+}
+
+func TestPipelinedLogstashElasticOutputPluginCompatibleMessageTLS(t *testing.T) {
+	testLogstashElasticOutputPluginCompatibleMessage(t, "cmp-async-tls", true, true)
+}
+
+func testLogstashElasticOutputPluginCompatibleMessage(
+	t *testing.T,
+	name string,
+	tls, pipelined bool,
+) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
 	timeout := 10 * time.Second
 
-	ls := newTestLogstashOutput(t, name, tls)
+	ls := newTestLogstashOutput(t, name, tls, pipelined)
 	defer ls.Cleanup()
 
 	es := newTestElasticsearchOutput(t, name)
@@ -458,21 +503,33 @@ func testLogstashElasticOutputPluginCompatibleMessage(t *testing.T, name string,
 }
 
 func TestLogstashElasticOutputPluginBulkCompatibleMessageTCP(t *testing.T) {
-	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tcp", false)
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tcp", false, false)
 }
 
 func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
-	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tls", true)
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-tls", true, false)
 }
 
-func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
+func TestPipelinedLogstashElasticOutputPluginBulkCompatibleMessageTCP(t *testing.T) {
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-async-tcp", false, true)
+}
+
+func TestPipelinedLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
+	testLogstashElasticOutputPluginBulkCompatibleMessage(t, "cmpblk-async-tls", true, true)
+}
+
+func testLogstashElasticOutputPluginBulkCompatibleMessage(
+	t *testing.T,
+	name string,
+	tls, pipelined bool,
+) {
 	if testing.Short() {
 		t.Skip("Skipping in short mode. Requires Logstash and Elasticsearch")
 	}
 
 	timeout := 10 * time.Second
 
-	ls := newTestLogstashOutput(t, name, tls)
+	ls := newTestLogstashOutput(t, name, tls, pipelined)
 	defer ls.Cleanup()
 
 	es := newTestElasticsearchOutput(t, name)
