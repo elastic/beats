@@ -110,6 +110,7 @@ func newClient(pub *PublisherType) *client {
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
+
 	publishEvent := c.filterEvent(event)
 	if publishEvent == nil {
 		return false
@@ -174,6 +175,10 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 
 	// make sure the event has the configured fields
 	c.annotateEvent(event)
+
+	if err := common.CheckEvent(event); err != nil {
+		logp.Err("checking event: %v", err)
+	}
 
 	// filter the event by applying the configured rules
 	publishEvent, drop := c.publisher.Filters.Filter(event)
