@@ -120,29 +120,6 @@ and sends it to the publisher
 The `Beat` parameter received by most of these methods contains data about the
 Beat, such as the name, version, and common configuration options.
 
-<<<<<<< HEAD
-=======
-For more complex Beats, the optional `FlagsHandler` interface is available.
-
-[source,go]
-----------------------------------------------------------------------
-type FlagsHandler interface {
-	HandleFlags(*Beat)
-}
-----------------------------------------------------------------------
-
-You can use the `FlagsHandler` interface to add additional command line flags to
-your Beat. The `HandleFlags` callback is called after the Beat parses the
-command line arguments inherited from libbeat and handles the `--help` and
-`--version` flags. For an example of how to implement `HandleFlags`, take a look
-at the https://github.com/elastic/beats/blob/master/packetbeat/beat/packetbeat.go[Packetbeat]
-code.
-
-We strongly recommend that you create a main package that contains only the main
-method. All your Beat-specific code should go in a separate folder and package.
-This will allow other Beats to use the other parts of your Beat as a library, if
-needed.
-
 NOTE: To be consistent with other Beats, you should append `beat` to your Beat name.
 
 Let's go through each of the methods in the `Beater` interface and look at a 
