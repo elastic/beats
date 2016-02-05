@@ -38,7 +38,7 @@ func (w EventWalker) PointerEnter(bool) error {
 }
 
 func (w EventWalker) PointerExit(bool) error {
-	return fmt.Errorf("no pointer exit")
+	return fmt.Errorf("no pointer allowed")
 }
 
 func CheckEvent(event MapStr) error {
