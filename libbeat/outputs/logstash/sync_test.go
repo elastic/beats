@@ -37,8 +37,8 @@ func TestClientCloseAfterWindowSize(t *testing.T) {
 	testCloseAfterWindowSize(t, makeTestClient)
 }
 
-func TestClientFailAfterMaxTimeouts(t *testing.T) {
-	testFailAfterMaxTimeouts(t, makeTestClient)
+func TestClientMultiFailMaxTimeouts(t *testing.T) {
+	testMultiFailMaxTimeouts(t, makeTestClient)
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {

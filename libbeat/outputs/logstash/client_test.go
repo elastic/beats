@@ -36,7 +36,7 @@ type testDriverCommand struct {
 }
 
 func newLumberjackTestClient(conn TransportClient) *client {
-	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 250*time.Millisecond)
+	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 100*time.Millisecond)
 	if err != nil {
 		panic(err)
 	}
@@ -195,64 +195,87 @@ func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 
 }
 
-func testFailAfterMaxTimeouts(t *testing.T, factory clientFactory) {
+func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
+
 	server := newMockServerTCP(t, 100*time.Millisecond, "")
-	sock, transp, err := server.connectPair(100 * time.Millisecond)
+	transp, err := server.transp()
 	if err != nil {
 		t.Fatalf("Failed to connect server and client: %v", err)
 	}
 
+	N := 5
 	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
-	defer sock.Close()
 	defer transp.Close()
 	defer client.Stop()
 
-	// publish event
 	event := common.MapStr{"name": "me", "line": 10}
-	client.Publish([]common.MapStr{event})
 
-	// force connection to time out
-	for i := 0; i < maxAllowedTimeoutErr; i++ {
-		// read window
+	for i := 0; i < N; i++ {
+		await := server.await()
+		err = transp.Connect(100 * time.Millisecond)
+		if err != nil {
+			t.Fatalf("Transport client Failed to connect: %v", err)
+		}
+		sock := <-await
+		conn := &mockConn{sock, streambuf.New(nil)}
+
+		// close socket only once test has finished
+		// so no EOF error can be generated
+		defer sock.Close()
+
+		// publish event
+		client.Publish([]common.MapStr{event})
+
+		for j := 0; j < maxAllowedTimeoutErr; j++ {
+			// read window
+			msg, err := conn.recvMessage()
+			if err != nil {
+				t.Errorf("Failed receiving window size: %v", err)
+				break
+			}
+			if msg.code != 'W' {
+				t.Errorf("expected window size message")
+				break
+			}
+
+			// read message
+			msg, err = conn.recvMessage()
+			if err != nil {
+				t.Errorf("Failed receiving data message: %v", err)
+				break
+			}
+			if msg.code != 'C' {
+				t.Errorf("expected data message")
+				break
+			}
+			// do not respond -> enforce timeout
+		}
+
+		// check connection being closed,
+		// timeout required in case of sender not closing the connection
+		// correctly
+		sock.SetDeadline(time.Now().Add(30 * time.Second))
 		msg, err := conn.recvMessage()
-		if err != nil {
-			t.Fatalf("Failed receiving window size: %v", err)
+		if msg != nil {
+			t.Errorf("Received message on connection expected to be closed")
+			break
 		}
-		if msg.code != 'W' {
-			t.Fatalf("expected window size message")
+		if nerr, ok := err.(net.Error); ok && nerr.Timeout() {
+			t.Errorf("Unexpected timeout error (client did not close connection in time?): %v", err)
+			break
 		}
-
-		// read message
-		msg, err = conn.recvMessage()
-		if err != nil {
-			t.Fatalf("Failed receiving data message: %v", err)
-		}
-		if msg.code != 'C' {
-			t.Fatalf("expected data message")
-		}
-
-		// do not respond -> enforce timeout
-	}
-
-	// check connection being closed
-	sock.SetDeadline(time.Now().Add(100 * time.Millisecond))
-	msg, err := conn.recvMessage()
-	if msg != nil {
-		t.Fatalf("Received message on connection expected to be closed")
-	}
-	if nerr, ok := err.(net.Error); err != io.EOF && !(ok && nerr.Timeout()) {
-		t.Fatalf("Unexpected error type: %v", err)
 	}
 
 	client.Stop()
 
 	returns := client.Returns()
-	if len(returns) != 1 {
+	if len(returns) != N {
 		t.Fatalf("PublishEvents did not return")
 	}
 
-	assert.Equal(t, 0, returns[0].n)
-	assert.NotNil(t, returns[0].err)
+	for i := 0; i < N; i++ {
+		assert.Equal(t, 0, returns[i].n)
+		assert.NotNil(t, returns[i].err)
+	}
 }
