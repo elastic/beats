@@ -59,31 +59,31 @@ The following patterns are supported:
 |`^`              |at beginning of text or line (`m`=true)
 |`$`              |at end of text (like `\z` not `\Z`) or line (`m`=true)
 |[[escape-sequences]]*Escape Sequences* 1+|
-|`\a`             |bell (≡ `\007`)
-|`\f`             |form feed (≡ `\014`)
-|`\t`             |horizontal tab (≡ `\011`)
-|`\n`             |newline (≡ `\012`)
-|`\r`             |carriage return (≡ `\015`)
-|`\v`             |vertical tab character (≡ `\013`)
+|`\a`             |bell (same as `\007`)
+|`\f`             |form feed (same as `\014`)
+|`\t`             |horizontal tab (same as `\011`)
+|`\n`             |newline (same as `\012`)
+|`\r`             |carriage return (same as `\015`)
+|`\v`             |vertical tab character (same as `\013`)
 |`\*`             |literal `*`, for any punctuation character `*`
 |`\123`           |octal character code (up to three digits)
-|`\x7F`           |hex character code (exactly two digits)
+|`\x7F`           |two-digit hex character code
 |`\x{10FFFF}`     |hex character code
 |[[ascii-character-classes]]*ASCII Character Classes* 1+|
-|`[[:alnum:]]`    |alphanumeric (≡ `[0-9A-Za-z]`)
-|`[[:alpha:]]`    |alphabetic (≡ `[A-Za-z]`)
-|`[[:ascii:]]`    |ASCII (≡ `\x00-\x7F]`)
-|`[[:blank:]]`    |blank (≡ `[\t ]`)
-|`[[:cntrl:]]`    |control (≡ `[\x00-\x1F\x7F]`)
-|`[[:digit:]]`    |digits (≡ `[0-9]`)
-|`[[:graph:]]`    |graphical (≡ `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\\]^_`` `{\|}~]`)
-|`[[:lower:]]`    |lower case (≡ `[a-z]`)
-|`[[:print:]]`    |printable (≡ `[ -~] == [ [:graph:]]`)
-|`[[:punct:]]`    |punctuation (≡ ++[!-/:-@[-`{-~]++)
-|`[[:space:]]`    |whitespace (≡ `[\t\n\v\f\r ]`)
-|`[[:upper:]]`    |upper case (≡ `[A-Z]`)
-|`[[:word:]]`     |word characters (≡ `[0-9A-Za-z_]`)
-|`[[:xdigit:]]`   |hex digit (≡ `[0-9A-Fa-f]`)
+|`[[:alnum:]]`    |alphanumeric (same as `[0-9A-Za-z]`)
+|`[[:alpha:]]`    |alphabetic (same as `[A-Za-z]`)
+|`[[:ascii:]]`    |ASCII (same as `\x00-\x7F]`)
+|`[[:blank:]]`    |blank (same as `[\t ]`)
+|`[[:cntrl:]]`    |control (same as `[\x00-\x1F\x7F]`)
+|`[[:digit:]]`    |digits (same as `[0-9]`)
+|`[[:graph:]]`    |graphical (same as `[!-~] == [A-Za-z0-9!"#$%&'()*+,\-./:;<=>?@[\\\\]^_`` `{\|}~]`)
+|`[[:lower:]]`    |lower case (same as `[a-z]`)
+|`[[:print:]]`    |printable (same as `[ -~] == [ [:graph:]]`)
+|`[[:punct:]]`    |punctuation (same as ++[!-/:-@[-`{-~]++)
+|`[[:space:]]`    |whitespace (same as `[\t\n\v\f\r ]`)
+|`[[:upper:]]`    |upper case (same as `[A-Z]`)
+|`[[:word:]]`     |word characters (same as `[0-9A-Za-z_]`)
+|`[[:xdigit:]]`   |hex digit (same as `[0-9A-Fa-f]`)
 |=======================
 
 [[unsupported-regexp-patterns]]
@@ -103,8 +103,8 @@ The following patterns are not supported.
 |*Unsupported Grouping*      1+|
 |`(?P<name>re)`    |named & numbered capturing group (submatch)
 |`(?:re)`          |non-capturing group
-|`(?i)abc`        |set flags within current group; non-capturing
-|`(?i:re)`         |set flags during re; non-capturing
+|`(?i)abc`         |set flags within current group, non-capturing
+|`(?i:re)`         |set flags during re, non-capturing
 |`(?i)PaTTeRN`     |case-insensitive (default false)
 |`(?m)multiline`   |multi-line mode: `^` and `$` match begin/end line in addition to begin/end text (default false)
 |`(?s)pattern.`    |let `.` match `\n` (default false)
@@ -118,12 +118,12 @@ The following patterns are not supported.
 |`\C`              |match a single byte even in UTF-8 mode
 |`\Q...\E`         |literal text `...` even if `...` has punctuation
 |*Unsupported Perl Character Classes*  1+|
-|`\d`              |digits (≡ `[0-9]`)
-|`\D`              |not digits (≡ `[^0-9]`)
-|`\s`              |whitespace (≡ `[\t\n\f\r ]`)
-|`\S`              |not whitespace (≡ `[^\t\n\f\r ]`)
-|`\w`              |word characters (≡ `[0-9A-Za-z_]`)
-|`\W`              |not word characters (≡ `[^0-9A-Za-z_]`)
+|`\d`              |digits (same as `[0-9]`)
+|`\D`              |not digits (same as `[^0-9]`)
+|`\s`              |whitespace (same as `[\t\n\f\r ]`)
+|`\S`              |not whitespace (same as `[^\t\n\f\r ]`)
+|`\w`              |word characters (same as `[0-9A-Za-z_]`)
+|`\W`              |not word characters (same as `[^0-9A-Za-z_]`)
 |=======================
 
 
