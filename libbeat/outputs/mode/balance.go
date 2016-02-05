@@ -145,30 +145,7 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 		}()
 
 		waitStart.Done()
-		for {
-			// reconnect loop
-			for !client.IsConnected() {
-				if err := client.Connect(m.timeout); err == nil {
-					break
-				}
-
-				select {
-				case <-m.done:
-					return
-				case <-time.After(m.waitRetry):
-				}
-			}
-
-			// receive and process messages
-			var msg eventsMessage
-			select {
-			case <-m.done:
-				return
-			case msg = <-m.retries: // receive message from other failed worker
-			case msg = <-m.work: // receive message from publisher
-			}
-			m.onMessage(client, msg)
-		}
+		m.clientLoop(client)
 	}
 
 	for _, client := range clients {
@@ -179,24 +156,84 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 	waitStart.Wait()
 }
 
-func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
+func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
+	debug("load balancer: start client loop")
+	defer debug("load balancer: stop client loop")
+
+	backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
+
+	done := false
+	for !done {
+		if done = m.connect(client, backoff); !done {
+			done = m.sendLoop(client, backoff)
+		}
+		debug("close client")
+		client.Close()
+	}
+}
+
+func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *backoff) bool {
+	for {
+		debug("try to (re-)connect client")
+		err := client.Connect(m.timeout)
+		if !backoff.WithError(err) {
+			return true
+		}
+
+		if err == nil {
+			return false
+		}
+	}
+}
+
+func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *backoff) bool {
+	for {
+		var msg eventsMessage
+		select {
+		case <-m.done:
+			return true
+		case msg = <-m.retries: // receive message from other failed worker
+		case msg = <-m.work: // receive message from publisher
+		}
+
+		done, err := m.onMessage(backoff, client, msg)
+		if done || err != nil {
+			return done
+		}
+	}
+}
+
+func (m *LoadBalancerMode) onMessage(
+	backoff *backoff,
+	client ProtocolClient,
+	msg eventsMessage,
+) (bool, error) {
+
+	done := false
 	if msg.event != nil {
-		if err := client.PublishEvent(msg.event); err != nil {
+		err := client.PublishEvent(msg.event)
+		done = !backoff.WithError(err)
+		if err != nil {
 			if msg.attemptsLeft > 0 {
 				msg.attemptsLeft--
 			}
 			m.onFail(msg, err)
-			return
+			return done, err
 		}
 	} else {
 		events := msg.events
 		total := len(events)
-		var backoffCount uint
 
 		for len(events) > 0 {
 			var err error
 
 			events, err = client.PublishEvents(events)
+			done = !backoff.WithError(err)
+			if done && err != nil {
+				outputs.SignalFailed(msg.signaler, err)
+				return done, err
+			}
+
 			if err != nil {
 				if msg.attemptsLeft > 0 {
 					msg.attemptsLeft--
@@ -212,27 +249,13 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 					// retry non-published subset of events in batch
 					msg.events = events
 					m.onFail(msg, err)
-					return
+					return done, err
 				}
 
 				if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
 					// no more attempts left => drop
 					dropping(msg)
-					return
-				}
-
-				// wait before retry
-				backoff := time.Duration(int64(m.waitRetry) * (1 << backoffCount))
-				if backoff > m.maxWaitRetry {
-					backoff = m.maxWaitRetry
-				} else {
-					backoffCount++
-				}
-				select {
-				case <-m.done: // shutdown
-					outputs.SignalFailed(msg.signaler, err)
-					return
-				case <-time.After(backoff):
+					return done, err
 				}
 
 				// reset total count for temporary failure loop
@@ -240,14 +263,16 @@ func (m *LoadBalancerMode) onMessage(client ProtocolClient, msg eventsMessage) {
 			}
 		}
 	}
+
 	outputs.SignalCompleted(msg.signaler)
+	return done, nil
 }
 
 func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
 
 	logp.Info("Error publishing events (retrying): %s", err)
 
-	if ok := m.forwardEvent(m.retries, msg); !ok {
+	if !m.forwardEvent(m.retries, msg) {
 		dropping(msg)
 	}
 }
