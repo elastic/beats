@@ -8,22 +8,32 @@ include::./overview.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::./configuration.asciidoc[]
-
 include::./command-line.asciidoc[]
 
-include::./fields.asciidoc[]
-
-include::./capturing.asciidoc[]
+include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
 
+include::./capturing.asciidoc[]
+
 include::./thrift.asciidoc[]
+
+include::./maintaining-topology.asciidoc[]
+
+include::./visualizing-data-packetbeat.asciidoc[]
 
 include::./filtering.asciidoc[]
 
 include::./kibana3.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
+
+include::./faq.asciidoc[]
+
+//OLD CONFIG include::./configuration.asciidoc[]
+
+include::./reference.asciidoc[]
+
+include::./fields.asciidoc[]
 
 include::./new_protocol.asciidoc[]

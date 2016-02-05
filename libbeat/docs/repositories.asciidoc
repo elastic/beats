@@ -1,5 +1,5 @@
 [[setup-repositories]]
-== Repositories for APT and YUM
+=== Repositories for APT and YUM
 
 We have repositories available for APT and YUM-based distributions. Note that we
 provide binary packages, but no source packages.
@@ -12,7 +12,7 @@ Elasticsearch Signing Key, with fingerprint
 to sign all our packages. It is available from https://pgp.mit.edu.
 
 [float]
-=== APT
+==== APT
 
 To add the Beats repository for APT:
 
@@ -61,7 +61,7 @@ sudo update-rc.d filebeat defaults 95 10
 --------------------------------------------------
 
 [float]
-=== YUM
+==== YUM
 
 To add the Beats repository for YUM:
 

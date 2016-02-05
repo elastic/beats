@@ -1,4 +1,4 @@
-== Thrift-RPC Support
+=== Configuring Thrift-RPC Support
 
 https://thrift.apache.org/[Apache Thrift] is a communication protocol and RPC
 framework initially created at Facebook. It is sometimes used in

@@ -8,16 +8,26 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./configuration.asciidoc[]
-
-include::../../libbeat/docs/regexp.asciidoc[]
-
 include::./command-line.asciidoc[]
 
-include::./fields.asciidoc[]
+include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
 
+include::./multiple-prospectors.asciidoc[]
+
+include::./troubleshooting.asciidoc[]
+
+//include::./support.asciidoc[]
+
+include::./faq.asciidoc[]
+
 include::./migration.asciidoc[]
 
-include::./support.asciidoc[]
+include::./reference.asciidoc[]
+
+//OLD CONFIG include::./configuration.asciidoc[]
+
+include::./fields.asciidoc[]
+
+include::../../libbeat/docs/regexp.asciidoc[]

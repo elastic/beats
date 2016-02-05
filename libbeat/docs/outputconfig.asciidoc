@@ -10,24 +10,8 @@
 //// Make sure this content appears below a level 2 heading.
 //////////////////////////////////////////////////////////////////////////
 
-[[configuration-output]]
-=== Output
-
-You can configure multiple outputs for exporting the correlated transactions. Currently the following output types are supported:
-
-* <<elasticsearch-output,Elasticsearch>>
-* <<logstash-output,Logstash>>
-* <<redis-output,Redis (DEPRECATED)>>
-* <<file-output,File>>
-* <<console-output,Console>>
-
-You can enable one or multiple outputs at a time. The output plugins are
-responsible for sending the transaction data in JSON format to the next step in
-the pipeline. They are also responsible for maintaining the
-network topology.
-
 [[elasticsearch-output]]
-==== Elasticsearch Output
+=== Elasticsearch Output
 
 When you specify Elasticsearch for the output, the Beat sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
 
@@ -108,6 +92,9 @@ output:
 
 ------------------------------------------------------------------------------
 
+==== Elasticsearch Output Options
+
+You can specify the following options in the `elasticsearch` section:
 
 [[hosts-option]]
 ===== hosts
@@ -252,11 +239,11 @@ See <<configuration-output-tls>> for more information.
 
 
 [[logstash-output]]
-==== Logstash Output
+=== Logstash Output
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
 protocol, which runs over TCP. To use this option, you must
-{libbeat}/getting-started.html#logstash-setup[install and configure] the Beats input
+{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
 plugin for Logstash. Logstash allows for additional processing and routing of
 generated events.
 
@@ -338,6 +325,9 @@ output:
     index: {beatname_lc}
 ------------------------------------------------------------------------------
 
+==== Logstash Output Options
+
+You can specify the following options in the `logstash` section:
 
 [[hosts]]
 ===== hosts
@@ -432,7 +422,7 @@ Elasticsearch. Beats that publish data in batches (such as Filebeat) send events
 spooler size.
 
 [[redis-output]]
-==== Redis Output (DEPRECATED)
+=== Redis Output (DEPRECATED)
 
 The Redis output inserts the events in a Redis list. This output plugin is compatible with
 the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash,
@@ -476,6 +466,9 @@ output:
     reconnect_interval: 1
 ------------------------------------------------------------------------------
 
+==== Redis Output Options
+
+You can specify the following options in the `redis` section:
 
 ===== host
 
@@ -520,7 +513,7 @@ setting does not affect how events are published.
 Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. 
 
 [[file-output]]
-==== File Output
+=== File Output
 
 The File output dumps the transactions into a file where each transaction is in a JSON format.
 Currently, this output is used for testing, but it can be used as input for
@@ -542,6 +535,10 @@ output:
     rotate_every_kb: 1000
     number_of_files: 7
 ------------------------------------------------------------------------------
+
+==== File Output Options
+
+You can specify the following options in the `file` section:
 
 [[path]]
 ===== path
@@ -566,7 +563,7 @@ oldest file is deleted, and the rest of the files are shifted from last to first
 is 7 files.
 
 [[console-output]]
-==== Console Output
+=== Console Output
 
 The Console output writes events in JSON format to stdout.
 
@@ -576,6 +573,10 @@ output:
   console:
     pretty: true
 ------------------------------------------------------------------------------
+
+==== Console Output Options
+
+You can specify the following options in the `console` section:
 
 ===== pretty
 
@@ -592,7 +593,32 @@ Setting `bulk_max_size` to values less than or equal to 0 disables buffering in 
 
 [[configuration-output-tls]]
 
+=== TLS Options
+
+You can specify TLS options for any output that supports TLS. 
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: ["192.168.1.42:9200"]
+
+    tls:
+      # List of root certificates for HTTPS server verifications
+      certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+      # Certificate for TLS client authentication
+      certificate: "/etc/pki/client/cert.pem"
+
+      # Client Certificate Key
+      certificate_key: "/etc/pki/client/cert.key"
+------------------------------------------------------------------------------
+
 ==== TLS Options
+
+You can specify the following options under the `tls` section:
 
 ===== certificate_authorities
 

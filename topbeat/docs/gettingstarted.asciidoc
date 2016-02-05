@@ -6,15 +6,17 @@ statistics along with a disk usage overview.
 
 To get started with your own Topbeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Elasticsearch for storage and indexing the data. 
+ * Kibana for the UI.
+ * Logstash (optional) for inserting data into Elasticsearch.
+ 
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After you have installed these products, you can start <<topbeat-installation>>.
 
 
 [[topbeat-installation]]
-=== Installing Topbeat
+=== Step 1: Installing Topbeat
 
 To download and install Topbeat, use the commands that work with your system
 (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
@@ -80,7 +82,7 @@ Before starting Topbeat, you should look at the configuration options in the con
 for example `C:\Program Files\Topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
 
 [[topbeat-configuration]]
-=== Configuring Topbeat
+=== Step 2: Configuring Topbeat
 
 To configure Topbeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/topbeat/topbeat.yml`. For mac and win, look in
@@ -130,12 +132,12 @@ output:
 If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
 [[config-filebeat-logstash]]
-=== Configuring Topbeat to Use Logstash
+=== Step 3 (Optional): Configuring Topbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[topbeat-template]]
-=== Loading the Index Template in Elasticsearch
+=== Step 4: Loading the Index Template in Elasticsearch
 
 Before starting Topbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
@@ -175,7 +177,7 @@ you can delete the old documents from `topbeat-*` to force Kibana to look
 at the newest documents. Use this command:
 `curl -XDELETE 'http://localhost:9200/topbeat-*'`.
 
-=== Running Topbeat
+=== Step 5: Starting Topbeat
 
 Run Topbeat by issuing the following command:
 
@@ -211,7 +213,7 @@ By default the log files are stored in `C:\ProgramData\topbeat\Logs`.
 NOTE: On Windows, statistics about system load and swap usage are currently
 not captured.
 
-=== Testing the Topbeat Installation
+==== Testing the Topbeat Installation
 
 To verify that your server's statistics are present in Elasticsearch, issue
 the following command:
@@ -226,15 +228,14 @@ instance.
 
 On Windows, if you don't have cURL installed, simply point your browser to the URL.
 
-=== Loading Sample Kibana Dashboards
+=== Step 6: Loading Sample Kibana Dashboards
 
 To make it easier for you to start monitoring your servers in Kibana,
 we have created a few sample dashboards. The dashboards are maintained in this
 https://github.com/elastic/beats-dashboards[GitHub repository], which also
 includes instructions for loading the dashboards.
 
-You can load all of the sample dashboards automatically by following
-{libbeat}/getting-started.html#load-kibana-dashboards[these steps].
+For more information about loading and viewing the dashboards, see {libbeat}/visualizing-data.html[Visualizing Your Data in Kibana].
 
 image:./images/topbeat-dashboard.png[Topbeat statistics]
 
