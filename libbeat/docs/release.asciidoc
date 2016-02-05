@@ -1,8 +1,9 @@
 :beats-dir: ../../../beats
 
 [[release-notes]]
-== Release notes
+= Release notes
 
+[partintro]
 --
 This section summarizes the changes in each release.
 
@@ -14,5 +15,5 @@ This section summarizes the changes in each release.
 * <<release-notes-1.0.0-beta4>>
 
 --
-
 include::{beats-dir}/CHANGELOG.asciidoc[]
+
