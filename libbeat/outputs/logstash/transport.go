@@ -82,9 +82,11 @@ func (c *tcpClient) IsConnected() bool {
 }
 
 func (c *tcpClient) Close() error {
-	err := c.conn.Close()
-	c.connected = false
-	return err
+	if c.connected {
+		c.connected = false
+		return c.conn.Close()
+	}
+	return nil
 }
 
 func (c *tcpClient) Read(b []byte) (int, error) {
