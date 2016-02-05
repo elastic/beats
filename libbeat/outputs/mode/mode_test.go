@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,6 +17,12 @@ type mockClient struct {
 	close     func() error
 	connected bool
 	connect   func(time.Duration) error
+}
+
+func enableLogging(selectors []string) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+	}
 }
 
 func (c *mockClient) Connect(timeout time.Duration) error {
