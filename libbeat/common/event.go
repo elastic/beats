@@ -33,6 +33,14 @@ func (w EventWalker) Map(v reflect.Value) error {
 	return nil
 }
 
+func (w EventWalker) PointerEnter(bool) error {
+	return fmt.Errorf("no pointer allowed")
+}
+
+func (w EventWalker) PointerExit(bool) error {
+	return fmt.Errorf("no pointer exit")
+}
+
 func CheckEvent(event MapStr) error {
 	var walker EventWalker
 
