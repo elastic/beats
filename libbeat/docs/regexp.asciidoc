@@ -12,7 +12,7 @@
 [[regexp-support]]
 == Regular Expression Support
 
-{beatname_uc} supports a subset of the regular expression syntax accepted by https://golang.org/s/re2syntax[RE2]. Because we use the POSIX implementation, some patterns are currently <<unsupported-regexp-patterns, not supported>>. 
+{beatname_uc} supports a subset of the https://godoc.org/regexp/syntax[regular expression syntax] accepted by RE2. Because we use the POSIX implementation, some patterns are currently <<unsupported-regexp-patterns, not supported>>. 
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
