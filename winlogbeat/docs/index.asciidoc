@@ -8,11 +8,18 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::./configuration.asciidoc[]
-
 include::./command-line.asciidoc[]
 
-include::./fields.asciidoc[]
+include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
 
+//include::./configuration.asciidoc[]
+
+include::./troubleshooting.asciidoc[]
+
+include::./faq.asciidoc[]
+
+include::./reference.asciidoc[]
+
+include::./fields.asciidoc[]

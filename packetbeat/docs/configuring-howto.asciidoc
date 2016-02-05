@@ -1,0 +1,8 @@
+[[configuring-howto-packetbeat]]
+== Configuring Packetbeat
+
+After following the <<configuring-packetbeat,configuration steps>> in the
+Getting Started, you might want to fine tune the behavior of Packetbeat. This section
+describes some common use cases for changing configuration options. 
+
+For a complete description of all Packetbeat configuration options, see <<packetbeat-configuration>>.

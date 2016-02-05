@@ -1,81 +1,23 @@
-== Troubleshooting
+[[troubleshooting]]
+= Troubleshooting
 
-If you suspect an issue with Packetbeat, please read the
-following tips and send us the logs and, if possible, a traffic trace.
+[partintro]
+--
+If you have issues installing or running Packetbeat, read the
+following tips.
 
-Please contact us on the https://discuss.elastic.co/c/beats/packetbeat[forums], and 
-we'll help you troubleshoot the problem.
+--
 
-If you're sure you found a bug, you can open a ticket on
-https://github.com/elastic/beats/issues?state=open[GitHub]. Note, however,
-that we close GitHub issues containing questions or requests for help if they
-don't indicate the presence of a bug.
+== Getting Help
 
-=== Running in the Foreground and Enabling Debugging
+include::../../libbeat/docs/getting-help.asciidoc[]
 
-By default, Packetbeat sends all its output to syslog. You can use the `-e`
-command line flag to redirect the output to standard error instead:
+[[enable-packetbeat-debugging]]
+== Debugging
 
-[source,shell]
------------------------------------------------
-packetbeat -e
------------------------------------------------
+include::../../libbeat/docs/debugging.asciidoc[]
 
-The default configuration file is `/etc/packetbeat/packetbeat.yml`. You can use
-a different file by using the `-c` flag:
-
-[source,shell]
-------------------------------------------------------------
-packetbeat -e -c /etc/packetbeat/packetbeat.yml
-------------------------------------------------------------
-
-You can increase the verbosity of debug messages by enabling one or more debug 
-selectors. For
-example, to view the published transactions, you can start Packetbeat like
-this:
-
-[source,shell]
-------------------------------------------------------------
-packetbeat -e -d "publish"
-------------------------------------------------------------
-
-You can enable multiple debug selectors by separating them with commas. For
-example, if you want to also see the mysql parsing messages, run:
-
-[source,shell]
----------------------------------------------------------------------------------
-packetbeat -e -c /etc/packetbeat/packetbeat.conf -d "publish,mysql,mysqldetailed"
----------------------------------------------------------------------------------
-
-Here is the list of commonly used debug selectors:
-
-* http
-* httpdetailed
-* ip
-* mysql
-* mysqldetailed
-* pcapfilter
-* pcapread
-* pgsql
-* pgsqldetailed
-* procs
-* procsdetailed
-* publish
-* redis
-* sockets
-* tcp
-* thrift
-* thriftdetailed
-
-If you want all the debugging output (fair warning, it's quite a lot), you can
-use `*`, like this:
-
-[source,shell]
-------------------------------------------------------------
-packetbeat -e -d "*"
-------------------------------------------------------------
-
-=== Recording a Trace
+== Recording a Trace
 
 If you are having an issue, it's often useful to record a full network trace
 and send it to us. It will help us reproduce the issue, and we can also add it
@@ -96,3 +38,4 @@ error).
 WARNING: PCAP files can be large. Please monitor the disk usage while doing the
 dump to make sure you don't run out of disk space. Whenever possible, we
 recommend recording the trace on a non-production machine.
+

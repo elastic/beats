@@ -16,6 +16,7 @@
 
 NOTE: We recommend that you wrap regular expressions in single quotation marks to work around YAML's string escaping rules. For example, `'^\[?[0-9][0-9]:?[0-9][0-9]|^[[:graph:]]+'`.
 
+[float]
 === Supported Patterns
 The following patterns are supported:
 
@@ -86,8 +87,11 @@ The following patterns are supported:
 |`[[:xdigit:]]`   |hex digit (same as `[0-9A-Fa-f]`)
 |=======================
 
+
 [[unsupported-regexp-patterns]]
+[float]
 === Unsupported Patterns
+
 The following patterns are not supported.
 
 [options="header"]

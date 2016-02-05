@@ -1,5 +1,5 @@
 [[capturing-options]]
-== Traffic Capturing Options
+=== Setting Traffic Capturing Options
 
 There are two main ways of deploying Packetbeat:
 
