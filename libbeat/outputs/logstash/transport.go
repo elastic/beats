@@ -93,10 +93,7 @@ func (c *tcpClient) Read(b []byte) (int, error) {
 	}
 
 	n, err := c.conn.Read(b)
-	if err != nil {
-		c.Close()
-	}
-	return n, err
+	return n, c.handleError(err)
 }
 
 func (c *tcpClient) Write(b []byte) (int, error) {
@@ -105,10 +102,7 @@ func (c *tcpClient) Write(b []byte) (int, error) {
 	}
 
 	n, err := c.conn.Write(b)
-	if err != nil {
-		c.Close()
-	}
-	return n, err
+	return n, c.handleError(err)
 }
 
 func (c *tcpClient) LocalAddr() net.Addr {
@@ -130,10 +124,7 @@ func (c *tcpClient) SetDeadline(t time.Time) error {
 		return ErrNotConnected
 	}
 	err := c.conn.SetDeadline(t)
-	if err != nil {
-		c.Close()
-	}
-	return err
+	return c.handleError(err)
 }
 
 func (c *tcpClient) SetReadDeadline(t time.Time) error {
@@ -141,10 +132,7 @@ func (c *tcpClient) SetReadDeadline(t time.Time) error {
 		return ErrNotConnected
 	}
 	err := c.conn.SetReadDeadline(t)
-	if err != nil {
-		c.Close()
-	}
-	return err
+	return c.handleError(err)
 }
 
 func (c *tcpClient) SetWriteDeadline(t time.Time) error {
@@ -152,8 +140,14 @@ func (c *tcpClient) SetWriteDeadline(t time.Time) error {
 		return ErrNotConnected
 	}
 	err := c.conn.SetWriteDeadline(t)
+	return c.handleError(err)
+}
+
+func (c *tcpClient) handleError(err error) error {
 	if err != nil {
-		c.Close()
+		if nerr, ok := err.(net.Error); !(ok && (nerr.Temporary() || nerr.Timeout())) {
+			c.Close()
+		}
 	}
 	return err
 }

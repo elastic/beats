@@ -41,11 +41,10 @@ type logstash struct {
 const (
 	logstashDefaultPort = 10200
 
-	logstashDefaultTimeout   = 30 * time.Second
-	logstasDefaultMaxTimeout = 90 * time.Second
-	defaultSendRetries       = 3
-	defaultMaxWindowSize     = 2048
-	defaultCompressionLevel  = 3
+	logstashDefaultTimeout  = 30 * time.Second
+	defaultSendRetries      = 3
+	defaultMaxWindowSize    = 2048
+	defaultCompressionLevel = 3
 )
 
 var waitRetry = time.Duration(1) * time.Second
