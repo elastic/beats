@@ -37,6 +37,10 @@ func TestClientCloseAfterWindowSize(t *testing.T) {
 	testCloseAfterWindowSize(t, makeTestClient)
 }
 
+func TestClientFailAfterMaxTimeouts(t *testing.T) {
+	testFailAfterMaxTimeouts(t, makeTestClient)
+}
+
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 	return &clientServer{newMockServerTCP(t, to, "")}
 }
@@ -93,10 +97,13 @@ func newClientTestDriver(client mode.ProtocolClient) *testSyncDriver {
 }
 
 func (t *testSyncDriver) Stop() {
-	t.ch <- testDriverCommand{code: driverCmdQuit}
-	t.wg.Wait()
-	close(t.ch)
-	t.client.Close()
+	if t.ch != nil {
+		t.ch <- testDriverCommand{code: driverCmdQuit}
+		t.wg.Wait()
+		close(t.ch)
+		t.client.Close()
+		t.ch = nil
+	}
 }
 
 func (t *testSyncDriver) Publish(events []common.MapStr) {

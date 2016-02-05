@@ -182,6 +182,7 @@ func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
 	defer sock.Close()
+	defer client.Stop()
 
 	client.Publish([]common.MapStr{common.MapStr{
 		"message": "hello world",
@@ -192,5 +193,66 @@ func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 		t.Fatalf("failed to read window size message: %v", err)
 	}
 
+}
+
+func testFailAfterMaxTimeouts(t *testing.T, factory clientFactory) {
+	enableLogging([]string{"*"})
+	server := newMockServerTCP(t, 100*time.Millisecond, "")
+	sock, transp, err := server.connectPair(100 * time.Millisecond)
+	if err != nil {
+		t.Fatalf("Failed to connect server and client: %v", err)
+	}
+
+	client := factory(transp)
+	conn := &mockConn{sock, streambuf.New(nil)}
+	defer sock.Close()
+	defer transp.Close()
 	defer client.Stop()
+
+	// publish event
+	event := common.MapStr{"name": "me", "line": 10}
+	client.Publish([]common.MapStr{event})
+
+	// force connection to time out
+	for i := 0; i < maxAllowedTimeoutErr; i++ {
+		// read window
+		msg, err := conn.recvMessage()
+		if err != nil {
+			t.Fatalf("Failed receiving window size: %v", err)
+		}
+		if msg.code != 'W' {
+			t.Fatalf("expected window size message")
+		}
+
+		// read message
+		msg, err = conn.recvMessage()
+		if err != nil {
+			t.Fatalf("Failed receiving data message: %v", err)
+		}
+		if msg.code != 'C' {
+			t.Fatalf("expected data message")
+		}
+
+		// do not respond -> enforce timeout
+	}
+
+	// check connection being closed
+	sock.SetDeadline(time.Now().Add(100 * time.Millisecond))
+	msg, err := conn.recvMessage()
+	if msg != nil {
+		t.Fatalf("Received message on connection expected to be closed")
+	}
+	if nerr, ok := err.(net.Error); err != io.EOF && !(ok && nerr.Timeout()) {
+		t.Fatalf("Unexpected error type: %v", err)
+	}
+
+	client.Stop()
+
+	returns := client.Returns()
+	if len(returns) != 1 {
+		t.Fatalf("PublishEvents did not return")
+	}
+
+	assert.Equal(t, 0, returns[0].n)
+	assert.NotNil(t, returns[0].err)
 }

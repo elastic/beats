@@ -89,7 +89,7 @@ func (l *client) PublishEvents(
 		logp.Debug("logstash", "%v events out of %v events sent to logstash. Continue sending ...", n, len(events))
 		events = events[n:]
 		if err != nil {
-			logp.Err("Failed to publish events caused by: ", err)
+			logp.Err("Failed to publish events caused by: %v", err)
 
 			eventsNotAcked.Add(int64(len(events)))
 			ackedEvents.Add(int64(totalNumberOfEvents - len(events)))
@@ -142,6 +142,7 @@ func (l *client) onFail(n int, err error) (int, error) {
 	nerr, ok := err.(net.Error)
 	if !ok || !nerr.Timeout() {
 		// no timeout error, close connection and return error
+		debug("no timeout error: %v", err)
 		_ = l.Close()
 		return n, err
 	}
@@ -150,11 +151,13 @@ func (l *client) onFail(n int, err error) (int, error) {
 	l.countTimeoutErr++
 	if l.countTimeoutErr == maxAllowedTimeoutErr {
 		_ = l.Close()
+		debug("max timeout errors reached: %v", err)
 		return n, err
 	}
 
 	// timeout error. events. Send
 	// mode might try to publish again with reduce window size or ask another
 	// client to send events
+	debug("ignore timeout error for now")
 	return n, nil
 }

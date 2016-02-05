@@ -218,7 +218,6 @@ func TestTransportClosedOnWriteReadError(t *testing.T) {
 		transp.Write([]byte("test3"))
 		_, err = transp.Read(buf[:])
 		assert.NotNil(t, err)
-		assert.False(t, transp.IsConnected())
 	}
 
 	run(newMockServerTCP)
