@@ -7,5 +7,3 @@ import:
   - libbeat/cfgfile
   - libbeat/common
   - libbeat/logp
-- package: {{cookiecutter.beat_path}}/{{cookiecutter.beat}}/beater
-- package: {{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config
