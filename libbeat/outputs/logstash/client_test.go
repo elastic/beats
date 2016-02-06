@@ -204,7 +204,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 		t.Fatalf("Failed to connect server and client: %v", err)
 	}
 
-	N := 5
+	N := 8
 	client := factory(transp)
 	defer transp.Close()
 	defer client.Stop()
@@ -224,40 +224,38 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 		// so no EOF error can be generated
 		defer sock.Close()
 
-		for j := 0; j < maxAllowedTimeoutErr; j++ {
-			// publish event. With client returning on timeout, we have to send
-			// messages again
-			client.Publish([]common.MapStr{event})
+		// publish event. With client returning on timeout, we have to send
+		// messages again
+		client.Publish([]common.MapStr{event})
 
-			// read window
-			msg, err := conn.recvMessage()
-			if err != nil {
-				t.Errorf("Failed receiving window size: %v", err)
-				break
-			}
-			if msg.code != 'W' {
-				t.Errorf("expected window size message")
-				break
-			}
-
-			// read message
-			msg, err = conn.recvMessage()
-			if err != nil {
-				t.Errorf("Failed receiving data message: %v", err)
-				break
-			}
-			if msg.code != 'C' {
-				t.Errorf("expected data message")
-				break
-			}
-			// do not respond -> enforce timeout
+		// read window
+		msg, err := conn.recvMessage()
+		if err != nil {
+			t.Errorf("Failed receiving window size: %v", err)
+			break
 		}
+		if msg.code != 'W' {
+			t.Errorf("expected window size message")
+			break
+		}
+
+		// read message
+		msg, err = conn.recvMessage()
+		if err != nil {
+			t.Errorf("Failed receiving data message: %v", err)
+			break
+		}
+		if msg.code != 'C' {
+			t.Errorf("expected data message")
+			break
+		}
+		// do not respond -> enforce timeout
 
 		// check connection being closed,
 		// timeout required in case of sender not closing the connection
 		// correctly
 		sock.SetDeadline(time.Now().Add(30 * time.Second))
-		msg, err := conn.recvMessage()
+		msg, err = conn.recvMessage()
 		if msg != nil {
 			t.Errorf("Received message on connection expected to be closed")
 			break
@@ -271,7 +269,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	client.Stop()
 
 	returns := client.Returns()
-	if len(returns) != N*maxAllowedTimeoutErr {
+	if len(returns) != N {
 		t.Fatalf("PublishEvents did not return")
 	}
 
