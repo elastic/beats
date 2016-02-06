@@ -3,7 +3,7 @@ package main
 // This file is mandatory as otherwise the packetbeat.test binary is not generated correctly.
 
 import (
-	"flag"
+"flag"
 	"testing"
 )
 
