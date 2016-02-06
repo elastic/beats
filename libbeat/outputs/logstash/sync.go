@@ -136,6 +136,7 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 }
 
 func (l *client) onFail(n int, err error) (int, error) {
+	debug("handle error: %v", err)
 	l.win.shrinkWindow()
 
 	// if timeout error, back off and ignore error
@@ -150,6 +151,7 @@ func (l *client) onFail(n int, err error) (int, error) {
 	// if we've seen 3 consecutive timeout errors, close connection
 	l.countTimeoutErr++
 	if l.countTimeoutErr == maxAllowedTimeoutErr {
+		l.countTimeoutErr = 0
 		_ = l.Close()
 		debug("max timeout errors reached: %v", err)
 		return n, err

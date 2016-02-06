@@ -83,6 +83,7 @@ func (c *tcpClient) IsConnected() bool {
 
 func (c *tcpClient) Close() error {
 	if c.connected {
+		debug("closing")
 		c.connected = false
 		return c.conn.Close()
 	}
@@ -94,6 +95,7 @@ func (c *tcpClient) Read(b []byte) (int, error) {
 		return 0, ErrNotConnected
 	}
 
+	debug("try read: %v", len(b))
 	n, err := c.conn.Read(b)
 	return n, c.handleError(err)
 }
@@ -147,6 +149,8 @@ func (c *tcpClient) SetWriteDeadline(t time.Time) error {
 
 func (c *tcpClient) handleError(err error) error {
 	if err != nil {
+		debug("handle error: %v", err)
+
 		if nerr, ok := err.(net.Error); !(ok && (nerr.Temporary() || nerr.Timeout())) {
 			c.Close()
 		}
