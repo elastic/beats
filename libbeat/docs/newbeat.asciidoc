@@ -1,6 +1,8 @@
 [[new-beat]]
-== Developer Guide: Creating a New Beat
+= Developer Guide: Creating a New Beat
 
+[partintro]
+--
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
 your servers and ship it to Elasticsearch or Logstash.  The common parts for
@@ -10,7 +12,9 @@ handling, for logging, and more. By using this common framework, you can ensure
 that all Beats behave consistently and that they are easy to package and run
 with common tools.
 
-=== Getting Ready
+--
+
+== Getting Ready
 
 All Beats are written in http://golang.org/[Go], so having Go installed and knowing
 the basics are prerequisites for understanding this guide.
@@ -37,7 +41,7 @@ Topbeat periodically ships them to Elasticsearch for storage.
 You can use Topbeat as an example implementation for creating a new Beat. Just copy
 the source files and modify them as necessary for your Beat.
 
-=== Overview
+== Overview
 
 At the high level, a simple Beat like Topbeat has two main components:
 
@@ -89,7 +93,7 @@ The following example shows an event object in Topbeat:
 
 Now that you have the big picture, let's dig into the code.
 
-=== Developing the Beat-Specific Code
+== Developing the Beat-Specific Code
 
 The Beat-specific code should implement the `Beater` interface defined
 in libbeat.
@@ -147,7 +151,7 @@ Let's go through each of the methods in the `Beater` interface and look at a
 sample implementation.
 
 [[config-method]]
-==== Config Method
+=== Config Method
 
 The `Config` method deals with the configuration file and optionally with
 custom CLI flags.
@@ -212,7 +216,7 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
     file.
 
 [[setup-method]]
-==== Setup Method
+=== Setup Method
 
 The `Setup` method enables you to execute logic before the main
 loop, usually for initialization. In the Topbeat implementation, this method
@@ -229,7 +233,7 @@ func (tb *Topbeat) Setup(b *beat.Beat) error {
 ----------------------------------------------------------------------
 
 [[run-method]]
-==== Run Method
+=== Run Method
 
 The `Run` method should contain your main application loop. For Topbeat it looks
 like this:
@@ -298,7 +302,7 @@ func (t *Topbeat) exportSystemStats() error {
 <3> Send the event.
 
 [[cleanup-method]]
-==== Cleanup Method
+=== Cleanup Method
 
 The `Cleanup` method is executed after the main loop finishes (or is interrupted)
 and gives you the opportunity to release any resources you might use. For
@@ -312,7 +316,7 @@ func (tb *Topbeat) Cleanup(b *beat.Beat) error {
 ----------------------------------------------------------------------
 
 [[stop-method]]
-==== Stop Method
+=== Stop Method
 
 The `Stop` method is called when the Beat is signaled to stop, for
 example through the SIGTERM signal on Unix systems or the service control
@@ -326,7 +330,7 @@ func (t *Topbeat) Stop() {
 }
 ----------------------------------------------------------------------
 
-==== The main Function
+=== The main Function
 
 If you follow the Topbeat model and put your Beat-specific code in its own type
 that implements the `Beater` interface, the code from your main package is
@@ -344,7 +348,7 @@ func main() {
 
 We recommend that you implement a `New` function that creates your Beats object.
 
-=== Sharing Your Beat with the Community
+== Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open
 a pull request to add your link <<community-beats, here>>.
