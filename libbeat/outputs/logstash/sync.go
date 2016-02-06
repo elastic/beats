@@ -153,13 +153,13 @@ func (l *client) onFail(n int, err error) (int, error) {
 	if l.countTimeoutErr == maxAllowedTimeoutErr {
 		l.countTimeoutErr = 0
 		_ = l.Close()
-		debug("max timeout errors reached: %v", err)
+		debug("max timeout errors reached, close connection")
 		return n, err
 	}
 
 	// timeout error. events. Send
 	// mode might try to publish again with reduce window size or ask another
 	// client to send events
-	debug("ignore timeout error for now")
-	return n, nil
+	debug("timeout error, keep connection alive for retrying")
+	return n, err
 }

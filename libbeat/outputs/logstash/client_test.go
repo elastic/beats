@@ -224,10 +224,11 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 		// so no EOF error can be generated
 		defer sock.Close()
 
-		// publish event
-		client.Publish([]common.MapStr{event})
-
 		for j := 0; j < maxAllowedTimeoutErr; j++ {
+			// publish event. With client returning on timeout, we have to send
+			// messages again
+			client.Publish([]common.MapStr{event})
+
 			// read window
 			msg, err := conn.recvMessage()
 			if err != nil {
@@ -270,12 +271,12 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	client.Stop()
 
 	returns := client.Returns()
-	if len(returns) != N {
+	if len(returns) != N*maxAllowedTimeoutErr {
 		t.Fatalf("PublishEvents did not return")
 	}
 
-	for i := 0; i < N; i++ {
-		assert.Equal(t, 0, returns[i].n)
-		assert.NotNil(t, returns[i].err)
+	for _, ret := range returns {
+		assert.Equal(t, 0, ret.n)
+		assert.NotNil(t, ret.err)
 	}
 }
