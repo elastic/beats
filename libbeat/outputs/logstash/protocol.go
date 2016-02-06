@@ -119,6 +119,7 @@ func (p *protocol) recvACK() (uint32, error) {
 	for ackbytes < 6 {
 		n, err := conn.Read(response[ackbytes:])
 		if err != nil {
+			debug("read ack sequence failed with: %v", err)
 			return 0, err
 		}
 		ackbytes += n
@@ -135,6 +136,8 @@ func (p *protocol) recvACK() (uint32, error) {
 // wait for ACK (accept partial ACK to reset timeout)
 // reset timeout timer for every ACK received.
 func (p *protocol) awaitACK(count uint32) (uint32, error) {
+	debug("await ack")
+
 	var ackSeq uint32
 	var err error
 
@@ -142,6 +145,7 @@ func (p *protocol) awaitACK(count uint32) (uint32, error) {
 	for ackSeq < count {
 		ackSeq, err = p.recvACK()
 		if err != nil {
+			debug("receive ack failed with: %v", err)
 			return ackSeq, err
 		}
 	}
