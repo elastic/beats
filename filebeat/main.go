@@ -1,7 +1,7 @@
 package main
 
 import (
-"os"
+	"os"
 
 	"github.com/elastic/beats/filebeat/beater"
 	"github.com/elastic/beats/libbeat/beat"
