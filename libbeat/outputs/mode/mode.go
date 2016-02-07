@@ -71,6 +71,16 @@ type ProtocolClient interface {
 	PublishEvent(event common.MapStr) error
 }
 
+// AsyncProtocolClient interface is a output plugin specfic client implementation
+// for asynchronous encoding and publishing events.
+type AsyncProtocolClient interface {
+	Connectable
+
+	AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error
+
+	AsyncPublishEvent(cb func(error), event common.MapStr) error
+}
+
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
 	ErrTempBulkFailure = errors.New("temporary bulk send failure")
@@ -98,13 +108,26 @@ func NewConnectionMode(
 		waitRetry, timeout, maxWaitRetry)
 }
 
+func NewAsyncConnectionMode(
+	clients []AsyncProtocolClient,
+	failover bool,
+	maxAttempts int,
+	waitRetry, timeout, maxWaitRetry time.Duration,
+) (ConnectionMode, error) {
+	if failover {
+		clients = NewAsyncFailoverClient(clients)
+	}
+	return NewAsyncLoadBalancerMode(clients, maxAttempts,
+		waitRetry, timeout, maxWaitRetry)
+}
+
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
 func MakeClients(
 	config outputs.MothershipConfig,
 	newClient func(string) (ProtocolClient, error),
 ) ([]ProtocolClient, error) {
-	hosts := readHostList(config)
+	hosts := ReadHostList(config)
 	if len(hosts) == 0 {
 		return nil, ErrNoHostsConfigured
 	}
@@ -124,7 +147,31 @@ func MakeClients(
 	return clients, nil
 }
 
-func readHostList(config outputs.MothershipConfig) []string {
+func MakeAsyncClients(
+	config outputs.MothershipConfig,
+	newClient func(string) (AsyncProtocolClient, error),
+) ([]AsyncProtocolClient, error) {
+	hosts := ReadHostList(config)
+	if len(hosts) == 0 {
+		return nil, ErrNoHostsConfigured
+	}
+
+	clients := make([]AsyncProtocolClient, 0, len(hosts))
+	for _, host := range hosts {
+		client, err := newClient(host)
+		if err != nil {
+			// on error destroy all client instance created
+			for _, client := range clients {
+				_ = client.Close() // ignore error
+			}
+			return nil, err
+		}
+		clients = append(clients, client)
+	}
+	return clients, nil
+}
+
+func ReadHostList(config outputs.MothershipConfig) []string {
 	var lst []string
 
 	// TODO: remove config.Host

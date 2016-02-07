@@ -41,7 +41,7 @@ func (b *backoff) Wait() bool {
 	}
 }
 
-func (b *backoff) WithError(err error) bool {
+func (b *backoff) WaitOnError(err error) bool {
 	if err == nil {
 		b.Reset()
 		return true
