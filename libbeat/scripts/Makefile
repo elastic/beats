@@ -71,7 +71,7 @@ crosscompile: $(GOFILES)
 # Checks project and source code if everything is according to standard
 .PHONY: check
 check:
-	@gofmt -l ${GOFILES_NOVENDOR} | read && echo "Code differs from gofmt's style" 1>&2 && exit 1 || true
+	@gofmt -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from gofmt's style" && false)
 	go vet ${GOPACKAGES}
 
 # Runs gofmt -w on the project's source code, modifying any files that do not
