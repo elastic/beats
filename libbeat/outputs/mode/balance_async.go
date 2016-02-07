@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-// LoadBalancerMode balances the sending of events between multiple connections.
+// AsyncLoadBalancerMode balances the sending of events between multiple connections.
 //
 // The balancing algorithm is mostly pull-based, with multiple workers trying to pull
 // some amount of work from a shared queue. Workers will try to get a new work item
@@ -29,9 +29,11 @@ import (
 // send attempts. If events have not been send after maximum number of allowed
 // attemps has been passed, they will be dropped.
 //
-// Distributing events to workers is subject to timeout. If no worker is available to
-// pickup a message for sending, the message will be dropped internally.
-type LoadBalancerMode struct {
+// Like network connections, distributing events to workers is subject to
+// timeout. If no worker is available to pickup a message for sending, the message
+// will be dropped internally after max_retries. If mode or message requires
+// guaranteed send, message is retried infinitely.
+type AsyncLoadBalancerMode struct {
 	timeout      time.Duration // Send/retry timeout. Every timeout is a failed send attempt
 	waitRetry    time.Duration // Duration to wait during re-connection attempts.
 	maxWaitRetry time.Duration // Maximum send/retry timeout in backoff case.
@@ -55,19 +57,12 @@ type LoadBalancerMode struct {
 	retries chan eventsMessage
 }
 
-type eventsMessage struct {
-	attemptsLeft int
-	signaler     outputs.Signaler
-	events       []common.MapStr
-	event        common.MapStr
-}
-
-// NewLoadBalancerMode create a new load balancer connection mode.
-func NewLoadBalancerMode(
-	clients []ProtocolClient,
+// NewAsyncLoadBalancerMode create a new load balancer connection mode.
+func NewAsyncLoadBalancerMode(
+	clients []AsyncProtocolClient,
 	maxAttempts int,
 	waitRetry, timeout, maxWaitRetry time.Duration,
-) (*LoadBalancerMode, error) {
+) (*AsyncLoadBalancerMode, error) {
 
 	// maxAttempts signals infinite retry. Convert to -1, so attempts left and
 	// and infinite retry can be more easily distinguished by load balancer
@@ -75,7 +70,7 @@ func NewLoadBalancerMode(
 		maxAttempts = -1
 	}
 
-	m := &LoadBalancerMode{
+	m := &AsyncLoadBalancerMode{
 		timeout:      timeout,
 		maxWaitRetry: maxWaitRetry,
 		waitRetry:    waitRetry,
@@ -92,14 +87,14 @@ func NewLoadBalancerMode(
 
 // Close stops all workers and closes all open connections. In flight events
 // are signaled as failed.
-func (m *LoadBalancerMode) Close() error {
+func (m *AsyncLoadBalancerMode) Close() error {
 	close(m.done)
 	m.wg.Wait()
 	return nil
 }
 
 // PublishEvents forwards events to some load balancing worker.
-func (m *LoadBalancerMode) PublishEvents(
+func (m *AsyncLoadBalancerMode) PublishEvents(
 	signaler outputs.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
@@ -109,7 +104,7 @@ func (m *LoadBalancerMode) PublishEvents(
 }
 
 // PublishEvent forwards the event to some load balancing worker.
-func (m *LoadBalancerMode) PublishEvent(
+func (m *AsyncLoadBalancerMode) PublishEvent(
 	signaler outputs.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
@@ -118,7 +113,7 @@ func (m *LoadBalancerMode) PublishEvent(
 		eventsMessage{signaler: signaler, event: event})
 }
 
-func (m *LoadBalancerMode) publishEventsMessage(
+func (m *AsyncLoadBalancerMode) publishEventsMessage(
 	opts outputs.Options,
 	msg eventsMessage,
 ) error {
@@ -134,9 +129,9 @@ func (m *LoadBalancerMode) publishEventsMessage(
 	return nil
 }
 
-func (m *LoadBalancerMode) start(clients []ProtocolClient) {
+func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 	var waitStart sync.WaitGroup
-	worker := func(client ProtocolClient) {
+	worker := func(client AsyncProtocolClient) {
 		defer func() {
 			if client.IsConnected() {
 				_ = client.Close()
@@ -145,7 +140,36 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 		}()
 
 		waitStart.Done()
-		m.clientLoop(client)
+
+		backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
+		for {
+			// reconnect loop
+			for !client.IsConnected() {
+				if err := client.Connect(m.timeout); err == nil {
+					break
+				}
+
+				if !backoff.Wait() { // done channel closed
+					return
+				}
+			}
+
+			// receive and process messages
+			var msg eventsMessage
+			select {
+			case <-m.done:
+				return
+			case msg = <-m.retries: // receive message from other failed worker
+				debug("events from retries queue")
+			case msg = <-m.work: // receive message from publisher
+				debug("events from worker worker queue")
+			}
+
+			err := m.onMessage(client, msg)
+			if !backoff.WaitOnError(err) { // done channel closed
+				return
+			}
+		}
 	}
 
 	for _, client := range clients {
@@ -156,128 +180,110 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 	waitStart.Wait()
 }
 
-func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
-	debug("load balancer: start client loop")
-	defer debug("load balancer: stop client loop")
-
-	backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
-
-	done := false
-	for !done {
-		if done = m.connect(client, backoff); !done {
-			done = m.sendLoop(client, backoff)
-		}
-		debug("close client")
-		client.Close()
-	}
-}
-
-func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *backoff) bool {
-	for {
-		debug("try to (re-)connect client")
-		err := client.Connect(m.timeout)
-		if !backoff.WaitOnError(err) {
-			return true
-		}
-
-		if err == nil {
-			return false
-		}
-	}
-}
-
-func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *backoff) bool {
-	for {
-		var msg eventsMessage
-		select {
-		case <-m.done:
-			return true
-		case msg = <-m.retries: // receive message from other failed worker
-		case msg = <-m.work: // receive message from publisher
-		}
-
-		done, err := m.onMessage(backoff, client, msg)
-		if done || err != nil {
-			return done
-		}
-	}
-}
-
-func (m *LoadBalancerMode) onMessage(
-	backoff *backoff,
-	client ProtocolClient,
+func (m *AsyncLoadBalancerMode) onMessage(
+	client AsyncProtocolClient,
 	msg eventsMessage,
-) (bool, error) {
-
-	done := false
+) error {
+	var err error
 	if msg.event != nil {
-		err := client.PublishEvent(msg.event)
-		done = !backoff.WaitOnError(err)
+		err = client.AsyncPublishEvent(handlePublishEventResult(m, msg), msg.event)
+	} else {
+		err = client.AsyncPublishEvents(handlePublishEventsResult(m, msg), msg.events)
+	}
+
+	if err != nil {
+		if msg.attemptsLeft > 0 {
+			msg.attemptsLeft--
+		}
+
+		// asynchronously retry to insert message (if attempts left), so worker can not
+		// deadlock on retries channel if client puts multiple failed outstanding
+		// events into the pipeline
+		m.onFail(true, msg, err)
+	}
+
+	return err
+}
+
+func handlePublishEventResult(m *AsyncLoadBalancerMode, msg eventsMessage) func(error) {
+	return func(err error) {
 		if err != nil {
 			if msg.attemptsLeft > 0 {
 				msg.attemptsLeft--
 			}
-			m.onFail(msg, err)
-			return done, err
+			m.onFail(false, msg, err)
+		} else {
+			outputs.SignalCompleted(msg.signaler)
 		}
+	}
+}
+
+func handlePublishEventsResult(
+	m *AsyncLoadBalancerMode,
+	msg eventsMessage,
+) func([]common.MapStr, error) {
+	total := len(msg.events)
+	return func(events []common.MapStr, err error) {
+		if err != nil {
+			if msg.attemptsLeft > 0 {
+				msg.attemptsLeft--
+			}
+
+			// reset attempt count if subset of messages has been processed
+			if len(events) < total && msg.attemptsLeft >= 0 {
+				msg.attemptsLeft = m.maxAttempts
+			}
+
+			if err != ErrTempBulkFailure {
+				// retry non-published subset of events in batch
+				msg.events = events
+				m.onFail(false, msg, err)
+				return
+			}
+
+			if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
+				// no more attempts left => drop
+				dropping(msg)
+				return
+			}
+
+			// retry non-published subset of events in batch
+			msg.events = events
+			m.onFail(false, msg, err)
+			return
+		}
+
+		// re-insert non-published events into pipeline
+		if len(events) != 0 {
+			msg.events = events
+			if ok := m.forwardEvent(m.retries, msg); !ok {
+				dropping(msg)
+			}
+			return
+		}
+
+		// all events published -> signal success
+		outputs.SignalCompleted(msg.signaler)
+	}
+}
+
+func (m *AsyncLoadBalancerMode) onFail(async bool, msg eventsMessage, err error) {
+	fn := func() {
+		logp.Info("Error publishing events (retrying): %s", err)
+
+		if ok := m.forwardEvent(m.retries, msg); !ok {
+			dropping(msg)
+		}
+	}
+
+	if async {
+		go fn()
 	} else {
-		events := msg.events
-		total := len(events)
-
-		for len(events) > 0 {
-			var err error
-
-			events, err = client.PublishEvents(events)
-			done = !backoff.WaitOnError(err)
-			if done && err != nil {
-				outputs.SignalFailed(msg.signaler, err)
-				return done, err
-			}
-
-			if err != nil {
-				if msg.attemptsLeft > 0 {
-					msg.attemptsLeft--
-				}
-
-				// reset attempt count if subset of messages has been processed
-				if len(events) < total && msg.attemptsLeft >= 0 {
-					debug("reset fails")
-					msg.attemptsLeft = m.maxAttempts
-				}
-
-				if err != ErrTempBulkFailure {
-					// retry non-published subset of events in batch
-					msg.events = events
-					m.onFail(msg, err)
-					return done, err
-				}
-
-				if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
-					// no more attempts left => drop
-					dropping(msg)
-					return done, err
-				}
-
-				// reset total count for temporary failure loop
-				total = len(events)
-			}
-		}
-	}
-
-	outputs.SignalCompleted(msg.signaler)
-	return done, nil
-}
-
-func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
-
-	logp.Info("Error publishing events (retrying): %s", err)
-
-	if !m.forwardEvent(m.retries, msg) {
-		dropping(msg)
+		fn()
 	}
 }
 
-func (m *LoadBalancerMode) forwardEvent(
+func (m *AsyncLoadBalancerMode) forwardEvent(
 	ch chan eventsMessage,
 	msg eventsMessage,
 ) bool {
@@ -300,12 +306,4 @@ func (m *LoadBalancerMode) forwardEvent(
 		}
 	}
 	return false
-}
-
-// dropping is called when a message is dropped. It updates the
-// relevant counters and sends a failed signal.
-func dropping(msg eventsMessage) {
-	debug("messages dropped")
-	messagesDropped.Add(1)
-	outputs.SignalFailed(msg.signaler, nil)
 }
