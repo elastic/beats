@@ -85,6 +85,10 @@ func newClientTestDriver(client mode.ProtocolClient) *testSyncDriver {
 			switch cmd.code {
 			case driverCmdQuit:
 				return
+			case driverCmdConnect:
+				driver.client.Connect(1 * time.Second)
+			case driverCmdClose:
+				driver.client.Close()
 			case driverCmdPublish:
 				events, err := driver.client.PublishEvents(cmd.events)
 				n := len(cmd.events) - len(events)
@@ -94,6 +98,14 @@ func newClientTestDriver(client mode.ProtocolClient) *testSyncDriver {
 	}()
 
 	return driver
+}
+
+func (t *testSyncDriver) Close() {
+	t.ch <- testDriverCommand{code: driverCmdClose}
+}
+
+func (t *testSyncDriver) Connect() {
+	t.ch <- testDriverCommand{code: driverCmdConnect}
 }
 
 func (t *testSyncDriver) Stop() {

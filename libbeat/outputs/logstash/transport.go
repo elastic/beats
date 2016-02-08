@@ -74,6 +74,7 @@ func (c *tcpClient) Connect(timeout time.Duration) error {
 
 	c.conn = conn
 	c.connected = true
+	debug("connected")
 	return nil
 }
 

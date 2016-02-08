@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type asyncClient struct {
@@ -66,7 +65,7 @@ func newAsyncLumberjackClient(
 }
 
 func (c *asyncClient) Connect(timeout time.Duration) error {
-	logp.Debug("logstash", "connect (async)")
+	debug("connect (async)")
 	err := c.TransportClient.Connect(timeout)
 	if err == nil {
 		c.startACK()
@@ -75,7 +74,7 @@ func (c *asyncClient) Connect(timeout time.Duration) error {
 }
 
 func (c *asyncClient) Close() error {
-	logp.Debug("logstash", "close (async) connection")
+	debug("close (async) connection")
 	c.stopACK()
 	return c.closeTransport()
 }
@@ -251,6 +250,7 @@ func (c *asyncClient) startACK() {
 }
 
 func (c *asyncClient) stopACK() {
+	debug("stop ackLoop")
 	close(c.done)
 	c.wg.Wait()
 	close(c.ch)
@@ -260,6 +260,8 @@ func (c *asyncClient) stopACK() {
 func (c *asyncClient) ackLoop() {
 	defer c.wg.Done()
 	defer debug("finished ackLoop")
+
+	debug("start ackLoop")
 
 	for {
 		var err error
@@ -271,6 +273,8 @@ func (c *asyncClient) ackLoop() {
 			c.drainACKLoop(false, true, io.EOF)
 			return
 		}
+
+		debug("new ack message")
 
 		inPartial := false
 		switch msg.tag {

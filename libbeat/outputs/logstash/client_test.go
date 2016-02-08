@@ -14,10 +14,15 @@ import (
 
 const (
 	driverCmdQuit = iota
+	driverCmdConnect
+	driverCmdClose
 	driverCmdPublish
 )
 
 type testClientDriver interface {
+	Connect()
+	Close()
+
 	Stop()
 	Publish(events []common.MapStr)
 	Returns() []testClientReturn
@@ -57,14 +62,19 @@ func testSendZero(t *testing.T, factory clientFactory) {
 	server := newMockServerTCP(t, 1*time.Second, "")
 	defer server.Close()
 
-	sock, transp, err := server.connectPair(1 * time.Second)
+	transp, err := server.transp()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to create transport client: %v", err)
 	}
+	defer transp.Close()
 
 	client := factory(transp)
+	defer client.Stop()
+
+	await := server.await()
+	client.Connect()
+	sock := <-await
 	defer sock.Close()
-	defer transp.Close()
 
 	client.Publish(make([]common.MapStr, 0))
 
@@ -81,15 +91,23 @@ func testSendZero(t *testing.T, factory clientFactory) {
 func testSimpleEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 	server := newMockServerTCP(t, 1*time.Second, "")
+	defer server.Close()
 
-	sock, transp, err := server.connectPair(1 * time.Second)
+	transp, err := server.transp()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to create transport client: %v", err)
 	}
-	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
+
+	client := factory(transp)
+	defer client.Stop()
+
+	await := server.await()
+	client.Connect()
+	sock := <-await
 	defer sock.Close()
+
+	conn := &mockConn{sock, streambuf.New(nil)}
 
 	event := common.MapStr{"name": "me", "line": 10}
 	client.Publish([]common.MapStr{event})
@@ -120,15 +138,23 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 func testStructuredEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 	server := newMockServerTCP(t, 1*time.Second, "")
+	defer server.Close()
 
-	sock, transp, err := server.connectPair(1 * time.Second)
+	transp, err := server.transp()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to create transport client: %v", err)
 	}
-	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
+
+	client := factory(transp)
+	defer client.Stop()
+
+	await := server.await()
+	client.Connect()
+	sock := <-await
 	defer sock.Close()
+
+	conn := &mockConn{sock, streambuf.New(nil)}
 
 	event := common.MapStr{
 		"name": "test",
@@ -173,16 +199,23 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 	server := newMockServerTCP(t, 100*time.Millisecond, "")
+	defer server.Close()
 
-	sock, transp, err := server.connectPair(100 * time.Millisecond)
+	transp, err := server.transp()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to create transport client: %v", err)
 	}
-	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
-	defer sock.Close()
+
+	client := factory(transp)
 	defer client.Stop()
+
+	await := server.await()
+	client.Connect()
+	sock := <-await
+	defer sock.Close()
+
+	conn := &mockConn{sock, streambuf.New(nil)}
 
 	client.Publish([]common.MapStr{common.MapStr{
 		"message": "hello world",
@@ -198,25 +231,29 @@ func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 
-	server := newMockServerTCP(t, 100*time.Millisecond, "")
+	N := 8
+
+	server := newMockServerTCP(t, 1*time.Second, "")
+	defer server.Close()
+
 	transp, err := server.transp()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to create transport client: %v", err)
 	}
-
-	N := 8
-	client := factory(transp)
 	defer transp.Close()
+
+	client := factory(transp)
 	defer client.Stop()
 
 	event := common.MapStr{"name": "me", "line": 10}
 
 	for i := 0; i < N; i++ {
-		await := server.await()
-		err = transp.Connect(100 * time.Millisecond)
-		if err != nil {
-			t.Fatalf("Transport client Failed to connect: %v", err)
+		if transp.IsConnected() {
+			t.Fatal("client should not be connected")
 		}
+
+		await := server.await()
+		client.Connect()
 		sock := <-await
 		conn := &mockConn{sock, streambuf.New(nil)}
 
