@@ -6,7 +6,7 @@ import (
 )
 
 // Version of Winlogbeat.
-var Version = "1.1.0"
+var Version = "1.1.1"
 
 // Name of this beat.
 var Name = "winlogbeat"
