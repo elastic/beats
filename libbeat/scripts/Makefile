@@ -28,7 +28,7 @@ ARCH?=$(shell uname -m)
 export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
-GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
+GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
 SHELL=bash
 ES_HOST?="elasticsearch"
 BUILD_DIR?=$(shell pwd)/build
@@ -44,7 +44,7 @@ PYTHON_ENV?=${BUILD_DIR}/python-env
 
 # Conditionally enable the race detector when RACE_DETECTOR=1.
 ifeq ($(RACE_DETECTOR),1)
-    RACE=-race
+	RACE=-race
 endif
 
 
@@ -181,7 +181,11 @@ testsuite:
 
 	# Runs system tests if SYSTEM_TESTS is set to true
 	if [ $(SYSTEM_TESTS) = true ]; then \
-		 $(MAKE) system-tests; \
+		if [ $(TEST_ENVIRONMENT) = true ]; then \
+			${DOCKER_COMPOSE} run beat make system-tests; \
+		else \
+			$(MAKE) system-tests; \
+		fi \
 	fi
 
 	$(MAKE) benchmark-tests
@@ -214,7 +218,7 @@ build-image: write-environment
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
 .PHONY: start-environment
 start-environment: stop-environment
-	${DOCKER_COMPOSE} up -d redis elasticsearch logstash
+	${DOCKER_COMPOSE} up -d
 
 .PHONY: stop-environment
 stop-environment:
