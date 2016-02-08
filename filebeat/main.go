@@ -5,7 +5,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-var Version = "1.1.0"
+var Version = "1.1.1"
 var Name = "filebeat"
 
 // The basic model of execution:
