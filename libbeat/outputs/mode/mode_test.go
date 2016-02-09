@@ -13,10 +13,11 @@ import (
 )
 
 type mockClient struct {
-	publish   func([]common.MapStr) ([]common.MapStr, error)
-	close     func() error
-	connected bool
-	connect   func(time.Duration) error
+	publish      func([]common.MapStr) ([]common.MapStr, error)
+	asyncPublish func(func([]common.MapStr, error), []common.MapStr) error
+	close        func() error
+	connected    bool
+	connect      func(time.Duration) error
 }
 
 func enableLogging(selectors []string) {
@@ -44,6 +45,16 @@ func (c *mockClient) PublishEvents(events []common.MapStr) ([]common.MapStr, err
 func (c *mockClient) PublishEvent(event common.MapStr) error {
 	_, err := c.PublishEvents([]common.MapStr{event})
 	return err
+}
+
+func (c *mockClient) AsyncPublishEvents(cb func([]common.MapStr, error), events []common.MapStr) error {
+	return c.asyncPublish(cb, events)
+}
+
+func (c *mockClient) AsyncPublishEvent(cb func(error), event common.MapStr) error {
+	return c.AsyncPublishEvents(
+		func(evts []common.MapStr, err error) { cb(err) },
+		[]common.MapStr{event})
 }
 
 func connectOK(timeout time.Duration) error {
@@ -78,6 +89,20 @@ func collectPublish(
 
 		*collected = append(*collected, events)
 		return nil, nil
+	}
+}
+
+func asyncCollectPublish(
+	collected *[][]common.MapStr,
+) func(func([]common.MapStr, error), []common.MapStr) error {
+	mutex := sync.Mutex{}
+	return func(cb func([]common.MapStr, error), events []common.MapStr) error {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		*collected = append(*collected, events)
+		cb(nil, nil)
+		return nil
 	}
 }
 
@@ -123,6 +148,52 @@ func publishFailStart(
 	pub func(events []common.MapStr) ([]common.MapStr, error),
 ) func(events []common.MapStr) ([]common.MapStr, error) {
 	return publishFailWith(n, errNetTimeout{}, pub)
+}
+
+func asyncFailStart(
+	n int,
+	pub func(func([]common.MapStr, error), []common.MapStr) error,
+) func(func([]common.MapStr, error), []common.MapStr) error {
+	return asyncFailStartWith(n, errNetTimeout{}, pub)
+}
+
+func asyncFailStartWith(
+	n int,
+	err error,
+	pub func(func([]common.MapStr, error), []common.MapStr) error,
+) func(func([]common.MapStr, error), []common.MapStr) error {
+	count := 0
+	return func(cb func([]common.MapStr, error), events []common.MapStr) error {
+		if count < n {
+			count++
+			debug("fail with(%v): %v", count, err)
+			return err
+		}
+
+		count = 0
+		debug("forward events")
+		return pub(cb, events)
+	}
+}
+
+func asyncFailWith(
+	n int,
+	err error,
+	pub func(func([]common.MapStr, error), []common.MapStr) error,
+) func(func([]common.MapStr, error), []common.MapStr) error {
+	count := 0
+	return func(cb func([]common.MapStr, error), events []common.MapStr) error {
+		if count < n {
+			count++
+			go func() {
+				cb(events, err)
+			}()
+			return nil
+		}
+
+		count = 0
+		return pub(cb, events)
+	}
 }
 
 func closeOK() error {
