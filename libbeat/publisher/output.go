@@ -86,7 +86,8 @@ func (o *outputWorker) sendBulk(
 ) {
 	debug("output worker: publish %v events", len(events))
 
-	err := o.out.BulkPublish(ctx.Signal, outputs.Options{ctx.Guaranteed}, events)
+	opts := outputs.Options{ctx.Guaranteed}
+	err := o.out.BulkPublish(ctx.Signal, opts, events)
 	if err != nil {
 		logp.Info("Error bulk publishing events: %s", err)
 	}
