@@ -196,7 +196,8 @@ func (l *lumberjackClient) onFail(n int, err error) (int, error) {
 
 	// if we've seen 3 consecutive timeout errors, close connection
 	l.countTimeoutErr++
-	if l.countTimeoutErr == maxAllowedTimeoutErr {
+	if l.countTimeoutErr >= maxAllowedTimeoutErr {
+		l.countTimeoutErr = 0 // reset error counter and close connection
 		_ = l.Close()
 		return n, err
 	}
