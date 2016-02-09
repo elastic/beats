@@ -234,7 +234,6 @@ func (t *Topbeat) exportProcStats() error {
 				"type":       "process",
 				"count":      1,
 				"proc":       proc,
-				"count":      1,
 			}
 
 			t.events.PublishEvent(event)
