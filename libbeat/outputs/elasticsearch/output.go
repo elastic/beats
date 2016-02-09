@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"bytes"
+	"io/ioutil"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
-	"io/ioutil"
 )
 
 var debug = logp.MakeDebug("elasticsearch")
@@ -101,21 +102,10 @@ func (out *elasticsearchOutput) init(
 	var waitRetry = time.Duration(1) * time.Second
 	var maxWaitRetry = time.Duration(60) * time.Second
 
-	var m mode.ConnectionMode
 	out.clients = clients
-	if len(clients) == 1 {
-		client := clients[0]
-		m, err = mode.NewSingleConnectionMode(client, maxAttempts,
-			waitRetry, timeout, maxWaitRetry)
-	} else {
-		loadBalance := config.LoadBalance == nil || *config.LoadBalance
-		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
-		}
-	}
+	loadBalance := config.LoadBalance == nil || *config.LoadBalance
+	m, err := mode.NewConnectionMode(clients, !loadBalance,
+		maxAttempts, waitRetry, timeout, maxWaitRetry)
 	if err != nil {
 		return err
 	}
