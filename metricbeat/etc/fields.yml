@@ -1,0 +1,11 @@
+version: 1.0
+
+defaults:
+  type: string
+  required: false
+  index: not_analyzed
+  doc_values: true
+  ignore_above: 1024
+
+sections:
+

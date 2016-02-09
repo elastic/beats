@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+- Logstash client entering infinite loop on too many timeout errors {pull}927[927]
+- Logstash output will not retry events that are not json-encodable {pull}927[927]
 
 *Packetbeat*
 - Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
@@ -58,6 +60,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
 - Add ability to create Elasticsearch mapping on startup {pull}639[639]
 - Add option to elasticsearch output to pass http parameters in index operations {issue}805[805]
+- Improve logstash and elasticsearch backoff behavior. {pull}927[927]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]

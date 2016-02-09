@@ -1,0 +1,3 @@
+package: github.com/elastic/beats/metricbeat/module/mysql
+import:
+- package: github.com/go-sql-driver/mysql

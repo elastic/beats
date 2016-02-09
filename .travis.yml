@@ -20,6 +20,7 @@ env:
     - TARGETS="-C filebeat testsuite"
     - TARGETS="-C winlogbeat testsuite"
     - TARGETS="-C packetbeat testsuite"
+    - TARGETS="-C metricbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
   global:
@@ -41,6 +42,8 @@ matrix:
       env: TARGETS="-C winlogbeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat testsuite"
+    - os: osx
+      env: TARGETS="-C metricbeat testsuite"
   fast_finish: true
   allow_failures:
     - env: TARGETS="-C libbeat crosscompile"
