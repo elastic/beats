@@ -13,6 +13,11 @@ type failOverClient struct {
 	active int
 }
 
+type asyncFailOverClient struct {
+	conns  []AsyncProtocolClient
+	active int
+}
+
 type clientList interface {
 	Active() int
 	Len() int
@@ -63,6 +68,52 @@ func (f *failOverClient) PublishEvent(event common.MapStr) error {
 		return errNoActiveConnection
 	}
 	return f.conns[f.active].PublishEvent(event)
+}
+
+func NewAsyncFailoverClient(clients []AsyncProtocolClient) []AsyncProtocolClient {
+	if len(clients) <= 1 {
+		return clients
+	}
+	return []AsyncProtocolClient{
+		&asyncFailOverClient{conns: clients, active: -1},
+	}
+}
+
+func (f *asyncFailOverClient) Active() int           { return f.active }
+func (f *asyncFailOverClient) Len() int              { return len(f.conns) }
+func (f *asyncFailOverClient) Get(i int) Connectable { return f.conns[i] }
+func (f *asyncFailOverClient) Activate(i int)        { f.active = i }
+
+func (f *asyncFailOverClient) Connect(to time.Duration) error {
+	return connect(f, to)
+}
+
+func (f *asyncFailOverClient) IsConnected() bool {
+	return f.active >= 0 && f.conns[f.active].IsConnected()
+}
+
+func (f *asyncFailOverClient) Close() error {
+	return closeActive(f)
+}
+
+func (f *asyncFailOverClient) AsyncPublishEvents(
+	cb func([]common.MapStr, error),
+	events []common.MapStr,
+) error {
+	if f.active < 0 {
+		return errNoActiveConnection
+	}
+	return f.conns[f.active].AsyncPublishEvents(cb, events)
+}
+
+func (f *asyncFailOverClient) AsyncPublishEvent(
+	cb func(error),
+	event common.MapStr,
+) error {
+	if f.active < 0 {
+		return errNoActiveConnection
+	}
+	return f.conns[f.active].AsyncPublishEvent(cb, event)
 }
 
 func connect(lst clientList, to time.Duration) error {
