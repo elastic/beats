@@ -15,25 +15,15 @@ class BaseTest(TestCase):
     @classmethod
     def setUpClass(self):
         self.beat_name = "packetbeat"
-<<<<<<< HEAD
         super(BaseTest, self).setUpClass()
-
-=======
-        self.build_path = "../../build/system-tests/"
-        self.beat_path = "../../packetbeat.test"
->>>>>>> amqp protocol
 
     def run_packetbeat(self, pcap,
                        cmd="../../packetbeat.test",
                        config="packetbeat.yml",
                        output="packetbeat.log",
                        extra_args=[],
-<<<<<<< HEAD
                        debug_selectors=[],
                        exit_code=0):
-=======
-                       debug_selectors=[]):
->>>>>>> amqp protocol
         """
         Executes packetbeat on an input pcap file.
         Waits for the process to finish before returning to
@@ -60,13 +50,9 @@ class BaseTest(TestCase):
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
-<<<<<<< HEAD
             actual_exit_code = proc.wait()
             assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (exit_code, actual_exit_code)
             return actual_exit_code
-=======
-            return proc.wait()
->>>>>>> amqp protocol
 
     def start_packetbeat(self,
                          cmd="../../packetbeat.test",

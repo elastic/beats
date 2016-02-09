@@ -61,10 +61,10 @@ type Icmp struct {
 }
 
 type Amqp struct {
-	ProtocolCommon              `yaml:",inline"`
-	ParseHeaders               *bool `yaml:"parse_headers"`
-	ParseArguments             *bool `yaml:"parse_arguments"`
-	MaxBodyLength             *int `yaml:"max_body_length"`
+	ProtocolCommon            `yaml:",inline"`
+	ParseHeaders              *bool `yaml:"parse_headers"`
+	ParseArguments            *bool `yaml:"parse_arguments"`
+	MaxBodyLength             *int  `yaml:"max_body_length"`
 	HideConnectionInformation *bool `yaml:"hide_connection_information"`
 }
 
