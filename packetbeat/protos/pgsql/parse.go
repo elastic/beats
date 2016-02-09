@@ -26,6 +26,8 @@ func (pgsql *Pgsql) pgsqlMessageParser(s *PgsqlStream) (bool, bool) {
 		ok, complete = pgsql.parseMessageStart(s)
 	case PgsqlGetDataState:
 		ok, complete = pgsql.parseMessageData(s)
+	case PgsqlExtendedQueryState:
+		ok, complete = pgsql.parseMessageExtendedQuery(s)
 	default:
 		logp.Critical("Pgsql invalid parser state")
 	}
@@ -122,6 +124,10 @@ func (pgsql *Pgsql) parseCommand(s *PgsqlStream) (bool, bool) {
 		return pgsql.parseReadyForQuery(s, length)
 	case 'E':
 		return pgsql.parseErrorResponse(s, length)
+	case 'P':
+		return pgsql.parseExtReq(s, length)
+	case '1':
+		return pgsql.parseExtResp(s, length)
 	default:
 		if !pgsqlValidType(typ) {
 			detailedf("invalid frame type: '%c'", typ)
@@ -263,6 +269,53 @@ func (pgsql *Pgsql) parseErrorResponse(s *PgsqlStream, length int) (bool, bool) 
 	m.Size = uint64(m.end - m.start)
 
 	return true, true
+}
+
+func (pgsql *Pgsql) parseExtReq(s *PgsqlStream, length int) (bool, bool) {
+	// Ready for query -> Parse for an extended query request
+	detailedf("Parse")
+
+	m := s.message
+	m.start = s.parseOffset
+	m.IsRequest = true
+
+	s.parseOffset += 1 //type
+	s.parseOffset += length
+	m.end = s.parseOffset
+	m.Size = uint64(m.end - m.start)
+	m.toExport = true
+
+	query, err := common.ReadString(s.data[m.start+6:])
+	if err != nil {
+		detailedf("Invalid extended query request")
+		return false, false
+	}
+	m.Query = query
+	detailedf("Parse in an extended query request: %s", m.Query)
+
+	// Ignore SET statement
+	if strings.HasPrefix(m.Query, "SET ") {
+		m.toExport = false
+	}
+	s.parseState = PgsqlExtendedQueryState
+	return pgsql.parseMessageExtendedQuery(s)
+}
+
+func (pgsql *Pgsql) parseExtResp(s *PgsqlStream, length int) (bool, bool) {
+	// Sync -> Parse completion for an extended query response
+	detailedf("ParseCompletion")
+
+	m := s.message
+	m.start = s.parseOffset
+	m.IsRequest = false
+	m.IsOK = true
+	m.toExport = true
+
+	s.parseOffset += 1 //type
+	s.parseOffset += length
+	detailedf("Parse completion in an extended query response")
+	s.parseState = PgsqlGetDataState
+	return pgsql.parseMessageData(s)
 }
 
 func (pgsql *Pgsql) parseSkipMessage(s *PgsqlStream, length int) (bool, bool) {
@@ -433,6 +486,15 @@ func (pgsql *Pgsql) parseMessageData(s *PgsqlStream) (bool, bool) {
 			detailedf("Rows: %s", m.Rows)
 
 			return true, true
+		case '2':
+			// Parse completion -> Bind completion for an extended query response
+
+			// skip type
+			s.parseOffset += 1
+			s.parseOffset += length
+			s.parseState = PgsqlStartState
+		case 'T':
+			return pgsql.parseRowDescription(s, length)
 		default:
 			// shouldn't happen -> return error
 			logp.Warn("Pgsql parser expected data message, but received command of type %v", typ)
@@ -501,6 +563,79 @@ func (pgsql *Pgsql) parseDataRow(s *PgsqlStream, buf []byte) error {
 	}
 
 	return nil
+}
+
+func (pgsql *Pgsql) parseMessageExtendedQuery(s *PgsqlStream) (bool, bool) {
+	detailedf("parseMessageExtendedQuery")
+
+	// An extended query request contains:
+	// Parse
+	// Bind
+	// Describe
+	// Execute
+	// Sync
+
+	m := s.message
+
+	for len(s.data[s.parseOffset:]) >= 5 {
+		// read type
+		typ := byte(s.data[s.parseOffset])
+
+		// read message length
+		length := readLength(s.data[s.parseOffset+1:])
+		if length < 4 {
+			// length should include the size of itself (int32)
+			detailedf("Invalid pgsql command length.")
+			return false, false
+		}
+		if len(s.data[s.parseOffset:]) <= length {
+			// wait for more
+			detailedf("Wait for more data")
+			return true, false
+		}
+
+		switch typ {
+		case 'B':
+			// Parse -> Bind
+
+			// skip type
+			s.parseOffset += 1
+			s.parseOffset += length
+			//TODO: pgsql.parseBind(s)
+		case 'D':
+			// Bind -> Describe
+
+			// skip type
+			s.parseOffset += 1
+			s.parseOffset += length
+			//TODO: pgsql.parseDescribe(s)
+		case 'E':
+			// Bind(or Describe) -> Execute
+
+			// skip type
+			s.parseOffset += 1
+			s.parseOffset += length
+			//TODO: pgsql.parseExecute(s)
+		case 'S':
+			// Execute -> Sync
+
+			// skip type
+			s.parseOffset += 1
+			s.parseOffset += length
+			m.end = s.parseOffset
+			m.Size = uint64(m.end - m.start)
+			s.parseState = PgsqlStartState
+
+			return true, true
+		default:
+			// shouldn't happen -> return error
+			logp.Warn("Pgsql parser expected extended query message, but received command of type %v", typ)
+			s.parseState = PgsqlStartState
+			return false, false
+		}
+	}
+
+	return true, false
 }
 
 func isSpecialPgsqlCommand(data []byte) (bool, int, int) {
