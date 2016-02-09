@@ -80,6 +80,7 @@ type PgsqlStream struct {
 const (
 	PgsqlStartState = iota
 	PgsqlGetDataState
+	PgsqlExtendedQueryState
 )
 
 const (
