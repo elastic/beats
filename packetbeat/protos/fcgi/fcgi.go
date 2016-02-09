@@ -2,6 +2,7 @@ package fcgi
 
 import (
     "time"
+//    "fmt"
     "github.com/elastic/beats/libbeat/common"
     "github.com/elastic/beats/libbeat/logp"
     "github.com/elastic/beats/packetbeat/protos"
@@ -36,7 +37,7 @@ import (
     type stream struct {
         tcptuple *common.TcpTuple
         data []byte                 // Stream raw data
-        parseOffset  int            // Bytes already parsed
+        parseOffset  uint32         // Bytes already parsed
         parseState   fcgiParseState // Control flags help
                                     // parsing long messages
         message *message            // Whole FCGI records with
@@ -55,9 +56,9 @@ import (
     // is passed along tcp conversations)
 
     type fcgiData struct {
-        Streams   map [uint8]*stream    // 
-        requests  messageList           //
-        responses messageList           //
+        Streams             map [uint8]*stream  // 
+        ParsedRecordsCount  int                 //
+        ParsedRecords       *messageList         //
     }
     
     // Interface call for fcgi protocol analyzer 
@@ -90,11 +91,11 @@ import (
     func (fcgi *Fcgi) Parse(pkt *protos.Packet, tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
         
         // Debug
-        if dir == tcp.TcpDirectionOriginal {
-            logp.Info("protos.fcgi.fcgi.Parse: %s:%d > %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
-        } else {
-            logp.Info("protos.fcgi.fcgi.Parse: %s:%d < %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
-        }
+        //if dir == tcp.TcpDirectionOriginal {
+        //    logp.Info("protos.fcgi.fcgi.Parse: %s:%d > %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
+        //} else {
+        //    logp.Info("protos.fcgi.fcgi.Parse: %s:%d < %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
+        //}
        
         // try cast private to fcgiData
         priv_fcgiData, ok := private.(*fcgiData)
@@ -103,19 +104,16 @@ import (
         //      and remove next stream checks * (if possible)
 
         if !ok {
-            priv_fcgiData = &fcgiData{ Streams: make(map[uint8]*stream)} 
+            priv_fcgiData = &fcgiData{ Streams: make(map[uint8]*stream), ParsedRecordsCount: 0, ParsedRecords: &messageList{ head: nil, tail: nil} } 
         }
         if priv_fcgiData.Streams[dir] == nil {
-            priv_fcgiData.Streams[dir] = &stream{ tcptuple: tcptuple, data: pkt.Payload, message:  &message{Ts: pkt.Ts}, }
+            priv_fcgiData.Streams[dir] = &stream{ tcptuple: tcptuple, data: pkt.Payload }
+        } else{
+            priv_fcgiData.Streams[dir].data = append(priv_fcgiData.Streams[dir].data, pkt.Payload...)
         }
-        priv_fcgiData.Streams[dir].data = append(priv_fcgiData.Streams[dir].data, pkt.Payload...)
-
-        // Debug
-        logp.Info("Bytes: %d",len( priv_fcgiData.Streams[dir].data))
-
         priv_fcgiData, newRecordExists := tryGetRecord(priv_fcgiData, dir) 
         if newRecordExists {
-            logp.Info("Got a... New record!")
+            //logp.Info("Got a... New record!")
         }
         return priv_fcgiData
     }
@@ -124,12 +122,28 @@ import (
     func (fcgi *Fcgi) ReceivedFin(tcptuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 
         // Debug
-        if dir == tcp.TcpDirectionOriginal {
-            logp.Info("protos.fcgi.fcgi.ReceivedFin: %s:%d > %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
-        } else {
-            logp.Info("protos.fcgi.fcgi.ReceivedFin: %s:%d < %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
+        //if dir == tcp.TcpDirectionOriginal {
+        //    logp.Info("protos.fcgi.fcgi.ReceivedFin: %s:%d > %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
+        //} else {
+        //    logp.Info("protos.fcgi.fcgi.ReceivedFin: %s:%d < %s:%d",tcptuple.Src_ip.String(),tcptuple.Src_port,tcptuple.Dst_ip.String(),tcptuple.Dst_port);
+        //}
+        priv_fcgiData, ok := private.(*fcgiData)
+        if ok && dir == tcp.TcpDirectionOriginal {
+
+            /*rs_pointer  := priv_fcgiData.ParsedRecords.head
+            rs_string   := ""
+            for rs_pointer != nil {
+                 
+                rs_string += fmt.Sprint(rs_pointer.recordType) + ", "
+                rs_pointer = rs_pointer.next
+            } 
+
+
+            logp.Info("protos.fcgi.fcgi.ReceivedFin: %s (%d)",rs_string, priv_fcgiData.ParsedRecordsCount);
+            */
+            priv_fcgiData = nil
         }
-        return nil
+        return priv_fcgiData
     }
 
     // GapInStream is called when a gap of nbytes bytes is found in the stream (due
@@ -137,11 +151,12 @@ import (
 
     func (fcgi *Fcgi) GapInStream(tcptuple *common.TcpTuple, dir uint8, nbytes int,
                 private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-        logp.Info("GAP! .\n");
+        logp.Info("protos.fcgi.fcgi.GapInStream: ")
+
         return private, true
     }
 
     func (fcgi *Fcgi) ConnectionTimeout() time.Duration {
-        logp.Info("Timeout! .\n");
-        return time.Duration(5) * time.Second
+        //logp.Info("Timeout! .\n");
+        return time.Duration(60) * time.Second
     }
