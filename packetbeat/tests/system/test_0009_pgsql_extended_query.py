@@ -6,8 +6,7 @@ class Test(BaseTest):
         self.render_config_template(
             pgsql_ports=[5432]
         )
-        self.run_packetbeat(pcap="pgsql_extended_query.pcap",
-			debug_selectors=["*"])
+        self.run_packetbeat(pcap="pgsql_extended_query.pcap")
 
         objs = self.read_output()
         assert len(objs) == 1

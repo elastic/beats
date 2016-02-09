@@ -125,9 +125,9 @@ func (pgsql *Pgsql) parseCommand(s *PgsqlStream) (bool, bool) {
 	case 'E':
 		return pgsql.parseErrorResponse(s, length)
 	case 'P':
-		return pgsql.parseParse(s, length)
+		return pgsql.parseExtReq(s, length)
 	case '1':
-		return pgsql.parseParseCompletion(s, length)
+		return pgsql.parseExtResp(s, length)
 	default:
 		if !pgsqlValidType(typ) {
 			detailedf("invalid frame type: '%c'", typ)
@@ -271,7 +271,7 @@ func (pgsql *Pgsql) parseErrorResponse(s *PgsqlStream, length int) (bool, bool) 
 	return true, true
 }
 
-func (pgsql *Pgsql) parseParse(s *PgsqlStream, length int) (bool, bool) {
+func (pgsql *Pgsql) parseExtReq(s *PgsqlStream, length int) (bool, bool) {
 	// Ready for query -> Parse for an extended query request
 	detailedf("Parse")
 
@@ -301,7 +301,7 @@ func (pgsql *Pgsql) parseParse(s *PgsqlStream, length int) (bool, bool) {
 	return pgsql.parseMessageExtendedQuery(s)
 }
 
-func (pgsql *Pgsql) parseParseCompletion(s *PgsqlStream, length int) (bool, bool) {
+func (pgsql *Pgsql) parseExtResp(s *PgsqlStream, length int) (bool, bool) {
 	// Sync -> Parse completion for an extended query response
 	detailedf("ParseCompletion")
 
