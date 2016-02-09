@@ -41,11 +41,10 @@ type logstash struct {
 const (
 	logstashDefaultPort = 10200
 
-	logstashDefaultTimeout   = 30 * time.Second
-	logstasDefaultMaxTimeout = 90 * time.Second
-	defaultSendRetries       = 3
-	defaultMaxWindowSize     = 1024
-	defaultCompressionLevel  = 3
+	logstashDefaultTimeout  = 30 * time.Second
+	defaultSendRetries      = 3
+	defaultMaxWindowSize    = 2048
+	defaultCompressionLevel = 3
 )
 
 var waitRetry = time.Duration(1) * time.Second
@@ -110,19 +109,9 @@ func (lj *logstash) init(
 		maxAttempts = 0
 	}
 
-	var m mode.ConnectionMode
-	if len(clients) == 1 {
-		m, err = mode.NewSingleConnectionMode(clients[0],
-			maxAttempts, waitRetry, timeout, maxWaitRetry)
-	} else {
-		loadBalance := config.LoadBalance != nil && *config.LoadBalance
-		if loadBalance {
-			m, err = mode.NewLoadBalancerMode(clients, maxAttempts,
-				waitRetry, timeout, maxWaitRetry)
-		} else {
-			m, err = mode.NewFailOverConnectionMode(clients, maxAttempts, waitRetry, timeout)
-		}
-	}
+	loadBalance := config.LoadBalance != nil && *config.LoadBalance
+	m, err := mode.NewConnectionMode(clients, !loadBalance,
+		maxAttempts, waitRetry, timeout, maxWaitRetry)
 	if err != nil {
 		return err
 	}
