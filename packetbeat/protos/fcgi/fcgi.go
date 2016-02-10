@@ -111,7 +111,7 @@ import (
         } else{
             priv_fcgiData.Streams[dir].data = append(priv_fcgiData.Streams[dir].data, pkt.Payload...)
         }
-        priv_fcgiData, newRecordExists := tryGetRecord(priv_fcgiData, dir) 
+        priv_fcgiData, newRecordExists := tryGetRecord(priv_fcgiData, dir, pkt.Ts) 
         if newRecordExists {
             //logp.Info("Got a... New record!")
         }
