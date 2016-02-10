@@ -58,10 +58,10 @@ func (p *Prospector) Init() error {
 
 	switch p.ProspectorConfig.Harvester.InputType {
 	case cfg.StdinInputType:
-		prospectorer, err = NewProspectorStdin(p.ProspectorConfig, p.channel)
+		prospectorer, err = NewProspectorStdin(p)
 		prospectorer.Init()
 	case cfg.LogInputType:
-		prospectorer, err = NewProspectorLog(p.ProspectorConfig, p.channel, p.registrar)
+		prospectorer, err = NewProspectorLog(p)
 		prospectorer.Init()
 
 	default:
@@ -102,17 +102,20 @@ func (p *Prospector) Stop() {
 	close(p.done)
 }
 
+func (p *Prospector) AddHarvester(file string, stat *harvester.FileStat) (*harvester.Harvester, error) {
+
+	h, err := harvester.NewHarvester(
+		&p.ProspectorConfig.Harvester, file, stat, p.channel)
+
+	return h, err
+}
+
 // Setup Prospector Config
 func (p *Prospector) setupProspectorConfig() error {
 	var err error
 	config := &p.ProspectorConfig
 
 	config.IgnoreOlderDuration, err = getConfigDuration(config.IgnoreOlder, cfg.DefaultIgnoreOlderDuration, "ignore_older")
-	if err != nil {
-		return err
-	}
-
-	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlderDuration, "close_older")
 	if err != nil {
 		return err
 	}
@@ -175,6 +178,11 @@ func (p *Prospector) setupHarvesterConfig() error {
 		logp.Info("force_close_file is enabled")
 	} else {
 		logp.Info("force_close_file is disabled")
+	}
+
+	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlderDuration, "close_older")
+	if err != nil {
+		return err
 	}
 
 	return nil

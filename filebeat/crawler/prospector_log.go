@@ -20,17 +20,14 @@ type ProspectorLog struct {
 	missingFiles   map[string]os.FileInfo
 	prospectorList map[string]harvester.FileStat
 	config         cfg.ProspectorConfig
-	channel        chan *input.FileEvent
-	registrar      *Registrar
 }
 
-func NewProspectorLog(config cfg.ProspectorConfig, channel chan *input.FileEvent, registrar *Registrar) (*ProspectorLog, error) {
+func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 
 	prospectorer := &ProspectorLog{
-		config:    config,
-		channel:   channel,
-		registrar: registrar,
-		lastscan:  time.Now(),
+		Prospector: p,
+		config:     p.ProspectorConfig,
+		lastscan:   time.Now(),
 	}
 
 	// Init File Stat list
@@ -123,8 +120,8 @@ func (p ProspectorLog) scanGlob(glob string) {
 		newInfo := harvester.NewFileStat(newFile.FileInfo, p.iteration)
 
 		// Init harvester with info
-		h, err := harvester.NewHarvester(
-			p.config, &p.config.Harvester, file, newInfo, p.channel)
+		h, err := p.Prospector.AddHarvester(file, newInfo)
+
 		if err != nil {
 			logp.Err("Error initializing harvester: %v", err)
 			continue
@@ -156,7 +153,7 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", h.Path)
 		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.registrar.fetchState(h.Path, h.Stat.Fileinfo)
+		offset, resuming := p.Prospector.registrar.fetchState(h.Path, h.Stat.Fileinfo)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
 		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
@@ -176,7 +173,7 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 		p.continueExistingFile(h, previousFile)
 	} else {
 		// Call crawler if there if there exists a state for the given file
-		offset, _ := p.registrar.fetchState(h.Path, h.Stat.Fileinfo)
+		offset, _ := p.Prospector.registrar.fetchState(h.Path, h.Stat.Fileinfo)
 		p.resumeHarvesting(h, offset)
 	}
 }
