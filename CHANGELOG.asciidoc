@@ -99,6 +99,17 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.1.1]]
+=== Beats version 1.1.1
+https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix logstash output loop hanging in infinite loop on too many output errors. {pull}944[944]
+- Fix critical bug in filebeat and winlogbeat potentially dropping events. {pull}953[953]
+
 [[release-notes-1.1.0]]
 === Beats version 1.1.0
 https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
