@@ -23,7 +23,7 @@ beat:
   entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 elasticsearch:
   build: ../testing/environments/docker/elasticsearch
-  dockerfile: Dockerfile-2.2.0
+  dockerfile: Dockerfile-2.2.0-shield
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
   image: redis

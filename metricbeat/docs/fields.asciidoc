@@ -1,0 +1,11 @@
+
+////
+This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
+////
+
+[[exported-fields]]
+== Exported Fields
+
+This document describes the fields that are exported by Metricbeat. They are
+grouped in the following categories:
+
