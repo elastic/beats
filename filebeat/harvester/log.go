@@ -2,7 +2,6 @@ package harvester
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 
@@ -17,38 +16,6 @@ import (
 const (
 	defaultMaxBytes = 10 * (1 << 20) // 10MB
 )
-
-func NewHarvester(
-	prospectorCfg config.ProspectorConfig,
-	cfg *config.HarvesterConfig,
-	path string,
-	stat *FileStat,
-	spooler chan *input.FileEvent,
-) (*Harvester, error) {
-	var err error
-	encoding, ok := encoding.FindEncoding(cfg.Encoding)
-	if !ok || encoding == nil {
-		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
-	}
-
-	h := &Harvester{
-		Path:             path,
-		ProspectorConfig: prospectorCfg,
-		Config:           cfg,
-		Stat:             stat,
-		SpoolerChan:      spooler,
-		encoding:         encoding,
-	}
-	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
-	if err != nil {
-		return h, err
-	}
-	h.IncludeLinesRegexp, err = InitRegexps(cfg.IncludeLines)
-	if err != nil {
-		return h, err
-	}
-	return h, nil
-}
 
 func createLineReader(
 	in FileSource,
@@ -120,7 +87,7 @@ func (h *Harvester) Harvest() {
 	config := h.Config
 	readerConfig := logFileReaderConfig{
 		forceClose:         config.ForceCloseFiles,
-		closeOlder:         h.ProspectorConfig.CloseOlderDuration,
+		closeOlder:         config.CloseOlderDuration,
 		backoffDuration:    config.BackoffDuration,
 		maxBackoffDuration: config.MaxBackoffDuration,
 		backoffFactor:      config.BackoffFactor,
@@ -290,5 +257,3 @@ func (h *Harvester) initFileOffset(file *os.File) error {
 
 func (h *Harvester) Stop() {
 }
-
-const maxConsecutiveEmptyReads = 100

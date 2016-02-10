@@ -35,7 +35,7 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, 3, len(prospectors[0].Harvester.Fields))
 	assert.Equal(t, "1", prospectors[0].Harvester.Fields["review"])
 	assert.Equal(t, "0", prospectors[0].IgnoreOlder)
-	assert.Equal(t, "1h", prospectors[0].CloseOlder)
+	assert.Equal(t, "1h", prospectors[0].Harvester.CloseOlder)
 	assert.Equal(t, "10s", prospectors[0].ScanFrequency)
 
 	assert.Equal(t, "stdin", prospectors[2].Input)
