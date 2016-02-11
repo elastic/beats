@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Add option to elasticsearch output to pass http parameters in index operations {issue}805[805]
 - Improve logstash and elasticsearch backoff behavior. {pull}927[927]
 - Add experimental Kafka output. {pull}942[942]
+- Add config file option to configure GOMAXPROCS. {pull}969[969]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]

@@ -86,6 +86,8 @@ type ShipperConfig struct {
 	// internal publisher queue sizes
 	QueueSize     *int `yaml:"queue_size"`
 	BulkQueueSize *int `yaml:"bulk_queue_size"`
+
+	MaxProcs *int `yaml:"max_procs"`
 }
 
 type Topology struct {
