@@ -497,8 +497,7 @@ class Test(BaseTest):
             filebeat = self.start_beat()
 
             self.wait_until(
-                lambda: self.log_contains(
-                    "Processing 1 events"),
+                lambda: self.output_has(lines=1),
                 max_timeout=15)
 
             # now write another line
@@ -507,8 +506,7 @@ class Test(BaseTest):
             f.flush()
 
             self.wait_until(
-                lambda: self.log_contains(
-                    "Processing 2 events"),
+                lambda: self.output_has(lines=3),
                 max_timeout=15)
 
         filebeat.check_kill_and_wait()
