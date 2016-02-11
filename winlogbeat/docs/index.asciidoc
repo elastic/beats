@@ -14,11 +14,9 @@ include::./configuring-howto.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
 
-//include::./configuration.asciidoc[]
-
 include::./troubleshooting.asciidoc[]
 
-include::./faq.asciidoc[]
+//include::./faq.asciidoc[]
 
 include::./reference.asciidoc[]
 
