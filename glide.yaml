@@ -38,3 +38,15 @@ import:
   version: v1.2.0
 - package: github.com/miekg/dns
   version: 85b661b2a6fc95a5a83e66d7730c4bc0b6e9c99e
+- package: github.com/Shopify/sarama
+  version: v1.8.0
+- package: github.com/klauspost/crc32
+  version: 6973dcf6594efa905c08260fe9120cae92ab4305
+- package: github.com/golang/snappy
+  version: 894fd4616c897c201d223c3c0c128e8c648c96a2
+- package: github.com/eapache/queue
+  version: ded5959c0d4e360646dc9e9908cff48666781367
+- package: github.com/eapache/go-resiliency
+  version: b86b1ec0dd4209a588dc1285cdd471e73525c0b3
+  subpackages:
+  - breaker
