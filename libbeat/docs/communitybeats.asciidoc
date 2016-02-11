@@ -18,6 +18,7 @@ here: https://github.com/elastic/libbeat/blob/master/docs/communitybeats.asciido
 NOTE: Elastic provides no warranty or support for community-sourced Beats.
 
 [[contributing-beats]]
+[float]
 === Contributing to Beats
 
 Remember, you can be a Beats developer, too. <<new-beat, Learn how>>

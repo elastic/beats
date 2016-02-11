@@ -10,6 +10,7 @@ This page walks you through the steps required to install the forked Kibana 3
 and load the Packetbeat dashboards. You can install Kibana 3 on the same system
 as Kibana 4.
 
+[float]
 === Downloading the Kibana 3 Fork
 
 Download and install the Kibana 3 fork by issuing the following commands:
@@ -60,6 +61,7 @@ sudo /etc/init.d/elasticsearch restart
 And try again to access Kibana in your browser. You should now see
 Kibana's welcome page.
 
+[float]
 === Loading Packetbeat Dashboards
 
 To load our sample Kibana 3 dashboards, use the following commands:

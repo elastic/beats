@@ -19,7 +19,7 @@ Filebeat introduces the following major changes:
 
 Filebeat requires a new input plugin in Logstash, called
 https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[logstash-input-beats].
-For information about getting started with this plugin, see {libbeat}/getting-started.html#logstash-setup[Setting up Logstash].
+For information about getting started with this plugin, see {libbeat}/logstash-installation.html#logstash-setup[Setting up Logstash].
 
 In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
 parallel with the

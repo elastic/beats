@@ -233,7 +233,7 @@ See <<configuration-output-tls>> for more information.
 ==== Logstash Output
 
 The Logstash output sends the events directly to Logstash by using the lumberjack
-protocol. To use this option, you must {libbeat}/getting-started.html#logstash-setup[install and configure] the logstash-input-beats
+protocol. To use this option, you must {libbeat}/logstash-installation.html#logstash-setup[install and configure] the logstash-input-beats
 plugin in Logstash. Logstash allows for additional processing and routing of
 generated events.
 
