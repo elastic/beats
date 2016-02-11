@@ -213,7 +213,7 @@ class Test(BaseTest):
         # wait for file to be closed due to ignore_older
         self.wait_until(
             lambda: self.log_contains(
-                "Closing file: {}\n".format(os.path.abspath(testfile))),
+                "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),
             max_timeout=10)
 
         # wait a bit longer (on 1.0.1 this would cause the harvester
@@ -347,7 +347,7 @@ class Test(BaseTest):
         # wait for file to be closed due to close_older
         self.wait_until(
                 lambda: self.log_contains(
-                        "Closing file: {}\n".format(os.path.abspath(testfile))),
+                        "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),
                 max_timeout=10)
 
         # write second line
