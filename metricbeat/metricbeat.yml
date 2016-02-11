@@ -5,8 +5,7 @@ metricbeat:
     #    expvar:
     #      period: 10s
     apache:
-      hosts:
-       - "http://192.168.99.100/"
+      hosts: "http://127.0.0.1/"
       metricsets:
         status:
           period: 1s
@@ -40,7 +39,7 @@ output:
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["192.168.99.100:9200"]
+    hosts: ["localhost:9200"]
 
     # Optional protocol and basic auth credentials.
     #protocol: "https"
@@ -230,6 +229,10 @@ shipper:
 
   # Internal queue size for single events in processing pipeline
   #queue_size: 1000
+
+  # Sets the maximum number of CPUs that can be executing simultaneously. The
+  # default is the number of logical CPUs available in the system.
+  #max_procs:
 
   # Configure local GeoIP database support.
   # If no paths are not configured geoip is disabled.
