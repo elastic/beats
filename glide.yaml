@@ -20,7 +20,6 @@ import:
 - package: github.com/samuel/go-parser
 - package: github.com/samuel/go-thrift
   version: 2187045faa54fce7f5028706ffeb2f2fc342aa7e
-  # Alternative name? gopkg.in/mgo.v2 https://github.com/Masterminds/glide/issues/221#issuecomment-179817757
 - package: labix.org/v2/mgo
 - package: github.com/tsg/gopacket
 - package: github.com/joeshaw/multierror
@@ -52,3 +51,4 @@ import:
   - breaker
 - package: github.com/dustin/go-humanize
   version: 8929fe90cee4b2cb9deb468b51fb34eba64d1bf0
+- package: github.com/urso/ucfg
