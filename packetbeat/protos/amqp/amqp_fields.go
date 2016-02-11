@@ -163,7 +163,7 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		offset = next
 	case timestamp:
 		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset+1:offset+9])), 0)
-		table[name] = t.Format(AMQPTIMELAYOUT)
+		table[name] = t.Format(amqpTimeLayout)
 		offset += 9
 	case fieldTable:
 		newMap := common.MapStr{}

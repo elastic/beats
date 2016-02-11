@@ -14,19 +14,19 @@ const (
 
 //layout used when a timestamp must be parsed
 const (
-	AMQPTIMELAYOUT = "January _2 15:04:05 2006"
+	amqpTimeLayout = "January _2 15:04:05 2006"
 )
 
 //Frame types and codes
 const (
-	METHOD    = 1
-	HEADER    = 2
-	BODY      = 3
-	HEARTBEAT = 8
+	methodType    = 1
+	headerType    = 2
+	bodyType      = 3
+	heartbeatType = 8
 )
 
 const (
-	FRAME_END_OCTET byte = 206
+	frameEndOctet byte = 206
 )
 
 //Codes for MethodMap
