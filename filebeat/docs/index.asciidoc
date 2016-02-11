@@ -18,15 +18,11 @@ include::./multiple-prospectors.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./support.asciidoc[]
-
-include::./faq.asciidoc[]
+//include::./faq.asciidoc[]
 
 include::./migration.asciidoc[]
 
 include::./reference.asciidoc[]
-
-//OLD CONFIG include::./configuration.asciidoc[]
 
 include::./fields.asciidoc[]
 
