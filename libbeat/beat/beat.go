@@ -220,6 +220,13 @@ func (b *Beat) LoadConfig() error {
 
 	logp.Debug("beat", "Initializing output plugins")
 
+	if b.Config.Shipper.MaxProcs != nil {
+		maxProcs := *b.Config.Shipper.MaxProcs
+		if maxProcs > 0 {
+			runtime.GOMAXPROCS(maxProcs)
+		}
+	}
+
 	pub, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper)
 	if err != nil {
 		return fmt.Errorf("error Initialising publisher: %v\n", err)
