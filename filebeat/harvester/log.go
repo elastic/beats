@@ -59,11 +59,15 @@ func (h *Harvester) Harvest() {
 			h.Stat.Return <- h.Offset
 		}
 
+		logp.Debug("harvester", "Stopping harvester for file: %s", h.Path)
+
 		// Make sure file is closed as soon as harvester exits
 		// If file was never properly opened, it can't be closed
 		if h.file != nil {
 			h.file.Close()
-			logp.Debug("harvester", "Closing file: %s", h.Path)
+			logp.Debug("harvester", "Stopping harvester, closing file: %s", h.Path)
+		} else {
+			logp.Debug("harvester", "Stopping harvester, NOT closing file as file info not available: %s", h.Path)
 		}
 	}()
 
@@ -93,13 +97,8 @@ func (h *Harvester) Harvest() {
 		backoffFactor:      config.BackoffFactor,
 	}
 
-	maxBytes := defaultMaxBytes
-	if config.MaxBytes != nil {
-		maxBytes = *config.MaxBytes
-	}
-
 	reader, err := createLineReader(
-		h.file, enc, config.BufferSize, maxBytes, readerConfig, config.Multiline)
+		h.file, enc, config.BufferSize, config.MaxBytes, readerConfig, config.Multiline)
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
