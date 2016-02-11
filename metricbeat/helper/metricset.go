@@ -1,12 +1,14 @@
 package helper
 
 import (
+	"sync"
+	"time"
+
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"gopkg.in/yaml.v2"
-	"sync"
-	"time"
 )
 
 // Base metric configuration
@@ -20,15 +22,7 @@ type MetricSet struct {
 	Name    string
 	Enabled bool
 
-	// Generic Config existing in all metrics
-	BaseConfig MetricSetConfig
-
-	// Raw metric specific config
-	// This is provided to convert it into Config later
-	RawConfig interface{}
-
-	// Metric specific config
-	Config interface{}
+	Config *ucfg.Config
 
 	MetricSeter MetricSeter
 	Module      *Module
@@ -61,14 +55,12 @@ func NewMetricSet(name string, metricset MetricSeter, module *Module) *MetricSet
 	}
 }
 
-func (m *MetricSet) LoadConfig(config interface{}) {
-
-	bytes, err := yaml.Marshal(m.RawConfig)
-
-	if err != nil {
+func (m *MetricSet) LoadConfig(config interface{}) error {
+	if err := m.Config.Unpack(config); err != nil {
 		logp.Err("Load metric config error: %v", err)
+		return err
 	}
-	yaml.Unmarshal(bytes, config)
+	return nil
 }
 
 // Registers metric with module
@@ -98,8 +90,14 @@ func (m *MetricSet) Start(b *beat.Beat, wg sync.WaitGroup) {
 	if err != nil {
 		logp.Err("Error happening during metricseter setup: %s", err)
 	}
-	period, err := time.ParseDuration(m.BaseConfig.Period)
 
+	period := time.Duration(0)
+	baseConfig := struct{ Period string }{
+		Period: "1s",
+	}
+	if err = m.Config.Unpack(&baseConfig); err == nil {
+		period, err = time.ParseDuration(baseConfig.Period)
+	}
 	if err != nil {
 		logp.Info("Error in parsing period of metric %s: %v", m.Name, err)
 	}

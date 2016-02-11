@@ -1,11 +1,12 @@
 package helper
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/logp"
-	"gopkg.in/yaml.v2"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/urso/ucfg"
 )
 
 // Module specifics. This must be defined by each module
@@ -22,12 +23,7 @@ type Module struct {
 	// List of all metricsets in this module
 	MetricSets map[string]*MetricSet
 
-	// Generic config existing in all modules
-	BaseConfig ModuleConfig
-
-	// Raw module specific config
-	// This is provided to convert it into Config later
-	RawConfig interface{}
+	Config *ucfg.Config
 
 	// MetricSet waitgroup
 	wg sync.WaitGroup
@@ -73,22 +69,33 @@ type ModuleConfig struct {
 
 // Helper functions to easily access default configurations
 func (m *Module) GetPeriod() (time.Duration, error) {
-	return time.ParseDuration(m.BaseConfig.Period)
+	baseConfig := struct{ Period string }{
+		Period: "1s",
+	}
+
+	if err := m.Config.Unpack(&baseConfig); err != nil {
+		return time.Duration(0), err
+	}
+	return time.ParseDuration(baseConfig.Period)
 }
 
 func (m *Module) GetHosts() []string {
-	return m.BaseConfig.Hosts
+	config := struct{ Hosts []string }{}
+	err := m.Config.Unpack(&config)
+	if err != nil {
+		logp.Err("Failed to read hosts: %v", err)
+	}
+	return config.Hosts
 }
 
 // Loads the configurations specific config.
 // This needs the configuration object defined inside the module
-func (m *Module) LoadConfig(config interface{}) {
-	bytes, err := yaml.Marshal(m.RawConfig)
-
+func (m *Module) LoadConfig(config interface{}) error {
+	err := m.Config.Unpack(config)
 	if err != nil {
 		logp.Err("Load module config error: %v", err)
 	}
-	yaml.Unmarshal(bytes, config)
+	return err
 }
 
 // Starts the given module

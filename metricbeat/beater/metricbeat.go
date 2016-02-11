@@ -27,7 +27,7 @@ for each MetricSet to prevent type conflicts. Also all values are stored under t
 package beater
 
 import (
-	"fmt"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -37,9 +37,7 @@ import (
 
 type Metricbeat struct {
 	done          chan struct{}
-	MbConfig      *MetricbeatConfig
-	ModulesConfig *RawModulesConfig
-	MetricsConfig *RawMetricsConfig
+	Configuration *MetricbeatConfig
 }
 
 // New creates a new Metricbeat instance
@@ -47,51 +45,68 @@ func New() *Metricbeat {
 	return &Metricbeat{}
 }
 
+func readMetricbeatConfig() (*MetricbeatConfig, error) {
+	// TODO: replace reading + parsing via ucfg.yaml.NewConfigWithFile
+	var rawYAMLConfig map[string]interface{}
+	err := cfgfile.Read(&rawYAMLConfig, "")
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return nil, err
+	}
+
+	rawConfig := ucfg.New()
+	err = rawConfig.Merge(map[string]interface{}{
+		"metricbeat": rawYAMLConfig["metricbeat"],
+	})
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return nil, err
+	}
+
+	config := &MetricbeatConfig{}
+	err = rawConfig.Unpack(config)
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return nil, err
+	}
+
+	return config, nil
+}
+
 func (mb *Metricbeat) Config(b *beat.Beat) error {
-
-	mb.MbConfig = &MetricbeatConfig{}
-	err := cfgfile.Read(mb.MbConfig, "")
+	config, err := readMetricbeatConfig()
 	if err != nil {
-		fmt.Println(err)
-		logp.Err("Error reading configuration file: %v", err)
 		return err
 	}
 
-	mb.ModulesConfig = &RawModulesConfig{}
-	err = cfgfile.Read(mb.ModulesConfig, "")
-	if err != nil {
-		fmt.Println(err)
-		logp.Err("Error reading configuration file: %v", err)
-		return err
-	}
-
-	mb.MetricsConfig = &RawMetricsConfig{}
-	err = cfgfile.Read(mb.MetricsConfig, "")
-	if err != nil {
-		fmt.Println(err)
-		logp.Err("Error reading configuration file: %v", err)
-		return err
-	}
+	mb.Configuration = config
 
 	logp.Info("Setup base and raw configuration for Modules and Metrics")
-	// Apply the base configuration to each module and metric
-	for moduleName, module := range helper.Registry {
-		// Check if config for module exist. Only configured modules are loaded
-		if _, ok := mb.MbConfig.Metricbeat.Modules[moduleName]; !ok {
+
+	for moduleName, moduleCfg := range config.Metricbeat.Modules {
+		module, ok := helper.Registry[moduleName]
+		if !ok {
+			logp.Critical("Unknown module: %v", moduleName)
 			continue
 		}
-		module.BaseConfig = mb.MbConfig.getModuleConfig(moduleName)
-		module.RawConfig = mb.ModulesConfig.Metricbeat.Modules[moduleName]
-		module.Enabled = true
 
-		for metricSetName, metricSet := range module.MetricSets {
-			// Check if config for metricset exist. Only configured metricset are loaded
-			if _, ok := mb.MbConfig.getModuleConfig(moduleName).MetricSets[metricSetName]; !ok {
+		module.Enabled = true
+		module.Config = moduleCfg
+
+		var metricsConfig struct {
+			MetricSets map[string]*ucfg.Config
+		}
+		moduleCfg.Unpack(&metricsConfig)
+
+		for metric, metricCfg := range metricsConfig.MetricSets {
+			metricSet, ok := module.MetricSets[metric]
+			if !ok {
+				logp.Critical("Unknown module metric: %v.%v", moduleName, metric)
 				continue
 			}
-			metricSet.BaseConfig = mb.MbConfig.getModuleConfig(moduleName).MetricSets[metricSetName]
-			metricSet.RawConfig = mb.MetricsConfig.Metricbeat.Modules[moduleName].MetricSets[metricSetName]
+
 			metricSet.Enabled = true
+			metricSet.Config = metricCfg
 		}
 	}
 
