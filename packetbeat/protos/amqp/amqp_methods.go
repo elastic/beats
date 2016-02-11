@@ -181,7 +181,7 @@ func queueDeclareMethod(m *AmqpMessage, args []byte) (bool, bool) {
 		"auto-delete": params[3],
 		"no-wait":     params[4],
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
@@ -236,7 +236,7 @@ func queueBindMethod(m *AmqpMessage, args []byte) (bool, bool) {
 	if len(exchange) > 0 {
 		m.Fields["exchange"] = exchange
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
@@ -274,7 +274,7 @@ func queueUnbindMethod(m *AmqpMessage, args []byte) (bool, bool) {
 	if len(exchange) > 0 {
 		m.Fields["exchange"] = exchange
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
@@ -363,7 +363,7 @@ func exchangeDeclareMethod(m *AmqpMessage, args []byte) (bool, bool) {
 		"durable":       params[1],
 		"no-wait":       params[4],
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
@@ -438,7 +438,7 @@ func exchangeBindUnbindInfo(m *AmqpMessage, args []byte) bool {
 		"routing-key": routingKey,
 		"no-wait":     params[0],
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {
@@ -487,7 +487,7 @@ func basicConsumeMethod(m *AmqpMessage, args []byte) (bool, bool) {
 		"exclusive":    params[2],
 		"no-wait":      params[3],
 	}
-	if args[offset+1] != FRAME_END_OCTET && m.ParseArguments {
+	if args[offset+1] != frameEndOctet && m.ParseArguments {
 		arguments := make(common.MapStr)
 		_, err, exists := getTable(arguments, args, offset+1)
 		if !err && exists {

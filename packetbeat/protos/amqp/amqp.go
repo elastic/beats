@@ -63,7 +63,7 @@ func (amqp *Amqp) setFromConfig(config config.Amqp) error {
 	return nil
 }
 
-func (amqp *Amqp) InitDefaults() {
+func (amqp *Amqp) initDefaults() {
 	amqp.SendRequest = false
 	amqp.SendResponse = false
 	amqp.MaxBodyLength = 1000
@@ -131,7 +131,7 @@ func (amqp *Amqp) InitDefaults() {
 }
 
 func (amqp *Amqp) Init(test_mode bool, results publish.Transactions) error {
-	amqp.InitDefaults()
+	amqp.initDefaults()
 	if !test_mode {
 		err := amqp.setFromConfig(config.ConfigSingleton.Protocols.Amqp)
 		if err != nil {

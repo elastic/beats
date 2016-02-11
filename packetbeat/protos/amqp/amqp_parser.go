@@ -33,13 +33,13 @@ func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 		}
 
 		switch f.Type {
-		case METHOD:
+		case methodType:
 			ok, complete = amqp.decodeMethodFrame(s, f.content)
-		case HEADER:
+		case headerType:
 			ok = amqp.decodeHeaderFrame(s, f.content)
-		case BODY:
+		case bodyType:
 			ok, complete = s.decodeBodyFrame(f.content)
-		case HEARTBEAT:
+		case heartbeatType:
 			detailedf("Heartbeat frame received")
 		default:
 			logp.Warn("Received unknown AMQP frame")
@@ -77,7 +77,7 @@ func readFrameHeader(data []byte) (ret *AmqpFrame, err bool) {
 		logp.Warn("Frame shorter than declared size, waiting for more data")
 		return nil, false
 	}
-	if data[frame.size+7] != FRAME_END_OCTET {
+	if data[frame.size+7] != frameEndOctet {
 		logp.Warn("Missing frame end octet in frame, discarding it")
 		return nil, true
 	}
@@ -275,7 +275,7 @@ func getMessageProperties(s *AmqpStream, data []byte) bool {
 
 	if hasProperty(prop2, timestampProp) {
 		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset:offset+8])), 0)
-		m.Fields["timestamp"] = t.Format(AMQPTIMELAYOUT)
+		m.Fields["timestamp"] = t.Format(amqpTimeLayout)
 		offset += 8
 	}
 
