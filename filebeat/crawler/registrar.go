@@ -25,6 +25,7 @@ type Registrar struct {
 
 	Channel chan []*FileEvent
 	done    chan struct{}
+	wg      sync.WaitGroup
 }
 
 func NewRegistrar(registryFile string) (*Registrar, error) {
@@ -79,10 +80,14 @@ func (r *Registrar) LoadState() {
 }
 
 func (r *Registrar) Run() {
+	r.wg.Add(1)
 	logp.Info("Starting Registrar")
 
 	// Writes registry on shutdown
-	defer r.writeRegistry()
+	defer func() {
+		r.writeRegistry()
+		r.wg.Done()
+	}()
 
 	for {
 		select {
@@ -123,6 +128,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
 	close(r.done)
+	r.wg.Wait()
 	// Note: don't block using waitGroup, cause this method is run by async signal handler
 }
 

@@ -101,9 +101,13 @@ func (p *syncLogPublisher) Start() {
 
 			pubEvents := make([]common.MapStr, 0, len(events))
 			for _, event := range events {
-				// Only send event with bytes read. 0 Bytes means state update only
+
+				// Only publish events with content, means more then 0 bytes read
+				// 0 Bytes event can be status reports like renames from harvesters
 				if event.Bytes > 0 {
 					pubEvents = append(pubEvents, event.ToMapStr())
+				} else {
+					logp.Debug("publish", "REPORTING STATE: %+v", event)
 				}
 			}
 

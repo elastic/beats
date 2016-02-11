@@ -60,13 +60,29 @@ func (h *Harvester) Harvest() {
 
 	reader, err := createLineReader(
 		h.file, enc, config.BufferSize, config.MaxBytes, readerConfig,
-		config.JSON, config.Multiline)
+		config.JSON, config.Multiline, h.done)
+
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
 	}
 
+	go func() {
+		// Closes file so readLine returns error
+		// TODO: What happens to this if h.done never closed?
+		<-h.done
+		h.file.Close()
+	}()
+
+	// Report status harvester
+	h.sendEvent(h.createEvent())
+
 	for {
+		select {
+		case <-h.done:
+			return
+		default:
+		}
 		// Partial lines return error and are only read on completion
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
 		if err != nil {
@@ -102,13 +118,25 @@ func (h *Harvester) Harvest() {
 		}
 
 		// Always send event to update state, also if lines was skipped
-		h.sendEvent(event)
+		sent := h.sendEvent(event)
+		if !sent {
+			return
+		}
 	}
 }
 
-// createEvent creates and empty event.
-// By default the offset is set to 0, means no bytes read. This can be used to report the status
-// of a harvester
+// sendEvent sends event to the spooler channel
+func (h *Harvester) sendEvent(event *input.FileEvent) bool {
+	select {
+	case <-h.done:
+		return false
+	case h.SpoolerChan <- event: // ship the new event downstream
+	}
+	return true
+}
+
+// createEvent creates a FileEvent.
+// By default this is an "empty" event with 0 bytes read, means this is only used to update the state
 func (h *Harvester) createEvent() *input.FileEvent {
 	return &input.FileEvent{
 		EventMetadata: h.Config.EventMetadata,
@@ -116,15 +144,10 @@ func (h *Harvester) createEvent() *input.FileEvent {
 		InputType:     h.Config.InputType,
 		DocumentType:  h.Config.DocumentType,
 		Offset:        h.GetOffset(),
+		JSONConfig:    h.Config.JSON,
 		Bytes:         0,
 		Fileinfo:      &h.fileInfo,
-		JSONConfig:    h.Config.JSON,
 	}
-}
-
-// sendEvent sends event to the spooler channel
-func (h *Harvester) sendEvent(event *input.FileEvent) {
-	h.SpoolerChan <- event // ship the new event downstream
 }
 
 // shouldExportLine decides if the line is exported or not based on

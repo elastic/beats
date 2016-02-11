@@ -19,12 +19,16 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Harvester struct {
+	Id                 uuid.UUID
 	Path               string /* the file path to harvest */
 	Config             *config.HarvesterConfig
 	offset             int64
@@ -36,6 +40,7 @@ type Harvester struct {
 	file               FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
+	done               chan struct{}
 }
 
 func NewHarvester(
@@ -52,11 +57,13 @@ func NewHarvester(
 	}
 
 	h := &Harvester{
+		Id:          uuid.NewV4(), // Unique identifier of each harvester
 		Path:        path,
 		Config:      cfg,
 		Stat:        stat,
 		SpoolerChan: spooler,
 		encoding:    encoding,
+		done:        make(chan struct{}),
 	}
 	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
 	if err != nil {
@@ -72,4 +79,9 @@ func NewHarvester(
 func (h *Harvester) Start() {
 	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
 	go h.Harvest()
+}
+
+func (h *Harvester) Stop() {
+	logp.Debug("harvester", "Stopping harvester: %v", h.Id)
+	close(h.done)
 }

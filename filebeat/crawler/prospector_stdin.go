@@ -21,7 +21,7 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
 	var err error
 
-	prospectorer.harvester, err = p.AddHarvester("-", nil)
+	prospectorer.harvester, err = p.CreateHarvester("-", nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
@@ -38,8 +38,7 @@ func (p *ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		p.harvester.Start()
-		p.started = true
+		p.Prospector.RunHarvester(p.harvester)
 	}
 
 	// Wait time during endless loop
