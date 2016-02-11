@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input"
 )
 
 type ProspectorStdin struct {
@@ -15,18 +13,15 @@ type ProspectorStdin struct {
 	started    bool
 }
 
-func NewProspectorStdin(config cfg.ProspectorConfig, channel chan *input.FileEvent) (*ProspectorStdin, error) {
+func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
-	prospectorer := &ProspectorStdin{}
+	prospectorer := &ProspectorStdin{
+		Prospector: p,
+	}
 
 	var err error
-	prospectorer.harvester, err = harvester.NewHarvester(
-		config,
-		&config.Harvester,
-		"-",
-		nil,
-		channel,
-	)
+
+	prospectorer.harvester, err = p.AddHarvester("-", nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)

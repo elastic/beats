@@ -64,6 +64,8 @@ func NewAsyncLoadBalancerMode(
 	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*AsyncLoadBalancerMode, error) {
 
+	debug("configure maxattempts: %v", maxAttempts)
+
 	// maxAttempts signals infinite retry. Convert to -1, so attempts left and
 	// and infinite retry can be more easily distinguished by load balancer
 	if maxAttempts == 0 {
@@ -119,9 +121,13 @@ func (m *AsyncLoadBalancerMode) publishEventsMessage(
 ) error {
 	maxAttempts := m.maxAttempts
 	if opts.Guaranteed {
+		debug("guaranteed flag is set")
 		maxAttempts = -1
+	} else {
+		debug("guaranteed flag is not set")
 	}
 	msg.attemptsLeft = maxAttempts
+	debug("publish events with attempts=%v", msg.attemptsLeft)
 
 	if ok := m.forwardEvent(m.work, msg); !ok {
 		dropping(msg)
@@ -224,7 +230,11 @@ func handlePublishEventsResult(
 ) func([]common.MapStr, error) {
 	total := len(msg.events)
 	return func(events []common.MapStr, err error) {
+		debug("handlePublishEventsResult")
+
 		if err != nil {
+			debug("handle publish error: %v", err)
+
 			if msg.attemptsLeft > 0 {
 				msg.attemptsLeft--
 			}
@@ -255,6 +265,7 @@ func handlePublishEventsResult(
 
 		// re-insert non-published events into pipeline
 		if len(events) != 0 {
+			debug("add non-published events back into pipeline: %v", len(events))
 			msg.events = events
 			if ok := m.forwardEvent(m.retries, msg); !ok {
 				dropping(msg)
@@ -263,6 +274,7 @@ func handlePublishEventsResult(
 		}
 
 		// all events published -> signal success
+		debug("async bulk publish success")
 		outputs.SignalCompleted(msg.signaler)
 	}
 }
@@ -287,21 +299,28 @@ func (m *AsyncLoadBalancerMode) forwardEvent(
 	ch chan eventsMessage,
 	msg eventsMessage,
 ) bool {
+	debug("forwards msg with attempts=%v", msg.attemptsLeft)
+
 	if msg.attemptsLeft < 0 {
 		select {
 		case ch <- msg:
+			debug("message forwarded")
 			return true
 		case <-m.done: // shutdown
+			debug("shutting down")
 			return false
 		}
 	} else {
 		for ; msg.attemptsLeft > 0; msg.attemptsLeft-- {
 			select {
 			case ch <- msg:
+				debug("message forwarded")
 				return true
 			case <-m.done: // shutdown
+				debug("shutting down")
 				return false
 			case <-time.After(m.timeout):
+				debug("forward timed out")
 			}
 		}
 	}

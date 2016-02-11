@@ -33,7 +33,15 @@ type MothershipConfig struct {
 	Pretty            *bool `yaml:"pretty"`
 	TLS               *TLSConfig
 	Worker            int
-	CompressionLevel  *int `yaml:"compression_level"`
+	CompressionLevel  *int   `yaml:"compression_level"`
+	KeepAlive         string `yaml:"keep_alive"`
+	MaxMessageBytes   *int   `yaml:"max_message_bytes"`
+	RequiredACKs      *int   `yaml:"required_acks"`
+	BrokerTimeout     string `yaml:"broker_timeout"`
+	Compression       string `yaml:"compression"`
+	ClientID          string `yaml:"client_id"`
+	Topic             string `yaml:"topic"`
+	UseType           *bool  `yaml:"use_type"`
 }
 
 type Template struct {

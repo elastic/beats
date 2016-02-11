@@ -44,32 +44,32 @@ type FilebeatConfig struct {
 }
 
 type ProspectorConfig struct {
-	Paths                 []string
+	ExcludeFiles          []string `yaml:"exclude_files"`
+	ExcludeFilesRegexp    []*regexp.Regexp
+	Harvester             HarvesterConfig `yaml:",inline"`
 	Input                 string
 	IgnoreOlder           string `yaml:"ignore_older"`
 	IgnoreOlderDuration   time.Duration
-	CloseOlder            string `yaml:"close_older"`
-	CloseOlderDuration    time.Duration
+	Paths                 []string
 	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
-	Harvester             HarvesterConfig `yaml:",inline"`
-	ExcludeFiles          []string        `yaml:"exclude_files"`
-	ExcludeFilesRegexp    []*regexp.Regexp
 }
 
 type HarvesterConfig struct {
-	InputType          string `yaml:"input_type"`
+	BufferSize         int    `yaml:"harvester_buffer_size"`
+	DocumentType       string `yaml:"document_type"`
+	Encoding           string `yaml:"encoding"`
 	Fields             common.MapStr
 	FieldsUnderRoot    bool   `yaml:"fields_under_root"`
-	BufferSize         int    `yaml:"harvester_buffer_size"`
+	InputType          string `yaml:"input_type"`
 	TailFiles          bool   `yaml:"tail_files"`
-	Encoding           string `yaml:"encoding"`
-	DocumentType       string `yaml:"document_type"`
 	Backoff            string `yaml:"backoff"`
 	BackoffDuration    time.Duration
 	BackoffFactor      int    `yaml:"backoff_factor"`
 	MaxBackoff         string `yaml:"max_backoff"`
 	MaxBackoffDuration time.Duration
+	CloseOlder         string `yaml:"close_older"`
+	CloseOlderDuration time.Duration
 	ForceCloseFiles    bool             `yaml:"force_close_files"`
 	ExcludeLines       []string         `yaml:"exclude_lines"`
 	IncludeLines       []string         `yaml:"include_lines"`
@@ -78,10 +78,10 @@ type HarvesterConfig struct {
 }
 
 type MultilineConfig struct {
-	Pattern  string `yaml:"pattern"`
 	Negate   bool   `yaml:"negate"`
 	Match    string `yaml:"match"`
 	MaxLines *int   `yaml:"max_lines"`
+	Pattern  string `yaml:"pattern"`
 	Timeout  string `yaml:"timeout"`
 }
 
