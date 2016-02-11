@@ -74,6 +74,7 @@ func TestProspectorInitNotSet(t *testing.T) {
 	assert.Equal(t, config.DefaultBackoffFactor, prospector.ProspectorConfig.Harvester.BackoffFactor)
 	assert.Equal(t, config.DefaultMaxBackoff, prospector.ProspectorConfig.Harvester.MaxBackoffDuration)
 	assert.Equal(t, config.DefaultForceCloseFiles, prospector.ProspectorConfig.Harvester.ForceCloseFiles)
+	assert.Equal(t, config.DefaultMaxBytes, prospector.ProspectorConfig.Harvester.MaxBytes)
 }
 
 func TestProspectorInitScanFrequency0(t *testing.T) {

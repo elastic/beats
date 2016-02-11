@@ -28,6 +28,7 @@ const (
 	DefaultBackoffFactor                     = 2
 	DefaultMaxBackoff                        = 10 * time.Second
 	DefaultForceCloseFiles                   = false
+	DefaultMaxBytes                          = 10 * (1 << 20) // 10MB
 )
 
 type Config struct {
@@ -73,7 +74,7 @@ type HarvesterConfig struct {
 	ForceCloseFiles    bool             `yaml:"force_close_files"`
 	ExcludeLines       []string         `yaml:"exclude_lines"`
 	IncludeLines       []string         `yaml:"include_lines"`
-	MaxBytes           *int             `yaml:"max_bytes"`
+	MaxBytes           int              `yaml:"max_bytes"`
 	Multiline          *MultilineConfig `yaml:"multiline"`
 }
 
