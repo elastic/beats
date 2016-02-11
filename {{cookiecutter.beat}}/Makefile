@@ -7,7 +7,14 @@ GOPACKAGES=$(shell glide novendor)
 PREFIX?=.
 
 # Path to the libbeat Makefile
-include $(ES_BEATS)/libbeat/scripts/Makefile
+-include $(ES_BEATS)/libbeat/scripts/Makefile
+
+.PHONY: init
+init:
+	glide update  --no-recursive
+	make update
+	git init
+	git add .
 
 .PHONY: install-cfg
 install-cfg:

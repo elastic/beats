@@ -13,9 +13,9 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	Configuration  *config.Config
-	done           chan struct{}
-	period         time.Duration
+	Configuration *config.Config
+	done          chan struct{}
+	period        time.Duration
 }
 
 // Creates beater
@@ -75,8 +75,6 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 		logp.Info("Event sent")
 		counter++
 	}
-
-	return nil
 }
 
 func (bt *{{cookiecutter.beat|capitalize}}) Cleanup(b *beat.Beat) error {

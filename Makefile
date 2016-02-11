@@ -12,8 +12,8 @@ test: python-env
 	cd build/src/beatpath/testbeat; \
 	export GOPATH=${PWD}/build; \
 	export GO15VENDOREXPERIMENT=1; \
-	glide update --no-recursive ; \
-	make update; \
+	make init ; \
+	make check ; \
 	make
 
 # Sets up the virtual python environment
