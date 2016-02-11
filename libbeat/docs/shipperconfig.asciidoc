@@ -153,6 +153,11 @@ value is 1000.
 
 (DO NOT TOUCH) The internal queue size for bulk events in the processing pipeline. The default value is 0.
 
+===== max_procs
+
+Sets the maximum number of CPUs that can be executing simultaneously. The
+default is the number of logical CPUs available in the system.
+
 ===== geoip.paths
 
 This configuration option is currently used by Packetbeat only.
