@@ -17,6 +17,8 @@ import (
 var debugf = logp.MakeDebug("kafka")
 
 func init() {
+	sarama.Logger = kafkaLogger{}
+
 	outputs.RegisterOutputPlugin("kafka", kafkaOutputPlugin{})
 }
 

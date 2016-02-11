@@ -143,31 +143,34 @@ func (p *Prospector) setupHarvesterConfig() error {
 	config := &p.ProspectorConfig.Harvester
 
 	// Setup Buffer Size
-	if config.BufferSize == 0 {
+	if config.BufferSize <= 0 {
 		config.BufferSize = cfg.DefaultHarvesterBufferSize
 	}
+	logp.Info("buffer_size set to: %v", config.BufferSize)
 
 	// Setup DocumentType
 	if config.DocumentType == "" {
 		config.DocumentType = cfg.DefaultDocumentType
 	}
+	logp.Info("document_type set to: %v", config.DocumentType)
 
 	// Setup InputType
 	if _, ok := cfg.ValidInputType[config.InputType]; !ok {
 		logp.Info("Invalid input type set: %v", config.InputType)
 		config.InputType = cfg.DefaultInputType
 	}
-	logp.Info("Input type set to: %v", config.InputType)
+	logp.Info("input_type set to: %v", config.InputType)
 
 	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
 	if err != nil {
 		return err
 	}
 
-	// Setup DocumentType
-	if config.BackoffFactor == 0 {
+	// Setup Backoff factor
+	if config.BackoffFactor <= 0 {
 		config.BackoffFactor = cfg.DefaultBackoffFactor
 	}
+	logp.Info("backoff_factor set to: %v", config.BackoffFactor)
 
 	config.MaxBackoffDuration, err = getConfigDuration(config.MaxBackoff, cfg.DefaultMaxBackoff, "max_backoff")
 	if err != nil {
@@ -184,6 +187,11 @@ func (p *Prospector) setupHarvesterConfig() error {
 	if err != nil {
 		return err
 	}
+
+	if config.MaxBytes <= 0 {
+		config.MaxBytes = cfg.DefaultMaxBytes
+	}
+	logp.Info("max_bytes set to: %v", config.MaxBytes)
 
 	return nil
 }
