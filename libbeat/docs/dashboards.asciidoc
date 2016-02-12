@@ -1,0 +1,107 @@
+[[load-kibana-dashboards]]
+=== Loading the Beats Dashboards
+
+Kibana has a large set of visualization types that you can combine to create
+the perfect dashboards for your needs. But this flexibility can be a bit
+overwhelming at the beginning, so we have created a couple of
+https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
+started and to demonstrate what is possible based on the Beats data.
+
+NOTE: The Beats dashboards require Kibana 4.
+
+To load the sample dashboards, you run a load script. The load script
+uploads the example dashboards, visualizations, and searches
+that you can use. The load command also creates index patterns for each Beat:
+
+   - [packetbeat-]YYYY.MM.DD
+   - [topbeat-]YYYY.MM.DD
+   - [filebeat-]YYYY.MM.DD
+   
+Use the following commands to run the script:
+
+*deb, rpm, and mac:*
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip
+unzip beats-dashboards-{Dashboards-version}.zip
+cd beats-dashboards-{Dashboards-version}/
+./load.sh
+----------------------------------------------------------------------
+
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
+to specify a different location. For example: `./load.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
+
+*win:*
+
+. Download the Beats dashboards from 
+http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip. 
+
+. Extract the contents of the archive.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell. 
+
+. Run the following commands to load the dashboards:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS > cd beats-dashboards-{Dashboards-version}
+PS > .\load.ps1
+----------------------------------------------------------------------
++
+By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
+to specify a different location. For example: `.\load.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
++
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://192.168.33.60:9200`.
+
+[[dashboard-load-options]]
+=== Other Dashboard Load Options
+When you load the Beats dashboards, you can also specify:
+
+* The Kibana index pattern where you want to load the dashboards in Elasticsearch. For example:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./load.sh -url http://test.com:9200 -index .kibana_env
+----------------------------------------------------------------------
+
+* The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./load.sh -url https://xyz.found.io -u user:password <1>
+
+./load.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
+
+./load.sh -url https://user:password@xyz.found.io <3>
+----------------------------------------------------------------------
++
+<1> Specify the username and password separated by a colon.
+<2> Use a file to avoid polluting the bash history with the password.
+<3> Put the username and password in the URL.
+
+These options are also available when you run `.\load.ps1` on Windows.
+
+[[view-kibana-dashboards]]
+=== Opening the Beats Dashboards in Kibana
+
+After <<load-kibana-dashboards,loading the Beats dashboards>>,
+launch the Kibana web interface by pointing your browser
+to port 5601. For example, `http://127.0.0.1:5601`.
+
+If Kibana raises a `No default index pattern` error, you must select or create
+an index pattern to continue. You can resolve the error by refreshing the page
+in the browser and then setting one of the predefined index patterns as the default.
+
+image:./images/kibana-created-indexes.png[Kibana configured indexes]
+
+To open the loaded dashboards, go to the `Dashboard` page and click the
+*Load Saved Dashboard* icon. Select `Packetbeat Dashboard` from the list.
+You can then easily switch between the dashboards by using the `Navigation` widget.
+
+image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
+
+Of course, you won't see actual data until you've installed and
+configured your Beat.
