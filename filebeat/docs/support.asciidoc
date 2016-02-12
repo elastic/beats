@@ -3,7 +3,10 @@
 If you have an issue with Filebeat, contact us in the https://discuss.elastic.co/c/beats/filebeat[Filebeat forum].
 If you want to contribute to Filebeat, check out our https://github.com/elastic/beats[Github repository].
 
+[float]
 === Known Issues
+
+[float]
 ==== Network Volumes
 
 We do not recommend reading log files from network volumes. Whenever possible, install Filebeat on the host machine and

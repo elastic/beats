@@ -3,9 +3,9 @@
 
 To get started with your own Filebeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Elasticsearch for storage and indexing the data. {libbeat}/elasticsearch-installation.html[More details]
+ * Kibana for the UI. {libbeat}/kibana-installation.html[More details]
+ * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/logstash-installation.html[More details]
 
 After you have installed these products, you can start <<filebeat-installation>>.
 
