@@ -1,3 +1,4 @@
+[[packetbeat-overview]]
 == Overview
 
 Packetbeat is a real-time network packet analyzer that you can use 
@@ -45,4 +46,3 @@ The same Elasticsearch and Kibana instances that are used for analysing the
 network traffic gathered by Packetbeat can be used for analysing the log files
 gathered by Logstash. This way, you can have network traffic and log analysis
 in the same system.
-

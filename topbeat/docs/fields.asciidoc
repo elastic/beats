@@ -66,7 +66,7 @@ The hostname as returned by the operating system on which the Beat is running.
 Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
 
 
-
+[float]
 === load Fields
 
 The system load average. The load average is the average number of jobs in the run queue.
@@ -94,6 +94,7 @@ type: float
 The load average over 15 minutes.
 
 
+[float]
 === cpu Fields
 
 This group contains statistics related to CPU usage.
@@ -167,12 +168,12 @@ type: int
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
-
+[float]
 === cpus Fields
 
 This group contains CPU usage per core statistics.
 
-
+[float]
 === cpuX Fields
 
 This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
@@ -240,6 +241,7 @@ type: int
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
+[float]
 === mem Fields
 
 This group contains statistics related to the memory usage on the system.
@@ -294,6 +296,7 @@ type: float
 The percentage of actual used memory.
 
 
+[float]
 === swap Fields
 
 This group contains statistics related to the swap memory usage on the system.
@@ -334,6 +337,7 @@ Per-process statistics that you can get by running the *top* or *ps* command on 
 
 
 
+[float]
 === proc Fields
 
 Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name, pid, and ppid.
@@ -382,6 +386,7 @@ type: string
 The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
 
 
+[float]
 === cpu Fields
 
 CPU-specific statistics per process.
@@ -422,6 +427,7 @@ type: string
 The time when the process was started. Example: "17:45".
 
 
+[float]
 === mem Fields
 
 Memory-specific statistics per process.
@@ -462,6 +468,7 @@ File system-related statistics that you can get by using the *df* command on Uni
 
 
 
+[float]
 === fs Fields
 
 Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as the device name and the mounting place.

@@ -1,4 +1,5 @@
-== Command Line Options
+[[packetbeat-command]]
+=== Command Line Options
 
 The following command line options are available for Packetbeat. To use these options,
 you need to start Packetbeat in the foreground.
@@ -36,7 +37,7 @@ Usage of ./packetbeat:
       Additional seconds to wait before shutting down
 ----------------------------------------------------------------------------
 
-=== Packet-Beat Specific Options
+==== Packet-Beat Specific Options
 These command line options are specific to Packetbeat:
 
 *`-I <file>`*::
@@ -62,7 +63,7 @@ Read the packets from the pcap file as fast as possible without sleeping. Use th
 *`-waitstop <n>`*::
 Wait an additional `n` seconds before exiting.
 
-=== Other Options
+==== Other Options
 
 These command line options from libbeat are also available for Packetbeat:
 
