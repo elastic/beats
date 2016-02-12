@@ -13,10 +13,11 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/dustin/go-humanize"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
-	"github.com/dustin/go-humanize"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -129,7 +130,7 @@ func (client *Client) PublishEvents(
 	}
 
 	// send bulk request
-	buffer_size := request.buf.Len()
+	bufferSize := request.buf.Len()
 	_, res, err := request.Flush()
 	if err != nil {
 		logp.Err("Failed to perform any bulk index operations: %s", err)
@@ -138,7 +139,7 @@ func (client *Client) PublishEvents(
 
 	logp.Debug("elasticsearch", "PublishEvents: %d metrics have been packed into a buffer of %s and published to elasticsearch in %v.",
 		len(events),
-		humanize.Bytes(uint64(buffer_size)),
+		humanize.Bytes(uint64(bufferSize)),
 		time.Now().Sub(begin))
 
 	// check response for transient errors
