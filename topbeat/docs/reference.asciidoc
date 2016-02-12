@@ -1,0 +1,11 @@
+[[reference]]
+= Reference
+
+[partintro]
+--
+This section contains reference information about Topbeat.
+
+--
+
+include::../../libbeat/docs/yaml.asciidoc[]
+include::reference/configuration.asciidoc[]

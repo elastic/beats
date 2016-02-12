@@ -1,0 +1,5 @@
+[[visualizing-data-packetbeat]]
+== Visualizing Packetbeat Data in Kibana
+
+Before trying to visualize Packetbeat data in Kibana, we recommend that you load the sample dashboards {libbeat}/visualizing-data.html[described here]. Then read the topics in this
+section to learn how to work with Packetbeat data in Kibana. 

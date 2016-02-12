@@ -1,0 +1,8 @@
+[[configuring-howto-filebeat]]
+== Configuring Filebeat
+
+After following the <<filebeat-configuration,configuration steps>> in the
+Getting Started, you might want to fine tune the behavior of Filebeat. This section
+describes some common use cases for changing configuration options. 
+
+For a complete description of all Filebeat configuration options, see <<filebeat-configuration-details>>.

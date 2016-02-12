@@ -1,5 +1,5 @@
 [[filebeat-command-line]]
-== Command Line Options
+=== Command Line Options
 
 Filebeat does not have any Filebeat-specific command line options. Instead, you
 configure the behaviour of Filebeat by specifying options in the configuration file.
