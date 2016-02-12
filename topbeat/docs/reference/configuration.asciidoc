@@ -1,0 +1,26 @@
+
+[[topbeat-configuration-options]]
+== Configuration Options
+
+Before modifying configuration settings, make sure you've completed the
+<<topbeat-configuration,configuration steps>> in the Getting Started.
+
+The Topbeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The configuration options are described in the following sections. After changing
+configuration settings, you need to restart Topbeat to pick up the changes.
+
+* <<configuration-input>>
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<redis-output>>
+* <<file-output>>
+* <<console-output>>
+* <<configuration-shipper>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
+
+include::configuration/topbeat-options.asciidoc[]
+
+
+
+

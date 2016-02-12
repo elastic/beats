@@ -1,0 +1,12 @@
+[[faq]]
+== Frequently Asked Questions
+
+This section contains frequently asked questions about Packetbeat. Also check out the
+https://discuss.elastic.co/c/beats/packetbeat[Packetbeat discussion forum].
+
+=== Why are the client_server and server fields empty?
+
+The `client_server` and `server` fiels will be empty if you have not configured Packetbeat
+to capture information about the network topology.
+
+To capture information about the network topology, you need to set the `save_topology` configuration option to true and make sure that you are sending the output to Elasticsearch.
