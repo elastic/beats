@@ -1,13 +1,5 @@
 
-== Getting Support
-If you have an issue with Filebeat, contact us in the https://discuss.elastic.co/c/beats/filebeat[Filebeat forum].
-If you want to contribute to Filebeat, check out our https://github.com/elastic/beats[Github repository].
 
-=== Known Issues
-==== Network Volumes
 
-We do not recommend reading log files from network volumes. Whenever possible, install Filebeat on the host machine and
-send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side effects. For example, changed file identifiers
-may result in Filebeat reading a log file from scratch again.
 
 
