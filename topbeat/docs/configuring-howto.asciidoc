@@ -1,0 +1,8 @@
+[[configuring-howto-topbeat]]
+== Configuring Topbeat
+
+After following the <<topbeat-configuration,configuration steps>> in the
+Getting Started, you might want to fine tune the behavior of Topbeat. This section
+describes some common use cases for changing configuration options. 
+
+For a complete description of all Topbeat configuration options, see <<topbeat-configuration-options>>.

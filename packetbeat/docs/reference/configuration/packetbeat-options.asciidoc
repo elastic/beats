@@ -1,24 +1,3 @@
-[[packetbeat-configuration]]
-== Configuration Options
-
-Before modifying configuration settings, make sure you've read
-<<configuring-packetbeat>>. 
-
-The Packetbeat configuration file uses http://yaml.org/[YAML] for its syntax.
-The configuration options are described in the following sections. After changing
-configuration settings, you need to restart Packetbeat to pick up the changes.
-
-* <<configuration-interfaces>>
-* <<configuration-protocols>>
-* <<configuration-processes>>
-* <<configuration-output>>
-* <<configuration-shipper>>
-* <<configuration-logging>>
-* <<configuration-run-options>>
-
-NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
-See <<maintaining-topology>> for more details.
-
 [[configuration-interfaces]]
 === Interfaces
 
@@ -284,6 +263,8 @@ The per protocol transaction timeout. Expired transactions will no longer be cor
 
 ==== ICMP Configuration Options
 
+You can specify the following options in the `icmp` section for the ICMP protocol:
+
 ===== enabled
 
 The ICMP protocol can be enabled/disabled via this option.
@@ -500,6 +481,8 @@ quiet requests with an error response are published immediately.
 
 ==== MySQL and PgSQL Configuration Options
 
+You can specify the following options in the `mysql` or `pgsql` sections: 
+
 ===== max_rows
 
 The maximum number of rows from the SQL message to publish to Elasticsearch. The
@@ -619,18 +602,6 @@ at the end of the document.
 Note that limiting documents in this way means that they are no longer correctly
 formatted JSON objects.
 
-[[maintaining-topology]]
-=== Maintaining the Real-Time State of the Network Topology
-
-One important feature of Packetbeat is that it knows the name of the source and
-destination servers for each transaction. It does this without needing to maintain
-a central configuration. Instead, each Beat notes the hostname of the server
-where the Beat runs, and maps the hostname to the list of IP addresses of that server.
-
-Packetbeat stores the topology information in an Elasticsearch index, so to save
-the network topology, you need to use Elasticsearch as output and set the
-`save_topology` configuration option to true.
-
 [[configuration-processes]]
 === Processes (Optional)
 
@@ -677,6 +648,8 @@ procs:
 
 ==== Process Monitoring Options
 
+You can specify the following process monitoring options in the `monitored` section:
+
 ===== process
 
 The name of the process as it will appear in the published transactions. The name
@@ -690,10 +663,11 @@ periodically afterwards, it scans the process table for
 processes that match the values specified for this option. The match is done against the
 process' command line as read from `/proc/<pid>/cmdline`.
 
-include::../../libbeat/docs/outputconfig.asciidoc[]
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-include::../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 
-include::../../libbeat/docs/loggingconfig.asciidoc[]
+include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
-include::../../libbeat/docs/runconfig.asciidoc[]
+include::../../../../libbeat/docs/runconfig.asciidoc[]
+

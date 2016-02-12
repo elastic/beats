@@ -54,7 +54,9 @@ shipper:
 
 ------------------------------------------------------------------------------
 
-==== Options
+==== Shipper Options
+
+You can specify the following options under the `shipper` section:
 
 ===== name
 

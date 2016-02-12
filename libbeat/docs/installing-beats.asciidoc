@@ -15,8 +15,16 @@
 ///// include::../../libbeat/docs/runconfig.asciidoc[]
 ////////////////////////////////////////////////////////////////////
 
-== Installing and Configuring Beats
+[[installing-beats]]
+=== Installing Beats
 
-After <<getting-started,installing and configuring>> Elasticsearch, Kibana, and, optionally, Logstash, you need to install and configure your Beat.
+After <<getting-started,installing and configuring>> the Elastic stack, you need to install and configure your Beat.
 
-For more information, see the Getting Started topic in the https://www.elastic.co/guide/index.html[Reference Guide] for your Beat.
+Each Beat is a separately installable product. To get up and running quickly with a Beat, see the Getting Started information for your Beat:
+
+* {packetbeat}/packetbeat-getting-started.html[Packetbeat]
+* {topbeat}/topbeat-getting-started.html[Topbeat]
+* {filebeat}/filebeat-getting-started.html[Filebeat]
+* {winlogbeat}/winlogbeat-getting-started.html[Winlogbeat]
+
+

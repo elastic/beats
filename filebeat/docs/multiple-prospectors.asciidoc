@@ -1,0 +1,25 @@
+[[multiple-prospectors]]
+=== Specifying Multiple Prospectors
+
+A config file can contain multiple prospectors and multiple paths per prospector
+as shown in the following example.
+
+NOTE: Make sure a file is not defined more than once across all prospectors because this can lead
+to unexpected behaviour.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/system.log
+        - /var/log/wifi.log
+    -
+      paths:
+        - "/var/log/apache2/*"
+-------------------------------------------------------------------------------------
+
+The config file in the example starts two prospectors. The first prospector has two harvesters,
+one harvesting the `system.log` file, and the other harvesting `wifi.log`. The second prospector
+starts a harvester for each file in the apache directory.
