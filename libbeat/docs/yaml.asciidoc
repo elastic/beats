@@ -1,0 +1,48 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/yaml.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+== YAML Tips and Gotchas
+
+The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax. When you edit the
+file to modify configuration settings, there are a few things that you should know.
+
+[float]
+=== Use Spaces for Indentation
+
+Indentation is meaningful in YAML. Make sure that you use spaces, rather than tab characters, to indent sections. 
+
+[float]
+=== Look at the Default Config File for Structure
+
+The best way to understand where to define a configuration option is by looking at
+the {beatname_lc}.yml configuration file. The configuration file contains most of the
+configuration options that are available for {beatname_uc}. To change a configuration setting,
+simply uncomment the line and change the setting.
+
+[float]
+=== Test Your Config File
+
+You can test your configuration file to verify that the structure is valid. Simply run
+{beatname_uc} in the foreground with the `-configtest` flag specified. For example: 
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+{beatname_lc} -c {beatname_lc}.yml -configtest
+----------------------------------------------------------------------
+
+You'll see a message if {beatname_uc} finds an error in the file.
+
+[float]
+=== Wrap Regular Expressions in Single Quotation Marks
+
+If you need to specify a regular expression in a YAML file, it's a good idea to wrap the regular expression in single quotation marks to work around YAML's tricky rules for string escaping. 
+
+For more information about YAML, see http://yaml.org/.

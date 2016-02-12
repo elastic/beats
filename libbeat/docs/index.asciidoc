@@ -1,5 +1,9 @@
 [[beats-reference]]
 = Beats Platform Reference
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/1.1
+:topbeat: http://www.elastic.co/guide/en/beats/topbeat/1.1
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/1.1
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/1.1
 :ES-version: 2.2.0
 :LS-version: 2.2.0
 :Kibana-version: 4.4.0
@@ -12,12 +16,18 @@ include::./communitybeats.asciidoc[]
 
 include::./gettingstarted.asciidoc[]
 
-include::./configuration.asciidoc[]
-
-include::./command-line.asciidoc[]
-
-include::./newbeat.asciidoc[]
+include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
+include::./command-line.asciidoc[]
+
+include::./visualizing-data.asciidoc[]
+
+include::./dashboards.asciidoc[]
+
+include::./newbeat.asciidoc[]
+
 include::./release.asciidoc[]
+
+//include::./../../../beats/CHANGELOG.asciidoc[]

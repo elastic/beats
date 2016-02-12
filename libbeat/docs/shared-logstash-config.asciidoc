@@ -30,5 +30,5 @@ In this configuration, `hosts` specifies the Logstash server and the port (`5044
 where Logstash is configured to listen for incoming Beats connections.
 
 To use this configuration, you must also
-{libbeat}/getting-started.html#logstash-setup[set up Logstash] to receive events
+{libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
 from Beats.

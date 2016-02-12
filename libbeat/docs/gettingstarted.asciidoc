@@ -1,17 +1,18 @@
 [[getting-started]]
 == Getting Started with Beats and the Elastic Stack
 
-Looking for an "ELK tutorial" that shows how to set up the Elastic stack for Beats? You've come to the right place.
+Looking for an "ELK tutorial" that shows how to set up the Elastic stack for Beats? You've
+come to the right place. The topics in this section describe how to install and configure
+the Elastic stack for Beats.
 
 A regular _Beats setup_ consists of:
 
- * One or more Beats. You install Beats on your servers to capture the data.
- For installation steps, see the documentation for your Beat.
+ * One or more Beats. You install the Beats on your servers to capture operational data.
  * Elasticsearch for storage and indexing. See <<elasticsearch-installation>>.
- * Optionally Logstash for inserting data into Elasticsearch. See <<logstash-installation>>.
+ * Logstash (optional) for inserting data into Elasticsearch. See <<logstash-installation,Installing Logstash>>.
  * Kibana for the UI. See <<kibana-installation>>.
  * Kibana dashboards for visualizing the data. See <<load-kibana-dashboards>>.
-  
+ 
 See the https://www.elastic.co/support/matrix[Elastic Support Matrix] for information 
 about supported operating systems and product compatibility.
 
@@ -20,6 +21,7 @@ single VM or even on your laptop. The only condition is that the machine must be
 accessible from the servers you want to monitor. As you add more Beats and
 your traffic grows, you'll want to replace the single Elasticsearch instance with
 a cluster. You'll probably also want to automate the installation process.
+
 
 [[elasticsearch-installation]]
 === Installing Elasticsearch
@@ -130,10 +132,12 @@ The simplest architecture for the Beats platform setup consists of one or more B
 Elasticsearch, and Kibana. This architecture is easy to get started
 with and sufficient for networks with low traffic. It also uses the minimum amount of
 servers: a single machine running Elasticsearch and Kibana. The Beats
-insert the transactions directly into the Elasticsearch instance.
+insert the transactions directly into the Elasticsearch instance. 
 
-This section explains how to use the Beats together with Logstash to provide
-additional buffering. An important advantage to this approach is that you can
+If you want to perform additional processing or buffering on the data, however,
+you'll want to install Logstash. 
+
+An important advantage to this approach is that you can
 use Logstash to modify the data captured by Beats in any way you like. You can also
 use Logstash's many output plugins to integrate with other systems.
 
@@ -190,31 +194,38 @@ http://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.ht
 output plugin for Logstash]. The Elasticsearch output plugin uses the bulk API, making
 indexing very efficient.
 
+To set up Logstash:
+
+. Make sure you have the latest compatible version of the Beats input plugin for
+Logstash installed.
++
 The Beats input plugin requires Logstash 1.5.4 or later. If you are using
 Logstash 1.5.4, you must install the Beats input plugin before applying this
-configuration because the plugin is not shipped with 1.5.4. To install
+configuration because the plugin is not shipped with 1.5.4. 
++
+To install
 the required plugin, run the following command inside the logstash directory
 (for deb and rpm installs, the directory is `/opt/logstash`).
-
++
 *deb, rpm, and mac:*
-
++
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 ./bin/plugin install logstash-input-beats
 ----------------------------------------------------------------------
-
++
 *win:*
-
++
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 bin\plugin install logstash-input-beats
 ----------------------------------------------------------------------
 
-Next configure Logstash to listen on port 5044 for incoming Beats connections
+. Configure Logstash to listen on port 5044 for incoming Beats connections
 and to index into Elasticsearch. You configure Logstash by creating a
 configuration file. For example, you can save the following example configuration
 to a file called `config.json`:
-
++
 [source,ruby]
 ------------------------------------------------------------------------------
 input {
@@ -232,12 +243,12 @@ output {
   }
 }
 ------------------------------------------------------------------------------
-
++
 Logstash uses this configuration to index events in Elasticsearch in the same
 way that the Beat would, but you get additional buffering and other capabilities
 provided by Logstash.
 
-To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for your Beat.
+To use this setup, you'll also need to configure your Beat to use Logstash. For more information, see the documentation for the Beat.
 
 [[logstash-input-update]]
 ==== Updating the Beats Input Plugin for Logstash
@@ -267,7 +278,7 @@ with input plugins in Logstash are available
 https://www.elastic.co/guide/en/logstash/current/working-with-plugins.html[here].
 
 
-==== Running Logstash
+==== Starting Logstash
 
 Now you can start Logstash. Use the command that works with your system. If you
 installed Logstash as a deb or rpm package, make sure the config file is in the
@@ -374,109 +385,3 @@ To launch the Kibana web interface, point your browser to port 5601. For example
 You can learn more about Kibana in the
 http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 
-[[load-kibana-dashboards]]
-==== Loading Kibana Dashboards
-
-Kibana has a large set of visualization types that you can combine to create
-the perfect dashboards for your needs. But this flexibility can be a bit
-overwhelming at the beginning, so we have created a couple of
-https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
-started and to demonstrate what is possible based on the Beats data.
-
-NOTE: The Beats dashboards require Kibana 4.
-
-To load the sample dashboards, you run a load script. The load script
-uploads the example dashboards, visualizations, and searches
-that you can use. The load command also creates index patterns for each Beat:
-
-   - [packetbeat-]YYYY.MM.DD
-   - [topbeat-]YYYY.MM.DD
-   - [filebeat-]YYYY.MM.DD
-   
-Use the following commands to run the script:
-
-*deb, rpm, and mac:*
-
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip
-unzip beats-dashboards-{Dashboards-version}.zip
-cd beats-dashboards-{Dashboards-version}/
-./load.sh
-----------------------------------------------------------------------
-
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `./load.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
-
-*win:*
-
-. Download the Beats dashboards from 
-http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip. 
-
-. Extract the contents of the archive.
-
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*). If you are running Windows XP, you may need
-to download and install PowerShell. 
-
-. Run the following commands to load the dashboards:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-PS > cd beats-dashboards-{Dashboards-version}
-PS > .\load.ps1
-----------------------------------------------------------------------
-+
-By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `.\load.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
-+
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://192.168.33.60:9200`.
-
-[[dashboard-load-options]]
-===== Other Dashboard Load Options
-When you load the dashboards, you can also specify:
-
-* The Kibana index pattern where you want to load the dashboards in Elasticsearch. For example:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./load.sh -url http://test.com:9200 -index .kibana_env
-----------------------------------------------------------------------
-
-* The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
-+
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-./load.sh -url https://xyz.found.io -u user:password <1>
-
-./load.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
-
-./load.sh -url https://user:password@xyz.found.io <3>
-----------------------------------------------------------------------
-+
-<1> Specify the username and password separated by a colon.
-<2> Use a file to avoid polluting the bash history with the password.
-<3> Put the username and password in the URL.
-
-These options are also available when you run `.\load.ps` on Windows.
-
-[[view-kibana-dashboards]]
-==== Opening the Beats Dashboards in Kibana
-
-After loading the dashboards, Kibana raises a `No default index
-pattern` error. You must select or create an index pattern to continue. You can
-resolve the error by refreshing the page in the browser and then setting one of
-the predefined index patterns as the default.
-
-image:./images/kibana-created-indexes.png[Kibana configured indexes]
-
-To open the loaded dashboards, go to the `Dashboard` page and click the
-*Load Saved Dashboard* icon. Select `Packetbeat Dashboard` from the list.
-You can then easily switch between the dashboards by using the `Navigation` widget.
-
-image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
-
-Of course, you won't see actual data until you've installed and
-configured your Beat.
-
-Enjoy!

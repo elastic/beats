@@ -1,4 +1,4 @@
-== Viewing the Topology Diagram
+=== Viewing the Topology Diagram
 
 We currently recommend using Kibana 4 together with Packetbeat. However, the topology panel type is not yet available for Kibana 4. This panel type is implemented in a fork of Kibana 3 that was never merged
 (and never will be). When Kibana 4 adds support for plugins, the topology panel will be
@@ -10,7 +10,7 @@ This page walks you through the steps required to install the forked Kibana 3
 and load the Packetbeat dashboards. You can install Kibana 3 on the same system
 as Kibana 4.
 
-=== Downloading the Kibana 3 Fork
+==== Downloading the Kibana 3 Fork
 
 Download and install the Kibana 3 fork by issuing the following commands:
 
@@ -60,7 +60,7 @@ sudo /etc/init.d/elasticsearch restart
 And try again to access Kibana in your browser. You should now see
 Kibana's welcome page.
 
-=== Loading Packetbeat Dashboards
+==== Loading Packetbeat Dashboards
 
 To load our sample Kibana 3 dashboards, use the following commands:
 

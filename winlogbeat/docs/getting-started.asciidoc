@@ -3,14 +3,16 @@
 
 To get started with your own Winlogbeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Elasticsearch for storage and indexing the data. 
+ * Kibana for the UI. 
+ * Logstash (optional) for inserting data into Elasticsearch.
+ 
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After you have installed these products, you can start <<winlogbeat-installation>>.
 
 [[winlogbeat-installation]]
-=== Installing Winlogbeat
+=== Step 1: Installing Winlogbeat
 
 . Download the Winlogbeat zip file from the
 https://www.elastic.co/downloads/beats/winlogbeat[downloads page].
@@ -46,7 +48,7 @@ configuration file, for example `C:\Program Files\Winlogbeat\winlogbeat.yml`.
 For more information about these options, see <<winlogbeat-configuration-details>>.
 
 [[winlogbeat-configuration]]
-=== Configuring Winlogbeat
+=== Step 2: Configuring Winlogbeat
 
 To configure Winlogbeat, you edit the `winlogbeat.yml` configuration file. Here is a sample of
 the `winlogbeat.yml` file:
@@ -111,12 +113,12 @@ PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest
 ----------------------------------------------------------------------
 
 [[config-filebeat-logstash]]
-=== Configuring Winlogbeat to Use Logstash
+=== Step 3: Configuring Winlogbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[winlogbeat-template]]
-=== Loading the Index Template in Elasticsearch
+=== Step 4: Loading the Index Template in Elasticsearch
 
 Before starting Winlogbeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
@@ -133,7 +135,7 @@ PS C:\Program Files\Winlogbeat> Invoke-WebRequest -Method Put -InFile winlogbeat
 
 where `localhost:9200` is the IP and port where Elasticsearch is listening.
 
-=== Running Winlogbeat
+=== Step 5: Starting Winlogbeat
 
 Start the Winlogbeat service with the following command:
 
@@ -154,7 +156,7 @@ this command:
 PS C:\Program Files\Winlogbeat> services.msc
 ----------------------------------------------------------------------
 
-=== Stopping Winlogbeat
+==== Stopping Winlogbeat
 
 Stop the Winlogbeat service with the following command:
 
@@ -163,4 +165,17 @@ Stop the Winlogbeat service with the following command:
 PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 ----------------------------------------------------------------------
 
-Enjoy!
+=== Step 6: Loading Sample Kibana Dashboards
+
+To make it easier for you to start monitoring your servers in Kibana,
+we have created a few sample dashboards. The dashboards are maintained in this
+https://github.com/elastic/beats-dashboards[GitHub repository], which also
+includes instructions for loading the dashboards.
+
+For more information about loading and viewing the dashboards, see {libbeat}/visualizing-data.html[Visualizing Your Data in Kibana].
+
+image:./images/winlogbeat-dashboard.png[Winlogbeat statistics]
+
+These dashboards are provided as examples. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
+to meet your needs.
