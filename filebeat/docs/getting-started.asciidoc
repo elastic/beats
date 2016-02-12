@@ -3,14 +3,16 @@
 
 To get started with your own Filebeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. {libbeat}/getting-started.html#elasticsearch-installation[More details]
- * Kibana for the UI. {libbeat}/getting-started.html#kibana-installation[More details]
- * Optionally Logstash for inserting data into Elasticsearch. {libbeat}/getting-started.html#logstash-installation[More details]
+ * Elasticsearch for storage and indexing the data. 
+ * Kibana for the UI. 
+ * Logstash (optional) for inserting data into Elasticsearch.
+ 
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After you have installed these products, you can start <<filebeat-installation>>.
 
 [[filebeat-installation]]
-=== Installing Filebeat
+=== Step 1: Installing Filebeat
 
 To download and install Filebeat, use the commands that work with your system
 (<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
@@ -77,7 +79,7 @@ file, for example `C:\Program Files\Filebeat\filebeat.yml` or `/etc/filebeat/fil
 see <<filebeat-configuration-details>>.
 
 [[filebeat-configuration]]
-=== Configuring Filebeat
+=== Step 2: Configuring Filebeat
 
 To configure Filebeat, you edit the configuration file. For rpm and deb, you'll
 find the configuration file at `/etc/filebeat/filebeat.yml`. For mac and win, look in
@@ -131,29 +133,6 @@ To fetch all files from a predefined level of subdirectories, the following patt
 `/var/log/*/*.log`. This fetches all `.log` files from the subfolders of `/var/log`. It does not
 fetch log files from the `/var/log` folder itself. Currently it is not possible to recursively
 fetch all files in all subdirectories of a directory.
-+
-A config file can contain multiple prospectors and multiple paths per prospector
-as shown in the following example.
-+
-NOTE: Make sure a file is not defined more than once across all prospectors because this can lead
-to unexpected behaviour.
-+
-[source,yaml]
--------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    -
-      paths:
-        - /var/log/system.log
-        - /var/log/wifi.log
-    -
-      paths:
-        - "/var/log/apache2/*"
--------------------------------------------------------------------------------------
-+
-The config file in the example starts two prospectors. The first prospector has two harvesters,
-one harvesting the `system.log` file, and the other harvesting `wifi.log`. The second prospector
-starts a harvester for each file in the apache directory.
 
 . If you are sending output to Elasticsearch, set the IP address and port where Filebeat can find the Elasticsearch installation:
 +
@@ -173,12 +152,12 @@ If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[config-filebeat-logstash]]
-=== Configuring Filebeat to Use Logstash
+=== Step 3 (Optional): Configuring Filebeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 
 [[filebeat-template]]
-=== Loading the Index Template in Elasticsearch
+=== Step 4: Loading the Index Template in Elasticsearch
 
 Before starting Filebeat, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
@@ -218,9 +197,9 @@ you can delete the old documents from `filebeat-*` to force Kibana to look
 at the newest documents. Use this command:
 `curl -XDELETE 'http://localhost:9200/filebeat-*'`.
 
-=== Running Filebeat
+=== Step 5: Starting Filebeat
 
-Run Filebeat by issuing the appropriate command for your platform.
+Start Filebeat by issuing the appropriate command for your platform.
 
 *deb:*
 
@@ -253,5 +232,3 @@ PS C:\Program Files\Filebeat> Start-Service filebeat
 By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 
 Filebeat is now ready to send log files to your defined output.
-
-Enjoy!

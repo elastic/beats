@@ -10,7 +10,7 @@
 //// This content is structured to be included as a whole file.
 //////////////////////////////////////////////////////////////////////////
 
-== HTTPS and Basic Authentication
+=== Securing Communication
 
 To secure the communication between {beatname_uc} and Elasticsearch, you can use HTTPS
 and basic authentication. Here is a sample configuration:
@@ -49,9 +49,10 @@ elasticsearch:
   password: verysecret
   protocol: https
   hosts: ["elasticsearch.example.com:9200"]
-  certificate_authorities: <1>
-    - /etc/pki/my_root_ca.pem
-    - /etc/pki/my_other_ca.pem
+  tls:
+    certificate_authorities: <1>
+      - /etc/pki/my_root_ca.pem
+      - /etc/pki/my_other_ca.pem
 ----------------------------------------------------------------------
 <1> The list of CA certificates to trust
 

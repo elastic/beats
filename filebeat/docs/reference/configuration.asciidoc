@@ -1,0 +1,26 @@
+
+[[filebeat-configuration-details]]
+== Configuration Options
+
+Before modifying configuration settings, make sure you've completed the
+<<filebeat-configuration,configuration steps>> in the Getting Started.
+
+The Filebeat configuration file uses http://yaml.org/[YAML] for its syntax.
+The configuration options are described in the following sections. After changing
+configuration settings, you need to restart Filebeat to pick up the changes.
+
+* <<configuration-filebeat-options>>
+* <<elasticsearch-output>>
+* <<logstash-output>>
+* <<redis-output>>
+* <<file-output>>
+* <<console-output>>
+* <<configuration-shipper>>
+* <<configuration-logging>>
+* <<configuration-run-options>>
+
+include::configuration/filebeat-options.asciidoc[]
+
+
+
+

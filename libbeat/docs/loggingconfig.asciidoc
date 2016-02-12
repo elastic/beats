@@ -38,7 +38,9 @@ logging:
 In addition to the logging system, the logging output configuration can be
 modified from the command line.
 
-==== Logging options
+==== Logging Options
+
+You can specify the following options under the `logging` section:
 
 ===== to_syslog
 
