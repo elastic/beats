@@ -1,0 +1,15 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {},
+            "schema": "metric",
+            "type": "count"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "fontSize": 60
+    },
+    "type": "metric"
+}

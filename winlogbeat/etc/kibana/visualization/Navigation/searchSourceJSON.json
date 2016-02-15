@@ -1,0 +1,9 @@
+{
+    "filter": [],
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "*"
+        }
+    }
+}

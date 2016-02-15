@@ -231,3 +231,13 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+
+load-kibana:
+	export KIBANA_PATH="."; \
+	bash  ${ES_BEATS}/libbeat/scripts/load-dashboards.sh
+
+extract-kibana:
+	python 	${ES_BEATS}/libbeat/scripts/kibana_extract.py
+
+dump-kibana:
+	echo "Not implemented yet"

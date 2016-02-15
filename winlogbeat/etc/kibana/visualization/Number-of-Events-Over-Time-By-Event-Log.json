@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"histogram\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"addTimeMarker\":false,\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"count\",\"params\":{},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"customInterval\":\"2h\",\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"log_name\",\"order\":\"desc\",\"size\":6},\"id\":\"3\",\"schema\":\"group\"}]}",
+  "description": "",
+  "title": "Number-of-Events-Over-Time-By-Event-Log",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+  }
+}

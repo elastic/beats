@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"metric\",\"listeners\":{},\"params\":{\"fontSize\":60},\"aggs\":[{\"type\":\"count\",\"params\":{},\"id\":\"1\",\"schema\":\"metric\"}]}",
+  "description": "",
+  "title": "Number-of-Events",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+  }
+}
