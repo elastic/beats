@@ -9,4 +9,4 @@ logstash:
 
 kibana:
   build: docker/kibana/
-  dockerfile: Dockerfile-4.3.1
+  dockerfile: Dockerfile-4.4.0
