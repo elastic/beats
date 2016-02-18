@@ -12,7 +12,7 @@ import (
 	. "github.com/elastic/beats/filebeat/input"
 )
 
-// Beater object. Contains all objects needed to run the beat
+// Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	FbConfig *cfg.Config
 	// Channel from harvesters to spooler
@@ -23,6 +23,7 @@ type Filebeat struct {
 	done          chan struct{}
 }
 
+// New creates a new Filebeat pointer instance.
 func New() *Filebeat {
 	return &Filebeat{}
 }
@@ -43,12 +44,14 @@ func (fb *Filebeat) Config(b *beat.Beat) error {
 	return nil
 }
 
+// Setup applies the minimum required setup to a new Filebeat instance for use.
 func (fb *Filebeat) Setup(b *beat.Beat) error {
 	fb.done = make(chan struct{})
 
 	return nil
 }
 
+// Run allows the beater to be run as a beat.
 func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	var err error
@@ -102,11 +105,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	return nil
 }
 
+// Cleanup removes any temporary files, data, or other items that were created by the Beat.
 func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 	return nil
 }
 
-// Stop is called on exit for cleanup
+// Stop is called on exit to stop the crawling, spooling and registration processes.
 func (fb *Filebeat) Stop() {
 
 	logp.Info("Stopping filebeat")
