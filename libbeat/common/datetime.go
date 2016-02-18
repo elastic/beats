@@ -6,10 +6,11 @@ import (
 	"time"
 )
 
-// Layout to be used in the timestamp marshaling/unmarshaling everywhere.
+// TsLayout is the layout to be used in the timestamp marshaling/unmarshaling everywhere.
 // The timezone must always be UTC.
 const TsLayout = "2006-01-02T15:04:05.000Z"
 
+// Time is an abstraction for the time.Time type
 type Time time.Time
 
 // MarshalJSON implements json.Marshaler interface.
