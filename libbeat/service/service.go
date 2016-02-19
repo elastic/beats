@@ -61,7 +61,7 @@ func WithCpuProfile() bool {
 // BeforeRun takes care of necessary actions such as creating files
 // before the beat should run.
 func BeforeRun() {
-	if *cpuprofile != "" {
+	if WithCpuProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
@@ -80,12 +80,12 @@ func BeforeRun() {
 // Cleanup handles cleaning up the runtime and OS environments. This includes
 // tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
-	if *cpuprofile != "" {
+	if WithCpuProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
 	}
 
-	if *memprofile != "" {
+	if WithMemProfile() {
 		runtime.GC()
 
 		writeHeapProfile(*memprofile)
