@@ -31,7 +31,9 @@ import (
 	"github.com/elastic/beats/packetbeat/sniffer"
 )
 
-var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
+// EnabledProtocolPlugins is a map which contains the different packetbeat
+// protocols which are enabled.
+var EnabledProtocolPlugins = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:     new(http.HTTP),
 	protos.MemcacheProtocol: new(memcache.Memcache),
 	protos.MysqlProtocol:    new(mysql.Mysql),
@@ -42,7 +44,7 @@ var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[proto
 	protos.DnsProtocol:      new(dns.Dns),
 }
 
-// Beater object. Contains all objects needed to run the beat
+// Packetbeat is a beater object. Contains all objects needed to run the beat
 type Packetbeat struct {
 	PbConfig    config.Config
 	CmdLineArgs CmdLineArgs
@@ -51,6 +53,8 @@ type Packetbeat struct {
 	over        chan bool
 }
 
+// CmdLineArgs represents the different arguments which may be passed to
+// packetbeats on the command line.
 type CmdLineArgs struct {
 	File         *string
 	Loop         *int
@@ -79,15 +83,15 @@ func init() {
 	}
 }
 
+// New generates a new Packetbeat instance.
 func New() *Packetbeat {
-
 	pb := &Packetbeat{}
 	pb.CmdLineArgs = cmdLineArgs
 
 	return pb
 }
 
-// Handle custom command line flags
+// HandleFlags manages custom command line flags which are passed to packetbeat
 func (pb *Packetbeat) HandleFlags(b *beat.Beat) {
 	// -devices CLI flag
 	if *pb.CmdLineArgs.PrintDevices {
@@ -111,7 +115,8 @@ func (pb *Packetbeat) HandleFlags(b *beat.Beat) {
 	}
 }
 
-// Loads the beat specific config and overwrites params based on cmd line
+// Config loads the beat specific config and overwrites configuration parameters
+// based on command line flags.
 func (pb *Packetbeat) Config(b *beat.Beat) error {
 
 	// Read beat implementation config as needed for setup
@@ -140,7 +145,7 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 	return err
 }
 
-// Setup packetbeat
+// Setup assembles the packetbeat
 func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	if err := procs.ProcWatcher.Init(pb.PbConfig.Procs); err != nil {
@@ -205,8 +210,8 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	return err
 }
 
+// Run executes the beat
 func (pb *Packetbeat) Run(b *beat.Beat) error {
-
 	// run the sniffer in background
 	go func() {
 		err := pb.Sniff.Run()
@@ -238,8 +243,9 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
+// Cleanup waits for existing streams / transactions to expire and cleans up
+// the beat runtime environment.
 func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
-
 	if service.WithMemProfile() {
 		logp.Debug("main", "Waiting for streams and transactions to expire...")
 		time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
@@ -252,7 +258,7 @@ func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
 	return nil
 }
 
-// Called by the Beat stop function
+// Stop ends the running packetbeat instance
 func (pb *Packetbeat) Stop() {
 	pb.Sniff.Stop()
 }

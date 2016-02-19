@@ -137,11 +137,11 @@ func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
 
 	pgsql.Ports = config.Ports
 
-	if config.Max_row_length != nil {
-		pgsql.maxRowLength = *config.Max_row_length
+	if config.MaxRowLength != nil {
+		pgsql.maxRowLength = *config.MaxRowLength
 	}
-	if config.Max_rows != nil {
-		pgsql.maxStoreRows = *config.Max_rows
+	if config.MaxRows != nil {
+		pgsql.maxStoreRows = *config.MaxRows
 	}
 	if config.SendRequest != nil {
 		pgsql.Send_request = *config.SendRequest

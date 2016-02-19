@@ -19,20 +19,23 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// SocketInfo holds information about a socket connection.
 type SocketInfo struct {
-	Src_ip, Dst_ip     uint32
-	Src_port, Dst_port uint16
+	SrcIP, DstIP     uint32
+	SrcPort, DstPort uint16
 
-	Uid   uint16
+	UID   uint16
 	Inode int64
 }
 
+// PortProcMapping maps the port information to a specific process ID (PID)
 type PortProcMapping struct {
 	Port uint16
 	Pid  int
 	Proc *Process
 }
 
+// Process contains information about the process that is being sniffed.
 type Process struct {
 	Name    string
 	Grepper string
@@ -43,6 +46,8 @@ type Process struct {
 	RefreshPidsTimer <-chan time.Time
 }
 
+// ProcessesWatcher contains the information about which processes are being
+// watched
 type ProcessesWatcher struct {
 	PortProcMap   map[uint16]PortProcMapping
 	LastMapUpdate time.Time
@@ -55,27 +60,33 @@ type ProcessesWatcher struct {
 	RefreshPidsFreq time.Duration
 
 	// test helpers
-	proc_prefix string
+	procPrefix  string
 	TestSignals *chan bool
 }
 
+// ProcsConfig contains information about whether a specific process should have
+// it's traffic sniffed / monitored and the characteristics of that behavior.
 type ProcsConfig struct {
-	Enabled            bool
-	Max_proc_read_freq int
-	Monitored          []ProcConfig
-	Refresh_pids_freq  int
+	Enabled         bool
+	MaxProcReadFreq int
+	Monitored       []ProcConfig
+	RefreshPidsFreq int
 }
 
+// ProcConfig contains what configuration would be used to identify a process.
 type ProcConfig struct {
-	Process      string
-	Cmdline_grep string
+	Process     string
+	CmdlineGrep string
 }
 
+// ProcWatcher is an instance of ProcessesWatcher which can be worked with
+// globally throughout the procs package.
 var ProcWatcher ProcessesWatcher
 
+// Init intializes the ProcessesWatcher with the necessary configuration
+// information to run on the machine.
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
-
-	proc.proc_prefix = ""
+	proc.procPrefix = ""
 	proc.PortProcMap = make(map[uint16]PortProcMapping)
 	proc.LastMapUpdate = time.Now()
 
@@ -89,17 +100,17 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 		}
 	}
 
-	if config.Max_proc_read_freq == 0 {
+	if config.MaxProcReadFreq == 0 {
 		proc.MaxReadFreq = 10 * time.Millisecond
 	} else {
-		proc.MaxReadFreq = time.Duration(config.Max_proc_read_freq) *
+		proc.MaxReadFreq = time.Duration(config.MaxProcReadFreq) *
 			time.Millisecond
 	}
 
-	if config.Refresh_pids_freq == 0 {
+	if config.RefreshPidsFreq == 0 {
 		proc.RefreshPidsFreq = 1 * time.Second
 	} else {
-		proc.RefreshPidsFreq = time.Duration(config.Refresh_pids_freq) *
+		proc.RefreshPidsFreq = time.Duration(config.RefreshPidsFreq) *
 			time.Millisecond
 	}
 
@@ -114,7 +125,7 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	if proc.ReadFromProc {
 		for _, procConfig := range config.Monitored {
 
-			grepper := procConfig.Cmdline_grep
+			grepper := procConfig.CmdlineGrep
 			if len(grepper) == 0 {
 				grepper = procConfig.Process
 			}
@@ -131,6 +142,8 @@ func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	return nil
 }
 
+// NewProcess creates a new Process object representing a specific process on
+// the operating system
 func NewProcess(proc *ProcessesWatcher, name string, grepper string,
 	refreshPidsTimer <-chan time.Time) (*Process, error) {
 
@@ -143,12 +156,14 @@ func NewProcess(proc *ProcessesWatcher, name string, grepper string,
 	return p, nil
 }
 
+// RefreshPids handles refreshing the PID values for the processes which should
+// be sniffed / monitored by packetbeat.
 func (p *Process) RefreshPids() {
 	logp.Debug("procs", "In RefreshPids")
 	for range p.RefreshPidsTimer {
 		logp.Debug("procs", "In RefreshPids tick")
 		var err error
-		p.Pids, err = FindPidsByCmdlineGrep(p.proc.proc_prefix, p.Grepper)
+		p.Pids, err = FindPidsByCmdlineGrep(p.proc.procPrefix, p.Grepper)
 		if err != nil {
 			logp.Err("Error finding PID files for %s: %s", p.Name, err)
 		}
@@ -160,6 +175,9 @@ func (p *Process) RefreshPids() {
 	}
 }
 
+// FindPidsByCmdlineGrep returns the pids for the processes that should be
+// monitored / sniffed by using the grep information provided during intial
+// configuration.
 func FindPidsByCmdlineGrep(prefix string, process string) ([]int, error) {
 	defer logp.Recover("FindPidsByCmdlineGrep exception")
 	pids := []int{}
@@ -285,7 +303,7 @@ func (proc *ProcessesWatcher) UpdateMap() {
 
 	for _, p := range proc.Processes {
 		for _, pid := range p.Pids {
-			inodes, err := FindSocketsOfPid(proc.proc_prefix, pid)
+			inodes, err := FindSocketsOfPid(proc.procPrefix, pid)
 			if err != nil {
 				logp.Err("FindSocketsOfPid: %s", err)
 				continue
@@ -294,7 +312,7 @@ func (proc *ProcessesWatcher) UpdateMap() {
 			for _, inode := range inodes {
 				sockInfo, exists := socks_map[inode]
 				if exists {
-					proc.UpdateMappingEntry(sockInfo.Src_port, pid, p)
+					proc.UpdateMappingEntry(sockInfo.SrcPort, pid, p)
 				}
 			}
 
@@ -326,20 +344,20 @@ func Parse_Proc_Net_Tcp(input io.Reader) ([]*SocketInfo, error) {
 		var sock SocketInfo
 		var err_ error
 
-		sock.Src_ip, sock.Src_port, err_ = hex_to_ip_port(words[1])
+		sock.SrcIP, sock.SrcPort, err_ = hex_to_ip_port(words[1])
 		if err_ != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
 		}
 
-		sock.Dst_ip, sock.Dst_port, err_ = hex_to_ip_port(words[2])
+		sock.DstIP, sock.DstPort, err_ = hex_to_ip_port(words[2])
 		if err_ != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err_)
 			continue
 		}
 
 		uid, _ := strconv.Atoi(string(words[7]))
-		sock.Uid = uint16(uid)
+		sock.UID = uint16(uid)
 		inode, _ := strconv.Atoi(string(words[9]))
 		sock.Inode = int64(inode)
 

@@ -89,8 +89,8 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "http.request_headers" not in o
-        assert "http.response_headers" not in o
+        assert "http.requestHeaders" not in o
+        assert "http.responseHeaders" not in o
 
         self.render_config_template(
             http_ports=[8888],
@@ -102,12 +102,12 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "http.request_headers" in o
-        assert "http.response_headers" in o
-        assert o["http.request_headers"]["cache-control"] == "max-age=0"
-        assert len(o["http.request_headers"]) == 9
-        assert len(o["http.response_headers"]) == 7
-        assert isinstance(o["http.response_headers"]["set-cookie"],
+        assert "http.requestHeaders" in o
+        assert "http.responseHeaders" in o
+        assert o["http.requestHeaders"]["cache-control"] == "max-age=0"
+        assert len(o["http.requestHeaders"]) == 9
+        assert len(o["http.responseHeaders"]) == 7
+        assert isinstance(o["http.responseHeaders"]["set-cookie"],
                           basestring)
 
         self.render_config_template(
@@ -121,11 +121,11 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert "http.request_headers" in o
-        assert "http.response_headers" in o
-        assert len(o["http.request_headers"]) == 1
-        assert len(o["http.response_headers"]) == 1
-        assert "user-agent" in o["http.request_headers"]
+        assert "http.requestHeaders" in o
+        assert "http.responseHeaders" in o
+        assert len(o["http.requestHeaders"]) == 1
+        assert len(o["http.responseHeaders"]) == 1
+        assert "user-agent" in o["http.requestHeaders"]
 
     def test_split_cookie(self):
         self.render_config_template(
@@ -139,11 +139,11 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
 
-        assert len(o["http.request_headers"]) == 9
-        assert len(o["http.response_headers"]) == 7
+        assert len(o["http.requestHeaders"]) == 9
+        assert len(o["http.responseHeaders"]) == 7
 
-        assert isinstance(o["http.request_headers"]["cookie"], dict)
-        assert len(o["http.request_headers"]["cookie"]) == 6
+        assert isinstance(o["http.requestHeaders"]["cookie"], dict)
+        assert len(o["http.requestHeaders"]["cookie"]) == 6
 
-        assert isinstance(o["http.response_headers"]["set-cookie"], dict)
-        assert len(o["http.response_headers"]["set-cookie"]) == 4
+        assert isinstance(o["http.responseHeaders"]["set-cookie"], dict)
+        assert len(o["http.responseHeaders"]["set-cookie"]) == 4

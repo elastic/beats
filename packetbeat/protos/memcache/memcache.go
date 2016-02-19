@@ -149,7 +149,7 @@ func (mc *Memcache) setFromConfig(config config.Memcache) error {
 	mc.config.parseUnkown = config.ParseUnknown
 
 	mc.udpConfig.transTimeout = computeTransTimeout(
-		config.UdpTransactionTimeout,
+		config.UDPTransactionTimeout,
 		protos.DefaultTransactionExpiration)
 	mc.tcpConfig.tcpTransTimeout = computeTransTimeout(
 		config.TransactionTimeout,

@@ -145,7 +145,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			if err != nil {
 				return err
 			}
-			err = sniffer.pcapHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+			err = sniffer.pcapHandle.SetBPFFilter(sniffer.config.BpfFilter)
 			if err != nil {
 				return err
 			}
@@ -154,12 +154,12 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 		sniffer.DataSource = gopacket.PacketDataSource(sniffer.pcapHandle)
 
 	case "af_packet":
-		if sniffer.config.Buffer_size_mb == 0 {
-			sniffer.config.Buffer_size_mb = 24
+		if sniffer.config.BufferSizeMb == 0 {
+			sniffer.config.BufferSizeMb = 24
 		}
 
 		frame_size, block_size, num_blocks, err := afpacketComputeSize(
-			sniffer.config.Buffer_size_mb,
+			sniffer.config.BufferSizeMb,
 			sniffer.config.Snaplen,
 			os.Getpagesize())
 		if err != nil {
@@ -176,7 +176,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			return err
 		}
 
-		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.config.BpfFilter)
 		if err != nil {
 			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
@@ -192,7 +192,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			return err
 		}
 
-		err = sniffer.pfringHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+		err = sniffer.pfringHandle.SetBPFFilter(sniffer.config.BpfFilter)
 		if err != nil {
 			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
@@ -243,12 +243,12 @@ func (sniffer *SnifferSetup) Init(
 	tcp tcp.Processor,
 	udp udp.Processor,
 ) error {
-	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
-		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
+	if config.ConfigSingleton.Interfaces.BpfFilter == "" {
+		with_vlans := config.ConfigSingleton.Interfaces.WithVlans
 		with_icmp := config.ConfigSingleton.Protocols.Icmp.Enabled
-		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans, with_icmp)
+		config.ConfigSingleton.Interfaces.BpfFilter = protos.Protos.BpfFilter(with_vlans, with_icmp)
 	}
-	logp.Debug("sniffer", "BPF filter: %s", config.ConfigSingleton.Interfaces.Bpf_filter)
+	logp.Debug("sniffer", "BPF filter: %s", config.ConfigSingleton.Interfaces.BpfFilter)
 
 	var err error
 	if !test_mode {

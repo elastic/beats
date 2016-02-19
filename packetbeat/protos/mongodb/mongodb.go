@@ -53,11 +53,11 @@ func (mongodb *Mongodb) setFromConfig(config config.Mongodb) error {
 	if config.SendResponse != nil {
 		mongodb.SendResponse = *config.SendResponse
 	}
-	if config.Max_docs != nil {
-		mongodb.MaxDocs = *config.Max_docs
+	if config.MaxDocs != nil {
+		mongodb.MaxDocs = *config.MaxDocs
 	}
-	if config.Max_doc_length != nil {
-		mongodb.MaxDocLength = *config.Max_doc_length
+	if config.MaxDocLength != nil {
+		mongodb.MaxDocLength = *config.MaxDocLength
 	}
 	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
 		mongodb.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second

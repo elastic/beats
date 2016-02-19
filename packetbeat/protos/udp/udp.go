@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 )
 
-type Udp struct {
+type UDP struct {
 	protocols protos.Protocols
 	portMap   map[uint16]protos.Protocol
 }
@@ -21,7 +21,7 @@ type Processor interface {
 // decideProtocol determines the protocol based on the source and destination
 // ports. If the protocol cannot be determined then protos.UnknownProtocol
 // is returned.
-func (udp *Udp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
+func (udp *UDP) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
 	protocol, exists := udp.portMap[tuple.Src_port]
 	if exists {
 		return protocol
@@ -39,7 +39,7 @@ func (udp *Udp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
 // determine the protocol type and then invokes the associated
 // UdpProtocolPlugin's ParseUdp method. If the protocol cannot be determined
 // or the payload is empty then the method is a noop.
-func (udp *Udp) Process(pkt *protos.Packet) {
+func (udp *UDP) Process(pkt *protos.Packet) {
 	protocol := udp.decideProtocol(&pkt.Tuple)
 	if protocol == protos.UnknownProtocol {
 		logp.Debug("udp", "unknown protocol")
@@ -83,13 +83,13 @@ func buildPortsMap(plugins map[protos.Protocol]protos.UdpProtocolPlugin) (map[ui
 }
 
 // NewUdp creates and returns a new Udp.
-func NewUdp(p protos.Protocols) (*Udp, error) {
+func NewUdp(p protos.Protocols) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUdp())
 	if err != nil {
 		return nil, err
 	}
 
-	udp := &Udp{protocols: p, portMap: portMap}
+	udp := &UDP{protocols: p, portMap: portMap}
 	logp.Debug("udp", "Port map: %v", portMap)
 
 	return udp, nil

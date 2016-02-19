@@ -142,7 +142,7 @@ func TestRefreshPids(t *testing.T) {
 	}
 
 	testSignals := make(chan bool)
-	var procs ProcessesWatcher = ProcessesWatcher{proc_prefix: path_prefix,
+	var procs ProcessesWatcher = ProcessesWatcher{procPrefix: path_prefix,
 		TestSignals: &testSignals}
 	var ch chan time.Time = make(chan time.Time)
 

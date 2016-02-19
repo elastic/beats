@@ -187,41 +187,41 @@ func (thrift *Thrift) readConfig(config config.Thrift) error {
 
 	thrift.Ports = config.Ports
 
-	if config.String_max_size != nil {
-		thrift.StringMaxSize = *config.String_max_size
+	if config.StringMaxSize != nil {
+		thrift.StringMaxSize = *config.StringMaxSize
 	}
-	if config.Collection_max_size != nil {
-		thrift.CollectionMaxSize = *config.Collection_max_size
+	if config.CollectionMaxSize != nil {
+		thrift.CollectionMaxSize = *config.CollectionMaxSize
 	}
-	if config.Drop_after_n_struct_fields != nil {
-		thrift.DropAfterNStructFields = *config.Drop_after_n_struct_fields
+	if config.DropAfterNStructFields != nil {
+		thrift.DropAfterNStructFields = *config.DropAfterNStructFields
 	}
-	if config.Transport_type != nil {
-		switch *config.Transport_type {
+	if config.TransportType != nil {
+		switch *config.TransportType {
 		case "socket":
 			thrift.TransportType = ThriftTSocket
 		case "framed":
 			thrift.TransportType = ThriftTFramed
 		default:
-			return fmt.Errorf("Transport type `%s` not known", *config.Transport_type)
+			return fmt.Errorf("Transport type `%s` not known", *config.TransportType)
 		}
 	}
-	if config.Protocol_type != nil {
-		switch *config.Protocol_type {
+	if config.ProtocolType != nil {
+		switch *config.ProtocolType {
 		case "binary":
 			thrift.ProtocolType = ThriftTBinary
 		default:
-			return fmt.Errorf("Protocol type `%s` not known", *config.Protocol_type)
+			return fmt.Errorf("Protocol type `%s` not known", *config.ProtocolType)
 		}
 	}
-	if config.Capture_reply != nil {
-		thrift.CaptureReply = *config.Capture_reply
+	if config.CaptureReply != nil {
+		thrift.CaptureReply = *config.CaptureReply
 	}
-	if config.Obfuscate_strings != nil {
-		thrift.ObfuscateStrings = *config.Obfuscate_strings
+	if config.ObfuscateStrings != nil {
+		thrift.ObfuscateStrings = *config.ObfuscateStrings
 	}
-	if len(config.Idl_files) > 0 {
-		thrift.Idl, err = NewThriftIdl(config.Idl_files)
+	if len(config.IdlFiles) > 0 {
+		thrift.Idl, err = NewThriftIdl(config.IdlFiles)
 		if err != nil {
 			return err
 		}
