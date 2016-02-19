@@ -2,6 +2,6 @@
 
 package service
 
-// On non-windows platforms, this function does nothing.
+// ProcessWindowsControlEvents is not used on non-windows platforms.
 func ProcessWindowsControlEvents(stopCallback func()) {
 }
