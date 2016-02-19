@@ -451,11 +451,10 @@ Elasticsearch. Beats that publish data in batches (such as Filebeat) send events
 spooler size.
 
 [[redis-output]]
-=== Redis Output (DEPRECATED)
+=== Redis Output
 
 The Redis output inserts the events in a Redis list. This output plugin is compatible with
-the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash,
-so the Redis Output for the Beats is deprecated.
+the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash.
 
 Example configuration:
 
