@@ -8,18 +8,18 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	cfg "github.com/elastic/beats/filebeat/config"
-	. "github.com/elastic/beats/filebeat/crawler"
-	. "github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/filebeat/crawler"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {
 	FbConfig *cfg.Config
 	// Channel from harvesters to spooler
-	publisherChan chan []*FileEvent
+	publisherChan chan []*input.FileEvent
 	spooler       *Spooler
-	registrar     *Registrar
-	cralwer       *Crawler
+	registrar     *crawler.Registrar
+	cralwer       *crawler.Crawler
 	done          chan struct{}
 }
 
@@ -57,16 +57,16 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 
 	// Init channels
-	fb.publisherChan = make(chan []*FileEvent, 1)
+	fb.publisherChan = make(chan []*input.FileEvent, 1)
 
 	// Setup registrar to persist state
-	fb.registrar, err = NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
+	fb.registrar, err = crawler.NewRegistrar(fb.FbConfig.Filebeat.RegistryFile)
 	if err != nil {
 		logp.Err("Could not init registrar: %v", err)
 		return err
 	}
 
-	fb.cralwer = &Crawler{
+	fb.cralwer = &crawler.Crawler{
 		Registrar: fb.registrar,
 	}
 
