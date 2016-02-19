@@ -70,7 +70,7 @@ func (proto *TestProtocol) ParseUdp(pkt *protos.Packet) {
 
 type TestStruct struct {
 	protocols *TestProtocols
-	udp       *Udp
+	udp       *UDP
 	plugin    *TestProtocol
 }
 

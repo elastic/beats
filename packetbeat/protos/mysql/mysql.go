@@ -150,11 +150,11 @@ func (mysql *Mysql) setFromConfig(config config.Mysql) error {
 
 	mysql.Ports = config.Ports
 
-	if config.Max_row_length != nil {
-		mysql.maxRowLength = *config.Max_row_length
+	if config.MaxRowLength != nil {
+		mysql.maxRowLength = *config.MaxRowLength
 	}
-	if config.Max_rows != nil {
-		mysql.maxStoreRows = *config.Max_rows
+	if config.MaxRows != nil {
+		mysql.maxStoreRows = *config.MaxRows
 	}
 	if config.SendRequest != nil {
 		mysql.Send_request = *config.SendRequest

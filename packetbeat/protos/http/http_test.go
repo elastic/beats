@@ -1042,7 +1042,7 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 func TestHttp_configsSettingAll(t *testing.T) {
 
 	http := httpModForTests()
-	config := new(config.Http)
+	config := new(config.HTTP)
 
 	// Assign config vars
 	config.Ports = []int{80, 8080}
@@ -1050,12 +1050,12 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	trueVar := true
 	config.SendRequest = &trueVar
 	config.SendResponse = &trueVar
-	config.Hide_keywords = []string{"a", "b"}
-	config.Redact_authorization = &trueVar
-	config.Send_all_headers = &trueVar
-	config.Split_cookie = &trueVar
+	config.HideKeywords = []string{"a", "b"}
+	config.RedactAuthorization = &trueVar
+	config.SendAllHeaders = &trueVar
+	config.SplitCookie = &trueVar
 	realIPHeader := "X-Forwarded-For"
-	config.Real_ip_header = &realIPHeader
+	config.RealIPHeader = &realIPHeader
 
 	// Set config
 	http.setFromConfig(*config)
@@ -1065,28 +1065,28 @@ func TestHttp_configsSettingAll(t *testing.T) {
 	assert.Equal(t, config.Ports, http.GetPorts())
 	assert.Equal(t, *config.SendRequest, http.SendRequest)
 	assert.Equal(t, *config.SendResponse, http.SendResponse)
-	assert.Equal(t, config.Hide_keywords, http.HideKeywords)
-	assert.Equal(t, *config.Redact_authorization, http.RedactAuthorization)
+	assert.Equal(t, config.HideKeywords, http.HideKeywords)
+	assert.Equal(t, *config.RedactAuthorization, http.RedactAuthorization)
 	assert.True(t, http.parserConfig.SendHeaders)
 	assert.True(t, http.parserConfig.SendAllHeaders)
-	assert.Equal(t, *config.Split_cookie, http.SplitCookie)
-	assert.Equal(t, strings.ToLower(*config.Real_ip_header), http.parserConfig.RealIPHeader)
+	assert.Equal(t, *config.SplitCookie, http.SplitCookie)
+	assert.Equal(t, strings.ToLower(*config.RealIPHeader), http.parserConfig.RealIPHeader)
 }
 
 func TestHttp_configsSettingHeaders(t *testing.T) {
 
 	http := httpModForTests()
-	config := new(config.Http)
+	config := new(config.HTTP)
 
 	// Assign config vars
-	config.Send_headers = []string{"a", "b", "c"}
+	config.SendHeaders = []string{"a", "b", "c"}
 
 	// Set config
 	http.setFromConfig(*config)
 
 	// Check if http config is set correctly
 	assert.True(t, http.parserConfig.SendHeaders)
-	assert.Equal(t, len(config.Send_headers), len(http.parserConfig.HeadersWhitelist))
+	assert.Equal(t, len(config.SendHeaders), len(http.parserConfig.HeadersWhitelist))
 
 	for _, val := range http.parserConfig.HeadersWhitelist {
 		assert.True(t, val)

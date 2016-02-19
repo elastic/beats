@@ -15,6 +15,7 @@ import (
 
 var debugf = logp.MakeDebug("decoder")
 
+// DecoderStruct information used for a packet decoder.
 type DecoderStruct struct {
 	decoders         map[gopacket.LayerType]gopacket.DecodingLayer
 	linkLayerDecoder gopacket.DecodingLayer
@@ -38,7 +39,7 @@ type DecoderStruct struct {
 	udpProc   udp.Processor
 }
 
-// Creates and returns a new DecoderStruct.
+// NewDecoder creates and returns a new DecoderStruct.
 func NewDecoder(
 	datalink layers.LinkType,
 	icmp4 icmp.ICMPv4Processor,
@@ -79,6 +80,7 @@ func NewDecoder(
 	return &d, nil
 }
 
+// DecodePacketData takes packet data from bytes to human intelligible data
 func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) {
 	defer logp.Recover("packet decoding failed")
 
@@ -118,16 +120,19 @@ func (d *DecoderStruct) DecodePacketData(data []byte, ci *gopacket.CaptureInfo) 
 	}
 }
 
+// SetTruncated sets the decoder to expect a truncated packet
 func (d *DecoderStruct) SetTruncated() {
 	d.truncated = true
 }
 
+// AddLayer adds another Open System Interconnection (OSI) layer to the decoder
 func (d *DecoderStruct) AddLayer(layer gopacket.DecodingLayer) {
 	for _, typ := range layer.CanDecode().LayerTypes() {
 		d.decoders[typ] = layer
 	}
 }
 
+// AddLayers adds multiple Open System Interconnection (OSI) layers to the decoder
 func (d *DecoderStruct) AddLayers(layers []gopacket.DecodingLayer) {
 	for _, layer := range layers {
 		d.AddLayer(layer)

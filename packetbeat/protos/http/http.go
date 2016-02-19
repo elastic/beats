@@ -83,7 +83,7 @@ func (http *HTTP) initDefaults() {
 	http.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
-func (http *HTTP) setFromConfig(config config.Http) (err error) {
+func (http *HTTP) setFromConfig(config config.HTTP) (err error) {
 
 	http.Ports = config.Ports
 
@@ -93,31 +93,31 @@ func (http *HTTP) setFromConfig(config config.Http) (err error) {
 	if config.SendResponse != nil {
 		http.SendResponse = *config.SendResponse
 	}
-	http.HideKeywords = config.Hide_keywords
-	if config.Redact_authorization != nil {
-		http.RedactAuthorization = *config.Redact_authorization
+	http.HideKeywords = config.HideKeywords
+	if config.RedactAuthorization != nil {
+		http.RedactAuthorization = *config.RedactAuthorization
 	}
 
-	if config.Send_all_headers != nil {
+	if config.SendAllHeaders != nil {
 		http.parserConfig.SendHeaders = true
 		http.parserConfig.SendAllHeaders = true
 	} else {
-		if len(config.Send_headers) > 0 {
+		if len(config.SendHeaders) > 0 {
 			http.parserConfig.SendHeaders = true
 
 			http.parserConfig.HeadersWhitelist = map[string]bool{}
-			for _, hdr := range config.Send_headers {
+			for _, hdr := range config.SendHeaders {
 				http.parserConfig.HeadersWhitelist[strings.ToLower(hdr)] = true
 			}
 		}
 	}
 
-	if config.Split_cookie != nil {
-		http.SplitCookie = *config.Split_cookie
+	if config.SplitCookie != nil {
+		http.SplitCookie = *config.SplitCookie
 	}
 
-	if config.Real_ip_header != nil {
-		http.parserConfig.RealIPHeader = strings.ToLower(*config.Real_ip_header)
+	if config.RealIPHeader != nil {
+		http.parserConfig.RealIPHeader = strings.ToLower(*config.RealIPHeader)
 	}
 
 	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
@@ -137,7 +137,7 @@ func (http *HTTP) Init(testMode bool, results publish.Transactions) error {
 	http.initDefaults()
 
 	if !testMode {
-		err := http.setFromConfig(config.ConfigSingleton.Protocols.Http)
+		err := http.setFromConfig(config.ConfigSingleton.Protocols.HTTP)
 		if err != nil {
 			return err
 		}
@@ -580,7 +580,7 @@ func (http *HTTP) cutMessageBody(m *message) []byte {
 }
 
 func (http *HTTP) shouldIncludeInBody(contenttype []byte) bool {
-	includedBodies := config.ConfigSingleton.Protocols.Http.Include_body_for
+	includedBodies := config.ConfigSingleton.Protocols.HTTP.IncludeBodyFor
 	for _, include := range includedBodies {
 		if bytes.Contains(contenttype, []byte(include)) {
 			if isDebug {

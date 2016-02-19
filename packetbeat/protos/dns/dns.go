@@ -4,7 +4,6 @@
 // RFC 4035 (DNS Security Extensions), but since those specifications only
 // add backwards compatible features there will be no issues handling the
 // messages.
-
 package dns
 
 import (
@@ -221,7 +220,7 @@ func (dns *Dns) initDefaults() {
 	dns.transactionTimeout = protos.DefaultTransactionExpiration
 }
 
-func (dns *Dns) setFromConfig(config config.Dns) error {
+func (dns *Dns) setFromConfig(config config.DNS) error {
 
 	dns.Ports = config.Ports
 
@@ -231,11 +230,11 @@ func (dns *Dns) setFromConfig(config config.Dns) error {
 	if config.SendResponse != nil {
 		dns.Send_response = *config.SendResponse
 	}
-	if config.Include_authorities != nil {
-		dns.Include_authorities = *config.Include_authorities
+	if config.IncludeAuthorities != nil {
+		dns.Include_authorities = *config.IncludeAuthorities
 	}
-	if config.Include_additionals != nil {
-		dns.Include_additionals = *config.Include_additionals
+	if config.IncludeAdditionals != nil {
+		dns.Include_additionals = *config.IncludeAdditionals
 	}
 	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
 		dns.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
@@ -247,7 +246,7 @@ func (dns *Dns) setFromConfig(config config.Dns) error {
 func (dns *Dns) Init(test_mode bool, results publish.Transactions) error {
 	dns.initDefaults()
 	if !test_mode {
-		dns.setFromConfig(config.ConfigSingleton.Protocols.Dns)
+		dns.setFromConfig(config.ConfigSingleton.Protocols.DNS)
 	}
 
 	dns.transactions = common.NewCacheWithRemovalListener(
