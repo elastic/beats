@@ -14,7 +14,7 @@ var Module = helper.NewModule("prometheus", Prometheus{})
 var Config = &PrometheusModuleConfig{}
 
 type PrometheusModuleConfig struct {
-	Name string
+	Name    string
 	Metrics map[string]interface{}
 	Hosts   []string
 }
@@ -26,8 +26,8 @@ type Prometheus struct {
 
 func (r Prometheus) Setup() error {
 
-// Loads module config
-// This is module specific config object
+	// Loads module config
+	// This is module specific config object
 	Module.LoadConfig(&Config)
 	Module.Name = Config.Name
 	return nil
@@ -37,10 +37,10 @@ func (r Prometheus) Setup() error {
 
 func GetPrometheusEnvHostPort() string {
 	host := os.Getenv("PROMETHEUS_EXPORTER_HOST") + ":"
-		+ os.Getenv("PROMETHEUS_EXPORTER_PORT")
+	+os.Getenv("PROMETHEUS_EXPORTER_PORT")
 	if len(host) == 0 {
 		host = "127.0.0.1:8080/"
 	}
 
-return host
+	return host
 }

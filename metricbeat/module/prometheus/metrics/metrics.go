@@ -1,4 +1,5 @@
 package metrics
+
 //read data from the /metrics endpoint and generate metrics from the same
 import (
 	"fmt"
@@ -47,10 +48,10 @@ func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
 
 		decoder := expfmt.NewDecoder(resp.Body, format)
 		result := []*dto.MetricFamily{}
-		for (err == nil) {
+		for err == nil {
 			mf := &dto.MetricFamily{}
 			err = decoder.Decode(mf)
-			if (err == nil) {
+			if err == nil {
 				result = append(result, mf)
 			}
 		}
@@ -58,16 +59,16 @@ func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
 		for _, mf := range result {
 			name := *mf.Name
 			metrics := mf.Metric
-			for _, metric := range metrics  {
+			for _, metric := range metrics {
 				event := common.MapStr{}
 				event["name"] = name
 
 				labels := metric.Label
 
-				if (len(labels) != 0) {
-					tagsMap := common.MapStr{};
+				if len(labels) != 0 {
+					tagsMap := common.MapStr{}
 					for _, label := range labels {
-						if (label.GetName() != "" && label.GetValue() != "") {
+						if label.GetName() != "" && label.GetValue() != "" {
 							tagsMap[label.GetName()] = label.GetValue()
 						}
 					}
@@ -75,19 +76,18 @@ func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
 
 				}
 
-				counter := metric.GetCounter();
-				if (counter != nil) {
+				counter := metric.GetCounter()
+				if counter != nil {
 					event["value"] = counter.GetValue()
 				}
 
-				guage := metric.GetGauge();
-				if (guage != nil) {
+				guage := metric.GetGauge()
+				if guage != nil {
 					event["value"] = guage.GetValue()
 				}
 
-
-				summary := metric.GetSummary();
-				if (summary != nil) {
+				summary := metric.GetSummary()
+				if summary != nil {
 					sum := strconv.FormatFloat(summary.GetSampleSum(), 'f', -1, 64)
 					event["sum"] = sum
 
@@ -96,7 +96,7 @@ func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
 
 					quantiles := summary.GetQuantile()
 
-					percentileMap := common.MapStr{};
+					percentileMap := common.MapStr{}
 					for _, quantile := range quantiles {
 						key := strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 						value := strconv.FormatFloat(quantile.GetValue(), 'f', -1, 64)
@@ -107,14 +107,14 @@ func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
 				}
 
 				histogram := metric.GetHistogram()
-				if (histogram != nil) {
+				if histogram != nil {
 					sum := strconv.FormatUint(histogram.GetSampleCount(), 10)
 					event["sum"] = sum
 
 					count := strconv.FormatUint(histogram.GetSampleCount(), 10)
 					event["count"] = count
 					buckets := histogram.GetBucket()
-					bucketMap := common.MapStr{};
+					bucketMap := common.MapStr{}
 					for _, bucket := range buckets {
 						key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 						value := strconv.FormatUint(bucket.GetCumulativeCount(), 10)
