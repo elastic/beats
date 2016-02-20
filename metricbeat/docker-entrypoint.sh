@@ -59,8 +59,29 @@ waitForMySQL() {
     echo >&2 "Address: ${MYSQL_HOST}:${MYSQL_PORT}"
 }
 
+waitForPrometheusExporter() {
+    echo -n "Waiting for Prometheus exporter(${PROMETHEUS_EXPORTER_HOST}:${PROMETHEUS_EXPORTER_PORT}) to start."
+    for ((i=1; i<=90; i++)) do
+        if nc -vz ${PROMETHEUS_EXPORTER_HOST} ${PROMETHEUS_EXPORTER_PORT} 2>/dev/null; then
+            echo
+            echo "Prometheus exporter is ready!"
+            return 0
+        fi
+
+        ((i++))
+        echo -n '.'
+        sleep 1
+    done
+
+    echo
+    echo >&2 'Prometheus exporter is not available'
+    echo >&2 "Address: ${PROMETHEUS_EXPORTER_HOST}:${PROMETHEUS_EXPORTER_PORT}"
+}
+
+
 # Main
 waitForApache
 waitForRedis
 waitForMySQL
+waitForPrometheusExporter
 exec "$@"
