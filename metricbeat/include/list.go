@@ -19,6 +19,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
+	_ "github.com/elastic/beats/metricbeat/module/prometheus/metrics"
 )
 
 func ListAll() {
