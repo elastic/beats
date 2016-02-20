@@ -36,7 +36,7 @@ const (
 	SidTypeLabel
 )
 
-// Mapping of SID types to their string representations.
+// sidTypeToString is a mapping of SID types to their string representations.
 var sidTypeToString = map[SIDType]string{
 	SidTypeUser:           "User",
 	SidTypeGroup:          "Group",
@@ -77,6 +77,7 @@ type InsufficientBufferError struct {
 	RequiredSize int // Size of the buffer that is required.
 }
 
+// Error returns the cause of the insufficient buffer error.
 func (e InsufficientBufferError) Error() string {
 	return e.Cause.Error()
 }
