@@ -1,0 +1,25 @@
+package: github.com/elastic/beats/metricbeat/module/prometheus
+import:
+- package: github.com/prometheus/client_model
+  subpackages:
+  - go
+- package: github.com/prometheus/common
+  subpackages:
+  - expfmt
+- package: github.com/golang/protobuf
+  subpackages:
+  - /proto
+- package: github.com/julienschmidt/httprouter
+- package: github.com/matttproud/golang_protobuf_extensions
+  subpackages:
+  - /pbutil
+- package: golang.org/x/net
+  subpackages:
+  - /context
+- package: github.com/Sirupsen/logrus
+- package: golang.org/x/crypto
+  subpackages:
+  - /ssh/terminal
+- package: gopkg.in/gemnasium/logrus-airbrake-hook.v2
+- package: gopkg.in/airbrake/gobrake.v2
+- package: github.com/onsi/ginkgo

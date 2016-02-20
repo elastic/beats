@@ -1,6 +1,7 @@
 package prometheus
 
 import (
+	"fmt"
 	"github.com/elastic/beats/metricbeat/helper"
 	"os"
 )
@@ -36,8 +37,8 @@ func (r Prometheus) Setup() error {
 ///*** Helper functions for testing ***///
 
 func GetPrometheusEnvHostPort() string {
-	host := os.Getenv("PROMETHEUS_EXPORTER_HOST") + ":"
-	+os.Getenv("PROMETHEUS_EXPORTER_PORT")
+	host := fmt.Sprint(os.Getenv("PROMETHEUS_EXPORTER_HOST"), ":",
+		os.Getenv("PROMETHEUS_EXPORTER_PORT"))
 	if len(host) == 0 {
 		host = "127.0.0.1:8080/"
 	}
