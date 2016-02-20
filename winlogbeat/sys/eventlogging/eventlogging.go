@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// Event represents a Windows Event within the Windows Event Log after it has
+// been converted from bytes to a structure.
 type Event struct {
 	RecordID      uint32     `json:",omitempty"`
 	TimeGenerated *time.Time `json:",omitempty"`
