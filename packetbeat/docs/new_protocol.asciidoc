@@ -4,11 +4,16 @@
 
 [partintro]
 --
-This guide walks you through the steps needed to add a new protocol to
-Packetbeat.
+The following topics walk you through the steps needed to add a new protocol to
+Packetbeat:
+
+* <<getting-ready-new-protocol>>
+* <<protocol-modules>>
+* <<testing>>
 
 --
 
+[[getting-ready-new-protocol]]
 == Getting Ready
 
 Packetbeat is written in http://golang.org/[Go], so having Go installed and knowing the basics are prerequisites for understanding this guide. But don't worry if you aren't a Go expert. Go is a relatively new language, and very few people are experts in it. In fact, several people learned Go by contributing to Packetbeat and libbeat, including the original Packetbeat authors.
@@ -89,6 +94,7 @@ $ git push --set-upstream tsg cool_new_protocol
   the branch after creating the PR. Submitting the PR early gives us more time to
   provide feedback and perhaps help you with it.
 
+[[protocol-modules]]
 == Protocol Modules
 
 Packetbeat's source code is split up in Go packages or modules. The protocol
@@ -176,6 +182,7 @@ loss is detected in a TCP stream. The protocol module can use these callbacks to
 decisions about what to do with partial data that it receives. For example, for the
 HTTP/1.0 protocol, the end of connection is used to know when the message is
 finished.
+
 
 [float]
 === Registering Your Plugin
@@ -560,7 +567,7 @@ application layer transaction type to make use of it. Here is an example from th
 Use `applayer.Message` in conjunction with `applayer.Transaction` for creating the
 transaction and `applayer.Stream` to manage your stream buffers for parsing.
 
-
+[[testing]]
 == Testing
 
 [float]
