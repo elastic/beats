@@ -12,6 +12,7 @@ https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from an Ela
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
+https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
