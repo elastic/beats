@@ -16,7 +16,7 @@ import (
 	_ "net/http/pprof"
 )
 
-// Handles OS signals that ask the service/daemon to stop.
+// HandleSignals manages OS signals that ask the service/daemon to stop.
 // The stopFunction should break the loop in the Beat so that
 // the service shut downs gracefully.
 func HandleSignals(stopFunction func()) {
@@ -48,17 +48,20 @@ func init() {
 	httpprof = flag.String("httpprof", "", "Start pprof http server")
 }
 
+// WithMemProfile returns whether the beat should write the memory profile to file
 func WithMemProfile() bool {
 	return *memprofile != ""
 }
 
+// WithCpuProfile returns whether the beat should write the CPU profile file
 func WithCpuProfile() bool {
 	return *cpuprofile != ""
 }
 
+// BeforeRun takes care of necessary actions such as creating files
+// before the beat should run.
 func BeforeRun() {
-
-	if *cpuprofile != "" {
+	if WithCpuProfile() {
 		cpuOut, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
@@ -74,13 +77,15 @@ func BeforeRun() {
 	}
 }
 
+// Cleanup handles cleaning up the runtime and OS environments. This includes
+// tasks such as stopping the CPU profile if it is running.
 func Cleanup() {
-	if *cpuprofile != "" {
+	if WithCpuProfile() {
 		pprof.StopCPUProfile()
 		cpuOut.Close()
 	}
 
-	if *memprofile != "" {
+	if WithMemProfile() {
 		runtime.GC()
 
 		writeHeapProfile(*memprofile)

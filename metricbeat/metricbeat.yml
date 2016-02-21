@@ -5,7 +5,7 @@ metricbeat:
     #    expvar:
     #      period: 10s
     apache:
-      hosts: "http://127.0.0.1/"
+      hosts: ["http://127.0.0.1/"]
       metricsets:
         status:
           period: 1s
