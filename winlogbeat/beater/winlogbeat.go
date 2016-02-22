@@ -45,6 +45,7 @@ type log struct {
 	eventLog eventlog.EventLog
 }
 
+// Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
 	beat       *beat.Beat             // Common beat information.
 	config     *config.Settings       // Configuration settings.
@@ -59,6 +60,7 @@ func New() *Winlogbeat {
 	return &Winlogbeat{}
 }
 
+// Config sets up the necessary configuration to use the winlogbeat
 func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	// Read configuration.
 	err := cfgfile.Read(&eb.config, "")
@@ -89,6 +91,8 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	return nil
 }
 
+// Setup uses the loaded config and creates necessary markers and environment
+// settings to allow the beat to be used.
 func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
 	eb.client = b.Events
@@ -120,6 +124,7 @@ func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	return nil
 }
 
+// Run is used within the beats interface to execute the winlogbeat.
 func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	persistedState := eb.checkpoint.States()
 
@@ -168,6 +173,8 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
+// Cleanup attempts to remove any files or data it may have created which should
+// not be persisted.
 func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 	logp.Info("Dumping runtime metrics...")
 	expvar.Do(func(kv expvar.KeyValue) {
@@ -181,6 +188,7 @@ func (eb *Winlogbeat) Cleanup(b *beat.Beat) error {
 	return nil
 }
 
+// Stop is used to tell the winlogbeat that it should cease executing.
 func (eb *Winlogbeat) Stop() {
 	logp.Info("Stopping Winlogbeat")
 	if eb.done != nil {

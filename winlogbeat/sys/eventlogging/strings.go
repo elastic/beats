@@ -29,8 +29,9 @@ func UTF16BytesToString(b []byte) (string, int, error) {
 	return string(utf16.Decode(s)), offset, nil
 }
 
-// RemoveWindowsLineEndings replaces CRLF with LF and trims any newline
-// character that may exist at the end of the string.
+// RemoveWindowsLineEndings replaces carriage return line feed (CRLF) with
+// line feed (LF) and trims any newline character that may exist at the end
+// of the string.
 func RemoveWindowsLineEndings(s string) string {
 	s = strings.Replace(s, "\r\n", "\n", -1)
 	return strings.TrimRight(s, "\n")

@@ -1,13 +1,13 @@
 /*
 
-Beat provides the basic environment for each beat.
+Package beat provides the basic environment for each beat.
 
 Each beat implementation has to implement the beater interface.
 
 
 # Start / Stop / Exit a Beat
 
-A beat is start by calling the Run(name string, version string, bt Beater) function an passing the beater object.
+A beat is start by calling the Run(name string, version string, bt Beater) function and passing the beater object.
 This will create new beat and will Start the beat in its own go process. The Run function is blocked until
 the Beat.exit channel is closed. This can be done through calling Beat.Exit(). This happens for example when CTRL-C
 is pressed.
@@ -54,7 +54,7 @@ type FlagsHandler interface {
 	HandleFlags(*Beat)
 }
 
-// Basic beat information
+// Beat struct contains the basic beat information
 type Beat struct {
 	Name      string
 	Version   string
@@ -79,7 +79,7 @@ const (
 	RunState    = 3
 )
 
-// Basic configuration of every beat
+// BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
 	Output  map[string]outputs.MothershipConfig
 	Logging logp.Logging
@@ -93,7 +93,7 @@ func init() {
 	printVersion = flag.Bool("version", false, "Print version and exit")
 }
 
-// Initiates a new beat object
+// NewBeat initiates a new beat object
 func NewBeat(name string, version string, bt Beater) *Beat {
 	if version == "" {
 		version = defaultBeatVersion
@@ -111,7 +111,7 @@ func NewBeat(name string, version string, bt Beater) *Beat {
 	return &b
 }
 
-// Initiates and runs a new beat object
+// Run initiates and runs a new beat object
 func Run(name string, version string, bt Beater) error {
 
 	b := NewBeat(name, version, bt)
@@ -174,7 +174,7 @@ func (b *Beat) Start() error {
 	return b.Run()
 }
 
-// Reads and parses the default command line params
+// CommandLineSetup reads and parses the default command line params
 // To set additional cmd line args use the beat.CmdLine type before calling the function
 // The second return param is to detect if system should exit. True if should exit
 // Exit can also be without error
@@ -300,7 +300,7 @@ func (b *Beat) Stop() {
 	b.setState(StopState)
 }
 
-// Exiting beat -> shutdown
+// Exit begins exiting the beat and initiating shutdown
 func (b *Beat) Exit() {
 
 	b.callback.Do(func() {
@@ -309,14 +309,14 @@ func (b *Beat) Exit() {
 	})
 }
 
-// Updates the state
+// setState updates the state
 func (b *Beat) setState(state int8) {
 	b.stateMutex.Lock()
 	defer b.stateMutex.Unlock()
 	b.state = state
 }
 
-// Fetches the state
+// getState fetches the state
 func (b *Beat) getState() int8 {
 	b.stateMutex.Lock()
 	defer b.stateMutex.Unlock()

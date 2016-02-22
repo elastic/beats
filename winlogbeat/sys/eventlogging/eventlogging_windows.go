@@ -33,6 +33,7 @@ func EventLogs() ([]string, error) {
 	return nil, fmt.Errorf("Not implemented yet.")
 }
 
+// OpenEventLog opens the Windows Event Log and returns the handle for it.
 func OpenEventLog(uncServerPath, logName string) (Handle, error) {
 	// If uncServerPath is nil the local computer is used.
 	var server *uint16
@@ -57,6 +58,8 @@ func OpenEventLog(uncServerPath, logName string) (Handle, error) {
 	return handle, nil
 }
 
+// ReadEventLog takes the handle for the Windows Event Log, and reads through a
+// buffer to prevent buffer overflows.
 func ReadEventLog(
 	handle Handle,
 	flags EventLogReadFlag,
@@ -82,6 +85,8 @@ func ReadEventLog(
 	return int(numBytesRead), nil
 }
 
+// RenderEvents takes raw events, formats them into a structured event, and adds
+// each event to a slice. The slice of formatted events is then returned.
 func RenderEvents(
 	eventsRaw []byte,
 	lang uint32,
@@ -141,11 +146,15 @@ func RenderEvents(
 	return events, 0, nil
 }
 
+// unixTime takes a time which is an unsigned 32-bit integer, and converts it
+// into a Golang time.Time pointer formatted as a unix time.
 func unixTime(sec uint32) *time.Time {
 	t := time.Unix(int64(sec), 0)
 	return &t
 }
 
+// formatmessage takes event data and formats the event message into a
+// normalized format.
 func formatMessage(
 	sourceName string,
 	eventID uint32,
@@ -412,6 +421,8 @@ func parseSID(record eventLogRecord, buffer []byte) (*SID, error) {
 	}, nil
 }
 
+// ClearEventLog takes an event log file handle and empties the log. If a backup
+// filename is provided, this will back up the event log before clearing the logs.
 func ClearEventLog(handle Handle, backupFileName string) error {
 	var name *uint16
 	if backupFileName != "" {
@@ -425,6 +436,8 @@ func ClearEventLog(handle Handle, backupFileName string) error {
 	return _ClearEventLog(handle, name)
 }
 
+// GetNumberOfEventLogRecords retrieves the number of events within a Windows
+// log file handle.
 func GetNumberOfEventLogRecords(handle Handle) (uint32, error) {
 	var numRecords uint32
 	err := _GetNumberOfEventLogRecords(handle, &numRecords)
@@ -435,6 +448,8 @@ func GetNumberOfEventLogRecords(handle Handle) (uint32, error) {
 	return numRecords, nil
 }
 
+// GetOldestEventLogRecord retrieves the oldest event within a Windows log file
+// handle and returns the raw event.
 func GetOldestEventLogRecord(handle Handle) (uint32, error) {
 	var oldestRecord uint32
 	err := _GetOldestEventLogRecord(handle, &oldestRecord)
@@ -454,6 +469,8 @@ func FreeLibrary(handle uintptr) error {
 	return windows.FreeLibrary(windows.Handle(handle))
 }
 
+// CloseEventLog takes an event log file handle, and closes the handle via
+// _CloseEventLog
 func CloseEventLog(handle Handle) error {
 	return _CloseEventLog(handle)
 }

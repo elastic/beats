@@ -13,6 +13,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/dustin/go-humanize"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -105,6 +107,8 @@ func (client *Client) Clone() *Client {
 func (client *Client) PublishEvents(
 	events []common.MapStr,
 ) ([]common.MapStr, error) {
+
+	begin := time.Now()
 	publishEventsCallCount.Add(1)
 
 	if !client.connected {
@@ -126,11 +130,17 @@ func (client *Client) PublishEvents(
 	}
 
 	// send bulk request
+	bufferSize := request.buf.Len()
 	_, res, err := request.Flush()
 	if err != nil {
 		logp.Err("Failed to perform any bulk index operations: %s", err)
 		return events, err
 	}
+
+	logp.Debug("elasticsearch", "PublishEvents: %d metrics have been packed into a buffer of %s and published to elasticsearch in %v.",
+		len(events),
+		humanize.Bytes(uint64(bufferSize)),
+		time.Now().Sub(begin))
 
 	// check response for transient errors
 	client.json.init(res.raw)

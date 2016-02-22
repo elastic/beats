@@ -12,6 +12,7 @@ https://github.com/radoondas/elasticbeat[elasticbeat]:: Reads status from Elasti
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
 https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
+https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses and indexes http://www.sflow.org/index.php[sflow] samples.
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
@@ -24,6 +25,7 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/chrsblck/redisbeat[redisbeat]:: Used for Redis monitoring.
+https://github.com/gravitational/udpbeat[udpbeat]:: Ship Structured Logs via UDP
 
 Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for     
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in GitHub to get your change merged. 
