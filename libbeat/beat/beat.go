@@ -7,7 +7,7 @@ Each beat implementation has to implement the beater interface.
 
 # Start / Stop / Exit a Beat
 
-A beat is start by calling the Run(name string, version string, bt Beater) function an passing the beater object.
+A beat is start by calling the Run(name string, version string, bt Beater) function and passing the beater object.
 This will create new beat and will Start the beat in its own go process. The Run function is blocked until
 the Beat.exit channel is closed. This can be done through calling Beat.Exit(). This happens for example when CTRL-C
 is pressed.
