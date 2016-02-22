@@ -1,15 +1,15 @@
 [[topbeat-getting-started]]
-== Getting Started
+== Getting Started With Topbeat
 
 Topbeat helps you monitor the availability of your website or service by providing system-wide and per-process
 statistics along with a disk usage overview.
 
 To get started with your own Topbeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. 
+ * Elasticsearch for storage and indexing the data.
  * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
- 
+
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After you have installed these products, you can start <<topbeat-installation>>.
@@ -24,9 +24,9 @@ mac>> for OS X, and <<win, win>> for Windows).
 
 [NOTE]
 ==================================================
-If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Topbeat from our repositories] to update to the newest version more easily. 
+If you use Apt or Yum, you can {libbeat}/setup-repositories.html[install Topbeat from our repositories] to update to the newest version more easily.
 
-See our https://www.elastic.co/downloads/beats/topbeat[download page] for other installation options, such as 32-bit images. 
+See our https://www.elastic.co/downloads/beats/topbeat[download page] for other installation options, such as 32-bit images.
 ==================================================
 
 [[deb]]
@@ -76,7 +76,7 @@ PS > cd 'C:\Program Files\Topbeat'
 PS C:\Program Files\Topbeat> .\install-service-topbeat.ps1
 ----------------------------------------------------------------------
 
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-topbeat.ps1`. 
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-topbeat.ps1`.
 
 Before starting Topbeat, you should look at the configuration options in the configuration file,
 for example `C:\Program Files\Topbeat\topbeat.yml`. For more information about these options, see <<topbeat-configuration-options>>.
@@ -89,7 +89,7 @@ find the configuration file at `/etc/topbeat/topbeat.yml`. For mac and win, look
 the archive that you just extracted.
 
 Here is a sample of the `topbeat.yml` file. Topbeat uses predefined
-default values for most configuration options. 
+default values for most configuration options.
 
 [source, shell]
 -------------------------------------
@@ -267,4 +267,3 @@ http://www.elastic.co/guide/en/kibana/current/index.html[Kibana User Guide].
 
 
 Enjoy!
-
