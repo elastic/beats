@@ -33,11 +33,12 @@ func TestUnpackPrimitiveValues(t *testing.T) {
 		}{},
 	}
 
-	c := New()
-	c.SetBool("b", 0, true)
-	c.SetInt("i", 0, 42)
-	c.SetFloat("f", 0, 3.14)
-	c.SetString("s", 0, "string")
+	c, _ := NewFrom(node{
+		"b": true,
+		"i": 42,
+		"f": 3.14,
+		"s": "string",
+	})
 
 	for i, out := range tests {
 		t.Logf("test unpack primitives(%v) into: %v", i, out)
@@ -51,8 +52,7 @@ func TestUnpackPrimitiveValues(t *testing.T) {
 	for i, in := range tests {
 		t.Logf("test unpack primitives(%v) check: %v", i, in)
 
-		c := New()
-		err := c.Merge(in)
+		c, err := NewFrom(in)
 		if err != nil {
 			t.Errorf("failed")
 			continue
@@ -84,10 +84,8 @@ func TestUnpackNested(t *testing.T) {
 		return s
 	}
 
-	sub := New()
-	sub.SetBool("b", 0, true)
-	c := New()
-	c.SetChild("c", 0, sub)
+	sub, _ := NewFrom(node{"b": true})
+	c, _ := NewFrom(node{"c": sub})
 
 	t.Logf("sub: %v", sub)
 	t.Logf("c: %v", c)
@@ -150,8 +148,7 @@ func TestUnpackNested(t *testing.T) {
 	for i, in := range tests {
 		t.Logf("test unpack nested(%v) check: %v", i, in)
 
-		c := New()
-		err := c.Merge(in)
+		c, err := NewFrom(in)
 		if err != nil {
 			t.Errorf("failed")
 			continue
@@ -167,10 +164,7 @@ func TestUnpackNested(t *testing.T) {
 }
 
 func TestUnpackArray(t *testing.T) {
-	c := New()
-	c.SetInt("a", 0, 1)
-	c.SetInt("a", 1, 2)
-	c.SetInt("a", 2, 3)
+	c, _ := NewFrom(node{"a": []int{1, 2, 3}})
 
 	tests := []interface{}{
 		map[string]interface{}{},
@@ -214,8 +208,7 @@ func TestUnpackArray(t *testing.T) {
 	for i, in := range tests {
 		t.Logf("test unpack nested(%v) check: %v", i, in)
 
-		c := New()
-		err := c.Merge(in)
+		c, err := NewFrom(in)
 		if err != nil {
 			t.Errorf("failed")
 			continue

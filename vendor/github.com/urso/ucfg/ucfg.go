@@ -22,6 +22,10 @@ var (
 
 	ErrArraySizeMistach = errors.New("Array size mismatch")
 
+	ErrNilConfig = errors.New("config is nil")
+
+	ErrNilValue = errors.New("unexpected nil value")
+
 	ErrTODO = errors.New("TODO - implement me")
 )
 
@@ -35,6 +39,14 @@ func New() *Config {
 	return &Config{
 		fields: make(map[string]value),
 	}
+}
+
+func NewFrom(from interface{}) (*Config, error) {
+	c := New()
+	if err := c.Merge(from); err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func (c *Config) GetFields() []string {

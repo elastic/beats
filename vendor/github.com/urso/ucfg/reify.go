@@ -3,6 +3,13 @@ package ucfg
 import "reflect"
 
 func (c *Config) Unpack(to interface{}) error {
+	if c == nil {
+		return ErrNilConfig
+	}
+	if to == nil {
+		return ErrNilValue
+	}
+
 	vTo := reflect.ValueOf(to)
 	if to == nil || (vTo.Kind() != reflect.Ptr && vTo.Kind() != reflect.Map) {
 		return ErrPointerRequired

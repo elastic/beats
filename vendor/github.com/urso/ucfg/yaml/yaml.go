@@ -9,17 +9,10 @@ import (
 
 func NewConfig(in []byte) (*ucfg.Config, error) {
 	var m map[string]interface{}
-
 	if err := yaml.Unmarshal(in, &m); err != nil {
 		return nil, err
 	}
-
-	c := ucfg.New()
-	if err := c.Merge(m); err != nil {
-		return nil, err
-	}
-
-	return c, nil
+	return ucfg.NewFrom(m)
 }
 
 func NewConfigWithFile(name string) (*ucfg.Config, error) {

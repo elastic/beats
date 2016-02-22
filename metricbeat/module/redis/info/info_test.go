@@ -3,6 +3,8 @@ package info
 import (
 	"testing"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/metricbeat/module/redis"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +16,11 @@ func TestConnect(t *testing.T) {
 	}
 
 	// Setup
-	redis.Module.BaseConfig.Hosts = []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()}
+	redis.Module.Config, _ = ucfg.NewFrom(map[string]interface{}{
+		"hosts": []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
+	})
+	MetricSet.Config = ucfg.New()
+
 	r := MetricSeter{}
 	err := r.Setup()
 	assert.NoError(t, err)
