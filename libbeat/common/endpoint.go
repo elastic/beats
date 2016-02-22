@@ -1,6 +1,6 @@
 package common
 
-// Representing an endpoint in the communication.
+// Endpoint represents an endpoint in the communication.
 type Endpoint struct {
 	Ip      string
 	Port    uint16

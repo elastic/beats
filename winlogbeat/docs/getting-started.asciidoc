@@ -1,12 +1,12 @@
 [[winlogbeat-getting-started]]
-== Getting Started
+== Getting Started With Winlogbeat
 
 To get started with your own Winlogbeat setup, install and configure these related products:
 
- * Elasticsearch for storage and indexing the data. 
- * Kibana for the UI. 
+ * Elasticsearch for storage and indexing the data.
+ * Kibana for the UI.
  * Logstash (optional) for inserting data into Elasticsearch.
- 
+
 See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic Stack] for more information.
 
 After you have installed these products, you can start <<winlogbeat-installation>>.
@@ -78,7 +78,7 @@ logging:
 To configure Winlogbeat:
 
 . In the `event_logs` section, specify the event logs that you want to monitor. By
-default, Winlogbeat is set to monitor application, security, and system logs: 
+default, Winlogbeat is set to monitor application, security, and system logs:
 +
 [source,yaml]
 ----------------------------------------------------------------------
@@ -89,7 +89,7 @@ default, Winlogbeat is set to monitor application, security, and system logs:
 ----------------------------------------------------------------------
 +
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell. For more
-information about this command, see the configuration details for 
+information about this command, see the configuration details for
 <<configuration-winlogbeat-options-event_logs-name,event_logs.name>>.
 
 . If you are sending output to Elasticsearch, set the IP address and port where

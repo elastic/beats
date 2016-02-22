@@ -18,7 +18,7 @@ type RemovalListener func(k Key, v Value)
 // Clock is the function type used to get the current time.
 type clock func() time.Time
 
-// An element stored in the cache.
+// element represents an element stored in the cache.
 type element struct {
 	expiration time.Time
 	timeout    time.Duration

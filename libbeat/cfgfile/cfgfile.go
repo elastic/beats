@@ -57,12 +57,13 @@ func Read(out interface{}, path string) error {
 	filecontent = expandEnv(filecontent)
 
 	if err = yaml.Unmarshal(filecontent, out); err != nil {
-		return fmt.Errorf("YAML config parsing failed on %s: %v. Exiting.", path, err)
+		return fmt.Errorf("YAML config parsing failed on %s: %v. Exiting", path, err)
 	}
 
 	return nil
 }
 
+// IsTestConfig returns whether or not this is configuration used for testing
 func IsTestConfig() bool {
 	return *testConfig
 }

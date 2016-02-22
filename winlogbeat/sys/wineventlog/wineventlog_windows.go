@@ -316,8 +316,8 @@ func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 	return h, nil
 }
 
-// Create a render context. Close must be called on returned EvtHandle when
-// finished with the handle.
+// CreateRenderContext creates a render context. Close must be called on
+// returned EvtHandle when finished with the handle.
 func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
 	context, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 	if err != nil {
