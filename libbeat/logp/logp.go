@@ -17,8 +17,8 @@ var debugSelectorsStr *string
 type Logging struct {
 	Selectors []string
 	Files     *FileRotator
-	ToSyslog  *bool `yaml:"to_syslog"`
-	ToFiles   *bool `yaml:"to_files"`
+	ToSyslog  *bool `config:"to_syslog"`
+	ToFiles   *bool `config:"to_files"`
 	Level     string
 }
 

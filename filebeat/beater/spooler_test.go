@@ -4,15 +4,31 @@ import (
 	"testing"
 	"time"
 
+	"github.com/urso/ucfg/yaml"
+
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
-func TestNewSpoolerDefaultConfig(t *testing.T) {
+func load(t *testing.T, in string) cfg.FilebeatConfig {
+	yaml, err := yaml.NewConfig([]byte(in))
+	if err != nil {
+		t.Fatalf("Failed to parse config input: %v", err)
+	}
+
 	var config cfg.FilebeatConfig
+	err = yaml.Unpack(&config)
+	if err != nil {
+		t.Fatalf("Failed to unpack config: %v", err)
+	}
+
+	return config
+}
+
+func TestNewSpoolerDefaultConfig(t *testing.T) {
+	config := load(t, "")
+
 	// Read from empty yaml config
-	yaml.Unmarshal([]byte(""), &config)
 	spooler := NewSpooler(config, nil)
 
 	assert.Equal(t, cfg.DefaultSpoolSize, spooler.spoolSize)
@@ -28,8 +44,7 @@ func TestNewSpoolerSpoolSize(t *testing.T) {
 }
 
 func TestNewSpoolerIdleTimeout(t *testing.T) {
-	var config cfg.FilebeatConfig
-	yaml.Unmarshal([]byte("idle_timeout: 10s"), &config)
+	config := load(t, "idle_timeout: 10s")
 	spooler := NewSpooler(config, nil)
 
 	assert.Equal(t, time.Duration(10*time.Second), spooler.idleTimeout)

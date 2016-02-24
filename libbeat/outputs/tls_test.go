@@ -4,16 +4,21 @@ import (
 	"crypto/tls"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/urso/ucfg/yaml"
 
-	"gopkg.in/yaml.v2"
+	"github.com/stretchr/testify/assert"
 )
 
 // test TLS config loading
 
 func load(yamlStr string) (*TLSConfig, error) {
 	var cfg TLSConfig
-	if err := yaml.Unmarshal([]byte(yamlStr), &cfg); err != nil {
+	config, err := yaml.NewConfig([]byte(yamlStr))
+	if err != nil {
+		return nil, err
+	}
+
+	if err = config.Unpack(&cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil

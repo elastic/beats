@@ -32,10 +32,10 @@ type Settings struct {
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	IgnoreOlder  string           `yaml:"ignore_older"`
-	EventLogs    []EventLogConfig `yaml:"event_logs"`
-	Metrics      MetricsConfig    `yaml:"metrics"`
-	RegistryFile string           `yaml:"registry_file"`
+	IgnoreOlder  string           `config:"ignore_older"`
+	EventLogs    []EventLogConfig `config:"event_logs"`
+	Metrics      MetricsConfig    `config:"metrics"`
+	RegistryFile string           `config:"registry_file"`
 }
 
 // Validate validates the WinlogbeatConfig data and returns an error describing
@@ -106,7 +106,7 @@ func (mc MetricsConfig) Validate() error {
 // to monitor.
 type EventLogConfig struct {
 	Name        string
-	IgnoreOlder string `yaml:"ignore_older"`
+	IgnoreOlder string `config:"ignore_older"`
 	API         string
 }
 
