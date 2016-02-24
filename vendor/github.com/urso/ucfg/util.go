@@ -13,7 +13,8 @@ func parseTags(tag string) (string, tagOptions) {
 	s := strings.Split(tag, ",")
 	opts := tagOptions{}
 	for _, opt := range s[1:] {
-		if opt == "squash" {
+		switch opt {
+		case "squash", "inline":
 			opts.squash = true
 		}
 	}

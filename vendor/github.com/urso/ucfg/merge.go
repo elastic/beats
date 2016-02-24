@@ -1,29 +1,17 @@
 package ucfg
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
-func (c *Config) Merge(from interface{}) error {
-	return mergeInto(c.fields, reflect.ValueOf(from))
-}
-
-func mergeInto(to map[string]value, from reflect.Value) error {
-	vFrom := chaseValue(from)
-
-	switch vFrom.Type() {
-	case tConfig:
-		return mergeConfig(to, vFrom.Convert(tConfig).Interface().(Config).fields)
-	case tConfigMap:
-		return mergeMap(to, vFrom)
-	default:
-		switch vFrom.Kind() {
-		case reflect.Struct:
-			return mergeStruct(to, vFrom)
-		case reflect.Map:
-			return mergeMap(to, vFrom)
-		}
-
-		return ErrTypeMismatch
+func (c *Config) Merge(from interface{}, options ...Option) error {
+	opts := makeOptions(options)
+	other, err := normalize(opts, from)
+	if err != nil {
+		return err
 	}
+	return mergeConfig(c.fields, other.fields)
 }
 
 func mergeConfig(to, from map[string]value) error {
@@ -34,19 +22,19 @@ func mergeConfig(to, from map[string]value) error {
 			continue
 		}
 
-		subOld, ok := old.(cfgSub)
-		if !ok {
+		subOld, err := old.toConfig()
+		if err != nil {
 			to[k] = v
 			continue
 		}
 
-		subFrom, ok := v.(cfgSub)
-		if !ok {
+		subFrom, err := v.toConfig()
+		if err != nil {
 			to[k] = v
 			continue
 		}
 
-		err := mergeConfig(subOld.c.fields, subFrom.c.fields)
+		err = mergeConfig(subOld.fields, subFrom.fields)
 		if err != nil {
 			return err
 		}
@@ -54,101 +42,173 @@ func mergeConfig(to, from map[string]value) error {
 	return nil
 }
 
-func mergeMap(to map[string]value, from reflect.Value) error {
+// convert from into normalized *Config checking for errors
+// before merging generated(normalized) config with current config
+func normalize(opts options, from interface{}) (*Config, error) {
+	vFrom := chaseValue(reflect.ValueOf(from))
+
+	switch vFrom.Type() {
+	case tConfig:
+		return vFrom.Addr().Interface().(*Config), nil
+	case tConfigMap:
+		return normalizeMap(opts, vFrom)
+	default:
+		switch vFrom.Kind() {
+		case reflect.Struct:
+			return normalizeStruct(opts, vFrom)
+		case reflect.Map:
+			return normalizeMap(opts, vFrom)
+		}
+	}
+
+	return nil, raise(ErrTypeMismatch)
+}
+
+func normalizeCfgPath(cfg *Config, opts options, field string) (*Config, string, error) {
+	if opts.pathSep == "" {
+		return cfg, field, nil
+	}
+
+	path := strings.Split(field, opts.pathSep)
+	for len(path) > 1 {
+		field = path[0]
+		path = path[1:]
+
+		sub, exists := cfg.fields[field]
+		if exists {
+			vSub, ok := sub.(cfgSub)
+			if !ok {
+				return nil, field, raise(ErrExpectedObject)
+			}
+
+			cfg = vSub.c
+			continue
+		}
+
+		next := New()
+		cfg.fields[field] = cfgSub{next}
+		cfg = next
+	}
+	field = path[0]
+
+	return cfg, field, nil
+}
+
+func normalizeMap(opts options, from reflect.Value) (*Config, error) {
+	cfg := New()
+	if err := normalizeMapInto(cfg, opts, from); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+func normalizeMapInto(cfg *Config, opts options, from reflect.Value) error {
 	k := from.Type().Key().Kind()
 	if k != reflect.String && k != reflect.Interface {
-		return ErrTypeMismatch
+		return raise(ErrTypeMismatch)
 	}
 
 	for _, k := range from.MapKeys() {
 		k = chaseValueInterfaces(k)
 		if k.Kind() != reflect.String {
-			return ErrTypeMismatch
+			return raise(ErrKeyTypeNotString)
 		}
 
-		key := k.String()
-		v := from.MapIndex(k)
+		err := normalizeSetField(cfg, opts, k.String(), from.MapIndex(k))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
-		var new value
+func normalizeStruct(opts options, from reflect.Value) (*Config, error) {
+	cfg := New()
+	if err := normalizeStructInto(cfg, opts, from); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+func normalizeStructInto(cfg *Config, opts options, from reflect.Value) error {
+	v := chaseValue(from)
+	numField := v.NumField()
+
+	for i := 0; i < numField; i++ {
 		var err error
+		stField := v.Type().Field(i)
+		name, tagOpts := parseTags(stField.Tag.Get(opts.tag))
 
-		if old, ok := to[key]; ok {
-			new, err = mergeValue(old, v)
+		if tagOpts.squash {
+			vField := chaseValue(v.Field(i))
+			switch vField.Kind() {
+			case reflect.Struct:
+				err = normalizeStructInto(cfg, opts, vField)
+			case reflect.Map:
+				err = normalizeMapInto(cfg, opts, vField)
+			default:
+				return raise(ErrTypeMismatch)
+			}
 		} else {
-			new, err = normalizeValue(v)
+			name = fieldName(name, stField.Name)
+			err = normalizeSetField(cfg, opts, name, v.Field(i))
 		}
 
 		if err != nil {
 			return err
 		}
-
-		to[key] = new
 	}
 	return nil
 }
 
-func mergeStruct(to map[string]value, from reflect.Value) error {
-	v := chaseValue(from)
-	numField := v.NumField()
-
-	for i := 0; i < numField; i++ {
-		stField := v.Type().Field(i)
-		name, opts := parseTags(stField.Tag.Get("config"))
-
-		if opts.squash {
-			var err error
-
-			vField := chaseValue(v.Field(i))
-			switch vField.Kind() {
-			case reflect.Struct:
-				err = mergeStruct(to, vField)
-			case reflect.Map:
-				err = mergeMap(to, vField)
-			default:
-				err = ErrTypeMismatch
-			}
-
-			if err != nil {
-				return err
-			}
-		} else {
-			name = fieldName(name, stField.Name)
-			var new value
-			var err error
-
-			if old, ok := to[name]; ok {
-				new, err = mergeValue(old, v.Field(i))
-			} else {
-				new, err = normalizeValue(v.Field(i))
-			}
-
-			if err != nil {
-				return err
-			}
-
-			to[name] = new
-		}
+func normalizeSetField(cfg *Config, opts options, name string, v reflect.Value) error {
+	to, name, err := normalizeCfgPath(cfg, opts, name)
+	if err != nil {
+		return err
+	}
+	if to.HasField(name) {
+		return errDuplicateKey(name)
 	}
 
+	val, err := normalizeValue(opts, v)
+	if err != nil {
+		return err
+	}
+
+	to.fields[name] = val
 	return nil
 }
 
-func mergeValue(old value, new reflect.Value) (value, error) {
-	if sub, ok := old.(cfgSub); ok {
-		v := chaseValue(new)
-		t := v.Type()
-		k := t.Kind()
-		isSub := t == tConfig || t == tConfigMap ||
-			k == reflect.Struct || k == reflect.Map
-		if isSub {
-			err := mergeInto(sub.c.fields, new)
-			return sub, err
-		}
+func normalizeStructValue(opts options, from reflect.Value) (value, error) {
+	sub, err := normalizeStruct(opts, from)
+	if err != nil {
+		return nil, err
 	}
-	return normalizeValue(new)
+	return cfgSub{sub}, nil
 }
 
-func normalizeValue(v reflect.Value) (value, error) {
+func normalizeMapValue(opts options, from reflect.Value) (value, error) {
+	sub, err := normalizeMap(opts, from)
+	if err != nil {
+		return nil, err
+	}
+	return cfgSub{sub}, nil
+}
+
+func normalizeArray(opts options, v reflect.Value) (value, error) {
+	l := v.Len()
+	out := make([]value, 0, l)
+	for i := 0; i < l; i++ {
+		tmp, err := normalizeValue(opts, v.Index(i))
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, tmp)
+	}
+	return &cfgArray{arr: out}, nil
+}
+
+func normalizeValue(opts options, v reflect.Value) (value, error) {
 	v = chaseValue(v)
 
 	// handle primitives
@@ -164,12 +224,10 @@ func normalizeValue(v reflect.Value) (value, error) {
 	case reflect.String:
 		return &cfgString{s: v.String()}, nil
 	case reflect.Array, reflect.Slice:
-		return normalizeArray(v)
+		return normalizeArray(opts, v)
 	case reflect.Map:
-		return normalizeMap(v)
+		return normalizeMapValue(opts, v)
 	case reflect.Struct:
-		tmp := make(map[string]value)
-
 		if v.Type().ConvertibleTo(tConfig) {
 			var c *Config
 			if !v.CanAddr() {
@@ -179,34 +237,13 @@ func normalizeValue(v reflect.Value) (value, error) {
 			} else {
 				c = v.Addr().Interface().(*Config)
 			}
-			mergeConfig(tmp, c.fields)
-		} else if err := mergeStruct(tmp, v); err != nil {
-			return nil, err
+			return cfgSub{c}, nil
 		}
-
-		return cfgSub{c: &Config{tmp}}, nil
+		return normalizeStructValue(opts, v)
 	default:
-		return nil, ErrTypeMismatch
-	}
-}
-
-func normalizeArray(v reflect.Value) (value, error) {
-	l := v.Len()
-	out := make([]value, 0, l)
-	for i := 0; i < l; i++ {
-		tmp, err := normalizeValue(v.Index(i))
-		if err != nil {
-			return nil, err
+		if v.IsNil() {
+			return cfgNil{}, nil
 		}
-		out = append(out, tmp)
+		return nil, raise(ErrTypeMismatch)
 	}
-	return &cfgArray{arr: out}, nil
-}
-
-func normalizeMap(m reflect.Value) (value, error) {
-	to := make(map[string]value)
-	if err := mergeMap(to, m); err != nil {
-		return nil, err
-	}
-	return cfgSub{&Config{to}}, nil
 }

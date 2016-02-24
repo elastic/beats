@@ -10,7 +10,7 @@ func (c *Config) CountField(name string) (int, error) {
 	if v, ok := c.fields[name]; ok {
 		return v.Len(), nil
 	}
-	return -1, ErrMissing
+	return -1, raise(ErrMissing)
 }
 
 func (c *Config) Bool(name string, idx int) (bool, error) {
@@ -76,17 +76,17 @@ func (c *Config) SetChild(name string, idx int, value *Config) {
 func (c *Config) getField(name string, idx int) (value, error) {
 	v, ok := c.fields[name]
 	if !ok {
-		return nil, ErrMissing
+		return nil, raise(ErrMissing)
 	}
 
 	if idx >= v.Len() {
-		return nil, ErrIndexOutOfRange
+		return nil, raise(ErrIndexOutOfRange)
 	}
 
 	if arr, ok := v.(*cfgArray); ok {
 		v = arr.arr[idx]
 		if v == nil {
-			return nil, ErrMissing
+			return nil, raise(ErrMissing)
 		}
 		return arr.arr[idx], nil
 	}

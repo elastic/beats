@@ -124,6 +124,43 @@ func TestMergeNested(t *testing.T) {
 	}
 }
 
+func TestMergeNestedPath(t *testing.T) {
+	tests := []interface{}{
+		map[string]interface{}{
+			"c.b": true,
+		},
+
+		map[string]bool{
+			"c.b": true,
+		},
+
+		node{
+			"c.b": true,
+		},
+
+		struct {
+			B bool `config:"c.b"`
+		}{true},
+	}
+
+	for i, in := range tests {
+		t.Logf("merge nested test(%v), %+v", i, in)
+
+		c := New()
+		err := c.Merge(in, PathSep("."))
+
+		assert.NoError(t, err)
+
+		sub, err := c.Child("c", 0)
+		assert.NoError(t, err)
+
+		b, err := sub.Bool("b", 0)
+		assert.NoError(t, err)
+
+		assert.True(t, b)
+	}
+}
+
 func TestMergeArray(t *testing.T) {
 	tests := []interface{}{
 		map[string]interface{}{
@@ -250,5 +287,53 @@ func TestMergeChildArray(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, i+1, int(v))
 		}
+	}
+}
+
+func TestMergeSquash(t *testing.T) {
+	type subType struct{ B bool }
+	type subInterface struct{ B interface{} }
+
+	tests := []interface{}{
+		&struct {
+			C subType `config:",squash"`
+		}{subType{true}},
+		&struct {
+			subType `config:",squash"`
+		}{subType{true}},
+
+		&struct {
+			C subInterface `config:",squash"`
+		}{subInterface{true}},
+		&struct {
+			subInterface `config:",squash"`
+		}{subInterface{true}},
+
+		&struct {
+			C map[string]bool `config:",squash"`
+		}{map[string]bool{"b": true}},
+
+		&struct {
+			C map[string]interface{} `config:",squash"`
+		}{map[string]interface{}{"b": true}},
+
+		&struct {
+			C node `config:",squash"`
+		}{node{"b": true}},
+		&struct {
+			node `config:",squash"`
+		}{node{"b": true}},
+	}
+
+	for i, in := range tests {
+		t.Logf("merge squash test(%v): %+v", i, in)
+
+		c := New()
+		err := c.Merge(in)
+		assert.NoError(t, err)
+
+		b, err := c.Bool("b", 0)
+		assert.NoError(t, err)
+		assert.Equal(t, true, b)
 	}
 }

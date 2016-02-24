@@ -163,6 +163,44 @@ func TestUnpackNested(t *testing.T) {
 	}
 }
 
+func TestUnpackNestedPath(t *testing.T) {
+	tests := []interface{}{
+		&struct {
+			B bool `config:"c.b"`
+		}{},
+
+		&struct {
+			B interface{} `config:"c.b"`
+		}{},
+	}
+
+	sub, _ := NewFrom(node{"b": true})
+	c, _ := NewFrom(node{"c": sub})
+
+	for i, out := range tests {
+		t.Logf("test unpack nested path(%v) into: %v", i, out)
+		err := c.Unpack(out, PathSep("."))
+		if err != nil {
+			t.Fatalf("failed to unpack: %v", err)
+		}
+	}
+
+	// validate content by merging struct (unnested)
+	for i, in := range tests {
+		t.Logf("test unpack nested(%v) check: %v", i, in)
+
+		c, err := NewFrom(in)
+		if err != nil {
+			t.Errorf("failed")
+			continue
+		}
+
+		b, err := c.Bool("c.b", 0)
+		assert.NoError(t, err)
+		assert.True(t, b)
+	}
+}
+
 func TestUnpackArray(t *testing.T) {
 	c, _ := NewFrom(node{"a": []int{1, 2, 3}})
 
@@ -219,5 +257,62 @@ func TestUnpackArray(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, i+1, int(v))
 		}
+	}
+}
+
+func TestUnpackInline(t *testing.T) {
+	type SubType struct{ B bool }
+	type SubInterface struct{ B interface{} }
+
+	tests := []interface{}{
+		&struct {
+			C SubType `config:",inline"`
+		}{SubType{true}},
+		&struct {
+			SubType `config:",inline"`
+		}{SubType{true}},
+
+		&struct {
+			C SubInterface `config:",inline"`
+		}{SubInterface{true}},
+		&struct {
+			SubInterface `config:",inline"`
+		}{SubInterface{true}},
+
+		&struct {
+			C map[string]bool `config:",inline"`
+		}{map[string]bool{"b": true}},
+
+		&struct {
+			C map[string]interface{} `config:",inline"`
+		}{map[string]interface{}{"b": true}},
+
+		&struct {
+			C node `config:",inline"`
+		}{node{"b": true}},
+	}
+
+	c, _ := NewFrom(map[string]bool{"b": true})
+
+	for i, out := range tests {
+		t.Logf("test unpack with inline(%v) into: %v", i, out)
+		err := c.Unpack(out)
+		if err != nil {
+			t.Fatalf("failed to unpack: %v", err)
+		}
+	}
+
+	// validate content by merging struct
+	for i, in := range tests {
+		t.Logf("test unpack inlined(%v) check: %v", i, in)
+
+		c, err := NewFrom(in)
+		if err != nil {
+			t.Fatalf("failed with: %v", err)
+		}
+
+		b, err := c.Bool("b", 0)
+		assert.NoError(t, err)
+		assert.Equal(t, true, b)
 	}
 }
