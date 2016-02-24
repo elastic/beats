@@ -1,5 +1,3 @@
-Notice: *This is an experimental proof of concept project.*
-
 # Winlogbeat
 
 *You know, for windows event logs*
