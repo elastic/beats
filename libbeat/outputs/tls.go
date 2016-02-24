@@ -32,14 +32,14 @@ var (
 
 // TLSConfig defines config file options for TLS clients.
 type TLSConfig struct {
-	Certificate    string   `yaml:"certificate"`
-	CertificateKey string   `yaml:"certificate_key"`
-	CAs            []string `yaml:"certificate_authorities"`
-	Insecure       bool     `yaml:"insecure,omitempty"`
-	CipherSuites   []string `yaml:"cipher_suites"`
-	MinVersion     string   `yaml:"min_version,omitempty"`
-	MaxVersion     string   `yaml:"max_version,omitempty"`
-	CurveTypes     []string `yaml:"curve_types"`
+	Certificate    string   `config:"certificate"`
+	CertificateKey string   `config:"certificate_key"`
+	CAs            []string `config:"certificate_authorities"`
+	Insecure       bool     `config:"insecure"`
+	CipherSuites   []string `config:"cipher_suites"`
+	MinVersion     string   `config:"min_version"`
+	MaxVersion     string   `config:"max_version"`
+	CurveTypes     []string `config:"curve_types"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys

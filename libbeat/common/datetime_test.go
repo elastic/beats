@@ -28,20 +28,6 @@ func TestParseTime(t *testing.T) {
 			Input:  "2015-02-28T11:19:05.112Z",
 			Output: time.Date(2015, time.February, 28, 11, 19, 05, 112*1e6, time.UTC),
 		},
-		// Golang time pkg happily parses 'wrong' dates like these.
-		// Just to have in mind.
-		{
-			Input:  "2015-02-29T11:19:05.112Z",
-			Output: time.Date(2015, time.March, 01, 11, 19, 05, 112*1e6, time.UTC),
-		},
-		{
-			Input:  "2015-03-31T11:19:05.112Z",
-			Output: time.Date(2015, time.March, 31, 11, 19, 05, 112*1e6, time.UTC),
-		},
-		{
-			Input:  "2015-04-31T11:19:05.112Z",
-			Output: time.Date(2015, time.April, 31, 11, 19, 05, 112*1e6, time.UTC),
-		},
 	}
 
 	for _, test := range tests {

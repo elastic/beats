@@ -56,7 +56,7 @@ class Test(BaseTest):
         print doc
         assert doc["hello"] == "world"
         assert doc["type"] == "log2"
-        assert doc["timestamp"] == "2"
+        assert doc["timestamp"] == 2
         assert "fields" not in doc
 
     def test_beat_fields(self):
