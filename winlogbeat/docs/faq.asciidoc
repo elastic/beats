@@ -4,7 +4,9 @@
 This section contains frequently asked questions about Winlogbeat. Also check out the
 https://discuss.elastic.co/c/beats/winlogbeat[Winlogbeat discussion forum].
 
+[[dashboard-fields-incorrect]]
+=== Why is the dashboard in Kibana breaking up my data fields incorrectly?
 
-=== Question 1
+The index template might not be loaded correctly. See <<winlogbeat-template>>.
 
-Answer TBD.
+include::../../libbeat/docs/shared-faq.asciidoc[]

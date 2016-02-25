@@ -18,7 +18,7 @@ include::./multiple-prospectors.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./faq.asciidoc[]
+include::./faq.asciidoc[]
 
 include::./migration.asciidoc[]
 
