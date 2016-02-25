@@ -1,25 +1,21 @@
 metricbeat:
   modules:
-    #golang:
-    #  metrics:
-    #    expvar:
-    #      period: 10s
-    apache:
+    - module: apache
+      metricsets: ["status"]
       hosts: ["http://127.0.0.1/"]
-      metricsets:
-        status:
-          period: 1s
-    redis:
-      hosts:
-        - "127.0.0.1:6379"
-      metricsets:
-        info:
-          period: 1s
-    mysql:
-      # This expectd a full mysql dsn
-      # Example: [username[:password]@][protocol[(address)]]/
-      hosts:
-        - "root@tcp(127.0.0.1:3306)/"
-      metricsets:
-        status:
-          period: 1s
+      period: 1s
+      #fields: ["aaa", "bbb"]
+      enabled: true
+    - module: redis
+      metricsets: ["info"]
+      period: 1s
+      hosts: ["127.0.0.1:6379"]
+      enabled: true
+      #filter: ...
+      #username: name
+      #password: hello world
+    - module: mysql
+      metricsets: ["status"]
+      enabled: true
+      period: 2s
+      hosts: ["root@tcp(127.0.0.1:3306)/"]
