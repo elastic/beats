@@ -28,7 +28,7 @@ include::./kibana3.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./faq.asciidoc[]
+include::./faq.asciidoc[]
 
 include::./reference.asciidoc[]
 
