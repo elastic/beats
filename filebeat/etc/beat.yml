@@ -140,10 +140,14 @@ filebeat:
       # file is skipped, as the reading starts at the end. We recommend to leave this option on false
       # but lower the ignore_older value to release files faster.
       #force_close_files: false
+      json_decoder:
+        on_unmarshal_error: add_error_key
+        overwrite_keys: true
+        keep_original: false
 
     # Additional stdin prospector
 
-      # Configuration to use stdin input
+    # Configuration to use stdin input
     #- input_type: stdin
 
 

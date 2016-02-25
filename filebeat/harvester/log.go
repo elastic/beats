@@ -139,6 +139,7 @@ func (h *Harvester) Harvest() {
 				Fileinfo:      &info,
 			}
 
+			event.SetJsonDecoder(h.Config.JsonDecoder)
 			h.SpoolerChan <- event // ship the new event downstream
 		}
 
