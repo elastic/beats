@@ -3,6 +3,7 @@ package info
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/redis"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,12 +15,16 @@ func TestConnect(t *testing.T) {
 	}
 
 	// Setup
-	redis.Module.BaseConfig.Hosts = []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()}
 	r := MetricSeter{}
 	err := r.Setup()
 	assert.NoError(t, err)
 
-	data, err := r.Fetch()
+	config := helper.ModuleConfig{
+		Hosts: []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
+	}
+	ms := helper.NewMetricSet("info", r, config)
+
+	data, err := r.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check fields

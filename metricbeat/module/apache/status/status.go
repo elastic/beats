@@ -9,28 +9,29 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/module/apache"
+	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
 
 func init() {
-	MetricSet.Register()
+	helper.Registry.AddMetricSeter("apache", "status", MetricSeter{})
 }
 
-var MetricSet = helper.NewMetricSet("status", MetricSeter{}, apache.Module)
-
-type MetricSeter struct {
-}
+type MetricSeter struct{}
 
 func (m MetricSeter) Setup() error {
 	return nil
 }
 
-func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
+func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
-	hosts := MetricSet.Module.GetHosts()
+	hosts := ms.Config.Hosts
 
 	for _, host := range hosts {
 		resp, err := http.Get(host + "server-status?auto")
+
+		if resp == nil {
+			continue
+		}
 		defer resp.Body.Close()
 
 		if err != nil {

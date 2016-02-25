@@ -4,27 +4,21 @@ package expvar
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/module/golang"
+	_ "github.com/elastic/beats/metricbeat/module/golang"
 )
 
 func init() {
-	MetricSet.Register()
+	helper.Registry.AddMetricSeter("golang", "expvar", MetricSeter{})
 }
 
-// MetricSet Setup
-var MetricSet = helper.NewMetricSet("expvar", ExpvarMetric{}, golang.Module)
+type MetricSeter struct{}
 
-// MetricSetter object
-type ExpvarMetric struct {
-	helper.MetricSetConfig
-}
-
-func (b ExpvarMetric) Setup() error {
+func (m MetricSeter) Setup() error {
 	return nil
 }
 
 // Fetch expvars from a running beat
-func (b ExpvarMetric) Fetch() (events []common.MapStr, err error) {
+func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
 	//path := "http://localhost:6060/debug/vars"
 
@@ -39,6 +33,6 @@ func (b ExpvarMetric) Fetch() (events []common.MapStr, err error) {
 	return events, nil
 }
 
-func (b ExpvarMetric) Cleanup() error {
+func (m MetricSeter) Cleanup() error {
 	return nil
 }

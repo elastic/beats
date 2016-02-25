@@ -121,7 +121,7 @@ unit-tests: prepare-tests
 # Runs the unit tests without coverage reports.
 .PHONY: unit
 unit:
-	go test $(RACE) -short ./...
+	go test $(RACE) -short ${GOPACKAGES}
 
 # Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
