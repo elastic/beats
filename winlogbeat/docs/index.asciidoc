@@ -16,7 +16,7 @@ include::../../libbeat/docs/https.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./faq.asciidoc[]
+include::./faq.asciidoc[]
 
 include::./reference.asciidoc[]
 

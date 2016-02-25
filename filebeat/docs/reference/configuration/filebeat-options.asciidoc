@@ -115,6 +115,7 @@ If this option is set to true, the custom <<configuration-fields>> are stored as
 in the output document instead of being grouped under a `fields` sub-dictionary.
 If the custom field names conflict with other field names added by Filebeat, the custom fields overwrite the other fields.
 
+[[ignore-older]]
 ===== ignore_older
 
 If this option is specified, Filebeat
