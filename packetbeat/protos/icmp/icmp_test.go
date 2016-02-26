@@ -59,8 +59,8 @@ func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		icmp.ProcessICMPv4(icmpRequestData, packetRequestData)
-		icmp.ProcessICMPv4(icmpResponseData, packetResponseData)
+		icmp.ProcessICMPv4(nil, icmpRequestData, packetRequestData)
+		icmp.ProcessICMPv4(nil, icmpResponseData, packetResponseData)
 
 		client := icmp.results.(*publish.ChanTransactions)
 		<-client.Channel

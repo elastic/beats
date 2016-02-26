@@ -178,6 +178,34 @@ you use this setting, it's your responsibility to keep the BPF filters in sync w
 ports defined in the `protocols` section.
 
 
+[[configuration-flows]]
+=== Flows
+
+The `flows` section contains configuration options for bidirectional network
+flows. If section is missing from configuration file, network flows are
+disabled.
+
+[source,yaml]
+------------------------------------------------------------------------------
+flows:
+  timeout: 30s
+  period: 10s
+------------------------------------------------------------------------------
+
+===== timeout
+
+Timeout configures the lifetime of a flow. If no packets have been received for
+a flow within the timeout time window, the flow is killed and reported. The
+default value is 30s.
+
+===== period
+
+Configure the reporting interval. All flows are reported at the very same point
+in time. Periodical reporting can be disabled by setting the value to -1. If
+disabled, flows are still reported once being timed out. The default value is
+10s.
+
+
 [[configuration-protocols]]
 === Protocols
 
