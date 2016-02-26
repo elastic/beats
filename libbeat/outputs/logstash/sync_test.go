@@ -52,7 +52,7 @@ func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error
 	}
 
 	lc, err := newLumberjackClient(transp, compressLevel,
-		defaultMaxWindowSize, 100*time.Millisecond)
+		defaultConfig.BulkMaxSize, 100*time.Millisecond)
 	if err != nil {
 		return nil, nil, err
 	}

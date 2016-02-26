@@ -7,6 +7,8 @@ import (
 	"crypto/tls"
 	"time"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -15,19 +17,18 @@ import (
 
 var debug = logp.MakeDebug("logstash")
 
+type logstashOutputPlugin struct{}
+
 func init() {
 	outputs.RegisterOutputPlugin("logstash", logstashOutputPlugin{})
 }
 
-type logstashOutputPlugin struct{}
-
 func (p logstashOutputPlugin) NewOutput(
-	config *outputs.MothershipConfig,
-	topologyExpire int,
+	cfg *ucfg.Config,
+	_ int,
 ) (outputs.Outputer, error) {
 	output := &logstash{}
-	err := output.init(*config, topologyExpire)
-	if err != nil {
+	if err := output.init(cfg); err != nil {
 		return nil, err
 	}
 	return output, nil
@@ -38,43 +39,23 @@ type logstash struct {
 	index string
 }
 
-const (
-	logstashDefaultPort = 10200
-
-	logstashDefaultTimeout  = 30 * time.Second
-	defaultSendRetries      = 3
-	defaultMaxWindowSize    = 2048
-	defaultCompressionLevel = 3
-)
-
 var waitRetry = time.Duration(1) * time.Second
 
 // NOTE: maxWaitRetry has no effect on mode, as logstash client currently does not return ErrTempBulkFailure
 var maxWaitRetry = time.Duration(60) * time.Second
 
-func (lj *logstash) init(
-	config outputs.MothershipConfig,
-	topologyExpire int,
-) error {
+func (lj *logstash) init(cfg *ucfg.Config) error {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return err
+	}
+
 	useTLS := (config.TLS != nil)
-	timeout := logstashDefaultTimeout
-	if config.Timeout != 0 {
-		timeout = time.Duration(config.Timeout) * time.Second
-	}
-
-	defaultPort := logstashDefaultPort
-	if config.Port != 0 {
-		defaultPort = config.Port
-	}
-
-	maxWindowSize := defaultMaxWindowSize
-	if config.BulkMaxSize != nil {
-		maxWindowSize = *config.BulkMaxSize
-	}
-
-	compressLevel := defaultCompressionLevel
-	if config.CompressionLevel != nil {
-		compressLevel = *config.CompressionLevel
+	timeout := time.Duration(config.Timeout) * time.Second
+	sendRetries := config.MaxRetries
+	maxAttempts := sendRetries + 1
+	if sendRetries < 0 {
+		maxAttempts = 0
 	}
 
 	var clients []mode.ProtocolClient
@@ -86,31 +67,18 @@ func (lj *logstash) init(
 			return err
 		}
 
-		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
-				makeTLSClient(defaultPort, tlsConfig)))
+		clients, err = mode.MakeClients(cfg,
+			makeClientFactory(&config, makeTLSClient(config.Port, tlsConfig)))
 	} else {
-		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
-				makeTCPClient(defaultPort)))
+		clients, err = mode.MakeClients(cfg,
+			makeClientFactory(&config, makeTCPClient(config.Port)))
 	}
 	if err != nil {
 		return err
 	}
 
-	sendRetries := defaultSendRetries
-	if config.MaxRetries != nil {
-		sendRetries = *config.MaxRetries
-	}
 	logp.Info("Max Retries set to: %v", sendRetries)
-
-	maxAttempts := sendRetries + 1
-	if sendRetries < 0 {
-		maxAttempts = 0
-	}
-
-	loadBalance := config.LoadBalance != nil && *config.LoadBalance
-	m, err := mode.NewConnectionMode(clients, !loadBalance,
+	m, err := mode.NewConnectionMode(clients, !config.LoadBalance,
 		maxAttempts, waitRetry, timeout, maxWaitRetry)
 	if err != nil {
 		return err
@@ -123,9 +91,7 @@ func (lj *logstash) init(
 }
 
 func makeClientFactory(
-	maxWindowSize int,
-	compressLevel int,
-	timeout time.Duration,
+	config *logstashConfig,
 	makeTransp func(string) (TransportClient, error),
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
@@ -133,7 +99,9 @@ func makeClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(transp, compressLevel, maxWindowSize, timeout)
+		timeout := time.Duration(config.Timeout) * time.Second
+		return newLumberjackClient(transp,
+			config.CompressionLevel, config.BulkMaxSize, timeout)
 	}
 }
 

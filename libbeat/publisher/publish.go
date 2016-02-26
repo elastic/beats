@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/nranchev/go-libGeoIP"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -180,7 +181,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 // Create new PublisherType
 func New(
 	beatName string,
-	configs map[string]outputs.MothershipConfig,
+	configs map[string]*ucfg.Config,
 	shipper ShipperConfig,
 ) (*PublisherType, error) {
 
@@ -194,7 +195,7 @@ func New(
 
 func (publisher *PublisherType) init(
 	beatName string,
-	configs map[string]outputs.MothershipConfig,
+	configs map[string]*ucfg.Config,
 	shipper ShipperConfig,
 ) error {
 	var err error
@@ -242,7 +243,7 @@ func (publisher *PublisherType) init(
 					hwm,
 					bulkHWM))
 
-			if !config.SaveTopology {
+			if ok, _ := config.Bool("save_topology", 0); !ok {
 				continue
 			}
 

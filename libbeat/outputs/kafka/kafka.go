@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,26 +15,17 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
-var debugf = logp.MakeDebug("kafka")
-
-func init() {
-	sarama.Logger = kafkaLogger{}
-
-	outputs.RegisterOutputPlugin("kafka", kafkaOutputPlugin{})
-}
-
 type kafkaOutputPlugin struct{}
 
 type kafka struct {
 	mode mode.ConnectionMode
 }
 
+var debugf = logp.MakeDebug("kafka")
+
 var (
-	kafkaDefaultTimeout        = 30 * time.Second
-	kafkaDefaultKeepAlive      = 0 * time.Second
-	kafkaDefaultCompression    = sarama.CompressionSnappy
-	kafkaDefaultClientID       = "beats"
-	kafkaDefaultTopicsFromType = false
+	errNoTopicSet = errors.New("No topic configured")
+	errNoHosts    = errors.New("No hosts configured")
 )
 
 var (
@@ -46,27 +38,33 @@ var (
 	}
 )
 
-var (
-	errNoTopicSet = errors.New("No topic configured")
-	errNoHosts    = errors.New("No hosts configured")
-)
+func init() {
+	sarama.Logger = kafkaLogger{}
+
+	outputs.RegisterOutputPlugin("kafka", kafkaOutputPlugin{})
+}
 
 func (p kafkaOutputPlugin) NewOutput(
-	config *outputs.MothershipConfig,
+	cfg *ucfg.Config,
 	topologyExpire int,
 ) (outputs.Outputer, error) {
 	output := &kafka{}
-	err := output.init(config)
+	err := output.init(cfg)
 	if err != nil {
 		return nil, err
 	}
 	return output, nil
 }
 
-func (k *kafka) init(config *outputs.MothershipConfig) error {
+func (k *kafka) init(cfg *ucfg.Config) error {
 	debugf("initialize kafka output")
 
-	cfg, retries, err := newKafkaConfig(config)
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return err
+	}
+
+	libCfg, retries, err := newKafkaConfig(&config)
 	if err != nil {
 		return err
 	}
@@ -78,10 +76,7 @@ func (k *kafka) init(config *outputs.MothershipConfig) error {
 	}
 	debugf("hosts: %v", hosts)
 
-	useType := kafkaDefaultTopicsFromType
-	if config.UseType != nil {
-		useType = *config.UseType
-	}
+	useType := config.UseType
 
 	topic := config.Topic
 	if topic == "" && !useType {
@@ -95,7 +90,7 @@ func (k *kafka) init(config *outputs.MothershipConfig) error {
 		worker = config.Worker
 	}
 	for i := 0; i < worker; i++ {
-		client, err := newKafkaClient(hosts, topic, useType, cfg)
+		client, err := newKafkaClient(hosts, topic, useType, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
 			return err
@@ -108,8 +103,8 @@ func (k *kafka) init(config *outputs.MothershipConfig) error {
 		clients,
 		false,
 		retries, // retry implemented by kafka client
-		cfg.Producer.Retry.Backoff,
-		cfg.Net.WriteTimeout,
+		libCfg.Producer.Retry.Backoff,
+		libCfg.Net.WriteTimeout,
 		10*time.Second)
 	if err != nil {
 		logp.Err("Failed to configure kafka connection: %v", err)
@@ -136,38 +131,24 @@ func (k *kafka) BulkPublish(
 	return k.mode.PublishEvents(signal, opts, event)
 }
 
-func newKafkaConfig(config *outputs.MothershipConfig) (*sarama.Config, int, error) {
+func newKafkaConfig(config *kafkaConfig) (*sarama.Config, int, error) {
 	k := sarama.NewConfig()
 	modeRetries := 1
 
 	// configure network level properties
-	timeout := kafkaDefaultTimeout
-	if config.Timeout > 0 {
-		timeout = time.Duration(config.Timeout) * time.Second
-	}
-
+	timeout := time.Duration(config.Timeout) * time.Second
 	k.Net.DialTimeout = timeout
 	k.Net.ReadTimeout = timeout
 	k.Net.WriteTimeout = timeout
+	k.Net.KeepAlive = config.KeepAlive
+	k.Producer.Timeout = config.BrokerTimeout
 
-	if config.TLS != nil {
-		tls, err := outputs.LoadTLSConfig(config.TLS)
-		if err != nil {
-			return nil, modeRetries, err
-		}
-		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls
+	tls, err := outputs.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, modeRetries, err
 	}
-
-	keepAlive := kafkaDefaultKeepAlive
-	if config.KeepAlive != "" {
-		var err error
-		keepAlive, err = time.ParseDuration(config.KeepAlive)
-		if err != nil {
-			return nil, modeRetries, err
-		}
-	}
-	k.Net.KeepAlive = keepAlive
+	k.Net.TLS.Enable = tls != nil
+	k.Net.TLS.Config = tls
 
 	// TODO: configure metadata level properties
 	//       use lib defaults
@@ -179,20 +160,10 @@ func newKafkaConfig(config *outputs.MothershipConfig) (*sarama.Config, int, erro
 	if config.RequiredACKs != nil {
 		k.Producer.RequiredAcks = sarama.RequiredAcks(*config.RequiredACKs)
 	}
-	if config.BrokerTimeout != "" {
-		var err error
-		k.Producer.Timeout, err = time.ParseDuration(config.BrokerTimeout)
-		if err != nil {
-			return nil, modeRetries, err
-		}
-	}
-	compressionMode := kafkaDefaultCompression
-	if config.Compression != "" {
-		mode, ok := compressionModes[strings.ToLower(config.Compression)]
-		if !ok {
-			return nil, modeRetries, fmt.Errorf("Unknown compression mode: %v", config.Compression)
-		}
-		compressionMode = mode
+
+	compressionMode, ok := compressionModes[strings.ToLower(config.Compression)]
+	if !ok {
+		return nil, modeRetries, fmt.Errorf("Unknown compression mode: %v", config.Compression)
 	}
 	k.Producer.Compression = compressionMode
 
@@ -209,12 +180,7 @@ func newKafkaConfig(config *outputs.MothershipConfig) (*sarama.Config, int, erro
 	}
 
 	// configure client ID
-	clientID := kafkaDefaultClientID
-	if config.ClientID != "" {
-		clientID = config.ClientID
-	}
-	k.ClientID = clientID
-
+	k.ClientID = config.ClientID
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, modeRetries, err

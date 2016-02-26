@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
@@ -119,19 +121,16 @@ func testElasticsearchIndex(test string) string {
 func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	windowSize := integrationTestWindowSize
 
-	config := &outputs.MothershipConfig{
-		Hosts:       []string{getLogstashHost()},
-		TLS:         nil,
-		Index:       testLogstashIndex(test),
-		BulkMaxSize: &windowSize,
+	config := map[string]interface{}{
+		"hosts":         []string{getLogstashHost()},
+		"index":         testLogstashIndex(test),
+		"bulk_max_size": &windowSize,
 	}
 	if tls {
-		config.Hosts = []string{getLogstashTLSHost()}
-		config.TLS = &outputs.TLSConfig{
-			Insecure: false,
-			CAs: []string{
-				"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
-			},
+		config["hosts"] = []string{getLogstashTLSHost()}
+		config["tls.insecure"] = false
+		config["tls.certificate_authorities"] = []string{
+			"../../../testing/environments/docker/logstash/pki/tls/certs/logstash.crt",
 		}
 	}
 
@@ -156,16 +155,16 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 
 	flushInterval := 0
 	bulkSize := 0
-	config := outputs.MothershipConfig{
-		Hosts:         []string{getElasticsearchHost()},
-		Index:         index,
-		FlushInterval: &flushInterval,
-		BulkMaxSize:   &bulkSize,
-		Username:      os.Getenv("ES_USER"),
-		Password:      os.Getenv("ES_PASS"),
-	}
+	config, _ := ucfg.NewFrom(map[string]interface{}{
+		"hosts":          []string{getElasticsearchHost()},
+		"index":          index,
+		"flush_interval": &flushInterval,
+		"bulk_max_size":  &bulkSize,
+		"username":       os.Getenv("ES_USER"),
+		"password":       os.Getenv("ES_PASS"),
+	})
 
-	output, err := plugin.NewOutput(&config, 10)
+	output, err := plugin.NewOutput(config, 10)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
