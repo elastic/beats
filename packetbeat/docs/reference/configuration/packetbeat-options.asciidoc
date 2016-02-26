@@ -192,6 +192,10 @@ flows:
   period: 10s
 ------------------------------------------------------------------------------
 
+==== Options
+
+You can specify the following options in the `flows` section:
+
 ===== timeout
 
 Timeout configures the lifetime of a flow. If no packets have been received for

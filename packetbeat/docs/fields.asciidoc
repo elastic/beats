@@ -21,7 +21,6 @@ grouped in the following categories:
 * <<exported-fields-redis>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-trans_measurements>>
-* <<exported-fields-flows_measurements>>
 * <<exported-fields-trans_env>>
 * <<exported-fields-flows_env>>
 * <<exported-fields-raw>>
@@ -246,34 +245,34 @@ The transport protocol used by the flow. If known, one of "udp" or "tcp".
 optional TCP connection id
 
 
-==== stats_source Fields
+=== stats_source Fields
 
 Object with source to destination flow measurements.
 
 
 
-===== stats_source.net_packets_total
+==== stats_source.net_packets_total
 
 Total number of packets
 
 
-===== stats_source.net_bytes_total
+==== stats_source.net_bytes_total
 
 Total number of bytes
 
 
-==== stats_dest Fields
+=== stats_dest Fields
 
 Object with destination to source flow measurements.
 
 
 
-===== stats_dest.net_packets_total
+==== stats_dest.net_packets_total
 
 Total number of packets
 
 
-===== stats_dest.net_bytes_total
+==== stats_dest.net_bytes_total
 
 Total number of bytes
 
