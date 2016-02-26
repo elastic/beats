@@ -11,11 +11,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/decoder"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/icmp"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/protos/udp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/layers"
@@ -30,9 +25,19 @@ type SnifferSetup struct {
 	isAlive        bool
 	dumper         *pcap.Dumper
 
-	Decoder    *decoder.DecoderStruct
+	// bpf filter
+	filter string
+
+	// Decoder    *decoder.DecoderStruct
+	worker     Worker
 	DataSource gopacket.PacketDataSource
 }
+
+type Worker interface {
+	OnPacket(data []byte, ci *gopacket.CaptureInfo)
+}
+
+type WorkerFactory func(layers.LinkType) (Worker, string, error)
 
 // Computes the block_size and the num_blocks in such a way that the
 // allocated mmap buffer is close to but smaller than target_size_mb.
@@ -145,7 +150,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			if err != nil {
 				return err
 			}
-			err = sniffer.pcapHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+			err = sniffer.pcapHandle.SetBPFFilter(sniffer.filter)
 			if err != nil {
 				return err
 			}
@@ -176,7 +181,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			return err
 		}
 
-		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+		err = sniffer.afpacketHandle.SetBPFFilter(sniffer.filter)
 		if err != nil {
 			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
@@ -192,7 +197,7 @@ func (sniffer *SnifferSetup) setFromConfig(config *config.InterfacesConfig) erro
 			return err
 		}
 
-		err = sniffer.pfringHandle.SetBPFFilter(sniffer.config.Bpf_filter)
+		err = sniffer.pfringHandle.SetBPFFilter(sniffer.filter)
 		if err != nil {
 			return fmt.Errorf("SetBPFFilter failed: %s", err)
 		}
@@ -236,21 +241,9 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(
-	test_mode bool,
-	icmp4 icmp.ICMPv4Processor,
-	icmp6 icmp.ICMPv6Processor,
-	tcp tcp.Processor,
-	udp udp.Processor,
-) error {
-	if config.ConfigSingleton.Interfaces.Bpf_filter == "" {
-		with_vlans := config.ConfigSingleton.Interfaces.With_vlans
-		with_icmp := config.ConfigSingleton.Protocols.Icmp.Enabled
-		config.ConfigSingleton.Interfaces.Bpf_filter = protos.Protos.BpfFilter(with_vlans, with_icmp)
-	}
-	logp.Debug("sniffer", "BPF filter: %s", config.ConfigSingleton.Interfaces.Bpf_filter)
-
+func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory) error {
 	var err error
+
 	if !test_mode {
 		err = sniffer.setFromConfig(&config.ConfigSingleton.Interfaces)
 		if err != nil {
@@ -258,10 +251,11 @@ func (sniffer *SnifferSetup) Init(
 		}
 	}
 
-	sniffer.Decoder, err = decoder.NewDecoder(sniffer.Datalink(), icmp4, icmp6, tcp, udp)
+	sniffer.worker, sniffer.filter, err = factory(sniffer.Datalink())
 	if err != nil {
 		return fmt.Errorf("Error creating decoder: %v", err)
 	}
+	logp.Debug("sniffer", "BPF filter: '%s'", sniffer.filter)
 
 	if sniffer.config.Dumpfile != "" {
 		p, err := pcap.OpenDead(sniffer.Datalink(), 65535)
@@ -353,7 +347,7 @@ func (sniffer *SnifferSetup) Run() error {
 		}
 		logp.Debug("sniffer", "Packet number: %d", counter)
 
-		sniffer.Decoder.DecodePacketData(data, &ci)
+		sniffer.worker.OnPacket(data, &ci)
 	}
 
 	logp.Info("Input finish. Processed %d packets. Have a nice day!", counter)

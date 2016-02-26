@@ -9,7 +9,8 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Packetbeat. They are
 grouped in the following categories:
 
-* <<exported-fields-event>>
+* <<exported-fields-flows_event>>
+* <<exported-fields-trans_event>>
 * <<exported-fields-icmp>>
 * <<exported-fields-dns>>
 * <<exported-fields-http>>
@@ -19,12 +20,266 @@ grouped in the following categories:
 * <<exported-fields-thrift>>
 * <<exported-fields-redis>>
 * <<exported-fields-mongodb>>
-* <<exported-fields-measurements>>
-* <<exported-fields-env>>
+* <<exported-fields-trans_measurements>>
+* <<exported-fields-flows_measurements>>
+* <<exported-fields-trans_env>>
+* <<exported-fields-flows_env>>
 * <<exported-fields-raw>>
 
-[[exported-fields-event]]
-=== Event Fields
+[[exported-fields-flows_event]]
+=== Flow Event Fields
+
+These fields contain data about the flow itself.
+
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp of the event, as measured by the Beat. The precision is in milliseconds. The timezone is UTC.
+
+
+==== start_time
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The time, the first packet for the flow has been seen.
+
+
+==== last_time
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The time, the most recent processed packet for the flow has been seen.
+
+
+==== type
+
+required: True
+
+Indicates the event to be a flow event. This field is always set to "flow".
+
+
+==== final
+
+Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
+
+
+==== flow_id
+
+Internal flow id based on connection meta data and address.
+
+
+==== mac_source
+
+Source MAC address as indicated by first packet seen for the current flow.
+
+
+==== mac_dest
+
+Destination MAC address as indicated by first packet seen for the current flow.
+
+
+==== vlan
+
+Innermost VLAN address used in network packets.
+
+
+==== outter_vlan
+
+Second innermost VLAN address used in network packets.
+
+
+==== ip4_source
+
+Innermost IPv4 source address as indicated by first packet seen for the current flow.
+
+
+==== ip4_source_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== ip4_dest
+
+Innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== ip4_dest_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== outter_ip4_source
+
+Second innermost IPv4 source address as indicated by first packet seen for the current flow.
+
+
+==== outter_ip4_source_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `outter_ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== outter_ip4_dest
+
+Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== outter_ip4_dest_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `outter_ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== ip6_source
+
+Innermost IPv6 source address as indicated by first packet seen for the current flow.
+
+
+==== ip6_source_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== ip6_dest
+
+Innermost IPv6 destination address as indicated by first packet seen for the current flow.
+
+
+==== ip6_dest_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== outter_ip6_source
+
+Second innermost IPv6 source address as indicated by first packet seen for the current flow.
+
+
+==== outter_ip6_source_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `outter_ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== outter_ip6_dest
+
+Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
+
+
+==== outter_ip6_dest_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `outter_ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== icmp_id
+
+ICMP id used in ICMP based flow.
+
+
+==== port_source
+
+Source port number as indicated by first packet seen for the current flow.
+
+
+==== port_dest
+
+Destination port number as indicated by first packet seen for the current flow.
+
+
+==== transport
+
+The transport protocol used by the flow. If known, one of "udp" or "tcp".
+
+
+==== connection_id
+
+optional TCP connection id
+
+
+==== stats_source Fields
+
+Object with source to destination flow measurements.
+
+
+
+===== stats_source.net_packets_total
+
+Total number of packets
+
+
+===== stats_source.net_bytes_total
+
+Total number of bytes
+
+
+==== stats_dest Fields
+
+Object with destination to source flow measurements.
+
+
+
+===== stats_dest.net_packets_total
+
+Total number of packets
+
+
+===== stats_dest.net_bytes_total
+
+Total number of bytes
+
+
+[[exported-fields-trans_event]]
+=== Transaction Event Fields
 
 These fields contain data about the transaction itself.
 
@@ -915,8 +1170,8 @@ A BSON document that specifies the update to be performed. For information on sp
 The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
 
-[[exported-fields-measurements]]
-=== Measurements Fields
+[[exported-fields-trans_measurements]]
+=== Measurements (Transactions) Fields
 
 These fields contain measurements related to the transaction.
 
@@ -977,8 +1232,8 @@ type: int
 In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded. In terms of the W3 Navigation Timing API, this is the difference between `domContentLoadedEnd` and `domContentLoadedStart`.
 
 
-[[exported-fields-env]]
-=== Environmental Fields
+[[exported-fields-trans_env]]
+=== Environmental (Transactions) Fields
 
 These fields contain data about the environment in which the transaction was captured.
 
@@ -1079,6 +1334,28 @@ The name of the process that initiated the transaction.
 ==== release
 
 The software release of the service serving the transaction. This can be the commit id or a semantic version.
+
+
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+[[exported-fields-flows_env]]
+=== Environmental (Flows) Fields
+
+These fields contain data about the environment in which the flow data was captured.
+
+
+
+==== beat.name
+
+Name of the Beat sending the events. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
 
 
 ==== tags
