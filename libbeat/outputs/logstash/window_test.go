@@ -11,7 +11,7 @@ func TestShrinkWindowSizeNeverZero(t *testing.T) {
 
 	windowSize := 124
 	var w window
-	w.init(windowSize, defaultMaxWindowSize)
+	w.init(windowSize, defaultConfig.BulkMaxSize)
 
 	w.windowSize = int32(windowSize)
 	for i := 0; i < 100; i++ {

@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/procs"
 )
@@ -12,7 +11,6 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Flows      *Flows
 	Protocols  Protocols
-	Output     map[string]outputs.MothershipConfig
 	Shipper    publisher.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions

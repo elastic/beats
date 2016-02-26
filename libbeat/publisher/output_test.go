@@ -3,6 +3,8 @@ package publisher
 import (
 	"testing"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +30,7 @@ func (t *testOutputer) PublishEvent(trans outputs.Signaler, opts outputs.Options
 func TestOutputWorker(t *testing.T) {
 	outputer := &testOutputer{events: make(chan common.MapStr, 10)}
 	ow := newOutputWorker(
-		outputs.MothershipConfig{},
+		ucfg.New(),
 		outputer,
 		newWorkerSignal(),
 		1, 0)

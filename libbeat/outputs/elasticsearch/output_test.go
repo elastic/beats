@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -23,20 +25,21 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		logp.Err("Invalid port. Cannot be converted to in: %s", GetEsPort())
 	}
 
-	var output elasticsearchOutput
-	output.init(outputs.MothershipConfig{
-		SaveTopology:  true,
-		Host:          GetEsHost(),
-		Port:          esPort,
-		Username:      os.Getenv("ES_USER"),
-		Password:      os.Getenv("ES_PASS"),
-		Path:          "",
-		Index:         index,
-		Protocol:      "http",
-		FlushInterval: &flushInterval,
-		BulkMaxSize:   &bulkSize,
-	}, 10)
+	config, _ := ucfg.NewFrom(map[string]interface{}{
+		"save_topology":  true,
+		"hosts":          []string{GetEsHost()},
+		"port":           esPort,
+		"username":       os.Getenv("ES_USER"),
+		"password":       os.Getenv("ES_PASS"),
+		"path":           "",
+		"index":          index,
+		"protocol":       "http",
+		"flush_interval": flushInterval,
+		"bulk_max_size":  bulkSize,
+	})
 
+	var output elasticsearchOutput
+	output.init(config, 10)
 	return output
 }
 

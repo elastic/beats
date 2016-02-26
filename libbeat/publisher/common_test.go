@@ -138,7 +138,7 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	}
 
 	ow := &outputWorker{}
-	ow.config.BulkMaxSize = &bulkSize
+	ow.config.BulkMaxSize = bulkSize
 	ow.handler = mh
 	ws := workerSignal{}
 	ow.messageWorker.init(&ws, defaultChanSize, defaultBulkChanSize, mh)
