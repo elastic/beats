@@ -55,7 +55,7 @@ func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 }
 
 func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
-	logp.Info("demobeat is running! Hit CTRL-C to stop it.")
+	logp.Info("{{cookiecutter.beat}} is running! Hit CTRL-C to stop it.")
 
 	ticker := time.NewTicker(bt.period)
 	counter := 1
