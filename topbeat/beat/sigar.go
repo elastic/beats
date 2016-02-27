@@ -60,14 +60,15 @@ type ProcCpuTime struct {
 }
 
 type Process struct {
-	Pid     int          `json:"pid"`
-	Ppid    int          `json:"ppid"`
-	Name    string       `json:"name"`
-	State   string       `json:"state"`
-	CmdLine string       `json:"cmdline"`
-	Mem     *ProcMemStat `json:"mem"`
-	Cpu     *ProcCpuTime `json:"cpu"`
-	ctime   time.Time
+	Pid      int          `json:"pid"`
+	Ppid     int          `json:"ppid"`
+	Name     string       `json:"name"`
+	Username string       `json:"username"`
+	State    string       `json:"state"`
+	CmdLine  string       `json:"cmdline"`
+	Mem      *ProcMemStat `json:"mem"`
+	Cpu      *ProcCpuTime `json:"cpu"`
+	ctime    time.Time
 }
 
 type FileSystemStat struct {
@@ -243,41 +244,36 @@ func getProcState(b byte) string {
 	return "unknown"
 }
 
-func GetProcess(pid int) (*Process, error) {
-
+func GetProcess(pid int, cmdline string) (*Process, error) {
 	state := sigar.ProcState{}
+	if err := state.Get(pid); err != nil {
+		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
+	}
+
 	mem := sigar.ProcMem{}
+	if err := mem.Get(pid); err != nil {
+		return nil, fmt.Errorf("error getting process mem for pid=%d: %v", pid, err)
+	}
+
 	cpu := sigar.ProcTime{}
-	args := sigar.ProcArgs{}
-
-	err := state.Get(pid)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting state info: %v", err)
+	if err := cpu.Get(pid); err != nil {
+		return nil, fmt.Errorf("error getting process cpu time for pid=%d: %v", pid, err)
 	}
 
-	err = mem.Get(pid)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting mem info: %v", err)
+	if cmdline == "" {
+		args := sigar.ProcArgs{}
+		if err := args.Get(pid); err != nil {
+			return nil, fmt.Errorf("error getting process arguments for pid=%d: %v", pid, err)
+		}
+		cmdline = strings.Join(args.List, " ")
 	}
-
-	err = cpu.Get(pid)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting cpu info: %v", err)
-	}
-
-	err = args.Get(pid)
-	if err != nil {
-		return nil, fmt.Errorf("Error getting command line: %v", err)
-	}
-
-	cmdLine := strings.Join(args.List, " ")
 
 	proc := Process{
 		Pid:     pid,
 		Ppid:    state.Ppid,
 		Name:    state.Name,
 		State:   getProcState(byte(state.State)),
-		CmdLine: cmdLine,
+		CmdLine: cmdline,
 		Mem: &ProcMemStat{
 			Size:  mem.Size,
 			Rss:   mem.Resident,
@@ -289,8 +285,8 @@ func GetProcess(pid int) (*Process, error) {
 			User:   cpu.User,
 			System: cpu.Sys,
 		},
+		ctime: time.Now(),
 	}
-	proc.ctime = time.Now()
 
 	return &proc, nil
 }

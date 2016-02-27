@@ -83,7 +83,7 @@ func TestGetProcess(t *testing.T) {
 
 	for _, pid := range pids {
 
-		process, err := GetProcess(pid)
+		process, err := GetProcess(pid, "")
 
 		if err != nil {
 			continue
@@ -143,5 +143,33 @@ func TestFileSystemList(t *testing.T) {
 		assert.True(t, (stat.Free >= 0))
 		assert.True(t, (stat.Avail >= 0))
 		assert.True(t, (stat.Used >= 0))
+	}
+}
+
+// BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
+// of the command line arguments enabled.
+func BenchmarkGetProcess(b *testing.B) {
+	pids, err := Pids()
+	if err != nil {
+		b.Fatal(err)
+	}
+	nPids := len(pids)
+	procs := make(ProcsMap, nPids)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		pid := pids[i%nPids]
+
+		var cmdline string
+		if p := procs[pid]; p != nil {
+			cmdline = p.CmdLine
+		}
+
+		process, err := GetProcess(pid, cmdline)
+		if err != nil {
+			continue
+		}
+
+		procs[pid] = process
 	}
 }
