@@ -22,7 +22,7 @@ To push {{cookiecutter.beat|capitalize}} in the git repository, run the followin
 git init
 git add .
 git commit
-git remote set-url origin https://{{cookiecutter.beat_path}}{{cookiecutter.beat}}
+git remote set-url origin https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 git push origin master
 ```
 
