@@ -29,7 +29,7 @@ Currently, Packetbeat supports the following protocols:
  * Memcache
 
 Packetbeat can insert the correlated transactions directly into Elasticsearch
-or into a central queue created with Redis (DEPRECATED) and Logstash. 
+or into a central queue created with Redis and Logstash. 
 
 Packetbeat can run on the same servers as your application processes or
 on its own servers. When running on dedicated servers, Packetbeat can get the
