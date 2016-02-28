@@ -1,13 +1,34 @@
 package publisher
 
 import (
+	"errors"
 	"fmt"
 	"sync/atomic"
+	"testing"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
+
+func enableLogging(selectors []string) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
+	}
+}
+
+// wait for f to execute. If the function f does not end
+// within one second the method returns the error.
+func wait(f func(), err error) error {
+	ch := make(chan error, 1)
+	go func() {
+		f()
+		ch <- nil
+	}()
+	time.AfterFunc(time.Second, func() { ch <- err })
+	return <-ch
+}
 
 // testMessageHandler receives messages and acknowledges them through
 // their Signaler.
@@ -24,6 +45,8 @@ func (mh *testMessageHandler) onMessage(m message) {
 	mh.msgs <- m
 	mh.acknowledgeMessage(m)
 }
+
+func (mh *testMessageHandler) shutdown() {}
 
 func (mh *testMessageHandler) onStop() {
 	atomic.AddUint32(&mh.stopped, 1)
@@ -42,7 +65,7 @@ func (mh *testMessageHandler) acknowledgeMessage(m message) {
 	}
 }
 
-// waitForMessages waits for n messages to be received and then returns. If n
+// waitformessages waits for n messages to be received and then returns. if n
 // messages are not received within one second the method returns an error.
 func (mh *testMessageHandler) waitForMessages(n int) ([]message, error) {
 	var msgs []message
@@ -132,6 +155,8 @@ const (
 )
 
 func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
+	pub := &PublisherType{}
+
 	mh := &testMessageHandler{
 		msgs:     make(chan message, 10),
 		response: response,
@@ -140,21 +165,20 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	ow := &outputWorker{}
 	ow.config.BulkMaxSize = &bulkSize
 	ow.handler = mh
-	ws := workerSignal{}
-	ow.messageWorker.init(&ws, defaultChanSize, defaultBulkChanSize, mh)
+	ow.messageWorker.init(&pub.wgOutput, defaultChanSize, defaultBulkChanSize, mh)
 
-	pub := &PublisherType{
-		Output:   []*outputWorker{ow},
-		wsOutput: ws,
-	}
-	pub.wsOutput.Init()
-	pub.wsPublisher.Init()
+	pub.Output = []*outputWorker{ow}
+
 	pub.syncPublisher = newSyncPublisher(pub, defaultChanSize, defaultBulkChanSize)
-	pub.asyncPublisher = newAsyncPublisher(pub, defaultChanSize, defaultBulkChanSize)
+	pub.asyncPublisher = newAsyncPublisher(pub, defaultChanSize, defaultBulkChanSize, &pub.wgPublisher)
 	return &testPublisher{
 		pub:              pub,
 		outputMsgHandler: mh,
 	}
+}
+
+func (t *testPublisher) stopTestPublisher() error {
+	return wait(t.pub.Stop, errors.New("Failed to close testPublisher"))
 }
 
 func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {

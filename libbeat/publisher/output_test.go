@@ -1,6 +1,7 @@
 package publisher
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -26,11 +27,12 @@ func (t *testOutputer) PublishEvent(trans outputs.Signaler, opts outputs.Options
 
 // Test OutputWorker by calling onStop() and onMessage() with various inputs.
 func TestOutputWorker(t *testing.T) {
+	var wg sync.WaitGroup
 	outputer := &testOutputer{events: make(chan common.MapStr, 10)}
 	ow := newOutputWorker(
 		outputs.MothershipConfig{},
 		outputer,
-		newWorkerSignal(),
+		&wg,
 		1, 0)
 
 	ow.onStop() // Noop

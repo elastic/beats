@@ -1,6 +1,7 @@
 package publisher
 
 import (
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -11,7 +12,7 @@ import (
 type asyncPublisher struct {
 	outputs []worker
 	pub     *PublisherType
-	ws      workerSignal
+	wg      *sync.WaitGroup
 }
 
 const (
@@ -19,13 +20,12 @@ const (
 	defaultBulkSize      = 2048
 )
 
-func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int) *asyncPublisher {
-	p := &asyncPublisher{pub: pub}
-	p.ws.Init()
+func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int, wg *sync.WaitGroup) *asyncPublisher {
+	p := &asyncPublisher{pub: pub, wg: wg}
 
 	var outputs []worker
 	for _, out := range pub.Output {
-		outputs = append(outputs, asyncOutputer(&p.ws, hwm, bulkHWM, out))
+		outputs = append(outputs, asyncOutputer(wg, hwm, bulkHWM, out))
 	}
 
 	p.outputs = outputs
@@ -33,7 +33,16 @@ func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int) *asyncPublisher {
 }
 
 // onStop will send stop signal to message batching workers
-func (p *asyncPublisher) onStop() { p.ws.stop() }
+func (p *asyncPublisher) onStop() {
+	for _, output := range p.outputs {
+		switch output.(type) {
+		case *bulkWorker:
+			output.shutdown()
+		default:
+		}
+	}
+	p.wg.Wait()
+}
 
 func (p *asyncPublisher) client() eventPublisher {
 	return p
@@ -63,12 +72,13 @@ func (p *asyncPublisher) send(m message) {
 	if m.context.Signal != nil && len(p.outputs) > 1 {
 		m.context.Signal = outputs.NewSplitSignaler(m.context.Signal, len(p.outputs))
 	}
+
 	for _, o := range p.outputs {
 		o.send(m)
 	}
 }
 
-func asyncOutputer(ws *workerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
+func asyncOutputer(wg *sync.WaitGroup, hwm, bulkHWM int, worker *outputWorker) worker {
 	config := worker.config
 
 	flushInterval := defaultFlushInterval
@@ -90,5 +100,5 @@ func asyncOutputer(ws *workerSignal, hwm, bulkHWM int, worker *outputWorker) wor
 
 	debug("create bulk processing worker (interval=%v, bulk size=%v)",
 		flushInterval, maxBulkSize)
-	return newBulkWorker(ws, hwm, bulkHWM, worker, flushInterval, maxBulkSize)
+	return newBulkWorker(wg, hwm, bulkHWM, worker, flushInterval, maxBulkSize)
 }

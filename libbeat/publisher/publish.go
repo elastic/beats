@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -61,13 +62,11 @@ type PublisherType struct {
 
 	RefreshTopologyTimer <-chan time.Time
 
-	// wsOutput and wsPublisher should be used for proper shutdown of publisher
-	// (not implemented yet). On shutdown the publisher should be finished first
-	// and the outputers next, so no publisher will attempt to send messages on
-	// closed channels.
+	// On shutdown the publisher is finished first and the outputers next,
+	// so no publisher will attempt to send messages on closed channels.
 	// Note: beat data producers must be shutdown before the publisher plugin
-	wsOutput    workerSignal
-	wsPublisher workerSignal
+	wgPublisher sync.WaitGroup
+	wgOutput    sync.WaitGroup
 
 	syncPublisher  *syncPublisher
 	asyncPublisher *asyncPublisher
@@ -217,9 +216,6 @@ func (publisher *PublisherType) init(
 
 	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
 
-	publisher.wsOutput.Init()
-	publisher.wsPublisher.Init()
-
 	if !publisher.disabled {
 		plugins, err := outputs.InitOutputs(beatName, configs, shipper.Topology_expire)
 		if err != nil {
@@ -238,7 +234,7 @@ func (publisher *PublisherType) init(
 				newOutputWorker(
 					config,
 					output,
-					&publisher.wsOutput,
+					&publisher.wgOutput,
 					hwm,
 					bulkHWM))
 
@@ -318,9 +314,19 @@ func (publisher *PublisherType) init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.asyncPublisher = newAsyncPublisher(publisher, hwm, bulkHWM)
+	publisher.asyncPublisher = newAsyncPublisher(publisher, hwm, bulkHWM, &publisher.wgPublisher)
 	publisher.syncPublisher = newSyncPublisher(publisher, hwm, bulkHWM)
 
 	publisher.client = newClient(publisher)
 	return nil
+}
+
+func (publisher *PublisherType) Stop() {
+	publisher.asyncPublisher.onStop()
+	publisher.wgPublisher.Wait()
+
+	for _, output := range publisher.Output {
+		output.shutdown()
+	}
+	publisher.wgOutput.Wait()
 }

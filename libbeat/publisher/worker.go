@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -15,12 +14,13 @@ var (
 
 type worker interface {
 	send(m message)
+	shutdown()
 }
 
 type messageWorker struct {
 	queue     chan message
 	bulkQueue chan message
-	ws        *workerSignal
+	wg        *sync.WaitGroup
 	handler   messageHandler
 }
 
@@ -30,81 +30,72 @@ type message struct {
 	events  []common.MapStr
 }
 
-type workerSignal struct {
-	done chan struct{}
-	wg   sync.WaitGroup
-}
-
 type messageHandler interface {
 	onMessage(m message)
 	onStop()
 }
 
-func newMessageWorker(ws *workerSignal, hwm, bulkHWM int, h messageHandler) *messageWorker {
+func newMessageWorker(wg *sync.WaitGroup, hwm, bulkHWM int, h messageHandler) *messageWorker {
 	p := &messageWorker{}
-	p.init(ws, hwm, bulkHWM, h)
+	p.init(wg, hwm, bulkHWM, h)
 	return p
 }
 
-func (p *messageWorker) init(ws *workerSignal, hwm, bulkHWM int, h messageHandler) {
+func (p *messageWorker) init(wg *sync.WaitGroup, hwm, bulkHWM int, h messageHandler) {
 	p.queue = make(chan message, hwm)
 	p.bulkQueue = make(chan message, bulkHWM)
-	p.ws = ws
+	p.wg = wg
 	p.handler = h
-	ws.wg.Add(1)
+	wg.Add(1)
 	go p.run()
 }
 
 func (p *messageWorker) run() {
-	defer p.shutdown()
+	defer func() {
+		p.wg.Done()
+	}()
+
+	var queueClosed bool
+	var bulkQueueClosed bool
+
 	for {
 		select {
-		case <-p.ws.done:
+		case m, ok := <-p.queue:
+			if !ok {
+				queueClosed = true
+			} else {
+				messagesInWorkerQueues.Add(-1)
+				p.handler.onMessage(m)
+				p.wg.Done()
+			}
+		case m, ok := <-p.bulkQueue:
+			if !ok {
+				bulkQueueClosed = true
+			} else {
+				messagesInWorkerQueues.Add(-1)
+				p.handler.onMessage(m)
+				p.wg.Done()
+			}
+		}
+		if queueClosed && bulkQueueClosed {
 			return
-		case m := <-p.queue:
-			messagesInWorkerQueues.Add(-1)
-			p.handler.onMessage(m)
-		case m := <-p.bulkQueue:
-			messagesInWorkerQueues.Add(-1)
-			p.handler.onMessage(m)
 		}
 	}
 }
 
 func (p *messageWorker) shutdown() {
 	p.handler.onStop()
-	stopQueue(p.queue)
-	stopQueue(p.bulkQueue)
-	p.ws.wg.Done()
+	close(p.queue)
+	close(p.bulkQueue)
+	p.wg.Wait()
 }
 
 func (p *messageWorker) send(m message) {
+	p.wg.Add(1)
 	if m.event != nil {
 		p.queue <- m
 	} else {
 		p.bulkQueue <- m
 	}
 	messagesInWorkerQueues.Add(1)
-}
-
-func (ws *workerSignal) stop() {
-	close(ws.done)
-	ws.wg.Wait()
-}
-
-func newWorkerSignal() *workerSignal {
-	w := &workerSignal{}
-	w.Init()
-	return w
-}
-
-func (ws *workerSignal) Init() {
-	ws.done = make(chan struct{})
-}
-
-func stopQueue(qu chan message) {
-	close(qu)
-	for msg := range qu { // clear queue and send fail signal
-		outputs.SignalFailed(msg.context.Signal, nil)
-	}
 }

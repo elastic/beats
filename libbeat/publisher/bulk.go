@@ -1,6 +1,7 @@
 package publisher
 
 import (
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -9,7 +10,7 @@ import (
 
 type bulkWorker struct {
 	output worker
-	ws     *workerSignal
+	wg     *sync.WaitGroup
 
 	queue       chan message
 	bulkQueue   chan message
@@ -22,14 +23,14 @@ type bulkWorker struct {
 }
 
 func newBulkWorker(
-	ws *workerSignal, hwm int, bulkHWM int,
+	wg *sync.WaitGroup, hwm int, bulkHWM int,
 	output worker,
 	flushInterval time.Duration,
 	maxBatchSize int,
 ) *bulkWorker {
 	b := &bulkWorker{
 		output:       output,
-		ws:           ws,
+		wg:           wg,
 		queue:        make(chan message, hwm),
 		bulkQueue:    make(chan message, bulkHWM),
 		flushTicker:  time.NewTicker(flushInterval),
@@ -38,35 +39,56 @@ func newBulkWorker(
 		pending:      nil,
 	}
 
-	ws.wg.Add(1)
+	wg.Add(1)
 	go b.run()
 	return b
 }
 
 func (b *bulkWorker) send(m message) {
 	if m.events == nil {
+		b.wg.Add(1)
 		b.queue <- m
 	} else {
+		b.wg.Add(len(m.events))
 		b.bulkQueue <- m
 	}
 }
 
 func (b *bulkWorker) run() {
-	defer b.shutdown()
+	defer func() {
+		b.wg.Done()
+	}()
+
+	var queueClosed bool
+	var bulkQueueClosed bool
 
 	for {
 		select {
-		case <-b.ws.done:
-			return
-		case m := <-b.queue:
-			b.onEvent(&m.context, m.event)
-		case m := <-b.bulkQueue:
-			b.onEvents(&m.context, m.events)
-		case <-b.flushTicker.C:
-			if len(b.events) > 0 {
-				b.publish()
+		case m, ok := <-b.queue:
+			if !ok {
+				queueClosed = true
+			} else {
+				b.onEvent(&m.context, m.event)
 			}
+		case m, ok := <-b.bulkQueue:
+			if !ok {
+				bulkQueueClosed = true
+			} else {
+				b.onEvents(&m.context, m.events)
+			}
+		case <-b.flushTicker.C:
+			b.flush()
 		}
+		if queueClosed && bulkQueueClosed {
+			b.flush()
+			return
+		}
+	}
+}
+
+func (b *bulkWorker) flush() {
+	if len(b.events) > 0 {
+		b.publish()
 	}
 }
 
@@ -127,6 +149,7 @@ func (b *bulkWorker) publish() {
 		events: b.events,
 	})
 
+	b.wg.Add(-len(b.events))
 	b.pending = nil
 	b.guaranteed = false
 	b.events = make([]common.MapStr, 0, b.maxBatchSize)
@@ -134,7 +157,7 @@ func (b *bulkWorker) publish() {
 
 func (b *bulkWorker) shutdown() {
 	b.flushTicker.Stop()
-	stopQueue(b.queue)
-	stopQueue(b.bulkQueue)
-	b.ws.wg.Done()
+	close(b.queue)
+	close(b.bulkQueue)
+	b.wg.Wait()
 }
