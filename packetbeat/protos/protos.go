@@ -63,6 +63,9 @@ type ProtocolPlugin interface {
 
 	// Called to return the configured ports
 	GetPorts() []int
+
+	// Called to stop the janitor and publish all events
+	Flush()
 }
 
 type TcpProtocolPlugin interface {

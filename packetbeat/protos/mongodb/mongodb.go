@@ -93,6 +93,8 @@ func (mongodb *Mongodb) Init(test_mode bool, results publish.Transactions) error
 	return nil
 }
 
+func (mongodb *Mongodb) Flush() {} // To implement ProtocolPlugin
+
 func (mongodb *Mongodb) ConnectionTimeout() time.Duration {
 	return mongodb.transactionTimeout
 }

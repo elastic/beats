@@ -266,6 +266,8 @@ func (thrift *Thrift) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
+func (m *Thrift) Flush() {} // To implement ProtocolPlugin
+
 func (m *ThriftMessage) String() string {
 	return fmt.Sprintf("IsRequest: %t Type: %d Method: %s SeqId: %d Params: %s ReturnValue: %s Exceptions: %s",
 		m.IsRequest, m.Type, m.Method, m.SeqId, m.Params, m.ReturnValue, m.Exceptions)

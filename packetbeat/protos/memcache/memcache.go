@@ -110,6 +110,8 @@ func (mc *Memcache) Init(testMode bool, results publish.Transactions) error {
 	)
 }
 
+func (mc *Memcache) Flush() {} // To implement ProtocolPlugin
+
 func (mc *Memcache) InitDefaults() {
 	if err := mc.Ports.Init(11211); err != nil {
 		logp.WTF("memcache default port number invalid")

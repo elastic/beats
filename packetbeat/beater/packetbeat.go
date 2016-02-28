@@ -66,7 +66,6 @@ type CmdLineArgs struct {
 	TopSpeed     *bool
 	Dumpfile     *string
 	PrintDevices *bool
-	WaitShutdown *int
 }
 
 var cmdLineArgs CmdLineArgs
@@ -84,7 +83,6 @@ func init() {
 		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
 		Dumpfile:     flag.String("dump", "", "Write all captured packets to this libpcap file"),
 		PrintDevices: flag.Bool("devices", false, "Print the list of devices and exit"),
-		WaitShutdown: flag.Int("waitstop", 0, "Additional seconds to wait before shutting down"),
 	}
 }
 
@@ -283,24 +281,24 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		service.Stop()
 	}
 
-	waitShutdown := pb.CmdLineArgs.WaitShutdown
-	if waitShutdown != nil && *waitShutdown > 0 {
-		time.Sleep(time.Duration(*waitShutdown) * time.Second)
-	}
-
 	return nil
 }
 
 func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
+	logp.Debug("main", "Cleaning up Packetbeat")
 
 	if service.WithMemProfile() {
 		logp.Debug("main", "Waiting for streams and transactions to expire...")
 		time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
 		logp.Debug("main", "Streams and transactions should all be expired now.")
+	} else {
+		logp.Debug("main", "Publishing all cached transactions")
+		for _, proto := range protos.Protos.GetAll() {
+			proto.Flush()
+		}
 	}
 
-	// TODO:
-	// pb.TransPub.Stop()
+	pb.Pub.Stop()
 
 	return nil
 }

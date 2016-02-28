@@ -51,11 +51,13 @@ func NewPublisher(pub *publisher.PublisherType, hwm, bulkHWM int) *PacketbeatPub
 }
 
 func (t *PacketbeatPublisher) PublishTransaction(event common.MapStr) bool {
+	t.wg.Add(1)
 	select {
 	case t.trans <- event:
 		return true
 	default:
 		// drop event if queue is full
+		t.wg.Done()
 		return false
 	}
 }
@@ -75,12 +77,12 @@ func (t *PacketbeatPublisher) Start() {
 	go func() {
 		defer t.wg.Done()
 		for {
-			select {
-			case <-t.done:
+			event, ok := <-t.trans
+			if !ok {
 				return
-			case event := <-t.trans:
-				t.onTransaction(event)
 			}
+			t.onTransaction(event)
+			t.wg.Done()
 		}
 	}()
 
@@ -99,8 +101,10 @@ func (t *PacketbeatPublisher) Start() {
 }
 
 func (t *PacketbeatPublisher) Stop() {
+	close(t.trans)
 	close(t.done)
 	t.wg.Wait()
+	t.pub.Stop()
 }
 
 func (t *PacketbeatPublisher) onTransaction(event common.MapStr) {

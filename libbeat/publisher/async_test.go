@@ -8,6 +8,7 @@ import (
 )
 
 func TestAsyncPublishEvent(t *testing.T) {
+	enableLogging([]string{"*"})
 	// Init
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	event := testEvent()
@@ -21,6 +22,11 @@ func TestAsyncPublishEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, event, msgs[0].event)
+
+	err = testPub.stopTestPublisher()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestAsyncPublishEvents(t *testing.T) {
@@ -38,6 +44,11 @@ func TestAsyncPublishEvents(t *testing.T) {
 	}
 	assert.Equal(t, events[0], msgs[0].events[0])
 	assert.Equal(t, events[1], msgs[0].events[1])
+
+	err = testPub.stopTestPublisher()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestBulkAsyncPublishEvent(t *testing.T) {
@@ -56,6 +67,11 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 	// Bulk outputer always sends bulk messages (even if only one event is
 	// present)
 	assert.Equal(t, event, msgs[0].events[0])
+
+	err = testPub.stopTestPublisher()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestBulkAsyncPublishEvents(t *testing.T) {
@@ -72,4 +88,9 @@ func TestBulkAsyncPublishEvents(t *testing.T) {
 	}
 	assert.Equal(t, events[0], msgs[0].events[0])
 	assert.Equal(t, events[1], msgs[0].events[1])
+
+	err = testPub.stopTestPublisher()
+	if err != nil {
+		t.Fatal(err)
+	}
 }

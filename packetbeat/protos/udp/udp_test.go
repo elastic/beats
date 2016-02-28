@@ -60,6 +60,10 @@ func (proto *TestProtocol) Init(test_mode bool, results publish.Transactions) er
 	return nil
 }
 
+func (proto *TestProtocol) Flush() {
+	return
+}
+
 func (proto *TestProtocol) GetPorts() []int {
 	return proto.Ports
 }

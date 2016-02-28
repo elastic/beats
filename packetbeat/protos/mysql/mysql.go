@@ -192,6 +192,8 @@ func (mysql *Mysql) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
+func (stream *Mysql) Flush() {} // To implement ProtocolPlugin
+
 func (stream *MysqlStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
 	stream.parseState = mysqlStateStart

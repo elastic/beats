@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -22,7 +23,7 @@ var (
 func newOutputWorker(
 	config outputs.MothershipConfig,
 	out outputs.Outputer,
-	ws *workerSignal,
+	wg *sync.WaitGroup,
 	hwm int,
 	bulkHWM int,
 ) *outputWorker {
@@ -36,7 +37,7 @@ func newOutputWorker(
 		config:      config,
 		maxBulkSize: maxBulkSize,
 	}
-	o.messageWorker.init(ws, hwm, bulkHWM, o)
+	o.messageWorker.init(wg, hwm, bulkHWM, o)
 	return o
 }
 

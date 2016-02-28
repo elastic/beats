@@ -86,6 +86,8 @@ func (redis *Redis) Init(test_mode bool, results publish.Transactions) error {
 	return nil
 }
 
+func (redis *Redis) Flush() {} // To implement ProtocolPlugin
+
 func (s *stream) PrepareForNewMessage() {
 	parser := &s.parser
 	s.Stream.Reset()
