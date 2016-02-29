@@ -1172,7 +1172,6 @@ sections:
   - ["redis", "Redis"]
   - ["mongodb", "MongoDb"]
   - ["trans_measurements", "Measurements (Transactions)"]
-#  - ["flows_measurements", "Measurements (Flows)"]
   - ["trans_env", "Environmental (Transactions)"]
   - ["flows_env", "Environmental (Flows)"]
   - ["raw", "Raw"]
