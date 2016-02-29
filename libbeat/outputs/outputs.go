@@ -11,6 +11,7 @@ type MothershipConfig struct {
 	Port              int
 	Hosts             []string
 	LoadBalance       *bool `yaml:"loadbalance"`
+	Pipelined         *bool `yaml:"pipelined"`
 	Protocol          string
 	Username          string
 	Password          string
