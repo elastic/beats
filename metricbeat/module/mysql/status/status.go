@@ -11,15 +11,11 @@ import (
 )
 
 func init() {
-	MetricSet.Register()
+	helper.Registry.AddMetricSeter("mysql", "status", MetricSeter{})
 }
-
-// Metric Setup
-var MetricSet = helper.NewMetricSet("status", MetricSeter{}, mysql.Module)
 
 // MetricSetter object
 type MetricSeter struct {
-	helper.MetricSetConfig
 }
 
 func (m MetricSeter) Setup() error {
@@ -27,10 +23,10 @@ func (m MetricSeter) Setup() error {
 }
 
 // Fetches status messages from mysql hosts
-func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
+func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
 	// Load status for all hosts and add it to events
-	for _, host := range MetricSet.Module.GetHosts() {
+	for _, host := range ms.Config.Hosts {
 		db, err := mysql.Connect(host)
 		if err != nil {
 			logp.Err("MySQL conenction error: %s", err)

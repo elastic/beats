@@ -1,37 +1,22 @@
 package redis
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/elastic/beats/metricbeat/helper"
+	"os"
 
 	"github.com/garyburd/redigo/redis"
 
-	"os"
+	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/elastic/beats/metricbeat/helper"
 )
 
 func init() {
-	Module.Register()
+	helper.Registry.AddModuler("redis", Moduler{})
 }
 
-var Module = helper.NewModule("redis", Redis{})
+type Moduler struct{}
 
-var Config = &RedisModuleConfig{}
-
-type RedisModuleConfig struct {
-	Metrics map[string]interface{}
-	Hosts   []string
-}
-
-type Redis struct {
-	Name   string
-	Config RedisModuleConfig
-}
-
-func (r Redis) Setup() error {
-	// Loads module config
-	// This is module specific config object
-	Module.LoadConfig(&Config)
+func (r Moduler) Setup() error {
 	return nil
 }
 

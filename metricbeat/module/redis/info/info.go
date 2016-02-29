@@ -2,6 +2,7 @@
 package info
 
 import (
+	"fmt"
 	"strings"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -14,32 +15,20 @@ import (
 )
 
 func init() {
-	MetricSet.Register()
+	helper.Registry.AddMetricSeter("redis", "info", MetricSeter{})
 }
 
-// Metric object
-var MetricSet = helper.NewMetricSet("info", MetricSeter{}, redis.Module)
-
-var Config = &MetricSetConfig{}
-
-type MetricSetConfig struct {
-}
-
-type MetricSeter struct {
-	Name   string
-	Config MetricSetConfig
-}
+type MetricSeter struct{}
 
 func (m MetricSeter) Setup() error {
-	// Loads module config
-	// This is module specific config object
-	MetricSet.LoadConfig(&Config)
 	return nil
 }
 
-func (m MetricSeter) Fetch() (events []common.MapStr, err error) {
+func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
-	hosts := MetricSet.Module.GetHosts()
+	hosts := ms.Config.Hosts
+
+	fmt.Printf("Hosts: %+v", hosts)
 
 	for _, host := range hosts {
 

@@ -7,11 +7,9 @@ import (
 
 // This one comabines module and metric
 func init() {
-	Module.Register()
+	helper.Registry.AddModuler("golang", Golang{})
+	//helper.NewModule("golang", Golang{}).Register()
 }
-
-// Module object
-var Module = helper.NewModule("golang", Golang{})
 
 type Golang struct {
 }

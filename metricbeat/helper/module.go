@@ -1,130 +1,167 @@
 package helper
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/logp"
-	"gopkg.in/yaml.v2"
 	"sync"
 	"time"
+
+	"fmt"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Module specifics. This must be defined by each module
-// The module object has to configs: BaseConfig and RawConfig. BaseConfig only containts the common fields
-// across all modules. RawConfig contains the unprocessed configuration which must be processed by the
-// specific implementation of the module on Setup
 type Module struct {
-	Name    string
-	Enabled bool
+	name string
 
 	// Moduler implementation
-	Moduler Moduler
+	moduler Moduler
 
-	// List of all metricsets in this module
-	MetricSets map[string]*MetricSet
+	// Module config
+	config ModuleConfig
 
-	// Generic config existing in all modules
-	BaseConfig ModuleConfig
-
-	// Raw module specific config
-	// This is provided to convert it into Config later
-	RawConfig interface{}
+	// List of all metricsets in this module. Use to keep track of metricsets
+	metricSets map[string]*MetricSet
 
 	// MetricSet waitgroup
 	wg sync.WaitGroup
+
+	done chan struct{}
 }
 
 // NewModule creates a new module
-func NewModule(name string, moduler Moduler) *Module {
+func NewModule(config ModuleConfig, moduler Moduler) *Module {
 	return &Module{
-		Name:       name,
-		Moduler:    moduler,
-		Enabled:    false,
-		MetricSets: map[string]*MetricSet{},
+		name:       config.Module,
+		config:     config,
+		moduler:    moduler,
+		metricSets: map[string]*MetricSet{},
 		wg:         sync.WaitGroup{},
+		done:       make(chan struct{}),
 	}
-}
-
-// Registers moudle with central registry
-func (m *Module) Register() {
-	Registry.AddModule(m)
-}
-
-// Add metric to module
-func (m *Module) AddMetric(metricSet *MetricSet) {
-	m.MetricSets[metricSet.Name] = metricSet
-}
-
-// Interface for each module
-type Moduler interface {
-	Setup() error
-}
-
-// Base configuration for list of modules
-type ModulesConfig struct {
-	Modules map[string]ModuleConfig
-}
-
-// Base module configuration
-type ModuleConfig struct {
-	Hosts      []string
-	Period     string
-	MetricSets map[string]MetricSetConfig `yaml:"metricsets"`
-}
-
-// Helper functions to easily access default configurations
-func (m *Module) GetPeriod() (time.Duration, error) {
-	return time.ParseDuration(m.BaseConfig.Period)
-}
-
-func (m *Module) GetHosts() []string {
-	return m.BaseConfig.Hosts
-}
-
-// Loads the configurations specific config.
-// This needs the configuration object defined inside the module
-func (m *Module) LoadConfig(config interface{}) {
-	bytes, err := yaml.Marshal(m.RawConfig)
-
-	if err != nil {
-		logp.Err("Load module config error: %v", err)
-	}
-	yaml.Unmarshal(bytes, config)
 }
 
 // Starts the given module
 func (m *Module) Start(b *beat.Beat) {
 
-	defer func() {
-		if r := recover(); r != nil {
-			logp.Err("Module %s paniced and stopped running. Reason: %+v", m.Name, r)
-		}
-	}()
+	defer logp.Recover(fmt.Sprintf("Module %s paniced and stopped running.", m.name))
 
-	if !m.Enabled {
-		logp.Debug("helper", "Not starting module %s as not enabled.", m.Name)
+	if !m.config.Enabled {
+		logp.Debug("helper", "Not starting module %s as not enabled.", m.name)
 		return
 	}
 
-	logp.Info("Start Module: %v", m.Name)
-
-	err := m.Moduler.Setup()
+	logp.Info("Setup moduler: %s", m.name)
+	err := m.moduler.Setup()
 	if err != nil {
 		logp.Err("Error setting up module: %s. Not starting metricsets for this module.", err)
 		return
 	}
 
-	for _, metricSet := range m.MetricSets {
-		go metricSet.Start(b, m.wg)
-		m.wg.Add(1)
+	// Setup - Create metricSets for the module
+	for _, metricsetName := range m.config.MetricSets {
+		metricSeter := Registry.MetricSeters[m.name][metricsetName]
+		// Setup
+		err := metricSeter.Setup()
+		if err != nil {
+			logp.Err("Error happening during metricseter setup: %s", err)
+		}
+
+		metricSet := NewMetricSet(metricsetName, metricSeter, m.config)
+		m.metricSets[metricsetName] = metricSet
 	}
+
+	// Setup period
+	period, err := time.ParseDuration(m.config.Period)
+	if err != nil {
+		logp.Info("Error in parsing period of metric %s: %v", m.name, err)
+	}
+
+	// If no period set, set default
+	if period == 0 {
+		logp.Info("Setting default period for metric %s as not set.", m.name)
+		period = 1 * time.Second
+	}
+
+	// TODO: Improve logging information with list (names of metricSets)
+	logp.Info("Start Module %s with metricsets %v and period %v", m.name, m.metricSets, period)
+
+	go m.Run(period, b)
+}
+
+func (m *Module) Run(period time.Duration, b *beat.Beat) {
+	ticker := time.NewTicker(period)
+	defer func() {
+		logp.Info("Stopped module %s with metricsets ... TODO", m.name)
+		ticker.Stop()
+	}()
+
+	var wg sync.WaitGroup
+	ch := make(chan struct{})
+
+	wait := func() {
+		wg.Wait()
+		ch <- struct{}{}
+	}
+
+	// TODO: A fetch event should take a maximum until the next ticker and
+	// be stopped before the next request is sent. If a fetch is not successful
+	// until the next it means it is a failure and a "error" event should be sent to es
+	fetch := func(set *MetricSet) {
+		defer wg.Done()
+		// Move execution part to module?
+		m.FetchMetricSets(b, set)
+	}
+
+	for {
+		// Waits for next ticker
+		select {
+		case <-m.done:
+			return
+		case <-ticker.C:
+		}
+
+		for _, set := range m.metricSets {
+			wg.Add(1)
+			go fetch(set)
+		}
+		go wait()
+
+		// Waits until all fetches are finished
+		select {
+		case <-m.done:
+			return
+		case <-ch:
+			// finished parallel fetch
+		}
+	}
+}
+
+func (m *Module) FetchMetricSets(b *beat.Beat, metricSet *MetricSet) {
+
+	m.wg.Add(1)
+
+	// Catches metric in case of panic. Keeps other metricsets running
+	defer m.wg.Done()
+
+	// Separate defer call as is has to be called directly
+	defer logp.Recover(fmt.Sprintf("Metric %s paniced and stopped running.", m.name))
+
+	events, err := metricSet.Fetch()
+
+	if err != nil {
+		// TODO: Also list module?
+		logp.Err("Fetching events in MetricSet %s returned error: %s", metricSet.Name, err)
+		// TODO: Still publish event with error
+		return
+	}
+
+	// Async publishing of event
+	b.Events.PublishEvents(events)
+
 }
 
 // Stop stops module and all its metricSets
 func (m *Module) Stop() {
-	logp.Info("Stopping module: %v", m.Name)
-	for _, metricSet := range m.MetricSets {
-		go metricSet.Stop()
-	}
-
+	logp.Info("Stopping module: %v", m.name)
 	m.wg.Wait()
 }

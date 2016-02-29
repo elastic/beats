@@ -1,25 +1,21 @@
 package mysql
 
 import (
+	"os"
+
 	"github.com/elastic/beats/metricbeat/helper"
 
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-
-	"os"
 )
 
 func init() {
-	Module.Register()
+	helper.Registry.AddModuler("mysql", Moduler{})
 }
 
-// Module object
-var Module = helper.NewModule("mysql", Mysql{})
+type Moduler struct{}
 
-type Mysql struct {
-}
-
-func (b Mysql) Setup() error {
+func (b Moduler) Setup() error {
 	// TODO: Ping available servers to check if available
 	return nil
 }
