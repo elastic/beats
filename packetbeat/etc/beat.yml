@@ -15,6 +15,14 @@
 interfaces:
   device: any
 
+flows:
+  # Set network flow timeout. Flow is killed if no packet is received before being
+  # timed out.
+  #timeout: 30s
+
+  # Configure reporting period. If set to -1, only killed flows will be reported
+  #period: 10s
+
 ############################# Protocols #######################################
 protocols:
   icmp:

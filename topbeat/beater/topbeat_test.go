@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/gosigar"
+	sigar "github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
 
