@@ -153,3 +153,47 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))
+
+    def test_rotating_file(self):
+        """
+        Checks that the registry is properly updated after a file is rotated
+        """
+        self.render_config_template(
+                path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/test.log"
+
+        filebeat = self.start_beat()
+
+        with open(testfile, 'w') as f:
+            f.write("offset 9\n")
+
+        self.wait_until(
+                lambda: self.output_has(lines=1),
+                max_timeout=10)
+
+
+        testfilerenamed = self.working_dir + "/log/test.1.log"
+        os.rename(testfile, testfilerenamed)
+
+        with open(testfile, 'w') as f:
+            f.write("offset 10\n")
+
+
+        self.wait_until(
+                lambda: self.output_has(lines=2),
+                max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        # Check that file exist
+        data = self.get_dot_filebeat()
+
+        # Make sure the offsets are correctly set
+        data[os.path.abspath(testfile)]["offset"] = 10
+        data[os.path.abspath(testfilerenamed)]["offset"] = 9
+
+        # Check that 2 files are port of the registrar file
+        assert len(data) == 2
