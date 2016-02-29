@@ -22,7 +22,7 @@ class Test(BaseTest):
             proc_patterns=["(?i)topbeat.test"]  # monitor itself
         )
         topbeat = self.start_beat()
-        self.wait_until(lambda: self.output_has(lines=1))
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         topbeat.check_kill_and_wait()
 
         output = self.read_output()[0]
