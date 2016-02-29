@@ -270,6 +270,15 @@ class TestCase(unittest.TestCase):
         Note that the msg must be present in a single line.
         """
 
+        return self.log_contains_count(msg, logfile) > 0
+
+    def log_contains_count(self, msg, logfile=None):
+        """
+        Returns the number of appearances of the given string in the log file
+        """
+
+        counter = 0
+
         # Init defaults
         if logfile is None:
             logfile = self.beat_name + ".log"
@@ -278,10 +287,11 @@ class TestCase(unittest.TestCase):
             with open(os.path.join(self.working_dir, logfile), "r") as f:
                 for line in f:
                     if line.find(msg) >= 0:
-                        return True
-                return False
+                        counter = counter + 1
         except IOError:
-            return False
+            counter = -1
+
+        return counter
 
     def output_has(self, lines, output_file=None):
         """

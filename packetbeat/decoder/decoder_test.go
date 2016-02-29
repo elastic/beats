@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 
 	"github.com/stretchr/testify/assert"
@@ -16,7 +18,7 @@ type TestIcmp4Processor struct {
 	pkt   *protos.Packet
 }
 
-func (l *TestIcmp4Processor) ProcessICMPv4(icmp4 *layers.ICMPv4, pkt *protos.Packet) {
+func (l *TestIcmp4Processor) ProcessICMPv4(id *flows.FlowID, icmp4 *layers.ICMPv4, pkt *protos.Packet) {
 	l.icmp4 = icmp4
 	l.pkt = pkt
 }
@@ -26,7 +28,7 @@ type TestIcmp6Processor struct {
 	pkt   *protos.Packet
 }
 
-func (l *TestIcmp6Processor) ProcessICMPv6(icmp6 *layers.ICMPv6, pkt *protos.Packet) {
+func (l *TestIcmp6Processor) ProcessICMPv6(id *flows.FlowID, icmp6 *layers.ICMPv6, pkt *protos.Packet) {
 	l.icmp6 = icmp6
 	l.pkt = pkt
 }
@@ -36,7 +38,7 @@ type TestTcpProcessor struct {
 	pkt    *protos.Packet
 }
 
-func (l *TestTcpProcessor) Process(tcphdr *layers.TCP, pkt *protos.Packet) {
+func (l *TestTcpProcessor) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
 	l.tcphdr = tcphdr
 	l.pkt = pkt
 }
@@ -45,7 +47,7 @@ type TestUdpProcessor struct {
 	pkt *protos.Packet
 }
 
-func (l *TestUdpProcessor) Process(pkt *protos.Packet) {
+func (l *TestUdpProcessor) Process(id *flows.FlowID, pkt *protos.Packet) {
 	l.pkt = pkt
 }
 
@@ -61,12 +63,16 @@ var ipv4TcpDns = []byte{
 
 // Test that DecodePacket decodes and IPv4/TCP packet and invokes the TCP processor.
 func TestDecodePacketData_ipv4Tcp(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"decoder"})
+	}
+
 	p := gopacket.NewPacket(ipv4TcpDns, layers.LinkTypeEthernet, gopacket.Default)
 	if p.ErrorLayer() != nil {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
 	d, tcp, _ := newTestDecoder(t)
-	d.DecodePacketData(p.Data(), &p.Metadata().CaptureInfo)
+	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, tcp.pkt, "TCP packet not received")
 	assert.Equal(t, "172.16.16.164", tcp.pkt.Tuple.Src_ip.String())
@@ -92,7 +98,7 @@ func TestDecodePacketData_ipv4Udp(t *testing.T) {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
 	d, _, udp := newTestDecoder(t)
-	d.DecodePacketData(p.Data(), &p.Metadata().CaptureInfo)
+	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, udp.pkt, "UDP packet not received")
 	assert.Equal(t, "192.168.170.8", udp.pkt.Tuple.Src_ip.String())
@@ -133,7 +139,7 @@ func TestDecodePacketData_ipv6Tcp(t *testing.T) {
 		t.Error("Failed to decode packet: ", p.ErrorLayer().Error())
 	}
 	d, tcp, _ := newTestDecoder(t)
-	d.DecodePacketData(p.Data(), &p.Metadata().CaptureInfo)
+	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, tcp.pkt, "TCP packet not received")
 	assert.Equal(t, "2001:6f8:102d:0:2d0:9ff:fee3:e8de", tcp.pkt.Tuple.Src_ip.String())
@@ -164,7 +170,7 @@ func TestDecodePacketData_ipv6Udp(t *testing.T) {
 		t.Error("Failed to decode packet:", p.ErrorLayer().Error())
 	}
 	d, _, udp := newTestDecoder(t)
-	d.DecodePacketData(p.Data(), &p.Metadata().CaptureInfo)
+	d.OnPacket(p.Data(), &p.Metadata().CaptureInfo)
 
 	assert.NotNil(t, udp.pkt, "UDP packet not received")
 	assert.Equal(t, "3ffe:507:0:1:200:86ff:fe05:80da", udp.pkt.Tuple.Src_ip.String())
@@ -180,7 +186,7 @@ func newTestDecoder(t *testing.T) (*DecoderStruct, *TestTcpProcessor, *TestUdpPr
 	icmp6Layer := &TestIcmp6Processor{}
 	tcpLayer := &TestTcpProcessor{}
 	udpLayer := &TestUdpProcessor{}
-	d, err := NewDecoder(layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
+	d, err := NewDecoder(nil, layers.LinkTypeEthernet, icmp4Layer, icmp6Layer, tcpLayer, udpLayer)
 	if err != nil {
 		t.Fatalf("Error creating decoder %v", err)
 	}

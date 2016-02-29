@@ -7,7 +7,29 @@ defaults:
   doc_values: true
   ignore_above: 1024
 
-env:
+flows_env:
+  type: group
+  description: >
+    These fields contain data about the environment in which the flow data was
+    captured.
+  fields:
+    - name: beat.name
+      description: >
+        Name of the Beat sending the events. If the shipper name is set
+        in the configuration file, then that value is used. If it is not set,
+        the hostname is used.
+
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+trans_env:
   type: group
   description: >
       These fields contain data about the environment in which the
@@ -103,7 +125,209 @@ env:
         Arbitrary tags that can be set per Beat and per transaction
         type.
 
-event:
+flows_event:
+  type: group
+  description: >
+    These fields contain data about the flow itself.
+  fields:
+    - name: "@timestamp"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The timestamp of the event, as measured by the Beat. The precision is in
+        milliseconds. The timezone is UTC.
+
+    - name: "start_time"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The time, the first packet for the flow has been seen.
+
+    - name: "last_time"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The time, the most recent processed packet for the flow has been seen.
+
+    - name: type
+      description: >
+        Indicates the event to be a flow event. This field is always set to "flow".
+      required: true
+
+    - name: final
+      description: >
+        Indicates if event is last event in flow. If final is false, the event
+        reports an intermediate flow state only.
+
+    - name: flow_id
+      description: >
+        Internal flow id based on connection meta data and address.
+
+    - name: mac_source
+      description: >
+        Source MAC address as indicated by first packet seen for the current flow.
+
+    - name: mac_dest
+      description: >
+        Destination MAC address as indicated by first packet seen for the current flow.
+
+    - name: vlan
+      description: >
+        Innermost VLAN address used in network packets.
+
+    - name: outter_vlan
+      description: >
+        Second innermost VLAN address used in network packets.
+
+    - name: ip4_source
+      description: >
+        Innermost IPv4 source address as indicated by first packet seen for the
+        current flow.
+
+    - name: ip4_source_location
+      type: geo_point
+      example: "40.715, -74.011"
+      description: >
+        The GeoIP location of the `ip4_source` IP address. The field is a string
+        containing the latitude and longitude separated by a comma.
+
+    - name: ip4_dest
+      description: >
+        Innermost IPv4 destination address as indicated by first packet seen for the
+        current flow.
+
+    - name: ip4_dest_location
+      type: geo_point
+      example: "40.715, -74.011"
+      description: >
+        The GeoIP location of the `ip4_dest` IP address. The field is a string
+        containing the latitude and longitude separated by a comma.
+
+    - name: outter_ip4_source
+      description: >
+        Second innermost IPv4 source address as indicated by first packet seen
+        for the current flow.
+
+    - name: outter_ip4_source_location
+      type: geo_point
+      example: "40.715, -74.011"
+      description: >
+        The GeoIP location of the `outter_ip4_source` IP address. The field is a
+        string containing the latitude and longitude separated by a comma.
+
+    - name: outter_ip4_dest
+      description: >
+        Second innermost IPv4 destination address as indicated by first packet
+        seen for the current flow.
+
+    - name: outter_ip4_dest_location
+      type: geo_point
+      example: "40.715, -74.011"
+      description: >
+        The GeoIP location of the `outter_ip4_dest` IP address. The field is a
+        string containing the latitude and longitude separated by a comma.
+
+    - name: ip6_source
+      description: >
+        Innermost IPv6 source address as indicated by first packet seen for the
+        current flow.
+
+    - name: ip6_source_location
+      type: geo_point
+      example: "60.715, -76.011"
+      description: >
+        The GeoIP location of the `ip6_source` IP address. The field is a string
+        containing the latitude and longitude separated by a comma.
+
+    - name: ip6_dest
+      description: >
+        Innermost IPv6 destination address as indicated by first packet seen for the
+        current flow.
+
+    - name: ip6_dest_location
+      type: geo_point
+      example: "60.715, -76.011"
+      description: >
+        The GeoIP location of the `ip6_dest` IP address. The field is a string
+        containing the latitude and longitude separated by a comma.
+
+    - name: outter_ip6_source
+      description: >
+        Second innermost IPv6 source address as indicated by first packet seen
+        for the current flow.
+
+    - name: outter_ip6_source_location
+      type: geo_point
+      example: "60.715, -76.011"
+      description: >
+        The GeoIP location of the `outter_ip6_source` IP address. The field is a
+        string containing the latitude and longitude separated by a comma.
+
+    - name: outter_ip6_dest
+      description: >
+        Second innermost IPv6 destination address as indicated by first packet
+        seen for the current flow.
+
+    - name: outter_ip6_dest_location
+      type: geo_point
+      example: "60.715, -76.011"
+      description: >
+        The GeoIP location of the `outter_ip6_dest` IP address. The field is a
+        string containing the latitude and longitude separated by a comma.
+
+    - name: icmp_id
+      description: >
+        ICMP id used in ICMP based flow.
+
+    - name: port_source
+      description: >
+        Source port number as indicated by first packet seen for the current flow.
+
+    - name: port_dest
+      description: >
+        Destination port number as indicated by first packet seen for the current flow.
+
+    - name: transport
+      description: >
+        The transport protocol used by the flow. If known, one of "udp" or "tcp".
+
+    - name: connection_id
+      description: >
+        optional TCP connection id
+
+    - name: stats_source
+      type: group
+      description: >
+        Object with source to destination flow measurements.
+      fields:
+        - name: stats_source.net_packets_total
+          description: >
+            Total number of packets
+
+        - name: stats_source.net_bytes_total
+          description: >
+            Total number of bytes
+
+    - name: stats_dest
+      type: group
+      description: >
+        Object with destination to source flow measurements.
+      fields:
+        - name: stats_dest.net_packets_total
+          description: >
+            Total number of packets
+
+        - name: stats_dest.net_bytes_total
+          description: >
+            Total number of bytes
+
+trans_event:
   type: group
   description: >
     These fields contain data about the transaction itself.
@@ -1077,7 +1301,7 @@ raw:
         (application layer only). For binary protocols this is our
         representation of the request.
 
-measurements:
+trans_measurements:
   type: group
   description: >
     These fields contain measurements related to the transaction.
@@ -1139,7 +1363,8 @@ measurements:
         `domContentLoadedStart`.
 
 sections:
-  - ["event", "Event"]
+  - ["flows_event", "Flow Event"]
+  - ["trans_event", "Transaction Event"]
   - ["icmp", "ICMP"]
   - ["dns", "DNS"]
   - ["http", "Http"]
@@ -1149,6 +1374,7 @@ sections:
   - ["thrift", "Thrift-RPC"]
   - ["redis", "Redis"]
   - ["mongodb", "MongoDb"]
-  - ["measurements", "Measurements"]
-  - ["env", "Environmental"]
+  - ["trans_measurements", "Measurements (Transactions)"]
+  - ["trans_env", "Environmental (Transactions)"]
+  - ["flows_env", "Environmental (Flows)"]
   - ["raw", "Raw"]

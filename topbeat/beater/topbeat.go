@@ -7,13 +7,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/gosigar"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
+	sigar "github.com/elastic/gosigar"
 )
 
 type ProcsMap map[int]*Process
@@ -167,13 +166,13 @@ func (t *Topbeat) initProcStats() {
 
 	pids, err := Pids()
 	if err != nil {
-		logp.Warn("Getting the list of pids: %v", err)
+		logp.Warn("Getting the initial list of pids: %v", err)
 	}
 
 	for _, pid := range pids {
-		process, err := GetProcess(pid)
+		process, err := GetProcess(pid, "")
 		if err != nil {
-			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 		t.procsMap[process.Pid] = process
@@ -194,9 +193,14 @@ func (t *Topbeat) exportProcStats() error {
 
 	newProcs := make(ProcsMap, len(pids))
 	for _, pid := range pids {
-		process, err := GetProcess(pid)
+		var cmdline string
+		if previousProc := t.procsMap[pid]; previousProc != nil {
+			cmdline = previousProc.CmdLine
+		}
+
+		process, err := GetProcess(pid, cmdline)
 		if err != nil {
-			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 

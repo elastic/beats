@@ -7,11 +7,21 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Tab indentation (no size specified)
-[Makefile]
-indent_style = tab
+[*.json]
+indent_size = 4
+indent_style = space
 
-# Matches the exact files either package.json or .travis.yml
+[*.py]
+indent_style = space
+indent_size = 4
+
 [*.yml]
 indent_style = space
 indent_size = 2
+
+[Makefile]
+indent_style = tab
+
+[Vagrantfile]
+indent_size = 2
+indent_style = space
