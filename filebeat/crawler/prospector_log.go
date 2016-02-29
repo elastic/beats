@@ -149,11 +149,12 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 
 	logp.Debug("prospector", "Start harvesting unknown file: %s", h.Path)
 
+	// Call crawler if there if there exists a state for the given file
+	offset, resuming := p.Prospector.registrar.fetchState(h.Path, h.Stat.Fileinfo)
+
 	if p.checkOldFile(h) {
 
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", h.Path)
-		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.Prospector.registrar.fetchState(h.Path, h.Stat.Fileinfo)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
 		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
@@ -172,8 +173,6 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 	} else if previousFile, err := p.getPreviousFile(h.Path, h.Stat.Fileinfo); err == nil {
 		p.continueExistingFile(h, previousFile)
 	} else {
-		// Call crawler if there if there exists a state for the given file
-		offset, _ := p.Prospector.registrar.fetchState(h.Path, h.Stat.Fileinfo)
 		p.resumeHarvesting(h, offset)
 	}
 }
