@@ -51,8 +51,8 @@ func TestAmqp_UnknownMethod(t *testing.T) {
 	stream := &AmqpStream{data: data, message: new(AmqpMessage)}
 	ok, complete := amqp.amqpMessageParser(stream)
 
-	if !ok {
-		t.Errorf("Parsing returned error")
+	if ok {
+		t.Errorf("Parsing should return error")
 	}
 	if complete {
 		t.Errorf("Message should not be complete")
@@ -75,18 +75,6 @@ func TestAmqp_FrameSize(t *testing.T) {
 
 	if !ok {
 		t.Errorf("Parsing should not raise an error")
-	}
-	if complete {
-		t.Errorf("message should not be complete")
-	}
-
-	//ok size
-	data, err = hex.DecodeString("0100000000000c000a001fffff00020000000ace")
-	assert.Nil(t, err)
-	stream = &AmqpStream{data: data, message: new(AmqpMessage)}
-	ok, complete = amqp.amqpMessageParser(stream)
-	if !ok {
-		t.Errorf("Parsing should be ok")
 	}
 	if complete {
 		t.Errorf("message should not be complete")
