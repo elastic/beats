@@ -13,7 +13,7 @@ func (amqp *Amqp) amqpMessageParser(s *AmqpStream) (ok bool, complete bool) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
 			logp.Warn("AMQP message smaller than a frame, waiting for more data")
-			return false, false
+			return true, false
 		}
 
 		yes, version := isProtocolHeader(s.data[s.parseOffset:])
@@ -62,6 +62,7 @@ func (stream *AmqpStream) PrepareForNewMessage() {
 }
 
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
+
 	if (string(data[:4]) == "AMQP") && data[4] == 0 {
 		return true, string(data[5:8])
 	}
@@ -103,7 +104,7 @@ The Method Payload, according to official doc :
 
 func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, m_data []byte) (bool, bool) {
 	if len(m_data) < 4 {
-		logp.Warn("Method frame too small")
+		logp.Warn("Method frame too small, waiting for more data")
 		return true, false
 	}
 	class := codeClass(binary.BigEndian.Uint16(m_data[0:2]))
@@ -118,7 +119,7 @@ func (amqp *Amqp) decodeMethodFrame(s *AmqpStream, m_data []byte) (bool, bool) {
 		return function(s.message, arguments)
 	} else {
 		logp.Debug("amqpdetailed", "Received unkown or not supported method")
-		return true, false
+		return false, false
 	}
 }
 
@@ -133,8 +134,8 @@ Structure of a content header, according to official doc :
 
 func (amqp *Amqp) decodeHeaderFrame(s *AmqpStream, h_data []byte) bool {
 	if len(h_data) < 14 {
-		logp.Warn("Header frame too small")
-		return false
+		logp.Warn("Header frame too small, waiting for mode data")
+		return true
 	}
 	s.message.Body_size = binary.BigEndian.Uint64(h_data[4:12])
 	debugf("Received Header frame. A message of %d bytes is expected", s.message.Body_size)
