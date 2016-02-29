@@ -99,6 +99,7 @@ type Protocol uint16
 // Protocol constants.
 const (
 	UnknownProtocol Protocol = iota
+	AmqpProtocol
 	HttpProtocol
 	MysqlProtocol
 	RedisProtocol
@@ -112,6 +113,7 @@ const (
 // Protocol names
 var ProtocolNames = []string{
 	"unknown",
+	"amqp",
 	"http",
 	"mysql",
 	"redis",

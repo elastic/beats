@@ -27,7 +27,6 @@ class BaseTest(TestCase):
         self.beat_name = "packetbeat"
         super(BaseTest, self).setUpClass()
 
-
     def run_packetbeat(self, pcap,
                        cmd="../../packetbeat.test",
                        config="packetbeat.yml",
