@@ -39,6 +39,12 @@ shipper:
 interfaces:
   device: {{ iface_device|default("any") }}
 
+{% if flows %}
+flows:
+  period: -1s
+  timeout: 10s
+{% endif %}
+
 # Configure which protocols to monitor and the ports where they are
 # running. You can disable a given protocol by commenting out its
 # configuration.

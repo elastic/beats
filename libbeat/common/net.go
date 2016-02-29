@@ -8,24 +8,24 @@ import (
 // LocalIpAddrs finds the IP addresses of the hosts on which
 // the shipper currently runs on.
 func LocalIpAddrs() ([]net.IP, error) {
-	var localAddrs = []net.IP{}
-	addrs, err := net.InterfaceAddrs()
+	var localIPAddrs = []net.IP{}
+	ipaddrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return []net.IP{}, err
 	}
-	for _, addr := range addrs {
-		if ipnet, ok := addr.(*net.IPNet); ok {
-			localAddrs = append(localAddrs, ipnet.IP)
+	for _, ipaddr := range ipaddrs {
+		if ipnet, ok := ipaddr.(*net.IPNet); ok {
+			localIPAddrs = append(localIPAddrs, ipnet.IP)
 		}
 	}
-	return localAddrs, nil
+	return localIPAddrs, nil
 }
 
-// LocalIpAddrs finds the IP addresses of the hosts on which
+// LocalIpAddrsAsStrings finds the IP addresses of the hosts on which
 // the shipper currently runs on and returns them as an array of
 // strings.
 func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
-	var localAddrsStrings = []string{}
+	var localIPAddrsStrings = []string{}
 	var err error
 	ipaddrs, err := LocalIpAddrs()
 	if err != nil {
@@ -33,10 +33,10 @@ func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 	}
 	for _, ipaddr := range ipaddrs {
 		if include_loopbacks || !ipaddr.IsLoopback() {
-			localAddrsStrings = append(localAddrsStrings, ipaddr.String())
+			localIPAddrsStrings = append(localIPAddrsStrings, ipaddr.String())
 		}
 	}
-	return localAddrsStrings, err
+	return localIPAddrsStrings, err
 }
 
 // IsLoopback check if a particular IP notation corresponds

@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
 - Improve shutdown of crawler and prospector to wait for clean completion {pull}720[720]
 - Omit `fields` from Filebeat events when null {issue}899[899]
+- - Fix registrar bug for rotated files {pull}1010[1010]
 
 *Winlogbeat*
 

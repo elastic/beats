@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 )
 
@@ -15,7 +16,7 @@ type Udp struct {
 }
 
 type Processor interface {
-	Process(pkt *protos.Packet)
+	Process(id *flows.FlowID, pkt *protos.Packet)
 }
 
 // decideProtocol determines the protocol based on the source and destination
@@ -39,7 +40,7 @@ func (udp *Udp) decideProtocol(tuple *common.IpPortTuple) protos.Protocol {
 // determine the protocol type and then invokes the associated
 // UdpProtocolPlugin's ParseUdp method. If the protocol cannot be determined
 // or the payload is empty then the method is a noop.
-func (udp *Udp) Process(pkt *protos.Packet) {
+func (udp *Udp) Process(id *flows.FlowID, pkt *protos.Packet) {
 	protocol := udp.decideProtocol(&pkt.Tuple)
 	if protocol == protos.UnknownProtocol {
 		logp.Debug("udp", "unknown protocol")
