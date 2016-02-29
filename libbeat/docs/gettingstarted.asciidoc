@@ -224,7 +224,7 @@ bin\plugin install logstash-input-beats
 . Configure Logstash to listen on port 5044 for incoming Beats connections
 and to index into Elasticsearch. You configure Logstash by creating a
 configuration file. For example, you can save the following example configuration
-to a file called `config.json`:
+to a file called `logstash.conf`:
 +
 [source,ruby]
 ------------------------------------------------------------------------------
@@ -302,14 +302,14 @@ sudo service logstash start
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./bin/logstash -f config.json
+./bin/logstash -f logstash.conf
 ----------------------------------------------------------------------
 
 *win:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-bin\logstash.bat -f config.json
+bin\logstash.bat -f logstash.conf
 ----------------------------------------------------------------------
 
 NOTE: The default configuration for Beats and Logstash uses plain TCP. For
