@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+- Fix registrar bug for rotated files {pull}1010[1010]
+
 
 *Winlogbeat*
 
@@ -32,6 +34,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+
 
 *Winlogbeat*
 

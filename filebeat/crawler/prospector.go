@@ -322,14 +322,15 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		return
 	}
 
+	// Call crawler if there if there exists a state for the given file
+	offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
+
 	// Check for unmodified time, but only if the file modification time is before the last scan started
 	// This ensures we don't skip genuine creations with dead times less than 10s
 	if newinfo.Fileinfo.ModTime().Before(p.lastscan) &&
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", file)
-		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
 		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
@@ -353,9 +354,6 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		lastinfo := p.prospectorList[previousFile]
 		newinfo.Continue(&lastinfo)
 	} else {
-
-		// Call crawler if there if there exists a state for the given file
-		offset, resuming := p.registrar.fetchState(file, newinfo.Fileinfo)
 
 		// Are we resuming a file or is this a completely new file?
 		if resuming {
