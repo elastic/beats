@@ -29,6 +29,7 @@ export PATH := ./bin:$(PATH)
 export GO15VENDOREXPERIMENT=1
 GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
+GOPACKAGES_NOVENDOR = $(glide novendor)
 SHELL=bash
 ES_HOST?="elasticsearch"
 BUILD_DIR?=$(shell pwd)/build
@@ -40,6 +41,7 @@ SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
 DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
+GOPACKAGES_NOVENDOR_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES_NOVENDOR}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
 
 # Conditionally enable the race detector when RACE_DETECTOR=1.
@@ -57,7 +59,7 @@ build: $(GOFILES)
 
 # Create test coverage binary
 .PHONY: buildbeat.test
-buildbeat.test: $(GOFILES)
+buildbeat.test: $(GOFILES_NOVENDOR)
 	go test $(RACE) -c -coverpkg ${GOPACKAGES_COMMA_SEP}
 
 # Cross-compile beat for the OS'es specified in GOX_OS variable.
@@ -72,7 +74,7 @@ crosscompile: $(GOFILES)
 .PHONY: check
 check:
 	@gofmt -l ${GOFILES_NOVENDOR} | (! grep . -q) || (echo "Code differs from gofmt's style" && false)
-	go vet ${GOPACKAGES}
+	go vet ${GOPACKAGES_NOVENDOR}
 
 # Runs gofmt -w on the project's source code, modifying any files that do not
 # match its style.
@@ -116,7 +118,7 @@ prepare-tests:
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short ${GOPACKAGES}
+	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short ${GOPACKAGES_NOVENDOR}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
@@ -126,7 +128,7 @@ unit:
 # Run integration tests. Unit tests are run as part of the integration tests.
 .PHONY: integration-tests
 integration-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES_NOVENDOR}
 
 # Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 .PHONY: integration-tests-environment

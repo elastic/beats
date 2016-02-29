@@ -23,3 +23,9 @@ metricbeat:
       metricsets:
         status:
           period: 1s
+    prometheus:
+      name: "prometheus-server"
+      hosts: ["http://127.0.0.1:9090/"]
+      metricsets:
+        metrics:
+          period: 1s

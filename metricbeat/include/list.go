@@ -18,6 +18,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/golang"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
+	_ "github.com/elastic/beats/metricbeat/module/prometheus/metrics"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 )
 
