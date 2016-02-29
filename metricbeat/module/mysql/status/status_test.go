@@ -3,6 +3,8 @@ package status
 import (
 	"testing"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/metricbeat/module/mysql"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +16,9 @@ func TestFetch(t *testing.T) {
 	}
 
 	// Setup Module config
-	mysql.Module.BaseConfig.Hosts = []string{mysql.GetMySQLEnvDSN()}
+	mysql.Module.Config, _ = ucfg.NewFrom(map[string]interface{}{
+		"hosts": []string{mysql.GetMySQLEnvDSN()},
+	})
 
 	// Setup Metric
 	m := MetricSeter{}
