@@ -5,12 +5,11 @@ filebeat:
     {% set prospectors = true %}
     {% endif %}
     {% if prospectors %}
-    -
+    - input_type: {{input_type | default("log") }}
       # Paths that should be crawled and fetched
       {% if path %}paths:
         - {{ path }}{% endif %}
       # Type of the files. Annotated in every documented
-      input_type: {{input_type | default("log") }}
       scan_frequency: {{scan_frequency | default("0.1s") }}
       ignore_older: "{{ignoreOlder}}"
       close_older: "{{closeOlder}}"

@@ -121,7 +121,7 @@ filebeat:
   # List of prospectors to fetch data.
   prospectors:
     # Each - is a prospector. Below are the prospector specific configurations
-    -
+    - input_type: log
       paths:
         - /var/log/messages
         - "/var/log/*.log"
@@ -129,10 +129,9 @@ filebeat:
       fields:
         service: apache
         zone: us-east-1
-    -
-      input_type: stdin <2>
+    - input_type: stdin <2>
       document_type: stdin
-    -
+    - input_type: log
       paths:
         - "/var/log/apache2/httpd-*.log"
       document_type: apache
@@ -200,20 +199,20 @@ output:
     # The Logstash hosts. <1>
     hosts:
       - localhost:5043
-      
+
     # Network timeout in seconds.
     timeout: 15
 
     tls: <2>
       # List of root certificates for HTTPS server verifications
-      certificate_authorities: 
+      certificate_authorities:
         - ./logstash-forwarder.crt
-        
+
       # Certificate for TLS client authentication
       certificate: ./logstash-forwarder.crt
 
       # Client Certificate Key
-      certificate_key: ./logstash-forwarder.key    
+      certificate_key: ./logstash-forwarder.key
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
@@ -282,7 +281,7 @@ Filebeat configuration:
 -------------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    -
+    - input_type: log
       paths:
         - "/var/log/*.log"
       document_type: syslog
@@ -371,7 +370,7 @@ you can use the <<fields-under-root>> configuration option:
 -------------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    -
+    - input_type: log
       paths:
         - "/var/log/*.log"
       document_type: syslog

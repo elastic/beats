@@ -94,12 +94,6 @@ filebeat:
   # List of prospectors to fetch data.
   prospectors:
     # Each - is a prospector. Below are the prospector specific configurations
-    -
-      # Paths that should be crawled and fetched. Glob based paths.
-      # For each file found under this path, a harvester is started.
-      paths:
-        - "/var/log/*.log"
-        #- c:\programdata\elasticsearch\logs\*
 
       # Type of the files. Based on this the way the file is read is decided.
       # The different types cannot be mixed in one prospector
@@ -107,7 +101,16 @@ filebeat:
       # Possible options are:
       # * log: Reads every line of the log file (default)
       # * stdin: Reads the standard in
-      input_type: log
+    - input_type: log
+
+      # Paths that should be crawled and fetched. Glob based paths.
+      # For each file found under this path, a harvester is started.
+      paths:
+        - "/var/log/*.log"
+        #- c:\programdata\elasticsearch\logs\*
+
+
+
 -------------------------------------------------------------------------------------
 
 To configure Filebeat:
@@ -120,7 +123,7 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 -------------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    -
+    - input_type: log
       paths:
         - "/var/log/*.log"
 -------------------------------------------------------------------------------------
