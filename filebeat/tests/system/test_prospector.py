@@ -279,6 +279,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait(exit_code=1)
 
+
     def test_files_added_late(self):
         """
         Tests that prospectors stay running even though no harvesters are started yet

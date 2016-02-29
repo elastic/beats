@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/amqp"
 	"github.com/elastic/beats/packetbeat/protos/dns"
 	"github.com/elastic/beats/packetbeat/protos/http"
 	"github.com/elastic/beats/packetbeat/protos/icmp"
@@ -36,6 +37,7 @@ import (
 
 var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
 	protos.HttpProtocol:     new(http.HTTP),
+	protos.AmqpProtocol:     new(amqp.Amqp),
 	protos.MemcacheProtocol: new(memcache.Memcache),
 	protos.MysqlProtocol:    new(mysql.Mysql),
 	protos.PgsqlProtocol:    new(pgsql.Pgsql),

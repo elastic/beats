@@ -59,6 +59,7 @@ Vagrant.configure(2) do |config|
 
   # Windows Server 2012 R2
   config.vm.define "win2012", primary: true do |win2012|
+
     win2012.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-01-20_0057.box"
     win2012.vm.guest = :windows
 

@@ -635,6 +635,209 @@ trans_event:
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
 
+    - name: amqp
+      type: group
+      description: AMQP specific event fields.
+      fields:
+        - name: amqp.reply-code
+          type: int
+          description: >
+            AMQP reply code to an error, similar to http reply-code
+          example: 404
+
+        - name: amqp.reply-text
+          type: string
+          description: >
+            Text expliciting the error.
+
+        - name: amqp.class-id
+          type: int
+          description: >
+            Failing method class.
+
+        - name: amqp.method-id
+          type: int
+          description: >
+            Failing method ID.
+
+        - name: amqp.exchange
+          type: string
+          description: >
+            Name of the exchange.
+
+        - name: amqp.exchange-type
+          type: string
+          description: >
+            Exchange type.
+          example: fanout
+
+        - name: amqp.passive
+          type: bool
+          description: >
+            If set, do not create exchange/queue.
+
+        - name: amqp.durable
+          type: bool
+          description: >
+            If set, request a durable exchange/queue.
+
+        - name: amqp.exclusive
+          type: bool
+          description: >
+            If set, request an exclusive queue.
+
+        - name: amqp.auto-delete
+          type: bool
+          description: >
+            If set, auto-delete queue when unused.
+
+        - name: amqp.no-wait
+          type: bool
+          description: >
+            If set, the server will not respond to the method.
+
+        - name: amqp.consumer-tag
+          description: >
+            Identifier for the consumer, valid within the current channel.
+
+        - name: amqp.delivery-tag
+          type: int
+          description: >
+            The server-­assigned and channel-­specific delivery tag.
+
+        - name: amqp.message-count
+          type: int
+          description: >
+            The number of messages in the queue, which will be zero for
+            newly-­declared queues.
+
+        - name: amqp.consumer-count
+          type: int
+          description: >
+            The number of consumers of a queue.
+
+        - name: amqp.routing-key
+          type: int
+          description: >
+            Message routing key.
+
+        - name: amqp.no-ack
+          type: bool
+          description: >
+            If set, the server does not expect acknowledgements for messages.
+
+        - name: amqp.no-local
+          type: bool
+          description: >
+            If set,  the server will not send messages to the connection that
+            published them.
+
+        - name: amqp.if-unused
+          type: bool
+          description: >
+            Delete only if unused.
+
+        - name: amqp.if-empty
+          type: bool
+          description: >
+            Delete only if empty.
+
+        - name: amqp.queue
+          type: string
+          description: >
+            The queue name identifies the queue within the vhost.
+
+        - name: amqp.redelivered
+          type: bool
+          description: >
+            Indicates that the message has been previously delivered to this
+            or another client.
+
+        - name: amqp.multiple
+          type: bool
+          description: >
+            Acknowledge multiple messages.
+
+        - name: amqp.arguments.*
+          description: >
+            Optional additional arguments passed to some methods. Can be of
+            various types.
+
+        - name: amqp.mandatory
+          type: bool
+          description: >
+            Indicates mandatory routing.
+
+        - name: amqp.immediate
+          type: bool
+          description: >
+            Request immediate delivery.
+
+        - name: amqp.content-type
+          type: string
+          description: >
+            MIME content type.
+          example: text/plain
+
+        - name: amqp.content-encoding
+          type: string
+          description: >
+            MIME content encoding.
+
+        - name: amqp.headers.*
+          description: >
+            Message header field table.
+
+        - name: amqp.delivery-mode
+          type: int
+          description: >
+            Non-persistent (1) or persistent (2).
+
+        - name: amqp.priority
+          type: int
+          description: >
+            Message priority, 0 to 9.
+
+        - name: amqp.correlation-id
+          type: string
+          description: >
+            Application correlation identifier.
+
+        - name: amqp.reply-to
+          type: string
+          description: >
+            Address to reply to.
+
+        - name: amqp.expiration
+          type: string
+          description: >
+            Message expiration specification.
+
+        - name: amqp.message-id
+          type: string
+          description: >
+            Application message identifier.
+
+        - name: amqp.timestamp
+          type: string
+          description: >
+            Message timestamp.
+
+        - name: amqp.type
+          type: string
+          description: >
+            Message type name.
+
+        - name: amqp.user-id
+          type: string
+          description: >
+            Creating user id.
+
+        - name: amqp.app-id
+          type: string
+          description: >
+            Creating application id.
+
     - name: http
       type: group
       description: HTTP-specific event fields.
