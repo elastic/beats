@@ -3,6 +3,7 @@ package status
 import (
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,15 +15,20 @@ func TestFetch(t *testing.T) {
 	}
 
 	// Setup Module config
-	mysql.Module.BaseConfig.Hosts = []string{mysql.GetMySQLEnvDSN()}
 
 	// Setup Metric
 	m := MetricSeter{}
 	err := m.Setup()
 	assert.NoError(t, err)
 
+	config := helper.ModuleConfig{
+		Hosts: []string{mysql.GetMySQLEnvDSN()},
+	}
+
+	ms := helper.NewMetricSet("status", m, config)
+
 	// Load events
-	events, err := m.Fetch()
+	events, err := m.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check event fields

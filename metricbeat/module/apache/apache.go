@@ -1,36 +1,18 @@
 package apache
 
 import (
-	//"github.com/elastic/beats/libbeat/logp"
+	"os"
 
 	"github.com/elastic/beats/metricbeat/helper"
-
-	"os"
 )
 
 func init() {
-	Module.Register()
+	helper.Registry.AddModuler("apache", Moduler{})
 }
 
-var Module = helper.NewModule("apache", Apache{})
+type Moduler struct{}
 
-var Config = &ApacheModuleConfig{}
-
-type ApacheModuleConfig struct {
-	Metrics map[string]interface{}
-	Hosts   []string
-}
-
-type Apache struct {
-	Name   string
-	Config ApacheModuleConfig
-}
-
-func (r Apache) Setup() error {
-
-	// Loads module config
-	// This is module specific config object
-	Module.LoadConfig(&Config)
+func (r Moduler) Setup() error {
 	return nil
 }
 

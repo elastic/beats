@@ -1,22 +1,24 @@
 metricbeat:
   modules:
     {% if redis %}
-    redis:
+    - module: redis
       hosts:
         - "{{ redis_host | default("127.0.0.1", true) }}:6379"
       metricsets:
-        info:
-          period: 1s
+        - info
+      period: 1s
+      enabled: true
     {% endif %}
     {% if mysql %}
-    mysql:
+    - module: mysql:
       # This expectd a full mysql dsn
       # Example: [username[:password]@][protocol[(address)]]/
       hosts:
         - "@tcp(127.0.0.1:3306)/"
       metricsets:
-        status:
-          period: 5s
+        - status
+      period: 5s
+      enabled: true
     {% endif %}
 
 
