@@ -56,9 +56,15 @@ filebeat:
       # fields.
       #fields_under_root: false
 
-      # Ignore files which were modified more then the defined timespan in the past
+      # Ignore files which were modified more then the defined timespan in the past.
+      # In case all files on your system must be read you can set this value very large.
       # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
-      #ignore_older: 24h
+      #ignore_older: 0
+
+      # Close older closes the file handler for which were not modified
+      # for longer then close_older
+      # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+      #close_older: 1h
 
       # Type to be published in the 'type' field. For Elasticsearch output,
       # the type defines the document type these entries should be stored
