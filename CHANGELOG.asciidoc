@@ -19,7 +19,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
-- Fix registrar bug for rotated files {pull}1010[1010]
+- Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
 
 
 *Winlogbeat*
@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+- Fix registrar bug for rotated files {pull}1010[1010]
 
 
 *Winlogbeat*
@@ -48,6 +49,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
+- Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
+
 
 *Winlogbeat*
 
