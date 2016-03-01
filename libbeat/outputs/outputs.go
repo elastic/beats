@@ -6,42 +6,42 @@ import (
 )
 
 type MothershipConfig struct {
-	SaveTopology      bool `yaml:"save_topology"`
+	SaveTopology      bool `config:"save_topology"`
 	Host              string
 	Port              int
 	Hosts             []string
-	LoadBalance       *bool `yaml:"loadbalance"`
+	LoadBalance       *bool `config:"loadbalance"`
 	Protocol          string
 	Username          string
 	Password          string
-	ProxyURL          string `yaml:"proxy_url"`
+	ProxyURL          string `config:"proxy_url"`
 	Index             string
 	Path              string
 	Template          Template
-	Params            map[string]string `yaml:"parameters"`
+	Params            map[string]string `config:"parameters"`
 	Db                int
-	DbTopology        int `yaml:"db_topology"`
+	DbTopology        int `config:"db_topology"`
 	Timeout           int
-	ReconnectInterval int    `yaml:"reconnect_interval"`
-	Filename          string `yaml:"filename"`
-	RotateEveryKb     int    `yaml:"rotate_every_kb"`
-	NumberOfFiles     int    `yaml:"number_of_files"`
+	ReconnectInterval int    `config:"reconnect_interval"`
+	Filename          string `config:"filename"`
+	RotateEveryKb     int    `config:"rotate_every_kb"`
+	NumberOfFiles     int    `config:"number_of_files"`
 	DataType          string
-	FlushInterval     *int  `yaml:"flush_interval"`
-	BulkMaxSize       *int  `yaml:"bulk_max_size"`
-	MaxRetries        *int  `yaml:"max_retries"`
-	Pretty            *bool `yaml:"pretty"`
+	FlushInterval     *int  `config:"flush_interval"`
+	BulkMaxSize       *int  `config:"bulk_max_size"`
+	MaxRetries        *int  `config:"max_retries"`
+	Pretty            *bool `config:"pretty"`
 	TLS               *TLSConfig
 	Worker            int
-	CompressionLevel  *int   `yaml:"compression_level"`
-	KeepAlive         string `yaml:"keep_alive"`
-	MaxMessageBytes   *int   `yaml:"max_message_bytes"`
-	RequiredACKs      *int   `yaml:"required_acks"`
-	BrokerTimeout     string `yaml:"broker_timeout"`
-	Compression       string `yaml:"compression"`
-	ClientID          string `yaml:"client_id"`
-	Topic             string `yaml:"topic"`
-	UseType           *bool  `yaml:"use_type"`
+	CompressionLevel  *int   `config:"compression_level"`
+	KeepAlive         string `config:"keep_alive"`
+	MaxMessageBytes   *int   `config:"max_message_bytes"`
+	RequiredACKs      *int   `config:"required_acks"`
+	BrokerTimeout     string `config:"broker_timeout"`
+	Compression       string `config:"compression"`
+	ClientID          string `config:"client_id"`
+	Topic             string `config:"topic"`
+	UseType           *bool  `config:"use_type"`
 }
 
 type Template struct {

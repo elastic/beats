@@ -53,35 +53,35 @@ type Protocols struct {
 }
 
 type ProtocolCommon struct {
-	Ports              []int `yaml:"ports"`
-	SendRequest        *bool `yaml:"send_request"`
-	SendResponse       *bool `yaml:"send_response"`
-	TransactionTimeout *int  `yaml:"transaction_timeout"`
+	Ports              []int `config:"ports"`
+	SendRequest        *bool `config:"send_request"`
+	SendResponse       *bool `config:"send_response"`
+	TransactionTimeout *int  `config:"transaction_timeout"`
 }
 
 type Icmp struct {
 	Enabled            bool
-	SendRequest        *bool `yaml:"send_request"`
-	SendResponse       *bool `yaml:"send_response"`
-	TransactionTimeout *int  `yaml:"transaction_timeout"`
+	SendRequest        *bool `config:"send_request"`
+	SendResponse       *bool `config:"send_response"`
+	TransactionTimeout *int  `config:"transaction_timeout"`
 }
 
 type Amqp struct {
-	ProtocolCommon            `yaml:",inline"`
-	ParseHeaders              *bool `yaml:"parse_headers"`
-	ParseArguments            *bool `yaml:"parse_arguments"`
-	MaxBodyLength             *int  `yaml:"max_body_length"`
-	HideConnectionInformation *bool `yaml:"hide_connection_information"`
+	ProtocolCommon            `config:",inline"`
+	ParseHeaders              *bool `config:"parse_headers"`
+	ParseArguments            *bool `config:"parse_arguments"`
+	MaxBodyLength             *int  `config:"max_body_length"`
+	HideConnectionInformation *bool `config:"hide_connection_information"`
 }
 
 type Dns struct {
-	ProtocolCommon      `yaml:",inline"`
+	ProtocolCommon      `config:",inline"`
 	Include_authorities *bool
 	Include_additionals *bool
 }
 
 type Http struct {
-	ProtocolCommon       `yaml:",inline"`
+	ProtocolCommon       `config:",inline"`
 	Send_all_headers     *bool
 	Send_headers         []string
 	Split_cookie         *bool
@@ -92,7 +92,7 @@ type Http struct {
 }
 
 type Memcache struct {
-	ProtocolCommon        `yaml:",inline"`
+	ProtocolCommon        `config:",inline"`
 	MaxValues             int
 	MaxBytesPerValue      int
 	UdpTransactionTimeout *int
@@ -100,25 +100,25 @@ type Memcache struct {
 }
 
 type Mysql struct {
-	ProtocolCommon `yaml:",inline"`
+	ProtocolCommon `config:",inline"`
 	Max_row_length *int
 	Max_rows       *int
 }
 
 type Mongodb struct {
-	ProtocolCommon `yaml:",inline"`
+	ProtocolCommon `config:",inline"`
 	Max_doc_length *int
 	Max_docs       *int
 }
 
 type Pgsql struct {
-	ProtocolCommon `yaml:",inline"`
+	ProtocolCommon `config:",inline"`
 	Max_row_length *int
 	Max_rows       *int
 }
 
 type Thrift struct {
-	ProtocolCommon             `yaml:",inline"`
+	ProtocolCommon             `config:",inline"`
 	String_max_size            *int
 	Collection_max_size        *int
 	Drop_after_n_struct_fields *int
@@ -130,7 +130,7 @@ type Thrift struct {
 }
 
 type Redis struct {
-	ProtocolCommon `yaml:",inline"`
+	ProtocolCommon `config:",inline"`
 }
 
 // Config Singleton
