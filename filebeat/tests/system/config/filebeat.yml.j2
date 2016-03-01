@@ -9,6 +9,7 @@ filebeat:
       input_type: {{input_type | default("log") }}
       scan_frequency: {{scan_frequency | default("0.1s") }}
       ignore_older: "{{ignoreOlder}}"
+      close_older: "{{closeOlder}}"
       harvester_buffer_size:
       encoding: {{encoding | default("utf-8") }}
       tail_files: {{tailFiles}}
