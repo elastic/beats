@@ -1,3 +1,5 @@
+// +build !integration
+
 package publisher
 
 import (
@@ -141,6 +143,9 @@ const (
 
 func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	pub := &PublisherType{}
+	pub.wsOutput.Init()
+	pub.wsPublisher.Init()
+
 	mh := &testMessageHandler{
 		msgs:     make(chan message, 10),
 		response: response,
@@ -153,8 +158,6 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 
 	pub.Output = []*outputWorker{ow}
 
-	pub.wsOutput.Init()
-	pub.wsPublisher.Init()
 	pub.syncPublisher = newSyncPublisher(pub, defaultChanSize, defaultBulkChanSize)
 	pub.asyncPublisher = newAsyncPublisher(pub, defaultChanSize, defaultBulkChanSize, &pub.wsPublisher)
 	return &testPublisher{

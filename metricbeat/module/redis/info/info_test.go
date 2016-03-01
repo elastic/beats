@@ -1,3 +1,5 @@
+// +build integration
+
 package info
 
 import (
@@ -25,10 +27,6 @@ type RedisModuleConfig struct {
 }
 
 func TestConnect(t *testing.T) {
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Redis")
-	}
 
 	config, _ := ucfg.NewFrom(RedisModuleConfig{
 		Module:  "redis",

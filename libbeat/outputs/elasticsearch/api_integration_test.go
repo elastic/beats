@@ -1,3 +1,5 @@
+// +build integration
+
 package elasticsearch
 
 import (
@@ -12,10 +14,6 @@ func TestIndex(t *testing.T) {
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
 	client := GetTestingElasticsearch()

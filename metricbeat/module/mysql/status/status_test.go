@@ -1,3 +1,5 @@
+// +build integration
+
 package status
 
 import (
@@ -10,10 +12,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires MySQL")
-	}
 
 	config := helper.ModuleConfig{
 		Hosts: []string{mysql.GetMySQLEnvDSN()},
