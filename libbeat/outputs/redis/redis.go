@@ -20,10 +20,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-type RedisOutputPlugin struct{}
-
-type redisDataType uint16
-
 const (
 	RedisListType redisDataType = iota
 	RedisChannelType
@@ -46,6 +42,8 @@ type redisOutput struct {
 	connected   bool
 }
 
+type redisDataType uint16
+
 type message struct {
 	trans outputs.Signaler
 	index string
@@ -53,13 +51,10 @@ type message struct {
 }
 
 func init() {
-	outputs.RegisterOutputPlugin("redis", RedisOutputPlugin{})
+	outputs.RegisterOutputPlugin("redis", New)
 }
 
-func (f RedisOutputPlugin) NewOutput(
-	cfg *ucfg.Config,
-	topologyExpire int,
-) (outputs.Outputer, error) {
+func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err

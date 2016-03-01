@@ -15,10 +15,13 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
-type kafkaOutputPlugin struct{}
-
 type kafka struct {
 	mode mode.ConnectionMode
+}
+
+func init() {
+	sarama.Logger = kafkaLogger{}
+	outputs.RegisterOutputPlugin("kafka", New)
 }
 
 var debugf = logp.MakeDebug("kafka")
@@ -38,16 +41,7 @@ var (
 	}
 )
 
-func init() {
-	sarama.Logger = kafkaLogger{}
-
-	outputs.RegisterOutputPlugin("kafka", kafkaOutputPlugin{})
-}
-
-func (p kafkaOutputPlugin) NewOutput(
-	cfg *ucfg.Config,
-	topologyExpire int,
-) (outputs.Outputer, error) {
+func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
 	output := &kafka{}
 	err := output.init(cfg)
 	if err != nil {

@@ -17,16 +17,11 @@ import (
 
 var debug = logp.MakeDebug("logstash")
 
-type logstashOutputPlugin struct{}
-
 func init() {
-	outputs.RegisterOutputPlugin("logstash", logstashOutputPlugin{})
+	outputs.RegisterOutputPlugin("logstash", New)
 }
 
-func (p logstashOutputPlugin) NewOutput(
-	cfg *ucfg.Config,
-	_ int,
-) (outputs.Outputer, error) {
+func New(cfg *ucfg.Config, _ int) (outputs.Outputer, error) {
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err
