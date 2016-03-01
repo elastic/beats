@@ -12,7 +12,6 @@ RUN set -x \
   go get \
 	github.com/pierrre/gotestcover \
 	github.com/tsg/goautotest \
-	golang.org/x/tools/cmd/cover \
 	golang.org/x/tools/cmd/vet
 
 COPY libbeat/scripts/docker-entrypoint.sh /entrypoint.sh

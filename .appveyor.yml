@@ -37,7 +37,7 @@ install:
   - ps: Push-AppveyorArtifact mingw-install.txt
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
-  - go get github.com/pierrre/gotestcover golang.org/x/tools/cmd/cover
+  - go get github.com/pierrre/gotestcover
   - set GO15VENDOREXPERIMENT=1
   - go version
   - go env
