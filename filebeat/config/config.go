@@ -15,7 +15,8 @@ import (
 // Defaults for config variables which are not set
 const (
 	DefaultRegistryFile                      = ".filebeat"
-	DefaultIgnoreOlderDuration time.Duration = 24 * time.Hour
+	DefaultIgnoreOlderDuration time.Duration = 0
+	DefaultCloseOlderDuration  time.Duration = 1 * time.Hour
 	DefaultScanFrequency       time.Duration = 10 * time.Second
 	DefaultSpoolSize           uint64        = 2048
 	DefaultIdleTimeout         time.Duration = 5 * time.Second
@@ -48,6 +49,8 @@ type ProspectorConfig struct {
 	Input                 string
 	IgnoreOlder           string `yaml:"ignore_older"`
 	IgnoreOlderDuration   time.Duration
+	CloseOlder            string `yaml:"close_older"`
+	CloseOlderDuration    time.Duration
 	ScanFrequency         string `yaml:"scan_frequency"`
 	ScanFrequencyDuration time.Duration
 	Harvester             HarvesterConfig `yaml:",inline"`

@@ -48,6 +48,11 @@ func (p *Prospector) setupProspectorConfig() error {
 		return err
 	}
 
+	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlderDuration, "close_older")
+	if err != nil {
+		return err
+	}
+
 	config.ScanFrequencyDuration, err = getConfigDuration(config.ScanFrequency, cfg.DefaultScanFrequency, "scan_frequency")
 	if err != nil {
 		return err
@@ -328,6 +333,7 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 	// Check for unmodified time, but only if the file modification time is before the last scan started
 	// This ensures we don't skip genuine creations with dead times less than 10s
 	if newinfo.Fileinfo.ModTime().Before(p.lastscan) &&
+		p.ProspectorConfig.IgnoreOlderDuration != 0 &&
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", file)

@@ -57,7 +57,7 @@ func TestReadLine(t *testing.T) {
 	// Read only 10 bytes which is not the end of the file
 	codec, _ := encoding.Plain(file)
 	readConfig := logFileReaderConfig{
-		maxInactive:        500 * time.Millisecond,
+		closeOlderDuration: 500 * time.Millisecond,
 		backoffDuration:    100 * time.Millisecond,
 		maxBackoffDuration: 1 * time.Second,
 		backoffFactor:      2,
