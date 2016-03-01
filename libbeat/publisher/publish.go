@@ -7,10 +7,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/nranchev/go-libGeoIP"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
@@ -84,10 +85,9 @@ type ShipperConfig struct {
 	Geoip                 common.Geoip
 
 	// internal publisher queue sizes
-	QueueSize     *int `yaml:"queue_size"`
-	BulkQueueSize *int `yaml:"bulk_queue_size"`
-
-	MaxProcs *int `yaml:"max_procs"`
+	QueueSize     *int `config:"queue_size"`
+	BulkQueueSize *int `config:"bulk_queue_size"`
+	MaxProcs      *int `config:"max_procs"`
 }
 
 type Topology struct {
