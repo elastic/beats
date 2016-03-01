@@ -107,8 +107,6 @@ ci:
 .PHONY: prepare-tests
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
-	# coverage tools
-	go get golang.org/x/tools/cmd/cover
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get github.com/pierrre/gotestcover
 
