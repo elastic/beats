@@ -72,7 +72,7 @@ metricbeat:
 
     # System module
     - module: system
-      metricsets: ["cpu", "memory"]
+      metricsets: ["cpu", "filesystem", "fsstats", "memory", "process"]
       enabled: true
       period: 2s
 
