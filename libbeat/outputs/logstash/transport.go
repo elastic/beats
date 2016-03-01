@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -22,11 +23,12 @@ type tcpClient struct {
 	hostport  string
 	connected bool
 	conn      net.Conn
+	mutex     sync.Mutex
 }
 
 type tlsClient struct {
 	tcpClient
-	tls tls.Config
+	tls *tls.Config
 }
 
 func newTCPClient(host string, defaultPort int) (*tcpClient, error) {
@@ -34,8 +36,15 @@ func newTCPClient(host string, defaultPort int) (*tcpClient, error) {
 }
 
 func (c *tcpClient) Connect(timeout time.Duration) error {
-	if c.IsConnected() {
-		_ = c.Close()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.doConnect(timeout)
+}
+
+func (c *tcpClient) doConnect(timeout time.Duration) error {
+	if c.connected {
+		c.connected = false
+		_ = c.conn.Close()
 	}
 
 	host, port, err := net.SplitHostPort(c.hostport)
@@ -78,10 +87,16 @@ func (c *tcpClient) Connect(timeout time.Duration) error {
 }
 
 func (c *tcpClient) IsConnected() bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	return c.connected
 }
 
 func (c *tcpClient) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if c.connected {
 		debug("closing")
 		c.connected = false
@@ -90,18 +105,30 @@ func (c *tcpClient) Close() error {
 	return nil
 }
 
-func (c *tcpClient) Read(b []byte) (int, error) {
+func (c *tcpClient) getConn() net.Conn {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	if !c.connected {
+		return nil
+	}
+	return c.conn
+}
+
+func (c *tcpClient) Read(b []byte) (int, error) {
+	conn := c.getConn()
+	if conn == nil {
 		return 0, ErrNotConnected
 	}
 
 	debug("try read: %v", len(b))
-	n, err := c.conn.Read(b)
+	n, err := conn.Read(b)
 	return n, c.handleError(err)
 }
 
 func (c *tcpClient) Write(b []byte) (int, error) {
-	if !c.connected {
+	conn := c.getConn()
+	if conn == nil {
 		return 0, ErrNotConnected
 	}
 
@@ -110,40 +137,49 @@ func (c *tcpClient) Write(b []byte) (int, error) {
 }
 
 func (c *tcpClient) LocalAddr() net.Addr {
-	if !c.connected {
-		return nil
+	conn := c.getConn()
+	if conn != nil {
+		return c.conn.LocalAddr()
 	}
-	return c.conn.LocalAddr()
+	return nil
+
 }
 
 func (c *tcpClient) RemoteAddr() net.Addr {
-	if !c.connected {
-		return nil
+	conn := c.getConn()
+	if conn != nil {
+		return c.conn.LocalAddr()
 	}
-	return c.conn.RemoteAddr()
+	return nil
 }
 
 func (c *tcpClient) SetDeadline(t time.Time) error {
-	if !c.connected {
+	conn := c.getConn()
+	if conn == nil {
 		return ErrNotConnected
 	}
-	err := c.conn.SetDeadline(t)
+
+	err := conn.SetDeadline(t)
 	return c.handleError(err)
 }
 
 func (c *tcpClient) SetReadDeadline(t time.Time) error {
-	if !c.connected {
+	conn := c.getConn()
+	if conn == nil {
 		return ErrNotConnected
 	}
-	err := c.conn.SetReadDeadline(t)
+
+	err := conn.SetReadDeadline(t)
 	return c.handleError(err)
 }
 
 func (c *tcpClient) SetWriteDeadline(t time.Time) error {
-	if !c.connected {
+	conn := c.getConn()
+	if conn == nil {
 		return ErrNotConnected
 	}
-	err := c.conn.SetWriteDeadline(t)
+
+	err := conn.SetWriteDeadline(t)
 	return c.handleError(err)
 }
 
@@ -161,23 +197,26 @@ func (c *tcpClient) handleError(err error) error {
 func newTLSClient(host string, defaultPort int, tls *tls.Config) (*tlsClient, error) {
 	c := tlsClient{}
 	c.hostport = fullAddress(host, defaultPort)
-	c.tls = *tls
+	c.tls = tls
 	return &c, nil
 }
 
 func (c *tlsClient) Connect(timeout time.Duration) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	host, _, err := net.SplitHostPort(c.hostport)
 	if err != nil {
 		return err
 	}
 
-	if err := c.tcpClient.Connect(timeout); err != nil {
+	if err := c.tcpClient.doConnect(timeout); err != nil {
 		return c.onFail(err)
 	}
 
 	tlsconfig := c.tls
 	tlsconfig.ServerName = host
-	socket := tls.Client(c.conn, &tlsconfig)
+	socket := tls.Client(c.conn, tlsconfig)
 	if err := socket.SetDeadline(time.Now().Add(timeout)); err != nil {
 		_ = socket.Close()
 		return c.onFail(err)
