@@ -114,7 +114,7 @@ prepare-tests:
 # Race is not enabled for unit tests because tests run much slower.
 .PHONY: unit-tests
 unit-tests: prepare-tests
-	$(GOPATH)/bin/gotestcover -coverprofile=${COVERAGE_DIR}/unit.cov -short ${GOPACKAGES}
+	$(GOPATH)/bin/gotestcover $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov -short ${GOPACKAGES}
 
 # Runs the unit tests without coverage reports.
 .PHONY: unit
