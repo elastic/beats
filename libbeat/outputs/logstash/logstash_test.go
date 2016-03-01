@@ -1,3 +1,5 @@
+// Need for unit and integration tests
+
 package logstash
 
 import (
@@ -21,6 +23,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs"
+)
+
+const (
+	logstashDefaultHost     = "localhost"
+	logstashTestDefaultPort = "5044"
 )
 
 type mockLSServer struct {
@@ -56,6 +63,24 @@ func (m *mockLSServer) sendACK(client net.Conn, seq uint32) {
 	if m.err == nil {
 		m.err = sockSendACK(client, seq)
 	}
+}
+
+func strDefault(a, defaults string) string {
+	if len(a) == 0 {
+		return defaults
+	}
+	return a
+}
+
+func getenv(name, defaultValue string) string {
+	return strDefault(os.Getenv(name), defaultValue)
+}
+
+func getLogstashHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("LS_HOST", logstashDefaultHost),
+		getenv("LS_TCP_PORT", logstashTestDefaultPort),
+	)
 }
 
 func testEvent() common.MapStr {

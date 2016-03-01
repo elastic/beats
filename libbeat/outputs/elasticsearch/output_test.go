@@ -1,3 +1,5 @@
+// +build integration
+
 package elasticsearch
 
 import (
@@ -44,9 +46,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 }
 
 func TestTopologyInES(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping topology tests in short mode, because they require Elasticsearch")
-	}
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
 	}
@@ -86,9 +86,7 @@ func TestTopologyInES(t *testing.T) {
 }
 
 func TestOneEvent(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
-	}
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch", "output_elasticsearch"})
 	}
@@ -160,9 +158,7 @@ func TestOneEvent(t *testing.T) {
 }
 
 func TestEvents(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
-	}
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch"})
 	}
@@ -300,9 +296,7 @@ func testBulkWithParams(t *testing.T, output elasticsearchOutput) {
 }
 
 func TestBulkEvents(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
-	}
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
 	}
@@ -318,9 +312,7 @@ func TestBulkEvents(t *testing.T) {
 }
 
 func TestEnableTTL(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping events publish in short mode, because they require Elasticsearch")
-	}
+
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"topology", "output_elasticsearch", "elasticsearch"})
 	}
