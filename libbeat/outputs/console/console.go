@@ -12,16 +12,14 @@ import (
 )
 
 func init() {
-	outputs.RegisterOutputPlugin("console", plugin{})
+	outputs.RegisterOutputPlugin("console", New)
 }
-
-type plugin struct{}
 
 type console struct {
 	config config
 }
 
-func (p plugin) NewOutput(config *ucfg.Config, _ int) (outputs.Outputer, error) {
+func New(config *ucfg.Config, _ int) (outputs.Outputer, error) {
 	c := &console{config: defaultConfig}
 	err := config.Unpack(&c.config)
 	if err != nil {

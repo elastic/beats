@@ -32,12 +32,8 @@ type BulkOutputer interface {
 	BulkPublish(trans Signaler, opts Options, event []common.MapStr) error
 }
 
-type OutputBuilder interface {
-	// Create and initialize the output plugin
-	NewOutput(
-		config *ucfg.Config,
-		topologyExpire int) (Outputer, error)
-}
+// Create and initialize the output plugin
+type OutputBuilder func(config *ucfg.Config, topologyExpire int) (Outputer, error)
 
 // Functions to be exported by a output plugin
 type OutputInterface interface {
@@ -81,7 +77,7 @@ func InitOutputs(
 			config.SetString("index", 0, beatName)
 		}
 
-		output, err := plugin.NewOutput(config, topologyExpire)
+		output, err := plugin(config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err

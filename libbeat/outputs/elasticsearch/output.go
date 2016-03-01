@@ -17,12 +17,14 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
-type elasticsearchOutputPlugin struct{}
-
 type elasticsearchOutput struct {
 	index string
 	mode  mode.ConnectionMode
 	topology
+}
+
+func init() {
+	outputs.RegisterOutputPlugin("elasticsearch", New)
 }
 
 var (
@@ -40,15 +42,8 @@ var (
 	ErrResponseRead = errors.New("bulk item status parse failed.")
 )
 
-func init() {
-	outputs.RegisterOutputPlugin("elasticsearch", elasticsearchOutputPlugin{})
-}
-
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
-func (f elasticsearchOutputPlugin) NewOutput(
-	cfg *ucfg.Config,
-	topologyExpire int,
-) (outputs.Outputer, error) {
+func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", 0, defaultBulkSize)
 	}

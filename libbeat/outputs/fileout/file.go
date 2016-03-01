@@ -11,19 +11,14 @@ import (
 )
 
 func init() {
-	outputs.RegisterOutputPlugin("file", FileOutputPlugin{})
+	outputs.RegisterOutputPlugin("file", New)
 }
-
-type FileOutputPlugin struct{}
 
 type fileOutput struct {
 	rotator logp.FileRotator
 }
 
-func (f FileOutputPlugin) NewOutput(
-	cfg *ucfg.Config,
-	_ int,
-) (outputs.Outputer, error) {
+func New(cfg *ucfg.Config, _ int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
