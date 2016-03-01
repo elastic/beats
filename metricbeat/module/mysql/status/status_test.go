@@ -3,9 +3,10 @@ package status
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
@@ -14,18 +15,16 @@ func TestFetch(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires MySQL")
 	}
 
-	// Setup Module config
-
 	// Setup Metric
-	m := MetricSeter{}
-	err := m.Setup()
-	assert.NoError(t, err)
+	m := New()
 
 	config := helper.ModuleConfig{
 		Hosts: []string{mysql.GetMySQLEnvDSN()},
 	}
-
-	ms := helper.NewMetricSet("status", m, config)
+	module := &helper.Module{
+		Config: config,
+	}
+	ms := helper.NewMetricSet("status", m, module)
 
 	// Load events
 	events, err := m.Fetch(ms)
