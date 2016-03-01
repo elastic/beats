@@ -6,28 +6,33 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("mysql", "status", MetricSeter{})
+	helper.Registry.AddMetricSeter("mysql", "status", New())
+}
+
+// New creates new instance of MetricSeter
+func New() *MetricSeter {
+	return &MetricSeter{
+		connections: map[string]*sql.DB{},
+	}
 }
 
 // MetricSetter object
 type MetricSeter struct {
-}
-
-func (m MetricSeter) Setup() error {
-	return nil
+	connections map[string]*sql.DB
 }
 
 // Fetches status messages from mysql hosts
-func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
 	// Load status for all hosts and add it to events
 	for _, host := range ms.Config.Hosts {
-		db, err := mysql.Connect(host)
+		db, err := m.getConnection(host)
 		if err != nil {
 			logp.Err("MySQL conenction error: %s", err)
 		}
@@ -45,12 +50,26 @@ func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err er
 	return events, nil
 }
 
-func (m MetricSeter) Cleanup() error {
-	return nil
+// getConnection returns the connection object for the given dsn
+// In case a connection already exists it is reused
+func (m *MetricSeter) getConnection(dsn string) (*sql.DB, error) {
+
+	if db, ok := m.connections[dsn]; ok {
+		return db, nil
+	}
+
+	db, err := mysql.Connect(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	m.connections[dsn] = db
+
+	return db, nil
 }
 
 // loadStatus loads all status entries from the given database into an array
-func (m MetricSeter) loadStatus(db *sql.DB) (map[string]string, error) {
+func (m *MetricSeter) loadStatus(db *sql.DB) (map[string]string, error) {
 
 	rows, err := db.Query("SHOW STATUS")
 	if err != nil {

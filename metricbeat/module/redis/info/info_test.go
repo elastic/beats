@@ -15,14 +15,15 @@ func TestConnect(t *testing.T) {
 	}
 
 	// Setup
-	r := MetricSeter{}
-	err := r.Setup()
-	assert.NoError(t, err)
+	r := &MetricSeter{}
 
 	config := helper.ModuleConfig{
 		Hosts: []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
 	}
-	ms := helper.NewMetricSet("info", r, config)
+	module := &helper.Module{
+		Config: config,
+	}
+	ms := helper.NewMetricSet("info", r, module)
 
 	data, err := r.Fetch(ms)
 	assert.NoError(t, err)
