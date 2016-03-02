@@ -195,6 +195,8 @@ func (p *asyncLogPublisher) collect() bool {
 		}
 
 		if p.failing {
+			logp.Warn("No registrar update for potentially published batch.")
+
 			// if in failing state keep cleaning up queue
 			continue
 		}
@@ -209,8 +211,14 @@ func (p *asyncLogPublisher) collect() bool {
 	return true
 }
 
-func (b *eventsBatch) Completed() { atomic.StoreInt32(&b.flag, batchSuccess) }
-func (b *eventsBatch) Failed()    { atomic.StoreInt32(&b.flag, batchFailed) }
+func (b *eventsBatch) Completed() {
+	atomic.StoreInt32(&b.flag, batchSuccess)
+}
+
+func (b *eventsBatch) Failed() {
+	logp.Err("Failed to publish batch. Stop updating registrar.")
+	atomic.StoreInt32(&b.flag, batchFailed)
+}
 
 func (l *batchList) append(b *eventsBatch) {
 	if l.head == nil {
