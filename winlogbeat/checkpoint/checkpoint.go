@@ -35,15 +35,15 @@ type Checkpoint struct {
 
 // PersistedState represents the format of the data persisted to disk.
 type PersistedState struct {
-	UpdateTime time.Time       `config:"update_time"`
-	States     []EventLogState `config:"event_logs"`
+	UpdateTime time.Time       `yaml:"update_time"`
+	States     []EventLogState `yaml:"event_logs"`
 }
 
 // EventLogState represents the state of an individual event log.
 type EventLogState struct {
-	Name         string    `config:"name"`
-	RecordNumber uint64    `config:"record_number"`
-	Timestamp    time.Time `config:"timestamp"`
+	Name         string    `yaml:"name"`
+	RecordNumber uint64    `yaml:"record_number"`
+	Timestamp    time.Time `yaml:"timestamp"`
 }
 
 // NewCheckpoint creates and returns a new Checkpoint. This method loads state
