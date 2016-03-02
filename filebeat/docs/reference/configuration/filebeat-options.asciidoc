@@ -14,7 +14,7 @@ filebeat:
   # List of prospectors to fetch data.
   prospectors:
     # Each - is a prospector. Below are the prospector specific configurations
-    -
+    - input_type: log
       # Paths that should be crawled and fetched. Glob based paths.
       # For each file found under this path, a harvester is started.
       paths:
@@ -23,7 +23,8 @@ filebeat:
       # the type defines the document type these entries should be stored
       # in. Default: log
       document_type: apache
-    -
+
+    - input_type: log
       paths:
         - /var/log/messages
         - "/var/log/*.log"
@@ -31,11 +32,6 @@ filebeat:
 -------------------------------------------------------------------------------------
 
 ==== Options
-
-===== paths
-
-A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
-each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
 ===== input_type
 
@@ -46,11 +42,16 @@ One of the following input types:
 
 The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
 
+===== paths
+
+A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
+each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
+
 ===== exclude_lines
 
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped.
 
-If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `exclude_lines`. 
+If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `exclude_lines`.
 
 The following example configures Filebeat to drop any lines that start with "DBG".
 
@@ -63,7 +64,7 @@ exclude_lines: ["^DBG"]
 
 A list of regular expressions to match the lines that you want Filebeat to include. Filebeat exports only the lines that match a regular expression in the list. By default, all lines are exported.
 
-If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `include_lines`. 
+If <<multiline>> is also specified, each multiline message is combined into a single line before the lines are filtered by `include_lines`.
 
 The following example configures Filebeat to export any lines that start with "ERR" or "WARN":
 
@@ -166,9 +167,9 @@ This setting is especially useful for multiline log messages, which can get larg
 [[multiline]]
 ===== multiline
 
-Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces. 
+Options that control how Filebeat deals with log messages that span multiple lines. Multiline messages are common in files that contain Java stack traces.
 
-The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`). 
+The following example shows how to configure Filebeat to handle a multiline message where the first line of the message begins with a bracket (`[`).
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -179,7 +180,7 @@ multiline:
 
 -------------------------------------------------------------------------------------
 
-Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event: 
+Filebeat takes all the lines that do not start with `[` and combines them with the previous line that does. For example, you could use this configuration to join the following lines of a multiline message into a single event:
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
@@ -192,7 +193,7 @@ Filebeat takes all the lines that do not start with `[` and combines them with t
 
 You specify the following settings under `multiline` to control how Filebeat combines the lines in the message:
 
-*`pattern`*:: Specifies the regular expression pattern to match. 
+*`pattern`*:: Specifies the regular expression pattern to match.
 
 *`negate`*:: Defines whether the pattern is negated. The default is `false`.
 
@@ -201,10 +202,10 @@ You specify the following settings under `multiline` to control how Filebeat com
 [options="header"]
 |=======================
 |Setting for `negate` | Setting for `match` | Result
-|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match. 
-|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match. 
-|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match. 
-|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match. 
+|`false`              | `after`             | Consecutive lines that match the pattern are appended to the previous line that doesn't match.
+|`false`              | `before`            | Consecutive lines that match the pattern are prepended to the next line that doesn't match.
+|`true`               | `after`             | Consecutive lines that don't match the pattern are appended to the previous line that does match.
+|`true`               | `before`            | Consecutive lines that don't match the pattern are prepended to the next line that does match.
 |=======================
 +
 NOTE: The `after` setting is equivalent to `previous` in https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html[Logstash], and `before` is equivalent to `next`.
@@ -215,7 +216,7 @@ lines are discarded. The default is 500.
 
 *`timeout`*:: After the specified timeout, Filebeat sends the multiline event even if no new pattern is found to start a new event. The default is 5s.
 
-Here's an example configuration that shows the regular expression for a slightly more complex example: 
+Here's an example configuration that shows the regular expression for a slightly more complex example:
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
@@ -230,7 +231,7 @@ In this example, the pattern matches the following lines:
 * a line that begins with spaces followed by the word `at` or `...`
 * a line that begins with the words `Caused by:`
 
-You could use this configuration to join the following lines from a Java stack trace into a single event: 
+You could use this configuration to join the following lines from a Java stack trace into a single event:
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------

@@ -5,7 +5,15 @@ filebeat:
   # List of prospectors to fetch data.
   prospectors:
     # Each - is a prospector. Below are the prospector specific configurations
-    -
+
+      # Type of the files. Based on this the way the file is read is decided.
+      # The different types cannot be mixed in one prospector
+      #
+      # Possible options are:
+      # * log: Reads every line of the log file (default)
+      # * stdin: Reads the standard in
+    - input_type: log
+
       # Paths that should be crawled and fetched. Glob based paths.
       # To fetch all ".log" files from a specific level of subdirectories
       # /var/log/*/*.log can be used.
@@ -21,14 +29,6 @@ filebeat:
       #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
       #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
       #encoding: plain
-
-      # Type of the files. Based on this the way the file is read is decided.
-      # The different types cannot be mixed in one prospector
-      #
-      # Possible options are:
-      # * log: Reads every line of the log file (default)
-      # * stdin: Reads the standard in
-      input_type: log
 
       # Exclude lines. A list of regular expressions to match. It drops the lines that are
       # matching any regular expression from the list. The include_lines is called before
@@ -141,10 +141,11 @@ filebeat:
       # but lower the ignore_older value to release files faster.
       #force_close_files: false
 
-    # Additional prospector
-    #-
+    # Additional stdin prospector
+
       # Configuration to use stdin input
-      #input_type: stdin
+    #- input_type: stdin
+
 
   # General filebeat configuration options
   #
