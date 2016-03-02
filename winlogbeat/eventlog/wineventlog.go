@@ -5,6 +5,7 @@ package eventlog
 import (
 	"fmt"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
 	sys "github.com/elastic/beats/winlogbeat/sys/wineventlog"
@@ -38,7 +39,8 @@ type winEventLog struct {
 	systemCtx sys.EvtHandle      // System render context.
 	cache     *messageFilesCache // Cached mapping of source name to event message file handles.
 
-	logPrefix string // String to prefix on log messages.
+	logPrefix     string               // String to prefix on log messages.
+	eventMetadata common.EventMetadata // Field and tags to add to each event.
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -101,16 +103,17 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 
 		r := Record{
-			API:          winEventLogAPIName,
-			EventLogName: e.Channel,
-			SourceName:   e.ProviderName,
-			ComputerName: e.Computer,
-			RecordNumber: e.RecordID,
-			EventID:      uint32(e.EventID),
-			Level:        e.Level,
-			Category:     e.Task,
-			Message:      e.Message,
-			MessageErr:   e.MessageErr,
+			API:           winEventLogAPIName,
+			EventLogName:  e.Channel,
+			SourceName:    e.ProviderName,
+			ComputerName:  e.Computer,
+			RecordNumber:  e.RecordID,
+			EventID:       uint32(e.EventID),
+			Level:         e.Level,
+			Category:      e.Task,
+			Message:       e.Message,
+			MessageErr:    e.MessageErr,
+			EventMetadata: l.eventMetadata,
 		}
 
 		if e.TimeCreated != nil {
@@ -163,13 +166,14 @@ func newWinEventLog(c Config) (EventLog, error) {
 	}
 
 	return &winEventLog{
-		channelName:  c.Name,
-		remoteServer: c.RemoteAddress,
-		maxRead:      defaultMaxNumRead,
-		renderBuf:    make([]byte, renderBufferSize),
-		systemCtx:    ctx,
-		cache:        newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
-		logPrefix:    fmt.Sprintf("WinEventLog[%s]", c.Name),
+		channelName:   c.Name,
+		remoteServer:  c.RemoteAddress,
+		maxRead:       defaultMaxNumRead,
+		renderBuf:     make([]byte, renderBufferSize),
+		systemCtx:     ctx,
+		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
+		logPrefix:     fmt.Sprintf("WinEventLog[%s]", c.Name),
+		eventMetadata: c.EventMetadata,
 	}, nil
 }
 

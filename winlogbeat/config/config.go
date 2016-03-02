@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/joeshaw/multierror"
 )
 
@@ -132,9 +133,10 @@ func (mc MetricsConfig) Validate() error {
 // EventLogConfig holds the configuration data that specifies which event logs
 // to monitor.
 type EventLogConfig struct {
-	Name        string
-	IgnoreOlder string `config:"ignore_older"`
-	API         string
+	common.EventMetadata `config:",inline"`
+	Name                 string
+	IgnoreOlder          string `config:"ignore_older"`
+	API                  string
 }
 
 // Validate validates the EventLogConfig data and returns an error describing

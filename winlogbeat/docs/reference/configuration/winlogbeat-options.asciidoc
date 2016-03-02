@@ -124,6 +124,52 @@ winlogbeat:
       ignore_older: 168h
 --------------------------------------------------------------------------------
 
+===== event_logs.tags
+
+A list of tags that the Beat includes in the `tags` field of each published
+event. Tags make it easy to select specific events in Kibana or apply
+conditional filtering in Logstash. These tags will be appended to the list of
+tags specified in the `shipper` configuration.
+
+Example:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat:
+  event_logs:
+    - name: CustomLog
+      tags: ["web"]
+--------------------------------------------------------------------------------
+
+[[configuration-fields]]
+===== event_logs.fields
+
+Optional fields that you can specify to add additional information to the
+output. For example, you might add fields that you can use for filtering event
+data. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the fields that you specify here will be
+grouped under a `fields` sub-dictionary in the output document. To store the
+custom fields as top-level fields, set the `fields_under_root` option to true.
+If a duplicate field is declared in the `shipper` configuration, then its value
+will be overwritten by the value declared here.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat:
+  event_logs:
+    - name: CustomLog
+      fields:
+        customer_id: 51415432
+--------------------------------------------------------------------------------
+
+[[fields-under-root]]
+===== event_logs.fields_under_root
+
+If this option is set to true, the custom <<configuration-fields>> are stored as
+top-level fields in the output document instead of being grouped under a
+`fields` sub-dictionary. If the custom field names conflict with other field
+names added by Winlogbeat, then the custom fields overwrite the other fields.
+
 ===== metrics.bindaddress
 
 The hostname and port where the Beat will host an HTTP web service that provides

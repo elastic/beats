@@ -37,7 +37,7 @@ class Test(BaseTest):
         win32evtlog.ClearEventLog(hlog, None)
         win32evtlog.CloseEventLog(hlog)
 
-    def write_event_log(self, message, eventID, sid=None):
+    def write_event_log(self, message, eventID=10, sid=None):
         if sid == None:
             sid = self.get_sid()
 
@@ -220,3 +220,94 @@ class Test(BaseTest):
         assert evt["message"] == msg
 
         return evt
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_eventlogging_fields_under_root(self):
+        """
+        Event Logging - Fields Under Root
+        """
+        self.fields_under_root("eventlogging")
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_wineventlog_fields_under_root(self):
+        """
+        Win Event Log - Fields Under Root
+        """
+        self.fields_under_root("wineventlog")
+
+    def fields_under_root(self, api):
+        msg = "Add fields under root"
+        self.write_event_log(msg)
+
+        # Run Winlogbeat
+        self.render_config_template(
+            tags = ["global"],
+            fields = {"global": "field", "env": "prod", "type": "overwrite"},
+            fields_under_root = True,
+            event_logs = [
+                {"name": self.providerName,
+                 "api": api,
+                 "tags": ["local"],
+                 "fields_under_root": True,
+                 "fields": {"local": "field", "env": "dev"}}
+            ]
+        )
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_has(1))
+        proc.check_kill_and_wait()
+
+        # Verify output
+        events = self.read_output()
+        self.assertEqual(len(events), 1)
+        evt = events[0]
+        self.assertDictContainsSubset({
+            "global": "field",
+            "env": "dev",
+            "type": "overwrite",
+            "local": "field",
+            "tags": ["global", "local"],
+        }, evt)
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_eventlogging_fields_not_under_root(self):
+        """
+        Event Logging - Fields Not Under Root
+        """
+        self.fields_not_under_root("eventlogging")
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
+    def test_wineventlog_fields_not_under_root(self):
+        """
+        Win Event Log - Fields Not Under Root
+        """
+        self.fields_not_under_root("wineventlog")
+
+    def fields_not_under_root(self, api):
+        msg = "Add fields"
+        self.write_event_log(msg)
+
+        # Run Winlogbeat
+        self.render_config_template(
+            fields = {"global": "field", "env": "prod", "type": "overwrite"},
+            event_logs = [
+                {"name": self.providerName,
+                 "api": api,
+                 "fields": {"local": "field", "env": "dev", "num": 1}}
+            ]
+        )
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_has(1))
+        proc.check_kill_and_wait()
+
+        # Verify output
+        events = self.read_output()
+        self.assertEqual(len(events), 1)
+        evt = events[0]
+        assert "tags" not in evt, "tags present in event"
+        self.assertDictContainsSubset({
+            "fields.global": "field",
+            "fields.env": "dev",
+            "fields.type": "overwrite",
+            "fields.local": "field",
+            "fields.num": 1,
+        }, evt)

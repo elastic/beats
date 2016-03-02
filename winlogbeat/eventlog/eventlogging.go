@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"syscall"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	sys "github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
@@ -22,13 +23,14 @@ var _ EventLog = &eventLogging{}
 // eventLogging implements the EventLog interface for reading from the Event
 // Logging API.
 type eventLogging struct {
-	uncServerPath string             // UNC name of remote server.
-	name          string             // Name of the log that is opened.
-	handle        sys.Handle         // Handle to the event log.
-	readBuf       []byte             // Buffer for reading in events.
-	formatBuf     []byte             // Buffer for formatting messages.
-	handles       *messageFilesCache // Cached mapping of source name to event message file handles.
-	logPrefix     string             // Prefix to add to all log entries.
+	uncServerPath string               // UNC name of remote server.
+	name          string               // Name of the log that is opened.
+	handle        sys.Handle           // Handle to the event log.
+	readBuf       []byte               // Buffer for reading in events.
+	formatBuf     []byte               // Buffer for formatting messages.
+	handles       *messageFilesCache   // Cached mapping of source name to event message file handles.
+	logPrefix     string               // Prefix to add to all log entries.
+	eventMetadata common.EventMetadata // Fields and tags to add to each event.
 
 	recordNumber uint32 // First record number to read.
 	seek         bool   // Read should use seek.
@@ -132,6 +134,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 			Message:        e.Message,
 			MessageInserts: e.MessageInserts,
 			MessageErr:     e.MessageErr,
+			EventMetadata:  l.eventMetadata,
 		}
 
 		if e.TimeGenerated != nil {
@@ -211,9 +214,10 @@ func newEventLogging(c Config) (EventLog, error) {
 		name:          c.Name,
 		handles: newMessageFilesCache(c.Name, sys.QueryEventMessageFiles,
 			sys.FreeLibrary),
-		logPrefix: fmt.Sprintf("EventLogging[%s]", c.Name),
-		readBuf:   make([]byte, 0, sys.MaxEventBufferSize),
-		formatBuf: make([]byte, sys.MaxFormatMessageBufferSize),
+		logPrefix:     fmt.Sprintf("EventLogging[%s]", c.Name),
+		readBuf:       make([]byte, 0, sys.MaxEventBufferSize),
+		formatBuf:     make([]byte, sys.MaxFormatMessageBufferSize),
+		eventMetadata: c.EventMetadata,
 	}, nil
 }
 

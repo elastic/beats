@@ -140,8 +140,9 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		debugf("Initializing EventLog[%s]", eventLogConfig.Name)
 
 		eventLog, err := eventlog.New(eventlog.Config{
-			Name: eventLogConfig.Name,
-			API:  eventLogConfig.API,
+			Name:          eventLogConfig.Name,
+			API:           eventLogConfig.API,
+			EventMetadata: eventLogConfig.EventMetadata,
 		})
 		if err != nil {
 			return fmt.Errorf("Failed to create new event log for %s. %v",
