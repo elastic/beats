@@ -7,6 +7,8 @@ import (
 	"expvar"
 	"time"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -124,10 +126,13 @@ func NewAsyncConnectionMode(
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
 func MakeClients(
-	config outputs.MothershipConfig,
+	config *ucfg.Config,
 	newClient func(string) (ProtocolClient, error),
 ) ([]ProtocolClient, error) {
-	hosts := ReadHostList(config)
+	hosts, err := ReadHostList(config)
+	if err != nil {
+		return nil, err
+	}
 	if len(hosts) == 0 {
 		return nil, ErrNoHostsConfigured
 	}
@@ -148,10 +153,13 @@ func MakeClients(
 }
 
 func MakeAsyncClients(
-	config outputs.MothershipConfig,
+	config *ucfg.Config,
 	newClient func(string) (AsyncProtocolClient, error),
 ) ([]AsyncProtocolClient, error) {
-	hosts := ReadHostList(config)
+	hosts, err := ReadHostList(config)
+	if err != nil {
+		return nil, err
+	}
 	if len(hosts) == 0 {
 		return nil, ErrNoHostsConfigured
 	}
@@ -171,10 +179,22 @@ func MakeAsyncClients(
 	return clients, nil
 }
 
-func ReadHostList(config outputs.MothershipConfig) []string {
-	var lst []string
+func ReadHostList(cfg *ucfg.Config) ([]string, error) {
+	config := struct {
+		Host   string   `config:"host"`
+		Hosts  []string `config:"hosts"`
+		Worker int      `config:"worker"`
+	}{
+		Worker: 1,
+	}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, err
+	}
 
 	// TODO: remove config.Host
+	var lst []string
 	if len(config.Hosts) > 0 {
 		lst = config.Hosts
 	} else if config.Host != "" {
@@ -182,7 +202,7 @@ func ReadHostList(config outputs.MothershipConfig) []string {
 	}
 
 	if len(lst) == 0 || config.Worker <= 1 {
-		return lst
+		return lst, nil
 	}
 
 	// duplicate entries config.Workers times
@@ -193,5 +213,5 @@ func ReadHostList(config outputs.MothershipConfig) []string {
 		}
 	}
 
-	return hosts
+	return hosts, nil
 }

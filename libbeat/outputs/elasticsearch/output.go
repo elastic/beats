@@ -1,14 +1,15 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"crypto/tls"
 	"errors"
+	"io/ioutil"
 	"net/url"
 	"strings"
 	"time"
 
-	"bytes"
-	"io/ioutil"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -16,7 +17,19 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
-var debug = logp.MakeDebug("elasticsearch")
+type elasticsearchOutput struct {
+	index string
+	mode  mode.ConnectionMode
+	topology
+}
+
+func init() {
+	outputs.RegisterOutputPlugin("elasticsearch", New)
+}
+
+var (
+	debug = logp.MakeDebug("elasticsearch")
+)
 
 var (
 	// ErrNotConnected indicates failure due to client having no valid connection
@@ -29,41 +42,14 @@ var (
 	ErrResponseRead = errors.New("bulk item status parse failed.")
 )
 
-const (
-	defaultMaxRetries = 3
-
-	defaultBulkSize = 50
-
-	elasticsearchDefaultTimeout = 90 * time.Second
-)
-
-func init() {
-	outputs.RegisterOutputPlugin("elasticsearch", elasticsearchOutputPlugin{})
-}
-
-type elasticsearchOutputPlugin struct{}
-
-type elasticsearchOutput struct {
-	index string
-	mode  mode.ConnectionMode
-
-	topology
-}
-
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
-func (f elasticsearchOutputPlugin) NewOutput(
-	config *outputs.MothershipConfig,
-	topologyExpire int,
-) (outputs.Outputer, error) {
-
-	// configure bulk size in config in case it is not set
-	if config.BulkMaxSize == nil {
-		bulkSize := defaultBulkSize
-		config.BulkMaxSize = &bulkSize
+func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
+	if !cfg.HasField("bulk_max_size") {
+		cfg.SetInt("bulk_max_size", 0, defaultBulkSize)
 	}
 
 	output := &elasticsearchOutput{}
-	err := output.init(*config, topologyExpire)
+	err := output.init(cfg, topologyExpire)
 	if err != nil {
 		return nil, err
 	}
@@ -71,29 +57,27 @@ func (f elasticsearchOutputPlugin) NewOutput(
 }
 
 func (out *elasticsearchOutput) init(
-	config outputs.MothershipConfig,
+	cfg *ucfg.Config,
 	topologyExpire int,
 ) error {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return err
+	}
+
 	tlsConfig, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return err
 	}
 
-	clients, err := mode.MakeClients(config, makeClientFactory(tlsConfig, config))
-
+	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config))
 	if err != nil {
 		return err
 	}
 
-	timeout := elasticsearchDefaultTimeout
-	if config.Timeout != 0 {
-		timeout = time.Duration(config.Timeout) * time.Second
-	}
+	timeout := time.Duration(config.Timeout) * time.Second
 
-	maxRetries := defaultMaxRetries
-	if config.MaxRetries != nil {
-		maxRetries = *config.MaxRetries
-	}
+	maxRetries := config.MaxRetries
 	maxAttempts := maxRetries + 1 // maximum number of send attempts (-1 = infinite)
 	if maxRetries < 0 {
 		maxAttempts = 0
@@ -103,7 +87,7 @@ func (out *elasticsearchOutput) init(
 	var maxWaitRetry = time.Duration(60) * time.Second
 
 	out.clients = clients
-	loadBalance := config.LoadBalance == nil || *config.LoadBalance
+	loadBalance := config.LoadBalance
 	m, err := mode.NewConnectionMode(clients, !loadBalance,
 		maxAttempts, waitRetry, timeout, maxWaitRetry)
 	if err != nil {
@@ -143,7 +127,7 @@ func (out *elasticsearchOutput) init(
 
 // loadTemplate checks if the index mapping template should be loaded
 // In case template loading is enabled, template is written to index
-func loadTemplate(config outputs.Template, clients []mode.ProtocolClient) {
+func loadTemplate(config Template, clients []mode.ProtocolClient) {
 	// Check if template should be loaded
 	// Not being able to load the template will output an error but will not stop execution
 	if config.Name != "" && len(clients) > 0 {
@@ -183,7 +167,7 @@ func loadTemplate(config outputs.Template, clients []mode.ProtocolClient) {
 
 func makeClientFactory(
 	tls *tls.Config,
-	config outputs.MothershipConfig,
+	config *elasticsearchConfig,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
 		esURL, err := getURL(config.Protocol, config.Path, host)

@@ -15,8 +15,7 @@ type asyncPublisher struct {
 }
 
 const (
-	defaultFlushInterval = 1000 * time.Millisecond // 1s
-	defaultBulkSize      = 2048
+	defaultBulkSize = 2048
 )
 
 func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int) *asyncPublisher {
@@ -71,16 +70,9 @@ func (p *asyncPublisher) send(m message) {
 func asyncOutputer(ws *workerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
 	config := worker.config
 
-	flushInterval := defaultFlushInterval
-	if config.FlushInterval != nil {
-		flushInterval = time.Duration(*config.FlushInterval) * time.Millisecond
-	}
+	flushInterval := time.Duration(config.FlushInterval) * time.Second
+	maxBulkSize := config.BulkMaxSize
 	logp.Info("Flush Interval set to: %v", flushInterval)
-
-	maxBulkSize := defaultBulkSize
-	if config.BulkMaxSize != nil {
-		maxBulkSize = *config.BulkMaxSize
-	}
 	logp.Info("Max Bulk Size set to: %v", maxBulkSize)
 
 	// batching disabled
