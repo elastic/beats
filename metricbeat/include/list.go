@@ -16,7 +16,6 @@ import (
 	// List of all metrics to make sure they are registred
 	// Every new metric must be added here
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
-	_ "github.com/elastic/beats/metricbeat/module/golang/expvar"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 )
