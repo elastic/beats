@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -73,15 +74,13 @@ func testLogstashIndex(test string) string {
 func newTestLumberjackOutput(
 	t *testing.T,
 	test string,
-	config *outputs.MothershipConfig,
+	config map[string]interface{},
 ) outputs.BulkOutputer {
 	if config == nil {
-		config = &outputs.MothershipConfig{
-			TLS:   nil,
-			Hosts: []string{getLogstashHost()},
-			Index: testLogstashIndex(test),
+		config = map[string]interface{}{
+			"hosts": []string{getLogstashHost()},
+			"index": testLogstashIndex(test),
 		}
-
 	}
 
 	plugin := outputs.FindOutputPlugin("logstash")
@@ -89,7 +88,8 @@ func newTestLumberjackOutput(
 		t.Fatalf("No logstash output plugin found")
 	}
 
-	output, err := plugin.NewOutput(config, 0)
+	cfg, _ := ucfg.NewFrom(config, ucfg.PathSep("."))
+	output, err := plugin(cfg, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
@@ -100,7 +100,7 @@ func newTestLumberjackOutput(
 func testOutputerFactory(
 	t *testing.T,
 	test string,
-	config *outputs.MothershipConfig,
+	config map[string]interface{},
 ) func() outputs.BulkOutputer {
 	return func() outputs.BulkOutputer {
 		return newTestLumberjackOutput(t, test, config)
@@ -238,12 +238,11 @@ func TestLogstashTCP(t *testing.T) {
 	server := newMockTCPServer(t, timeout)
 
 	// create lumberjack output client
-	config := outputs.MothershipConfig{
-		Timeout: 2,
-		Hosts:   []string{server.Addr()},
+	config := map[string]interface{}{
+		"hosts":   []string{server.Addr()},
+		"timeout": 2,
 	}
-
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
 
 func TestLogstashTLS(t *testing.T) {
@@ -254,15 +253,12 @@ func TestLogstashTLS(t *testing.T) {
 	genCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs: []string{certName + ".pem"},
-		},
-		Timeout: 2,
-		Hosts:   []string{server.Addr()},
+	config := map[string]interface{}{
+		"hosts":                       []string{server.Addr()},
+		"timeout":                     2,
+		"tls.certificate_authorities": []string{certName + ".pem"},
 	}
-
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
 
 func TestLogstashInvalidTLSInsecure(t *testing.T) {
@@ -273,18 +269,14 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	genCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
-	retries := 1
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs:      []string{certName + ".pem"},
-			Insecure: true,
-		},
-		Timeout:    2,
-		MaxRetries: &retries,
-		Hosts:      []string{server.Addr()},
+	config := map[string]interface{}{
+		"hosts":                       []string{server.Addr()},
+		"timeout":                     2,
+		"max_retries":                 1,
+		"tls.insecure":                true,
+		"tls.certificate_authorities": []string{certName + ".pem"},
 	}
-
-	testConnectionType(t, server, testOutputerFactory(t, "", &config))
+	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
 
 func testConnectionType(
@@ -361,14 +353,11 @@ func TestLogstashInvalidTLS(t *testing.T) {
 	genCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
-	retries := 0
-	config := outputs.MothershipConfig{
-		TLS: &outputs.TLSConfig{
-			CAs: []string{certName + ".pem"},
-		},
-		Timeout:    1,
-		MaxRetries: &retries,
-		Hosts:      []string{server.Addr()},
+	config := map[string]interface{}{
+		"hosts":                       []string{server.Addr()},
+		"timeout":                     1,
+		"max_retries":                 0,
+		"tls.certificate_authorities": []string{certName + ".pem"},
 	}
 
 	var result struct {
@@ -404,7 +393,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 		defer wg.finish.Done()
 		wg.ready.Wait()
 
-		output := newTestLumberjackOutput(t, "", &config)
+		output := newTestLumberjackOutput(t, "", config)
 
 		signal := outputs.NewSyncSignal()
 		output.PublishEvent(signal, testOptions, testEvent())

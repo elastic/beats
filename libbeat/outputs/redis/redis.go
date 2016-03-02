@@ -11,33 +11,14 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/garyburd/redigo/redis"
+
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-
-	"github.com/garyburd/redigo/redis"
 )
-
-func init() {
-
-	outputs.RegisterOutputPlugin("redis", RedisOutputPlugin{})
-}
-
-type RedisOutputPlugin struct{}
-
-func (f RedisOutputPlugin) NewOutput(
-	config *outputs.MothershipConfig,
-	topology_expire int,
-) (outputs.Outputer, error) {
-	output := &redisOutput{}
-	err := output.Init(*config, topology_expire)
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
-}
-
-type redisDataType uint16
 
 const (
 	RedisListType redisDataType = iota
@@ -61,40 +42,48 @@ type redisOutput struct {
 	connected   bool
 }
 
+type redisDataType uint16
+
 type message struct {
 	trans outputs.Signaler
 	index string
 	msg   string
 }
 
-func (out *redisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func init() {
+	outputs.RegisterOutputPlugin("redis", New)
+}
+
+func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
+	config := defaultConfig
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	output := &redisOutput{}
+	if err := output.Init(&config, topologyExpire); err != nil {
+		return nil, err
+	}
+	return output, nil
+}
+
+func (out *redisOutput) Init(config *redisConfig, topology_expire int) error {
 
 	logp.Warn("Redis Output is deprecated. Please use the Redis Output Plugin from Logstash instead.")
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
-
-	if config.Password != "" {
-		out.Password = config.Password
-	}
-
-	if config.Db != 0 {
-		out.Db = config.Db
-	}
-
-	out.DbTopology = 1
-	if config.DbTopology != 0 {
-		out.DbTopology = config.DbTopology
-	}
+	out.Password = config.Password
+	out.Index = config.Index
+	out.Db = config.Db
+	out.DbTopology = config.DbTopology
 
 	out.Timeout = 5 * time.Second
-	if config.Timeout != 0 {
+	if config.Timeout > 0 {
 		out.Timeout = time.Duration(config.Timeout) * time.Second
 	}
 
-	out.Index = config.Index
-
 	out.ReconnectInterval = time.Duration(1) * time.Second
-	if config.ReconnectInterval != 0 {
+	if config.ReconnectInterval >= 0 {
 		out.ReconnectInterval = time.Duration(config.ReconnectInterval) * time.Second
 	}
 	logp.Info("Reconnect Interval set to: %v", out.ReconnectInterval)

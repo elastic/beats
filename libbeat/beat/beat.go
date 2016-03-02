@@ -29,10 +29,10 @@ import (
 	"sync"
 
 	"github.com/satori/go.uuid"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/service"
 )
@@ -81,7 +81,7 @@ const (
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Output  map[string]outputs.MothershipConfig
+	Output  map[string]*ucfg.Config
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
 }

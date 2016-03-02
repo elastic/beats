@@ -1,54 +1,11 @@
 package outputs
 
 import (
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
-
-type MothershipConfig struct {
-	SaveTopology      bool `config:"save_topology"`
-	Host              string
-	Port              int
-	Hosts             []string
-	LoadBalance       *bool `config:"loadbalance"`
-	Protocol          string
-	Username          string
-	Password          string
-	ProxyURL          string `config:"proxy_url"`
-	Index             string
-	Path              string
-	Template          Template
-	Params            map[string]string `config:"parameters"`
-	Db                int
-	DbTopology        int `config:"db_topology"`
-	Timeout           int
-	ReconnectInterval int    `config:"reconnect_interval"`
-	Filename          string `config:"filename"`
-	RotateEveryKb     int    `config:"rotate_every_kb"`
-	NumberOfFiles     int    `config:"number_of_files"`
-	DataType          string
-	FlushInterval     *int  `config:"flush_interval"`
-	BulkMaxSize       *int  `config:"bulk_max_size"`
-	MaxRetries        *int  `config:"max_retries"`
-	Pretty            *bool `config:"pretty"`
-	TLS               *TLSConfig
-	Worker            int
-	CompressionLevel  *int   `config:"compression_level"`
-	KeepAlive         string `config:"keep_alive"`
-	MaxMessageBytes   *int   `config:"max_message_bytes"`
-	RequiredACKs      *int   `config:"required_acks"`
-	BrokerTimeout     string `config:"broker_timeout"`
-	Compression       string `config:"compression"`
-	ClientID          string `config:"client_id"`
-	Topic             string `config:"topic"`
-	UseType           *bool  `config:"use_type"`
-}
-
-type Template struct {
-	Name      string
-	Path      string
-	Overwrite bool
-}
 
 type Options struct {
 	Guaranteed bool
@@ -75,12 +32,8 @@ type BulkOutputer interface {
 	BulkPublish(trans Signaler, opts Options, event []common.MapStr) error
 }
 
-type OutputBuilder interface {
-	// Create and initialize the output plugin
-	NewOutput(
-		config *MothershipConfig,
-		topologyExpire int) (Outputer, error)
-}
+// Create and initialize the output plugin
+type OutputBuilder func(config *ucfg.Config, topologyExpire int) (Outputer, error)
 
 // Functions to be exported by a output plugin
 type OutputInterface interface {
@@ -90,7 +43,7 @@ type OutputInterface interface {
 
 type OutputPlugin struct {
 	Name   string
-	Config MothershipConfig
+	Config *ucfg.Config
 	Output Outputer
 }
 
@@ -110,7 +63,7 @@ func FindOutputPlugin(name string) OutputBuilder {
 
 func InitOutputs(
 	beatName string,
-	configs map[string]MothershipConfig,
+	configs map[string]*ucfg.Config,
 	topologyExpire int,
 ) ([]OutputPlugin, error) {
 	var plugins []OutputPlugin = nil
@@ -120,11 +73,11 @@ func InitOutputs(
 			continue
 		}
 
-		if config.Index == "" {
-			config.Index = beatName
+		if !config.HasField("index") {
+			config.SetString("index", 0, beatName)
 		}
 
-		output, err := plugin.NewOutput(&config, topologyExpire)
+		output, err := plugin(config, topologyExpire)
 		if err != nil {
 			logp.Err("failed to initialize %s plugin as output: %s", name, err)
 			return nil, err

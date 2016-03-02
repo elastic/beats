@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -300,65 +302,76 @@ func signals(s ...bool) []bool {
 	return s
 }
 
+func makeTestClients(c map[string]interface{},
+	newClient func(string) (ProtocolClient, error),
+) ([]ProtocolClient, error) {
+	cfg, err := ucfg.NewFrom(c, ucfg.PathSep("."))
+	if err != nil {
+		return nil, err
+	}
+
+	return MakeClients(cfg, newClient)
+}
+
 func TestMakeEmptyClientFail(t *testing.T) {
-	config := outputs.MothershipConfig{}
-	clients, err := MakeClients(config, dummyMockClientFactory)
+	config := map[string]interface{}{}
+	clients, err := makeTestClients(config, dummyMockClientFactory)
 	assert.Equal(t, ErrNoHostsConfigured, err)
 	assert.Equal(t, 0, len(clients))
 }
 
 func TestMakeSingleClient(t *testing.T) {
-	config := outputs.MothershipConfig{
-		Hosts: []string{"single"},
+	config := map[string]interface{}{
+		"hosts": []string{"single"},
 	}
 
-	clients, err := MakeClients(config, dummyMockClientFactory)
+	clients, err := makeTestClients(config, dummyMockClientFactory)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(clients))
 }
 
 func TestMakeSingleClientWorkers(t *testing.T) {
-	config := outputs.MothershipConfig{
-		Hosts:  []string{"single"},
-		Worker: 3,
+	config := map[string]interface{}{
+		"hosts":  []string{"single"},
+		"worker": 3,
 	}
 
-	clients, err := MakeClients(config, dummyMockClientFactory)
+	clients, err := makeTestClients(config, dummyMockClientFactory)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(clients))
 }
 
 func TestMakeTwoClient(t *testing.T) {
-	config := outputs.MothershipConfig{
-		Hosts: []string{"client1", "client2"},
+	config := map[string]interface{}{
+		"hosts": []string{"client1", "client2"},
 	}
 
-	clients, err := MakeClients(config, dummyMockClientFactory)
+	clients, err := makeTestClients(config, dummyMockClientFactory)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(clients))
 }
 
 func TestMakeTwoClientWorkers(t *testing.T) {
-	config := outputs.MothershipConfig{
-		Hosts:  []string{"client1", "client2"},
-		Worker: 3,
+	config := map[string]interface{}{
+		"hosts":  []string{"client1", "client2"},
+		"worker": 3,
 	}
 
-	clients, err := MakeClients(config, dummyMockClientFactory)
+	clients, err := makeTestClients(config, dummyMockClientFactory)
 	assert.Nil(t, err)
 	assert.Equal(t, 6, len(clients))
 }
 
 func TestMakeTwoClientFail(t *testing.T) {
-	config := outputs.MothershipConfig{
-		Hosts:  []string{"client1", "client2"},
-		Worker: 3,
+	config := map[string]interface{}{
+		"hosts":  []string{"client1", "client2"},
+		"worker": 3,
 	}
 
 	testError := errors.New("test")
 
 	i := 1
-	_, err := MakeClients(config, func(host string) (ProtocolClient, error) {
+	_, err := makeTestClients(config, func(host string) (ProtocolClient, error) {
 		if i%3 == 0 {
 			return nil, testError
 		}

@@ -3,6 +3,8 @@ package publisher
 import (
 	"errors"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -11,30 +13,44 @@ import (
 type outputWorker struct {
 	messageWorker
 	out         outputs.BulkOutputer
-	config      outputs.MothershipConfig
+	config      outputConfig
 	maxBulkSize int
 }
+
+type outputConfig struct {
+	BulkMaxSize   int `config:"bulk_max_size"`
+	FlushInterval int `config:"flush_interval"`
+}
+
+var (
+	defaultConfig = outputConfig{
+		FlushInterval: 1,
+		BulkMaxSize:   2048,
+	}
+)
 
 var (
 	errSendFailed = errors.New("failed send attempt")
 )
 
 func newOutputWorker(
-	config outputs.MothershipConfig,
+	cfg *ucfg.Config,
 	out outputs.Outputer,
 	ws *workerSignal,
 	hwm int,
 	bulkHWM int,
 ) *outputWorker {
-	maxBulkSize := defaultBulkSize
-	if config.BulkMaxSize != nil {
-		maxBulkSize = *config.BulkMaxSize
+	config := defaultConfig
+	err := cfg.Unpack(&config)
+	if err != nil {
+		logp.Err("Failed to read output worker config: %v", err)
+		return nil
 	}
 
 	o := &outputWorker{
 		out:         outputs.CastBulkOutputer(out),
 		config:      config,
-		maxBulkSize: maxBulkSize,
+		maxBulkSize: config.BulkMaxSize,
 	}
 	o.messageWorker.init(ws, hwm, bulkHWM, o)
 	return o
