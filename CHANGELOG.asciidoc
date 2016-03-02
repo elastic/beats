@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
 ==== Bugfixes
 
 *Filebeat*
+
 - Fix registrar bug for rotated files {pull}1010[1010]
 
 
