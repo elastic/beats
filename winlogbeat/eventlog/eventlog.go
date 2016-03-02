@@ -50,6 +50,8 @@ type Record struct {
 	Message        string   // The message from the event log.
 	MessageInserts []string // The raw message data logged by an application.
 	MessageErr     error    // The error that occurred while reading and formatting the message from the event log.
+
+	common.EventMetadata // Fields and tags to add to the event.
 }
 
 // String returns a string representation of Record.
@@ -66,10 +68,11 @@ func (r Record) String() string {
 // ToMapStr returns a new MapStr containing the data from this Record.
 func (r Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"@timestamp":    common.Time(r.TimeGenerated),
-		"log_name":      r.EventLogName,
-		"source_name":   r.SourceName,
-		"computer_name": r.ComputerName,
+		common.EventMetadataKey: r.EventMetadata,
+		"@timestamp":            common.Time(r.TimeGenerated),
+		"log_name":              r.EventLogName,
+		"source_name":           r.SourceName,
+		"computer_name":         r.ComputerName,
 		// Use a string to represent this uint64 data because its value can
 		// be outside the range represented by a Java long.
 		"record_number": strconv.FormatUint(r.RecordNumber, 10),

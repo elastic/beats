@@ -1,21 +1,34 @@
 ###############################################################################
 ############################# Winlogbeat ######################################
 winlogbeat:
-  {% if ignore_older %}
+  {%- if ignore_older %}
   ignore_older: {{ignore_older}}
   {% endif %}
 
-  {% if event_logs %}
+  {%- if event_logs %}
   event_logs:
-    {% for log in event_logs %}
+    {% for log in event_logs -%}
     - name: {{ log.name }}
-      {% if log.ignore_older %}
+      {%- if log.ignore_older %}
       ignore_older: {{ log.ignore_older }}
       {% endif %}
-      {% if log.api %}
+      {%- if log.api %}
       api: {{ log.api }}
       {% endif %}
-    {% endfor %}
+      {%- if log.tags %}
+      tags:
+        {% for tag in log.tags -%}
+        - {{ tag }}
+        {% endfor -%}
+      {% endif -%}
+      {%- if log.fields %}
+      {% if log.fields_under_root %}fields_under_root: true{% endif %}
+      fields:
+        {% for k, v in log.fields.items() -%}
+        {{ k }}: {{ v }}
+        {% endfor -%}
+      {% endif %}
+    {% endfor -%}
   {% endif %}
 
 ###############################################################################
@@ -35,18 +48,23 @@ output:
 ############################# Shipper #########################################
 
 shipper:
- {% if shipper_name %}
- name: {{ shipper_name }}
- {% endif %}
+  {%- if shipper_name %}
+  name: {{ shipper_name }}
+  {% endif %}
 
- {% if tags %}
- tags: [
-    {%- if agent_tags -%}
-        {%- for tag in agent_tags -%}
-            "{{ tag }}"
-            {%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
-    {%- endif -%}]
- {% endif %}
+  {%- if tags %}
+  tags:
+    {% for tag in tags -%}
+    - {{ tag }}
+    {% endfor -%}
+  {% endif %}
+
+  {%- if fields %}
+  {% if fields_under_root %}fields_under_root: true{% endif %}
+  fields:
+    {% for k, v in fields.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor -%}
+  {% endif %}
 
 # vim: set ft=jinja:

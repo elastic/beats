@@ -127,20 +127,18 @@ func (h *Harvester) Harvest() {
 		}
 
 		if h.shouldExportLine(text) {
-			// Sends text to spooler
 			event := &input.FileEvent{
-				ReadTime:     ts,
-				Source:       &h.Path,
-				InputType:    h.Config.InputType,
-				DocumentType: h.Config.DocumentType,
-				Offset:       h.Offset,
-				Bytes:        bytesRead,
-				Text:         &text,
-				Fields:       h.Config.Fields,
-				Fileinfo:     &info,
+				EventMetadata: h.Config.EventMetadata,
+				ReadTime:      ts,
+				Source:        &h.Path,
+				InputType:     h.Config.InputType,
+				DocumentType:  h.Config.DocumentType,
+				Offset:        h.Offset,
+				Bytes:         bytesRead,
+				Text:          &text,
+				Fileinfo:      &info,
 			}
 
-			event.SetFieldsUnderRoot(h.Config.FieldsUnderRoot)
 			h.SpoolerChan <- event // ship the new event downstream
 		}
 

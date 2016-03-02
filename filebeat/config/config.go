@@ -57,11 +57,11 @@ type ProspectorConfig struct {
 }
 
 type HarvesterConfig struct {
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+
 	BufferSize         int    `config:"harvester_buffer_size"`
 	DocumentType       string `config:"document_type"`
 	Encoding           string `config:"encoding"`
-	Fields             common.MapStr
-	FieldsUnderRoot    bool   `config:"fields_under_root"`
 	InputType          string `config:"input_type"`
 	TailFiles          bool   `config:"tail_files"`
 	Backoff            string `config:"backoff"`

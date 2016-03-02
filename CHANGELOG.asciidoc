@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 *Filebeat*
 - Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
+- Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
 
 *Winlogbeat*
 
@@ -72,6 +73,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Improve logstash and elasticsearch backoff behavior. {pull}927[927]
 - Add experimental Kafka output. {pull}942[942]
 - Add config file option to configure GOMAXPROCS. {pull}969[969]
+- Added a `fields` and `fields_under_root` as options available under the `shipper` configuration {pull}1092[1092]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]
@@ -84,10 +86,12 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
 - Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
+- Added the ability to set a list of tags for each prospector {pull}1092[1092]
 
 *Winlogbeat*
 - Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
 - Improve config validation by checking for unknown top-level YAML keys. {pull}1100[1100]
+- Added the ability to set tags, fields, and fields_under_root as options for each event log {pull}1092[1092]
 
 ==== Deprecated
 

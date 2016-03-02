@@ -1,12 +1,10 @@
 package common
 
 import (
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 func TestMapStrUpdate(t *testing.T) {
@@ -188,83 +186,148 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestUnmarshalYAML(t *testing.T) {
+func TestMergeFields(t *testing.T) {
 	type io struct {
-		InputLines []string
-		Output     MapStr
+		UnderRoot bool
+		Event     MapStr
+		Fields    MapStr
+		Output    MapStr
+		Err       error
 	}
 	tests := []io{
-		// should return nil for empty document
+		// underRoot = true, merges
 		{
-			InputLines: []string{},
-			Output:     nil,
-		},
-		// should handle scalar values
-		{
-			InputLines: []string{
-				"a: b",
-				"c: true",
-				"123: 456",
+			UnderRoot: true,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"b": 2,
 			},
 			Output: MapStr{
-				"a":   "b",
-				"c":   "true",
-				"123": "456",
+				"a": "1",
+				"b": 2,
 			},
 		},
-		// should handle array with scalar values
+
+		// underRoot = true, overwrites existing
 		{
-			InputLines: []string{
-				"a:",
-				"  - b",
-				"  - true",
-				"  - 123",
+			UnderRoot: true,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"a": 2,
 			},
 			Output: MapStr{
-				"a": []interface{}{"b", "true", "123"},
+				"a": 2,
 			},
 		},
-		// should handle array with nested map
+
+		// underRoot = false, adds new 'fields' when it doesn't exist
 		{
-			InputLines: []string{
-				"a:",
-				"  - b: c",
-				"    d: true",
-				"    123: 456",
+			UnderRoot: false,
+			Event: MapStr{
+				"a": "1",
+			},
+			Fields: MapStr{
+				"a": 2,
 			},
 			Output: MapStr{
-				"a": []interface{}{
-					MapStr{
-						"b":   "c",
-						"d":   "true",
-						"123": "456",
-					},
+				"a": "1",
+				"fields": MapStr{
+					"a": 2,
 				},
 			},
 		},
-		// should handle nested map
+
+		// underRoot = false, merge with existing 'fields' and overwrites existing keys
 		{
-			InputLines: []string{
-				"a: ",
-				"  b: c",
-				"  d: true",
-				"  123: 456",
-			},
-			Output: MapStr{
-				"a": MapStr{
-					"b":   "c",
-					"d":   "true",
-					"123": "456",
+			UnderRoot: false,
+			Event: MapStr{
+				"fields": MapStr{
+					"a": "1",
+					"b": 2,
 				},
 			},
+			Fields: MapStr{
+				"a": 3,
+				"c": 4,
+			},
+			Output: MapStr{
+				"fields": MapStr{
+					"a": 3,
+					"b": 2,
+					"c": 4,
+				},
+			},
+		},
+
+		// underRoot = false, error when 'fields' is wrong type
+		{
+			UnderRoot: false,
+			Event: MapStr{
+				"fields": "not a MapStr",
+			},
+			Fields: MapStr{
+				"a": 3,
+			},
+			Output: MapStr{
+				"fields": "not a MapStr",
+			},
+			Err: ErrorFieldsIsNotMapStr,
 		},
 	}
+
 	for _, test := range tests {
-		var actual MapStr
-		if err := yaml.Unmarshal([]byte(strings.Join(test.InputLines, "\n")), &actual); err != nil {
-			assert.Fail(t, "YAML unmarshaling unexpectedly failed: %s", err)
-			continue
-		}
-		assert.Equal(t, test.Output, actual)
+		err := MergeFields(test.Event, test.Fields, test.UnderRoot)
+		assert.Equal(t, test.Err, err)
+		assert.Equal(t, test.Output, test.Event)
+	}
+}
+
+func TestAddTag(t *testing.T) {
+	type io struct {
+		Event  MapStr
+		Tags   []string
+		Output MapStr
+		Err    error
+	}
+	tests := []io{
+		// No existing tags, creates new tag array
+		{
+			Event: MapStr{},
+			Tags:  []string{"json"},
+			Output: MapStr{
+				"tags": []string{"json"},
+			},
+		},
+		// Existing tags, appends
+		{
+			Event: MapStr{
+				"tags": []string{"json"},
+			},
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"tags": []string{"json", "docker"},
+			},
+		},
+		// Existing tags is not a []string
+		{
+			Event: MapStr{
+				"tags": "not a slice",
+			},
+			Tags: []string{"docker"},
+			Output: MapStr{
+				"tags": "not a slice",
+			},
+			Err: ErrorTagsIsNotStringArray,
+		},
+	}
+
+	for _, test := range tests {
+		err := AddTags(test.Event, test.Tags)
+		assert.Equal(t, test.Err, err)
+		assert.Equal(t, test.Output, test.Event)
 	}
 }
