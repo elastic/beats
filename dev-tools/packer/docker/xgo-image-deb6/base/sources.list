@@ -1,0 +1,3 @@
+deb http://snapshot.debian.org/archive/debian/20160229T214851Z squeeze main
+deb http://snapshot.debian.org/archive/debian/20160229T214851Z squeeze-updates main
+deb http://snapshot.debian.org/archive/debian/20160229T214851Z squeeze-lts main
