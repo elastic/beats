@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,6 +42,10 @@ func TestAsyncPublishEvents(t *testing.T) {
 }
 
 func TestBulkAsyncPublishEvent(t *testing.T) {
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
 	// Init
 	testPub := newTestPublisherWithBulk(CompletedResponse)
 	event := testEvent()
@@ -53,9 +58,10 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	// Bulk outputer always sends bulk messages (even if only one event is
 	// present)
-	assert.Equal(t, event, msgs[0].events[0])
+	assert.Equal(t, event, msgs[0].event)
 }
 
 func TestBulkAsyncPublishEvents(t *testing.T) {

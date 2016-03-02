@@ -89,7 +89,7 @@ func newTestLumberjackOutput(
 	}
 
 	cfg, _ := ucfg.NewFrom(config, ucfg.PathSep("."))
-	output, err := plugin.NewOutput(cfg, 0)
+	output, err := plugin(cfg, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

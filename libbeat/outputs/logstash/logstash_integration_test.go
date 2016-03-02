@@ -164,7 +164,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"password":       os.Getenv("ES_PASS"),
 	})
 
-	output, err := plugin.NewOutput(config, 10)
+	output, err := plugin(config, 10)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
