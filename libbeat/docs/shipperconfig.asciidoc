@@ -101,7 +101,7 @@ shipper:
   tags: ["my-service", "hardware", "test"]
 --------------------------------------------------------------------------------
 
-[[configuration-fields]]
+[[libbeat-configuration-fields]]
 ===== fields
 
 Optional fields that you can specify to add additional information to the
@@ -120,9 +120,9 @@ shipper:
 
 ===== fields_under_root
 
-If this option is set to true, the custom <<configuration-fields>> are stored as
-top-level fields in the output document instead of being grouped under a
-`fields` sub-dictionary. If the custom field names conflict with other field
+If this option is set to true, the custom <<libbeat-configuration-fields>> are
+stored as top-level fields in the output document instead of being grouped under
+a `fields` sub-dictionary. If the custom field names conflict with other field
 names, then the custom fields overwrite the other fields.
 
 Example:
