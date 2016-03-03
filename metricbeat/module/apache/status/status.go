@@ -13,16 +13,12 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("apache", "status", MetricSeter{})
+	helper.Registry.AddMetricSeter("apache", "status", &MetricSeter{})
 }
 
 type MetricSeter struct{}
 
-func (m MetricSeter) Setup() error {
-	return nil
-}
-
-func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
 	hosts := ms.Config.Hosts
 
@@ -47,8 +43,4 @@ func (m MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err er
 	}
 
 	return events, nil
-}
-
-func (m MetricSeter) Cleanup() error {
-	return nil
 }
