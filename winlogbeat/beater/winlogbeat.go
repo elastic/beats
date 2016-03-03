@@ -69,7 +69,7 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	}
 
 	// Validate configuration.
-	err = eb.config.Winlogbeat.Validate()
+	err = eb.config.Validate()
 	if err != nil {
 		return fmt.Errorf("Error validating configuration file. %v", err)
 	}
