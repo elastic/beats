@@ -1,4 +1,4 @@
-FROM tudorg/xgo-deb6-1.5.3
+FROM tudorg/xgo-deb6-1.6
 
 MAINTAINER Tudor Golubenco <tudor@elastic.co>
 
@@ -11,7 +11,7 @@ RUN \
 	dpkg -x libpcap0.8-dev_*_amd64.deb /libpcap/amd64 && \
 	rm libpcap0.8-dev*.deb
 RUN \
-	apt-get update && \
+	apt-get -o Acquire::Check-Valid-Until=false update && \
 	apt-get install -y libpcap0.8-dev
 
 # add patch for gopacket
