@@ -141,7 +141,7 @@ winlogbeat:
       tags: ["web"]
 --------------------------------------------------------------------------------
 
-[[configuration-fields]]
+[[winlogbeat-configuration-fields]]
 ===== event_logs.fields
 
 Optional fields that you can specify to add additional information to the
@@ -162,13 +162,13 @@ winlogbeat:
         customer_id: 51415432
 --------------------------------------------------------------------------------
 
-[[fields-under-root]]
 ===== event_logs.fields_under_root
 
-If this option is set to true, the custom <<configuration-fields>> are stored as
-top-level fields in the output document instead of being grouped under a
-`fields` sub-dictionary. If the custom field names conflict with other field
-names added by Winlogbeat, then the custom fields overwrite the other fields.
+If this option is set to true, the custom <<winlogbeat-configuration-fields>>
+are stored as top-level fields in the output document instead of being grouped
+under a `fields` sub-dictionary. If the custom field names conflict with other
+field names added by Winlogbeat, then the custom fields overwrite the other
+fields.
 
 ===== metrics.bindaddress
 
@@ -202,4 +202,3 @@ include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/runconfig.asciidoc[]
-
