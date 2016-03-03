@@ -17,6 +17,7 @@ type File struct {
 
 // FileEvent is sent to the output and must contain all relevant information
 type FileEvent struct {
+	common.EventMetadata
 	ReadTime     time.Time
 	Source       *string
 	InputType    string
@@ -24,10 +25,7 @@ type FileEvent struct {
 	Offset       int64
 	Bytes        int
 	Text         *string
-	Fields       common.MapStr
 	Fileinfo     *os.FileInfo
-
-	fieldsUnderRoot bool
 }
 
 type FileState struct {
@@ -57,37 +55,16 @@ func (f *FileEvent) GetState() *FileState {
 	return state
 }
 
-// SetFieldsUnderRoot sets whether the fields should be added
-// top level to the output documentation (fieldsUnderRoot = true) or
-// under a fields dictionary.
-func (f *FileEvent) SetFieldsUnderRoot(fieldsUnderRoot bool) {
-	f.fieldsUnderRoot = fieldsUnderRoot
-}
-
 func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
-		"@timestamp": common.Time(f.ReadTime),
-		"source":     f.Source,
-		"offset":     f.Offset, // Offset here is the offset before the starting char.
-		"message":    f.Text,
-		"type":       f.DocumentType,
-		"input_type": f.InputType,
-		"count":      1,
-	}
-
-	if f.Fields != nil {
-		if f.fieldsUnderRoot {
-			for key, value := range f.Fields {
-				// in case of conflicts, overwrite
-				_, found := event[key]
-				if found {
-					logp.Warn("Overwriting %s key", key)
-				}
-				event[key] = value
-			}
-		} else {
-			event["fields"] = f.Fields
-		}
+		common.EventMetadataKey: f.EventMetadata,
+		"@timestamp":            common.Time(f.ReadTime),
+		"source":                f.Source,
+		"offset":                f.Offset, // Offset here is the offset before the starting char.
+		"message":               f.Text,
+		"type":                  f.DocumentType,
+		"input_type":            f.InputType,
+		"count":                 1,
 	}
 
 	return event

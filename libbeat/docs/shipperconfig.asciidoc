@@ -89,16 +89,51 @@ shipper:
 
 A list of tags that the Beat includes in the `tags` field of each published
 transaction. Tags make it easy to group servers by different logical properties.
-For example, if you have a cluster of web servers, you can add the "webservers" tag
-to the Beat on each server, and then use filters and queries in the
-Kibana web interface to get visualisations for the whole group of servers.
+For example, if you have a cluster of web servers, you can add the "webservers"
+tag to the Beat on each server, and then use filters and queries in the Kibana
+web interface to get visualisations for the whole group of servers.
+
+Example:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+shipper:
+  tags: ["my-service", "hardware", "test"]
+--------------------------------------------------------------------------------
+
+[[configuration-fields]]
+===== fields
+
+Optional fields that you can specify to add additional information to the
+output. Fields can be scalar values, arrays, dictionaries, or any nested
+combination of these. By default, the fields that you specify here will be
+grouped under a `fields` sub-dictionary in the output document. To store the
+custom fields as top-level fields, set the `fields_under_root` option to true.
 
 Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
 shipper:
-  tags: ["my-service", "hardware", "test"]
+  fields: {project: "myproject", instance-id: "574734885120952459"}
+------------------------------------------------------------------------------
+
+===== fields_under_root
+
+If this option is set to true, the custom <<configuration-fields>> are stored as
+top-level fields in the output document instead of being grouped under a
+`fields` sub-dictionary. If the custom field names conflict with other field
+names, then the custom fields overwrite the other fields.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+shipper:
+  fields_under_root: true
+  fields:
+    instance_id: i-10a64379
+    region: us-east-1
 ------------------------------------------------------------------------------
 
 ===== ignore_outgoing

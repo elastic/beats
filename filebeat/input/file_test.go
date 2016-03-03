@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -111,24 +110,4 @@ func TestFileEventToMapStr(t *testing.T) {
 	mapStr := event.ToMapStr()
 	_, found := mapStr["fields"]
 	assert.False(t, found)
-}
-
-func TestFieldsUnderRoot(t *testing.T) {
-	event := FileEvent{
-		Fields: common.MapStr{
-			"hello": "world",
-		},
-	}
-	event.SetFieldsUnderRoot(true)
-	mapStr := event.ToMapStr()
-	_, found := mapStr["fields"]
-	assert.False(t, found)
-	assert.Equal(t, "world", mapStr["hello"])
-
-	event.SetFieldsUnderRoot(false)
-	mapStr = event.ToMapStr()
-	_, found = mapStr["hello"]
-	assert.False(t, found)
-	_, found = mapStr["fields"]
-	assert.True(t, found)
 }

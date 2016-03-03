@@ -213,6 +213,17 @@ shipper:
   # logical properties.
   #tags: ["service-X", "web-tier"]
 
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these. 
+  #fields:
+  #  env: staging
+
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false
+
   # Uncomment the following if you want to ignore transactions created
   # by the server on which the shipper is installed. This option is useful
   # to remove duplicates if shippers are installed on multiple servers.
