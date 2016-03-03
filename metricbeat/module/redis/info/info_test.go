@@ -3,9 +3,11 @@ package info
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/redis"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConnect(t *testing.T) {
@@ -29,7 +31,10 @@ func TestConnect(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check fields
-	assert.Equal(t, 4, len(data[0]))
-	assert.Equal(t, "3.0.6", data[0]["version"])
-	assert.Equal(t, "standalone", data[0]["mode"])
+	assert.Equal(t, 8, len(data[0]))
+
+	server := data[0]["server"].(common.MapStr)
+
+	assert.Equal(t, "3.0.7", server["redis_version"])
+	assert.Equal(t, "standalone", server["redis_mode"])
 }

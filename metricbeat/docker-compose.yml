@@ -20,7 +20,7 @@ beat:
   command: make
   entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 elasticsearch:
-  image: elasticsearch:2.1.0
+  image: elasticsearch:2.2.0
   command: elasticsearch -Des.network.host=0.0.0.0
 
 # Modules
@@ -33,4 +33,4 @@ mysql:
     - MYSQL_ROOT_PASSWORD=test
 
 redis:
-  image: redis:3.0.6
+  image: redis:3.0.7
