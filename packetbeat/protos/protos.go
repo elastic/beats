@@ -87,14 +87,8 @@ func (protocols ProtocolsStruct) Init(
 	results publish.Transactions,
 	configs map[string]*ucfg.Config,
 ) error {
-	protoMap := map[string]Protocol{}
-	for i, name := range ProtocolNames[1:] {
-		protoMap[name] = Protocol(i + 1)
-		logp.Info("protomap: %v -> %v", name, protoMap[name])
-	}
-
-	for proto, _ := range protocolPlugins {
-		logp.Info("registered protocol plugin: %v", proto.String())
+	for proto := range protocolSyms {
+		logp.Info("registered protocol plugin: %v", proto)
 	}
 
 	for name, config := range configs {
@@ -103,7 +97,7 @@ func (protocols ProtocolsStruct) Init(
 			continue
 		}
 
-		proto, exists := protoMap[name]
+		proto, exists := protocolSyms[name]
 		if !exists {
 			logp.Err("Unknown protocol plugin: %v", name)
 			continue
@@ -173,20 +167,20 @@ func (protocols ProtocolsStruct) BpfFilter(with_vlans bool, with_icmp bool) stri
 		proto := Protocol(key)
 		plugin := protocols.all[proto]
 		for _, port := range plugin.GetPorts() {
-			has_tcp := false
-			has_udp := false
+			hasTCP := false
+			hasUDP := false
 
 			if _, present := protocols.tcp[proto]; present {
-				has_tcp = true
+				hasTCP = true
 			}
 			if _, present := protocols.udp[proto]; present {
-				has_udp = true
+				hasUDP = true
 			}
 
 			var expr string
-			if has_tcp && !has_udp {
+			if hasTCP && !hasUDP {
 				expr = "tcp port %d"
-			} else if !has_tcp && has_udp {
+			} else if !hasTCP && hasUDP {
 				expr = "udp port %d"
 			} else {
 				expr = "port %d"
@@ -214,7 +208,7 @@ func (protos ProtocolsStruct) register(proto Protocol, plugin Plugin) {
 
 	protos.all[proto] = plugin
 
-	var success bool = false
+	success := false
 	if tcp, ok := plugin.(TcpPlugin); ok {
 		protos.tcp[proto] = tcp
 		success = true

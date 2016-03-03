@@ -54,42 +54,41 @@ type Protocol uint16
 // Protocol constants.
 const (
 	UnknownProtocol Protocol = iota
-	AmqpProtocol
-	HttpProtocol
-	MysqlProtocol
-	RedisProtocol
-	PgsqlProtocol
-	ThriftProtocol
-	MongodbProtocol
-	DnsProtocol
-	MemcacheProtocol
 )
 
 // Protocol names
-var ProtocolNames = []string{
+var protocolNames = []string{
 	"unknown",
-	"amqp",
-	"http",
-	"mysql",
-	"redis",
-	"pgsql",
-	"thrift",
-	"mongodb",
-	"dns",
-	"memcache",
 }
 
 func (p Protocol) String() string {
-	if int(p) >= len(ProtocolNames) {
+	if int(p) >= len(protocolNames) {
 		return "impossible"
 	}
-	return ProtocolNames[p]
+	return protocolNames[p]
 }
 
 var (
 	protocolPlugins = map[Protocol]ProtocolPlugin{}
+	protocolSyms    = map[string]Protocol{}
 )
 
-func Register(proto Protocol, plugin ProtocolPlugin) {
+func Lookup(name string) Protocol {
+	if p, exists := protocolSyms[name]; exists {
+		return p
+	}
+	return UnknownProtocol
+}
+
+func Register(name string, plugin ProtocolPlugin) {
+	proto := Protocol(len(protocolNames))
+	if p, exists := protocolSyms[name]; exists {
+		// keep symbol table entries if plugin gets overwritten
+		proto = p
+	} else {
+		protocolNames = append(protocolNames, name)
+		protocolSyms[name] = proto
+	}
+
 	protocolPlugins[proto] = plugin
 }

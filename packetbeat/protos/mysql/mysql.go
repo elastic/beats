@@ -131,7 +131,7 @@ type Mysql struct {
 }
 
 func init() {
-	protos.Register(protos.MysqlProtocol, New)
+	protos.Register("mysql", New)
 }
 
 func New(

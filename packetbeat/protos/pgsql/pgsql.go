@@ -118,7 +118,7 @@ type Pgsql struct {
 }
 
 func init() {
-	protos.Register(protos.PgsqlProtocol, New)
+	protos.Register("pgsql", New)
 }
 
 func New(

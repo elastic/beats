@@ -37,7 +37,7 @@ type transactionKey struct {
 }
 
 func init() {
-	protos.Register(protos.MongodbProtocol, New)
+	protos.Register("mongodb", New)
 }
 
 func New(
