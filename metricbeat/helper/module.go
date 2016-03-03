@@ -6,7 +6,9 @@ import (
 
 	"fmt"
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"sort"
 )
 
 // Module specifics. This must be defined by each module
@@ -17,7 +19,7 @@ type Module struct {
 	moduler Moduler
 
 	// Module config
-	config ModuleConfig
+	Config ModuleConfig
 
 	// List of all metricsets in this module. Use to keep track of metricsets
 	metricSets map[string]*MetricSet
@@ -32,7 +34,7 @@ type Module struct {
 func NewModule(config ModuleConfig, moduler Moduler) *Module {
 	return &Module{
 		name:       config.Module,
-		config:     config,
+		Config:     config,
 		moduler:    moduler,
 		metricSets: map[string]*MetricSet{},
 		wg:         sync.WaitGroup{},
@@ -41,39 +43,30 @@ func NewModule(config ModuleConfig, moduler Moduler) *Module {
 }
 
 // Starts the given module
-func (m *Module) Start(b *beat.Beat) {
+func (m *Module) Start(b *beat.Beat) error {
 
 	defer logp.Recover(fmt.Sprintf("Module %s paniced and stopped running.", m.name))
 
-	if !m.config.Enabled {
-		logp.Debug("helper", "Not starting module %s as not enabled.", m.name)
-		return
+	if !m.Config.Enabled {
+		logp.Debug("helper", "Not starting module %s with metricsets %s as not enabled.", m.name, m.getMetricSetsList())
+		return nil
 	}
 
 	logp.Info("Setup moduler: %s", m.name)
 	err := m.moduler.Setup()
 	if err != nil {
-		logp.Err("Error setting up module: %s. Not starting metricsets for this module.", err)
-		return
+		return fmt.Errorf("Error setting up module: %s. Not starting metricsets for this module.", err)
 	}
 
-	// Setup - Create metricSets for the module
-	for _, metricsetName := range m.config.MetricSets {
-		metricSeter := Registry.MetricSeters[m.name][metricsetName]
-		// Setup
-		err := metricSeter.Setup()
-		if err != nil {
-			logp.Err("Error happening during metricseter setup: %s", err)
-		}
-
-		metricSet := NewMetricSet(metricsetName, metricSeter, m.config)
-		m.metricSets[metricsetName] = metricSet
+	err = m.loadMetricsets()
+	if err != nil {
+		return fmt.Errorf("Error loading metricsets: %s", err)
 	}
 
 	// Setup period
-	period, err := time.ParseDuration(m.config.Period)
+	period, err := time.ParseDuration(m.Config.Period)
 	if err != nil {
-		logp.Info("Error in parsing period of metric %s: %v", m.name, err)
+		return fmt.Errorf("Error in parsing period of metric %s: %v", m.name, err)
 	}
 
 	// If no period set, set default
@@ -83,15 +76,18 @@ func (m *Module) Start(b *beat.Beat) {
 	}
 
 	// TODO: Improve logging information with list (names of metricSets)
-	logp.Info("Start Module %s with metricsets %v and period %v", m.name, m.metricSets, period)
+	logp.Info("Start Module %s with metricsets [%s] and period %v", m.name, m.getMetricSetsList(), period)
 
 	go m.Run(period, b)
+
+	return nil
 }
 
 func (m *Module) Run(period time.Duration, b *beat.Beat) {
 	ticker := time.NewTicker(period)
+
 	defer func() {
-		logp.Info("Stopped module %s with metricsets ... TODO", m.name)
+		logp.Info("Stopped module %s with metricsets %s", m.name, m.getMetricSetsList())
 		ticker.Stop()
 	}()
 
@@ -155,6 +151,8 @@ func (m *Module) FetchMetricSets(b *beat.Beat, metricSet *MetricSet) {
 		return
 	}
 
+	events, err = m.processEvents(events, metricSet)
+
 	// Async publishing of event
 	b.Events.PublishEvents(events)
 
@@ -164,4 +162,83 @@ func (m *Module) FetchMetricSets(b *beat.Beat, metricSet *MetricSet) {
 func (m *Module) Stop() {
 	logp.Info("Stopping module: %v", m.name)
 	m.wg.Wait()
+}
+
+// loadMetricsets creates and setups the metricseter for the module
+func (m *Module) loadMetricsets() error {
+	// Setup - Create metricSets for the module
+	for _, metricsetName := range m.Config.MetricSets {
+
+		metricSet, err := Registry.GetMetricSet(m, metricsetName)
+		if err != nil {
+			return err
+		}
+		m.metricSets[metricsetName] = metricSet
+	}
+	return nil
+}
+
+// getMetricSetsList is a helper function that returns a list of all module metricsets as string
+// This is mostly used for logging
+func (m *Module) getMetricSetsList() string {
+
+	// Sort list first alphabetically
+	keys := make([]string, 0, len(m.metricSets))
+	for key := range m.metricSets {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	// Create output string
+	list := ""
+	first := true
+
+	for _, value := range keys {
+		if !first {
+			list = list + ", "
+		}
+		first = false
+		list = list + value
+	}
+
+	return list
+}
+
+func (m *Module) processEvents(events []common.MapStr, metricSet *MetricSet) ([]common.MapStr, error) {
+	newEvents := []common.MapStr{}
+
+	// Default name is empty, means it will be metricbeat
+	indexName := ""
+	typeName := "metricsets"
+	timestamp := common.Time(time.Now())
+
+	for _, event := range events {
+		// Set meta information dynamic if set
+		indexName = getIndex(event, indexName)
+		typeName = getType(event, typeName)
+		timestamp = getTimestamp(event, timestamp)
+
+		// Each metricset has a unique eventfieldname to prevent type conflicts
+		eventFieldName := m.name + "-" + metricSet.Name
+
+		// TODO: Add fields_under_root option for "metrics"?
+		event = common.MapStr{
+			"type":         typeName,
+			eventFieldName: event,
+			"metricset":    metricSet.Name,
+			"module":       m.name,
+			"@timestamp":   timestamp,
+		}
+
+		// Overwrite index in case it is set
+		if indexName != "" {
+			event["beat"] = common.MapStr{
+				"index": indexName,
+			}
+		}
+
+		newEvents = append(newEvents, event)
+	}
+
+	return newEvents, nil
 }

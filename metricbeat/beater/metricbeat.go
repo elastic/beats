@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/include"
 )
 
 type Metricbeat struct {
@@ -52,6 +53,9 @@ func (mb *Metricbeat) Config(b *beat.Beat) error {
 		return err
 	}
 
+	// List all registered modules and metricsets
+	include.ListAll()
+
 	return nil
 }
 
@@ -70,7 +74,10 @@ func (mb *Metricbeat) Run(b *beat.Beat) error {
 			return err
 		}
 
-		module.Start(b)
+		err = module.Start(b)
+		if err != nil {
+			return err
+		}
 	}
 
 	<-mb.done

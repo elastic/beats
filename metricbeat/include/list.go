@@ -11,7 +11,7 @@ package include
 // TODO: create a script to automatically generate this list
 import (
 	"github.com/elastic/beats/libbeat/logp"
-	_ "github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper"
 
 	// List of all metrics to make sure they are registred
 	// Every new metric must be added here
@@ -22,9 +22,9 @@ import (
 
 func ListAll() {
 	logp.Debug("beat", "Registered Modules and Metrics")
-	//for moduleName, module := range helper.Registry {
-	//	for metricName, _ := range module.MetricSets {
-	//		logp.Debug("beat", "Registred: Module: %v, Metric: %v", moduleName, metricName)
-	//	}
-	//}
+	for module := range helper.Registry.Modulers {
+		for metricset := range helper.Registry.MetricSeters[module] {
+			logp.Debug("metricbeat", "Registred: Module: %v, MetricSet: %v", module, metricset)
+		}
+	}
 }

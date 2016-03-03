@@ -56,3 +56,20 @@ func (r *Register) GetModule(config ModuleConfig) (*Module, error) {
 
 	return NewModule(config, moduler), nil
 }
+
+// GetMetricSet returns a new metricset instance for the given metricset name combined with the module name
+func (r *Register) GetMetricSet(module *Module, metricsetName string) (*MetricSet, error) {
+
+	if _, ok := Registry.MetricSeters[module.name]; !ok {
+		return nil, fmt.Errorf("Module %s does not exist", module.name)
+	}
+
+	if _, ok := Registry.MetricSeters[module.name][metricsetName]; !ok {
+		return nil, fmt.Errorf("Metricset %s in module %s does not exist", metricsetName, module.name)
+	}
+
+	metricSeter := Registry.MetricSeters[module.name][metricsetName]
+
+	return NewMetricSet(metricsetName, metricSeter, module), nil
+
+}
