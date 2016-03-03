@@ -4,6 +4,7 @@ package config
 import (
 	"fmt"
 	"net"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +28,33 @@ type Validator interface {
 
 // Settings is the root of the Winlogbeat configuration data hierarchy.
 type Settings struct {
-	Winlogbeat WinlogbeatConfig
+	Winlogbeat WinlogbeatConfig       `config:"winlogbeat"`
+	All        map[string]interface{} `config:",inline"`
+}
+
+// Validate validates the Settings data and returns an error describing
+// all problems or nil if there are none.
+func (s Settings) Validate() error {
+	validKeys := []string{"winlogbeat", "output", "shipper", "logging"}
+	sort.Strings(validKeys)
+
+	// Check for invalid top-level keys.
+	var errs multierror.Errors
+	for k, _ := range s.All {
+		k = strings.ToLower(k)
+		i := sort.SearchStrings(validKeys, k)
+		if i >= len(validKeys) || validKeys[i] != k {
+			errs = append(errs, fmt.Errorf("Invalid top-level key '%s' "+
+				"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+		}
+	}
+
+	err := s.Winlogbeat.Validate()
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	return errs.Err()
 }
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.

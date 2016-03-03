@@ -143,7 +143,7 @@ func (l *winEventLog) Close() error {
 func newWinEventLog(c Config) (EventLog, error) {
 	eventMetadataHandle := func(providerName, sourceName string) eventlogging.MessageFiles {
 		mf := eventlogging.MessageFiles{SourceName: sourceName}
-		h, err := sys.OpenPublisherMetadata(0, providerName, 0)
+		h, err := sys.OpenPublisherMetadata(0, sourceName, 0)
 		if err != nil {
 			mf.Err = err
 			return mf

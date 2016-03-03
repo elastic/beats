@@ -87,6 +87,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 
 *Winlogbeat*
 - Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
+- Improve config validation by checking for unknown top-level YAML keys. {pull}1100[1100]
 
 ==== Deprecated
 
