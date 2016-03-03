@@ -9,8 +9,8 @@ class Test(BaseTest):
 
     def test_valid_config(self):
         """
-        With -configtest and an error in the configuration, it should
-        return a non-zero error code.
+        With -configtest and valid config, it should return a non-zero error
+        code.
         """
         self.render_config_template(
             ignore_older="1h",

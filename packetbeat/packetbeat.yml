@@ -29,6 +29,28 @@ protocols:
     # Enable ICMPv4 and ICMPv6 monitoring. Default: false
     enabled: true
 
+  amqp:
+    # Configure the ports where to listen for AMQP traffic. You can disable
+    # the AMQP protocol by commenting out the list of ports.
+    ports: [5672]
+    # Truncate messages that are published and avoid huge messages being
+    # indexed.
+    # Default: 1000
+    #max_body_length: 1000
+
+    # Hide the header fields in header frames.
+    # Default: false
+    #parse_headers: false
+
+    # Hide the additional arguments of method frames.
+    # Default: false
+    #parse_arguments: false
+
+    # Hide all methods relative to connection negociation between server and
+    # client.
+    # Default: true
+    #hide_connection_information: true
+
   dns:
     # Configure the ports where to listen for DNS traffic. You can disable
     # the DNS protocol by commenting out the list of ports.
@@ -51,24 +73,6 @@ protocols:
     # Default: false
     # send_request:  true
     # send_response: true
-
-  amqp:
-    # Configure the ports where to listen for AMQP traffic. You can disable
-    # the AMQP protocol by commenting out the list of ports.
-    ports: [5672]
-    # Truncate messages that are published and avoid huge messages being
-    # indexed.
-    # Default: 1000
-    #max_body_length: 1000
-    # Hide the header fields in header frames.
-    # Default: false
-    #parse_headers: false
-    # Hide the additional arguments of method frames.
-    # Default: false
-    #parse_arguments: false
-    # See all methods relative to connection negociation between server and
-    # client.
-    #hide_connection_information: false
 
   http:
     # Configure the ports where to listen for HTTP traffic. You can disable
@@ -166,7 +170,6 @@ protocols:
 #
 #    - process: app
 #      cmdline_grep: gunicorn
-
 ###############################################################################
 ############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features
@@ -357,6 +360,17 @@ shipper:
   # logical properties.
   #tags: ["service-X", "web-tier"]
 
+  # Optional fields that you can specify to add additional information to the
+  # output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these. 
+  #fields:
+  #  env: staging
+
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false
+
   # Uncomment the following if you want to ignore transactions created
   # by the server on which the shipper is installed. This option is useful
   # to remove duplicates if shippers are installed on multiple servers.
@@ -424,3 +438,5 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
+
+

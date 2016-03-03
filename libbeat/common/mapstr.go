@@ -2,12 +2,30 @@ package common
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 )
 
+const (
+	EventMetadataKey = "_event_metadata"
+	FieldsKey        = "fields"
+	TagsKey          = "tags"
+)
+
+var ErrorFieldsIsNotMapStr = errors.New("the value stored in fields is not a MapStr")
+var ErrorTagsIsNotStringArray = errors.New("the value stored in tags is not a []string")
+
 // Commonly used map of things, used in JSON creation and the like.
 type MapStr map[string]interface{}
+
+// EventMetadata contains fields and tags that can be added to an event via
+// configuration.
+type EventMetadata struct {
+	Fields          MapStr
+	FieldsUnderRoot bool `config:"fields_under_root"`
+	Tags            []string
+}
 
 // Eventer defines a type its ability to fill a MapStr.
 type Eventer interface {
@@ -69,6 +87,7 @@ func (m MapStr) EnsureTimestampField(now func() time.Time) error {
 	return fmt.Errorf("Don't know how to convert %v to a Time value", ts)
 }
 
+// EnsureCountField sets the 'count' field to 1 if count does not already exist.
 func (m MapStr) EnsureCountField() error {
 	_, exists := m["count"]
 	if !exists {
@@ -77,7 +96,7 @@ func (m MapStr) EnsureCountField() error {
 	return nil
 }
 
-// Prints the dict as a json
+// String returns the MapStr as a JSON string.
 func (m MapStr) String() string {
 	bytes, err := json.Marshal(m)
 	if err != nil {
@@ -86,51 +105,60 @@ func (m MapStr) String() string {
 	return string(bytes)
 }
 
-// UnmarshalYAML helps out with the YAML unmarshalling when the target
-// variable is a MapStr. The default behavior is to unmarshal nested
-// maps to map[interface{}]interface{} values, and such values can't
-// be marshalled as JSON.
+// MergeFields merges the top-level keys and values in each source hash (it does
+// not perform a deep merge). If the same key exists in both, the value in
+// fields takes precedence. If underRoot is true then the contents of the fields
+// MapStr is merged with the value of the 'fields' key in ms.
 //
-// The keys of map[interface{}]interface{} maps will be converted to
-// strings with a %v format string, as will any scalar values that
-// aren't already strings (i.e. numbers and boolean values).
-//
-// Since we want to modify the receiver it needs to be a pointer.
-func (ms *MapStr) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var result map[interface{}]interface{}
-	err := unmarshal(&result)
-	if err != nil {
-		panic(err)
+// An error is returned if underRoot is true and the value of ms.fields is not a
+// MapStr.
+func MergeFields(ms, fields MapStr, underRoot bool) error {
+	if ms == nil || fields == nil {
+		return nil
 	}
-	*ms = cleanUpInterfaceMap(result)
+
+	fieldsMS := ms
+	if !underRoot {
+		f, ok := ms[FieldsKey]
+		if !ok {
+			fieldsMS = make(MapStr, len(fields))
+			ms[FieldsKey] = fieldsMS
+		} else {
+			// Use existing 'fields' value.
+			fieldsMS, ok = f.(MapStr)
+			if !ok {
+				return ErrorFieldsIsNotMapStr
+			}
+		}
+	}
+
+	// Add fields and override.
+	for k, v := range fields {
+		fieldsMS[k] = v
+	}
+
 	return nil
 }
 
-func cleanUpInterfaceArray(in []interface{}) []interface{} {
-	result := make([]interface{}, len(in))
-	for i, v := range in {
-		result[i] = cleanUpMapValue(v)
+// AddTag appends a tag to the tags field of ms. If the tags field does not
+// exist then it will be created. If the tags field exists and is not a []string
+// then an error will be returned. It does not deduplicate the list of tags.
+func AddTags(ms MapStr, tags []string) error {
+	if ms == nil || len(tags) == 0 {
+		return nil
 	}
-	return result
-}
 
-func cleanUpInterfaceMap(in map[interface{}]interface{}) MapStr {
-	result := make(MapStr)
-	for k, v := range in {
-		result[fmt.Sprintf("%v", k)] = cleanUpMapValue(v)
+	tagsIfc, ok := ms[TagsKey]
+	if !ok {
+		ms[TagsKey] = tags
+		return nil
 	}
-	return result
-}
 
-func cleanUpMapValue(v interface{}) interface{} {
-	switch v := v.(type) {
-	case []interface{}:
-		return cleanUpInterfaceArray(v)
-	case map[interface{}]interface{}:
-		return cleanUpInterfaceMap(v)
-	case string:
-		return v
-	default:
-		return fmt.Sprintf("%v", v)
+	existingTags, ok := tagsIfc.([]string)
+	if !ok {
+		return ErrorTagsIsNotStringArray
 	}
+
+	ms[TagsKey] = append(existingTags, tags...)
+	return nil
 }

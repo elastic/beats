@@ -53,13 +53,14 @@ type PublisherType struct {
 	hostname       string // Host name as returned by the operation system
 	name           string // The shipperName if configured, the hostname otherwise
 	IpAddrs        []string
-	tags           []string
 	disabled       bool
 	Index          string
 	Output         []*outputWorker
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
+
+	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
 
 	RefreshTopologyTimer <-chan time.Time
 
@@ -78,11 +79,11 @@ type PublisherType struct {
 }
 
 type ShipperConfig struct {
+	common.EventMetadata  `config:",inline"` // Fields and tags to add to each event.
 	Name                  string
 	Refresh_topology_freq int
 	Ignore_outgoing       bool
 	Topology_expire       int
-	Tags                  []string
 	Geoip                 common.Geoip
 
 	// internal publisher queue sizes
@@ -291,7 +292,7 @@ func (publisher *PublisherType) init(
 	}
 	logp.Info("Publisher name: %s", publisher.name)
 
-	publisher.tags = shipper.Tags
+	publisher.globalEventMetadata = shipper.EventMetadata
 
 	//Store the publisher's IP addresses
 	publisher.IpAddrs, err = common.LocalIpAddrsAsStrings(false)

@@ -15,7 +15,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            fields={"hello": "world"}
+            fields={"hello": "world", "number": 2}
         )
 
         with open(self.working_dir + "/test.log", "w") as f:
@@ -28,6 +28,7 @@ class Test(BaseTest):
         output = self.read_output()
         doc = output[0]
         assert doc["fields.hello"] == "world"
+        assert doc["fields.number"] == 2
 
     def test_custom_fields_under_root(self):
         """
