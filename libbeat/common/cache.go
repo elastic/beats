@@ -188,7 +188,7 @@ func (c *Cache) CleanUp() int {
 	return count
 }
 
-// Entries returns a copy of the non-expired elements in the cache.
+// Entries returns a shallow copy of the non-expired elements in the cache.
 func (c *Cache) Entries() map[Key]Value {
 	c.RLock()
 	defer c.RUnlock()
