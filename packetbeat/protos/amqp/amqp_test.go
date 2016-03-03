@@ -2,19 +2,21 @@ package amqp
 
 import (
 	"encoding/hex"
+	"net"
+	"testing"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/stretchr/testify/assert"
-	"net"
-	"testing"
 )
 
 func AmqpModForTests() *Amqp {
 	var amqp Amqp
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
-	amqp.Init(true, results)
+	config := defaultConfig
+	amqp.init(results, &config)
 	return &amqp
 }
 

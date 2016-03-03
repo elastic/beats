@@ -20,34 +20,34 @@ const (
 )
 
 type TestProtocols struct {
-	udp map[protos.Protocol]protos.UdpProtocolPlugin
+	udp map[protos.Protocol]protos.UdpPlugin
 }
 
 func (p TestProtocols) BpfFilter(with_vlans bool, with_icmp bool) string {
 	return "mock bpf filter"
 }
 
-func (p TestProtocols) GetTcp(proto protos.Protocol) protos.TcpProtocolPlugin {
+func (p TestProtocols) GetTcp(proto protos.Protocol) protos.TcpPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetUdp(proto protos.Protocol) protos.UdpProtocolPlugin {
+func (p TestProtocols) GetUdp(proto protos.Protocol) protos.UdpPlugin {
 	return p.udp[proto]
 }
 
-func (p TestProtocols) GetAll() map[protos.Protocol]protos.ProtocolPlugin {
+func (p TestProtocols) GetAll() map[protos.Protocol]protos.Plugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllTcp() map[protos.Protocol]protos.TcpProtocolPlugin {
+func (p TestProtocols) GetAllTcp() map[protos.Protocol]protos.TcpPlugin {
 	return nil
 }
 
-func (p TestProtocols) GetAllUdp() map[protos.Protocol]protos.UdpProtocolPlugin {
+func (p TestProtocols) GetAllUdp() map[protos.Protocol]protos.UdpPlugin {
 	return p.udp
 }
 
-func (p TestProtocols) Register(proto protos.Protocol, plugin protos.ProtocolPlugin) {
+func (p TestProtocols) Register(proto protos.Protocol, plugin protos.Plugin) {
 	return
 }
 
@@ -81,7 +81,7 @@ func testSetup(t *testing.T) *TestStruct {
 	}
 
 	protocols := &TestProtocols{}
-	protocols.udp = make(map[protos.Protocol]protos.UdpProtocolPlugin)
+	protocols.udp = make(map[protos.Protocol]protos.UdpPlugin)
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
@@ -96,7 +96,7 @@ func testSetup(t *testing.T) *TestStruct {
 func Test_buildPortsMap(t *testing.T) {
 
 	type configTest struct {
-		Input  map[protos.Protocol]protos.UdpProtocolPlugin
+		Input  map[protos.Protocol]protos.UdpPlugin
 		Output map[uint16]protos.Protocol
 	}
 
@@ -104,7 +104,7 @@ func Test_buildPortsMap(t *testing.T) {
 	// for testing purposes.
 	config_tests := []configTest{
 		{
-			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
+			Input: map[protos.Protocol]protos.UdpPlugin{
 				protos.HttpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
 			Output: map[uint16]protos.Protocol{
@@ -113,7 +113,7 @@ func Test_buildPortsMap(t *testing.T) {
 			},
 		},
 		{
-			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
+			Input: map[protos.Protocol]protos.UdpPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
@@ -129,7 +129,7 @@ func Test_buildPortsMap(t *testing.T) {
 
 		// should ignore duplicate ports in the same protocol
 		{
-			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
+			Input: map[protos.Protocol]protos.UdpPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 			},
@@ -152,7 +152,7 @@ func Test_buildPortsMap(t *testing.T) {
 // for the same port number.
 func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	type errTest struct {
-		Input map[protos.Protocol]protos.UdpProtocolPlugin
+		Input map[protos.Protocol]protos.UdpPlugin
 		Err   string
 	}
 
@@ -161,7 +161,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 	tests := []errTest{
 		{
 			// Should raise error on duplicate port
-			Input: map[protos.Protocol]protos.UdpProtocolPlugin{
+			Input: map[protos.Protocol]protos.UdpPlugin{
 				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
 				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},

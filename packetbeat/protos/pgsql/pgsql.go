@@ -7,8 +7,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/urso/ucfg"
 
-	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -117,57 +117,31 @@ type Pgsql struct {
 		dir uint8, raw_msg []byte)
 }
 
-func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {
-	v := pgsql.transactions.Get(k)
-	if v != nil {
-		return v.([]*PgsqlTransaction)
-	}
-	return nil
+func init() {
+	protos.Register(protos.PgsqlProtocol, New)
 }
 
-func (pgsql *Pgsql) InitDefaults() {
-	pgsql.maxRowLength = 1024
-	pgsql.maxStoreRows = 10
-	pgsql.Send_request = false
-	pgsql.Send_response = false
-	pgsql.transactionTimeout = protos.DefaultTransactionExpiration
-}
-
-func (pgsql *Pgsql) setFromConfig(config config.Pgsql) error {
-
-	pgsql.Ports = config.Ports
-
-	if config.Max_row_length != nil {
-		pgsql.maxRowLength = *config.Max_row_length
-	}
-	if config.Max_rows != nil {
-		pgsql.maxStoreRows = *config.Max_rows
-	}
-	if config.SendRequest != nil {
-		pgsql.Send_request = *config.SendRequest
-	}
-	if config.SendResponse != nil {
-		pgsql.Send_response = *config.SendResponse
-	}
-	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
-		pgsql.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
-	}
-	return nil
-}
-
-func (pgsql *Pgsql) GetPorts() []int {
-	return pgsql.Ports
-}
-
-func (pgsql *Pgsql) Init(test_mode bool, results publish.Transactions) error {
-
-	pgsql.InitDefaults()
-	if !test_mode {
-		err := pgsql.setFromConfig(config.ConfigSingleton.Protocols.Pgsql)
-		if err != nil {
-			return err
+func New(
+	testMode bool,
+	results publish.Transactions,
+	cfg *ucfg.Config,
+) (protos.Plugin, error) {
+	p := &Pgsql{}
+	config := defaultConfig
+	if !testMode {
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
 		}
 	}
+
+	if err := p.init(results, &config); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (pgsql *Pgsql) init(results publish.Transactions, config *pgsqlConfig) error {
+	pgsql.setFromConfig(config)
 
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,
@@ -177,6 +151,27 @@ func (pgsql *Pgsql) Init(test_mode bool, results publish.Transactions) error {
 	pgsql.results = results
 
 	return nil
+}
+
+func (pgsql *Pgsql) setFromConfig(config *pgsqlConfig) {
+	pgsql.Ports = config.Ports
+	pgsql.maxRowLength = config.MaxRowLength
+	pgsql.maxStoreRows = config.MaxRows
+	pgsql.Send_request = config.SendRequest
+	pgsql.Send_response = config.SendResponse
+	pgsql.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+}
+
+func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {
+	v := pgsql.transactions.Get(k)
+	if v != nil {
+		return v.([]*PgsqlTransaction)
+	}
+	return nil
+}
+
+func (pgsql *Pgsql) GetPorts() []int {
+	return pgsql.Ports
 }
 
 func (stream *PgsqlStream) PrepareForNewMessage() {

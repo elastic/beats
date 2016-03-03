@@ -6,8 +6,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/urso/ucfg"
 
-	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -48,42 +48,47 @@ var (
 	isDebug = false
 )
 
-func (redis *Redis) InitDefaults() {
-	redis.SendRequest = false
-	redis.SendResponse = false
-	redis.transactionTimeout = protos.DefaultTransactionExpiration
+func init() {
+	protos.Register(protos.RedisProtocol, New)
 }
 
-func (redis *Redis) setFromConfig(config config.Redis) error {
-	redis.Ports = config.Ports
+func New(
+	testMode bool,
+	results publish.Transactions,
+	cfg *ucfg.Config,
+) (protos.Plugin, error) {
+	p := &Redis{}
+	config := defaultConfig
+	if !testMode {
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
+	}
 
-	if config.SendRequest != nil {
-		redis.SendRequest = *config.SendRequest
+	if err := p.init(results, &config); err != nil {
+		return nil, err
 	}
-	if config.SendResponse != nil {
-		redis.SendResponse = *config.SendResponse
-	}
-	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
-		redis.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
-	}
+	return p, nil
+}
+
+func (redis *Redis) init(results publish.Transactions, config *redisConfig) error {
+	redis.setFromConfig(config)
+
+	redis.results = results
+	isDebug = logp.IsDebug("redis")
+
 	return nil
+}
+
+func (redis *Redis) setFromConfig(config *redisConfig) {
+	redis.Ports = config.Ports
+	redis.SendRequest = config.SendRequest
+	redis.SendResponse = config.SendResponse
+	redis.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
 }
 
 func (redis *Redis) GetPorts() []int {
 	return redis.Ports
-}
-
-func (redis *Redis) Init(test_mode bool, results publish.Transactions) error {
-	redis.InitDefaults()
-	if !test_mode {
-		redis.setFromConfig(config.ConfigSingleton.Protocols.Redis)
-	}
-
-	redis.results = results
-
-	isDebug = logp.IsDebug("redis")
-
-	return nil
 }
 
 func (s *stream) PrepareForNewMessage() {
