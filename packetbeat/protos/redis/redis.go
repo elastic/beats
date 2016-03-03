@@ -49,7 +49,7 @@ var (
 )
 
 func init() {
-	protos.Register(protos.RedisProtocol, New)
+	protos.Register("redis", New)
 }
 
 func New(

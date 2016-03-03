@@ -101,7 +101,7 @@ type memcacheStat struct {
 var debug = logp.MakeDebug("memcache")
 
 func init() {
-	protos.Register(protos.MemcacheProtocol, New)
+	protos.Register("memcache", New)
 }
 
 func New(

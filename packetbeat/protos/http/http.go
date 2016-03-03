@@ -78,7 +78,7 @@ var (
 )
 
 func init() {
-	protos.Register(protos.HttpProtocol, New)
+	protos.Register("http", New)
 }
 
 func New(
@@ -86,7 +86,7 @@ func New(
 	results publish.Transactions,
 	cfg *ucfg.Config,
 ) (protos.Plugin, error) {
-	http := &HTTP{}
+	p := &HTTP{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -94,10 +94,10 @@ func New(
 		}
 	}
 
-	if err := http.init(results, &config); err != nil {
+	if err := p.init(results, &config); err != nil {
 		return nil, err
 	}
-	return http, nil
+	return p, nil
 }
 
 // Init initializes the HTTP protocol analyser.

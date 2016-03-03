@@ -159,7 +159,7 @@ type Thrift struct {
 }
 
 func init() {
-	protos.Register(protos.ThriftProtocol, New)
+	protos.Register("thrift", New)
 }
 
 func New(

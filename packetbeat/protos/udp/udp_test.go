@@ -10,6 +10,11 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
 
+	// import plugins for testing
+	_ "github.com/elastic/beats/packetbeat/protos/http"
+	_ "github.com/elastic/beats/packetbeat/protos/mysql"
+	_ "github.com/elastic/beats/packetbeat/protos/redis"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,6 +22,12 @@ import (
 const (
 	PROTO = protos.Protocol(1)
 	PORT  = 1234
+)
+
+var (
+	httpProtocol  = protos.Lookup("http")
+	mysqlProtocol = protos.Lookup("mysql")
+	redisProtocol = protos.Lookup("redis")
 )
 
 type TestProtocols struct {
@@ -94,7 +105,6 @@ func testSetup(t *testing.T) *TestStruct {
 }
 
 func Test_buildPortsMap(t *testing.T) {
-
 	type configTest struct {
 		Input  map[protos.Protocol]protos.UdpPlugin
 		Output map[uint16]protos.Protocol
@@ -105,38 +115,38 @@ func Test_buildPortsMap(t *testing.T) {
 	config_tests := []configTest{
 		{
 			Input: map[protos.Protocol]protos.UdpPlugin{
-				protos.HttpProtocol: &TestProtocol{Ports: []int{80, 8080}},
+				httpProtocol: &TestProtocol{Ports: []int{80, 8080}},
 			},
 			Output: map[uint16]protos.Protocol{
-				80:   protos.HttpProtocol,
-				8080: protos.HttpProtocol,
+				80:   httpProtocol,
+				8080: httpProtocol,
 			},
 		},
 		{
 			Input: map[protos.Protocol]protos.UdpPlugin{
-				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
-				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
-				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
+				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
+				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
+				redisProtocol: &TestProtocol{Ports: []int{6379, 6380}},
 			},
 			Output: map[uint16]protos.Protocol{
-				80:   protos.HttpProtocol,
-				8080: protos.HttpProtocol,
-				3306: protos.MysqlProtocol,
-				6379: protos.RedisProtocol,
-				6380: protos.RedisProtocol,
+				80:   httpProtocol,
+				8080: httpProtocol,
+				3306: mysqlProtocol,
+				6379: redisProtocol,
+				6380: redisProtocol,
 			},
 		},
 
 		// should ignore duplicate ports in the same protocol
 		{
 			Input: map[protos.Protocol]protos.UdpPlugin{
-				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
-				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
+				httpProtocol:  &TestProtocol{Ports: []int{80, 8080, 8080}},
+				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 			},
 			Output: map[uint16]protos.Protocol{
-				80:   protos.HttpProtocol,
-				8080: protos.HttpProtocol,
-				3306: protos.MysqlProtocol,
+				80:   httpProtocol,
+				8080: httpProtocol,
+				3306: mysqlProtocol,
 			},
 		},
 	}
@@ -162,9 +172,9 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 		{
 			// Should raise error on duplicate port
 			Input: map[protos.Protocol]protos.UdpPlugin{
-				protos.HttpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
-				protos.MysqlProtocol: &TestProtocol{Ports: []int{3306}},
-				protos.RedisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
+				httpProtocol:  &TestProtocol{Ports: []int{80, 8080}},
+				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
+				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
 			},
 			Err: "Duplicate port (3306) exists",
 		},

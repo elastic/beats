@@ -185,7 +185,7 @@ type DnsTransaction struct {
 }
 
 func init() {
-	protos.Register(protos.DnsProtocol, New)
+	protos.Register("dns", New)
 }
 
 func New(
@@ -193,7 +193,7 @@ func New(
 	results publish.Transactions,
 	cfg *ucfg.Config,
 ) (protos.Plugin, error) {
-	dns := &Dns{}
+	p := &Dns{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -201,10 +201,10 @@ func New(
 		}
 	}
 
-	if err := dns.init(results, &config); err != nil {
+	if err := p.init(results, &config); err != nil {
 		return nil, err
 	}
-	return dns, nil
+	return p, nil
 }
 
 func (dns *Dns) init(results publish.Transactions, config *dnsConfig) error {

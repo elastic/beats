@@ -35,7 +35,7 @@ type Amqp struct {
 }
 
 func init() {
-	protos.Register(protos.AmqpProtocol, New)
+	protos.Register("amqp", New)
 }
 
 func New(
@@ -43,7 +43,7 @@ func New(
 	results publish.Transactions,
 	cfg *ucfg.Config,
 ) (protos.Plugin, error) {
-	amqp := &Amqp{}
+	p := &Amqp{}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -51,10 +51,10 @@ func New(
 		}
 	}
 
-	if err := amqp.init(results, &config); err != nil {
+	if err := p.init(results, &config); err != nil {
 		return nil, err
 	}
-	return amqp, nil
+	return p, nil
 }
 
 func (amqp *Amqp) init(results publish.Transactions, config *amqpConfig) error {
