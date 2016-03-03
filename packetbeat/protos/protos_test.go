@@ -100,25 +100,25 @@ func TestProtocolNames(t *testing.T) {
 
 func newProtocols() Protocols {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]ProtocolPlugin)
-	p.tcp = make(map[Protocol]TcpProtocolPlugin)
-	p.udp = make(map[Protocol]UdpProtocolPlugin)
+	p.all = make(map[Protocol]Plugin)
+	p.tcp = make(map[Protocol]TcpPlugin)
+	p.udp = make(map[Protocol]UdpPlugin)
 
 	tcp := &TcpProtocol{Ports: []int{80}}
 	udp := &UdpProtocol{Ports: []int{5060}}
 	tcpUdp := &TcpUdpProtocol{Ports: []int{53}}
 
-	p.Register(1, tcp)
-	p.Register(2, udp)
-	p.Register(3, tcpUdp)
+	p.register(1, tcp)
+	p.register(2, udp)
+	p.register(3, tcpUdp)
 	return p
 }
 
 func TestBpfFilterWithoutVlanOnlyIcmp(t *testing.T) {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]ProtocolPlugin)
-	p.tcp = make(map[Protocol]TcpProtocolPlugin)
-	p.udp = make(map[Protocol]UdpProtocolPlugin)
+	p.all = make(map[Protocol]Plugin)
+	p.tcp = make(map[Protocol]TcpPlugin)
+	p.udp = make(map[Protocol]UdpPlugin)
 
 	filter := p.BpfFilter(false, true)
 	assert.Equal(t, "icmp or icmp6", filter)

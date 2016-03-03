@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/packetbeat/config"
 )
 
 type memcacheTest struct {
@@ -15,10 +13,10 @@ type memcacheTest struct {
 	transactions []*transaction
 }
 
-func newMemcacheTest(config config.Memcache) *memcacheTest {
+func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
 	mc := &Memcache{}
-	mc.InitWithConfig(config, false, nil)
+	mc.init(nil, &config)
 	mc.handler = mct
 	mct.mc = mc
 	return mct
@@ -65,7 +63,7 @@ func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
 }
 
 func Test_TryMergeUnmergeableRespnses(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "STORED\r\n")
 	msg2 := textParseNoFail(t, "0\r\n")
 	b, err := tryMergeResponses(mct.mc, msg1, msg2)
@@ -74,7 +72,7 @@ func Test_TryMergeUnmergeableRespnses(t *testing.T) {
 }
 
 func Test_TryMergeUnmergeableResponseWithValue(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "VALUE k 1 5 3\r\nvalue\r\n")
 	msg2 := textParseNoFail(t, "0\r\n")
 	b, err := tryMergeResponses(mct.mc, msg1, msg2)
@@ -83,7 +81,7 @@ func Test_TryMergeUnmergeableResponseWithValue(t *testing.T) {
 }
 
 func Test_TryMergeUnmergeableResponseWithStat(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "STAT name value\r\n")
 	msg2 := textParseNoFail(t, "0\r\n")
 	b, err := tryMergeResponses(mct.mc, msg1, msg2)
@@ -92,7 +90,7 @@ func Test_TryMergeUnmergeableResponseWithStat(t *testing.T) {
 }
 
 func Test_MergeTextValueResponses(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "VALUE k 1 6 3\r\nvalue1\r\n")
 	msg2 := textParseNoFail(t, "VALUE k 1 6 3\r\nvalue2\r\n")
 	msg3 := textParseNoFail(t, "END\r\n")
@@ -109,7 +107,7 @@ func Test_MergeTextValueResponses(t *testing.T) {
 }
 
 func Test_MergeTextStatsValueResponses(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := textParseNoFail(t, "STAT name1 value1\r\n")
 	msg2 := textParseNoFail(t, "STAT name2 value2\r\n")
 	msg3 := textParseNoFail(t, "END\r\n")
@@ -126,7 +124,7 @@ func Test_MergeTextStatsValueResponses(t *testing.T) {
 }
 
 func Test_MergeBinaryStatsValueResponses(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	msg1 := makeBinMessage(t,
 		&binHeader{opcode: opcodeStat, request: false},
 		extras(), key("stat1"), value("value1"))
@@ -149,7 +147,10 @@ func Test_MergeBinaryStatsValueResponses(t *testing.T) {
 }
 
 func Test_MergeTextValueResponsesNoLimits(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{MaxValues: -1, MaxBytesPerValue: 1000})
+	config := defaultConfig
+	config.MaxValues = -1
+	config.MaxBytesPerValue = 1000
+	mct := newMemcacheTest(config)
 	msg1 := textParseNoFail(t, "VALUE k1 1 6 3\r\nvalue1\r\n")
 	msg2 := textParseNoFail(t, "VALUE k2 1 6 3\r\nvalue2\r\n")
 	msg3 := textParseNoFail(t, "END\r\n")
@@ -173,7 +174,10 @@ func Test_MergeTextValueResponsesNoLimits(t *testing.T) {
 }
 
 func Test_MergeTextValueResponsesWithLimits(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{MaxValues: 1, MaxBytesPerValue: 1000})
+	config := defaultConfig
+	config.MaxValues = 1
+	config.MaxBytesPerValue = 1000
+	mct := newMemcacheTest(config)
 	msg1 := textParseNoFail(t, "VALUE k1 1 6 3\r\nvalue1\r\n")
 	msg2 := textParseNoFail(t, "VALUE k2 1 6 3\r\nvalue2\r\n")
 	msg3 := textParseNoFail(t, "END\r\n")
@@ -197,7 +201,7 @@ func Test_MergeTextValueResponsesWithLimits(t *testing.T) {
 }
 
 func Test_TransactionComplete(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	trans := mct.genTransaction(
 		textParseNoFail(t, "set k 0 0 5\r\nvalue\r\n"),
 		textParseNoFail(t, "STORED\r\n"),
@@ -213,7 +217,7 @@ func Test_TransactionComplete(t *testing.T) {
 }
 
 func Test_TransactionRequestNoReply(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	trans := mct.genTransaction(
 		textParseNoFail(t, "set k 0 0 5 noreply\r\nvalue\r\n"),
 		nil,
@@ -229,7 +233,7 @@ func Test_TransactionRequestNoReply(t *testing.T) {
 }
 
 func Test_TransactionLostResponse(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	trans := mct.genTransaction(
 		textParseNoFail(t, "set k 0 0 5\r\nvalue\r\n"),
 		nil,
@@ -245,7 +249,7 @@ func Test_TransactionLostResponse(t *testing.T) {
 }
 
 func Test_TransactionLostRequest(t *testing.T) {
-	mct := newMemcacheTest(config.Memcache{})
+	mct := newMemcacheTest(defaultConfig)
 	trans := mct.genTransaction(
 		nil,
 		textParseNoFail(t, "STORED\r\n"),
