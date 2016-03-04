@@ -43,15 +43,13 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
-- Update builds to Golang version 1.5.2
-- Make logstash output compression level configurable. {pull}630[630]
 - Add ability to override configuration settings using environment variables {issue}114[114]
 
 *Packetbeat*
 
 *Topbeat*
-- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 - Add the command line used to start processes {issue}533[533]
+- Add username to processes {pull}845[845]
 
 *Filebeat*
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
