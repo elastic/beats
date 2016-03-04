@@ -9,8 +9,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/urso/ucfg"
 
-	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -63,6 +63,7 @@ type HTTP struct {
 	SplitCookie         bool
 	HideKeywords        []string
 	RedactAuthorization bool
+	IncludeBodyFor      []string
 
 	parserConfig parserConfig
 
@@ -76,29 +77,51 @@ var (
 	isDetailed = false
 )
 
-func (http *HTTP) initDefaults() {
-	http.SendRequest = false
-	http.SendResponse = false
-	http.RedactAuthorization = false
-	http.transactionTimeout = protos.DefaultTransactionExpiration
+func init() {
+	protos.Register("http", New)
 }
 
-func (http *HTTP) setFromConfig(config config.Http) (err error) {
+func New(
+	testMode bool,
+	results publish.Transactions,
+	cfg *ucfg.Config,
+) (protos.Plugin, error) {
+	p := &HTTP{}
+	config := defaultConfig
+	if !testMode {
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
+	}
 
+	if err := p.init(results, &config); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// Init initializes the HTTP protocol analyser.
+func (http *HTTP) init(results publish.Transactions, config *httpConfig) error {
+	http.setFromConfig(config)
+
+	isDebug = logp.IsDebug("http")
+	isDetailed = logp.IsDebug("httpdetailed")
+	http.results = results
+	return nil
+}
+
+func (http *HTTP) setFromConfig(config *httpConfig) {
 	http.Ports = config.Ports
-
-	if config.SendRequest != nil {
-		http.SendRequest = *config.SendRequest
-	}
-	if config.SendResponse != nil {
-		http.SendResponse = *config.SendResponse
-	}
+	http.SendRequest = config.SendRequest
+	http.SendResponse = config.SendResponse
 	http.HideKeywords = config.Hide_keywords
-	if config.Redact_authorization != nil {
-		http.RedactAuthorization = *config.Redact_authorization
-	}
+	http.RedactAuthorization = config.Redact_authorization
+	http.SplitCookie = config.Split_cookie
+	http.parserConfig.RealIPHeader = strings.ToLower(config.Real_ip_header)
+	http.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	http.IncludeBodyFor = config.Include_body_for
 
-	if config.Send_all_headers != nil {
+	if config.Send_all_headers {
 		http.parserConfig.SendHeaders = true
 		http.parserConfig.SendAllHeaders = true
 	} else {
@@ -111,44 +134,11 @@ func (http *HTTP) setFromConfig(config config.Http) (err error) {
 			}
 		}
 	}
-
-	if config.Split_cookie != nil {
-		http.SplitCookie = *config.Split_cookie
-	}
-
-	if config.Real_ip_header != nil {
-		http.parserConfig.RealIPHeader = strings.ToLower(*config.Real_ip_header)
-	}
-
-	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
-		http.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
-	}
-
-	return nil
 }
 
 // GetPorts lists the port numbers the HTTP protocol analyser will handle.
 func (http *HTTP) GetPorts() []int {
 	return http.Ports
-}
-
-// Init initializes the HTTP protocol analyser.
-func (http *HTTP) Init(testMode bool, results publish.Transactions) error {
-	http.initDefaults()
-
-	if !testMode {
-		err := http.setFromConfig(config.ConfigSingleton.Protocols.Http)
-		if err != nil {
-			return err
-		}
-	}
-
-	isDebug = logp.IsDebug("http")
-	isDetailed = logp.IsDebug("httpdetailed")
-
-	http.results = results
-
-	return nil
 }
 
 // messageGap is called when a gap of size `nbytes` is found in the
@@ -580,7 +570,7 @@ func (http *HTTP) cutMessageBody(m *message) []byte {
 }
 
 func (http *HTTP) shouldIncludeInBody(contenttype []byte) bool {
-	includedBodies := config.ConfigSingleton.Protocols.Http.Include_body_for
+	includedBodies := http.IncludeBodyFor
 	for _, include := range includedBodies {
 		if bytes.Contains(contenttype, []byte(include)) {
 			if isDebug {

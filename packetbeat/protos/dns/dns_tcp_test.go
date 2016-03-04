@@ -23,7 +23,7 @@ import (
 )
 
 // Verify that the interface TCP has been satisfied.
-var _ protos.TcpProtocolPlugin = &Dns{}
+var _ protos.TcpPlugin = &Dns{}
 
 var (
 	messagesTcp = []DnsTestMessage{

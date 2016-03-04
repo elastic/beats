@@ -63,7 +63,7 @@ func (udp *Udp) Process(id *flows.FlowID, pkt *protos.Packet) {
 // buildPortsMap creates a mapping of port numbers to protocol identifiers. If
 // any two UdpProtocolPlugins operate on the same port number then an error
 // will be returned.
-func buildPortsMap(plugins map[protos.Protocol]protos.UdpProtocolPlugin) (map[uint16]protos.Protocol, error) {
+func buildPortsMap(plugins map[protos.Protocol]protos.UdpPlugin) (map[uint16]protos.Protocol, error) {
 	var res = map[uint16]protos.Protocol{}
 
 	for proto, protoPlugin := range plugins {

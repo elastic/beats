@@ -1,15 +1,16 @@
 package amqp
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/urso/ucfg"
 )
 
 var (
@@ -33,44 +34,45 @@ type Amqp struct {
 	MethodMap map[codeClass]map[codeMethod]AmqpMethod
 }
 
-func (amqp *Amqp) GetPorts() []int {
-	return amqp.Ports
+func init() {
+	protos.Register("amqp", New)
 }
 
-func (amqp *Amqp) setFromConfig(config config.Amqp) error {
-	amqp.Ports = config.Ports
-	if config.SendRequest != nil {
-		amqp.SendRequest = *config.SendRequest
+func New(
+	testMode bool,
+	results publish.Transactions,
+	cfg *ucfg.Config,
+) (protos.Plugin, error) {
+	p := &Amqp{}
+	config := defaultConfig
+	if !testMode {
+		if err := cfg.Unpack(&config); err != nil {
+			return nil, err
+		}
 	}
-	if config.SendResponse != nil {
-		amqp.SendResponse = *config.SendResponse
+
+	if err := p.init(results, &config); err != nil {
+		return nil, err
 	}
-	if config.MaxBodyLength != nil {
-		amqp.MaxBodyLength = *config.MaxBodyLength
+	return p, nil
+}
+
+func (amqp *Amqp) init(results publish.Transactions, config *amqpConfig) error {
+	amqp.initMethodMap()
+	amqp.setFromConfig(config)
+
+	if amqp.HideConnectionInformation == false {
+		amqp.addConnectionMethods()
 	}
-	if config.ParseHeaders != nil {
-		amqp.ParseHeaders = *config.ParseHeaders
-	}
-	if config.ParseArguments != nil {
-		amqp.ParseArguments = *config.ParseArguments
-	}
-	if config.HideConnectionInformation != nil {
-		amqp.HideConnectionInformation = *config.HideConnectionInformation
-	}
-	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
-		amqp.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
-	}
+	amqp.transactions = common.NewCache(
+		amqp.transactionTimeout,
+		protos.DefaultTransactionHashSize)
+	amqp.transactions.StartJanitor(amqp.transactionTimeout)
+	amqp.results = results
 	return nil
 }
 
-func (amqp *Amqp) initDefaults() {
-	amqp.SendRequest = false
-	amqp.SendResponse = false
-	amqp.MaxBodyLength = 1000
-	amqp.ParseHeaders = true
-	amqp.ParseArguments = true
-	amqp.HideConnectionInformation = true
-	amqp.transactionTimeout = protos.DefaultTransactionExpiration
+func (amqp *Amqp) initMethodMap() {
 	amqp.MethodMap = map[codeClass]map[codeMethod]AmqpMethod{
 		connectionCode: map[codeMethod]AmqpMethod{
 			connectionClose:   connectionCloseMethod,
@@ -130,23 +132,19 @@ func (amqp *Amqp) initDefaults() {
 	}
 }
 
-func (amqp *Amqp) Init(test_mode bool, results publish.Transactions) error {
-	amqp.initDefaults()
-	if !test_mode {
-		err := amqp.setFromConfig(config.ConfigSingleton.Protocols.Amqp)
-		if err != nil {
-			return err
-		}
-	}
-	if amqp.HideConnectionInformation == false {
-		amqp.addConnectionMethods()
-	}
-	amqp.transactions = common.NewCache(
-		amqp.transactionTimeout,
-		protos.DefaultTransactionHashSize)
-	amqp.transactions.StartJanitor(amqp.transactionTimeout)
-	amqp.results = results
-	return nil
+func (amqp *Amqp) GetPorts() []int {
+	return amqp.Ports
+}
+
+func (amqp *Amqp) setFromConfig(config *amqpConfig) {
+	amqp.Ports = config.Ports
+	amqp.SendRequest = config.SendRequest
+	amqp.SendResponse = config.SendResponse
+	amqp.MaxBodyLength = config.MaxBodyLength
+	amqp.ParseHeaders = config.ParseHeaders
+	amqp.ParseArguments = config.ParseArguments
+	amqp.HideConnectionInformation = config.HideConnectionInformation
+	amqp.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
 }
 
 func (amqp *Amqp) addConnectionMethods() {

@@ -19,33 +19,12 @@ import (
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/amqp"
-	"github.com/elastic/beats/packetbeat/protos/dns"
-	"github.com/elastic/beats/packetbeat/protos/http"
 	"github.com/elastic/beats/packetbeat/protos/icmp"
-	"github.com/elastic/beats/packetbeat/protos/memcache"
-	"github.com/elastic/beats/packetbeat/protos/mongodb"
-	"github.com/elastic/beats/packetbeat/protos/mysql"
-	"github.com/elastic/beats/packetbeat/protos/pgsql"
-	"github.com/elastic/beats/packetbeat/protos/redis"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/protos/thrift"
 	"github.com/elastic/beats/packetbeat/protos/udp"
 	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/elastic/beats/packetbeat/sniffer"
 )
-
-var EnabledProtocolPlugins map[protos.Protocol]protos.ProtocolPlugin = map[protos.Protocol]protos.ProtocolPlugin{
-	protos.HttpProtocol:     new(http.HTTP),
-	protos.AmqpProtocol:     new(amqp.Amqp),
-	protos.MemcacheProtocol: new(memcache.Memcache),
-	protos.MysqlProtocol:    new(mysql.Mysql),
-	protos.PgsqlProtocol:    new(pgsql.Pgsql),
-	protos.RedisProtocol:    new(redis.Redis),
-	protos.ThriftProtocol:   new(thrift.Thrift),
-	protos.MongodbProtocol:  new(mongodb.Mongodb),
-	protos.DnsProtocol:      new(dns.Dns),
-}
 
 // Beater object. Contains all objects needed to run the beat
 type Packetbeat struct {
@@ -171,13 +150,10 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	pb.Pub.Start()
 
 	logp.Debug("main", "Initializing protocol plugins")
-	for proto, plugin := range EnabledProtocolPlugins {
-		err := plugin.Init(false, pb.Pub)
-		if err != nil {
-			logp.Critical("Initializing plugin %s failed: %v", proto, err)
-			os.Exit(1)
-		}
-		protos.Protos.Register(proto, plugin)
+	err := protos.Protos.Init(false, pb.Pub, pb.PbConfig.Protocols)
+	if err != nil {
+		logp.Critical("Initializing protocol analyzers failed: %v", err)
+		os.Exit(1)
 	}
 
 	pb.over = make(chan bool)
@@ -201,7 +177,7 @@ func (pb *Packetbeat) setupSniffer() error {
 	cfg := &pb.PbConfig
 
 	withVlans := cfg.Interfaces.With_vlans
-	withICMP := cfg.Protocols.Icmp.Enabled
+	_, withICMP := cfg.Protocols["icmp"]
 	filter := cfg.Interfaces.Bpf_filter
 	if filter == "" && cfg.Flows == nil {
 		filter = protos.Protos.BpfFilter(withVlans, withICMP)
@@ -223,9 +199,16 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 			}
 		}
 
-		icmp, err := icmp.NewIcmp(false, pb.Pub)
-		if err != nil {
-			return nil, "", err
+		var icmp4 icmp.ICMPv4Processor
+		var icmp6 icmp.ICMPv6Processor
+		if cfg, exists := pb.PbConfig.Protocols["icmp"]; exists {
+			icmp, err := icmp.New(false, pb.Pub, cfg)
+			if err != nil {
+				return nil, "", err
+			}
+
+			icmp4 = icmp
+			icmp6 = icmp
 		}
 
 		tcp, err := tcp.NewTcp(&protos.Protos)
@@ -238,7 +221,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 			return nil, "", err
 		}
 
-		worker, err := decoder.NewDecoder(f, dl, icmp, icmp, tcp, udp)
+		worker, err := decoder.NewDecoder(f, dl, icmp4, icmp6, tcp, udp)
 		if err != nil {
 			return nil, "", err
 		}

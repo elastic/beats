@@ -263,15 +263,19 @@ func (d *DecoderStruct) process(
 }
 
 func (d *DecoderStruct) onICMPv4(packet *protos.Packet) {
-	packet.Payload = d.icmp4.Payload
-	packet.Tuple.ComputeHashebles()
-	d.icmp4Proc.ProcessICMPv4(d.flowID, &d.icmp4, packet)
+	if d.icmp4Proc != nil {
+		packet.Payload = d.icmp4.Payload
+		packet.Tuple.ComputeHashebles()
+		d.icmp4Proc.ProcessICMPv4(d.flowID, &d.icmp4, packet)
+	}
 }
 
 func (d *DecoderStruct) onICMPv6(packet *protos.Packet) {
-	packet.Payload = d.icmp6.Payload
-	packet.Tuple.ComputeHashebles()
-	d.icmp6Proc.ProcessICMPv6(d.flowID, &d.icmp6, packet)
+	if d.icmp6Proc != nil {
+		packet.Payload = d.icmp6.Payload
+		packet.Tuple.ComputeHashebles()
+		d.icmp6Proc.ProcessICMPv6(d.flowID, &d.icmp6, packet)
+	}
 }
 
 func (d *DecoderStruct) onUDP(packet *protos.Packet) {
