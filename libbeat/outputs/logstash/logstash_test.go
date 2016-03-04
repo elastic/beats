@@ -30,11 +30,11 @@ type mockLSServer struct {
 var testOptions = outputs.Options{}
 
 func newMockTLSServer(t *testing.T, to time.Duration, cert string) *mockLSServer {
-	return &mockLSServer{newMockServerTLS(t, to, cert)}
+	return &mockLSServer{newMockServerTLS(t, to, cert, nil)}
 }
 
 func newMockTCPServer(t *testing.T, to time.Duration) *mockLSServer {
-	return &mockLSServer{newMockServerTCP(t, to, "")}
+	return &mockLSServer{newMockServerTCP(t, to, "", nil)}
 }
 
 func (m *mockLSServer) readMessage(buf *streambuf.Buffer, client net.Conn) *message {
