@@ -42,9 +42,8 @@ type AsyncLoadBalancerMode struct {
 	// block until event has been successfully published.
 	maxAttempts int
 
-	// waitGroup + signaling channel for handling shutdown
-	wg   sync.WaitGroup
-	done chan struct{}
+	// WorkerSignal for handling events and a clean shutdown
+	ws common.WorkerSignal
 
 	// channels for forwarding work items to workers.
 	// The work channel is used by publisher to insert new events
@@ -80,8 +79,8 @@ func NewAsyncLoadBalancerMode(
 
 		work:    make(chan eventsMessage),
 		retries: make(chan eventsMessage, len(clients)*2),
-		done:    make(chan struct{}),
 	}
+	m.ws.Init()
 	m.start(clients)
 
 	return m, nil
@@ -90,8 +89,7 @@ func NewAsyncLoadBalancerMode(
 // Close stops all workers and closes all open connections. In flight events
 // are signaled as failed.
 func (m *AsyncLoadBalancerMode) Close() error {
-	close(m.done)
-	m.wg.Wait()
+	m.ws.Stop()
 	return nil
 }
 
@@ -129,8 +127,9 @@ func (m *AsyncLoadBalancerMode) publishEventsMessage(
 	msg.attemptsLeft = maxAttempts
 	debug("publish events with attempts=%v", msg.attemptsLeft)
 
+	m.ws.AddEvent(1)
 	if ok := m.forwardEvent(m.work, msg); !ok {
-		dropping(msg)
+		dropping(msg, &m.ws)
 	}
 	return nil
 }
@@ -142,12 +141,12 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 			if client.IsConnected() {
 				_ = client.Close()
 			}
-			m.wg.Done()
+			m.ws.WorkerFinished()
 		}()
 
 		waitStart.Done()
 
-		backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
+		backoff := newBackoff(m.ws.Done, m.waitRetry, m.maxWaitRetry)
 		for {
 			// reconnect loop
 			for !client.IsConnected() {
@@ -163,7 +162,7 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 			// receive and process messages
 			var msg eventsMessage
 			select {
-			case <-m.done:
+			case <-m.ws.Done:
 				return
 			case msg = <-m.retries: // receive message from other failed worker
 				debug("events from retries queue")
@@ -179,7 +178,7 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 	}
 
 	for _, client := range clients {
-		m.wg.Add(1)
+		m.ws.WorkerStart()
 		waitStart.Add(1)
 		go worker(client)
 	}
@@ -220,6 +219,7 @@ func handlePublishEventResult(m *AsyncLoadBalancerMode, msg eventsMessage) func(
 			m.onFail(false, msg, err)
 		} else {
 			outputs.SignalCompleted(msg.signaler)
+			m.ws.DoneEvent()
 		}
 	}
 }
@@ -253,7 +253,7 @@ func handlePublishEventsResult(
 
 			if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
 				// no more attempts left => drop
-				dropping(msg)
+				dropping(msg, &m.ws)
 				return
 			}
 
@@ -268,7 +268,7 @@ func handlePublishEventsResult(
 			debug("add non-published events back into pipeline: %v", len(events))
 			msg.events = events
 			if ok := m.forwardEvent(m.retries, msg); !ok {
-				dropping(msg)
+				dropping(msg, &m.ws)
 			}
 			return
 		}
@@ -276,6 +276,7 @@ func handlePublishEventsResult(
 		// all events published -> signal success
 		debug("async bulk publish success")
 		outputs.SignalCompleted(msg.signaler)
+		m.ws.DoneEvent()
 	}
 }
 
@@ -284,7 +285,7 @@ func (m *AsyncLoadBalancerMode) onFail(async bool, msg eventsMessage, err error)
 		logp.Info("Error publishing events (retrying): %s", err)
 
 		if ok := m.forwardEvent(m.retries, msg); !ok {
-			dropping(msg)
+			dropping(msg, &m.ws)
 		}
 	}
 
@@ -306,7 +307,7 @@ func (m *AsyncLoadBalancerMode) forwardEvent(
 		case ch <- msg:
 			debug("message forwarded")
 			return true
-		case <-m.done: // shutdown
+		case <-m.ws.Done: // shutdown
 			debug("shutting down")
 			return false
 		}
@@ -316,7 +317,7 @@ func (m *AsyncLoadBalancerMode) forwardEvent(
 			case ch <- msg:
 				debug("message forwarded")
 				return true
-			case <-m.done: // shutdown
+			case <-m.ws.Done: // shutdown
 				debug("shutting down")
 				return false
 			case <-time.After(m.timeout):

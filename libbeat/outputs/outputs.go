@@ -13,8 +13,9 @@ type Options struct {
 
 type Outputer interface {
 	// Publish event
-
 	PublishEvent(trans Signaler, opts Options, event common.MapStr) error
+
+	Close() error
 }
 
 type TopologyOutputer interface {

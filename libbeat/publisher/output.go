@@ -36,7 +36,7 @@ var (
 func newOutputWorker(
 	cfg *ucfg.Config,
 	out outputs.Outputer,
-	ws *workerSignal,
+	ws *common.WorkerSignal,
 	hwm int,
 	bulkHWM int,
 ) *outputWorker {
@@ -56,7 +56,12 @@ func newOutputWorker(
 	return o
 }
 
-func (o *outputWorker) onStop() {}
+func (o *outputWorker) onStop() {
+	err := o.out.Close()
+	if err != nil {
+		logp.Info("Failed to close outputer: %s", err)
+	}
+}
 
 func (o *outputWorker) onMessage(m message) {
 	if m.event != nil {
