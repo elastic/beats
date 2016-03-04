@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -59,18 +60,20 @@ func newDns(verbose bool) *Dns {
 		logp.LogInit(logp.LOG_EMERG, "", false, true, []string{"dns"})
 	}
 
-	dns := &Dns{}
-	err := dns.Init(true, &publish.ChanTransactions{make(chan common.MapStr, 100)})
+	results := &publish.ChanTransactions{make(chan common.MapStr, 100)}
+	cfg, _ := ucfg.NewFrom(map[string]interface{}{
+		"ports":               []int{ServerPort},
+		"include_authorities": true,
+		"include_additionals": true,
+		"send_request":        true,
+		"send_response":       true,
+	})
+	dns, err := New(false, results, cfg)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
-	dns.Ports = []int{ServerPort}
-	dns.Include_authorities = true
-	dns.Include_additionals = true
-	dns.Send_request = true
-	dns.Send_response = true
-	return dns
+	return dns.(*Dns)
 }
 
 func newPacket(t common.IpPortTuple, payload []byte) *protos.Packet {

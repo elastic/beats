@@ -6,8 +6,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/urso/ucfg"
 
-	"github.com/elastic/beats/packetbeat/config"
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -50,16 +50,23 @@ const (
 	orphanedResponseMsg = "Response was received without an associated request."
 )
 
-func NewIcmp(testMode bool, results publish.Transactions) (*Icmp, error) {
-	icmp := &Icmp{}
-	icmp.initDefaults()
-
+func New(testMode bool, results publish.Transactions, cfg *ucfg.Config) (*Icmp, error) {
+	p := &Icmp{}
+	config := defaultConfig
 	if !testMode {
-		err := icmp.setFromConfig(config.ConfigSingleton.Protocols.Icmp)
-		if err != nil {
+		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
 	}
+
+	if err := p.init(results, &config); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (icmp *Icmp) init(results publish.Transactions, config *icmpConfig) error {
+	icmp.setFromConfig(config)
 
 	var err error
 	icmp.localIps, err = common.LocalIpAddrs()
@@ -82,27 +89,13 @@ func NewIcmp(testMode bool, results publish.Transactions) (*Icmp, error) {
 
 	icmp.results = results
 
-	return icmp, nil
-}
-
-func (icmp *Icmp) initDefaults() {
-	icmp.sendRequest = false
-	icmp.sendResponse = false
-	icmp.transactionTimeout = protos.DefaultTransactionExpiration
-}
-
-func (icmp *Icmp) setFromConfig(config config.Icmp) (err error) {
-	if config.SendRequest != nil {
-		icmp.sendRequest = *config.SendRequest
-	}
-	if config.SendResponse != nil {
-		icmp.sendResponse = *config.SendResponse
-	}
-	if config.TransactionTimeout != nil && *config.TransactionTimeout > 0 {
-		icmp.transactionTimeout = time.Duration(*config.TransactionTimeout) * time.Second
-	}
-
 	return nil
+}
+
+func (icmp *Icmp) setFromConfig(config *icmpConfig) {
+	icmp.sendRequest = config.SendRequest
+	icmp.sendResponse = config.SendResponse
+	icmp.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
 }
 
 func (icmp *Icmp) ProcessICMPv4(

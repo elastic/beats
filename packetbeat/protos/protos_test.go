@@ -88,37 +88,30 @@ func (proto *TcpUdpProtocol) ConnectionTimeout() time.Duration { return 0 }
 
 func TestProtocolNames(t *testing.T) {
 	assert.Equal(t, "unknown", UnknownProtocol.String())
-	assert.Equal(t, "http", HttpProtocol.String())
-	assert.Equal(t, "mysql", MysqlProtocol.String())
-	assert.Equal(t, "redis", RedisProtocol.String())
-	assert.Equal(t, "pgsql", PgsqlProtocol.String())
-	assert.Equal(t, "thrift", ThriftProtocol.String())
-	assert.Equal(t, "mongodb", MongodbProtocol.String())
-
 	assert.Equal(t, "impossible", Protocol(100).String())
 }
 
 func newProtocols() Protocols {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]ProtocolPlugin)
-	p.tcp = make(map[Protocol]TcpProtocolPlugin)
-	p.udp = make(map[Protocol]UdpProtocolPlugin)
+	p.all = make(map[Protocol]Plugin)
+	p.tcp = make(map[Protocol]TcpPlugin)
+	p.udp = make(map[Protocol]UdpPlugin)
 
 	tcp := &TcpProtocol{Ports: []int{80}}
 	udp := &UdpProtocol{Ports: []int{5060}}
 	tcpUdp := &TcpUdpProtocol{Ports: []int{53}}
 
-	p.Register(1, tcp)
-	p.Register(2, udp)
-	p.Register(3, tcpUdp)
+	p.register(1, tcp)
+	p.register(2, udp)
+	p.register(3, tcpUdp)
 	return p
 }
 
 func TestBpfFilterWithoutVlanOnlyIcmp(t *testing.T) {
 	p := ProtocolsStruct{}
-	p.all = make(map[Protocol]ProtocolPlugin)
-	p.tcp = make(map[Protocol]TcpProtocolPlugin)
-	p.udp = make(map[Protocol]UdpProtocolPlugin)
+	p.all = make(map[Protocol]Plugin)
+	p.tcp = make(map[Protocol]TcpPlugin)
+	p.udp = make(map[Protocol]UdpPlugin)
 
 	filter := p.BpfFilter(false, true)
 	assert.Equal(t, "icmp or icmp6", filter)

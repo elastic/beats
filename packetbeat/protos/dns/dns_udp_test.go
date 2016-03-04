@@ -33,7 +33,7 @@ import (
 )
 
 // Verify that the interface for UDP has been satisfied.
-var _ protos.UdpProtocolPlugin = &Dns{}
+var _ protos.UdpPlugin = &Dns{}
 
 // DNS messages for testing. When adding a new test message, add it to the
 // messages array and create a new benchmark test for the message.
