@@ -160,8 +160,8 @@ func (out *redisOutput) Connect() error {
 	return nil
 }
 
-func (out *redisOutput) Close() {
-	_ = out.Conn.Close()
+func (out *redisOutput) Close() error {
+	return out.Conn.Close()
 }
 
 func (out *redisOutput) Reconnect() {

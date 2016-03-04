@@ -217,7 +217,12 @@ func testMode(
 	expectedSignals []bool,
 	collectedEvents *[][]common.MapStr,
 ) {
-	defer mode.Close()
+	defer func() {
+		err := mode.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	if events == nil {
 		return
