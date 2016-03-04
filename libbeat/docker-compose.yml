@@ -4,6 +4,7 @@ beat:
     - redis
     - elasticsearch
     - logstash
+    - kafka
   environment:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
@@ -14,6 +15,8 @@ beat:
     - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
     # TODO: Set to true as soon as stable release is out
     - SHIELD=false
+    - KAFKA_HOST=kafka
+    - KAFKA_PORT=9092
   env_file:
     - build/test.env
   volumes:
@@ -35,4 +38,8 @@ logstash:
     - build/test.env
   links:
     - elasticsearch
-
+kafka:
+  image: spotify/kafka
+  expose:
+    - 9092
+    - 2181
