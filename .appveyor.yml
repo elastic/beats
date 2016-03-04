@@ -33,8 +33,11 @@ install:
   - ps: c:\gopath\src\github.com\elastic\beats\libbeat\scripts\install-go.ps1 -version 1.5.3
   - set PATH=%GOROOT%\bin;%PATH%
   # AppVeyor installed mingw is 32-bit only.
-  - cinst mingw > mingw-install.txt
-  - ps: Push-AppveyorArtifact mingw-install.txt
+  - ps: >-
+      if(!(Test-Path "C:\tools\mingw64\bin\gcc.exe")) {
+        cinst mingw > mingw-install.txt
+        Push-AppveyorArtifact mingw-install.txt
+      }
   - set PATH=C:\tools\mingw64\bin;%GOROOT%\bin;%PATH%
   - set PATH=%GOPATH%\bin;%PATH%
   - go get github.com/pierrre/gotestcover
