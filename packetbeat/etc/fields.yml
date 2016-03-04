@@ -516,7 +516,7 @@ trans_event:
             as escaped base 10 integers (\DDD). Back slashes and quotes are escaped.
             Tabs, carriage returns, and line feeds are converted to \t, \r, and
             \n respectively.
-          example: www.google.com
+          example: www.google.com.
 
         - name: dns.question.type
           description: The type of records being queried.
@@ -526,6 +526,13 @@ trans_event:
           description: The class of of records being queried.
           example: IN
 
+        - name: dns.question.etld_plus_one
+          description: The effective top-level domain (eTLD) plus one more label.
+            For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
+            The data for determining the eTLD comes from an embedded copy of the
+            data from http://publicsuffix.org.
+          example: amazon.co.uk.
+
         - name: dns.answers_count
           type: int
           description: >
@@ -533,7 +540,7 @@ trans_event:
 
         - name: dns.answers.name
           description: The domain name to which this resource record pertains.
-          example: example.com
+          example: example.com.
 
         - name: dns.answers.type
           description: The type of data contained in this resource record.
@@ -570,7 +577,7 @@ trans_event:
 
         - name: dns.authorities.name
           description: The domain name to which this resource record pertains.
-          example: example.com
+          example: example.com.
 
         - name: dns.authorities.type
           description: The type of data contained in this resource record.
@@ -613,7 +620,7 @@ trans_event:
 
         - name: dns.additionals.name
           description: The domain name to which this resource record pertains.
-          example: example.com
+          example: example.com.
 
         - name: dns.additionals.type
           description: The type of data contained in this resource record.
@@ -653,12 +660,12 @@ trans_event:
         - name: amqp.class-id
           type: int
           description: >
-            Failing method class.
+            Failing method class.
 
         - name: amqp.method-id
           type: int
           description: >
-            Failing method ID.
+            Failing method ID.
 
         - name: amqp.exchange
           type: string
@@ -694,27 +701,27 @@ trans_event:
         - name: amqp.no-wait
           type: bool
           description: >
-            If set, the server will not respond to the method.
+            If set, the server will not respond to the method.
 
         - name: amqp.consumer-tag
           description: >
-            Identifier for the consumer, valid within the current channel.
+            Identifier for the consumer, valid within the current channel.
 
         - name: amqp.delivery-tag
           type: int
           description: >
-            The server-­assigned and channel-­specific delivery tag.
+            The server-assigned and channel-specific delivery tag.
 
         - name: amqp.message-count
           type: int
           description: >
-            The number of messages in the queue, which will be zero for
-            newly-­declared queues.
+            The number of messages in the queue, which will be zero for
+            newly-declared queues.
 
         - name: amqp.consumer-count
           type: int
           description: >
-            The number of consumers of a queue.
+            The number of consumers of a queue.
 
         - name: amqp.routing-key
           type: int
@@ -724,13 +731,13 @@ trans_event:
         - name: amqp.no-ack
           type: bool
           description: >
-            If set, the server does not expect acknowledgements for messages.
+            If set, the server does not expect acknowledgements for messages.
 
         - name: amqp.no-local
           type: bool
           description: >
-            If set,  the server will not send messages to the connection that
-            published them.
+            If set, the server will not send messages to the connection that
+            published them.
 
         - name: amqp.if-unused
           type: bool
@@ -745,13 +752,13 @@ trans_event:
         - name: amqp.queue
           type: string
           description: >
-            The queue name identifies the queue within the vhost.
+            The queue name identifies the queue within the vhost.
 
         - name: amqp.redelivered
           type: bool
           description: >
-            Indicates that the message has been previously delivered to this
-            or another client.
+            Indicates that the message has been previously delivered to this
+            or another client.
 
         - name: amqp.multiple
           type: bool
@@ -801,7 +808,7 @@ trans_event:
         - name: amqp.correlation-id
           type: string
           description: >
-            Application correlation identifier.
+            Application correlation identifier.
 
         - name: amqp.reply-to
           type: string
@@ -816,7 +823,7 @@ trans_event:
         - name: amqp.message-id
           type: string
           description: >
-            Application message identifier.
+            Application message identifier.
 
         - name: amqp.timestamp
           type: string
