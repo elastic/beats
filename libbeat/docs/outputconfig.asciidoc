@@ -380,6 +380,34 @@ output:
 The default port to use if the port number is not given in <<hosts>>. The default port number
 is 10200.
 
+===== proxy_url
+
+The URL of the SOCKS5 proxy to use when connecting to the Logstash servers. The
+value must be a URL with a scheme of `socks5://`. The protocol used to
+communicate to Logstash is not based on HTTP so a web-proxy cannot be used.
+
+If the SOCKS5 proxy server requires client authentication, then a username and
+password can be embedded in the URL as shown in the example.
+
+When using a proxy, hostnames are resolved on the proxy server instead of on the
+client. You can change this behavior by setting the
+<<logstash-proxy-use-local-resolver,proxy_use_local_resolver>> option.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output:
+  logstash:
+    hosts: ["remote-host:5044"]
+    proxy_url: socks5://user:password@socks5-proxy:2233
+------------------------------------------------------------------------------
+
+[[logstash-proxy-use-local-resolver]]
+===== proxy_use_local_resolver
+
+The `proxy_use_local_resolver` option determines if Logstash hostnames are
+resolved locally when using a proxy. The default value is false which means
+that when a proxy is used the name resolution occurs on the proxy server.
+
 ===== index
 
 The index root name to write events to. The default is the Beat name.

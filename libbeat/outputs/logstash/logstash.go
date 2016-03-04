@@ -53,6 +53,11 @@ func (lj *logstash) init(cfg *ucfg.Config) error {
 		maxAttempts = 0
 	}
 
+	// Initialize and validate the proxy settings.
+	if err := config.Proxy.parseURL(); err != nil {
+		return err
+	}
+
 	var clients []mode.ProtocolClient
 	var err error
 	if useTLS {
@@ -63,10 +68,10 @@ func (lj *logstash) init(cfg *ucfg.Config) error {
 		}
 
 		clients, err = mode.MakeClients(cfg,
-			makeClientFactory(&config, makeTLSClient(config.Port, tlsConfig)))
+			makeClientFactory(&config, makeTLSClient(config.Port, tlsConfig, &config.Proxy)))
 	} else {
 		clients, err = mode.MakeClients(cfg,
-			makeClientFactory(&config, makeTCPClient(config.Port)))
+			makeClientFactory(&config, makeTCPClient(config.Port, &config.Proxy)))
 	}
 	if err != nil {
 		return err
@@ -100,15 +105,15 @@ func makeClientFactory(
 	}
 }
 
-func makeTCPClient(port int) func(string) (TransportClient, error) {
+func makeTCPClient(port int, socks *proxyConfig) func(string) (TransportClient, error) {
 	return func(host string) (TransportClient, error) {
-		return newTCPClient(host, port)
+		return newTCPClient(host, port, socks)
 	}
 }
 
-func makeTLSClient(port int, tls *tls.Config) func(string) (TransportClient, error) {
+func makeTLSClient(port int, tls *tls.Config, socks *proxyConfig) func(string) (TransportClient, error) {
 	return func(host string) (TransportClient, error) {
-		return newTLSClient(host, port, tls)
+		return newTLSClient(host, port, tls, socks)
 	}
 }
 
