@@ -1,0 +1,167 @@
+= Redis Module
+
+The Redis module fetches periodic information from redis.
+
+
+== Configuration
+
+The Redis module supports the standard configuration options which can be found here (add link).
+
+```
+metricbeat:
+  modules:
+    - module: redis
+      metricsets: ["info"]
+      period: 1s
+      hosts: ["127.0.0.1:6379"]
+      enabled: true
+
+      # Network type to be used for redis connection. Default: tcp
+      #network: tcp
+
+      # Max number of concurrent connections. Default: 10
+      #maxconn: 10
+```
+
+Redis has two additional config options:
+
+* network: Network type to be used for redis connection. Default is tcp
+* maxconn: Maximum number of concurrent connections to redis. Default is 10
+
+== MetricSets
+
+The Redis Module has currently one MetricSet which is called info. For more details see below.
+
+
+== Redis Info Metricset
+
+
+It fetches the `REDIS INFO` from the Redis server on the predefined period. More details about the variables available on the Redis server can be found here: http://redis.io/commands/INFO
+
+
+=== Available selectors
+
+Redis info metricset has the following selectors available:
+
+* clients
+* cluster
+* cpu
+* keyspace
+* memory
+* presistence
+* replication
+* server
+* stats
+
+
+=== Document Structure
+
+```
+{
+  "@timestamp": "2016-03-18T12:51:41.397Z",
+  "beat": {
+    "hostname": "ruflin",
+    "name": "ruflin"
+  },
+  "metricset": "info",
+  "module": "redis",
+  "redis-info": {
+    "clients": {
+      "blocked_clients": 0,
+      "client_biggest_input_buf": 0,
+      "client_longest_output_list": 0,
+      "connected_clients": 1
+    },
+    "cluster": {
+      "cluster_enabled": false
+    },
+    "cpu": {
+      "used_cpu_sys": 71.78,
+      "used_cpu_sys_children": 0.01,
+      "used_cpu_user": 40.44,
+      "used_cpu_user_children": 0
+    },
+    "keyspace": {
+      "db0": {
+        "avg_ttl": 0,
+        "expires": 0,
+        "keys": 1
+      }
+    },
+    "memory": {
+      "mem_allocator": "libc",
+      "used_memory": 1008480,
+      "used_memory_lua": 36864,
+      "used_memory_peak": 1059040,
+      "used_memory_rss": 503808
+    },
+    "presistence": {
+      "aof_current_rewrite_time_sec": -1,
+      "aof_enabled": false,
+      "aof_last_bgrewrite_status": "ok",
+      "aof_last_rewrite_time_sec": -1,
+      "aof_last_write_status": "ok",
+      "aof_rewrite_in_progress": false,
+      "aof_rewrite_scheduled": false,
+      "loading": false,
+      "rdb_bgsave_in_progress": false,
+      "rdb_changes_since_last_save": 0,
+      "rdb_current_bgsave_time_sec": -1,
+      "rdb_last_bgsave_status": "ok",
+      "rdb_last_bgsave_time_sec": 0,
+      "rdb_last_save_time": 1457993872
+    },
+    "replication": {
+      "connected_slaves": 0,
+      "master_repl_offset": 0,
+      "repl_backlog_active": 0,
+      "repl_backlog_first_byte_offset": 0,
+      "repl_backlog_histlen": 0,
+      "repl_backlog_size": 1048576,
+      "role": "master"
+    },
+    "server": {
+      "arch_bits": "64",
+      "config_file": "",
+      "gcc_version": "4.2.1",
+      "hz": 10,
+      "lru_clock": 15464925,
+      "multiplexing_api": "kqueue",
+      "os": "Darwin 15.3.0 x86_64",
+      "process_id": 82986,
+      "redis_build_id": "aa27a151289c9b98",
+      "redis_git_dirty": "0",
+      "redis_git_sha1": "00000000",
+      "redis_mode": "standalone",
+      "redis_version": "3.0.7",
+      "run_id": "625a0a522c079382500a1dd51d3ffae43e787d0a",
+      "tcp_port": 6379,
+      "uptime_in_days": 6,
+      "uptime_in_seconds": 596299
+    },
+    "stats": {
+      "evicted_keys": 0,
+      "expired_keys": 0,
+      "instantaneous_input_kbps": 0,
+      "instantaneous_ops_per_sec": 0,
+      "instantaneous_output_kbps": 0,
+      "keyspace_hits": 0,
+      "keyspace_misses": 0,
+      "latest_fork_usec": 1810,
+      "migrate_cached_sockets": 0,
+      "pubsub_channels": 0,
+      "pubsub_patterns": 0,
+      "rejected_connections": 0,
+      "sync_full": 0,
+      "sync_partial_err": 0,
+      "sync_partial_ok": 0,
+      "total_commands_processed": 28045,
+      "total_connections_received": 135,
+      "total_net_input_bytes": 737571,
+      "total_net_output_bytes": 53981809
+    }
+  },
+  "rtt": 1317,
+  "type": "metricsets"
+}
+```

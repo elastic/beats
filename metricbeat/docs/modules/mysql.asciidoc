@@ -1,0 +1,83 @@
+= MySQL Module
+
+The MySQL module fetches periodic information from a MySQL server.
+
+
+== Configuration
+
+The MySQL module supports the standard configuration options which can be found here (add link).
+
+A basic configuration with the mysql module and the status metricset enabled look as following:
+
+
+```
+metricbeat:
+  modules:
+    - module: mysql
+      metricsets: ["status"]
+      period: 10s
+      hosts: ["root@tcp(127.0.0.1:3306)/"]
+```
+
+The host must be passed as so called data source name (dsn). The format of the DSN is as following:
+
+```
+[username[:password]@][protocol[(address)]]/
+```
+
+
+== MetricSets
+
+The MySQL Module has currently one MetricSet which is called status. It fetches the `GLOBAL STATUS` from the MySQL server on the predefined period. More details about the variables available on the MySQL server can be found here: http://dev.mysql.com/doc/refman/5.7/en/show-status.html
+
+=== MySQL Status Metricset
+
+
+The status metricset contains a large amount of metrics. The JSON document stored by default in elasticsearch looks as following:
+
+```
+{
+  "@timestamp": "2016-03-18T12:16:13.382Z",
+  "beat": {
+    "hostname": "ruflin.com",
+    "name": "ruflin.com"
+  },
+  "metricset": "status",
+  "module": "mysql",
+  "mysql-status": {
+    "Connections": 690,
+    "Flush_commands": 2,
+    "Max_used_connections": 2,
+    "aborted": {
+      "Aborted_clients": 88,
+      "Aborted_connects": 597
+    },
+    "binlog": {
+      "Binlog_cache_disk_use": 0,
+      "Binlog_cache_use": 0
+    },
+    "bytes": {
+      "Bytes_received": 549749,
+      "Bytes_sent": 144506849
+    },
+    "created": {
+      "Created_tmp_disk_tables": 1,
+      "Created_tmp_files": 5,
+      "Created_tmp_tables": 2
+    },
+    "delayed": {
+      "Delayed_errors": 0,
+      "Delayed_insert_threads": 0,
+      "Delayed_writes": 0
+    },
+    "open": {
+      "Open_files": 0,
+      "Open_streams": 0,
+      "Open_tables": 15,
+      "Opened_tables": 142
+    }
+  },
+  "rtt": 4861,
+  "type": "metricsets"
+}
+```
