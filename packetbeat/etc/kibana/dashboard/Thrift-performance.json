@@ -1,0 +1,11 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Thrift performance", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Thrift-requests-per-minute\",\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"Thrift-RPC-Errors\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Slowest-Thrift-RPC-methods\",\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Thrift-response-times-percentiles\",\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-Thrift-RPC-methods\",\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Top-Thrift-RPC-calls-with-errors\",\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"id\":\"Thrift-transactions\",\"type\":\"search\",\"size_x\":12,\"size_y\":8,\"col\":1,\"row\":12,\"columns\":[\"method\",\"type\",\"path\",\"responsetime\",\"status\"],\"sort\":[\"@timestamp\",\"desc\"]}]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

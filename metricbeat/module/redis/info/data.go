@@ -1,7 +1,10 @@
 package info
 
 import (
+	"strconv"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Map data to MapStr
@@ -10,7 +13,7 @@ func eventMapping(info map[string]string) common.MapStr {
 	// Full mapping from info
 	event := common.MapStr{
 		"clients": common.MapStr{
-			"connected_clients":          info["connected_clients"],
+			"connected_clients":          toInt(info["connected_clients"]),
 			"client_longest_output_list": info["client_longest_output_list"],
 			"client_biggest_input_buf":   info["client_biggest_input_buf"],
 			"blocked_clients":            info["blocked_clients"],
@@ -25,7 +28,7 @@ func eventMapping(info map[string]string) common.MapStr {
 			"used_cpu_user_children": info["used_cpu_user_children"],
 		},
 		"memory": common.MapStr{
-			"used_memory":      info["used_memory"],
+			"used_memory":      toInt(info["used_memory"]),
 			"used_memory_rss":  info["used_memory_rss"],
 			"used_memory_peak": info["used_memory_peak"],
 			"used_memory_lua":  info["used_memory_lua"],
@@ -76,14 +79,14 @@ func eventMapping(info map[string]string) common.MapStr {
 			"config_file":       info["config_file"],
 		},
 		"stats": common.MapStr{
-			"total_connections_received": info["total_connections_received"],
+			"total_connections_received": toInt(info["total_connections_received"]),
 			"total_commands_processed":   info["total_commands_processed"],
 			"instantaneous_ops_per_sec":  info["instantaneous_ops_per_sec"],
 			"total_net_input_bytes":      info["total_net_input_bytes"],
 			"total_net_output_bytes":     info["total_net_output_bytes"],
 			"instantaneous_input_kbps":   info["instantaneous_input_kbps"],
 			"instantaneous_output_kbps":  info["instantaneous_output_kbps"],
-			"rejected_connections":       info["rejected_connections"],
+			"rejected_connections":       toInt(info["rejected_connections"]),
 			"sync_full":                  info["sync_full"],
 			"sync_partial_ok":            info["sync_partial_ok"],
 			"sync_partial_err":           info["sync_partial_err"],
@@ -100,4 +103,15 @@ func eventMapping(info map[string]string) common.MapStr {
 	}
 
 	return event
+}
+
+func toInt(param string) int {
+	value, err := strconv.Atoi(param)
+
+	if err != nil {
+		logp.Err("Error converting param to int: %s", param)
+		value = 0
+	}
+
+	return value
 }

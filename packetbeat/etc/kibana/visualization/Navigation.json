@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"markdown\",\"params\":{\"markdown\":\"###Packetbeat:\\n\\n[Dashboard](/#/dashboard/Packetbeat-Dashboard)\\n\\n[Web transactions](/#/dashboard/HTTP)\\n\\n[MySQL performance](/#/dashboard/MySQL-performance)\\n\\n[PostgreSQL performance](/#/dashboard/PgSQL-performance)\\n\\n[MongoDB performance](/#/dashboard/MongoDB-performance)\\n\\n[Thrift-RPC performance](/#/dashboard/Thrift-performance)\\n\\n###Topbeat:\\n\\n[Dashboard](/#/dashboard/Topbeat-Dashboard)\\n\\n###Winlogbeat:\\n\\n[Dashboard](/#/dashboard/Winlogbeat-Dashboard)\"},\"aggs\":[],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Navigation", 
+  "uiStateJSON": "{}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+  }
+}
