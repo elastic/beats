@@ -54,6 +54,7 @@ var (
 		q_class: "IN",
 		q_type:  "A",
 		q_name:  "elastic.co.",
+		q_etld:  "elastic.co.",
 		answers: []string{"54.148.130.30", "54.69.104.66"},
 		request: []byte{
 			0x21, 0x51, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65, 0x6c, 0x61,
@@ -75,6 +76,7 @@ var (
 		q_class: "IN",
 		q_type:  "IXFR",
 		q_name:  "etas.com.",
+		q_etld:  "etas.com.",
 		answers: []string{"training2003p.", "training2003p.", "training2003p.",
 			"training2003p.", "1.1.1.100"},
 		request: []byte{
@@ -111,6 +113,7 @@ var (
 		q_class: "IN",
 		q_type:  "PTR",
 		q_name:  "131.252.30.192.in-addr.arpa.",
+		q_etld:  "192.in-addr.arpa.",
 		answers: []string{"github.com."},
 		authorities: []string{"a.root-servers.net.", "b.root-servers.net.", "c.root-servers.net.",
 			"d.root-servers.net.", "e.root-servers.net.", "f.root-servers.net.", "g.root-servers.net.",
@@ -153,6 +156,7 @@ var (
 		q_name: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
 			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net.",
+		q_etld: "sophosxl.net.",
 		request: []byte{
 			0x20, 0x2e, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33, 0x3f, 0x31,
 			0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34, 0x71, 0x70,

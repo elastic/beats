@@ -6,7 +6,7 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 [[exported-fields]]
 == Exported Fields
 
-This document describes the fields that are exported by Packetbeat. They are
+This document describes the fields that are exported by Docs/Fields.Asciidoc. They are
 grouped in the following categories:
 
 * <<exported-fields-flows_event>>
@@ -477,7 +477,7 @@ The DNS status code.
 
 ==== dns.question.name
 
-example: www.google.com
+example: www.google.com.
 
 The domain name being queried. If the name field contains non-printable characters (below 32 or above 126), then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds are converted to \t, \r, and \n respectively.
 
@@ -494,6 +494,12 @@ example: IN
 
 The class of of records being queried.
 
+==== dns.question.etld_plus_one
+
+example: amazon.co.uk.
+
+The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
+
 ==== dns.answers_count
 
 type: int
@@ -503,7 +509,7 @@ The number of resource records contained in the `dns.answers` field.
 
 ==== dns.answers.name
 
-example: example.com
+example: example.com.
 
 The domain name to which this resource record pertains.
 
@@ -547,7 +553,7 @@ The number of resource records contained in the `dns.authorities` field. The `dn
 
 ==== dns.authorities.name
 
-example: example.com
+example: example.com.
 
 The domain name to which this resource record pertains.
 
@@ -598,7 +604,7 @@ The number of resource records contained in the `dns.additionals` field. The `dn
 
 ==== dns.additionals.name
 
-example: example.com
+example: example.com.
 
 The domain name to which this resource record pertains.
 
@@ -624,6 +630,284 @@ The time interval in seconds that this resource record may be cached before it s
 ==== dns.additionals.data
 
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+=== amqp Fields
+
+AMQP specific event fields.
+
+
+==== amqp.reply-code
+
+type: int
+
+example: 404
+
+AMQP reply code to an error, similar to http reply-code
+
+
+==== amqp.reply-text
+
+type: string
+
+Text expliciting the error.
+
+
+==== amqp.class-id
+
+type: int
+
+Failing method class.
+
+
+==== amqp.method-id
+
+type: int
+
+Failing method ID.
+
+
+==== amqp.exchange
+
+type: string
+
+Name of the exchange.
+
+
+==== amqp.exchange-type
+
+type: string
+
+example: fanout
+
+Exchange type.
+
+
+==== amqp.passive
+
+type: bool
+
+If set, do not create exchange/queue.
+
+
+==== amqp.durable
+
+type: bool
+
+If set, request a durable exchange/queue.
+
+
+==== amqp.exclusive
+
+type: bool
+
+If set, request an exclusive queue.
+
+
+==== amqp.auto-delete
+
+type: bool
+
+If set, auto-delete queue when unused.
+
+
+==== amqp.no-wait
+
+type: bool
+
+If set, the server will not respond to the method.
+
+
+==== amqp.consumer-tag
+
+Identifier for the consumer, valid within the current channel.
+
+
+==== amqp.delivery-tag
+
+type: int
+
+The server-assigned and channel-specific delivery tag.
+
+
+==== amqp.message-count
+
+type: int
+
+The number of messages in the queue, which will be zero for newly-declared queues.
+
+
+==== amqp.consumer-count
+
+type: int
+
+The number of consumers of a queue.
+
+
+==== amqp.routing-key
+
+type: int
+
+Message routing key.
+
+
+==== amqp.no-ack
+
+type: bool
+
+If set, the server does not expect acknowledgements for messages.
+
+
+==== amqp.no-local
+
+type: bool
+
+If set, the server will not send messages to the connection that published them.
+
+
+==== amqp.if-unused
+
+type: bool
+
+Delete only if unused.
+
+
+==== amqp.if-empty
+
+type: bool
+
+Delete only if empty.
+
+
+==== amqp.queue
+
+type: string
+
+The queue name identifies the queue within the vhost.
+
+
+==== amqp.redelivered
+
+type: bool
+
+Indicates that the message has been previously delivered to this or another client.
+
+
+==== amqp.multiple
+
+type: bool
+
+Acknowledge multiple messages.
+
+
+==== amqp.arguments.*
+
+Optional additional arguments passed to some methods. Can be of various types.
+
+
+==== amqp.mandatory
+
+type: bool
+
+Indicates mandatory routing.
+
+
+==== amqp.immediate
+
+type: bool
+
+Request immediate delivery.
+
+
+==== amqp.content-type
+
+type: string
+
+example: text/plain
+
+MIME content type.
+
+
+==== amqp.content-encoding
+
+type: string
+
+MIME content encoding.
+
+
+==== amqp.headers.*
+
+Message header field table.
+
+
+==== amqp.delivery-mode
+
+type: int
+
+Non-persistent (1) or persistent (2).
+
+
+==== amqp.priority
+
+type: int
+
+Message priority, 0 to 9.
+
+
+==== amqp.correlation-id
+
+type: string
+
+Application correlation identifier.
+
+
+==== amqp.reply-to
+
+type: string
+
+Address to reply to.
+
+
+==== amqp.expiration
+
+type: string
+
+Message expiration specification.
+
+
+==== amqp.message-id
+
+type: string
+
+Application message identifier.
+
+
+==== amqp.timestamp
+
+type: string
+
+Message timestamp.
+
+
+==== amqp.type
+
+type: string
+
+Message type name.
+
+
+==== amqp.user-id
+
+type: string
+
+Creating user id.
+
+
+==== amqp.app-id
+
+type: string
+
+Creating application id.
 
 
 [[exported-fields-http]]
