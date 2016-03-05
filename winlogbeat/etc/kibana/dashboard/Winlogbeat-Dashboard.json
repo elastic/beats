@@ -1,0 +1,13 @@
+{
+  "hits": 0,
+  "timeRestore": false,
+  "description": "",
+  "title": "Winlogbeat Dashboard",
+  "uiStateJSON": "{}",
+  "panelsJSON": "[{\"type\":\"visualization\",\"id\":\"Number-of-Events-Over-Time-By-Event-Log\",\"size_x\":9,\"size_y\":4,\"panelIndex\":1,\"col\":4,\"row\":1},{\"type\":\"visualization\",\"id\":\"Number-of-Events\",\"size_x\":3,\"size_y\":3,\"panelIndex\":3,\"col\":1,\"row\":5},{\"type\":\"visualization\",\"id\":\"Top-Event-IDs\",\"size_x\":3,\"size_y\":3,\"panelIndex\":4,\"col\":7,\"row\":5},{\"type\":\"visualization\",\"id\":\"Event-Levels\",\"size_x\":3,\"size_y\":3,\"panelIndex\":5,\"col\":10,\"row\":5},{\"type\":\"visualization\",\"id\":\"Sources\",\"size_x\":3,\"size_y\":3,\"panelIndex\":6,\"col\":4,\"row\":5},{\"type\":\"visualization\",\"id\":\"Navigation\",\"size_x\":3,\"size_y\":4,\"panelIndex\":7,\"col\":1,\"row\":1}]",
+  "optionsJSON": "{\"darkTheme\":false}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}

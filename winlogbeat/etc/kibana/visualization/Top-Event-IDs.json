@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"count\",\"params\":{},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"event_id\",\"order\":\"desc\",\"size\":5},\"id\":\"2\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Top-Event-IDs",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+  }
+}

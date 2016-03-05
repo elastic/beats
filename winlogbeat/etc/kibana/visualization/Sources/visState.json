@@ -1,0 +1,32 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {},
+            "schema": "metric",
+            "type": "count"
+        },
+        {
+            "id": "2",
+            "params": {
+                "exclude": {
+                    "pattern": "\"\""
+                },
+                "field": "source_name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 7
+            },
+            "schema": "segment",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTooltip": true,
+        "isDonut": false,
+        "shareYAxis": true
+    },
+    "type": "pie"
+}

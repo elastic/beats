@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"count\",\"params\":{},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"exclude\":{\"pattern\":\"\\\"\\\"\"},\"size\":5,\"order\":\"desc\",\"field\":\"level\"},\"id\":\"2\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Event-Levels",
+  "uiStateJSON": "{}",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+  }
+}

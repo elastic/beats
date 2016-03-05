@@ -1,0 +1,22 @@
+{
+  "sort": [
+    "@timestamp",
+    "desc"
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "Windows Event Log Search",
+  "version": 1,
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[],\"highlight\":{\"fields\":{\"*\":{}},\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"],\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"index\":\"winlogbeat-*\"}"
+  },
+  "columns": [
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
+  ]
+}
