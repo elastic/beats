@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -16,7 +17,7 @@ func init() {
 
 type Moduler struct{}
 
-func (r Moduler) Setup() error {
+func (r Moduler) Setup(cfg *ucfg.Config) error {
 	return nil
 }
 
