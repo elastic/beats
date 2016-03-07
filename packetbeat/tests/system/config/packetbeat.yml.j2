@@ -147,6 +147,11 @@ protocols:
 {% if mongodb_max_docs is not none %}    max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}    max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
+  drda:
+    ports: [{{ drda_ports|default([1527])|join(", ") }}]
+{% if drda_send_request %}    send_request: true{% endif %}
+{% if drda_send_response %}    send_response: true{% endif %}
+
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by packetbeat.

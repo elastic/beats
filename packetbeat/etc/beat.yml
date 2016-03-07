@@ -146,6 +146,12 @@ protocols:
     # the MongoDB protocol by commenting out the list of ports.
     ports: [27017]
 
+  drda:
+    # Configure the ports where to listen for DRDA traffic. You can disable
+    # the DRDA protocol by commenting out the list of ports.
+    # DRDA is used by DB2, Apache Derby and Informix.
+    ports: [1527]
+
 ############################# Processes #######################################
 
 # Configure the processes to be monitored and how to find them. If a process is

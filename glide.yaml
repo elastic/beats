@@ -54,3 +54,4 @@ import:
   version: 8929fe90cee4b2cb9deb468b51fb34eba64d1bf0
 - package: github.com/urso/ucfg
   version: 60c5618c1d445e97c3c52d738dbc887d68af76a5
+- package: github.com/Intermernet/ebcdic

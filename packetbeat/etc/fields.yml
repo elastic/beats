@@ -1283,6 +1283,21 @@ trans_event:
           description: >
             The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
+    - name: drda
+      type: group
+      description: DRDA-specific event fields.
+      fields:
+        - name: drda.responses
+          type: dict
+          description: >
+           The response data structure (DDM and Parameters)
+
+        - name: drda.requests
+          type: dict
+          description: >
+            The request data structure (DDM and Parameters)
+
+
 raw:
   type: group
   description: These fields contain the raw transaction data.
@@ -1378,3 +1393,4 @@ sections:
   - ["trans_env", "Environmental (Transactions)"]
   - ["flows_env", "Environmental (Flows)"]
   - ["raw", "Raw"]
+  - ["drda", "DRDA"]

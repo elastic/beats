@@ -9,6 +9,7 @@ import (
 	// import support protocol modules
 	_ "github.com/elastic/beats/packetbeat/protos/amqp"
 	_ "github.com/elastic/beats/packetbeat/protos/dns"
+	_ "github.com/elastic/beats/packetbeat/protos/drda"
 	_ "github.com/elastic/beats/packetbeat/protos/http"
 	_ "github.com/elastic/beats/packetbeat/protos/memcache"
 	_ "github.com/elastic/beats/packetbeat/protos/mongodb"

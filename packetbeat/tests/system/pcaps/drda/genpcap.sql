@@ -1,0 +1,11 @@
+connect 'jdbc:derby://localhost:1527/MyDbTest;create=true';
+create table derbyDB(num int, addr varchar(40));
+insert into derbyDB values (1956,'Webster St.');
+insert into derbyDB values (1910,'Union St.');
+update derbyDB set num=180, addr='Grand Ave.' where num=1956;
+select * from derbyDb;
+values lower('LowerCASE me!');
+CALL SQLJ.install_jar ('myStuff.jar', 'APP.MyStuffJar', 0);
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY ('derby.database.classpath', 'APP.MyStuffJar');
+disconnect;
+exit;

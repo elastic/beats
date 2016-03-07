@@ -227,6 +227,7 @@ Currently, Packetbeat supports the following protocols:
  - Thrift-RPC
  - MongoDB
  - Memcache
+ - DRDA (DB2, Informix, Derby)
 
 Example configuration:
 
@@ -256,6 +257,9 @@ protocols:
 
   thrift:
     ports: [9090]
+
+  drda:
+    ports: [1527]
 ------------------------------------------------------------------------------
 
 ==== Common Protocol Options
@@ -514,7 +518,7 @@ quiet requests with an error response are published immediately.
 
 ==== MySQL and PgSQL Configuration Options
 
-You can specify the following options in the `mysql` or `pgsql` sections: 
+You can specify the following options in the `mysql` or `pgsql` sections:
 
 ===== max_rows
 

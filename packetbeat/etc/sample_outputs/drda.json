@@ -1,0 +1,116 @@
+{
+    "@timestamp":"2016-02-29T20:07:39.094Z",
+    "beat":{
+        "hostname":"Hendriks-MacBook-Pro.local",
+        "name":"Hendriks-MacBook-Pro.local"
+    },
+    "bytes_in":276,
+    "bytes_out":1107,
+    "client_ip":"127.0.0.1",
+    "client_port":52933,
+    "client_proc":"",
+    "client_server":"Hendriks-MacBook-Pro.local",
+    "count":1,
+    "drda":{
+        "requests":{
+            "DSCSQLSTT_2":{
+                "codepoint":8200,
+                "correlation_id":2,
+                "description":"Describe SQL Statement",
+                "direction":1,
+                "format":1,
+                "length":91,
+                "length2":85,
+                "parameters":{
+                    "PKGNAMCSN":{
+                        "codepoint":8467,
+                        "data_ascii":"\u0000\u0014MyDbTest;create=true\u0000\u0012NULLID            \u0000\u0012SYSLH000          SYSLVL01\u0000\u0002",
+                        "data_ebcdic":"\u0000\ufffd(`\ufffd\ufffd\ufffd\ufffd\ufffdț\ufffd\ufffd\ufffd/\ufffd\ufffd\u0015\ufffd\ufffd\ufffd\ufffd\u0000\u0012+\ufffd\u003c\u003c\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0000\u0012\ufffd\ufffd\ufffd\u003c琐\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u003c\ufffd\u003c\ufffd\ufffd\u0000\u0002",
+                        "desc":"RDB Package Name, Consistency Token, and Section Number",
+                        "length":76
+                    },
+                    "TYPSQLDA":{
+                        "codepoint":8518,
+                        "data_ascii":"\u0005",
+                        "data_ebcdic":"\t",
+                        "desc":"Type of SQL Descriptor Area",
+                        "length":5
+                    }
+                }
+            },
+            "PRPSQLSTT_1":{
+                "codepoint":8205,
+                "correlation_id":1,
+                "description":"Prepare SQL Statement",
+                "direction":1,
+                "format":81,
+                "length":86,
+                "length2":80,
+                "parameters":{
+                    "PKGNAMCSN":{
+                        "codepoint":8467,
+                        "data_ascii":"\u0000\u0014MyDbTest;create=true\u0000\u0012NULLID            \u0000\u0012SYSLH000          SYSLVL01\u0000\u0002",
+                        "data_ebcdic":"\u0000\ufffd(`\ufffd\ufffd\ufffd\ufffd\ufffdț\ufffd\ufffd\ufffd/\ufffd\ufffd\u0015\ufffd\ufffd\ufffd\ufffd\u0000\u0012+\ufffd\u003c\u003c\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0000\u0012\ufffd\ufffd\ufffd\u003c琐\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u003c\ufffd\u003c\ufffd\ufffd\u0000\u0002",
+                        "desc":"RDB Package Name, Consistency Token, and Section Number",
+                        "length":76
+                    }
+                }
+            },
+            "SQLATTR_1":{
+                "codepoint":9296,
+                "correlation_id":1,
+                "description":"SQL Statement Attributes",
+                "direction":1,
+                "format":83,
+                "length":26,
+                "length2":20,
+                "parameters":{
+
+                }
+            },
+            "SQLSTT_1":{
+                "codepoint":9236,
+                "correlation_id":1,
+                "description":"SQL Statement",
+                "direction":1,
+                "format":67,
+                "length":73,
+                "length2":67,
+                "parameters":{
+
+                }
+            }
+        },
+        "responses":{
+            "SQLCARD_1":{
+                "codepoint":9224,
+                "correlation_id":1,
+                "description":"SQL Communications Area Reply Data",
+                "format":67,
+                "length":71,
+                "length2":65,
+                "parameters":{
+
+                }
+            },
+            "SQLDARD_2":{
+                "codepoint":9233,
+                "correlation_id":2,
+                "description":"SQLDA Reply Data",
+                "format":3,
+                "length":1036,
+                "length2":1030,
+                "parameters":{
+
+                }
+            }
+        }
+    },
+    "ip":"127.0.0.1",
+    "port":1527,
+    "proc":"",
+    "responsetime":0,
+    "server":"Hendriks-MacBook-Pro.local",
+    "status":"OK",
+    "type":"drda"
+}
