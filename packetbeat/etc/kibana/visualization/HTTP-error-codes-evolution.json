@@ -1,0 +1,9 @@
+{
+  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"count\"},\"schema\":\"metric\",\"type\":\"sum\"},{\"id\":\"2\",\"params\":{\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"id\":\"3\",\"params\":{\"field\":\"http.code\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTooltip\":true,\"defaultYExtents\":false,\"shareYAxis\":true},\"type\":\"line\"}", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"key\":\"type\",\"value\":\"http\",\"disabled\":false},\"query\":{\"match\":{\"type\":{\"query\":\"http\",\"type\":\"phrase\"}}}}],\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"query\":{\"query_string\":{\"query\":\"!http.code: [200 TO 299]\",\"analyze_wildcard\":true}}}"
+  }, 
+  "version": 1, 
+  "description": "", 
+  "title": "HTTP error codes evolution"
+}

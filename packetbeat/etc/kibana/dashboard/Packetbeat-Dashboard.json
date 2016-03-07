@@ -1,0 +1,11 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat Dashboard", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Web-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":4,\"id\":\"DB-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Cache-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":10,\"id\":\"RPC-transactions\",\"row\":5,\"size_x\":3,\"size_y\":2,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Response-times-percentiles\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Errors-count-over-time\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Errors-vs-successful-transactions\",\"row\":10,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Latency-histogram\",\"row\":13,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":4,\"id\":\"Client-locations\",\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Response-times-repartition\",\"row\":7,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\"},{\"id\":\"Navigation\",\"type\":\"visualization\",\"size_x\":3,\"size_y\":4,\"col\":1,\"row\":1}]", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
