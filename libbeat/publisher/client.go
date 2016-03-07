@@ -110,20 +110,40 @@ func newClient(pub *PublisherType) *client {
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
+
 	c.annotateEvent(event)
 
-	ctx, client := c.getClient(opts)
-	publishedEvents.Add(1)
-	return client.PublishEvent(ctx, event)
-}
-
-func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	for _, event := range events {
-		c.annotateEvent(event)
+	publishEvent := c.filterEvent(event)
+	if publishEvent == nil {
+		return false
 	}
 
 	ctx, client := c.getClient(opts)
-	publishedEvents.Add(int64(len(events)))
+	publishedEvents.Add(1)
+	return client.PublishEvent(ctx, *publishEvent)
+}
+
+func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
+
+	// optimization: shares the backing array and capacity
+	publishEvents := events[:0]
+
+	for _, event := range events {
+		c.annotateEvent(event)
+
+		publishEvent := c.filterEvent(event)
+		if publishEvent != nil {
+			publishEvents = append(publishEvents, *publishEvent)
+		}
+	}
+
+	ctx, client := c.getClient(opts)
+	if len(publishEvents) == 0 {
+		logp.Debug("filter", "No events to publish")
+		return true
+	}
+
+	publishedEvents.Add(int64(len(publishEvents)))
 	return client.PublishEvents(ctx, events)
 }
 
@@ -157,9 +177,22 @@ func (c *client) annotateEvent(event common.MapStr) {
 		delete(event, common.EventMetadataKey)
 	}
 
-	if logp.IsDebug("publish") {
-		PrintPublishEvent(event)
+}
+
+func (c *client) filterEvent(event common.MapStr) *common.MapStr {
+
+	if event = common.ConvertToGenericEvent(event); event == nil {
+		logp.Err("fail to convert to a generic event")
+		return nil
+
 	}
+
+	// filter the event by applying the configured rules
+	publishEvent := c.publisher.Filters.Filter(event)
+	if logp.IsDebug("publish") {
+		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
+	}
+	return &publishEvent
 }
 
 func (c *client) getClient(opts []ClientOption) (Context, eventPublisher) {

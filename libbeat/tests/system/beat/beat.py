@@ -11,6 +11,9 @@ import time
 import yaml
 from datetime import datetime, timedelta
 
+BEAT_REQUIRED_FIELDS = ["@timestamp", "type",
+                        "beat.name", "beat.hostname"]
+
 
 class Proc(object):
     """
@@ -204,7 +207,9 @@ class TestCase(unittest.TestCase):
             f.write(output_str)
 
     # Returns output as JSON object with flattened fields (. notation)
-    def read_output(self, output_file=None):
+    def read_output(self,
+                    output_file=None,
+                    required_fields=None):
 
         # Init defaults
         if output_file is None:
@@ -215,8 +220,7 @@ class TestCase(unittest.TestCase):
             for line in f:
                 jsons.append(self.flatten_object(json.loads(line),
                                                  []))
-        self.all_have_fields(jsons, ["@timestamp", "type",
-                                     "beat.name", "beat.hostname"])
+        self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
         return jsons
 
     # Returns output as JSON object
