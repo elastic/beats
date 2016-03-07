@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"sort"
 	"sync"
 	"time"
 
@@ -8,7 +9,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"sort"
+
+	"github.com/urso/ucfg"
 )
 
 // Module specifics. This must be defined by each module
@@ -21,6 +23,9 @@ type Module struct {
 	// Module config
 	Config ModuleConfig
 
+	// Raw config object to be unpacked by moduler
+	cfg *ucfg.Config
+
 	// List of all metricsets in this module. Use to keep track of metricsets
 	metricSets map[string]*MetricSet
 
@@ -31,15 +36,27 @@ type Module struct {
 }
 
 // NewModule creates a new module
-func NewModule(config ModuleConfig, moduler Moduler) *Module {
+func NewModule(cfg *ucfg.Config, moduler Moduler) (*Module, error) {
+
+	// Module config defaults
+	config := ModuleConfig{
+		Period: "1s",
+	}
+
+	err := cfg.Unpack(&config)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Module{
 		name:       config.Module,
 		Config:     config,
+		cfg:        cfg,
 		moduler:    moduler,
 		metricSets: map[string]*MetricSet{},
 		wg:         sync.WaitGroup{},
 		done:       make(chan struct{}),
-	}
+	}, nil
 }
 
 // Starts the given module
@@ -53,7 +70,7 @@ func (m *Module) Start(b *beat.Beat) error {
 	}
 
 	logp.Info("Setup moduler: %s", m.name)
-	err := m.moduler.Setup()
+	err := m.moduler.Setup(m.cfg)
 	if err != nil {
 		return fmt.Errorf("Error setting up module: %s. Not starting metricsets for this module.", err)
 	}
@@ -223,11 +240,12 @@ func (m *Module) processEvents(events []common.MapStr, metricSet *MetricSet) ([]
 
 		// TODO: Add fields_under_root option for "metrics"?
 		event = common.MapStr{
-			"type":         typeName,
-			eventFieldName: event,
-			"metricset":    metricSet.Name,
-			"module":       m.name,
-			"@timestamp":   timestamp,
+			"type":                  typeName,
+			eventFieldName:          event,
+			"metricset":             metricSet.Name,
+			"module":                m.name,
+			"@timestamp":            timestamp,
+			common.EventMetadataKey: m.Config.EventMetadata,
 		}
 
 		// Overwrite index in case it is set
