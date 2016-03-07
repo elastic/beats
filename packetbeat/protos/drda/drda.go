@@ -22,8 +22,7 @@ Limitations:
 - Raw message not supported (guess that makes not much sense here)
 - No unit tests yet
 - Too few system tests
-- No DSS decoding yet
-- Check if all codepoints are covered (also "esoteric" like those from IMS)
+- Check that all codepoints are covered (also "esoteric" like those from IMS)
 
 Dependencies:
 - https://github.com/Intermernet/ebcdic
@@ -33,13 +32,13 @@ Dependencies:
 type parseState int
 
 const (
-	drdaStateStart parseState = iota
-	drdaStateContent
+	drdaStateDDM parseState = iota
+	drdaStateParameter
 )
 
 var stateStrings []string = []string{
-	"Start",
-	"Content",
+	"DDM",
+	"Parameter",
 }
 
 func drdaAbbrev(codepoint uint16) string {
@@ -117,7 +116,7 @@ func (drda *Drda) GetPorts() []int {
 
 func (stream *DrdaStream) PrepareForNewMessage() {
 	stream.data = stream.data[stream.parseOffset:]
-	stream.parseState = drdaStateStart
+	stream.parseState = drdaStateDDM
 	stream.parseOffset = 0
 	stream.message = nil
 }
@@ -142,7 +141,7 @@ func drdaMessageParser(s *DrdaStream) (bool, bool) {
 		logp.Debug("drdadetailed", "parser round with parseState = %s and offset: %d, len of data is %d", s.parseState, s.parseOffset, len(s.data))
 
 		switch s.parseState {
-		case drdaStateStart:
+		case drdaStateDDM:
 
 			m.start = s.parseOffset
 			if len(s.data[s.parseOffset:]) < 10 {
@@ -168,6 +167,8 @@ func drdaMessageParser(s *DrdaStream) (bool, bool) {
 
 			ddm.Length = uint16(hdr[0])<<8 | uint16(hdr[1])
 			ddm.Format = uint8(hdr[3])
+			ddm.DSSType = ddm.Format & 0x0F
+			ddm.DSSFlags = ddm.Format >> 4
 			ddm.Cor = uint16(hdr[4])<<8 | uint16(hdr[5])
 			ddm.Length2 = uint16(hdr[6])<<8 | uint16(hdr[7])
 			ddm.Codepoint = uint16(hdr[8])<<8 | uint16(hdr[9])
@@ -180,51 +181,36 @@ func drdaMessageParser(s *DrdaStream) (bool, bool) {
 			s.parseOffset += 10
 
 			if ddm.Length > 10 {
-				s.parseState = drdaStateContent
+				s.parseState = drdaStateParameter
 				continue
 			} else {
 				logp.Debug("drdadetailed", "       - No parameters")
 				return true, true
 			}
 
-		case drdaStateContent:
+		case drdaStateParameter:
 
 			if len(s.data[s.parseOffset:]) < 4 {
 				logp.Err("Parameters message too short. Ignore it.")
 				return false, false
 			}
 
-			contentLength := uint16(s.data[s.parseOffset])<<8 | uint16(s.data[s.parseOffset+1])
-
-			if contentLength == 0 {
-				logp.Debug("drdadetailed", "       - Parameter with zero length, thats ok but immediately advance to next DDM")
-				s.parseOffset += m.RemainingLength
-				s.parseState = drdaStateStart
-				return true, true
-			}
-
-			if contentLength == 255 {
-				logp.Debug("drdadetailed", "        - Parameter with invalid length of 255, thats ok but immediately advance to next DDM")
-				s.parseOffset += m.RemainingLength
-				s.parseState = drdaStateStart
-				return true, true
-			}
-
-			if int(contentLength) > m.RemainingLength {
-				logp.Debug("drdadetailed", "        - Parameter with invalid length of %d, thats ok but immediately advance to next DDM", int(contentLength))
-				s.parseOffset += m.RemainingLength
-				s.parseState = drdaStateStart
-				return true, true
-			}
-
-			dataLength := int(contentLength) - 4
 			codePoint := uint16(s.data[s.parseOffset+2])<<8 | uint16(s.data[s.parseOffset+3])
+			parameterLength := uint16(s.data[s.parseOffset])<<8 | uint16(s.data[s.parseOffset+1])
+
+			if parameterLength == 0 || parameterLength == 1 || int(parameterLength) > m.RemainingLength {
+				logp.Debug("drdadetailed", "       - Parameter %s with special length, thats ok but assume last parameter", drdaAbbrev(codePoint))
+				parameterLength = uint16(m.RemainingLength)
+			} else {
+				logp.Debug("drdadetailed", "       - Parameter: Length %d %s (%s)", parameterLength, drdaAbbrev(codePoint), drda_description[codePoint])
+			}
+
+			dataLength := int(parameterLength) - 4
 
 			parameter := &Parameter{}
-			parameter.Length = contentLength
+			parameter.Length = parameterLength
 			parameter.Codepoint = codePoint
 
-			logp.Debug("drdadetailed", "       - Parameter: Length %d %s (%s)", contentLength, drdaAbbrev(codePoint), drda_description[codePoint])
 			var data []byte
 
 			if dataLength > 0 {
@@ -235,11 +221,11 @@ func drdaMessageParser(s *DrdaStream) (bool, bool) {
 			}
 
 			m.parameters[codePoint] = *parameter
-			m.RemainingLength -= int(contentLength)
-			s.parseOffset += int(contentLength)
+			m.RemainingLength -= int(parameterLength)
+			s.parseOffset += int(parameterLength)
 
 			if m.RemainingLength <= 0 {
-				s.parseState = drdaStateStart
+				s.parseState = drdaStateDDM
 				return true, true
 			}
 
@@ -454,16 +440,27 @@ func (drda *Drda) receivedDrdaRequest(msg *DrdaMessage) {
 		tmp[drdaAbbrev(key)] = p
 	}
 
+	if val, ok := msg.parameters[DRDA_CP_SQLSTT]; ok {
+		trans.Query = val.ASCIIData
+	}
+
 	trans.Requests[fmt.Sprint(drdaAbbrev(msg.ddm.Codepoint), "_", msg.ddm.Cor)] = common.MapStr{
 
-		"description":    drda_description[msg.ddm.Codepoint],
-		"codepoint":      msg.ddm.Codepoint,
-		"length2":        msg.ddm.Length2,
-		"format":         msg.ddm.Format,
-		"correlation_id": msg.ddm.Cor,
-		"length":         msg.ddm.Length,
-		"direction":      msg.Direction,
-		"parameters":     tmp,
+		"description":  drda_description[msg.ddm.Codepoint],
+		"codepoint":    msg.ddm.Codepoint,
+		"length2":      msg.ddm.Length2,
+		"format":       msg.ddm.Format,
+		"format_flags": msg.ddm.DSSFlags,
+		//"format_reserved":        msg.ddm.DSSFlags >> DRDA_DSSFMT_RESERVED,
+		//"format_chained":         msg.ddm.DSSFlags >> DRDA_DSSFMT_CHAINED,
+		//"format_continue":        msg.ddm.DSSFlags >> DRDA_DSSFMT_CONTINUE,
+		//"format_samecor":         msg.ddm.DSSFlags >> DRDA_DSSFMT_SAME_CORR,
+		"format_dss_type":        msg.ddm.DSSType,
+		"format_dss_type_abbrev": dss_abbrev[uint16(msg.ddm.DSSType)],
+		"correlation_id":         msg.ddm.Cor,
+		"length":                 msg.ddm.Length,
+		"direction":              msg.Direction,
+		"parameters":             tmp,
 	}
 
 	trans.Notes = msg.Notes
@@ -497,12 +494,19 @@ func (drda *Drda) receivedDrdaResponse(msg *DrdaMessage) {
 
 	trans.Responses[fmt.Sprint(drdaAbbrev(msg.ddm.Codepoint), "_", msg.ddm.Cor)] = common.MapStr{
 
-		"description":    drda_description[msg.ddm.Codepoint],
-		"codepoint":      msg.ddm.Codepoint,
-		"length2":        msg.ddm.Length2,
-		"format":         msg.ddm.Format,
-		"correlation_id": msg.ddm.Cor,
-		"length":         msg.ddm.Length,
+		"description":  drda_description[msg.ddm.Codepoint],
+		"codepoint":    msg.ddm.Codepoint,
+		"length2":      msg.ddm.Length2,
+		"format":       msg.ddm.Format,
+		"format_flags": msg.ddm.DSSFlags,
+		//"format_reserved":        msg.ddm.DSSFlags >> DRDA_DSSFMT_RESERVED,
+		//"format_chained":         msg.ddm.DSSFlags >> DRDA_DSSFMT_CHAINED,
+		//"format_continue":        msg.ddm.DSSFlags >> DRDA_DSSFMT_CONTINUE,
+		//"format_samecor":         msg.ddm.DSSFlags >> DRDA_DSSFMT_SAME_CORR,
+		"format_dss_type":        msg.ddm.DSSType,
+		"format_dss_type_abbrev": dss_abbrev[uint16(msg.ddm.DSSType)],
+		"correlation_id":         msg.ddm.Cor,
+		"length":                 msg.ddm.Length,
 		//"direction": msg.Direction,
 		"parameters": tmp,
 	}
@@ -530,6 +534,8 @@ func (drda *Drda) publishTransaction(t *DrdaTransaction) {
 	if drda.Send_response {
 		event["response"] = "n.a." //t.Response_raw
 	}
+
+	event["query"] = t.Query
 
 	event["status"] = common.OK_STATUS
 

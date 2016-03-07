@@ -12,6 +12,8 @@ type Ddm struct {
 	Format    uint8
 	Length2   uint16
 	Codepoint uint16
+	DSSType   uint8
+	DSSFlags  uint8
 }
 
 type Parameter struct {
@@ -47,6 +49,7 @@ type DrdaTransaction struct {
 	Notes        []string
 	Requests     common.MapStr
 	Responses    common.MapStr
+	Query        string
 	//Request_raw  string
 	//Response_raw string
 }
