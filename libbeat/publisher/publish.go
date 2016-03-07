@@ -1,7 +1,6 @@
 package publisher
 
 import (
-	"encoding/json"
 	"errors"
 	"flag"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 
@@ -59,6 +59,7 @@ type PublisherType struct {
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
+	Filters        *filter.FilterList
 
 	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
 
@@ -102,15 +103,6 @@ const (
 
 func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
-}
-
-func PrintPublishEvent(event common.MapStr) {
-	json, err := json.MarshalIndent(event, "", "  ")
-	if err != nil {
-		logp.Err("json.Marshal: %s", err)
-	} else {
-		debug("Publish: %s", string(json))
-	}
 }
 
 func (publisher *PublisherType) IsPublisherIP(ip string) bool {
@@ -174,6 +166,12 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 		}
 	}
 
+	return nil
+}
+
+func (publisher *PublisherType) RegisterFilter(filters *filter.FilterList) error {
+
+	publisher.Filters = filters
 	return nil
 }
 

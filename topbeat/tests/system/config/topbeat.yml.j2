@@ -98,3 +98,16 @@ shipper:
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
+
+filter:
+
+    {% if include_fields %}
+
+    - include_fields:
+        fields: {{ include_fields }}
+
+    {% endif %}
+
+    - drop_fields:
+        fields: {{ drop_fields | default([]) }}
+
