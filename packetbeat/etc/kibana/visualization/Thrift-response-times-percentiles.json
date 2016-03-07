@@ -1,0 +1,10 @@
+{
+  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"responsetime\",\"percents\":[75,99,99.5]},\"schema\":\"metric\",\"type\":\"percentiles\"},{\"id\":\"2\",\"params\":{\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTooltip\":true,\"defaultYExtents\":false,\"shareYAxis\":true},\"type\":\"line\"}", 
+  "description": "", 
+  "title": "Thrift response times percentiles", 
+  "version": 1, 
+  "savedSearchId": "Thrift-transactions", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}
