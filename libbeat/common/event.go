@@ -1,53 +1,45 @@
 package common
 
 import (
-	"fmt"
-	"reflect"
+	"encoding/json"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/mitchellh/reflectwalk"
 )
 
-type EventWalker struct {
-}
+func ConvertToGenericEvent(v MapStr) MapStr {
+	for key, value := range v {
 
-func (w EventWalker) Struct(v reflect.Value) error {
-	if v.Type().String() == "common.Time" {
-		return nil
+		switch value.(type) {
+		case int, int8, int16, int32, int64:
+		case uint8, uint16, uint32, uint64:
+		case float32, float64:
+		case complex64, complex128:
+		case bool:
+		case uintptr:
+		case string, *string:
+		case Time, *Time:
+		case time.Location, *time.Location:
+		case MapStr:
+			v[key] = ConvertToGenericEvent(value.(MapStr))
+		case *MapStr:
+			v[key] = ConvertToGenericEvent(*value.(*MapStr))
+		default:
+
+			// decode and encode JSON
+			marshaled, err := json.Marshal(value)
+			if err != nil {
+				logp.Err("marshal err: %v", err)
+				return nil
+			}
+			var v1 MapStr
+			err = json.Unmarshal(marshaled, &v1)
+			if err != nil {
+				logp.Err("unmarshal err: %v, type %T", err, value)
+				return nil
+			}
+			v[key] = v1
+		}
 	}
-	if v.Type().String() == "time.Location" {
-		return nil
-	}
-	return fmt.Errorf("no struct allowed: %s, type=%v", v.String(), v.Type().String())
-}
-
-func (w EventWalker) StructField(v reflect.StructField, f reflect.Value) error {
-	return nil
-}
-
-func (w EventWalker) Primitive(v reflect.Value) error {
-	return nil
-}
-
-func (w EventWalker) Map(v reflect.Value) error {
-	return nil
-}
-
-func (w EventWalker) PointerEnter(bool) error {
-	return fmt.Errorf("no pointer allowed")
-}
-
-func (w EventWalker) PointerExit(bool) error {
-	return fmt.Errorf("no pointer allowed")
-}
-
-func CheckEvent(event MapStr) error {
-	var walker EventWalker
-
-	if err := reflectwalk.Walk(event, walker); err != nil {
-		logp.Err("checking event ... ERROR %s", err)
-		return err
-	}
-	logp.Info("checking event ... OK")
-	return nil
+	return v
 }

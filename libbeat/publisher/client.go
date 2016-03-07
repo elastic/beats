@@ -176,8 +176,10 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 	// make sure the event has the configured fields
 	c.annotateEvent(event)
 
-	if err := common.CheckEvent(event); err != nil {
-		logp.Err("checking event: %v", err)
+	if event = common.ConvertToGenericEvent(event); event == nil {
+		logp.Err("fail to convert to a generic event")
+		return nil
+
 	}
 
 	// filter the event by applying the configured rules
