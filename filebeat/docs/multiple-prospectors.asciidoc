@@ -16,11 +16,11 @@ to unexpected behaviour.
 -------------------------------------------------------------------------------------
 filebeat:
   prospectors:
-    -
+    - input_type: log
       paths:
         - /var/log/system.log
         - /var/log/wifi.log
-    -
+    - input_type: log
       paths:
         - "/var/log/apache2/*"
       fields:
