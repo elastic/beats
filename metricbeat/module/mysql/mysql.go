@@ -11,7 +11,12 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("mysql", Moduler{})
+	helper.Registry.AddModuler("mysql", New)
+}
+
+// New creates new instance of Moduler
+func New() helper.Moduler {
+	return &Moduler{}
 }
 
 type Moduler struct{}
