@@ -124,7 +124,12 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("redis", "info", &MetricSeter{})
+	helper.Registry.AddMetricSeter("redis", "info", New)
+}
+
+// New creates new instance of MetricSeter
+func New() helper.MetricSeter {
+	return &MetricSeter{}
 }
 
 type MetricSeter struct{}

@@ -13,7 +13,12 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("apache", "status", &MetricSeter{})
+	helper.Registry.AddMetricSeter("apache", "status", New)
+}
+
+// New creates new instance of MetricSeter
+func New() helper.MetricSeter {
+	return &MetricSeter{}
 }
 
 type MetricSeter struct{}

@@ -20,7 +20,7 @@ type ModuleConfig struct {
 // Interface for each metric
 type MetricSeter interface {
 	// Method to periodically fetch new events
-	Fetch(m *MetricSet) ([]common.MapStr, error)
+	Fetch(ms *MetricSet) ([]common.MapStr, error)
 }
 
 // Interface for each module
