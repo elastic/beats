@@ -1,0 +1,10 @@
+{
+  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"count\"},\"schema\":\"metric\",\"type\":\"sum\"}],\"listeners\":{},\"params\":{\"fontSize\":\"37\"},\"type\":\"metric\"}", 
+  "description": "", 
+  "title": "Total number of HTTP transactions", 
+  "version": 1, 
+  "savedSearchId": "Web-transactions", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "visState": "{\"type\":\"tile_map\",\"params\":{\"isDesaturated\":true,\"mapType\":\"Shaded Circle Markers\"},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"client_location\",\"precision\":3}}],\"listeners\":{}}", 
+  "description": "", 
+  "title": "Client locations", 
+  "version": 1, 
+  "savedSearchId": "Web-transactions", 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[]}"
+  }
+}

@@ -4,13 +4,14 @@ metricbeat:
       metricsets: ["status"]
       hosts: ["http://127.0.0.1/"]
       period: 1s
-      #fields: ["aaa", "bbb"]
       enabled: true
     - module: redis
       metricsets: ["info"]
       period: 1s
       hosts: ["127.0.0.1:6379"]
       enabled: true
+      fields:
+        datacenter: west
       #filter: ...
       #username: name
       #password: hello world
@@ -147,6 +148,12 @@ output:
     # For Packetbeat, the default is set to packetbeat, for Topbeat
     # top topbeat and for Filebeat to filebeat.
     #index: metricbeat
+
+    # SOCKS5 proxy server URL
+    #proxy_url: socks5://user:password@socks5-server:2233
+
+    # Resolve names locally when using a proxy server. Defaults to false.
+    #proxy_use_local_resolver: false
 
     # Optional TLS. By default is off.
     #tls:

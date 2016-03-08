@@ -5,6 +5,7 @@ PROJECTS=libbeat ${BEATS}
 
 # Runs complete testsuites (unit, system, integration) for all beats,
 # with coverage and race detection.
+.PHONY: testsuite
 testsuite:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) testsuite || exit 1;)
 
@@ -31,17 +32,29 @@ coverage-report:
 	-tail -q -n +2 ./libbeat/${COVERAGE_DIR}/*.cov >> ./${COVERAGE_DIR}/full.cov
 	go tool cover -html=./${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
 
+.PHONY: update
 update:
 	$(foreach var,$(BEATS),$(MAKE) -C $(var) update || exit 1;)
 
+.PHONY: clean
 clean:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) clean || exit 1;)
 
+.PHONY: check
 check:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) check || exit 1;)
 
+.PHONY: fmt
 fmt:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) fmt || exit 1;)
 
+.PHONY: simplify
 simplify:
 	$(foreach var,$(PROJECTS),$(MAKE) -C $(var) simplify || exit 1;)
+
+# Collects all dashboards and generates dashboard folder for https://github.com/elastic/beats-dashboards/tree/master/dashboards
+.PHONY: beats-dashboards
+beats-dashboards:
+	mkdir -p build
+	$(foreach var,$(PROJECTS),cp -r $(var)/etc/kibana/ build/dashboards  || exit 1;)
+

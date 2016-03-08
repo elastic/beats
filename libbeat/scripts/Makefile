@@ -203,6 +203,16 @@ coverage-report:
 update:
 	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
 
+### KIBANA FILES HANDLING ###
+
+KIBANA_ES?=http://localhost:9200/
+.PHONY: update
+kibana-export:
+	python ${ES_BEATS}/libbeat/scripts/kibana_export.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
+
+.PHONY: update
+kibana-import:
+	python ${ES_BEATS}/libbeat/scripts/kibana_import.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
 
 
 ### CONTAINER ENVIRONMENT ####
@@ -231,3 +241,4 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+

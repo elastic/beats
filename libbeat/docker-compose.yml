@@ -29,7 +29,7 @@ elasticsearch:
   dockerfile: Dockerfile-2.2.0-shield
   command: elasticsearch -Des.network.host=0.0.0.0
 redis:
-  image: redis
+  image: redis:3.0.7
 # This host name is fixed because of the certificate
 logstash:
   build: ../testing/environments/docker/logstash
