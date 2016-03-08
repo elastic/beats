@@ -36,6 +36,7 @@ type DnsTestMessage struct {
 	q_class     string
 	q_type      string
 	q_name      string
+	q_etld      string
 	answers     []string
 	authorities []string
 	additionals []string
@@ -214,6 +215,7 @@ func assertRequest(t testing.TB, m common.MapStr, q DnsTestMessage) {
 	assert.Equal(t, q.q_class, mapValue(t, m, "dns.question.class"))
 	assert.Equal(t, q.q_type, mapValue(t, m, "dns.question.type"))
 	assert.Equal(t, q.q_name, mapValue(t, m, "dns.question.name"))
+	assert.Equal(t, q.q_etld, mapValue(t, m, "dns.question.etld_plus_one"))
 }
 
 // Assert that the specified flags are set.

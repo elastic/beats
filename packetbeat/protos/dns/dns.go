@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/packetbeat/publish"
 
 	mkdns "github.com/miekg/dns"
+	"golang.org/x/net/publicsuffix"
 )
 
 const MaxDnsTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
@@ -406,10 +407,16 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 
 	if len(dns.Question) > 0 {
 		q := dns.Question[0]
-		m["question"] = common.MapStr{
+		qMapStr := common.MapStr{
 			"name":  q.Name,
 			"type":  dnsTypeToString(q.Qtype),
 			"class": dnsClassToString(q.Qclass),
+		}
+		m["question"] = qMapStr
+
+		eTLDPlusOne, err := publicsuffix.EffectiveTLDPlusOne(strings.TrimRight(q.Name, "."))
+		if err == nil {
+			qMapStr["etld_plus_one"] = eTLDPlusOne + "."
 		}
 	}
 
