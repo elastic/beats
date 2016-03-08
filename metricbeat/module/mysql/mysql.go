@@ -1,12 +1,13 @@
 package mysql
 
 import (
+	"database/sql"
 	"os"
 
 	"github.com/elastic/beats/metricbeat/helper"
 
-	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -15,7 +16,7 @@ func init() {
 
 type Moduler struct{}
 
-func (b Moduler) Setup() error {
+func (b Moduler) Setup(cfg *ucfg.Config) error {
 	// TODO: Ping available servers to check if available
 	return nil
 }

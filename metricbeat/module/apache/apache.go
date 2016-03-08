@@ -3,6 +3,8 @@ package apache
 import (
 	"os"
 
+	"github.com/urso/ucfg"
+
 	"github.com/elastic/beats/metricbeat/helper"
 )
 
@@ -12,7 +14,7 @@ func init() {
 
 type Moduler struct{}
 
-func (r Moduler) Setup() error {
+func (r Moduler) Setup(cfg *ucfg.Config) error {
 	return nil
 }
 
