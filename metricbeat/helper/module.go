@@ -36,7 +36,7 @@ type Module struct {
 }
 
 // NewModule creates a new module
-func NewModule(cfg *ucfg.Config, moduler Moduler) (*Module, error) {
+func NewModule(cfg *ucfg.Config, moduler func() Moduler) (*Module, error) {
 
 	// Module config defaults
 	config := ModuleConfig{
@@ -52,7 +52,7 @@ func NewModule(cfg *ucfg.Config, moduler Moduler) (*Module, error) {
 		name:       config.Module,
 		Config:     config,
 		cfg:        cfg,
-		moduler:    moduler,
+		moduler:    moduler(),
 		metricSets: map[string]*MetricSet{},
 		wg:         sync.WaitGroup{},
 		done:       make(chan struct{}),
