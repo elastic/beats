@@ -104,8 +104,8 @@ func TestCpuPercentage(t *testing.T) {
 
 	beat.addCpuPercentage(&cpu2)
 
-	assert.Equal(t, cpu2.UserPercent, 0.95)
-	assert.Equal(t, cpu2.SystemPercent, 0.04)
+	assert.Equal(t, cpu2.UserPercent, 0.9502)
+	assert.Equal(t, cpu2.SystemPercent, 0.0448)
 }
 
 func TestProcMemPercentage(t *testing.T) {

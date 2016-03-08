@@ -2,7 +2,7 @@
 
 // +build darwin freebsd linux netbsd openbsd
 
-package sigar
+package gosigar
 
 import "syscall"
 
