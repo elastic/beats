@@ -49,7 +49,7 @@ type MockMetricSeter struct {
 }
 
 func (m *MockMetricSeter) Fetch(ms *MetricSet) (events []common.MapStr, err error) {
-	m.counter = m.counter + 1
+	m.counter += 1
 
 	event := common.MapStr{
 		"counter": m.counter,

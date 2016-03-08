@@ -18,15 +18,15 @@ import (
 var Registry = Register{}
 
 type Register struct {
-	Modulers     map[string]Moduler
+	Modulers     map[string]func() Moduler
 	MetricSeters map[string]map[string]func() MetricSeter
 }
 
 // AddModule registers the given module with the registry
-func (r *Register) AddModuler(name string, m Moduler) {
+func (r *Register) AddModuler(name string, m func() Moduler) {
 
 	if r.Modulers == nil {
-		r.Modulers = map[string]Moduler{}
+		r.Modulers = map[string]func() Moduler{}
 	}
 
 	logp.Info("Register module: %s", name)
