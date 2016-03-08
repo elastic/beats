@@ -12,11 +12,11 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("mysql", "status", New())
+	helper.Registry.AddMetricSeter("mysql", "status", New)
 }
 
 // New creates new instance of MetricSeter
-func New() *MetricSeter {
+func New() helper.MetricSeter {
 	return &MetricSeter{
 		connections: map[string]*sql.DB{},
 	}

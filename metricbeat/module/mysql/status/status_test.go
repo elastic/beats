@@ -15,19 +15,16 @@ func TestFetch(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires MySQL")
 	}
 
-	// Setup Metric
-	m := New()
-
 	config := helper.ModuleConfig{
 		Hosts: []string{mysql.GetMySQLEnvDSN()},
 	}
 	module := &helper.Module{
 		Config: config,
 	}
-	ms := helper.NewMetricSet("status", m, module)
+	ms := helper.NewMetricSet("status", New, module)
 
 	// Load events
-	events, err := m.Fetch(ms)
+	events, err := ms.MetricSeter.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check event fields
