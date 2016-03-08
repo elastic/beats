@@ -27,6 +27,11 @@ import:
 - package: github.com/andrewkroh/sys
   subpackages:
   - /windows/svc/eventlog
+- package: golang.org/x/net
+  version: d58ca6618b994150e624f6888d871f4709db51a0
+  subpackages:
+  - /proxy
+  - /publicsuffix
 - package: golang.org/x/text
   version: f024ad8118c1182f0c9c976f0fa8e56b39ef821b
   subpackages:
@@ -54,3 +59,5 @@ import:
   version: 8929fe90cee4b2cb9deb468b51fb34eba64d1bf0
 - package: github.com/urso/ucfg
   version: 60c5618c1d445e97c3c52d738dbc887d68af76a5
+- package: github.com/armon/go-socks5
+  version: 3a873e99f5400ad7706e464e905ffcc94b3ff247

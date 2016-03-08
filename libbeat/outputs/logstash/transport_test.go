@@ -3,12 +3,15 @@ package logstash
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"net"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/armon/go-socks5"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type mockServer struct {
@@ -19,8 +22,8 @@ type mockServer struct {
 	transp    func() (TransportClient, error)
 }
 
-type mockServerFactory func(*testing.T, time.Duration, string) *mockServer
-type transportFactory func(addr string) (TransportClient, error)
+type mockServerFactory func(*testing.T, time.Duration, string, *proxyConfig) *mockServer
+type transportFactory func(addr string, proxy *proxyConfig) (TransportClient, error)
 
 func (m *mockServer) Addr() string {
 	return m.Listener.Addr().String()
@@ -61,7 +64,40 @@ func (m *mockServer) connectPair(to time.Duration) (net.Conn, TransportClient, e
 	return client, transp, nil
 }
 
-func newMockServerTLS(t *testing.T, to time.Duration, cert string) *mockServer {
+// netSOCKS5Proxy starts a new SOCKS5 proxy server that listens on localhost.
+//
+// Usage:
+//  l, tcpAddr := newSOCKS5Proxy(t)
+//  defer l.Close()
+func newSOCKS5Proxy(t *testing.T) (net.Listener, proxyConfig) {
+	// Create a SOCKS5 server
+	conf := &socks5.Config{}
+	server, err := socks5.New(conf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a local listener
+	l, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+
+	// Listen
+	go func() {
+		err := server.Serve(l)
+		if err != nil {
+			t.Log(err)
+		}
+	}()
+
+	tcpAddr := l.Addr().(*net.TCPAddr)
+	config := proxyConfig{URL: fmt.Sprintf("socks5://%s", tcpAddr.String())}
+	assert.NoError(t, config.parseURL())
+	return l, config
+}
+
+func newMockServerTLS(t *testing.T, to time.Duration, cert string, proxy *proxyConfig) *mockServer {
 	tcpListener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to generate TCP listener")
@@ -97,13 +133,13 @@ func newMockServerTLS(t *testing.T, to time.Duration, cert string) *mockServer {
 		server.err = tlsConn.Handshake()
 	}
 	server.transp = func() (TransportClient, error) {
-		return connectTLS(cert)(server.Addr())
+		return connectTLS(cert)(server.Addr(), proxy)
 	}
 
 	return server
 }
 
-func newMockServerTCP(t *testing.T, to time.Duration, cert string) *mockServer {
+func newMockServerTCP(t *testing.T, to time.Duration, cert string, proxy *proxyConfig) *mockServer {
 	tcpListener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
 		t.Fatalf("failed to generate TCP listener")
@@ -112,7 +148,7 @@ func newMockServerTCP(t *testing.T, to time.Duration, cert string) *mockServer {
 	server := &mockServer{Listener: tcpListener, timeout: to}
 	server.handshake = func(client net.Conn) {}
 	server.transp = func() (TransportClient, error) {
-		return connectTCP(server.Addr())
+		return connectTCP(server.Addr(), proxy)
 	}
 	return server
 }
@@ -123,12 +159,12 @@ func (m *mockServer) clientDeadline(client net.Conn, to time.Duration) {
 	}
 }
 
-func connectTCP(addr string) (TransportClient, error) {
-	return newTCPClient(addr, 0)
+func connectTCP(addr string, proxy *proxyConfig) (TransportClient, error) {
+	return newTCPClient(addr, 0, proxy)
 }
 
 func connectTLS(certName string) transportFactory {
-	return func(addr string) (TransportClient, error) {
+	return func(addr string, proxy *proxyConfig) (TransportClient, error) {
 		tlsConfig, err := outputs.LoadTLSConfig(&outputs.TLSConfig{
 			CAs: []string{certName + ".pem"},
 		})
@@ -136,17 +172,20 @@ func connectTLS(certName string) transportFactory {
 			return nil, err
 		}
 
-		return newTLSClient(addr, 0, tlsConfig)
+		return newTLSClient(addr, 0, tlsConfig, proxy)
 	}
 }
 
 func TestTransportReconnectsOnConnect(t *testing.T) {
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	timeout := 2 * time.Second
 	genCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
 
-	run := func(makeServer mockServerFactory) {
-		server := makeServer(t, timeout, certName)
+	run := func(makeServer mockServerFactory, proxy *proxyConfig) {
+		server := makeServer(t, timeout, certName, proxy)
 		defer server.Close()
 
 		transp, err := server.transp()
@@ -174,19 +213,24 @@ func TestTransportReconnectsOnConnect(t *testing.T) {
 		transp.Close()
 	}
 
-	run(newMockServerTCP)
-	run(newMockServerTLS)
+	run(newMockServerTCP, nil)
+	run(newMockServerTLS, nil)
+	run(newMockServerTCP, &config)
+	run(newMockServerTLS, &config)
 }
 
 func TestTransportFailConnectUnknownAddress(t *testing.T) {
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	timeout := 100 * time.Millisecond
 	genCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
 
 	invalidAddr := "invalid.dns.fqdn-unknown.invalid:100"
 
-	run := func(makeTransp transportFactory) {
-		transp, err := makeTransp(invalidAddr)
+	run := func(makeTransp transportFactory, proxy *proxyConfig) {
+		transp, err := makeTransp(invalidAddr, proxy)
 		if err != nil {
 			t.Fatalf("failed to generate transport client: %v", err)
 		}
@@ -195,17 +239,22 @@ func TestTransportFailConnectUnknownAddress(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 
-	run(connectTCP)
-	run(connectTLS(certName))
+	run(connectTCP, nil)
+	run(connectTLS(certName), nil)
+	run(connectTCP, &config)
+	run(connectTLS(certName), &config)
 }
 
 func TestTransportClosedOnWriteReadError(t *testing.T) {
+	l, config := newSOCKS5Proxy(t)
+	defer l.Close()
+
 	certName := "ca_test"
 	timeout := 2 * time.Second
 	genCertsForIPIfMIssing(t, net.IP{127, 0, 0, 1}, certName)
 
-	run := func(makeServer mockServerFactory) {
-		server := makeServer(t, timeout, certName)
+	run := func(makeServer mockServerFactory, proxy *proxyConfig) {
+		server := makeServer(t, timeout, certName, proxy)
 		defer server.Close()
 
 		client, transp, err := server.connectPair(timeout)
@@ -220,6 +269,8 @@ func TestTransportClosedOnWriteReadError(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 
-	run(newMockServerTCP)
-	run(newMockServerTLS)
+	run(newMockServerTCP, nil)
+	run(newMockServerTLS, nil)
+	run(newMockServerTCP, &config)
+	run(newMockServerTLS, &config)
 }
