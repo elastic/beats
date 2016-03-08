@@ -1,6 +1,6 @@
 // Copyright (c) 2012 VMware, Inc.
 
-package sigar
+package gosigar
 
 /*
 #include <stdlib.h>

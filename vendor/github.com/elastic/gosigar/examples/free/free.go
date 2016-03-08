@@ -4,8 +4,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/elastic/gosigar"
 	"os"
+
+	"github.com/elastic/gosigar"
 )
 
 func format(val uint64) uint64 {
@@ -13,8 +14,8 @@ func format(val uint64) uint64 {
 }
 
 func main() {
-	mem := sigar.Mem{}
-	swap := sigar.Swap{}
+	mem := gosigar.Mem{}
+	swap := gosigar.Swap{}
 
 	mem.Get()
 	swap.Get()
