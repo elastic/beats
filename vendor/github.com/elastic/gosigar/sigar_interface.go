@@ -1,4 +1,4 @@
-package sigar
+package gosigar
 
 import (
 	"time"
