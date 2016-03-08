@@ -19,7 +19,7 @@ var Registry = Register{}
 
 type Register struct {
 	Modulers     map[string]Moduler
-	MetricSeters map[string]map[string]MetricSeter
+	MetricSeters map[string]map[string]func() MetricSeter
 }
 
 // AddModule registers the given module with the registry
@@ -34,19 +34,19 @@ func (r *Register) AddModuler(name string, m Moduler) {
 	r.Modulers[name] = m
 }
 
-func (r *Register) AddMetricSeter(module string, name string, m MetricSeter) {
+func (r *Register) AddMetricSeter(module string, name string, new func() MetricSeter) {
 
 	if r.MetricSeters == nil {
-		r.MetricSeters = map[string]map[string]MetricSeter{}
+		r.MetricSeters = map[string]map[string]func() MetricSeter{}
 	}
 
 	if _, ok := r.MetricSeters[module]; !ok {
-		r.MetricSeters[module] = map[string]MetricSeter{}
+		r.MetricSeters[module] = map[string]func() MetricSeter{}
 	}
 
 	logp.Info("Register metricset %s for module %s", name, module)
 
-	r.MetricSeters[module][name] = m
+	r.MetricSeters[module][name] = new
 }
 
 // GetModule returns a new module instance for the given moduler name
@@ -79,8 +79,8 @@ func (r *Register) GetMetricSet(module *Module, metricsetName string) (*MetricSe
 		return nil, fmt.Errorf("Metricset %s in module %s does not exist", metricsetName, module.name)
 	}
 
-	metricSeter := Registry.MetricSeters[module.name][metricsetName]
+	newMetricSeter := Registry.MetricSeters[module.name][metricsetName]
 
-	return NewMetricSet(metricsetName, metricSeter, module), nil
+	return NewMetricSet(metricsetName, newMetricSeter, module), nil
 
 }

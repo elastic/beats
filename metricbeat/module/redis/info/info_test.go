@@ -16,18 +16,15 @@ func TestConnect(t *testing.T) {
 		t.Skip("Skipping in short mode, because it requires Redis")
 	}
 
-	// Setup
-	r := &MetricSeter{}
-
 	config := helper.ModuleConfig{
 		Hosts: []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
 	}
 	module := &helper.Module{
 		Config: config,
 	}
-	ms := helper.NewMetricSet("info", r, module)
+	ms := helper.NewMetricSet("info", New, module)
 
-	data, err := r.Fetch(ms)
+	data, err := ms.MetricSeter.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check fields
