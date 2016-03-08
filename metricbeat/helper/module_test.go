@@ -1,11 +1,12 @@
 package helper
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/urso/ucfg"
-	"reflect"
 )
 
 func TestGetMetricSetsList(t *testing.T) {
