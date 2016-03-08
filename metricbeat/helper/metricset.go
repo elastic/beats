@@ -15,10 +15,12 @@ type MetricSet struct {
 }
 
 // Creates a new MetricSet
-func NewMetricSet(name string, metricset MetricSeter, module *Module) *MetricSet {
+func NewMetricSet(name string, new func() MetricSeter, module *Module) *MetricSet {
+	metricSeter := new()
+
 	return &MetricSet{
 		Name:        name,
-		MetricSeter: metricset,
+		MetricSeter: metricSeter,
 		Config:      module.Config,
 		Module:      module,
 	}
