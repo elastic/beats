@@ -299,6 +299,12 @@ output:
     # top topbeat and for Filebeat to filebeat.
     #index: packetbeat
 
+    # SOCKS5 proxy server URL
+    #proxy_url: socks5://user:password@socks5-server:2233
+
+    # Resolve names locally when using a proxy server. Defaults to false.
+    #proxy_use_local_resolver: false
+
     # Optional TLS. By default is off.
     #tls:
       # List of root certificates for HTTPS server verifications

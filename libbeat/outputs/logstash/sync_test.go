@@ -42,7 +42,7 @@ func TestClientMultiFailMaxTimeouts(t *testing.T) {
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
-	return &clientServer{newMockServerTCP(t, to, "")}
+	return &clientServer{newMockServerTCP(t, to, "", nil)}
 }
 
 func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error) {

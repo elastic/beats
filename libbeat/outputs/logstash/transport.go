@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/proxy"
+
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -21,6 +23,7 @@ type TransportClient interface {
 
 type tcpClient struct {
 	hostport  string
+	proxy     *proxyConfig
 	connected bool
 	conn      net.Conn
 	mutex     sync.Mutex
@@ -31,8 +34,8 @@ type tlsClient struct {
 	tls *tls.Config
 }
 
-func newTCPClient(host string, defaultPort int) (*tcpClient, error) {
-	return &tcpClient{hostport: fullAddress(host, defaultPort)}, nil
+func newTCPClient(host string, defaultPort int, proxy *proxyConfig) (*tcpClient, error) {
+	return &tcpClient{hostport: fullAddress(host, defaultPort), proxy: proxy}, nil
 }
 
 func (c *tcpClient) Connect(timeout time.Duration) error {
@@ -52,15 +55,22 @@ func (c *tcpClient) doConnect(timeout time.Duration) error {
 		return err
 	}
 
-	// TODO: address lookup copied from logstash-forwarded. Really required?
-	addresses, err := net.LookupHost(host)
-	c.conn = nil
-	if err != nil {
-		logp.Warn("DNS lookup failure \"%s\": %s", host, err)
-		return err
+	var address string
+	var dialer proxy.Dialer = &net.Dialer{Timeout: timeout}
+	if c.proxy != nil && c.proxy.parsedURL != nil {
+		// Do not resolve the address locally. It will be resolved on the
+		// SOCKS server. The beat will have no control over the randomization
+		// of the IP used when multiple IPs are returned by DNS.
+		if !c.proxy.LocalResolve {
+			address = host
+		}
+
+		dialer, err = proxy.FromURL(c.proxy.parsedURL, dialer)
+		if err != nil {
+			return err
+		}
 	}
 
-	// connect to random address
 	// Use randomization on DNS reported addresses combined with timeout and ACKs
 	// to spread potential load when starting up large number of beats using
 	// lumberjack.
@@ -73,10 +83,17 @@ func (c *tcpClient) doConnect(timeout time.Duration) error {
 	//
 	// https://tools.ietf.org/html/rfc1794
 	// > "Clients, of course, may reorder this information" - with respect to
-	// > handling order of dns records in a response. address :=
-	address := addresses[rand.Int()%len(addresses)]
-	addressport := net.JoinHostPort(address, port)
-	conn, err := net.DialTimeout("tcp", addressport, timeout)
+	// > handling order of dns records in a response.orwarded. Really required?
+	if address == "" {
+		addresses, err := net.LookupHost(host)
+		if err != nil {
+			logp.Warn(`DNS lookup failure "%s": %v`, host, err)
+			return err
+		}
+		address = addresses[rand.Int()%len(addresses)]
+	}
+
+	conn, err := dialer.Dial("tcp", net.JoinHostPort(address, port))
 	if err != nil {
 		return err
 	}
@@ -194,10 +211,11 @@ func (c *tcpClient) handleError(err error) error {
 	return err
 }
 
-func newTLSClient(host string, defaultPort int, tls *tls.Config) (*tlsClient, error) {
+func newTLSClient(host string, defaultPort int, tls *tls.Config, proxy *proxyConfig) (*tlsClient, error) {
 	c := tlsClient{}
 	c.hostport = fullAddress(host, defaultPort)
 	c.tls = tls
+	c.proxy = proxy
 	return &c, nil
 }
 
