@@ -4,13 +4,14 @@ metricbeat:
       metricsets: ["status"]
       hosts: ["http://127.0.0.1/"]
       period: 1s
-      #fields: ["aaa", "bbb"]
       enabled: true
     - module: redis
       metricsets: ["info"]
       period: 1s
       hosts: ["127.0.0.1:6379"]
       enabled: true
+      fields:
+        datacenter: west
       #filter: ...
       #username: name
       #password: hello world

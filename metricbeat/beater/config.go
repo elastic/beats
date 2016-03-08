@@ -1,7 +1,7 @@
 package beater
 
 import (
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/urso/ucfg"
 )
 
 type Config struct {
@@ -9,5 +9,5 @@ type Config struct {
 }
 
 type MetricbeatConfig struct {
-	Modules []helper.ModuleConfig
+	Modules []*ucfg.Config
 }
