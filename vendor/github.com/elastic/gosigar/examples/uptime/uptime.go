@@ -4,15 +4,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/elastic/gosigar"
 	"os"
 	"time"
+
+	"github.com/elastic/gosigar"
 )
 
 func main() {
-	concreteSigar := sigar.ConcreteSigar{}
+	concreteSigar := gosigar.ConcreteSigar{}
 
-	uptime := sigar.Uptime{}
+	uptime := gosigar.Uptime{}
 	uptime.Get()
 	avg, err := concreteSigar.GetLoadAverage()
 	if err != nil {
