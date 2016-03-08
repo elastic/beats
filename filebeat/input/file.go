@@ -19,18 +19,19 @@ type File struct {
 type FileEvent struct {
 	common.EventMetadata
 	ReadTime     time.Time
-	Source       *string
+	Source       string
 	InputType    string
 	DocumentType string
 	Offset       int64
 	Bytes        int
 	Text         *string
+	Fields       common.MapStr
 	Fileinfo     *os.FileInfo
 }
 
 type FileState struct {
-	Source      *string `json:"source,omitempty"`
-	Offset      int64   `json:"offset,omitempty"`
+	Source      string `json:"source,omitempty"`
+	Offset      int64  `json:"offset,omitempty"`
 	FileStateOS *FileStateOS
 }
 

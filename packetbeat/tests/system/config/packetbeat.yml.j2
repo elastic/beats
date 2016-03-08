@@ -205,4 +205,10 @@ procs:
       cmdline_grep: memcached
 {% endif %}
 
+{% if filter_enabled %}
+
+filter:
+    - drop_fields:
+        fields: {{drop_fields}}
+{% endif %}
 # vim: set ft=jinja:

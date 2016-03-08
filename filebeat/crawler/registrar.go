@@ -91,8 +91,8 @@ func (r *Registrar) Run() {
 			return
 		// Treats new log files to persist with higher priority then new events
 		case state := <-r.Persist:
-			r.State[*state.Source] = state
-			logp.Debug("prospector", "Registrar will re-save state for %s", *state.Source)
+			r.State[state.Source] = state
+			logp.Debug("prospector", "Registrar will re-save state for %s", state.Source)
 		case events := <-r.Channel:
 			r.processEvents(events)
 		}
@@ -115,7 +115,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 			continue
 		}
 
-		r.State[*event.Source] = event.GetState()
+		r.State[event.Source] = event.GetState()
 	}
 }
 
@@ -172,7 +172,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
-		lastState.Source = &filePath
+		lastState.Source = filePath
 		r.Persist <- lastState
 		return lastState.Offset, true
 	}

@@ -130,7 +130,7 @@ func (h *Harvester) Harvest() {
 			event := &input.FileEvent{
 				EventMetadata: h.Config.EventMetadata,
 				ReadTime:      ts,
-				Source:        &h.Path,
+				Source:        h.Path,
 				InputType:     h.Config.InputType,
 				DocumentType:  h.Config.DocumentType,
 				Offset:        h.Offset,
