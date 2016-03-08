@@ -47,6 +47,7 @@ The value that you specify here is used as the `input_type` for each event publi
 A list of glob-based paths that should be crawled and fetched. Filebeat starts a harvester for
 each file that it finds under the specified paths. You can specify one path per line. Each line begins with a dash (-).
 
+[[exclude-lines]]
 ===== exclude_lines
 
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped.
@@ -60,6 +61,7 @@ The following example configures Filebeat to drop any lines that start with "DBG
 exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
+[[include-lines]]
 ===== include_lines
 
 A list of regular expressions to match the lines that you want Filebeat to include. Filebeat exports only the lines that match a regular expression in the list. By default, all lines are exported.
