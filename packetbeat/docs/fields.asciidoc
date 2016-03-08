@@ -6,7 +6,7 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 [[exported-fields]]
 == Exported Fields
 
-This document describes the fields that are exported by Docs/Fields.Asciidoc. They are
+This document describes the fields that are exported by Packetbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-flows_event>>
@@ -650,7 +650,7 @@ AMQP reply code to an error, similar to http reply-code
 
 type: string
 
-Text expliciting the error.
+Text explaining the error.
 
 
 ==== amqp.class-id
