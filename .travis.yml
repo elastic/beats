@@ -87,3 +87,4 @@ after_success:
   - test -f topbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f topbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
   - test -f winlogbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f winlogbeat/build/coverage/full.cov
+  - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov
