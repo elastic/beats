@@ -66,6 +66,7 @@ The hostname as returned by the operating system on which the Beat is running.
 Contains system-wide statistics. These statistics are the details that you can get by running the *top* command on Unix systems.
 
 
+
 [float]
 === load Fields
 
@@ -168,10 +169,12 @@ type: int
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
+
 [float]
 === cpus Fields
 
 This group contains CPU usage per core statistics.
+
 
 [float]
 === cpuX Fields

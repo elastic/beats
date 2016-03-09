@@ -348,18 +348,25 @@ class TestCase(unittest.TestCase):
 
         Reads these lists from the fields documentation.
         """
-        def extract_fields(doc_list):
+        def extract_fields(doc_list, name):
             fields = []
             dictfields = []
             for field in doc_list:
+
+                # Chain together names
+                if name != "":
+                    newName = name + "." + field["name"]
+                else:
+                    newName = field["name"]
+
                 if field.get("type") == "group":
-                    subfields, subdictfields = extract_fields(field["fields"])
+                    subfields, subdictfields = extract_fields(field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
                 else:
-                    fields.append(field["name"])
+                    fields.append(newName)
                     if field.get("type") == "dict":
-                        dictfields.append(field["name"])
+                        dictfields.append(newName)
             return fields, dictfields
 
         with open(fields_doc, "r") as f:
@@ -369,7 +376,7 @@ class TestCase(unittest.TestCase):
             for key, value in doc.items():
                 if isinstance(value, dict) and \
                         value.get("type") == "group":
-                    subfields, subdictfields = extract_fields(value["fields"])
+                    subfields, subdictfields = extract_fields(value["fields"], "")
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
             return fields, dictfields
