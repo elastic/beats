@@ -655,7 +655,7 @@ trans_event:
         - name: amqp.reply-text
           type: string
           description: >
-            Text expliciting the error.
+            Text explaining the error.
 
         - name: amqp.class-id
           type: int

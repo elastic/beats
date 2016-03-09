@@ -51,7 +51,7 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Check column length in pgsql parser. {issue}565{565
 
 *Topbeat*
-- Fix issue with cpu.system_p being abnormally high {pull}1200[1200]
+- Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
 *Filebeat*
 - Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
