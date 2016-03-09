@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
+	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -25,6 +26,11 @@ func New() helper.MetricSeter {
 // MetricSetter object
 type MetricSeter struct {
 	connections map[string]*sql.DB
+}
+
+// Setup any metric specific configuration
+func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
+	return nil
 }
 
 // Fetches status messages from mysql hosts

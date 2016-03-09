@@ -81,6 +81,6 @@ func (r *Register) GetMetricSet(module *Module, metricsetName string) (*MetricSe
 
 	newMetricSeter := Registry.MetricSeters[module.name][metricsetName]
 
-	return NewMetricSet(metricsetName, newMetricSeter, module), nil
+	return NewMetricSet(metricsetName, newMetricSeter, module)
 
 }
