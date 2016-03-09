@@ -121,7 +121,7 @@ filebeat:
       #backoff: 1s
 
       # Max backoff defines what the maximum backoff time is. After having backed off multiple times
-      # from checking the files, the waiting time will never exceed max_backoff idenependent of the
+      # from checking the files, the waiting time will never exceed max_backoff independent of the
       # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
       # file after having backed off multiple times, it takes a maximum of 10s to read the new line
       #max_backoff: 10s
