@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
+	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -22,6 +23,11 @@ func New() helper.MetricSeter {
 }
 
 type MetricSeter struct{}
+
+// Setup any metric specific configuration
+func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
+	return nil
+}
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
