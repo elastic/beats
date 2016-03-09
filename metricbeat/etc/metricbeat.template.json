@@ -20,7 +20,32 @@
           }
         }
       ],
-      "properties": {}
+      "properties": {
+        "redis-info": {
+          "properties": {
+            "cpu": {
+              "properties": {
+                "used_cpu_sys": {
+                  "doc_values": "true",
+                  "type": "float"
+                },
+                "used_cpu_sys_children": {
+                  "doc_values": "true",
+                  "type": "float"
+                },
+                "used_cpu_user": {
+                  "doc_values": "true",
+                  "type": "float"
+                },
+                "used_cpu_user_children": {
+                  "doc_values": "true",
+                  "type": "float"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "settings": {

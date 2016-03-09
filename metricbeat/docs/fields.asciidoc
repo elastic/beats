@@ -9,3 +9,100 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
+* <<exported-fields-redis-info>>
+
+[[exported-fields-redis-info]]
+=== Redis Info Stats Fields
+
+Redis info Stats
+
+
+
+[[exported-fields-redis-info]]
+=== Redis Info Stats Fields
+
+Redis info stats
+
+
+
+=== clients Fields
+
+Redis client stats
+
+
+
+==== redis-info.clients.connected_clients
+
+type: int
+
+Number of client connections (excluding connections from slaves)
+
+
+==== redis-info.clients.client_longest_output_list
+
+type: int
+
+Longest output list among current client connections.
+
+
+==== redis-info.clients.client_biggest_input_buf
+
+type: int
+
+Biggest input buffer among current client connections
+
+
+==== redis-info.clients.blocked_clients
+
+type: int
+
+Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
+
+
+=== cluster Fields
+
+Redis cluster information
+
+
+
+==== redis-info.cluster.cluster_enabled
+
+type: bool
+
+Indicate Redis cluster is enabled
+
+
+=== cpu Fields
+
+Redis CPU stats
+
+
+
+==== redis-info.cpu.used_cpu_sys
+
+type: float
+
+System CPU consumed by the Redis server
+
+
+==== redis-info.cpu.used_cpu_sys_children
+
+type: float
+
+User CPU consumed by the Redis server
+
+
+==== redis-info.cpu.used_cpu_user
+
+type: float
+
+System CPU consumed by the background processes
+
+
+==== redis-info.cpu.used_cpu_user_children
+
+type: float
+
+User CPU consumed by the background processes
+
+

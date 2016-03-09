@@ -11,3 +11,10 @@ include ../libbeat/scripts/Makefile
 .PHONY: kibana
 kibana:
 	cp -r module/*/.kibana/ etc/kibana
+
+
+# Collects all module and metricset fields
+.PHONY: fields
+fields:
+	cat etc/fields_base.yml > etc/fields.yml
+	cat module/*/*/fields.yml >> etc/fields.yml
