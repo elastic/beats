@@ -162,13 +162,17 @@ func (m *Module) FetchMetricSets(b *beat.Beat, metricSet *MetricSet) {
 	events, err := metricSet.Fetch()
 
 	if err != nil {
-		// TODO: Also list module?
-		logp.Err("Fetching events in MetricSet %s returned error: %s", metricSet.Name, err)
-		// TODO: Still publish event with error
-		return
-	}
+		logp.Err("Fetching events for MetricSet %s in Module %s returned error: %s", metricSet.Name, m.name, err)
 
-	events, err = m.processEvents(events, metricSet)
+		// Publish event with error
+		event := common.MapStr{
+			"error": err.Error(),
+		}
+		event = m.createEvent(event, common.Time(time.Now()), metricSet.Name)
+		events = append(events, event)
+	} else {
+		events, err = m.processEvents(events, metricSet)
+	}
 
 	// Async publishing of event
 	b.Events.PublishEvents(events)
@@ -224,39 +228,47 @@ func (m *Module) getMetricSetsList() string {
 func (m *Module) processEvents(events []common.MapStr, metricSet *MetricSet) ([]common.MapStr, error) {
 	newEvents := []common.MapStr{}
 
-	// Default name is empty, means it will be metricbeat
-	indexName := ""
-	typeName := "metricsets"
 	timestamp := common.Time(time.Now())
 
 	for _, event := range events {
-		// Set meta information dynamic if set
-		indexName = getIndex(event, indexName)
-		typeName = getType(event, typeName)
-		timestamp = getTimestamp(event, timestamp)
-
-		// Each metricset has a unique eventfieldname to prevent type conflicts
-		eventFieldName := m.name + "-" + metricSet.Name
-
-		// TODO: Add fields_under_root option for "metrics"?
-		event = common.MapStr{
-			"type":                  typeName,
-			eventFieldName:          event,
-			"metricset":             metricSet.Name,
-			"module":                m.name,
-			"@timestamp":            timestamp,
-			common.EventMetadataKey: m.Config.EventMetadata,
-		}
-
-		// Overwrite index in case it is set
-		if indexName != "" {
-			event["beat"] = common.MapStr{
-				"index": indexName,
-			}
-		}
+		event = m.createEvent(event, timestamp, metricSet.Name)
 
 		newEvents = append(newEvents, event)
 	}
 
 	return newEvents, nil
+}
+
+func (m *Module) createEvent(event common.MapStr, timestamp common.Time, metricSetName string) common.MapStr {
+
+	// Default name is empty, means it will be metricbeat
+	indexName := ""
+	typeName := "metricsets"
+
+	// Set meta information dynamic if set
+	indexName = getIndex(event, indexName)
+	typeName = getType(event, typeName)
+	timestamp = getTimestamp(event, timestamp)
+
+	// Each metricset has a unique eventfieldname to prevent type conflicts
+	eventFieldName := m.name + "-" + metricSetName
+
+	// TODO: Add fields_under_root option for "metrics"?
+	event = common.MapStr{
+		"type":                  typeName,
+		eventFieldName:          event,
+		"metricset":             metricSetName,
+		"module":                m.name,
+		"@timestamp":            timestamp,
+		common.EventMetadataKey: m.Config.EventMetadata,
+	}
+
+	// Overwrite index in case it is set
+	if indexName != "" {
+		event["beat"] = common.MapStr{
+			"index": indexName,
+		}
+	}
+
+	return event
 }
