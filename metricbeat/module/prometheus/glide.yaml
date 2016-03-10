@@ -1,0 +1,14 @@
+package: main
+import:
+- package: github.com/prometheus/client_model
+  subpackages:
+  - /go
+- package: github.com/prometheus/common
+  subpackages:
+  - /expfmt
+- package: github.com/golang/protobuf
+  subpackages:
+  - /proto
+- package: github.com/matttproud/golang_protobuf_extensions
+  subpackages:
+  - /pbutil

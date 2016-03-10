@@ -4,7 +4,7 @@
 BEATNAME?=libbeat
 BEAT_DIR?=github.com/elastic/beats
 ES_BEATS?=..
-GOPACKAGES?=${BEAT_DIR}/${BEATNAME}/...
+GOPACKAGES?=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
 
 # Makefile for a custom beat that includes this libbeat/scripts/Makefile:
 # if glide is used to manage vendor dependencies,

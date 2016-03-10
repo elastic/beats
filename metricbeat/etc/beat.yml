@@ -20,3 +20,8 @@ metricbeat:
       enabled: true
       period: 2s
       hosts: ["root@tcp(127.0.0.1:3306)/"]
+    - module: prometheus
+      hosts: ["http://127.0.0.1:9090/"]
+      metricsets: ["metrics"]
+      period: 1s
+      enabled: true
