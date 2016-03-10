@@ -30,6 +30,8 @@ type Module struct {
 	// List of all metricsets in this module. Use to keep track of metricsets
 	metricSets map[string]*MetricSet
 
+	Publish chan common.MapStr
+
 	// MetricSet waitgroup
 	wg sync.WaitGroup
 
@@ -55,8 +57,10 @@ func NewModule(cfg *ucfg.Config, moduler func() Moduler) (*Module, error) {
 		cfg:        cfg,
 		moduler:    moduler(),
 		metricSets: map[string]*MetricSet{},
-		wg:         sync.WaitGroup{},
-		done:       make(chan struct{}),
+		// TODO: What should be size of channel?
+		Publish: make(chan common.MapStr),
+		wg:      sync.WaitGroup{},
+		done:    make(chan struct{}),
 	}, nil
 }
 
@@ -134,9 +138,13 @@ func (m *Module) Run(period time.Duration, b *beat.Beat) {
 	fetch := func(set *MetricSet) {
 		defer wg.Done()
 		// Move execution part to module?
-		m.FetchMetricSets(b, set)
+		m.FetchMetricSets(set)
 	}
 
+	// Start publisher
+	go m.publishing(b)
+
+	// Start fetching metrics
 	for {
 		// Waits for next ticker
 		select {
@@ -161,34 +169,15 @@ func (m *Module) Run(period time.Duration, b *beat.Beat) {
 	}
 }
 
-func (m *Module) FetchMetricSets(b *beat.Beat, metricSet *MetricSet) {
-
-	m.wg.Add(1)
-
-	// Catches metric in case of panic. Keeps other metricsets running
-	defer m.wg.Done()
+func (m *Module) FetchMetricSets(metricSet *MetricSet) {
 
 	// Separate defer call as is has to be called directly
 	defer logp.Recover(fmt.Sprintf("Metric %s paniced and stopped running.", m.name))
 
-	events, err := metricSet.Fetch()
-
+	err := metricSet.Fetch()
 	if err != nil {
 		logp.Err("Fetching events for MetricSet %s in Module %s returned error: %s", metricSet.Name, m.name, err)
-
-		// Publish event with error
-		event := common.MapStr{
-			"error": err.Error(),
-		}
-		event = m.createEvent(event, common.Time(time.Now()), metricSet.Name)
-		events = append(events, event)
-	} else {
-		events, err = m.processEvents(events, metricSet)
 	}
-
-	// Async publishing of event
-	b.Events.PublishEvents(events)
-
 }
 
 // Stop stops module and all its metricSets
@@ -237,54 +226,25 @@ func (m *Module) getMetricSetsList() string {
 	return list
 }
 
-func (m *Module) processEvents(events []common.MapStr, metricSet *MetricSet) ([]common.MapStr, error) {
-	newEvents := []common.MapStr{}
+// publishing runs the receiving channel to receive events from the metricset
+// and forward them to the publisher
+func (m *Module) publishing(b *beat.Beat) {
+	for {
 
-	timestamp := common.Time(time.Now())
-
-	for _, event := range events {
-		event = m.createEvent(event, timestamp, metricSet.Name)
-
-		newEvents = append(newEvents, event)
-	}
-
-	return newEvents, nil
-}
-
-func (m *Module) createEvent(event common.MapStr, timestamp common.Time, metricSetName string) common.MapStr {
-
-	// Default name is empty, means it will be metricbeat
-	indexName := ""
-	typeName := "metricsets"
-
-	// Set meta information dynamic if set
-	indexName = getIndex(event, indexName)
-	typeName = getType(event, typeName)
-	timestamp = getTimestamp(event, timestamp)
-
-	// Each metricset has a unique eventfieldname to prevent type conflicts
-	eventFieldName := m.name + "-" + metricSetName
-
-	// TODO: Add fields_under_root option for "metrics"?
-	event = common.MapStr{
-		"type":                  typeName,
-		eventFieldName:          event,
-		"metricset":             metricSetName,
-		"module":                m.name,
-		"@timestamp":            timestamp,
-		common.EventMetadataKey: m.Config.EventMetadata,
-	}
-
-	// Overwrite index in case it is set
-	if indexName != "" {
-		event["beat"] = common.MapStr{
-			"index": indexName,
+		select {
+		case <-m.done:
+			return
+		case event := <-m.Publish:
+			// TODO transform to publish events - @ruflin,20160314
+			// Will this merge multiple events together to use bulk sending?
+			b.Events.PublishEvent(event)
 		}
 	}
-
-	return event
 }
 
+// ProcessConfig allows to process additional configuration params which are not
+// part of the module default configuratoin. This allows each metricset
+// to have its specific config params
 func (m *Module) ProcessConfig(config interface{}) error {
 
 	if err := m.cfg.Unpack(config); err != nil {
