@@ -13,9 +13,9 @@ import (
 )
 
 type {{cookiecutter.beat|capitalize}} struct {
-	Configuration *config.Config
-	done          chan struct{}
-	period        time.Duration
+	beatConfig *config.Config
+	done       chan struct{}
+	period     time.Duration
 }
 
 // Creates beater
@@ -29,8 +29,8 @@ func New() *{{cookiecutter.beat|capitalize}} {
 
 func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
-	// Load beater configuration
-	err := cfgfile.Read(&bt.Configuration, "")
+	// Load beater beatConfig
+	err := cfgfile.Read(&bt.beatConfig, "")
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
@@ -41,12 +41,12 @@ func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 
 	// Setting default period if not set
-	if bt.Configuration.{{cookiecutter.beat|capitalize}}.Period == "" {
-		bt.Configuration.{{cookiecutter.beat|capitalize}}.Period = "1s"
+	if bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period == "" {
+		bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period = "1s"
 	}
 
 	var err error
-	bt.period, err = time.ParseDuration(bt.Configuration.{{cookiecutter.beat|capitalize}}.Period)
+	bt.period, err = time.ParseDuration(bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period)
 	if err != nil {
 		return err
 	}
