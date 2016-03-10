@@ -1,3 +1,5 @@
+// +build integration
+
 package redis
 
 import (
@@ -8,10 +10,6 @@ import (
 )
 
 func TestConnect(t *testing.T) {
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Redis")
-	}
 
 	_, err := Connect(GetRedisEnvHost() + ":" + GetRedisEnvPort())
 	assert.NoError(t, err)

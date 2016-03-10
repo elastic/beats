@@ -1,3 +1,5 @@
+// +build integration
+
 package elasticsearch
 
 import (
@@ -11,9 +13,6 @@ import (
 )
 
 func TestClientConnect(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping test in short mode because it requires ES")
-	}
 
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
@@ -23,9 +22,6 @@ func TestClientConnect(t *testing.T) {
 }
 
 func TestCheckTemplate(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping test in short mode because it requires ES")
-	}
 
 	client := GetTestingElasticsearch()
 	err := client.Connect(5 * time.Second)
@@ -36,9 +32,6 @@ func TestCheckTemplate(t *testing.T) {
 }
 
 func TestLoadTemplate(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping test in short mode because it requires ES")
-	}
 
 	// Load template
 	absPath, err := filepath.Abs("../../tests/files/")
@@ -73,9 +66,6 @@ func TestLoadTemplate(t *testing.T) {
 }
 
 func TestLoadInvalidTemplate(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping test in short mode because it requires ES")
-	}
 
 	// Invalid Template
 	reader := bytes.NewReader([]byte("{json:invalid}"))

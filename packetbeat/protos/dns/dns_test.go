@@ -1,3 +1,5 @@
+// +build !integration
+
 // Common variables, functions and tests for the dns package tests
 
 package dns

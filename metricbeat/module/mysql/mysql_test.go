@@ -1,3 +1,5 @@
+// +build integration
+
 package mysql
 
 import (
@@ -7,10 +9,6 @@ import (
 )
 
 func TestConnect(t *testing.T) {
-
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires MySQL")
-	}
 
 	db, err := Connect(GetMySQLEnvDSN())
 	assert.NoError(t, err)

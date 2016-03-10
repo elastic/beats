@@ -1,4 +1,4 @@
-// +build windows
+// +build windows,integration
 
 package eventlog
 
@@ -145,9 +145,7 @@ func uninstallLog(provider, source string, log *elog.Log) error {
 
 // Verify that all messages are read from the event log.
 func TestRead(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
@@ -210,9 +208,7 @@ func TestRead(t *testing.T) {
 // Test that when an unknown Event ID is found, that a message containing the
 // insert strings (the message parameters) is returned.
 func TestReadUnknownEventId(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -268,9 +264,7 @@ func TestReadUnknownEventId(t *testing.T) {
 // separated list of files. If the message for an event ID is not found in one
 // of the files then the next file should be checked.
 func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName,
 		servicesMsgFile+";"+eventCreateMsgFile)
@@ -322,9 +316,7 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 
 // Test event messages that require more than one message parameter.
 func TestReadMultiParameterMsg(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName, servicesMsgFile)
 	if err != nil {
@@ -382,9 +374,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 // Verify that opening an invalid provider succeeds. Windows opens the
 // Application event log provider when this happens (unfortunately).
 func TestOpenInvalidProvider(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 
 	el, err := newEventLogging(Config{Name: "nonExistentProvider"})
@@ -399,9 +389,7 @@ func TestOpenInvalidProvider(t *testing.T) {
 
 // Test event messages that require no parameters.
 func TestReadNoParameterMsg(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName, netEventMsgFile)
 	if err != nil {
@@ -455,9 +443,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 // TestReadWhileCleared tests that the Read method recovers from the event log
 // being cleared or reset while reading.
 func TestReadWhileCleared(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode.")
-	}
+
 	configureLogp()
 	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
 	if err != nil {
