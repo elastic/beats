@@ -167,13 +167,13 @@ func (t *Topbeat) initProcStats() {
 
 	pids, err := Pids()
 	if err != nil {
-		logp.Warn("Getting the list of pids: %v", err)
+		logp.Warn("Getting the initial list of pids: %v", err)
 	}
 
 	for _, pid := range pids {
-		process, err := GetProcess(pid)
+		process, err := GetProcess(pid, "")
 		if err != nil {
-			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 		t.procsMap[process.Pid] = process
@@ -194,9 +194,14 @@ func (t *Topbeat) exportProcStats() error {
 
 	newProcs := make(ProcsMap, len(pids))
 	for _, pid := range pids {
-		process, err := GetProcess(pid)
+		var cmdline string
+		if previousProc := t.procsMap[pid]; previousProc != nil {
+			cmdline = previousProc.CmdLine
+		}
+
+		process, err := GetProcess(pid, cmdline)
 		if err != nil {
-			logp.Debug("topbeat", "Skip process %d: %v", pid, err)
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 
@@ -207,19 +212,26 @@ func (t *Topbeat) exportProcStats() error {
 
 			newProcs[process.Pid] = process
 
+			proc := common.MapStr{
+				"pid":   process.Pid,
+				"ppid":  process.Ppid,
+				"name":  process.Name,
+				"state": process.State,
+				"mem":   process.Mem,
+				"cpu":   process.Cpu,
+			}
+
+			if process.CmdLine != "" {
+				proc["cmdline"] = process.CmdLine
+			}
+
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"type":       "process",
-				"proc": common.MapStr{
-					"pid":   process.Pid,
-					"ppid":  process.Ppid,
-					"name":  process.Name,
-					"state": process.State,
-					"mem":   process.Mem,
-					"cpu":   process.Cpu,
-				},
-				"count": 1,
+				"count":      1,
+				"proc":       proc,
 			}
+
 			t.events.PublishEvent(event)
 		}
 	}

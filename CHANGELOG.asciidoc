@@ -43,10 +43,13 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
+- Add ability to override configuration settings using environment variables {issue}114[114]
 
 *Packetbeat*
 
 *Topbeat*
+- Add the command line used to start processes {issue}533[533]
+- Add username to processes {pull}845[845]
 
 *Filebeat*
 - Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
