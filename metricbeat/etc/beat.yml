@@ -1,17 +1,25 @@
 metricbeat:
   modules:
+
+    # Apache Module
     - module: apache
       metricsets: ["status"]
       hosts: ["http://127.0.0.1/"]
       period: 1s
       enabled: true
+
+    # Redis Module
     - module: redis
       metricsets: ["info"]
       period: 1s
       hosts: ["127.0.0.1:6379"]
       enabled: true
-      network: tcp
-      maxconn: 10
+
+      # Network type to be used for redis connection. Default: tcp
+      #network: tcp
+
+      # Max number of concurrent connections. Default: 10
+      #maxconn: 10
       fields:
         datacenter: west
       #filter: ...
