@@ -108,12 +108,12 @@ filebeat:
         # Default is 5s.
         #timeout: 5s
 
-      # Setting tail_files to true means filebeat starts readding new files at the end
+      # Setting tail_files to true means filebeat starts reading new files at the end
       # instead of the beginning. If this is used in combination with log rotation
       # this can mean that the first entries of a new file are skipped.
       #tail_files: false
 
-      # Backoff values define how agressively filebeat crawls new files for updates
+      # Backoff values define how aggressively filebeat crawls new files for updates
       # The default values can be used in most cases. Backoff defines how long it is waited
       # to check a file again after EOF is reached. Default is 1s which means the file
       # is checked every second if new lines were added. This leads to a near real time crawling.
@@ -407,7 +407,7 @@ shipper:
 
 ############################# Logging #########################################
 
-# There are three options for the log ouput: syslog, file, stderr.
+# There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 logging:
