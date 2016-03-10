@@ -1,3 +1,5 @@
+// +build !integration
+
 // Unit tests and benchmarks for the dns package.
 //
 // The byte array test data was generated from pcap files using the gopacket
