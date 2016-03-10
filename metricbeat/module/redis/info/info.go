@@ -120,7 +120,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/module/redis"
+	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -129,21 +129,51 @@ func init() {
 
 // New creates new instance of MetricSeter
 func New() helper.MetricSeter {
-	return &MetricSeter{}
+	return &MetricSeter{
+		redisPools: map[string]*rd.Pool{},
+	}
 }
 
-type MetricSeter struct{}
+type MetricSeter struct {
+	redisPools map[string]*rd.Pool
+}
+
+// Configure connection pool for each Redis host
+func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
+
+	config := struct {
+		Hosts   []string `config:"hosts"`
+		Network string   `config:"network"`
+		MaxConn int      `config:"maxconn"`
+	}{}
+	if err := cfg.Unpack(&config); err != nil {
+		return err
+	}
+
+	for _, host := range config.Hosts {
+		// Set up redis pool
+		redisPool := rd.NewPool(func() (rd.Conn, error) {
+			c, err := rd.Dial(config.Network, host)
+
+			if err != nil {
+				logp.Err("Failed to create Redis connection pool: %v", err)
+				return nil, err
+			}
+
+			return c, err
+		}, config.MaxConn)
+
+		// TODO add AUTH
+		m.redisPools[host] = redisPool
+	}
+	return nil
+}
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
-
 	for _, host := range ms.Config.Hosts {
-
-		conn, err := redis.Connect(host)
-		if err != nil {
-			return nil, err
-		}
-
-		out, err := rd.String(conn.Do("INFO"))
+		c := m.redisPools[host].Get()
+		out, err := rd.String(c.Do("INFO"))
+		c.Close()
 		if err != nil {
 			logp.Err("Error converting to string: %v", err)
 		}

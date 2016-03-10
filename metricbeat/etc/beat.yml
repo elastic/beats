@@ -10,6 +10,8 @@ metricbeat:
       period: 1s
       hosts: ["127.0.0.1:6379"]
       enabled: true
+      network: tcp
+      maxconn: 10
       fields:
         datacenter: west
       #filter: ...
