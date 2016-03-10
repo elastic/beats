@@ -53,90 +53,78 @@ system:
   fields:
     - name: load
       type: group
+      prefix: "[float]"
       description: >
         The system load average. The load average is the average number
         of jobs in the run queue.
       fields:
         - name: load1
-          path: load.load1
           type: float
           description: >
             The load average over 1 minute.
 
         - name: load5
-          path: load.load5
           type: float
           description: >
             The load average over 5 minutes.
 
         - name: load15
-          path: load.load15
           type: float
           description: >
             The load average over 15 minutes.
 
     - name: cpu
       type: group
+      prefix: "[float]"
       description: This group contains statistics related to CPU usage.
       fields:
         - name: user
-          path: cpu.user
           type: int
           description: >
            The amount of CPU time spent in user space.
 
         - name: user_p
-          path: cpu.user_p
           type: float
           description: >
             The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
             For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
         - name: nice
-          path: cpu.nice
           type: int
           description: >
             The amount of CPU time spent on low-priority processes.
 
-
         - name: system
-          path: cpu.system
           type: int
           description: >
             The amount of CPU time spent in kernel space.
 
         - name: system_p
-          path: cpu.system_p
           type: float
           description: >
             The percentage of CPU time spent in kernel space.
 
         - name: idle
-          path: cpu.idle
           type: int
           description: >
             The amount of CPU time spent idle.
 
         - name: iowait
-          path: cpu.iowait
           type: int
           description: >
             The amount of CPU time spent in wait (on disk).
 
         - name: irq
-          path: cpu.irq
           type: int
           description: >
             The amount of CPU time spent servicing and handling hardware interrupts.
 
         - name: softirq
-          path: cpu.softirq
           type: int
           description:
             The amount of CPU time spent servicing and handling software interrupts.
 
         - name: steal
-          path: cpu.steal
           type: int
           description: >
             The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
@@ -145,65 +133,56 @@ system:
 
     - name: cpus
       type: group
+      prefix: "[float]"
       description: This group contains CPU usage per core statistics.
       fields:
         - name: cpuX
+          prefix: "[float]"
           type: group
           description: This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
           fields:
 
           - name: user
-            path: cpus.cpuX.user
             type: int
             description: >
              The amount of CPU time spent in user space on core X.
 
           - name: user_p
-            path: cpus.cpuX.user_p
             type: float
             description: >
               The percentage of CPU time spent in user space on core X.
 
           - name: nice
-            path: cpus.cpuX.nice
             type: int
             description: >
               The amount of CPU time spent on low-priority processes on core X.
 
-
           - name: system
-            path: cpus.cpuX.system
             type: int
             description: >
               The amount of CPU time spent in kernel space on core X.
 
           - name: system_p
-            path: cpus.cpuX.system_p
             type: float
             description: >
               The percentage of CPU time spent in kernel space on core X.
 
           - name: idle
-            path: cpus.cpuX.idle
             type: int
             description: >
               The amount of CPU time spent idle on core X.
 
           - name: iowait
-            path: cpus.cpuX.iowait
             type: int
             description: >
               The amount of CPU time spent in wait (on disk) on core X.
 
           - name: softirq
-            path: cpus.cpuX.softirq
             type: int
             description:
               The amount of CPU time spent servicing and handling software interrupts on core X.
 
-
           - name: steal
-            path: cpus.cpuX.steal
             type: int
             description: >
               The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
@@ -214,76 +193,67 @@ system:
 
     - name: mem
       type: group
+      prefix: "[float]"
       description: This group contains statistics related to the memory usage on the system.
       fields:
         - name: total
-          path: mem.total
           type: int
           description: >
             Total memory.
 
         - name: used
-          path: mem.used
           type: int
           description: >
             Used memory.
 
         - name: free
-          path: mem.free
           type: int
           description: >
             Available memory.
 
         - name: used_p
-          path: mem.used_p
           type: float
           description: >
             The percentage of used memory.
 
         - name: actual_used
-          path: mem.actual_used
           type: int
           description: >
             Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
             Available only on Unix.
 
         - name: actual_free
-          path: mem.actual_free
           type: int
           description: >
             Actual available memory. This value is the "free" memory plus the memory used for disk caches and
             buffers. Available only on Unix.
 
         - name: actual_used_p
-          path: mem.actual_used_p
           type: float
           description: >
             The percentage of actual used memory.
 
     - name: swap
       type: group
+      prefix: "[float]"
       description: This group contains statistics related to the swap memory usage on the system.
       fields:
         - name: total
-          path: swap.total
           type: int
           description: >
             Total swap memory.
 
         - name: used
-          path: swap.used
           type: int
           description: >
             Used swap memory.
 
         - name: free
-          path: swap.free
           type: int
           description: >
             Available swap memory.
 
         - name: used_p
-          path: swap.used_p
           type: float
           description: >
             The percentage of used swap memory.
@@ -295,43 +265,38 @@ process:
   fields:
     - name: proc
       type: group
+      prefix: "[float]"
       description: >
         Contains per-process statistics like memory usage, CPU usage, and details about each process, such as state, name,
         pid, and ppid.
       fields:
         - name: name
-          path: proc.name
           type: string
           description: >
             The process name.
 
         - name: state
-          path: proc.state
           type: string
           description: >
             The process state. For example: "running"
 
         - name: pid
-          path: proc.pid
           type: int
           description: >
             The process pid.
 
         - name: ppid
-          path: proc.ppid
           type: int
           description: >
             The process parent pid.
 
         - name: cmdline
-          path: proc.cmdline
           type: string
           description: >
             The full command-line used to start the process, including the
             arguments separated by space.
 
         - name: username
-          path: proc.username
           type: string
           description: >
             The username of the user that created the process. If the username
@@ -341,35 +306,31 @@ process:
 
         - name: cpu
           type: group
+          prefix: "[float]"
           description: CPU-specific statistics per process.
           fields:
             - name: user
-              path: proc.cpu.user
               type: int
               description: >
                 The amount of CPU time the process spent in user space.
 
             - name: total_p
-              path: proc.cpu.total_p
               type: float
               description: >
                 The percentage of CPU time spent by the process since the last update. Its value is similar with the
                 %CPU value of the process displayed by the top command on unix systems.
 
             - name: system
-              path: proc.cpu.system
               type: int
               description: >
                 The amount of CPU time the process spent in kernel space.
 
             - name: total
-              path: proc.cpu.total
               type: int
               description: >
                 The total CPU time spent by the process.
 
             - name: start_time
-              path: proc.cpu.start_time
               type: string
               description: >
                 The time when the process was started. Example: "17:45".
@@ -377,27 +338,24 @@ process:
         - name: mem
           type: group
           description: Memory-specific statistics per process.
+          prefix: "[float]"
           fields:
             - name: size
-              path: proc.mem.size
               type: int
               description: >
                 The total virtual memory the process has.
 
             - name: rss
-              path: proc.mem.rss
               type: int
               description: >
                 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
             - name: rss_p
-              path: proc.mem.rss_p
               type: float
               description: >
                 The percentage of memory the process occupied in main memory (RAM).
 
             - name: share
-              path: proc.mem.share
               type: int
               description: >
                 The shared memory the process uses.
@@ -409,54 +367,47 @@ filesystem:
   fields:
     - name: fs
       type: group
+      prefix: "[float]"
       description: >
         Contains details about the mounted disks, such as the total or used disk space, and details about each disk, such as
         the device name and the mounting place.
       fields:
         - name: avail
-          path: fs.avail
           type: int
           description: >
             The available disk space in bytes.
 
         - name: device_name
-          path: fs.device_name
           type: string
           description: >
             The disk name. For example: `/dev/disk1`
 
         - name: mount_point
-          path: fs.mount_point
           type: string
           description: >
             The mounting point. For example: `/`
 
         - name: files
-          path: fs.files
           type: int
           description: >
             The total number of file nodes in the file system.
 
         - name: free_files
-          path: fs.free_files
           type: int
           description: >
             The number of free file nodes in the file system.
 
         - name: total
-          path: fs.total
           type: int
           description: >
             The total disk space in bytes.
 
         - name: used
-          path: fs.used
           type: int
           description: >
             The used disk space in bytes.
 
         - name: used_p
-          path: fs.used_p
           type: float
           description: >
             The percentage of used disk space.

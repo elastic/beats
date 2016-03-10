@@ -306,11 +306,11 @@ flows_event:
       description: >
         Object with source to destination flow measurements.
       fields:
-        - name: stats_source.net_packets_total
+        - name: net_packets_total
           description: >
             Total number of packets
 
-        - name: stats_source.net_bytes_total
+        - name: net_bytes_total
           description: >
             Total number of bytes
 
@@ -319,11 +319,11 @@ flows_event:
       description: >
         Object with destination to source flow measurements.
       fields:
-        - name: stats_dest.net_packets_total
+        - name: net_packets_total
           description: >
             Total number of packets
 
-        - name: stats_dest.net_bytes_total
+        - name: net_bytes_total
           description: >
             Total number of bytes
 
@@ -422,33 +422,33 @@ trans_event:
       type: group
       description: ICMP specific event fields.
       fields:
-        - name: icmp.version
+        - name: version
           description: The version of the ICMP protocol.
           possible_values:
             - 4
             - 6
 
-        - name: icmp.request.message
+        - name: request.message
           type: string
           description: A human readable form of the request.
 
-        - name: icmp.request.type
+        - name: request.type
           type: int
           description: The request type.
 
-        - name: icmp.request.code
+        - name: request.code
           type: int
           description: The request code.
 
-        - name: icmp.response.message
+        - name: response.message
           type: string
           description: A human readable form of the response.
 
-        - name: icmp.response.type
+        - name: response.type
           type: int
           description: The response type.
 
-        - name: icmp.response.code
+        - name: response.code
           type: int
           description: The response code.
 
@@ -456,60 +456,60 @@ trans_event:
       type: group
       description: DNS-specific event fields.
       fields:
-        - name: dns.id
+        - name: id
           type: int
           description: >
             The DNS packet identifier assigned by the program that generated the
             query. The identifier is copied to the response.
 
-        - name: dns.op_code
+        - name: op_code
           description: >
             The DNS operation code that specifies the kind of query in the message.
             This value is set by the originator of a query and copied into the
             response.
           example: QUERY
 
-        - name: dns.flags.authoritative
+        - name: flags.authoritative
           type: bool
           description: >
             A DNS flag specifying that the responding server is an authority for
             the domain name used in the question.
 
-        - name: dns.flags.recursion_available
+        - name: flags.recursion_available
           type: bool
           description: >
             A DNS flag specifying whether recursive query support is available in the
             name server.
 
-        - name: dns.flags.recursion_desired
+        - name: flags.recursion_desired
           type: bool
           description: >
             A DNS flag specifying that the client directs the server to pursue a
             query recursively. Recursive query support is optional.
 
-        - name: dns.flags.authentic_data
+        - name: flags.authentic_data
           type: bool
           description: >
             A DNS flag specifying that the recursive server considers the response
             authentic.
 
-        - name: dns.flags.checking_disabled
+        - name: flags.checking_disabled
           type: bool
           description: >
             A DNS flag specifying that the client disables the server
             signature validation of the query.
 
-        - name: dns.flags.truncated_response
+        - name: flags.truncated_response
           type: bool
           description: >
             A DNS flag specifying that only the first 512 bytes of the reply were
             returned.
 
-        - name: dns.response_code
+        - name: response_code
           description: The DNS status code.
           example: NOERROR
 
-        - name: dns.question.name
+        - name: question.name
           description: >
             The domain name being queried. If the name field contains non-printable
             characters (below 32 or above 126), then those characters are represented
@@ -518,126 +518,126 @@ trans_event:
             \n respectively.
           example: www.google.com.
 
-        - name: dns.question.type
+        - name: question.type
           description: The type of records being queried.
           example: AAAA
 
-        - name: dns.question.class
+        - name: question.class
           description: The class of of records being queried.
           example: IN
 
-        - name: dns.question.etld_plus_one
+        - name: question.etld_plus_one
           description: The effective top-level domain (eTLD) plus one more label.
             For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.".
             The data for determining the eTLD comes from an embedded copy of the
             data from http://publicsuffix.org.
           example: amazon.co.uk.
 
-        - name: dns.answers_count
+        - name: answers_count
           type: int
           description: >
             The number of resource records contained in the `dns.answers` field.
 
-        - name: dns.answers.name
+        - name: answers.name
           description: The domain name to which this resource record pertains.
           example: example.com.
 
-        - name: dns.answers.type
+        - name: answers.type
           description: The type of data contained in this resource record.
           example: MX
 
-        - name: dns.answers.class
+        - name: answers.class
           description: The class of DNS data contained in this resource record.
           example: IN
 
-        - name: dns.answers.ttl
+        - name: answers.ttl
           description: >
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
-        - name: dns.answers.data
+        - name: answers.data
           description: >
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
 
-        - name: dns.authorities
+        - name: authorities
           type: dict
           description: >
             An array containing a dictionary for each authority section from the
             answer.
 
-        - name: dns.authorities_count
+        - name: authorities_count
           type: int
           description: >
             The number of resource records contained in the `dns.authorities` field.
             The `dns.authorities` field may or may not be included depending on the
             configuration of Packetbeat.
 
-        - name: dns.authorities.name
+        - name: authorities.name
           description: The domain name to which this resource record pertains.
           example: example.com.
 
-        - name: dns.authorities.type
+        - name: authorities.type
           description: The type of data contained in this resource record.
           example: NS
 
-        - name: dns.authorities.class
+        - name: authorities.class
           description: The class of DNS data contained in this resource record.
           example: IN
 
-        - name: dns.answers
+        - name: answers
           type: dict
           description: >
             An array containing a dictionary about each answer section returned by
             the server.
 
-        - name: dns.answers.ttl
+        - name: answers.ttl
           description: >
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
-        - name: dns.answers.data
+        - name: answers.data
           description: >
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
 
-        - name: dns.additionals
+        - name: additionals
           type: dict
           description: >
             An array containing a dictionary for each additional section from the
             answer.
 
-        - name: dns.additionals_count
+        - name: additionals_count
           type: int
           description: >
             The number of resource records contained in the `dns.additionals` field.
             The `dns.additionals` field may or may not be included depending on the
             configuration of Packetbeat.
 
-        - name: dns.additionals.name
+        - name: additionals.name
           description: The domain name to which this resource record pertains.
           example: example.com.
 
-        - name: dns.additionals.type
+        - name: additionals.type
           description: The type of data contained in this resource record.
           example: NS
 
-        - name: dns.additionals.class
+        - name: additionals.class
           description: The class of DNS data contained in this resource record.
           example: IN
 
-        - name: dns.additionals.ttl
+        - name: additionals.ttl
           description: >
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
           type: int
 
-        - name: dns.additionals.data
+        - name: additionals.data
           description: >
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
@@ -646,201 +646,201 @@ trans_event:
       type: group
       description: AMQP specific event fields.
       fields:
-        - name: amqp.reply-code
+        - name: reply-code
           type: int
           description: >
             AMQP reply code to an error, similar to http reply-code
           example: 404
 
-        - name: amqp.reply-text
+        - name: reply-text
           type: string
           description: >
             Text explaining the error.
 
-        - name: amqp.class-id
+        - name: class-id
           type: int
           description: >
             Failing method class.
 
-        - name: amqp.method-id
+        - name: method-id
           type: int
           description: >
             Failing method ID.
 
-        - name: amqp.exchange
+        - name: exchange
           type: string
           description: >
             Name of the exchange.
 
-        - name: amqp.exchange-type
+        - name: exchange-type
           type: string
           description: >
             Exchange type.
           example: fanout
 
-        - name: amqp.passive
+        - name: passive
           type: bool
           description: >
             If set, do not create exchange/queue.
 
-        - name: amqp.durable
+        - name: durable
           type: bool
           description: >
             If set, request a durable exchange/queue.
 
-        - name: amqp.exclusive
+        - name: exclusive
           type: bool
           description: >
             If set, request an exclusive queue.
 
-        - name: amqp.auto-delete
+        - name: auto-delete
           type: bool
           description: >
             If set, auto-delete queue when unused.
 
-        - name: amqp.no-wait
+        - name: no-wait
           type: bool
           description: >
             If set, the server will not respond to the method.
 
-        - name: amqp.consumer-tag
+        - name: consumer-tag
           description: >
             Identifier for the consumer, valid within the current channel.
 
-        - name: amqp.delivery-tag
+        - name: delivery-tag
           type: int
           description: >
             The server-assigned and channel-specific delivery tag.
 
-        - name: amqp.message-count
+        - name: message-count
           type: int
           description: >
             The number of messages in the queue, which will be zero for
             newly-declared queues.
 
-        - name: amqp.consumer-count
+        - name: consumer-count
           type: int
           description: >
             The number of consumers of a queue.
 
-        - name: amqp.routing-key
+        - name: routing-key
           type: int
           description: >
             Message routing key.
 
-        - name: amqp.no-ack
+        - name: no-ack
           type: bool
           description: >
             If set, the server does not expect acknowledgements for messages.
 
-        - name: amqp.no-local
+        - name: no-local
           type: bool
           description: >
             If set, the server will not send messages to the connection that
             published them.
 
-        - name: amqp.if-unused
+        - name: if-unused
           type: bool
           description: >
             Delete only if unused.
 
-        - name: amqp.if-empty
+        - name: if-empty
           type: bool
           description: >
             Delete only if empty.
 
-        - name: amqp.queue
+        - name: queue
           type: string
           description: >
             The queue name identifies the queue within the vhost.
 
-        - name: amqp.redelivered
+        - name: redelivered
           type: bool
           description: >
             Indicates that the message has been previously delivered to this
             or another client.
 
-        - name: amqp.multiple
+        - name: multiple
           type: bool
           description: >
             Acknowledge multiple messages.
 
-        - name: amqp.arguments.*
+        - name: arguments.*
           description: >
             Optional additional arguments passed to some methods. Can be of
             various types.
 
-        - name: amqp.mandatory
+        - name: mandatory
           type: bool
           description: >
             Indicates mandatory routing.
 
-        - name: amqp.immediate
+        - name: immediate
           type: bool
           description: >
             Request immediate delivery.
 
-        - name: amqp.content-type
+        - name: content-type
           type: string
           description: >
             MIME content type.
           example: text/plain
 
-        - name: amqp.content-encoding
+        - name: content-encoding
           type: string
           description: >
             MIME content encoding.
 
-        - name: amqp.headers.*
+        - name: headers.*
           description: >
             Message header field table.
 
-        - name: amqp.delivery-mode
+        - name: delivery-mode
           type: int
           description: >
             Non-persistent (1) or persistent (2).
 
-        - name: amqp.priority
+        - name: priority
           type: int
           description: >
             Message priority, 0 to 9.
 
-        - name: amqp.correlation-id
+        - name: correlation-id
           type: string
           description: >
             Application correlation identifier.
 
-        - name: amqp.reply-to
+        - name: reply-to
           type: string
           description: >
             Address to reply to.
 
-        - name: amqp.expiration
+        - name: expiration
           type: string
           description: >
             Message expiration specification.
 
-        - name: amqp.message-id
+        - name: message-id
           type: string
           description: >
             Application message identifier.
 
-        - name: amqp.timestamp
+        - name: timestamp
           type: string
           description: >
             Message timestamp.
 
-        - name: amqp.type
+        - name: type
           type: string
           description: >
             Message type name.
 
-        - name: amqp.user-id
+        - name: user-id
           type: string
           description: >
             Creating user id.
 
-        - name: amqp.app-id
+        - name: app-id
           type: string
           description: >
             Creating application id.
@@ -849,15 +849,15 @@ trans_event:
       type: group
       description: HTTP-specific event fields.
       fields:
-        - name: http.code
+        - name: code
           description: The HTTP status code.
           example: 404
 
-        - name: http.phrase
+        - name: phrase
           description: The HTTP status phrase.
           example: Not found.
 
-        - name: http.request_headers
+        - name: request_headers
           type: dict
           description: >
             A map containing the captured header fields from the request.
@@ -865,7 +865,7 @@ trans_event:
             header name are present in the message, they will be separated by
             commas.
 
-        - name: http.response_headers
+        - name: response_headers
           type: dict
           description: >
             A map containing the captured header fields from the response.
@@ -873,7 +873,7 @@ trans_event:
             same header name are present in the message, they will be separated
             by commas.
 
-        - name: http.content_length
+        - name: content_length
           type: int
           description: >
             The value of the Content-Length header if present.
@@ -882,19 +882,19 @@ trans_event:
       type: group
       description: Memcached-specific event fields
       fields:
-        - name: memcache.protocol_type
+        - name: protocol_type
           type: string
           description: >
             The memcache protocol implementation. The value can be "binary"
             for binary-based, "text" for text-based, or "unknown" for an unknown
             memcache protocol type.
 
-        - name: memcache.request.line
+        - name: request.line
           type: string
           description: >
             The raw command line for unknown commands ONLY.
 
-        - name: memcache.request.command
+        - name: request.command
           type: string
           description: >
             The memcache command being requested in the memcache text protocol.
@@ -902,20 +902,20 @@ trans_event:
             The binary protocol opcodes are translated into memcache text protocol
             commands.
 
-        - name: memcache.response.command
+        - name: response.command
           type: string
           description: >
             Either the text based protocol response message type
             or the name of the originating request if binary protocol is used.
 
-        - name: memcache.request.type
+        - name: request.type
           type: string
           description: >
             The memcache command classification. This value can be "UNKNOWN", "Load",
             "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
             "Stats", "Success", "Fail", or "Auth".
 
-        - name: memcache.response.type
+        - name: response.type
           type: string
           description: >
             The memcache command classification. This value can be "UNKNOWN", "Load",
@@ -925,194 +925,194 @@ trans_event:
             binary based protocol will mirror the request commands only (see
             `memcache.response.status` for binary protocol).
 
-        - name: memcache.response.error_msg
+        - name: response.error_msg
           type: string
           description: >
             The optional error message in the memcache response (text based protocol only).
 
-        - name: memcache.request.opcode
+        - name: request.opcode
           type: string
           description: >
             The binary protocol message opcode name.
 
-        - name: memcache.response.opcode
+        - name: response.opcode
           type: string
           description: >
             The binary protocol message opcode name.
 
-        - name: memcache.request.opcode_value
+        - name: request.opcode_value
           type: int
           description: >
             The binary protocol message opcode value.
 
-        - name: memcache.response.opcode_value
+        - name: response.opcode_value
           type: int
           description: >
             The binary protocol message opcode value.
 
-        - name: memcache.request.opaque
+        - name: request.opaque
           type: int
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
-        - name: memcache.response.opaque
+        - name: response.opaque
           type: int
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
-        - name: memcache.request.vbucket
+        - name: request.vbucket
           type: int
           description: >
             The vbucket index sent in the binary message.
 
-        - name: memcache.response.status
+        - name: response.status
           type: string
           description: >
             The textual representation of the response error code
             (binary protocol only).
 
-        - name: memcache.response.status_code
+        - name: response.status_code
           type: int
           description: >
             The status code value returned in the response (binary protocol only).
 
-        - name: memcache.request.keys
+        - name: request.keys
           type: list
           description: >
             The list of keys sent in the store or load commands.
 
-        - name: memcache.response.keys
+        - name: response.keys
           type: list
           description: >
             The list of keys returned for the load command (if present).
 
-        - name: memcache.request.count_values
+        - name: request.count_values
           type: int
           description: >
             The number of values found in the memcache request message.
             If the command does not send any data, this field is missing.
 
-        - name: memcache.response.count_values
+        - name: response.count_values
           type: int
           description: >
             The number of values found in the memcache response message.
             If the command does not send any data, this field is missing.
 
-        - name: memcache.request.values
+        - name: request.values
           type: list
           description: >
             The list of base64 encoded values sent with the request (if present).
 
-        - name: memcache.response.values
+        - name: response.values
           type: list
           description: >
             The list of base64 encoded values sent with the response (if present).
 
-        - name: memcache.request.bytes
+        - name: request.bytes
           type: int
           description: >
             The byte count of the values being transfered.
 
-        - name: memcache.response.bytes
+        - name: response.bytes
           type: int
           description: >
             The byte count of the values being transfered.
 
-        - name: memcache.request.delta
+        - name: request.delta
           type: int
           description: >
             The counter increment/decrement delta value.
 
-        - name: memcache.request.initial
+        - name: request.initial
           type: int
           description: >
             The counter increment/decrement initial value parameter (binary protocol only).
 
-        - name: memcache.request.verbosity
+        - name: request.verbosity
           type: int
           description: >
             The value of the memcache "verbosity" command.
 
-        - name: memcache.request.raw_args
+        - name: request.raw_args
           type: string
           description: >
             The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
-        - name: memcache.request.source_class
+        - name: request.source_class
           type: int
           description: >
             The source class id in 'slab reassign' command.
 
-        - name: memcache.request.dest_class
+        - name: request.dest_class
           type: int
           description: >
             The destination class id in 'slab reassign' command.
 
-        - name: memcache.request.automove
+        - name: request.automove
           type: string
           description: >
               The automove mode in the 'slab automove' command expressed as a string.
               This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if
               the value is unknown.
 
-        - name: memcache.request.flags
+        - name: request.flags
           type: int
           description: >
             The memcache command flags sent in the request (if present).
 
-        - name: memcache.response.flags
+        - name: response.flags
           type: int
           description: >
             The memcache message flags sent in the response (if present).
 
-        - name: memcache.request.exptime
+        - name: request.exptime
           type: int
           description: >
             The data expiry time in seconds sent with the memcache command (if present).
             If the value is <30 days, the expiry time is relative to "now", or else it
             is an absolute Unix time in seconds (32-bit).
 
-        - name: memcache.request.sleep_us
+        - name: request.sleep_us
           type: int
           description: >
             The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
-        - name: memcache.response.value
+        - name: response.value
           type: int
           description: >
             The counter value returned by a counter operation.
 
-        - name: memcache.request.noreply
+        - name: request.noreply
           type: bool
           description: >
             Set to true if noreply was set in the request.
             The `memcache.response` field will be missing.
 
-        - name: memcache.request.quiet
+        - name: request.quiet
           type: bool
           description: >
             Set to true if the binary protocol message is to be treated as a quiet message.
 
-        - name: memcache.request.cas_unique
+        - name: request.cas_unique
           type: int
           description: >
             The CAS (compare-and-swap) identifier if present.
 
-        - name: memcache.response.cas_unique
+        - name: response.cas_unique
           type: int
           description: >
             The CAS (compare-and-swap) identifier to be used with CAS-based updates
             (if present).
 
-        - name: memcache.response.stats
+        - name: response.stats
           type: list
           description: >
             The list of statistic values returned. Each entry is a dictionary with the
             fields "name" and "value".
 
-        - name: memcache.response.version
+        - name: response.version
           type: string
           description: >
             The returned memcache version string.
@@ -1122,42 +1122,42 @@ trans_event:
       type: group
       description: MySQL-specific event fields.
       fields:
-        - name: mysql.iserror
+        - name: iserror
           type: bool
           description: >
            If the MySQL query returns an error, this field is set to true.
 
-        - name: mysql.affected_rows
+        - name: affected_rows
           type: int
           description: >
             If the MySQL command is successful, this field contains the affected
             number of rows of the last statement.
 
-        - name: mysql.insert_id
+        - name: insert_id
           description: >
             If the INSERT query is successful, this field contains the id of the
             newly inserted row.
 
-        - name: mysql.num_fields
+        - name: num_fields
           description: >
             If the SELECT query is successful, this field is set to the number
             of fields returned.
 
-        - name: mysql.num_rows
+        - name: num_rows
           description: >
             If the SELECT query is successful, this field is set to the number
             of rows returned.
 
-        - name: mysql.query
+        - name: query
           description: >
             The row mysql query as read from the transaction's request.
 
-        - name: mysql.error_code
+        - name: error_code
           type: int
           description: >
             The error code returned by MySQL.
 
-        - name: mysql.error_message
+        - name: error_message
           description: >
             The error info message returned by MySQL.
 
@@ -1165,35 +1165,35 @@ trans_event:
       type: group
       description: PostgreSQL-specific event fields.
       fields:
-        - name: pgsql.query
+        - name: query
           description: >
             The row pgsql query as read from the transaction's request.
 
-        - name: pgsql.iserror
+        - name: iserror
           type: bool
           description: >
             If the PgSQL query returns an error, this field is set to true.
 
-        - name: pgsql.error_code
+        - name: error_code
           description: The PostgreSQL error code.
           type: int
 
-        - name: pgsql.error_message
+        - name: error_message
           description: The PostgreSQL error message.
 
-        - name: pgsql.error_severity
+        - name: error_severity
           description: The PostgreSQL error severity.
           possible_values:
             - ERROR
             - FATAL
             - PANIC
 
-        - name: pgsql.num_fields
+        - name: num_fields
           description: >
             If the SELECT query if successful, this field is set to the number
             of fields returned.
 
-        - name: pgsql.num_rows
+        - name: num_rows
           description: >
             If the SELECT query if successful, this field is set to the number
             of rows returned.
@@ -1202,22 +1202,22 @@ trans_event:
       type: group
       description: Thrift-RPC specific event fields.
       fields:
-        - name: thrift.params
+        - name: params
           description: >
             The RPC method call parameters in a human readable format. If the IDL
             files are available, the parameters use names whenever possible.
             Otherwise, the IDs from the message are used.
 
-        - name: thrift.service
+        - name: service
           description: >
             The name of the Thrift-RPC service as defined in the IDL files.
 
-        - name: thrift.return_value
+        - name: return_value
           description: >
             The value returned by the Thrift-RPC call. This is encoded in a human
             readable format.
 
-        - name: thrift.exceptions
+        - name: exceptions
           description: >
             If the call resulted in exceptions, this field contains the exceptions in a human
             readable format.
@@ -1226,11 +1226,11 @@ trans_event:
       type: group
       description: Redis-specific event fields.
       fields:
-        - name: redis.return_value
+        - name: return_value
           description: >
             The return value of the Redis command in a human readable format.
 
-        - name: redis.error
+        - name: error
           description: >
             If the Redis command has resulted in an error, this field contains the
             error message returned by the Redis server.
@@ -1242,51 +1242,51 @@ trans_event:
          the fields for the MongoDB wire protocol. The higher level fields
          (for example, `query` and `resource`) apply to MongoDB events as well.
       fields:
-        - name: mongodb.error
+        - name: error
           description: >
             If the MongoDB request has resulted in an error, this field contains the
             error message returned by the server.
-        - name: mongodb.fullCollectionName
+        - name: fullCollectionName
           description: >
             The full collection name.
             The full collection name is the concatenation of the database name with the collection name,
             using a dot (.) for the concatenation.
             For example, for the database foo and the collection bar, the full collection name is foo.bar.
-        - name: mongodb.numberToSkip
+        - name: numberToSkip
           type: number
           description: >
             Sets the number of documents to omit - starting from the first document in the resulting dataset -
             when returning the result of the query.
-        - name: mongodb.numberToReturn
+        - name: numberToReturn
           type: number
           description: >
             The requested maximum number of documents to be returned.
-        - name: mongodb.numberReturned
+        - name: numberReturned
           type: number
           description: >
             The number of documents in the reply.
-        - name: mongodb.startingFrom
+        - name: startingFrom
           description: >
             Where in the cursor this reply is starting.
-        - name: mongodb.query
+        - name: query
           description: >
             A JSON document that represents the query.
             The query will contain one or more elements, all of which must match for a document
             to be included in the result set.
             Possible elements include $query, $orderby, $hint, $explain, and $snapshot.
-        - name: mongodb.returnFieldsSelector
+        - name: returnFieldsSelector
           description: >
             A JSON document that limits the fields in the returned documents.
             The returnFieldsSelector contains one or more elements, each of which is the name of a field that should be returned,
             and the integer value 1.
-        - name: mongodb.selector
+        - name: selector
           description: >
             A BSON document that specifies the query for selecting the document to update or delete.
-        - name: mongodb.update
+        - name: update
           description: >
             A BSON document that specifies the update to be performed.
             For information on specifying updates, see the Update Operations documentation from the MongoDB Manual.
-        - name: mongodb.cursorId
+        - name: cursorId
           description: >
             The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
