@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -52,7 +51,7 @@ type MockMetricSeter struct {
 	counter int
 }
 
-func (m *MockMetricSeter) Setup(cfg *ucfg.Config) error {
+func (m *MockMetricSeter) Setup(ms *MetricSet) error {
 	return nil
 }
 

@@ -96,9 +96,20 @@ func (m *Module) Start(b *beat.Beat) error {
 	// TODO: Improve logging information with list (names of metricSets)
 	logp.Info("Start Module %s with metricsets [%s] and period %v", m.name, m.getMetricSetsList(), period)
 
+	m.setupMetricSets()
+
 	go m.Run(period, b)
 
 	return nil
+}
+
+func (m *Module) setupMetricSets() {
+	for _, set := range m.metricSets {
+		err := set.Setup()
+		if err != nil {
+			logp.Err("Error setting up MetricSet %s: %s", set.Name, err)
+		}
+	}
 }
 
 func (m *Module) Run(period time.Duration, b *beat.Beat) {
@@ -272,4 +283,12 @@ func (m *Module) createEvent(event common.MapStr, timestamp common.Time, metricS
 	}
 
 	return event
+}
+
+func (m *Module) ProcessConfig(config interface{}) error {
+
+	if err := m.cfg.Unpack(config); err != nil {
+		return err
+	}
+	return nil
 }

@@ -19,7 +19,7 @@ type ModuleConfig struct {
 
 // Interface for each metric
 type MetricSeter interface {
-	Setup(cfg *ucfg.Config) error
+	Setup(ms *MetricSet) error
 	// Method to periodically fetch new events
 	Fetch(ms *MetricSet) ([]common.MapStr, error)
 }
