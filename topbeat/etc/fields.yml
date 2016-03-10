@@ -323,6 +323,22 @@ process:
           description: >
             The process parent pid.
 
+        - name: cmdline
+          path: proc.cmdline
+          type: string
+          description: >
+            The full command-line used to start the process, including the
+            arguments separated by space.
+
+        - name: username
+          path: proc.username
+          type: string
+          description: >
+            The username of the user that created the process. If the username
+            can not be determined then the the field will contain the user's
+            numeric identifier (UID). On Windows, this field includes the user's
+            domain and is formatted as `domain\username`.
+
         - name: cpu
           type: group
           description: CPU-specific statistics per process.
