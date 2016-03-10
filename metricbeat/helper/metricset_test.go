@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -12,7 +13,8 @@ import (
 func TestMetricSeterState(t *testing.T) {
 	module := &Module{}
 
-	metricSet := NewMetricSet("mockmetricset", NewMockMetricSeter, module)
+	metricSet, err := NewMetricSet("mockmetricset", NewMockMetricSeter, module)
+	assert.NoError(t, err)
 
 	events, _ := metricSet.MetricSeter.Fetch(metricSet)
 	assert.Equal(t, 1, events[0]["counter"])
@@ -25,8 +27,10 @@ func TestMetricSeterState(t *testing.T) {
 func TestMetricSetTwoInstances(t *testing.T) {
 	module := &Module{}
 
-	metricSet1 := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
-	metricSet2 := NewMetricSet("mockmetricset2", NewMockMetricSeter, module)
+	metricSet1, err1 := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
+	metricSet2, err2 := NewMetricSet("mockmetricset2", NewMockMetricSeter, module)
+	assert.NoError(t, err1)
+	assert.NoError(t, err2)
 
 	events, _ := metricSet1.MetricSeter.Fetch(metricSet1)
 	assert.Equal(t, 1, events[0]["counter"], 1)
@@ -46,6 +50,10 @@ func NewMockMetricSeter() MetricSeter {
 
 type MockMetricSeter struct {
 	counter int
+}
+
+func (m *MockMetricSeter) Setup(cfg *ucfg.Config) error {
+	return nil
 }
 
 func (m *MockMetricSeter) Fetch(ms *MetricSet) (events []common.MapStr, err error) {

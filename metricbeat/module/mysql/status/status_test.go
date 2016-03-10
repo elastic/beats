@@ -21,7 +21,8 @@ func TestFetch(t *testing.T) {
 	module := &helper.Module{
 		Config: config,
 	}
-	ms := helper.NewMetricSet("status", New, module)
+	ms, msErr := helper.NewMetricSet("status", New, module)
+	assert.NoError(t, msErr)
 
 	// Load events
 	events, err := ms.MetricSeter.Fetch(ms)
