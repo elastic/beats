@@ -6,11 +6,12 @@ BUILDID?=$(DATE)
 all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/bin \
 	topbeat/deb topbeat/rpm topbeat/darwin topbeat/win topbeat/bin \
 	filebeat/deb filebeat/rpm filebeat/darwin filebeat/win filebeat/bin \
+	metricbeat/deb metricbeat/rpm metricbeat/darwin metricbeat/win metricbeat/bin \
 	winlogbeat/win \
 	build/upload/build_id.txt latest
 
-.PHONY: packetbeat topbeat filebeat
-packetbeat topbeat filebeat winlogbeat: build/upload
+.PHONY: packetbeat topbeat filebeat metricbeat winlogbeat
+packetbeat topbeat filebeat metricbeat winlogbeat: build/upload
 	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
 		-before-build=../xgo-scripts/before_build.sh \
@@ -44,8 +45,8 @@ packetbeat topbeat filebeat winlogbeat: build/upload
 
 .PHONY: deps
 deps:
-	go get github.com/tsg/xgo
-	go get github.com/tsg/gotpl
+	go get -u github.com/tsg/xgo
+	go get -u github.com/tsg/gotpl
 
 .PHONY: xgo-image
 xgo-image:
