@@ -1,4 +1,4 @@
 beat_name: winlogbeat
-beat_url: 'https://github.com/elastic/winlogbeat'
-beat_repo: 'github.com/elastic/winlogbeat'
+beat_url: 'https://github.com/elastic/beats/winlogbeat'
+beat_repo: 'github.com/elastic/beats/winlogbeat'
 beat_description: Ships Windows event logs to Elasticsearch or Logstash

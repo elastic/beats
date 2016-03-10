@@ -1,4 +1,4 @@
 beat_name: packetbeat
-beat_url: 'https://github.com/elastic/packetbeat'
-beat_repo: 'github.com/elastic/packetbeat'
+beat_url: 'https://github.com/elastic/beats/packetbeat'
+beat_repo: 'github.com/elastic/beats/packetbeat'
 beat_description: A network analyzer tool that sends data to Elasticsearch.
