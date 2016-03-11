@@ -66,6 +66,15 @@ Contains data from a Windows event log record.
 
 
 
+==== activity_id
+
+type: string
+
+required: False
+
+A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
+
+
 ==== computer_name
 
 type: string
@@ -75,13 +84,13 @@ required: True
 The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
 
 
-==== category
+==== event_data
 
-type: string
+type: dictionary
 
 required: False
 
-The category for this event. The meaning of this value depends on the source of the event.
+The event specific data. This field is mutually exclusive with `user_data`.
 
 
 ==== event_id
@@ -91,6 +100,15 @@ type: long
 required: True
 
 The event identifier. The value is specific to the source of the event.
+
+
+==== keywords
+
+type: string[]
+
+required: False
+
+The keywords are used to classify an event.
 
 
 ==== log_name
@@ -106,7 +124,7 @@ The name of the event log from which this record was read. This value is one of 
 
 type: string
 
-required: True
+required: False
 
 The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
@@ -126,16 +144,7 @@ type: string
 
 required: False
 
-The error that occurred while reading and formatting the message from the log. This field is mutually exclusive with `message`.
-
-
-==== message_inserts
-
-type: list
-
-required: False
-
-The raw message data logged by an application. Normally this data is inserted into a parameterized string to create `message`, but in case of an error, Winlogbeat attempts to provide this raw data. This field is mutually exclusive with `message`.
+The error that occurred while reading and formatting the message from the log.
 
 
 ==== record_number
@@ -147,6 +156,42 @@ required: True
 The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
 
 
+==== related_activity_id
+
+type: string
+
+required: False
+
+A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
+
+
+==== opcode
+
+type: string
+
+required: False
+
+The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
+
+
+==== provider_guid
+
+type: string
+
+required: False
+
+A globally unique identifier that identifies the provider that logged the event.
+
+
+==== process_id
+
+type: long
+
+required: False
+
+The process_id identifies the process that generated the event.
+
+
 ==== source_name
 
 type: string
@@ -154,6 +199,33 @@ type: string
 required: True
 
 The source of the event log record (the application or service that logged the record).
+
+
+==== task
+
+type: string
+
+required: False
+
+The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
+
+
+==== thread_id
+
+type: long
+
+required: False
+
+The thread_id identifies the thread that generated the event.
+
+
+==== user_data
+
+type: dictionary
+
+required: False
+
+The event specific data. This field is mutually exclusive with `event_data`.
 
 
 ==== user.identifier
@@ -195,4 +267,12 @@ required: False
 
 The type of account associated with this event.
 
+
+==== version
+
+type: int
+
+required: False
+
+The version number of the event's definition.
 

@@ -56,6 +56,14 @@ eventlog:
   description: >
     Contains data from a Windows event log record.
   fields:
+    - name: activity_id
+      type: string
+      required: false
+      description: >
+        A globally unique identifier that identifies the current activity. The
+        events that are published with this identifier are part of the same
+        activity.
+
     - name: computer_name
       type: string
       required: true
@@ -63,12 +71,12 @@ eventlog:
         The name of the computer that generated the record. When using Windows
         event forwarding, this name can differ from the `beat.hostname`.
 
-    - name: category
-      type: string
+    - name: event_data
+      type: dictionary
       required: false
       description: >
-        The category for this event. The meaning of this value depends on the
-        source of the event.
+        The event specific data. This field is mutually exclusive with
+        `user_data`.
 
     - name: event_id
       type: long
@@ -76,19 +84,26 @@ eventlog:
       description: >
         The event identifier. The value is specific to the source of the event.
 
+    - name: keywords
+      type: string[]
+      required: false
+      description: >
+        The keywords are used to classify an event.
+
     - name: log_name
       type: string
       required: true
       description: >
-        The name of the event log from which this record was read. This value is one
-        of the names from the `event_logs` collection in the configuration.
+        The name of the event log from which this record was read. This value is
+        one of the names from the `event_logs` collection in the configuration.
 
     - name: level
       type: string
-      required: true
+      required: false
       description: >
-        The level of the event. There are five levels of events that can be logged:
-        Success, Information, Warning, Error, Audit Success, and Audit Failure.
+        The level of the event. There are five levels of events that can be
+        logged: Success, Information, Warning, Error, Audit Success, and Audit
+        Failure.
 
     - name: message
       type: string
@@ -104,16 +119,7 @@ eventlog:
       required: false
       description: >
         The error that occurred while reading and formatting the message from
-        the log. This field is mutually exclusive with `message`.
-
-    - name: message_inserts
-      type: list
-      required: false
-      description: >
-        The raw message data logged by an application. Normally this data is
-        inserted into a parameterized string to create `message`, but in case of
-        an error, Winlogbeat attempts to provide this raw data. This field is
-        mutually exclusive with `message`.
+        the log.
 
     - name: record_number
       type: string
@@ -125,12 +131,63 @@ eventlog:
         for the Event Logging API and 2^64^ for the Windows Event Log API),
         the next record number will be 0.
 
+    - name: related_activity_id
+      type: string
+      required: false
+      description: >
+        A globally unique identifier that identifies the activity to which
+        control was transferred to. The related events would then have this
+        identifier as their `activity_id` identifier.
+
+    - name: opcode
+      type: string
+      required: false
+      description: >
+        The opcode defined in the event. Task and opcode are typically used to
+        identify the location in the application from where the event was
+        logged.
+
+    - name: provider_guid
+      type: string
+      required: false
+      description: >
+        A globally unique identifier that identifies the provider that logged
+        the event.
+
+    - name: process_id
+      type: long
+      required: false
+      description: >
+        The process_id identifies the process that generated the event.
+
     - name: source_name
       type: string
       required: true
       description: >
         The source of the event log record (the application or service that
         logged the record).
+
+    - name: task
+      type: string
+      required: false
+      description: >
+        The task defined in the event. Task and opcode are typically used to
+        identify the location in the application from where the event was
+        logged. The category used by the Event Logging API (on pre Windows Vista
+        operating systems) is written to this field.
+
+    - name: thread_id
+      type: long
+      required: false
+      description: >
+        The thread_id identifies the thread that generated the event.
+
+    - name: user_data
+      type: dictionary
+      required: false
+      description: >
+        The event specific data. This field is mutually exclusive with
+        `event_data`.
 
     - name: user.identifier
       type: string
@@ -163,6 +220,11 @@ eventlog:
       required: false
       description: >
         The type of account associated with this event.
+
+    - name: version
+      type: int
+      required: false
+      description: The version number of the event's definition.
 
 sections:
   - ["common", "Common Beat"]

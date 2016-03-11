@@ -13,7 +13,6 @@ if sys.platform.startswith("win"):
 Contains tests for reading from the Windows Event Log (both APIs).
 """
 
-
 class Test(BaseTest):
     providerName = "WinlogbeatTestPython"
     applicationName = "SystemTest"
@@ -58,10 +57,40 @@ class Test(BaseTest):
 
     def get_sid_string(self):
         if self.sidString == None:
-            self.sidString = win32security.ConvertSidToStringSid(
-                self.get_sid())
+            self.sidString = win32security.ConvertSidToStringSid(self.get_sid())
 
         return self.sidString
+
+    def assert_common_fields(self, evt, api, msg=None, eventID=10, sid=None, extra=None):
+        assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
+        assert "record_number" in evt
+        self.assertDictContainsSubset({
+            "count": 1,
+            "event_id": eventID,
+            "level": "Information",
+            "log_name": self.providerName,
+            "source_name": self.applicationName,
+            "type": api,
+        }, evt)
+
+        if msg == None:
+            assert "message" not in evt
+        else:
+            self.assertEquals(evt["message"], msg)
+            self.assertDictContainsSubset({"event_data.param1": msg}, evt)
+
+        if sid == None:
+            self.assertEquals(evt["user.identifier"], self.get_sid_string())
+            self.assertEquals(evt["user.name"].lower(), win32api.GetUserName().lower())
+            self.assertEquals(evt["user.type"], "User")
+            assert "user.domain" in evt
+        else:
+            self.assertEquals(evt["user.identifier"], sid)
+            assert "user.name" not in evt
+            assert "user.type" not in evt
+
+        if extra != None:
+            self.assertDictContainsSubset(extra, evt)
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_eventlogging_read_one_event(self):
@@ -75,12 +104,15 @@ class Test(BaseTest):
         """
         Win Event Log - Read one event
         """
-        self.read_one_event("wineventlog")
+        evt = self.read_one_event("wineventlog")
+        self.assertDictContainsSubset({
+            "keywords": ["Classic"],
+            "opcode": "Info",
+        }, evt)
 
     def read_one_event(self, api):
         msg = "Read One Event Testcase"
-        eventID = 11
-        self.write_event_log(msg, eventID)
+        self.write_event_log(msg)
 
         # Run Winlogbeat
         self.render_config_template(
@@ -96,19 +128,7 @@ class Test(BaseTest):
         events = self.read_output()
         assert len(events) == 1
         evt = events[0]
-        assert evt["type"] == api
-        assert evt["event_id"] == eventID
-        assert evt["level"] == "Information"
-        assert evt["log_name"] == self.providerName
-        assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower(
-        ) == win32api.GetComputerName().lower()
-        assert evt["user.identifier"] == self.get_sid_string()
-        assert evt["user.name"] == win32api.GetUserName()
-        assert "user.type" in evt
-        assert "user.domain" in evt
-        assert evt["message"] == msg
-
+        self.assert_common_fields(evt, api, msg)
         return evt
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
@@ -118,7 +138,6 @@ class Test(BaseTest):
         """
         evt = self.read_unknown_event_id("eventlogging")
 
-        assert "message_inserts" in evt
         assert evt["message_error"].lower() == ("The system cannot find "
                                                 "message text for message number 1111 in the message file for "
                                                 "C:\\Windows\\system32\\EventCreate.exe.").lower()
@@ -129,11 +148,14 @@ class Test(BaseTest):
         Win Event Log - Read unknown event ID
         """
         evt = self.read_unknown_event_id("wineventlog")
+        self.assertDictContainsSubset({
+            "keywords": ["Classic"],
+            "opcode": "Info",
+        }, evt)
 
-        # TODO: messageInserts has not been implemented for wineventlog.
-        # assert "messageInserts" in evt
-        assert evt["message_error"] == ("the message resource is present but "
-                                        "the message is not found in the string/message table")
+        # No rendering error is being given.
+        #assert evt["message_error"] == ("the message resource is present but "
+        #                                "the message is not found in the string/message table")
 
     def read_unknown_event_id(self, api):
         msg = "Unknown Event ID Testcase"
@@ -154,19 +176,7 @@ class Test(BaseTest):
         events = self.read_output()
         assert len(events) == 1
         evt = events[0]
-        assert evt["type"] == api
-        assert evt["event_id"] == eventID
-        assert evt["level"] == "Information"
-        assert evt["log_name"] == self.providerName
-        assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower(
-        ) == win32api.GetComputerName().lower()
-        assert evt["user.identifier"] == self.get_sid_string()
-        assert evt["user.name"] == win32api.GetUserName()
-        assert "user.type" in evt
-        assert "user.domain" in evt
-        assert "message" not in evt
-
+        self.assert_common_fields(evt, api, None, eventID=1111, extra={"event_data.param1": msg})
         return evt
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
@@ -181,7 +191,11 @@ class Test(BaseTest):
         """
         Win Event Log - Read event with unknown SID
         """
-        self.read_unknown_sid("wineventlog")
+        evt = self.read_unknown_sid("wineventlog")
+        self.assertDictContainsSubset({
+            "keywords": ["Classic"],
+            "opcode": "Info",
+        }, evt)
 
     def read_unknown_sid(self, api):
         # Fake SID that was made up.
@@ -189,8 +203,7 @@ class Test(BaseTest):
         sid = win32security.ConvertStringSidToSid(accountIdentifier)
 
         msg = "Unknown SID of " + accountIdentifier
-        eventID = 40
-        self.write_event_log(msg, eventID, sid)
+        self.write_event_log(msg, sid=sid)
 
         # Run Winlogbeat
         self.render_config_template(
@@ -206,19 +219,7 @@ class Test(BaseTest):
         events = self.read_output()
         assert len(events) == 1
         evt = events[0]
-        assert evt["type"] == api
-        assert evt["event_id"] == eventID
-        assert evt["level"] == "Information"
-        assert evt["log_name"] == self.providerName
-        assert evt["source_name"] == self.applicationName
-        assert evt["computer_name"].lower(
-        ) == win32api.GetComputerName().lower()
-        assert evt["user.identifier"] == accountIdentifier
-        assert "user.name" not in evt
-        assert "user.type" not in evt
-        assert "user.domain" not in evt
-        assert evt["message"] == msg
-
+        self.assert_common_fields(evt, api, msg, sid=accountIdentifier)
         return evt
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
@@ -267,6 +268,7 @@ class Test(BaseTest):
             "local": "field",
             "tags": ["global", "local"],
         }, evt)
+        return evt
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_eventlogging_fields_not_under_root(self):
@@ -311,3 +313,4 @@ class Test(BaseTest):
             "fields.local": "field",
             "fields.num": 1,
         }, evt)
+        return evt

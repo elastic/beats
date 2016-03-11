@@ -250,9 +250,9 @@ loop:
 			// of event if it is going to be filtered.
 			// TODO: Add a severity filter.
 			// TODO: Check the global IgnoreOlder filter.
-			if ignoreOlder != 0 && time.Since(lr.TimeGenerated) > ignoreOlder {
-				detailf("EventLog[%s] ignore_older filter dropping event: %s",
-					api.Name(), lr.String())
+			if ignoreOlder != 0 && time.Since(lr.TimeCreated.SystemTime) > ignoreOlder {
+				detailf("EventLog[%s] ignore_older filter dropping event: %+v",
+					api.Name(), lr)
 				ignoredEvents.Add("total", 1)
 				ignoredEvents.Add(api.Name(), 1)
 				continue
@@ -276,8 +276,8 @@ loop:
 		}
 
 		eb.checkpoint.Persist(api.Name(),
-			records[len(records)-1].RecordNumber,
-			records[len(records)-1].TimeGenerated.UTC())
+			records[len(records)-1].RecordID,
+			records[len(records)-1].TimeCreated.SystemTime.UTC())
 	}
 }
 

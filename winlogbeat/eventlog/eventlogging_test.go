@@ -190,9 +190,9 @@ func TestRead(t *testing.T) {
 	assert.Len(t, records, len(messages))
 	for _, record := range records {
 		t.Log(record)
-		m, exists := messages[record.EventID]
+		m, exists := messages[record.EventIdentifier.ID]
 		if !exists {
-			t.Errorf("Unknown EventId %d Read() from event log. %v", record.EventID, record)
+			t.Errorf("Unknown EventId %d Read() from event log. %v", record.EventIdentifier.ID, record)
 			continue
 		}
 		assert.Equal(t, eventlogging.EventType(m.eventType).String(), record.Level)
@@ -253,9 +253,9 @@ func TestReadUnknownEventId(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
-	assert.Equal(t, msg, records[0].MessageInserts[0])
-	assert.NotNil(t, records[0].MessageErr)
+	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
+	assert.Equal(t, msg, records[0].EventData.Pairs[0].Value)
+	assert.NotNil(t, records[0].RenderErr)
 	assert.Equal(t, "", records[0].Message)
 }
 
@@ -310,7 +310,7 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
 	assert.Equal(t, msg, strings.TrimRight(records[0].Message, "\r\n"))
 }
 
@@ -366,7 +366,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
 	assert.Equal(t, fmt.Sprintf(template, msgs[0], msgs[1]),
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -435,7 +435,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
 	assert.Equal(t, template,
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -487,7 +487,7 @@ func TestReadWhileCleared(t *testing.T) {
 	assert.NoError(t, err, "Expected 1 message but received error")
 	assert.Len(t, lr, 1, "Expected 1 message")
 	if len(lr) > 0 {
-		assert.Equal(t, uint32(3), lr[0].EventID)
+		assert.Equal(t, uint32(3), lr[0].EventIdentifier.ID)
 	}
 }
 
