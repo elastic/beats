@@ -173,6 +173,7 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err e
 
 	for _, host := range ms.Config.Hosts {
 		c := m.redisPools[host].Get()
+
 		// TODO: Do better error reporting
 		if c == nil {
 			logp.Err("Connection object for host %s is nil", host)

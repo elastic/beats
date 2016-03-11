@@ -40,6 +40,7 @@ func TestConnect(t *testing.T) {
 	assert.NoError(t, mErr)
 	assert.NoError(t, msErr)
 
+	ms.Setup()
 	data, err := ms.MetricSeter.Fetch(ms)
 	assert.NoError(t, err)
 
