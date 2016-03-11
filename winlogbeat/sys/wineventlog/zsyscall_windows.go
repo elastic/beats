@@ -77,8 +77,8 @@ func _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) {
 	return
 }
 
-func _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths *uint16, flags EvtRenderContextFlag) (handle EvtHandle, err error) {
-	r0, _, e1 := syscall.Syscall(procEvtCreateRenderContext.Addr(), 3, uintptr(ValuePathsCount), uintptr(unsafe.Pointer(valuePaths)), uintptr(flags))
+func _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) {
+	r0, _, e1 := syscall.Syscall(procEvtCreateRenderContext.Addr(), 3, uintptr(ValuePathsCount), uintptr(valuePaths), uintptr(flags))
 	handle = EvtHandle(r0)
 	if handle == 0 {
 		if e1 != 0 {

@@ -31,6 +31,8 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
 
 *Winlogbeat*
+- The `message_inserts` field was replaced with the `event_data` field {issue}1053[1053]
+- The `category` field was renamed to `task` to better align with the Windows Event Log API naming {issue}1053[1053]
 
 
 ==== Bugfixes
@@ -96,6 +98,9 @@ https://github.com/elastic/beats/compare/v1.1.0...master[Check the HEAD diff]
 - Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
 - Improve config validation by checking for unknown top-level YAML keys. {pull}1100[1100]
 - Add the ability to set tags, fields, and fields_under_root as options for each event log {pull}1092[1092]
+- Add additional data to the events published by Winlogbeat. The new fields are `activity_id`,
+`event_data`, `keywords`, `opcode`, `process_id`, `provider_guid`, `related_activity_id`,
+`task`, `thread_id`, `user_data`. and `version`. {issue}1053[1053]
 
 ==== Deprecated
 

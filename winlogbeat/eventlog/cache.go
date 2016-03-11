@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/elastic/beats/winlogbeat/sys"
 )
 
 // Stats for the message file caches.
@@ -26,7 +26,7 @@ const (
 
 // Function type for loading event message files associated with the given
 // event log and source name.
-type messageFileLoaderFunc func(eventLogName, sourceName string) eventlogging.MessageFiles
+type messageFileLoaderFunc func(eventLogName, sourceName string) sys.MessageFiles
 
 // Function type for freeing Handles.
 type freeHandleFunc func(handle uintptr) error
@@ -75,7 +75,7 @@ func newMessageFilesCache(eventLogName string, loader messageFileLoaderFunc,
 // If no item is cached, then one is loaded, stored, and returned.
 // Callers should check the MessageFiles.Err value to see if an error occurred
 // while loading the message files.
-func (hc *messageFilesCache) get(sourceName string) eventlogging.MessageFiles {
+func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
 	v := hc.cache.Get(sourceName)
 	if v == nil {
 		hc.miss()
@@ -89,11 +89,11 @@ func (hc *messageFilesCache) get(sourceName string) eventlogging.MessageFiles {
 		existing := hc.cache.PutIfAbsent(sourceName, v)
 		if existing != nil {
 			// A value was already loaded, so free the handles we just created.
-			messageFiles, _ := v.(eventlogging.MessageFiles)
+			messageFiles, _ := v.(sys.MessageFiles)
 			hc.freeHandles(messageFiles)
 
 			// Return the existing cached value.
-			messageFiles, _ = existing.(eventlogging.MessageFiles)
+			messageFiles, _ = existing.(sys.MessageFiles)
 			return messageFiles
 		}
 		hc.size()
@@ -101,7 +101,7 @@ func (hc *messageFilesCache) get(sourceName string) eventlogging.MessageFiles {
 		hc.hit()
 	}
 
-	messageFiles, _ := v.(eventlogging.MessageFiles)
+	messageFiles, _ := v.(sys.MessageFiles)
 	return messageFiles
 }
 
@@ -111,7 +111,7 @@ func (hc *messageFilesCache) evictionHandler(k common.Key, v common.Value) {
 	// Update the size on a different goroutine after the callback completes.
 	defer func() { go hc.size() }()
 
-	messageFiles, ok := v.(eventlogging.MessageFiles)
+	messageFiles, ok := v.(sys.MessageFiles)
 	if !ok {
 		return
 	}
@@ -123,7 +123,7 @@ func (hc *messageFilesCache) evictionHandler(k common.Key, v common.Value) {
 
 // freeHandles free the event message file Handles so that the modules can
 // be unloaded. The Handles are no longer valid after being freed.
-func (hc *messageFilesCache) freeHandles(mf eventlogging.MessageFiles) {
+func (hc *messageFilesCache) freeHandles(mf sys.MessageFiles) {
 	for _, fh := range mf.Handles {
 		err := hc.freer(fh.Handle)
 		if err != nil {

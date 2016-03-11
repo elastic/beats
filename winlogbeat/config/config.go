@@ -41,7 +41,7 @@ func (s Settings) Validate() error {
 
 	// Check for invalid top-level keys.
 	var errs multierror.Errors
-	for k, _ := range s.All {
+	for k := range s.All {
 		k = strings.ToLower(k)
 		i := sort.SearchStrings(validKeys, k)
 		if i >= len(validKeys) || validKeys[i] != k {
