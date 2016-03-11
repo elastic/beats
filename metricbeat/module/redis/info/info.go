@@ -136,19 +136,23 @@ func New() helper.MetricSeter {
 
 type MetricSeter struct {
 	redisPools map[string]*rd.Pool
+	databases  []int
 }
 
 // Configure connection pool for each Redis host
 func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
 
 	config := struct {
-		Hosts   []string `config:"hosts"`
-		Network string   `config:"network"`
-		MaxConn int      `config:"maxconn"`
+		Hosts     []string `config:"hosts"`
+		Network   string   `config:"network"`
+		MaxConn   int      `config:"maxconn"`
+		Databases []int    `config:"databases"`
 	}{}
 	if err := cfg.Unpack(&config); err != nil {
 		return err
 	}
+
+	m.databases = config.Databases
 
 	for _, host := range config.Hosts {
 		// Set up redis pool
@@ -178,7 +182,7 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err e
 			logp.Err("Error converting to string: %v", err)
 		}
 
-		event := eventMapping(parseRedisInfo(out))
+		event := eventMapping(parseRedisInfo(out), m.databases)
 		events = append(events, event)
 	}
 
@@ -196,10 +200,15 @@ func parseRedisInfo(info string) map[string]string {
 
 	for _, value := range result {
 		// Values are separated by :
-		parts := strings.Split(value, ":")
+		parts := parseRedisLine(value, ":")
 		if len(parts) == 2 {
 			values[parts[0]] = parts[1]
 		}
 	}
 	return values
+}
+
+// parseRedisLine parses a single line returned by INFO
+func parseRedisLine(s string, delimeter string) []string {
+	return strings.Split(s, delimeter)
 }

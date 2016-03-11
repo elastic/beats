@@ -8,7 +8,36 @@ import (
 )
 
 // Map data to MapStr
-func eventMapping(info map[string]string) common.MapStr {
+func eventMapping(info map[string]string, dbs []int) common.MapStr {
+
+	// Sort out keyspace stats
+	keyspace := map[string]common.MapStr{}
+	for _, i := range dbs {
+		// Create DB key
+		s := strconv.Itoa(i)
+		dbKey := "db" + s
+
+		// Extract out the overloaded values for db keyspace
+		// fmt: info[db0] = keys=795341,expires=0,avg_ttl=0
+		dbInfo := parseRedisLine(info[dbKey], ",")
+
+		if len(dbInfo) == 3 {
+			db := map[string]string{}
+			for _, dbEntry := range dbInfo {
+				stats := parseRedisLine(dbEntry, "=")
+
+				if len(stats) == 2 {
+					db[stats[0]] = stats[1]
+				}
+			}
+			keyspace[dbKey] = common.MapStr{
+				"keys":    toInt(db["keys"]),
+				"expires": toInt(db["expires"]),
+				"avg_ttl": toInt(db["avg_ttl"]),
+			}
+
+		}
+	}
 
 	// Full mapping from info
 	event := common.MapStr{
@@ -100,6 +129,7 @@ func eventMapping(info map[string]string) common.MapStr {
 			"latest_fork_usec":       info["latest_fork_usec"],
 			"migrate_cached_sockets": info["migrate_cached_sockets"],
 		},
+		"keyspace": keyspace,
 	}
 
 	return event
