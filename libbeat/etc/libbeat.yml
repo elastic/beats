@@ -195,7 +195,7 @@ shipper:
 
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested
-  # combination of these. 
+  # combination of these.
   #fields:
   #  env: staging
 
@@ -235,7 +235,7 @@ shipper:
 
 ############################# Logging #########################################
 
-# There are three options for the log ouput: syslog, file, stderr.
+# There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 logging:
