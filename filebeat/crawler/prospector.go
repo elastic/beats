@@ -133,6 +133,18 @@ func (p *Prospector) setupProspectorConfig() error {
 		return fmt.Errorf("No paths were defined for prospector")
 	}
 
+	if config.Harvester.JSON != nil && len(config.Harvester.JSON.MessageKey) == 0 &&
+		config.Harvester.Multiline != nil {
+
+		return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
+	}
+
+	if config.Harvester.JSON != nil && len(config.Harvester.JSON.MessageKey) == 0 &&
+		(len(config.Harvester.IncludeLines) > 0 || len(config.Harvester.ExcludeLines) > 0) {
+
+		return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
+	}
+
 	return nil
 }
 

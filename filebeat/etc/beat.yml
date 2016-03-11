@@ -30,6 +30,28 @@ filebeat:
       #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
       #encoding: plain
 
+
+      # Decode JSON options. Enable this if your logs are structured in JSON.
+      #json:
+        # JSON key on which to apply the line filtering and multiline settings. This key
+        # must be top level and its value must be string, otherwise it is ignored. If
+        # no text key is defined, the line filtering and multiline features cannot be used.
+        #message_key:
+
+        # By default, the decoded JSON is placed under a "json" key in the output document.
+        # If you enable this setting, the keys are copied top level in the output document.
+        #keys_under_root: false
+
+        # If keys_under_root and this setting are enabled, then the values from the decoded
+        # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
+        # in case of conflicts.
+        #overwrite_keys: false
+
+        # If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
+        # unmarshaling errors or when a text key is defined in the configuration but cannot
+        # be used.
+        #add_error_key: false
+
       # Exclude lines. A list of regular expressions to match. It drops the lines that are
       # matching any regular expression from the list. The include_lines is called before
       # exclude_lines. By default, no lines are dropped.

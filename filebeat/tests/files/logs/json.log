@@ -1,0 +1,3 @@
+{"host": "test", "timestamp": "2016-02-25 13:00:00", "module": "libbeat", "message": "hello json world"}
+{"host": "test", "timestamp": "2016-02-25 13:00:01", "module": "topbeat", "message": "hello topbeat"}
+{"host": "test", "timestamp": "2016-02-25 13:00:01", "module": "filebeat", "message": "hello filebeat"}

@@ -1,0 +1,5 @@
+{"log":"[log] The following are log messages\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"[log] This one is\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":" on multiple\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":" lines","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}
+{"log":"[log] In total there should be 3 events\n","stream":"stdout","time":"2016-03-02T22:58:51.338462311Z"}

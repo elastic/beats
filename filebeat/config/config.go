@@ -76,6 +76,14 @@ type HarvesterConfig struct {
 	IncludeLines       []string         `config:"include_lines"`
 	MaxBytes           int              `config:"max_bytes"`
 	Multiline          *MultilineConfig `config:"multiline"`
+	JSON               *JSONConfig      `config:"json"`
+}
+
+type JSONConfig struct {
+	MessageKey    string `config:"message_key"`
+	KeysUnderRoot bool   `config:"keys_under_root"`
+	OverwriteKeys bool   `config:"overwrite_keys"`
+	AddErrorKey   bool   `config:"add_error_key"`
 }
 
 type MultilineConfig struct {
