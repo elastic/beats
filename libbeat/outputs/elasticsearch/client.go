@@ -249,6 +249,38 @@ func (client *Client) PublishEvent(event common.MapStr) error {
 	return nil
 }
 
+// LoadTemplate loads a template into Elasticsearch overwriting the existing
+// template if it exists. If you wish to not overwrite an existing template
+// then use CheckTemplate prior to calling this method.
+func (client *Client) LoadTemplate(templateName string, reader *bytes.Reader) error {
+
+	status, _, err := client.execRequest("PUT", client.URL+"/_template/"+templateName, reader)
+
+	if err != nil {
+		return fmt.Errorf("Template could not be loaded. Error: %s", err)
+	}
+	if status != 200 {
+		return fmt.Errorf("Template could not be loaded. Status: %v", status)
+	}
+
+	logp.Info("Elasticsearch template with name '%s' loaded", templateName)
+
+	return nil
+}
+
+// CheckTemplate checks if a given template already exist. It returns true if
+// and only if Elasticsearch returns with HTTP status code 200.
+func (client *Client) CheckTemplate(templateName string) bool {
+
+	status, _, _ := client.request("HEAD", "/_template/"+templateName, nil, nil)
+
+	if status != 200 {
+		return false
+	}
+
+	return true
+}
+
 func (conn *Connection) Connect(timeout time.Duration) error {
 	var err error
 	conn.connected, err = conn.Ping(timeout)
@@ -290,7 +322,7 @@ func (conn *Connection) request(
 	body interface{},
 ) (int, []byte, error) {
 	url := makeURL(conn.URL, path, params)
-	logp.Debug("elasticsearch", "%s %s %s", method, url, body)
+	logp.Debug("elasticsearch", "%s %s %v", method, url, body)
 
 	var obj []byte
 	if body != nil {

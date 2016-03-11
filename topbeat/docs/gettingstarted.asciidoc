@@ -144,8 +144,43 @@ http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates
 template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
-The recommended template file is installed by the Topbeat packages. Load it with the
-following command:
+The recommended template file is installed by the Topbeat packages. It can be either loaded by the beat
+or through a bash / powershell script.
+
+==== Load Template with Beat
+
+To load the template through your beat, the elasticsearch output must be enabled. In your configuration file,
+uncomment the template part under elasticsearch output. By default the template is named the same as the beat.
+Adjust the path to your template file. In case a template already exists in the index, it is not overwritten.
+To overwrite an existing template, enable `overwrite: true`.
+
+[source,yaml]
+----------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: ["localhost:9200"]
+
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is disabled and no template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones
+    template:
+
+      # Template name. By default the template name is filebeat.
+      #name: "topbeat"
+
+      # Path to template file
+      path: "topbeat.template.json"
+
+      # Overwrite existing template
+      #overwrite: false
+----------------------------------------------------------------------
+
+The template is then loaded as soon as the beat is started up.
+
+
+==== Load Template with Shell Script
+
+The template can be loaded with the following command
 
 *deb or rpm:*
 
