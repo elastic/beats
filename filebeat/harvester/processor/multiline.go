@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // MultiLine processor combining multiple line events into one multi-line event.
@@ -31,6 +32,7 @@ type MultiLine struct {
 	last      []byte
 	readBytes int // bytes as read from input source
 	numLines  int
+	fields    common.MapStr
 
 	err   error // last seen error
 	state func(*MultiLine) (Line, error)
@@ -213,20 +215,23 @@ func (mlr *MultiLine) startNewLine(l Line) Line {
 	retLine := mlr.pushLine()
 	mlr.addLine(l)
 	mlr.ts = l.Ts
+	mlr.fields = l.Fields
 	return retLine
 }
 
 func (mlr *MultiLine) pushLine() Line {
 	content := mlr.content
 	sz := mlr.readBytes
+	fields := mlr.fields
 
 	mlr.content = nil
 	mlr.last = nil
 	mlr.readBytes = 0
 	mlr.numLines = 0
 	mlr.err = nil
+	mlr.fields = nil
 
-	return Line{Ts: mlr.ts, Content: content, Bytes: sz}
+	return Line{Ts: mlr.ts, Content: content, Fields: fields, Bytes: sz}
 }
 
 func (mlr *MultiLine) addLine(l Line) {
