@@ -13,13 +13,13 @@ all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/b
 packetbeat topbeat filebeat winlogbeat: build/upload
 	# cross compile on ubuntu
 	cd build && xgo -image=tudorg/beats-builder \
-		-before-build=../xgo-scripts/$@_before_build.sh \
+		-before-build=../xgo-scripts/before_build.sh \
 		-pkg $@ \
 		-source ../../.. \
 		github.com/elastic/beats
 	# linux builds on debian 6
 	cd build && xgo -image=tudorg/beats-builder-deb6 \
-		-before-build=../xgo-scripts/$@_before_build.sh \
+		-before-build=../xgo-scripts/before_build.sh \
 		-pkg $@ \
 		-source ../../.. \
 		github.com/elastic/beats
