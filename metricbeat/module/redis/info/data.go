@@ -8,10 +8,10 @@ import (
 )
 
 // Map data to MapStr
-func eventMapping(info map[string]string, dbs []int) common.MapStr {
+func eventMapping(info map[string]string, keyspaceMap map[string]string) common.MapStr {
 
 	// Sort out keyspace stats
-	keyspace := getKeyspaceStats(info, dbs)
+	keyspace := getKeyspaceStats(keyspaceMap)
 
 	// Full mapping from info
 	event := common.MapStr{
@@ -109,16 +109,13 @@ func eventMapping(info map[string]string, dbs []int) common.MapStr {
 	return event
 }
 
-func getKeyspaceStats(info map[string]string, dbs []int) map[string]common.MapStr {
+func getKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
 	keyspace := map[string]common.MapStr{}
-	for _, i := range dbs {
-		// Create DB key
-		s := strconv.Itoa(i)
-		dbKey := "db" + s
+	for k, v := range keyspaceMap {
 
 		// Extract out the overloaded values for db keyspace
 		// fmt: info[db0] = keys=795341,expires=0,avg_ttl=0
-		dbInfo := parseRedisLine(info[dbKey], ",")
+		dbInfo := parseRedisLine(v, ",")
 
 		if len(dbInfo) == 3 {
 			db := map[string]string{}
@@ -129,12 +126,11 @@ func getKeyspaceStats(info map[string]string, dbs []int) map[string]common.MapSt
 					db[stats[0]] = stats[1]
 				}
 			}
-			keyspace[dbKey] = common.MapStr{
+			keyspace[k] = common.MapStr{
 				"keys":    toInt(db["keys"]),
 				"expires": toInt(db["expires"]),
 				"avg_ttl": toInt(db["avg_ttl"]),
 			}
-
 		}
 	}
 	return keyspace

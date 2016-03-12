@@ -95,6 +95,18 @@ The document sent to elasticsearch has the following structure:
 	      "total_connections_received": "146",
 	      "total_net_input_bytes": "2247",
 	      "total_net_output_bytes": "277354"
+	    },
+		"keyspace": {
+		  "db0": {
+		    "avg_ttl": 0,
+			"expires": 0,
+			"keys": 1
+		  },
+		  "db1": {
+			"avg_ttl": 0,
+			"expires": 0,
+			"keys": 1
+		  }
 	    }
 	  }
 	}
@@ -102,12 +114,6 @@ The document sent to elasticsearch has the following structure:
 
 The current implementation is tested with redis 3.0.7
 More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
-
-Currently not reported are Keyspaces coming in the following format:
-
-	# Keyspace
-	db0:keys=2,expires=0,avg_ttl=0
-	db3:keys=1,expires=0,avg_ttl=0
 */
 package info
 
@@ -136,23 +142,19 @@ func New() helper.MetricSeter {
 
 type MetricSeter struct {
 	redisPools map[string]*rd.Pool
-	databases  []int
 }
 
 // Configure connection pool for each Redis host
 func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
 
 	config := struct {
-		Hosts     []string `config:"hosts"`
-		Network   string   `config:"network"`
-		MaxConn   int      `config:"maxconn"`
-		Databases []int    `config:"databases"`
+		Hosts   []string `config:"hosts"`
+		Network string   `config:"network"`
+		MaxConn int      `config:"maxconn"`
 	}{}
 	if err := cfg.Unpack(&config); err != nil {
 		return err
 	}
-
-	m.databases = config.Databases
 
 	for _, host := range config.Hosts {
 		// Set up redis pool
@@ -175,18 +177,32 @@ func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 	for _, host := range ms.Config.Hosts {
-		c := m.redisPools[host].Get()
-		out, err := rd.String(c.Do("INFO"))
-		c.Close()
-		if err != nil {
-			logp.Err("Error converting to string: %v", err)
-		}
+		// Fetch default INFO
+		info := m.fetchRedisStats(host, "default")
 
-		event := eventMapping(parseRedisInfo(out), m.databases)
+		// TODO: Take this approach for all sub types, or grep out keyspace from info
+		//
+		// Fetch keyspace metrics, so they can be easily iterated over later.
+		// It might be nice to take this approach for all sub stats from
+		// INFO and allow user to configure which sub metric sets they collect.
+		keyspace := m.fetchRedisStats(host, "keyspace")
+
+		event := eventMapping(parseRedisInfo(info), parseRedisInfo(keyspace))
 		events = append(events, event)
 	}
 
 	return events, nil
+}
+
+func (m *MetricSeter) fetchRedisStats(host string, stat string) string {
+	c := m.redisPools[host].Get()
+	out, err := rd.String(c.Do("INFO", stat))
+	c.Close()
+
+	if err != nil {
+		logp.Err("Error converting to string: %v", err)
+	}
+	return out
 }
 
 // parseRedisInfo parses the string returned by the INFO command

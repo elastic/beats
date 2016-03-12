@@ -12,7 +12,6 @@ metricbeat:
       enabled: true
       network: tcp
       maxconn: 10
-      databases: [0]
       fields:
         datacenter: west
       #filter: ...

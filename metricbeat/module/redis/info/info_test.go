@@ -23,7 +23,6 @@ type RedisModuleConfig struct {
 	Enabled    bool     `config:"enabled"`
 	MaxConn    int      `config:"maxconn"`
 	Network    string   `config:"network"`
-	Databases  []int    `config:"databases"`
 
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
@@ -71,17 +70,16 @@ func TestKeyspace(t *testing.T) {
 
 func getRedisModuleConfig() (*ucfg.Config, error) {
 	return ucfg.NewFrom(RedisModuleConfig{
-		Module:    "redis",
-		Hosts:     []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
-		Network:   "tcp",
-		MaxConn:   10,
-		Databases: []int{0},
+		Module:  "redis",
+		Hosts:   []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
+		Network: "tcp",
+		MaxConn: 10,
 	})
 }
 
 // writeToRedis will write to the default DB 0
 func writeToRedis(host string) error {
-	c, err := rd.Dial("tcp", ":6379")
+	c, err := rd.Dial("tcp", host)
 	if err != nil {
 		return err
 	}
