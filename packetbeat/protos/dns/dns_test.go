@@ -228,6 +228,10 @@ func assertFlags(t testing.TB, m common.MapStr, flags []string) {
 			t.Fatalf("Unknown flag '%s' specified in test.", expected)
 		case "aa":
 			key = "dns.flags.authoritative"
+		case "ad":
+			key = "dns.flags.authentic_data"
+		case "cd":
+			key = "dns.flags.checking_disabled"
 		case "ra":
 			key = "dns.flags.recursion_available"
 		case "rd":

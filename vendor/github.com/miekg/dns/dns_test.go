@@ -99,8 +99,9 @@ func TestPackUnpack3(t *testing.T) {
 
 func TestBailiwick(t *testing.T) {
 	yes := map[string]string{
-		"miek.nl": "ns.miek.nl",
-		".":       "miek.nl",
+		"miek1.nl": "miek1.nl",
+		"miek.nl":  "ns.miek.nl",
+		".":        "miek.nl",
 	}
 	for parent, child := range yes {
 		if !IsSubDomain(parent, child) {

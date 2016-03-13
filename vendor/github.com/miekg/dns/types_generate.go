@@ -20,11 +20,11 @@ import (
 )
 
 var skipLen = map[string]struct{}{
-	"NSEC":     struct{}{},
-	"NSEC3":    struct{}{},
-	"OPT":      struct{}{},
-	"WKS":      struct{}{},
-	"IPSECKEY": struct{}{},
+	"NSEC":     {},
+	"NSEC3":    {},
+	"OPT":      {},
+	"WKS":      {},
+	"IPSECKEY": {},
 }
 
 var packageHdr = `
@@ -229,7 +229,10 @@ func main() {
 			if sl, ok := st.Field(i).Type().(*types.Slice); ok {
 				t := sl.Underlying().String()
 				t = strings.TrimPrefix(t, "[]")
-				t = strings.TrimPrefix(t, "github.com/miekg/dns.")
+				if strings.Contains(t, ".") {
+					splits := strings.Split(t, ".")
+					t = splits[len(splits)-1]
+				}
 				fmt.Fprintf(b, "%s := make([]%s, len(rr.%s)); copy(%s, rr.%s)\n",
 					f, t, f, f, f)
 				fields = append(fields, f)
