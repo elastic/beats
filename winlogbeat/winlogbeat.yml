@@ -147,9 +147,8 @@ output:
     # Optional load balance the events between the Logstash hosts
     #loadbalance: true
 
-    # Optional index name. The default index name depends on the each beat.
-    # For Packetbeat, the default is set to packetbeat, for Topbeat
-    # top topbeat and for Filebeat to filebeat.
+    # Optional index name. The default index name is set to name of the beat
+    # in all lowercase.
     #index: winlogbeat
 
     # SOCKS5 proxy server URL
@@ -191,7 +190,7 @@ output:
     #filename: winlogbeat
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
-    # rotated. The default value is 10 MB.
+    # rotated. The default value is 10240 kB.
     #rotate_every_kb: 10000
 
     # Maximum number of files under path. When this number of files is reached, the

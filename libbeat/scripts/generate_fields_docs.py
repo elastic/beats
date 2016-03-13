@@ -1,9 +1,13 @@
 import yaml
 import sys
 
-def document_fields(output, section, sections):
+def document_fields(output, section, sections, path):
     if "anchor" in section:
         output.write("[[exported-fields-{}]]\n".format(section["anchor"]))
+
+    if "prefix" in section:
+        output.write("{}\n".format(section["prefix"]))
+
     output.write("=== {} Fields\n\n".format(section["name"]))
 
     if "description" in section:
@@ -15,6 +19,11 @@ def document_fields(output, section, sections):
     output.write("\n")
     for field in section["fields"]:
 
+        if path == "":
+            newpath = field["name"]
+        else:
+            newpath = path + "." + field["name"]
+
         if "type" in field and field["type"] == "group":
 
             for value in sections:
@@ -24,15 +33,15 @@ def document_fields(output, section, sections):
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
-            document_fields(output, field, sections)
+            document_fields(output, field, sections, newpath)
         else:
-            document_field(output, field)
+            document_field(output, field, newpath)
 
 
-def document_field(output, field):
+def document_field(output, field, path):
 
     if "path" not in field:
-        field["path"] = field["name"]
+        field["path"] = path
 
     output.write("==== {}\n\n".format(field["path"]))
 
@@ -101,7 +110,7 @@ grouped in the following categories:
                 if section["type"] == "group":
                     section["name"] = name
                     section["anchor"] = doc
-                    document_fields(output, section, sections)
+                    document_fields(output, section, sections, "")
 
 
 if __name__ == "__main__":

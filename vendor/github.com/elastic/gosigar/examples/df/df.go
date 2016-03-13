@@ -4,18 +4,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/elastic/gosigar"
 	"os"
+
+	"github.com/elastic/gosigar"
 )
 
 const output_format = "%-15s %4s %4s %5s %4s %-15s\n"
 
 func formatSize(size uint64) string {
-	return sigar.FormatSize(size * 1024)
+	return gosigar.FormatSize(size * 1024)
 }
 
 func main() {
-	fslist := sigar.FileSystemList{}
+	fslist := gosigar.FileSystemList{}
 	fslist.Get()
 
 	fmt.Fprintf(os.Stdout, output_format,
@@ -24,7 +25,7 @@ func main() {
 	for _, fs := range fslist.List {
 		dir_name := fs.DirName
 
-		usage := sigar.FileSystemUsage{}
+		usage := gosigar.FileSystemUsage{}
 
 		usage.Get(dir_name)
 
@@ -33,7 +34,7 @@ func main() {
 			formatSize(usage.Total),
 			formatSize(usage.Used),
 			formatSize(usage.Avail),
-			sigar.FormatPercent(usage.UsePercent()),
+			gosigar.FormatPercent(usage.UsePercent()),
 			dir_name)
 	}
 }

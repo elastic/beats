@@ -15,13 +15,19 @@ type MetricSet struct {
 }
 
 // Creates a new MetricSet
-func NewMetricSet(name string, metricset MetricSeter, module *Module) *MetricSet {
+func NewMetricSet(name string, new func() MetricSeter, module *Module) (*MetricSet, error) {
+	metricSeter := new()
+	err := metricSeter.Setup(module.cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		Name:        name,
-		MetricSeter: metricset,
+		MetricSeter: metricSeter,
 		Config:      module.Config,
 		Module:      module,
-	}
+	}, nil
 }
 
 // RunMetric runs the given metricSet and returns the event

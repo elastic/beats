@@ -1,3 +1,5 @@
+// +build integration
+
 package status
 
 import (
@@ -11,23 +13,17 @@ import (
 
 func TestFetch(t *testing.T) {
 
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires MySQL")
-	}
-
-	// Setup Metric
-	m := New()
-
 	config := helper.ModuleConfig{
 		Hosts: []string{mysql.GetMySQLEnvDSN()},
 	}
 	module := &helper.Module{
 		Config: config,
 	}
-	ms := helper.NewMetricSet("status", m, module)
+	ms, msErr := helper.NewMetricSet("status", New, module)
+	assert.NoError(t, msErr)
 
 	// Load events
-	events, err := m.Fetch(ms)
+	events, err := ms.MetricSeter.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check event fields

@@ -9,7 +9,12 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("apache", Moduler{})
+	helper.Registry.AddModuler("apache", New)
+}
+
+// New creates new instance of Moduler
+func New() helper.Moduler {
+	return &Moduler{}
 }
 
 type Moduler struct{}

@@ -1,3 +1,5 @@
+// Need for unit and integration tests
+
 package logstash
 
 import (

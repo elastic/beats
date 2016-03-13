@@ -9,14 +9,15 @@ import (
 
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
+	"github.com/urso/ucfg"
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("mysql", "status", New())
+	helper.Registry.AddMetricSeter("mysql", "status", New)
 }
 
 // New creates new instance of MetricSeter
-func New() *MetricSeter {
+func New() helper.MetricSeter {
 	return &MetricSeter{
 		connections: map[string]*sql.DB{},
 	}
@@ -25,6 +26,11 @@ func New() *MetricSeter {
 // MetricSetter object
 type MetricSeter struct {
 	connections map[string]*sql.DB
+}
+
+// Setup any metric specific configuration
+func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
+	return nil
 }
 
 // Fetches status messages from mysql hosts

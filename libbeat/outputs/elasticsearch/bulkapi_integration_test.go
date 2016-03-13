@@ -1,3 +1,5 @@
+// +build integration
+
 package elasticsearch
 
 import (
@@ -11,9 +13,6 @@ import (
 func TestBulk(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
 	client := GetTestingElasticsearch()
@@ -66,9 +65,6 @@ func TestEmptyBulk(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
 	}
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Elasticsearch")
-	}
 
 	client := GetTestingElasticsearch()
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
@@ -90,9 +86,6 @@ func TestEmptyBulk(t *testing.T) {
 func TestBulkMoreOperations(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"elasticsearch"})
-	}
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Elasticsearch")
 	}
 
 	client := GetTestingElasticsearch()

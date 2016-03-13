@@ -1,33 +1,46 @@
+// +build integration
+
 package info
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/redis"
 )
 
+// Test Redis specific struct
+type RedisModuleConfig struct {
+	Hosts      []string `config:"hosts"`
+	Period     string   `config:"period"`
+	Module     string   `config:"module"`
+	MetricSets []string `config:"metricsets"`
+	Enabled    bool     `config:"enabled"`
+	MaxConn    int      `config:"maxconn"`
+	Network    string   `config:"network"`
+
+	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+}
+
 func TestConnect(t *testing.T) {
 
-	if testing.Short() {
-		t.Skip("Skipping in short mode, because it requires Redis")
-	}
+	config, _ := ucfg.NewFrom(RedisModuleConfig{
+		Module:  "redis",
+		Hosts:   []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
+		Network: "tcp",
+		MaxConn: 10,
+	})
 
-	// Setup
-	r := &MetricSeter{}
+	module, mErr := helper.NewModule(config, redis.New)
+	ms, msErr := helper.NewMetricSet("info", New, module)
+	assert.NoError(t, mErr)
+	assert.NoError(t, msErr)
 
-	config := helper.ModuleConfig{
-		Hosts: []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
-	}
-	module := &helper.Module{
-		Config: config,
-	}
-	ms := helper.NewMetricSet("info", r, module)
-
-	data, err := r.Fetch(ms)
+	data, err := ms.MetricSeter.Fetch(ms)
 	assert.NoError(t, err)
 
 	// Check fields

@@ -27,9 +27,9 @@ script:
   - gofmt -l . | read && echo "Code differs from gofmt's style. Run 'gofmt -w .'" 1>&2 && exit 1 || true
   - go vet
   - go build
-  - go test
+  - mkdir -p build/coverage
+  - go test -cover -coverprofile=build/coverage/unit.cov -coverpkg=github.com/elastic/gosigar -v .
+  - for i in $(ls examples); do go build -o examples/$i/$i ./examples/$i; ./examples/$i/$i; done
 
-matrix:
-  allow_failures:
-    # Investigating linux bug with gosigar's nproc value.
-    - os: linux
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f build/coverage/unit.cov

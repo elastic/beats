@@ -13,10 +13,13 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 
-	// List of all metrics to make sure they are registred
+	// List of all metrics to make sure they are registered
 	// Every new metric must be added here
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
+
+	// Redis module and metrics
+	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 )
 
