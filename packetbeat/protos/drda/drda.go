@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"strings"
 	"time"
 
 	"github.com/Intermernet/ebcdic"
@@ -216,8 +217,8 @@ func drdaMessageParser(s *DrdaStream) (bool, bool) {
 			if dataLength > 0 {
 
 				data = s.data[s.parseOffset+4 : s.parseOffset+4+dataLength]
-				parameter.ASCIIData = string(data)
-				parameter.EBCDICData = string(ebcdic.Decode(data))
+				parameter.ASCIIData = stripNonASCIIChars(string(data))
+				parameter.EBCDICData = stripNonASCIIChars(string(ebcdic.Decode(data)))
 			}
 
 			m.parameters[codePoint] = *parameter
@@ -438,10 +439,10 @@ func (drda *Drda) receivedDrdaRequest(msg *DrdaMessage) {
 		p["data_ascii"] = value.ASCIIData
 		p["data_ebcdic"] = value.EBCDICData
 		tmp[drdaAbbrev(key)] = p
-	}
 
-	if val, ok := msg.parameters[DRDA_CP_SQLSTT]; ok {
-		trans.Query = val.ASCIIData
+		if value.Codepoint == DRDA_CP_DATA {
+			trans.Query = value.ASCIIData
+		}
 	}
 
 	trans.Requests[fmt.Sprint(drdaAbbrev(msg.ddm.Codepoint), "_", msg.ddm.Cor)] = common.MapStr{
@@ -559,4 +560,13 @@ func (drda *Drda) publishTransaction(t *DrdaTransaction) {
 	logp.Debug("drda", "Transaction published")
 
 	drda.results.PublishTransaction(event)
+}
+
+func stripNonASCIIChars(str string) string {
+	return strings.Map(func(r rune) rune {
+		if r >= 32 && r < 127 {
+			return r
+		}
+		return -1
+	}, str)
 }
