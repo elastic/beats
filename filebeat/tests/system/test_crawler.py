@@ -37,9 +37,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 80 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations), max_timeout=10)
 
         # TODO: Find better solution when filebeat did crawl the file
         # Idea: Special flag to filebeat so that filebeat is only doing and
@@ -172,8 +170,8 @@ class Test(BaseTest):
         testfile1 = self.working_dir + "/log/test-old.log"
         file = open(testfile1, 'w')
 
-        iterations = 5
-        for n in range(0, iterations):
+        iterations1 = 5
+        for n in range(0, iterations1):
             file.write("old file")
             file.write("\n")
 
@@ -182,9 +180,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 5 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations1), max_timeout=10)
 
         # Rename the file (no new file created)
         testfile2 = self.working_dir + "/log/test-new.log"
@@ -193,8 +189,8 @@ class Test(BaseTest):
 
         # using 6 events to have a separate log line that we can
         # grep for.
-        iterations = 6
-        for n in range(0, iterations):
+        iterations2 = 6
+        for n in range(0, iterations2):
             file.write("new file")
             file.write("\n")
 
@@ -202,9 +198,7 @@ class Test(BaseTest):
 
         # expecting 6 more events
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 6 events"),
-            max_timeout=20)
+            lambda: self.output_has(lines=iterations1+iterations2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -226,8 +220,8 @@ class Test(BaseTest):
         testfile = self.working_dir + "/log/test.log"
         file = open(testfile, 'w')
 
-        iterations = 5
-        for n in range(0, iterations):
+        iterations1 = 5
+        for n in range(0, iterations1):
             file.write("disappearing file")
             file.write("\n")
 
@@ -237,17 +231,15 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 5 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations1), max_timeout=10)
         os.remove(testfile)
 
         # Create new file to check if new file is picked up
         testfile2 = self.working_dir + "/log/test2.log"
         file = open(testfile2, 'w')
 
-        iterations = 6
-        for n in range(0, iterations):
+        iterations2 = 6
+        for n in range(0, iterations2):
             file.write("new file")
             file.write("\n")
 
@@ -255,9 +247,7 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 6 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -412,9 +402,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 1 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=1), max_timeout=10)
 
         with open(testfile, 'a') as f:
             # now write another line
@@ -422,9 +410,7 @@ class Test(BaseTest):
             f.write("hello world 2\n")
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 2 events"),
-            max_timeout=15)
+            lambda: self.output_has(lines=1+2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -585,9 +571,7 @@ class Test(BaseTest):
             f.flush()
 
             self.wait_until(
-                lambda: self.log_contains(
-                    "Processing 1 events"),
-                max_timeout=15)
+                lambda: self.output_has(lines=1), max_timeout=10)
 
         # Append utf-8 chars to check if it keeps reading
         with codecs.open(testfile, "a") as f:
@@ -597,9 +581,7 @@ class Test(BaseTest):
             f.flush()
 
             self.wait_until(
-                lambda: self.log_contains(
-                    "Processing 2 events"),
-                max_timeout=15)
+                lambda: self.output_has(lines=1+2), max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
