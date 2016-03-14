@@ -126,7 +126,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -145,18 +144,19 @@ type MetricSeter struct {
 }
 
 // Configure connection pool for each Redis host
-func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
+func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
+	// Additional configuration options
 	config := struct {
-		Hosts   []string `config:"hosts"`
-		Network string   `config:"network"`
-		MaxConn int      `config:"maxconn"`
+		Network string `config:"network"`
+		MaxConn int    `config:"maxconn"`
 	}{}
-	if err := cfg.Unpack(&config); err != nil {
+
+	if err := ms.Module.ProcessConfig(&config); err != nil {
 		return err
 	}
 
-	for _, host := range config.Hosts {
+	for _, host := range ms.Config.Hosts {
 		// Set up redis pool
 		redisPool := rd.NewPool(func() (rd.Conn, error) {
 			c, err := rd.Dial(config.Network, host)
@@ -169,13 +169,14 @@ func (m *MetricSeter) Setup(cfg *ucfg.Config) error {
 			return c, err
 		}, config.MaxConn)
 
-		// TODO add AUTH
+		// TODO: add AUTH
 		m.redisPools[host] = redisPool
 	}
 	return nil
 }
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+
 	for _, host := range ms.Config.Hosts {
 		// Fetch default INFO
 		info := m.fetchRedisStats(host, "default")

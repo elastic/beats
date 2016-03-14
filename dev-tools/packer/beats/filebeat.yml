@@ -1,4 +1,4 @@
 beat_name: filebeat
-beat_url: 'https://github.com/elastic/filebeat'
-beat_repo: 'github.com/elastic/filebeat'
+beat_url: 'https://github.com/elastic/beats/filebeat'
+beat_repo: 'github.com/elastic/beats/filebeat'
 beat_description: Sends log files to Logstash or directly to Elasticsearch.

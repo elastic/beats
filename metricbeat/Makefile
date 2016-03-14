@@ -18,3 +18,8 @@ kibana:
 fields:
 	cat etc/fields_base.yml > etc/fields.yml
 	cat module/*/*/fields.yml >> etc/fields.yml
+
+# This is called by the beats packer before building starts
+.PHONY: before-build
+before-build:
+
