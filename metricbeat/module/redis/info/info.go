@@ -1,7 +1,14 @@
 /**
 
-This calls the info command in redis and retrieves the data.
+The current implementation is tested with redis 3.0.7
+More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
 
+`info.go` uses the Redis `INFO default` command for stats. This allows us to fetch  all metrics at once and filter out
+undesired metrics based on user configuration on the client. The alternative would be to fetch each type as an
+independent `INFO` call, which has the potential of introducing higher latency (e.g., more round trip Redis calls).
+
+There's a special case for the `keyspace` stat, which requires additional parsing because the
+values are overloaded: (keys=795341,expires=0,avg_ttl=0). This is handled in `eventMapping()`.
 
 The document sent to elasticsearch has the following structure:
 
@@ -110,10 +117,6 @@ The document sent to elasticsearch has the following structure:
 	    }
 	  }
 	}
-
-
-The current implementation is tested with redis 3.0.7
-More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
 */
 package info
 
