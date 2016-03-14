@@ -11,17 +11,14 @@ Ensure that this folder is at the following location:
 To get running with {{cookiecutter.beat|capitalize}}, run the following commands:
 
 ```
-glide update --no-recursive
-make update
+make init
 ```
 
 
 To push {{cookiecutter.beat|capitalize}} in the git repository, run the following commands:
 
 ```
-git init
-git add .
-git commit
+git commit 
 git remote set-url origin https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 git push origin master
 ```
@@ -65,6 +62,17 @@ make coverage-report
 
 The test coverage is reported in the folder `./build/coverage/`
 
+
+### Package
+
+To cross-compile and package {{cookiecutter.beat|capitalize}} for all supported platforms, run the following commands:
+
+```
+cd dev-tools/packer
+make deps
+make images
+make
+```
 
 ### Update
 

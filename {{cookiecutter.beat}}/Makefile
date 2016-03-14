@@ -29,3 +29,7 @@ install-cfg:
 .PHONY: update-deps
 update-deps:
 	glide update  --no-recursive
+
+# This is called by the beats packer before building starts
+.PHONY: before-build
+before-build:
