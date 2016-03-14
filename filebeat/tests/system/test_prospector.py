@@ -65,9 +65,7 @@ class Test(BaseTest):
         proc = self.start_beat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 5 events"),
-            max_timeout=10)
+            lambda: self.output_has(lines=iterations), max_timeout=10)
 
         proc.check_kill_and_wait()
 
