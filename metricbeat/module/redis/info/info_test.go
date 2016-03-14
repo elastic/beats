@@ -57,6 +57,8 @@ func TestKeyspace(t *testing.T) {
 	assert.NoError(t, mErr)
 	assert.NoError(t, msErr)
 
+	ms.Setup()
+
 	// Write to DB to enable Keyspace stats
 	rErr := writeToRedis(redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort())
 	assert.NoError(t, rErr)
