@@ -1,7 +1,14 @@
 /**
 
-This calls the info command in redis and retrieves the data.
+The current implementation is tested with redis 3.0.7
+More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
 
+`info.go` uses the Redis `INFO default` command for stats. This allows us to fetch  all metrics at once and filter out
+undesired metrics based on user configuration on the client. The alternative would be to fetch each type as an
+independent `INFO` call, which has the potential of introducing higher latency (e.g., more round trip Redis calls).
+
+There's a special case for the `keyspace` stat, which requires additional parsing because the
+values are overloaded: (keys=795341,expires=0,avg_ttl=0). This is handled in `eventMapping()`.
 
 The document sent to elasticsearch has the following structure:
 
@@ -95,19 +102,21 @@ The document sent to elasticsearch has the following structure:
 	      "total_connections_received": "146",
 	      "total_net_input_bytes": "2247",
 	      "total_net_output_bytes": "277354"
+	    },
+		"keyspace": {
+		  "db0": {
+		    "avg_ttl": 0,
+			"expires": 0,
+			"keys": 1
+		  },
+		  "db1": {
+			"avg_ttl": 0,
+			"expires": 0,
+			"keys": 1
+		  }
 	    }
 	  }
 	}
-
-
-The current implementation is tested with redis 3.0.7
-More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
-
-Currently not reported are Keyspaces coming in the following format:
-
-	# Keyspace
-	db0:keys=2,expires=0,avg_ttl=0
-	db3:keys=1,expires=0,avg_ttl=0
 */
 package info
 
@@ -172,25 +181,25 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
 
 	for _, host := range ms.Config.Hosts {
-		c := m.redisPools[host].Get()
-
-		// TODO: Do better error reporting
-		if c == nil {
-			logp.Err("Connection object for host %s is nil", host)
-			continue
-		}
-
-		out, err := rd.String(c.Do("INFO"))
-		c.Close()
-		if err != nil {
-			logp.Err("Error converting to string: %v", err)
-		}
-
-		event := eventMapping(parseRedisInfo(out))
+		// Fetch default INFO
+		info := m.fetchRedisStats(host, "default")
+		event := eventMapping(info)
 		events = append(events, event)
 	}
 
 	return events, nil
+}
+
+// fetchRedisStats returns a map of requested stats
+func (m *MetricSeter) fetchRedisStats(host string, stat string) map[string]string {
+	c := m.redisPools[host].Get()
+	out, err := rd.String(c.Do("INFO", stat))
+	c.Close()
+
+	if err != nil {
+		logp.Err("Error converting to string: %v", err)
+	}
+	return parseRedisInfo(out)
 }
 
 // parseRedisInfo parses the string returned by the INFO command
@@ -204,10 +213,15 @@ func parseRedisInfo(info string) map[string]string {
 
 	for _, value := range result {
 		// Values are separated by :
-		parts := strings.Split(value, ":")
+		parts := parseRedisLine(value, ":")
 		if len(parts) == 2 {
 			values[parts[0]] = parts[1]
 		}
 	}
 	return values
+}
+
+// parseRedisLine parses a single line returned by INFO
+func parseRedisLine(s string, delimeter string) []string {
+	return strings.Split(s, delimeter)
 }
