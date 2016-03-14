@@ -159,43 +159,8 @@ include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 [[filebeat-template]]
 === Step 4: Loading the Index Template in Elasticsearch
 
-Before starting Filebeat, you need to load the
-http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which lets Elasticsearch know which fields should be analyzed
-in which way.
-
-The recommended template file is installed by the Filebeat packages. Load it with the
-following command:
-
-*deb or rpm:*
-
-[source,shell]
-----------------------------------------------------------------------
-curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json
-----------------------------------------------------------------------
-
-*mac:*
-
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-cd filebeat-{version}-darwin
-curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat.template.json
-----------------------------------------------------------------------
-
-*win:*
-
-["source","sh",subs="attributes,callouts"]
-----------------------------------------------------------------------
-PS C:\Program Files\Filebeat> Invoke-WebRequest -Method Put -InFile filebeat.template.json -Uri http://localhost:9200/_template/filebeat?pretty
-----------------------------------------------------------------------
-
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
-
-NOTE: If you've already used Filebeat to index data into Elasticsearch,
-the index may contain old documents. After you load the index template,
-you can delete the old documents from `filebeat-*` to force Kibana to look
-at the newest documents. Use this command:
-`curl -XDELETE 'http://localhost:9200/filebeat-*'`.
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 === Step 5: Starting Filebeat
 

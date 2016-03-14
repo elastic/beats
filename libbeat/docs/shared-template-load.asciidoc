@@ -1,0 +1,103 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-template-load.asciidoc[]
+//// If you want to include conditional content, you also need to
+//// add the following doc attribute definition  before the
+//// include statement so that you have:
+//// :allplatforms:
+//// include::../../libbeat/docs/shared-template-load.asciidoc[]
+//// This content must be embedded underneath a level 3 heading.
+//////////////////////////////////////////////////////////////////////////
+
+
+Before starting {beatname_uc}, you need to load the
+http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template], which lets Elasticsearch know which fields should be analyzed
+in which way.
+
+The recommended template file is installed by the {beatname_uc} packages. You can either configure 
+{beatname_uc} to load the template automatically, or you can run a shell script to load the template:
+
+* <<load-template-auto>>
+* <<load-template-shell>>
+
+[[load-template-auto]]
+==== Configuring {beatname_uc} to Load the Template
+
+To configure {beatname_uc} to load the template, you must enable the elasticsearch output. In the
+{beatname_uc} configuration file, uncomment the template part under elasticsearch output. By default
+the template is named {beatname_lc}. Adjust the path to your template file. 
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: ["localhost:9200"]
+
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is disabled and no template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones
+    template:
+
+      # Template name. By default the template name is {beatname_lc}.
+      #name: "{beatname_lc}"
+
+      # Path to template file
+      path: "{beatname_lc}.template.json"
+
+      # Overwrite existing template
+      #overwrite: false
+----------------------------------------------------------------------
+
+The template is loaded when you start {beatname_uc}. By default, if a template
+already exists in the index, it is not overwritten. To overwrite an existing template,
+set `overwrite: true` in the configuration file.
+
+[[load-template-shell]]
+==== Running a Shell Script to Load the Template
+
+You can load the template by running the following command:
+
+ifdef::allplatforms[]
+
+*deb or rpm:*
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@/etc/{beatname_lc}/{beatname_lc}.template.json
+----------------------------------------------------------------------
+
+*mac:*
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+cd {beatname_lc}-{version}-darwin
+curl -XPUT 'http://localhost:9200/_template/{beatname_lc}' -d@{beatname_lc}.template.json
+----------------------------------------------------------------------
+
+endif::allplatforms[]
+
+*win:*
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+PS C:\Program Files{backslash}{beatname_uc}> Invoke-WebRequest -Method Put -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}?pretty
+----------------------------------------------------------------------
+
+where `localhost:9200` is the IP and port where Elasticsearch is listening.
+
+NOTE: If you've already used {beatname_uc} to index data into Elasticsearch,
+the index may contain old documents. After you load the index template,
+you can delete the old documents from {beatname_lc}-* to force Kibana to look
+at the newest documents. Use this command:
+
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+curl -XDELETE 'http://localhost:9200/{beatname_lc}-*'
+----------------------------------------------------------------------
