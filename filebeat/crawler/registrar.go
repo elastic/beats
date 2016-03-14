@@ -181,7 +181,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Not resuming rotated file: %s", filePath)
 	}
 
-	logp.Info("prospector", "New file. Start reading from the beginning: %s", filePath)
+	logp.Info("New file. Start reading from the beginning: %s", filePath)
 
 	// New file so just start from the beginning
 	return 0, false

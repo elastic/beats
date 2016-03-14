@@ -251,6 +251,3 @@ func (h *Harvester) initFileOffset(file *os.File) error {
 
 	return err
 }
-
-func (h *Harvester) Stop() {
-}
