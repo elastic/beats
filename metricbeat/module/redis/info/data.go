@@ -2,16 +2,14 @@ package info
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Map data to MapStr
-func eventMapping(info map[string]string, keyspaceMap map[string]string) common.MapStr {
-
-	// Sort out keyspace stats
-	keyspace := getKeyspaceStats(keyspaceMap)
+func eventMapping(info map[string]string) common.MapStr {
 
 	// Full mapping from info
 	event := common.MapStr{
@@ -103,13 +101,31 @@ func eventMapping(info map[string]string, keyspaceMap map[string]string) common.
 			"latest_fork_usec":       info["latest_fork_usec"],
 			"migrate_cached_sockets": info["migrate_cached_sockets"],
 		},
-		"keyspace": keyspace,
+		"keyspace": getKeyspaceStats(info),
 	}
 
 	return event
 }
 
-func getKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
+func getKeyspaceStats(info map[string]string) map[string]common.MapStr {
+	keyspaceMap := findKeyspaceStats(info)
+	return parseKeyspaceStats(keyspaceMap)
+}
+
+// findKeyspaceStats will grep for keyspace ("^db" keys) and return the resulting map
+func findKeyspaceStats(info map[string]string) map[string]string {
+	keyspace := map[string]string{}
+
+	for k, v := range info {
+		if strings.HasPrefix(k, "db") {
+			keyspace[k] = v
+		}
+	}
+	return keyspace
+}
+
+// parseKeyspaceStats resolves the overloaded value string that Redis returns for keyspace
+func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr {
 	keyspace := map[string]common.MapStr{}
 	for k, v := range keyspaceMap {
 

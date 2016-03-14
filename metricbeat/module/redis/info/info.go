@@ -179,22 +179,15 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err e
 	for _, host := range ms.Config.Hosts {
 		// Fetch default INFO
 		info := m.fetchRedisStats(host, "default")
-
-		// TODO: Take this approach for all sub types, or grep out keyspace from info
-		//
-		// Fetch keyspace metrics, so they can be easily iterated over later.
-		// It might be nice to take this approach for all sub stats from
-		// INFO and allow user to configure which sub metric sets they collect.
-		keyspace := m.fetchRedisStats(host, "keyspace")
-
-		event := eventMapping(parseRedisInfo(info), parseRedisInfo(keyspace))
+		event := eventMapping(info)
 		events = append(events, event)
 	}
 
 	return events, nil
 }
 
-func (m *MetricSeter) fetchRedisStats(host string, stat string) string {
+// fetchRedisStats returns a map of requested stats
+func (m *MetricSeter) fetchRedisStats(host string, stat string) map[string]string {
 	c := m.redisPools[host].Get()
 	out, err := rd.String(c.Do("INFO", stat))
 	c.Close()
@@ -202,7 +195,7 @@ func (m *MetricSeter) fetchRedisStats(host string, stat string) string {
 	if err != nil {
 		logp.Err("Error converting to string: %v", err)
 	}
-	return out
+	return parseRedisInfo(out)
 }
 
 // parseRedisInfo parses the string returned by the INFO command
