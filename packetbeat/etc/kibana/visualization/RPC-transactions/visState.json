@@ -1,0 +1,32 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+            },
+            "schema": "segment",
+            "type": "date_histogram"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": false,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "mode": "stacked",
+        "shareYAxis": true
+    },
+    "type": "histogram"
+}

@@ -1,0 +1,740 @@
+[
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.redis_git_dirty",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.memory.used_memory_peak",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_bgsave_in_progress",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_last_write_status",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.instantaneous_input_kbps",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "type",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.redis_mode",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.cpu.used_cpu_user",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.lru_clock",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_rewrite_scheduled",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.pubsub_patterns",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.redis_version",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.uptime_in_days",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.sync_partial_ok",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.repl_backlog_first_byte_offset",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.instantaneous_output_kbps",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.sync_full",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "redis-info.clients.connected_clients",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "redis-info.stats.total_connections_received",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.loading",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_rewrite_in_progress",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_last_save_time",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.repl_backlog_size",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.repl_backlog_active",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.cpu.used_cpu_user_children",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "module",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.keyspace_hits",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.uptime_in_seconds",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.clients.client_longest_output_list",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "beat.name",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.redis_git_sha1",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.repl_backlog_histlen",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.redis_build_id",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.multiplexing_api",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_last_bgsave_time_sec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_source",
+        "scripted": false,
+        "type": "_source"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.total_net_input_bytes",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.migrate_cached_sockets",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "redis-info.memory.used_memory",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_current_rewrite_time_sec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.hz",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.arch_bits",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_index",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.tcp_port",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.gcc_version",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.evicted_keys",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.instantaneous_ops_per_sec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.memory.used_memory_lua",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.expired_keys",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_current_bgsave_time_sec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.latest_fork_usec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.config_file",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.total_net_output_bytes",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.pubsub_channels",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.master_repl_offset",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_enabled",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.keyspace_misses",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_last_bgsave_status",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.sync_partial_err",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_last_bgrewrite_status",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.connected_slaves",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.memory.used_memory_rss",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.cluster.cluster_enabled",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.run_id",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.replication.role",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.rdb_changes_since_last_save",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.os",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.clients.client_biggest_input_buf",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.stats.total_commands_processed",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "beat.hostname",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.clients.blocked_clients",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.cpu.used_cpu_sys",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "@timestamp",
+        "scripted": false,
+        "type": "date"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.memory.mem_allocator",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.presistence.aof_last_rewrite_time_sec",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.server.process_id",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "metricset",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "redis-info.stats.rejected_connections",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "redis-info.cpu.used_cpu_sys_children",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_id",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_type",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_score",
+        "scripted": false,
+        "type": "number"
+    }
+]

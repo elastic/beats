@@ -1,9 +1,9 @@
 {
-  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"proc.cpu.total\"},\"schema\":\"metric\",\"type\":\"max\"},{\"id\":\"2\",\"params\":{\"field\":\"proc.name\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":10},\"schema\":\"segment\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"times\":[],\"yAxis\":{}},\"type\":\"histogram\"}", 
-  "description": "", 
-  "title": "Top 10 processes by total CPU usage", 
-  "version": 1, 
-  "savedSearchId": "Processes", 
+  "visState": "{\"type\":\"histogram\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"addTimeMarker\":false,\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"max\",\"params\":{\"field\":\"proc.cpu.total\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"proc.name\",\"order\":\"desc\",\"size\":10},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Top-10-processes-by-total-CPU-usage",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

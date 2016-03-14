@@ -1,0 +1,23 @@
+{
+    "filter": [],
+    "highlight": {
+        "fields": {
+            "*": {}
+        },
+        "fragment_size": 2147483647,
+        "post_tags": [
+            "@/kibana-highlighted-field@"
+        ],
+        "pre_tags": [
+            "@kibana-highlighted-field@"
+        ],
+        "require_field_match": false
+    },
+    "index": "packetbeat-*",
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "*"
+        }
+    }
+}

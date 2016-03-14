@@ -1,20 +1,22 @@
 {
   "sort": [
-    "@timestamp", 
+    "@timestamp",
     "desc"
-  ], 
-  "hits": 0, 
-  "description": "", 
-  "title": "MySQL Transactions", 
-  "version": 1, 
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "MySQL-Transactions",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"key\":\"type\",\"value\":\"mysql\",\"disabled\":false},\"query\":{\"match\":{\"type\":{\"query\":\"mysql\",\"type\":\"phrase\"}}}}],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
-  }, 
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match\":{\"type\":{\"query\":\"mysql\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"negate\":false,\"value\":\"mysql\",\"key\":\"type\"}}],\"highlight\":{\"fields\":{\"*\":{}},\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"]},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"index\":\"packetbeat-*\"}"
+  },
   "columns": [
-    "method", 
-    "type", 
-    "path", 
-    "responsetime", 
-    "status"
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
   ]
 }

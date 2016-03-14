@@ -1,0 +1,73 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "fs.used"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "fs.used_p"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "fs.total"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "4",
+            "params": {
+                "field": "fs.free"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "5",
+            "params": {
+                "field": "fs.free"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "6",
+            "params": {
+                "field": "fs.device_name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "bucket",
+            "type": "terms"
+        },
+        {
+            "id": "7",
+            "params": {
+                "field": "fs.mount_point",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "bucket",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "perPage": 10,
+        "showMeticsAtAllLevels": false,
+        "showPartialRows": false
+    },
+    "type": "table"
+}

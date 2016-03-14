@@ -1,0 +1,56 @@
+{
+    "filter": [
+        {
+            "meta": {
+                "disabled": false,
+                "index": "packetbeat-*",
+                "key": "type",
+                "negate": false,
+                "value": "http"
+            },
+            "query": {
+                "match": {
+                    "type": {
+                        "query": "http",
+                        "type": "phrase"
+                    }
+                }
+            }
+        },
+        {
+            "meta": {
+                "disabled": false,
+                "index": "packetbeat-*",
+                "key": "http.code",
+                "negate": true,
+                "value": 200
+            },
+            "query": {
+                "match": {
+                    "http.code": {
+                        "query": 200,
+                        "type": "phrase"
+                    }
+                }
+            }
+        }
+    ],
+    "highlight": {
+        "fields": {
+            "*": {}
+        },
+        "post_tags": [
+            "@/kibana-highlighted-field@"
+        ],
+        "pre_tags": [
+            "@kibana-highlighted-field@"
+        ]
+    },
+    "index": "packetbeat-*",
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "*"
+        }
+    }
+}

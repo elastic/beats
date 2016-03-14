@@ -1,0 +1,54 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "proc.cpu.user_p"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "proc.mem.rss"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "proc.mem.rss_p"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "5",
+            "params": {
+                "field": "proc.mem.share"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "6",
+            "params": {
+                "field": "proc.name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+            },
+            "schema": "bucket",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "perPage": 10,
+        "showMeticsAtAllLevels": false,
+        "showPartialRows": false
+    },
+    "type": "table"
+}

@@ -1,9 +1,9 @@
 {
-  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"count\"},\"schema\":\"metric\",\"type\":\"sum\"}],\"listeners\":{},\"params\":{\"fontSize\":\"37\"},\"type\":\"metric\"}", 
-  "description": "", 
-  "title": "Total number of HTTP transactions", 
-  "version": 1, 
-  "savedSearchId": "Web-transactions", 
+  "visState": "{\"type\":\"metric\",\"listeners\":{},\"params\":{\"fontSize\":\"37\"},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"}]}",
+  "description": "",
+  "title": "Total-number-of-HTTP-transactions",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

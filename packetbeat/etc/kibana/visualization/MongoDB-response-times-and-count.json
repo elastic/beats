@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":false,\"radiusRatio\":\"9\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"percents\":[99]}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"resource\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1.99\"}},{\"id\":\"4\",\"type\":\"sum\",\"schema\":\"radius\",\"params\":{\"field\":\"count\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "MongoDB response times and count", 
-  "version": 1, 
-  "savedSearchId": "MongoDB-transactions", 
+  "visState": "{\"type\":\"line\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"showCircles\":true,\"yAxis\":{},\"smoothLines\":false,\"addTimeMarker\":false,\"interpolate\":\"linear\",\"addLegend\":true,\"shareYAxis\":true,\"radiusRatio\":\"9\",\"drawLinesBetweenPoints\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"percentiles\",\"params\":{\"field\":\"responsetime\",\"percents\":[99]},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"customInterval\":\"2h\",\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1.99\",\"field\":\"resource\",\"order\":\"desc\",\"size\":5},\"id\":\"3\",\"schema\":\"group\"},{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"4\",\"schema\":\"radius\"}]}",
+  "description": "",
+  "title": "MongoDB-response-times-and-count",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

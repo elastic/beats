@@ -1,0 +1,17 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "fontSize": "37"
+    },
+    "type": "metric"
+}

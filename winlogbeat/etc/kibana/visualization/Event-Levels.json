@@ -1,10 +1,10 @@
 {
-  "visState": "{\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"level\",\"exclude\":{\"pattern\":\"\\\"\\\"\"},\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Event Levels", 
-  "uiStateJSON": "{}", 
-  "version": 1, 
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"count\",\"params\":{},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"exclude\":{\"pattern\":\"\\\"\\\"\"},\"size\":5,\"order\":\"desc\",\"field\":\"level\"},\"id\":\"2\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Event-Levels",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+    "searchSourceJSON": "{\"filter\":[],\"index\":\"winlogbeat-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
   }
 }

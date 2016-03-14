@@ -1,22 +1,22 @@
 {
   "sort": [
-    "@timestamp", 
+    "@timestamp",
     "desc"
-  ], 
-  "hits": 0, 
-  "description": "", 
-  "title": "System wide", 
-  "version": 1, 
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "System-wide",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"topbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"topbeat-*\",\"key\":\"type\",\"value\":\"system\",\"disabled\":false},\"query\":{\"match\":{\"type\":{\"query\":\"system\",\"type\":\"phrase\"}}}}]}"
-  }, 
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match\":{\"type\":{\"query\":\"system\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"topbeat-*\",\"negate\":false,\"value\":\"system\",\"key\":\"type\"}}],\"highlight\":{\"fields\":{\"*\":{}},\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"],\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"index\":\"topbeat-*\"}"
+  },
   "columns": [
-    "beat.name", 
-    "cpu.user_p", 
-    "cpu.steal", 
-    "load.load1", 
-    "load.load5", 
-    "mem.used", 
-    "mem.used_p"
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
   ]
 }

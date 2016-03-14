@@ -1,0 +1,22 @@
+{
+    "filter": [],
+    "highlight": {
+        "fields": {
+            "*": {}
+        },
+        "fragment_size": 2147483647,
+        "post_tags": [
+            "@/kibana-highlighted-field@"
+        ],
+        "pre_tags": [
+            "@kibana-highlighted-field@"
+        ]
+    },
+    "index": "packetbeat-*",
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "type: mysql or type: pgsql or type: mongodb"
+        }
+    }
+}

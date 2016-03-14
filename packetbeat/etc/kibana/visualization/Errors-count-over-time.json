@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"mode\":\"stacked\",\"defaultYExtents\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"type\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Errors count over time", 
-  "version": 1, 
-  "savedSearchId": "Errors", 
+  "visState": "{\"type\":\"histogram\",\"listeners\":{},\"params\":{\"defaultYExtents\":false,\"shareYAxis\":true,\"addTooltip\":true,\"mode\":\"stacked\",\"addLegend\":true},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"type\",\"order\":\"desc\",\"size\":10},\"id\":\"3\",\"schema\":\"group\"}]}",
+  "description": "",
+  "title": "Errors-count-over-time",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

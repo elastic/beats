@@ -1,20 +1,22 @@
 {
   "sort": [
-    "@timestamp", 
+    "@timestamp",
     "desc"
-  ], 
-  "hits": 0, 
-  "description": "", 
-  "title": "MySQL errors", 
-  "version": 1, 
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "MySQL-errors",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[{\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"key\":\"type\",\"negate\":false,\"value\":\"mysql\"},\"query\":{\"match\":{\"type\":{\"query\":\"mysql\",\"type\":\"phrase\"}}}},{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":true,\"key\":\"status\",\"value\":\"OK\",\"disabled\":false},\"query\":{\"match\":{\"status\":{\"query\":\"OK\",\"type\":\"phrase\"}}}}],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
-  }, 
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match\":{\"type\":{\"query\":\"mysql\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"negate\":false,\"value\":\"mysql\",\"key\":\"type\"}},{\"query\":{\"match\":{\"status\":{\"query\":\"OK\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"negate\":true,\"value\":\"OK\",\"key\":\"status\"}}],\"highlight\":{\"fields\":{\"*\":{}},\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"]},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"index\":\"packetbeat-*\"}"
+  },
   "columns": [
-    "method", 
-    "type", 
-    "path", 
-    "responsetime", 
-    "status"
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
   ]
 }

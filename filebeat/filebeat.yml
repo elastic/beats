@@ -407,7 +407,7 @@ shipper:
 
 ############################# Logging #########################################
 
-# There are three options for the log output: syslog, file, stderr.
+# There are three options for the log ouput: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 logging:

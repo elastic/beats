@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"tile_map\",\"params\":{\"isDesaturated\":true,\"mapType\":\"Shaded Circle Markers\"},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"client_location\",\"precision\":3}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Client locations", 
-  "version": 1, 
-  "savedSearchId": "Web-transactions", 
+  "visState": "{\"type\":\"tile_map\",\"listeners\":{},\"params\":{\"isDesaturated\":true,\"mapType\":\"Shaded Circle Markers\"},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"geohash_grid\",\"params\":{\"field\":\"client_location\",\"precision\":3},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Client-locations",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

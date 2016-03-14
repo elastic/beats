@@ -1,0 +1,42 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "proc.pid"
+            },
+            "schema": "metric",
+            "type": "cardinality"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "beat.name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "segment",
+            "type": "terms"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "proc.state",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "segment",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTooltip": true,
+        "isDonut": false,
+        "shareYAxis": true
+    },
+    "type": "pie"
+}

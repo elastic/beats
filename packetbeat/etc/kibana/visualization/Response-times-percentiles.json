@@ -1,10 +1,9 @@
 {
-  "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"percents\":[75,95,99]}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Response times percentiles", 
-  "uiStateJSON": "{}", 
-  "version": 1, 
-  "savedSearchId": "Packetbeat-Search", 
+  "visState": "{\"type\":\"line\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"showCircles\":true,\"yAxis\":{},\"smoothLines\":false,\"addTimeMarker\":false,\"interpolate\":\"linear\",\"addLegend\":true,\"shareYAxis\":true,\"radiusRatio\":9,\"drawLinesBetweenPoints\":true,\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"percentiles\",\"params\":{\"field\":\"responsetime\",\"percents\":[75,95,99]},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"customInterval\":\"2h\",\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Response-times-percentiles",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

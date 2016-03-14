@@ -1,10 +1,9 @@
 {
-  "visState": "{\"type\":\"area\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"smoothLines\":false,\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"responsetime\",\"interval\":10,\"extended_bounds\":{}}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Latency histogram", 
-  "uiStateJSON": "{}", 
-  "version": 1, 
-  "savedSearchId": "Packetbeat-Search", 
+  "visState": "{\"type\":\"area\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"smoothLines\":false,\"addTimeMarker\":false,\"interpolate\":\"linear\",\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"histogram\",\"params\":{\"field\":\"responsetime\",\"interval\":10,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Latency-histogram",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

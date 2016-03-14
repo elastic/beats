@@ -1,14 +1,12 @@
 {
-  "hits": 0, 
-  "timeFrom": "now-15m", 
-  "timeRestore": true, 
-  "description": "", 
-  "title": "Topbeat-Dashboard", 
-  "uiStateJSON": "{}", 
-  "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"panelIndex\":1,\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\"},{\"col\":4,\"id\":\"System-load\",\"panelIndex\":2,\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\"},{\"col\":8,\"id\":\"Process-status\",\"panelIndex\":4,\"row\":5,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Memory-usage\",\"panelIndex\":5,\"row\":9,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"CPU-usage\",\"panelIndex\":7,\"row\":9,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"CPU-usage-per-process\",\"panelIndex\":8,\"row\":13,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Memory-usage-per-process\",\"panelIndex\":9,\"row\":13,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Top-processes\",\"panelIndex\":10,\"row\":17,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"Servers\",\"panelIndex\":11,\"row\":5,\"size_x\":7,\"size_y\":4,\"type\":\"visualization\"},{\"col\":7,\"id\":\"Disk-utilization-over-time\",\"panelIndex\":12,\"row\":17,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"}]", 
-  "timeTo": "now", 
-  "optionsJSON": "{\"darkTheme\":false}", 
-  "version": 1, 
+  "hits": 0,
+  "timeRestore": false,
+  "description": "",
+  "title": "Topbeat Dashboard",
+  "uiStateJSON": "{}",
+  "panelsJSON": "[{\"type\":\"visualization\",\"id\":\"Navigation\",\"size_x\":3,\"size_y\":4,\"panelIndex\":1,\"col\":1,\"row\":1},{\"type\":\"visualization\",\"id\":\"System-load\",\"size_x\":9,\"size_y\":4,\"panelIndex\":2,\"col\":4,\"row\":1},{\"type\":\"visualization\",\"id\":\"Process-status\",\"size_x\":5,\"size_y\":4,\"panelIndex\":4,\"col\":8,\"row\":5},{\"type\":\"visualization\",\"id\":\"Memory-usage\",\"size_x\":6,\"size_y\":4,\"panelIndex\":5,\"col\":1,\"row\":9},{\"type\":\"visualization\",\"id\":\"CPU-usage\",\"size_x\":6,\"size_y\":4,\"panelIndex\":7,\"col\":7,\"row\":9},{\"type\":\"visualization\",\"id\":\"CPU-usage-per-process\",\"size_x\":6,\"size_y\":4,\"panelIndex\":8,\"col\":1,\"row\":13},{\"type\":\"visualization\",\"id\":\"Memory-usage-per-process\",\"size_x\":6,\"size_y\":4,\"panelIndex\":9,\"col\":7,\"row\":13},{\"type\":\"visualization\",\"id\":\"Top-processes\",\"size_x\":6,\"size_y\":5,\"panelIndex\":10,\"col\":1,\"row\":17},{\"type\":\"visualization\",\"id\":\"Servers\",\"size_x\":7,\"size_y\":4,\"panelIndex\":11,\"col\":1,\"row\":5},{\"type\":\"visualization\",\"id\":\"Disk-utilization-over-time\",\"size_x\":6,\"size_y\":5,\"panelIndex\":12,\"col\":7,\"row\":17}]",
+  "optionsJSON": "{\"darkTheme\":false}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
   }

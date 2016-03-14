@@ -1,0 +1,20 @@
+[
+    {
+        "col": 1,
+        "id": "connected_clients",
+        "panelIndex": 1,
+        "row": 1,
+        "size_x": 9,
+        "size_y": 2,
+        "type": "visualization"
+    },
+    {
+        "col": 1,
+        "id": "connections-received",
+        "panelIndex": 2,
+        "row": 3,
+        "size_x": 9,
+        "size_y": 2,
+        "type": "visualization"
+    }
+]

@@ -1,0 +1,41 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {},
+            "schema": "metric",
+            "type": "count"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "query",
+                "order": "desc",
+                "orderBy": "1",
+                "row": false,
+                "size": 5
+            },
+            "schema": "split",
+            "type": "terms"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "http.code",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 10
+            },
+            "schema": "segment",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTooltip": true,
+        "isDonut": false,
+        "shareYAxis": true
+    },
+    "type": "pie"
+}

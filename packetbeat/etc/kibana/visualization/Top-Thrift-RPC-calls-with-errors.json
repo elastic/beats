@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":false,\"mode\":\"stacked\",\"defaultYExtents\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"method\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Top Thrift-RPC calls with errors", 
-  "version": 1, 
-  "savedSearchId": "Thrift-errors", 
+  "visState": "{\"type\":\"histogram\",\"listeners\":{},\"params\":{\"defaultYExtents\":false,\"shareYAxis\":true,\"addTooltip\":true,\"mode\":\"stacked\",\"addLegend\":false},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"method\",\"order\":\"desc\",\"size\":5},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Top-Thrift-RPC-calls-with-errors",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

@@ -1,21 +1,22 @@
 {
   "sort": [
-    "@timestamp", 
+    "@timestamp",
     "desc"
-  ], 
-  "hits": 0, 
-  "description": "", 
-  "title": "Processes", 
-  "version": 1, 
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "Processes",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"topbeat-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"topbeat-*\",\"key\":\"type\",\"value\":\"proc\",\"disabled\":false},\"query\":{\"match\":{\"type\":{\"query\":\"proc\",\"type\":\"phrase\"}}}}]}"
-  }, 
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match\":{\"type\":{\"query\":\"proc\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"topbeat-*\",\"negate\":false,\"value\":\"proc\",\"key\":\"type\"}}],\"highlight\":{\"fields\":{\"*\":{}},\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"],\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"index\":\"topbeat-*\"}"
+  },
   "columns": [
-    "proc.name", 
-    "proc.cpu.user_p", 
-    "proc.mem.rss_p", 
-    "proc.mem.rss", 
-    "proc.state", 
-    "proc.cpu.start_time"
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
   ]
 }

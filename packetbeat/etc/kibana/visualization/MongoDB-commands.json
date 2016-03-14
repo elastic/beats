@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"area\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"smoothLines\":true,\"scale\":\"linear\",\"interpolate\":\"linear\",\"mode\":\"silhouette\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"method\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "MongoDB commands", 
-  "version": 1, 
-  "savedSearchId": "MongoDB-transactions", 
+  "visState": "{\"type\":\"area\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"smoothLines\":true,\"addTimeMarker\":false,\"interpolate\":\"linear\",\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"silhouette\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"customInterval\":\"2h\",\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"method\",\"order\":\"desc\",\"size\":5},\"id\":\"3\",\"schema\":\"group\"}]}",
+  "description": "",
+  "title": "MongoDB-commands",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }
