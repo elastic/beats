@@ -2,18 +2,21 @@
 
 set -e
 
-BEATS_PATH=/go/src/github.com/elastic/beats
+BEATS_PATH=/go/src/${1}
 
 # BEATNAME is in the $PACK variable
 BEATNAME=$PACK
 
 if [ $BEATNAME = "packetbeat" ]; then
-	cd $BEATS_PATH
 	patch -p1 < /gopacket_pcap.patch
 fi
 
+if [ $BEATS_PATH = "/go/src/github.com/elastic/beats" ]; then
+    BEAT_PATH=$BEATS_PATH/$BEATNAME
+else
+    BEAT_PATH=$BEATS_PATH
+fi
 
-BEAT_PATH=$BEATS_PATH/$BEATNAME
 cd $BEAT_PATH
 
 PREFIX=/build
