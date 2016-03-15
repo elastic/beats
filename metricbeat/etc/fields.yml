@@ -8,11 +8,83 @@ defaults:
   ignore_above: 1024
 
 sections:
+  - ["common", "Common fields"]
   - ["redis-info", "Redis Info Stats"]
+  - ["mysql-status", "MySQL Status"]
+
+common:
+  type: group
+  description: >
+    Contains common fields available in all event types.
+  fields:
+    - name: beat.name
+      description: >
+        The name of the Beat sending the log messages. If the shipper name is set
+        in the configuration file, then that value is used. If it is not set,
+        the hostname is used.
+
+    - name: beat.hostname
+      description: >
+        The hostname as returned by the operating system on which the Beat is
+        running.
+
+    - name: "@timestamp"
+      type: date
+      required: true
+      format: YYYY-MM-DDTHH:MM:SS.milliZ
+      example: 2015-01-24T14:06:05.071Z
+      description: >
+        The timestamp when the log line was read. The precision is in
+        milliseconds. The timezone is UTC.
+
+    - name: response_time
+      type: long
+      required: true
+      description: >
+        Event Reponse time in nano seconds
+mysql-status:
+  type: group
+  description: >
+    MySQL Stats
+  fields:
+    - name: mysql-status
+      type: group
+      description: >
+        MySQL Status
+      fields:
+        - name: aborted
+          type: group
+          description: >
+            Aborted status fields
+          fields:
+            - name: Aborted_clients
+              type: integer
+              description: >
+                The number of connections that were aborted because the client died without closing the connection properly.
+
+            - name: Aborted_connects
+              type: integer
+              description: >
+                The number of failed attempts to connect to the MySQL server.
+
+        - name: bytes
+          type: group
+          description: >
+            Bytes stats
+          fields:
+            - name: Bytes_received
+              type: integer
+              description: >
+                The number of bytes received from all clients.
+
+            - name: Bytes_sent
+              type: integer
+              description: >
+                The number of bytes sent to all clients.
 redis-info:
   type: group
   description: >
-    Redis info Stats
+    Redis Stats
   fields:
     - name: redis-info
       type: group
@@ -25,22 +97,22 @@ redis-info:
             Redis client stats
           fields:
             - name: connected_clients
-              type: int
+              type: integer
               description: >
                 Number of client connections (excluding connections from slaves)
 
             - name: client_longest_output_list
-              type: int
+              type: integer
               description: >
                 Longest output list among current client connections.
 
             - name: client_biggest_input_buf
-              type: int
+              type: integer
               description: >
                 Biggest input buffer among current client connections
 
             - name: blocked_clients
-              type: int
+              type: integer
               description: >
                 Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
 

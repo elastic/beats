@@ -1,4 +1,13 @@
-// Fetch status information from mysql: http://dev.mysql.com/doc/refman/5.7/en/show-status.html
+/**
+
+Fetch status information from mysql: http://dev.mysql.com/doc/refman/5.7/en/show-status.html
+
+TODO @ruflin, 20160315
+ * Complete fields read
+ * Complete template
+ * Complete dashboards
+
+*/
 package status
 
 import (
@@ -71,7 +80,8 @@ func (m *MetricSeter) getConnection(dsn string) (*sql.DB, error) {
 // loadStatus loads all status entries from the given database into an array
 func (m *MetricSeter) loadStatus(db *sql.DB) (map[string]string, error) {
 
-	rows, err := db.Query("SHOW STATUS")
+	// Returns the global status, also for versions previous 5.0.2
+	rows, err := db.Query("SHOW /*!50002 GLOBAL */ STATUS;")
 	if err != nil {
 		return nil, err
 	}
