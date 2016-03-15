@@ -24,8 +24,56 @@
         "@timestamp": {
           "type": "date"
         },
+        "mysql-status": {
+          "properties": {
+            "aborted": {
+              "properties": {
+                "Aborted_clients": {
+                  "doc_values": "true",
+                  "type": "integer"
+                },
+                "Aborted_connects": {
+                  "doc_values": "true",
+                  "type": "integer"
+                }
+              }
+            },
+            "bytes": {
+              "properties": {
+                "Bytes_received": {
+                  "doc_values": "true",
+                  "type": "integer"
+                },
+                "Bytes_sent": {
+                  "doc_values": "true",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
         "redis-info": {
           "properties": {
+            "clients": {
+              "properties": {
+                "blocked_clients": {
+                  "doc_values": "true",
+                  "type": "integer"
+                },
+                "client_biggest_input_buf": {
+                  "doc_values": "true",
+                  "type": "integer"
+                },
+                "client_longest_output_list": {
+                  "doc_values": "true",
+                  "type": "integer"
+                },
+                "connected_clients": {
+                  "doc_values": "true",
+                  "type": "integer"
+                }
+              }
+            },
             "cpu": {
               "properties": {
                 "used_cpu_sys": {
@@ -48,7 +96,7 @@
             }
           }
         },
-        "response_time": {
+        "rtt": {
           "doc_values": "true",
           "type": "long"
         }

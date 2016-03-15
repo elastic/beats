@@ -37,8 +37,9 @@ common:
         The timestamp when the log line was read. The precision is in
         milliseconds. The timezone is UTC.
 
-    - name: response_time
+    - name: rtt
       type: long
       required: true
       description: >
-        Event Reponse time in nano seconds
+        Event round trip time in nano seconds
+

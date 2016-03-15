@@ -137,6 +137,11 @@ def fill_field_properties(field, defaults):
             "type": "float",
             "doc_values": "true"
         }
+    elif field.get("type") == "integer":
+        properties[field["name"]] = {
+            "type": "integer",
+            "doc_values": "true"
+        }
     elif field.get("type") == "group":
         prop = fill_section_properties(field, defaults)
 
