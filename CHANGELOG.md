@@ -10,4 +10,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Added
 
+### Changed
+- Rename `Configuration` variable in beat struct to `beatConfig` as generalization from @buehler.
+
 ### Deprecated
