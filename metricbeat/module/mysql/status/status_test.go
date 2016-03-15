@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 )
@@ -28,9 +29,10 @@ func TestFetch(t *testing.T) {
 
 	// Check event fields
 	connections := event["Connections"].(int)
-	openTables := event["Open_tables"].(int)
-	openFiles := event["Open_files"].(int)
-	openStreams := event["Open_streams"].(int)
+	open := event["open"].(common.MapStr)
+	openTables := open["Open_tables"].(int)
+	openFiles := open["Open_files"].(int)
+	openStreams := open["Open_streams"].(int)
 
 	assert.True(t, connections > 0)
 	assert.True(t, openTables > 0)

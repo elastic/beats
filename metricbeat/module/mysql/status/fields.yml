@@ -1,0 +1,39 @@
+mysql-status:
+  type: group
+  description: >
+    MySQL Stats
+  fields:
+    - name: mysql-status
+      type: group
+      description: >
+        MySQL Status
+      fields:
+        - name: aborted
+          type: group
+          description: >
+            Aborted status fields
+          fields:
+            - name: Aborted_clients
+              type: integer
+              description: >
+                The number of connections that were aborted because the client died without closing the connection properly.
+
+            - name: Aborted_connects
+              type: integer
+              description: >
+                The number of failed attempts to connect to the MySQL server.
+
+        - name: bytes
+          type: group
+          description: >
+            Bytes stats
+          fields:
+            - name: Bytes_received
+              type: integer
+              description: >
+                The number of bytes received from all clients.
+
+            - name: Bytes_sent
+              type: integer
+              description: >
+                The number of bytes sent to all clients.
