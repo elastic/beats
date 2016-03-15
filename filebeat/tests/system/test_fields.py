@@ -62,12 +62,12 @@ class Test(BaseTest):
 
     def test_beat_fields(self):
         """
-        Checks that it's possible to set a custom shipper name. Also
+        Checks that it's possible to set a custom beat name. Also
         tests that beat.hostname  has values.
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            shipperName="testShipperName"
+            beatName="testBeatName"
         )
 
         with open(self.working_dir + "/test.log", "w") as f:
@@ -79,6 +79,6 @@ class Test(BaseTest):
 
         output = self.read_output()
         doc = output[0]
-        assert doc["beat.name"] == "testShipperName"
+        assert doc["beat.name"] == "testBeatName"
         assert doc["beat.hostname"] == socket.gethostname()
         assert "fields" not in doc

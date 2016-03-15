@@ -514,7 +514,7 @@ quiet requests with an error response are published immediately.
 
 ==== MySQL and PgSQL Configuration Options
 
-You can specify the following options in the `mysql` or `pgsql` sections: 
+You can specify the following options in the `mysql` or `pgsql` sections:
 
 ===== max_rows
 
@@ -698,7 +698,7 @@ process' command line as read from `/proc/<pid>/cmdline`.
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/beatconfig.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 

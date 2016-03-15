@@ -42,6 +42,35 @@ class Test(BaseTest):
         assert self.log_contains("loading config file error") is True
         assert self.log_contains("YAML config parsing failed") is True
 
+    def test_beat_shipper_config(self):
+        """
+        Test that error occurs when beat and shipper are used
+        """
+        shutil.copy("../files/beat-shipper.yml",
+                    os.path.join(self.working_dir, "beat-shipper.yml"))
+
+        exit_code = self.run_beat(config="beat-shipper.yml")
+
+        assert exit_code == 1
+        assert self.log_contains("beat and shipper are set in config. Only one can be enabled. shipper is deprecated, use beat.") is True
+
+    def test_shipper_to_beat(self):
+        """
+        Test that shipper config is copied to beat
+        """
+        shutil.copy("../files/shipper.yml",
+                    os.path.join(self.working_dir, "shipper.yml"))
+
+        exit_code = self.run_beat()
+
+        proc = self.start_beat(config="shipper.yml")
+        self.wait_until( lambda: self.log_contains("mockbeat sucessfully setup"))
+        exit_code = proc.kill_and_wait()
+
+        assert exit_code == 0
+        assert self.log_contains("shipper config is deprecated. Please use beat instead.") is True
+        assert self.log_contains("Publisher name: shipperName") is True
+
     def test_config_test(self):
         """
         Checks if -configtest works as expected

@@ -58,15 +58,15 @@ filebeat:
   registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
 
 
-############################# Shipper ############################################
-shipper:
+############################# Beat ############################################
+beat:
 
- # The name of the shipper that publishes the network data. It can be used to group
- # all the transactions sent by a single shipper in the web interface.
+ # The name of the beat that publishes the data. It can be used to group
+ # all the transactions sent by a single beat in the web interface.
  # If this options is not defined, the hostname is used.
- name: {{shipperName}}
+ name: {{beatName}}
 
- # The tags of the shipper are included in their own field with each
+ # The tags of the beat are included in their own field with each
  # transaction published. Tags make it easy to group servers by different
  # logical properties.
  tags: [
@@ -79,8 +79,8 @@ shipper:
 
 
  # Uncomment the following if you want to ignore transactions created
- # by the server on which the shipper is installed. This option is useful
- # to remove duplicates if shippers are installed on multiple servers.
+ # by the server on which the beat is installed. This option is useful
+ # to remove duplicates if beat are installed on multiple servers.
  # ignore_outgoing: true
 
 

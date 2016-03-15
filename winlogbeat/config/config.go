@@ -36,7 +36,7 @@ type Settings struct {
 // Validate validates the Settings data and returns an error describing
 // all problems or nil if there are none.
 func (s Settings) Validate() error {
-	validKeys := []string{"winlogbeat", "output", "shipper", "logging"}
+	validKeys := []string{"winlogbeat", "output", "beat", "shipper", "logging"}
 	sort.Strings(validKeys)
 
 	// Check for invalid top-level keys.

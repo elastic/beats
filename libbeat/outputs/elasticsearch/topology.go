@@ -64,7 +64,7 @@ func (t *topology) EnableTTL() error {
 	return nil
 }
 
-// Get the name of a shipper by its IP address from the local topology map
+// Get the name of a beat by its IP address from the local topology map
 func (t *topology) GetNameByIP(ip string) string {
 	topologyMap, ok := t.TopologyMap.Load().(map[string]string)
 	if ok {
@@ -76,7 +76,7 @@ func (t *topology) GetNameByIP(ip string) string {
 	return ""
 }
 
-// Each shipper publishes a list of IPs together with its name to Elasticsearch
+// Each beat publishes a list of IPs together with its name to Elasticsearch
 func (t *topology) PublishIPs(name string, localAddrs []string) error {
 	if !t.ttlEnabled {
 		logp.Debug("output_elasticsearch",
@@ -120,7 +120,7 @@ func (t *topology) PublishIPs(name string, localAddrs []string) error {
 
 // Update the local topology map
 func loadTopolgyMap(client *Client) (map[string]string, error) {
-	// get all shippers IPs from Elasticsearch
+	// get all beats IPs from Elasticsearch
 
 	index := ".packetbeat-topology"
 	docType := "server-ip"

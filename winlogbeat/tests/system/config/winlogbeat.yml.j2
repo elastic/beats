@@ -45,11 +45,11 @@ output:
     {% endif %}
     rotate_every_kb: 1000
 
-############################# Shipper #########################################
+############################# Beat #########################################
 
-shipper:
-  {%- if shipper_name %}
-  name: {{ shipper_name }}
+beat:
+  {%- if beat_name %}
+  name: {{ beat_name }}
   {% endif %}
 
   {%- if tags %}

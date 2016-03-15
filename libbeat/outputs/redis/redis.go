@@ -219,7 +219,7 @@ func (out *redisOutput) UpdateLocalTopologyMap(conn redis.Conn) {
 	topologyMapTmp := make(map[string]string)
 	hostnames, err := redis.Strings(conn.Do("KEYS", "*"))
 	if err != nil {
-		logp.Err("Fail to get the all shippers from the topology map %s", err)
+		logp.Err("Fail to get the all beats from the topology map %s", err)
 		return
 	}
 	for _, hostname := range hostnames {

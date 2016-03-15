@@ -1,0 +1,14 @@
+# This is an invalid config and an error should be returned
+beat:
+  name: "beatName"
+
+# Deprecated shipper config
+shipper:
+  name: "shipperName"
+
+
+output:
+  elasticsearch:
+    enabled: true
+    port: 9200
+    host: localhost

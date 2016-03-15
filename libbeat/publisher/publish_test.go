@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	shipperName   = "testShipper"
+	beatName      = "testBeat"
 	hostOnNetwork = "someHost"
 )
 
@@ -46,8 +46,8 @@ func TestPrintPublishEvent(t *testing.T) {
 
 // Test GetServerName.
 func TestPublisherTypeGetServerName(t *testing.T) {
-	pt := &PublisherType{name: shipperName}
-	assert.Equal(t, shipperName, pt.GetServerName("127.0.0.1"))
+	pt := &PublisherType{name: beatName}
+	assert.Equal(t, beatName, pt.GetServerName("127.0.0.1"))
 
 	// Unknown hosts return empty string.
 	assert.Equal(t, "", pt.GetServerName("172.0.0.1"))
@@ -67,7 +67,7 @@ func TestPublisherTypeUpdateTopologyPeriodically(t *testing.T) {
 		publishLocalAddrs: make(chan []string, 1),
 	}
 	pt := &PublisherType{
-		name:                 shipperName,
+		name:                 beatName,
 		RefreshTopologyTimer: c,
 		TopologyOutput:       topo,
 	}
@@ -78,6 +78,6 @@ func TestPublisherTypeUpdateTopologyPeriodically(t *testing.T) {
 	pt.UpdateTopologyPeriodically()
 
 	// Validate that PublishTopology was invoked.
-	assert.Equal(t, shipperName, <-topo.publishName)
+	assert.Equal(t, beatName, <-topo.publishName)
 	assert.True(t, len(<-topo.publishLocalAddrs) > 0)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 // LocalIpAddrs finds the IP addresses of the hosts on which
-// the shipper currently runs on.
+// the beat currently runs on.
 func LocalIpAddrs() ([]net.IP, error) {
 	var localIPAddrs = []net.IP{}
 	ipaddrs, err := net.InterfaceAddrs()
@@ -22,7 +22,7 @@ func LocalIpAddrs() ([]net.IP, error) {
 }
 
 // LocalIpAddrsAsStrings finds the IP addresses of the hosts on which
-// the shipper currently runs on and returns them as an array of
+// the beat currently runs on and returns them as an array of
 // strings.
 func LocalIpAddrsAsStrings(include_loopbacks bool) ([]string, error) {
 	var localIPAddrsStrings = []string{}
