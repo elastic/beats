@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"histogram\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"scale\":\"linear\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"proc.mem.rss_p\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"proc.name\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Top 10 memory consumers", 
-  "version": 1, 
-  "savedSearchId": "Processes", 
+  "visState": "{\"type\":\"histogram\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"addTimeMarker\":false,\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"avg\",\"params\":{\"field\":\"proc.mem.rss_p\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"proc.name\",\"order\":\"desc\",\"size\":10},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Top-10-memory-consumers",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

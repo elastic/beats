@@ -1,0 +1,70 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "cpu.user_p"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "cpu.system_p"
+            },
+            "schema": "metric",
+            "type": "avg"
+        },
+        {
+            "id": "4",
+            "params": {
+                "field": "mem.total"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "5",
+            "params": {
+                "field": "mem.used"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "8",
+            "params": {
+                "field": "mem.used_p"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "6",
+            "params": {
+                "field": "mem.free"
+            },
+            "schema": "metric",
+            "type": "max"
+        },
+        {
+            "id": "9",
+            "params": {
+                "field": "beat.name",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "bucket",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "perPage": 10,
+        "showMeticsAtAllLevels": false,
+        "showPartialRows": false
+    },
+    "type": "table"
+}

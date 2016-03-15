@@ -1,0 +1,27 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "client_location",
+                "precision": 3
+            },
+            "schema": "segment",
+            "type": "geohash_grid"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "isDesaturated": true,
+        "mapType": "Shaded Circle Markers"
+    },
+    "type": "tile_map"
+}

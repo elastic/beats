@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"defaultYExtents\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\",\"percents\":[75,99,99.5]}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Mysql response times percentiles", 
-  "version": 1, 
-  "savedSearchId": "MySQL-Transactions", 
+  "visState": "{\"type\":\"line\",\"listeners\":{},\"params\":{\"defaultYExtents\":false,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true},\"aggs\":[{\"type\":\"percentiles\",\"params\":{\"field\":\"responsetime\",\"percents\":[75,99,99.5]},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "Mysql-response-times-percentiles",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

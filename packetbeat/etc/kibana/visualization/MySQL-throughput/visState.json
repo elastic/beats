@@ -1,0 +1,39 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "bytes_out"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "bytes_in"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "4",
+            "params": {
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+            },
+            "schema": "segment",
+            "type": "date_histogram"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "shareYAxis": true
+    },
+    "type": "line"
+}

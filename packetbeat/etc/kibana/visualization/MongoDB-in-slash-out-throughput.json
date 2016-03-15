@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "MongoDB in/out throughput", 
-  "version": 1, 
-  "savedSearchId": "MongoDB-transactions", 
+  "visState": "{\"type\":\"line\",\"listeners\":{},\"params\":{\"scale\":\"linear\",\"showCircles\":true,\"yAxis\":{},\"smoothLines\":false,\"addTimeMarker\":false,\"interpolate\":\"linear\",\"addLegend\":true,\"shareYAxis\":true,\"radiusRatio\":9,\"drawLinesBetweenPoints\":true,\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[]},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"bytes_in\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"customInterval\":\"2h\",\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"sum\",\"params\":{\"field\":\"bytes_out\"},\"id\":\"4\",\"schema\":\"metric\"}]}",
+  "description": "",
+  "title": "MongoDB-in-slash-out-throughput",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

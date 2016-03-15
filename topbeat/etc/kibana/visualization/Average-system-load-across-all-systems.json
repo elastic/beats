@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"metric\",\"params\":{\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"load.load1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Average system load across all systems", 
-  "version": 1, 
-  "savedSearchId": "System-wide", 
+  "visState": "{\"type\":\"metric\",\"listeners\":{},\"params\":{\"fontSize\":60},\"aggs\":[{\"type\":\"avg\",\"params\":{\"field\":\"load.load1\"},\"id\":\"1\",\"schema\":\"metric\"}]}",
+  "description": "",
+  "title": "Average-system-load-across-all-systems",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

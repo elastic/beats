@@ -205,6 +205,8 @@ coverage-report:
 .PHONY: update
 update:
 	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
+	make kibana-extract
+	make kibana-construct
 
 ### KIBANA FILES HANDLING ###
 
@@ -217,6 +219,11 @@ kibana-export:
 kibana-import:
 	python ${ES_BEATS}/libbeat/scripts/kibana_import.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
 
+kibana-extract:
+	python 	${ES_BEATS}/libbeat/scripts/kibana_extract.py
+
+kibana-construct:
+	python 	${ES_BEATS}/libbeat/scripts/kibana_construct.py ${BEATNAME}
 
 ### CONTAINER ENVIRONMENT ####
 

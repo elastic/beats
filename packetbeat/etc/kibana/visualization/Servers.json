@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"cpu.user_p\"}},{\"id\":\"3\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"cpu.system_p\"}},{\"id\":\"4\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mem.total\"}},{\"id\":\"5\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mem.used\"}},{\"id\":\"8\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mem.used_p\"}},{\"id\":\"6\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"mem.free\"}},{\"id\":\"9\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"beat.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Servers", 
-  "version": 1, 
-  "savedSearchId": "System-stats", 
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"avg\",\"params\":{\"field\":\"cpu.user_p\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"avg\",\"params\":{\"field\":\"cpu.system_p\"},\"id\":\"3\",\"schema\":\"metric\"},{\"type\":\"max\",\"params\":{\"field\":\"mem.total\"},\"id\":\"4\",\"schema\":\"metric\"},{\"type\":\"max\",\"params\":{\"field\":\"mem.used\"},\"id\":\"5\",\"schema\":\"metric\"},{\"type\":\"max\",\"params\":{\"field\":\"mem.used_p\"},\"id\":\"8\",\"schema\":\"metric\"},{\"type\":\"max\",\"params\":{\"field\":\"mem.free\"},\"id\":\"6\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"beat.name\",\"order\":\"desc\",\"size\":5},\"id\":\"9\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Servers",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

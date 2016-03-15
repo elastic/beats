@@ -1,0 +1,32 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "field": "http.code",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "segment",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": false,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "mode": "stacked",
+        "shareYAxis": true
+    },
+    "type": "histogram"
+}

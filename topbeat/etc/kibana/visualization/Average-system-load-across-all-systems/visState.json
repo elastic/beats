@@ -1,0 +1,17 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "load.load1"
+            },
+            "schema": "metric",
+            "type": "avg"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "fontSize": 60
+    },
+    "type": "metric"
+}

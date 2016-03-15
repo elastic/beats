@@ -1,0 +1,51 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "responsetime"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "customInterval": "2h",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+            },
+            "schema": "segment",
+            "type": "date_histogram"
+        },
+        {
+            "id": "3",
+            "params": {
+                "field": "resource",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+            },
+            "schema": "group",
+            "type": "terms"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTimeMarker": false,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "interpolate": "linear",
+        "mode": "stacked",
+        "scale": "linear",
+        "setYExtents": false,
+        "shareYAxis": true,
+        "smoothLines": false,
+        "times": [],
+        "yAxis": {}
+    },
+    "type": "area"
+}

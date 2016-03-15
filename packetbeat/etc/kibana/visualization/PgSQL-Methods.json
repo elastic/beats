@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"area\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"mode\":\"wiggle\",\"defaultYExtents\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"count\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"method\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "PgSQL Methods", 
-  "version": 1, 
-  "savedSearchId": "PgSQL-transactions", 
+  "visState": "{\"type\":\"area\",\"listeners\":{},\"params\":{\"defaultYExtents\":false,\"shareYAxis\":true,\"addTooltip\":true,\"mode\":\"wiggle\",\"addLegend\":true},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"count\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"2\",\"schema\":\"segment\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"method\",\"order\":\"desc\",\"size\":5},\"id\":\"3\",\"schema\":\"group\"}]}",
+  "description": "",
+  "title": "PgSQL-Methods",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

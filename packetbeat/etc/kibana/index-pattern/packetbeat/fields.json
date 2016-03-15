@@ -1,0 +1,605 @@
+[
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.server",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_source",
+        "scripted": false,
+        "type": "_source"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "count",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "bytes_out",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.content_length",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.cache-control",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.date",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "type",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "client_ip",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.user-agent",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.accept",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "status",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.connection",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_index",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.accept-encoding",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.content-type",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "client_server",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "@timestamp",
+        "scripted": false,
+        "type": "date"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.connection",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.accept-language",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "beat.name",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "port",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "client_proc",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "responsetime",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "http.response_headers.cache-control",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "direction",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "query",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.x-forward-for",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.x-scheme",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "client_location",
+        "scripted": false,
+        "type": "conflict"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "beat.hostname",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "path",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "client_port",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "proc",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "bytes_in",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.cookie",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.host",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.phrase",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.x-real-ip",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.code",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "params",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "ip",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "real_ip",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.content-length",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "method",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "server",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.insert_id",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.num_fields",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.iserror",
+        "scripted": false,
+        "type": "boolean"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "mysql.error_message",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.num_rows",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.affected_rows",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "mysql.error_code",
+        "scripted": false,
+        "type": "number"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.x-requested-with",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.last-modified",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.accept-charset",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "request",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.transfer-encoding",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.set-cookie",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.referer",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.accept-ranges",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": true,
+        "count": 0,
+        "doc_values": false,
+        "indexed": true,
+        "name": "response",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.response_headers.content-encoding",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": true,
+        "indexed": true,
+        "name": "http.request_headers.pragma",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_id",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_type",
+        "scripted": false,
+        "type": "string"
+    },
+    {
+        "analyzed": false,
+        "count": 0,
+        "doc_values": false,
+        "indexed": false,
+        "name": "_score",
+        "scripted": false,
+        "type": "number"
+    }
+]

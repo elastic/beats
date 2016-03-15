@@ -1,0 +1,56 @@
+{
+    "filter": [
+        {
+            "meta": {
+                "disabled": false,
+                "index": "packetbeat-*",
+                "key": "type",
+                "negate": false,
+                "value": "mysql"
+            },
+            "query": {
+                "match": {
+                    "type": {
+                        "query": "mysql",
+                        "type": "phrase"
+                    }
+                }
+            }
+        },
+        {
+            "meta": {
+                "disabled": false,
+                "index": "packetbeat-*",
+                "key": "status",
+                "negate": true,
+                "value": "OK"
+            },
+            "query": {
+                "match": {
+                    "status": {
+                        "query": "OK",
+                        "type": "phrase"
+                    }
+                }
+            }
+        }
+    ],
+    "highlight": {
+        "fields": {
+            "*": {}
+        },
+        "post_tags": [
+            "@/kibana-highlighted-field@"
+        ],
+        "pre_tags": [
+            "@kibana-highlighted-field@"
+        ]
+    },
+    "index": "packetbeat-*",
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "*"
+        }
+    }
+}

@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"fs.used\"}},{\"id\":\"2\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"fs.used_p\"}},{\"id\":\"3\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"fs.total\"}},{\"id\":\"4\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"fs.free\"}},{\"id\":\"5\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"fs.free\"}},{\"id\":\"6\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fs.device_name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"7\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"fs.mount_point\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Disk usage", 
-  "version": 1, 
-  "savedSearchId": "Filesystem-stats", 
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"avg\",\"params\":{\"field\":\"fs.used\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"avg\",\"params\":{\"field\":\"fs.used_p\"},\"id\":\"2\",\"schema\":\"metric\"},{\"type\":\"avg\",\"params\":{\"field\":\"fs.total\"},\"id\":\"3\",\"schema\":\"metric\"},{\"type\":\"avg\",\"params\":{\"field\":\"fs.free\"},\"id\":\"4\",\"schema\":\"metric\"},{\"type\":\"avg\",\"params\":{\"field\":\"fs.free\"},\"id\":\"5\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"fs.device_name\",\"order\":\"desc\",\"size\":5},\"id\":\"6\",\"schema\":\"bucket\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"fs.mount_point\",\"order\":\"desc\",\"size\":5},\"id\":\"7\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Disk-usage",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

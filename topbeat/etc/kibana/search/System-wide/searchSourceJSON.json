@@ -1,0 +1,40 @@
+{
+    "filter": [
+        {
+            "meta": {
+                "disabled": false,
+                "index": "topbeat-*",
+                "key": "type",
+                "negate": false,
+                "value": "system"
+            },
+            "query": {
+                "match": {
+                    "type": {
+                        "query": "system",
+                        "type": "phrase"
+                    }
+                }
+            }
+        }
+    ],
+    "highlight": {
+        "fields": {
+            "*": {}
+        },
+        "fragment_size": 2147483647,
+        "post_tags": [
+            "@/kibana-highlighted-field@"
+        ],
+        "pre_tags": [
+            "@kibana-highlighted-field@"
+        ]
+    },
+    "index": "topbeat-*",
+    "query": {
+        "query_string": {
+            "analyze_wildcard": true,
+            "query": "*"
+        }
+    }
+}

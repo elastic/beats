@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"defaultYExtents\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_out\"}},{\"id\":\"3\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"bytes_in\"}},{\"id\":\"4\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "MySQL throughput", 
-  "version": 1, 
-  "savedSearchId": "MySQL-Transactions", 
+  "visState": "{\"type\":\"line\",\"listeners\":{},\"params\":{\"defaultYExtents\":false,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true},\"aggs\":[{\"type\":\"sum\",\"params\":{\"field\":\"bytes_out\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"sum\",\"params\":{\"field\":\"bytes_in\"},\"id\":\"3\",\"schema\":\"metric\"},{\"type\":\"date_histogram\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}},\"id\":\"4\",\"schema\":\"segment\"}]}",
+  "description": "",
+  "title": "MySQL-throughput",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }

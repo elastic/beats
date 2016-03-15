@@ -1,0 +1,61 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+            },
+            "schema": "segment",
+            "type": "date_histogram"
+        },
+        {
+            "id": "3",
+            "params": {
+                "filters": [
+                    {
+                        "input": {
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true,
+                                    "query": "method: SELECT"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "input": {
+                            "query": {
+                                "query_string": {
+                                    "analyze_wildcard": true,
+                                    "query": "method: INSERT or method: UPDATE or method: DELETE"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "schema": "group",
+            "type": "filters"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "mode": "grouped",
+        "shareYAxis": true
+    },
+    "type": "histogram"
+}

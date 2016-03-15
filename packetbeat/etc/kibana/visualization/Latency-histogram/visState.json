@@ -1,0 +1,38 @@
+{
+    "aggs": [
+        {
+            "id": "1",
+            "params": {
+                "field": "count"
+            },
+            "schema": "metric",
+            "type": "sum"
+        },
+        {
+            "id": "2",
+            "params": {
+                "extended_bounds": {},
+                "field": "responsetime",
+                "interval": 10
+            },
+            "schema": "segment",
+            "type": "histogram"
+        }
+    ],
+    "listeners": {},
+    "params": {
+        "addLegend": true,
+        "addTimeMarker": false,
+        "addTooltip": true,
+        "defaultYExtents": false,
+        "interpolate": "linear",
+        "mode": "stacked",
+        "scale": "linear",
+        "setYExtents": false,
+        "shareYAxis": true,
+        "smoothLines": false,
+        "times": [],
+        "yAxis": {}
+    },
+    "type": "area"
+}

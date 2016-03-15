@@ -1,20 +1,22 @@
 {
   "sort": [
-    "@timestamp", 
+    "@timestamp",
     "desc"
-  ], 
-  "hits": 0, 
-  "description": "", 
-  "title": "Thrift transactions", 
-  "version": 1, 
+  ],
+  "hits": 0,
+  "description": "",
+  "title": "Thrift-transactions",
+  "version": 1,
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[{\"meta\":{\"index\":\"packetbeat-*\",\"negate\":false,\"key\":\"type\",\"value\":\"thrift\",\"disabled\":false},\"query\":{\"match\":{\"type\":{\"query\":\"thrift\",\"type\":\"phrase\"}}}}],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"type: thrift\"}}}"
-  }, 
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"match\":{\"type\":{\"query\":\"thrift\",\"type\":\"phrase\"}}},\"meta\":{\"disabled\":false,\"index\":\"packetbeat-*\",\"negate\":false,\"value\":\"thrift\",\"key\":\"type\"}}],\"highlight\":{\"fields\":{\"*\":{}},\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"]},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"type: thrift\"}},\"index\":\"packetbeat-*\"}"
+  },
   "columns": [
-    "method", 
-    "type", 
-    "path", 
-    "responsetime", 
-    "status"
+    "record_number",
+    "log_name",
+    "level",
+    "source_name",
+    "message",
+    "event_id",
+    "user.name"
   ]
 }

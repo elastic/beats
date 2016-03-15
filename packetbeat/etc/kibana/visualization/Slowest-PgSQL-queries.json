@@ -1,9 +1,9 @@
 {
-  "visState": "{\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"responsetime\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"query\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}", 
-  "description": "", 
-  "title": "Slowest PgSQL queries", 
-  "version": 1, 
-  "savedSearchId": "PgSQL-transactions", 
+  "visState": "{\"type\":\"table\",\"listeners\":{},\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false},\"aggs\":[{\"type\":\"avg\",\"params\":{\"field\":\"responsetime\"},\"id\":\"1\",\"schema\":\"metric\"},{\"type\":\"terms\",\"params\":{\"orderBy\":\"1\",\"field\":\"query\",\"order\":\"desc\",\"size\":10},\"id\":\"2\",\"schema\":\"bucket\"}]}",
+  "description": "",
+  "title": "Slowest-PgSQL-queries",
+  "uiStateJSON": "{}",
+  "version": 1,
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }
