@@ -21,6 +21,9 @@
         }
       ],
       "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
         "redis-info": {
           "properties": {
             "cpu": {
@@ -44,6 +47,10 @@
               }
             }
           }
+        },
+        "response_time": {
+          "doc_values": "true",
+          "type": "long"
         }
       }
     }
