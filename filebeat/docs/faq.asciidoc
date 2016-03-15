@@ -4,8 +4,41 @@
 This section contains frequently asked questions about Filebeat. Also check out the
 https://discuss.elastic.co/c/beats/filebeat[Filebeat discussion forum].
 
-=== Can I read log files from network volumes?
+[[filebeat-network-volumes]]
+=== Why can't I read log files from network volumes?
 
 We do not recommend reading log files from network volumes. Whenever possible, install Filebeat on the host machine and
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
 effects. For example, changed file identifiers may result in Filebeat reading a log file from scratch again.
+
+=== Why isn’t Filebeat collecting lines from my file?
+
+Filebeat might be incorrectly configured or unable to send events to the output. To resolve the issue:
+
+* Make sure the config file specifies the correct path to the file that you are collecting. See <<filebeat-configuration>>
+for more information.
+* Verify that the file is not older than the value specified by <<ignore-older,`ignore_older`>>. By default, Filebeat
+stops reading files that are older than 24 hours. You can change this behavior by specifying a different value for
+<<ignore-older,`ignore_older`>>.
+* Make sure that Filebeat is able to send events to the configured output. Run Filebeat in debug mode to determine whether
+it's publishing events successfully:
++
+["source","sh",subs="attributes,callouts"]
+----------------------------------------------------------------------
+./filebeat -c config.yml -e -d "*"
+----------------------------------------------------------------------
+
+[[filebeat-cpu]]
+=== Why is Filebeat using too much CPU?
+
+Filebeat might be configured to scan for files too frequently. Check the setting for `scan_frequency` in the `filebeat.yml`
+config file. Setting `scan_frequency` to less than 1s may cause Filebeat to scan the disk in a tight loop.
+
+//=== Why is Filebeat keeping old files open?
+
+[[dashboard-fields-incorrect-filebeat]]
+=== Why is the dashboard in Kibana breaking up my data fields incorrectly?
+
+The index template might not be loaded correctly. See <<filebeat-template>>.
+
+include::../../libbeat/docs/shared-faq.asciidoc[]

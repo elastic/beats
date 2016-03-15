@@ -1,6 +1,6 @@
 = Packetbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.1
-:version: 1.1.1
+:version: 1.1.2
 :beatname_lc: packetbeat
 :beatname_uc: Packetbeat
 
@@ -28,7 +28,7 @@ include::./kibana3.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./faq.asciidoc[]
+include::./faq.asciidoc[]
 
 include::./reference.asciidoc[]
 

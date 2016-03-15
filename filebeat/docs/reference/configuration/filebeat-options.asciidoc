@@ -46,6 +46,7 @@ One of the following input types:
 
 The value that you specify here is used as the `input_type` for each event published to Logstash and Elasticsearch.
 
+[[exclude-lines]]
 ===== exclude_lines
 
 A list of regular expressions to match the lines that you want Filebeat to exclude. Filebeat drops any lines that match a regular expression in the list. By default, no lines are dropped.
@@ -59,6 +60,7 @@ The following example configures Filebeat to drop any lines that start with "DBG
 exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
+[[include-lines]]
 ===== include_lines
 
 A list of regular expressions to match the lines that you want Filebeat to include. Filebeat exports only the lines that match a regular expression in the list. By default, all lines are exported.
@@ -113,6 +115,7 @@ If this option is set to true, the custom <<configuration-fields>> are stored as
 in the output document instead of being grouped under a `fields` sub-dictionary.
 If the custom field names conflict with other field names added by Filebeat, the custom fields overwrite the other fields.
 
+[[ignore-older]]
 ===== ignore_older
 
 If this option is specified, Filebeat

@@ -1,6 +1,6 @@
 = Winlogbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.1
-:version: 1.1.1
+:version: 1.1.2
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
 
@@ -16,7 +16,7 @@ include::../../libbeat/docs/https.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
-//include::./faq.asciidoc[]
+include::./faq.asciidoc[]
 
 include::./reference.asciidoc[]
 
