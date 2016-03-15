@@ -23,14 +23,14 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, msErr)
 
 	// Load events
-	events, err := ms.MetricSeter.Fetch(ms)
+	event, err := ms.MetricSeter.Fetch(ms, module.Config.Hosts[0])
 	assert.NoError(t, err)
 
 	// Check event fields
-	connections := events[0]["Connections"].(int)
-	openTables := events[0]["Open_tables"].(int)
-	openFiles := events[0]["Open_files"].(int)
-	openStreams := events[0]["Open_streams"].(int)
+	connections := event["Connections"].(int)
+	openTables := event["Open_tables"].(int)
+	openFiles := event["Open_files"].(int)
+	openStreams := event["Open_streams"].(int)
 
 	assert.True(t, connections > 0)
 	assert.True(t, openTables > 0)

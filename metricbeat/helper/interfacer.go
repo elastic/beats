@@ -24,8 +24,11 @@ type MetricSeter interface {
 	// and the module.
 	Setup(ms *MetricSet) error
 
-	// Method to periodically fetch new events
-	Fetch(ms *MetricSet) ([]common.MapStr, error)
+	// Method to periodically fetch a new event from a host
+	// Fetch is called for each host. In case where host does not exist, it can be transferred
+	// differently in the setup to have a different meaning. An example here is for filesystem
+	// of topbeat, where each host could be a filesystem.
+	Fetch(ms *MetricSet, host string) (common.MapStr, error)
 }
 
 // Interface for each module

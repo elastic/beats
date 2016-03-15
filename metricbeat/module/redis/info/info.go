@@ -151,15 +151,20 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 	// Additional configuration options
 	config := struct {
+		// TODO: Introduce default value for network
 		Network string `config:"network"`
 		MaxConn int    `config:"maxconn"`
-	}{}
+	}{
+		Network: "tcp",
+		MaxConn: 10,
+	}
 
 	if err := ms.Module.ProcessConfig(&config); err != nil {
 		return err
 	}
 
 	for _, host := range ms.Config.Hosts {
+
 		// Set up redis pool
 		redisPool := rd.NewPool(func() (rd.Conn, error) {
 			c, err := rd.Dial(config.Network, host)
@@ -175,19 +180,16 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 		// TODO: add AUTH
 		m.redisPools[host] = redisPool
 	}
+
 	return nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
 
-	for _, host := range ms.Config.Hosts {
-		// Fetch default INFO
-		info := m.fetchRedisStats(host, "default")
-		event := eventMapping(info)
-		events = append(events, event)
-	}
-
-	return events, nil
+	// Fetch default INFO
+	info := m.fetchRedisStats(host, "default")
+	event := eventMapping(info)
+	return event, nil
 }
 
 // fetchRedisStats returns a map of requested stats
