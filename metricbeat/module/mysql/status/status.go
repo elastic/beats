@@ -33,26 +33,21 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 }
 
 // Fetches status messages from mysql hosts
-func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
 
-	// Load status for all hosts and add it to events
-	for _, host := range ms.Config.Hosts {
-		db, err := m.getConnection(host)
-		if err != nil {
-			logp.Err("MySQL conenction error: %s", err)
-		}
-
-		status, err := m.loadStatus(db)
-
-		if err != nil {
-			return nil, err
-		}
-
-		event := eventMapping(status)
-		events = append(events, event)
+	db, err := m.getConnection(host)
+	if err != nil {
+		logp.Err("MySQL conenction error: %s", err)
 	}
 
-	return events, nil
+	status, err := m.loadStatus(db)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return eventMapping(status), nil
+
 }
 
 // getConnection returns the connection object for the given dsn

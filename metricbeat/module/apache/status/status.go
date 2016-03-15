@@ -7,7 +7,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
@@ -28,29 +27,22 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 	return nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet) (events []common.MapStr, err error) {
+func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
 
-	hosts := ms.Config.Hosts
+	resp, err := http.Get(host + "server-status?auto")
+	if resp == nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
-	for _, host := range hosts {
-		resp, err := http.Get(host + "server-status?auto")
-
-		if resp == nil {
-			continue
-		}
-		defer resp.Body.Close()
-
-		if err != nil {
-			logp.Err("Error during Request: %s", err)
-		}
-
-		if resp.StatusCode != 200 {
-			return nil, fmt.Errorf("HTTP Error %s: %s", resp.StatusCode, resp.Status)
-		}
-
-		event := eventMapping(resp.Body)
-		events = append(events, event)
+	if err != nil {
+		return nil, fmt.Errorf("Error during Request: %s", err)
 	}
 
-	return events, nil
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("HTTP Error %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	return eventMapping(resp.Body), nil
+
 }
