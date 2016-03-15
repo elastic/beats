@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "metricbeat-mysql", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"id\":\"metricbeat-mysql-open\",\"type\":\"visualization\",\"panelIndex\":1,\"size_x\":12,\"size_y\":3,\"col\":1,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}}]}"
+  }
+}

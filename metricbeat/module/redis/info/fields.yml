@@ -14,22 +14,22 @@ redis-info:
             Redis client stats
           fields:
             - name: connected_clients
-              type: int
+              type: integer
               description: >
                 Number of client connections (excluding connections from slaves)
 
             - name: client_longest_output_list
-              type: int
+              type: integer
               description: >
                 Longest output list among current client connections.
 
             - name: client_biggest_input_buf
-              type: int
+              type: integer
               description: >
                 Biggest input buffer among current client connections
 
             - name: blocked_clients
-              type: int
+              type: integer
               description: >
                 Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
 
