@@ -5,8 +5,8 @@
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :ES-version: 2.2.0
-:LS-version: 2.2.0
-:Kibana-version: 4.4.0
+:LS-version: 2.2.2
+:Kibana-version: 4.4.1
 :Dashboards-version: 1.1.1
 
 

@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClientConnect(t *testing.T) {

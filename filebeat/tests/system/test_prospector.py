@@ -112,6 +112,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignoreOlder="1s",
+            closeOlder="1s",
             scan_frequency="0.1s",
         )
 
@@ -307,7 +308,6 @@ class Test(BaseTest):
             max_timeout=15)
 
         filebeat.check_kill_and_wait()
-
 
     def test_close_older(self):
         """
