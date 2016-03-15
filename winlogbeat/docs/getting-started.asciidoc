@@ -120,20 +120,7 @@ include::../../libbeat/docs/shared-logstash-config.asciidoc[]
 [[winlogbeat-template]]
 === Step 4: Loading the Index Template in Elasticsearch
 
-Before starting Winlogbeat, you need to load the
-http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which lets Elasticsearch know which fields should be analyzed
-in which way.
-
-The recommended template file is installed by the Winlogbeat packages. Load it
-with the following command:
-
-[source,shell]
-----------------------------------------------------------------------
-PS C:\Program Files\Winlogbeat> Invoke-WebRequest -Method Put -InFile winlogbeat.template.json -Uri http://localhost:9200/_template/winlogbeat?pretty
-----------------------------------------------------------------------
-
-where `localhost:9200` is the IP and port where Elasticsearch is listening.
+include::../../libbeat/docs/shared-template-load.asciidoc[]
 
 === Step 5: Starting Winlogbeat
 
