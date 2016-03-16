@@ -1,8 +1,6 @@
 package helper
 
 import (
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -34,5 +32,5 @@ type MetricSeter interface {
 // Interface for each module
 type Moduler interface {
 	// Raw ucfg config is passed. This allows each module to extract its own local config variables
-	Setup(cfg *ucfg.Config) error
+	Setup(m *Module) error
 }

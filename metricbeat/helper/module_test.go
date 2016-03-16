@@ -33,7 +33,7 @@ func TestNewModule(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, module)
 
-	err = module.moduler.Setup(config)
+	err = module.moduler.Setup(module)
 	assert.NoError(t, err)
 }
 
@@ -49,7 +49,7 @@ func TestNewModulerDifferentInstance(t *testing.T) {
 	module2, err := NewModule(config, NewMockModuler)
 	assert.NoError(t, err)
 
-	module1.moduler.Setup(config)
+	module1.moduler.Setup(module1)
 	assert.False(t, reflect.DeepEqual(module1.moduler, module2.moduler))
 	assert.True(t, reflect.DeepEqual(module1.moduler, module1.moduler))
 }
@@ -63,7 +63,7 @@ type MockModuler struct {
 	counter int
 }
 
-func (m *MockModuler) Setup(cfg *ucfg.Config) error {
+func (m *MockModuler) Setup(mo *Module) error {
 	m.counter += 1
 	return nil
 }
