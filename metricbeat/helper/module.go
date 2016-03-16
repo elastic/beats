@@ -57,10 +57,9 @@ func NewModule(cfg *ucfg.Config, moduler func() Moduler) (*Module, error) {
 		cfg:        cfg,
 		moduler:    moduler(),
 		metricSets: map[string]*MetricSet{},
-		// TODO: What should be size of channel?
-		Publish: make(chan common.MapStr),
-		wg:      sync.WaitGroup{},
-		done:    make(chan struct{}),
+		Publish:    make(chan common.MapStr), // TODO: What should be size of channel? @ruflin,20160316
+		wg:         sync.WaitGroup{},
+		done:       make(chan struct{}),
 	}, nil
 }
 
@@ -75,7 +74,7 @@ func (m *Module) Start(b *beat.Beat) error {
 	}
 
 	logp.Info("Setup moduler: %s", m.name)
-	err := m.moduler.Setup(m.cfg)
+	err := m.moduler.Setup(m)
 	if err != nil {
 		return fmt.Errorf("Error setting up module: %s. Not starting metricsets for this module.", err)
 	}
