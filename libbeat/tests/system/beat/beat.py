@@ -203,6 +203,7 @@ class TestCase(unittest.TestCase):
         with open(os.path.join(self.working_dir, output), "wb") as f:
             f.write(output_str)
 
+    # Returns output as JSON object with flattened fields (. notation)
     def read_output(self, output_file=None):
 
         # Init defaults
@@ -216,6 +217,19 @@ class TestCase(unittest.TestCase):
                                                  []))
         self.all_have_fields(jsons, ["@timestamp", "type",
                                      "beat.name", "beat.hostname"])
+        return jsons
+
+    # Returns output as JSON object
+    def read_output_json(self, output_file=None):
+
+        # Init defaults
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        jsons = []
+        with open(os.path.join(self.working_dir, output_file), "r") as f:
+            for line in f:
+                jsons.append(json.loads(line))
         return jsons
 
     def copy_files(self, files, source_dir="files/"):

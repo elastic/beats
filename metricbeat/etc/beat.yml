@@ -15,13 +15,21 @@ metricbeat:
       hosts: ["127.0.0.1:6379"]
       enabled: true
 
+      # Selectors to only fetch a subset of metrics (whitelisting)
+      # If no selectors are set, all metrics are sent.
+      # Use filters for a more fine grained filtering.
+      #selectors: []
+
+      # Optional fields to be added to each event
+      #fields:
+      #  datacenter: west
+
       # Network type to be used for redis connection. Default: tcp
       #network: tcp
 
       # Max number of concurrent connections. Default: 10
       #maxconn: 10
-      fields:
-        datacenter: west
+
       #filter: ...
       #username: name
       #password: hello world
