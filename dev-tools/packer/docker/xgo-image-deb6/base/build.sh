@@ -16,18 +16,31 @@
 #   FLAG_RACE   - Optional race flag to set on the Go builder
 
 # Download the canonical import path (may fail, don't allow failures beyond)
-echo "Fetching main repository $1..."
-mkdir -p $GOPATH/src/`dirname $1`
-cd $GOPATH/src/`dirname $1`
-if [ "$SOURCE" != "" ]; then
-        rsync --exclude ".git" -a $SOURCE/ `basename $1`/
+
+if [ $1 = "github.com/elastic/beats" ]; then
+        SRC_FOLDER=$SOURCE
+        DST_FOLDER=$GOPATH/src/$1
+        WORKING_DIRECTORY=$GOPATH/src/$1
 else
+        SRC_FOLDER=$SOURCE
+        DST_FOLDER=$GOPATH/src/$1
+        WORKING_DIRECTORY=$GOPATH/src/`dirname $1`
+fi
+
+if [ "$SOURCE" != "" ]; then
+        mkdir -p ${DST_FOLDER}
+        echo "Copying main source folder ${SRC_FOLDER} to folder ${DST_FOLDER}"
+        rsync --exclude ".git"  --exclude "build/" -a ${SRC_FOLDER}/ ${DST_FOLDER}
+else
+        mkdir -p $GOPATH/src/`dirname $1`
+        cd $GOPATH/src/`dirname $1`
+        echo "Fetching main git repository $1 in folder $GOPATH/src/`dirname $1`"
         git clone https://$1.git
 fi
 
 set -e
 
-cd $GOPATH/src/$1
+cd $WORKING_DIRECTORY
 export GOPATH=$GOPATH:`pwd`/Godeps/_workspace
 export GO15VENDOREXPERIMENT=1
 
@@ -75,8 +88,8 @@ if [ "$STATIC" == "true" ]; then LDARGS=--ldflags\ \'-extldflags\ \"-static\"\';
 
 if [ -n $BEFORE_BUILD ]; then
 	chmod +x /scripts/$BEFORE_BUILD
-	echo "Execute /scripts/$BEFORE_BUILD"
-	/scripts/$BEFORE_BUILD
+	echo "Execute /scripts/$BEFORE_BUILD ${1}"
+	/scripts/$BEFORE_BUILD ${1}
 fi
 
 # Build for each platform individually
