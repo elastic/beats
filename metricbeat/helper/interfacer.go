@@ -13,6 +13,7 @@ type ModuleConfig struct {
 	Module     string   `config:"module"`
 	MetricSets []string `config:"metricsets"`
 	Enabled    bool     `config:"enabled"`
+	Selectors  []string `config:"selectors"`
 
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }
