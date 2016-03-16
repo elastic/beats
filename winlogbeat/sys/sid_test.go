@@ -1,6 +1,6 @@
 // +build !integration
 
-package eventlogging
+package sys
 
 import (
 	"testing"

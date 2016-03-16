@@ -9,10 +9,8 @@ import (
 	"reflect"
 	"runtime"
 	"syscall"
-	"time"
-	"unsafe"
 
-	"github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/elastic/beats/winlogbeat/sys"
 	"golang.org/x/sys/windows"
 )
 
@@ -28,6 +26,14 @@ var (
 // a new event log subscription and resume from the given record ID.
 const bookmarkTemplate = `<BookmarkList><Bookmark Channel="%s" RecordId="%d" ` +
 	`IsCurrent="True"/></BookmarkList>`
+
+var providerNameContext EvtHandle
+
+func init() {
+	if avail, _ := IsAvailable(); avail {
+		providerNameContext, _ = CreateRenderContext([]string{"Event/System/Provider/@Name"}, EvtRenderContextValues)
+	}
+}
 
 // IsAvailable returns true if the Windows Event Log API is supported by this
 // operating system. If not supported then false is returned with the
@@ -138,56 +144,21 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 }
 
 // RenderEvent reads the event data associated with the EvtHandle and renders
-// the data so that it can used.
+// the data as XML.
 func RenderEvent(
 	eventHandle EvtHandle,
-	systemContext EvtHandle,
 	lang uint32,
 	renderBuf []byte,
-	pubHandleProvider func(string) eventlogging.MessageFiles,
-) (Event, error) {
-	var err error
-
-	// Create a render context for local machine.
-	if systemContext == 0 {
-		systemContext, err = _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
-		if err != nil {
-			return Event{}, err
-		}
-		defer _EvtClose(systemContext)
-	}
-
-	var bufferUsed, propertyCount uint32
-	err = _EvtRender(systemContext, eventHandle, EvtRenderEventValues,
-		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed,
-		&propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER {
-		return Event{}, eventlogging.InsufficientBufferError{err, int(bufferUsed)}
-	}
+	pubHandleProvider func(string) sys.MessageFiles,
+) (string, error) {
+	providerName, err := evtRenderProviderName(renderBuf, eventHandle)
 	if err != nil {
-		return Event{}, err
-	}
-
-	// Validate bufferUsed set by Windows.
-	if int(bufferUsed) > len(renderBuf) {
-		return Event{}, fmt.Errorf("Bytes used (%d) is greater than the "+
-			"buffer size (%d)", bufferUsed, len(renderBuf))
-	}
-
-	// Ignore any additional unknown properties that might exist.
-	if propertyCount > uint32(EvtSystemPropertyIdEND) {
-		propertyCount = uint32(EvtSystemPropertyIdEND)
-	}
-
-	var e Event
-	err = parseRenderEventBuffer(renderBuf[:bufferUsed], &e)
-	if err != nil {
-		return Event{}, err
+		return "", err
 	}
 
 	var publisherHandle uintptr
 	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(e.ProviderName)
+		messageFiles := pubHandleProvider(providerName)
 		if messageFiles.Err == nil {
 			// There is only ever a single handle when using the Windows Event
 			// Log API.
@@ -195,108 +166,10 @@ func RenderEvent(
 		}
 	}
 
-	// Populate strings that must be looked up.
-	populateStrings(eventHandle, EvtHandle(publisherHandle), lang, renderBuf, &e)
-
-	return e, nil
-}
-
-// parseRenderEventBuffer parses the system context data from buffer. This
-// function can be used on the data written by the EvtRender system call.
-func parseRenderEventBuffer(buffer []byte, evt *Event) error {
-	reader := bytes.NewReader(buffer)
-
-	for i := 0; i < int(EvtSystemPropertyIdEND); i++ {
-		// Each EVT_VARIANT is 16 bytes.
-		_, err := reader.Seek(int64(16*i), 0)
-		if err != nil {
-			return fmt.Errorf("Error seeking to read %s: %v",
-				EvtSystemPropertyID(i), err)
-		}
-
-		switch EvtSystemPropertyID(i) {
-		case EvtSystemKeywords, EvtSystemLevel, EvtSystemOpcode, EvtSystemTask:
-			// These are rendered as strings so ignore them here.
-			continue
-		case EvtSystemProviderName:
-			evt.ProviderName, err = readString(buffer, reader)
-		case EvtSystemComputer:
-			evt.Computer, err = readString(buffer, reader)
-		case EvtSystemChannel:
-			evt.Channel, err = readString(buffer, reader)
-		case EvtSystemVersion:
-			err = binary.Read(reader, binary.LittleEndian, &evt.Version)
-		case EvtSystemEventID:
-			err = binary.Read(reader, binary.LittleEndian, &evt.EventID)
-		case EvtSystemQualifiers:
-			err = binary.Read(reader, binary.LittleEndian, &evt.Qualifiers)
-		case EvtSystemThreadID:
-			err = binary.Read(reader, binary.LittleEndian, &evt.ThreadID)
-		case EvtSystemProcessID:
-			err = binary.Read(reader, binary.LittleEndian, &evt.ProcessID)
-		case EvtSystemEventRecordId:
-			err = binary.Read(reader, binary.LittleEndian, &evt.RecordID)
-		case EvtSystemTimeCreated:
-			evt.TimeCreated, err = readFiletime(reader)
-		case EvtSystemActivityID:
-			evt.ActivityID, err = readGUID(buffer, reader)
-		case EvtSystemRelatedActivityID:
-			evt.RelatedActivityID, err = readGUID(buffer, reader)
-		case EvtSystemProviderGuid:
-			evt.ProviderGUID, err = readGUID(buffer, reader)
-		case EvtSystemUserID:
-			evt.UserSID, err = readSID(buffer, reader)
-		}
-
-		if err != nil {
-			return fmt.Errorf("Error reading %s: %v", EvtSystemPropertyID(i), err)
-		}
-	}
-
-	return nil
-}
-
-// populateStrings populates the string fields of the Event that require
-// formatting (Message, Level, Task, Opcode, and Keywords). It attempts to
-// populate each field even if an error occurs. Any errors that occur are
-// written to the Event (see MessageErr, LevelErr, TaskErr, OpcodeErr, and
-// KeywordsErr).
-func populateStrings(
-	eventHandle EvtHandle,
-	providerHandle EvtHandle,
-	lang uint32,
-	buffer []byte,
-	event *Event,
-) {
-	var strs []string
-	strs, event.MessageErr = FormatEventString(EvtFormatMessageEvent,
-		eventHandle, event.ProviderName, providerHandle, lang, buffer)
-	if len(strs) > 0 {
-		event.Message = strs[0]
-	}
-	// TODO: Populate the MessageInserts when there is a MessageErr.
-
-	strs, event.LevelErr = FormatEventString(EvtFormatMessageLevel,
-		eventHandle, event.ProviderName, providerHandle, lang, buffer)
-	if len(strs) > 0 {
-		event.Level = strs[0]
-	}
-
-	strs, event.TaskErr = FormatEventString(EvtFormatMessageTask,
-		eventHandle, event.ProviderName, providerHandle, lang, buffer)
-	if len(strs) > 0 {
-		event.Task = strs[0]
-	}
-
-	strs, event.OpcodeErr = FormatEventString(EvtFormatMessageOpcode,
-		eventHandle, event.ProviderName, providerHandle, lang, buffer)
-	if len(strs) > 0 {
-		event.Opcode = strs[0]
-	}
-
-	event.Keywords, event.KeywordsError = FormatEventString(
-		EvtFormatMessageKeyword, eventHandle, event.ProviderName,
-		providerHandle, lang, buffer)
+	// Only a single string is returned when rendering XML.
+	xml, err := FormatEventString(EvtFormatMessageXml,
+		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf)
+	return xml, err
 }
 
 // CreateBookmark creates a new handle to a bookmark. Close must be called on
@@ -319,7 +192,22 @@ func CreateBookmark(channel string, recordID uint64) (EvtHandle, error) {
 // CreateRenderContext creates a render context. Close must be called on
 // returned EvtHandle when finished with the handle.
 func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
-	context, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
+	var paths []uintptr
+	for _, path := range valuePaths {
+		utf16, err := syscall.UTF16FromString(path)
+		if err != nil {
+			return 0, err
+		}
+
+		paths = append(paths, reflect.ValueOf(&utf16[0]).Pointer())
+	}
+
+	var pathsAddr uintptr
+	if len(paths) > 0 {
+		pathsAddr = reflect.ValueOf(&paths[0]).Pointer()
+	}
+
+	context, err := _EvtCreateRenderContext(uint32(len(paths)), pathsAddr, flag)
 	if err != nil {
 		return 0, err
 	}
@@ -368,18 +256,13 @@ func FormatEventString(
 	publisherHandle EvtHandle,
 	lang uint32,
 	buffer []byte,
-) ([]string, error) {
-	p, err := syscall.UTF16PtrFromString(publisher)
-	if err != nil {
-		return nil, err
-	}
-
+) (string, error) {
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
 	if ph == 0 {
-		ph, err = _EvtOpenPublisherMetadata(0, p, nil, lang, 0)
+		ph, err := OpenPublisherMetadata(0, publisher, 0)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		defer _EvtClose(ph)
 	}
@@ -387,45 +270,31 @@ func FormatEventString(
 	// Create a buffer if one was not provider.
 	var bufferUsed uint32
 	if buffer == nil {
-		err = _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 			0, nil, &bufferUsed)
-		bufferUsed *= 2 // It returns the number of utf-16 chars.
 		if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
-			return nil, err
+			return "", err
 		}
 
+		bufferUsed *= 2
 		buffer = make([]byte, bufferUsed)
 		bufferUsed = 0
 	}
 
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
-	bufferUsed *= 2 // It returns the number of utf-16 chars.
+	bufferUsed *= 2
 	if err == ERROR_INSUFFICIENT_BUFFER {
-		return nil, eventlogging.InsufficientBufferError{err, int(bufferUsed)}
+		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	var value string
-	var offset int
-	var size int
-	var values []string
-	for {
-		value, size, err = eventlogging.UTF16BytesToString(buffer[offset:bufferUsed])
-		if err != nil {
-			return nil, err
-		}
-		offset += size
-		values = append(values, eventlogging.RemoveWindowsLineEndings(value))
-
-		if offset >= int(bufferUsed) {
-			break
-		}
-	}
-
-	return values, nil
+	// This assumes there is only a single string value to read. This will
+	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
+	value, _, err := sys.UTF16BytesToString(buffer[0:bufferUsed])
+	return value, err
 }
 
 // offset reads a pointer value from the reader then calculates an offset from
@@ -480,110 +349,23 @@ func readString(buffer []byte, reader io.Reader) (string, error) {
 		}
 		return "", err
 	}
-	str, _, err := eventlogging.UTF16BytesToString(buffer[offset:])
+	str, _, err := sys.UTF16BytesToString(buffer[offset:])
 	return str, err
 }
 
-// readFiletime reads a Windows Filetime struct and converts it to a
-// time.Time value with a UTC timezone.
-func readFiletime(reader io.Reader) (*time.Time, error) {
-	var filetime syscall.Filetime
-	err := binary.Read(reader, binary.LittleEndian, &filetime.LowDateTime)
-	if err != nil {
-		return nil, err
+// evtRenderProviderName renders the ProviderName of an event.
+func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, error) {
+	var bufferUsed, propertyCount uint32
+	err := _EvtRender(providerNameContext, eventHandle, EvtRenderEventValues,
+		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed,
+		&propertyCount)
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
 	}
-	err = binary.Read(reader, binary.LittleEndian, &filetime.HighDateTime)
 	if err != nil {
-		return nil, err
-	}
-	t := time.Unix(0, filetime.Nanoseconds()).UTC()
-	return &t, nil
-}
-
-// readSID reads a pointer using the reader then parses the Windows SID
-// data that the pointer addresses within the buffer.
-func readSID(buffer []byte, reader io.Reader) (*eventlogging.SID, error) {
-	offset, err := offset(buffer, reader)
-	if err != nil {
-		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNull {
-			return nil, nil
-		}
-		return nil, err
-	}
-	sid := (*windows.SID)(unsafe.Pointer(&buffer[offset]))
-	identifier, err := sid.String()
-	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("evtRenderProviderName %v", err)
 	}
 
-	account, domain, accountType, err := sid.LookupAccount("")
-	if err != nil {
-		// Ignore the error and return a partially populated SID.
-		return &eventlogging.SID{Identifier: identifier}, nil
-	}
-
-	return &eventlogging.SID{
-		Identifier: identifier,
-		Name:       account,
-		Domain:     domain,
-		Type:       eventlogging.SIDType(accountType),
-	}, nil
-}
-
-// readGUID reads a pointer using the reader then parses the Windows GUID
-// data that the pointer addresses within the buffer.
-func readGUID(buffer []byte, reader io.ReadSeeker) (string, error) {
-	offset, err := offset(buffer, reader)
-	if err != nil {
-		// Ignore NULL values.
-		if err == ErrorEvtVarTypeNull {
-			return "", nil
-		}
-		return "", err
-	}
-
-	guid := &syscall.GUID{}
-	_, err = reader.Seek(int64(offset), 0)
-	if err != nil {
-		return "", err
-	}
-	err = binary.Read(reader, binary.LittleEndian, &guid.Data1)
-	if err != nil {
-		return "", err
-	}
-	err = binary.Read(reader, binary.LittleEndian, &guid.Data2)
-	if err != nil {
-		return "", err
-	}
-	err = binary.Read(reader, binary.LittleEndian, &guid.Data3)
-	if err != nil {
-		return "", err
-	}
-	err = binary.Read(reader, binary.LittleEndian, &guid.Data4)
-	if err != nil {
-		return "", err
-	}
-
-	guidStr, err := StringFromGUID(guid)
-	if err != nil {
-		return "", err
-	}
-
-	return guidStr, nil
-}
-
-// StringFromGUID returns a displayable GUID string from the GUID struct.
-func StringFromGUID(guid *syscall.GUID) (string, error) {
-	if guid == nil {
-		return "", nil
-	}
-
-	buf := make([]uint16, 40)
-	err := _StringFromGUID2(guid, &buf[0], uint32(len(buf)))
-	if err != nil {
-		return "", err
-	}
-
-	return syscall.UTF16ToString(buf), nil
+	reader := bytes.NewReader(renderBuf)
+	return readString(renderBuf, reader)
 }

@@ -2,18 +2,24 @@ package eventlog
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/sys"
+)
+
+// Debug selectors used in this package.
+const (
+	debugSelector  = "eventlog"
+	detailSelector = "eventlog_detail"
 )
 
 // Debug logging functions for this package.
 var (
-	debugf  = logp.MakeDebug("eventlog")
-	detailf = logp.MakeDebug("eventlog_detail")
+	debugf  = logp.MakeDebug(debugSelector)
+	detailf = logp.MakeDebug(detailSelector)
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -35,100 +41,133 @@ type EventLog interface {
 
 // Record represents a single event from the log.
 type Record struct {
-	API string // The event log API type used to read the record.
-
-	EventLogName  string    // The name of the event log from which this record was read.
-	SourceName    string    // The source of the event log record (the application or service that logged the record).
-	ComputerName  string    // The name of the computer that generated the record.
-	RecordNumber  uint64    // The record number of the event log record.
-	EventID       uint32    // The event identifier. The value is specific to the source of the event.
-	Level         string    // The level or severity of the event.
-	Category      string    // The category for this event. The meaning of this value depends on the event source.
-	TimeGenerated time.Time // The timestamp when the record was generated.
-	User          *User     // The user that logged the record.
-
-	Message        string   // The message from the event log.
-	MessageInserts []string // The raw message data logged by an application.
-	MessageErr     error    // The error that occurred while reading and formatting the message from the event log.
-
-	common.EventMetadata // Fields and tags to add to the event.
-}
-
-// String returns a string representation of Record.
-func (r Record) String() string {
-	return fmt.Sprintf("Record API[%s] EventLogName[%s] SourceName[%s] "+
-		"ComputerName[%s] RecordNumber[%d] EventID[%d] Level[%s] "+
-		"Category[%s] TimeGenerated[%s] User[%s] "+
-		"Message[%s] MessageInserts[%s] MessageErr[%s]", r.API,
-		r.EventLogName, r.SourceName, r.ComputerName, r.RecordNumber,
-		r.EventID, r.Level, r.Category, r.TimeGenerated, r.User,
-		r.Message, strings.Join(r.MessageInserts, ", "), r.MessageErr)
+	API                  string // The event log API type used to read the record.
+	common.EventMetadata        // Fields and tags to add to the event.
+	sys.Event
 }
 
 // ToMapStr returns a new MapStr containing the data from this Record.
-func (r Record) ToMapStr() common.MapStr {
+func (e Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		common.EventMetadataKey: r.EventMetadata,
-		"@timestamp":            common.Time(r.TimeGenerated),
-		"log_name":              r.EventLogName,
-		"source_name":           r.SourceName,
-		"computer_name":         r.ComputerName,
-		// Use a string to represent this uint64 data because its value can
-		// be outside the range represented by a Java long.
-		"record_number": strconv.FormatUint(r.RecordNumber, 10),
-		"event_id":      r.EventID,
-		"level":         r.Level,
-		"type":          r.API,
-		"count":         1,
+		"type":                  e.API,
+		common.EventMetadataKey: e.EventMetadata,
+		"count":                 1,
+		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
+		"log_name":              e.Channel,
+		"source_name":           e.Provider.Name,
+		"computer_name":         e.Computer,
+		"record_number":         strconv.FormatUint(e.RecordID, 10),
+		"event_id":              e.EventIdentifier.ID,
 	}
 
-	if r.Message != "" {
-		m["message"] = r.Message
-	} else {
-		if len(r.MessageInserts) > 0 {
-			m["message_inserts"] = r.MessageInserts
-		}
+	addOptional(m, "provider_guid", e.Provider.GUID)
+	addOptional(m, "version", e.Version)
+	addOptional(m, "level", e.Level)
+	addOptional(m, "task", e.Task)
+	addOptional(m, "opcode", e.Opcode)
+	addOptional(m, "keywords", e.Keywords)
+	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
+	addOptional(m, "message_error", e.RenderErr)
 
-		if r.MessageErr != nil {
-			m["message_error"] = r.MessageErr.Error()
-		}
-	}
+	// Correlation
+	addOptional(m, "activity_id", e.Correlation.ActivityID)
+	addOptional(m, "related_activity_id", e.Correlation.RelatedActivityID)
 
-	if r.Category != "" {
-		m["category"] = r.Category
-	}
+	// Execution
+	addOptional(m, "process_id", e.Execution.ProcessID)
+	addOptional(m, "thread_id", e.Execution.ThreadID)
+	addOptional(m, "processor_id", e.Execution.ProcessorID)
+	addOptional(m, "session_id", e.Execution.SessionID)
+	addOptional(m, "kernel_time", e.Execution.KernelTime)
+	addOptional(m, "user_time", e.Execution.UserTime)
+	addOptional(m, "processor_time", e.Execution.ProcessorTime)
 
-	if r.User != nil {
+	if e.User.Identifier != "" {
 		user := common.MapStr{
-			"identifier": r.User.Identifier,
+			"identifier": e.User.Identifier,
 		}
 		m["user"] = user
 
-		// Optional fields.
-		if r.User.Name != "" {
-			user["name"] = r.User.Name
-		}
-		if r.User.Domain != "" {
-			user["domain"] = r.User.Domain
-		}
-		if r.User.Type != "" {
-			user["type"] = r.User.Type
-		}
+		addOptional(user, "name", e.User.Name)
+		addOptional(user, "domain", e.User.Domain)
+		addOptional(user, "type", e.User.Type.String())
 	}
+
+	addPairs(m, "event_data", e.EventData.Pairs)
+	userData := addPairs(m, "user_data", e.UserData.Pairs)
+	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
 	return m
 }
 
-// User contains information about a Windows account.
-type User struct {
-	Identifier string // Unique identifier used by Windows to ID the account.
-	Name       string // User name
-	Domain     string // Domain that the user is a member of
-	Type       string // Type of account (e.g. User, Computer, Service)
+// addOptional adds a key and value to the given MapStr if the value is not the
+// zero value for the type of v. It is safe to call the function with a nil
+// MapStr.
+func addOptional(m common.MapStr, key string, v interface{}) {
+	if m != nil && !isZero(v) {
+		m[key] = v
+	}
 }
 
-// String returns a string representation of Record.
-func (u User) String() string {
-	return fmt.Sprintf("User Name[%s] Domain[%s] Type[%s]",
-		u.Name, u.Domain, u.Type)
+// addPairs adds a new dictionary to the given MapStr. The key/value pairs are
+// added to the new dictionary. If any keys are duplicates, the first key/value
+// pair is added and the remaining duplicates are dropped.
+//
+// The new dictionary is added to the given MapStr and it is also returned for
+// convenience purposes.
+func addPairs(m common.MapStr, key string, pairs []sys.KeyValue) common.MapStr {
+	if len(pairs) == 0 {
+		return nil
+	}
+
+	h := make(common.MapStr, len(pairs))
+	for i, kv := range pairs {
+		// Ignore empty values.
+		if kv.Value == "" {
+			continue
+		}
+
+		// If the key name is empty or if it the default of "Data" then
+		// assign a generic name of paramN.
+		k := kv.Key
+		if k == "" || k == "Data" {
+			k = fmt.Sprintf("param%d", i+1)
+		}
+
+		// Do not overwrite.
+		_, exists := h[k]
+		if !exists {
+			h[k] = sys.RemoveWindowsLineEndings(kv.Value)
+		} else {
+			debugf("Droping key/value (k=%s, v=%s) pair because key already "+
+				"exists. event=%+v", k, kv.Value, m)
+		}
+	}
+
+	if len(h) == 0 {
+		return nil
+	}
+
+	m[key] = h
+	return h
+}
+
+// isZero return true if the given value is the zero value for its type.
+func isZero(i interface{}) bool {
+	v := reflect.ValueOf(i)
+	switch v.Kind() {
+	case reflect.Array, reflect.String:
+		return v.Len() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+		return v.IsNil()
+	}
+	return false
 }

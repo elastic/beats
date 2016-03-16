@@ -5,15 +5,23 @@ import (
 	"encoding/binary"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
 	"unsafe"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/sys"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
+)
+
+// The value of EventID element contains the low-order 16 bits of the event
+// identifier and the Qualifier attribute contains the high-order 16 bits of the
+// event identifier.
+const (
+	eventIDLowerMask uint32 = 0xFFFF
+	eventIDUpperMask uint32 = 0xFFFF0000
 )
 
 // IsAvailable returns true if the Event Logging API is supported by this
@@ -71,7 +79,7 @@ func ReadEventLog(
 		&buffer[0], uint32(len(buffer)),
 		&numBytesRead, &minBytesRequiredToRead)
 	if err == syscall.ERROR_INSUFFICIENT_BUFFER {
-		return 0, InsufficientBufferError{err, int(minBytesRequiredToRead)}
+		return 0, sys.InsufficientBufferError{err, int(minBytesRequiredToRead)}
 	}
 	if err != nil {
 		return 0, err
@@ -85,15 +93,15 @@ func ReadEventLog(
 	return int(numBytesRead), nil
 }
 
-// RenderEvents takes raw events, formats them into a structured event, and adds
-// each event to a slice. The slice of formatted events is then returned.
+// RenderEvents reads raw events from the provided buffer, formats them into
+// structured events, and adds each on to a slice that is returned.
 func RenderEvents(
 	eventsRaw []byte,
 	lang uint32,
 	buffer []byte,
-	pubHandleProvider func(string) MessageFiles,
-) ([]Event, int, error) {
-	var events []Event
+	pubHandleProvider func(string) sys.MessageFiles,
+) ([]sys.Event, int, error) {
+	var events []sys.Event
 	var offset int
 	for {
 		if offset >= len(eventsRaw) {
@@ -105,14 +113,18 @@ func RenderEvents(
 		if err != nil {
 			return nil, 0, err
 		}
-		event := Event{
-			RecordID:      record.recordNumber,
-			TimeGenerated: unixTime(record.timeGenerated),
-			TimeWritten:   unixTime(record.timeWritten),
-			EventID:       record.eventID,
-			Level:         EventType(record.eventType).String(),
-			SourceName:    record.sourceName,
-			Computer:      record.computerName,
+
+		var qualifier uint16 = uint16((record.eventID & eventIDUpperMask) >> 16)
+		var eventID uint32 = record.eventID & eventIDLowerMask
+		event := sys.Event{
+			Provider:        sys.Provider{Name: record.sourceName},
+			EventIdentifier: sys.EventIdentifier{ID: eventID, Qualifiers: qualifier},
+			LevelRaw:        uint8(record.eventType), // Possible overflow
+			TaskRaw:         record.eventCategory,
+			TimeCreated:     sys.TimeCreated{unixTime(record.timeGenerated)},
+			RecordID:        uint64(record.recordNumber),
+			Computer:        record.computerName,
+			Level:           EventType(record.eventType).String(),
 		}
 
 		// Create a slice from the larger buffer only data from the one record.
@@ -120,25 +132,33 @@ func RenderEvents(
 		recordBuf := eventsRaw[offset : offset+int(record.length)]
 		offset += int(record.length)
 
+		// Parse and format the user that logged the event.
+		sid, _ := parseSID(record, recordBuf) // TODO: do something with this error
+		if sid != nil {
+			event.User = *sid
+		}
+
 		// Parse the UTF-16 message insert strings.
 		stringInserts, stringInsertPtrs, err := parseInsertStrings(record, recordBuf)
 		if err != nil {
-			event.MessageErr = err
+			event.RenderErr = err.Error()
 			events = append(events, event)
 			continue
 		}
-		event.MessageInserts = stringInserts
 
-		// Format the parameterized message using the insert strings.
+		for _, s := range stringInserts {
+			event.EventData.Pairs = append(event.EventData.Pairs, sys.KeyValue{Value: s})
+		}
+
+		// Format the parametrized message using the insert strings.
 		event.Message, _, err = formatMessage(record.sourceName,
 			record.eventID, lang, stringInsertPtrs, buffer, pubHandleProvider)
-		event.MessageErr = err
-
-		// Parse and format the user that logged the event.
-		event.UserSID, event.UserSIDErr = parseSID(record, recordBuf)
-
-		// TODO: Parse the message category string.
-		event.Category = strconv.FormatUint(uint64(record.eventCategory), 10)
+		if err != nil {
+			event.RenderErr = err.Error()
+			if errno, ok := err.(syscall.Errno); ok {
+				event.RenderErrorCode = uint32(errno)
+			}
+		}
 
 		events = append(events, event)
 	}
@@ -148,9 +168,9 @@ func RenderEvents(
 
 // unixTime takes a time which is an unsigned 32-bit integer, and converts it
 // into a Golang time.Time pointer formatted as a unix time.
-func unixTime(sec uint32) *time.Time {
+func unixTime(sec uint32) time.Time {
 	t := time.Unix(int64(sec), 0)
-	return &t
+	return t
 }
 
 // formatmessage takes event data and formats the event message into a
@@ -161,7 +181,7 @@ func formatMessage(
 	lang uint32,
 	stringInserts []uintptr,
 	buffer []byte,
-	pubHandleProvider func(string) MessageFiles,
+	pubHandleProvider func(string) sys.MessageFiles,
 ) (string, int, error) {
 	var addr uintptr
 	if len(stringInserts) > 0 {
@@ -171,7 +191,7 @@ func formatMessage(
 	messageFiles := pubHandleProvider(sourceName)
 
 	var lastErr error
-	var fh FileHandle
+	var fh sys.FileHandle
 	var message string
 	for _, fh = range messageFiles.Handles {
 		if fh.Err != nil {
@@ -196,12 +216,10 @@ func formatMessage(
 			continue
 		}
 
-		message, _, err = UTF16BytesToString(buffer[:numChars*2])
+		message, _, err = sys.UTF16BytesToString(buffer[:numChars*2])
 		if err != nil {
 			return "", 0, err
 		}
-
-		message = RemoveWindowsLineEndings(message)
 	}
 
 	if message == "" {
@@ -340,7 +358,7 @@ func parseEventLogRecord(buffer []byte) (eventLogRecord, error) {
 
 	// SourceName (null-terminated UTF-16 string)
 	begin, _ := reader.Seek(0, 1)
-	sourceName, length, err := UTF16BytesToString(buffer[begin:])
+	sourceName, length, err := sys.UTF16BytesToString(buffer[begin:])
 	if err != nil {
 		return record, err
 	}
@@ -351,7 +369,7 @@ func parseEventLogRecord(buffer []byte) (eventLogRecord, error) {
 	}
 
 	// ComputerName (null-terminated UTF-16 string)
-	computerName, length, err := UTF16BytesToString(buffer[begin:])
+	computerName, length, err := sys.UTF16BytesToString(buffer[begin:])
 	if err != nil {
 		return record, err
 	}
@@ -384,7 +402,7 @@ func parseInsertStrings(record eventLogRecord, buffer []byte) ([]string, []uintp
 				"offset=%d, len(buffer)=%d, record=%+v", i+1, offset,
 				len(buffer), record)
 		}
-		insertStr, length, err := UTF16BytesToString(buffer[offset:])
+		insertStr, length, err := sys.UTF16BytesToString(buffer[offset:])
 		if err != nil {
 			return nil, nil, err
 		}
@@ -396,7 +414,7 @@ func parseInsertStrings(record eventLogRecord, buffer []byte) ([]string, []uintp
 	return inserts, insertPtrs, nil
 }
 
-func parseSID(record eventLogRecord, buffer []byte) (*SID, error) {
+func parseSID(record eventLogRecord, buffer []byte) (*sys.SID, error) {
 	if record.userSidLength == 0 {
 		return nil, nil
 	}
@@ -407,18 +425,7 @@ func parseSID(record eventLogRecord, buffer []byte) (*SID, error) {
 		return nil, err
 	}
 
-	account, domain, accountType, err := sid.LookupAccount("")
-	if err != nil {
-		// Ignore the error and return a partially populated SID.
-		return &SID{Identifier: identifier}, nil
-	}
-
-	return &SID{
-		Identifier: identifier,
-		Name:       account,
-		Domain:     domain,
-		Type:       SIDType(accountType),
-	}, nil
+	return &sys.SID{Identifier: identifier}, nil
 }
 
 // ClearEventLog takes an event log file handle and empties the log. If a backup
@@ -480,8 +487,8 @@ func CloseEventLog(handle Handle) error {
 // event log messages. If found, it loads the libraries as a datafiles and
 // returns a slice of Handles to the libraries. Those handles must be closed
 // by the caller.
-func QueryEventMessageFiles(providerName, sourceName string) MessageFiles {
-	mf := MessageFiles{SourceName: sourceName}
+func QueryEventMessageFiles(providerName, sourceName string) sys.MessageFiles {
+	mf := sys.MessageFiles{SourceName: sourceName}
 
 	// Open key in registry:
 	registryKeyName := fmt.Sprintf(
@@ -523,7 +530,7 @@ func QueryEventMessageFiles(providerName, sourceName string) MessageFiles {
 		strings.Join(eventMessageFiles, ","))
 
 	// Load the libraries:
-	var files []FileHandle
+	var files []sys.FileHandle
 	for _, eventMessageFile := range eventMessageFiles {
 		sPtr, err := syscall.UTF16PtrFromString(eventMessageFile)
 		if err != nil {
@@ -538,7 +545,7 @@ func QueryEventMessageFiles(providerName, sourceName string) MessageFiles {
 				"Skipping. %v", eventMessageFile, err)
 		}
 
-		f := FileHandle{File: eventMessageFile, Handle: uintptr(handle), Err: err}
+		f := sys.FileHandle{File: eventMessageFile, Handle: uintptr(handle), Err: err}
 		files = append(files, f)
 	}
 

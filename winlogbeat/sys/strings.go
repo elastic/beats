@@ -1,4 +1,4 @@
-package eventlogging
+package sys
 
 import (
 	"fmt"
