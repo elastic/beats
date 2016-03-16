@@ -8,6 +8,7 @@ metricbeat:
         - info
       period: 1s
       enabled: true
+      selectors: {{ redis_selectors }}
     {% endif %}
     {% if mysql %}
     - module: mysql:

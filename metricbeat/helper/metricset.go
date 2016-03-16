@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Metric specific data
@@ -86,6 +87,8 @@ func (m *MetricSet) createEvent(event common.MapStr) common.MapStr {
 	// Each metricset has a unique eventfieldname to prevent type conflicts
 	eventFieldName := m.Module.name + "-" + m.Name
 
+	event = applySelector(event, m.Config.Selectors)
+
 	// TODO: Add fields_under_root option for "metrics"?
 	event = common.MapStr{
 		"type":                  typeName,
@@ -104,4 +107,25 @@ func (m *MetricSet) createEvent(event common.MapStr) common.MapStr {
 	}
 
 	return event
+}
+
+func applySelector(event common.MapStr, selectors []string) common.MapStr {
+
+	// No selectors set means return full events
+	if len(selectors) == 0 {
+		return event
+	}
+
+	newEvent := common.MapStr{}
+	logp.Debug("metricset", "Applying selectors: %v", selectors)
+
+	for _, selector := range selectors {
+
+		if value, ok := event[selector]; ok {
+			newEvent[selector] = value
+		}
+
+	}
+
+	return newEvent
 }
