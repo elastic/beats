@@ -16,16 +16,6 @@ init:
 	git init
 	git add .
 
-.PHONY: install-cfg
-install-cfg:
-	mkdir -p $(PREFIX)
-	cp etc/{{cookiecutter.beat}}.template.json     $(PREFIX)/{{cookiecutter.beat}}.template.json
-	cp etc/{{cookiecutter.beat}}.yml               $(PREFIX)/{{cookiecutter.beat}}.yml
-	cp etc/{{cookiecutter.beat}}.yml               $(PREFIX)/{{cookiecutter.beat}}-linux.yml
-	cp etc/{{cookiecutter.beat}}.yml               $(PREFIX)/{{cookiecutter.beat}}-binary.yml
-	cp etc/{{cookiecutter.beat}}.yml               $(PREFIX)/{{cookiecutter.beat}}-darwin.yml
-	cp etc/{{cookiecutter.beat}}.yml               $(PREFIX)/{{cookiecutter.beat}}-win.yml
-
 .PHONY: update-deps
 update-deps:
 	glide update  --no-recursive
