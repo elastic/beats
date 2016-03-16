@@ -7,7 +7,6 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/urso/ucfg"
 )
 
 func init() {
@@ -21,8 +20,7 @@ func New() helper.Moduler {
 
 type Moduler struct{}
 
-func (b Moduler) Setup(cfg *ucfg.Config) error {
-	// TODO: Ping available servers to check if available
+func (m *Moduler) Setup(mo *helper.Module) error {
 	return nil
 }
 

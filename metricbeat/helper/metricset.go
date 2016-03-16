@@ -55,10 +55,16 @@ func (m *MetricSet) Fetch() error {
 			event, err := m.MetricSeter.Fetch(m, h)
 
 			if err != nil {
+				// Most of the time, event is nil in case of error (not required)
+				if event == nil {
+					event = common.MapStr{}
+				}
 				event["error"] = err
 			}
 			event = m.createEvent(event)
+
 			m.Module.Publish <- event
+
 		}(host)
 	}
 	return nil
