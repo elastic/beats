@@ -64,7 +64,6 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 		"message":               f.Text,
 		"type":                  f.DocumentType,
 		"input_type":            f.InputType,
-		"count":                 1,
 	}
 
 	return event

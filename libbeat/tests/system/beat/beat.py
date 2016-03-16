@@ -215,8 +215,7 @@ class TestCase(unittest.TestCase):
                 jsons.append(self.flatten_object(json.loads(line),
                                                  []))
         self.all_have_fields(jsons, ["@timestamp", "type",
-                                     "beat.name", "beat.hostname",
-                                     "count"])
+                                     "beat.name", "beat.hostname"])
         return jsons
 
     def copy_files(self, files, source_dir="files/"):
