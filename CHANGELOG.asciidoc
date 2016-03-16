@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Filebeat*
 - Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
 - Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
+- Count field was removed from event as not used in filebeat {issue}778[778]
 
 *Winlogbeat*
 
