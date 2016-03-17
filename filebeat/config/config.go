@@ -71,11 +71,12 @@ type HarvesterConfig struct {
 	MaxBackoffDuration time.Duration
 	CloseOlder         string `config:"close_older"`
 	CloseOlderDuration time.Duration
-	ForceCloseFiles    bool             `config:"force_close_files"`
-	ExcludeLines       []string         `config:"exclude_lines"`
-	IncludeLines       []string         `config:"include_lines"`
-	MaxBytes           int              `config:"max_bytes"`
-	Multiline          *MultilineConfig `config:"multiline"`
+	ForceCloseFiles    bool               `config:"force_close_files"`
+	ExcludeLines       []string           `config:"exclude_lines"`
+	IncludeLines       []string           `config:"include_lines"`
+	MaxBytes           int                `config:"max_bytes"`
+	Multiline          *MultilineConfig   `config:"multiline"`
+	JsonDecoder        *JsonDecoderConfig `yaml:"json_decoder"`
 }
 
 type MultilineConfig struct {
@@ -84,6 +85,12 @@ type MultilineConfig struct {
 	MaxLines *int   `config:"max_lines"`
 	Pattern  string `config:"pattern"`
 	Timeout  string `config:"timeout"`
+}
+
+type JsonDecoderConfig struct {
+	OnUnmarshalError string `yaml:"on_unmarshal_error"`
+	OverwriteKeys    bool   `yaml:"overwrite_keys"`
+	KeepOriginal     bool   `yaml:"keep_original"`
 }
 
 const (

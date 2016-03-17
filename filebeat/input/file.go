@@ -1,9 +1,12 @@
 package input
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"time"
 
+	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -18,14 +21,16 @@ type File struct {
 // FileEvent is sent to the output and must contain all relevant information
 type FileEvent struct {
 	common.EventMetadata
-	ReadTime     time.Time
-	Source       *string
-	InputType    string
-	DocumentType string
-	Offset       int64
-	Bytes        int
-	Text         *string
-	Fileinfo     *os.FileInfo
+	ReadTime        time.Time
+	Source          *string
+	InputType       string
+	DocumentType    string
+	Offset          int64
+	Bytes           int
+	Text            *string
+	Fileinfo        *os.FileInfo
+	fieldsUnderRoot bool
+	jsonDecoder     *config.JsonDecoderConfig
 }
 
 type FileState struct {
@@ -55,6 +60,12 @@ func (f *FileEvent) GetState() *FileState {
 	return state
 }
 
+// SetJsonDecoder configures how to do JSON parsing. If nil is passed,
+// JSON decoding is disabled.
+func (f *FileEvent) SetJsonDecoder(jsonDecoder *config.JsonDecoderConfig) {
+	f.jsonDecoder = jsonDecoder
+}
+
 func (f *FileEvent) ToMapStr() common.MapStr {
 	event := common.MapStr{
 		common.EventMetadataKey: f.EventMetadata,
@@ -64,6 +75,29 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 		"message":               f.Text,
 		"type":                  f.DocumentType,
 		"input_type":            f.InputType,
+	}
+
+	if f.jsonDecoder != nil {
+		var jsonObj common.MapStr
+		err := json.Unmarshal([]byte(*f.Text), &jsonObj)
+		if err != nil {
+			logp.Err("Error decoding JSON: %v", err)
+			if f.jsonDecoder.OnUnmarshalError == "add_error_key" {
+				event["json_error"] = fmt.Sprintf("Error decoding JSON: %v", err)
+			}
+		} else {
+			// no error, move keys into the object
+			for key, value := range jsonObj {
+				_, found := event[key]
+				if !found || f.jsonDecoder.OverwriteKeys {
+					event[key] = value
+				}
+			}
+
+			if !f.jsonDecoder.KeepOriginal {
+				delete(event, "message")
+			}
+		}
 	}
 
 	return event
