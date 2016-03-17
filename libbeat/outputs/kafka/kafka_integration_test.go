@@ -125,7 +125,7 @@ func TestOneMessageToKafka(t *testing.T) {
 	err := kafka.PublishEvent(nil, testOptions, event)
 	assert.NoError(t, err)
 
-	messages := testReadFromKafkaTopic(t, "test-libbeat", 1, time.Second)
+	messages := testReadFromKafkaTopic(t, "test-libbeat", 1, 5*time.Second)
 
 	msg := messages[0]
 	logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
@@ -150,7 +150,7 @@ func TestUseType(t *testing.T) {
 	err := kafka.PublishEvent(nil, testOptions, event)
 	assert.NoError(t, err)
 
-	messages := testReadFromKafkaTopic(t, "log-type", 1, time.Second)
+	messages := testReadFromKafkaTopic(t, "log-type", 1, 5*time.Second)
 
 	msg := messages[0]
 	logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
