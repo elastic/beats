@@ -48,12 +48,11 @@ func (m *MetricSet) Setup() error {
 func (m *MetricSet) Fetch() error {
 
 	for _, host := range m.Config.Hosts {
-		// TODO Improve fetching in go routing -> how are go routines stopped if they take too long? - @ruflin,20160314
-		m.Module.wg.Add(1)
+
 		go func(h string) {
-			defer m.Module.wg.Done()
 
 			starttime := time.Now()
+			// Fetch method must make sure to return error after Timeout reached
 			event, err := m.MetricSeter.Fetch(m, h)
 			elapsed := time.Since(starttime)
 
