@@ -43,13 +43,13 @@ required: True
 The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
 
 
-==== response_time
+==== rtt
 
 type: long
 
 required: True
 
-Event Reponse time in nano seconds
+Event round trip time time in nano seconds
 
 
 [[exported-fields-redis-info]]
