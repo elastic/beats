@@ -41,5 +41,5 @@ common:
       type: long
       required: true
       description: >
-        Event round trip time in nano seconds
+        Event round trip time in microseconds
 
