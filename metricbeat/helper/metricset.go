@@ -53,7 +53,9 @@ func (m *MetricSet) Fetch() error {
 		go func(h string) {
 			defer m.Module.wg.Done()
 
+			starttime := time.Now()
 			event, err := m.MetricSeter.Fetch(m, h)
+			elapsed := time.Since(starttime)
 
 			if err != nil {
 				// Most of the time, event is nil in case of error (not required)
@@ -62,7 +64,11 @@ func (m *MetricSet) Fetch() error {
 				}
 				event["error"] = err
 			}
+
 			event = m.createEvent(event)
+
+			// Add round trip time
+			event["rtt"] = elapsed.Nanoseconds()
 
 			m.Module.Publish <- event
 

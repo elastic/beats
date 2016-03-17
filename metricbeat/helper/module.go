@@ -131,7 +131,7 @@ func (m *Module) Run(period time.Duration, b *beat.Beat) {
 		ch <- struct{}{}
 	}
 
-	// TODO: A fetch event should take a maximum until the next ticker and
+	// TODO: A fetch event should take a maximum until the next ticker and - @ruflin,20160315
 	// be stopped before the next request is sent. If a fetch is not successful
 	// until the next it means it is a failure and a "error" event should be sent to es
 	fetch := func(set *MetricSet) {
