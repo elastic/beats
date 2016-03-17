@@ -57,18 +57,7 @@ func (m *MetricSet) Fetch() error {
 			event, err := m.MetricSeter.Fetch(m, h)
 			elapsed := time.Since(starttime)
 
-			if err != nil {
-				// Most of the time, event is nil in case of error (not required)
-				if event == nil {
-					event = common.MapStr{}
-				}
-				event["error"] = err
-			}
-
-			event = m.createEvent(event)
-
-			// Add round trip time
-			event["rtt"] = elapsed.Nanoseconds()
+			event = m.createEvent(event, elapsed, err)
 
 			m.Module.Publish <- event
 
@@ -77,7 +66,12 @@ func (m *MetricSet) Fetch() error {
 	return nil
 }
 
-func (m *MetricSet) createEvent(event common.MapStr) common.MapStr {
+func (m *MetricSet) createEvent(event common.MapStr, rtt time.Duration, eventErr error) common.MapStr {
+
+	// Most of the time, event is nil in case of error (not required)
+	if event == nil {
+		event = common.MapStr{}
+	}
 
 	timestamp := common.Time(time.Now())
 
@@ -95,12 +89,12 @@ func (m *MetricSet) createEvent(event common.MapStr) common.MapStr {
 
 	event = applySelector(event, m.Config.Selectors)
 
-	// TODO: Add fields_under_root option for "metrics"?
 	event = common.MapStr{
 		"type":                  typeName,
 		eventFieldName:          event,
 		"metricset":             m.Name,
 		"module":                m.Module.name,
+		"rtt":                   rtt.Nanoseconds() / int64(time.Microsecond),
 		"@timestamp":            timestamp,
 		common.EventMetadataKey: m.Config.EventMetadata,
 	}
@@ -110,6 +104,10 @@ func (m *MetricSet) createEvent(event common.MapStr) common.MapStr {
 		event["beat"] = common.MapStr{
 			"index": indexName,
 		}
+	}
+
+	if eventErr != nil {
+		event["error"] = eventErr.Error()
 	}
 
 	return event
