@@ -49,7 +49,7 @@ type: long
 
 required: True
 
-Event round trip time time in nano seconds
+Event round trip time in microseconds
 
 
 [[exported-fields-redis-info]]
