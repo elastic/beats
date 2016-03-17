@@ -114,8 +114,8 @@ func RenderEvents(
 			return nil, 0, err
 		}
 
-		var qualifier uint16 = uint16((record.eventID & eventIDUpperMask) >> 16)
-		var eventID uint32 = record.eventID & eventIDLowerMask
+		var qualifier = uint16((record.eventID & eventIDUpperMask) >> 16)
+		var eventID = record.eventID & eventIDLowerMask
 		event := sys.Event{
 			Provider:        sys.Provider{Name: record.sourceName},
 			EventIdentifier: sys.EventIdentifier{ID: eventID, Qualifiers: qualifier},
