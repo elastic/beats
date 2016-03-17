@@ -144,7 +144,9 @@ func EventHandles(subscription EvtHandle, maxHandles int) ([]EvtHandle, error) {
 }
 
 // RenderEvent reads the event data associated with the EvtHandle and renders
-// the data as XML.
+// the data as XML. An error and XML can be returned by this method if an error
+// occurs while rendering the XML with RenderingInfo and the method is able to
+// recover by rendering the XML without RenderingInfo.
 func RenderEvent(
 	eventHandle EvtHandle,
 	lang uint32,
@@ -169,6 +171,19 @@ func RenderEvent(
 	// Only a single string is returned when rendering XML.
 	xml, err := FormatEventString(EvtFormatMessageXml,
 		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf)
+
+	// Recover by rendering the XML without the RenderingInfo (message string).
+	if err != nil {
+		// Do not try to recover from InsufficientBufferErrors because these
+		// can be retried with a larger buffer.
+		if _, ok := err.(sys.InsufficientBufferError); ok {
+			return "", err
+		}
+
+		// Ignore the error and return the original error with the response.
+		xml, _ = evtRenderXML(renderBuf, eventHandle)
+	}
+
 	return xml, err
 }
 
@@ -368,4 +383,21 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 
 	reader := bytes.NewReader(renderBuf)
 	return readString(renderBuf, reader)
+}
+
+// evtRenderXML render the events as XML but without the RenderingInfo (message).
+func evtRenderXML(renderBuf []byte, eventHandle EvtHandle) (string, error) {
+	var bufferUsed, propertyCount uint32
+	err := _EvtRender(0, eventHandle, EvtRenderEventXml, uint32(len(renderBuf)),
+		&renderBuf[0], &bufferUsed, &propertyCount)
+	bufferUsed *= 2 // It returns the number of utf-16 chars.
+	if err == ERROR_INSUFFICIENT_BUFFER {
+		return "", sys.InsufficientBufferError{err, int(bufferUsed)}
+	}
+	if err != nil {
+		return "", err
+	}
+
+	xml, _, err := sys.UTF16BytesToString(renderBuf[0:bufferUsed])
+	return xml, err
 }
