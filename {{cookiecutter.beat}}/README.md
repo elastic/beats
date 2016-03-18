@@ -8,17 +8,23 @@ Ensure that this folder is at the following location:
 ## Getting Started with {{cookiecutter.beat|capitalize}}
 
 ### Init Project
-To get running with {{cookiecutter.beat|capitalize}}, run the following commands:
+To get running with {{cookiecutter.beat|capitalize}}, run the following command:
 
 ```
 make init
 ```
 
+To commit the first version before you modify it, run:
+
+```
+make commit
+```
+
+It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.
 
 To push {{cookiecutter.beat|capitalize}} in the git repository, run the following commands:
 
 ```
-git commit 
 git remote set-url origin https://{{cookiecutter.beat_path}}/{{cookiecutter.beat}}
 git push origin master
 ```
@@ -46,7 +52,7 @@ To run {{cookiecutter.beat|capitalize}} with debugging output enabled, run:
 
 ### Test
 
-To test {{cookiecutter.beat|capitalize}}, run the following commands:
+To test {{cookiecutter.beat|capitalize}}, run the following command:
 
 ```
 make testsuite
