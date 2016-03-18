@@ -137,6 +137,11 @@ def fill_field_properties(field, defaults):
             "type": "float",
             "doc_values": "true"
         }
+    elif field.get("type") == "double":
+        properties[field["name"]] = {
+            "type": "double",
+            "doc_values": "true"
+        }
     elif field.get("type") == "integer":
         properties[field["name"]] = {
             "type": "integer",
