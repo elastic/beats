@@ -3,7 +3,9 @@
 package helper
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -92,6 +94,50 @@ func TestApplySelectorTwoNested(t *testing.T) {
 			"hd": "not available",
 		},
 	}, newEvent)
+}
+
+func TestCreateEvent(t *testing.T) {
+	module := &Module{}
+	metricSet, _ := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
+
+	event := common.MapStr{}
+	host := "localhost"
+	rtt, _ := time.ParseDuration("1s")
+	event = metricSet.createEvent(event, host, rtt, nil)
+
+	assert.Equal(t, host, event["metricset-host"])
+
+	_, ok := event["error"]
+	assert.False(t, ok)
+	assert.Equal(t, rtt.Nanoseconds()/1000, event["rtt"])
+}
+
+func TestCreateEventError(t *testing.T) {
+	module := &Module{}
+	metricSet, _ := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
+
+	event := common.MapStr{}
+	host := "localhost"
+	rtt, _ := time.ParseDuration("1s")
+
+	eventErr := fmt.Errorf("hello world")
+	event = metricSet.createEvent(event, host, rtt, eventErr)
+
+	assert.Equal(t, host, event["metricset-host"])
+	assert.Equal(t, eventErr.Error(), event["error"])
+}
+
+func TestCreateEventNoHost(t *testing.T) {
+	module := &Module{}
+	metricSet, _ := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
+
+	event := common.MapStr{}
+	rtt, _ := time.ParseDuration("1s")
+
+	event = metricSet.createEvent(event, "", rtt, nil)
+
+	_, ok := event["metricset-host"]
+	assert.False(t, ok)
 }
 
 /*** Mock tests objects ***/
