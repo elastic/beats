@@ -36,6 +36,8 @@ cat << EOF
 
     -g=GPG_KEY | --gpg-key=GPG_KEY   Optional. Path to GPG key file to import.
 
+    -o=ORIGIN | --origin=ORIGIN      Optional. Origin to use in APT repo metadata.
+
     -v | --verbose                   Optional. Enable verbose logging to stderr.
     
     -h | --help                      Optional. Print this usage information.
@@ -85,6 +87,10 @@ parseArgs() {
       usage
       exit 1
       ;;
+    -o=*|--origin=*)
+      ORIGIN="${i#*=}"
+      shift
+      ;;
     -p=*|--prefix=*)
       PREFIX="${i#*=}"
       shift
@@ -132,6 +138,7 @@ parseArgs() {
   fi
 
   export BUCKET
+  export ORIGIN 
   export PREFIX
   export AWS_ACCESS_KEY
   export AWS_SECRET_KEY

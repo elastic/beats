@@ -27,6 +27,7 @@ bucket="packages.elasticsearch.org"
 prefix="beats"
 dir="/beats-packer/build/upload"
 gpg_key="/beats-packer/docker/deb-rpm-s3/elasticsearch.asc"
+origin=Elastic
 
 docker run -it --rm \
   --env="PASS=$PASS" \
@@ -38,6 +39,7 @@ docker run -it --rm \
   --aws-access-key="$AWS_ACCESS_KEY" \
   --aws-secret-key="$AWS_SECRET_KEY" \
   --gpg-key="$gpg_key" \
+  --origin="$origin" \
   --verbose \
   "$@"
 
