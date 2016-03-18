@@ -57,7 +57,7 @@ func (m *MetricSet) Fetch() error {
 			event, err := m.MetricSeter.Fetch(m, h)
 			elapsed := time.Since(starttime)
 
-			event = m.createEvent(event, elapsed, err)
+			event = m.createEvent(event, h, elapsed, err)
 
 			m.Module.Publish <- event
 
@@ -66,7 +66,7 @@ func (m *MetricSet) Fetch() error {
 	return nil
 }
 
-func (m *MetricSet) createEvent(event common.MapStr, rtt time.Duration, eventErr error) common.MapStr {
+func (m *MetricSet) createEvent(event common.MapStr, host string, rtt time.Duration, eventErr error) common.MapStr {
 
 	// Most of the time, event is nil in case of error (not required)
 	if event == nil {
@@ -106,6 +106,12 @@ func (m *MetricSet) createEvent(event common.MapStr, rtt time.Duration, eventErr
 		}
 	}
 
+	// Adds host name to event. In case credentials are passed through hostname, these are contained in this string
+	if host != "" {
+		event["metricset-host"] = host
+	}
+
+	// Adds error to event in case error happened
 	if eventErr != nil {
 		event["error"] = eventErr.Error()
 	}

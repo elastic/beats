@@ -31,7 +31,6 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 	// Additional configuration options
 	config := struct {
-		// TODO: Introduce default value for network
 		Network string `config:"network"`
 		MaxConn int    `config:"maxconn"`
 	}{
