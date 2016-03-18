@@ -38,16 +38,34 @@ type MetricSeter struct {
 
 // Setup any metric specific configuration
 func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
+
+	// Additional configuration options
+	config := struct {
+		Username string `config:"username"`
+		Password string `config:"password"`
+	}{
+		Username: "",
+		Password: "",
+	}
+
+	for _, host := range ms.Config.Hosts {
+		dsn := mysql.CreateDSN(host, config.Username, config.Password)
+
+		db, err := mysql.Connect(dsn)
+		if err != nil {
+			logp.Err(err.Error())
+		}
+
+		m.connections[host] = db
+	}
+
 	return nil
 }
 
 // Fetches status messages from mysql hosts
 func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
 
-	db, err := m.getConnection(host)
-	if err != nil {
-		logp.Err("MySQL conenction error: %s", err)
-	}
+	db := m.connections[host]
 
 	status, err := m.loadStatus(db)
 
@@ -57,24 +75,6 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 
 	return eventMapping(status), nil
 
-}
-
-// getConnection returns the connection object for the given dsn
-// In case a connection already exists it is reused
-func (m *MetricSeter) getConnection(dsn string) (*sql.DB, error) {
-
-	if db, ok := m.connections[dsn]; ok {
-		return db, nil
-	}
-
-	db, err := mysql.Connect(dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	m.connections[dsn] = db
-
-	return db, nil
 }
 
 // loadStatus loads all status entries from the given database into an array

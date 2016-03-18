@@ -20,8 +20,15 @@ func TestFetch(t *testing.T) {
 	module := &helper.Module{
 		Config: config,
 	}
+
 	ms, msErr := helper.NewMetricSet("status", New, module)
 	assert.NoError(t, msErr)
+
+	var err error
+
+	// Setup metricset
+	err = ms.Setup()
+	assert.NoError(t, err)
 
 	// Load events
 	event, err := ms.MetricSeter.Fetch(ms, module.Config.Hosts[0])
@@ -36,6 +43,6 @@ func TestFetch(t *testing.T) {
 
 	assert.True(t, connections > 0)
 	assert.True(t, openTables > 0)
-	assert.True(t, openFiles > 0)
+	assert.True(t, openFiles >= 0)
 	assert.True(t, openStreams == 0)
 }
