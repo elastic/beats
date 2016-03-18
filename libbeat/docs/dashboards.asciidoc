@@ -7,15 +7,16 @@ overwhelming at the beginning, so we have created a couple of
 https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
 started and to demonstrate what is possible based on the Beats data.
 
-NOTE: The Beats dashboards require Kibana 4.
+NOTE: The Beats dashboards require Kibana 4 or later.
 
 To load the sample dashboards, you run a load script. The load script
 uploads the example dashboards, visualizations, and searches
 that you can use. The load command also creates index patterns for each Beat:
 
-   - [packetbeat-]YYYY.MM.DD
-   - [topbeat-]YYYY.MM.DD
-   - [filebeat-]YYYY.MM.DD
+   - `packetbeat-*`
+   - `topbeat-*`
+   - `filebeat-*`
+   - `winlogbeat-*`
    
 Use the following commands to run the script:
 
