@@ -1,6 +1,7 @@
 package eventlog
 
 import (
+	"expvar"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -21,6 +22,10 @@ var (
 	debugf  = logp.MakeDebug(debugSelector)
 	detailf = logp.MakeDebug(detailSelector)
 )
+
+// dropReasons contains counters for the number of dropped events for each
+// reason.
+var dropReasons = expvar.NewMap("dropReasons")
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
