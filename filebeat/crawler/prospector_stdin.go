@@ -34,15 +34,14 @@ func (p ProspectorStdin) Init() {
 	p.started = false
 }
 
-func (prospector ProspectorStdin) Run() {
+func (p ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
-	if !prospector.started {
-		prospector.harvester.Start()
+	if !p.started {
+		p.harvester.Start()
 	}
 
 	// Wait time during endless loop
 	oneSecond, _ := time.ParseDuration("1s")
 	time.Sleep(oneSecond)
-
 }
