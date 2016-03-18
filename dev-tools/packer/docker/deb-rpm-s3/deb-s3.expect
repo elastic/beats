@@ -9,6 +9,7 @@ spawn deb-s3 upload \
         --bucket "$env(BUCKET)" \
         --prefix "$env(PREFIX)/apt" \
         --arch $env(arch) \
+        -o "$env(ORIGIN)" \
         {*}$argv
 expect {
   "Enter passphrase: " {
