@@ -16,7 +16,7 @@ configuration settings, you need to restart Winlogbeat to pick up the changes.
 * <<kafka-output>>
 * <<file-output>>
 * <<console-output>>
-* <<configuration-shipper>>
+* <<configuration-beat>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
 

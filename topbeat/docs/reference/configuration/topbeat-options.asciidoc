@@ -55,8 +55,8 @@ parent pid, state, pid, CPU usage, and memory usage.
 * `filesystem` to export file system statistics, including details about the
 mounted disks, such as the total and used disk space, and details about each
 disk, such as the device name and the mounting place.
-* `cpu_per_core` to export the CPU usage per core. By default, this setting is false. It makes sense only if 
-`system: true` is specified. 
+* `cpu_per_core` to export the CPU usage per core. By default, this setting is false. It makes sense only if
+`system: true` is specified.
 The details are grouped under `cpus`. The Beat exports details for each core of the server. For example:
 +
 [source,json]
@@ -82,7 +82,7 @@ For more information about the exported fields, see <<exported-fields-system>>.
 
 include::../../../../libbeat/docs/outputconfig.asciidoc[]
 
-include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+include::../../../../libbeat/docs/beatconfig.asciidoc[]
 
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 

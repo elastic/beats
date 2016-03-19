@@ -83,7 +83,8 @@ const (
 type BeatConfig struct {
 	Output  map[string]*ucfg.Config
 	Logging logp.Logging
-	Shipper publisher.ShipperConfig
+	Shipper *publisher.BeatConfig
+	Beat    *publisher.BeatConfig
 }
 
 var printVersion *bool
@@ -218,16 +219,30 @@ func (b *Beat) LoadConfig() error {
 	// Disable stderr logging if requested by cmdline flag
 	logp.SetStderr()
 
-	logp.Debug("beat", "Initializing output plugins")
+	if b.Config.Beat != nil && b.Config.Shipper != nil {
+		return fmt.Errorf("beat and shipper are set in config. Only one can be enabled. shipper is deprecated, use beat.")
+	}
 
-	if b.Config.Shipper.MaxProcs != nil {
-		maxProcs := *b.Config.Shipper.MaxProcs
+	// Copy shipper to config to beat @deprecated
+	if b.Config.Shipper != nil {
+		logp.Warn("shipper config is deprecated. Please use beat instead.")
+		b.Config.Beat = b.Config.Shipper
+	}
+
+	// Inits object in case it is not set in the config as it is not required
+	if b.Config.Beat == nil {
+		b.Config.Beat = &publisher.BeatConfig{}
+	}
+
+	if b.Config.Beat.MaxProcs != nil {
+		maxProcs := *b.Config.Beat.MaxProcs
 		if maxProcs > 0 {
 			runtime.GOMAXPROCS(maxProcs)
 		}
 	}
 
-	pub, err := publisher.New(b.Name, b.Config.Output, b.Config.Shipper)
+	logp.Debug("beat", "Initializing output plugins")
+	pub, err := publisher.New(b.Name, b.Config.Output, *b.Config.Beat)
 	if err != nil {
 		return fmt.Errorf("error Initialising publisher: %v\n", err)
 	}

@@ -139,12 +139,12 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	}
 
 	queueSize := defaultQueueSize
-	if pb.PbConfig.Shipper.QueueSize != nil {
-		queueSize = *pb.PbConfig.Shipper.QueueSize
+	if pb.PbConfig.Beat.QueueSize != nil {
+		queueSize = *pb.PbConfig.Beat.QueueSize
 	}
 	bulkQueueSize := defaultBulkQueueSize
-	if pb.PbConfig.Shipper.BulkQueueSize != nil {
-		bulkQueueSize = *pb.PbConfig.Shipper.BulkQueueSize
+	if pb.PbConfig.Beat.BulkQueueSize != nil {
+		bulkQueueSize = *pb.PbConfig.Beat.BulkQueueSize
 	}
 	pb.Pub = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize)
 	pb.Pub.Start()

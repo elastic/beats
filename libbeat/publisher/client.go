@@ -29,7 +29,7 @@ var (
 //  }
 //
 // Event publishers can add fields and tags to an event. The fields will take
-// precedence over the global fields defined in the shipper configuration.
+// precedence over the global fields defined in the beat configuration.
 //
 //  event := common.MapStr{
 //      // Add custom fields to the root of the event.
@@ -143,7 +143,7 @@ func (c *client) annotateEvent(event common.MapStr) {
 	}
 	event["beat"] = beatMeta
 
-	// Add the global tags and fields defined under shipper.
+	// Add the global tags and fields defined under beat.
 	common.AddTags(event, c.globalEventMetadata.Tags)
 	common.MergeFields(event, c.globalEventMetadata.Fields, c.globalEventMetadata.FieldsUnderRoot)
 

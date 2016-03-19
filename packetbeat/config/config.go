@@ -12,7 +12,7 @@ type Config struct {
 	Interfaces InterfacesConfig
 	Flows      *Flows
 	Protocols  map[string]*ucfg.Config
-	Shipper    publisher.ShipperConfig
+	Beat       publisher.BeatConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
 	Logging    logp.Logging

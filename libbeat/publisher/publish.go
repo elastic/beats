@@ -49,9 +49,9 @@ type TransactionalEventPublisher interface {
 }
 
 type PublisherType struct {
-	shipperName    string // Shipper name as set in the configuration file
+	beatName       string // beat name as set in the configuration file
 	hostname       string // Host name as returned by the operation system
-	name           string // The shipperName if configured, the hostname otherwise
+	name           string // The beatName if configured, the hostname otherwise
 	IpAddrs        []string
 	disabled       bool
 	Index          string
@@ -76,7 +76,7 @@ type PublisherType struct {
 	client *client
 }
 
-type ShipperConfig struct {
+type BeatConfig struct {
 	common.EventMetadata  `config:",inline"` // Fields and tags to add to each event.
 	Name                  string
 	Refresh_topology_freq int
@@ -124,7 +124,7 @@ func (publisher *PublisherType) IsPublisherIP(ip string) bool {
 }
 
 func (publisher *PublisherType) GetServerName(ip string) string {
-	// in case the IP is localhost, return current shipper name
+	// in case the IP is localhost, return current beat name
 	islocal, err := common.IsLoopback(ip)
 	if err != nil {
 		logp.Err("Parsing IP %s fails with: %s", ip, err)
@@ -135,7 +135,7 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 		return publisher.name
 	}
 
-	// find the shipper with the desired IP
+	// find the beat with the desired IP
 	if publisher.TopologyOutput != nil {
 		return publisher.TopologyOutput.GetNameByIP(ip)
 	}
@@ -181,11 +181,11 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 func New(
 	beatName string,
 	configs map[string]*ucfg.Config,
-	shipper ShipperConfig,
+	beat BeatConfig,
 ) (*PublisherType, error) {
 
 	publisher := PublisherType{}
-	err := publisher.init(beatName, configs, shipper)
+	err := publisher.init(beatName, configs, beat)
 	if err != nil {
 		return nil, err
 	}
@@ -195,10 +195,10 @@ func New(
 func (publisher *PublisherType) init(
 	beatName string,
 	configs map[string]*ucfg.Config,
-	shipper ShipperConfig,
+	beat BeatConfig,
 ) error {
 	var err error
-	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
+	publisher.IgnoreOutgoing = beat.Ignore_outgoing
 
 	publisher.disabled = *publishDisabled
 	if publisher.disabled {
@@ -206,22 +206,22 @@ func (publisher *PublisherType) init(
 	}
 
 	hwm := defaultChanSize
-	if shipper.QueueSize != nil && *shipper.QueueSize > 0 {
-		hwm = *shipper.QueueSize
+	if beat.QueueSize != nil && *beat.QueueSize > 0 {
+		hwm = *beat.QueueSize
 	}
 
 	bulkHWM := defaultBulkChanSize
-	if shipper.BulkQueueSize != nil && *shipper.BulkQueueSize >= 0 {
-		bulkHWM = *shipper.BulkQueueSize
+	if beat.BulkQueueSize != nil && *beat.BulkQueueSize >= 0 {
+		bulkHWM = *beat.BulkQueueSize
 	}
 
-	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
+	publisher.GeoLite = common.LoadGeoIPData(beat.Geoip)
 
 	publisher.wsPublisher.Init()
 	publisher.wsOutput.Init()
 
 	if !publisher.disabled {
-		plugins, err := outputs.InitOutputs(beatName, configs, shipper.Topology_expire)
+		plugins, err := outputs.InitOutputs(beatName, configs, beat.Topology_expire)
 		if err != nil {
 			return err
 		}
@@ -278,19 +278,19 @@ func (publisher *PublisherType) init(
 		}
 	}
 
-	publisher.shipperName = shipper.Name
+	publisher.beatName = beat.Name
 	publisher.hostname, err = os.Hostname()
 	if err != nil {
 		return err
 	}
-	if len(publisher.shipperName) > 0 {
-		publisher.name = publisher.shipperName
+	if len(publisher.beatName) > 0 {
+		publisher.name = publisher.beatName
 	} else {
 		publisher.name = publisher.hostname
 	}
 	logp.Info("Publisher name: %s", publisher.name)
 
-	publisher.globalEventMetadata = shipper.EventMetadata
+	publisher.globalEventMetadata = beat.EventMetadata
 
 	//Store the publisher's IP addresses
 	publisher.IpAddrs, err = common.LocalIpAddrsAsStrings(false)
@@ -301,13 +301,13 @@ func (publisher *PublisherType) init(
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if shipper.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(shipper.Refresh_topology_freq) * time.Second
+		if beat.Refresh_topology_freq != 0 {
+			RefreshTopologyFreq = time.Duration(beat.Refresh_topology_freq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)
 
-		// register shipper and its public IP addresses
+		// register beat and its public IP addresses
 		err = publisher.PublishTopology()
 		if err != nil {
 			logp.Err("Failed to publish topology: %s", err)

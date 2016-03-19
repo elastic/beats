@@ -352,15 +352,15 @@ output:
     #pretty: false
 
 
-############################# Shipper #########################################
+############################# Beat #########################################
 
-shipper:
-  # The name of the shipper that publishes the network data. It can be used to group
-  # all the transactions sent by a single shipper in the web interface.
+beat:
+  # The name of the beat that publishes the network data. It can be used to group
+  # all the transactions sent by a single beat in the web interface.
   # If this options is not defined, the hostname is used.
   #name:
 
-  # The tags of the shipper are included in their own field with each
+  # The tags of the beat are included in their own field with each
   # transaction published. Tags make it easy to group servers by different
   # logical properties.
   #tags: ["service-X", "web-tier"]
@@ -377,15 +377,15 @@ shipper:
   #fields_under_root: false
 
   # Uncomment the following if you want to ignore transactions created
-  # by the server on which the shipper is installed. This option is useful
-  # to remove duplicates if shippers are installed on multiple servers.
+  # by the server on which the beat is installed. This option is useful
+  # to remove duplicates if beat are installed on multiple servers.
   #ignore_outgoing: true
 
-  # How often (in seconds) shippers are publishing their IPs to the topology map.
+  # How often (in seconds) beat are publishing their IPs to the topology map.
   # The default is 10 seconds.
   #refresh_topology_freq: 10
 
-  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+  # Expiration time (in seconds) of the IPs published by a beat to the topology map.
   # All the IPs will be deleted afterwards. Note, that the value must be higher than
   # refresh_topology_freq. The default is 15 seconds.
   #topology_expire: 15
