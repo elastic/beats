@@ -2,9 +2,11 @@ metricbeat:
   modules:
 
     # Apache Module
+    # Server-status page (/server-status) is configurable string in apache and
+    # must be defined by user
     - module: apache
       metricsets: ["status"]
-      hosts: ["http://127.0.0.1/"]
+      hosts: ["http://127.0.0.1/server-status"]
       period: 1s
       enabled: true
 
