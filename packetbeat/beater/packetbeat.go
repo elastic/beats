@@ -106,6 +106,9 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 
 	// Read beat implementation config as needed for setup
 	err := cfgfile.Read(&pb.PbConfig, "")
+	if err != nil {
+		logp.Err("fails to read the beat config: %v, %v", err, pb.PbConfig)
+	}
 
 	// CLI flags over-riding config
 	if *pb.CmdLineArgs.TopSpeed {

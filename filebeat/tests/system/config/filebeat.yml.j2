@@ -124,4 +124,18 @@ output:
     rotate_every_kb: 1000
     #number_of_files: 7
 
+{% if filter_enabled %}
+
+filter:
+
+    {%- if drop_fields %}
+    - drop_fields:
+        fields: {{drop_fields}}
+    {%- endif %}
+    {%- if include_fields is not none %}
+    - include_fields:
+        fields: {{include_fields}}
+    {%- endif %}
+{% endif %}
+
 # vim: set ft=jinja:

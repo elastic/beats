@@ -21,6 +21,7 @@ class Test(BaseTest):
         assert len(objs) == 1
 
         o = objs[0]
+        assert "tags" in o
         assert o["tags"] == ["nginx", "wsgi", "drum"]
 
     def test_empty_tags(self):
