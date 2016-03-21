@@ -1,10 +1,26 @@
 package helper
 
 import (
+	"expvar"
+	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+// expvar variables
+var (
+	fetchedEvents        = expvar.NewMap("fetchedEvents")
+	openMetricSetFetches = expvar.NewMap("openMetricSetFetches")
+)
+
+const (
+	// To prevent "too many open files" issue the number of concurrent fetchers per
+	// metricset instance is limited to 32. Concurrent fetching happens if the timeout
+	// is set bigger then period or if a fetch method does not timeout properly.
+	maxConcurrentFetchers = 32
 )
 
 // Metric specific data
@@ -15,6 +31,8 @@ type MetricSet struct {
 	// Inherits config from module
 	Config ModuleConfig
 	Module *Module
+
+	fetchCounter uint32
 }
 
 // Creates a new MetricSet
@@ -51,10 +69,31 @@ func (m *MetricSet) Fetch() error {
 
 		go func(h string) {
 
+			fetchCounter := m.incrementFetcher()
+			defer m.decrementFetcher()
+
+			var event common.MapStr
+			var err error
+
 			starttime := time.Now()
-			// Fetch method must make sure to return error after Timeout reached
-			event, err := m.MetricSeter.Fetch(m, h)
+
+			// Check if max number of concurrent fetchers is reached
+			if fetchCounter > maxConcurrentFetchers {
+				err = fmt.Errorf("Too many concurrent fetchers started for metricset %s", m.Name)
+				logp.Err("Too many concurrent fetchers started for metricset %s", m.Name)
+			} else {
+				// Fetch method must make sure to return error after Timeout reached
+				event, err = m.MetricSeter.Fetch(m, h)
+			}
 			elapsed := time.Since(starttime)
+
+			// expvar stats
+			baseName := m.Module.name + "-" + m.Name
+			if err != nil {
+				fetchedEvents.Add(baseName+"-failed", 1)
+			} else {
+				fetchedEvents.Add(baseName+"-success", 1)
+			}
 
 			event = m.createEvent(event, h, elapsed, err)
 
@@ -137,4 +176,17 @@ func applySelector(event common.MapStr, selectors []string) common.MapStr {
 	}
 
 	return newEvent
+}
+
+// incrementFetcher increments the number of open fetcher
+func (m *MetricSet) incrementFetcher() uint32 {
+	openMetricSetFetches.Add(m.Module.name+"-"+m.Name, 1)
+	return atomic.AddUint32(&m.fetchCounter, 1)
+}
+
+// decrementFetcher decrements the number of open fetchers
+func (m *MetricSet) decrementFetcher() uint32 {
+	openMetricSetFetches.Add(m.Module.name+"-"+m.Name, -1)
+	// Decrements value by 1
+	return atomic.AddUint32(&m.fetchCounter, ^uint32(0))
 }
