@@ -43,6 +43,126 @@ func TestMapStrUnion(t *testing.T) {
 	assert.Equal(c, MapStr{"a": 1, "b": 3, "c": 4})
 }
 
+func TestMapStrCopyFieldsTo(t *testing.T) {
+	assert := assert.New(t)
+
+	m := MapStr{
+		"a": MapStr{
+			"a1": 2,
+			"a2": 3,
+		},
+		"b": 2,
+		"c": MapStr{
+			"c1": 1,
+			"c2": 2,
+			"c3": MapStr{
+				"c31": 1,
+				"c32": 2,
+			},
+		},
+	}
+	c := MapStr{}
+
+	err := m.CopyFieldsTo(c, "dd")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{}, c)
+
+	err = m.CopyFieldsTo(c, "a")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"a": MapStr{"a1": 2, "a2": 3}}, c)
+
+	err = m.CopyFieldsTo(c, "c.c1")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"a": MapStr{"a1": 2, "a2": 3}, "c": MapStr{"c1": 1}}, c)
+
+	err = m.CopyFieldsTo(c, "b")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"a": MapStr{"a1": 2, "a2": 3}, "c": MapStr{"c1": 1}, "b": 2}, c)
+
+	err = m.CopyFieldsTo(c, "c.c3.c32")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"a": MapStr{"a1": 2, "a2": 3}, "c": MapStr{"c1": 1, "c3": MapStr{"c32": 2}}, "b": 2}, c)
+}
+
+func TestMapStrDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	m := MapStr{
+		"c": MapStr{
+			"c1": 1,
+			"c2": 2,
+			"c3": MapStr{
+				"c31": 1,
+				"c32": 2,
+			},
+		},
+	}
+
+	err := m.Delete("c.c2")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"c": MapStr{"c1": 1, "c3": MapStr{"c31": 1, "c32": 2}}}, m)
+
+	err = m.Delete("c.c2.c21")
+	assert.NotEqual(nil, err)
+	assert.Equal(MapStr{"c": MapStr{"c1": 1, "c3": MapStr{"c31": 1, "c32": 2}}}, m)
+
+	err = m.Delete("c.c3.c31")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{"c": MapStr{"c1": 1, "c3": MapStr{"c32": 2}}}, m)
+
+	err = m.Delete("c")
+	assert.Equal(nil, err)
+	assert.Equal(MapStr{}, m)
+}
+
+func TestHasKey(t *testing.T) {
+	assert := assert.New(t)
+
+	m := MapStr{
+		"c": MapStr{
+			"c1": 1,
+			"c2": 2,
+			"c3": MapStr{
+				"c31": 1,
+				"c32": 2,
+			},
+		},
+	}
+
+	hasKey, err := m.HasKey("c.c2")
+	assert.Equal(nil, err)
+	assert.Equal(true, hasKey)
+
+	hasKey, err = m.HasKey("c.c4")
+	assert.Equal(nil, err)
+	assert.Equal(false, hasKey)
+
+	hasKey, err = m.HasKey("c.c3.c32")
+	assert.Equal(nil, err)
+	assert.Equal(true, hasKey)
+
+	hasKey, err = m.HasKey("dd")
+	assert.Equal(nil, err)
+	assert.Equal(false, hasKey)
+
+}
+
+func TestClone(t *testing.T) {
+	assert := assert.New(t)
+
+	m := MapStr{
+		"c1": 1,
+		"c2": 2,
+		"c3": MapStr{
+			"c31": 1,
+			"c32": 2,
+		},
+	}
+
+	c := m.Clone()
+	assert.Equal(MapStr{"c31": 1, "c32": 2}, c["c3"])
+}
+
 func TestEnsureTimestampField(t *testing.T) {
 
 	type io struct {
@@ -186,6 +306,15 @@ func TestString(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.Output, test.Input.String())
 	}
+}
+
+// Smoke test. The method has no observable outputs so this
+// is only verifying there are no panics.
+func TestStringToPrint(t *testing.T) {
+	m := MapStr{}
+
+	assert.Equal(t, "{}", m.StringToPrint())
+	assert.Equal(t, true, len(m.StringToPrint()) > 0)
 }
 
 func TestMergeFields(t *testing.T) {

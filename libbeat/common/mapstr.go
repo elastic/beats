@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -55,6 +56,110 @@ func (m MapStr) Update(d MapStr) {
 	for k, v := range d {
 		m[k] = v
 	}
+}
+
+func (m MapStr) Delete(key string) error {
+	keyParts := strings.Split(key, ".")
+	keysLen := len(keyParts)
+
+	mapp := m
+	for i := 0; i < keysLen-1; i++ {
+		keyPart := keyParts[i]
+
+		if _, ok := mapp[keyPart]; ok {
+			mapp, ok = mapp[keyPart].(MapStr)
+			if !ok {
+				return fmt.Errorf("unexpected type of %s key", keyPart)
+			}
+		} else {
+			return fmt.Errorf("unknown key %s", keyPart)
+		}
+	}
+	delete(mapp, keyParts[keysLen-1])
+	return nil
+}
+
+func (m MapStr) CopyFieldsTo(to MapStr, key string) error {
+
+	keyParts := strings.Split(key, ".")
+	keysLen := len(keyParts)
+
+	toPointer := to
+	fromPointer := m
+
+	for i := 0; i < keysLen-1; i++ {
+		keyPart := keyParts[i]
+		var success bool
+
+		if _, ok := fromPointer[keyPart]; ok {
+			if _, already := toPointer[keyPart]; !already {
+				toPointer[keyPart] = MapStr{}
+			}
+
+			fromPointer, success = fromPointer[keyPart].(MapStr)
+			if !success {
+				return fmt.Errorf("Unexpected type of %s key", keyPart)
+			}
+
+			toPointer, success = toPointer[keyPart].(MapStr)
+			if !success {
+				return fmt.Errorf("Unexpected type of %s key", keyPart)
+			}
+		} else {
+			return nil
+		}
+	}
+
+	if _, ok := fromPointer[keyParts[keysLen-1]]; ok {
+		toPointer[keyParts[keysLen-1]] = fromPointer[keyParts[keysLen-1]]
+	} else {
+		return nil
+	}
+	return nil
+}
+
+func (m MapStr) Clone() MapStr {
+	result := MapStr{}
+
+	for k, v := range m {
+		mapstr, ok := v.(MapStr)
+		if ok {
+			v = mapstr.Clone()
+		}
+		result[k] = v
+	}
+
+	return result
+}
+
+func (m MapStr) HasKey(key string) (bool, error) {
+	keyParts := strings.Split(key, ".")
+	keyPartsLen := len(keyParts)
+
+	mapp := m
+	for i := 0; i < keyPartsLen; i++ {
+		keyPart := keyParts[i]
+
+		if _, ok := mapp[keyPart]; ok {
+			if i < keyPartsLen-1 {
+				mapp, ok = mapp[keyPart].(MapStr)
+				if !ok {
+					return false, fmt.Errorf("Unknown type of %s key", keyPart)
+				}
+			}
+		} else {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (m MapStr) StringToPrint() string {
+	json, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return fmt.Sprintf("Not valid json: %v", err)
+	}
+	return string(json)
 }
 
 // Checks if a timestamp field exists and if it doesn't it adds
