@@ -81,7 +81,6 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 		re = regexp.MustCompile("CPULoad: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
 			cpu_load = ParseMatchFloat(matches[1], hostname, "cpu_load")
-			//fmt.Printf("Test fcie: %v\n", ParseMatchFloat(matches[1], hostname, "cpu_load"))
 		}
 
 		// CPUUser: 0
