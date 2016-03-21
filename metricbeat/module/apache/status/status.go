@@ -4,9 +4,10 @@ package status
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
-
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
@@ -28,8 +29,13 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 }
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
+	u, e := url.Parse(host)
+	if e != nil {
+		logp.Err("Invalid Apache HTTPD server-status page: %v", e)
+		return nil, err
+	}
 
-	resp, err := http.Get(host + "server-status?auto")
+	resp, err := http.Get(u.String() + "?auto")
 	if resp == nil {
 		return nil, err
 	}
@@ -43,6 +49,6 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 		return nil, fmt.Errorf("HTTP Error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventMapping(resp.Body), nil
+	return eventMapping(resp.Body, u.Host, ms.Name), nil
 
 }
