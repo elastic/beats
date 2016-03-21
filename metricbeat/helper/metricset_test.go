@@ -140,6 +140,20 @@ func TestCreateEventNoHost(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func TestFetcherCounter(t *testing.T) {
+	module := &Module{}
+	m, _ := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)
+
+	counter := m.incrementFetcher()
+	assert.Equal(t, uint32(1), counter)
+
+	counter = m.incrementFetcher()
+	assert.Equal(t, uint32(2), counter)
+
+	counter = m.decrementFetcher()
+	assert.Equal(t, uint32(1), counter)
+}
+
 /*** Mock tests objects ***/
 
 // New creates new instance of MetricSeter
