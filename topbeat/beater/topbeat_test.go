@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/topbeat/system"
 	sigar "github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,45 +28,41 @@ func TestMatchProcs(t *testing.T) {
 
 func TestMemPercentage(t *testing.T) {
 
-	beat := Topbeat{}
-
-	m := MemStat{
+	m := system.MemStat{
 		Mem: sigar.Mem{
 			Total: 7,
 			Used:  5,
 			Free:  2,
 		},
 	}
-	beat.addMemPercentage(&m)
+	system.AddMemPercentage(&m)
 	assert.Equal(t, m.UsedPercent, 0.71)
 
-	m = MemStat{
+	m = system.MemStat{
 		Mem: sigar.Mem{Total: 0},
 	}
-	beat.addMemPercentage(&m)
+	system.AddMemPercentage(&m)
 	assert.Equal(t, m.UsedPercent, 0.0)
 }
 
 func TestActualMemPercentage(t *testing.T) {
 
-	beat := Topbeat{}
-
-	m := MemStat{
+	m := system.MemStat{
 		Mem: sigar.Mem{
 			Total:      7,
 			ActualUsed: 5,
 			ActualFree: 2,
 		},
 	}
-	beat.addMemPercentage(&m)
+	system.AddMemPercentage(&m)
 	assert.Equal(t, m.ActualUsedPercent, 0.71)
 
-	m = MemStat{
+	m = system.MemStat{
 		Mem: sigar.Mem{
 			Total: 0,
 		},
 	}
-	beat.addMemPercentage(&m)
+	system.AddMemPercentage(&m)
 	assert.Equal(t, m.ActualUsedPercent, 0.0)
 }
 
@@ -73,7 +70,7 @@ func TestCpuPercentage(t *testing.T) {
 
 	beat := Topbeat{}
 
-	cpu1 := CpuTimes{
+	cpu1 := system.CpuTimes{
 		Cpu: sigar.Cpu{
 			User:    10855311,
 			Nice:    0,
@@ -91,7 +88,7 @@ func TestCpuPercentage(t *testing.T) {
 	assert.Equal(t, cpu1.UserPercent, 0.0)
 	assert.Equal(t, cpu1.SystemPercent, 0.0)
 
-	cpu2 := CpuTimes{
+	cpu2 := system.CpuTimes{
 		Cpu: sigar.Cpu{
 			User:    10855693,
 			Nice:    0,
@@ -114,7 +111,7 @@ func TestProcMemPercentage(t *testing.T) {
 
 	beat := Topbeat{}
 
-	p := Process{
+	p := system.Process{
 		Pid: 3456,
 		Mem: sigar.ProcMem{
 			Resident: 1416,
@@ -122,10 +119,10 @@ func TestProcMemPercentage(t *testing.T) {
 		},
 	}
 
-	beat.procsMap = make(ProcsMap)
+	beat.procsMap = make(system.ProcsMap)
 	beat.procsMap[p.Pid] = &p
 
-	rssPercent := beat.getProcMemPercentage(&p, 10000)
+	rssPercent := system.GetProcMemPercentage(&p, 10000)
 	assert.Equal(t, rssPercent, 0.14)
 }
 
@@ -135,29 +132,29 @@ func TestProcCpuPercentage(t *testing.T) {
 
 	ctime := time.Now()
 
-	p2 := Process{
+	p2 := system.Process{
 		Pid: 3545,
 		Cpu: sigar.ProcTime{
 			User:  14794,
 			Sys:   47,
 			Total: 14841,
 		},
-		ctime: ctime,
+		Ctime: ctime,
 	}
 
-	p1 := Process{
+	p1 := system.Process{
 		Pid: 3545,
 		Cpu: sigar.ProcTime{
 			User:  11345,
 			Sys:   37,
 			Total: 11382,
 		},
-		ctime: ctime.Add(-1 * time.Second),
+		Ctime: ctime.Add(-1 * time.Second),
 	}
 
-	beat.procsMap = make(ProcsMap)
+	beat.procsMap = make(system.ProcsMap)
 	beat.procsMap[p1.Pid] = &p1
 
-	totalPercent := beat.getProcCpuPercentage(&p2)
+	totalPercent := system.GetProcCpuPercentage(&p1, &p2)
 	assert.Equal(t, totalPercent, 3.459)
 }
