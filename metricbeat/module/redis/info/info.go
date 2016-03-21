@@ -46,7 +46,8 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 		// Set up redis pool
 		redisPool := rd.NewPool(func() (rd.Conn, error) {
-			c, err := rd.Dial(config.Network, host)
+			// Sets timeout to exit request if is longer then Timeout
+			c, err := rd.Dial(config.Network, host, rd.DialReadTimeout(ms.Module.Timeout))
 
 			if err != nil {
 				logp.Err("Failed to create Redis connection pool: %v", err)

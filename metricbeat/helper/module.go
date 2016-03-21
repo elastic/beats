@@ -24,6 +24,8 @@ type Module struct {
 	// Module config
 	Config ModuleConfig
 
+	Timeout time.Duration
+
 	// Raw config object to be unpacked by moduler
 	cfg *ucfg.Config
 
@@ -43,7 +45,8 @@ func NewModule(cfg *ucfg.Config, moduler func() Moduler) (*Module, error) {
 
 	// Module config defaults
 	config := ModuleConfig{
-		Period: "1s",
+		Period:  "1s",
+		Enabled: true,
 	}
 
 	err := cfg.Unpack(&config)
@@ -87,16 +90,34 @@ func (m *Module) Start(b *beat.Beat) error {
 	// Setup period
 	period, err := time.ParseDuration(m.Config.Period)
 	if err != nil {
-		return fmt.Errorf("Error in parsing period of metric %s: %v", m.name, err)
+		return fmt.Errorf("Error in parsing period of module %s: %v", m.name, err)
 	}
 
 	// If no period set, set default
 	if period == 0 {
-		logp.Info("Setting default period for metric %s as not set.", m.name)
+		logp.Info("Setting default period for module %s as not set.", m.name)
 		period = 1 * time.Second
 	}
 
-	// TODO: Improve logging information with list (names of metricSets)
+	var timeout time.Duration
+
+	if m.Config.Timeout != "" {
+		// Setup timeout
+		timeout, err := time.ParseDuration(m.Config.Timeout)
+		if err != nil {
+			return fmt.Errorf("Error in parsing timeout of module %s: %v", m.name, err)
+		}
+
+		// If no timeout set, set to period as default
+		if timeout == 0 {
+			logp.Info("Setting default timeout for module %s as not set.", m.name)
+			timeout = period
+		}
+	} else {
+		timeout = period
+	}
+	m.Timeout = timeout
+
 	logp.Info("Start Module %s with metricsets [%s] and period %v", m.name, m.getMetricSetsList(), period)
 
 	m.setupMetricSets()
@@ -123,20 +144,7 @@ func (m *Module) Run(period time.Duration, b *beat.Beat) {
 		ticker.Stop()
 	}()
 
-	var wg sync.WaitGroup
-	ch := make(chan struct{})
-
-	wait := func() {
-		wg.Wait()
-		ch <- struct{}{}
-	}
-
-	// TODO: A fetch event should take a maximum until the next ticker and - @ruflin,20160315
-	// be stopped before the next request is sent. If a fetch is not successful
-	// until the next it means it is a failure and a "error" event should be sent to es
 	fetch := func(set *MetricSet) {
-		defer wg.Done()
-		// Move execution part to module?
 		m.FetchMetricSets(set)
 	}
 
@@ -144,26 +152,18 @@ func (m *Module) Run(period time.Duration, b *beat.Beat) {
 	go m.publishing(b)
 
 	// Start fetching metrics
+	// The frequency is always based on the ticker interval. No delays are taken into account.
+	// Each Metricset must ensure to exit after timeout.
 	for {
+		for _, set := range m.metricSets {
+			go fetch(set)
+		}
+
 		// Waits for next ticker
 		select {
 		case <-m.done:
 			return
 		case <-ticker.C:
-		}
-
-		for _, set := range m.metricSets {
-			wg.Add(1)
-			go fetch(set)
-		}
-		go wait()
-
-		// Waits until all fetches are finished
-		select {
-		case <-m.done:
-			return
-		case <-ch:
-			// finished parallel fetch
 		}
 	}
 }
