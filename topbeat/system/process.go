@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -22,6 +23,12 @@ type Process struct {
 	Mem      sigar.ProcMem
 	Cpu      sigar.ProcTime
 	Ctime    time.Time
+}
+
+type ProcStats struct {
+	ProcStats bool
+	Procs     []string
+	ProcsMap  ProcsMap
 }
 
 func GetProcess(pid int, cmdline string) (*Process, error) {
@@ -148,4 +155,89 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 		return Round(perc, .5, 4)
 	}
 	return 0
+}
+
+func (procStats *ProcStats) MatchProcess(name string) bool {
+
+	for _, reg := range procStats.Procs {
+		matched, _ := regexp.MatchString(reg, name)
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
+func (procStats *ProcStats) InitProcStats() {
+
+	procStats.ProcsMap = make(ProcsMap)
+
+	if len(procStats.Procs) == 0 {
+		return
+	}
+
+	pids, err := Pids()
+	if err != nil {
+		logp.Warn("Getting the initial list of pids: %v", err)
+	}
+
+	for _, pid := range pids {
+		process, err := GetProcess(pid, "")
+		if err != nil {
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
+			continue
+		}
+		procStats.ProcsMap[process.Pid] = process
+	}
+}
+
+func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
+
+	if len(procStats.Procs) == 0 {
+		return nil, nil
+	}
+
+	pids, err := Pids()
+	if err != nil {
+		logp.Warn("Getting the list of pids: %v", err)
+		return nil, err
+	}
+
+	events := []common.MapStr{}
+	newProcs := make(ProcsMap, len(pids))
+	for _, pid := range pids {
+		var cmdline string
+		if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
+			cmdline = previousProc.CmdLine
+		}
+
+		process, err := GetProcess(pid, cmdline)
+		if err != nil {
+			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
+			continue
+		}
+
+		if procStats.MatchProcess(process.Name) {
+
+			newProcs[process.Pid] = process
+
+			last, ok := procStats.ProcsMap[process.Pid]
+			if ok {
+				procStats.ProcsMap[process.Pid] = process
+			}
+			proc := GetProcessEvent(process, last)
+
+			event := common.MapStr{
+				"@timestamp": common.Time(time.Now()),
+				"type":       "process",
+				"count":      1,
+				"proc":       proc,
+			}
+
+			events = append(events, event)
+		}
+	}
+
+	procStats.ProcsMap = newProcs
+	return events, nil
 }

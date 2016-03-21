@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,6 +66,73 @@ func TestProcState(t *testing.T) {
 	assert.Equal(t, getProcState('D'), "idle")
 	assert.Equal(t, getProcState('T'), "stopped")
 	assert.Equal(t, getProcState('Z'), "zombie")
+}
+
+func TestMatchProcs(t *testing.T) {
+
+	var procStats = ProcStats{}
+
+	procStats.Procs = []string{".*"}
+	assert.True(t, procStats.MatchProcess("topbeat"))
+
+	procStats.Procs = []string{"topbeat"}
+	assert.False(t, procStats.MatchProcess("burn"))
+
+	// match no processes
+	procStats.Procs = []string{"$^"}
+	assert.False(t, procStats.MatchProcess("burn"))
+}
+
+func TestProcMemPercentage(t *testing.T) {
+
+	procStats := ProcStats{}
+
+	p := Process{
+		Pid: 3456,
+		Mem: gosigar.ProcMem{
+			Resident: 1416,
+			Size:     145164088,
+		},
+	}
+
+	procStats.ProcsMap = make(ProcsMap)
+	procStats.ProcsMap[p.Pid] = &p
+
+	rssPercent := GetProcMemPercentage(&p, 10000)
+	assert.Equal(t, rssPercent, 0.14)
+}
+
+func TestProcCpuPercentage(t *testing.T) {
+
+	procStats := ProcStats{}
+
+	ctime := time.Now()
+
+	p2 := Process{
+		Pid: 3545,
+		Cpu: gosigar.ProcTime{
+			User:  14794,
+			Sys:   47,
+			Total: 14841,
+		},
+		Ctime: ctime,
+	}
+
+	p1 := Process{
+		Pid: 3545,
+		Cpu: gosigar.ProcTime{
+			User:  11345,
+			Sys:   37,
+			Total: 11382,
+		},
+		Ctime: ctime.Add(-1 * time.Second),
+	}
+
+	procStats.ProcsMap = make(ProcsMap)
+	procStats.ProcsMap[p1.Pid] = &p1
+
+	totalPercent := GetProcCpuPercentage(&p1, &p2)
+	assert.Equal(t, totalPercent, 3.459)
 }
 
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
