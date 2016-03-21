@@ -1,4 +1,4 @@
-// +build integration
+// +build !integration
 
 package mysql
 
@@ -8,11 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConnect(t *testing.T) {
+func TestCreateDSN(t *testing.T) {
 
-	db, err := Connect(GetMySQLEnvDSN())
-	assert.NoError(t, err)
+	hostname := "tcp(127.0.0.1:3306)/"
+	username := "root"
+	password := "test"
 
-	err = db.Ping()
-	assert.NoError(t, err)
+	dsn := CreateDSN(hostname, username, password)
+	assert.Equal(t, "root:test@tcp(127.0.0.1:3306)/", dsn)
+
+	dsn = CreateDSN(hostname, username, "")
+	assert.Equal(t, "root@tcp(127.0.0.1:3306)/", dsn)
+
+	dsn = CreateDSN(hostname, "", "")
+	assert.Equal(t, "tcp(127.0.0.1:3306)/", dsn)
 }

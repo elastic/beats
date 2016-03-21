@@ -6,7 +6,7 @@ metricbeat:
         - "{{ redis_host | default("127.0.0.1", true) }}:6379"
       metricsets:
         - info
-      period: 1s
+      period: 2s
       enabled: true
       selectors: {{ redis_selectors }}
     {% endif %}
