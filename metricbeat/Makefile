@@ -19,7 +19,16 @@ fields:
 	cat etc/fields_base.yml > etc/fields.yml
 	cat module/*/*/fields.yml >> etc/fields.yml
 
+# Collects all module docs
+.PHONY: docs
+docs:
+	cp -r module/*/*.asciidoc docs/modules
+
+
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
 
+# Runs all collection steps and updates afterwards
+.PHONY: collect
+collect: kibana fields docs update
