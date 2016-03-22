@@ -2,8 +2,18 @@ package system
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	sigar "github.com/elastic/gosigar"
+	"strconv"
+	"time"
 )
+
+type CPU struct {
+	CpuPerCore bool
+
+	LastCpuTimes     *CpuTimes
+	LastCpuTimesList []CpuTimes
+}
 
 type CpuTimes struct {
 	sigar.Cpu
@@ -96,4 +106,70 @@ func GetCpuStatEvent(cpuStat *CpuTimes) common.MapStr {
 		"user_p":   cpuStat.UserPercent,
 		"system_p": cpuStat.SystemPercent,
 	}
+}
+
+func (cpu *CPU) AddCpuPercentage(t2 *CpuTimes) {
+	cpu.LastCpuTimes = GetCpuPercentage(cpu.LastCpuTimes, t2)
+}
+
+func (cpu *CPU) AddCpuPercentageList(t2 []CpuTimes) {
+	cpu.LastCpuTimesList = GetCpuPercentageList(cpu.LastCpuTimesList, t2)
+}
+
+func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
+	loadStat, err := GetSystemLoad()
+	if err != nil {
+		logp.Warn("Getting load statistics: %v", err)
+		return nil, err
+	}
+	cpuStat, err := GetCpuTimes()
+	if err != nil {
+		logp.Warn("Getting cpu times: %v", err)
+		return nil, err
+	}
+
+	cpu.AddCpuPercentage(cpuStat)
+
+	memStat, err := GetMemory()
+	if err != nil {
+		logp.Warn("Getting memory details: %v", err)
+		return nil, err
+	}
+	AddMemPercentage(memStat)
+
+	swapStat, err := GetSwap()
+	if err != nil {
+		logp.Warn("Getting swap details: %v", err)
+		return nil, err
+	}
+	AddSwapPercentage(swapStat)
+
+	event := common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "system",
+		"count":      1,
+		"load":       loadStat,
+		"cpu":        GetCpuStatEvent(cpuStat),
+		"mem":        GetMemoryEvent(memStat),
+		"swap":       GetSwapEvent(swapStat),
+	}
+
+	if cpu.CpuPerCore {
+
+		cpuCoreStat, err := GetCpuTimesList()
+		if err != nil {
+			logp.Warn("Getting cpu core times: %v", err)
+			return nil, err
+		}
+		cpu.AddCpuPercentageList(cpuCoreStat)
+
+		cpus := common.MapStr{}
+
+		for coreNumber, stat := range cpuCoreStat {
+			cpus["cpu"+strconv.Itoa(coreNumber)] = GetCpuStatEvent(&stat)
+		}
+		event["cpus"] = cpus
+	}
+
+	return event, nil
 }
