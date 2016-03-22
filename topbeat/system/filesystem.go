@@ -66,7 +66,6 @@ func CollectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
 		event := common.MapStr{
 			"@timestamp": common.Time(time.Now()),
 			"type":       "filesystem",
-			"count":      1,
 			"fs":         GetFilesystemEvent(fsStat),
 		}
 		events = append(events, event)

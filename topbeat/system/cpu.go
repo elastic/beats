@@ -1,11 +1,12 @@
 package system
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	sigar "github.com/elastic/gosigar"
-	"strconv"
-	"time"
 )
 
 type CPU struct {
@@ -147,7 +148,6 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
-		"count":      1,
 		"load":       loadStat,
 		"cpu":        GetCpuStatEvent(cpuStat),
 		"mem":        GetMemoryEvent(memStat),
