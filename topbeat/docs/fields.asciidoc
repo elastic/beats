@@ -41,15 +41,6 @@ required: True
 Set to "system" to indicate that the statistics are system-wide.
 
 
-==== count
-
-type: int
-
-required: True
-
-The number of transactions that this event represents. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values. Reserved for future usage.
-
-
 ==== beat.name
 
 Name of the Beat sending the events. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
