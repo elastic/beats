@@ -230,7 +230,6 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 			event := common.MapStr{
 				"@timestamp": common.Time(time.Now()),
 				"type":       "process",
-				"count":      1,
 				"proc":       proc,
 			}
 
