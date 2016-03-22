@@ -16,23 +16,26 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-Before starting {beatname_uc}, you need to load the
+Before using {beatname_uc}, you need to load the
 http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
 template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
-The recommended template file is installed by the {beatname_uc} packages. You can either configure 
-{beatname_uc} to load the template automatically, or you can run a shell script to load the template:
+The recommended template file is installed by the {beatname_uc} packages. By default, {beatname_uc} 
+loads the template automatically when you start the Beat. However, if you want to disable
+automatic template loading, or you want to load your own template, you can change the settings for template
+loading in the {beatname_uc} configuration file. If you choose to disable automatic template loading,
+you need to load the template manually. For more information, see:
 
 * <<load-template-auto>>
-* <<load-template-shell>>
+* <<load-template-manually>>
 
 [[load-template-auto]]
-==== Configuring {beatname_uc} to Load the Template
+==== Configuring Template Loading
 
-To configure {beatname_uc} to load the template, you must enable the elasticsearch output. In the
-{beatname_uc} configuration file, uncomment the template part under elasticsearch output. By default
-the template is named {beatname_lc}. Adjust the path to your template file. 
+By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
+if elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
+by adjusting the `name` and `path` options under `template` in +{beatname_uc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -46,7 +49,7 @@ output:
     template:
 
       # Template name. By default the template name is {beatname_lc}.
-      #name: "{beatname_lc}"
+      name: "{beatname_lc}"
 
       # Path to template file
       path: "{beatname_lc}.template.json"
@@ -55,14 +58,15 @@ output:
       #overwrite: false
 ----------------------------------------------------------------------
 
-The template is loaded when you start {beatname_uc}. By default, if a template
-already exists in the index, it is not overwritten. To overwrite an existing template,
-set `overwrite: true` in the configuration file.
+By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
+template, set `overwrite: true` in the configuration file.
 
-[[load-template-shell]]
-==== Running a Shell Script to Load the Template
+To disable automatic template loading, comment out the template part under elasticsearch output.
 
-You can load the template by running the following command:
+[[load-template-manually]]
+==== Loading the Template Manually
+
+If you disable automatic template loading, you need to run the following command to load the template:
 
 ifdef::allplatforms[]
 
