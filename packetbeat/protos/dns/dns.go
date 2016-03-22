@@ -16,7 +16,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -192,7 +191,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Dns{}
 	config := defaultConfig
@@ -234,7 +233,7 @@ func (dns *Dns) setFromConfig(config *dnsConfig) error {
 	dns.Send_response = config.SendResponse
 	dns.Include_authorities = config.Include_authorities
 	dns.Include_additionals = config.Include_additionals
-	dns.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	dns.transactionTimeout = config.TransactionTimeout
 	return nil
 }
 

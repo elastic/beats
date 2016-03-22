@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -43,7 +41,7 @@ var (
 )
 
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
-func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", 0, defaultBulkSize)
 	}
@@ -57,7 +55,7 @@ func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
 }
 
 func (out *elasticsearchOutput) init(
-	cfg *ucfg.Config,
+	cfg *common.Config,
 	topologyExpire int,
 ) error {
 	config := defaultConfig
@@ -75,8 +73,6 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	timeout := time.Duration(config.Timeout) * time.Second
-
 	maxRetries := config.MaxRetries
 	maxAttempts := maxRetries + 1 // maximum number of send attempts (-1 = infinite)
 	if maxRetries < 0 {
@@ -89,7 +85,7 @@ func (out *elasticsearchOutput) init(
 	out.clients = clients
 	loadBalance := config.LoadBalance
 	m, err := mode.NewConnectionMode(clients, !loadBalance,
-		maxAttempts, waitRetry, timeout, maxWaitRetry)
+		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
 	if err != nil {
 		return err
 	}

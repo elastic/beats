@@ -10,13 +10,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 )
 
 const (
 	DefaultTransactionHashSize                 = 2 ^ 16
 	DefaultTransactionExpiration time.Duration = 10 * time.Second
-	DefaultTransactionTimeout                  = 10
 )
 
 // ProtocolData interface to represent an upper
@@ -85,7 +83,7 @@ var Protos = ProtocolsStruct{
 func (protocols ProtocolsStruct) Init(
 	testMode bool,
 	results publish.Transactions,
-	configs map[string]*ucfg.Config,
+	configs map[string]*common.Config,
 ) error {
 	for proto := range protocolSyms {
 		logp.Info("registered protocol plugin: %v", proto)

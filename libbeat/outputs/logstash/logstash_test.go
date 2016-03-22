@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
@@ -113,7 +112,7 @@ func newTestLumberjackOutput(
 		t.Fatalf("No logstash output plugin found")
 	}
 
-	cfg, _ := ucfg.NewFrom(config, ucfg.PathSep("."))
+	cfg, _ := common.NewConfigFrom(config)
 	output, err := plugin(cfg, 0)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)

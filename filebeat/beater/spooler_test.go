@@ -6,14 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/urso/ucfg/yaml"
-
 	cfg "github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
 func load(t *testing.T, in string) cfg.FilebeatConfig {
-	yaml, err := yaml.NewConfig([]byte(in))
+	yaml, err := common.NewConfigWithYAML([]byte(in), "")
 	if err != nil {
 		t.Fatalf("Failed to parse config input: %v", err)
 	}

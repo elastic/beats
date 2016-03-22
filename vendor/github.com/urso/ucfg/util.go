@@ -55,3 +55,50 @@ func chaseTypePointers(t reflect.Type) reflect.Type {
 	}
 	return t
 }
+
+// tryTConfig tries to convert input value into addressable Config by converting
+// to *Config first. If value is convertible to Config, but not addressable a new
+// value is allocated in order to guarantee returned value of type Config is
+// addressable. Returns false if type value is not convertible to TConfig.
+func tryTConfig(value reflect.Value) (reflect.Value, bool) {
+	v := chaseValue(value)
+	t := v.Type()
+
+	if t == tConfig {
+		v := pointerize(tConfigPtr, tConfig, v)
+		return v.Elem(), true
+	}
+
+	if !t.ConvertibleTo(tConfig) {
+		return reflect.Value{}, false
+	}
+
+	v = pointerize(reflect.PtrTo(v.Type()), v.Type(), v)
+	if !v.Type().ConvertibleTo(tConfigPtr) {
+		return reflect.Value{}, false
+	}
+
+	v = v.Convert(tConfigPtr)
+	return v.Elem(), true
+}
+
+func pointerize(t, base reflect.Type, v reflect.Value) reflect.Value {
+	if t == base {
+		return v
+	}
+
+	if t.Kind() == reflect.Interface {
+		return v
+	}
+
+	for t != v.Type() {
+		if !v.CanAddr() {
+			tmp := reflect.New(v.Type())
+			tmp.Elem().Set(v)
+			v = tmp
+		} else {
+			v = v.Addr()
+		}
+	}
+	return v
+}

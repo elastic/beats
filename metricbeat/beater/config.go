@@ -1,13 +1,11 @@
 package beater
 
-import (
-	"github.com/urso/ucfg"
-)
+import "github.com/elastic/beats/libbeat/common"
 
 type Config struct {
 	Metricbeat MetricbeatConfig
 }
 
 type MetricbeatConfig struct {
-	Modules []*ucfg.Config
+	Modules []*common.Config
 }

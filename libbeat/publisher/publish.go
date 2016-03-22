@@ -6,13 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/nranchev/go-libGeoIP"
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/nranchev/go-libGeoIP"
 
 	// load supported output plugins
 	_ "github.com/elastic/beats/libbeat/outputs/console"
@@ -78,12 +76,12 @@ type PublisherType struct {
 }
 
 type ShipperConfig struct {
-	common.EventMetadata  `config:",inline"` // Fields and tags to add to each event.
-	Name                  string
-	Refresh_topology_freq int
-	Ignore_outgoing       bool
-	Topology_expire       int
-	Geoip                 common.Geoip
+	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
+	Name                 string
+	RefreshTopologyFreq  time.Duration `config:"refresh_topology_freq"`
+	Ignore_outgoing      bool          `config:"ignore_outgoing"`
+	Topology_expire      int           `config:"topology_expire"`
+	Geoip                common.Geoip  `config:"geoip"`
 
 	// internal publisher queue sizes
 	QueueSize     *int `config:"queue_size"`
@@ -178,7 +176,7 @@ func (publisher *PublisherType) RegisterFilter(filters *filter.FilterList) error
 // Create new PublisherType
 func New(
 	beatName string,
-	configs map[string]*ucfg.Config,
+	configs map[string]*common.Config,
 	shipper ShipperConfig,
 ) (*PublisherType, error) {
 
@@ -192,7 +190,7 @@ func New(
 
 func (publisher *PublisherType) init(
 	beatName string,
-	configs map[string]*ucfg.Config,
+	configs map[string]*common.Config,
 	shipper ShipperConfig,
 ) error {
 	var err error
@@ -299,8 +297,8 @@ func (publisher *PublisherType) init(
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if shipper.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(shipper.Refresh_topology_freq) * time.Second
+		if shipper.RefreshTopologyFreq != 0 {
+			RefreshTopologyFreq = shipper.RefreshTopologyFreq
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)

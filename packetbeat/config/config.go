@@ -1,17 +1,19 @@
 package config
 
 import (
+	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/urso/ucfg"
 )
 
 type Config struct {
 	Interfaces InterfacesConfig
 	Flows      *Flows
-	Protocols  map[string]*ucfg.Config
+	Protocols  map[string]*common.Config
 	Shipper    publisher.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
@@ -38,10 +40,10 @@ type Flows struct {
 }
 
 type ProtocolCommon struct {
-	Ports              []int `config:"ports"`
-	SendRequest        bool  `config:"send_request"`
-	SendResponse       bool  `config:"send_response"`
-	TransactionTimeout int   `config:"transaction_timeout"`
+	Ports              []int         `config:"ports"`
+	SendRequest        bool          `config:"send_request"`
+	SendResponse       bool          `config:"send_response"`
+	TransactionTimeout time.Duration `config:"transaction_timeout"`
 }
 
 // Config Singleton

@@ -1,8 +1,6 @@
 package outputs
 
 import (
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -34,7 +32,7 @@ type BulkOutputer interface {
 }
 
 // Create and initialize the output plugin
-type OutputBuilder func(config *ucfg.Config, topologyExpire int) (Outputer, error)
+type OutputBuilder func(config *common.Config, topologyExpire int) (Outputer, error)
 
 // Functions to be exported by a output plugin
 type OutputInterface interface {
@@ -44,7 +42,7 @@ type OutputInterface interface {
 
 type OutputPlugin struct {
 	Name   string
-	Config *ucfg.Config
+	Config *common.Config
 	Output Outputer
 }
 
@@ -64,7 +62,7 @@ func FindOutputPlugin(name string) OutputBuilder {
 
 func InitOutputs(
 	beatName string,
-	configs map[string]*ucfg.Config,
+	configs map[string]*common.Config,
 	topologyExpire int,
 ) ([]OutputPlugin, error) {
 	var plugins []OutputPlugin = nil

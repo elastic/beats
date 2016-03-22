@@ -8,9 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/urso/ucfg"
-	"github.com/urso/ucfg/yaml"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -57,12 +55,12 @@ func Read(out interface{}, path string) error {
 	}
 	filecontent = expandEnv(filecontent)
 
-	config, err := yaml.NewConfig(filecontent, ucfg.PathSep("."))
+	config, err := common.NewConfigWithYAML(filecontent, path)
 	if err != nil {
 		return fmt.Errorf("YAML config parsing failed on %s: %v. Exiting.", path, err)
 	}
 
-	err = config.Unpack(out, ucfg.PathSep("."))
+	err = config.Unpack(out)
 	if err != nil {
 		return fmt.Errorf("Failed to apply config %s: %v. Exiting. ", path, err)
 	}

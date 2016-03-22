@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tsg/gopacket/layers"
@@ -30,7 +29,7 @@ var (
 )
 
 func init() {
-	new := func(_ bool, _ publish.Transactions, _ *ucfg.Config) (protos.Plugin, error) {
+	new := func(_ bool, _ publish.Transactions, _ *common.Config) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 

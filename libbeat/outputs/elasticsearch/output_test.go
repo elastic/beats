@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -27,7 +25,7 @@ func createElasticsearchConnection(flushInterval int, bulkSize int) elasticsearc
 		logp.Err("Invalid port. Cannot be converted to in: %s", GetEsPort())
 	}
 
-	config, _ := ucfg.NewFrom(map[string]interface{}{
+	config, _ := common.NewConfigFrom(map[string]interface{}{
 		"save_topology":  true,
 		"hosts":          []string{GetEsHost()},
 		"port":           esPort,

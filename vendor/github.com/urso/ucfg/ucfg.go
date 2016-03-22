@@ -1,52 +1,33 @@
 package ucfg
 
 import (
-	"errors"
-	"fmt"
 	"reflect"
+	"regexp"
 	"time"
 )
 
 type Config struct {
+	ctx      context
+	metadata *Meta
+	fields   *fields
+}
+
+type fields struct {
 	fields map[string]value
 }
 
-type Option func(*options)
-
-type options struct {
-	tag     string
-	pathSep string
+// Meta holds additional meta data per config value
+type Meta struct {
+	Source string
 }
 
 var (
-	ErrMissing = errors.New("field name missing")
-
-	ErrTypeNoArray = errors.New("field is no array")
-
-	ErrTypeMismatch = errors.New("type mismatch")
-
-	ErrKeyTypeNotString = errors.New("key must be a string")
-
-	ErrIndexOutOfRange = errors.New("index out of range")
-
-	ErrPointerRequired = errors.New("requires pointer for unpacking")
-
-	ErrArraySizeMistach = errors.New("Array size mismatch")
-
-	ErrExpectedObject = errors.New("expected object")
-
-	ErrNilConfig = errors.New("config is nil")
-
-	ErrNilValue = errors.New("unexpected nil value")
-
-	ErrTODO = errors.New("TODO - implement me")
-)
-
-var (
 	tConfig         = reflect.TypeOf(Config{})
+	tConfigPtr      = reflect.PtrTo(tConfig)
 	tConfigMap      = reflect.TypeOf((map[string]interface{})(nil))
 	tInterfaceArray = reflect.TypeOf([]interface{}(nil))
 	tDuration       = reflect.TypeOf(time.Duration(0))
+	tRegexp         = reflect.TypeOf(regexp.Regexp{})
 
 	tBool    = reflect.TypeOf(true)
 	tInt64   = reflect.TypeOf(int64(0))
@@ -56,7 +37,7 @@ var (
 
 func New() *Config {
 	return &Config{
-		fields: make(map[string]value),
+		fields: &fields{map[string]value{}},
 	}
 }
 
@@ -70,45 +51,39 @@ func NewFrom(from interface{}, opts ...Option) (*Config, error) {
 
 func (c *Config) GetFields() []string {
 	var names []string
-	for k := range c.fields {
+	for k := range c.fields.fields {
 		names = append(names, k)
 	}
 	return names
 }
 
 func (c *Config) HasField(name string) bool {
-	_, ok := c.fields[name]
+	_, ok := c.fields.fields[name]
 	return ok
 }
 
-func StructTag(tag string) Option {
-	return func(o *options) {
-		o.tag = tag
-	}
+func (c *Config) Path(sep string) string {
+	return c.ctx.path(sep)
 }
 
-func PathSep(sep string) Option {
-	return func(o *options) {
-		o.pathSep = sep
-	}
+func (c *Config) PathOf(field, sep string) string {
+	return c.ctx.pathOf(field, sep)
 }
 
-func makeOptions(opts []Option) options {
-	o := options{
-		tag:     "config",
-		pathSep: "", // no separator by default
-	}
-	for _, opt := range opts {
-		opt(&o)
-	}
-	return o
-}
+func (c *Config) Parent() *Config {
+	ctx := c.ctx
+	for {
+		if ctx.parent == nil {
+			return nil
+		}
 
-func errDuplicateKey(name string) error {
-	return fmt.Errorf("duplicate field key '%v'", name)
-}
-
-func raise(err error) error {
-	// fmt.Println(string(debug.Stack()))
-	return err
+		switch p := ctx.parent.(type) {
+		case *cfgArray:
+			ctx = p.Context()
+		case cfgSub:
+			return p.c
+		default:
+			return nil
+		}
+	}
 }

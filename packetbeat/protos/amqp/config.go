@@ -16,7 +16,7 @@ type amqpConfig struct {
 var (
 	defaultConfig = amqpConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 		ParseHeaders:              true,
 		ParseArguments:            true,

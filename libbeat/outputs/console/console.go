@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -19,7 +17,7 @@ type console struct {
 	config config
 }
 
-func New(config *ucfg.Config, _ int) (outputs.Outputer, error) {
+func New(config *common.Config, _ int) (outputs.Outputer, error) {
 	c := &console{config: defaultConfig}
 	err := config.Unpack(&c.config)
 	if err != nil {
