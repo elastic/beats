@@ -19,7 +19,7 @@ type httpConfig struct {
 var (
 	defaultConfig = httpConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 	}
 )

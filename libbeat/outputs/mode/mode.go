@@ -7,8 +7,6 @@ import (
 	"expvar"
 	"time"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -126,7 +124,7 @@ func NewAsyncConnectionMode(
 // MakeClients will create a list from of ProtocolClient instances from
 // outputer configuration host list and client factory function.
 func MakeClients(
-	config *ucfg.Config,
+	config *common.Config,
 	newClient func(string) (ProtocolClient, error),
 ) ([]ProtocolClient, error) {
 	hosts, err := ReadHostList(config)
@@ -153,7 +151,7 @@ func MakeClients(
 }
 
 func MakeAsyncClients(
-	config *ucfg.Config,
+	config *common.Config,
 	newClient func(string) (AsyncProtocolClient, error),
 ) ([]AsyncProtocolClient, error) {
 	hosts, err := ReadHostList(config)
@@ -179,7 +177,7 @@ func MakeAsyncClients(
 	return clients, nil
 }
 
-func ReadHostList(cfg *ucfg.Config) ([]string, error) {
+func ReadHostList(cfg *common.Config) ([]string, error) {
 	config := struct {
 		Host   string   `config:"host"`
 		Hosts  []string `config:"hosts"`

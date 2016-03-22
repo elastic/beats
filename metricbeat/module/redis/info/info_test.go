@@ -7,7 +7,6 @@ import (
 
 	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
@@ -71,8 +70,8 @@ func TestKeyspace(t *testing.T) {
 	assert.True(t, (keyCount > 0))
 }
 
-func getRedisModuleConfig() (*ucfg.Config, error) {
-	return ucfg.NewFrom(RedisModuleConfig{
+func getRedisModuleConfig() (*common.Config, error) {
+	return common.NewConfigFrom(RedisModuleConfig{
 		Module: "redis",
 		Hosts:  []string{redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()},
 	})

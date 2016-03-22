@@ -7,8 +7,6 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -21,7 +19,7 @@ func init() {
 	outputs.RegisterOutputPlugin("logstash", New)
 }
 
-func New(cfg *ucfg.Config, _ int) (outputs.Outputer, error) {
+func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	output := &logstash{}
 	if err := output.init(cfg); err != nil {
 		return nil, err
@@ -39,14 +37,13 @@ var waitRetry = time.Duration(1) * time.Second
 // NOTE: maxWaitRetry has no effect on mode, as logstash client currently does not return ErrTempBulkFailure
 var maxWaitRetry = time.Duration(60) * time.Second
 
-func (lj *logstash) init(cfg *ucfg.Config) error {
+func (lj *logstash) init(cfg *common.Config) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return err
 	}
 
 	useTLS := (config.TLS != nil)
-	timeout := time.Duration(config.Timeout) * time.Second
 	sendRetries := config.MaxRetries
 	maxAttempts := sendRetries + 1
 	if sendRetries < 0 {
@@ -79,7 +76,7 @@ func (lj *logstash) init(cfg *ucfg.Config) error {
 
 	logp.Info("Max Retries set to: %v", sendRetries)
 	m, err := mode.NewConnectionMode(clients, !config.LoadBalance,
-		maxAttempts, waitRetry, timeout, maxWaitRetry)
+		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
 	if err != nil {
 		return err
 	}
@@ -99,9 +96,8 @@ func makeClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		timeout := time.Duration(config.Timeout) * time.Second
 		return newLumberjackClient(transp,
-			config.CompressionLevel, config.BulkMaxSize, timeout)
+			config.CompressionLevel, config.BulkMaxSize, config.Timeout)
 	}
 }
 

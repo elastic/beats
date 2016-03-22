@@ -20,6 +20,9 @@ func TestSetGetPrimitives(t *testing.T) {
 	assert.True(t, c.HasField("str"))
 	assert.Len(t, c.GetFields(), 4)
 
+	path := c.Path(".")
+	assert.Equal(t, "", path)
+
 	cnt, err := c.CountField("bool")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, cnt)
@@ -67,15 +70,45 @@ func TestSetGetChild(t *testing.T) {
 	i, err := child.Int("test", 0)
 	assert.Nil(t, err)
 	assert.Equal(t, 42, int(i))
+
+	assert.Equal(t, "", c.Path("."))
+	assert.Equal(t, "child", child.Path("."))
+	assert.Equal(t, c, child.Parent())
+}
+
+func TestSetGetChildPath(t *testing.T) {
+	c := New()
+
+	err := c.SetInt("sub.test", 0, 42, PathSep("."))
+	assert.NoError(t, err)
+
+	sub, err := c.Child("sub", 0)
+	assert.Nil(t, err)
+
+	i, err := sub.Int("test", 0)
+	assert.Nil(t, err)
+	assert.Equal(t, 42, int(i))
+
+	i, err = c.Int("sub.test", 0, PathSep("."))
+	assert.Nil(t, err)
+	assert.Equal(t, 42, int(i))
+
+	assert.Equal(t, "", c.Path("."))
+	assert.Equal(t, "sub", sub.Path("."))
+	assert.Equal(t, c, sub.Parent())
 }
 
 func TestSetGetArray(t *testing.T) {
 	c := New()
 
+	child := New()
+	child.SetInt("test", 0, 42)
+
 	c.SetBool("a", 0, true)
 	c.SetInt("a", 1, 42)
 	c.SetFloat("a", 2, 3.14)
 	c.SetString("a", 3, "string")
+	c.SetChild("a", 4, child)
 
 	b, err := c.Bool("a", 0)
 	assert.NoError(t, err)
@@ -92,4 +125,10 @@ func TestSetGetArray(t *testing.T) {
 	s, err := c.String("a", 3)
 	assert.NoError(t, err)
 	assert.Equal(t, "string", s)
+
+	child, err = c.Child("a", 4)
+	assert.Nil(t, err)
+	assert.Equal(t, "", c.Path("."))
+	assert.Equal(t, "a.4", child.Path("."))
+	assert.Equal(t, c, child.Parent())
 }

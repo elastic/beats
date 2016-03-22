@@ -20,5 +20,7 @@ func NewConfigWithFile(name string, opts ...ucfg.Option) (*ucfg.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	opts = append([]ucfg.Option{ucfg.MetaData(ucfg.Meta{name})}, opts...)
 	return NewConfig(input, opts...)
 }

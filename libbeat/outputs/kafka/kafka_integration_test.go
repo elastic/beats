@@ -13,7 +13,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 )
 
 const (
@@ -61,7 +60,7 @@ func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Output
 		"use_type":       useType,
 	}
 
-	cfg, err := ucfg.NewFrom(config, ucfg.PathSep("."))
+	cfg, err := common.NewConfigFrom(config)
 	assert.NoError(t, err)
 	output, err := New(cfg, 0)
 	assert.NoError(t, err)

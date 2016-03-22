@@ -20,7 +20,7 @@ type thriftConfig struct {
 var (
 	defaultConfig = thriftConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 		StringMaxSize:          200,
 		CollectionMaxSize:      15,

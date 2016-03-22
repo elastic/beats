@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/flows"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -50,7 +49,7 @@ const (
 	orphanedResponseMsg = "Response was received without an associated request."
 )
 
-func New(testMode bool, results publish.Transactions, cfg *ucfg.Config) (*Icmp, error) {
+func New(testMode bool, results publish.Transactions, cfg *common.Config) (*Icmp, error) {
 	p := &Icmp{}
 	config := defaultConfig
 	if !testMode {
@@ -95,7 +94,7 @@ func (icmp *Icmp) init(results publish.Transactions, config *icmpConfig) error {
 func (icmp *Icmp) setFromConfig(config *icmpConfig) {
 	icmp.sendRequest = config.SendRequest
 	icmp.sendResponse = config.SendResponse
-	icmp.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	icmp.transactionTimeout = config.TransactionTimeout
 }
 
 func (icmp *Icmp) ProcessICMPv4(

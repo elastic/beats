@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 )
 
 var (
@@ -41,7 +40,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Amqp{}
 	config := defaultConfig
@@ -144,7 +143,7 @@ func (amqp *Amqp) setFromConfig(config *amqpConfig) {
 	amqp.ParseHeaders = config.ParseHeaders
 	amqp.ParseArguments = config.ParseArguments
 	amqp.HideConnectionInformation = config.HideConnectionInformation
-	amqp.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	amqp.transactionTimeout = config.TransactionTimeout
 }
 
 func (amqp *Amqp) addConnectionMethods() {

@@ -28,14 +28,13 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/satori/go.uuid"
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/libbeat/service"
+	"github.com/satori/go.uuid"
 )
 
 // Beater interface that every beat must use
@@ -82,7 +81,7 @@ const (
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Output  map[string]*ucfg.Config
+	Output  map[string]*common.Config
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
 	Filter  []filter.FilterConfig

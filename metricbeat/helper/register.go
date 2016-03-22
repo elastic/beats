@@ -3,8 +3,7 @@ package helper
 import (
 	"fmt"
 
-	"github.com/urso/ucfg"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -50,13 +49,13 @@ func (r *Register) AddMetricSeter(module string, name string, new func() MetricS
 }
 
 // GetModule returns a new module instance for the given moduler name
-func (r *Register) GetModule(ucfg *ucfg.Config) (*Module, error) {
+func (r *Register) GetModule(cfg *common.Config) (*Module, error) {
 
 	// Unpack config to load module name
 	config := struct {
 		Module string `config:"module"`
 	}{}
-	if err := ucfg.Unpack(&config); err != nil {
+	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
@@ -65,7 +64,7 @@ func (r *Register) GetModule(ucfg *ucfg.Config) (*Module, error) {
 		return nil, fmt.Errorf("Module %s does not exist", config.Module)
 	}
 
-	return NewModule(ucfg, moduler)
+	return NewModule(cfg, moduler)
 }
 
 // GetMetricSet returns a new metricset instance for the given metricset name combined with the module name

@@ -9,7 +9,7 @@ import (
 type kafkaConfig struct {
 	Hosts           []string           `config:"hosts"`
 	TLS             *outputs.TLSConfig `config:"tls"`
-	Timeout         int                `config:"timeout"`
+	Timeout         time.Duration      `config:"timeout"`
 	Worker          int                `config:"worker"`
 	UseType         bool               `config:"use_type"`
 	Topic           string             `config:"topic"`
@@ -24,7 +24,7 @@ type kafkaConfig struct {
 
 var (
 	defaultConfig = kafkaConfig{
-		Timeout:     30,
+		Timeout:     30 * time.Second,
 		Worker:      1,
 		Compression: "gzip",
 		ClientID:    "beats",
