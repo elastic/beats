@@ -87,3 +87,13 @@ func GetFilesystemEvent(fsStat *FileSystemStat) common.MapStr {
 		"used_p":      fsStat.UsedPercent,
 	}
 }
+
+func GetFileSystemStats() ([]common.MapStr, error) {
+	fss, err := GetFileSystemList()
+	if err != nil {
+		logp.Warn("Getting filesystem list: %v", err)
+		return nil, err
+	}
+
+	return CollectFileSystemStats(fss), nil
+}

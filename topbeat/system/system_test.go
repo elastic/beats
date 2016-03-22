@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,4 +53,44 @@ func TestGetSwap(t *testing.T) {
 	assert.True(t, (swap.Total >= 0))
 	assert.True(t, (swap.Used >= 0))
 	assert.True(t, (swap.Free >= 0))
+}
+
+func TestMemPercentage(t *testing.T) {
+
+	m := MemStat{
+		Mem: gosigar.Mem{
+			Total: 7,
+			Used:  5,
+			Free:  2,
+		},
+	}
+	AddMemPercentage(&m)
+	assert.Equal(t, m.UsedPercent, 0.71)
+
+	m = MemStat{
+		Mem: gosigar.Mem{Total: 0},
+	}
+	AddMemPercentage(&m)
+	assert.Equal(t, m.UsedPercent, 0.0)
+}
+
+func TestActualMemPercentage(t *testing.T) {
+
+	m := MemStat{
+		Mem: gosigar.Mem{
+			Total:      7,
+			ActualUsed: 5,
+			ActualFree: 2,
+		},
+	}
+	AddMemPercentage(&m)
+	assert.Equal(t, m.ActualUsedPercent, 0.71)
+
+	m = MemStat{
+		Mem: gosigar.Mem{
+			Total: 0,
+		},
+	}
+	AddMemPercentage(&m)
+	assert.Equal(t, m.ActualUsedPercent, 0.0)
 }
