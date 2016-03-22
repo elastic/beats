@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -112,4 +114,75 @@ func TestFileEventToMapStr(t *testing.T) {
 	mapStr := event.ToMapStr()
 	_, found := mapStr["fields"]
 	assert.False(t, found)
+}
+
+func TestFileEventToMapStrJSON(t *testing.T) {
+	type io struct {
+		Event         FileEvent
+		ExpectedItems common.MapStr
+	}
+
+	text := "hello"
+
+	tests := []io{
+		{
+			// by default, don't overwrite keys
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true},
+			},
+			ExpectedItems: common.MapStr{
+				"type": "test_type",
+				"text": "hello",
+			},
+		},
+		{
+			// overwrite keys if asked
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"type": "test",
+				"text": "hello",
+			},
+		},
+		{
+			// without keys_under_root, put everything in a json key
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "text": "hello"},
+				JSONConfig:   &config.JSONConfig{},
+			},
+			ExpectedItems: common.MapStr{
+				"json": common.MapStr{"type": "test", "text": "hello"},
+				"type": "test_type",
+			},
+		},
+		{
+			// when MessageKey is defined, the Text overwrites the value of that key
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "text": "hi"},
+				JSONConfig:   &config.JSONConfig{MessageKey: "text"},
+			},
+			ExpectedItems: common.MapStr{
+				"json": common.MapStr{"type": "test", "text": "hello"},
+				"type": "test_type",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		result := test.Event.ToMapStr()
+		for k, v := range test.ExpectedItems {
+			assert.Equal(t, v, result[k])
+		}
+	}
 }
