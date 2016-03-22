@@ -139,7 +139,7 @@ func GetProcessEvent(process *Process, last *Process) common.MapStr {
 
 func GetProcCpuPercentage(last *Process, current *Process) float64 {
 
-	if last != nil {
+	if last != nil && current != nil {
 
 		delta_proc := (current.Cpu.User - last.Cpu.User) + (current.Cpu.Sys - last.Cpu.Sys)
 		delta_time := current.Ctime.Sub(last.Ctime).Nanoseconds() / 1e6 // in milliseconds
