@@ -44,6 +44,14 @@ filebeat:
 
       max_bytes: {{ max_bytes|default(10485760) }}
 
+      {% if json %}
+      json:
+        {% if json.message_key %}message_key: {{json.message_key}}{% endif %}
+        {% if json.keys_under_root %}keys_under_root: true{% endif %}
+        {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
+        {% if json.add_error_key %}add_error_key: true{% endif %}
+      {% endif %}
+
       {% if multiline %}
       multiline:
         pattern: {{pattern}}

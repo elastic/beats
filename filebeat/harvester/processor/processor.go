@@ -1,18 +1,28 @@
 package processor
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 
+	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+)
+
+const (
+	jsonErrorKey = "json_error"
 )
 
 // Line represents a line event with timestamp, content and actual number
 // of bytes read from input before decoding.
 type Line struct {
-	Ts      time.Time // timestamp the line was read
-	Content []byte    // actual line read
-	Bytes   int       // total number of bytes read to generate the line
+	Ts      time.Time     // timestamp the line was read
+	Content []byte        // actual line read
+	Bytes   int           // total number of bytes read to generate the line
+	Fields  common.MapStr // optional fields that can be added by processors
 }
 
 // LineProcessor is the interface that wraps the basic Next method for
@@ -40,6 +50,11 @@ type StripNewline struct {
 type LimitProcessor struct {
 	reader   LineProcessor
 	maxBytes int
+}
+
+type JSONProcessor struct {
+	reader LineProcessor
+	cfg    *config.JSONConfig
 }
 
 // NewLineSource creates a new LineSource from input reader by applying
@@ -88,6 +103,57 @@ func (p *LimitProcessor) Next() (Line, error) {
 		line.Content = line.Content[:p.maxBytes]
 	}
 	return line, err
+}
+
+// NewJSONProcessor creates a new processor that can decode JSON.
+func NewJSONProcessor(in LineProcessor, cfg *config.JSONConfig) *JSONProcessor {
+	return &JSONProcessor{reader: in, cfg: cfg}
+}
+
+// decodeJSON unmarshals the text parameter into a MapStr and
+// returns the new text column if one was requested.
+func (p *JSONProcessor) decodeJSON(text []byte) ([]byte, common.MapStr) {
+	var jsonFields common.MapStr
+	err := json.Unmarshal(text, &jsonFields)
+	if err != nil {
+		logp.Err("Error decoding JSON: %v", err)
+		if p.cfg.AddErrorKey {
+			jsonFields = common.MapStr{jsonErrorKey: fmt.Sprintf("Error decoding JSON: %v", err)}
+		}
+		return text, jsonFields
+	}
+
+	if len(p.cfg.MessageKey) == 0 {
+		return []byte(""), jsonFields
+	}
+
+	textValue, ok := jsonFields[p.cfg.MessageKey]
+	if !ok {
+		if p.cfg.AddErrorKey {
+			jsonFields[jsonErrorKey] = fmt.Sprintf("Key '%s' not found", p.cfg.MessageKey)
+		}
+		return []byte(""), jsonFields
+	}
+
+	textString, ok := textValue.(string)
+	if !ok {
+		if p.cfg.AddErrorKey {
+			jsonFields[jsonErrorKey] = fmt.Sprintf("Value of key '%s' is not a string", p.cfg.MessageKey)
+		}
+		return []byte(""), jsonFields
+	}
+
+	return []byte(textString), jsonFields
+}
+
+// Next decodes JSON and returns the filled Line object.
+func (p *JSONProcessor) Next() (Line, error) {
+	line, err := p.reader.Next()
+	if err != nil {
+		return line, err
+	}
+	line.Content, line.Fields = p.decodeJSON(line.Content)
+	return line, nil
 }
 
 // isLine checks if the given byte array is a line, means has a line ending \n
