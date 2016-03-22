@@ -126,6 +126,9 @@ protocols:
 {% if redis_send_request %}    send_request: true{% endif %}
 {% if redis_send_response %}    send_response: true{% endif %}
 
+  nfs:
+    ports: [{{ nfs_ports|default([2049])|join(", ") }}]
+
   thrift:
     ports: [{{ thrift_ports|default([9090])|join(", ") }}]
     transport_type: "{{ thrift_transport_type|default('socket') }}"
