@@ -26,15 +26,6 @@ env:
         Set to "system" to indicate that the statistics are system-wide.
       required: true
 
-    - name: count
-      type: int
-      description: >
-        The number of transactions that this event represents. This
-        is generally the inverse of the sampling rate. For example, for
-        a sample rate of 1/10, the count is 10. The count is used by the
-        UIs to return estimated values. Reserved for future usage.
-      required: true
-
     - name: beat.name
       description: >
         Name of the Beat sending the events. If the shipper name is set
