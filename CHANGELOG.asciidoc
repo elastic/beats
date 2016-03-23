@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Topbeat*
 - Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
 - Remove count field from the exported fields {pull}1207[1207]
+- Rename input top level config option to topbeat
 
 *Filebeat*
 - Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.

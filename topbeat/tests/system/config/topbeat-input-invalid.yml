@@ -3,21 +3,11 @@
 ############################# Topbeat ############################################
 topbeat:
   # In seconds, defines how often to read server statistics
-  period: {{ period | default(1) }}
+  period: 2
 
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [
-    {%- for proc_pattern in proc_patterns|default([".*"]) -%}
-        "{{ proc_pattern}}" {%- if not loop.last %}, {% endif -%}
-    {%- endfor %}]
-
-  # Statistics to collect (all enabled by default)
-  stats:
-    system: {{ "false" if system_stats == false else "true" }}
-    process: {{ "false" if process_stats == false else "true" }}
-    filesystem: {{ "false" if filesystem_stats == false else "true" }}
-    cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
+# Should throw an error as both topbeat and input are specified
+input:
+  period: 12
 
 ############################# Output ##########################################
 
@@ -31,12 +21,12 @@ output:
     enabled: true
 
     # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+    path: test
 
 
     # Name of the generated files. The default is `topbeat` and it generates
     # files: `topbeat`, `topbeat.1`, `topbeat.2`, etc.
-    filename: "{{ output_file_filename|default("topbeat") }}"
+    filename: "topbeat"
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.
@@ -98,16 +88,4 @@ shipper:
 
     # Number of rotated log files to keep. Oldest files will be deleted first.
     #keepfiles: 7
-
-filter:
-
-    {% if include_fields %}
-
-    - include_fields:
-        fields: {{ include_fields }}
-
-    {% endif %}
-
-    - drop_fields:
-        fields: {{ drop_fields | default([]) }}
 

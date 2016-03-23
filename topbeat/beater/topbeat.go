@@ -2,6 +2,7 @@ package beater
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -41,34 +42,46 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 		return err
 	}
 
-	if tb.TbConfig.Input.Period != nil {
-		tb.period = time.Duration(*tb.TbConfig.Input.Period) * time.Second
+	if tb.TbConfig.Topbeat != nil && tb.TbConfig.Input != nil {
+		return fmt.Errorf("topbeat and input are set in config. Only one can be enabled. input is deprecated, use topbeat.")
+	}
+
+	// Copy input config to topbeat @deprecated
+	if tb.TbConfig.Input != nil {
+		logp.Warn("The 'input' configuration section is deprecated. Please use 'topbeat' instead")
+		tb.TbConfig.Topbeat = tb.TbConfig.Input
+	}
+
+	topbeatConfig := tb.TbConfig.Topbeat
+
+	if topbeatConfig.Period != nil {
+		tb.period = time.Duration(*topbeatConfig.Period) * time.Second
 	} else {
 		tb.period = 10 * time.Second
 	}
-	if tb.TbConfig.Input.Procs != nil {
-		tb.procStats.Procs = *tb.TbConfig.Input.Procs
+	if topbeatConfig.Procs != nil {
+		tb.procStats.Procs = *topbeatConfig.Procs
 	} else {
 		tb.procStats.Procs = []string{".*"} //all processes
 	}
 
-	if tb.TbConfig.Input.Stats.System != nil {
-		tb.sysStats = *tb.TbConfig.Input.Stats.System
+	if topbeatConfig.Stats.System != nil {
+		tb.sysStats = *topbeatConfig.Stats.System
 	} else {
 		tb.sysStats = true
 	}
-	if tb.TbConfig.Input.Stats.Proc != nil {
-		tb.procStats.ProcStats = *tb.TbConfig.Input.Stats.Proc
+	if topbeatConfig.Stats.Proc != nil {
+		tb.procStats.ProcStats = *topbeatConfig.Stats.Proc
 	} else {
 		tb.procStats.ProcStats = true
 	}
-	if tb.TbConfig.Input.Stats.Filesystem != nil {
-		tb.fsStats = *tb.TbConfig.Input.Stats.Filesystem
+	if topbeatConfig.Stats.Filesystem != nil {
+		tb.fsStats = *topbeatConfig.Stats.Filesystem
 	} else {
 		tb.fsStats = true
 	}
-	if tb.TbConfig.Input.Stats.CpuPerCore != nil {
-		tb.cpu.CpuPerCore = *tb.TbConfig.Input.Stats.CpuPerCore
+	if topbeatConfig.Stats.CpuPerCore != nil {
+		tb.cpu.CpuPerCore = *topbeatConfig.Stats.CpuPerCore
 	} else {
 		tb.cpu.CpuPerCore = false
 	}
