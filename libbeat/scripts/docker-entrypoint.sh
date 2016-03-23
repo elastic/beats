@@ -53,7 +53,7 @@ es_url() {
 # green or yellow.
 waitForElasticsearch() {
   echo -n "Waiting on elasticsearch($(es_url)) to start."
-  for ((i=1;i<=30;i++))
+  for ((i=1;i<=60;i++))
   do
     health=$(curl --silent "$(es_url)/_cat/health" | awk '{print $4}')
     if [[ "$health" == "green" ]] || [[ "$health" == "yellow" ]]
