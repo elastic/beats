@@ -26,14 +26,14 @@ beat:
   entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 elasticsearch:
   build: ../testing/environments/docker/elasticsearch
-  dockerfile: Dockerfile-2.2.0-shield
-  command: elasticsearch -Des.network.host=0.0.0.0
+  dockerfile: Dockerfile-5.0.0-alpha1
+  command: elasticsearch -Ees.network.host=0.0.0.0
 redis:
   image: redis:3.0.7
 # This host name is fixed because of the certificate
 logstash:
   build: ../testing/environments/docker/logstash
-  dockerfile: Dockerfile-2.2.0
+  dockerfile: Dockerfile-5.0.0-alpha1
   env_file:
     - build/test.env
   links:
