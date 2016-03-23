@@ -181,6 +181,37 @@ The index root name to write events to. The default is the Beat name.
 For example "{beatname_lc}" generates "[{beatname_lc}-]YYYY.MM.DD" indexes (for example,
 "{beatname_lc}-2015.04.26").
 
+===== template
+
+The http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+template] to use for setting mappings in Elasticsearch. By default, template loading is
+enabled. 
+
+You can adjust the following settings to load your own template or overwrite an existing one:
+
+*`name`*:: The name of the template. The default is +{beatname_lc}+.
+
+*`path`*:: The path to the template file.
+
+*`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
+is false.
+
+For example:
+
+["source","yaml",subs="attributes,callouts"]
+----------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: ["localhost:9200"]
+    template:
+      name: "{beatname_lc}"
+      path: "{beatname_lc}.template.json"
+      overwrite: false
+----------------------------------------------------------------------
+
+To disable automatic template loading, comment out the template part under elasticsearch output.
+If you disable this option, you must <<load-template-manually,load the template manually>>. 
+
 ===== max_retries
 
 The number of times to retry publishing an event after a publishing failure.
