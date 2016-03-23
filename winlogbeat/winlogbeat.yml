@@ -6,14 +6,17 @@ winlogbeat:
   # in the directory in which it was started.
   #registry_file: .winlogbeat.yml
 
-  # List of event logs to monitor.
+  # event_logs specifies a list of event logs to monitor as well as any
+  # accompanying options. The YAML data type of event_logs is a list of
+  # dictionaries.
   #
-  # Optionally, ignore_older may be specified to filter events that are older
-  # then the specified amount of time. If omitted then no filtering will
-  # occur. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h"
+  # The supported keys are name (required), tags, fields, fields_under_root,
+  # ignore_older, level, event_id, provider, and include_xml. Please visit the
+  # documentation for the complete details of each option.
+  # https://go.es.io/WinlogbeatConfig
   event_logs:
     - name: Application
-      ignore_older: 72h 
+      ignore_older: 72h
     - name: Security
     - name: System
 
