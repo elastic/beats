@@ -10,8 +10,8 @@ logs so that new event data is sent in a timely manner. The read position for
 each event log is persisted to disk to allow Winlogbeat to resume after
 restarts.
 
-Winlogbeat can capture event data from any event logs running
-on your system. For example, you can capture events such as:
+Winlogbeat can capture event data from any event logs running on your system.
+For example, you can capture events such as:
 
 * application events
 * hardware events

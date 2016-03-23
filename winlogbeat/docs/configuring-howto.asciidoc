@@ -2,7 +2,8 @@
 == Configuring Winlogbeat
 
 After following the <<winlogbeat-configuration,configuration steps>> in the
-Getting Started, you might want to fine tune the behavior of Winlogbeat. This section
-describes some common use cases for changing configuration options. 
+Getting Started, you might want to fine tune the behavior of Winlogbeat. This
+section describes some common use cases for changing configuration options. 
 
-For a complete description of all Winlogbeat configuration options, see <<winlogbeat-configuration-details>>.
+For a complete description of all Winlogbeat configuration options, see
+<<winlogbeat-configuration-details>>.

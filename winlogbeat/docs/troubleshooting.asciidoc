@@ -3,8 +3,7 @@
 
 [partintro]
 --
-If you have issues installing or running Winlogbeat, read the
-following tips.
+If you have issues installing or running Winlogbeat, read the following tips.
 
 --
 
@@ -17,5 +16,3 @@ include::../../libbeat/docs/getting-help.asciidoc[]
 == Debugging
 
 include::../../libbeat/docs/debugging.asciidoc[]
-
-
