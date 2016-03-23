@@ -18,8 +18,9 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(
-            lambda: self.log_contains(
-                "output worker: publish"))
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
+
         topbeat.kill_and_wait()
 
         output = self.read_output(
@@ -50,8 +51,8 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(
-            lambda: self.log_contains(
-                "output worker: publish"))
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
 
         topbeat.kill_and_wait()
 
@@ -92,8 +93,8 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(
-            lambda: self.log_contains(
-                "output worker: publish"))
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
 
         topbeat.kill_and_wait()
 
@@ -132,9 +133,8 @@ class Test(BaseTest):
         )
         topbeat = self.start_beat()
         self.wait_until(
-            lambda: self.log_contains(
-                "output worker: publish"))
-
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
         topbeat.kill_and_wait()
 
         output = self.read_output(
