@@ -18,7 +18,6 @@ env:
     - TARGETS="-C libbeat testsuite"
     - TARGETS="-C topbeat testsuite"
     - TARGETS="-C filebeat testsuite"
-    - TARGETS="-C winlogbeat testsuite"
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
@@ -36,8 +35,6 @@ matrix:
       env: TARGETS="-C filebeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat crosscompile"
-    - os: osx
-      env: TARGETS="-C winlogbeat testsuite"
     - os: osx
       env: TARGETS="-C winlogbeat crosscompile"
     - os: osx
@@ -86,5 +83,4 @@ after_success:
   - test -f packetbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f packetbeat/build/coverage/full.cov
   - test -f topbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f topbeat/build/coverage/full.cov
   - test -f libbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f libbeat/build/coverage/full.cov
-  - test -f winlogbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f winlogbeat/build/coverage/full.cov
   - test -f metricbeat/build/coverage/full.cov && bash <(curl -s https://codecov.io/bash) -f metricbeat/build/coverage/full.cov

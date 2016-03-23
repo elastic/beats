@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
+	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/windows"
 )
 
@@ -26,13 +28,44 @@ const (
 	winEventLogAPIName = "wineventlog"
 )
 
+var winEventLogConfigKeys = append(commonConfigKeys, "ignore_older", "include_xml",
+	"event_id", "level", "provider")
+
+type winEventLogConfig struct {
+	configCommon `config:",inline"`
+	IncludeXML   bool                   `config:"include_xml"`
+	SimpleQuery  query                  `config:",inline"`
+	Raw          map[string]interface{} `config:",inline"`
+}
+
+// query contains parameters used to customize the event log data that is
+// queried from the log.
+type query struct {
+	IgnoreOlder time.Duration `config:"ignore_older"` // Ignore records older than this period of time.
+	EventID     string        `config:"event_id"`     // White-list and black-list of events.
+	Level       string        `config:"level"`        // Severity level.
+	Provider    []string      `config:"provider"`     // Provider (source name).
+}
+
+// Validate validates the winEventLogConfig data and returns an error describing
+// any problems or nil.
+func (c *winEventLogConfig) Validate() error {
+	var errs multierror.Errors
+	if c.Name == "" {
+		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
+	}
+
+	return errs.Err()
+}
+
 // Validate that winEventLog implements the EventLog interface.
 var _ EventLog = &winEventLog{}
 
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLog struct {
-	remoteServer string        // Name of the remote server from which to read.
+	config       winEventLogConfig
+	query        string
 	channelName  string        // Name of the channel from which to read.
 	subscription win.EvtHandle // Handle to the subscription.
 	maxRead      int           // Maximum number returned in one Read.
@@ -63,11 +96,12 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 		return nil
 	}
 
+	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
-		0, // null session (used for connecting to remote event logs)
+		0, // Session - nil for localhost
 		signalEvent,
-		l.channelName,
-		"",       // Query - nil means all events
+		"",       // Channel - empty b/c channel is in the query
+		l.query,  // Query - nil means all events
 		bookmark, // Bookmark - for resuming from a specific event
 		win.EvtSubscribeStartAfterBookmark)
 	if err != nil {
@@ -158,6 +192,10 @@ func (l *winEventLog) buildRecordFromXML(x string, recoveredErr error) (Record, 
 		Event:         e,
 	}
 
+	if l.config.IncludeXML {
+		r.XML = x
+	}
+
 	return r, nil
 }
 
@@ -177,7 +215,23 @@ func reportDrop(reason interface{}) {
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLog(c Config) (EventLog, error) {
+func newWinEventLog(options map[string]interface{}) (EventLog, error) {
+	var c winEventLogConfig
+	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
+		return nil, err
+	}
+
+	query, err := win.Query{
+		Log:         c.Name,
+		IgnoreOlder: c.SimpleQuery.IgnoreOlder,
+		Level:       c.SimpleQuery.Level,
+		EventID:     c.SimpleQuery.EventID,
+		Provider:    c.SimpleQuery.Provider,
+	}.Build()
+	if err != nil {
+		return nil, err
+	}
+
 	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
 		mf := sys.MessageFiles{SourceName: sourceName}
 		h, err := win.OpenPublisherMetadata(0, sourceName, 0)
@@ -195,8 +249,9 @@ func newWinEventLog(c Config) (EventLog, error) {
 	}
 
 	return &winEventLog{
+		config:        c,
+		query:         query,
 		channelName:   c.Name,
-		remoteServer:  c.RemoteAddress,
 		maxRead:       defaultMaxNumRead,
 		renderBuf:     make([]byte, renderBufferSize),
 		cache:         newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),

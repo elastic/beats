@@ -5,11 +5,13 @@ package eventlog
 import (
 	"fmt"
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
+	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -18,13 +20,32 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
+var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older")
+
+type eventLoggingConfig struct {
+	configCommon `config:",inline"`
+	IgnoreOlder  time.Duration          `config:"ignore_older"`
+	Raw          map[string]interface{} `config:",inline"`
+}
+
+// Validate validates the eventLoggingConfig data and returns an error
+// describing any problems or nil.
+func (c *eventLoggingConfig) Validate() error {
+	var errs multierror.Errors
+	if c.Name == "" {
+		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
+	}
+
+	return errs.Err()
+}
+
 // Validate that eventLogging implements the EventLog interface.
 var _ EventLog = &eventLogging{}
 
 // eventLogging implements the EventLog interface for reading from the Event
 // Logging API.
 type eventLogging struct {
-	uncServerPath string               // UNC name of remote server.
+	config        eventLoggingConfig
 	name          string               // Name of the log that is opened.
 	handle        win.Handle           // Handle to the event log.
 	readBuf       []byte               // Buffer for reading in events.
@@ -44,9 +65,9 @@ func (l eventLogging) Name() string {
 }
 
 func (l *eventLogging) Open(recordNumber uint64) error {
-	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=%s, "+
-		"providerName=%s)", l.logPrefix, recordNumber, l.uncServerPath, l.name)
-	handle, err := win.OpenEventLog(l.uncServerPath, l.name)
+	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=, "+
+		"providerName=%s)", l.logPrefix, recordNumber, l.name)
+	handle, err := win.OpenEventLog("", l.name)
 	if err != nil {
 		return err
 	}
@@ -147,6 +168,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 		l.ignoreFirst = false
 	}
 
+	records = filter(records, l.ignoreOlder)
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
 	return records, nil
 }
@@ -191,12 +213,39 @@ func readErrorHandler(err error) ([]Record, error) {
 	return nil, err
 }
 
+// Filter returns a new slice holding only the elements of s that satisfy the
+// predicate fn().
+func filter(in []Record, fn func(*Record) bool) []Record {
+	var out []Record
+	for _, r := range in {
+		if fn(&r) {
+			out = append(out, r)
+		}
+	}
+	return out
+}
+
+// ignoreOlder is a filter predicate that checks the record timestamp and
+// returns true if the event was not matched by the filter.
+func (l *eventLogging) ignoreOlder(r *Record) bool {
+	if l.config.IgnoreOlder != 0 && time.Since(r.TimeCreated.SystemTime) > l.config.IgnoreOlder {
+		return false
+	}
+
+	return true
+}
+
 // newEventLogging creates and returns a new EventLog for reading event logs
 // using the Event Logging API.
-func newEventLogging(c Config) (EventLog, error) {
+func newEventLogging(options map[string]interface{}) (EventLog, error) {
+	var c eventLoggingConfig
+	if err := readConfig(options, &c, eventLoggingConfigKeys); err != nil {
+		return nil, err
+	}
+
 	return &eventLogging{
-		uncServerPath: c.RemoteAddress,
-		name:          c.Name,
+		config: c,
+		name:   c.Name,
 		handles: newMessageFilesCache(c.Name, win.QueryEventMessageFiles,
 			win.FreeLibrary),
 		logPrefix:     fmt.Sprintf("EventLogging[%s]", c.Name),

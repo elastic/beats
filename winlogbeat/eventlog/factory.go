@@ -6,24 +6,67 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/joeshaw/multierror"
 )
 
-// Config is the configuration data used to instantiate a new EventLog.
-type Config struct {
-	Name                 string // Name of the event log or channel.
-	RemoteAddress        string // Remote computer to connect to. Optional.
-	common.EventMetadata        // Fields and tags to add to each event.
+var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root", "tags"}
 
-	API string // Name of the API to use. Optional.
+// Config is the configuration data used to instantiate a new EventLog.
+type configCommon struct {
+	API                  string             `config:"api"`  // Name of the API to use. Optional.
+	Name                 string             `config:"name"` // Name of the event log or channel.
+	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
+}
+
+type validator interface {
+	Validate() error
+}
+
+func readConfig(
+	data map[string]interface{},
+	config interface{},
+	validKeys []string,
+) error {
+	c, err := common.NewConfigFrom(data)
+	if err != nil {
+		return fmt.Errorf("Failed reading config. %v", err)
+	}
+
+	if err := c.Unpack(config); err != nil {
+		return fmt.Errorf("Failed unpacking config. %v", err)
+	}
+
+	var errs multierror.Errors
+	if len(validKeys) > 0 {
+		sort.Strings(validKeys)
+
+		// Check for invalid keys.
+		for k := range data {
+			k = strings.ToLower(k)
+			i := sort.SearchStrings(validKeys, k)
+			if i >= len(validKeys) || validKeys[i] != k {
+				errs = append(errs, fmt.Errorf("Invalid event log key '%s' "+
+					"found. Valid keys are %s", k, strings.Join(validKeys, ", ")))
+			}
+		}
+	}
+
+	if v, ok := config.(validator); ok {
+		if err := v.Validate(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	return errs.Err()
 }
 
 // Producer produces a new event log instance for reading event log records.
-type producer func(Config) (EventLog, error)
+type producer func(map[string]interface{}) (EventLog, error)
 
 // Channels lists the available channels (event logs).
 type channels func() ([]string, error)
 
-// eventLogInfo is the registration info associate with an event log API.
+// eventLogInfo is the registration info associated with an event log API.
 type eventLogInfo struct {
 	apiName  string
 	priority int
@@ -54,18 +97,23 @@ func Register(apiName string, priority int, producer producer, channels channels
 
 // New creates and returns a new EventLog instance based on the given config
 // and the registered EventLog producers.
-func New(config Config) (EventLog, error) {
+func New(options map[string]interface{}) (EventLog, error) {
 	if len(eventLogs) == 0 {
 		return nil, fmt.Errorf("No event log API is available on this system")
+	}
+
+	var config configCommon
+	if err := readConfig(options, &config, nil); err != nil {
+		return nil, err
 	}
 
 	// A specific API is being requested (usually done for testing).
 	if config.API != "" {
 		for _, v := range eventLogs {
-			debugf("Testing %s", v.apiName)
+			debugf("Checking %s", v.apiName)
 			if strings.EqualFold(v.apiName, config.API) {
 				debugf("Using %s API for event log %s", v.apiName, config.Name)
-				e, err := v.producer(config)
+				e, err := v.producer(options)
 				return e, err
 			}
 		}
@@ -83,6 +131,6 @@ func New(config Config) (EventLog, error) {
 	eventLog := eventLogs[keys[0]]
 	debugf("Using highest priority API, %s, for event log %s",
 		eventLog.apiName, config.Name)
-	e, err := eventLog.producer(config)
+	e, err := eventLog.producer(options)
 	return e, err
 }
