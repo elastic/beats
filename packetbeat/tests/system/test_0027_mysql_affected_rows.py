@@ -18,4 +18,3 @@ class Test(BaseTest):
         assert objs[0]["method"] == "UPDATE"
         assert objs[0]["mysql.affected_rows"] == 316
         assert objs[0]["status"] == "OK"
-        assert objs[0]["count"] == 1

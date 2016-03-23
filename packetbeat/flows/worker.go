@@ -193,7 +193,6 @@ func createEvent(
 		"last_time":  common.Time(f.ts),
 		"type":       "flow",
 		"flow_id":    common.NetString(f.id.Serialize()),
-		"count":      1,
 		"final":      isOver,
 	}
 

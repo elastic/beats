@@ -23,7 +23,6 @@ class Test(BaseTest):
         assert objs[0]["amqp.auto-delete"] == False
         assert objs[0]["amqp.exclusive"] == False
         assert objs[0]["amqp.no-wait"] == False
-        assert objs[0]["count"] == 1
 
         assert objs[1]["method"] == "basic.publish"
         assert objs[1]["status"] == "OK"
@@ -32,4 +31,3 @@ class Test(BaseTest):
         assert objs[1]["amqp.mandatory"] == False
         assert objs[1]["amqp.immediate"] == False
         assert objs[1]["amqp.content-type"] == "text/plain"
-        assert objs[1]["count"] == 1
