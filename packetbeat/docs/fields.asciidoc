@@ -304,15 +304,6 @@ required: True
 The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
 
 
-==== count
-
-type: int
-
-required: True
-
-A count of the number of transactions that this event represents. This is generally the inverse of the sampling rate. For example, for a sample rate of 1/10, the count is 10. The count is used by the UIs to return estimated values.
-
-
 ==== direction
 
 required: True

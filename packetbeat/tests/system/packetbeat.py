@@ -11,13 +11,10 @@ from beat.beat import TestCase
 from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
-                         "beat.name", "beat.hostname",
-                         "count"]
+                         "beat.name", "beat.hostname"]
 
 FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
-                         "beat.name", "beat.hostname",
-                         "count"]
-
+                         "beat.name", "beat.hostname"]
 
 
 class BaseTest(TestCase):
