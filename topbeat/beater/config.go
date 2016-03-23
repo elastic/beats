@@ -12,5 +12,6 @@ type TopConfig struct {
 }
 
 type ConfigSettings struct {
-	Input TopConfig
+	Input   *TopConfig `config:"input"`
+	Topbeat *TopConfig `config:"topbeat"`
 }
