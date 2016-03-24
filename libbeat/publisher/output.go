@@ -72,7 +72,7 @@ func (o *outputWorker) onMessage(m message) {
 
 func (o *outputWorker) onEvent(ctx *Context, event common.MapStr) {
 	debug("output worker: publish single event")
-	o.out.PublishEvent(ctx.Signal, outputs.Options{ctx.Guaranteed}, event)
+	o.out.PublishEvent(ctx.Signal, outputs.Options{Guaranteed: ctx.Guaranteed}, event)
 }
 
 func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
@@ -106,7 +106,7 @@ func (o *outputWorker) sendBulk(
 ) {
 	debug("output worker: publish %v events", len(events))
 
-	opts := outputs.Options{ctx.Guaranteed}
+	opts := outputs.Options{Guaranteed: ctx.Guaranteed}
 	err := o.out.BulkPublish(ctx.Signal, opts, events)
 	if err != nil {
 		logp.Info("Error bulk publishing events: %s", err)
