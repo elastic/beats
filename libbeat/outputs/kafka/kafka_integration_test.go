@@ -43,6 +43,7 @@ func getTestKafkaHost() string {
 func newTestKafkaClient(t *testing.T, topic string) *client {
 
 	hosts := []string{getTestKafkaHost()}
+	t.Logf("host: %v", hosts)
 
 	client, err := newKafkaClient(hosts, topic, false, nil)
 	assert.NoError(t, err)
@@ -53,11 +54,10 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Outputer {
 
 	config := map[string]interface{}{
-		"hosts":          []string{getTestKafkaHost()},
-		"broker_timeout": "1s",
-		"timeout":        1,
-		"topic":          topic,
-		"use_type":       useType,
+		"hosts":    []string{getTestKafkaHost()},
+		"timeout":  "1s",
+		"topic":    topic,
+		"use_type": useType,
 	}
 
 	cfg, err := common.NewConfigFrom(config)
@@ -85,7 +85,9 @@ func testReadFromKafkaTopic(
 	}()
 
 	partitionConsumer, err := consumer.ConsumePartition(topic, 0, sarama.OffsetOldest)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer func() {
 		partitionConsumer.Close()
 	}()

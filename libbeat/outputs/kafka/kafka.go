@@ -62,7 +62,7 @@ func (k *kafka) init(cfg *common.Config) error {
 		return err
 	}
 
-	libCfg, retries, err := newKafkaConfig(&config)
+	libCfg, err := newKafkaConfig(&config)
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (k *kafka) init(cfg *common.Config) error {
 	mode, err := mode.NewAsyncConnectionMode(
 		clients,
 		false,
-		retries, // retry implemented by kafka client
+		config.MaxRetries,
 		libCfg.Producer.Retry.Backoff,
 		libCfg.Net.WriteTimeout,
 		10*time.Second)
@@ -167,13 +167,15 @@ func validateConfig(raw *common.Config, config *kafkaConfig) error {
 	if _, ok := compressionModes[strings.ToLower(config.Compression)]; !ok {
 		return errf("compression", fmt.Sprintf("'%v' is not supported", config.Compression))
 	}
+	if config.ChanBufferSize <= 0 {
+		return errf("channel_buffer_size", "must be > 0")
+	}
 
 	return nil
 }
 
-func newKafkaConfig(config *kafkaConfig) (*sarama.Config, int, error) {
+func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k := sarama.NewConfig()
-	modeRetries := 1
 
 	// configure network level properties
 	timeout := config.Timeout
@@ -185,7 +187,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, int, error) {
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, modeRetries, err
+		return nil, err
 	}
 	k.Net.TLS.Enable = tls != nil
 	k.Net.TLS.Config = tls
@@ -203,27 +205,24 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, int, error) {
 
 	compressionMode, ok := compressionModes[strings.ToLower(config.Compression)]
 	if !ok {
-		return nil, modeRetries, fmt.Errorf("Unknown compression mode: %v", config.Compression)
+		return nil, fmt.Errorf("Unknown compression mode: %v", config.Compression)
 	}
 	k.Producer.Compression = compressionMode
 
 	k.Producer.Return.Successes = true // enable return channel for signaling
 	k.Producer.Return.Errors = true
 
-	if config.MaxRetries != nil {
-		retries := *config.MaxRetries
-		if retries < 0 {
-			retries = 10
-			modeRetries = -1
-		}
-		k.Producer.Retry.Max = retries
-	}
+	// have retries being handled by libbeat, disable retries in sarama library
+	k.Producer.Retry.Max = 0
+
+	// configure per broker go channel buffering
+	k.ChannelBufferSize = config.ChanBufferSize
 
 	// configure client ID
 	k.ClientID = config.ClientID
 	if err := k.Validate(); err != nil {
 		logp.Err("Invalid kafka configuration: %v", err)
-		return nil, modeRetries, err
+		return nil, err
 	}
-	return k, modeRetries, nil
+	return k, nil
 }

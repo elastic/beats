@@ -18,8 +18,9 @@ type kafkaConfig struct {
 	RequiredACKs    *int               `config:"required_acks"`
 	BrokerTimeout   time.Duration      `config:"broker_timeout"`
 	Compression     string             `config:"compression"`
-	MaxRetries      *int               `config:"max_retries"`
+	MaxRetries      int                `config:"max_retries"`
 	ClientID        string             `config:"client_id"`
+	ChanBufferSize  int                `config:"channel_buffer_size"`
 }
 
 var (
@@ -35,7 +36,8 @@ var (
 		RequiredACKs:    nil, // use library default
 		BrokerTimeout:   10 * time.Second,
 		Compression:     "gzip",
-		MaxRetries:      nil,
+		MaxRetries:      3,
 		ClientID:        "beats",
+		ChanBufferSize:  256,
 	}
 )
