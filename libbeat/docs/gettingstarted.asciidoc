@@ -211,14 +211,14 @@ the required plugin, run the following command inside the logstash directory
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./bin/plugin install logstash-input-beats
+./bin/logstash-plugin install logstash-input-beats
 ----------------------------------------------------------------------
 +
 *win:*
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-bin\plugin install logstash-input-beats
+bin\logstash-plugin install logstash-input-beats
 ----------------------------------------------------------------------
 
 . Configure Logstash to listen on port 5044 for incoming Beats connections
@@ -262,14 +262,14 @@ run the following command from your Logstash installation:
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./bin/plugin update logstash-input-beats
+./bin/logstash-plugin update logstash-input-beats
 ----------------------------------------------------------------------
 
 *win:*
 
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-bin\plugin update logstash-input-beats
+bin\logstash-plugin update logstash-input-beats
 ----------------------------------------------------------------------
 
 Keep in mind that you can update to the latest version of the plugin without
