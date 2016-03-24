@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 - Some publisher options refactoring in libbeat {pull}684[684]
 - Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
+- Add include_fields and drop_fields as part of generic filtering {pull}1120[1120]
 
 *Packetbeat*
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
