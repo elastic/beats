@@ -16,6 +16,14 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+// The value of EventID element contains the low-order 16 bits of the event
+// identifier and the Qualifier attribute contains the high-order 16 bits of the
+// event identifier.
+const (
+	eventIDLowerMask uint32 = 0xFFFF
+	eventIDUpperMask uint32 = 0xFFFF0000
+)
+
 // IsAvailable returns true if the Event Logging API is supported by this
 // operating system. If not supported then false is returned with the
 // accompanying error.
@@ -104,7 +112,7 @@ func RenderEvents(
 			RecordID:      record.recordNumber,
 			TimeGenerated: unixTime(record.timeGenerated),
 			TimeWritten:   unixTime(record.timeWritten),
-			EventID:       record.eventID,
+			EventID:       record.eventID & eventIDLowerMask,
 			Level:         EventType(record.eventType).String(),
 			SourceName:    record.sourceName,
 			Computer:      record.computerName,
