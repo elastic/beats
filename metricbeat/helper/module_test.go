@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/libbeat/common"
 
-	"github.com/urso/ucfg"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetMetricSetsList(t *testing.T) {
@@ -27,7 +27,7 @@ func TestGetMetricSetsList(t *testing.T) {
 
 func TestNewModule(t *testing.T) {
 
-	config, _ := ucfg.NewFrom(ModuleConfig{
+	config, _ := common.NewConfigFrom(ModuleConfig{
 		Module: "test",
 	})
 
@@ -42,7 +42,7 @@ func TestNewModule(t *testing.T) {
 // Check that the moduler inside each module is a different instance
 func TestNewModulerDifferentInstance(t *testing.T) {
 
-	config, _ := ucfg.NewFrom(ModuleConfig{
+	config, _ := common.NewConfigFrom(ModuleConfig{
 		Module: "test",
 	})
 

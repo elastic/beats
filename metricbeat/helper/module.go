@@ -10,8 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/urso/ucfg"
 )
 
 // Module specifics. This must be defined by each module
@@ -27,7 +25,7 @@ type Module struct {
 	Timeout time.Duration
 
 	// Raw config object to be unpacked by moduler
-	cfg *ucfg.Config
+	cfg *common.Config
 
 	// List of all metricsets in this module. Use to keep track of metricsets
 	metricSets map[string]*MetricSet
@@ -41,7 +39,7 @@ type Module struct {
 }
 
 // NewModule creates a new module
-func NewModule(cfg *ucfg.Config, moduler func() Moduler) (*Module, error) {
+func NewModule(cfg *common.Config, moduler func() Moduler) (*Module, error) {
 
 	// Module config defaults
 	config := ModuleConfig{

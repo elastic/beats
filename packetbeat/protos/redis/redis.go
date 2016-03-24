@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -55,7 +54,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Redis{}
 	config := defaultConfig
@@ -84,7 +83,7 @@ func (redis *Redis) setFromConfig(config *redisConfig) {
 	redis.Ports = config.Ports
 	redis.SendRequest = config.SendRequest
 	redis.SendResponse = config.SendResponse
-	redis.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	redis.transactionTimeout = config.TransactionTimeout
 }
 
 func (redis *Redis) GetPorts() []int {

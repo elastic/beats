@@ -14,7 +14,7 @@ type dnsConfig struct {
 var (
 	defaultConfig = dnsConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 	}
 )

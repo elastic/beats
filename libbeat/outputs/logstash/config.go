@@ -3,6 +3,7 @@ package logstash
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -15,7 +16,7 @@ type logstashConfig struct {
 	Port             int                `config:"port"`
 	LoadBalance      bool               `config:"loadbalance"`
 	BulkMaxSize      int                `config:"bulk_max_size"`
-	Timeout          int                `config:"timeout"`
+	Timeout          time.Duration      `config:"timeout"`
 	CompressionLevel int                `config:"compression_level"`
 	MaxRetries       int                `config:"max_retries"`
 	TLS              *outputs.TLSConfig `config:"tls"`
@@ -28,7 +29,7 @@ var (
 		LoadBalance:      false,
 		BulkMaxSize:      2048,
 		CompressionLevel: 3,
-		Timeout:          30,
+		Timeout:          30 * time.Second,
 		MaxRetries:       3,
 	}
 )

@@ -14,7 +14,7 @@ type mysqlConfig struct {
 var (
 	defaultConfig = mysqlConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 		MaxRowLength: 1024,
 		MaxRows:      10,

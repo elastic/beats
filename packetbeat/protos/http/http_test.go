@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 )
 
 type testParser struct {
@@ -52,7 +51,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 
 func httpModForTests() *HTTP {
 	results := &publish.ChanTransactions{Channel: make(chan common.MapStr, 10)}
-	http, err := New(false, results, ucfg.New())
+	http, err := New(false, results, common.NewConfig())
 	if err != nil {
 		panic(err)
 	}

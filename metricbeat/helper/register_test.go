@@ -5,14 +5,13 @@ package helper
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/urso/ucfg"
 )
 
 func TestGetModuleInvalid(t *testing.T) {
 
-	config, _ := ucfg.NewFrom(ModuleConfig{
+	config, _ := common.NewConfigFrom(ModuleConfig{
 		Module: "test",
 	})
 

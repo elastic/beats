@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
@@ -107,7 +106,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Memcache{}
 	config := defaultConfig
@@ -151,12 +150,8 @@ func (mc *Memcache) setFromConfig(config *memcacheConfig) error {
 
 	mc.config.parseUnkown = config.ParseUnknown
 
-	mc.udpConfig.transTimeout = computeTransTimeout(
-		&config.UdpTransactionTimeout,
-		protos.DefaultTransactionExpiration)
-	mc.tcpConfig.tcpTransTimeout = computeTransTimeout(
-		&config.TransactionTimeout,
-		protos.DefaultTransactionExpiration)
+	mc.udpConfig.transTimeout = config.UdpTransactionTimeout
+	mc.tcpConfig.tcpTransTimeout = config.TransactionTimeout
 
 	debug("transaction timeout: %v", config.TransactionTimeout)
 	debug("udp transaction timeout: %v", config.UdpTransactionTimeout)
@@ -462,11 +457,4 @@ func (mc memcacheData) MarshalJSON() ([]byte, error) {
 
 func (mc memcacheData) IsSet() bool {
 	return mc.data != nil
-}
-
-func computeTransTimeout(to *int, defaultTo time.Duration) time.Duration {
-	if to == nil || *to <= 0 {
-		return defaultTo
-	}
-	return time.Duration(*to) * time.Millisecond
 }

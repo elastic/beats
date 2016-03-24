@@ -1,0 +1,1 @@
+(assert) value of type 'int' not convertible into unsupported go type 'struct {}' accessing config (source:'test.source')

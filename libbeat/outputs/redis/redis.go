@@ -13,8 +13,6 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -54,7 +52,7 @@ func init() {
 	outputs.RegisterOutputPlugin("redis", New)
 }
 
-func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -77,10 +75,7 @@ func (out *redisOutput) Init(config *redisConfig, topology_expire int) error {
 	out.Db = config.Db
 	out.DbTopology = config.DbTopology
 
-	out.Timeout = 5 * time.Second
-	if config.Timeout > 0 {
-		out.Timeout = time.Duration(config.Timeout) * time.Second
-	}
+	out.Timeout = config.Timeout
 
 	out.ReconnectInterval = time.Duration(1) * time.Second
 	if config.ReconnectInterval >= 0 {

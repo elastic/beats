@@ -8,7 +8,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -137,7 +136,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Mysql{}
 	config := defaultConfig
@@ -172,7 +171,7 @@ func (mysql *Mysql) setFromConfig(config *mysqlConfig) {
 	mysql.maxStoreRows = config.MaxRows
 	mysql.Send_request = config.SendRequest
 	mysql.Send_response = config.SendResponse
-	mysql.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	mysql.transactionTimeout = config.TransactionTimeout
 }
 
 func (mysql *Mysql) getTransaction(k common.HashableTcpTuple) *MysqlTransaction {

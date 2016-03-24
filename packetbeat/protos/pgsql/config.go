@@ -14,7 +14,7 @@ type pgsqlConfig struct {
 var (
 	defaultConfig = pgsqlConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 		MaxRowLength: 1024,
 		MaxRows:      10,

@@ -14,7 +14,7 @@ type mongodbConfig struct {
 var (
 	defaultConfig = mongodbConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 		MaxDocLength: 5000,
 		MaxDocs:      10,

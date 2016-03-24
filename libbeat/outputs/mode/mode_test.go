@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -312,7 +310,7 @@ func signals(s ...bool) []bool {
 func makeTestClients(c map[string]interface{},
 	newClient func(string) (ProtocolClient, error),
 ) ([]ProtocolClient, error) {
-	cfg, err := ucfg.NewFrom(c, ucfg.PathSep("."))
+	cfg, err := common.NewConfigFrom(c)
 	if err != nil {
 		return nil, err
 	}

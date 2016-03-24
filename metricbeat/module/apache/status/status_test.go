@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/urso/ucfg"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/module/apache"
 )
@@ -42,8 +42,8 @@ type ApacheModuleConfig struct {
 	Module string   `config:"module"`
 }
 
-func getApacheModuleConfig() (*ucfg.Config, error) {
-	return ucfg.NewFrom(ApacheModuleConfig{
+func getApacheModuleConfig() (*common.Config, error) {
+	return common.NewConfigFrom(ApacheModuleConfig{
 		Module: "apache",
 		Hosts:  []string{apache.GetApacheEnvHost()},
 	})

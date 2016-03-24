@@ -2,8 +2,7 @@ package publisher
 
 import (
 	"errors"
-
-	"github.com/urso/ucfg"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -18,13 +17,13 @@ type outputWorker struct {
 }
 
 type outputConfig struct {
-	BulkMaxSize   int `config:"bulk_max_size"`
-	FlushInterval int `config:"flush_interval"`
+	BulkMaxSize   int           `config:"bulk_max_size"`
+	FlushInterval time.Duration `config:"flush_interval"`
 }
 
 var (
 	defaultConfig = outputConfig{
-		FlushInterval: 1,
+		FlushInterval: 1 * time.Second,
 		BulkMaxSize:   2048,
 	}
 )
@@ -34,7 +33,7 @@ var (
 )
 
 func newOutputWorker(
-	cfg *ucfg.Config,
+	cfg *common.Config,
 	out outputs.Outputer,
 	ws *common.WorkerSignal,
 	hwm int,

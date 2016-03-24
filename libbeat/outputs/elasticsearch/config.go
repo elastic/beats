@@ -1,6 +1,10 @@
 package elasticsearch
 
-import "github.com/elastic/beats/libbeat/outputs"
+import (
+	"time"
+
+	"github.com/elastic/beats/libbeat/outputs"
+)
 
 type elasticsearchConfig struct {
 	Protocol     string             `config:"protocol"`
@@ -13,7 +17,7 @@ type elasticsearchConfig struct {
 	LoadBalance  bool               `config:"loadbalance"`
 	TLS          *outputs.TLSConfig `config:"tls"`
 	MaxRetries   int                `config:"max_retries"`
-	Timeout      int                `config:"timeout"`
+	Timeout      time.Duration      `config:"timeout"`
 	SaveTopology bool               `config:"save_topology"`
 	Template     Template           `config:"template"`
 }
@@ -36,7 +40,7 @@ var (
 		Params:      nil,
 		Username:    "",
 		Password:    "",
-		Timeout:     90,
+		Timeout:     90 * time.Second,
 		MaxRetries:  3,
 		TLS:         nil,
 		LoadBalance: true,

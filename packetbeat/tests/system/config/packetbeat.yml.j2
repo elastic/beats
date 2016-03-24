@@ -105,7 +105,7 @@ protocols:
 {% if memcache_send_response %}    send_response: true{%- endif %}
 {% if memcache_parse_unknown %}    parseunknown: true{%- endif %}
 {% if memcache_max_values %}    maxvalues: {{ memcache_max_values }}{%- endif %}
-{% if memcache_udp_transaction_timeout %}    udptransactiontimeout: {{ memcache_udp_transaction_timeout}}{%- endif %}
+{% if memcache_udp_transaction_timeout %}    udptransactiontimeout: {{ memcache_udp_transaction_timeout}}ms {%- endif %}
 
   mysql:
     ports: [{{ mysql_ports|default([3306])|join(", ") }}]
