@@ -1,9 +1,9 @@
 version: 1.0
 
 defaults:
-  type: string
+  type: keyword
   required: false
-  index: not_analyzed
+  index: true
   doc_values: true
   ignore_above: 1024
 
@@ -48,7 +48,7 @@ log:
     Contains log file lines.
   fields:
     - name: source
-      type: string
+      type: keyword
       required: true
       description: >
         The file from which the line was read. This field contains the full path to the file.
@@ -61,8 +61,7 @@ log:
         The file offset the reported line starts at.
 
     - name: message
-      type: string
-      index: analyzed
+      type: text
       doc_values: true
       ignore_above: 0
       required: true
