@@ -24,9 +24,18 @@ type kafkaConfig struct {
 
 var (
 	defaultConfig = kafkaConfig{
-		Timeout:     30 * time.Second,
-		Worker:      1,
-		Compression: "gzip",
-		ClientID:    "beats",
+		Hosts:           nil,
+		TLS:             nil,
+		Timeout:         30 * time.Second,
+		Worker:          1,
+		UseType:         false,
+		Topic:           "",
+		KeepAlive:       0,
+		MaxMessageBytes: nil, // use library default
+		RequiredACKs:    nil, // use library default
+		BrokerTimeout:   10 * time.Second,
+		Compression:     "gzip",
+		MaxRetries:      nil,
+		ClientID:        "beats",
 	}
 )
