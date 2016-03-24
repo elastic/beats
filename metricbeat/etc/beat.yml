@@ -43,8 +43,11 @@ metricbeat:
       #maxconn: 10
 
       #filter: ...
-      #username: name
-      #password: hello world
+
+      # Redis AUTH password. Empty by default.
+      #password: foobared
+
+    # MySQL Module
     - module: mysql
       metricsets: ["status"]
       enabled: true
