@@ -26,6 +26,8 @@ include::./visualizing-data.asciidoc[]
 
 include::./dashboards.asciidoc[]
 
+include::./filtering.asciidoc[]
+
 include::./newbeat.asciidoc[]
 
 include::./release.asciidoc[]

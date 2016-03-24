@@ -1,0 +1,67 @@
+[[filtering-data]]
+== Reduce the exported fields
+
+With the evolution of the Beats, the number of fields that are exported increases. In most of the use cases, you are
+interested only in a subset of data that are exported by the Beats, so there are two options. 
+
+One option is to use specific configuration options implemented by each Beat to filter the data. For example, in Filebeat you
+can configure the `include_lines` option to specify via regular expressions what log lines to export. The disadvantage 
+of this approach is that you need to implement a configuration option for each filtering criteria that you need.
+
+The second option is to use a more generic way of filtering that is implemented in libbeat and it's available to all Beats. The generic
+filtering is defined by a list of filtering criteria that are applied in sequence to the event before sending it to the defined output.
+
+
+This section describes how to reduce the exported fields of a Beat by using the generic filtering feature of libbeat.
+The `filter` section contains a list of actions, executed in the defined order. The supported actions are:
+
+* <<include_fields, include_fields>>
+* <<drop_fields, drop_fields>>
+
+There is a list of mandatory fields like `@timestamp` and `type` that cannot be removed as they are required by the
+outputs.
+
+[[include_fields]]
+=== Include fields
+
+The include fields action defines the list of fields to be exported. As field you can also define full nested maps. For
+example, Topbeat can export only the load, memory, swap and the percentage value of the cpu usage in user space with the
+following filter configuration:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: ["load, "mem", "swap", "cpu.user_p"]
+-----------------------------------------------------
+
+By default, all fields are exported and `include_fields` is undefined. 
+
+Note:: In case the include fields is equal with the empty list, then only the mandatory fields are exported.
+
+[[drop_fields]]
+=== Drop fields
+
+The drop fields action defines the list of fields to be dropped. Similar with the <<include_fields>> action, you can
+also define full nested maps as fields. For example, Topbeat can drop all swap information by configuring:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - drop_fields:
+     fields: ["swap"]
+-----------------------------------------------------
+
+
+An example of using multiple actions might the following where only the CPU load percentages are kept and the CPU ticks
+values are removed:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: [“cpu”]
+ - drop_fields:
+     fields: [“cpu.user”, “cpu.system”]
+-----------------------------------------------------
+
