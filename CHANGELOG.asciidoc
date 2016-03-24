@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Filebeat*
 
 *Winlogbeat*
+- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1227[1227]
 
 
 ==== Added

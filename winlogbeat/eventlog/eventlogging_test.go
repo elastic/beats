@@ -341,10 +341,9 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	// <EventID Qualifiers="16384">7036</EventID>
 	// 1073748860 = 16384 << 16 + 7036
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385206(v=vs.85).aspx
-	var eventID uint32 = 1073748860
 	template := "The %s service entered the %s state."
 	msgs := []string{"Windows Update", "running"}
-	err = log.Report(elog.Info, eventID, msgs)
+	err = log.Report(elog.Info, uint32(1073748860), msgs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -374,7 +373,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, uint32(7036), records[0].EventID)
 	assert.Equal(t, fmt.Sprintf(template, msgs[0], msgs[1]),
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -447,7 +446,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventID)
+	assert.Equal(t, uint32(6006), records[0].EventID)
 	assert.Equal(t, template,
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
