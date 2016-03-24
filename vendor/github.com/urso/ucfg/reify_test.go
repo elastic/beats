@@ -93,8 +93,11 @@ func TestUnpackNested(t *testing.T) {
 	tests := []interface{}{
 		New(),
 
+		newC(),
+
 		map[string]interface{}{},
 		map[string]*Config{},
+		map[string]*C{},
 		map[string]map[string]bool{},
 		map[string]map[string]interface{}{},
 		map[string]interface{}{
@@ -108,14 +111,26 @@ func TestUnpackNested(t *testing.T) {
 		map[string]*Config{
 			"c": nil,
 		},
+		map[string]*C{
+			"c": nil,
+		},
 		map[string]interface{}{
 			"c": New(),
+		},
+		map[string]interface{}{
+			"c": newC(),
 		},
 		map[string]interface{}{
 			"c": genSub("b"),
 		},
 		map[string]interface{}{
 			"c": genSub("d"),
+		},
+		map[string]interface{}{
+			"c": fromConfig(genSub("b")),
+		},
+		map[string]interface{}{
+			"c": fromConfig(genSub("d")),
 		},
 		map[string]*struct{ B bool }{},
 		map[string]*struct{ B bool }{"c": nil},
@@ -125,6 +140,7 @@ func TestUnpackNested(t *testing.T) {
 		node{"c": node{}},
 		node{"c": node{"b": false}},
 		node{"c": genSub("d")},
+		node{"c": fromConfig(genSub("d"))},
 
 		&struct{ C *Config }{},
 		&struct{ C *Config }{sub},
@@ -134,6 +150,10 @@ func TestUnpackNested(t *testing.T) {
 		&struct{ C struct{ B bool } }{},
 		&struct{ C *struct{ B bool } }{&struct{ B bool }{}},
 		&struct{ C *struct{ B bool } }{},
+
+		&struct{ C *C }{},
+		&struct{ C *C }{fromConfig(sub)},
+		&struct{ C *C }{fromConfig(genSub("d"))},
 	}
 
 	for i, out := range tests {

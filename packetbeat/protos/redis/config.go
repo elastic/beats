@@ -12,7 +12,7 @@ type redisConfig struct {
 var (
 	defaultConfig = redisConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionTimeout,
+			TransactionTimeout: protos.DefaultTransactionExpiration,
 		},
 	}
 )

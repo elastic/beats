@@ -53,6 +53,6 @@ type MetricSeter interface {
 
 // Interface for each module
 type Moduler interface {
-	// Raw ucfg config is passed. This allows each module to extract its own local config variables
+	// Raw *common.Config config is passed. This allows each module to extract its own local config variables
 	Setup(m *Module) error
 }

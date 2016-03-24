@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 )
 
 var debugf = logp.MakeDebug("mongodb")
@@ -43,7 +42,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Mongodb{}
 	config := defaultConfig
@@ -82,7 +81,7 @@ func (mongodb *Mongodb) setFromConfig(config *mongodbConfig) {
 	mongodb.SendResponse = config.SendResponse
 	mongodb.MaxDocs = config.MaxDocs
 	mongodb.MaxDocLength = config.MaxDocLength
-	mongodb.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	mongodb.transactionTimeout = config.TransactionTimeout
 }
 
 func (mongodb *Mongodb) GetPorts() []int {

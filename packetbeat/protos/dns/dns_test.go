@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -64,7 +63,7 @@ func newDns(verbose bool) *Dns {
 	}
 
 	results := &publish.ChanTransactions{make(chan common.MapStr, 100)}
-	cfg, _ := ucfg.NewFrom(map[string]interface{}{
+	cfg, _ := common.NewConfigFrom(map[string]interface{}{
 		"ports":               []int{ServerPort},
 		"include_authorities": true,
 		"include_additionals": true,

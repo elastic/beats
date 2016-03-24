@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -84,7 +83,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &HTTP{}
 	config := defaultConfig
@@ -118,7 +117,7 @@ func (http *HTTP) setFromConfig(config *httpConfig) {
 	http.RedactAuthorization = config.Redact_authorization
 	http.SplitCookie = config.Split_cookie
 	http.parserConfig.RealIPHeader = strings.ToLower(config.Real_ip_header)
-	http.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	http.transactionTimeout = config.TransactionTimeout
 	http.IncludeBodyFor = config.Include_body_for
 
 	if config.Send_all_headers {

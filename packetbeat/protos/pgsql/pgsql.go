@@ -7,7 +7,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
@@ -124,7 +123,7 @@ func init() {
 func New(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &Pgsql{}
 	config := defaultConfig
@@ -159,7 +158,7 @@ func (pgsql *Pgsql) setFromConfig(config *pgsqlConfig) {
 	pgsql.maxStoreRows = config.MaxRows
 	pgsql.Send_request = config.SendRequest
 	pgsql.Send_response = config.SendResponse
-	pgsql.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	pgsql.transactionTimeout = config.TransactionTimeout
 }
 
 func (pgsql *Pgsql) getTransaction(k common.HashableTcpTuple) []*PgsqlTransaction {

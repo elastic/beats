@@ -5,13 +5,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/publish"
-	"github.com/urso/ucfg"
 )
 
 type ProtocolPlugin func(
 	testMode bool,
 	results publish.Transactions,
-	cfg *ucfg.Config,
+	cfg *common.Config,
 ) (Plugin, error)
 
 // Functions to be exported by a protocol plugin

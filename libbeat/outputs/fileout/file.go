@@ -3,8 +3,6 @@ package fileout
 import (
 	"encoding/json"
 
-	"github.com/urso/ucfg"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -18,7 +16,7 @@ type fileOutput struct {
 	rotator logp.FileRotator
 }
 
-func New(cfg *ucfg.Config, _ int) (outputs.Outputer, error) {
+func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -41,6 +39,7 @@ func (out *fileOutput) init(config config) error {
 	if out.rotator.Name == "" {
 		out.rotator.Name = config.Index
 	}
+	logp.Info("File output path set to: %v", out.rotator.Path)
 	logp.Info("File output base filename set to: %v", out.rotator.Name)
 
 	rotateeverybytes := uint64(config.RotateEveryKb) * 1024

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -41,7 +40,7 @@ var (
 	}
 )
 
-func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
+func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	output := &kafka{}
 	err := output.init(cfg)
 	if err != nil {
@@ -50,7 +49,7 @@ func New(cfg *ucfg.Config, topologyExpire int) (outputs.Outputer, error) {
 	return output, nil
 }
 
-func (k *kafka) init(cfg *ucfg.Config) error {
+func (k *kafka) init(cfg *common.Config) error {
 	debugf("initialize kafka output")
 
 	config := defaultConfig
@@ -134,7 +133,7 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, int, error) {
 	modeRetries := 1
 
 	// configure network level properties
-	timeout := time.Duration(config.Timeout) * time.Second
+	timeout := config.Timeout
 	k.Net.DialTimeout = timeout
 	k.Net.ReadTimeout = timeout
 	k.Net.WriteTimeout = timeout

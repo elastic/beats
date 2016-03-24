@@ -9,7 +9,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/urso/ucfg"
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -47,7 +46,7 @@ func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 	}
 
 	results := &publish.ChanTransactions{make(chan common.MapStr, 10)}
-	icmp, err := New(true, results, ucfg.New())
+	icmp, err := New(true, results, common.NewConfig())
 	if err != nil {
 		b.Error("Failed to create ICMP processor")
 		return

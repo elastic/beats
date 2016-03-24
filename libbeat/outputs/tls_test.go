@@ -6,8 +6,7 @@ import (
 	"crypto/tls"
 	"testing"
 
-	"github.com/urso/ucfg/yaml"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +14,7 @@ import (
 
 func load(yamlStr string) (*TLSConfig, error) {
 	var cfg TLSConfig
-	config, err := yaml.NewConfig([]byte(yamlStr))
+	config, err := common.NewConfigWithYAML([]byte(yamlStr), "")
 	if err != nil {
 		return nil, err
 	}
