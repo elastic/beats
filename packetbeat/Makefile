@@ -9,7 +9,6 @@ include ../libbeat/scripts/Makefile
 with_pfring:
 	go build --tags havepfring
 
-
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
@@ -18,7 +17,6 @@ before-build:
 	# win
 	sed -i.bk 's/device: any/device: 0/' $(PREFIX)/packetbeat-win.yml
 	rm $(PREFIX)/packetbeat-win.yml.bk
-
 
 .PHONY: benchmark
 benchmark:
