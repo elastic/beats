@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/topbeat/system"
@@ -36,7 +35,7 @@ func New() *Topbeat {
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
 
-	err := cfgfile.Read(&tb.TbConfig, "")
+	err := b.RawConfig.Unpack(&tb.TbConfig)
 	if err != nil {
 		logp.Err("Error reading configuration file: %v", err)
 		return err

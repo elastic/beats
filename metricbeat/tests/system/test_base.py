@@ -10,6 +10,6 @@ class Test(BaseTest):
         )
 
         proc = self.start_beat()
-        self.wait_until( lambda: self.log_contains("Init Beat"))
+        self.wait_until( lambda: self.log_contains("Setup Beat"))
         exit_code = proc.kill_and_wait()
         assert exit_code == 0
