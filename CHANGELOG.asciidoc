@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 - Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 - Add include_fields and drop_fields as part of generic filtering {pull}1120[1120]
+- The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
 
 *Packetbeat*
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 - Ensure proper shutdown of libbeat. {pull}1075[1075]
 - Add `fields` and `fields_under_root` options under the `shipper` configuration {pull}1092[1092]
 - Add the ability to use a SOCKS5 proxy with the Logstash output {issue}823[823]
+- The `-configtest` flag will now print "Config OK" to stdout on success {pull}1249[1249]
 
 *Packetbeat*
 - Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]

@@ -9,26 +9,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_NewBeat(t *testing.T) {
-
+func TestNewInstance(t *testing.T) {
 	tb := &TestBeater{}
-	b := NewBeat("testbeat", "0.9", tb)
+	b := newInstance("testbeat", "0.9", tb)
 
-	assert.Equal(t, "testbeat", b.Name)
-	assert.Equal(t, "0.9", b.Version)
+	assert.Equal(t, "testbeat", b.data.Name)
+	assert.Equal(t, "0.9", b.data.Version)
 
 	// UUID4 should be 36 chars long
-	assert.Equal(t, 16, len(b.UUID))
-	assert.Equal(t, 36, len(b.UUID.String()))
+	assert.Equal(t, 16, len(b.data.UUID))
+	assert.Equal(t, 36, len(b.data.UUID.String()))
 }
 
-func Test_NewBeat_UUID(t *testing.T) {
-
+func TestNewInstanceUUID(t *testing.T) {
 	tb := &TestBeater{}
-	b := NewBeat("testbeat", "0.9", tb)
+	b := newInstance("testbeat", "0.9", tb)
 
 	// Make sure the UUID's are different
-	assert.NotEqual(t, b.UUID, uuid.NewV4())
+	assert.NotEqual(t, b.data.UUID, uuid.NewV4())
 }
 
 // Test beat object

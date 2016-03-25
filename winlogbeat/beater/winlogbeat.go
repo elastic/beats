@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher"
@@ -63,7 +62,7 @@ func New() *Winlogbeat {
 // Config sets up the necessary configuration to use the winlogbeat
 func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	// Read configuration.
-	err := cfgfile.Read(&eb.config, "")
+	err := b.RawConfig.Unpack(&eb.config)
 	if err != nil {
 		return fmt.Errorf("Error reading configuration file. %v", err)
 	}

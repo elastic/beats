@@ -3,12 +3,11 @@ package beater
 import (
 	"flag"
 	"fmt"
-	"os"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common/droppriv"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/service"
@@ -32,7 +31,6 @@ type Packetbeat struct {
 	CmdLineArgs CmdLineArgs
 	Pub         *publish.PacketbeatPublisher
 	Sniff       *sniffer.SnifferSetup
-	over        chan bool
 
 	services []interface {
 		Start()
@@ -78,13 +76,12 @@ func New() *Packetbeat {
 }
 
 // Handle custom command line flags
-func (pb *Packetbeat) HandleFlags(b *beat.Beat) {
+func (pb *Packetbeat) HandleFlags(b *beat.Beat) error {
 	// -devices CLI flag
 	if *pb.CmdLineArgs.PrintDevices {
 		devs, err := sniffer.ListDeviceNames(true)
 		if err != nil {
-			fmt.Printf("Error getting devices list: %v\n", err)
-			os.Exit(1)
+			return fmt.Errorf("Error getting devices list: %v\n", err)
 		}
 		if len(devs) == 0 {
 			fmt.Printf("No devices found.")
@@ -97,17 +94,19 @@ func (pb *Packetbeat) HandleFlags(b *beat.Beat) {
 		for i, dev := range devs {
 			fmt.Printf("%d: %s\n", i, dev)
 		}
-		os.Exit(0)
+		return beat.GracefulExit
 	}
+	return nil
 }
 
 // Loads the beat specific config and overwrites params based on cmd line
 func (pb *Packetbeat) Config(b *beat.Beat) error {
 
 	// Read beat implementation config as needed for setup
-	err := cfgfile.Read(&pb.PbConfig, "")
+	err := b.RawConfig.Unpack(&pb.PbConfig)
 	if err != nil {
 		logp.Err("fails to read the beat config: %v, %v", err, pb.PbConfig)
+		return err
 	}
 
 	// CLI flags over-riding config
@@ -130,7 +129,7 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 	// TODO: Refactor
 	config.ConfigSingleton = pb.PbConfig
 
-	return err
+	return nil
 }
 
 // Setup packetbeat
@@ -138,7 +137,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
 	if err := procs.ProcWatcher.Init(pb.PbConfig.Procs); err != nil {
 		logp.Critical(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	queueSize := defaultQueueSize
@@ -155,22 +154,17 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	logp.Debug("main", "Initializing protocol plugins")
 	err := protos.Protos.Init(false, pb.Pub, pb.PbConfig.Protocols)
 	if err != nil {
-		logp.Critical("Initializing protocol analyzers failed: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
-
-	pb.over = make(chan bool)
 
 	logp.Debug("main", "Initializing sniffer")
 	if err := pb.setupSniffer(); err != nil {
-		logp.Critical("Initializing sniffer failed: %v", err)
-		os.Exit(1)
+		return fmt.Errorf("Initializing sniffer failed: %v", err)
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
 	if err := droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
-		logp.Critical(err.Error())
-		os.Exit(1)
+		return err
 	}
 
 	return nil
@@ -243,27 +237,25 @@ func (pb *Packetbeat) Run(b *beat.Beat) error {
 		service.Start()
 	}
 
-	// run the sniffer in background
+	var wg sync.WaitGroup
+	errC := make(chan error, 1)
+
+	// Run the sniffer in background
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		err := pb.Sniff.Run()
 		if err != nil {
-			logp.Critical("Sniffer main loop failed: %v", err)
-			os.Exit(1)
+			errC <- fmt.Errorf("Sniffer main loop failed: %v", err)
 		}
-		pb.over <- true
 	}()
 
-	// Startup successful, disable stderr logging if requested by
-	// cmdline flag
-	logp.SetStderr()
-
 	logp.Debug("main", "Waiting for the sniffer to finish")
-
-	// Wait for the goroutines to finish
-	for range pb.over {
-		if !pb.Sniff.IsAlive() {
-			break
-		}
+	wg.Wait()
+	select {
+	default:
+	case err := <-errC:
+		return err
 	}
 
 	// kill services

@@ -28,7 +28,6 @@ package beater
 
 import (
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/include"
@@ -47,7 +46,7 @@ func New() *Metricbeat {
 func (mb *Metricbeat) Config(b *beat.Beat) error {
 
 	mb.MbConfig = &Config{}
-	err := cfgfile.Read(mb.MbConfig, "")
+	err := b.RawConfig.Unpack(mb.MbConfig)
 	if err != nil {
 		logp.Err("Error reading configuration file: %v", err)
 		return err
