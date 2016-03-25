@@ -1,10 +1,10 @@
 {
-  "visState": "{\"aggs\":[{\"id\":\"1\",\"params\":{\"field\":\"proc.cpu.total\"},\"schema\":\"metric\",\"type\":\"max\"},{\"id\":\"2\",\"params\":{\"field\":\"proc.name\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":10},\"schema\":\"segment\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"shareYAxis\":true,\"times\":[],\"yAxis\":{}},\"type\":\"histogram\"}", 
+  "visState": "{\n  \"aggs\": [\n    {\n      \"id\": \"1\",\n      \"params\": {\n        \"field\": \"proc.cpu.total\"\n      },\n      \"schema\": \"metric\",\n      \"type\": \"max\"\n    },\n    {\n      \"id\": \"2\",\n      \"params\": {\n        \"field\": \"proc.name\",\n        \"order\": \"desc\",\n        \"orderBy\": \"1\",\n        \"size\": 10\n      },\n      \"schema\": \"segment\",\n      \"type\": \"terms\"\n    }\n  ],\n  \"listeners\": {},\n  \"params\": {\n    \"addLegend\": true,\n    \"addTimeMarker\": false,\n    \"addTooltip\": true,\n    \"defaultYExtents\": false,\n    \"mode\": \"stacked\",\n    \"scale\": \"linear\",\n    \"setYExtents\": false,\n    \"shareYAxis\": true,\n    \"times\": [],\n    \"yAxis\": {}\n  },\n  \"type\": \"histogram\"\n}", 
   "description": "", 
   "title": "Top 10 processes by total CPU usage", 
   "version": 1, 
-  "savedSearchId": "Processes", 
+  "savedSearchId": "Proc-stats", 
   "kibanaSavedObjectMeta": {
-    "searchSourceJSON": "{\"filter\":[]}"
+    "searchSourceJSON": "{\n  \"filter\": []\n}"
   }
 }
