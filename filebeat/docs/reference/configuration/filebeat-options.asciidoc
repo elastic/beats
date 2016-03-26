@@ -58,7 +58,11 @@ The following example configures Filebeat to drop any lines that start with "DBG
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-exclude_lines: ["^DBG"]
+filebeat:
+  prospectors:
+    - paths:
+        - /var/log/myapp/*.log
+      exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
 [[include-lines]]
@@ -72,7 +76,11 @@ The following example configures Filebeat to export any lines that start with "E
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-include_lines: ["^ERR", "^WARN"]
+filebeat:
+  prospectors:
+    - paths:
+        - /var/log/myapp/*.log
+      include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
 NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
@@ -83,6 +91,7 @@ NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes
  exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
+[[exclude-files]]
 ===== exclude_files
 
 A list of regular expressions to match the files that you want Filebeat to ignore. By default no files are excluded.
@@ -425,4 +434,6 @@ include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/runconfig.asciidoc[]
+
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
 

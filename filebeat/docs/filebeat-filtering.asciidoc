@@ -1,0 +1,42 @@
+[[filtering-data]]
+=== Filtering the Exported Data
+
+When your use case requires only a subset of the data exported by Filebeat, you can <<filebeat-filtering-overview,use Filebeat config options to filter the data>>, or you can <<generic-filtering-overview-filebeat,use the generic filtering provided by libbeat>>.
+
+[[filebeat-filtering-overview]]
+==== Filebeat Config Options for Filtering
+
+You can specify configuration options in the `filebeat` section of the config file to define regular expressions that
+match the lines you want to include and/or exclude from the output. The supported options are <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>. 
+
+For example, you can use the `include_lines` option to export any lines that start with "ERR" or "WARN":
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat:
+  prospectors:
+    - paths:
+        - /var/log/myapp/*.log
+      include_lines: ["^ERR", "^WARN"]
+-------------------------------------------------------------------------------------
+
+The disadvantage of this approach is that you need to implement a configuration option for each filtering criteria that you need.
+
+See <<configuration-filebeat-options,Filebeat configuration options>> for more information about each option.
+
+[[generic-filtering-overview-filebeat]]
+==== Generic Filtering
+
+include::../../libbeat/docs/filtering.asciidoc[]
+
+For example, the following filter configuration exports fewer fields (in this case, `message` and `source`) along
+with the mandatory fields.
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: ["message", "source"]
+-----------------------------------------------------
+
+See <<configuration-filter,filter configuration options>> for more information.
