@@ -2,7 +2,8 @@ FROM java:8-jre
 
 ENV LS_VERSION 2
 
-ENV DEB_URL https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb
+# As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
+ENV DEB_URL https://s3-eu-west-1.amazonaws.com/build-eu.elasticsearch.org/logstash/master/nightly/JDK8/logstash-latest-SNAPSHOT.deb?20160327
 
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
@@ -16,7 +17,7 @@ RUN set -x && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN plugin install logstash-input-beats
+RUN logstash-plugin install logstash-input-beats
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
