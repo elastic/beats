@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 - Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
 - Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
 - Check column length in pgsql parser. {issue}565{565
+- Split real_ip_header value when it contains multiple IPs {pull}1241[1241]
 
 *Topbeat*
 - Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
