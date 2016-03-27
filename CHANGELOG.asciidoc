@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Affecting all Beats*
 
 *Packetbeat*
+- Split real_ip_header value when it contains multiple IPs {pull}1241[1241]
 
 *Topbeat*
 
