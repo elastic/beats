@@ -4,7 +4,9 @@ package kafka
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -45,7 +47,9 @@ func newTestKafkaClient(t *testing.T, topic string) *client {
 	hosts := []string{getTestKafkaHost()}
 
 	client, err := newKafkaClient(hosts, topic, false, nil)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	return client
 }
@@ -61,9 +65,14 @@ func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Output
 	}
 
 	cfg, err := common.NewConfigFrom(config)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	output, err := New(cfg, 0)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	return output
 }
@@ -71,7 +80,9 @@ func newTestKafkaOutput(t *testing.T, topic string, useType bool) outputs.Output
 func newTestConsumer(t *testing.T) sarama.Consumer {
 	hosts := []string{getTestKafkaHost()}
 	consumer, err := sarama.NewConsumer(hosts, nil)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return consumer
 }
 
@@ -85,13 +96,15 @@ func testReadFromKafkaTopic(
 	}()
 
 	partitionConsumer, err := consumer.ConsumePartition(topic, 0, sarama.OffsetOldest)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer func() {
 		partitionConsumer.Close()
 	}()
 
 	timer := time.After(timeout)
-	messages := []*sarama.ConsumerMessage{}
+	var messages []*sarama.ConsumerMessage
 	for i := 0; i < nMessages; i++ {
 		select {
 		case msg := <-partitionConsumer.Messages():
@@ -99,7 +112,6 @@ func testReadFromKafkaTopic(
 		case <-timer:
 			break
 		}
-
 	}
 
 	return messages
@@ -113,21 +125,26 @@ func TestOneMessageToKafka(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
 	}
 
-	kafka := newTestKafkaOutput(t, "test-libbeat", false)
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	topic := fmt.Sprintf("test-libbeat-%s", id)
 
+	kafka := newTestKafkaOutput(t, topic, false)
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
 		"type":       "log",
-		"message":    "hello world",
+		"message":    id,
 	}
-	err := kafka.PublishEvent(nil, testOptions, event)
-	assert.NoError(t, err)
+	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
+		t.Fatal(err)
+	}
 
-	messages := testReadFromKafkaTopic(t, "test-libbeat", 1, 5*time.Second)
-
-	msg := messages[0]
-	logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
+	messages := testReadFromKafkaTopic(t, topic, 1, 5*time.Second)
+	if assert.Len(t, messages, 1) {
+		msg := messages[0]
+		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
+		assert.Contains(t, string(msg.Value), id)
+	}
 }
 
 func TestUseType(t *testing.T) {
@@ -138,19 +155,24 @@ func TestUseType(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"kafka"})
 	}
 
-	kafka := newTestKafkaOutput(t, "", true)
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	logType := fmt.Sprintf("log-type-%s", id)
 
+	kafka := newTestKafkaOutput(t, "", true)
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
 		"host":       "test-host",
-		"type":       "log-type",
-		"message":    "hello world",
+		"type":       logType,
+		"message":    id,
 	}
-	err := kafka.PublishEvent(nil, testOptions, event)
-	assert.NoError(t, err)
+	if err := kafka.PublishEvent(nil, testOptions, event); err != nil {
+		t.Fatal(err)
+	}
 
-	messages := testReadFromKafkaTopic(t, "log-type", 1, 5*time.Second)
-
-	msg := messages[0]
-	logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
+	messages := testReadFromKafkaTopic(t, logType, 1, 5*time.Second)
+	if assert.Len(t, messages, 1) {
+		msg := messages[0]
+		logp.Debug("kafka", "%s: %s", msg.Key, msg.Value)
+		assert.Contains(t, string(msg.Value), id)
+	}
 }

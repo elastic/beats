@@ -41,7 +41,7 @@ func TestBulk(t *testing.T) {
 	}
 	_, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
-		t.Errorf("Bulk() returned error: %s", err)
+		t.Fatalf("Bulk() returned error: %s", err)
 	}
 
 	params = map[string]string{
@@ -49,7 +49,7 @@ func TestBulk(t *testing.T) {
 	}
 	_, result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
+		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
@@ -76,7 +76,7 @@ func TestEmptyBulk(t *testing.T) {
 	}
 	resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
-		t.Errorf("Bulk() returned error: %s", err)
+		t.Fatalf("Bulk() returned error: %s", err)
 	}
 	if resp != nil {
 		t.Errorf("Unexpected response: %s", resp)
@@ -143,8 +143,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	}
 	resp, err := client.Bulk(index, "type1", params, body)
 	if err != nil {
-		t.Errorf("Bulk() returned error: %s [%s]", err, resp)
-		return
+		t.Fatalf("Bulk() returned error: %s [%s]", err, resp)
 	}
 
 	params = map[string]string{
@@ -152,7 +151,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	}
 	_, result, err := client.SearchURI(index, "type1", params)
 	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
+		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
@@ -163,7 +162,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	}
 	_, result, err = client.SearchURI(index, "type1", params)
 	if err != nil {
-		t.Errorf("SearchUri() returns an error: %s", err)
+		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
