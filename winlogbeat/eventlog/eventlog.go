@@ -57,7 +57,6 @@ func (e Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
 		"type":                  e.API,
 		common.EventMetadataKey: e.EventMetadata,
-		"count":                 1,
 		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
 		"log_name":              e.Channel,
 		"source_name":           e.Provider.Name,

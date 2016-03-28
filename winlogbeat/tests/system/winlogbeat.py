@@ -94,7 +94,6 @@ class WriteReadTest(BaseTest):
         assert evt["computer_name"].lower() == win32api.GetComputerName().lower()
         assert "record_number" in evt
         self.assertDictContainsSubset({
-            "count": 1,
             "event_id": eventID,
             "level": level,
             "log_name": self.providerName,

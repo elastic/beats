@@ -44,13 +44,6 @@ common:
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
 
-    - name: count
-      type: int
-      required: true
-      description: >
-        The number of event log records represented in the event. This field is
-        always set to 1.
-
 eventlog:
   type: group
   description: >
