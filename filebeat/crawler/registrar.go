@@ -158,7 +158,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	lastState, isFound := r.GetFileState(filePath)
 
 	if isFound && input.IsSameFile(filePath, fileInfo) {
-		logp.Debug("registar", "Same file as before found. Fetch the state and persist it.")
+		logp.Debug("registrar", "Same file as before found. Fetch the state and persist it.")
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
 		r.Persist <- lastState
