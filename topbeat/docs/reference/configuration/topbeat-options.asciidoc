@@ -1,12 +1,12 @@
-[[configuration-input]]
-=== Input
+[[configuration-topbeat]]
+=== Topbeat
 
-The `input` section specifies how often Topbeat reads server statistics and which
+The `topbeat` section specifies how often Topbeat reads server statistics and which
 statistics it captures. Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-input:
+topbeat:
   # In seconds, defines how often to read server statistics
   period: 10
 
@@ -31,9 +31,9 @@ input:
 
 ------------------------------------------------------------------------------
 
-==== Input Options
+==== Topbeat Options
 
-You can specify the following options in the `input` section:
+You can specify the following options in the `topbeat` section:
 
 ===== period
 
@@ -55,8 +55,8 @@ parent pid, state, pid, CPU usage, and memory usage.
 * `filesystem` to export file system statistics, including details about the
 mounted disks, such as the total and used disk space, and details about each
 disk, such as the device name and the mounting place.
-* `cpu_per_core` to export the CPU usage per core. By default, this setting is false. It makes sense only if 
-`system: true` is specified. 
+* `cpu_per_core` to export the CPU usage per core. By default, this setting is false. It makes sense only if
+`system: true` is specified.
 The details are grouped under `cpus`. The Beat exports details for each core of the server. For example:
 +
 [source,json]

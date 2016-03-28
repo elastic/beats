@@ -93,7 +93,7 @@ default values for most configuration options.
 
 [source, shell]
 -------------------------------------
-input:
+topbeat:
   period: 10
   procs: [".*"]
 -------------------------------------
@@ -111,7 +111,7 @@ If you are not interested in monitoring processes, you can use:
 +
 [source, shell]
 -------------------------------------
-input:
+topbeat:
   period: 10
   procs: ["^$"]
 -------------------------------------
