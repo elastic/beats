@@ -18,15 +18,26 @@ type kafkaConfig struct {
 	RequiredACKs    *int               `config:"required_acks"`
 	BrokerTimeout   time.Duration      `config:"broker_timeout"`
 	Compression     string             `config:"compression"`
-	MaxRetries      *int               `config:"max_retries"`
+	MaxRetries      int                `config:"max_retries"`
 	ClientID        string             `config:"client_id"`
+	ChanBufferSize  int                `config:"channel_buffer_size"`
 }
 
 var (
 	defaultConfig = kafkaConfig{
-		Timeout:     30 * time.Second,
-		Worker:      1,
-		Compression: "gzip",
-		ClientID:    "beats",
+		Hosts:           nil,
+		TLS:             nil,
+		Timeout:         30 * time.Second,
+		Worker:          1,
+		UseType:         false,
+		Topic:           "",
+		KeepAlive:       0,
+		MaxMessageBytes: nil, // use library default
+		RequiredACKs:    nil, // use library default
+		BrokerTimeout:   10 * time.Second,
+		Compression:     "gzip",
+		MaxRetries:      3,
+		ClientID:        "beats",
+		ChanBufferSize:  256,
 	}
 )
