@@ -17,6 +17,7 @@ packer_absdir=$(shell dirname ${makefile_abspath})
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win: %
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/windows/build.sh
 	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin: %
