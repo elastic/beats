@@ -30,6 +30,33 @@ ip link set <device_name> promisc on
 
 For example: `ip link set enp5s0f1 promisc on`
 
+[[packetbeat-loopback-interface]]
+=== Why can't Packetbeat capture traffic from the loopback interface on Windows?
+
+Packetbeat is unable to capture traffic from the loopback device (127.0.0.1 traffic)
+because the Windows TCP/IP stack does not implement a network loopback interface, 
+making it difficult for Windows packet capture drivers like WinPcap to sniff traffic. 
+
+As a workaround, you can try installing https://github.com/nmap/npcap/releases[Npcap],
+an update of WinPcap. Make sure that you restart Windows after installing Npcap.
+Npcap creates an Npcap Loopback Adapter that you can select if you want to capture
+loopback traffic.
+
+For the list of devices shown here, you would configure Packetbeat
+to use device `4`:
+
+["source","sh"]
+----------------------------------------------------------------------
+PS C:\Users\vagrant\Desktop\packetbeat-1.2.0-windows> .\packetbeat.exe -devices
+0: \Device\NPF_NdisWanBh (NdisWan Adapter)
+1: \Device\NPF_NdisWanIp (NdisWan Adapter)
+2: \Device\NPF_NdisWanIpv6 (NdisWan Adapter)
+3: \Device\NPF_{DD72B02C-4E48-4924-8D0F-F80EA2755534} (Intel(R) PRO/1000 MT Desktop Adapter)
+4: \Device\NPF_{77DFFCAF-1335-4B0D-AFD4-5A4685674FAA} (MS NDIS 6.0 LoopBack Driver)
+----------------------------------------------------------------------
+
+NOTE: Npcap is sponsored but not officially supported by the Nmap Project. 
+
 [[packetbeat-missing-transactions]]
 === Why is Packetbeat missing long running transactions?
 
