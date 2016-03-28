@@ -9,7 +9,7 @@ The Topbeat configuration file uses http://yaml.org/[YAML] for its syntax.
 The configuration options are described in the following sections. After changing
 configuration settings, you need to restart Topbeat to pick up the changes.
 
-* <<configuration-input>>
+* <<configuration-topbeat>>
 * <<elasticsearch-output>>
 * <<logstash-output>>
 * <<redis-output>>
