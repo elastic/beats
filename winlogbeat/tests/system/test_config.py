@@ -1,3 +1,5 @@
+import sys
+import unittest
 from winlogbeat import BaseTest
 
 """
@@ -5,12 +7,11 @@ Contains tests for config parsing.
 """
 
 
+@unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
 class Test(BaseTest):
-
     def test_valid_config(self):
         """
-        With -configtest and valid config, it should return a non-zero error
-        code.
+        configtest - valid config
         """
         self.render_config_template(
             ignore_older="1h",
@@ -22,15 +23,42 @@ class Test(BaseTest):
 
     def test_invalid_ignore_older(self):
         """
-        With -configtest and an error in the configuration, it should
-        return a non-zero error code.
+        configtest - invalid ignore_older units (1 hour)
         """
         self.render_config_template(
-            ignore_older="1 hour",
             event_logs=[
-                {"name": "Application"}
+                {"name": "Application", "ignore_older": "1 hour"}
             ]
         )
         self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
         assert self.log_contains(
-            "Invalid top level ignore_older value '1 hour'")
+            "can not convert 'string' into 'duration' accessing 'ignore_older'")
+            # Latest ucfg update affected this error message and we lost the
+            # time.ParseDuration error message.
+            # "time: unknown unit  hour in duration 1 hour")
+
+    def test_invalid_level(self):
+        """
+        configtest - invalid level (errors)
+        """
+        self.render_config_template(
+            event_logs=[
+                {"name": "Application", "level": "errors"}
+            ]
+        )
+        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
+        assert self.log_contains(
+            "invalid level ('errors') for query")
+
+    def test_invalid_api(self):
+        """
+        configtest - invalid api (file)
+        """
+        self.render_config_template(
+            event_logs=[
+                {"name": "Application", "api": "file"}
+            ]
+        )
+        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
+        assert self.log_contains(("Failed to create new event log. file API is "
+                                  "not available"))

@@ -17,7 +17,10 @@ func (v validationTestCase) run(t *testing.T) {
 	if v.errMsg == "" {
 		assert.NoError(t, v.config.Validate())
 	} else {
-		assert.Contains(t, v.config.Validate().Error(), v.errMsg)
+		err := v.config.Validate()
+		if assert.Error(t, err, "expected '%s'", v.errMsg) {
+			assert.Contains(t, err.Error(), v.errMsg)
+		}
 	}
 }
 
@@ -26,8 +29,8 @@ func TestConfigValidate(t *testing.T) {
 		// Top-level config
 		{
 			WinlogbeatConfig{
-				EventLogs: []EventLogConfig{
-					{Name: "App"},
+				EventLogs: []map[string]interface{}{
+					{"Name": "App"},
 				},
 			},
 			"", // No Error
@@ -35,8 +38,8 @@ func TestConfigValidate(t *testing.T) {
 		{
 			Settings{
 				WinlogbeatConfig{
-					EventLogs: []EventLogConfig{
-						{Name: "App"},
+					EventLogs: []map[string]interface{}{
+						{"Name": "App"},
 					},
 				},
 				map[string]interface{}{"other": "value"},
@@ -50,27 +53,13 @@ func TestConfigValidate(t *testing.T) {
 				"event_logs",
 		},
 		{
-			WinlogbeatConfig{IgnoreOlder: "1"},
-			"2 errors: Invalid top level ignore_older value '1' (time: " +
-				"missing unit in duration 1); At least one event log must be " +
-				"configured as part of event_logs",
-		},
-		{
 			WinlogbeatConfig{
-				EventLogs: []EventLogConfig{
-					{Name: "App"},
+				EventLogs: []map[string]interface{}{
+					{"Name": "App"},
 				},
 				Metrics: MetricsConfig{BindAddress: "example.com"},
 			},
 			"1 error: bind_address",
-		},
-		{
-			WinlogbeatConfig{
-				EventLogs: []EventLogConfig{
-					{},
-				},
-			},
-			"1 error: event log is missing a 'name'",
 		},
 		// MetricsConfig
 		{
@@ -102,32 +91,6 @@ func TestConfigValidate(t *testing.T) {
 		{
 			MetricsConfig{BindAddress: "example.com:65536"},
 			"bind_address port must be within [1-65535] but was '65536'",
-		},
-		// EventLogConfig
-		{
-			EventLogConfig{Name: "System"},
-			"",
-		},
-		{
-			EventLogConfig{},
-			"event log is missing a 'name'",
-		},
-		{
-			EventLogConfig{Name: "System", IgnoreOlder: "24"},
-			"Invalid ignore_older value ('24') for event_log 'System' " +
-				"(time: missing unit in duration 24)",
-		},
-		{
-			EventLogConfig{Name: "System", API: "eventlogging"},
-			"",
-		},
-		{
-			EventLogConfig{Name: "System", API: "wineventlog"},
-			"",
-		},
-		{
-			EventLogConfig{Name: "System", API: "invalid"},
-			"Invalid api value ('invalid') for event_log 'System'",
 		},
 	}
 

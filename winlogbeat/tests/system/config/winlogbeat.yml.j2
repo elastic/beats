@@ -1,32 +1,49 @@
 ###############################################################################
 ############################# Winlogbeat ######################################
 winlogbeat:
-  {%- if ignore_older %}
-  ignore_older: {{ignore_older}}
-  {% endif %}
-
   {%- if event_logs %}
   event_logs:
     {% for log in event_logs -%}
     - name: {{ log.name }}
-      {%- if log.ignore_older %}
-      ignore_older: {{ log.ignore_older }}
-      {% endif %}
-      {%- if log.api %}
+      {%- if log.api is defined %}
       api: {{ log.api }}
       {% endif %}
-      {%- if log.tags %}
+      {%- if log.ignore_older is defined %}
+      ignore_older: {{ log.ignore_older }}
+      {% endif %}
+      {%- if log.event_id is defined %}
+      event_id: {{ log.event_id }}
+      {% endif %}
+      {%- if log.level is defined %}
+      level: {{ log.level }}
+      {% endif %}
+      {%- if log.provider %}
+      provider:
+        {% for p in log.provider -%}
+        - {{ p }}
+        {% endfor -%}
+      {% endif -%}
+      {%- if log.include_message is defined %}
+      include_message: {{ log.include_message }}
+      {% endif %}
+      {%- if log.include_xml is defined %}
+      include_xml: {{ log.include_xml }}
+      {% endif %}
+      {%- if log.tags is defined %}
       tags:
         {% for tag in log.tags -%}
         - {{ tag }}
         {% endfor -%}
       {% endif -%}
-      {%- if log.fields %}
+      {%- if log.fields is defined %}
       {% if log.fields_under_root %}fields_under_root: true{% endif %}
       fields:
         {% for k, v in log.fields.items() -%}
         {{ k }}: {{ v }}
         {% endfor -%}
+      {% endif %}
+      {%- if log.invalid is defined %}
+      invalid: {{ log.invalid }}
       {% endif %}
     {% endfor -%}
   {% endif %}
