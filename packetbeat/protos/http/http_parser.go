@@ -330,7 +330,9 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 				m.connection = headerVal
 			}
 			if len(config.RealIPHeader) > 0 && bytes.Equal(headerName, []byte(config.RealIPHeader)) {
-				m.RealIP = headerVal
+				if ips := bytes.SplitN(headerVal, []byte{','}, 2); len(ips) > 0 {
+					m.RealIP = trim(ips[0])
+				}
 			}
 
 			if config.SendHeaders {
