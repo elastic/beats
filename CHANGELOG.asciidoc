@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -19,8 +19,6 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Topbeat*
 
 *Filebeat*
-- Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
-
 
 *Winlogbeat*
 
@@ -30,32 +28,22 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Affecting all Beats*
 
 *Packetbeat*
-- Split real_ip_header value when it contains multiple IPs {pull}1241[1241]
 
 *Topbeat*
 
 *Filebeat*
 
 *Winlogbeat*
-- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1227[1227]
-
 
 ==== Added
 
 *Affecting all Beats*
-- Add ability to override configuration settings using environment variables {issue}114[114]
-- Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
-- Add ability to create Elasticsearch mapping on startup {pull}639[639]
 
 *Packetbeat*
 
 *Topbeat*
-- Add the command line used to start processes {issue}533[533]
-- Add username to processes {pull}845[845]
 
 *Filebeat*
-- Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
-
 
 *Winlogbeat*
 
@@ -72,6 +60,43 @@ https://github.com/elastic/beats/compare/v1.1.2...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-1.2.0]]
+=== Beats version 1.2.0
+https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Default config for ignore_older is now infinite instead of 24h, means ignore_older is disabled by default. Use close_older to only close file handlers.
+
+==== Bugfixes
+
+*Packetbeat*
+
+- Split real_ip_header value when it contains multiple IPs {pull}1241[1241]
+
+*Winlogbeat*
+
+- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1227[1227]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add ability to override configuration settings using environment variables {issue}114[114]
+- Libbeat now always exits through a single exit method for proper cleanup and control {pull}736[736]
+- Add ability to create Elasticsearch mapping on startup {pull}639[639]
+
+*Topbeat*
+
+- Add the command line used to start processes {issue}533[533]
+- Add username to processes {pull}845[845]
+
+*Filebeat*
+
+- Add close_older configuration option to complete ignore_older https://github.com/elastic/filebeat/issues/181[181]
 
 [[release-notes-1.1.2]]
 === Beats version 1.1.2
