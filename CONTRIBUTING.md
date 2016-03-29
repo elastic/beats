@@ -51,7 +51,7 @@ Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.
 
 The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already. The current Go version
-used for development is Golang 1.5.3.
+used for development is Golang 1.6.
 
 The Beats are Go programs, so install the latest version of
 [golang](http://golang.org/) if you don't have it already.

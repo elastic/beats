@@ -6,7 +6,7 @@ services:
 language: go
 
 go:
-  - 1.5.3
+  - 1.6
 
 os:
   - linux
