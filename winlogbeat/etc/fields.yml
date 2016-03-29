@@ -44,13 +44,6 @@ common:
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
 
-    - name: count
-      type: int
-      required: true
-      description: >
-        The number of event log records represented in the event. This field is
-        always set to 1.
-
 eventlog:
   type: group
   description: >
@@ -222,6 +215,21 @@ eventlog:
       type: int
       required: false
       description: The version number of the event's definition.
+
+    - name: xml
+      type: string
+      required: false
+      description: >
+        The raw XML representation of the event obtained from Windows. This
+        field is only available on operating systems supporting the Windows
+        Event Log API (Microsoft Windows Vista and newer). This field is not
+        included by default and must be enabled by setting `include_xml: true`
+        as a configuration option for an individual event log.
+
+
+        The XML representation of the event is useful for troubleshooting
+        purposes. The data in the fields reported by Winlogbeat can be compared
+        to the data in the XML to diagnose problems.
 
 sections:
   - ["common", "Common Beat"]

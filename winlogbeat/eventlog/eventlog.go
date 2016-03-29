@@ -46,9 +46,10 @@ type EventLog interface {
 
 // Record represents a single event from the log.
 type Record struct {
-	API                  string // The event log API type used to read the record.
-	common.EventMetadata        // Fields and tags to add to the event.
 	sys.Event
+	common.EventMetadata        // Fields and tags to add to the event.
+	API                  string // The event log API type used to read the record.
+	XML                  string // XML representation of the event.
 }
 
 // ToMapStr returns a new MapStr containing the data from this Record.
@@ -56,7 +57,6 @@ func (e Record) ToMapStr() common.MapStr {
 	m := common.MapStr{
 		"type":                  e.API,
 		common.EventMetadataKey: e.EventMetadata,
-		"count":                 1,
 		"@timestamp":            common.Time(e.TimeCreated.SystemTime),
 		"log_name":              e.Channel,
 		"source_name":           e.Provider.Name,
@@ -65,6 +65,7 @@ func (e Record) ToMapStr() common.MapStr {
 		"event_id":              e.EventIdentifier.ID,
 	}
 
+	addOptional(m, "xml", e.XML)
 	addOptional(m, "provider_guid", e.Provider.GUID)
 	addOptional(m, "version", e.Version)
 	addOptional(m, "level", e.Level)

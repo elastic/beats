@@ -1,4 +1,4 @@
-// +build windows,integration
+// +build windows
 
 package eventlog
 
@@ -167,7 +167,7 @@ func TestRead(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +229,7 @@ func TestReadUnknownEventId(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +286,7 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -342,7 +342,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -366,7 +366,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
 	assert.Equal(t, fmt.Sprintf(template, msgs[0], msgs[1]),
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -377,7 +377,7 @@ func TestOpenInvalidProvider(t *testing.T) {
 
 	configureLogp()
 
-	el, err := newEventLogging(Config{Name: "nonExistentProvider"})
+	el, err := newEventLogging(map[string]interface{}{"name": "nonExistentProvider"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -411,7 +411,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	}
 
 	// Read messages:
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -435,7 +435,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	if len(records) != 1 {
 		t.FailNow()
 	}
-	assert.Equal(t, eventID, records[0].EventIdentifier.ID)
+	assert.Equal(t, eventID&0xFFFF, records[0].EventIdentifier.ID)
 	assert.Equal(t, template,
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
@@ -456,7 +456,7 @@ func TestReadWhileCleared(t *testing.T) {
 		}
 	}()
 
-	eventlog, err := newEventLogging(Config{Name: providerName})
+	eventlog, err := newEventLogging(map[string]interface{}{"name": providerName})
 	if err != nil {
 		t.Fatal(err)
 	}

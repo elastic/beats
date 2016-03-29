@@ -50,15 +50,6 @@ The event log API type used to read the record. The possible values are "wineven
 The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
 
-==== count
-
-type: int
-
-required: True
-
-The number of event log records represented in the event. This field is always set to 1.
-
-
 [[exported-fields-eventlog]]
 === Event Log Record Fields
 
@@ -275,4 +266,15 @@ type: int
 required: False
 
 The version number of the event's definition.
+
+==== xml
+
+type: string
+
+required: False
+
+The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
+
+The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
+
 
