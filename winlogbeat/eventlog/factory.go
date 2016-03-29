@@ -11,8 +11,10 @@ import (
 
 var commonConfigKeys = []string{"api", "name", "fields", "fields_under_root", "tags"}
 
-// Config is the configuration data used to instantiate a new EventLog.
-type configCommon struct {
+// ConfigCommon is the common configuration data used to instantiate a new
+// EventLog. Each implementation is free to support additional configuration
+// options.
+type ConfigCommon struct {
 	API                  string             `config:"api"`  // Name of the API to use. Optional.
 	Name                 string             `config:"name"` // Name of the event log or channel.
 	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
@@ -102,7 +104,7 @@ func New(options map[string]interface{}) (EventLog, error) {
 		return nil, fmt.Errorf("No event log API is available on this system")
 	}
 
-	var config configCommon
+	var config ConfigCommon
 	if err := readConfig(options, &config, nil); err != nil {
 		return nil, err
 	}
