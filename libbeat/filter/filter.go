@@ -72,7 +72,7 @@ func (filters *FilterList) Filter(event common.MapStr) common.MapStr {
 	for _, filter := range filters.filters {
 		filtered, err = filter.Filter(filtered)
 		if err != nil {
-			logp.Err("fail to apply filtering rule %s: %s", filter, err)
+			logp.Debug("filter", "fail to apply filtering rule %s: %s", filter, err)
 		}
 	}
 
