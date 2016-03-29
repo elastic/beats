@@ -32,7 +32,7 @@ var winEventLogConfigKeys = append(commonConfigKeys, "ignore_older", "include_xm
 	"event_id", "level", "provider")
 
 type winEventLogConfig struct {
-	configCommon `config:",inline"`
+	ConfigCommon `config:",inline"`
 	IncludeXML   bool                   `config:"include_xml"`
 	SimpleQuery  query                  `config:",inline"`
 	Raw          map[string]interface{} `config:",inline"`
