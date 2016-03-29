@@ -23,7 +23,7 @@ const (
 var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older")
 
 type eventLoggingConfig struct {
-	configCommon `config:",inline"`
+	ConfigCommon `config:",inline"`
 	IgnoreOlder  time.Duration          `config:"ignore_older"`
 	Raw          map[string]interface{} `config:",inline"`
 }
