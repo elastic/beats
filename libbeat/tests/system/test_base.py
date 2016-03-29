@@ -15,9 +15,8 @@ class Test(BaseTest):
         )
 
         proc = self.start_beat()
-        self.wait_until( lambda: self.log_contains("Init Beat"))
-        exit_code = proc.kill_and_wait()
-        assert exit_code == 0
+        self.wait_until( lambda: self.log_contains("Setup Beat"))
+        proc.check_kill_and_wait()
 
     def test_no_config(self):
         """
@@ -26,8 +25,8 @@ class Test(BaseTest):
         exit_code = self.run_beat()
 
         assert exit_code == 1
-        assert self.log_contains("loading config file error") is True
-        assert self.log_contains("Failed to read") is True
+        assert self.log_contains("error loading config file") is True
+        assert self.log_contains("failed to read") is True
 
     def test_invalid_config(self):
         """
@@ -39,7 +38,7 @@ class Test(BaseTest):
         exit_code = self.run_beat(config="invalid.yml")
 
         assert exit_code == 1
-        assert self.log_contains("loading config file error") is True
+        assert self.log_contains("error loading config file") is True
         assert self.log_contains("YAML config parsing failed") is True
 
     def test_config_test(self):
@@ -53,7 +52,7 @@ class Test(BaseTest):
                 config="libbeat.yml", extra_args=["-configtest"])
 
         assert exit_code == 0
-        assert self.log_contains("Testing configuration file") is True
+        assert self.log_contains("Config OK") is True
 
     def test_version(self):
         """
@@ -70,7 +69,7 @@ class Test(BaseTest):
                      os.path.join(self.working_dir, "coverage.cov")
                      ])
 
-        assert self.log_contains("loading config file error") is False
+        assert self.log_contains("error loading config file") is False
 
         with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") \
                 as outputfile:

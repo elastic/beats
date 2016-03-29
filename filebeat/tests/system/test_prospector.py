@@ -250,7 +250,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains(
-                "shutting down"),
+                "Exiting"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
@@ -273,7 +273,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains(
-                "shutting down"),
+                "Exiting"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait(exit_code=1)
