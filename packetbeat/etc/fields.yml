@@ -1,9 +1,9 @@
 version: 1.0
 
 defaults:
-  type: string
+  type: keyword
   required: false
-  index: not_analyzed
+  index: true
   doc_values: true
   ignore_above: 1024
 
@@ -398,17 +398,15 @@ trans_event:
         is the key.
 
     - name: query
-      type: string
+      type: keyword
       ignore_above: 0
-      index: not_analyzed
-      doc_values: true
       description: >
         The query in a human readable format. For HTTP, it will typically be
         something like `GET /users/_search?name=test`. For MySQL, it is
         something like `SELECT id from users where name=test`.
 
     - name: params
-      index: analyzed
+      type: text
       description: >
         The request parameters. For HTTP, these are the POST or GET parameters.
         For Thrift-RPC, these are the parameters from the request.
@@ -429,7 +427,7 @@ trans_event:
             - 6
 
         - name: request.message
-          type: string
+          type: keyword
           description: A human readable form of the request.
 
         - name: request.type
@@ -441,7 +439,7 @@ trans_event:
           description: The request code.
 
         - name: response.message
-          type: string
+          type: keyword
           description: A human readable form of the response.
 
         - name: response.type
@@ -653,7 +651,7 @@ trans_event:
           example: 404
 
         - name: reply-text
-          type: string
+          type: keyword
           description: >
             Text explaining the error.
 
@@ -668,12 +666,12 @@ trans_event:
             Failing method ID.
 
         - name: exchange
-          type: string
+          type: keyword
           description: >
             Name of the exchange.
 
         - name: exchange-type
-          type: string
+          type: keyword
           description: >
             Exchange type.
           example: fanout
@@ -750,7 +748,7 @@ trans_event:
             Delete only if empty.
 
         - name: queue
-          type: string
+          type: keyword
           description: >
             The queue name identifies the queue within the vhost.
 
@@ -781,13 +779,13 @@ trans_event:
             Request immediate delivery.
 
         - name: content-type
-          type: string
+          type: keyword
           description: >
             MIME content type.
           example: text/plain
 
         - name: content-encoding
-          type: string
+          type: keyword
           description: >
             MIME content encoding.
 
@@ -806,42 +804,42 @@ trans_event:
             Message priority, 0 to 9.
 
         - name: correlation-id
-          type: string
+          type: keyword
           description: >
             Application correlation identifier.
 
         - name: reply-to
-          type: string
+          type: keyword
           description: >
             Address to reply to.
 
         - name: expiration
-          type: string
+          type: keyword
           description: >
             Message expiration specification.
 
         - name: message-id
-          type: string
+          type: keyword
           description: >
             Application message identifier.
 
         - name: timestamp
-          type: string
+          type: keyword
           description: >
             Message timestamp.
 
         - name: type
-          type: string
+          type: keyword
           description: >
             Message type name.
 
         - name: user-id
-          type: string
+          type: keyword
           description: >
             Creating user id.
 
         - name: app-id
-          type: string
+          type: keyword
           description: >
             Creating application id.
 
@@ -883,19 +881,19 @@ trans_event:
       description: Memcached-specific event fields
       fields:
         - name: protocol_type
-          type: string
+          type: keyword
           description: >
             The memcache protocol implementation. The value can be "binary"
             for binary-based, "text" for text-based, or "unknown" for an unknown
             memcache protocol type.
 
         - name: request.line
-          type: string
+          type: keyword
           description: >
             The raw command line for unknown commands ONLY.
 
         - name: request.command
-          type: string
+          type: keyword
           description: >
             The memcache command being requested in the memcache text protocol.
             For example "set" or "get".
@@ -903,20 +901,20 @@ trans_event:
             commands.
 
         - name: response.command
-          type: string
+          type: keyword
           description: >
             Either the text based protocol response message type
             or the name of the originating request if binary protocol is used.
 
         - name: request.type
-          type: string
+          type: keyword
           description: >
             The memcache command classification. This value can be "UNKNOWN", "Load",
             "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
             "Stats", "Success", "Fail", or "Auth".
 
         - name: response.type
-          type: string
+          type: keyword
           description: >
             The memcache command classification. This value can be "UNKNOWN", "Load",
             "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler",
@@ -926,17 +924,17 @@ trans_event:
             `memcache.response.status` for binary protocol).
 
         - name: response.error_msg
-          type: string
+          type: keyword
           description: >
             The optional error message in the memcache response (text based protocol only).
 
         - name: request.opcode
-          type: string
+          type: keyword
           description: >
             The binary protocol message opcode name.
 
         - name: response.opcode
-          type: string
+          type: keyword
           description: >
             The binary protocol message opcode name.
 
@@ -968,7 +966,7 @@ trans_event:
             The vbucket index sent in the binary message.
 
         - name: response.status
-          type: string
+          type: keyword
           description: >
             The textual representation of the response error code
             (binary protocol only).
@@ -1036,7 +1034,7 @@ trans_event:
             The value of the memcache "verbosity" command.
 
         - name: request.raw_args
-          type: string
+          type: keyword
           description: >
             The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
@@ -1051,7 +1049,7 @@ trans_event:
             The destination class id in 'slab reassign' command.
 
         - name: request.automove
-          type: string
+          type: keyword
           description: >
               The automove mode in the 'slab automove' command expressed as a string.
               This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if
@@ -1113,7 +1111,7 @@ trans_event:
             fields "name" and "value".
 
         - name: response.version
-          type: string
+          type: keyword
           description: >
             The returned memcache version string.
 
@@ -1295,14 +1293,14 @@ raw:
   description: These fields contain the raw transaction data.
   fields:
     - name: request
-      index: analyzed
+      type: text
       description: >
         For text protocols, this is the request as seen on the wire
         (application layer only). For binary protocols this is our
         representation of the request.
 
     - name: response
-      index: analyzed
+      type: text
       description: >
         For text protocols, this is the response as seen on the wire
         (application layer only). For binary protocols this is our

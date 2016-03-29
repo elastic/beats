@@ -49,17 +49,14 @@ def fields_to_es_template(input, output, index):
         "mappings": {
             "_default_": {
                 "_all": {
-                    "enabled": True,
-                    "norms": {
-                        "enabled": False
-                    }
+                    "norms": False
                 },
                 "properties": {},
                 "dynamic_templates": [{
                     "template1": {
-                        "match": "*",
+                        "match_mapping_type": "string",
                         "mapping": {
-                            "type": "{dynamic_type}",
+                            "type": "keyword",
                             "index": defaults["index"],
                             "doc_values": defaults["doc_values"],
                             "ignore_above": defaults["ignore_above"]
@@ -109,44 +106,29 @@ def fill_field_properties(field, defaults):
             field[key] = defaults[key]
 
     # TODO: Make this more dyanmic
-    if field.get("index") == "analyzed":
+    if field.get("type") == "text":
         properties[field["name"]] = {
             "type": field["type"],
-            "index": "analyzed",
-            "norms": {
-                "enabled": False
-            }
+            "norms": False
         }
 
-    elif field.get("type") == "geo_point":
+    elif field.get("type")  == "keyword":
+        mapping = {
+        }
+        if field.get("doc_values") != defaults.get("doc_values"):
+             mapping["doc_values"] = field.get("doc_values")
+        if field.get("ignore_above") != defaults.get("ignore_above"):
+             mapping["ignore_above"] = field.get("ignore_above")
+        if len(mapping) > 0:
+            # only add the field if the mapping is different from the defaults
+            mapping["type"] = "keyword"
+            properties[field["name"]] = mapping
+
+    elif field.get("type") in ["geo_point", "date", "long", "integer", "double", "float"]:
         properties[field["name"]] = {
-            "type": "geo_point"
+            "type": field.get("type")
         }
 
-    elif field.get("type") == "date":
-        properties[field["name"]] = {
-            "type": "date"
-        }
-    elif field.get("type") == "long":
-        properties[field["name"]] = {
-            "type": "long",
-            "doc_values": "true"
-        }
-    elif field.get("type") == "float":
-        properties[field["name"]] = {
-            "type": "float",
-            "doc_values": "true"
-        }
-    elif field.get("type") == "double":
-        properties[field["name"]] = {
-            "type": "double",
-            "doc_values": "true"
-        }
-    elif field.get("type") == "integer":
-        properties[field["name"]] = {
-            "type": "integer",
-            "doc_values": "true"
-        }
     elif field.get("type") == "group":
         prop = fill_section_properties(field, defaults)
 
@@ -155,15 +137,7 @@ def fill_field_properties(field, defaults):
             properties[field.get("name")] = {"properties": {}}
             properties[field.get("name")]["properties"] = prop
 
-
-
-
-    elif field.get("ignore_above") == 0:
-        properties[field["name"]] = {
-            "type": field["type"],
-            "index": field["index"],
-            "doc_values": field["doc_values"]
-        }
+    # Otherwise let dynamic mappings do the job
 
     return properties
 

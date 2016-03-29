@@ -1,9 +1,9 @@
 version: 1.0
 
 defaults:
-  type: string
+  type: keyword
   required: false
-  index: not_analyzed
+  index: true
   doc_values: true
   ignore_above: 1024
 
@@ -57,7 +57,7 @@ eventlog:
     Contains data from a Windows event log record.
   fields:
     - name: activity_id
-      type: string
+      type: keyword
       required: false
       description: >
         A globally unique identifier that identifies the current activity. The
@@ -65,7 +65,7 @@ eventlog:
         activity.
 
     - name: computer_name
-      type: string
+      type: keyword
       required: true
       description: >
         The name of the computer that generated the record. When using Windows
@@ -85,20 +85,20 @@ eventlog:
         The event identifier. The value is specific to the source of the event.
 
     - name: keywords
-      type: string[]
+      type: keyword[]
       required: false
       description: >
         The keywords are used to classify an event.
 
     - name: log_name
-      type: string
+      type: keyword
       required: true
       description: >
         The name of the event log from which this record was read. This value is
         one of the names from the `event_logs` collection in the configuration.
 
     - name: level
-      type: string
+      type: keyword
       required: false
       description: >
         The level of the event. There are five levels of events that can be
@@ -106,23 +106,20 @@ eventlog:
         Failure.
 
     - name: message
-      type: string
-      index: analyzed
-      doc_values: true
-      ignore_above: 0
+      type: text
       required: false
       description: >
         The message from the event log record.
 
     - name: message_error
-      type: string
+      type: keyword
       required: false
       description: >
         The error that occurred while reading and formatting the message from
         the log.
 
     - name: record_number
-      type: string
+      type: keyword
       required: true
       description: >
         The record number of the event log record. The first record written
@@ -132,7 +129,7 @@ eventlog:
         the next record number will be 0.
 
     - name: related_activity_id
-      type: string
+      type: keyword
       required: false
       description: >
         A globally unique identifier that identifies the activity to which
@@ -140,7 +137,7 @@ eventlog:
         identifier as their `activity_id` identifier.
 
     - name: opcode
-      type: string
+      type: keyword
       required: false
       description: >
         The opcode defined in the event. Task and opcode are typically used to
@@ -148,7 +145,7 @@ eventlog:
         logged.
 
     - name: provider_guid
-      type: string
+      type: keyword
       required: false
       description: >
         A globally unique identifier that identifies the provider that logged
@@ -161,14 +158,14 @@ eventlog:
         The process_id identifies the process that generated the event.
 
     - name: source_name
-      type: string
+      type: keyword
       required: true
       description: >
         The source of the event log record (the application or service that
         logged the record).
 
     - name: task
-      type: string
+      type: keyword
       required: false
       description: >
         The task defined in the event. Task and opcode are typically used to
@@ -190,7 +187,7 @@ eventlog:
         `event_data`.
 
     - name: user.identifier
-      type: string
+      type: keyword
       required: false
       example: S-1-5-21-3541430928-2051711210-1391384369-1001
       description: >
@@ -204,19 +201,19 @@ eventlog:
         clues as to what the problem may be.
 
     - name: user.name
-      type: string
+      type: keyword
       required: false
       description: >
         The name of the account associated with this event.
 
     - name: user.domain
-      type: string
+      type: keyword
       required: false
       description: >
         The domain that the account associated with this event is a member of.
 
     - name: user.type
-      type: string
+      type: keyword
       required: false
       description: >
         The type of account associated with this event.

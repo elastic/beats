@@ -2,10 +2,7 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "enabled": true,
-        "norms": {
-          "enabled": false
-        }
+        "norms": false
       },
       "dynamic_templates": [
         {
@@ -13,10 +10,10 @@
             "mapping": {
               "doc_values": true,
               "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "{dynamic_type}"
+              "index": true,
+              "type": "keyword"
             },
-            "match": "*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -25,22 +22,16 @@
           "type": "date"
         },
         "event_id": {
-          "doc_values": "true",
           "type": "long"
         },
         "message": {
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          },
-          "type": "string"
+          "norms": false,
+          "type": "text"
         },
         "process_id": {
-          "doc_values": "true",
           "type": "long"
         },
         "thread_id": {
-          "doc_values": "true",
           "type": "long"
         }
       }
