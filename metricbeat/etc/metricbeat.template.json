@@ -2,10 +2,7 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "enabled": true,
-        "norms": {
-          "enabled": false
-        }
+        "norms": false
       },
       "dynamic_templates": [
         {
@@ -13,10 +10,10 @@
             "mapping": {
               "doc_values": true,
               "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "{dynamic_type}"
+              "index": true,
+              "type": "keyword"
             },
-            "match": "*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -29,11 +26,9 @@
             "aborted": {
               "properties": {
                 "Aborted_clients": {
-                  "doc_values": "true",
                   "type": "integer"
                 },
                 "Aborted_connects": {
-                  "doc_values": "true",
                   "type": "integer"
                 }
               }
@@ -41,11 +36,9 @@
             "bytes": {
               "properties": {
                 "Bytes_received": {
-                  "doc_values": "true",
                   "type": "integer"
                 },
                 "Bytes_sent": {
-                  "doc_values": "true",
                   "type": "integer"
                 }
               }
@@ -57,19 +50,15 @@
             "clients": {
               "properties": {
                 "blocked_clients": {
-                  "doc_values": "true",
                   "type": "integer"
                 },
                 "client_biggest_input_buf": {
-                  "doc_values": "true",
                   "type": "integer"
                 },
                 "client_longest_output_list": {
-                  "doc_values": "true",
                   "type": "integer"
                 },
                 "connected_clients": {
-                  "doc_values": "true",
                   "type": "integer"
                 }
               }
@@ -77,19 +66,15 @@
             "cpu": {
               "properties": {
                 "used_cpu_sys": {
-                  "doc_values": "true",
                   "type": "float"
                 },
                 "used_cpu_sys_children": {
-                  "doc_values": "true",
                   "type": "float"
                 },
                 "used_cpu_user": {
-                  "doc_values": "true",
                   "type": "float"
                 },
                 "used_cpu_user_children": {
-                  "doc_values": "true",
                   "type": "float"
                 }
               }
@@ -97,7 +82,6 @@
           }
         },
         "rtt": {
-          "doc_values": "true",
           "type": "long"
         }
       }

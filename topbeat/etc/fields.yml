@@ -1,9 +1,9 @@
 version: 1.0
 
 defaults:
-  type: string
+  type: keyword
   required: false
-  index: not_analyzed
+  index: true
   doc_values: true
   ignore_above: 1024
 
@@ -262,12 +262,12 @@ process:
         pid, and ppid.
       fields:
         - name: name
-          type: string
+          type: keyword
           description: >
             The process name.
 
         - name: state
-          type: string
+          type: keyword
           description: >
             The process state. For example: "running"
 
@@ -282,13 +282,13 @@ process:
             The process parent pid.
 
         - name: cmdline
-          type: string
+          type: keyword
           description: >
             The full command-line used to start the process, including the
             arguments separated by space.
 
         - name: username
-          type: string
+          type: keyword
           description: >
             The username of the user that created the process. If the username
             can not be determined then the the field will contain the user's
@@ -322,7 +322,7 @@ process:
                 The total CPU time spent by the process.
 
             - name: start_time
-              type: string
+              type: keyword
               description: >
                 The time when the process was started. Example: "17:45".
 
@@ -369,12 +369,12 @@ filesystem:
             The available disk space in bytes.
 
         - name: device_name
-          type: string
+          type: keyword
           description: >
             The disk name. For example: `/dev/disk1`
 
         - name: mount_point
-          type: string
+          type: keyword
           description: >
             The mounting point. For example: `/`
 

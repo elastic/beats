@@ -2,10 +2,7 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "enabled": true,
-        "norms": {
-          "enabled": false
-        }
+        "norms": false
       },
       "dynamic_templates": [
         {
@@ -13,10 +10,10 @@
             "mapping": {
               "doc_values": true,
               "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "{dynamic_type}"
+              "index": true,
+              "type": "keyword"
             },
-            "match": "*"
+            "match_mapping_type": "string"
           }
         }
       ],
@@ -55,30 +52,20 @@
           "type": "geo_point"
         },
         "params": {
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          },
-          "type": "string"
+          "norms": false,
+          "type": "text"
         },
         "query": {
-          "doc_values": true,
-          "index": "not_analyzed",
-          "type": "string"
+          "ignore_above": 0,
+          "type": "keyword"
         },
         "request": {
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          },
-          "type": "string"
+          "norms": false,
+          "type": "text"
         },
         "response": {
-          "index": "analyzed",
-          "norms": {
-            "enabled": false
-          },
-          "type": "string"
+          "norms": false,
+          "type": "text"
         },
         "start_time": {
           "type": "date"
