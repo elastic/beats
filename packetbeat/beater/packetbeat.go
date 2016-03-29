@@ -59,7 +59,7 @@ const (
 
 func init() {
 	cmdLineArgs = CmdLineArgs{
-		File:         flag.String("I", "", "file"),
+		File:         flag.String("I", "", "Read packet data from specified file"),
 		Loop:         flag.Int("l", 1, "Loop file. 0 - loop forever"),
 		OneAtAtime:   flag.Bool("O", false, "Read packets one at a time (press Enter)"),
 		TopSpeed:     flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
