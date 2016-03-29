@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
 
 	cfg "github.com/elastic/beats/filebeat/config"
@@ -32,7 +31,7 @@ func New() *Filebeat {
 func (fb *Filebeat) Config(b *beat.Beat) error {
 
 	// Load Base config
-	err := cfgfile.Read(&fb.FbConfig, "")
+	err := b.RawConfig.Unpack(&fb.FbConfig)
 
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
