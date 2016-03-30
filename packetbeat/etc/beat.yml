@@ -146,6 +146,11 @@ protocols:
     # the MongoDB protocol by commenting out the list of ports.
     ports: [27017]
 
+  nfs:
+    # Configure the ports where to listen for NFS traffic. You can disable
+    # the NFS protocol by commenting out the list of ports.
+    ports: [2049]
+
 ############################# Processes #######################################
 
 # Configure the processes to be monitored and how to find them. If a process is

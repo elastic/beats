@@ -1,0 +1,41 @@
+{
+  "@timestamp": "2016-03-28T06:18:18.431Z",
+  "beat": {
+    "hostname": "localhost",
+    "name": "localhost"
+  },
+  "count": 1,
+  "dst": "127.0.0.1",
+  "dst_port": 2049,
+  "nfs": {
+    "minor_version": 1,
+    "opcode": "GETATTR",
+    "status": "NFSERR_NOENT",
+    "tag": "",
+    "version": 4
+  },
+  "rpc": {
+    "auth_flavor": "unix",
+    "call_size": 200,
+    "cred": {
+      "gid": 500,
+      "gids": [
+        491,
+        499,
+        500
+      ],
+      "machinename": "localhost",
+      "stamp": 4597002,
+      "uid": 500
+    },
+    "reply_size": 96,
+    "status": "success",
+    "time": 25631000,
+    "time_str": "25.631ms",
+    "xid": "2cf0c876"
+  },
+  "src": "127.0.0.1",
+  "src_port": 975,
+  "type": "nfs"
+}
+
