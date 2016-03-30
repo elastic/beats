@@ -1288,6 +1288,74 @@ trans_event:
           description: >
             The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
+    - name: rpc
+      type: group
+      description: OncRPC specific event fields.
+      fields:
+        - name: xid
+          description: RPC message transaction identifier.
+
+        - name: call_size
+          type: number
+          description: RPC call size with argument.
+
+        - name: reply_size
+          type: number
+          description: RPC reply size with argument.
+
+        - name: status
+          description: RPC message reply status.
+
+        - name: time
+          type: number
+          description: RPC message processing time.
+
+        - name: time_str
+          description: RPC message processing time in human readable form.
+
+        - name: auth_flavor
+          description: RPC authentication flavor.
+
+        - name: cred.uid
+          type: number
+          description: RPC caller's user id, in case of auth-unix.
+
+        - name: cred.gid
+          type: number
+          description: RPC caller's group id, in case of auth-unix.
+
+        - name: cred.gids
+          description: RPC caller's secondary group ids, in case of auth-unix.
+
+        - name: cred.stamp
+          type: number
+          description: Arbitrary ID which the caller machine may generate.
+
+        - name: cred.machinename
+          description: The name of the caller's machine.
+
+    - name: nfs
+      type: group
+      description: NFS v4/3 specific event fields.
+      fields:
+        - name: version
+          type: number
+          description: NFS protocol version number.
+
+        - name: minor_version
+          type: number
+          description: NFS protocol minor version number.
+
+        - name: tag
+          description: NFS v4 COMPOUND operation tag.
+
+        - name: opcode
+          description: >
+            NFS operation name, or main operation name, in case of COMPOUND
+            calls.
+
+        - name: status
+          description: NFS operation reply status.
 raw:
   type: group
   description: These fields contain the raw transaction data.
@@ -1383,3 +1451,4 @@ sections:
   - ["trans_env", "Environmental (Transactions)"]
   - ["flows_env", "Environmental (Flows)"]
   - ["raw", "Raw"]
+  - ["nfs", "NFS"]

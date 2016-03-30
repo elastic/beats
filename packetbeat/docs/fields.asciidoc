@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-trans_env>>
 * <<exported-fields-flows_env>>
 * <<exported-fields-raw>>
+* <<exported-fields-nfs>>
 
 [[exported-fields-flows_event]]
 === Flow Event Fields
@@ -1452,6 +1453,102 @@ A BSON document that specifies the update to be performed. For information on sp
 
 The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
+
+=== rpc Fields
+
+OncRPC specific event fields.
+
+
+==== rpc.xid
+
+RPC message transaction identifier.
+
+==== rpc.call_size
+
+type: number
+
+RPC call size with argument.
+
+==== rpc.reply_size
+
+type: number
+
+RPC reply size with argument.
+
+==== rpc.status
+
+RPC message reply status.
+
+==== rpc.time
+
+type: number
+
+RPC message processing time.
+
+==== rpc.time_str
+
+RPC message processing time in human readable form.
+
+==== rpc.auth_flavor
+
+RPC authentication flavor.
+
+==== rpc.cred.uid
+
+type: number
+
+RPC caller's user id, in case of auth-unix.
+
+==== rpc.cred.gid
+
+type: number
+
+RPC caller's group id, in case of auth-unix.
+
+==== rpc.cred.gids
+
+RPC caller's secondary group ids, in case of auth-unix.
+
+==== rpc.cred.stamp
+
+type: number
+
+Arbitrary ID which the caller machine may generate.
+
+==== rpc.cred.machinename
+
+The name of the caller's machine.
+
+[[exported-fields-nfs]]
+=== NFS Fields
+
+NFS v4/3 specific event fields.
+
+
+==== nfs.version
+
+type: number
+
+NFS protocol version number.
+
+==== nfs.minor_version
+
+type: number
+
+NFS protocol minor version number.
+
+==== nfs.tag
+
+NFS v4 COMPOUND operation tag.
+
+==== nfs.opcode
+
+NFS operation name, or main operation name, in case of COMPOUND calls.
+
+
+==== nfs.status
+
+NFS operation reply status.
 
 [[exported-fields-trans_measurements]]
 === Measurements (Transactions) Fields
