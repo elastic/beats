@@ -39,6 +39,7 @@ You can specify the following options in the `topbeat` section:
 
 How often, in seconds, to read system-wide and per-process statistics from your servers. The default is 10.
 
+[[procs-option]]
 ===== procs
 
 A list of regular expressions to match all the processes that need to be monitored. By
@@ -87,4 +88,7 @@ include::../../../../libbeat/docs/shipperconfig.asciidoc[]
 include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/runconfig.asciidoc[]
+
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+
 

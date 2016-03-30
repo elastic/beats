@@ -21,6 +21,7 @@ configuration settings, you need to restart Packetbeat to pick up the changes.
 * <<configuration-shipper>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
+* <<configuration-filter>>
 
 NOTE: Packetbeat maintains a real-time topology map of all the servers in your network.
 See <<maintaining-topology>> for more details.

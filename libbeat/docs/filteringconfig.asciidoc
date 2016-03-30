@@ -1,0 +1,67 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/filteringconfig.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-filter]]
+=== Filter
+
+You can set options in the `filter` section of the {beatname_uc} config file to reduce the number of fields that are 
+exported by the Beat. See <<exported-fields>> for the full list of possible fields.
+
+The filter actions that you specify are applied to each event before it's sent to the defined output. You can define
+multiple filter actions. The filter actions are executed in the order that they're defined in the config file.
+
+==== Filter Options
+
+You can specify the following options under the `filter` section:
+
+[[include-fields]]
+===== include_fields
+
+The `include_fields` action specifies the list of fields to export. For each field, you can specify a simple field
+name, or a nested map. For example, if you specify `dns.question.name`, the Beat exports only the `name` field
+because it's a simple field. If you specify `dns.question`, the Beat exports all the fields nested under
+`dns.question`. 
+
+Example configuration:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: ["field_A", "field_B", "field_C"]
+-----------------------------------------------------
+
+If `include_fields` is not specified, all fields are exported by default. 
+
+See <<filtering-data>> for specific {beatname_uc} examples.
+
+NOTE: If you specify an empty list for `include_fields`, only the required fields, `@timestamp` and `type`, are
+exported. 
+
+[[drop-fields]]
+===== drop_fields
+
+The `drop_fields` action defines a list of fields to drop. For each field, you can specify a simple field name, or a
+nested map. For example, if you specify `dns.question.name`, the Beat drops only the `name` field because it's a
+simple field. If you specify `dns.question`, the Beat drops all the fields nested under `dns.question`. Some fields,
+such as `@timestamp` and `type`, are mandatory and cannot be removed because they are required by the outputs. 
+
+Example configuration:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - drop_fields:
+     fields: ["field_A"]
+-----------------------------------------------------
+
+See <<filtering-data>> for specific {beatname_uc} examples.

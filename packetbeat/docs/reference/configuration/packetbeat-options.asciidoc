@@ -704,3 +704,5 @@ include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 
 include::../../../../libbeat/docs/runconfig.asciidoc[]
 
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
+
