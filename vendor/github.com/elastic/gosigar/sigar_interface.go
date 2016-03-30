@@ -1,4 +1,4 @@
-package sigar
+package gosigar
 
 import (
 	"time"
@@ -106,6 +106,7 @@ const (
 
 type ProcState struct {
 	Name      string
+	Username  string
 	State     RunState
 	Ppid      int
 	Tty       int
