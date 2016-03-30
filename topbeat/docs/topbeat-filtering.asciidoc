@@ -1,0 +1,55 @@
+[[filtering-data]]
+=== Filtering the Exported Data
+
+When your use case requires only a subset of the data exported by Topbeat, you can <<topbeat-filtering-overview,use Topbeat config options to filter the data>>, or you can <<generic-filtering-overview-topbeat,use the generic filtering provided by libbeat>>.
+
+[[topbeat-filtering-overview]]
+==== Topbeat Config Options for Filtering
+
+You can specify the <<procs-option,`procs`>> option in the `input` section of the config file to specify a list of
+regular expressions to match the processes that you want to monitor. 
+
+By default, all processes are monitored:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+procs: [".*"]
+-------------------------------------------------------------------------------------
+
+[[generic-filtering-overview-topbeat]]
+==== Generic Filtering
+
+include::../../libbeat/docs/filtering.asciidoc[]
+
+
+For example, the following filter configuration reduces the exported fields to include only `load`, `memory`,
+`swap`, and `cpu.user_p`, the percentage of CPU time spent in user space:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: ["load", "mem", "swap", "cpu.user_p"]
+-----------------------------------------------------
+
+The following filter configuration drops all the swap information:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - drop_fields:
+     fields: ["swap"]
+-----------------------------------------------------
+
+The following filter configuration uses multiple actions to keep the fields that contain CPU load percentages, but remove the fields that contain CPU ticks values:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+ - include_fields:
+     fields: ["cpu"]
+ - drop_fields:
+     fields: ["cpu.user", "cpu.system"]
+-----------------------------------------------------
+
+See <<configuration-filter,filter configuration options>> for more information.

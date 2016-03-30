@@ -1,0 +1,44 @@
+[[filtering-data]]
+=== Filtering the Exported Data
+
+include::../../libbeat/docs/filtering.asciidoc[]
+
+For example, the following filter configuration includes a subset of the Packetbeat DNS fields so that only the
+requests and their response codes are reported:
+
+[source, yaml]
+-----------------------------------------------------
+filter:
+  - include_fields:
+      fields: 
+        - bytes_in
+        - bytes_out
+        - ip
+        - client_ip
+        - dns.question.name
+        - dns.question.etld_plus_one
+        - dns.response_code
+-----------------------------------------------------
+
+The filtered event would look something like this:
+
+[source,shell]
+-----------------------------------------------------
+{
+  "@timestamp": "2016-03-28T14:48:21.732Z",
+  "bytes_in": 32,
+  "bytes_out": 48,
+  "client_ip": "192.168.10.111",
+  "dns": {
+    "question": {
+      "etld_plus_one": "google.com.",
+      "name": "www.google.com."
+    },
+    "response_code": "NOERROR"
+  },
+  "ip": "8.8.8.8",
+  "type": "dns"
+}
+-----------------------------------------------------
+
+See <<configuration-filter,filter configuration options>> for more information.
