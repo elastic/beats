@@ -148,7 +148,7 @@ winlogbeat:
 A list of event levels to include. The value is a comma-separated list of
 levels. *{vista_and_newer}*
 
-[cols="3*", options="header"]
+[cols="2*", options="header"]
 |===
 |Level
 |Value
