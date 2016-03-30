@@ -13,6 +13,16 @@ metricbeat:
       # Path to server status. Default server-status
       #server_status_path: "server-status"
 
+    # Nginx Module
+    - module: nginx
+      metricsets: ["stubstatus"]
+      hosts: ["http://127.0.0.1/"]
+      period: 1s
+      enabled: true
+
+      # Path to server status. Default server-status
+      #server_status_path: "server-status"
+
     # Redis Module
     - module: redis
       metricsets: ["info"]
@@ -335,5 +345,3 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
-
-

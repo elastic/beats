@@ -17,6 +17,7 @@ import (
 	// Every new metric must be added here
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
+	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 
 	// Redis module and metrics
 	_ "github.com/elastic/beats/metricbeat/module/redis"

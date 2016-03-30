@@ -20,6 +20,25 @@ waitForApache() {
     echo >&2 "Address: ${APACHE_HOST}:${APACHE_PORT}"
 }
 
+waitForNginx() {
+    echo -n "Waiting for nginx(${NGINX_HOST}:${NGINX_PORT}) to start."
+    for ((i=1; i<=90; i++)) do
+        if nc -vz ${NGINX_HOST} ${NGINX_PORT} 2>/dev/null; then
+            echo
+            echo "Nginx is ready!"
+            return 0
+        fi
+
+        ((i++))
+        echo -n '.'
+        sleep 1
+    done
+
+    echo
+    echo >&2 'Nginx is not available'
+    echo >&2 "Address: ${NGINX_HOST}:${NGINX_PORT}"
+}
+
 waitForRedis() {
     echo -n "Waiting for redis(${REDIS_HOST}:${REDIS_PORT}) to start."
     for ((i=1; i<=90; i++)) do
@@ -61,6 +80,7 @@ waitForMySQL() {
 
 # Main
 waitForApache
+waitForNginx
 waitForRedis
 waitForMySQL
 exec "$@"
