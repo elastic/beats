@@ -3,14 +3,8 @@
 package logstash
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
 	"fmt"
 	"io"
-	"math/big"
 	"net"
 	"os"
 	"sync"
@@ -22,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
 )
 
 const (
@@ -30,37 +25,37 @@ const (
 )
 
 type mockLSServer struct {
-	*mockServer
+	*transptest.MockServer
 }
 
 var testOptions = outputs.Options{}
 
 func newMockTLSServer(t *testing.T, to time.Duration, cert string) *mockLSServer {
-	return &mockLSServer{newMockServerTLS(t, to, cert, nil)}
+	return &mockLSServer{transptest.NewMockServerTLS(t, to, cert, nil)}
 }
 
 func newMockTCPServer(t *testing.T, to time.Duration) *mockLSServer {
-	return &mockLSServer{newMockServerTCP(t, to, "", nil)}
+	return &mockLSServer{transptest.NewMockServerTCP(t, to, "", nil)}
 }
 
 func (m *mockLSServer) readMessage(buf *streambuf.Buffer, client net.Conn) *message {
-	if m.err != nil {
+	if m.Err != nil {
 		return nil
 	}
 
-	m.clientDeadline(client, m.timeout)
-	if m.err != nil {
+	m.ClientDeadline(client, m.Timeout)
+	if m.Err != nil {
 		return nil
 	}
 
 	msg, err := sockReadMessage(buf, client)
-	m.err = err
+	m.Err = err
 	return msg
 }
 
 func (m *mockLSServer) sendACK(client net.Conn, seq uint32) {
-	if m.err == nil {
-		m.err = sockSendACK(client, seq)
+	if m.Err == nil {
+		m.Err = sockSendACK(client, seq)
 	}
 }
 
@@ -159,104 +154,6 @@ func sockSendACK(out io.Writer, seq uint32) error {
 	return err
 }
 
-// genCertsIfMIssing generates a testing certificate for ip 127.0.0.1 for
-// testing if certificate or key is missing. Generated is used for CA,
-// client-auth and server-auth. Use only for testing.
-func genCertsForIPIfMIssing(
-	t *testing.T,
-	ip net.IP,
-	name string,
-) error {
-	capem := name + ".pem"
-	cakey := name + ".key"
-
-	_, err := os.Stat(capem)
-	if err == nil {
-		_, err = os.Stat(cakey)
-		if err == nil {
-			return nil
-		}
-	}
-
-	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
-	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
-	if err != nil {
-		t.Fatalf("failed to generate serial number: %s", err)
-	}
-
-	caTemplate := x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			Country:            []string{"US"},
-			Organization:       []string{"elastic"},
-			OrganizationalUnit: []string{"beats"},
-		},
-		Issuer: pkix.Name{
-			Country:            []string{"US"},
-			Organization:       []string{"elastic"},
-			OrganizationalUnit: []string{"beats"},
-			Locality:           []string{"locality"},
-			Province:           []string{"province"},
-			StreetAddress:      []string{"Mainstreet"},
-			PostalCode:         []string{"12345"},
-			SerialNumber:       "23",
-			CommonName:         "*",
-		},
-		IPAddresses: []net.IP{ip},
-
-		SignatureAlgorithm:    x509.SHA512WithRSA,
-		PublicKeyAlgorithm:    x509.ECDSA,
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		SubjectKeyId:          []byte("12345"),
-		BasicConstraintsValid: true,
-		IsCA: true,
-		ExtKeyUsage: []x509.ExtKeyUsage{
-			x509.ExtKeyUsageClientAuth,
-			x509.ExtKeyUsageServerAuth},
-		KeyUsage: x509.KeyUsageKeyEncipherment |
-			x509.KeyUsageDigitalSignature |
-			x509.KeyUsageCertSign,
-	}
-
-	// generate keys
-	priv, err := rsa.GenerateKey(rand.Reader, 4096)
-	if err != nil {
-		t.Fatalf("failed to generate ca private key: %v", err)
-	}
-	pub := &priv.PublicKey
-
-	// generate certificate
-	caBytes, err := x509.CreateCertificate(
-		rand.Reader,
-		&caTemplate,
-		&caTemplate,
-		pub, priv)
-	if err != nil {
-		t.Fatalf("failed to generate ca certificate: %v", err)
-	}
-
-	// write key file
-	keyOut, err := os.OpenFile(cakey, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		t.Fatalf("failed to open key file for writing: %v", err)
-	}
-	pem.Encode(keyOut, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(priv)})
-	keyOut.Close()
-
-	// write certificate
-	certOut, err := os.Create(capem)
-	if err != nil {
-		t.Fatalf("failed to open cert.pem for writing: %s", err)
-	}
-	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes})
-	certOut.Close()
-
-	return nil
-}
-
 func TestLogstashTCP(t *testing.T) {
 	timeout := 2 * time.Second
 	server := newMockTCPServer(t, timeout)
@@ -274,7 +171,7 @@ func TestLogstashTLS(t *testing.T) {
 	ip := net.IP{127, 0, 0, 1}
 
 	timeout := 2 * time.Second
-	genCertsForIPIfMIssing(t, ip, certName)
+	transptest.GenCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
 	config := map[string]interface{}{
@@ -290,7 +187,7 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	ip := net.IP{1, 2, 3, 4}
 
 	timeout := 2 * time.Second
-	genCertsForIPIfMIssing(t, ip, certName)
+	transptest.GenCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
 	config := map[string]interface{}{
@@ -319,6 +216,8 @@ func testConnectionType(
 		finish sync.WaitGroup
 	}
 
+	t.Log("testConnectionType")
+
 	wg.ready.Add(1)  // server signaling readiness to client worker
 	wg.finish.Add(2) // server/client signaling test end
 
@@ -327,14 +226,17 @@ func testConnectionType(
 		defer wg.finish.Done()
 		wg.ready.Done()
 
-		client := server.accept()
-		server.handshake(client)
+		t.Log("start server loop")
+		defer t.Log("stop server loop")
+
+		client := server.Accept()
+		server.Handshake(client)
 
 		buf := streambuf.New(nil)
 		result.win = server.readMessage(buf, client)
 		result.data = server.readMessage(buf, client)
 		server.sendACK(client, 1)
-		result.err = server.err
+		result.err = server.Err
 	}()
 
 	// worker loop
@@ -342,10 +244,18 @@ func testConnectionType(
 		defer wg.finish.Done()
 		wg.ready.Wait()
 
+		t.Log("start worker loop")
+		defer t.Log("stop worker loop")
+
+		t.Log("make outputter")
 		output := makeOutputer()
+		t.Logf("new outputter: %v", output)
 
 		signal := outputs.NewSyncSignal()
+		t.Log("publish event")
 		output.PublishEvent(signal, testOptions, testEvent())
+
+		t.Log("wait signal")
 		result.signal = signal.Wait()
 	}()
 
@@ -374,7 +284,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 	ip := net.IP{1, 2, 3, 4}
 
 	timeout := 2 * time.Second
-	genCertsForIPIfMIssing(t, ip, certName)
+	transptest.GenCertsForIPIfMIssing(t, ip, certName)
 	server := newMockTLSServer(t, timeout, certName)
 
 	config := map[string]interface{}{
@@ -403,13 +313,13 @@ func TestLogstashInvalidTLS(t *testing.T) {
 		defer wg.finish.Done()
 		wg.ready.Done()
 
-		client := server.accept()
-		if server.err != nil {
-			t.Fatalf("server error: %v", server.err)
+		client := server.Accept()
+		if server.Err != nil {
+			t.Fatalf("server error: %v", server.Err)
 		}
 
-		server.handshake(client)
-		result.handshakeFail = server.err != nil
+		server.Handshake(client)
+		result.handshakeFail = server.Err != nil
 	}()
 
 	// client loop

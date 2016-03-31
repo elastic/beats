@@ -13,11 +13,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
 	"github.com/stretchr/testify/assert"
 )
 
 type protocolServer struct {
-	*mockServer
+	*transptest.MockServer
 }
 
 type mockConn struct {
@@ -45,11 +46,11 @@ func (d document) get(path string) interface{} {
 }
 
 func newProtoServerTCP(t *testing.T, to time.Duration) *protocolServer {
-	return &protocolServer{newMockServerTCP(t, to, "", nil)}
+	return &protocolServer{transptest.NewMockServerTCP(t, to, "", nil)}
 }
 
 func (s *protocolServer) connectPair(compressLevel int) (*mockConn, *protocol, error) {
-	client, transp, err := s.mockServer.connectPair(1 * time.Second)
+	client, transp, err := s.MockServer.ConnectPair()
 	if err != nil {
 		return nil, nil, err
 	}

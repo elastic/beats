@@ -10,6 +10,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
 )
 
 type testSyncDriver struct {
@@ -20,7 +22,7 @@ type testSyncDriver struct {
 }
 
 type clientServer struct {
-	*mockServer
+	*transptest.MockServer
 }
 
 func TestClientSendZero(t *testing.T) {
@@ -44,11 +46,11 @@ func TestClientMultiFailMaxTimeouts(t *testing.T) {
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
-	return &clientServer{newMockServerTCP(t, to, "", nil)}
+	return &clientServer{transptest.NewMockServerTCP(t, to, "", nil)}
 }
 
 func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error) {
-	client, transp, err := s.mockServer.connectPair(100 * time.Millisecond)
+	client, transp, err := s.MockServer.ConnectPair()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -63,7 +65,7 @@ func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error
 	return conn, lc, nil
 }
 
-func makeTestClient(conn TransportClient) testClientDriver {
+func makeTestClient(conn *transport.Client) testClientDriver {
 	return newClientTestDriver(newLumberjackTestClient(conn))
 }
 
