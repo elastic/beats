@@ -19,4 +19,3 @@ class Test(BaseTest):
         assert objs[0]["status"] == "Error"
         assert objs[0]["mysql.error_code"] == 1046
         assert objs[0]["mysql.error_message"] == "3D000: No database selected"
-        assert objs[0]["count"] == 1

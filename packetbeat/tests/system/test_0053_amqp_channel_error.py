@@ -21,7 +21,6 @@ class Test(BaseTest):
         assert objs[0]["amqp.exchange-type"] == "fanout"
         assert objs[0]["amqp.passive"] == False
         assert objs[0]["amqp.no-wait"] == True
-        assert objs[0]["count"] == 1
 
         assert objs[1]["method"] == "queue.declare"
         assert objs[1]["status"] == "OK"
@@ -31,7 +30,6 @@ class Test(BaseTest):
         assert objs[1]["amqp.durable"] == False
         assert objs[1]["amqp.auto-delete"] == False
         assert objs[1]["amqp.passive"] == False
-        assert objs[1]["count"] == 1
 
         assert objs[2]["method"] == "channel.close"
         assert objs[2]["status"] == "Error"
@@ -39,4 +37,3 @@ class Test(BaseTest):
         assert objs[2]["amqp.reply-text"] == "NOT_FOUND - no exchange 'plop' in vhost '/'"
         assert objs[2]["amqp.class-id"] == 50
         assert objs[2]["amqp.method-id"] == 20
-        assert objs[2]["count"] == 1
