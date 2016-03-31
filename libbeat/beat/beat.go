@@ -251,6 +251,7 @@ func (bc *instance) run() error {
 // clean-up. This method is guaranteed to be invoked on shutdown if the beat
 // reaches the setup stage.
 func (bc *instance) cleanup() error {
+	logp.Info("%s cleanup", bc.data.Name)
 	return bc.beater.Cleanup(bc.data)
 }
 
@@ -259,42 +260,50 @@ func (bc *instance) cleanup() error {
 // an error occurs. The exit flag controls if this method calls os.Exit when
 // it completes.
 func (bc *instance) launch(exit bool) error {
-	err := bc.handleFlags()
+	var err error
+	if exit {
+		defer func() { exitProcess(err) }()
+	}
+
+	err = bc.handleFlags()
 	if err != nil {
-		goto cleanup
+		return err
 	}
 
 	err = bc.config()
 	if err != nil {
-		goto cleanup
+		return err
 	}
 
 	defer bc.cleanup()
 	err = bc.setup()
 	if err != nil {
-		goto cleanup
+		return err
 	}
 
 	svc.HandleSignals(bc.beater.Stop)
 	err = bc.run()
+	return err
+}
 
-cleanup:
-	if exit {
-		code := 0
-		if ee, ok := err.(ExitError); ok {
-			code = ee.ExitCode
-		} else if err != nil {
-			code = 1
-		}
-
-		if err != nil && code != 0 {
-			// logp may not be initialized so log the err to stderr too.
-			logp.Critical("Exiting: %v", err)
-			fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
-		}
-
-		os.Exit(code)
+// exitProcess causes the process to exit. If no error is provided then it will
+// exit with code 0. If an error is provided it will set a non-zero exit code
+// and log the error logp and to stderr.
+//
+// The exit code can controlled if the error is an ExitError.
+func exitProcess(err error) {
+	code := 0
+	if ee, ok := err.(ExitError); ok {
+		code = ee.ExitCode
+	} else if err != nil {
+		code = 1
 	}
 
-	return err
+	if err != nil && code != 0 {
+		// logp may not be initialized so log the err to stderr too.
+		logp.Critical("Exiting: %v", err)
+		fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
+	}
+
+	os.Exit(code)
 }
