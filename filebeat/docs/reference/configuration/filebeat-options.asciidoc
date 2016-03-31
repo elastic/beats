@@ -281,7 +281,7 @@ lines. The `backoff` value will be multiplied each time with the `backoff_factor
 
 ===== force_close_files
 
-By default, Filebeat keeps the files that it’s reading open until the timespan specified by `ignore_older` has elapsed.
+By default, Filebeat keeps the files that it’s reading open until the timespan specified by `close_older` has elapsed.
 This behaviour can cause issues when a file is removed. On Windows, the file cannot be fully removed until Filebeat closes
 the file. In addition no new file with the same name can be created during this time.
 
