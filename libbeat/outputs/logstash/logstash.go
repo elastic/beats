@@ -4,13 +4,13 @@ package logstash
 // output plugins
 
 import (
-	"crypto/tls"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 var debug = logp.MakeDebug("logstash")
@@ -50,26 +50,22 @@ func (lj *logstash) init(cfg *common.Config) error {
 		maxAttempts = 0
 	}
 
-	// Initialize and validate the proxy settings.
-	if err := config.Proxy.parseURL(); err != nil {
-		return err
+	transp := &transport.Config{
+		Timeout: config.Timeout,
+		Proxy:   &config.Proxy,
 	}
-
-	var clients []mode.ProtocolClient
-	var err error
 	if useTLS {
-		var tlsConfig *tls.Config
-		tlsConfig, err = outputs.LoadTLSConfig(config.TLS)
+		var err error
+		transp.TLS, err = outputs.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return err
 		}
-
-		clients, err = mode.MakeClients(cfg,
-			makeClientFactory(&config, makeTLSClient(config.Port, tlsConfig, &config.Proxy)))
-	} else {
-		clients, err = mode.MakeClients(cfg,
-			makeClientFactory(&config, makeTCPClient(config.Port, &config.Proxy)))
 	}
+
+	clients, err := mode.MakeClients(cfg,
+		makeClientFactory(&config, func(host string) (*transport.Client, error) {
+			return transport.NewClient(transp, "tcp", host, config.Port)
+		}))
 	if err != nil {
 		return err
 	}
@@ -89,7 +85,7 @@ func (lj *logstash) init(cfg *common.Config) error {
 
 func makeClientFactory(
 	config *logstashConfig,
-	makeTransp func(string) (TransportClient, error),
+	makeTransp func(string) (*transport.Client, error),
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
 		transp, err := makeTransp(host)
@@ -98,18 +94,6 @@ func makeClientFactory(
 		}
 		return newLumberjackClient(transp,
 			config.CompressionLevel, config.BulkMaxSize, config.Timeout)
-	}
-}
-
-func makeTCPClient(port int, socks *proxyConfig) func(string) (TransportClient, error) {
-	return func(host string) (TransportClient, error) {
-		return newTCPClient(host, port, socks)
-	}
-}
-
-func makeTLSClient(port int, tls *tls.Config, socks *proxyConfig) func(string) (TransportClient, error) {
-	return func(host string) (TransportClient, error) {
-		return newTLSClient(host, port, tls, socks)
 	}
 }
 
