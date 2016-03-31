@@ -24,5 +24,18 @@ RUN \
 	unzip `basename $WPDPACK_URL` -d /libpcap/win && \
 	rm `basename $WPDPACK_URL`
 
-# add patch for gopacket
+# Add patch for gopacket.
 ADD gopacket_pcap.patch /gopacket_pcap.patch
+
+# Add the wpcap.dll from the WinPcap_4_1_2.exe installer so that
+# we can generate a 64-bit compatible libwpcap.a.
+ENV WINPCAP_DLL_SHA1 d2afb08d0379bd96e423857963791e2ba00c9645
+ADD wpcap.dll /libpcap/win/wpcap.dll
+RUN \
+    apt-get install mingw-w64-tools && \
+    cd /libpcap/win && \
+    echo "$WINPCAP_DLL_SHA1 wpcap.dll" | sha1sum -c - && \
+    gendef /libpcap/win/wpcap.dll && \
+    x86_64-w64-mingw32-dlltool --as-flags=--64 -m i386:x86-64 -k --output-lib /libpcap/win/WpdPack/Lib/x64/libwpcap.a --input-def wpcap.def && \
+    rm wpcap.def wpcap.dll
+
