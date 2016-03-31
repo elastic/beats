@@ -4,7 +4,7 @@
   "title": "Process status", 
   "uiStateJSON": "{}", 
   "version": 1, 
-  "savedSearchId": "Proc-stats", 
+  "savedSearchId": "Process-stats", 
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }
