@@ -2,9 +2,9 @@
 
 # Usage examples:
 # env KIBANA_INDEX='.kibana_env1' ./load.sh
-# ./load.sh -url http://test.com:9200
-# ./load.sh -url http://test.com:9200 -user admin:secret
-# ./load.sh -url http://test.com:9200 -index .kibana-test
+# ./load.sh -url http://test.com:9200 -dir etc/kibana
+# ./load.sh -url http://test.com:9200 -user admin:secret -dir etc/kibana
+# ./load.sh -url http://test.com:9200 -index .kibana-test -dir etc/kibana
 
 # The default value of the variable. Initialize your own variables here
 ELASTICSEARCH=http://localhost:9200
