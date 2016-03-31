@@ -2,6 +2,7 @@ param(
   [String] $l, [String] $url, 
   [String] $u, [String] $user, 
   [String] $i, [String] $index,
+  [String] $d, [String] $dir,
   [switch] $h = $false, [switch] $help = $false
 )
 
@@ -10,6 +11,7 @@ $ELASTICSEARCH="http://localhost:9200"
 $CURL="Invoke-RestMethod"
 $KIBANA_INDEX=".kibana"
 $SCRIPT=$MyInvocation.MyCommand.Name
+$DIR=
 
 # Verify that Invoke-RestMethod is present. It was added in PS 3.
 if (!(Get-Command $CURL -errorAction SilentlyContinue))
@@ -29,6 +31,9 @@ Usage:
 Options:
   -h | -help
     Print the help menu.
+  -d | -dir
+    Local directory where the dashboards, visualizations, searches and index pattern
+    are saved.
   -l | -url
     Elasticseacrh URL. By default is $ELASTICSEARCH.
   -u | -user
@@ -72,7 +77,14 @@ if ($user -ne "") {
   $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}" -f $user)))
   $headers=@{Authorization=("Basic $base64AuthInfo")}
 }
-
+if ($dir -ne "") {
+  $DIR=$dir
+}
+if ($DIR -eq "") {
+  Write-Error "Error: Missing directory."
+  print_usage
+  exit 1
+}
 if ($i -ne "") {
   $KIBANA_INDEX=$i
 }
@@ -85,8 +97,7 @@ if ($KIBANA_INDEX -eq "") {
   exit 1
 }
 
-$DIR="./dashboards"
-echo "Loading dashboards to $ELASTICSEARCH in $KIBANA_INDEX"  
+echo "Import dashboards to $ELASTICSEARCH in $KIBANA_INDEX"
 
 ForEach ($file in Get-ChildItem "$DIR/search/" -Filter *.json) {
   $name = [io.path]::GetFileNameWithoutExtension($file.Name)
