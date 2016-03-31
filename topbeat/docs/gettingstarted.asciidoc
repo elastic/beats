@@ -129,20 +129,15 @@ output:
      hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
-
-[[config-filebeat-logstash]]
-=== Step 3 (Optional): Configuring Topbeat to Use Logstash
-
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+If you are sending output to Logstash, see <<config-topbeat-logstash>> instead.
 
 [[topbeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 3: Loading the Index Template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-=== Step 5: Starting Topbeat
+=== Step 4: Starting Topbeat
 
 Run Topbeat by issuing the following command:
 
@@ -193,7 +188,7 @@ instance.
 
 On Windows, if you don't have cURL installed, simply point your browser to the URL.
 
-=== Step 6: Loading Sample Kibana Dashboards
+=== Step 5: Loading Sample Kibana Dashboards
 
 To make it easier for you to start monitoring your servers in Kibana,
 we have created a few sample dashboards. The dashboards are maintained in this
