@@ -10,7 +10,7 @@
 ELASTICSEARCH=http://localhost:9200
 CURL=curl
 KIBANA_INDEX=".kibana"
-DIR=.
+DIR=
 
 print_usage() {
   echo "
@@ -93,6 +93,13 @@ case $1 in
 esac
 shift 2
 done
+
+if [ "$DIR" = "" ]; then
+    echo "Error: Missing directory. Please specify the local directory containing the dashboards, visualizations,
+    searches and index patterns."
+    print_usage
+    exit 1
+fi
 
 
 echo "Import searches from ${DIR}/search to ${ELASTICSEARCH} in ${KIBANA_INDEX} index"
