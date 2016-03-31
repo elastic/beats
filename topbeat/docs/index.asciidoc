@@ -14,6 +14,8 @@ include::./configuring-howto.asciidoc[]
 
 include::./topbeat-filtering.asciidoc[]
 
+include::./configuring-logstash.asciidoc[]
+
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
