@@ -147,11 +147,6 @@ func validateEvent(event common.MapStr) error {
 		return errors.New("invalid '@timestamp' field from event")
 	}
 
-	err := event.EnsureCountField()
-	if err != nil {
-		return err
-	}
-
 	t, ok := event["type"]
 	if !ok {
 		return errors.New("missing 'type' field from event")
@@ -210,8 +205,6 @@ func normalizeTransAddr(pub *publisher.PublisherType, event common.MapStr) bool 
 		}
 
 	}
-
-	event.EnsureCountField()
 
 	if pub.GeoLite != nil {
 		realIP, exists := event["real_ip"]

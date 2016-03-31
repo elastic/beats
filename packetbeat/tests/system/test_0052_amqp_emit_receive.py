@@ -22,7 +22,6 @@ class Test(BaseTest):
         assert objs[0]["amqp.exchange-type"] == "fanout"
         assert objs[0]["amqp.passive"] == False
         assert objs[0]["amqp.no-wait"] == False
-        assert objs[0]["count"] == 1
 
         assert objs[1]["method"] == "queue.declare"
         assert objs[1]["status"] == "OK"
@@ -32,14 +31,12 @@ class Test(BaseTest):
         assert objs[1]["amqp.durable"] == False
         assert objs[1]["amqp.auto-delete"] == False
         assert objs[1]["amqp.passive"] == False
-        assert objs[1]["count"] == 1
 
         assert objs[2]["method"] == "queue.bind"
         assert objs[2]["status"] == "OK"
         assert objs[2]["amqp.queue"] != ""
         assert objs[2]["amqp.exchange"] == "logs"
         assert objs[2]["amqp.no-wait"] == False
-        assert objs[2]["count"] == 1
 
         assert objs[3]["method"] == "basic.consume"
         assert objs[3]["status"] == "OK"
@@ -48,7 +45,6 @@ class Test(BaseTest):
         assert objs[3]["amqp.no-wait"] == False
         assert objs[3]["amqp.no-local"] == False
         assert objs[3]["amqp.exclusive"] == False
-        assert objs[3]["count"] == 1
 
         assert objs[4]["method"] == "exchange.declare"
         assert objs[4]["status"] == "OK"
@@ -57,7 +53,6 @@ class Test(BaseTest):
         assert objs[4]["amqp.exchange-type"] == "fanout"
         assert objs[4]["amqp.passive"] == False
         assert objs[4]["amqp.no-wait"] == False
-        assert objs[4]["count"] == 1
 
         assert objs[5]["method"] == "basic.publish"
         assert objs[5]["status"] == "OK"
@@ -65,7 +60,6 @@ class Test(BaseTest):
         assert objs[5]["amqp.exchange"] == "logs"
         assert objs[5]["amqp.immediate"] == False
         assert objs[5]["amqp.mandatory"] == False
-        assert objs[5]["count"] == 1
 
         assert objs[6]["method"] == "basic.deliver"
         assert objs[6]["status"] == "OK"
@@ -73,4 +67,3 @@ class Test(BaseTest):
         assert objs[6]["amqp.delivery-tag"] == 1
         assert objs[6]["amqp.exchange"] == "logs"
         assert objs[6]["amqp.redelivered"] == False
-        assert objs[6]["count"] == 1

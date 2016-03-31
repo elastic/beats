@@ -17,23 +17,19 @@ class Test(BaseTest):
         assert objs[0]["method"] == "SET"
         assert objs[0]["path"] == ""
         assert objs[0]["status"] == "OK"
-        assert objs[0]["count"] == 1
 
         assert objs[2]["method"] == "DROP"
         assert objs[2]["mysql.iserror"] is False
         assert objs[2]["status"] == "OK"
-        assert objs[0]["count"] == 1
 
         assert objs[3]["method"] == "CREATE"
         assert objs[3]["mysql.iserror"] is False
         assert objs[3]["status"] == "OK"
-        assert objs[0]["count"] == 1
 
         assert objs[5]["method"] == "SELECT"
         assert objs[5]["path"] == "test.test"
         assert objs[5]["status"] == "OK"
         assert objs[5]["bytes_out"] == 118
-        assert objs[0]["count"] == 1
 
         assert all(["bytes_in" in o.keys() for o in objs])
         assert all(["bytes_out" in o.keys() for o in objs])

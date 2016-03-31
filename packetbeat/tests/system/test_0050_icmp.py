@@ -68,7 +68,6 @@ class Test(BaseTest):
 
     def assert_common_fields(self, objs):
         assert all([o["type"] == "icmp" for o in objs])
-        assert all([o["count"] == 1 for o in objs])
         assert all([o["bytes_in"] == 4 for o in objs])
         assert all([o["bytes_out"] == 4 for o in objs])
         assert all([("port" in o) == False for o in objs])

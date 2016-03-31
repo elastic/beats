@@ -265,7 +265,6 @@ func (icmp *Icmp) publishTransaction(trans *icmpTransaction) {
 	// common fields - group "event"
 	event["@timestamp"] = common.Time(trans.Ts) // timestamp of the first packet
 	event["type"] = "icmp"                      // protocol name
-	event["count"] = 1                          // reserved for future sampling support
 	event["path"] = trans.Tuple.DstIp           // what is requested (dst ip)
 	if trans.HasError() {
 		event["status"] = common.ERROR_STATUS
