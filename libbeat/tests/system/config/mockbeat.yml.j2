@@ -36,6 +36,12 @@ shipper:
 # Configure what outputs to use when sending the data collected by packetbeat.
 # Multiple outputs may be enabled.
 output:
+  {% if console -%}
+  console:
+    {% for k, v in console.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor -%}
+  {%- endif %}
 
   # Elasticsearch as output
   # Options:

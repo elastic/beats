@@ -29,7 +29,7 @@ class Test(BaseTest):
 
         print output["proc.name"]
         assert re.match("(?i)topbeat.test(.exe)?", output["proc.name"])
-        assert re.match("(?i).*topbeat.test(.exe)? -e -c", output["proc.cmdline"])
+        assert re.match("(?i).*topbeat.test(.exe)? -systemTest", output["proc.cmdline"])
         assert isinstance(output["proc.state"], basestring)
         assert isinstance(output["proc.cpu.start_time"], basestring)
         self.check_username(output["proc.username"])

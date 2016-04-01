@@ -1,8 +1,6 @@
 package publisher
 
 import (
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -65,7 +63,7 @@ func (p *asyncPublisher) send(m message) {
 func asyncOutputer(ws *common.WorkerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
 	config := worker.config
 
-	flushInterval := config.FlushInterval * time.Second
+	flushInterval := config.FlushInterval
 	maxBulkSize := config.BulkMaxSize
 	logp.Info("Flush Interval set to: %v", flushInterval)
 	logp.Info("Max Bulk Size set to: %v", maxBulkSize)
