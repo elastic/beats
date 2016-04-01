@@ -211,7 +211,7 @@ update:
 KIBANA_ES?=http://localhost:9200/
 .PHONY: update
 kibana-export:
-	python ${ES_BEATS}/libbeat/scripts/kibana_export.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
+	python ${ES_BEATS}/libbeat/scripts/kibana_export.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
 .PHONY: update
 kibana-import:
