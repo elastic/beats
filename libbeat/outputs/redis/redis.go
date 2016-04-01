@@ -1,6 +1,3 @@
-//@deprecated: Starting with version 1.0.0-beta4 the Redis Output is deprecated as
-// it's replaced by the Logstash Output that has support for Redis Output plugin.
-
 package redis
 
 import (
@@ -68,8 +65,6 @@ type message struct {
 }
 
 func (out *redisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
-
-	logp.Warn("Redis Output is deprecated. Please use the Redis Output Plugin from Logstash instead.")
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
