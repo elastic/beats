@@ -7,6 +7,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
 // Metrics that can retrieved through the expvar web interface.
@@ -23,7 +24,7 @@ var (
 // it is suggested to use lumberjack in conjunction with roundRobinConnectionMode
 // if logstash becomes unresponsive
 type client struct {
-	TransportClient
+	*transport.Client
 	*protocol
 
 	win             window
@@ -41,7 +42,7 @@ var (
 )
 
 func newLumberjackClient(
-	conn TransportClient,
+	conn *transport.Client,
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
@@ -51,22 +52,19 @@ func newLumberjackClient(
 		return nil, err
 	}
 
-	c := &client{
-		TransportClient: conn,
-		protocol:        p,
-	}
+	c := &client{Client: conn, protocol: p}
 	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
 	return c, nil
 }
 
 func (l *client) Connect(timeout time.Duration) error {
 	logp.Debug("logstash", "connect")
-	return l.TransportClient.Connect(timeout)
+	return l.Client.Connect()
 }
 
 func (l *client) Close() error {
 	logp.Debug("logstash", "close connection")
-	return l.TransportClient.Close()
+	return l.Client.Close()
 }
 
 func (l *client) PublishEvent(event common.MapStr) error {
