@@ -6,7 +6,7 @@ the etc/fields.yml file.
 
 Example usage:
 
-   python generate_template.py etc/fields.yml etc/topbeat.template.json
+   python generate_template.py etc/fields.yml topbeat.template.json
 """
 
 import sys
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     beat_name = sys.argv[2]
 
     input = open(beat_path + "/etc/fields.yml", 'r')
-    output = open(beat_path + "/etc/" + beat_name + ".template.json", 'w')
+    output = open(beat_path + "/" + beat_name + ".template.json", 'w')
 
     try:
         fields_to_es_template(input, output, beat_name + "-*")
