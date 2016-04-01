@@ -60,7 +60,10 @@ class Proc(object):
             self.proc.terminate()
 
     def wait(self):
-        return self.proc.wait()
+        try:
+            return self.proc.wait()
+        finally:
+            self.output.close()
 
     def check_wait(self, exit_code=0):
         actual_exit_code = self.wait()
@@ -70,7 +73,7 @@ class Proc(object):
     def kill_and_wait(self):
         self.kill()
         os.close(self.stdin_write)
-        return self.proc.wait()
+        return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
         self.kill()
@@ -92,7 +95,6 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase):
-
     @classmethod
     def setUpClass(self):
 
@@ -110,51 +112,31 @@ class TestCase(unittest.TestCase):
         if not hasattr(self, 'beat_path'):
             self.beat_path = "../../" + self.beat_name + ".test"
 
-
-    def run_beat(self, cmd=None,
+    def run_beat(self,
+                 cmd=None,
                  config=None,
                  output=None,
-                 extra_args=[]):
+                 logging_args=["-e", "-v", "-d", "*"],
+                 extra_args=[],
+                 exit_code=None):
         """
-        Executes beat
+        Executes beat.
         Waits for the process to finish before returning to
         the caller.
         """
+        proc = self.start_beat(cmd=cmd, config=config, output=output,
+                               logging_args=logging_args,
+                               extra_args=extra_args)
+        if exit_code != None:
+            return proc.check_wait(exit_code)
 
-        # Init defaults
-        if cmd is None:
-            cmd = self.beat_path
-
-        if config is None:
-            config = self.beat_name + ".yml"
-
-        if output is None:
-            output = self.beat_name + ".log"
-
-        args = [cmd]
-
-        args.extend(["-e",
-                     "-c", os.path.join(self.working_dir, config),
-                     "-systemTest",
-                     "-v",
-                     "-d", "*",
-                     "-test.coverprofile", os.path.join(
-                         self.working_dir, "coverage.cov")
-                     ])
-
-        if extra_args:
-            args.extend(extra_args)
-
-        with open(os.path.join(self.working_dir, output), "wb") as outputfile:
-            proc = subprocess.Popen(args,
-                                    stdout=outputfile,
-                                    stderr=subprocess.STDOUT)
-            return proc.wait()
+        return proc.wait()
 
     def start_beat(self,
                    cmd=None,
                    config=None,
                    output=None,
+                   logging_args=["-e", "-v", "-d", "*"],
                    extra_args=[]):
         """
         Starts beat and returns the process handle. The
@@ -173,14 +155,14 @@ class TestCase(unittest.TestCase):
             output = self.beat_name + ".log"
 
         args = [cmd,
-                "-e",
-                "-c", os.path.join(self.working_dir, config),
                 "-systemTest",
-                "-v",
-                "-d", "*",
-                "-test.coverprofile", os.path.join(
-                    self.working_dir, "coverage.cov")
+                "-test.coverprofile",
+                os.path.join(self.working_dir, "coverage.cov"),
+                "-c", os.path.join(self.working_dir, config)
                 ]
+
+        if logging_args:
+            args.extend(logging_args)
 
         if extra_args:
             args.extend(extra_args)

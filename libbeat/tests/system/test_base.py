@@ -6,7 +6,6 @@ import subprocess
 
 
 class Test(BaseTest):
-
     def test_base(self):
         """
         Basic test with exiting Mockbeat normally
@@ -15,7 +14,7 @@ class Test(BaseTest):
         )
 
         proc = self.start_beat()
-        self.wait_until( lambda: self.log_contains("Setup Beat"))
+        self.wait_until(lambda: self.log_contains("Setup Beat"))
         proc.check_kill_and_wait()
 
     def test_no_config(self):
@@ -48,8 +47,8 @@ class Test(BaseTest):
         shutil.copy("../../etc/libbeat.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
 
-        exit_code = self.run_beat(
-                config="libbeat.yml", extra_args=["-configtest"])
+        exit_code = self.run_beat(config="libbeat.yml",
+                                  extra_args=["-configtest"])
 
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
@@ -72,7 +71,7 @@ class Test(BaseTest):
         assert self.log_contains("error loading config file") is False
 
         with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") \
-                as outputfile:
+            as outputfile:
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)
@@ -82,3 +81,33 @@ class Test(BaseTest):
         assert self.log_contains("mockbeat") is True
         assert self.log_contains("version") is True
         assert self.log_contains("9.9.9") is True
+
+    def test_console_output_timed_flush(self):
+        """
+        outputs/console - timed flush
+        """
+        self.render_config_template(
+            console={"pretty": "false"}
+        )
+
+        proc = self.start_beat(logging_args=["-e"])
+        self.wait_until(lambda: self.log_contains("Mockbeat is alive"),
+                        max_timeout=2)
+        proc.check_kill_and_wait()
+
+    def test_console_output_size_flush(self):
+        """
+        outputs/console - size based flush
+        """
+        self.render_config_template(
+            console={
+                "pretty": "false",
+                "bulk_max_size": 1,
+                "flush_interval": "1h"
+            }
+        )
+
+        proc = self.start_beat(logging_args=["-e"])
+        self.wait_until(lambda: self.log_contains("Mockbeat is alive"),
+                        max_timeout=2)
+        proc.check_kill_and_wait()
