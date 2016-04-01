@@ -1,7 +1,10 @@
 package mock
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
 )
 
 ///*** Mock Beat Setup ***///
@@ -32,6 +35,11 @@ func (mb *Mockbeat) Setup(b *beat.Beat) error {
 
 func (mb *Mockbeat) Run(b *beat.Beat) error {
 	// Wait until mockbeat is done
+	b.Events.PublishEvent(common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "mock",
+		"message":    "Mockbeat is alive!",
+	})
 	<-mb.done
 	return nil
 }
