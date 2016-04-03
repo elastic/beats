@@ -12,3 +12,10 @@ the Packetbeat flows.
 
 Note:: The search is not the default view in the Discovery page, so you need to open it explicitly in the Discovery page after
 importing the sample dashboards in Kibana.
+
+Packetbeat Discovery Search:
+image:./images/discovery-packetbeat-transactions.png[Packetbeat Discovery Search]
+
+
+Packetbeat Discovery Flows Search:
+image:./images/discovery-packetbeat-flows.png[Packetbeat Discovery Flows Search]
