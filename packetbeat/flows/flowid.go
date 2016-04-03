@@ -224,25 +224,25 @@ func (f *FlowID) AddConnectionID(id uint64) {
 }
 
 func (f *FlowID) addMultLayerID(
-	off, outterOff *uint8,
-	flag, outterFlag FlowIDFlag,
+	off, outerOff *uint8,
+	flag, outerFlag FlowIDFlag,
 	a, b []byte,
 	hint flowDirection,
 ) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
-	flags := f.flags & (flag | outterFlag)
+	flags := f.flags & (flag | outerFlag)
 	switch flags {
-	case flag | outterFlag:
-		*outterOff, *off = *off, *outterOff
+	case flag | outerFlag:
+		*outerOff, *off = *off, *outerOff
 		la := copy(f.flowID[(*off):], a)
 		copy(f.flowID[la+int(*off):], b)
 
 	case flag:
-		*outterOff = *off
+		*outerOff = *off
 		*off = uint8(len(f.flowID))
 		f.flowID = append(append(f.flowID, a...), b...)
-		f.flags |= outterFlag
+		f.flags |= outerFlag
 
 	default:
 		*off = uint8(len(f.flowID))
