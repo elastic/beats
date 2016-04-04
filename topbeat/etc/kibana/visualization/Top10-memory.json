@@ -3,7 +3,7 @@
   "description": "", 
   "title": "Top 10 memory consumers", 
   "version": 1, 
-  "savedSearchId": "Proc-stats", 
+  "savedSearchId": "Process-stats", 
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\n  \"filter\": []\n}"
   }

@@ -3,7 +3,7 @@
   "description": "", 
   "title": "Memory usage per process", 
   "version": 1, 
-  "savedSearchId": "Proc-stats", 
+  "savedSearchId": "Process-stats", 
   "kibanaSavedObjectMeta": {
     "searchSourceJSON": "{\"filter\":[]}"
   }
