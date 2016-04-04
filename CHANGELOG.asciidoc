@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 - Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
 - Remove count field from the exported fields {pull}1207[1207]
 - Rename input top level config option to topbeat
+- Add username to processes {pull}845[845]
 
 *Filebeat*
 - Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
@@ -149,7 +150,6 @@ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
 *Topbeat*
 
 - Add the command line used to start processes {issue}533[533]
-- Add username to processes {pull}845[845]
 
 *Filebeat*
 
