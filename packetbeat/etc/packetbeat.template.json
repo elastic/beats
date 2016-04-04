@@ -47,10 +47,6 @@
           "norms": false,
           "type": "text"
         },
-        "query": {
-          "ignore_above": 0,
-          "type": "keyword"
-        },
         "request": {
           "norms": false,
           "type": "text"
