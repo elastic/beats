@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat MySQL performance", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":4,\"id\":\"MySQL-Errors\",\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":1},{\"col\":9,\"id\":\"MySQL-Methods\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":2},{\"col\":1,\"id\":\"Navigation\",\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":3},{\"col\":7,\"id\":\"MySQL-throughput\",\"row\":8,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":4},{\"col\":1,\"id\":\"Most-frequent-MySQL-queries\",\"row\":11,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\",\"panelIndex\":5},{\"col\":7,\"id\":\"Slowest-MySQL-queries\",\"row\":11,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\",\"panelIndex\":6},{\"col\":1,\"id\":\"Mysql-response-times-percentiles\",\"row\":5,\"size_x\":12,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":7},{\"id\":\"MySQL-Reads-vs-Writes\",\"type\":\"visualization\",\"size_x\":6,\"size_y\":3,\"col\":1,\"row\":8,\"panelIndex\":8}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
