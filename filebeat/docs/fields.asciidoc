@@ -65,7 +65,7 @@ Contains log file lines.
 
 ==== source
 
-type: string
+type: keyword
 
 required: True
 
@@ -83,7 +83,7 @@ The file offset the reported line starts at.
 
 ==== message
 
-type: string
+type: text
 
 required: True
 

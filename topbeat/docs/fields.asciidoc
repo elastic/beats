@@ -340,14 +340,14 @@ Contains per-process statistics like memory usage, CPU usage, and details about 
 
 ==== proc.name
 
-type: string
+type: keyword
 
 The process name.
 
 
 ==== proc.state
 
-type: string
+type: keyword
 
 The process state. For example: "running"
 
@@ -368,14 +368,14 @@ The process parent pid.
 
 ==== proc.cmdline
 
-type: string
+type: keyword
 
 The full command-line used to start the process, including the arguments separated by space.
 
 
 ==== proc.username
 
-type: string
+type: keyword
 
 The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
 
@@ -416,7 +416,7 @@ The total CPU time spent by the process.
 
 ==== proc.cpu.start_time
 
-type: string
+type: keyword
 
 The time when the process was started. Example: "17:45".
 
@@ -478,14 +478,14 @@ The available disk space in bytes.
 
 ==== fs.device_name
 
-type: string
+type: keyword
 
 The disk name. For example: `/dev/disk1`
 
 
 ==== fs.mount_point
 
-type: string
+type: keyword
 
 The mounting point. For example: `/`
 
