@@ -69,10 +69,10 @@ updateConfigFile_2() {
 
 # Main
 readParams
-if [ "$LS_VERSION" == "2" ]; then
-    updateConfigFile_2
-else
+if [ "$LS_VERSION" == "1.5" ]; then
     updateConfigFile_1_5
+else
+    updateConfigFile_2
 fi
 
 waitForElasticsearch
