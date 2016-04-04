@@ -3,7 +3,7 @@
 elasticsearch:
   build: ./docker/elasticsearch
   dockerfile: Dockerfile-5.0.0-alpha1
-  command: elasticsearch -Ees.network.host=0.0.0.0
+  command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
 
 logstash:
   build: ./docker/logstash
