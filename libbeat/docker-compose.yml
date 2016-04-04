@@ -33,7 +33,7 @@ redis:
 # This host name is fixed because of the certificate
 logstash:
   build: ../testing/environments/docker/logstash
-  dockerfile: Dockerfile-2.2.0
+  dockerfile: Dockerfile-5.0.0-alpha1
   env_file:
     - build/test.env
   links:
