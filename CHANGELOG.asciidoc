@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Require braces for environment variable expansion in config files {pull}1304[1304]
 
 *Packetbeat*
 
