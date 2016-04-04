@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 - Add include_fields and drop_fields as part of generic filtering {pull}1120[1120]
 - The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
+- Require braces for environment variable expansion in config files {pull}1304[1304]
 
 *Packetbeat*
 - Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
