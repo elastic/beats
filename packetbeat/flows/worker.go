@@ -222,22 +222,22 @@ func createEvent(
 
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
-		source["outer_ip4"] = net.IP(src).String()
-		dest["outer_ip4"] = net.IP(dst).String()
+		source["outer_ip"] = net.IP(src).String()
+		dest["outer_ip"] = net.IP(dst).String()
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
-		source["ip4"] = net.IP(src).String()
-		dest["ip4"] = net.IP(dst).String()
+		source["ip"] = net.IP(src).String()
+		dest["ip"] = net.IP(dst).String()
 	}
 
 	// ipv6 layer meta data
 	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
-		source["outer_ip6"] = net.IP(src).String()
-		dest["outer_ip6"] = net.IP(dst).String()
+		source["outer_ipv6"] = net.IP(src).String()
+		dest["outer_ipv6"] = net.IP(dst).String()
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
-		source["ip6"] = net.IP(src).String()
-		dest["ip6"] = net.IP(dst).String()
+		source["ipv6"] = net.IP(src).String()
+		dest["ipv6"] = net.IP(dst).String()
 	}
 
 	// udp layer meta data

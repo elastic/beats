@@ -255,10 +255,10 @@ func addGeoIPToFlow(pub *publisher.PublisherType, event common.MapStr) bool {
 	}
 
 	ipFieldNames := [][]string{
-		{"ip4", "ip4_location"},
-		{"outter_ip4", "outter_ip4_location"},
-		{"ip6", "ip6_location"},
-		{"outter_ip6", "outter_ip6_location"},
+		{"ip", "ip_location"},
+		{"outter_ip", "outter_ip_location"},
+		{"ipv6", "ipv6_location"},
+		{"outter_ipv6", "outter_ipv6_location"},
 	}
 
 	source := event["source"].(common.MapStr)

@@ -119,8 +119,8 @@ func TestFlowsCounting(t *testing.T) {
 	// validate generated event
 	assert.Equal(t, net.HardwareAddr(mac1).String(), source["mac"])
 	assert.Equal(t, net.HardwareAddr(mac2).String(), dest["mac"])
-	assert.Equal(t, net.IP(ip1).String(), source["ip4"])
-	assert.Equal(t, net.IP(ip2).String(), dest["ip4"])
+	assert.Equal(t, net.IP(ip1).String(), source["ip"])
+	assert.Equal(t, net.IP(ip2).String(), dest["ip"])
 	assert.Equal(t, uint16(256), source["port"])
 	assert.Equal(t, uint16(512), dest["port"])
 	assert.Equal(t, "tcp", event["transport"])

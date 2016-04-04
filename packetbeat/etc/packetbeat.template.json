@@ -26,16 +26,16 @@
         },
         "dest": {
           "properties": {
-            "ip4_location": {
+            "ip_location": {
               "type": "geo_point"
             },
-            "ip6_location": {
+            "ipv6_location": {
               "type": "geo_point"
             },
-            "outer_ip4_location": {
+            "outer_ip_location": {
               "type": "geo_point"
             },
-            "outer_ip6_location": {
+            "outer_ipv6_location": {
               "type": "geo_point"
             }
           }
@@ -61,16 +61,16 @@
         },
         "source": {
           "properties": {
-            "ip4_location": {
+            "ip_location": {
               "type": "geo_point"
             },
-            "ip6_location": {
+            "ipv6_location": {
               "type": "geo_point"
             },
-            "outer_ip4_location": {
+            "outer_ip_location": {
               "type": "geo_point"
             },
-            "outer_ip6_location": {
+            "outer_ipv6_location": {
               "type": "geo_point"
             }
           }

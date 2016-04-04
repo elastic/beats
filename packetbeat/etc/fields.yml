@@ -187,52 +187,52 @@ flows_event:
           description: >
             Source MAC address as indicated by first packet seen for the current flow.
 
-        - name: ip4
+        - name: ip
           description: >
             Innermost IPv4 source address as indicated by first packet seen for the
             current flow.
 
-        - name: ip4_location
+        - name: ip_location
           type: geo_point
           example: "40.715, -74.011"
           description: >
-            The GeoIP location of the `ip4_source` IP address. The field is a string
+            The GeoIP location of the `ip_source` IP address. The field is a string
             containing the latitude and longitude separated by a comma.
 
-        - name: outer_ip4
+        - name: outer_ip
           description: >
             Second innermost IPv4 source address as indicated by first packet seen
             for the current flow.
 
-        - name: outer_ip4_location
+        - name: outer_ip_location
           type: geo_point
           example: "40.715, -74.011"
           description: >
-            The GeoIP location of the `outer_ip4_source` IP address. The field is a
+            The GeoIP location of the `outer_ip_source` IP address. The field is a
             string containing the latitude and longitude separated by a comma.
 
-        - name: ip6
+        - name: ipv6
           description: >
             Innermost IPv6 source address as indicated by first packet seen for the
             current flow.
 
-        - name: ip6_location
+        - name: ipv6_location
           type: geo_point
           example: "60.715, -76.011"
           description: >
-            The GeoIP location of the `ip6_source` IP address. The field is a string
+            The GeoIP location of the `ipv6_source` IP address. The field is a string
             containing the latitude and longitude separated by a comma.
 
-        - name: outer_ip6
+        - name: outer_ipv6
           description: >
             Second innermost IPv6 source address as indicated by first packet seen
             for the current flow.
 
-        - name: outer_ip6_location
+        - name: outer_ipv6_location
           type: geo_point
           example: "60.715, -76.011"
           description: >
-            The GeoIP location of the `outer_ip6_source` IP address. The field is a
+            The GeoIP location of the `outer_ipv6_source` IP address. The field is a
             string containing the latitude and longitude separated by a comma.
 
         - name: port
@@ -263,52 +263,52 @@ flows_event:
           description: >
             Destination MAC address as indicated by first packet seen for the current flow.
 
-        - name: ip4
+        - name: ip
           description: >
             Innermost IPv4 destination address as indicated by first packet seen for the
             current flow.
 
-        - name: ip4_location
+        - name: ip_location
           type: geo_point
           example: "40.715, -74.011"
           description: >
-            The GeoIP location of the `ip4_dest` IP address. The field is a string
+            The GeoIP location of the `ip_dest` IP address. The field is a string
             containing the latitude and longitude separated by a comma.
 
-        - name: outer_ip4
+        - name: outer_ip
           description: >
             Second innermost IPv4 destination address as indicated by first packet
             seen for the current flow.
 
-        - name: outer_ip4_location
+        - name: outer_ip_location
           type: geo_point
           example: "40.715, -74.011"
           description: >
-            The GeoIP location of the `outer_ip4_dest` IP address. The field is a
+            The GeoIP location of the `outer_ip_dest` IP address. The field is a
             string containing the latitude and longitude separated by a comma.
 
-        - name: ip6
+        - name: ipv6
           description: >
             Innermost IPv6 destination address as indicated by first packet seen for the
             current flow.
 
-        - name: ip6_location
+        - name: ipv6_location
           type: geo_point
           example: "60.715, -76.011"
           description: >
-            The GeoIP location of the `ip6_dest` IP address. The field is a string
+            The GeoIP location of the `ipv6_dest` IP address. The field is a string
             containing the latitude and longitude separated by a comma.
 
-        - name: outer_ip6
+        - name: outer_ipv6
           description: >
             Second innermost IPv6 destination address as indicated by first packet
             seen for the current flow.
 
-        - name: outer_ip6_location
+        - name: outer_ipv6_location
           type: geo_point
           example: "60.715, -76.011"
           description: >
-            The GeoIP location of the `outer_ip6_dest` IP address. The field is a
+            The GeoIP location of the `outer_ipv6_dest` IP address. The field is a
             string containing the latitude and longitude separated by a comma.
 
         - name: port

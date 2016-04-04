@@ -110,60 +110,60 @@ Properties of the source host
 Source MAC address as indicated by first packet seen for the current flow.
 
 
-==== source.ip4
+==== source.ip
 
 Innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== source.ip4_location
+==== source.ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.outer_ip4
+==== source.outer_ip
 
 Second innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== source.outer_ip4_location
+==== source.outer_ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `outer_ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.ip6
+==== source.ipv6
 
 Innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== source.ip6_location
+==== source.ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== source.outer_ip6
+==== source.outer_ipv6
 
 Second innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== source.outer_ip6_location
+==== source.outer_ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `outer_ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
 ==== source.port
@@ -198,60 +198,60 @@ Properties of the destination host
 Destination MAC address as indicated by first packet seen for the current flow.
 
 
-==== dest.ip4
+==== dest.ip
 
 Innermost IPv4 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.ip4_location
+==== dest.ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.outer_ip4
+==== dest.outer_ip
 
 Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.outer_ip4_location
+==== dest.outer_ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `outer_ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.ip6
+==== dest.ipv6
 
 Innermost IPv6 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.ip6_location
+==== dest.ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== dest.outer_ip6
+==== dest.outer_ipv6
 
 Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
 
 
-==== dest.outer_ip6_location
+==== dest.outer_ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `outer_ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
 ==== dest.port
