@@ -1,6 +1,6 @@
 = Winlogbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
-:version: master
+:version: 5.0.0-alpha1
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
 
