@@ -4,10 +4,10 @@
 :topbeat: http://www.elastic.co/guide/en/beats/topbeat/master
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
-:ES-version: 2.3.0
-:LS-version: 2.3.0
-:Kibana-version: 4.5.0
-:Dashboards-version: 1.2.0
+:ES-version: 5.0.0-alpha1
+:LS-version: 5.0.0-alpha1
+:Kibana-version: 5.0.0-alpha1
+:Dashboards-version: 5.0.0-alpha1
 
 include::./overview.asciidoc[]
 
