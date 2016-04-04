@@ -89,151 +89,195 @@ Indicates if event is last event in flow. If final is false, the event reports a
 Internal flow id based on connection meta data and address.
 
 
-==== mac_source
-
-Source MAC address as indicated by first packet seen for the current flow.
-
-
-==== mac_dest
-
-Destination MAC address as indicated by first packet seen for the current flow.
-
-
 ==== vlan
 
 Innermost VLAN address used in network packets.
 
 
-==== outter_vlan
+==== outer_vlan
 
 Second innermost VLAN address used in network packets.
 
 
-==== ip4_source
+=== source Fields
+
+Properties of the source host
+
+
+
+==== source.mac
+
+Source MAC address as indicated by first packet seen for the current flow.
+
+
+==== source.ip
 
 Innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== ip4_source_location
+==== source.ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== ip4_dest
-
-Innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
-==== ip4_dest_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== outter_ip4_source
+==== source.outer_ip
 
 Second innermost IPv4 source address as indicated by first packet seen for the current flow.
 
 
-==== outter_ip4_source_location
+==== source.outer_ip_location
 
 type: geo_point
 
 example: 40.715, -74.011
 
-The GeoIP location of the `outter_ip4_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== outter_ip4_dest
-
-Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
-==== outter_ip4_dest_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `outter_ip4_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== ip6_source
+==== source.ipv6
 
 Innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== ip6_source_location
+==== source.ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== ip6_dest
-
-Innermost IPv6 destination address as indicated by first packet seen for the current flow.
-
-
-==== ip6_dest_location
-
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== outter_ip6_source
+==== source.outer_ipv6
 
 Second innermost IPv6 source address as indicated by first packet seen for the current flow.
 
 
-==== outter_ip6_source_location
+==== source.outer_ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `outter_ip6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
 
 
-==== outter_ip6_dest
+==== source.port
+
+Source port number as indicated by first packet seen for the current flow.
+
+
+=== stats Fields
+
+Object with source to destination flow measurements.
+
+
+
+==== source.stats.net_packets_total
+
+Total number of packets
+
+
+==== source.stats.net_bytes_total
+
+Total number of bytes
+
+
+=== dest Fields
+
+Properties of the destination host
+
+
+
+==== dest.mac
+
+Destination MAC address as indicated by first packet seen for the current flow.
+
+
+==== dest.ip
+
+Innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.outer_ip
+
+Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.outer_ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.ipv6
+
+Innermost IPv6 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.ipv6_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.outer_ipv6
 
 Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
 
 
-==== outter_ip6_dest_location
+==== dest.outer_ipv6_location
 
 type: geo_point
 
 example: 60.715, -76.011
 
-The GeoIP location of the `outter_ip6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.port
+
+Destination port number as indicated by first packet seen for the current flow.
+
+
+=== stats Fields
+
+Object with destination to source flow measurements.
+
+
+
+==== dest.stats.net_packets_total
+
+Total number of packets
+
+
+==== dest.stats.net_bytes_total
+
+Total number of bytes
 
 
 ==== icmp_id
 
 ICMP id used in ICMP based flow.
-
-
-==== port_source
-
-Source port number as indicated by first packet seen for the current flow.
-
-
-==== port_dest
-
-Destination port number as indicated by first packet seen for the current flow.
 
 
 ==== transport
@@ -244,38 +288,6 @@ The transport protocol used by the flow. If known, one of "udp" or "tcp".
 ==== connection_id
 
 optional TCP connection id
-
-
-=== stats_source Fields
-
-Object with source to destination flow measurements.
-
-
-
-==== stats_source.net_packets_total
-
-Total number of packets
-
-
-==== stats_source.net_bytes_total
-
-Total number of bytes
-
-
-=== stats_dest Fields
-
-Object with destination to source flow measurements.
-
-
-
-==== stats_dest.net_packets_total
-
-Total number of packets
-
-
-==== stats_dest.net_bytes_total
-
-Total number of bytes
 
 
 [[exported-fields-trans_event]]
@@ -338,12 +350,14 @@ The path the transaction refers to. For HTTP, this is the URL. For SQL databases
 
 ==== query
 
-type: string
+type: keyword
 
 The query in a human readable format. For HTTP, it will typically be something like `GET /users/_search?name=test`. For MySQL, it is something like `SELECT id from users where name=test`.
 
 
 ==== params
+
+type: text
 
 The request parameters. For HTTP, these are the POST or GET parameters. For Thrift-RPC, these are the parameters from the request.
 
@@ -365,7 +379,7 @@ The version of the ICMP protocol.
 
 ==== icmp.request.message
 
-type: string
+type: keyword
 
 A human readable form of the request.
 
@@ -383,7 +397,7 @@ The request code.
 
 ==== icmp.response.message
 
-type: string
+type: keyword
 
 A human readable form of the response.
 
@@ -640,7 +654,7 @@ AMQP reply code to an error, similar to http reply-code
 
 ==== amqp.reply-text
 
-type: string
+type: keyword
 
 Text explaining the error.
 
@@ -661,14 +675,14 @@ Failing method ID.
 
 ==== amqp.exchange
 
-type: string
+type: keyword
 
 Name of the exchange.
 
 
 ==== amqp.exchange-type
 
-type: string
+type: keyword
 
 example: fanout
 
@@ -773,7 +787,7 @@ Delete only if empty.
 
 ==== amqp.queue
 
-type: string
+type: keyword
 
 The queue name identifies the queue within the vhost.
 
@@ -813,7 +827,7 @@ Request immediate delivery.
 
 ==== amqp.content-type
 
-type: string
+type: keyword
 
 example: text/plain
 
@@ -822,7 +836,7 @@ MIME content type.
 
 ==== amqp.content-encoding
 
-type: string
+type: keyword
 
 MIME content encoding.
 
@@ -848,56 +862,56 @@ Message priority, 0 to 9.
 
 ==== amqp.correlation-id
 
-type: string
+type: keyword
 
 Application correlation identifier.
 
 
 ==== amqp.reply-to
 
-type: string
+type: keyword
 
 Address to reply to.
 
 
 ==== amqp.expiration
 
-type: string
+type: keyword
 
 Message expiration specification.
 
 
 ==== amqp.message-id
 
-type: string
+type: keyword
 
 Application message identifier.
 
 
 ==== amqp.timestamp
 
-type: string
+type: keyword
 
 Message timestamp.
 
 
 ==== amqp.type
 
-type: string
+type: keyword
 
 Message type name.
 
 
 ==== amqp.user-id
 
-type: string
+type: keyword
 
 Creating user id.
 
 
 ==== amqp.app-id
 
-type: string
+type: keyword
 
 Creating application id.
 
@@ -949,63 +963,63 @@ Memcached-specific event fields
 
 ==== memcache.protocol_type
 
-type: string
+type: keyword
 
 The memcache protocol implementation. The value can be "binary" for binary-based, "text" for text-based, or "unknown" for an unknown memcache protocol type.
 
 
 ==== memcache.request.line
 
-type: string
+type: keyword
 
 The raw command line for unknown commands ONLY.
 
 
 ==== memcache.request.command
 
-type: string
+type: keyword
 
 The memcache command being requested in the memcache text protocol. For example "set" or "get". The binary protocol opcodes are translated into memcache text protocol commands.
 
 
 ==== memcache.response.command
 
-type: string
+type: keyword
 
 Either the text based protocol response message type or the name of the originating request if binary protocol is used.
 
 
 ==== memcache.request.type
 
-type: string
+type: keyword
 
 The memcache command classification. This value can be "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail", or "Auth".
 
 
 ==== memcache.response.type
 
-type: string
+type: keyword
 
 The memcache command classification. This value can be "UNKNOWN", "Load", "Store", "Delete", "Counter", "Info", "SlabCtrl", "LRUCrawler", "Stats", "Success", "Fail", or "Auth". The text based protocol will employ any of these, whereas the binary based protocol will mirror the request commands only (see `memcache.response.status` for binary protocol).
 
 
 ==== memcache.response.error_msg
 
-type: string
+type: keyword
 
 The optional error message in the memcache response (text based protocol only).
 
 
 ==== memcache.request.opcode
 
-type: string
+type: keyword
 
 The binary protocol message opcode name.
 
 
 ==== memcache.response.opcode
 
-type: string
+type: keyword
 
 The binary protocol message opcode name.
 
@@ -1047,7 +1061,7 @@ The vbucket index sent in the binary message.
 
 ==== memcache.response.status
 
-type: string
+type: keyword
 
 The textual representation of the response error code (binary protocol only).
 
@@ -1138,7 +1152,7 @@ The value of the memcache "verbosity" command.
 
 ==== memcache.request.raw_args
 
-type: string
+type: keyword
 
 The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
@@ -1159,7 +1173,7 @@ The destination class id in 'slab reassign' command.
 
 ==== memcache.request.automove
 
-type: string
+type: keyword
 
 The automove mode in the 'slab automove' command expressed as a string. This value can be "standby"(=0), "slow"(=1), "aggressive"(=2), or the raw value if the value is unknown.
 
@@ -1236,7 +1250,7 @@ The list of statistic values returned. Each entry is a dictionary with the field
 
 ==== memcache.response.version
 
-type: string
+type: keyword
 
 The returned memcache version string.
 
@@ -1742,10 +1756,14 @@ These fields contain the raw transaction data.
 
 ==== request
 
+type: text
+
 For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 
 
 ==== response
+
+type: text
 
 For text protocols, this is the response as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 

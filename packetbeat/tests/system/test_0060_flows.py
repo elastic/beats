@@ -29,17 +29,17 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'final': True,
-            'mac_source': '0a:00:27:00:00:00',
-            'mac_dest': '08:00:27:76:d7:41',
-            'ip4_dest': '192.168.33.14',
-            'ip4_source': '192.168.33.1',
+            'source.mac': '0a:00:27:00:00:00',
+            'dest.mac': '08:00:27:76:d7:41',
+            'dest.ip': '192.168.33.14',
+            'source.ip': '192.168.33.1',
             'transport': 'tcp',
-            'port_source': 60137,
-            'port_dest': 3306,
-            'stats_source.net_packets_total': 22,
-            'stats_source.net_bytes_total': 1480,
-            'stats_dest.net_packets_total': 10,
-            'stats_dest.net_bytes_total': 181133,
+            'source.port': 60137,
+            'dest.port': 3306,
+            'source.stats.net_packets_total': 22,
+            'source.stats.net_bytes_total': 1480,
+            'dest.stats.net_packets_total': 10,
+            'dest.stats.net_bytes_total': 181133,
         })
 
     def test_memcache_udp_flow(self):
@@ -59,15 +59,15 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'final': True,
-            'mac_source': 'ac:bc:32:77:41:0b',
-            'mac_dest': '08:00:27:dd:3b:28',
-            'ip4_source': '192.168.188.37',
-            'ip4_dest': '192.168.188.38',
+            'source.mac': 'ac:bc:32:77:41:0b',
+            'dest.mac': '08:00:27:dd:3b:28',
+            'source.ip': '192.168.188.37',
+            'dest.ip': '192.168.188.38',
             'transport': 'udp',
-            'port_source': 63888,
-            'port_dest': 11211,
-            'stats_source.net_packets_total': 3,
-            'stats_source.net_bytes_total': 280,
+            'source.port': 63888,
+            'dest.port': 11211,
+            'source.stats.net_packets_total': 3,
+            'source.stats.net_bytes_total': 280,
         })
 
     def test_icmp4_ping(self):
@@ -87,16 +87,16 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'final': True,
-            'mac_source': '00:00:00:00:00:01',
-            'mac_dest': '00:00:00:00:00:02',
+            'source.mac': '00:00:00:00:00:01',
+            'dest.mac': '00:00:00:00:00:02',
             'vlan': 10,
-            'ip4_source': '10.0.0.1',
-            'ip4_dest': '10.0.0.2',
+            'source.ip': '10.0.0.1',
+            'dest.ip': '10.0.0.2',
             'icmp_id': 5,
-            'stats_source.net_bytes_total': 50,
-            'stats_source.net_packets_total': 1,
-            'stats_dest.net_bytes_total': 50,
-            'stats_dest.net_packets_total': 1,
+            'source.stats.net_bytes_total': 50,
+            'source.stats.net_packets_total': 1,
+            'dest.stats.net_bytes_total': 50,
+            'dest.stats.net_packets_total': 1,
         })
 
     def test_icmp6_ping(self):
@@ -116,14 +116,14 @@ class Test(BaseTest):
         assert len(objs) == 1
         check_fields(objs[0], {
             'final': True,
-            'mac_source': '00:00:00:00:00:01',
-            'mac_dest': '00:00:00:00:00:02',
+            'source.mac': '00:00:00:00:00:01',
+            'dest.mac': '00:00:00:00:00:02',
             'vlan': 10,
-            'ip6_source': '::1',
-            'ip6_dest': '::2',
+            'source.ipv6': '::1',
+            'dest.ipv6': '::2',
             'icmp_id': 5,
-            'stats_source.net_bytes_total': 70,
-            'stats_source.net_packets_total': 1,
-            'stats_dest.net_bytes_total': 70,
-            'stats_dest.net_packets_total': 1,
+            'source.stats.net_bytes_total': 70,
+            'source.stats.net_packets_total': 1,
+            'dest.stats.net_bytes_total': 70,
+            'dest.stats.net_packets_total': 1,
         })
