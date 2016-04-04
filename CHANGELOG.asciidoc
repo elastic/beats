@@ -87,15 +87,12 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 - Add support for NFS v3 and v4. {pull}1231[1231]
 
 *Topbeat*
-- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
-- Add multiline support for combining multiple related lines into one event. {issue}461[461]
 - Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 - Add the ability to set a list of tags for each prospector {pull}1092[1092]
 - Add JSON decoding support {pull}1143[1143]
 
-*Filebeat*
 
 *Winlogbeat*
 - Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
@@ -103,7 +100,7 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 - Add the ability to set tags, fields, and fields_under_root as options for each event log {pull}1092[1092]
 - Add additional data to the events published by Winlogbeat. The new fields are `activity_id`,
 `event_data`, `keywords`, `opcode`, `process_id`, `provider_guid`, `related_activity_id`,
-`task`, `thread_id`, `user_data`. and `version`. {issue}1053[1053]
+`task`, `thread_id`, `user_data`, and `version`. {issue}1053[1053]
 - Add `event_id`, `level`, and `provider` configuration options for filtering events {pull}1218[1218]
 - Add `include_xml` configuration option for including the raw XML with the event {pull}1218[1218]
 
@@ -226,7 +223,6 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 
 *Topbeat*
 
-- Group all cpu usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 - Group all CPU usage per core statistics and export them optionally if cpu_per_core is configured {pull}496[496]
 
 *Filebeat*
