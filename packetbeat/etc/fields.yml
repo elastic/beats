@@ -404,7 +404,6 @@ trans_event:
 
     - name: query
       type: keyword
-      ignore_above: 0
       description: >
         The query in a human readable format. For HTTP, it will typically be
         something like `GET /users/_search?name=test`. For MySQL, it is
