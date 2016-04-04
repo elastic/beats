@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat MongoDB performance", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":1},{\"col\":4,\"id\":\"MongoDB-errors\",\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":2},{\"col\":9,\"id\":\"MongoDB-commands\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":3},{\"col\":1,\"id\":\"MongoDB-errors-per-collection\",\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":4},{\"col\":5,\"id\":\"MongoDB-in-slash-out-throughput\",\"row\":5,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":5},{\"col\":1,\"id\":\"MongoDB-response-times-by-collection\",\"row\":8,\"size_x\":8,\"size_y\":5,\"type\":\"visualization\",\"panelIndex\":6},{\"col\":9,\"id\":\"Top-slowest-MongoDB-queries\",\"row\":8,\"size_x\":4,\"size_y\":5,\"type\":\"visualization\",\"panelIndex\":7},{\"id\":\"Number-of-MongoDB-transactions-with-writeConcern-w-equal-0\",\"type\":\"visualization\",\"size_x\":4,\"size_y\":3,\"col\":9,\"row\":5,\"panelIndex\":8}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
