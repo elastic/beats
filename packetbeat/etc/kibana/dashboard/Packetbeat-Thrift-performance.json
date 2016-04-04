@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat Thrift performance", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":1,\"id\":\"Navigation\",\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":1},{\"col\":4,\"id\":\"Thrift-requests-per-minute\",\"row\":1,\"size_x\":5,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":2},{\"col\":9,\"id\":\"Thrift-RPC-Errors\",\"row\":1,\"size_x\":4,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":3},{\"col\":1,\"id\":\"Slowest-Thrift-RPC-methods\",\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":4},{\"col\":7,\"id\":\"Thrift-response-times-percentiles\",\"row\":5,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":5},{\"col\":1,\"id\":\"Top-Thrift-RPC-methods\",\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":6},{\"col\":7,\"id\":\"Top-Thrift-RPC-calls-with-errors\",\"row\":8,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":7}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
