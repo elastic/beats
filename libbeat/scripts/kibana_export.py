@@ -25,11 +25,20 @@ def ExportDashboards(es, beat, kibana_index, output_directory):
         # save dependencies
         panels = json.loads(doc['_source']['panelsJSON'])
         for panel in panels:
-            ExportVisualization(
-                es,
-                panel["id"],
-                kibana_index,
-                output_directory)
+            if panel["type"] == "visualization":
+                ExportVisualization(
+                    es,
+                    panel["id"],
+                    kibana_index,
+                    output_directory)
+            elif panel["type"] == "search":
+                ExportSearch(
+                    es,
+                    panel["id"],
+                    kibana_index,
+                    output_directory)
+            else:
+                print("Unknown type {} in dashboard".format(panel["type"]))
 
 
 def ExportVisualization(es, visualization, kibana_index, output_directory):
