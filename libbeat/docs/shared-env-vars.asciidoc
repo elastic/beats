@@ -12,10 +12,12 @@
 [[using-environ-vars]]
 === Using Environment Variables in the Configuration
 
+experimental[]
+
 You can use environment variable references in the +{beatname_lc}.yml+ file to set values
 that need to be configurable during deployment. To do this, use:
 
-`$VAR` or `${VAR}`
+`${VAR}`
 
 Where `VAR` is the name of the environment variable.
 
@@ -39,7 +41,6 @@ and what each configuration looks like after replacement:
 [options="header"]
 |==================================
 |Config source	       |Environment setting   |Config after replacement
-|`name: $NAME`         |`export NAME=elastic` |`name: elastic`
 |`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
 |`name: ${NAME:beats}` |no setting            |`name: beats`
 |`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
