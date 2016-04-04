@@ -113,16 +113,19 @@ func TestFlowsCounting(t *testing.T) {
 	event := events[0]
 	t.Logf("event: %v", event)
 
+	source := event["source"].(common.MapStr)
+	dest := event["dest"].(common.MapStr)
+
 	// validate generated event
-	assert.Equal(t, net.HardwareAddr(mac1).String(), event["mac_source"])
-	assert.Equal(t, net.HardwareAddr(mac2).String(), event["mac_dest"])
-	assert.Equal(t, net.IP(ip1).String(), event["ip4_source"])
-	assert.Equal(t, net.IP(ip2).String(), event["ip4_dest"])
-	assert.Equal(t, uint16(256), event["port_source"])
-	assert.Equal(t, uint16(512), event["port_dest"])
+	assert.Equal(t, net.HardwareAddr(mac1).String(), source["mac"])
+	assert.Equal(t, net.HardwareAddr(mac2).String(), dest["mac"])
+	assert.Equal(t, net.IP(ip1).String(), source["ip"])
+	assert.Equal(t, net.IP(ip2).String(), dest["ip"])
+	assert.Equal(t, uint16(256), source["port"])
+	assert.Equal(t, uint16(512), dest["port"])
 	assert.Equal(t, "tcp", event["transport"])
 
-	stat := event["stats_source"].(map[string]interface{})
+	stat := source["stats"].(map[string]interface{})
 	assert.Equal(t, int64(-1), stat["int1"])
 	assert.Equal(t, nil, stat["int2"])
 	assert.Equal(t, uint64(1), stat["uint1"])
@@ -130,7 +133,7 @@ func TestFlowsCounting(t *testing.T) {
 	assert.Equal(t, 3.14, stat["float1"])
 	assert.Equal(t, nil, stat["float2"])
 
-	stat = event["stats_dest"].(map[string]interface{})
+	stat = dest["stats"].(map[string]interface{})
 	assert.Equal(t, nil, stat["int1"])
 	assert.Equal(t, int64(-1), stat["int2"])
 	assert.Equal(t, nil, stat["uint1"])

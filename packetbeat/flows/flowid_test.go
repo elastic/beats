@@ -65,7 +65,7 @@ func vlanAddr(id *FlowID) ([]byte, []byte, bool) {
 	return v, nil, len(v) == 2
 }
 
-func outterVlanAddr(id *FlowID) ([]byte, []byte, bool) {
+func outerVlanAddr(id *FlowID) ([]byte, []byte, bool) {
 	v := id.OutterVLan()
 	return v, nil, len(v) == 2
 }
@@ -214,7 +214,7 @@ func TestFlowIDAddressSorted(t *testing.T) {
 			concat(mac1, mac2, vlan1, vlan2),
 			[]addrCheck{
 				{(*FlowID).EthAddr, mac1, mac2},
-				{outterVlanAddr, vlan1, nil},
+				{outerVlanAddr, vlan1, nil},
 				{vlanAddr, vlan2, nil},
 			},
 		},
@@ -224,7 +224,7 @@ func TestFlowIDAddressSorted(t *testing.T) {
 			concat(mac1, mac2, vlan3, vlan2),
 			[]addrCheck{
 				{(*FlowID).EthAddr, mac1, mac2},
-				{outterVlanAddr, vlan2, nil},
+				{outerVlanAddr, vlan2, nil},
 				{vlanAddr, vlan3, nil},
 			},
 		},

@@ -169,129 +169,168 @@ flows_event:
       description: >
         Internal flow id based on connection meta data and address.
 
-    - name: mac_source
-      description: >
-        Source MAC address as indicated by first packet seen for the current flow.
-
-    - name: mac_dest
-      description: >
-        Destination MAC address as indicated by first packet seen for the current flow.
-
     - name: vlan
       description: >
         Innermost VLAN address used in network packets.
 
-    - name: outter_vlan
+    - name: outer_vlan
       description: >
         Second innermost VLAN address used in network packets.
 
-    - name: ip4_source
-      description: >
-        Innermost IPv4 source address as indicated by first packet seen for the
-        current flow.
 
-    - name: ip4_source_location
-      type: geo_point
-      example: "40.715, -74.011"
+    - name: source
+      type: group
       description: >
-        The GeoIP location of the `ip4_source` IP address. The field is a string
-        containing the latitude and longitude separated by a comma.
+        Properties of the source host
+      fields:
+        - name: mac
+          description: >
+            Source MAC address as indicated by first packet seen for the current flow.
 
-    - name: ip4_dest
-      description: >
-        Innermost IPv4 destination address as indicated by first packet seen for the
-        current flow.
+        - name: ip
+          description: >
+            Innermost IPv4 source address as indicated by first packet seen for the
+            current flow.
 
-    - name: ip4_dest_location
-      type: geo_point
-      example: "40.715, -74.011"
-      description: >
-        The GeoIP location of the `ip4_dest` IP address. The field is a string
-        containing the latitude and longitude separated by a comma.
+        - name: ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `ip_source` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
 
-    - name: outter_ip4_source
-      description: >
-        Second innermost IPv4 source address as indicated by first packet seen
-        for the current flow.
+        - name: outer_ip
+          description: >
+            Second innermost IPv4 source address as indicated by first packet seen
+            for the current flow.
 
-    - name: outter_ip4_source_location
-      type: geo_point
-      example: "40.715, -74.011"
-      description: >
-        The GeoIP location of the `outter_ip4_source` IP address. The field is a
-        string containing the latitude and longitude separated by a comma.
+        - name: outer_ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `outer_ip_source` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
 
-    - name: outter_ip4_dest
-      description: >
-        Second innermost IPv4 destination address as indicated by first packet
-        seen for the current flow.
+        - name: ipv6
+          description: >
+            Innermost IPv6 source address as indicated by first packet seen for the
+            current flow.
 
-    - name: outter_ip4_dest_location
-      type: geo_point
-      example: "40.715, -74.011"
-      description: >
-        The GeoIP location of the `outter_ip4_dest` IP address. The field is a
-        string containing the latitude and longitude separated by a comma.
+        - name: ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `ipv6_source` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
 
-    - name: ip6_source
-      description: >
-        Innermost IPv6 source address as indicated by first packet seen for the
-        current flow.
+        - name: outer_ipv6
+          description: >
+            Second innermost IPv6 source address as indicated by first packet seen
+            for the current flow.
 
-    - name: ip6_source_location
-      type: geo_point
-      example: "60.715, -76.011"
-      description: >
-        The GeoIP location of the `ip6_source` IP address. The field is a string
-        containing the latitude and longitude separated by a comma.
+        - name: outer_ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `outer_ipv6_source` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
 
-    - name: ip6_dest
-      description: >
-        Innermost IPv6 destination address as indicated by first packet seen for the
-        current flow.
+        - name: port
+          description: >
+            Source port number as indicated by first packet seen for the current flow.
 
-    - name: ip6_dest_location
-      type: geo_point
-      example: "60.715, -76.011"
-      description: >
-        The GeoIP location of the `ip6_dest` IP address. The field is a string
-        containing the latitude and longitude separated by a comma.
+        - name: stats
+          type: group
+          description: >
+            Object with source to destination flow measurements.
+          fields:
+            - name: net_packets_total
+              description: >
+                Total number of packets
 
-    - name: outter_ip6_source
-      description: >
-        Second innermost IPv6 source address as indicated by first packet seen
-        for the current flow.
+            - name: net_bytes_total
+              description: >
+                Total number of bytes
 
-    - name: outter_ip6_source_location
-      type: geo_point
-      example: "60.715, -76.011"
-      description: >
-        The GeoIP location of the `outter_ip6_source` IP address. The field is a
-        string containing the latitude and longitude separated by a comma.
 
-    - name: outter_ip6_dest
-      description: >
-        Second innermost IPv6 destination address as indicated by first packet
-        seen for the current flow.
 
-    - name: outter_ip6_dest_location
-      type: geo_point
-      example: "60.715, -76.011"
+    - name: dest
+      type: group
       description: >
-        The GeoIP location of the `outter_ip6_dest` IP address. The field is a
-        string containing the latitude and longitude separated by a comma.
+        Properties of the destination host
+      fields:
+        - name: mac
+          description: >
+            Destination MAC address as indicated by first packet seen for the current flow.
+
+        - name: ip
+          description: >
+            Innermost IPv4 destination address as indicated by first packet seen for the
+            current flow.
+
+        - name: ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `ip_dest` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ip
+          description: >
+            Second innermost IPv4 destination address as indicated by first packet
+            seen for the current flow.
+
+        - name: outer_ip_location
+          type: geo_point
+          example: "40.715, -74.011"
+          description: >
+            The GeoIP location of the `outer_ip_dest` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: ipv6
+          description: >
+            Innermost IPv6 destination address as indicated by first packet seen for the
+            current flow.
+
+        - name: ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `ipv6_dest` IP address. The field is a string
+            containing the latitude and longitude separated by a comma.
+
+        - name: outer_ipv6
+          description: >
+            Second innermost IPv6 destination address as indicated by first packet
+            seen for the current flow.
+
+        - name: outer_ipv6_location
+          type: geo_point
+          example: "60.715, -76.011"
+          description: >
+            The GeoIP location of the `outer_ipv6_dest` IP address. The field is a
+            string containing the latitude and longitude separated by a comma.
+
+        - name: port
+          description: >
+            Destination port number as indicated by first packet seen for the current flow.
+
+        - name: stats
+          type: group
+          description: >
+            Object with destination to source flow measurements.
+          fields:
+            - name: net_packets_total
+              description: >
+                Total number of packets
+
+            - name: net_bytes_total
+              description: >
+                Total number of bytes
 
     - name: icmp_id
       description: >
         ICMP id used in ICMP based flow.
-
-    - name: port_source
-      description: >
-        Source port number as indicated by first packet seen for the current flow.
-
-    - name: port_dest
-      description: >
-        Destination port number as indicated by first packet seen for the current flow.
 
     - name: transport
       description: >
@@ -301,31 +340,6 @@ flows_event:
       description: >
         optional TCP connection id
 
-    - name: stats_source
-      type: group
-      description: >
-        Object with source to destination flow measurements.
-      fields:
-        - name: net_packets_total
-          description: >
-            Total number of packets
-
-        - name: net_bytes_total
-          description: >
-            Total number of bytes
-
-    - name: stats_dest
-      type: group
-      description: >
-        Object with destination to source flow measurements.
-      fields:
-        - name: net_packets_total
-          description: >
-            Total number of packets
-
-        - name: net_bytes_total
-          description: >
-            Total number of bytes
 
 trans_event:
   type: group

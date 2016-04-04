@@ -229,40 +229,55 @@ func normalizeTransAddr(pub *publisher.PublisherType, event common.MapStr) bool 
 }
 
 func addGeoIPToFlow(pub *publisher.PublisherType, event common.MapStr) bool {
-	if pub.GeoLite == nil {
-		return true
-	}
 
-	ipFieldNames := [][]string{
-		{"ip4_source", "ip4_source_location"},
-		{"ip4_dest", "ip4_dest_location"},
-		{"outter_ip4_source", "outter_ip4_source_location"},
-		{"outter_ip4_dest", "outter_ip4_dest_location"},
-		{"ip6_source", "ip6_source_location"},
-		{"ip6_dest", "ip6_dest_location"},
-		{"outter_ip6_source", "outter_ip6_source_location"},
-		{"outter_ip6_dest", "outter_ip6_dest_location"},
-	}
+	getLocation := func(host common.MapStr, ip_type string) string {
 
-	for _, name := range ipFieldNames {
-		ip, exists := event[name[0]]
+		ip, exists := host[ip_type]
 		if !exists {
-			continue
+			return ""
 		}
 
 		str, ok := ip.(string)
 		if !ok {
 			logp.Warn("IP address must be string")
-			return false
+			return ""
 		}
-
 		loc := pub.GeoLite.GetLocationByIP(str)
 		if loc == nil || loc.Latitude == 0 || loc.Longitude == 0 {
-			continue
+			return ""
 		}
 
-		event[name[1]] = fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
+		return fmt.Sprintf("%f, %f", loc.Latitude, loc.Longitude)
 	}
+
+	if pub.GeoLite == nil {
+		return true
+	}
+
+	ipFieldNames := [][]string{
+		{"ip", "ip_location"},
+		{"outter_ip", "outter_ip_location"},
+		{"ipv6", "ipv6_location"},
+		{"outter_ipv6", "outter_ipv6_location"},
+	}
+
+	source := event["source"].(common.MapStr)
+	dest := event["dest"].(common.MapStr)
+
+	for _, name := range ipFieldNames {
+
+		loc := getLocation(source, name[0])
+		if loc != "" {
+			source[name[1]] = loc
+		}
+
+		loc = getLocation(dest, name[0])
+		if loc != "" {
+			dest[name[1]] = loc
+		}
+	}
+	event["source"] = source
+	event["dest"] = dest
 
 	return true
 }

@@ -24,32 +24,24 @@
         "client_location": {
           "type": "geo_point"
         },
-        "ip4_dest_location": {
-          "type": "geo_point"
-        },
-        "ip4_source_location": {
-          "type": "geo_point"
-        },
-        "ip6_dest_location": {
-          "type": "geo_point"
-        },
-        "ip6_source_location": {
-          "type": "geo_point"
+        "dest": {
+          "properties": {
+            "ip_location": {
+              "type": "geo_point"
+            },
+            "ipv6_location": {
+              "type": "geo_point"
+            },
+            "outer_ip_location": {
+              "type": "geo_point"
+            },
+            "outer_ipv6_location": {
+              "type": "geo_point"
+            }
+          }
         },
         "last_time": {
           "type": "date"
-        },
-        "outter_ip4_dest_location": {
-          "type": "geo_point"
-        },
-        "outter_ip4_source_location": {
-          "type": "geo_point"
-        },
-        "outter_ip6_dest_location": {
-          "type": "geo_point"
-        },
-        "outter_ip6_source_location": {
-          "type": "geo_point"
         },
         "params": {
           "norms": false,
@@ -66,6 +58,22 @@
         "response": {
           "norms": false,
           "type": "text"
+        },
+        "source": {
+          "properties": {
+            "ip_location": {
+              "type": "geo_point"
+            },
+            "ipv6_location": {
+              "type": "geo_point"
+            },
+            "outer_ip_location": {
+              "type": "geo_point"
+            },
+            "outer_ipv6_location": {
+              "type": "geo_point"
+            }
+          }
         },
         "start_time": {
           "type": "date"

@@ -196,15 +196,18 @@ func createEvent(
 		"final":      isOver,
 	}
 
+	source := common.MapStr{}
+	dest := common.MapStr{}
+
 	// add ethernet layer meta data
 	if src, dst, ok := f.id.EthAddr(); ok {
-		event["mac_source"] = net.HardwareAddr(src).String()
-		event["mac_dest"] = net.HardwareAddr(dst).String()
+		source["mac"] = net.HardwareAddr(src).String()
+		dest["mac"] = net.HardwareAddr(dst).String()
 	}
 
 	// add vlan
 	if vlan := f.id.OutterVLan(); vlan != nil {
-		event["outter_vlan"] = binary.LittleEndian.Uint16(vlan)
+		event["outer_vlan"] = binary.LittleEndian.Uint16(vlan)
 	}
 	if vlan := f.id.VLan(); vlan != nil {
 		event["vlan"] = binary.LittleEndian.Uint16(vlan)
@@ -219,35 +222,35 @@ func createEvent(
 
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
-		event["outter_ip4_source"] = net.IP(src).String()
-		event["outter_ip4_dest"] = net.IP(dst).String()
+		source["outer_ip"] = net.IP(src).String()
+		dest["outer_ip"] = net.IP(dst).String()
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
-		event["ip4_source"] = net.IP(src).String()
-		event["ip4_dest"] = net.IP(dst).String()
+		source["ip"] = net.IP(src).String()
+		dest["ip"] = net.IP(dst).String()
 	}
 
 	// ipv6 layer meta data
 	if src, dst, ok := f.id.OutterIPv6Addr(); ok {
-		event["outter_ip6_source"] = net.IP(src).String()
-		event["outter_ip6_dest"] = net.IP(dst).String()
+		source["outer_ipv6"] = net.IP(src).String()
+		dest["outer_ipv6"] = net.IP(dst).String()
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
-		event["ip6_source"] = net.IP(src).String()
-		event["ip6_dest"] = net.IP(dst).String()
+		source["ipv6"] = net.IP(src).String()
+		dest["ipv6"] = net.IP(dst).String()
 	}
 
 	// udp layer meta data
 	if src, dst, ok := f.id.UDPAddr(); ok {
-		event["port_source"] = binary.LittleEndian.Uint16(src)
-		event["port_dest"] = binary.LittleEndian.Uint16(dst)
+		source["port"] = binary.LittleEndian.Uint16(src)
+		dest["port"] = binary.LittleEndian.Uint16(dst)
 		event["transport"] = "udp"
 	}
 
 	// tcp layer meta data
 	if src, dst, ok := f.id.TCPAddr(); ok {
-		event["port_source"] = binary.LittleEndian.Uint16(src)
-		event["port_dest"] = binary.LittleEndian.Uint16(dst)
+		source["port"] = binary.LittleEndian.Uint16(src)
+		dest["port"] = binary.LittleEndian.Uint16(dst)
 		event["transport"] = "tcp"
 	}
 
@@ -256,11 +259,14 @@ func createEvent(
 	}
 
 	if f.stats[0] != nil {
-		event["stats_source"] = encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		source["stats"] = encodeStats(f.stats[0], intNames, uintNames, floatNames)
 	}
 	if f.stats[1] != nil {
-		event["stats_dest"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
+		dest["stats"] = encodeStats(f.stats[1], intNames, uintNames, floatNames)
 	}
+
+	event["source"] = source
+	event["dest"] = dest
 
 	return event
 }
