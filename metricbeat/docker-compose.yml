@@ -21,7 +21,7 @@ beat:
   entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 elasticsearch:
   image: elasticsearch:2.2.0
-  command: elasticsearch -Des.network.host=0.0.0.0
+  command: elasticsearch -Des.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
 
 # Modules
 apache:

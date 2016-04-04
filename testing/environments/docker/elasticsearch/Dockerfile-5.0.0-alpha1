@@ -15,7 +15,7 @@ RUN apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 46095ACC85485
 ENV ELASTICSEARCH_MAJOR 5.0
 ENV ELASTICSEARCH_VERSION 5.0.0-alpha1
 
-RUN wget http://download.elastic.co/elasticsearch/staging/5.0.0-alpha1-bf98a44/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.deb
+RUN wget http://download.elastic.co/elasticsearch/staging/5.0.0-alpha1-7d4ed5b/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.deb
 
 RUN dpkg -i elasticsearch-5.0.0-alpha1.deb
 
