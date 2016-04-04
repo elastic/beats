@@ -107,7 +107,7 @@ output:
       - localhost:9200
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
+If you are sending output to Logstash, see <<config-winlogbeat-logstash>> instead.
 
 . After you save your configuration file, test it with the following command.
 +
@@ -116,7 +116,7 @@ If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 PS C:\Program Files\Winlogbeat> .\winlogbeat.exe -c .\winlogbeat.yml -configtest -e
 ----------------------------------------------------------------------
 
-[[config-filebeat-logstash]]
+[[config-winlogbeat-logstash]]
 === Step 3: Configuring Winlogbeat to Use Logstash
 
 include::../../libbeat/docs/shared-logstash-config.asciidoc[]
