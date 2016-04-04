@@ -17,7 +17,7 @@ RUN arch="$(dpkg --print-architecture)" \
 
 RUN set -x \
 
-	&& curl -fSL "http://download.elastic.co/kibana/kibana-snapshot/kibana-5.0.0-snapshot-linux-x64.tar.gz" -o kibana.tar.gz \
+	&& curl -fSL "https://download.elastic.co/kibana/kibana/kibana-5.0.0-alpha1-linux-x64.tar.gz" -o kibana.tar.gz \
 	&& mkdir -p /opt/kibana \
 	&& tar -xz --strip-components=1 -C /opt/kibana -f kibana.tar.gz \
 	&& chown -R kibana:kibana /opt/kibana \
@@ -27,8 +27,8 @@ ENV PATH /opt/kibana/bin:$PATH
 
 COPY ./docker-entrypoint.sh /
 
-RUN gosu kibana kibana plugin --install elastic/sense
-RUN gosu kibana kibana plugin --install kibana/timelion
+# There is no compatible Sense plugin for Kibana 5.0-alpha1.
+RUN gosu kibana kibana-plugin install https://download.elasticsearch.org/kibana/timelion/timelion-5.0.0-0.1.259.zip
 
 EXPOSE 5601
 ENTRYPOINT ["/docker-entrypoint.sh"]
