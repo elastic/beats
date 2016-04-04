@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat HTTP", 
+  "uiStateJSON": "{}", 
+  "panelsJSON": "[{\"col\":4,\"id\":\"Web-transactions\",\"row\":1,\"size_x\":9,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":1},{\"col\":1,\"id\":\"HTTP-error-codes\",\"row\":8,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":2},{\"col\":7,\"id\":\"HTTP-error-codes-evolution\",\"row\":8,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":3},{\"col\":1,\"id\":\"Navigation\",\"row\":1,\"size_x\":3,\"size_y\":4,\"type\":\"visualization\",\"panelIndex\":4},{\"col\":1,\"id\":\"Total-number-of-HTTP-transactions\",\"row\":5,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":5},{\"col\":4,\"id\":\"HTTP-codes-for-the-top-queries\",\"row\":5,\"size_x\":9,\"size_y\":3,\"type\":\"visualization\",\"panelIndex\":6},{\"id\":\"Top-10-HTTP-requests\",\"type\":\"visualization\",\"size_x\":12,\"size_y\":5,\"col\":1,\"row\":11,\"panelIndex\":7}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
