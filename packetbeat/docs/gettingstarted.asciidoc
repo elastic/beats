@@ -184,20 +184,15 @@ output:
      hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
-If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
-
-[[config-filebeat-logstash]]
-=== Step 3 (Optional): Configuring Packetbeat to Use Logstash
-
-include::../../libbeat/docs/shared-logstash-config.asciidoc[]
+If you are sending output to Logstash, see <<config-packetbeat-logstash>> instead.
 
 [[packetbeat-template]]
-=== Step 4: Loading the Index Template in Elasticsearch
+=== Step 3: Loading the Index Template in Elasticsearch
 
 :allplatforms:
 include::../../libbeat/docs/shared-template-load.asciidoc[]
 
-=== Step 5: Starting Packetbeat
+=== Step 4: Starting Packetbeat
 
 Run Packetbeat by issuing the following command:
 
@@ -252,7 +247,7 @@ curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty'
 Make sure that you replace `localhost:9200` with the address of your Elasticsearch
 instance. The command should return data about the HTTP transaction you just created.
 
-=== Step 6: Loading Sample Kibana Dashboards
+=== Step 5: Loading Sample Kibana Dashboards
 
 To make it easier for you to get application performance insights
 from packet data, we have created a few sample dashboards. The

@@ -73,9 +73,6 @@ conversion to create a Filebeat config file for each Logstash Forwarder config f
 Before migrating your config files, we recommend that you first read the <<filebeat-configuration-details>>
 section to understand the Filebeat options.
 
-NOTE: Logstash Forwarder has the option of autocompleting environment variables in
-the configuration file. This option currently doesn't exist in Filebeat.
-
 [float]
 === Migrating the "files" Section
 
