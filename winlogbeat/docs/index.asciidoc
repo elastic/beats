@@ -1,5 +1,6 @@
 = Winlogbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
 :version: 5.0.0-alpha1
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
@@ -13,6 +14,8 @@ include::./command-line.asciidoc[]
 include::./configuring-howto.asciidoc[]
 
 include::./winlogbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
