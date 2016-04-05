@@ -8,102 +8,45 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
-- Run function to start a beat no returns an error instead of directly exiting. {pull}771[771]
-- Some publisher options refactoring in libbeat {pull}684[684]
-- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
-- Add include_fields and drop_fields as part of generic filtering {pull}1120[1120]
-- The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
 
 *Packetbeat*
-- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
-  Former SOA field `ttl` becomes `minimum`. {pull}803[803]
-- The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot. {pull}803[803]
-- Remove the count field from the exported event {pull}1210[1210]
 
 *Topbeat*
-- Rename proc.cpu.user_p with proc.cpu.total_p as includes CPU time spent in kernel space {pull}631[631]
-- Remove count field from the exported fields {pull}1207[1207]
-- Rename input top level config option to topbeat
-- Add username to processes {pull}845[845]
 
 *Filebeat*
-- Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
-- Count field was removed from event as not used in filebeat {issue}778[778]
 
 *Winlogbeat*
-- The `message_inserts` field was replaced with the `event_data` field {issue}1053[1053]
-- The `category` field was renamed to `task` to better align with the Windows Event Log API naming {issue}1053[1053]
 
 
 ==== Bugfixes
 
 *Affecting all Beats*
-- Logstash client entering infinite loop on too many timeout errors {pull}927[927]
-- Logstash output will not retry events that are not json-encodable {pull}927[927]
 
 *Packetbeat*
-- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
-- Check column length in pgsql parser. {issue}565[565]
-- Harden pgsql parser. {issue}565[565]
-
-*Packetbeat*
-- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
-- Allow PF_RING sniffer type to be configured using pf_ring or pfring {pull}671[671]
-- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
-- Check column length in pgsql parser. {issue}565{565
 
 *Topbeat*
-- Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
 *Filebeat*
-- Stop filebeat if filebeat is started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
-- Improve shutdown of crawler and prospector to wait for clean completion {pull}720[720]
-- Omit `fields` from Filebeat events when null {issue}899[899]
 
 *Winlogbeat*
-- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1153[1153]
 
 ==== Added
 
 *Affecting all Beats*
-- Update builds to Golang version 1.6
-- Make logstash output compression level configurable. {pull}630[630]
-- Add option to elasticsearch output to pass http parameters in index operations {issue}805[805]
-- Improve logstash and elasticsearch backoff behavior. {pull}927[927]
-- Add experimental Kafka output. {pull}942[942]
-- Add config file option to configure GOMAXPROCS. {pull}969[969]
-- Added a `fields` and `fields_under_root` as options available under the `shipper` configuration {pull}1092[1092]
-- Ensure proper shutdown of libbeat. {pull}1075[1075]
-- Add `fields` and `fields_under_root` options under the `shipper` configuration {pull}1092[1092]
-- Add the ability to use a SOCKS5 proxy with the Logstash output {issue}823[823]
-- The `-configtest` flag will now print "Config OK" to stdout on success {pull}1249[1249]
 
 *Packetbeat*
-- Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]
-- Add support for NFS v3 and v4. {pull}1231[1231]
 
 *Topbeat*
 
 *Filebeat*
-- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
-- Add the ability to set a list of tags for each prospector {pull}1092[1092]
-- Add JSON decoding support {pull}1143[1143]
-
 
 *Winlogbeat*
-- Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
-- Improve config validation by checking for unknown top-level YAML keys. {pull}1100[1100]
-- Add the ability to set tags, fields, and fields_under_root as options for each event log {pull}1092[1092]
-- Add additional data to the events published by Winlogbeat. The new fields are `activity_id`,
-`event_data`, `keywords`, `opcode`, `process_id`, `provider_guid`, `related_activity_id`,
-`task`, `thread_id`, `user_data`, and `version`. {issue}1053[1053]
-- Add `event_id`, `level`, and `provider` configuration options for filtering events {pull}1218[1218]
-- Add `include_xml` configuration option for including the raw XML with the event {pull}1218[1218]
+
 
 ==== Deprecated
 
@@ -118,6 +61,118 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.0.0-alpha1]]
+=== Beats version 5.0.0-alpha1
+https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
+
+==== Breaking changes
+
+*libbeat*
+
+- Run function to start a Beat now returns an error instead of directly exiting. {pull}771[771]
+- Some publisher options refactoring in libbeat {pull}684[684]
+- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
+- The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
+
+*Packetbeat*
+
+- Rename output fields in the dns package. Former flag `recursion_allowed` becomes `recursion_available`. {pull}803[803]
+  Former SOA field `ttl` becomes `minimum`. {pull}803[803]
+- The fully qualified domain names which are part of output fields values of the dns package now terminate with a dot. {pull}803[803]
+- Remove the count field from the exported event {pull}1210[1210]
+
+*Topbeat*
+
+- Rename `proc.cpu.user_p` with `proc.cpu.total_p` as it includes CPU time spent in kernel space {pull}631[631]
+- Remove `count` field from the exported fields {pull}1207[1207]
+- Rename `input` top level config option to `topbeat`
+
+*Filebeat*
+
+- Scalar values in used in the `fields` configuration setting are no longer automatically converted to strings. {pull}1092[1092]
+- Count field was removed from event as not used in filebeat {issue}778[778]
+
+*Winlogbeat*
+
+- The `message_inserts` field was replaced with the `event_data` field {issue}1053[1053]
+- The `category` field was renamed to `task` to better align with the Windows Event Log API naming {issue}1053[1053]
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Logstash client entering infinite loop on too many timeout errors {pull}927[927]
+- Logstash output will not retry events that are not JSON-encodable {pull}927[927]
+
+*Packetbeat*
+
+- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
+- Check column length in pgsql parser. {issue}565[565]
+- Harden pgsql parser. {issue}565[565]
+- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
+- Allow PF_RING sniffer type to be configured using `pf_ring` or `pfring` {pull}671[671]
+- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
+- Check column length in pgsql parser. {issue}565{565
+
+*Topbeat*
+
+- Fix issue with `cpu.system_p` being greater than 1 on Windows {pull}1128[1128]
+
+*Filebeat*
+
+- Stop filebeat if started without any prospectors defined or empty prospectors {pull}644[644] {pull}647[647]
+- Improve shutdown of crawler and prospector to wait for clean completion {pull}720[720]
+- Omit `fields` from Filebeat events when null {issue}899[899]
+
+*Winlogbeat*
+
+- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1153[1153]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update builds to Golang version 1.6
+- Make Logstash output compression level configurable. {pull}630[630]
+- Add option to Elasticsearch output to pass http parameters in index operations {issue}805[805]
+- Improve Logstash and Elasticsearch backoff behavior. {pull}927[927]
+- Add experimental Kafka output. {pull}942[942]
+- Add config file option to configure GOMAXPROCS. {pull}969[969]
+- Added a `fields` and `fields_under_root` as options available under the `shipper` configuration {pull}1092[1092]
+- Ensure proper shutdown of libbeat. {pull}1075[1075]
+- Add `fields` and `fields_under_root` options under the `shipper` configuration {pull}1092[1092]
+- Add the ability to use a SOCKS5 proxy with the Logstash output {issue}823[823]
+- The `-configtest` flag will now print "Config OK" to stdout on success {pull}1249[1249]
+
+*Packetbeat*
+
+- Change the DNS library used throughout the dns package to github.com/miekg/dns. {pull}803[803]
+- Add support for NFS v3 and v4. {pull}1231[1231]
+
+*Topbeat*
+
+- Add `username` to processes {pull}845[845]
+
+*Filebeat*
+
+- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
+- Add the ability to set a list of tags for each prospector {pull}1092[1092]
+- Add JSON decoding support {pull}1143[1143]
+
+
+*Winlogbeat*
+
+- Add caching of event metadata handles and the system render context for the wineventlog API {pull}888[888]
+- Improve config validation by checking for unknown top-level YAML keys. {pull}1100[1100]
+- Add the ability to set tags, fields, and fields_under_root as options for each event log {pull}1092[1092]
+- Add additional data to the events published by Winlogbeat. The new fields are `activity_id`,
+`event_data`, `keywords`, `opcode`, `process_id`, `provider_guid`, `related_activity_id`,
+`task`, `thread_id`, `user_data`, and `version`. {issue}1053[1053]
+- Add `event_id`, `level`, and `provider` configuration options for filtering events {pull}1218[1218]
+- Add `include_xml` configuration option for including the raw XML with the event {pull}1218[1218]
+
 
 [[release-notes-1.2.0]]
 === Beats version 1.2.0
@@ -213,6 +268,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 
 *Affecting all Beats*
 
+- Add include_fields and drop_fields as part of generic filtering {pull}1120[1120]
 - Make logstash output compression level configurable. {pull}630[630]
 - Some publisher options refactoring in libbeat {pull}684[684]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
