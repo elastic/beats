@@ -71,8 +71,6 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 *libbeat*
 
 - Run function to start a Beat now returns an error instead of directly exiting. {pull}771[771]
-- Some publisher options refactoring in libbeat {pull}684[684]
-- Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 - The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
 - Require braces for environment variable expansion in config files {pull}1304[1304]
 
@@ -98,13 +96,13 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 
 - The `message_inserts` field was replaced with the `event_data` field {issue}1053[1053]
 - The `category` field was renamed to `task` to better align with the Windows Event Log API naming {issue}1053[1053]
+- Remove the count field from the exported event {pull}1218[1218]
 
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Logstash client entering infinite loop on too many timeout errors {pull}927[927]
 - Logstash output will not retry events that are not JSON-encodable {pull}927[927]
 
 *Packetbeat*
@@ -112,10 +110,6 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 - Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
 - Check column length in pgsql parser. {issue}565[565]
 - Harden pgsql parser. {issue}565[565]
-- Fix setting direction to out and use its value to decide when dropping events if ignore_outgoing is enabled {pull}557[557]
-- Allow PF_RING sniffer type to be configured using `pf_ring` or `pfring` {pull}671[671]
-- Create a proper BPF filter when ICMP is the only enabled protocol {issue}757[757]
-- Check column length in pgsql parser. {issue}565{565
 
 *Topbeat*
 
@@ -129,20 +123,16 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 
 *Winlogbeat*
 
-- Fix invalid `event_id` on Windows XP and Windows 2003 {pull}1153[1153]
-
 ==== Added
 
 *Affecting all Beats*
 
 - Update builds to Golang version 1.6
-- Make Logstash output compression level configurable. {pull}630[630]
 - Add option to Elasticsearch output to pass http parameters in index operations {issue}805[805]
 - Improve Logstash and Elasticsearch backoff behavior. {pull}927[927]
 - Add experimental Kafka output. {pull}942[942]
 - Add config file option to configure GOMAXPROCS. {pull}969[969]
-- Added a `fields` and `fields_under_root` as options available under the `shipper` configuration {pull}1092[1092]
-- Ensure proper shutdown of libbeat. {pull}1075[1075]
+- Improve shutdown handling in libbeat. {pull}1075[1075]
 - Add `fields` and `fields_under_root` options under the `shipper` configuration {pull}1092[1092]
 - Add the ability to use a SOCKS5 proxy with the Logstash output {issue}823[823]
 - The `-configtest` flag will now print "Config OK" to stdout on success {pull}1249[1249]
@@ -158,7 +148,6 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 
 *Filebeat*
 
-- Add experimental option to enable filebeat publisher pipeline to operate asynchonrously {pull}782[782]
 - Add the ability to set a list of tags for each prospector {pull}1092[1092]
 - Add JSON decoding support {pull}1143[1143]
 
