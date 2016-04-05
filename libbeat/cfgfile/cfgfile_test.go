@@ -46,21 +46,31 @@ func TestExpandEnv(t *testing.T) {
 		in  string
 		out string
 	}{
-		// Environment variables can be specified as ${env} or $env.
-		{"x$y", "xy"},
-		{"x${y}", "xy"},
+		// Environment variables can be specified as ${env} only.
+		{"${y}", "y"},
+		{"$y", "$y"},
 
-		// Environment variables are case-sensitive. Neither are replaced.
-		{"x$Y", "x"},
-		{"x${Y}", "x"},
+		// Environment variables are case-sensitive.
+		{"${Y}", ""},
 
-		// Defaults can only be specified when using braces.
+		// Defaults can be specified.
 		{"x${Z:D}", "xD"},
 		{"x${Z:A B C D}", "xA B C D"}, // Spaces are allowed in the default.
 		{"x${Z:}", "x"},
 
-		// Defaults don't work unless braces are used.
-		{"x$y:D", "xy:D"},
+		// Un-matched braces are swallowed by the Go os.Expand function.
+		{"x${Y ${Z:Z}", "xZ"},
+
+		// Special environment variables are not replaced.
+		{"$*", "$*"},
+		{"${*}", ""},
+		{"$@", "$@"},
+		{"${@}", ""},
+		{"$1", "$1"},
+		{"${1}", ""},
+
+		{"", ""},
+		{"$$", "$$"},
 	}
 
 	for _, test := range tests {

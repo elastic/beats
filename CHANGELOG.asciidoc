@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v1.2.0...5.0.0-alpha1[View commits]
 - Some publisher options refactoring in libbeat {pull}684[684]
 - Move event preprocessor applying GeoIP to packetbeat {pull}772[772]
 - The method signature of HandleFlags() was changed to allow returning an error {pull}1249[1249]
+- Require braces for environment variable expansion in config files {pull}1304[1304]
 
 *Packetbeat*
 
