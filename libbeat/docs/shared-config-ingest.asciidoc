@@ -1,0 +1,35 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+//////////////////////////////////////////////////////////////////////////
+
+[[configuring-ingest-node]]
+=== Configuring {beatname_uc} to Use Ingest Node
+
+When you use Elasticsearch for output, you can configure {beatname_uc} to use
+https://www.elastic.co/guide/en/elasticsearch/reference/master/ingest.html[ingest node] to pre-process documents
+before the actual indexing takes place in Elasticsearch. Ingest node is a convenient processing option when you
+want to do some extra processing on your data, but you do not require the full power of Logstash. For
+example, you can create an ingest node pipeline in Elasticsearch that consists of one processor
+that removes a field in a document followed by another processor that renames a field. 
+
+After defining the pipeline in Elasticsearch, you simply configure your Beat to use the pipeline. To configure
+{beatname_uc}, you specify the pipeline ID in the `parameters` option under `elasticsearch` in the 
++{beatname_lc}.yml+ file:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: [localhost:9200]
+    parameters: {pipeline: my_pipeline_id}
+------------------------------------------------------------------------------
+
+For more information about defining a pre-processing pipeline, see the {elasticsearch}/ingest.html[Ingest Node]
+documentation.
