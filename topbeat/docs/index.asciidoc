@@ -1,5 +1,6 @@
 = Topbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
 :version: 5.0.0-alpha1
 :beatname_lc: topbeat
 :beatname_uc: Topbeat
@@ -14,6 +15,8 @@ include::./command-line.asciidoc[]
 include::./configuring-howto.asciidoc[]
 
 include::./topbeat-filtering.asciidoc[]
+
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::./configuring-logstash.asciidoc[]
 
