@@ -36,7 +36,7 @@ For more information, see:
 
 By default, {beatname_uc} automatically loads the recommended template file, +{beatname_lc}.template.json+,
 if elasticsearch output is enabled. You can configure {beatname_lc} to load a different template
-by adjusting the `name` and `path` options under `template` in +{beatname_uc}.yml+ file:
+by adjusting the `name` and `path` options under `template` in +{beatname_lc}.yml+ file:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -56,7 +56,7 @@ output:
       path: "{beatname_lc}.template.json"
 
       # Overwrite existing template
-      #overwrite: false
+      overwrite: false
 ----------------------------------------------------------------------
 
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
