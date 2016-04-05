@@ -22,10 +22,11 @@ template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
 The recommended template file is installed by the {beatname_uc} packages. By default, {beatname_uc} 
-loads the template automatically when you start the Beat. However, if you want to disable
-automatic template loading, or you want to load your own template, you can change the settings for template
-loading in the {beatname_uc} configuration file. If you choose to disable automatic template loading,
-you need to load the template manually. For more information, see:
+loads the template automatically when you start the Beat if no template was previously loaded.
+However, if you want to disable automatic template loading, or you want to load your own template, 
+you can change the settings for template loading in the {beatname_uc} configuration file. If you 
+choose to disable automatic template loading, you need to load the template manually. 
+For more information, see:
 
 * <<load-template-auto>>
 * <<load-template-manually>>
