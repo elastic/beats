@@ -64,7 +64,7 @@ sudo service elasticsearch start
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
 curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.zip
 unzip elasticsearch-5.0.0-alpha1.zip
-cd elasticsearch-5.0.0-alpha1.zip
+cd elasticsearch-5.0.0-alpha1
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
