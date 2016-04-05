@@ -1,0 +1,24 @@
+{
+  "sort": [
+    "@timestamp", 
+    "desc"
+  ], 
+  "hits": 0, 
+  "description": "", 
+  "title": "Transactions errors", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"index\":\"packetbeat-*\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"!type: flow AND !status: OK\",\"analyze_wildcard\":true}}}"
+  }, 
+  "columns": [
+    "client_ip", 
+    "client_port", 
+    "ip", 
+    "port", 
+    "type", 
+    "query", 
+    "method", 
+    "responsetime", 
+    "status"
+  ]
+}
