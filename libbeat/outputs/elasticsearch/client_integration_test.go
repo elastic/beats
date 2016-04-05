@@ -99,7 +99,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 
 	for _, beat := range beats {
 		// Load template
-		absPath, err := filepath.Abs("../../../" + beat + "/etc/")
+		absPath, err := filepath.Abs("../../../" + beat)
 		assert.NotNil(t, absPath)
 		assert.Nil(t, err)
 
