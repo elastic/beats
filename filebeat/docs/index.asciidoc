@@ -3,6 +3,7 @@
 :version: 5.0.0-alpha1
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
+:security: X-Pack Security
 
 include::./overview.asciidoc[]
 
