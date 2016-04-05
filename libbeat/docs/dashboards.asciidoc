@@ -92,15 +92,14 @@ After <<load-kibana-dashboards,loading the Beats dashboards>>,
 launch the Kibana web interface by pointing your browser
 to port 5601. For example, `http://127.0.0.1:5601`.
 
-If Kibana raises a `No default index pattern` error, you must select or create
-an index pattern to continue. You can resolve the error by refreshing the page
-in the browser and then setting one of the predefined index patterns as the default.
+If Kibana shows a `No default index pattern` warning, you must select or create
+an index pattern to continue. To resolve the issue, select one of the
+predefined index patterns and set it as the default.
 
 image:./images/kibana-created-indexes.png[Kibana configured indexes]
 
-To open the loaded dashboards, go to the `Dashboard` page and click the
-*Load Saved Dashboard* icon. Select `Packetbeat Dashboard` from the list.
-You can then easily switch between the dashboards by using the `Navigation` widget.
+To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
+Select the dashboard that you want to open. 
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
 
