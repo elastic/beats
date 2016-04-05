@@ -42,8 +42,8 @@ mac>> for OS X, and <<win, win>> for Windows):
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.deb
-sudo dpkg -i elasticsearch-{ES-version}.deb
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.deb
+sudo dpkg -i elasticsearch-5.0.0-alpha1.deb
 sudo /etc/init.d/elasticsearch start
 ----------------------------------------------------------------------
 
@@ -52,8 +52,8 @@ sudo /etc/init.d/elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.rpm
-sudo rpm -i elasticsearch-{ES-version}.rpm
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.rpm
+sudo rpm -i elasticsearch-5.0.0-alpha1.rpm
 sudo service elasticsearch start
 ----------------------------------------------------------------------
 
@@ -62,9 +62,9 @@ sudo service elasticsearch start
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 # install Java, e.g. from: https://www.java.com/en/download/manual.jsp
-curl -L -O https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-{ES-version}.zip
-unzip elasticsearch-{ES-version}.zip
-cd elasticsearch-{ES-version}
+curl -L -O https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/5.0.0-alpha1/elasticsearch-5.0.0-alpha1.zip
+unzip elasticsearch-5.0.0-alpha1.zip
+cd elasticsearch-5.0.0-alpha1.zip
 ./bin/elasticsearch
 ----------------------------------------------------------------------
 
@@ -151,8 +151,8 @@ with your system:
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-7-jre
-curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_{LS-version}-1_all.deb
-sudo dpkg -i logstash_{LS-version}-1_all.deb
+curl -L -O https://download.elastic.co/logstash/logstash/packages/debian/logstash_5.0.0~alpha1-1_all.deb
+sudo dpkg -i logstash_5.0.0~alpha1-1_all.deb
 ----------------------------------------------------------------------
 
 *rpm:*
@@ -160,8 +160,8 @@ sudo dpkg -i logstash_{LS-version}-1_all.deb
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo yum install java-1.7.0-openjdk
-curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-{LS-version}-1.noarch.rpm
-sudo rpm -i logstash-{LS-version}-1.noarch.rpm
+curl -L -O https://download.elastic.co/logstash/logstash/packages/centos/logstash-5.0.0~alpha1-1.noarch.rpm
+sudo rpm -i logstash-5.0.0~alpha1-1.noarch.rpm
 ----------------------------------------------------------------------
 
 *mac:*
