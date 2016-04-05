@@ -132,7 +132,7 @@ func GetProcessEvent(process *Process, last *Process) common.MapStr {
 			"user":       process.Cpu.User,
 			"system":     process.Cpu.Sys,
 			"total":      process.Cpu.Total,
-			"total_p":    GetProcCpuPercentage(process, last),
+			"total_p":    GetProcCpuPercentage(last, process),
 			"start_time": process.Cpu.FormatStartTime(),
 		},
 	}
@@ -148,7 +148,7 @@ func GetProcCpuPercentage(last *Process, current *Process) float64 {
 
 	if last != nil && current != nil {
 
-		delta_proc := (current.Cpu.User - last.Cpu.User) + (current.Cpu.Sys - last.Cpu.Sys)
+		delta_proc := current.Cpu.Total - last.Cpu.Total
 		delta_time := current.Ctime.Sub(last.Ctime).Nanoseconds() / 1e6 // in milliseconds
 		perc := float64(delta_proc) / float64(delta_time)
 
