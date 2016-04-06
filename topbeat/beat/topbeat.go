@@ -213,12 +213,13 @@ func (t *Topbeat) exportProcStats() error {
 			newProcs[process.Pid] = process
 
 			proc := common.MapStr{
-				"pid":   process.Pid,
-				"ppid":  process.Ppid,
-				"name":  process.Name,
-				"state": process.State,
-				"mem":   process.Mem,
-				"cpu":   process.Cpu,
+				"pid":      process.Pid,
+				"ppid":     process.Ppid,
+				"name":     process.Name,
+				"state":    process.State,
+				"username": process.Username,
+				"mem":      process.Mem,
+				"cpu":      process.Cpu,
 			}
 
 			if process.CmdLine != "" {

@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
 *Topbeat*
 
 - Add the command line used to start processes {issue}533[533]
+- Add username to processes {pull}845[845]
 - Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
 *Filebeat*
