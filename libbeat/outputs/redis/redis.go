@@ -275,7 +275,7 @@ func (out *redisOutput) doBulkPublish(events []common.MapStr) error {
 		event := events[0]
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
-			logp.Err("Fail to convert the event to JSON: %s", err)
+			logp.Err("Fail to json encode event (%v): %#v", err, event)
 			return err
 		}
 
@@ -287,7 +287,7 @@ func (out *redisOutput) doBulkPublish(events []common.MapStr) error {
 	for _, event := range events {
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
-			logp.Err("Fail to convert the event to JSON: %s", err)
+			logp.Err("Fail to json encode event (%v): %#v", err, event)
 			continue
 		}
 		err = out.Conn.Send(command, out.Index, string(jsonEvent))

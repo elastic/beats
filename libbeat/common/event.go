@@ -64,7 +64,8 @@ func ConvertToGenericEvent(v MapStr) MapStr {
 			case reflect.Map:
 				anothermap, err := MarshallUnmarshall(value)
 				if err != nil {
-					logp.Warn("fail to marschall & unmarshall map %v", key)
+					logp.Warn("fail to marschall & unmarshall map (%v): key=%v value=%#v",
+						key, value)
 					continue
 				}
 				v[key] = anothermap
