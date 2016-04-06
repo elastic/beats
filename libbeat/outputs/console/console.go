@@ -62,7 +62,7 @@ func (c *console) PublishEvent(
 		jsonEvent, err = json.Marshal(event)
 	}
 	if err != nil {
-		logp.Err("Fail to convert the event to JSON: %s", err)
+		logp.Err("Fail to convert the event to JSON (%v): %#v", err, event)
 		outputs.SignalCompleted(s)
 		return err
 	}

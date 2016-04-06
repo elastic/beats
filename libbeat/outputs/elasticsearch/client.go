@@ -463,6 +463,7 @@ func (conn *Connection) request(
 		var err error
 		obj, err = json.Marshal(body)
 		if err != nil {
+			logp.Warn("Failed to json encode body (%v): %#v", err, body)
 			return 0, nil, ErrJSONEncodeFailed
 		}
 	}
