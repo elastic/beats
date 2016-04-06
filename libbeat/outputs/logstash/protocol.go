@@ -265,7 +265,7 @@ func (p *protocol) serializeDataFrame(
 
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
-		debug("Fail to convert the event to JSON: %s", err)
+		debug("Fail to json encode event (%v): %#v", err, event)
 		return err
 	}
 
