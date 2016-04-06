@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/gosigar"
+	sigar "github.com/elastic/gosigar"
 )
 
 type SystemLoad struct {
