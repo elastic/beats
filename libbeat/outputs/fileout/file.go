@@ -78,7 +78,7 @@ func (out *fileOutput) PublishEvent(
 		// mark as success so event is not sent again.
 		outputs.SignalCompleted(trans)
 
-		logp.Err("Fail to convert the event to JSON: %s", err)
+		logp.Err("Fail to json encode event(%v): %#v", err, event)
 		return err
 	}
 

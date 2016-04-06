@@ -1,6 +1,10 @@
 package elasticsearch
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/elastic/beats/libbeat/logp"
+)
 
 type QueryResult struct {
 	Ok      bool            `json:"ok"`
@@ -35,6 +39,7 @@ type CountResults struct {
 func (r QueryResult) String() string {
 	out, err := json.Marshal(r)
 	if err != nil {
+		logp.Warn("failed to marshal QueryResult (%v): %#v", err, r)
 		return "ERROR"
 	}
 	return string(out)
