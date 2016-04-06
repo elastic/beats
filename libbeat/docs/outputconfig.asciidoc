@@ -490,6 +490,9 @@ spooler size.
 The Redis output inserts the events in a Redis list. This output plugin is compatible with
 the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash.
 
+NOTE: With the current implementation of the Redis output, data may be lost if the Redis server is temporarily
+unavailable. We recommend that you avoid using Redis output unless some data loss is tolerable.
+
 Example configuration:
 
 ["source","yaml",subs="attributes"]
