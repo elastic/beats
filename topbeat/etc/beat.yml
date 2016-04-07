@@ -15,7 +15,7 @@ topbeat:
     system: true
 
     # per process statistics, by default is true
-    proc: true
+    process: true
 
     # file system information, by default is true
     filesystem: true
