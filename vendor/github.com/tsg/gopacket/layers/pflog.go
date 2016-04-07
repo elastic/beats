@@ -8,7 +8,6 @@ package layers
 
 import (
 	"encoding/binary"
-	"errors"
 
 	"github.com/tsg/gopacket"
 )
@@ -52,12 +51,8 @@ func (pf *PFLog) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error 
 	pf.RuleUID = binary.BigEndian.Uint32(data[52:56])
 	pf.RulePID = int32(binary.BigEndian.Uint32(data[56:60]))
 	pf.Direction = PFDirection(data[60])
-	if pf.Length%4 != 1 {
-		return errors.New("PFLog header length should be 3 less than multiple of 4")
-	}
-	actualLength := int(pf.Length) + 3
-	pf.Contents = data[:actualLength]
-	pf.Payload = data[actualLength:]
+	pf.Contents = data[:pf.Length]
+	pf.Payload = data[pf.Length:]
 	return nil
 }
 
