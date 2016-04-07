@@ -1,6 +1,6 @@
 = Filebeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/1.2
-:version: 1.2.0
+:version: 1.2.1
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 
