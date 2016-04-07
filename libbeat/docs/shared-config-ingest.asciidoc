@@ -27,9 +27,44 @@ After defining the pipeline in Elasticsearch, you simply configure your Beat to 
 ------------------------------------------------------------------------------
 output:
   elasticsearch:
-    hosts: [localhost:9200]
+    hosts: ["localhost:9200"]
     parameters: {pipeline: my_pipeline_id}
 ------------------------------------------------------------------------------
+
+For example, let's say that you've defined the following pipeline in a file named `pipeline.json`:
+
+[source,json]
+------------------------------------------------------------------------------
+{
+    "description": "Test pipeline",
+    "processors": [
+        {
+            "lowercase": {
+                "field": "beat.name"
+            }
+        }
+    ]
+}
+------------------------------------------------------------------------------
+
+To add the pipeline in Elasticsearch, you would run:
+
+[source,shell]
+------------------------------------------------------------------------------
+curl -XPUT 'http://192.168.99.100:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
+------------------------------------------------------------------------------
+
+Then in the +{beatname_lc}.yml+ file, you would specify:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output:
+  elasticsearch:
+    hosts: ["localhost:9200"]
+    parameters: {pipeline: "test-pipeline"}
+------------------------------------------------------------------------------
+
+When you run {beatname_uc}, the value of `beat.name` is converted to lowercase before indexing.
 
 For more information about defining a pre-processing pipeline, see the {elasticsearch}/ingest.html[Ingest Node]
 documentation.
