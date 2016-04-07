@@ -10,6 +10,7 @@ package pcap
 /*
 #cgo linux LDFLAGS: -lpcap
 #cgo freebsd LDFLAGS: -lpcap
+#cgo openbsd LDFLAGS: -lpcap
 #cgo darwin LDFLAGS: -lpcap
 #cgo solaris LDFLAGS: -lpcap
 #cgo windows CFLAGS: -I C:/WpdPack/Include
@@ -83,6 +84,10 @@ int pcap_set_rfmon(pcap_t *p, int rfmon) {
 #elif __GLIBC__
 #define gopacket_time_secs_t __time_t
 #define gopacket_time_usecs_t __suseconds_t
+#elif __OpenBSD__
+// time_t is 64-bit, however bpf_timeval uses 32 bit fields
+#define gopacket_time_secs_t u_int32_t
+#define gopacket_time_usecs_t u_int32_t
 #else
 #define gopacket_time_secs_t time_t
 #define gopacket_time_usecs_t suseconds_t
