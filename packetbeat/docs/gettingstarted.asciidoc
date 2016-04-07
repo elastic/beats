@@ -250,16 +250,12 @@ instance. The command should return data about the HTTP transaction you just cre
 === Step 5: Loading Sample Kibana Dashboards
 
 To make it easier for you to get application performance insights
-from packet data, we have created a few sample dashboards. The
-dashboards are maintained in this
-https://github.com/elastic/beats-dashboards[GitHub repository], which also
-includes instructions for loading the dashboards.
+from packet data, we have created a sample Packetbeat dashboard. This dashboard is provided as
+an example. We recommend that you
+http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
+to meet your needs.
 
-For more information about loading and viewing the dashboards, see {libbeat}/visualizing-data.html[Visualizing Your Data in Kibana].
-
+For more information about loading and viewing the Beats dashboards, see
+{libbeat}/visualizing-data.html[Visualizing Your Data in Kibana].
 
 image:./images/packetbeat-statistics.png[Packetbeat statistics]
-
-These dashboards are provided as examples. We recommend that you
-http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] them
-to meet your needs.
