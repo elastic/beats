@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/gosigar"
+	sigar "github.com/elastic/gosigar"
 )
 
 type SystemLoad struct {
@@ -269,11 +269,12 @@ func GetProcess(pid int, cmdline string) (*Process, error) {
 	}
 
 	proc := Process{
-		Pid:     pid,
-		Ppid:    state.Ppid,
-		Name:    state.Name,
-		State:   getProcState(byte(state.State)),
-		CmdLine: cmdline,
+		Pid:      pid,
+		Ppid:     state.Ppid,
+		Name:     state.Name,
+		State:    getProcState(byte(state.State)),
+		Username: state.Username,
+		CmdLine:  cmdline,
 		Mem: &ProcMemStat{
 			Size:  mem.Size,
 			Rss:   mem.Resident,

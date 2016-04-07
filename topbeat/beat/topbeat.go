@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/gosigar"
+	sigar "github.com/elastic/gosigar"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -213,12 +213,13 @@ func (t *Topbeat) exportProcStats() error {
 			newProcs[process.Pid] = process
 
 			proc := common.MapStr{
-				"pid":   process.Pid,
-				"ppid":  process.Ppid,
-				"name":  process.Name,
-				"state": process.State,
-				"mem":   process.Mem,
-				"cpu":   process.Cpu,
+				"pid":      process.Pid,
+				"ppid":     process.Ppid,
+				"name":     process.Name,
+				"state":    process.State,
+				"username": process.Username,
+				"mem":      process.Mem,
+				"cpu":      process.Cpu,
 			}
 
 			if process.CmdLine != "" {
@@ -383,9 +384,9 @@ func (t *Topbeat) addCpuPercentage(t2 *CpuTimes) {
 		calculate := func(field2 uint64, field1 uint64) float64 {
 
 			perc := 0.0
-			delta := field2 - field1
+			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 2)
+			return Round(perc, .5, 4)
 		}
 
 		t2.UserPercent = calculate(t2.User, t1.User)
@@ -405,9 +406,9 @@ func (t *Topbeat) addCpuPercentageList(t2 []CpuTimes) {
 		calculate := func(field2 uint64, field1 uint64, all_delta uint64) float64 {
 
 			perc := 0.0
-			delta := field2 - field1
+			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 2)
+			return Round(perc, .5, 4)
 		}
 
 		for i := 0; i < len(t1); i++ {
@@ -451,7 +452,7 @@ func (t *Topbeat) addProcCpuPercentage(proc *Process) {
 
 		t.procsMap[proc.Pid] = proc
 
-		proc.Cpu.UserPercent = Round(perc, .5, 2)
+		proc.Cpu.UserPercent = Round(perc, .5, 4)
 
 	}
 }
