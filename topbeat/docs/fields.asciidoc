@@ -352,6 +352,13 @@ type: string
 The process name.
 
 
+==== proc.username
+
+type: string
+
+The user name of the process owner. Added in 1.2.1.
+
+
 ==== proc.state
 
 type: string
