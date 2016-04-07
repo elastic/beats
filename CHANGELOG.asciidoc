@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 
 *Topbeat*
 
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file. {pull}1343[1343]
+
 *Filebeat*
 
 *Winlogbeat*
