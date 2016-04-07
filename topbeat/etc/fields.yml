@@ -305,6 +305,12 @@ process:
           description: >
             The process name.
 
+        - name: username
+          path: proc.username
+          type: string
+          description: >
+            The user name of the process owner.
+
         - name: state
           path: proc.state
           type: string
