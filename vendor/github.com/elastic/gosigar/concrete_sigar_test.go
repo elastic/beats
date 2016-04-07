@@ -1,85 +1,76 @@
-package sigar_test
+package gosigar_test
 
 import (
+	"runtime"
+	"testing"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	sigar "github.com/elastic/gosigar"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("ConcreteSigar", func() {
-	var concreteSigar *sigar.ConcreteSigar
+func TestConcreteCollectCpuStats(t *testing.T) {
+	concreteSigar := &sigar.ConcreteSigar{}
 
-	BeforeEach(func() {
-		concreteSigar = &sigar.ConcreteSigar{}
-	})
+	// Immediately makes first CPU usage available even though it's not very accurate.
+	samplesCh, stop := concreteSigar.CollectCpuStats(500 * time.Millisecond)
+	firstValue := <-samplesCh
+	assert.True(t, firstValue.User > 0)
+	stop <- struct{}{}
 
-	Describe("CollectCpuStats", func() {
-		It("immediately makes first CPU usage available even though it's not very accurate", func() {
-			samplesCh, stop := concreteSigar.CollectCpuStats(500 * time.Millisecond)
+	// Makes CPU usage delta values available
+	samplesCh, stop = concreteSigar.CollectCpuStats(500 * time.Millisecond)
+	firstValue = <-samplesCh
+	secondValue := <-samplesCh
+	assert.True(t, secondValue.User < firstValue.User)
+	stop <- struct{}{}
 
-			firstValue := <-samplesCh
-			Expect(firstValue.User).To(BeNumerically(">", 0))
+	// Does not block.
+	_, stop = concreteSigar.CollectCpuStats(10 * time.Millisecond)
+	// Sleep long enough for samplesCh to fill at least 2 values
+	time.Sleep(20 * time.Millisecond)
+	stop <- struct{}{}
+}
 
-			stop <- struct{}{}
-		})
+func TestConcreteGetLoadAverage(t *testing.T) {
+	concreteSigar := &sigar.ConcreteSigar{}
+	avg, err := concreteSigar.GetLoadAverage()
+	if assert.NoError(t, err) {
+		assert.NotNil(t, avg.One)
+		assert.NotNil(t, avg.Five)
+		assert.NotNil(t, avg.Fifteen)
+	}
+}
 
-		It("makes CPU usage delta values available", func() {
-			samplesCh, stop := concreteSigar.CollectCpuStats(500 * time.Millisecond)
+func TestConcreteGetMem(t *testing.T) {
+	concreteSigar := &sigar.ConcreteSigar{}
+	mem, err := concreteSigar.GetMem()
+	if assert.NoError(t, err) {
+		assert.True(t, mem.Total > 0)
+		assert.True(t, mem.Used+mem.Free <= mem.Total)
+	}
+}
 
-			firstValue := <-samplesCh
+func TestConcreteGetSwap(t *testing.T) {
+	concreteSigar := &sigar.ConcreteSigar{}
+	swap, err := concreteSigar.GetSwap()
+	if assert.NoError(t, err) {
+		assert.True(t, swap.Used+swap.Free <= swap.Total)
+	}
+}
 
-			secondValue := <-samplesCh
-			Expect(secondValue.User).To(BeNumerically("<", firstValue.User))
+func TestConcreteFileSystemUsage(t *testing.T) {
+	root := "/"
+	if runtime.GOOS == "windows" {
+		root = "C:\\"
+	}
 
-			stop <- struct{}{}
-		})
+	concreteSigar := &sigar.ConcreteSigar{}
+	fsusage, err := concreteSigar.GetFileSystemUsage(root)
+	if assert.NoError(t, err, "Error is %v", err) {
+		assert.True(t, fsusage.Total > 0)
+	}
 
-		It("does not block", func() {
-			_, stop := concreteSigar.CollectCpuStats(10 * time.Millisecond)
-
-			// Sleep long enough for samplesCh to fill at least 2 values
-			time.Sleep(20 * time.Millisecond)
-
-			stop <- struct{}{}
-
-			// If CollectCpuStats blocks it will never get here
-			Expect(true).To(BeTrue())
-		})
-	})
-
-	It("GetLoadAverage", func() {
-		avg, err := concreteSigar.GetLoadAverage()
-		Expect(avg.One).ToNot(BeNil())
-		Expect(avg.Five).ToNot(BeNil())
-		Expect(avg.Fifteen).ToNot(BeNil())
-
-		Expect(err).ToNot(HaveOccurred())
-	})
-
-	It("GetMem", func() {
-		mem, err := concreteSigar.GetMem()
-		Expect(err).ToNot(HaveOccurred())
-
-		Expect(mem.Total).To(BeNumerically(">", 0))
-		Expect(mem.Used + mem.Free).To(BeNumerically("<=", mem.Total))
-	})
-
-	It("GetSwap", func() {
-		swap, err := concreteSigar.GetSwap()
-		Expect(err).ToNot(HaveOccurred())
-		Expect(swap.Used + swap.Free).To(BeNumerically("<=", swap.Total))
-	})
-
-	It("GetSwap", func() {
-		fsusage, err := concreteSigar.GetFileSystemUsage("/")
-		Expect(err).ToNot(HaveOccurred())
-		Expect(fsusage.Total).ToNot(BeNil())
-
-		fsusage, err = concreteSigar.GetFileSystemUsage("T O T A L L Y B O G U S")
-		Expect(err).To(HaveOccurred())
-		Expect(fsusage.Total).To(Equal(uint64(0)))
-	})
-})
+	fsusage, err = concreteSigar.GetFileSystemUsage("T O T A L L Y B O G U S")
+	assert.Error(t, err)
+}
