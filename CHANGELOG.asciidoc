@@ -8,12 +8,11 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.2.1...1.2[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
-- Require braces for environment variable expansion in config files {pull}1304[1304]
 
 *Packetbeat*
 
@@ -31,8 +30,6 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 *Packetbeat*
 
 *Topbeat*
-
-- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file. {pull}1343[1343]
 
 *Filebeat*
 
@@ -63,6 +60,33 @@ https://github.com/elastic/beats/compare/v1.2.0...master[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-1.2.1]]
+=== Beats version 1.2.1
+https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Require braces for environment variable expansion in config files {pull}1304[1304]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Removed deprecation warning for the Redis output. {pull}1282[1282]
+
+*Topbeat*
+
+- Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file. {pull}1343[1343]
+- Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
+
+==== Added
+
+*Topbeat*
+
+- Add username to processes {pull}845[845]
 
 [[release-notes-1.2.0]]
 === Beats version 1.2.0
@@ -95,8 +119,6 @@ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
 *Topbeat*
 
 - Add the command line used to start processes {issue}533[533]
-- Add username to processes {pull}845[845]
-- Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
 *Filebeat*
 
