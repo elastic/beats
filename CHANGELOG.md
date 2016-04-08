@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file based on the
 
 ### Changed
 - Rename `Configuration` variable in beat struct to `beatConfig` as generalization from @buehler.
+- Update Golang dependency to 1.6.0
 
 ### Backward Compatibility Breaks
 

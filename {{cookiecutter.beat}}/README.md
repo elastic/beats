@@ -7,6 +7,11 @@ Ensure that this folder is at the following location:
 
 ## Getting Started with {{cookiecutter.beat|capitalize}}
 
+### Requirements
+
+* [Golang](https://golang.org/dl/) 1.6
+* [Glide](https://github.com/Masterminds/glide) >= 0.10.0
+
 ### Init Project
 To get running with {{cookiecutter.beat|capitalize}}, run the following command:
 
@@ -70,6 +75,11 @@ The test coverage is reported in the folder `./build/coverage/`
 
 
 ### Package
+
+To be able to package {{cookiecutter.beat|capitalize}} the requirements are as follows:
+
+ * [Docker Environment](https://docs.docker.com/engine/installation/) >= 1.10
+ * $GOPATH/bin must be part of $PATH: `export PATH=${PATH}:${GOPATH}/bin`
 
 To cross-compile and package {{cookiecutter.beat|capitalize}} for all supported platforms, run the following commands:
 
