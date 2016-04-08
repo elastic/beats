@@ -31,7 +31,7 @@ commit:
 
 .PHONY: update-deps
 update-deps:
-	glide update  --no-recursive
+	glide update --no-recursive --strip-vcs
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
