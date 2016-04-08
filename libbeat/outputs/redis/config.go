@@ -11,7 +11,7 @@ type redisConfig struct {
 	Password    string                `config:"password"`
 	Index       string                `config:"index"`
 	Port        int                   `config:"port"`
-	LoadBalance bool                  `config:"LoadBalance"`
+	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
 	MaxRetries  int                   `config:"max_retries"`
 	TLS         *outputs.TLSConfig    `config:"tls"`

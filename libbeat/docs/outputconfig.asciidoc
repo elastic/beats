@@ -487,11 +487,9 @@ spooler size.
 [[redis-output]]
 === Redis Output
 
-The Redis output inserts the events in a Redis list. This output plugin is compatible with
+The Redis output inserts the events in a Redis list or a Redis channel.
+This output plugin is compatible with
 the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-redis.html[Redis input plugin] for Logstash.
-
-NOTE: With the current implementation of the Redis output, data may be lost if the Redis server is temporarily
-unavailable. We recommend that you avoid using Redis output unless some data loss is tolerable.
 
 Example configuration:
 
@@ -500,12 +498,11 @@ Example configuration:
 output:
   redis:
     # Set the host and port where to find Redis.
-    host: "localhost"
-    port: 6379
+    hosts: ["localhost"]
 
-    # Uncomment out this option if you want to store the topology in Redis.
-    # The default is false.
-    save_topology: true
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    password: "my_password"
 
     # Optional index name. The default is {beatname_lc} and generates {beatname_lc} keys.
     index: "{beatname_lc}"
@@ -514,68 +511,129 @@ output:
     # The default is 0.
     db: 0
 
-    # Optional Redis database number where the topology is stored
-    # The default is 1. It must have a different value than db.
-    db_topology: 1
-
-    # Optional password to authenticate with. By default, no
-    # password is set.
-    # password: ""
-
     # Optional Redis initial connection timeout in seconds.
     # The default is 5 seconds.
     timeout: 5
-
-    # Optional interval for reconnecting to failed Redis connections.
-    # The default is 1 second.
-    reconnect_interval: 1
 ------------------------------------------------------------------------------
 
 ==== Redis Output Options
 
 You can specify the following options in the `redis` section:
 
-===== host
+===== hosts
 
-The host of the Redis server.
+The list of Redis server to connect to. If load balancing is enabled events are
+distributed to these servers. If one server becomes unreachable, the events are
+distributed to the reachable servers only. Each Redis server can be defined as
+`HOST` or `HOST:PORT`. For example: "192.15.3.2", "test.redis.io:12345". If no
+port is specified the value configured by `port` will be used.
 
 ===== port
 
-The port of the Redis server.
-
-===== db
-
-The Redis database number where the events are published. The default is 0.
-
-===== db_topology
-
-The Redis database number where the topology information is stored. The default is 1.
+Redis default port if hosts do not contain port number. The default is 6379.
 
 ===== index
 
-The name of the Redis list where the events are published. The default is
+The name of the Redis list or channel the events are published to. The default is
 "{beatname_lc}".
 
 ===== password
 
 The password to authenticate with. The default is no authentication.
 
+===== db
+
+The Redis database number where the events are published. The default is 0.
+
+===== datatype
+
+Choose Redis datatype used to publish events to. If datatype is `list`, the
+Redis RPUSH command will be used. Datatype `channel` will publish events by
+using the Redis `PUBLISH` command. The default value is `list`.
+
+===== host_topology
+
+Redis host to connect to for use with topology map support. Topology support is disabled if this option is not set.
+
+===== password_topology
+
+The password to authenticate with when connection to topology Redis server. The default is no authentication.
+
+===== db_topology
+
+The Redis database number where the topology information is stored. The default is 1.
+
+===== worker
+
+The number of workers per configured host publishing events to Redis. This
+is best used with load balancing mode enabled. Example: If you have 2 hosts and
+3 workers, in total 6 workers are started (3 for each host).
+
+===== loadbalance
+
+If set to true and multiple hosts or workers are configured, the output plugin load balances published events onto all Redis hosts. If set to false, the output plugin sends all events to only one host (determined at random) and will switch to another host if currently selected one becomes unreachable. The default value is true.
+
 ===== timeout
 
-The Redis initial connection timeout in seconds. The default is 5 seconds.
+The Redis connection timeout in seconds. The default is 5 seconds.
 
-===== reconnect_interval
+===== max_retries
 
-The interval for reconnecting failed Redis connections. The default is 1 second.
+The number of times to retry publishing an event after a publishing failure.
+After the specified number of retries, the events are typically dropped.
+Some Beats, such as Filebeat, ignore the `max_retries` setting and retry until all
+events are published.
+
+Set `max_retries` to a value less than 0 to retry until all events are published. 
+
+The default is 3.
 
 ===== bulk_max_size
 
-The maximum number of events to buffer internally during publishing. The default is 2048. 
+The maximum number of events to bulk in a single Redis rpush request or pipeline
+on network. The default is 2048.
 
-Specifying a larger batch size may add some latency and buffering during publishing. However, for Redis output, this 
-setting does not affect how events are published.
+If the Beat sends single events, the events are collected into batches. If the
+Beat publishes a large batch of events (larger than the value specified by
+`bulk_max_size`), the batch is split.
 
-Setting `bulk_max_size` to values less than or equal to 0 disables buffering in libbeat. 
+Specifying a larger batch size can improve performance by lowering the overhead
+of sending events. However big batch sizes can also increase processing times,
+which might result in API errors, killed connections, timed-out publishing
+requests, and, ultimately, lower throughput.
+
+Setting `bulk_max_size` to values less than or equal to 0 disables buffering in
+libbeat. When buffering is disabled, Beats that publish single events (such as
+Packetbeat and Topbeat) send each event directly to Redis. Beats that publish
+data in batches (such as Filebeat) send events in batches based on the spooler
+size.
+
+===== tls
+
+Configuration options for TLS parameters like the root CA for Redis connections
+guarded by SSL proxies (for example [stunnel](https://www.stunnel.org)). See
+<<configuration-output-tls>> for more information.
+
+===== proxy_url
+
+The URL of the SOCKS5 proxy to use when connecting to the Redis servers. The
+value must be a URL with a scheme of `socks5://`. The protocol used to
+communicate to Redis is not based on HTTP so a web-proxy cannot be used.
+
+If the SOCKS5 proxy server requires client authentication, then a username and
+password can be embedded in the URL.
+
+When using a proxy, hostnames are resolved on the proxy server instead of on the
+client. You can change this behavior by setting the
+<<redis-proxy-use-local-resolver,proxy_use_local_resolver>> option.
+
+[[redis-proxy-use-local-resolver]]
+===== proxy_use_local_resolver
+
+The `proxy_use_local_resolver` option determines if Redis hostnames are
+resolved locally when using a proxy. The default value is false which means
+that when a proxy is used the name resolution occurs on the proxy server.
+
 
 [[kafka-output]]
 === Kafka Output
