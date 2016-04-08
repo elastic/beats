@@ -207,16 +207,15 @@ update:
 	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
 
 ### KIBANA FILES HANDLING ###
-
-KIBANA_ES?=http://localhost:9200/
-.PHONY: update
-kibana-export:
-	python ${ES_BEATS}/libbeat/scripts/kibana_export.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+ES_URL?=http://localhost:9200/
 
 .PHONY: update
-kibana-import:
-	python ${ES_BEATS}/libbeat/scripts/kibana_import.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
+export-dashboards:
+	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
+.PHONY: update
+import-dashboards:
+	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
