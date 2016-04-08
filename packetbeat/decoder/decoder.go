@@ -24,6 +24,7 @@ type DecoderStruct struct {
 	sll       layers.LinuxSLL
 	lo        layers.Loopback
 	eth       layers.Ethernet
+	pf        layers.PFLog
 	d1q       [2]layers.Dot1Q
 	ip4       [2]layers.IPv4
 	ip6       [2]layers.IPv6
@@ -88,6 +89,7 @@ func NewDecoder(
 		&d.sll,             // LinuxSLL
 		&d.eth,             // Ethernet
 		&d.lo,              // loopback on OS X
+		&d.pf,              // pflog(4)
 		&d.stD1Q,           // VLAN
 		&d.stIP4, &d.stIP6, // IP
 		&d.icmp4, &d.icmp6, // ICMP
@@ -107,6 +109,9 @@ func NewDecoder(
 	case layers.LinkTypeNull: // loopback on OSx
 		d.linkLayerDecoder = &d.lo
 		d.linkLayerType = layers.LayerTypeLoopback
+	case layers.LinkTypePFLog: // pflog(4)
+		d.linkLayerDecoder = &d.pf
+		d.linkLayerType = layers.LayerTypePFLog
 	default:
 		return nil, fmt.Errorf("Unsupported link type: %s", datalink.String())
 	}
