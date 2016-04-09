@@ -173,6 +173,8 @@ func (p *Prospector) setupHarvesterConfig() error {
 	}
 	logp.Info("input_type set to: %v", config.InputType)
 
+	logp.Info("chunk_size set to: %v", config.ChunkSize)
+
 	config.BackoffDuration, err = getConfigDuration(config.Backoff, cfg.DefaultBackoff, "backoff")
 	if err != nil {
 		return err

@@ -63,6 +63,7 @@ type HarvesterConfig struct {
 	DocumentType       string `config:"document_type"`
 	Encoding           string `config:"encoding"`
 	InputType          string `config:"input_type"`
+	ChunkSize          int    `config:"chunk_size"`
 	TailFiles          bool   `config:"tail_files"`
 	Backoff            string `config:"backoff"`
 	BackoffDuration    time.Duration
