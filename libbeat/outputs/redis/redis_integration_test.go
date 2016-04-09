@@ -18,12 +18,47 @@ import (
 const (
 	RedisDefaultHost = "localhost"
 	RedisDefaultPort = "6379"
+
+	SRedisDefaultHost = "localhost"
+	SRedisDefaultPort = "6380"
 )
 
-func TestTopologyInRedis(t *testing.T) {
-	index := "test_topo"
+func TestTopologyInRedisTCP(t *testing.T) {
 	db := 1
+	index := "test_topo_tcp"
+	redisHosts := []string{getRedisAddr()}
+	redisConfig := map[string]interface{}{
+		"hosts":         redisHosts,
+		"index":         index,
+		"host_topology": redisHosts[0],
+		"db_topology":   db,
+		"timeout":       "5s",
+	}
 
+	testTopologyInRedis(t, redisConfig)
+}
+
+func TestTopologyInRedisTLS(t *testing.T) {
+	db := 1
+	index := "test_topo_tls"
+	redisHosts := []string{getSRedisAddr()}
+	redisConfig := map[string]interface{}{
+		"hosts":         redisHosts,
+		"index":         index,
+		"host_topology": redisHosts[0],
+		"db_topology":   db,
+		"timeout":       "5s",
+
+		"tls.insecure": false,
+		"tls.certificate_authorities": []string{
+			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
+		},
+	}
+
+	testTopologyInRedis(t, redisConfig)
+}
+
+func testTopologyInRedis(t *testing.T, cfg map[string]interface{}) {
 	tests := []struct {
 		out  *redisOut
 		name string
@@ -34,18 +69,15 @@ func TestTopologyInRedis(t *testing.T) {
 		{nil, "proxy3", []string{"10.1.0.10"}},
 	}
 
-	redisHosts := []string{getRedisAddr()}
-	redisConfig := map[string]interface{}{
-		"hosts":         redisHosts,
-		"index":         index,
-		"host_topology": redisHosts[0],
-		"db_topology":   db,
-		"timeout":       "5s",
+	db := 0
+	index := cfg["index"].(string)
+	if v, ok := cfg["db_topology"]; ok {
+		db = v.(int)
 	}
 
 	// prepare redis
 	{
-		conn, err := redis.Dial("tcp", redisHosts[0], redis.DialDatabase(db))
+		conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
 		if err != nil {
 			t.Fatalf("redis.Dial failed %v", err)
 		}
@@ -56,7 +88,7 @@ func TestTopologyInRedis(t *testing.T) {
 
 	// 1. connect
 	for i := range tests {
-		tests[i].out = newRedisTestingOutput(t, redisConfig)
+		tests[i].out = newRedisTestingOutput(t, cfg)
 		defer tests[i].out.Close()
 	}
 
@@ -83,23 +115,51 @@ func TestTopologyInRedis(t *testing.T) {
 	}
 }
 
-func TestPublishList(t *testing.T) {
-	index := "test_publist"
-	batches := 100
-	batchSize := 1000
-	total := batches & batchSize
+func TestPublishListTCP(t *testing.T) {
+	index := "test_publist_tcp"
 	db := 0
-	redisHosts := []string{getRedisAddr()}
-
 	redisConfig := map[string]interface{}{
-		"hosts":    redisHosts,
+		"hosts":    []string{getRedisAddr()},
 		"index":    index,
 		"db":       db,
 		"datatype": "list",
 		"timeout":  "5s",
 	}
 
-	conn, err := redis.Dial("tcp", redisHosts[0], redis.DialDatabase(db))
+	testPublishList(t, redisConfig)
+}
+
+func TestPublishListTLS(t *testing.T) {
+	index := "test_publist_tls"
+	db := 0
+	redisConfig := map[string]interface{}{
+		"hosts":    []string{getSRedisAddr()},
+		"index":    index,
+		"db":       db,
+		"datatype": "list",
+		"timeout":  "5s",
+
+		"tls.insecure": false,
+		"tls.certificate_authorities": []string{
+			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
+		},
+	}
+
+	testPublishList(t, redisConfig)
+}
+
+func testPublishList(t *testing.T, cfg map[string]interface{}) {
+	batches := 100
+	batchSize := 1000
+	total := batches & batchSize
+
+	db := 0
+	index := cfg["index"].(string)
+	if v, ok := cfg["db"]; ok {
+		db = v.(int)
+	}
+
+	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
 	if err != nil {
 		t.Fatalf("redis.Dial failed %v", err)
 	}
@@ -108,7 +168,7 @@ func TestPublishList(t *testing.T) {
 	defer conn.Close()
 	conn.Do("DEL", index)
 
-	out := newRedisTestingOutput(t, redisConfig)
+	out := newRedisTestingOutput(t, cfg)
 	err = sendTestEvents(out, batches, batchSize)
 	assert.NoError(t, err)
 
@@ -126,23 +186,51 @@ func TestPublishList(t *testing.T) {
 	}
 }
 
-func TestPublishChannel(t *testing.T) {
-	index := "test_pubchan"
-	batches := 100
-	batchSize := 1000
-	total := batches & batchSize
+func TestPublishChannelTCP(t *testing.T) {
 	db := 0
-	redisHosts := []string{getRedisAddr()}
-
+	index := "test_pubchan_tcp"
 	redisConfig := map[string]interface{}{
-		"hosts":    redisHosts,
+		"hosts":    []string{getRedisAddr()},
 		"index":    index,
 		"db":       db,
 		"datatype": "channel",
 		"timeout":  "5s",
 	}
 
-	conn, err := redis.Dial("tcp", redisHosts[0], redis.DialDatabase(db))
+	testPublishChannel(t, redisConfig)
+}
+
+func TestPublishChannelTLS(t *testing.T) {
+	db := 0
+	index := "test_pubchan_tls"
+	redisConfig := map[string]interface{}{
+		"hosts":    []string{getSRedisAddr()},
+		"index":    index,
+		"db":       db,
+		"datatype": "channel",
+		"timeout":  "5s",
+
+		"tls.insecure": false,
+		"tls.certificate_authorities": []string{
+			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
+		},
+	}
+
+	testPublishChannel(t, redisConfig)
+}
+
+func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
+	batches := 100
+	batchSize := 1000
+	total := batches & batchSize
+
+	db := 0
+	index := cfg["index"].(string)
+	if v, ok := cfg["db"]; ok {
+		db = v.(int)
+	}
+
+	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
 	if err != nil {
 		t.Fatalf("redis.Dial failed %v", err)
 	}
@@ -161,7 +249,7 @@ func TestPublishChannel(t *testing.T) {
 	// connect and publish events
 	var wg sync.WaitGroup
 	var pubErr error
-	out := newRedisTestingOutput(t, redisConfig)
+	out := newRedisTestingOutput(t, cfg)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -211,6 +299,12 @@ func getRedisAddr() string {
 	return fmt.Sprintf("%v:%v",
 		getEnv("REDIS_HOST", RedisDefaultHost),
 		getEnv("REDIS_PORT", RedisDefaultPort))
+}
+
+func getSRedisAddr() string {
+	return fmt.Sprintf("%v:%v",
+		getEnv("SREDIS_HOST", SRedisDefaultHost),
+		getEnv("SREDIS_PORT", SRedisDefaultPort))
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) *redisOut {
