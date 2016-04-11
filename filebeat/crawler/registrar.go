@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/filebeat/input"
 	. "github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 type Registrar struct {
@@ -46,17 +47,12 @@ func (r *Registrar) Init() error {
 		r.registryFile = cfg.DefaultRegistryFile
 	}
 
-	// Make sure the directory where we store the registryFile exists
-	absPath, err := filepath.Abs(r.registryFile)
-	if err != nil {
-		return fmt.Errorf("Failed to get the absolute path of %s: %v",
-			r.registryFile, err)
-	}
-	r.registryFile = absPath
+	// The registry file is opened in the data path
+	r.registryFile = paths.Resolve(paths.Data, r.registryFile)
 
 	// Create directory if it does not already exist.
 	registryPath := filepath.Dir(r.registryFile)
-	err = os.MkdirAll(registryPath, 0755)
+	err := os.MkdirAll(registryPath, 0755)
 	if err != nil {
 		return fmt.Errorf("Failed to created registry file dir %s: %v",
 			registryPath, err)

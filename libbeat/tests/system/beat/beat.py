@@ -230,7 +230,8 @@ class TestCase(unittest.TestCase):
         )
 
         # create working dir
-        self.working_dir = os.path.join(self.build_path + "run", self.id())
+        self.working_dir = os.path.abspath(os.path.join(
+            self.build_path + "run", self.id()))
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
