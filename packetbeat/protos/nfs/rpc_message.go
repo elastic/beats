@@ -2,9 +2,10 @@ package nfs
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/packetbeat/publish"
-	"time"
 )
 
 const (
