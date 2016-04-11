@@ -133,6 +133,15 @@ func makePublishRPUSH(conn redis.Conn) (publishFn, error) {
 		return nil, err
 	}
 
+	// Check Redis version number choosing the method
+	// how RPUSH shall be used. With version 2.4 RPUSH
+	// can accept multiple values at once turning RPUSH
+	// into batch like call instead of relying on pipelining.
+	//
+	// Versions 1.0 to 2.3 only accept one value being send with
+	// RPUSH requiring pipelining.
+	//
+	// See: http://redis.io/commands/rpush
 	multiValue := major > 2 || (major == 2 && minor >= 4)
 	if multiValue {
 		return publishEventsBulk(conn, "RPUSH"), nil
