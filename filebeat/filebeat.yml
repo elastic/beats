@@ -53,7 +53,7 @@ filebeat:
         #add_error_key: false
 
       # If chunk_size is set, the input is read in chunks of given byte-length instead of lines
-      # chunk_size: 200
+      #chunk_size: 200 
 
       # Exclude lines. A list of regular expressions to match. It drops the lines that are
       # matching any regular expression from the list. The include_lines is called before
@@ -194,7 +194,6 @@ filebeat:
   # the prospector part is processed. All global options like spool_size are ignored.
   # The config_dir MUST point to a different directory then where the main filebeat config file is in.
   #config_dir:
-
 ###############################################################################
 ############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features
@@ -468,3 +467,5 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
+
+

@@ -38,7 +38,7 @@ func createLineReader(
 	if chunkSize <= 0 {
 		p, err = processor.NewLineSource(fileReader, codec, bufferSize)
 	} else {
-		p, err = processor.NewChunkSource(fileReader, codec, chunkSize, bufferSize);
+		p, err = processor.NewChunkSource(fileReader, codec, chunkSize, bufferSize)
 	}
 	if err != nil {
 		return nil, err

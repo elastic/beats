@@ -176,9 +176,9 @@ type ChunkReader struct {
 	rawInput   io.Reader
 	codec      encoding.Encoding
 	bufferSize int
-	chunkSize int
+	chunkSize  int
 
-	buffer  *streambuf.Buffer
+	buffer    *streambuf.Buffer
 	rawBuffer *streambuf.Buffer
 	byteCount int // number of bytes decoded from input buffer into output buffer
 	decoder   transform.Transformer
@@ -232,7 +232,7 @@ func (l *ChunkReader) Next() ([]byte, int, error) {
 	}
 
 	// output chunk from the rawBuffer and reset the buffer
-	bytes, err := l.rawBuffer.Collect(l.chunkSize);
+	bytes, err := l.rawBuffer.Collect(l.chunkSize)
 	l.rawBuffer.Reset()
 	if err != nil {
 		// This should never happen as otherwise we have a broken state
@@ -262,14 +262,14 @@ func (l *ChunkReader) decode(input []byte) ([]byte, error) {
 				continue
 			}
 			if err == transform.ErrShortSrc {
-				err = nil;
-				break;
+				err = nil
+				break
 			}
 			break
 		}
 	}
 	resdata := l.buffer.Bytes()
 	l.buffer.Collect(l.buffer.Len())
-	l.buffer.Reset();
+	l.buffer.Reset()
 	return resdata, err
 }
