@@ -22,6 +22,10 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 
 *Filebeat*
 
+* Default location for the registry file was changed to be `data/registry` from the binary directory,
+  rather than `.filebeat` in the current working directory. This affects installations for zip/tar.gz/source,
+  the location for DEB and RPM packages stays the same. {pull}1373[1373]
+
 *Winlogbeat*
 
 
@@ -58,6 +62,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 ==== Deprecated
 
 *Affecting all Beats*
+
+* Configuration options and CLI flags for setting the home, data and config paths. {pull}1373[1373]
 
 *Packetbeat*
 

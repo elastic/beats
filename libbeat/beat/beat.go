@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/satori/go.uuid"
@@ -106,6 +107,7 @@ type BeatConfig struct {
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
 	Filter  []filter.FilterConfig
+	Path    paths.Path
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -179,12 +181,20 @@ func (bc *instance) config() error {
 		return fmt.Errorf("error unpacking config data: %v", err)
 	}
 
+	err = paths.InitPaths(&bc.data.Config.Path)
+	if err != nil {
+		return fmt.Errorf("error setting default paths: %v", err)
+	}
+
 	err = logp.Init(bc.data.Name, &bc.data.Config.Logging)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
 	// Disable stderr logging if requested by cmdline flag
 	logp.SetStderr()
+
+	// log paths values to help with troubleshooting
+	logp.Info(paths.Paths.String())
 
 	bc.data.filters, err = filter.New(bc.data.Config.Filter)
 	if err != nil {
