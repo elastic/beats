@@ -12,6 +12,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache"
 )
 
+const AUTO_STRING = "?auto"
+
 func init() {
 	helper.Registry.AddMetricSeter("apache", "status", New)
 }
@@ -23,6 +25,9 @@ func New() helper.MetricSeter {
 
 type MetricSeter struct {
 	ServerStatusPath string
+	Username         string
+	Password         string
+	Authentication   bool
 }
 
 // Setup any metric specific configuration
@@ -31,8 +36,12 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 	// Additional configuration options
 	config := struct {
 		ServerStatusPath string `config:"server_status_path"`
+		Username         string `config:"username"`
+		Password         string `config:"password"`
 	}{
 		ServerStatusPath: "server-status",
+		Username:         "",
+		Password:         "",
 	}
 
 	if err := ms.Module.ProcessConfig(&config); err != nil {
@@ -40,6 +49,13 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 	}
 
 	m.ServerStatusPath = config.ServerStatusPath
+	m.Username = config.Username
+	m.Password = config.Password
+	if m.Password != "" && m.Username != "" {
+		m.Authentication = true
+	} else {
+		m.Authentication = false
+	}
 
 	return nil
 }
@@ -52,7 +68,14 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 		return nil, err
 	}
 
-	resp, err := http.Get(u.String() + "?auto")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", u.String()+AUTO_STRING, nil)
+
+	if m.Authentication {
+		req.SetBasicAuth(m.Username, m.Password)
+	}
+	resp, err := client.Do(req)
+
 	if resp == nil {
 		return nil, err
 	}
