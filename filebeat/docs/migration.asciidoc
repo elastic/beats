@@ -41,7 +41,7 @@ The registry file stores the state and location information that Filebeat uses t
 where it was last reading. Under Logstash Forwarder, this file was called `.logstash-fowarder`. For Filebeat,
 the file was renamed. The name varies depending on the package type:
 
- * `.filebeat` for `.tar.gz` and `.tgz` archives
+ * `data/registry` for `.tar.gz` and `.tgz` archives
  * `/var/lib/filebeat/registry` for DEB and RPM packages
  * `c:\ProgramData\filebeat\registry` for the Windows zip file
 
@@ -426,7 +426,7 @@ with the new packages.
 One notable change is the name of the registry file. The name varies depending on the package
 type:
 
- * `.filebeat` for `.tar.gz` and `.tgz` archives
+ * `registry` for `.tar.gz` and `.tgz` archives
  * `/usr/lib/filebeat/registry` for DEB and RPM packages
  * `c:\ProgramData\filebeat\registry` for the Windows zip file
 

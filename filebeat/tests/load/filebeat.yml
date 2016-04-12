@@ -14,7 +14,7 @@ filebeat:
 
   spool_size: 4096
   idle_timeout: 5s
-  registry_file: .filebeat
+  registry_file: registry
 
 
 ############################# Output ##########################################

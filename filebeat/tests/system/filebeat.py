@@ -15,7 +15,7 @@ class BaseTest(TestCase):
         super(BaseTest, self).setUpClass()
 
     def get_registry(self):
-        # Returns content of the .filebeat file
+        # Returns content of the registry file
         dotFilebeat = self.working_dir + '/registry'
         assert os.path.isfile(dotFilebeat) is True
 

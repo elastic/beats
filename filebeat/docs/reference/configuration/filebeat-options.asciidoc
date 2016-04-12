@@ -390,13 +390,13 @@ filebeat:
 
 ===== registry_file
 
-The name of the registry file. By default, the registry file is put in the current
-working directory. If the working directory changes for subsequent runs of Filebeat, indexing starts from the beginning again.
+The name of the registry file. If a relative path is used, it is considered relative to the
+data path. The default is `registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat:
-  registry_file: .filebeat
+  registry_file: registry
 -------------------------------------------------------------------------------------
 
 
