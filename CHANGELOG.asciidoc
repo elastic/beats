@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 *Topbeat*
 
 *Filebeat*
+- Improvements in registrar dealing with file rotation. {pull}1281[1281]
 
 *Winlogbeat*
 

@@ -56,7 +56,7 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 		go prospector.Run(&c.wg)
 	}
 
-	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.State))
+	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.getStateCopy()))
 
 	return nil
 }

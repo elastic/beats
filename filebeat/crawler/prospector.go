@@ -20,8 +20,8 @@ type Prospector struct {
 }
 
 type Prospectorer interface {
-	Run()
 	Init()
+	Run()
 }
 
 func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, channel chan *input.FileEvent) (*Prospector, error) {
