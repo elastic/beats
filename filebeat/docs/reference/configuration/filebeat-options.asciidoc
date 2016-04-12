@@ -193,7 +193,7 @@ document. The default value is `log`.
 
 ===== harvester_buffer_size
 
-The buffer size every harvester uses when fetching the file. The default is 16384.
+The size in bytes of the buffer that each harvester uses when fetching a file. The default is 16384.
 
 ===== max_bytes
 
@@ -359,8 +359,8 @@ rotated files in case not all lines were read from the rotated file.
 
 ===== spool_size
 
-The event count spool threshold. This setting forces a network flush if the specified
-value is exceeded.
+The event count spool threshold. This setting forces a network flush if the number of events in the spooler exceeds
+the specified value.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
