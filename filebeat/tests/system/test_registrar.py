@@ -2,6 +2,9 @@ from filebeat import BaseTest
 
 import os
 import platform
+import time
+import shutil
+from nose.plugins.skip import Skip, SkipTest
 
 
 # Additional tests: to be implemented
@@ -32,10 +35,17 @@ class Test(BaseTest):
         file.close()
 
         filebeat = self.start_beat()
+        c = self.log_contains_count("states written")
+
         self.wait_until(
             lambda: self.log_contains(
                 "Processing 5 events"),
             max_timeout=15)
+
+        # Make sure states written appears one more time
+        self.wait_until(
+            lambda: self.log_contains("states written") > c,
+            max_timeout=10)
 
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
@@ -207,3 +217,158 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         assert os.path.isfile(self.working_dir + "/datapath/registry")
+
+    def test_rotating_file_inode(self):
+        """
+        Check that inodes are properly written during file rotation
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            scan_frequency="1s"
+        )
+
+        if os.name == "nt":
+            raise SkipTest
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/input"
+
+        filebeat = self.start_beat()
+
+        with open(testfile, 'w') as f:
+            f.write("entry1\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        data = self.get_registry()
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+
+        testfilerenamed1 = self.working_dir + "/log/input.1"
+        os.rename(testfile, testfilerenamed1)
+
+        with open(testfile, 'w') as f:
+            f.write("entry2\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        data = self.get_registry()
+
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+        assert os.stat(testfilerenamed1).st_ino == data[os.path.abspath(testfilerenamed1)]["FileStateOS"]["inode"]
+
+        # Rotate log file, create a new empty one and remove it afterwards
+        testfilerenamed2 = self.working_dir + "/log/input.2"
+        os.rename(testfilerenamed1, testfilerenamed2)
+        os.rename(testfile, testfilerenamed1)
+
+        with open(testfile, 'w') as f:
+            f.write("")
+
+        os.remove(testfilerenamed2)
+
+        with open(testfile, 'w') as f:
+            f.write("entry3\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=3),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+
+        # Compare file inodes and the one in the registry
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+        assert os.stat(testfilerenamed1).st_ino == data[os.path.abspath(testfilerenamed1)]["FileStateOS"]["inode"]
+
+        # Check that 2 files are part of the registrar file. The deleted file should never have been detected
+        assert len(data) == 2
+
+
+    def test_rotating_file_with_shutdown(self):
+        """
+        Check that inodes are properly written during file rotation and shutdown
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            scan_frequency="1s"
+        )
+
+        if os.name == "nt":
+            raise SkipTest
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/input"
+
+        filebeat = self.start_beat()
+
+        with open(testfile, 'w') as f:
+            f.write("entry1\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        data = self.get_registry()
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+
+        testfilerenamed1 = self.working_dir + "/log/input.1"
+        os.rename(testfile, testfilerenamed1)
+
+        with open(testfile, 'w') as f:
+            f.write("entry2\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        data = self.get_registry()
+
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+        assert os.stat(testfilerenamed1).st_ino == data[os.path.abspath(testfilerenamed1)]["FileStateOS"]["inode"]
+
+        filebeat.check_kill_and_wait()
+
+        # Store first registry file
+        shutil.copyfile(self.working_dir + "/registry", self.working_dir + "/registry.first")
+
+        # Rotate log file, create a new empty one and remove it afterwards
+        testfilerenamed2 = self.working_dir + "/log/input.2"
+        os.rename(testfilerenamed1, testfilerenamed2)
+        os.rename(testfile, testfilerenamed1)
+
+        with open(testfile, 'w') as f:
+            f.write("")
+
+        os.remove(testfilerenamed2)
+
+        with open(testfile, 'w') as f:
+            f.write("entry3\n")
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Output file was rotated
+        self.wait_until(
+            lambda: self.output_has(lines=2, output_file="output/filebeat.1"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+
+        # Compare file inodes and the one in the registry
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+        assert os.stat(testfilerenamed1).st_ino == data[os.path.abspath(testfilerenamed1)]["FileStateOS"]["inode"]
+
+        # Check that 2 files are part of the registrar file. The deleted file should never have been detected
+        assert len(data) == 2
+
+
