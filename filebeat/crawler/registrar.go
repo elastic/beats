@@ -64,7 +64,7 @@ func (r *Registrar) Init() error {
 }
 
 // loadState fetches the previous reading state from the configure RegistryFile file
-// The default file is .filebeat file which is stored in the same path as the binary is running
+// The default file is `registry` in the data path.
 func (r *Registrar) LoadState() {
 	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()

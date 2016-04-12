@@ -39,6 +39,15 @@ Start http server for profiling. This option is useful for troubleshooting and p
 Write memory profile data to the specified output file. This option is useful for
 troubleshooting the Beat.
 
+*`-path.config`*::
+Set the default location for configuration (e.g. the Elasticsearch template).
+
+*`-path.data`*::
+Set the default location for data files.
+
+*`-path.home`*::
+Set the default location for miscellaneous files.
+
 *`-v`*::
 Enable verbose output to show INFO-level messages.
 
