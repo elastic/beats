@@ -21,6 +21,129 @@
         "@timestamp": {
           "type": "date"
         },
+        "apache-status": {
+          "properties": {
+            "busyWorkers": {
+              "type": "integer"
+            },
+            "bytesPerReq": {
+              "type": "float"
+            },
+            "bytesPerSec": {
+              "type": "float"
+            },
+            "connections": {
+              "properties": {
+                "connsAsyncClosing": {
+                  "type": "integer"
+                },
+                "connsAsyncKeepAlive": {
+                  "type": "integer"
+                },
+                "connsAsyncWriting": {
+                  "type": "integer"
+                },
+                "connsTotal": {
+                  "type": "integer"
+                }
+              }
+            },
+            "cpu": {
+              "properties": {
+                "cpuChildrenSystem": {
+                  "type": "float"
+                },
+                "cpuChildrenUser": {
+                  "type": "float"
+                },
+                "cpuLoad": {
+                  "type": "float"
+                },
+                "cpuSystem": {
+                  "type": "float"
+                },
+                "cpuUser": {
+                  "type": "float"
+                }
+              }
+            },
+            "idleWorkers": {
+              "type": "integer"
+            },
+            "load": {
+              "properties": {
+                "load1": {
+                  "type": "float"
+                },
+                "load15": {
+                  "type": "float"
+                },
+                "load5": {
+                  "type": "float"
+                }
+              }
+            },
+            "reqPerSec": {
+              "type": "float"
+            },
+            "scoreboard": {
+              "properties": {
+                "closingConnection": {
+                  "type": "integer"
+                },
+                "dnsLookup": {
+                  "type": "integer"
+                },
+                "gracefullyFinishing": {
+                  "type": "integer"
+                },
+                "idleCleanup": {
+                  "type": "integer"
+                },
+                "keepalive": {
+                  "type": "integer"
+                },
+                "logging": {
+                  "type": "integer"
+                },
+                "openSlot": {
+                  "type": "integer"
+                },
+                "readingRequest": {
+                  "type": "integer"
+                },
+                "sendingReply": {
+                  "type": "integer"
+                },
+                "startingUp": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "waitingForConnection": {
+                  "type": "integer"
+                }
+              }
+            },
+            "totalAccesses": {
+              "type": "integer"
+            },
+            "totalKBytes": {
+              "type": "integer"
+            },
+            "uptime": {
+              "properties": {
+                "serverUptimeSeconds": {
+                  "type": "integer"
+                },
+                "uptime": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
         "mysql-status": {
           "properties": {
             "aborted": {

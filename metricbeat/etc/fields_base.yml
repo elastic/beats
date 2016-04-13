@@ -1,14 +1,15 @@
 version: 1.0
 
 defaults:
-  type: string
+  type: keyword
   required: false
-  index: not_analyzed
+  index: true
   doc_values: true
   ignore_above: 1024
 
 sections:
   - ["common", "Common fields"]
+  - ["apache-status", "Apache Status Info"]
   - ["redis-info", "Redis Info Stats"]
   - ["mysql-status", "MySQL Status"]
 
