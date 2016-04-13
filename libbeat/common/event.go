@@ -18,7 +18,7 @@ func MarshallUnmarshall(v interface{}) (MapStr, error) {
 	var v1 MapStr
 	err = json.Unmarshal(marshaled, &v1)
 	if err != nil {
-		logp.Warn("unmarshal err: %v")
+		logp.Warn("unmarshal err: %v", err)
 		return nil, err
 	}
 
