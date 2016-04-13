@@ -13,9 +13,12 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+
 - Add scripts for managing the dashboards of a single Beat {pull}1359[1359]
+- On DEB/RPM installations, the binary files are now found under `/usr/share/{{beat_name}}/bin`, not in `/usr/bin`. {pull}1385[1385]
 
 *Packetbeat*
+
 - Configuration of redis topology support changed. {pull}1353[1353]
 
 *Topbeat*
