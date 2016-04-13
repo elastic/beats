@@ -10,13 +10,16 @@
 ELASTICSEARCH=http://localhost:9200
 CURL=curl
 KIBANA_INDEX=".kibana"
-DIR=
+DIR=.
 
 print_usage() {
   echo "
   
-Load the dashboards, visualizations and index patterns into the given
-Elasticsearch instance.
+Import the dashboards, visualizations and index patterns into Kibana. 
+
+The Kibana dashboards together with its dependencies are saved into a
+special index pattern in Elasticsearch (by default .kibana), so you need to 
+specify the Elasticsearch URL and optionally an username and password.
 
 Usage:
   $(basename "$0") -url ${ELASTICSEARCH} -user admin:secret -index ${KIBANA_INDEX}
@@ -26,6 +29,7 @@ Options:
     Print the help menu.
   -d | -dir
     Local directory where the dashboards, visualizations, searches and index pattern are saved.
+    By default is current directory.
   -l | -url
     Elasticseacrh URL. By default is ${ELASTICSEARCH}.
   -u | -user
