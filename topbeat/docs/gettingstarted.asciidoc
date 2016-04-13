@@ -107,13 +107,13 @@ By default, it's set to 10 seconds.
 
 * The `procs` option defines a list of regular expressions to match all the processes that need to be monitored. By default, all the running processes are monitored.
 +
-If you are not interested in monitoring processes, you can use:
+If you are not interested in collecting per-process statistics, you can use:
 +
 [source, shell]
 -------------------------------------
 topbeat:
-  period: 10
-  procs: ["^$"]
+  stats:
+    process: false
 -------------------------------------
 
 . If you are sending output to Elasticsearch, set the IP address and port where Topbeat can find the Elasticsearch installation:
