@@ -1,7 +1,7 @@
 /etc/filebeat.dev.yml
 .idea
 .vagrant
-.filebeat
+/data/
 /docs/html_docs
 
 filebeat

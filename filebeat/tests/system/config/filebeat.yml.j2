@@ -63,7 +63,9 @@ filebeat:
     {% endif %}
   spool_size:
   idle_timeout: 0.1s
-  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
+  {% if not skip_registry_config %}
+  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+  {%endif%}
 
 
 ############################# Shipper ############################################
@@ -145,5 +147,10 @@ filter:
         fields: {{include_fields}}
     {%- endif %}
 {% endif %}
+
+{% if path_data %}
+path:
+  data: {{path_data}}
+{%endif%}
 
 # vim: set ft=jinja:

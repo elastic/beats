@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 type elasticsearchOutput struct {
@@ -131,7 +132,10 @@ func loadTemplate(config Template, clients []mode.ProtocolClient) {
 		// Always takes the first client
 		esClient := clients[0].(*Client)
 
-		logp.Info("Loading template enabled. Trying to load template: %v", config.Path)
+		// Look for the template in the configuration path, if it's not absolute
+		templatePath := paths.Resolve(paths.Config, config.Path)
+
+		logp.Info("Loading template enabled. Trying to load template: %v", templatePath)
 
 		exists := esClient.CheckTemplate(config.Name)
 
@@ -143,9 +147,9 @@ func loadTemplate(config Template, clients []mode.ProtocolClient) {
 			}
 
 			// Load template from file
-			content, err := ioutil.ReadFile(config.Path)
+			content, err := ioutil.ReadFile(templatePath)
 			if err != nil {
-				logp.Err("Could not load template from file path: %s; Error: %s", config.Path, err)
+				logp.Err("Could not load template from file path: %s; Error: %s", templatePath, err)
 			} else {
 				reader := bytes.NewReader(content)
 				err = esClient.LoadTemplate(config.Name, reader)
