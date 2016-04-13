@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/config"
@@ -72,12 +72,7 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 	if eb.config.Winlogbeat.RegistryFile == "" {
 		eb.config.Winlogbeat.RegistryFile = config.DefaultRegistryFile
 	}
-	eb.config.Winlogbeat.RegistryFile, err = filepath.Abs(
-		eb.config.Winlogbeat.RegistryFile)
-	if err != nil {
-		return fmt.Errorf("Error getting absolute path of registry file %s. %v",
-			eb.config.Winlogbeat.RegistryFile, err)
-	}
+	eb.config.Winlogbeat.RegistryFile = paths.Resolve(paths.Data, eb.config.Winlogbeat.RegistryFile)
 	logp.Info("State will be read from and persisted to %s",
 		eb.config.Winlogbeat.RegistryFile)
 
