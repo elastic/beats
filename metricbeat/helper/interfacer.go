@@ -12,6 +12,7 @@ package helper
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/filter"
 )
 
 /*
@@ -25,13 +26,13 @@ an identifier for each fetch call and it would have to be decide, which fetch ca
 
 // Base configuration for each module/metricsets combination
 type ModuleConfig struct {
-	Hosts      []string `config:"hosts"`
-	Period     string   `config:"period"`
-	Timeout    string   `config:"timeout"`
-	Module     string   `config:"module"`
-	MetricSets []string `config:"metricsets"`
-	Enabled    bool     `config:"enabled"`
-	Selectors  []string `config:"selectors"`
+	Hosts      []string              `config:"hosts"`
+	Period     string                `config:"period"`
+	Timeout    string                `config:"timeout"`
+	Module     string                `config:"module"`
+	MetricSets []string              `config:"metricsets"`
+	Enabled    bool                  `config:"enabled"`
+	Filters    []filter.FilterConfig `config:"filters"`
 
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 }

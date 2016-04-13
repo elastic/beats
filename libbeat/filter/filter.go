@@ -65,6 +65,11 @@ func (filters *FilterList) Get(index int) FilterRule {
 // Applies a sequence of filtering rules and returns the filtered event
 func (filters *FilterList) Filter(event common.MapStr) common.MapStr {
 
+	// Check if filters are set, just return event if not
+	if len(filters.filters) == 0 {
+		return event
+	}
+
 	// clone the event at first, before starting filtering
 	filtered := event.Clone()
 	var err error
