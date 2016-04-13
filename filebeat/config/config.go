@@ -14,7 +14,7 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile                      = ".filebeat"
+	DefaultRegistryFile                      = "registry"
 	DefaultIgnoreOlderDuration time.Duration = 0
 	DefaultCloseOlderDuration  time.Duration = 1 * time.Hour
 	DefaultScanFrequency       time.Duration = 10 * time.Second

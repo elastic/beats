@@ -41,12 +41,12 @@ class Test(BaseTest):
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
             lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                ".filebeat")),
+                                                "registry")),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
         # Check that a single file exists in the registry.
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
         assert len(data) == 1
 
         logFileAbsPath = os.path.abspath(testfile)
@@ -112,12 +112,12 @@ class Test(BaseTest):
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
             lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                ".filebeat")),
+                                                "registry")),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
         # Check that file exist
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
 
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
@@ -156,7 +156,7 @@ class Test(BaseTest):
         Checks that the registry is properly updated after a file is rotated
         """
         self.render_config_template(
-                path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*"
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -167,10 +167,8 @@ class Test(BaseTest):
         with open(testfile, 'w') as f:
             f.write("offset 9\n")
 
-        self.wait_until(
-                lambda: self.output_has(lines=1),
-                max_timeout=10)
-
+        self.wait_until(lambda: self.output_has(lines=1),
+                        max_timeout=10)
 
         testfilerenamed = self.working_dir + "/log/test.1.log"
         os.rename(testfile, testfilerenamed)
@@ -178,15 +176,13 @@ class Test(BaseTest):
         with open(testfile, 'w') as f:
             f.write("offset 10\n")
 
-
-        self.wait_until(
-                lambda: self.output_has(lines=2),
-                max_timeout=10)
+        self.wait_until(lambda: self.output_has(lines=2),
+                        max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
         # Check that file exist
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
 
         # Make sure the offsets are correctly set
         data[os.path.abspath(testfile)]["offset"] = 10
@@ -194,3 +190,20 @@ class Test(BaseTest):
 
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
+
+    def test_data_path(self):
+        """
+        Checks that the registry file is written in a custom data path.
+        """
+        self.render_config_template(
+            path=self.working_dir + "/test.log",
+            path_data=self.working_dir + "/datapath",
+            skip_registry_config=True,
+        )
+        with open(self.working_dir + "/test.log", "w") as f:
+            f.write("test message\n")
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        assert os.path.isfile(self.working_dir + "/datapath/registry")

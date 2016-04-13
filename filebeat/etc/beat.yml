@@ -181,10 +181,9 @@ filebeat:
   # Flush even though spool_size is not reached.
   #idle_timeout: 5s
 
-  # Name of the registry file. Per default it is put in the current working
-  # directory. In case the working directory is changed after when running
-  # filebeat again, indexing starts from the beginning again.
-  #registry_file: .filebeat
+  # Name of the registry file. If a relative path is used, it is considered relative to the
+  # data path.
+  #registry_file: registry
 
   # Full Path to directory with additional prospector configuration files. Each file must end with .yml
   # These config files must have the full filebeat config part inside, but only
