@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 - Drain response buffers when pipelining is used by redis output. {pull}1353[1353]
 - Unterminated environment variable expressions in config files will now cause an error {pull}1389[1389]
+- Fix issue with the automatic template loading when Elasticsearch is not available on Beat start. {issue}1321[1321]
 
 *Packetbeat*
 
