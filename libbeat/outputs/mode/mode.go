@@ -81,6 +81,8 @@ type AsyncProtocolClient interface {
 	AsyncPublishEvent(cb func(error), event common.MapStr) error
 }
 
+type ClientFactory func(host string) (ProtocolClient, error)
+
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
 	ErrTempBulkFailure = errors.New("temporary bulk send failure")
@@ -125,7 +127,7 @@ func NewAsyncConnectionMode(
 // outputer configuration host list and client factory function.
 func MakeClients(
 	config *common.Config,
-	newClient func(string) (ProtocolClient, error),
+	newClient ClientFactory,
 ) ([]ProtocolClient, error) {
 	hosts, err := ReadHostList(config)
 	if err != nil {
