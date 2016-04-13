@@ -10,6 +10,7 @@ This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-common>>
+* <<exported-fields-apache-status>>
 * <<exported-fields-redis-info>>
 * <<exported-fields-mysql-status>>
 
@@ -50,6 +51,288 @@ type: long
 required: True
 
 Event round trip time in microseconds
+
+
+[[exported-fields-apache-status]]
+=== Apache Status Info Fields
+
+Apache Status
+
+
+
+[[exported-fields-apache-status]]
+=== Apache Status Info Fields
+
+Apache Status info
+
+
+
+==== apache-status.hostname
+
+type: string
+
+Apache hostname
+
+
+==== apache-status.totalAccesses
+
+type: integer
+
+Total number of access requests
+
+
+==== apache-status.totalKBytes
+
+type: integer
+
+Total number of kilobytes served
+
+
+==== apache-status.reqPerSec
+
+type: float
+
+Requests per second
+
+
+==== apache-status.bytesPerSec
+
+type: float
+
+Bytes per second
+
+
+==== apache-status.bytesPerReq
+
+type: float
+
+Bytes per request
+
+
+==== apache-status.busyWorkers
+
+type: integer
+
+Number of busy workers
+
+
+==== apache-status.idleWorkers
+
+type: integer
+
+Number of idle workers
+
+
+=== uptime Fields
+
+Uptime stats
+
+
+
+==== apache-status.uptime.serverUptimeSeconds
+
+type: integer
+
+Server uptime in seconds
+
+
+==== apache-status.uptime.uptime
+
+type: integer
+
+Server uptime
+
+
+=== cpu Fields
+
+CPU stats
+
+
+
+==== apache-status.cpu.cpuLoad
+
+type: float
+
+CPU Load
+
+
+==== apache-status.cpu.cpuUser
+
+type: float
+
+cpu user load
+
+
+==== apache-status.cpu.cpuSystem
+
+type: float
+
+System cpu
+
+
+==== apache-status.cpu.cpuChildrenUser
+
+type: float
+
+CPU of children user
+
+
+==== apache-status.cpu.cpuChildrenSystem
+
+type: float
+
+cpu of children system
+
+
+=== connections Fields
+
+Connection stats
+
+
+
+==== apache-status.connections.connsTotal
+
+type: integer
+
+Total connections
+
+
+==== apache-status.connections.connsAsyncWriting
+
+type: integer
+
+Async connectin writing
+
+
+==== apache-status.connections.connsAsyncKeepAlive
+
+type: integer
+
+Async keeped alive connetions
+
+
+==== apache-status.connections.connsAsyncClosing
+
+type: integer
+
+Async closed connections
+
+
+=== load Fields
+
+Load averages
+
+
+
+==== apache-status.load.load1
+
+type: float
+
+Load average for the last minute
+
+
+==== apache-status.load.load5
+
+type: float
+
+Load avarage for the last 5 minutes
+
+
+==== apache-status.load.load15
+
+type: float
+
+Load aferage for the last 15 minutes
+
+
+=== scoreboard Fields
+
+Scoreboard metrics
+
+
+
+==== apache-status.scoreboard.startingUp
+
+type: integer
+
+Starting up
+
+
+==== apache-status.scoreboard.readingRequest
+
+type: integer
+
+Reading requests
+
+
+==== apache-status.scoreboard.sendingReply
+
+type: integer
+
+Sending Reply
+
+
+==== apache-status.scoreboard.keepalive
+
+type: integer
+
+Keep alive
+
+
+==== apache-status.scoreboard.dnsLookup
+
+type: integer
+
+Dns Lookups
+
+
+==== apache-status.scoreboard.closingConnection
+
+type: integer
+
+Closing connections
+
+
+==== apache-status.scoreboard.logging
+
+type: integer
+
+Logging
+
+
+==== apache-status.scoreboard.gracefullyFinishing
+
+type: integer
+
+Gracefully finishing
+
+
+==== apache-status.scoreboard.idleCleanup
+
+type: integer
+
+Idle cleanups
+
+
+==== apache-status.scoreboard.openSlot
+
+type: integer
+
+Open slots
+
+
+==== apache-status.scoreboard.waitingForConnection
+
+type: integer
+
+Waiting for connections
+
+
+==== apache-status.scoreboard.total
+
+type: integer
+
+Total
 
 
 [[exported-fields-redis-info]]
