@@ -5,13 +5,14 @@ param(
   [String] $d, [String] $dir,
   [switch] $h = $false, [switch] $help = $false
 )
+function prompt { "$pwd\" }
 
 # The default value of the variable. Initialize your own variables here
 $ELASTICSEARCH="http://localhost:9200"
 $CURL="Invoke-RestMethod"
 $KIBANA_INDEX=".kibana"
 $SCRIPT=$MyInvocation.MyCommand.Name
-$KIBANA_DIR=
+$KIBANA_DIR=prompt
 
 # Verify that Invoke-RestMethod is present. It was added in PS 3.
 if (!(Get-Command $CURL -errorAction SilentlyContinue))
@@ -33,6 +34,7 @@ Options:
     Print the help menu.
   -d | -dir
     Local directory where the dashboards, visualizations, searches and index pattern are saved.
+    By default is $KIBANA_DIR.
   -l | -url
     Elasticseacrh URL. By default is $ELASTICSEARCH.
   -u | -user

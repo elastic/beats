@@ -28,4 +28,6 @@ include::./dashboards.asciidoc[]
 
 include::./newbeat.asciidoc[]
 
+include::./newdashboards.asciidoc[]
+
 include::./release.asciidoc[]

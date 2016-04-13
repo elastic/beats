@@ -58,8 +58,6 @@ def ExportVisualization(es, visualization, kibana_index, output_directory):
             search,
             kibana_index,
             output_directory)
-    else:
-        print("Missing savedSearchId from {}".format(doc["_source"]))
 
 
 def ExportSearch(es, search, kibana_index, output_directory):
@@ -115,8 +113,8 @@ def main():
                         help="Elasticsearch index for the Kibana dashboards. "
                         "E.g. .kibana",
                         default=".kibana")
-    parser.add_argument("--dir", help="Output directory",
-                        default="saved")
+    parser.add_argument("--dir", help="Output directory. E.g. output",
+                        default="output")
 
     args = parser.parse_args()
 
