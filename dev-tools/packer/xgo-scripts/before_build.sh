@@ -25,15 +25,11 @@ PREFIX=/build
 
 echo $PREFIX
 
-
 # Copy template
 cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
 
 # linux
 cp $BEATNAME.yml $PREFIX/$BEATNAME-linux.yml
-
-# Updates template path for linux distros
-sed -i "s@path: \"$BEATNAME.template.json\"@path: \"/etc/$BEATNAME/$BEATNAME.template.json\"@" $PREFIX/$BEATNAME-linux.yml
 
 # binary
 cp $BEATNAME.yml $PREFIX/$BEATNAME-binary.yml

@@ -16,11 +16,11 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="{{.beat_description}}"
 NAME="{{.beat_name}}"
-DAEMON=/usr/bin/$NAME
-DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml"
+DAEMON=/usr/share/{{.beat_name}}/bin/$NAME
+DAEMON_ARGS="-c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}}"
 TEST_ARGS="-e -configtest"
 PIDFILE=/var/run/{{.beat_name}}.pid
-WRAPPER="/usr/bin/{{.beat_name}}-god"
+WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
