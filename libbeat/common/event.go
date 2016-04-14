@@ -18,7 +18,7 @@ func MarshallUnmarshall(v interface{}) (MapStr, error) {
 	var v1 MapStr
 	err = json.Unmarshal(marshaled, &v1)
 	if err != nil {
-		logp.Warn("unmarshal err: %v")
+		logp.Warn("unmarshal err: %v", err)
 		return nil, err
 	}
 
@@ -64,7 +64,7 @@ func ConvertToGenericEvent(v MapStr) MapStr {
 			case reflect.Map:
 				anothermap, err := MarshallUnmarshall(value)
 				if err != nil {
-					logp.Warn("fail to marschall & unmarshall map (%v): key=%v value=%#v",
+					logp.Warn("fail to marshall & unmarshall map (%v): key=%v value=%#v",
 						key, value)
 					continue
 				}
@@ -73,7 +73,7 @@ func ConvertToGenericEvent(v MapStr) MapStr {
 			case reflect.Struct:
 				anothermap, err := MarshallUnmarshall(value)
 				if err != nil {
-					logp.Warn("fail to marschall & unmarshall struct %v", key)
+					logp.Warn("fail to marshall & unmarshall struct %v", key)
 					continue
 				}
 				v[key] = anothermap
