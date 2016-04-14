@@ -20,7 +20,8 @@ class Test(BaseTest):
         exit_code = self.run_beat(config="invalid.yml", extra_args=["-N"])
 
         assert exit_code == 1
-        assert self.log_contains("topbeat and input are set in config") is True
+        assert self.log_contains(
+            "'topbeat' and 'input' are both set in config.") is True
 
     def test_old_config(self):
         """
@@ -33,5 +34,6 @@ class Test(BaseTest):
         time.sleep(1)
         topbeat.check_kill_and_wait()
 
-        assert self.log_contains("The 'input' configuration section is deprecated. Please use 'topbeat' instead") is True
-
+        assert self.log_contains(
+            "Using 'input' in configuration is deprecated and is scheduled to "
+            "be removed in Topbeat 6.0. Use 'topbeat' instead.") is True
