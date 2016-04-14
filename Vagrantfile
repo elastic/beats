@@ -20,7 +20,7 @@
 # -------------------
 #   - Use gmake instead of make.
 #
-# freebsd
+# freebsd and openbsd
 # -------------------
 #   - Use gmake instead of make.
 #   - Folder syncing doesn't work well. Consider copying the files into the box or
@@ -91,6 +91,20 @@ Vagrant.configure(2) do |config|
     # To enable the /vagrant folder, set disabled to false and uncomment the private_network.
     config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => true, disabled: true
     #config.vm.network "private_network", ip: "192.168.135.18"
+
+    freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
+  end
+
+  # OpenBSD 5.9
+  config.vm.define "openbsd", primary: true do |freebsd|
+    freebsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-virtualbox-2016-04-14_0019.box"
+    freebsd.vm.network :forwarded_port, guest: 22,   host: 2225,  id: "ssh", auto_correct: true
+
+    config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
+    config.vm.provider :virtualbox do |vbox|
+      vbox.check_guest_additions = false
+      vbox.functional_vboxsf = false
+    end
 
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
