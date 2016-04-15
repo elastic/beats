@@ -14,47 +14,39 @@
 
 experimental[]
 
-You can use environment variable references in the +{beatname_lc}.yml+ file to set values
-that need to be configurable during deployment. To do this, use:
+You can use environment variable references in the +{beatname_lc}.yml+ file to
+set values that need to be configurable during deployment. To do this, use:
 
 `${VAR}`
 
 Where `VAR` is the name of the environment variable.
 
-Each variable reference is replaced at startup by the value of the environment variable.
-The replacement is case-sensitive and occurs before the YAML file is parsed. References
-to undefined variables are replaced by empty strings unless you specify a default value.
-To specify a default value, use:
+Each variable reference is replaced at startup by the value of the environment
+variable. The replacement is case-sensitive and occurs before the YAML file is
+parsed. References to undefined variables are replaced by empty strings unless
+you specify a default value. To specify a default value, use:
 
 `${VAR:default_value}`
 
-Where `default_value` is the value to use if the environment variable is undefined.
+Where `default_value` is the value to use if the environment variable is
+undefined.
 
-After changing the value of an environment variable, you need to restart {beatname_uc} to
-pick up the new value.
+If you need to use a literal `${` in your configuration file then you can write
+`$${` to escape the expansion.
+
+After changing the value of an environment variable, you need to restart
+{beatname_uc} to pick up the new value.
 
 ==== Examples
 
 Here are some examples of configurations that use environment variables
-and what each configuration looks like after replacement: 
+and what each configuration looks like after replacement:
 
 [options="header"]
 |==================================
 |Config source	       |Environment setting   |Config after replacement
 |`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
+|`name: ${NAME}`       |no setting            |`name: `
 |`name: ${NAME:beats}` |no setting            |`name: beats`
 |`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
-|`hosts: [$HOSTS]`     |`export HOSTS="'localhost:9200', 'localhost:9202'"` |`hosts: ['localhost:9200', 'localhost:9202']`
 |==================================
-
-==== Troubleshooting
-
-When <<configuration-logging,logging>> is enabled at the `info` level or higher, a message is logged for each
-environment variable replacement. For example:
-
-["source","sh"]
--------------------------------------------------------------------------------------
-2016/01/13 23:00:27.925523 cfgfile.go:87: INFO Replacing config environment variable '${NAME}' with 'elastic'
-2016/01/13 23:00:27.925786 cfgfile.go:87: INFO Replacing config environment variable '${HOSTS}' with ''localhost:9200', 'localhost:9202''
--------------------------------------------------------------------------------------
-
