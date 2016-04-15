@@ -5,6 +5,7 @@ set -e
 cd /build
 
 mkdir /{{.beat_name}}-{{.version}}-windows
+cp -r homedirs/{{.beat_name}}/* /{{.beat_name}}-{{.version}}-windows/
 cp {{.beat_name}}-windows-{{.arch}}.exe /{{.beat_name}}-{{.version}}-windows/{{.beat_name}}.exe
 unix2dos {{.beat_name}}-win.yml
 cp {{.beat_name}}-win.yml /{{.beat_name}}-{{.version}}-windows/{{.beat_name}}.yml

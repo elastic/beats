@@ -25,6 +25,10 @@ PREFIX=/build
 
 echo $PREFIX
 
+# Add data to the home directory
+mkdir -p $PREFIX/homedirs/$BEATNAME
+make install-home HOME_PREFIX=$PREFIX/homedirs/$BEATNAME
+
 # Copy template
 cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
 
