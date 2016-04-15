@@ -1,0 +1,7 @@
+[[securing-packetbeat]]
+== Securing Packetbeat
+
+The following topics describe how to secure communication between Packetbeat and other products in the Elastic stack:
+
+* <<securing-communication-elasticsearch>>
+* <<configuring-tls-logstash>>
