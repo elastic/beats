@@ -269,58 +269,7 @@ TODO: Describe file in detail
 
 == Metricseter Details
 
-As described before, a metricseter looks as following:
-
-module/{module-name}/{module-name}/{metricset-name}/{metricset-name}.go
-----
-package {metricset-name}
-
-import (
-	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/metricbeat/helper"
-)
-
-func init() {
-	helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New)
-}
-
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
-}
-
-type MetricSeter struct {}
-
-// Setup Metricset
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
-}
-
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
-	event := common.MapStr{"hello": "world"}
-	return event
-}
-----
-
-Each metricseter contains 3 parts:
-
-* Registration of metricseter
-* Type definition
-* Interface methods
-
-TODO:
-* describe file above in detail
-* Recommendation: If the transfomration is large, do it in a seprate file `data.go`
-* Create template with the types of your dashboard
-* Make sure that Fetch does respect the timeout
-* Update list.go file with your metricset
-* Define all types in details
-* Add details about setup that it should not block and still open connection to server even if not reachable beacuse of error returned.
-  * All hosts must be setup independent on message received
-  * If host not reachable, metricset must send afterwards error for each host not reachable
-  * Event should try to reconnect on error?
-* How to use fields.yml and what it does with the docs
+TODO: Link to create-metricset
 
 
 == Testing
