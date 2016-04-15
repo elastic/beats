@@ -5,6 +5,7 @@ set -e
 cd /build
 
 mkdir /{{.beat_name}}-{{.version}}-{{.bin_arch}}
+cp -r homedirs/{{.beat_name}}/* /{{.beat_name}}-{{.version}}-{{.bin_arch}}/
 cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}
 cp {{.beat_name}}-binary.yml /{{.beat_name}}-{{.version}}-{{.bin_arch}}/{{.beat_name}}.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-{{.bin_arch}}/

@@ -5,6 +5,7 @@ set -e
 cd /build
 
 mkdir /{{.beat_name}}-{{.version}}-darwin
+cp -r homedirs/{{.beat_name}}/* /{{.beat_name}}-{{.version}}-darwin/
 cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}
 cp {{.beat_name}}-darwin.yml /{{.beat_name}}-{{.version}}-darwin/{{.beat_name}}.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-{{.version}}-darwin/

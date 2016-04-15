@@ -244,3 +244,17 @@ write-environment:
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
 
+
+### Packaging targets ####
+
+# Installs the files that need to get to the home path on installations
+HOME_PREFIX?=/tmp/${BEATNAME}
+.PHONY: install-home
+install-home:
+	mkdir -p ${HOME_PREFIX}
+	if [ -d "etc/kibana" ]; then \
+		cp -r etc/kibana ${HOME_PREFIX}/kibana; \
+		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
+		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
+	fi
+
