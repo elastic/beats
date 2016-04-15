@@ -38,6 +38,11 @@ common:
         The timestamp when the log line was read. The precision is in
         milliseconds. The timezone is UTC.
 
+    - name: metricset-host
+      description: >
+        Hostname of the machine from which the metricset was collected. This
+        field may not be present when the data was collected locally.
+
     - name: rtt
       type: long
       required: true
