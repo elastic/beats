@@ -11,10 +11,6 @@ import (
 
 const output_format = "%-15s %4s %4s %5s %4s %-15s\n"
 
-func formatSize(size uint64) string {
-	return gosigar.FormatSize(size * 1024)
-}
-
 func main() {
 	fslist := gosigar.FileSystemList{}
 	fslist.Get()
@@ -31,9 +27,9 @@ func main() {
 
 		fmt.Fprintf(os.Stdout, output_format,
 			fs.DevName,
-			formatSize(usage.Total),
-			formatSize(usage.Used),
-			formatSize(usage.Avail),
+			gosigar.FormatSize(usage.Total),
+			gosigar.FormatSize(usage.Used),
+			gosigar.FormatSize(usage.Avail),
 			gosigar.FormatPercent(usage.UsePercent()),
 			dir_name)
 	}
