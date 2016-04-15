@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # this is executed in the docker fpm image
 set -e
@@ -10,9 +10,18 @@ cp ${RUNID}.init /tmp/{{.beat_name}}.init
 # create script to reload systemd config
 echo "#!/bin/bash\nsystemctl daemon-reload 2> /dev/null || true" > /tmp/systemd-daemon-reload.sh
 
+# add SNAPSHOT if it was requested
+VERSION="{{.version}}"
+if [ "$SNAPSHOT" = "yes" ]; then
+    VERSION="${VERSION}-SNAPSHOT"
+fi
+
+# replace - with ~ to allow the GA versions to be installed over alpahs/betas/snapshots
+RPM_VERSION=`echo ${VERSION} | sed 's/-/~/'`
+
 # create rpm
 fpm --force -s dir -t rpm \
-        -n {{.beat_name}} -v {{.rpm_version}} \
+        -n {{.beat_name}} -v ${RPM_VERSION} \
         --architecture {{.rpm_arch}} \
         --vendor "Elastic" \
         --license "ASL 2.0" \
@@ -31,10 +40,10 @@ fpm --force -s dir -t rpm \
 
 # rename so that the filename respects semver rules
 mkdir -p upload/{{.beat_name}}
-mv {{.beat_name}}-{{.rpm_version}}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm"
+mv {{.beat_name}}-${RPM_VERSION}-1.{{.rpm_arch}}.rpm upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm"
 
 # create sha1 file
 cd upload/{{.beat_name}}
-sha1sum {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm > {{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1.txt
-echo "Created upload/{{.beat_name}}/{{.beat_name}}-{{.version}}-{{.rpm_arch}}.rpm.sha1.txt"
+sha1sum {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm > {{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1.txt
+echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.rpm_arch}}.rpm.sha1.txt"
