@@ -264,6 +264,18 @@ class TestCase(unittest.TestCase):
                                 "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
 
+    def get_log(self, logfile=None):
+        """
+        Returns the log as a string.
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+            data=f.read()
+
+        return data
+
     def log_contains(self, msg, logfile=None):
         """
         Returns true if the give logfile contains the given message.
