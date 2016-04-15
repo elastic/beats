@@ -125,7 +125,7 @@ func testEvent() common.MapStr {
 }
 
 type testPublisher struct {
-	pub              *PublisherType
+	pub              *Publisher
 	outputMsgHandler *testMessageHandler
 }
 
@@ -142,7 +142,7 @@ const (
 )
 
 func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
-	pub := &PublisherType{}
+	pub := &Publisher{}
 	pub.wsOutput.Init()
 	pub.wsPublisher.Init()
 
@@ -158,8 +158,8 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 
 	pub.Output = []*outputWorker{ow}
 
-	pub.syncPublisher = newSyncPublisher(pub, defaultChanSize, defaultBulkChanSize)
-	pub.asyncPublisher = newAsyncPublisher(pub, defaultChanSize, defaultBulkChanSize, &pub.wsPublisher)
+	pub.pipelines.sync = newSyncPipeline(pub, defaultChanSize, defaultBulkChanSize)
+	pub.pipelines.async = newAsyncPipeline(pub, defaultChanSize, defaultBulkChanSize, &pub.wsPublisher)
 	return &testPublisher{
 		pub:              pub,
 		outputMsgHandler: mh,
@@ -168,22 +168,22 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 
 func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
 	ctx := Context{}
-	return t.pub.asyncPublisher.client().PublishEvent(ctx, event)
+	return t.pub.pipelines.async.publish(message{context: ctx, event: event})
 }
 
 func (t *testPublisher) asyncPublishEvents(events []common.MapStr) bool {
 	ctx := Context{}
-	return t.pub.asyncPublisher.client().PublishEvents(ctx, events)
+	return t.pub.pipelines.async.publish(message{context: ctx, events: events})
 }
 
 func (t *testPublisher) syncPublishEvent(event common.MapStr) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	return t.pub.syncPublisher.client().PublishEvent(ctx, event)
+	return t.pub.pipelines.sync.publish(message{context: ctx, event: event})
 }
 
 func (t *testPublisher) syncPublishEvents(events []common.MapStr) bool {
 	ctx := Context{publishOptions: publishOptions{Guaranteed: true}}
-	return t.pub.syncPublisher.client().PublishEvents(ctx, events)
+	return t.pub.pipelines.sync.publish(message{context: ctx, events: events})
 }
 
 // newTestPublisherWithBulk returns a new testPublisher with bulk message

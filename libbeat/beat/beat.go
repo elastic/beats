@@ -89,14 +89,14 @@ type FlagsHandler interface {
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Name      string                   // Beat name.
-	Version   string                   // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
-	UUID      uuid.UUID                // ID assigned to a Beat instance.
-	BT        Beater                   // Beater implementation.
-	RawConfig *common.Config           // Raw config that can be unpacked to get Beat specific config data.
-	Config    BeatConfig               // Common Beat configuration data.
-	Events    publisher.Client         // Client used for publishing events.
-	Publisher *publisher.PublisherType // Publisher
+	Name      string               // Beat name.
+	Version   string               // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
+	UUID      uuid.UUID            // ID assigned to a Beat instance.
+	BT        Beater               // Beater implementation.
+	RawConfig *common.Config       // Raw config that can be unpacked to get Beat specific config data.
+	Config    BeatConfig           // Common Beat configuration data.
+	Events    publisher.Client     // Client used for publishing events.
+	Publisher *publisher.Publisher // Publisher
 
 	filters *filter.FilterList // Filters
 }
@@ -234,7 +234,7 @@ func (bc *instance) setup() error {
 	}
 
 	bc.data.Publisher.RegisterFilter(bc.data.filters)
-	bc.data.Events = bc.data.Publisher.Client()
+	bc.data.Events = bc.data.Publisher.Connect()
 
 	err = bc.beater.Setup(bc.data)
 	if err != nil {

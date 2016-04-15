@@ -1,35 +1,21 @@
 package publisher
 
-import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
-)
+import "github.com/elastic/beats/libbeat/outputs"
 
-type syncPublisher struct {
-	pub *PublisherType
+type syncPipeline struct {
+	pub *Publisher
 }
 
-type syncClient func(message) bool
-
-func newSyncPublisher(pub *PublisherType, hwm, bulkHWM int) *syncPublisher {
-	return &syncPublisher{pub: pub}
+type syncSignal struct {
+	ch   chan bool
+	done chan struct{}
 }
 
-func (p *syncPublisher) client() eventPublisher {
-	return p
+func newSyncPipeline(pub *Publisher, hwm, bulkHWM int) *syncPipeline {
+	return &syncPipeline{pub: pub}
 }
 
-func (p *syncPublisher) PublishEvent(ctx Context, event common.MapStr) bool {
-	msg := message{context: ctx, event: event}
-	return p.send(msg)
-}
-
-func (p *syncPublisher) PublishEvents(ctx Context, events []common.MapStr) bool {
-	msg := message{context: ctx, events: events}
-	return p.send(msg)
-}
-
-func (p *syncPublisher) send(m message) bool {
+func (p *syncPipeline) publish(m message) bool {
 	if p.pub.disabled {
 		debug("publisher disabled")
 		outputs.SignalCompleted(m.context.Signal)
@@ -37,7 +23,7 @@ func (p *syncPublisher) send(m message) bool {
 	}
 
 	signal := m.context.Signal
-	sync := outputs.NewSyncSignal()
+	sync := &syncSignal{done: m.client.done, ch: make(chan bool, 1)}
 	if len(p.pub.Output) > 1 {
 		m.context.Signal = outputs.NewSplitSignaler(sync, len(p.pub.Output))
 	} else {
@@ -48,11 +34,26 @@ func (p *syncPublisher) send(m message) bool {
 		o.send(m)
 	}
 
-	ok := sync.Wait()
-	if ok {
-		outputs.SignalCompleted(signal)
-	} else if signal != nil {
-		signal.Failed()
+	// Await completion signal from output plugin. If client has been disconnected
+	// ignore any signal and drop events no matter if send or not.
+	select {
+	case <-sync.done:
+		// do not signal on 'drop' when closing connection
+		return false
+	case ok := <-sync.ch:
+		if ok {
+			outputs.SignalCompleted(signal)
+		} else if signal != nil {
+			signal.Failed()
+		}
+		return ok
 	}
-	return ok
+}
+
+func (s *syncSignal) Completed() {
+	s.ch <- true
+}
+
+func (s *syncSignal) Failed() {
+	s.ch <- false
 }

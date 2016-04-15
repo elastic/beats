@@ -6,61 +6,65 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-type asyncPublisher struct {
+type asyncPipeline struct {
 	outputs []worker
-	pub     *PublisherType
+	pub     *Publisher
+}
+
+type asyncSignal struct {
+	cancel *canceling
+	signal outputs.Signaler
 }
 
 const (
 	defaultBulkSize = 2048
 )
 
-func newAsyncPublisher(pub *PublisherType, hwm, bulkHWM int, ws *common.WorkerSignal) *asyncPublisher {
-	p := &asyncPublisher{pub: pub}
+func newAsyncPipeline(
+	pub *Publisher,
+	hwm, bulkHWM int,
+	ws *common.WorkerSignal,
+) *asyncPipeline {
+	p := &asyncPipeline{pub: pub}
 
 	var outputs []worker
 	for _, out := range pub.Output {
-		outputs = append(outputs, asyncOutputer(ws, hwm, bulkHWM, out))
+		outputs = append(outputs, makeAsyncOutput(ws, hwm, bulkHWM, out))
 	}
 
 	p.outputs = outputs
 	return p
 }
 
-func (p *asyncPublisher) client() eventPublisher {
-	return p
-}
-
-func (p *asyncPublisher) PublishEvent(ctx Context, event common.MapStr) bool {
-	p.send(message{context: ctx, event: event})
-	return true
-}
-
-func (p *asyncPublisher) PublishEvents(ctx Context, events []common.MapStr) bool {
-	p.send(message{context: ctx, events: events})
-	return true
-}
-
-func (p *asyncPublisher) send(m message) {
+func (p *asyncPipeline) publish(m message) bool {
 	if p.pub.disabled {
 		debug("publisher disabled")
 		outputs.SignalCompleted(m.context.Signal)
-		return
+		return true
 	}
 
-	// m.signal is not set yet. But a async client type supporting signals might
-	// be implemented in the future.
-	// If m.Signal is nil, NewSplitSignaler will return nil -> signaler will
-	// only set if client did send one
-	if m.context.Signal != nil && len(p.outputs) > 1 {
-		m.context.Signal = outputs.NewSplitSignaler(m.context.Signal, len(p.outputs))
+	if m.context.Signal != nil {
+		var s outputs.Signaler = &asyncSignal{
+			cancel: m.client.canceling,
+			signal: m.context.Signal,
+		}
+		if len(p.outputs) > 1 {
+			s = outputs.NewSplitSignaler(s, len(p.outputs))
+		}
+		m.context.Signal = s
 	}
+
 	for _, o := range p.outputs {
 		o.send(m)
 	}
+	return true
 }
 
-func asyncOutputer(ws *common.WorkerSignal, hwm, bulkHWM int, worker *outputWorker) worker {
+func makeAsyncOutput(
+	ws *common.WorkerSignal,
+	hwm, bulkHWM int,
+	worker *outputWorker,
+) worker {
 	config := worker.config
 
 	flushInterval := config.FlushInterval
@@ -76,4 +80,22 @@ func asyncOutputer(ws *common.WorkerSignal, hwm, bulkHWM int, worker *outputWork
 	debug("create bulk processing worker (interval=%v, bulk size=%v)",
 		flushInterval, maxBulkSize)
 	return newBulkWorker(ws, hwm, bulkHWM, worker, flushInterval, maxBulkSize)
+}
+
+func (s *asyncSignal) Completed() {
+	s.cancel.lock.RLock()
+	defer s.cancel.lock.RUnlock()
+
+	if s.cancel.active {
+		s.signal.Completed()
+	}
+}
+
+func (s *asyncSignal) Failed() {
+	s.cancel.lock.RLock()
+	defer s.cancel.lock.RUnlock()
+
+	if s.cancel.active {
+		s.signal.Failed()
+	}
 }
