@@ -1,15 +1,24 @@
-from metricbeat.metricbeat import BaseTest
+import re
+from metricbeat import BaseTest
+
 
 class Test(BaseTest):
-
-    def test_base(self):
+    def test_start_stop(self):
         """
-        Basic test with exiting Mockbeat normally
+        Metricbeat starts and stops without error.
         """
-        self.render_config_template(
-        )
-
+        self.render_config_template()
         proc = self.start_beat()
-        self.wait_until( lambda: self.log_contains("Setup Beat"))
-        exit_code = proc.kill_and_wait()
-        assert exit_code == 0
+        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        # Ensure all Beater stages are used.
+        self.assertRegexpMatches(log, re.compile(".*".join([
+            "Setup Beat: metricbeat",
+            "metricbeat start running",
+            "metricbeat cleanup"
+        ]), re.DOTALL))

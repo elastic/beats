@@ -35,7 +35,7 @@ func eventMapping(info map[string]string) common.MapStr {
 			"used_memory_lua":  toInt(info["used_memory_lua"]),
 			"mem_allocator":    info["mem_allocator"], // Could be moved to server as it rarely changes
 		},
-		"presistence": common.MapStr{
+		"persistence": common.MapStr{
 			"loading":                      toBool(info["loading"]),
 			"rdb_changes_since_last_save":  toInt(info["rdb_changes_since_last_save"]),
 			"rdb_bgsave_in_progress":       toBool(info["rdb_bgsave_in_progress"]),
@@ -85,8 +85,8 @@ func eventMapping(info map[string]string) common.MapStr {
 			"instantaneous_ops_per_sec":  toInt(info["instantaneous_ops_per_sec"]),
 			"total_net_input_bytes":      toInt(info["total_net_input_bytes"]),
 			"total_net_output_bytes":     toInt(info["total_net_output_bytes"]),
-			"instantaneous_input_kbps":   toInt(info["instantaneous_input_kbps"]),
-			"instantaneous_output_kbps":  toInt(info["instantaneous_output_kbps"]),
+			"instantaneous_input_kbps":   toFloat(info["instantaneous_input_kbps"]),
+			"instantaneous_output_kbps":  toFloat(info["instantaneous_output_kbps"]),
 			"rejected_connections":       toInt(info["rejected_connections"]),
 			"sync_full":                  toInt(info["sync_full"]),
 			"sync_partial_ok":            toInt(info["sync_partial_ok"]),
