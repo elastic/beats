@@ -4,6 +4,9 @@ import (
 	"errors"
 	"io"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -55,6 +58,103 @@ func createLineReader(
 	p = processor.NewStripNewline(p)
 	return processor.NewLimitProcessor(p, maxBytes), nil
 }
+
+
+func (h *Harvester) processException(text string) int {
+
+	// no text to test
+	if len(text) < 4 {
+		return 0
+	}
+
+	isExtension := h.CurrentException.Name != "" && (strings.Contains(text, "Caused by: ") || strings.HasPrefix(strings.Trim(text, " "), "at ") || strings.HasPrefix(text, "... "))
+
+	// not a continuation, if we have an exception, log it.
+	if !isExtension && h.CurrentException.Name != "" {
+
+		h.CurrentEvent.CustomS["ex_cause"] = h.CurrentException.Cause.String() + ""
+
+		h.SpoolerChan <- h.CurrentEvent // ship the new event downstream
+
+		h.CurrentException = LogException{} // make a new exception
+	}
+
+
+	// this is a multiline exception
+	if isExtension {
+
+		var expLen = len(h.Config.ExceptionPackages)
+
+
+		// find the file and package name for the exception 
+		if h.CurrentException.Name == "" {
+			re := regexp.MustCompile("([a-zA-Z0-9\\.]+)\\(([a-zA-Z0-9]+\\.javax?):(\\d+)\\)")
+			reg_result := re.FindStringSubmatch(text)
+			if reg_result != nil {
+				h.CurrentEvent.CustomS["ex_package"] = reg_result[1]
+				h.CurrentEvent.CustomS["ex_file"] = reg_result[2]
+				i64, err := strconv.ParseInt(reg_result[3], 10, 32)
+				if err == nil {
+					h.CurrentEvent.CustomI3["ex_line"] = i64
+				}
+			}
+		}
+
+		// load in the call stack
+		if h.CurrentException.NumCause < h.Config.ExceptionMaxStack {
+			var matched bool = false
+			// is this package in the list of packages to track?
+			for i := 0; i < expLen; i++ {
+				if strings.Contains(text, h.Config.ExceptionPackages[i]) {
+					h.CurrentException.Cause.WriteString("," + text[3:len(text)])
+					matched = true
+					h.CurrentException.NumCause += 1
+					break
+				}
+			}
+
+			// it's not so replace with a .
+			if !matched {
+				h.CurrentException.Cause.WriteString(".")
+			}
+		} else {
+			// no packages to track use a .
+			h.CurrentException.Cause.WriteString(".")
+		}
+
+		return 2
+	}
+
+	// find exceptions ...
+	if strings.Contains(text, "Exception: ") || strings.Contains(text, "Exception; ") {
+
+		// make sure we have additional storage
+		if h.CurrentEvent.CustomS == nil {
+			h.CurrentEvent.CustomS = make(map[string]string)
+		}
+		if h.CurrentEvent.CustomI3 == nil {
+			h.CurrentEvent.CustomI3 = make(map[string]int64)
+		}
+
+		// caprture exception name and package
+		re := regexp.MustCompile("([a-z\\.]*)\\.([A-Z][a-zA-Z\\.]*Exception)[:;]\\s+(.*)")
+		reg_result := re.FindStringSubmatch(text)
+		if reg_result != nil {
+			h.CurrentEvent.CustomS["ex_package"] = reg_result[1] + ""
+			h.CurrentEvent.CustomS["ex_name"] = reg_result[2] + ""
+			h.CurrentException.Name = reg_result[2] + ""
+			h.CurrentEvent.CustomS["ex_description"] = reg_result[3] + ""
+			h.CurrentException.NumCause = 0
+		} else {
+			logp.Warn("   ****** Exception REGEX DID NOT MATCH", text)
+		}
+
+		return 3
+	}
+
+	return 0
+}
+
 
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
@@ -110,6 +210,7 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
+	Loop:
 	for {
 		// Partial lines return error and are only read on completion
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
@@ -131,23 +232,94 @@ func (h *Harvester) Harvest() {
 			logp.Info("Read line error: %s", err)
 			return
 		}
+		h.Lineno += 1
 
 		if h.shouldExportLine(text) {
-			event := &input.FileEvent{
-				EventMetadata: h.Config.EventMetadata,
-				ReadTime:      ts,
-				Source:        &h.Path,
-				InputType:     h.Config.InputType,
-				DocumentType:  h.Config.DocumentType,
-				Offset:        h.Offset,
-				Bytes:         bytesRead,
-				Text:          &text,
-				Fileinfo:      &info,
-				JSONFields:    jsonFields,
-				JSONConfig:    h.Config.JSON,
+
+			// if we aren't working on a current exception
+			if h.CurrentException.Name == "" {
+				//fmt.Println("  create event.")
+				h.CurrentEvent = &input.FileEvent{
+					EventMetadata: h.Config.EventMetadata,
+					ReadTime:      ts,
+					Source:        &h.Path,
+					InputType:     h.Config.InputType,
+					DocumentType:  h.Config.DocumentType,
+					Offset:        h.Offset,
+					Bytes:         bytesRead,
+					// TODO remove Text
+					//Text:     &text,
+					Fileinfo: &info,
+					JSONFields:    jsonFields,
+					JSONConfig:    h.Config.JSON,
+				}
 			}
 
-			h.SpoolerChan <- event // ship the new event downstream
+
+			// have a regular expression to map fields
+			if h.Config.RegexList != nil {
+				m := 0
+				x := 0
+				h.CurrentEvent.CustomS = make(map[string]string)
+				h.CurrentEvent.CustomI3 = make(map[string]int64)
+
+				NextRegex:
+				for x := 0; x < len(h.Config.RegexList); x++ {
+
+					bigregex := ""
+					for i := 0; i < len(h.Config.RegexList[x].Regex); i++ {
+						prop := h.Config.RegexList[x].Regex[i]
+						bigregex += prop.Regex
+					}
+					reg_result := h.RegexList[x].FindStringSubmatch(text)
+
+
+					var i = -1
+					for k := range reg_result {
+						v := reg_result[k]
+
+						if i >= 0 && i < len(h.Config.RegexList[x].Regex) {
+
+							prop := h.Config.RegexList[x].Regex[i]
+							if prop.Name != "ignore" {
+								h.CurrentEvent.CustomS[prop.Name] = v
+								logp.Debug("(%s) %s\n", prop.Name, v)
+
+								// we will process "message" for exceptions
+								if prop.Name == "message" {
+									var exproc = h.processException(h.CurrentEvent.CustomS[prop.Name])
+									// continuation of an exception, get the next line
+									if exproc > 1 {
+										continue Loop
+									}
+									// the exception is done, log this line
+								}
+							}
+						}
+						i++
+					}
+
+
+					if i > -1 {
+						logp.Debug("harvester", " OOO-> " + "[" + h.Config.RegexList[x].Name + "] regex matched: " + bigregex + "|" + text)
+						if h.Config.RegexList[x].IncludeMessage {
+							h.CurrentEvent.Text = &text
+						}
+						break NextRegex
+					} 					
+					m++
+				}
+				if x >= len(h.Config.RegexList) {
+					logp.Warn("harvester", " XXX-> line: " + strconv.FormatInt(h.Lineno, 10) + " all regexs " + strconv.Itoa(m) + " failed to match: " + text)
+					h.CurrentEvent.CustomI3["unmatched"] = 1
+					h.CurrentEvent.Text = &text
+				} 
+			} else { 
+				// no regular expression field mapping so just process the text
+				h.CurrentEvent.Text = &text
+			}
+
+			h.SpoolerChan <- h.CurrentEvent // ship the new event downstream
 		}
 
 		// Set Offset
@@ -174,7 +346,6 @@ func (h *Harvester) shouldExportLine(line string) bool {
 	}
 
 	return true
-
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file

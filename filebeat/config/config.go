@@ -14,7 +14,7 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultRegistryFile                      = "registry"
+	DefaultRegistryFile                      = ".filebeat"
 	DefaultIgnoreOlderDuration time.Duration = 0
 	DefaultCloseOlderDuration  time.Duration = 1 * time.Hour
 	DefaultScanFrequency       time.Duration = 10 * time.Second
@@ -56,6 +56,24 @@ type ProspectorConfig struct {
 	ScanFrequencyDuration time.Duration
 }
 
+type ExceptionConfig struct {
+	MaxStack        uint8
+	IncludePackages []string
+}
+
+type RegexList struct {
+	Regex []RegexConfig `yaml:"regex"`
+	Name  string
+	IncludeMessage bool `yaml:"include_message"`
+}
+
+type RegexConfig struct {
+	Type  string `yaml:"es_type"`
+	Name  string
+	Regex string
+	Value string
+}
+
 type HarvesterConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
@@ -76,6 +94,10 @@ type HarvesterConfig struct {
 	IncludeLines       []string         `config:"include_lines"`
 	MaxBytes           int              `config:"max_bytes"`
 	Multiline          *MultilineConfig `config:"multiline"`
+
+	RegexList         []RegexList `config:"regex_list"`
+	ExceptionPackages []string
+	ExceptionMaxStack int
 	JSON               *JSONConfig      `config:"json"`
 }
 
