@@ -1,3 +1,7 @@
+/*
+Package beater provides the implementation of the libbeat Beater interface for
+Winlogbeat. The main event loop is implemented in this package.
+*/
 package beater
 
 import (
