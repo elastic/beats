@@ -9,8 +9,6 @@ const defaultBeatVersion = "{}"
 
 template_packer = '''
 version: "{version}"
-rpm_version: "{rpm_version}"
-deb_version: "{deb_version}"
 '''
 
 
@@ -29,8 +27,6 @@ def main():
     with open(dir + "/packer/version.yml", "w") as f:
         f.write(template_packer.format(
             version=version,
-            rpm_version=version.replace("-", "~"),
-            deb_version=version.replace("-", "~")
         ))
 
 if __name__ == "__main__":
