@@ -56,8 +56,10 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Added ability to escape `${x}` in config files to avoid environment variable expansion {pull}1389[1389]
 
 *Packetbeat*
+- Add support for OpenBSD. {pull}1347[1347]
 
 *Topbeat*
+- Add support for OpenBSD. {pull}1403[1403]
 
 *Filebeat*
 
