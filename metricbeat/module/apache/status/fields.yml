@@ -1,12 +1,13 @@
-apache-status:
+apache:
   type: group
   description: >
-    Apache Status
+    Apache HTTPD server metrics collected from the mod_status module.
   fields:
     - name: apache-status
       type: group
       description: >
-        Apache Status info
+        `apache-status` contains the metrics that were scraped from the status
+        page.
       fields:
         - name: hostname
           type: string

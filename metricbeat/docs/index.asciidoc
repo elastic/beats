@@ -1,128 +1,37 @@
-= Welcome to Metricbeat
+= Metricbeat Reference
+:libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
+:version: 5.0.0-alpha1
+:beatname_lc: metricbeat
+:beatname_uc: Metricbeat
+:security: X-Pack Security
 
+include::./overview.asciidoc[]
 
-Metricbeat fetchs metrics from services on a predefined period.
+include::./gettingstarted.asciidoc[]
 
-== Where to Install
+include::./command-line.asciidoc[]
 
-Metricbeat should be installed as close as possible to the service you want to monitor. If you have 4 servers with MySQL running it is recommend to run Metricbeat on each service. This allows Metricbeat to access your service from localhost and does not cause any additional network traffic on the MySQL server. Metrics can be fetch from the MySQL server also if there are some network issue. The metrics from the different Metricbeat instances will be combined on the elasticsearch server.
+include::./configuring-howto.asciidoc[]
 
-In case multiple instances of the same service are running on a host, Metricbeat allows for each module to define multiple hosts.
+include::./metricbeat-filtering.asciidoc[]
 
+include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
-== Supported Services
+include::./configuring-logstash.asciidoc[]
 
-Currently the following services are supported
+include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
-* Apache
-* MySQL
-* Redis
+include::../../libbeat/docs/https.asciidoc[]
 
-TODO: Add links to modules
+include::./modules.asciidoc[]
 
-Each service is a module with its own metricsets. More details on each module and configuration can be found under the module docs.
+include::./troubleshooting.asciidoc[]
 
+include::./faq.asciidoc[]
 
-==  Event Structure
+include::./reference.asciidoc[]
 
-Every event sent has the same base structure. It contains the following fields:
+include::./fields.asciidoc[]
 
-* @timestamp: Time when event was captured
-* beat.hostname: Hostname of the server on which the beat is running on
-* beat.name: Name given to the beat
-* metricset: Name of the metricset that the data is from
-* module: Name of the module that the data is from
-* rtt: Round trip time of the request in microseconds
-* type: This is always "metricset" and the same for all metricset events
-
-An example of an event can be seen below:
-```
-{
-  "@timestamp": "2016-03-18T12:18:57.124Z",
-  "apache-status": {},
-  "beat": {
-    "hostname": "ruflin",
-    "name": "ruflin"
-  },
-  "metricset": "status",
-  "module": "apache",
-  "rtt": 1082,
-  "type": "metricsets"
-}
-
-```
-
-=== Error events
-
-Metricbeat also sends an event based on the predefined period also if the service is not reachable. The error received during fetching the event is added to the event. This allows to monitor for errors in the metric fetching and to see a debug message on what the potential issue on the server is.
-
-An error message sent can look as following for example if the apache server is not reachable. It has the same structure as the base event but the error field with an error string is added. This makes it possible to check for errors across all metric events.
-
-```
-{
-  "@timestamp": "2016-03-18T12:18:57.124Z",
-  "apache-status": {},
-  "beat": {
-    "hostname": "ruflin",
-    "name": "ruflin"
-  },
-  "error": "Get http://127.0.0.1/server-status?auto: dial tcp 127.0.0.1:80: getsockopt: connection refused",
-  "metricset": "status",
-  "module": "apache",
-  "rtt": 1082,
-  "type": "metricsets"
-}
-
-```
-
-
-== How does Metricbeat work
-
-Metricbeat is structured in modules and metricsets. Each module can contain one more multiple metricsets. The module is responsible for providing the basic logic for the specific service and the metricset for fetching the data from the service on the predefined period. An even is fetched on the predefined period not taking into account any delay. Depending on the metricset implementation it can happen that multiple requests are happening at the same time. Normally each metricset should exit after `timeout` to make sure not multiple events run in parallel. Metricbeat sends the events asynchronously to elasticsearch, means the event retrieval is not acknowledge. In case that elasticsearch is not available, it can happen that events are lost.
-
-Metricbeat has some specific features which are critical to how it works and are described below in more detail:
-
-* Metric event sent for errors
-* No aggregations on fetching time
-* Not only numbers
-* Multiple events in one event
-
-These details should provide a deeper understanding on why metricbeat was implemented in this way and the workings behind it.
-
-=== Metric event sent for errors
-
-Metricbeat not only sends metrics. It also sends errors in case metrics cannot be retrieved. The error is not just a flag but a full error string that is created during fetching from the hosts system. Providing an error and the details of the error directly by the metricsystem allows to metrics monitoring system not only be used to monitor metrics but also errors.
-
-Delivering a full error message instead of a flag should help to find and track down the error faster. In addition, the error is in case of metricbeat not detected by a remote system which could have different side affects like network or others, metricbeat is installed locally on the host machine so it is an error that also happens locally.
-
-Each metricset is retrieved on the predefined period so in case no metrics are retrieved from metricbeat after more then one interval, it can also be said that there is potentially something wrong with the host or host connectivity.
-
-
-=== No Aggregations on Fetching Time
-
-Metricbeat doesn't do any aggregations like gauge, sum, counters etc. Metricbeat send the raw data retrieved from the host to elasticsearch for processing. All the processing happens during query time on the elasticsearch host.
-
-This has the advantage that on the host all raw data is available for drilling down into the details and the data can be reprocessed at any time. In addition it reduces the complexity on the metricbeat side.
-
-
-=== Not only numbers
-
-Metricbeat not only sends metrics as numbers. Metrics can also contain strings to report certain status information. As each metricset has a predefined structure, elasticsearch knows in advance which types will be stored in elasticsearch and can optimize to store then im the right way.
-
-Basic meta information about each metric are sent as part of each event (like host). Additional meta information like unit can be provided as part of the mapping template in elasticsearch (not implemented yet). This allows the query system and visualizations to apply additional logics to understand Bytes and Kilobytes and visualise them correctly. This provides the benefit that no unit standardisation has to happen on the metricbeat side.
-
-
-
-
-
-
-
-=== Multiple events in one event
-
-Each event create by metricbeat contains not only one metric but a list of metrics. This has the advantage that with one request to the host system all metrics can be retrieved which means less load on the host system because of metrics. As elasticsearch can directly store and query the metrics as a nested JSON document, this is also efficient in sending the data to elasticsearch.
-
-As the full raw event from the host system with all events is available, it allows metricbeat or elasticsearch to do any transformations on the data later. In case for example it is required to store data in the Metrics2.0[http://metrics20.org/] format, this format could be generated out of the existing event by splitting up the event with all metrics into multiple metrics2.0 events.
-
-The meta information about the type of each metric are stored in the mapping template. All meta information that is common to all metric events is part of the event structure itself (like host, timestamp) and is only stored once for all events.
-
-In case one of the metrics of a service is off it is very simple to have a look at the other values of the service as all are stored in one event.
+include::./developer-guide/index.asciidoc[]
