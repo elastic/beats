@@ -16,12 +16,8 @@ Scripts to generate the template from fields.yml are implemented. It must be che
 
 The mapping for each metricset must be completed and verified
 
-# Filtering
-A more generic filtering should be introduced so not all data is sent by default. In general I think every metricset should be able to provide the full data set, but by default it should only send a reasonable amount of data.
-
-Filtering can happen through generic filtering but a less complex options with levels or something similar would be nice to have. One idea would be to have 3 levels on the data side: Minimum, Basic, Full. Each metricset would have to support that and the level would be configurable. An alternative is that each metricset has to implement its own configuration on how to handle which parts are enabled.
-
-Generic filtering support must be added to the module.
+# Connections
+For most metricset, setup creates the connections to the remote hosts. One potential issue is, that if one connection goes down, that it is not setup again means an error is reported in the future. Does this mean Setup should be called every time before fetch but must be able to handle multiple calls? What is the best approach here to guarantee reconnection in case some connections go down?
 
 # Topbeat
 Topbeat should be added to metricbeat (see https://github.com/elastic/beats/pull/1081). To make the two better integrated some refactoring on the Topbeat side is needed so MapStr can be consumed directly.
