@@ -19,6 +19,8 @@ func (c *Canceler) Cancel() {
 	c.lock.Lock()
 	c.active = false
 	c.lock.Unlock()
+
+	close(c.done)
 }
 
 func (c *Canceler) Done() <-chan struct{} {
