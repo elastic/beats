@@ -108,10 +108,10 @@ class Test(BaseTest):
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
 
-    def test_rotating_ignore_older_larger_write_rate(self):
+    def test_rotating_close_older_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="1s",
+            ignoreOlder="10s",
             closeOlder="1s",
             scan_frequency="0.1s",
         )
@@ -174,10 +174,10 @@ class Test(BaseTest):
         assert 1 == len(output)
         assert output[0]["message"] == "line in log file"
 
-    def test_rotating_ignore_older_low_write_rate(self):
+    def test_rotating_close_older_low_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            ignoreOlder="1s",
+            ignoreOlder="10s",
             closeOlder="1s",
             scan_frequency="0.1s",
         )
@@ -209,7 +209,7 @@ class Test(BaseTest):
         os.rename(testfile, testfile + ".1")
         open(testfile, 'w').close()
 
-        # wait for file to be closed due to ignore_older
+        # wait for file to be closed due to close_older
         self.wait_until(
             lambda: self.log_contains(
                 "Stopping harvester, closing file: {}\n".format(os.path.abspath(testfile))),

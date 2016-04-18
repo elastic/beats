@@ -61,7 +61,7 @@ func (h *Harvester) Harvest() {
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		if h.Stat != nil {
-			h.Stat.Return <- h.Offset
+			h.Stat.Return <- h.GetOffset()
 		}
 
 		logp.Debug("harvester", "Stopping harvester for file: %s", h.Path)
@@ -123,8 +123,8 @@ func (h *Harvester) Harvest() {
 
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
 
-				h.Offset = 0
-				seeker.Seek(h.Offset, os.SEEK_SET)
+				h.SetOffset(0)
+				seeker.Seek(h.GetOffset(), os.SEEK_SET)
 				continue
 			}
 
@@ -136,10 +136,10 @@ func (h *Harvester) Harvest() {
 			event := &input.FileEvent{
 				EventMetadata: h.Config.EventMetadata,
 				ReadTime:      ts,
-				Source:        &h.Path,
+				Source:        h.Path,
 				InputType:     h.Config.InputType,
 				DocumentType:  h.Config.DocumentType,
-				Offset:        h.Offset,
+				Offset:        h.GetOffset(),
 				Bytes:         bytesRead,
 				Text:          &text,
 				Fileinfo:      &info,
@@ -151,7 +151,7 @@ func (h *Harvester) Harvest() {
 		}
 
 		// Set Offset
-		h.Offset += int64(bytesRead) // Update offset if complete line has been processed
+		h.SetOffset(h.GetOffset() + int64(bytesRead)) // Update offset if complete line has been processed
 	}
 }
 
@@ -237,25 +237,52 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 func (h *Harvester) initFileOffset(file *os.File) error {
 	offset, err := file.Seek(0, os.SEEK_CUR)
 
-	if h.Offset > 0 {
+	if h.GetOffset() > 0 {
 		// continue from last known offset
 
 		logp.Debug("harvester",
-			"harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-		_, err = file.Seek(h.Offset, os.SEEK_SET)
+			"harvest: %q position:%d (offset snapshot:%d)", h.Path, h.GetOffset(), offset)
+		_, err = file.Seek(h.GetOffset(), os.SEEK_SET)
 	} else if h.Config.TailFiles {
 		// tail file if file is new and tail_files config is set
 
 		logp.Debug("harvester",
 			"harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
-		h.Offset, err = file.Seek(0, os.SEEK_END)
+		offset, err = file.Seek(0, os.SEEK_END)
+		h.SetOffset(offset)
 
 	} else {
 		// get offset from file in case of encoding factory was
 		// required to read some data.
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
-		h.Offset = offset
+		h.SetOffset(offset)
 	}
 
 	return err
+}
+
+// GetState returns current state of harvester
+func (h *Harvester) GetState() *input.FileState {
+
+	state := input.FileState{
+		Source:      h.Path,
+		Offset:      h.GetOffset(),
+		FileStateOS: input.GetOSFileState(&h.Stat.Fileinfo),
+	}
+
+	return &state
+}
+
+func (h *Harvester) SetOffset(offset int64) {
+	h.offsetLock.Lock()
+	defer h.offsetLock.Unlock()
+
+	h.offset = offset
+}
+
+func (h *Harvester) GetOffset() int64 {
+	h.offsetLock.Lock()
+	defer h.offsetLock.Unlock()
+
+	return h.offset
 }
