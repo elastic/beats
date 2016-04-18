@@ -1,6 +1,6 @@
 package publisher
 
-import "github.com/elastic/beats/libbeat/outputs"
+import "github.com/elastic/beats/libbeat/common/op"
 
 // ClientOption allows API users to set additional options when publishing events.
 type ClientOption func(option Context) Context
@@ -19,12 +19,12 @@ func Sync(o Context) Context {
 	return o
 }
 
-func Signal(signaler outputs.Signaler) ClientOption {
+func Signal(signaler op.Signaler) ClientOption {
 	return func(ctx Context) Context {
 		if ctx.Signal == nil {
 			ctx.Signal = signaler
 		} else {
-			ctx.Signal = outputs.NewCompositeSignaler(ctx.Signal, signaler)
+			ctx.Signal = op.CombineSignalers(ctx.Signal, signaler)
 		}
 		return ctx
 	}

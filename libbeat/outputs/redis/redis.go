@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -112,7 +113,7 @@ func (r *redisOut) Close() error {
 }
 
 func (r *redisOut) PublishEvent(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -120,7 +121,7 @@ func (r *redisOut) PublishEvent(
 }
 
 func (r *redisOut) BulkPublish(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {

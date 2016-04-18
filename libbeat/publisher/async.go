@@ -1,19 +1,13 @@
 package publisher
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 )
 
 type asyncPipeline struct {
 	outputs []worker
 	pub     *Publisher
-}
-
-type asyncSignal struct {
-	cancel *canceling
-	signal outputs.Signaler
 }
 
 const (
@@ -23,7 +17,7 @@ const (
 func newAsyncPipeline(
 	pub *Publisher,
 	hwm, bulkHWM int,
-	ws *common.WorkerSignal,
+	ws *workerSignal,
 ) *asyncPipeline {
 	p := &asyncPipeline{pub: pub}
 
@@ -39,17 +33,14 @@ func newAsyncPipeline(
 func (p *asyncPipeline) publish(m message) bool {
 	if p.pub.disabled {
 		debug("publisher disabled")
-		outputs.SignalCompleted(m.context.Signal)
+		op.SigCompleted(m.context.Signal)
 		return true
 	}
 
 	if m.context.Signal != nil {
-		var s outputs.Signaler = &asyncSignal{
-			cancel: m.client.canceling,
-			signal: m.context.Signal,
-		}
+		s := op.CancelableSignaler(m.client.canceler, m.context.Signal)
 		if len(p.outputs) > 1 {
-			s = outputs.NewSplitSignaler(s, len(p.outputs))
+			s = op.SplitSignaler(s, len(p.outputs))
 		}
 		m.context.Signal = s
 	}
@@ -61,7 +52,7 @@ func (p *asyncPipeline) publish(m message) bool {
 }
 
 func makeAsyncOutput(
-	ws *common.WorkerSignal,
+	ws *workerSignal,
 	hwm, bulkHWM int,
 	worker *outputWorker,
 ) worker {
@@ -80,22 +71,4 @@ func makeAsyncOutput(
 	debug("create bulk processing worker (interval=%v, bulk size=%v)",
 		flushInterval, maxBulkSize)
 	return newBulkWorker(ws, hwm, bulkHWM, worker, flushInterval, maxBulkSize)
-}
-
-func (s *asyncSignal) Completed() {
-	s.cancel.lock.RLock()
-	defer s.cancel.lock.RUnlock()
-
-	if s.cancel.active {
-		s.signal.Completed()
-	}
-}
-
-func (s *asyncSignal) Failed() {
-	s.cancel.lock.RLock()
-	defer s.cancel.lock.RUnlock()
-
-	if s.cancel.active {
-		s.signal.Failed()
-	}
 }

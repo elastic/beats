@@ -5,6 +5,7 @@ import (
 	"expvar"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -58,7 +59,7 @@ type Client interface {
 }
 
 type client struct {
-	*canceling
+	canceler *op.Canceler
 
 	publisher           *Publisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
@@ -67,7 +68,7 @@ type client struct {
 
 func newClient(pub *Publisher) *client {
 	c := &client{
-		canceling: newCanceller(),
+		canceler: op.NewCanceller(),
 
 		publisher: pub,
 		beatMeta: common.MapStr{
@@ -80,7 +81,7 @@ func newClient(pub *Publisher) *client {
 }
 
 func (c *client) Close() error {
-	c.cancel()
+	c.canceler.Cancel()
 	return nil
 }
 

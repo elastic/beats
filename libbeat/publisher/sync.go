@@ -1,14 +1,9 @@
 package publisher
 
-import "github.com/elastic/beats/libbeat/outputs"
+import "github.com/elastic/beats/libbeat/common/op"
 
 type syncPipeline struct {
 	pub *Publisher
-}
-
-type syncSignal struct {
-	ch   chan bool
-	done chan struct{}
 }
 
 func newSyncPipeline(pub *Publisher, hwm, bulkHWM int) *syncPipeline {
@@ -18,14 +13,15 @@ func newSyncPipeline(pub *Publisher, hwm, bulkHWM int) *syncPipeline {
 func (p *syncPipeline) publish(m message) bool {
 	if p.pub.disabled {
 		debug("publisher disabled")
-		outputs.SignalCompleted(m.context.Signal)
+		op.SigCompleted(m.context.Signal)
 		return true
 	}
 
+	client := m.client
 	signal := m.context.Signal
-	sync := &syncSignal{done: m.client.done, ch: make(chan bool, 1)}
+	sync := op.NewSignalChannel()
 	if len(p.pub.Output) > 1 {
-		m.context.Signal = outputs.NewSplitSignaler(sync, len(p.pub.Output))
+		m.context.Signal = op.SplitSignaler(sync, len(p.pub.Output))
 	} else {
 		m.context.Signal = sync
 	}
@@ -37,23 +33,10 @@ func (p *syncPipeline) publish(m message) bool {
 	// Await completion signal from output plugin. If client has been disconnected
 	// ignore any signal and drop events no matter if send or not.
 	select {
-	case <-sync.done:
-		// do not signal on 'drop' when closing connection
-		return false
-	case ok := <-sync.ch:
-		if ok {
-			outputs.SignalCompleted(signal)
-		} else if signal != nil {
-			signal.Failed()
-		}
-		return ok
+	case <-client.canceler.Done():
+		return true
+	case sig := <-sync.C:
+		sig.Apply(signal)
+		return sig == op.SignalCompleted
 	}
-}
-
-func (s *syncSignal) Completed() {
-	s.ch <- true
-}
-
-func (s *syncSignal) Failed() {
-	s.ch <- false
 }

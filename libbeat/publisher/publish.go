@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -28,7 +29,7 @@ var debug = logp.MakeDebug("publish")
 
 type Context struct {
 	publishOptions
-	Signal outputs.Signaler
+	Signal op.Signaler
 }
 
 type pipeline interface {
@@ -41,7 +42,7 @@ type publishOptions struct {
 }
 
 type TransactionalEventPublisher interface {
-	PublishTransaction(transaction outputs.Signaler, events []common.MapStr)
+	PublishTransaction(transaction op.Signaler, events []common.MapStr)
 }
 
 type Publisher struct {
@@ -64,8 +65,8 @@ type Publisher struct {
 	// On shutdown the publisher is finished first and the outputers next,
 	// so no publisher will attempt to send messages on closed channels.
 	// Note: beat data producers must be shutdown before the publisher plugin
-	wsPublisher common.WorkerSignal
-	wsOutput    common.WorkerSignal
+	wsPublisher workerSignal
+	wsOutput    workerSignal
 
 	pipelines struct {
 		sync  pipeline
@@ -318,6 +319,6 @@ func (publisher *Publisher) init(
 }
 
 func (publisher *Publisher) Stop() {
-	publisher.wsPublisher.Stop()
-	publisher.wsOutput.Stop()
+	publisher.wsPublisher.stop()
+	publisher.wsOutput.stop()
 }
