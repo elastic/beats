@@ -8,10 +8,10 @@ defaults:
   ignore_above: 1024
 
 sections:
-  - ["common", "Common fields"]
-  - ["apache-status", "Apache Status Info"]
-  - ["redis-info", "Redis Info Stats"]
-  - ["mysql-status", "MySQL Status"]
+  - ["common", "Common"]
+  - ["apache", "Apache Status"]
+  - ["redis", "Redis Info"]
+  - ["mysql", "MySQL Status"]
 
 common:
   type: group

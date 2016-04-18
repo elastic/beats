@@ -10,12 +10,12 @@ This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-common>>
-* <<exported-fields-apache-status>>
-* <<exported-fields-redis-info>>
-* <<exported-fields-mysql-status>>
+* <<exported-fields-apache>>
+* <<exported-fields-redis>>
+* <<exported-fields-mysql>>
 
 [[exported-fields-common]]
-=== Common fields Fields
+=== Common Fields
 
 Contains common fields available in all event types.
 
@@ -58,17 +58,16 @@ required: True
 Event round trip time in microseconds
 
 
-[[exported-fields-apache-status]]
-=== Apache Status Info Fields
+[[exported-fields-apache]]
+=== Apache Status Fields
 
-Apache Status
+Apache HTTPD server metrics collected from the mod_status module.
 
 
 
-[[exported-fields-apache-status]]
-=== Apache Status Info Fields
+=== apache-status Fields
 
-Apache Status info
+`apache-status` contains the metrics that were scraped from the status page.
 
 
 
@@ -340,17 +339,16 @@ type: integer
 Total
 
 
-[[exported-fields-redis-info]]
-=== Redis Info Stats Fields
+[[exported-fields-redis]]
+=== Redis Info Fields
 
-Redis Stats
+Redis metrics collected from the Redis `INFO` command.
 
 
 
-[[exported-fields-redis-info]]
-=== Redis Info Stats Fields
+=== redis-info Fields
 
-Redis info stats
+`redis-info` contains the information and statistics returned by the `INFO` command.
 
 
 
@@ -435,17 +433,16 @@ type: float
 User CPU consumed by the background processes
 
 
-[[exported-fields-mysql-status]]
+[[exported-fields-mysql]]
 === MySQL Status Fields
 
-MySQL Stats
+MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
 
 
 
-[[exported-fields-mysql-status]]
-=== MySQL Status Fields
+=== mysql-status Fields
 
-MySQL Status
+`mysql-status` contains the metrics that were obtained the status SQL query.
 
 
 
