@@ -172,4 +172,5 @@ func (tb *Topbeat) Cleanup(b *beat.Beat) error {
 func (t *Topbeat) Stop() {
 	logp.Info("Send stop signal to topbeat main loop")
 	close(t.done)
+	t.events.Close()
 }
