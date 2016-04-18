@@ -46,7 +46,7 @@ and what each configuration looks like after replacement:
 |==================================
 |Config source	       |Environment setting   |Config after replacement
 |`name: ${NAME}`       |`export NAME=elastic` |`name: elastic`
-|`name: ${NAME}`       |no setting            |`name: `
+|`name: ${NAME}`       |no setting            |`name:`
 |`name: ${NAME:beats}` |no setting            |`name: beats`
 |`name: ${NAME:beats}` |`export NAME=elastic` |`name: elastic`
 |==================================

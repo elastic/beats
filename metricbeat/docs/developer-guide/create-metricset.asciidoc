@@ -1,22 +1,30 @@
-= Create a Metricset for a Metricbeat Module
+=== Create a Metricset for a Metricbeat Module
 
-A Metricset is the part of a metricbeat module that fetches and structures the data from the remote service. Each module can have multiple metricsets.
+A Metricset is the part of a metricbeat module that fetches and structures the
+data from the remote service. Each module can have multiple metricsets.
 
-This guide should help you to create your own metricset. This assumes you have an existing metricbeat Module where you want to add one more metricset.
+This guide should help you to create your own metricset. This assumes you have
+an existing metricbeat Module where you want to add one more metricset.
 
-== Create the basic metricset
+==== Create the basic metricset
 
-To get started with a new metricset, you must first decide for a name of your metricset. This name can only contain lower case letters oder underline. In the examples below, you have to replace {metricset-name} with the name you decided for.
+To get started with a new metricset, you must first decide for a name of your
+metricset. This name can only contain lower case letters oder underline. In the
+examples below, you have to replace \{metricset-name} with the name you decided
+for.
 
-The first step is to create the golang file needed for your metricset code. Create this file under
+The first step is to create the Go file needed for your metricset code.
+Create this file under:
 
-```
-module/{module-name}/{module-name}/{metricset-name}/{metricset-name}.go
-```
+----
+module/{module-name}/{metricset-name}/{metricset-name}.go
+----
 
-Replace {module-name} with the name of the module you are extending.
+Replace \{module-name} with the name of the module you are extending.
 
-The following is a basic example of a metricset. Again you have to replace {module-name} and {metricset-name}. We will discuss in the following all parts of this example in detail.
+The following is a basic example of a metricset. Again you have to replace
+\{module-name} and \{metricset-name}. We will discuss in the following all parts
+of this example in detail.
 
 Each metricseter consists 3 parts:
 
@@ -24,6 +32,7 @@ Each metricseter consists 3 parts:
 * MetricSeter Type definition
 * MetricSeter Interface methods
 
+[source,go]
 ----
 package {metricset-name}
 
@@ -55,11 +64,16 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.Ma
 }
 ----
 
-This adds a working metricset do your module which reports the event `"hello":"world"`.
+This adds a working metricset do your module which reports the event
+`"hello": "world"`.
 
-The first few lines of the metricset are to define the package name which is identical with the {metricset-name}. In addition, the minimal required packages are imported. `common` contains the `MapStr` object which is used for the events and `helper` is required to register the metricset.
+The first few lines of the metricset are to define the package name which is
+identical with the \{metricset-name}. In addition, the minimal required packages
+are imported. `common` contains the `MapStr` object which is used for the events
+and `helper` is required to register the metricset.
 
----
+[source,go]
+----
 package {metricset-name}
 
 import (
@@ -67,80 +81,118 @@ import (
 
 	"github.com/elastic/beats/metricbeat/helper"
 )
----
+----
 
-Then we have the init function. This is called directly when metricbeat is started on all files before execution. This registers the metricset in a central registry with the given module and makes sure it is run later as expected.
----
+Then we have the init function. This is called directly when metricbeat is
+started on all files before execution. This registers the metricset in a central
+registry with the given module and makes sure it is run later as expected.
+
+[source,go]
+----
 func init() {
 	helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New)
 }
----
+----
 
-The New function is used to created a new MetricSeter object. The example below is an empty struct, but MetricSeter can also be used to store local variables (state) of the MetricSet. This can be useful to store information between two calls. These variables must be defined as part of MetricSeter and initiated in the `New` function. The `New` function is called when a module instantiates a module.
----
+The New function is used to created a new MetricSeter object. The example below
+is an empty struct, but MetricSeter can also be used to store local variables
+(state) of the MetricSet. This can be useful to store information between two
+calls. These variables must be defined as part of MetricSeter and initiated in
+the `New` function. The `New` function is called when a module instantiates a
+module.
+
+[source,go]
+----
 // New creates new instance of MetricSeter
 func New() helper.MetricSeter {
 	return &MetricSeter{}
 }
 
 type MetricSeter struct {}
----
+----
 
-The Setup method is called once before the Fetch methods is called. Setup can be used to load specific local configuration variables (more on this here) or setting up connections to the hosts.
----
+The `Setup` method is called once before the `Fetch methods is called. `Setup`
+can be used to load specific local configuration variables (more on this here)
+or setting up connections to the hosts.
+
+[source,go]
+----
 // Setup Metricset
 func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 	return nil
 }
----
+----
 
-The Fetch method is the central part of the metricset. Fetch is called every time new data is retrieved. In case more then one host is defined, fetch is called for each host once. The frequency of calling fetch is based on the Period defined in the configuration.
+The `Fetch` method is the central part of the metricset. Fetch is called every
+time new data is retrieved. In case more then one host is defined, fetch is
+called for each host once. The frequency of calling fetch is based on the Period
+defined in the configuration.
 
-Fetch must return a `common.MapStr` object which is then sent to elasticsearch. In case an error happens, an error must be returned which is then sent instead to elasticsearch. That means metricbeat always sends an event, also on failture. It must made sure, that the error message helps to identify what the actual error is.
----
+Fetch must return a `common.MapStr` object which is then sent to elasticsearch.
+In case an error happens, an error must be returned which is then sent instead
+to elasticsearch. That means metricbeat always sends an event, also on failure.
+It must made sure, that the error message helps to identify what the actual
+error is.
+
+[source,go]
+----
 func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
 	event := common.MapStr{"hello": "world"}
 	return event
 }
----
+----
 
-The second last step is updating `include/list.go` with an import for your metricset. This makes sure the metricset is compiled and registered. This import can also happen at an other place in your repo, you just must make sure this line is compiled.
+The second last step is updating `include/list.go` with an import for your
+metricset. This makes sure the metricset is compiled and registered. This import
+can also happen at an other place in your repo, you just must make sure this
+line is compiled.
 
----
+[source,go]
+----
 import (
 	_ "github.com/elastic/beats/metricbeat/module/{module-name}/{metricset-name}"
 )
----
+----
 
 To use the new metricset, it must be added to the configuration file `beat.yml`.
 
----
+[source,go]
+----
 metricbeat:
   modules:
     - module: {module-name}
       metricsets: ["{metricset-name}"]
----
+----
 
-Now if your run `make update` to update all files and `make` to compile the binary, you can start `./metricbeat -e -d "*"` and you should see your new metricset sending data.
+Now if your run `make update` to update all files and `make` to compile the
+binary, you can start `./metricbeat -e -d "*"` and you should see your new
+metricset sending data.
 
-In general it helps before creating your own metricset, to have a look at the implementation of the existing metricsets as inspiration.
+In general it helps before creating your own metricset, to have a look at the
+implementation of the existing metricsets as inspiration.
 
-== Add special configuration options
+==== Add special configuration options
 
-Each metricset can have it's own configuration variables defined. To make use of these variables, the Setup method must be extended. Assuming `password` should be introduced in the metricset, the `beat.yml` would be first extended in the following way:
+Each metricset can have it's own configuration variables defined. To make use of
+these variables, the Setup method must be extended. Assuming `password` should
+be introduced in the metricset, the `beat.yml` would be first extended in the
+following way:
 
----
+[source,yaml]
+----
 metricbeat:
   modules:
     - module: {module-name}
       metricsets: ["{metricset-name}"]
       password: "test1234"
----
+----
 
+To read out the password config in the Setup method, the `ProcessConfig` method
+should be used. A config struct must be defined with the value types to be read.
+Second as the values of the struct, default values can be set if needed.
 
-To read out the password config in the Setup method, the `ProcessConfig` method should be used. A config struct must be defined with the value types to be read. Second as the values of the struct, default values can be set if needed.
-
----
+[source,go]
+----
 func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 	// Additional configuration options
@@ -156,31 +208,53 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 	return nil
 }
----
+----
 
-== Connections to Services
-As each time the Fetch method is called, it makes a request to the service, it is important to handle the connections correctly. It is recommended to setup the connections in the Setup methods and keep them in the MetricSeter object. Like this connections can be reused.
+==== Connections to Services
 
-One very important thing is that connections must respect the timeout variable: `ms.Module.Timeout`. After the timeout a request must be ended and an error must be returned. If this does not happen, it can happen that multiple requests are queuing up and putting pressure on the service from the Metricbeat side which should not happen. By default the Timeout is set to Period, so one request gets ended when a new request is made.
+As each time the Fetch method is called, it makes a request to the service, it
+is important to handle the connections correctly. It is recommended to setup the
+connections in the Setup methods and keep them in the MetricSeter object. Like
+this connections can be reused.
 
-In case of a request must be ended or has an error, it should be make sure to return a good error message. This error message is also sent to elasticesarch in indext. This makes it possible to not only fetch metrics from the service, but also report potential problems / errors with the metricset.
+One very important thing is that connections must respect the timeout variable:
+`ms.Module.Timeout`. After the timeout a request must be ended and an error must
+be returned. If this does not happen, it can happen that multiple requests are
+queuing up and putting pressure on the service from the Metricbeat side which
+should not happen. By default the Timeout is set to Period, so one request gets
+ended when a new request is made.
 
+In case of a request must be ended or has an error, it should be make sure to
+return a good error message. This error message is also sent to Elasticesarch in
+index. This makes it possible to not only fetch metrics from the service, but
+also report potential problems / errors with the metricset.
 
-== Data Transformation
-In case the data transformation that has to happen in the `Fetch` method is large, we recommend to create a second file called `data.go` in the same package which contains a function `eventMapping(...)`. This is not required but currently best practice. This keeps the functionality of the metricset separate from the data mapping part.
+==== Data Transformation
 
+In case the data transformation that has to happen in the `Fetch` method is
+large, we recommend to create a second file called `data.go` in the same package
+which contains a function `eventMapping(...)`. This is not required but
+currently best practice. This keeps the functionality of the metricset separate
+from the data mapping part.
 
-== Dashboards
-Dashboards are an important part of each metricset. Data gets much more useful when visualised. To create dashboards for the metricset, follow the guide here (link to dashboard guide).
+==== Dashboards
 
-== Fields.yml
+Dashboards are an important part of each metricset. Data gets much more useful
+when visualized. To create dashboards for the metricset, follow the guide here
+(link to dashboard guide).
+
+==== fields.yml
+
 Must be created
+
 * Creates the template
 * Creates the docs
 * How should this file be used -> generic guide?
 * Define all types in details
 * Link to common fields.yml guide
 
+==== Testing
 
-== Testing
-It is important to also add tests to your metricset. To find out more about how to add tests for your metricset, follow the general testing guide under developerguide/testing(to be added).
+It is important to also add tests to your metricset. To find out more about how
+to add tests for your metricset, follow the <<developerguide-testing,general
+testing guide>>.

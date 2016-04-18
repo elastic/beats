@@ -8,10 +8,10 @@ defaults:
   ignore_above: 1024
 
 sections:
-  - ["common", "Common fields"]
-  - ["apache-status", "Apache Status Info"]
-  - ["redis-info", "Redis Info Stats"]
-  - ["mysql-status", "MySQL Status"]
+  - ["common", "Common"]
+  - ["apache", "Apache Status"]
+  - ["redis", "Redis Info"]
+  - ["mysql", "MySQL Status"]
 
 common:
   type: group
@@ -49,15 +49,16 @@ common:
       description: >
         Event round trip time in microseconds
 
-apache-status:
+apache:
   type: group
   description: >
-    Apache Status
+    Apache HTTPD server metrics collected from the mod_status module.
   fields:
     - name: apache-status
       type: group
       description: >
-        Apache Status info
+        `apache-status` contains the metrics that were scraped from the status
+        page.
       fields:
         - name: hostname
           type: string
@@ -220,15 +221,16 @@ apache-status:
               type: integer
               description: >
                 Total
-mysql-status:
+mysql:
   type: group
   description: >
-    MySQL Stats
+    MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
   fields:
     - name: mysql-status
       type: group
       description: >
-        MySQL Status
+        `mysql-status` contains the metrics that were obtained the status SQL
+        query.
       fields:
         - name: aborted
           type: group
@@ -259,15 +261,16 @@ mysql-status:
               type: integer
               description: >
                 The number of bytes sent to all clients.
-redis-info:
+redis:
   type: group
   description: >
-    Redis Stats
+    Redis metrics collected from the Redis `INFO` command.
   fields:
     - name: redis-info
       type: group
       description: >
-        Redis info stats
+        `redis-info` contains the information and statistics returned by the
+        `INFO` command.
       fields:
         - name: clients
           type: group

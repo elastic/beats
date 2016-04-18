@@ -1,0 +1,7 @@
+[[faq]]
+== Frequently Asked Questions
+
+This section contains frequently asked questions about Metricbeat. Also check out the
+https://discuss.elastic.co/c/beats/metricbeat[Metricbeat discussion forum].
+
+include::../../libbeat/docs/shared-faq.asciidoc[]

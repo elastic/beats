@@ -1,34 +1,52 @@
-= Metricbeat Contributions
+[[metricbeat-developer-guide]]
+= Metricbeat Developer Guide
 
-Metricbeat is periodically interrogating other services to fetch key metrics information. As a developer Metricbeat can be used in two different ways:
+[partintro]
+--
+
+Metricbeat is periodically interrogating other services to fetch key metrics
+information. As a developer Metricbeat can be used in two different ways:
 
 * As application to extend
 * As library
 
-That means as a contributor you have different options on how to use metricbeat and how to contribute.
+That means as a contributor you have different options on how to use metricbeat
+and how to contribute.
 
-If you are looking to contribute in general to beats or the foundation of metricbeat, also have a look at the general contributor guide (add link here).
+If you are looking to contribute in general to beats or the foundation of
+metricbeat, also have a look at the general contributor guide (add link here).
 
+--
 
 == Overview
 
-Metricbeat consists of modules and metricsets. A metricbeat module is normally called the same as the service the metrics should be fetch from (e.g. redis, mysql, ...). Each module can contain multiple metricsets. A metricset represents multiple metrics which are normally retrieved with one request from the remote system (e.g. redis-info, mysql-status).
+Metricbeat consists of modules and metricsets. A metricbeat module is normally
+called the same as the service the metrics should be fetch from (e.g. redis,
+mysql, ...). Each module can contain multiple metricsets. A metricset represents
+multiple metrics which are normally retrieved with one request from the remote
+system (e.g. redis-info, mysql-status).
 
 == Creating a metricbeat module
 
 When creating a module, there are three options:
 
 * Create an independent beat based on metricbeat library with only our module
-* Create an independent beat based on metricbeat library but including all existing metricbeat modules
+* Create an independent beat based on metricbeat library but including all
+  existing metricbeat modules
 * Create a module based on metricbeat and contribute it to metricbeat
 
-When creating a new module it is recommend to go through all three phases above as this allows you to develop, test and run your module independent of metricbeat in the beginning.
+When creating a new module it is recommend to go through all three phases above
+as this allows you to develop, test and run your module independent of
+metricbeat in the beginning.
 
-Independent which way you choose, make sure to add tests to your module and metricset. More details on testing can be found below (add anker).
+Independent which way you choose, make sure to add tests to your module and
+metricset. More details on testing can be found below (add anker).
 
 === Create a module based on metricbeat library
 
-If you plan to create your module, have a look at https://github.com/ruflin/df2beat[df2beat]. df2beat is a very simple example module which reads out the `df` command for file system stats.
+If you plan to create your module, have a look at
+https://github.com/ruflin/df2beat[df2beat]. df2beat is a very simple example
+module which reads out the `df` command for file system stats.
 
 To start your module, create the following files:
 
@@ -36,12 +54,13 @@ To start your module, create the following files:
 * glide.yaml
 * Makefile
 * etc/beat.yml (contains your config options)
-* module/{module-name}/{module-name}.go
-* module/{module-name}/{module-name}/{metricset-name}/{metricset-name}.go
+* module/\{module-name}/\{module-name}.go
+* module/\{module-name}/\{module-name}/\{metricset-name}/\{metricset-name}.go
 
 The content of the files should be as following:
 
 main.go
+[source,go]
 ----
 package main
 
@@ -67,6 +86,7 @@ func main() {
 
 
 glide.yaml
+[source,yaml]
 ----
 package: github.com/ruflin/df2beat
 import:
@@ -79,6 +99,7 @@ import:
 ----
 
 Makefile
+[source,makefile]
 ----
 BEATNAME=df2beat
 BEAT_DIR=github.com/ruflin
@@ -93,6 +114,7 @@ include $(ES_BEATS)/libbeat/scripts/Makefile
 ----
 
 etc/beat.yml
+[source,yaml]
 ----
 metricbeat:
   modules:
@@ -102,9 +124,11 @@ metricbeat:
       enabled: true
 ----
 
-The moduler file looks as following. More details can be found under Moduler Details (add link)
+The moduler file looks as following. More details can be found under Moduler
+Details (add link)
 
-`module/{module-name}/{module-name}.go`
+module/\{module-name}/\{module-name}.go
+[source,go]
 ----
 package {module-name}
 
@@ -128,9 +152,11 @@ func (m *Moduler) Setup(mo *helper.Module) error {
 }
 ----
 
-The metricseter files looks as following. More details can be found under Metricseter Details (add link)
+The metricseter files looks as following. More details can be found under
+Metricseter Details (add link)
 
-`module/{module-name}/{module-name}/{metricset-name}/{metricset-name}.go`
+module/\{module-name}/\{module-name}/\{metricset-name}/\{metricset-name}.go
+[source,go]
 ----
 package {metricset-name}
 
@@ -163,23 +189,33 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.Ma
 ----
 
 
-After creating the files, run `glide update` to retrieve the most recent version of metricbeat. Then run `make update` to generate all the necessary files. The above assumes, the beat is named the same as your module. We use glide for the dependency versioning.
+After creating the files, run `glide update` to retrieve the most recent version
+of metricbeat. Then run `make update` to generate all the necessary files. The
+above assumes, the beat is named the same as your module. We use glide for the
+dependency versioning.
 
-Now running `make` already creates your new beat and you can run. It is now your task to implement the fetching of the metricset from a service in {metricset-name}.go. For some examples, have a look at existing metricsets.
+Now running `make` already creates your new beat and you can run. It is now your
+task to implement the fetching of the metricset from a service in
+{metricset-name}.go. For some examples, have a look at existing metricsets.
 
-Note: We hope to simlify these steps in the future with a generator.
+Note: We hope to simplify these steps in the future with a generator.
 
 
 === Create an independent beat based on metricbeat library but including all existing metricbeat modules
 
-Creating a metricbeat module but actually including all existing modules and metricsets requires only two changes from creating your independent beat. The following files have to be adjusted:
+Creating a metricbeat module but actually including all existing modules and
+metricsets requires only two changes from creating your independent beat. The
+following files have to be adjusted:
 
 * main.go: Add link to metricbeat modules and metricsets
 * etc/beat.yml: Add configuration options
 
-Only one line has to be added to `main.go`: `_ "github.com/elastic/beats/metricbeat/include"`. Including this package includes all official modules and metricsets.
+Only one line has to be added to `main.go`: `_
+"github.com/elastic/beats/metricbeat/include"`. Including this package includes
+all official modules and metricsets.
 
 main.go
+[source,go]
 ----
 package main
 
@@ -207,20 +243,35 @@ func main() {
 }
 ----
 
-To enable the modules and metricsets copy over the configuration options from the metricbeat repository `etc/beat.yml` and paste it into your own `beat.yml` below your configuration options. Run `make update` to create the new complete configuration.
+To enable the modules and metricsets copy over the configuration options from
+the metricbeat repository `etc/beat.yml` and paste it into your own `beat.yml`
+below your configuration options. Run `make update` to create the new complete
+configuration.
 
-If you only want to include a few modules you can also link to them directly. This also allows to link modules from other repositories and use them in your beat.
+If you only want to include a few modules you can also link to them directly.
+This also allows to link modules from other repositories and use them in your
+beat.
 
 
 === Create a module based on metricbeat and contribute it to metricbeat
-As soon as you have a running version of your own module and beat and you would like to see this module as part of the standard metricbeat distribution, start a conversation with the beats team under https://discuss.elastic.co/c/beats[discuss] to see if your module could fit into the standard distribution. Be aware that not necessarly every module can be accepted into metricbeat.
 
-To contribute your module and metricsets, fork the beat repository and copy your module over to the metricbeat repository. Add your config options to the beat.yml file and update the `include/list.go` with your module and metricset.
+As soon as you have a running version of your own module and beat and you would
+like to see this module as part of the standard metricbeat distribution, start a
+conversation with the beats team under
+https://discuss.elastic.co/c/beats[discuss] to see if your module could fit into
+the standard distribution. Be aware that not necessarly every module can be
+accepted into metricbeat.
+
+To contribute your module and metricsets, fork the beat repository and copy your
+module over to the metricbeat repository. Add your config options to the
+beat.yml file and update the `include/list.go` with your module and metricset.
 
 
 ==== Module & Metricsets Requirements
 
-It is important for us that only high quality modules are part metricbeat to guarantee the best user experience. Modules and Metricsets which are contributed must fulfill the following requirements:
+It is important for us that only high quality modules are part metricbeat to
+guarantee the best user experience. Modules and Metricsets which are contributed
+must fulfill the following requirements:
 
 * Elasticsearch templates
 * Kibana Dashboard
@@ -228,13 +279,18 @@ It is important for us that only high quality modules are part metricbeat to gua
 * Integration tests with docker environment
 * 80% test coverage (unit, integration, system tests combined)
 
-Metricbeat allows to build a wide variety of modules and metricset on top of it. The module which will be accepted should be focused on fetching service metrics directly from a service itself and not via a third party tool. The goal is to have as few movable parts as possible and that metricbeat runs as close as possible to the service which should be monitored.
+Metricbeat allows to build a wide variety of modules and metricset on top of it.
+The module which will be accepted should be focused on fetching service metrics
+directly from a service itself and not via a third party tool. The goal is to
+have as few movable parts as possible and that metricbeat runs as close as
+possible to the service which should be monitored.
 
 == Moduler details
 
 As described before, a metricseter looks as following:
 
-module/{module-name}/{module-name}.go
+module/\{module-name}/\{module-name}.go
+[source,go]
 ----
 package {module-name}
 
@@ -269,9 +325,9 @@ TODO: Describe file in detail
 
 == Metricseter Details
 
-TODO: Link to create-metricset
+include::./create-metricset.asciidoc[]
 
-
+[[developerguide-testing]]
 == Testing
 
 To test a beat there exist three different type of tests:
@@ -280,32 +336,50 @@ To test a beat there exist three different type of tests:
 * integration tests
 * system tests
 
-When creating a beat we recommend to make use of all three. Unit tests are written in Golang and have no dependencies. Integration tests are also written in Golang but require the service that is required for the module to be running. System-tests for metricbeat also require the service to be running and are written in Python based on our small python test framework.
+When creating a beat we recommend to make use of all three. Unit tests are
+written in Golang and have no dependencies. Integration tests are also written
+in Golang but require the service that is required for the module to be running.
+System-tests for metricbeat also require the service to be running and are
+written in Python based on our small python test framework.
 
-It is recommended to use a combination of the three tests to test your module as each method has its advantage and disavantages. The unit and integration tests can be found in the `_test.go` files under modules and metricsets. The system tests are under `tests/systems`. To get started with your own tests, it is best having a look at the existing tests.
+It is recommended to use a combination of the three tests to test your module as
+each method has its advantage and disavantages. The unit and integration tests
+can be found in the `_test.go` files under modules and metricsets. The system
+tests are under `tests/systems`. To get started with your own tests, it is best
+having a look at the existing tests.
 
 === Run tests
 
-To run all the tests, run `make testsuite`. To only run unit tests, run `make unit-tests` or for integration tests `make integration-tests`. Be aware that for integration and system tests a running docker environment is needed.
+To run all the tests, run `make testsuite`. To only run unit tests, run `make
+unit-tests` or for integration tests `make integration-tests`. Be aware that for
+integration and system tests a running docker environment is needed.
 
 
 === Add environment
 
-Integration and system tests need an environment running with the service to test. This is done with docker and a docker-compose file. In case you add a module which requires a service, you must add this to the virtual environment. For this two steps are required:
+Integration and system tests need an environment running with the service to
+test. This is done with docker and a docker-compose file. In case you add a
+module which requires a service, you must add this to the virtual environment.
+For this two steps are required:
 
 * Update the `docker-compose.yml` file with your environment
-* Update the docker-entrypoint.sh` script
+* Update the `docker-entrypoint.sh` script
 
-The docker-compose.yml file is at the root of metricbeat. Most services have existing docker modules and can be added as simple as redis:
+The `docker-compose.yml` file is at the root of metricbeat. Most services have
+existing docker modules and can be added as simple as redis:
 
-```
+[source,yaml]
+----
 redis:
   image: redis:3.0.7
-````
+----
 
-To make sure the service is running before the tests are started, the `docker-entrypoint.sh` must be modified to add a check for your service to be running. An example for redis looks as following:
+To make sure the service is running before the tests are started, the
+`docker-entrypoint.sh` must be modified to add a check for your service to be
+running. An example for redis looks as following:
 
-```
+[source,shell]
+----
 waitForRedis() {
     echo -n "Waiting for redis(${REDIS_HOST}:${REDIS_PORT}) to start."
     for ((i=1; i<=90; i++)) do
@@ -324,15 +398,19 @@ waitForRedis() {
     echo >&2 'Redis is not available'
     echo >&2 "Address: ${REDIS_HOST}:${REDIS_PORT}"
 }
-```
+----
 
 
 == Configuration
 
-Each module and metircset have a predefined set of Configurations which can be accessed throught the Config object in both. It is possible to add further config options to your module and metricset. An example of this can be found in `module/redis/info.go`:
+Each module and metircset have a predefined set of configurations which can be
+accessed throught the Config object in both. It is possible to add further
+config options to your module and metricset. An example of this can be found in
+`module/redis/info.go`:
 
 
-```
+[source,go]
+----
 // Additional configuration options
 config := struct {
 	// TODO: Introduce default value for network
@@ -347,18 +425,25 @@ config := struct {
 if err := ms.Module.ProcessConfig(&config); err != nil {
 	return err
 }
-```
+----
 
-The redis module requires two additional configuration options: Network and MaxConn. First a struct with the required fields is defined and as values the default options can be defined. The method `Module.ProcessConfig(&config)` is then used to process the values which were set in the config file. It is important that the name defined in `config:"network"` is identical with the name defined in the yaml config file.
+The redis module requires two additional configuration options: Network and
+MaxConn. First a struct with the required fields is defined and as values the
+default options can be defined. The method `Module.ProcessConfig(&config)` is
+then used to process the values which were set in the config file. It is
+important that the name defined in `config:"network"` is identical with the name
+defined in the yaml config file.
 
-
-TODO: Note how to add your own config options to the beat.yml file and run make update
+TODO: Note how to add your own config options to the beat.yml file and run make
+update
 
 == Documentation
 
-Each module must be documented. The documentation is based on asciidoc and is in the file {module-name.asciidoc} in your module folder. This file contains the documentation for the module itself and the containing metricsets. For details on what should be documented, check the existing documented modules.
+Each module must be documented. The documentation is based on asciidoc and is in
+the file \{module-name}.asciidoc in your module folder. This file contains the
+documentation for the module itself and the containing metricsets. For details
+on what should be documented, check the existing documented modules.
 
 == Dashboards
 
 TODO: Add details on how to create dashboards
-

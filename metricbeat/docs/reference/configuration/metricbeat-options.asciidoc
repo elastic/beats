@@ -1,0 +1,94 @@
+[[configuration-metricbeat]]
+=== Metricbeat
+
+The `metricbeat` section specifies how often Metricbeat reads server statistics
+and which statistics it captures. Here is an example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+metricbeat:
+  # In seconds, defines how often to read server statistics
+  period: 10
+
+  # Regular expression to match the processes that are monitored
+  # By default, all the processes are monitored
+  procs: [".*"]
+
+  # Statistics to collect (all enabled by default)
+  stats:
+    # per system statistics, by default is true
+    system: true
+
+    # per process statistics, by default is true
+    process: true
+
+    # file system information, by default is true
+    filesystem: true
+
+    # cpu usage per core, by default is false
+    cpu_per_core: false
+
+
+------------------------------------------------------------------------------
+
+==== Metricbeat Options
+
+You can specify the following options in the `metricbeat` section:
+
+===== period
+
+How often, in seconds, to read system-wide and per-process statistics from your
+servers. The default is 10.
+
+[[procs-option]]
+===== procs
+
+A list of regular expressions to match all the processes that need to be monitored. By
+default, all the running processes are monitored.
+
+===== stats
+
+The statistics to collect. You can specify the following settings:
+
+* `system` to export system-wide statistics, including statistics about
+system load, CPU usage, memory usage, and swap usage.
+* `process` to export per-process statistics, such as the process name,
+parent pid, state, pid, CPU usage, and memory usage.
+* `filesystem` to export file system statistics, including details about the
+mounted disks, such as the total and used disk space, and details about each
+disk, such as the device name and the mounting place.
+* `cpu_per_core` to export the CPU usage per core. By default, this setting is
+false. It makes sense only if `system: true` is specified.
+The details are grouped under `cpus`. The Beat exports details for each core of
+the server. For example:
++
+[source,json]
+----------------------------------------------------------------------------------
+    "cpus": {
+      "cpu0": {
+        "user": 373170,
+        "user_p": 0,
+        "nice": 0,
+        "system": 463408,
+        "system_p": 0,
+        "idle": 2904305,
+        "iowait": 0,
+        "irq": 0,
+        "softirq": 0,
+        "steal": 0
+      },
+      ...
+  }
+----------------------------------------------------------------------------------
++
+For more information about the exported fields, see <<exported-fields>>.
+
+include::../../../../libbeat/docs/outputconfig.asciidoc[]
+
+include::../../../../libbeat/docs/shipperconfig.asciidoc[]
+
+include::../../../../libbeat/docs/loggingconfig.asciidoc[]
+
+include::../../../../libbeat/docs/runconfig.asciidoc[]
+
+include::../../../../libbeat/docs/filteringconfig.asciidoc[]
