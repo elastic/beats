@@ -27,6 +27,8 @@ type FileEvent struct {
 	Bytes        int
 	Text         *string
 	Fileinfo     *os.FileInfo
+	CustomS      map[string]string
+	CustomI3     map[string]int64
 	JSONFields   common.MapStr
 	JSONConfig   *config.JSONConfig
 }
@@ -88,9 +90,41 @@ func (f *FileEvent) ToMapStr() common.MapStr {
 		"@timestamp":            common.Time(f.ReadTime),
 		"source":                f.Source,
 		"offset":                f.Offset, // Offset here is the offset before the starting char.
+		//"message":               f.Text,
 		"type":                  f.DocumentType,
 		"input_type":            f.InputType,
 	}
+
+	if f.Text != nil {
+        event["message"] = f.Text
+    }
+
+    if f.CustomS != nil {
+        for k, v := range f.CustomS {
+            event[k] = v 
+        }
+    }   
+    if f.CustomI3 != nil {
+        for k, v := range f.CustomI3 {
+            event[k] = v 
+        }
+    }   
+ 
+
+    if f.Fields != nil {
+            event["fields"] = f.Fields
+        /*
+            common.EventMetadataKey: f.EventMetadata,
+            "@timestamp":            common.Time(f.ReadTime),
+            "source":                f.Source,
+            "offset":                f.Offset, // Offset here is the offset before the starting char.
+            "message":               f.Text,
+            "type":                  f.DocumentType,
+            "input_type":            f.InputType,
+            "count":                 1,
+        */
+    }
+
 
 	if f.JSONConfig != nil && len(f.JSONFields) > 0 {
 		mergeJSONFields(f, event)

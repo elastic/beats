@@ -20,8 +20,35 @@ filebeat:
       # For each file found under this path, a harvester is started.
       # Make sure not file is defined twice as this can lead to unexpected behaviour.
       paths:
-        - /var/log/*.log
+        - /var/log/auth.log
         #- c:\programdata\elasticsearch\logs\*
+      regex_list:
+        -
+          descr: auth 
+          name: auth logs
+          include_message: true 
+          regex:
+            -
+              name: ignore
+              es_type: string
+              regex: \s*(\w+\s*\d+\s*\d+:\d+:\d+)\s*
+            -
+              name: hostname
+              es_type: string
+              regex: ([^\s]+)\s*
+            -
+              name: process
+              es_type: string
+              regex: ([^\s]+)\s*
+            -
+              name: authmethod
+              es_type: string
+              regex: ([^\s]+)\s*
+            -
+              name: message
+              es_type: string
+              regex: (.*)
+
 
       # Configure the file encoding for reading files with international characters
       # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
@@ -29,28 +56,6 @@ filebeat:
       #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
       #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
       #encoding: plain
-
-
-      # Decode JSON options. Enable this if your logs are structured in JSON.
-      #json:
-        # JSON key on which to apply the line filtering and multiline settings. This key
-        # must be top level and its value must be string, otherwise it is ignored. If
-        # no text key is defined, the line filtering and multiline features cannot be used.
-        #message_key:
-
-        # By default, the decoded JSON is placed under a "json" key in the output document.
-        # If you enable this setting, the keys are copied top level in the output document.
-        #keys_under_root: false
-
-        # If keys_under_root and this setting are enabled, then the values from the decoded
-        # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
-        # in case of conflicts.
-        #overwrite_keys: false
-
-        # If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-        # unmarshaling errors or when a text key is defined in the configuration but cannot
-        # be used.
-        #add_error_key: false
 
       # Exclude lines. A list of regular expressions to match. It drops the lines that are
       # matching any regular expression from the list. The include_lines is called before
@@ -133,7 +138,7 @@ filebeat:
       # Setting tail_files to true means filebeat starts reading new files at the end
       # instead of the beginning. If this is used in combination with log rotation
       # this can mean that the first entries of a new file are skipped.
-      #tail_files: false
+      tail_files: false
 
       # Backoff values define how aggressively filebeat crawls new files for updates
       # The default values can be used in most cases. Backoff defines how long it is waited
@@ -181,9 +186,10 @@ filebeat:
   # Flush even though spool_size is not reached.
   #idle_timeout: 5s
 
-  # Name of the registry file. If a relative path is used, it is considered relative to the
-  # data path.
-  #registry_file: registry
+  # Name of the registry file. Per default it is put in the current working
+  # directory. In case the working directory is changed after when running
+  # filebeat again, indexing starts from the beginning again.
+  #registry_file: .filebeat
 
   # Full Path to directory with additional prospector configuration files. Each file must end with .yml
   # These config files must have the full filebeat config part inside, but only
@@ -207,7 +213,7 @@ output:
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["localhost:9200"]
+      hosts: ["rubber-licorice1.body.prod:9200", "rubber-licorice2.body.prod:9200"]
 
     # Optional protocol and basic auth credentials.
     #protocol: "https"
@@ -224,21 +230,21 @@ output:
 
     # Optional index name. The default is "filebeat" and generates
     # [filebeat-]YYYY.MM.DD keys.
-    #index: "filebeat"
+    # index: "filebeat"
 
     # A template is used to set the mapping in Elasticsearch
-    # By default template loading is enabled and the template is loaded.
+    # By default template loading is disabled and no template is loaded.
     # These settings can be adjusted to load your own template or overwrite existing ones
-    template:
+    #template:
 
       # Template name. By default the template name is filebeat.
-      name: "filebeat"
+      #name: "filebeat"
 
       # Path to template file
-      path: "filebeat.template.json"
+      #path: "filebeat.template.json"
 
       # Overwrite existing template
-      overwrite: false
+      #overwrite: false
 
     # Optional HTTP Path
     #path: "/elasticsearch"
