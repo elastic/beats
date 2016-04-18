@@ -68,3 +68,41 @@ telnet <hostname or IP> 5044
 TIP: For testing purposes only, you can set `insecure: true` to disable hostname checking.
 
 * Make sure that you have enabled SSL (set `ssl => true`) when configuring the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
+
+==== Common Errors and Resolutions
+
+Here are some common errors and ways to fix them:
+
+* <<cannot-validate-certificate>>
+* <<getsockopt-no-route-to-host>>
+* <<getsockopt-connection-refused>>
+* <<target-machine-refused-connection>>
+
+[[cannot-validate-certificate]]
+===== x509: cannot validate certificate for <IP address> because it doesn't contain any IP SANs
+
+This happens because your certificate is only valid for the hostname present in the Subject field.
+
+To resolve this problem, try one of these solutions:
+
+* Create a DNS entry for the hostname mapping it to the server's IP.
+* Create an entry in `/etc/hosts` for the hostname. Or on Windows add an entry to
+`C:\Windows\System32\drivers\etc\hosts`.
+* Re-create the server certificate and add a SubjectAltName (SAN) for the IP address of the server. This make the
+server's certificate valid for both the hostname and the IP address.
+
+[[getsockopt-no-route-to-host]]
+===== getsockopt: no route to host
+
+This is not a TLS problem. It's a networking problem. Make sure the two hosts can communicate.
+
+[[getsockopt-connection-refused]]
+===== getsockopt: connection refused
+
+This is not a TLS problem. Make sure that Logstash is running and that there is no firewall blocking the traffic.
+
+[[target-machine-refused-connection]]
+===== No connection could be made because the target machine actively refused it
+
+A firewall is refusing the connection. Check if a firewall is blocking the traffic on the client, the network, or the
+destination host.
