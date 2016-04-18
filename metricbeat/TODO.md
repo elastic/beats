@@ -22,6 +22,9 @@ For most metricset, setup creates the connections to the remote hosts. One poten
 # Topbeat
 Topbeat should be added to metricbeat (see https://github.com/elastic/beats/pull/1081). To make the two better integrated some refactoring on the Topbeat side is needed so MapStr can be consumed directly.
 
+# Collection of fields
+Currently the fields.yml is combined from all fields.yml fields in the metricsets. This leads to the problem that if a module has two metricsets, the module is defined twice in the global fields.yml file. The module part should be moved to a fields.yml in the module.
+
 # More
 * Add service host as default event informartion. See https://github.com/elastic/beats/issues/619#issuecomment-185242407
 * Add version number of service. See https://github.com/elastic/beats/issues/619#issuecomment-185242407
