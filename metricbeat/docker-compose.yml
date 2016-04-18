@@ -19,9 +19,11 @@ beat:
     - ..:/go/src/github.com/elastic/beats/
   command: make
   entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
+
 elasticsearch:
-  image: elasticsearch:2.2.0
-  command: elasticsearch -Des.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
+  build: ../testing/environments/docker/elasticsearch
+  dockerfile: Dockerfile-5.0.0-alpha1
+  command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
 
 # Modules
 apache:
