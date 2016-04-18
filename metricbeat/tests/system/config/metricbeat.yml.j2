@@ -1,30 +1,67 @@
 metricbeat:
   modules:
-    {% if redis %}
-    - module: redis
+    {% for m in modules -%}
+    - module: {{ m.name }}
+      {% if m.enabled is defined -%}
+      enabled: {{ m.enabled }}
+      {% endif -%}
+
+      {% if m.hosts -%}
       hosts:
-        - "{{ redis_host|default("127.0.0.1", true) }}:6379"
+        {% for host in m.hosts -%}
+        - '{{ host }}'
+        {% endfor %}
+      {% endif -%}
+
+      {% if m.metricsets -%}
       metricsets:
-        - info
-      period: 2s
-      enabled: true
-      {% if redis_include_fields %}
+        {% for ms in m.metricsets -%}
+        - {{ ms }}
+        {% endfor %}
+      {% endif -%}
+
+      {% if m.period -%}
+      period: {{ m.period }}
+      {% endif -%}
+
+      {% if m.timeout -%}
+      timeout: {{ m.timeout }}
+      {% endif -%}
+
+      {% if m.filters is defined -%}
       filters:
-        - include_fields:
-            fields: {{ redis_include_fields }}
-      {% endif %}
-    {% endif %}
-    {% if mysql %}
-    - module: mysql:
-      # This expects a full MySQL Data Source Name (DSN).
-      # Example: [username[:password]@][protocol[(address)]]/
-      hosts:
-        - "@tcp(127.0.0.1:3306)/"
-      metricsets:
-        - status
-      period: 5s
-      enabled: true
-    {% endif %}
+        {% for f in m.filters -%}
+        {% for k, v in f.items() -%}
+        - {{ k }}.fields: [
+          {%- for field in v -%}
+          '{{ field }}' {%- if not loop.last %}, {% endif -%}
+          {%- endfor -%}
+        ]
+        {%- endfor %}
+        {%- endfor %}
+      {% endif -%}
+
+      {% if m.tags is defined -%}
+      tags:
+        {% for tag in m.tags -%}
+        - {{ tag }}
+        {% endfor %}
+      {% endif -%}
+
+      {% if m.fields is defined -%}
+      {% if m.fields_under_root %}fields_under_root: true{% endif %}
+      fields:
+        {% for k, v in m.fields.items() -%}
+        {{ k }}: {{ v }}
+        {%- endfor %}
+      {% endif -%}
+
+      {% if m.extras -%}
+      {% for k, v in m.extras.items() -%}
+      {{ k }}: {{ v }}
+      {% endfor %}
+      {% endif -%}
+    {%- endfor %}
 
 output:
   file:

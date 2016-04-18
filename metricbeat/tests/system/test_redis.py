@@ -20,10 +20,11 @@ class RedisInfoTest(metricbeat.BaseTest):
         """
         Redis module outputs an event.
         """
-        self.render_config_template(
-            redis=True,
-            redis_host=os.getenv('REDIS_HOST')
-        )
+        self.render_config_template(modules=[{
+            "name": "redis",
+            "metricsets": ["info"],
+            "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+        }])
         proc = self.start_beat()
         self.wait_until(
             lambda: self.output_has(lines=1)
@@ -53,11 +54,14 @@ class RedisInfoTest(metricbeat.BaseTest):
         Test filters for Redis info event.
         """
         fields = ["clients", "cpu"]
-        self.render_config_template(
-            redis=True,
-            redis_host=os.getenv('REDIS_HOST'),
-            redis_include_fields=fields
-        )
+        self.render_config_template(modules=[{
+            "name": "redis",
+            "metricsets": ["info"],
+            "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+            "filters": [{
+                "include_fields": fields,
+            }],
+        }])
         proc = self.start_beat()
         self.wait_until(
             lambda: self.output_has(lines=1)
