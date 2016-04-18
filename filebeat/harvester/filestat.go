@@ -2,7 +2,7 @@ package harvester
 
 import "os"
 
-// Contains statistic about file when it was last seend by the prospector
+// Contains statistic about file when it was last seen by the prospector
 type FileStat struct {
 	Fileinfo      os.FileInfo /* the file info */
 	Return        chan int64  /* the harvester will send an event with its offset when it closes */

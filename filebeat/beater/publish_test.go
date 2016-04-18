@@ -22,7 +22,7 @@ func makeEvents(name string, n int) []*input.FileEvent {
 			DocumentType: "log",
 			Bytes:        100,
 			Offset:       int64(i),
-			Source:       &name,
+			Source:       name,
 		}
 		events = append(events, event)
 	}
