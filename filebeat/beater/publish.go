@@ -53,8 +53,9 @@ const (
 )
 
 const (
-	batchSuccess int32 = 1
-	batchFailed  int32 = 2
+	batchSuccess   int32 = 1
+	batchFailed    int32 = 2
+	batchCancelled int32 = 3
 )
 
 func newPublisher(
@@ -218,6 +219,11 @@ func (b *eventsBatch) Completed() {
 func (b *eventsBatch) Failed() {
 	logp.Err("Failed to publish batch. Stop updating registrar.")
 	atomic.StoreInt32(&b.flag, batchFailed)
+}
+
+func (b *eventsBatch) Cancelled() {
+	logp.Info("In-flight batch has been cancelled during shutdown")
+	atomic.StoreInt32(&b.flag, batchCancelled)
 }
 
 func (l *batchList) append(b *eventsBatch) {

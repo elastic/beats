@@ -95,7 +95,6 @@ type Beat struct {
 	BT        Beater               // Beater implementation.
 	RawConfig *common.Config       // Raw config that can be unpacked to get Beat specific config data.
 	Config    BeatConfig           // Common Beat configuration data.
-	Events    publisher.Client     // Client used for publishing events.
 	Publisher *publisher.Publisher // Publisher
 
 	filters *filter.FilterList // Filters
@@ -234,8 +233,6 @@ func (bc *instance) setup() error {
 	}
 
 	bc.data.Publisher.RegisterFilter(bc.data.filters)
-	bc.data.Events = bc.data.Publisher.Connect()
-
 	err = bc.beater.Setup(bc.data)
 	if err != nil {
 		return err

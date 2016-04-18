@@ -87,7 +87,7 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 // settings to allow the beat to be used.
 func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
-	eb.client = b.Events
+	eb.client = b.Publisher.Connect()
 	eb.done = make(chan struct{})
 
 	var err error

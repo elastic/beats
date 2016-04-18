@@ -93,7 +93,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Publishes event to output
 	pub := newPublisher(fb.FbConfig.Filebeat.PublishAsync,
-		fb.publisherChan, fb.registrar.Channel, b.Events)
+		fb.publisherChan, fb.registrar.Channel, b.Publisher.Connect())
 	pub.Start()
 
 	// Blocks progressing
