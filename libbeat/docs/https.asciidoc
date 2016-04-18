@@ -10,7 +10,8 @@
 //// This content is structured to be included as a whole file.
 //////////////////////////////////////////////////////////////////////////
 
-=== Securing Communication
+[[securing-communication-elasticsearch]]
+=== Securing Communication With Elasticsearch
 
 To secure the communication between {beatname_uc} and Elasticsearch, you can use HTTPS
 and basic authentication. Here is a sample configuration:
@@ -39,8 +40,10 @@ https://www.elastic.co/guide/en/shield/current/certificate-authority.html[Settin
 topic in the {security} documentation.
 
 By default {beatname_uc} uses the list of trusted certificate authorities from the
-operating system where {beatname_uc} is running. You can configure a Beat to use a specific list of
-CA certificates instead of the list from the OS. Here is an example:
+operating system where {beatname_uc} is running. You can configure {beatname_uc} to use a specific list of
+CA certificates instead of the list from the OS. You can also configure it to use client authentication
+by specifying the certificate and key to use when the server requires the Beat to authenticate. Here is an example
+configuration:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
@@ -53,8 +56,12 @@ elasticsearch:
     certificate_authorities: <1>
       - /etc/pki/my_root_ca.pem
       - /etc/pki/my_other_ca.pem
+    certificate: "/etc/pki/client.pem" <2>
+    certificate_key: "/etc/pki/key.pem" <3>
 ----------------------------------------------------------------------
 <1> The list of CA certificates to trust
+<2> The path to the certificate for TLS client authentication
+<3> The client certificate key
 
 NOTE: For any given connection, the SSL/TLS certificates must have a subject
 that matches the value specified for `hosts`, or the TLS handshake fails.

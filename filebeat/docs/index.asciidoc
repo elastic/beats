@@ -20,9 +20,13 @@ include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::./multiple-prospectors.asciidoc[]
+
+include::./securing-filebeat.asciidoc[]
+
 include::../../libbeat/docs/https.asciidoc[]
 
-include::./multiple-prospectors.asciidoc[]
+include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
