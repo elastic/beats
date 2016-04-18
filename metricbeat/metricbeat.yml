@@ -66,6 +66,12 @@ metricbeat:
 
       # Password of hosts. Empty by default
       #password: test
+
+    # System module
+    - module: system
+      metricsets: ["cpu", "memory"]
+      enabled: true
+      period: 2s
 ###############################################################################
 ############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features

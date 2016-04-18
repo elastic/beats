@@ -12,6 +12,7 @@ sections:
   - ["apache", "Apache Status"]
   - ["redis", "Redis Info"]
   - ["mysql", "MySQL Status"]
+  - ["system", "System Status"]
 
 common:
   type: group

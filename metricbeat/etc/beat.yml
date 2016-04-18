@@ -66,3 +66,9 @@ metricbeat:
 
       # Password of hosts. Empty by default
       #password: test
+
+    # System module
+    - module: system
+      metricsets: ["cpu", "memory"]
+      enabled: true
+      period: 2s
