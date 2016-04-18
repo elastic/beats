@@ -33,11 +33,6 @@ metricbeat:
       # should never take longer then period, as otherwise calls can pile up.
       #timeout: 1s
 
-      # Selectors to only fetch a subset of metrics (whitelisting)
-      # If no selectors are set, all metrics are sent.
-      # Use filters for a more fine grained filtering.
-      #selectors: []
-
       # Optional fields to be added to each event
       #fields:
       #  datacenter: west
@@ -48,7 +43,10 @@ metricbeat:
       # Max number of concurrent connections. Default: 10
       #maxconn: 10
 
-      #filter: ...
+      # Filters can be used to reduce the number of fields sent.
+      #filters:
+      #  - include_fields:
+      #      fields: ["stats"]
 
       # Redis AUTH password. Empty by default.
       #password: foobared

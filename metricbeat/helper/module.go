@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -32,10 +33,9 @@ type Module struct {
 
 	Publish chan common.MapStr
 
-	// MetricSet waitgroup
-	wg sync.WaitGroup
-
-	done chan struct{}
+	wg      sync.WaitGroup // MetricSet waitgroup
+	done    chan struct{}
+	filters *filter.FilterList
 }
 
 // NewModule creates a new module
@@ -52,6 +52,12 @@ func NewModule(cfg *common.Config, moduler func() Moduler) (*Module, error) {
 		return nil, err
 	}
 
+	filters, err := filter.New(config.Filters)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing filters: %v", err)
+	}
+	logp.Debug("module", "Filters: %+v", filters)
+
 	return &Module{
 		name:       config.Module,
 		Config:     config,
@@ -61,6 +67,7 @@ func NewModule(cfg *common.Config, moduler func() Moduler) (*Module, error) {
 		Publish:    make(chan common.MapStr), // TODO: What should be size of channel? @ruflin,20160316
 		wg:         sync.WaitGroup{},
 		done:       make(chan struct{}),
+		filters:    filters,
 	}, nil
 }
 
