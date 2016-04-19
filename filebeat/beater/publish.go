@@ -29,8 +29,8 @@ type asyncLogPublisher struct {
 	in, out chan []*input.FileEvent
 
 	// list of in-flight batches
-	active  batchList
-	failing bool
+	active   batchList
+	stopping bool
 
 	done chan struct{}
 	wg   sync.WaitGroup
@@ -48,14 +48,17 @@ type batchList struct {
 	head, tail *eventsBatch
 }
 
+type batchStatus int32
+
 const (
 	defaultGCTimeout = 1 * time.Second
 )
 
 const (
-	batchSuccess   int32 = 1
-	batchFailed    int32 = 2
-	batchCancelled int32 = 3
+	batchInProgress batchStatus = iota
+	batchSuccess
+	batchFailed
+	batchCancelled
 )
 
 func newPublisher(
@@ -116,6 +119,7 @@ func (p *syncLogPublisher) Start() {
 
 func (p *syncLogPublisher) Stop() {
 	close(p.done)
+	p.client.Close()
 	p.wg.Wait()
 }
 
@@ -170,6 +174,7 @@ func (p *asyncLogPublisher) Start() {
 
 func (p *asyncLogPublisher) Stop() {
 	close(p.done)
+	p.client.Close()
 	p.wg.Wait()
 }
 
@@ -178,9 +183,16 @@ func (p *asyncLogPublisher) Stop() {
 // as bulk-Events have been received by the spooler
 func (p *asyncLogPublisher) collect() bool {
 	for batch := p.active.head; batch != nil; batch = batch.next {
-		state := atomic.LoadInt32(&batch.flag)
-		if state == 0 && !p.failing {
+		state := batchStatus(atomic.LoadInt32(&batch.flag))
+		if state == batchInProgress && !p.stopping {
 			break
+		}
+
+		if state == batchFailed {
+			// with guaranteed enabled this must must not happen.
+			msg := "Failed to process batch"
+			logp.Critical(msg)
+			panic(msg)
 		}
 
 		// remove batch from active list
@@ -189,14 +201,14 @@ func (p *asyncLogPublisher) collect() bool {
 			p.active.tail = nil
 		}
 
-		// Batches get marked as failed, if publisher pipeline is shutting down
+		// Batches get marked as cancelled, if publisher pipeline is shutting down
 		// In this case we do not want to send any more batches to the registrar
-		if state == batchFailed {
-			p.failing = true
+		if state == batchCancelled {
+			p.stopping = true
 		}
 
-		if p.failing {
-			logp.Warn("No registrar update for potentially published batch.")
+		if p.stopping {
+			logp.Info("Shutting down - No registrar update for potentially published batch.")
 
 			// if in failing state keep cleaning up queue
 			continue
@@ -205,6 +217,7 @@ func (p *asyncLogPublisher) collect() bool {
 		// Tell the registrar that we've successfully sent these events
 		select {
 		case <-p.done:
+			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false
 		case p.out <- batch.events:
 		}
