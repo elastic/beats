@@ -38,6 +38,14 @@ common:
         The timestamp when the log line was read. The precision is in
         milliseconds. The timezone is UTC.
 
+    - name: module
+      description: >
+        The name of the module that generated the event.
+
+    - name: metricset
+      description: >
+        The name of the metricset that generated the event.
+
     - name: metricset-host
       description: >
         Hostname of the machine from which the metricset was collected. This
@@ -49,3 +57,8 @@ common:
       description: >
         Event round trip time in microseconds
 
+    - name: type
+      required: true
+      example: metricsets
+      description: >
+        The document type. Always set to "metricsets".

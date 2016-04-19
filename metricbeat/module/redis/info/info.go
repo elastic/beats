@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	debugf = logp.MakeDebug("redis")
+	debugf = logp.MakeDebug("redis-info")
 )
 
 func init() {
