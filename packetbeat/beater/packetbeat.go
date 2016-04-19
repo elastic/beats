@@ -287,5 +287,6 @@ func (pb *Packetbeat) Cleanup(b *beat.Beat) error {
 
 // Called by the Beat stop function
 func (pb *Packetbeat) Stop() {
+	logp.Info("Packetbeat send stop signal")
 	pb.Sniff.Stop()
 }

@@ -100,6 +100,7 @@ func (t *PacketbeatPublisher) Start() {
 
 func (t *PacketbeatPublisher) Stop() {
 	close(t.done)
+	t.client.Close()
 	t.wg.Wait()
 }
 
