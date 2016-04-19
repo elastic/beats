@@ -18,7 +18,7 @@ type File struct {
 // FileEvent is sent to the output and must contain all relevant information
 type FileEvent struct {
 	ReadTime     time.Time
-	Source       *string
+	Source       string
 	InputType    string
 	DocumentType string
 	Offset       int64
@@ -31,8 +31,8 @@ type FileEvent struct {
 }
 
 type FileState struct {
-	Source      *string `json:"source,omitempty"`
-	Offset      int64   `json:"offset,omitempty"`
+	Source      string `json:"source,omitempty"`
+	Offset      int64  `json:"offset,omitempty"`
 	FileStateOS *FileStateOS
 }
 

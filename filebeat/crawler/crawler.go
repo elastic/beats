@@ -58,7 +58,7 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 	logp.Debug("prospector", "Waiting for %d prospectors to initialise", pendingProspectorCnt)
 
 	for event := range crawler.Registrar.Persist {
-		if event.Source == nil {
+		if event.Source == "" {
 
 			pendingProspectorCnt--
 			if pendingProspectorCnt == 0 {
@@ -67,15 +67,15 @@ func (crawler *Crawler) Start(files []config.ProspectorConfig, eventChan chan *i
 			}
 			continue
 		}
-		crawler.Registrar.State[*event.Source] = event
-		logp.Debug("prospector", "Registrar will re-save state for %s", *event.Source)
+		crawler.Registrar.state[event.Source] = event
+		logp.Debug("prospector", "Registrar will re-save state for %s", event.Source)
 
 		if !crawler.running {
 			break
 		}
 	}
 
-	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.State))
+	logp.Info("All prospectors initialised with %d states to persist", len(crawler.Registrar.getStateCopy()))
 }
 
 func (crawler *Crawler) Stop() {

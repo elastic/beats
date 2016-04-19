@@ -272,3 +272,25 @@ class TestCase(unittest.TestCase):
 
         with open(dotFilebeat) as file:
             return json.load(file)
+
+
+    def log_contains_count(self, msg, logfile=None):
+        """
+        Returns the number of appearances of the given string in the log file
+        """
+
+        counter = 0
+
+        # Init defaults
+        if logfile is None:
+            logfile = "filebeat.log"
+
+        try:
+            with open(os.path.join(self.working_dir, logfile), "r") as f:
+                for line in f:
+                    if line.find(msg) >= 0:
+                        counter = counter + 1
+        except IOError:
+            counter = -1
+
+        return counter

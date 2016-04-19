@@ -17,6 +17,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -27,7 +28,8 @@ type Harvester struct {
 	Path               string /* the file path to harvest */
 	ProspectorConfig   config.ProspectorConfig
 	Config             *config.HarvesterConfig
-	Offset             int64
+	offset             int64
+	offsetLock         sync.Mutex
 	Stat               *FileStat
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory

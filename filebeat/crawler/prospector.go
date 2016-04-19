@@ -166,7 +166,7 @@ func (p *Prospector) logRun(spoolChan chan *input.FileEvent) {
 
 	// This signals we finished considering the previous state
 	event := &input.FileState{
-		Source: nil,
+		Source: "",
 	}
 	p.registrar.Persist <- event
 
@@ -214,7 +214,7 @@ func (p *Prospector) stdinRun(spoolChan chan *input.FileEvent) {
 
 	// This signals we finished considering the previous state
 	event := &input.FileState{
-		Source: nil,
+		Source: "",
 	}
 	p.registrar.Persist <- event
 
@@ -344,7 +344,7 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		if resuming {
 			logp.Debug("prospector", "Resuming harvester on a previously harvested file: %s", file)
 
-			h.Offset = offset
+			h.SetOffset(offset)
 			h.Start()
 		} else {
 			// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
@@ -354,11 +354,13 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 				file)
 			newinfo.Skip(newinfo.Fileinfo.Size())
 		}
+		p.registrar.Persist <- h.GetState()
 	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected: %s -> %s", previousFile, file)
 		lastinfo := p.prospectorList[previousFile]
 		newinfo.Continue(&lastinfo)
+		p.registrar.Persist <- h.GetState()
 	} else {
 
 		// Are we resuming a file or is this a completely new file?
@@ -369,8 +371,9 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		}
 
 		// Launch the harvester
-		h.Offset = offset
+		h.SetOffset(offset)
 		h.Start()
+		p.registrar.Persist <- h.GetState()
 	}
 }
 
@@ -402,6 +405,7 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 
 			lastinfo := p.prospectorList[previousFile]
 			newinfo.Continue(&lastinfo)
+			p.registrar.Persist <- h.GetState()
 		} else {
 			// File is not the same file we saw previously, it must have rotated and is a new file
 			logp.Debug("prospector", "Launching harvester on rotated file: %s", file)
@@ -411,6 +415,7 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 
 			// Start a new harvester on the path
 			h.Start()
+			p.registrar.Persist <- h.GetState()
 		}
 
 		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
@@ -423,8 +428,9 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 
 		// Start a harvester on the path; an old file was just modified and it doesn't have a harvester
 		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
-		h.Offset = <-newinfo.Return
+		h.SetOffset(<-newinfo.Return)
 		h.Start()
+		p.registrar.Persist <- h.GetState()
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", file)
 	}

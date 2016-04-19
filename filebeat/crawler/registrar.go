@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
@@ -16,7 +17,8 @@ type Registrar struct {
 	// Path to the Registry File
 	registryFile string
 	// Map with all file paths inside and the corresponding state
-	State map[string]*FileState
+	state      map[string]*FileState
+	stateMutex sync.Mutex
 	// Channel used by the prospector and crawler to send FileStates to be persisted
 	Persist chan *input.FileState
 	running bool
@@ -39,7 +41,7 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 func (r *Registrar) Init() error {
 	// Init state
 	r.Persist = make(chan *FileState)
-	r.State = make(map[string]*FileState)
+	r.state = map[string]*FileState{}
 	r.Channel = make(chan []*FileEvent, 1)
 
 	// Set to default in case it is not set
@@ -71,11 +73,13 @@ func (r *Registrar) Init() error {
 // loadState fetches the previous reading state from the configure RegistryFile file
 // The default file is .filebeat file which is stored in the same path as the binary is running
 func (r *Registrar) LoadState() {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
 	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()
 		logp.Info("Loading registrar data from %s", r.registryFile)
 		decoder := json.NewDecoder(existing)
-		decoder.Decode(&r.State)
+		decoder.Decode(&r.state)
 	}
 }
 
@@ -94,8 +98,9 @@ func (r *Registrar) Run() {
 			return
 		// Treats new log files to persist with higher priority then new events
 		case state := <-r.Persist:
-			r.State[*state.Source] = state
-			logp.Debug("prospector", "Registrar will re-save state for %s", *state.Source)
+			source := state.Source
+			r.setState(source, state)
+			logp.Debug("prospector", "Registrar will re-save state for %s", source)
 		case events := <-r.Channel:
 			r.processEvents(events)
 		}
@@ -121,7 +126,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 			continue
 		}
 
-		r.State[*event.Source] = event.GetState()
+		r.setState(event.Source, event.GetState())
 	}
 }
 
@@ -133,7 +138,7 @@ func (r *Registrar) Stop() {
 }
 
 func (r *Registrar) GetFileState(path string) (*FileState, bool) {
-	state, exist := r.State[path]
+	state, exist := r.getState(path)
 	return state, exist
 }
 
@@ -149,12 +154,13 @@ func (r *Registrar) writeRegistry() error {
 	}
 
 	encoder := json.NewEncoder(file)
-	encoder.Encode(r.State)
+	state := r.getStateCopy()
+	encoder.Encode(state)
 
 	// Directly close file because of windows
 	file.Close()
 
-	logp.Info("Registry file updated. %d states written.", len(r.State))
+	logp.Info("Registry file updated. %d states written.", len(state))
 
 	return SafeFileRotate(r.registryFile, tempfile)
 }
@@ -168,7 +174,6 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Debug("registar", "Same file as before found. Fetch the state and persist it.")
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
-		r.Persist <- lastState
 		return lastState.Offset, true
 	}
 
@@ -179,8 +184,7 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
-		lastState.Source = &filePath
-		r.Persist <- lastState
+		r.updateStateSource(lastState, filePath)
 		return lastState.Offset, true
 	}
 
@@ -198,7 +202,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 
 	newState := input.GetOSFileState(&newFileInfo)
 
-	for oldFilePath, oldState := range r.State {
+	for oldFilePath, oldState := range r.getStateCopy() {
 
 		// Skipping when path the same
 		if oldFilePath == newFilePath {
@@ -213,4 +217,35 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 	}
 
 	return "", fmt.Errorf("No previous file found")
+}
+
+func (r *Registrar) setState(path string, state *FileState) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	r.state[path] = state
+}
+
+func (r *Registrar) getState(path string) (*FileState, bool) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	state, exist := r.state[path]
+	return state, exist
+}
+
+func (r *Registrar) updateStateSource(state *FileState, path string) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	state.Source = path
+}
+
+func (r *Registrar) getStateCopy() map[string]FileState {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
+	copy := make(map[string]FileState)
+	for k, v := range r.state {
+		copy[k] = *v
+	}
+
+	return copy
 }
