@@ -17,7 +17,9 @@ var (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("redis", "info", New)
+	if err := helper.Registry.AddMetricSeter("redis", "info", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter

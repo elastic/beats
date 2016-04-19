@@ -32,7 +32,9 @@ var (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("apache", "status", New)
+	if err := helper.Registry.AddMetricSeter("apache", "status", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter

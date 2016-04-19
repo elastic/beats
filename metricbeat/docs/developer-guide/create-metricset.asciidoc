@@ -43,7 +43,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New)
+	if err := helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New); err != nil {
+        panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter
@@ -90,7 +92,9 @@ registry with the given module and makes sure it is run later as expected.
 [source,go]
 ----
 func init() {
-	helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New)
+	if err := helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New); err != nil {
+        panic(err)
+	}
 }
 ----
 

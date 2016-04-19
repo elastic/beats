@@ -2,56 +2,85 @@ package helper
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Global register for moduler and metricseter
-// The Register keeps a global list of moduler and metricseter
-// A copy of the moduler or metricset instance can be used to create a module or metricset
-
-// TODO: Global variables should be prevent.
-// 	This should be moved into the metricbeat object but can't because the init()
-//	functions in each metricset are called before the beater object exists.
+// Registry is the singleton Register instance where all modules and metricsets
+// should register their factories.
 var Registry = Register{}
 
+// Register contains the factory functions for creating new Modulers and new
+// MetricSeters.
 type Register struct {
-	Modulers     map[string]func() Moduler
-	MetricSeters map[string]map[string]func() MetricSeter
+	Modulers     map[string]func() Moduler                // A map of module name to Moduler factory function.
+	MetricSeters map[string]map[string]func() MetricSeter // A map of module name to nested map of metricset name to MetricSeter factory function.
 }
 
-// AddModule registers the given module with the registry
-func (r *Register) AddModuler(name string, m func() Moduler) {
-
+// AddModuler registers a new Moduler factory. An error is returned if the
+// name is empty, factory is nil, or if a factory has already been registered
+// under the name.
+func (r *Register) AddModuler(name string, factory func() Moduler) error {
 	if r.Modulers == nil {
 		r.Modulers = map[string]func() Moduler{}
 	}
 
-	logp.Info("Register module: %s", name)
+	if name == "" {
+		return fmt.Errorf("module name is required")
+	}
 
-	r.Modulers[name] = m
+	_, exists := r.Modulers[name]
+	if exists {
+		return fmt.Errorf("module '%s' is already registered", name)
+	}
+
+	if factory == nil {
+		return fmt.Errorf("module '%s' cannot be registered with a nil factory", name)
+	}
+
+	r.Modulers[name] = factory
+	logp.Info("Module registered: %s", name)
+	return nil
 }
 
-func (r *Register) AddMetricSeter(module string, name string, new func() MetricSeter) {
-
+// AddMetricSeter registers a new MetricSeter factory. An error is returned if
+// any parameter is empty or nil or if a factory has already been registered
+// under the name.
+func (r *Register) AddMetricSeter(module string, name string, factory func() MetricSeter) error {
 	if r.MetricSeters == nil {
 		r.MetricSeters = map[string]map[string]func() MetricSeter{}
 	}
 
-	if _, ok := r.MetricSeters[module]; !ok {
-		r.MetricSeters[module] = map[string]func() MetricSeter{}
+	if module == "" {
+		return fmt.Errorf("module name is required")
 	}
 
-	logp.Info("Register metricset %s for module %s", name, module)
+	if name == "" {
+		return fmt.Errorf("metricset name is required")
+	}
 
-	r.MetricSeters[module][name] = new
+	if metricsets, ok := r.MetricSeters[module]; !ok {
+		r.MetricSeters[module] = map[string]func() MetricSeter{}
+	} else if _, exists := metricsets[name]; exists {
+		return fmt.Errorf("metricset '%s/%s' is already registered", module, name)
+	}
+
+	if factory == nil {
+		return fmt.Errorf("metricset '%s/%s' cannot be registered with a nil factory", module, name)
+	}
+
+	r.MetricSeters[module][name] = factory
+	logp.Info("metricset registered: %s/%s", module, name)
+	return nil
 }
 
-// GetModule returns a new module instance for the given moduler name
+// GetModule returns a new Module instance for the given moduler name. An
+// error is returned if the module does not exist.
 func (r *Register) GetModule(cfg *common.Config) (*Module, error) {
-
-	// Unpack config to load module name
+	// Unpack config to get the module name.
 	config := struct {
 		Module string `config:"module"`
 	}{}
@@ -59,27 +88,47 @@ func (r *Register) GetModule(cfg *common.Config) (*Module, error) {
 		return nil, err
 	}
 
-	moduler, ok := Registry.Modulers[config.Module]
+	moduler, ok := r.Modulers[config.Module]
 	if !ok {
-		return nil, fmt.Errorf("Module %s does not exist", config.Module)
+		return nil, fmt.Errorf("module '%s' does not exist", config.Module)
 	}
 
 	return NewModule(cfg, moduler)
 }
 
-// GetMetricSet returns a new metricset instance for the given metricset name combined with the module name
-func (r *Register) GetMetricSet(module *Module, metricsetName string) (*MetricSet, error) {
-
-	if _, ok := Registry.MetricSeters[module.name]; !ok {
-		return nil, fmt.Errorf("Module %s does not exist", module.name)
+// GetMetricSet returns a new MetricSet instance given the module and metricset
+// name. An error is returned if the module or metricset do not exist.
+func (r *Register) GetMetricSet(module *Module, name string) (*MetricSet, error) {
+	metricSets, found := r.MetricSeters[module.name]
+	if !found {
+		return nil, fmt.Errorf("module '%s' does not exist", module.name)
 	}
 
-	if _, ok := Registry.MetricSeters[module.name][metricsetName]; !ok {
-		return nil, fmt.Errorf("Metricset %s in module %s does not exist", metricsetName, module.name)
+	factory, found := metricSets[name]
+	if !found {
+		return nil, fmt.Errorf("metricset '%s/%s' does not exist", module.name, name)
 	}
 
-	newMetricSeter := Registry.MetricSeters[module.name][metricsetName]
+	return NewMetricSet(name, factory, module)
+}
 
-	return NewMetricSet(metricsetName, newMetricSeter, module)
+// String return a string representation of the registered modules and
+// metricsets.
+func (r Register) String() string {
+	var modules []string
+	for module := range r.Modulers {
+		modules = append(modules, module)
+	}
+	sort.Strings(modules)
 
+	var metricSets []string
+	for module, m := range r.MetricSeters {
+		for name := range m {
+			metricSets = append(metricSets, fmt.Sprintf("%s/%s", module, name))
+		}
+	}
+	sort.Strings(metricSets)
+
+	return fmt.Sprintf("Register [Modules:[%s], MetricSets:[%s]]",
+		strings.Join(modules, ", "), strings.Join(metricSets, ", "))
 }

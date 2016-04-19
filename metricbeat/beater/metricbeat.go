@@ -30,8 +30,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/include"
 )
 
 type Metricbeat struct {
@@ -45,14 +45,14 @@ func New() *Metricbeat {
 }
 
 func (mb *Metricbeat) Config(b *beat.Beat) error {
+	// List all registered modules and metricsets.
+	logp.Info("%s", helper.Registry.String())
+
 	mb.config = &Config{}
 	err := b.RawConfig.Unpack(mb.config)
 	if err != nil {
 		return fmt.Errorf("error reading configuration file. %v", err)
 	}
-
-	// List all registered modules and metricsets
-	include.ListAll()
 
 	return nil
 }

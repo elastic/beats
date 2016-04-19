@@ -5,7 +5,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("apache", New)
+	if err := helper.Registry.AddModuler("apache", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of Moduler
