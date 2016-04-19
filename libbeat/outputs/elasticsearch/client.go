@@ -35,13 +35,16 @@ type Client struct {
 	json jsonReader
 }
 
+type connectCallback func(client *Client) error
+
 type Connection struct {
 	URL      string
 	Username string
 	Password string
 
-	http      *http.Client
-	connected bool
+	http              *http.Client
+	connected         bool
+	onConnectCallback func() error
 }
 
 var (
@@ -61,6 +64,7 @@ func NewClient(
 	esURL, index string, proxyURL *url.URL, tls *tls.Config,
 	username, password string,
 	params map[string]string,
+	onConnectCallback connectCallback,
 ) *Client {
 	proxy := http.ProxyFromEnvironment
 	if proxyURL != nil {
@@ -81,6 +85,13 @@ func NewClient(
 		},
 		index:  index,
 		params: params,
+	}
+
+	client.Connection.onConnectCallback = func() error {
+		if onConnectCallback != nil {
+			return onConnectCallback(client)
+		}
+		return nil
 	}
 	return client
 }
@@ -423,6 +434,11 @@ func (conn *Connection) Connect(timeout time.Duration) error {
 	}
 	if !conn.connected {
 		return ErrNotConnected
+	}
+
+	err = conn.onConnectCallback()
+	if err != nil {
+		return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
 	}
 	return nil
 }

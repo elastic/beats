@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +31,7 @@ func TestCheckTemplate(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Check for non existant template
-	assert.False(t, client.CheckTemplate("libbeat"))
+	assert.False(t, client.CheckTemplate("libbeat-notexists"))
 }
 
 func TestLoadTemplate(t *testing.T) {
@@ -128,4 +130,59 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		// Make sure it was removed
 		assert.False(t, client.CheckTemplate(templateName))
 	}
+}
+
+// TestOutputLoadTemplate checks that the template is inserted before
+// the first event is published.
+func TestOutputLoadTemplate(t *testing.T) {
+
+	client := GetTestingElasticsearch()
+	err := client.Connect(5 * time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// delete template if it exists
+	client.request("DELETE", "/_template/libbeat", nil, nil)
+
+	// Make sure template is not yet there
+	assert.False(t, client.CheckTemplate("libbeat"))
+
+	tPath, err := filepath.Abs("../../../topbeat/topbeat.template.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	config := map[string]interface{}{
+		"hosts": GetEsHost(),
+		"template": map[string]interface{}{
+			"name": "libbeat",
+			"path": tPath,
+		},
+	}
+
+	cfg, err := common.NewConfigFrom(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output, err := New(cfg, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	event := common.MapStr{
+		"@timestamp": common.Time(time.Now()),
+		"host":       "test-host",
+		"type":       "libbeat",
+		"message":    "Test message from libbeat",
+	}
+
+	err = output.PublishEvent(nil, outputs.Options{Guaranteed: true}, event)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Guaranteed publish, so the template should be there
+
+	assert.True(t, client.CheckTemplate("libbeat"))
+
 }
