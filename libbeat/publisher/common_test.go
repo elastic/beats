@@ -113,7 +113,7 @@ func (s *testSignaler) Failed() {
 	s.status <- false
 }
 
-func (s *testSignaler) Cancelled() {
+func (s *testSignaler) Canceled() {
 	s.status <- true
 }
 

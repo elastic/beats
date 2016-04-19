@@ -8,7 +8,7 @@ import (
 type Signaler interface {
 	Completed()
 	Failed()
-	Cancelled()
+	Canceled()
 }
 
 // splitSignal guards one output signaler from multiple calls
@@ -25,8 +25,8 @@ type splitSignal struct {
 
 	// Flags to compute final state.
 	// Use atomic ops to determine final SignalResponse
-	cancelled uint32
-	failed    uint32
+	canceled uint32
+	failed   uint32
 }
 
 // compositeSignal combines multiple signalers into one Signaler forwarding an
@@ -53,7 +53,7 @@ type SignalResponse uint8
 const (
 	SignalCompleted SignalResponse = iota + 1
 	SignalFailed
-	SignalCancelled
+	SignalCanceled
 )
 
 func (f SignalCallback) Completed() {
@@ -64,8 +64,8 @@ func (f SignalCallback) Failed() {
 	f(SignalFailed)
 }
 
-func (f SignalCallback) Cancelled() {
-	f(SignalCancelled)
+func (f SignalCallback) Canceled() {
+	f(SignalCanceled)
 }
 
 func (code SignalResponse) Apply(s Signaler) {
@@ -78,8 +78,8 @@ func (code SignalResponse) Apply(s Signaler) {
 		s.Completed()
 	case SignalFailed:
 		s.Failed()
-	case SignalCancelled:
-		s.Cancelled()
+	case SignalCanceled:
+		s.Canceled()
 	default:
 		panic(fmt.Errorf("Invalid signaler code: %v", code))
 	}
@@ -110,19 +110,19 @@ func (s *splitSignal) Failed() {
 	s.onEvent()
 }
 
-func (s *splitSignal) Cancelled() {
-	atomic.StoreUint32(&s.cancelled, 1)
+func (s *splitSignal) Canceled() {
+	atomic.StoreUint32(&s.canceled, 1)
 	s.onEvent()
 }
 
 func (s *splitSignal) onEvent() {
 	res := atomic.AddInt32(&s.count, -1)
 	if res == 0 {
-		cancelled := atomic.LoadUint32(&s.cancelled)
+		canceled := atomic.LoadUint32(&s.canceled)
 		failed := atomic.LoadUint32(&s.failed)
 
-		if cancelled == 1 {
-			s.signaler.Cancelled()
+		if canceled == 1 {
+			s.signaler.Canceled()
 		} else if failed == 1 {
 			s.signaler.Failed()
 		} else {
@@ -157,11 +157,11 @@ func (cs *compositeSignal) Failed() {
 	}
 }
 
-// Cancelled sends the Completed signal to all signalers.
-func (cs *compositeSignal) Cancelled() {
+// Canceled sends the Completed signal to all signalers.
+func (cs *compositeSignal) Canceled() {
 	for _, s := range cs.signalers {
 		if s != nil {
-			s.Cancelled()
+			s.Canceled()
 		}
 	}
 }
@@ -182,7 +182,7 @@ func (s *cancelableSignal) Completed() {
 		s.signaler.Completed()
 	} else {
 		l.RUnlock()
-		s.signaler.Cancelled()
+		s.signaler.Canceled()
 	}
 }
 
@@ -195,12 +195,12 @@ func (s *cancelableSignal) Failed() {
 		s.signaler.Failed()
 	} else {
 		l.RUnlock()
-		s.signaler.Cancelled()
+		s.signaler.Canceled()
 	}
 }
 
-func (s *cancelableSignal) Cancelled() {
-	s.signaler.Cancelled()
+func (s *cancelableSignal) Canceled() {
+	s.signaler.Canceled()
 }
 
 func NewSignalChannel() *SignalChannel {
@@ -215,8 +215,8 @@ func (s *SignalChannel) Failed() {
 	s.C <- SignalFailed
 }
 
-func (s *SignalChannel) Cancelled() {
-	s.C <- SignalCancelled
+func (s *SignalChannel) Canceled() {
+	s.C <- SignalCanceled
 }
 
 func (s *SignalChannel) Wait() SignalResponse {

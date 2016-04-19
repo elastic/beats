@@ -8,7 +8,7 @@ type Canceler struct {
 	active bool
 }
 
-func NewCanceller() *Canceler {
+func NewCanceler() *Canceler {
 	return &Canceler{
 		done:   make(chan struct{}),
 		active: true,

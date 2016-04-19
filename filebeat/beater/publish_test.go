@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/op"
 	pubtest "github.com/elastic/beats/libbeat/publisher/testing"
 	"github.com/stretchr/testify/assert"
 )
@@ -64,7 +64,7 @@ func TestPublisherModes(t *testing.T) {
 		}
 
 		for _, i := range test.order {
-			outputs.SignalCompleted(msgs[i-1].Context.Signal)
+			op.SigCompleted(msgs[i-1].Context.Signal)
 		}
 
 		var regEvents [][]*input.FileEvent

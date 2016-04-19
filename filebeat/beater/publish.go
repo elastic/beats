@@ -58,7 +58,7 @@ const (
 	batchInProgress batchStatus = iota
 	batchSuccess
 	batchFailed
-	batchCancelled
+	batchCanceled
 )
 
 func newPublisher(
@@ -201,9 +201,9 @@ func (p *asyncLogPublisher) collect() bool {
 			p.active.tail = nil
 		}
 
-		// Batches get marked as cancelled, if publisher pipeline is shutting down
+		// Batches get marked as canceled, if publisher pipeline is shutting down
 		// In this case we do not want to send any more batches to the registrar
-		if state == batchCancelled {
+		if state == batchCanceled {
 			p.stopping = true
 		}
 
@@ -226,17 +226,17 @@ func (p *asyncLogPublisher) collect() bool {
 }
 
 func (b *eventsBatch) Completed() {
-	atomic.StoreInt32(&b.flag, batchSuccess)
+	atomic.StoreInt32(&b.flag, int32(batchSuccess))
 }
 
 func (b *eventsBatch) Failed() {
 	logp.Err("Failed to publish batch. Stop updating registrar.")
-	atomic.StoreInt32(&b.flag, batchFailed)
+	atomic.StoreInt32(&b.flag, int32(batchFailed))
 }
 
-func (b *eventsBatch) Cancelled() {
-	logp.Info("In-flight batch has been cancelled during shutdown")
-	atomic.StoreInt32(&b.flag, batchCancelled)
+func (b *eventsBatch) Canceled() {
+	logp.Info("In-flight batch has been canceled during shutdown")
+	atomic.StoreInt32(&b.flag, int32(batchCanceled))
 }
 
 func (l *batchList) append(b *eventsBatch) {

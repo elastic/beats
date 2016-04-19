@@ -14,7 +14,7 @@ import (
 func TestMessageWorkerSend(t *testing.T) {
 	enableLogging([]string{"*"})
 
-	client := &client{canceler: op.NewCanceller()}
+	client := &client{canceler: op.NewCanceler()}
 
 	// Setup
 	ws := newWorkerSignal()

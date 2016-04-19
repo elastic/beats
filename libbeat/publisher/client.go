@@ -68,7 +68,7 @@ type client struct {
 
 func newClient(pub *Publisher) *client {
 	c := &client{
-		canceler: op.NewCanceller(),
+		canceler: op.NewCanceler(),
 
 		publisher: pub,
 		beatMeta: common.MapStr{
