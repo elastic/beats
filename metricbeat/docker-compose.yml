@@ -1,8 +1,7 @@
 beat:
-  build: .
+  build: ${PWD}/.
   links:
     - apache
-    - elasticsearch
     - mysql
     - redis
   environment:
@@ -16,18 +15,13 @@ beat:
     - TEST_ENVIRONMENT=false
   working_dir: /go/src/github.com/elastic/beats/metricbeat
   volumes:
-    - ..:/go/src/github.com/elastic/beats/
+    - ${PWD}/..:/go/src/github.com/elastic/beats/
   command: make
   entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
-elasticsearch:
-  build: ../testing/environments/docker/elasticsearch
-  dockerfile: Dockerfile-5.0.0-alpha1
-  command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
-
 # Modules
 apache:
-  build: tests/environments/apache
+  build: ${PWD}/tests/environments/apache
 
 mysql:
   image: mysql:5.7.10

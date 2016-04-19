@@ -1,0 +1,13 @@
+# Defines if ports should be exported
+elasticsearch:
+  ports:
+    - "9200:9200"
+
+logstash:
+  ports:
+    - "5044:5044"
+    - "5055:5055"
+
+kibana:
+  ports:
+    - "5601:5601"

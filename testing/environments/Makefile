@@ -1,13 +1,14 @@
 ENV?=latest.yml
+BASE_COMMAND=docker-compose -f base.yml -f ports.yml -f ${ENV}
 
 start:
 	# This is run every time to make sure the environment is up-to-date
-	docker-compose -f base.yml -f ${ENV} build
-	docker-compose -f base.yml -f ${ENV} run beat bash
+	${BASE_COMMAND} build
+	${BASE_COMMAND} run beat bash
 
 stop:
-	docker-compose -f base.yml -f ${ENV} stop
-	docker-compose -f base.yml -f ${ENV} rm -f
+	${BASE_COMMAND} stop
+	${BASE_COMMAND} rm -f
 
 # Be careful using this command, as it will remove all containers and volumes of your docker-machine
 clean:
