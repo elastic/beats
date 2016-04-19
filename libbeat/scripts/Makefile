@@ -155,6 +155,7 @@ benchmark-tests:
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \

@@ -73,9 +73,17 @@ Packetbeat:
 Some of the Beats might have extra development requirements, in which case a
 CONTRIBUTING.md file is find in the Beat directory.
 
+## Testing
+
 You can run the whole testsuite with the following command:
 
-    # make testsuite
+    $ make testsuite
+
+Running the testsuite has the following requirements:
+
+* Python >=2.7.9
+* Docker >=1.10.0
+* Docker-compose >= 1.7.0
 
 ## Dependencies
 
