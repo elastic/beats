@@ -134,7 +134,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// Initialize metrics.
 	publishedEvents.Add("total", 0)
-	publishedEvents.Add("failures", 0)
 	ignoredEvents.Add("total", 0)
 
 	var wg sync.WaitGroup
