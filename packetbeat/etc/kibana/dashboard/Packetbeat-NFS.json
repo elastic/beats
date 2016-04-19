@@ -1,0 +1,13 @@
+{
+  "hits": 0, 
+  "timeRestore": false, 
+  "description": "", 
+  "title": "Packetbeat NFS", 
+  "uiStateJSON": "{\"P-1\":{\"vis\":{\"legendOpen\":true}},\"P-4\":{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"legendOpen\":true}},\"P-5\":{\"vis\":{\"legendOpen\":true}},\"P-6\":{\"vis\":{\"legendOpen\":false}},\"P-9\":{\"vis\":{\"legendOpen\":true}}}", 
+  "panelsJSON": "[{\"col\":5,\"id\":\"NFS-clients-pie-chart\",\"panelIndex\":1,\"row\":1,\"size_x\":4,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"NFS-operations-area-chart\",\"panelIndex\":3,\"row\":12,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":9,\"id\":\"NFS-top-group-pie-chart\",\"panelIndex\":4,\"row\":1,\"size_x\":4,\"size_y\":2,\"type\":\"visualization\"},{\"col\":9,\"id\":\"NFS-top-users-pie-chart\",\"panelIndex\":5,\"row\":3,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"NFS-response-times\",\"panelIndex\":6,\"row\":6,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"NFS-errors\",\"panelIndex\":7,\"row\":9,\"size_x\":6,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"NFS-operation-table\",\"panelIndex\":8,\"row\":12,\"size_x\":6,\"size_y\":4,\"type\":\"visualization\"},{\"col\":1,\"id\":\"NFS-bytes-in-slash-out\",\"panelIndex\":9,\"row\":6,\"size_x\":6,\"size_y\":6,\"type\":\"visualization\"},{\"id\":\"Navigation\",\"type\":\"visualization\",\"panelIndex\":10,\"size_x\":4,\"size_y\":5,\"col\":1,\"row\":1}]", 
+  "optionsJSON": "{\"darkTheme\":false}", 
+  "version": 1, 
+  "kibanaSavedObjectMeta": {
+    "searchSourceJSON": "{\"filter\":[{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}]}"
+  }
+}
