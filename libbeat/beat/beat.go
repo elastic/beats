@@ -262,6 +262,7 @@ func (bc *instance) run() error {
 // reaches the setup stage.
 func (bc *instance) cleanup() error {
 	logp.Info("%s cleanup", bc.data.Name)
+	defer svc.Cleanup()
 	return bc.beater.Cleanup(bc.data)
 }
 
@@ -291,6 +292,7 @@ func (bc *instance) launch(exit bool) error {
 		return err
 	}
 
+	svc.BeforeRun()
 	svc.HandleSignals(bc.beater.Stop)
 	err = bc.run()
 	return err
