@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -20,6 +22,9 @@ type elasticsearchOutput struct {
 	index string
 	mode  mode.ConnectionMode
 	topology
+
+	templateContents []byte
+	templateMutex    sync.Mutex
 }
 
 func init() {
@@ -69,7 +74,12 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config))
+	err = out.readTemplate(config.Template)
+	if err != nil {
+		return err
+	}
+
+	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
 	}
@@ -90,8 +100,6 @@ func (out *elasticsearchOutput) init(
 	if err != nil {
 		return err
 	}
-
-	loadTemplate(config.Template, clients)
 
 	if config.SaveTopology {
 		err := out.EnableTTL()
@@ -122,52 +130,56 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
-// loadTemplate checks if the index mapping template should be loaded
-// In case template loading is enabled, template is written to index
-func loadTemplate(config Template, clients []mode.ProtocolClient) {
-	// Check if template should be loaded
-	// Not being able to load the template will output an error but will not stop execution
-	if config.Name != "" && len(clients) > 0 {
-
-		// Always takes the first client
-		esClient := clients[0].(*Client)
-
+// readTemplates reads the ES mapping template from the disk, if configured.
+func (out *elasticsearchOutput) readTemplate(config Template) error {
+	if len(config.Name) > 0 {
 		// Look for the template in the configuration path, if it's not absolute
 		templatePath := paths.Resolve(paths.Config, config.Path)
 
-		logp.Info("Loading template enabled. Trying to load template: %v", templatePath)
+		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
 
-		exists := esClient.CheckTemplate(config.Name)
+		var err error
+		out.templateContents, err = ioutil.ReadFile(templatePath)
+		if err != nil {
+			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+		}
+	}
+	return nil
+}
 
-		// Check if template already exist or should be overwritten
-		if !exists || config.Overwrite {
+// loadTemplate checks if the index mapping template should be loaded
+// In case the template is not already loaded or overwritting is enabled, the
+// template is written to index
+func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) error {
+	out.templateMutex.Lock()
+	defer out.templateMutex.Unlock()
 
-			if config.Overwrite {
-				logp.Info("Existing template will be overwritten, as overwrite is enabled.")
-			}
+	logp.Info("Trying to load template for client: %s", client)
 
-			// Load template from file
-			content, err := ioutil.ReadFile(templatePath)
-			if err != nil {
-				logp.Err("Could not load template from file path: %s; Error: %s", templatePath, err)
-			} else {
-				reader := bytes.NewReader(content)
-				err = esClient.LoadTemplate(config.Name, reader)
+	// Check if template already exist or should be overwritten
+	exists := client.CheckTemplate(config.Name)
+	if !exists || config.Overwrite {
 
-				if err != nil {
-					logp.Err("Could not load template: %v", err)
-				}
-			}
-		} else {
-			logp.Info("Template already exists and will not be overwritten.")
+		if config.Overwrite {
+			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
+		reader := bytes.NewReader(out.templateContents)
+		err := client.LoadTemplate(config.Name, reader)
+		if err != nil {
+			return fmt.Errorf("Could not load template: %v", err)
+		}
+	} else {
+		logp.Info("Template already exists and will not be overwritten.")
 	}
+
+	return nil
 }
 
 func makeClientFactory(
 	tls *tls.Config,
 	config *elasticsearchConfig,
+	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
 		esURL, err := getURL(config.Protocol, config.Path, host)
@@ -196,10 +208,19 @@ func makeClientFactory(
 		if len(params) == 0 {
 			params = nil
 		}
+
+		// define a callback to be called on connection
+		var onConnected connectCallback
+		if len(out.templateContents) > 0 {
+			onConnected = func(client *Client) error {
+				return out.loadTemplate(config.Template, client)
+			}
+		}
+
 		client := NewClient(
 			esURL, config.Index, proxyURL, tls,
 			config.Username, config.Password,
-			params)
+			params, onConnected)
 		return client, nil
 	}
 }
