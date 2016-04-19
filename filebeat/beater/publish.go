@@ -214,7 +214,12 @@ func (p *asyncLogPublisher) collect() bool {
 			continue
 		}
 
-		// Tell the registrar that we've successfully sent these events
+		// Tell the registrar that we've successfully publish the last batch events.
+		// If registrar queue is blocking (quite unlikely), but stop signal has been
+		// received in the meantime (by closing p.done), we do not wait for
+		// registrar picking up the current batch. Instead prefer to shut-down and
+		// resend the last published batch on next restart, basically taking advantage
+		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
 		select {
 		case <-p.done:
 			logp.Info("Shutting down - No registrar update for successfully published batch.")
