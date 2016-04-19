@@ -175,6 +175,7 @@ func (eb *Winlogbeat) Stop() {
 	logp.Info("Stopping Winlogbeat")
 	if eb.done != nil {
 		close(eb.done)
+		eb.client.Close()
 	}
 }
 
