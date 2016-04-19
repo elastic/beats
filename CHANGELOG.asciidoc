@@ -82,6 +82,9 @@ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
 - Fixed name of the setting `stats.proc` to `stats.process` in the default configuration file. {pull}1343[1343]
 - Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
+*Filebeat*
+- Improvements in registrar dealing with file rotation. {pull}1281[1281]
+
 ==== Added
 
 *Topbeat*
