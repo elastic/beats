@@ -46,8 +46,9 @@ func newLumberjackClient(
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
+	beat string,
 ) (*client, error) {
-	p, err := newClientProcol(conn, timeout, compressLevel)
+	p, err := newClientProcol(conn, timeout, compressLevel, beat)
 	if err != nil {
 		return nil, err
 	}

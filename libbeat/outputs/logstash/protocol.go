@@ -20,6 +20,9 @@ type protocol struct {
 	timeout       time.Duration
 	compressLevel int
 
+	// the beat name
+	beat []byte
+
 	eventsBuffer *bytes.Buffer
 }
 
@@ -43,6 +46,7 @@ func newClientProcol(
 	conn net.Conn,
 	timeout time.Duration,
 	compressLevel int,
+	beat string,
 ) (*protocol, error) {
 
 	// validate by creating and discarding zlib writer with configured level
@@ -55,11 +59,17 @@ func newClientProcol(
 		w.Close()
 	}
 
+	encodedBeat, err := json.Marshal(beat)
+	if err != nil {
+		return nil, err
+	}
+
 	return &protocol{
 		conn:          conn,
 		timeout:       timeout,
 		compressLevel: compressLevel,
 		eventsBuffer:  bytes.NewBuffer(nil),
+		beat:          encodedBeat,
 	}, nil
 }
 
@@ -263,7 +273,7 @@ func (p *protocol) serializeDataFrame(
 	// payloadLen (bytes): uint32
 	// payload: JSON document
 
-	jsonEvent, err := json.Marshal(event)
+	jsonEvent, err := serializeEvent(event, p.beat)
 	if err != nil {
 		debug("Fail to json encode event (%v): %#v", err, event)
 		return err
@@ -283,6 +293,49 @@ func (p *protocol) serializeDataFrame(
 	}
 
 	return nil
+}
+
+func serializeEvent(event common.MapStr, beat []byte) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	buf.WriteRune('{')
+
+	if _, hasMeta := event["@metadata"]; !hasMeta {
+		typ := event["type"].(string)
+
+		buf.WriteString(`"@metadata":{"type":`)
+		tmp, err := json.Marshal(typ)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+
+		buf.WriteString(`,"beat":`)
+		buf.Write(beat)
+		buf.WriteString(`},`)
+	}
+
+	for k, v := range event {
+		// append key
+		tmp, err := json.Marshal(k)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+		buf.WriteRune(':')
+
+		// append value
+		tmp, err = json.Marshal(v)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+		buf.WriteRune(',')
+	}
+
+	b := buf.Bytes()
+	b[len(b)-1] = '}'
+
+	return b, nil
 }
 
 func writeUint32(out io.Writer, v uint32) error {
