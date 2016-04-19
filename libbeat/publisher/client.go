@@ -3,6 +3,7 @@ package publisher
 import (
 	"errors"
 	"expvar"
+	"sync/atomic"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
@@ -82,6 +83,9 @@ func newClient(pub *Publisher) *client {
 
 func (c *client) Close() error {
 	c.canceler.Cancel()
+
+	// atomic decrement clients counter
+	atomic.AddUint32(&c.publisher.numClients, ^uint32(0))
 	return nil
 }
 

@@ -16,7 +16,7 @@ func TestAsyncPublishEvent(t *testing.T) {
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	event := testEvent()
 
-	defer testPub.pub.Stop()
+	defer testPub.Stop()
 
 	// Execute. Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvent(event))
@@ -34,7 +34,7 @@ func TestAsyncPublishEvents(t *testing.T) {
 	testPub := newTestPublisherNoBulk(CompletedResponse)
 	events := []common.MapStr{testEvent(), testEvent()}
 
-	defer testPub.pub.Stop()
+	defer testPub.Stop()
 
 	// Execute. Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))
@@ -56,7 +56,7 @@ func TestAsyncShutdownPublishEvents(t *testing.T) {
 	// Execute. Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))
 
-	testPub.pub.Stop()
+	testPub.Stop()
 
 	// Validate
 	msgs := testPub.outputMsgHandler.msgs
@@ -76,7 +76,7 @@ func TestBulkAsyncPublishEvent(t *testing.T) {
 	testPub := newTestPublisherWithBulk(CompletedResponse)
 	event := testEvent()
 
-	defer testPub.pub.Stop()
+	defer testPub.Stop()
 
 	// Execute. Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvent(event))
@@ -97,7 +97,7 @@ func TestBulkAsyncPublishEvents(t *testing.T) {
 	testPub := newTestPublisherWithBulk(CompletedResponse)
 	events := []common.MapStr{testEvent(), testEvent()}
 
-	defer testPub.pub.Stop()
+	defer testPub.Stop()
 
 	// Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))
@@ -118,7 +118,7 @@ func TestBulkAsyncShutdownPublishEvents(t *testing.T) {
 	// Async PublishEvent always immediately returns true.
 	assert.True(t, testPub.asyncPublishEvents(events))
 
-	testPub.pub.Stop()
+	testPub.Stop()
 
 	// Validate
 	msgs := testPub.outputMsgHandler.msgs

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -72,6 +73,10 @@ type Publisher struct {
 		sync  pipeline
 		async pipeline
 	}
+
+	// keep count of clients connected to publisher. A publisher is allowed to
+	// Stop only if all clients have been disconnected
+	numClients uint32
 }
 
 type ShipperConfig struct {
@@ -133,6 +138,7 @@ func (publisher *Publisher) GetServerName(ip string) string {
 }
 
 func (publisher *Publisher) Connect() Client {
+	atomic.AddUint32(&publisher.numClients, 1)
 	return newClient(publisher)
 }
 
@@ -319,6 +325,10 @@ func (publisher *Publisher) init(
 }
 
 func (publisher *Publisher) Stop() {
+	if atomic.LoadUint32(&publisher.numClients) > 0 {
+		panic("All clients must disconnect before shutting down publisher pipeline")
+	}
+
 	publisher.wsPublisher.stop()
 	publisher.wsOutput.stop()
 }

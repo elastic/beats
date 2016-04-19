@@ -173,6 +173,11 @@ func newTestPublisher(bulkSize int, response OutputResponse) *testPublisher {
 	}
 }
 
+func (t *testPublisher) Stop() {
+	t.client.Close()
+	t.pub.Stop()
+}
+
 func (t *testPublisher) asyncPublishEvent(event common.MapStr) bool {
 	ctx := Context{}
 	msg := message{client: t.client, context: ctx, event: event}
