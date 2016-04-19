@@ -2,13 +2,13 @@ metricbeat:
   modules:
 
     # Apache Module
-    # Server-status page (/server-status) is configurable string in apache and
-    # must be defined by user
     - module: apache
       metricsets: ["status"]
-      hosts: ["http://127.0.0.1/"]
-      period: 1s
       enabled: true
+      period: 1s
+
+      # Apache hosts
+      hosts: ["http://127.0.0.1/"]
 
       # Path to server status. Default server-status
       #server_status_path: "server-status"
@@ -22,7 +22,10 @@ metricbeat:
     # Redis Module
     - module: redis
       metricsets: ["info"]
+      enabled: true
       period: 1s
+
+      # Redis hosts
       hosts: ["127.0.0.1:6379"]
 
       # Enabled defines if the module is enabled. Default: true
