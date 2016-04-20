@@ -9,7 +9,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("mysql", New)
+	if err := helper.Registry.AddModuler("mysql", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of Moduler
