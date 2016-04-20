@@ -1,12 +1,17 @@
 package input
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+)
+
+const (
+	jsonErrorKey = "json_error"
 )
 
 type File struct {
@@ -72,7 +77,37 @@ func mergeJSONFields(f *FileEvent, event common.MapStr) {
 	if f.JSONConfig.KeysUnderRoot {
 		for k, v := range f.JSONFields {
 			if f.JSONConfig.OverwriteKeys {
-				event[k] = v
+				if k == "@timestamp" {
+					vstr, ok := v.(string)
+					if !ok {
+						logp.Err("JSON: Won't overwrite @timestamp because value is not string")
+						event[jsonErrorKey] = "@timestamp not overwritten (not string)"
+						continue
+					}
+					// @timestamp must be of time common.Time
+					ts, err := common.ParseTime(vstr)
+					if err != nil {
+						logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
+						event[jsonErrorKey] = fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)
+						continue
+					}
+					event[k] = ts
+				} else if k == "type" {
+					vstr, ok := v.(string)
+					if !ok {
+						logp.Err("JSON: Won't overwrite type because value is not string")
+						event[jsonErrorKey] = "type not overwritten (not string)"
+						continue
+					}
+					if len(vstr) == 0 || vstr[0] == '_' {
+						logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
+						event[jsonErrorKey] = fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)
+						continue
+					}
+					event[k] = vstr
+				} else {
+					event[k] = v
+				}
 			} else if _, exists := event[k]; !exists {
 				event[k] = v
 			}

@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 * Default location for the registry file was changed to be `data/registry` from the binary directory,
   rather than `.filebeat` in the current working directory. This affects installations for zip/tar.gz/source,
   the location for DEB and RPM packages stays the same. {pull}1373[1373]
+* Fix issue with JSON decoding where `@timestamp` or `type` keys with the wrong type could cause Filebeat
+  to crash. {issue}1378[1378]
 
 *Winlogbeat*
 
