@@ -8,41 +8,25 @@ func TestOPTTtl(t *testing.T) {
 	e.Hdr.Rrtype = TypeOPT
 
 	if e.Do() {
-		t.Fail()
+		t.Errorf("DO bit should be zero")
 	}
 
 	e.SetDo()
 	if !e.Do() {
-		t.Fail()
+		t.Errorf("DO bit should be non-zero")
 	}
 
-	oldTtl := e.Hdr.Ttl
-
 	if e.Version() != 0 {
-		t.Fail()
+		t.Errorf("version should be non-zero")
 	}
 
 	e.SetVersion(42)
 	if e.Version() != 42 {
-		t.Fail()
-	}
-
-	e.SetVersion(0)
-	if e.Hdr.Ttl != oldTtl {
-		t.Fail()
-	}
-
-	if e.ExtendedRcode() != 0 {
-		t.Fail()
+		t.Errorf("set 42, expected %d, got %d", 42, e.Version())
 	}
 
 	e.SetExtendedRcode(42)
 	if e.ExtendedRcode() != 42 {
-		t.Fail()
-	}
-
-	e.SetExtendedRcode(0)
-	if e.Hdr.Ttl != oldTtl {
-		t.Fail()
+		t.Errorf("set 42, expected %d, got %d", 42-15, e.ExtendedRcode())
 	}
 }

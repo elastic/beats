@@ -28,9 +28,10 @@ type Client struct {
 	Net            string            // if "tcp" or "tcp-tls" (DNS over TLS) a TCP query will be initiated, otherwise an UDP one (default is "" for UDP)
 	UDPSize        uint16            // minimum receive buffer for UDP messages
 	TLSConfig      *tls.Config       // TLS connection configuration
-	DialTimeout    time.Duration     // net.DialTimeout, defaults to 2 seconds
-	ReadTimeout    time.Duration     // net.Conn.SetReadTimeout value for connections, defaults to 2 seconds
-	WriteTimeout   time.Duration     // net.Conn.SetWriteTimeout value for connections, defaults to 2 seconds
+	Timeout        time.Duration     // a cumulative timeout for dial, write and read, defaults to 0 (disabled) - overrides DialTimeout, ReadTimeout and WriteTimeout when non-zero
+	DialTimeout    time.Duration     // net.DialTimeout, defaults to 2 seconds - overridden by Timeout when that value is non-zero
+	ReadTimeout    time.Duration     // net.Conn.SetReadTimeout value for connections, defaults to 2 seconds - overridden by Timeout when that value is non-zero
+	WriteTimeout   time.Duration     // net.Conn.SetWriteTimeout value for connections, defaults to 2 seconds - overridden by Timeout when that value is non-zero
 	TsigSecret     map[string]string // secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be fully qualified
 	SingleInflight bool              // if true suppress multiple outstanding queries for the same Qname, Qtype and Qclass
 	group          singleflight
@@ -39,14 +40,7 @@ type Client struct {
 // Exchange performs a synchronous UDP query. It sends the message m to the address
 // contained in a and waits for an reply. Exchange does not retry a failed query, nor
 // will it fall back to TCP in case of truncation.
-// If you need to send a DNS message on an already existing connection, you can use the
-// following:
-//
-//	co := &dns.Conn{Conn: c} // c is your net.Conn
-//	co.WriteMsg(m)
-//	in, err := co.ReadMsg()
-//	co.Close()
-//
+// See client.Exchange for more information on setting larger buffer sizes.
 func Exchange(m *Msg, a string) (r *Msg, err error) {
 	var co *Conn
 	co, err = DialTimeout("udp", a, dnsTimeout)
@@ -106,6 +100,10 @@ func ExchangeConn(c net.Conn, m *Msg) (r *Msg, err error) {
 //
 // Exchange does not retry a failed query, nor will it fall back to TCP in
 // case of truncation.
+// It is up to the caller to create a message that allows for larger responses to be
+// returned. Specifically this means adding an EDNS0 OPT RR that will advertise a larger
+// buffer, see SetEdns0. Messsages without an OPT RR will fallback to the historic limit
+// of 512 bytes.
 func (c *Client) Exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err error) {
 	if !c.SingleInflight {
 		return c.exchange(m, a)
@@ -132,6 +130,9 @@ func (c *Client) Exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err erro
 }
 
 func (c *Client) dialTimeout() time.Duration {
+	if c.Timeout != 0 {
+		return c.Timeout
+	}
 	if c.DialTimeout != 0 {
 		return c.DialTimeout
 	}
@@ -173,6 +174,11 @@ func (c *Client) exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err erro
 		}
 	}
 
+	var deadline time.Time
+	if c.Timeout != 0 {
+		deadline = time.Now().Add(c.Timeout)
+	}
+
 	if tls {
 		co, err = DialTimeoutWithTLS(network, a, c.TLSConfig, c.dialTimeout())
 	} else {
@@ -195,12 +201,12 @@ func (c *Client) exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err erro
 	}
 
 	co.TsigSecret = c.TsigSecret
-	co.SetWriteDeadline(time.Now().Add(c.writeTimeout()))
+	co.SetWriteDeadline(deadlineOrTimeout(deadline, c.writeTimeout()))
 	if err = co.WriteMsg(m); err != nil {
 		return nil, 0, err
 	}
 
-	co.SetReadDeadline(time.Now().Add(c.readTimeout()))
+	co.SetReadDeadline(deadlineOrTimeout(deadline, c.readTimeout()))
 	r, err = co.ReadMsg()
 	if err == nil && r.Id != m.Id {
 		err = ErrId
@@ -258,7 +264,7 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 		}
 		p = make([]byte, l)
 		n, err = tcpRead(r, p)
-
+		co.rtt = time.Since(co.t)
 	default:
 		if co.UDPSize > MinMsgSize {
 			p = make([]byte, co.UDPSize)
@@ -266,6 +272,7 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 			p = make([]byte, MinMsgSize)
 		}
 		n, err = co.Read(p)
+		co.rtt = time.Since(co.t)
 	}
 
 	if err != nil {
@@ -342,8 +349,6 @@ func (co *Conn) Read(p []byte) (n int, err error) {
 	if err != nil {
 		return n, err
 	}
-
-	co.rtt = time.Since(co.t)
 	return n, err
 }
 
@@ -437,4 +442,11 @@ func DialTimeoutWithTLS(network, address string, tlsConfig *tls.Config, timeout 
 		return nil, err
 	}
 	return conn, nil
+}
+
+func deadlineOrTimeout(deadline time.Time, timeout time.Duration) time.Time {
+	if deadline.IsZero() {
+		return time.Now().Add(timeout)
+	}
+	return deadline
 }

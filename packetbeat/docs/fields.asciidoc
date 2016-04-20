@@ -638,6 +638,30 @@ The time interval in seconds that this resource record may be cached before it s
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
+==== dns.opt.version
+
+example: 0
+
+The EDNS version.
+
+==== dns.opt.do
+
+type: bool
+
+If set, the transaction uses DNSSEC.
+
+==== dns.opt.ext_rcode
+
+example: BADVERS
+
+Extended response code field.
+
+==== dns.opt.udp_size
+
+type: int
+
+Requestor's UDP payload size (in bytes).
+
 === amqp Fields
 
 AMQP specific event fields.
