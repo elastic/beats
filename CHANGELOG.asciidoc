@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Unterminated environment variable expressions in config files will now cause an error {pull}1389[1389]
 - Fix issue with the automatic template loading when Elasticsearch is not available on Beat start. {issue}1321[1321]
 - Fix bug affecting -cpuprofile, -memprofile, and -httpprof CLI flags {pull}1415[1415]
+- Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410] {pull}1428[1428]
 
 *Packetbeat*
 

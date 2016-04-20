@@ -162,6 +162,7 @@ func TestLogstashTCP(t *testing.T) {
 	// create lumberjack output client
 	config := map[string]interface{}{
 		"hosts":   []string{server.Addr()},
+		"index":   testLogstashIndex("logstash-conn-tcp"),
 		"timeout": 2,
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
@@ -177,6 +178,7 @@ func TestLogstashTLS(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-conn-tls"),
 		"timeout":                     2,
 		"tls.certificate_authorities": []string{certName + ".pem"},
 	}
@@ -193,6 +195,7 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-conn-tls-invalid"),
 		"timeout":                     2,
 		"max_retries":                 1,
 		"tls.insecure":                true,
@@ -290,6 +293,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-tls-invalid"),
 		"timeout":                     1,
 		"max_retries":                 0,
 		"tls.certificate_authorities": []string{certName + ".pem"},
