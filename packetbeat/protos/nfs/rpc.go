@@ -34,8 +34,8 @@ type rpcConnectionData struct {
 
 type Rpc struct {
 	// Configuration data.
-	Ports []int
-
+	Ports              []int
+	callsSeen          *common.Cache
 	transactionTimeout time.Duration
 
 	results publish.Transactions // Channel where results are pushed.
@@ -69,13 +69,16 @@ func New(
 func (rpc *Rpc) init(results publish.Transactions, config *rpcConfig) error {
 	rpc.setFromConfig(config)
 	rpc.results = results
+	rpc.callsSeen = common.NewCache(rpc.transactionTimeout,
+		protos.DefaultTransactionHashSize)
 
+	rpc.callsSeen.StartJanitor(rpc.transactionTimeout)
 	return nil
 }
 
 func (rpc *Rpc) setFromConfig(config *rpcConfig) error {
 	rpc.Ports = config.Ports
-	rpc.transactionTimeout = time.Duration(config.TransactionTimeout) * time.Second
+	rpc.transactionTimeout = config.TransactionTimeout
 	return nil
 }
 
@@ -221,7 +224,7 @@ func (rpc *Rpc) handleRpcFragment(
 		event["src"] = &src
 		event["dst"] = &dst
 
-		msg.fillEvent(event, rpc.results, size)
+		msg.fillEvent(event, rpc, size)
 
 		st.rawData = st.rawData[4+size:]
 	}
