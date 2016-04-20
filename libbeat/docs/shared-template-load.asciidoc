@@ -22,7 +22,7 @@ template], which lets Elasticsearch know which fields should be analyzed
 in which way.
 
 The recommended template file is installed by the {beatname_uc} packages. You can either configure 
-{beatname_uc} to load the template automatically, or you can run a shell script to load the template:
+{beatname_uc} to load the template automatically, or you can run a shell command to load the template:
 
 * <<load-template-auto>>
 * <<load-template-shell>>
@@ -60,7 +60,7 @@ already exists in the index, it is not overwritten. To overwrite an existing tem
 set `overwrite: true` in the configuration file.
 
 [[load-template-shell]]
-==== Running a Shell Script to Load the Template
+==== Running a Shell Command to Load the Template
 
 You can load the template by running the following command:
 
