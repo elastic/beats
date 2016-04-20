@@ -55,7 +55,7 @@ func (s *protocolServer) connectPair(compressLevel int) (*mockConn, *protocol, e
 		return nil, nil, err
 	}
 
-	proto, err := newClientProcol(transp, 100*time.Millisecond, compressLevel)
+	proto, err := newClientProcol(transp, 100*time.Millisecond, compressLevel, "test")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -240,7 +240,7 @@ func readMessage(buf *streambuf.Buffer) (*message, error) {
 
 func TestInvalidCompressionLevel(t *testing.T) {
 	conn := (net.Conn)(nil)
-	p, err := newClientProcol(conn, 5*time.Second, 10)
+	p, err := newClientProcol(conn, 5*time.Second, 10, "test")
 	assert.Nil(t, p)
 	assert.NotNil(t, err)
 }
@@ -273,6 +273,7 @@ func TestProtocolCloseAfterWindowSize(t *testing.T) {
 	// defer transp.conn.Close()
 
 	transp.sendEvents([]common.MapStr{common.MapStr{
+		"type":    "test",
 		"message": "hello world",
 	}})
 
@@ -306,7 +307,11 @@ func testProtocolReturnWindowSizes(
 
 	events := []common.MapStr{}
 	for i := 0; i < n; i++ {
-		events = append(events, common.MapStr{"message": string(i)})
+		events = append(events,
+			common.MapStr{
+				"type":    "test",
+				"message": string(i),
+			})
 	}
 
 	outEvents, err := transp.sendEvents(events)
@@ -328,7 +333,11 @@ func testProtocolReturnWindowSizes(
 
 	seq, err := transp.awaitACK(uint32(n))
 	assert.Equal(t, outEvents, events)
-	assert.Equal(t, docs, events)
+	assert.Equal(t, len(docs), len(events))
+	for i := range docs {
+		assert.Equal(t, docs[i]["type"], events[i]["type"])
+		assert.Equal(t, docs[i]["message"], events[i]["message"])
+	}
 	assert.Equal(t, n, int(seq))
 	assert.Equal(t, n, int(msg.size))
 	if expectErr {
@@ -367,7 +376,11 @@ func TestProtocolFailOnClosedConnection(t *testing.T) {
 
 	events := []common.MapStr{}
 	for i := 0; i < N; i++ {
-		events = append(events, common.MapStr{"message": i})
+		events = append(events,
+			common.MapStr{
+				"type":    "test",
+				"message": i,
+			})
 	}
 
 	transp.conn.Close()
