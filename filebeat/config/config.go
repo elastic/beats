@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 // Defaults for config variables which are not set
@@ -160,6 +161,9 @@ func (config *Config) FetchConfigs() {
 	if configDir == "" {
 		return
 	}
+
+	// If configDir is relative, consider it relative to the config path
+	configDir = paths.Resolve(paths.Config, configDir)
 
 	// Check if optional configDir is set to fetch additional config files
 	logp.Info("Additional config files are fetched from: %s", configDir)
