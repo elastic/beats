@@ -156,7 +156,6 @@ func (paths *Path) Resolve(fileType FileType, path string) string {
 		return filepath.Join(paths.Logs, path)
 	default:
 		panic(fmt.Sprintf("Unknown file type: %s", fileType))
-		return ""
 	}
 }
 
