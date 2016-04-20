@@ -37,6 +37,9 @@ type lumberjackClient struct {
 	timeout         time.Duration
 	countTimeoutErr int
 	compressLevel   int
+
+	// the beat name, already json encoded
+	beat []byte
 }
 
 const (
@@ -65,6 +68,7 @@ func newLumberjackClient(
 	compressLevel int,
 	maxWindowSize int,
 	timeout time.Duration,
+	beat string,
 ) (*lumberjackClient, error) {
 
 	// validate by creating and discarding zlib writer with configured level
@@ -77,12 +81,18 @@ func newLumberjackClient(
 		w.Close()
 	}
 
+	encodedBeat, err := json.Marshal(beat)
+	if err != nil {
+		return nil, err
+	}
+
 	return &lumberjackClient{
 		TransportClient: conn,
 		windowSize:      defaultStartMaxWindowSize,
 		timeout:         timeout,
 		maxWindowSize:   maxWindowSize,
 		compressLevel:   compressLevel,
+		beat:            encodedBeat,
 	}, nil
 }
 
@@ -344,7 +354,7 @@ func (l *lumberjackClient) writeDataFrame(
 	// payloadLen (bytes): uint32
 	// payload: JSON document
 
-	jsonEvent, err := json.Marshal(event)
+	jsonEvent, err := serializeEvent(event, l.beat)
 	if err != nil {
 		debug("Fail to convert the event to JSON: %s", err)
 		return err
@@ -364,6 +374,48 @@ func (l *lumberjackClient) writeDataFrame(
 	}
 
 	return nil
+}
+func serializeEvent(event common.MapStr, beat []byte) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	buf.WriteRune('{')
+
+	if _, hasMeta := event["@metadata"]; !hasMeta {
+		typ := event["type"].(string)
+
+		buf.WriteString(`"@metadata":{"type":`)
+		tmp, err := json.Marshal(typ)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+
+		buf.WriteString(`,"beat":`)
+		buf.Write(beat)
+		buf.WriteString(`},`)
+	}
+
+	for k, v := range event {
+		// append key
+		tmp, err := json.Marshal(k)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+		buf.WriteRune(':')
+
+		// append value
+		tmp, err = json.Marshal(v)
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(tmp)
+		buf.WriteRune(',')
+	}
+
+	b := buf.Bytes()
+	b[len(b)-1] = '}'
+
+	return b, nil
 }
 
 func writeUint32(out io.Writer, v uint32) error {

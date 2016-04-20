@@ -65,7 +65,7 @@ type mockTransport struct {
 }
 
 func newLumberjackTestClient(conn TransportClient) *lumberjackClient {
-	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 5*time.Second)
+	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 5*time.Second, "test")
 	if err != nil {
 		panic(err)
 	}
@@ -325,7 +325,7 @@ func TestSimpleEvent(t *testing.T) {
 	transp := newMockTransport()
 	client := newClientTestDriver(newLumberjackTestClient(transp))
 
-	event := common.MapStr{"name": "me", "line": 10}
+	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 	client.Publish([]common.MapStr{event})
 
 	// receive window message
@@ -357,6 +357,7 @@ func TestStructuredEvent(t *testing.T) {
 	transp := newMockTransport()
 	client := newClientTestDriver(newLumberjackTestClient(transp))
 	event := common.MapStr{
+		"type": "test",
 		"name": "test",
 		"struct": common.MapStr{
 			"field1": 1,
@@ -432,7 +433,7 @@ func testGrowWindowSize(t *testing.T,
 	initial, maxOK, windowSize, batchSize, expected int,
 ) {
 	enableLogging([]string{"logstash"})
-	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second, "test")
 	c.windowSize = initial
 	c.maxOkWindowSize = maxOK
 	for i := 0; i < 100; i++ {
@@ -447,7 +448,7 @@ func TestShrinkWindowSizeNeverZero(t *testing.T) {
 	enableLogging([]string{"logstash"})
 
 	windowSize := 124
-	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second)
+	c, _ := newLumberjackClient(nil, 3, windowSize, 1*time.Second, "test")
 	c.windowSize = windowSize
 	for i := 0; i < 100; i++ {
 		c.shrinkWindow()

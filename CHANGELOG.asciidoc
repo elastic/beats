@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v1.2.1...1.2[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+- Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410]
 
 *Packetbeat*
 

@@ -88,11 +88,11 @@ func (lj *logstash) init(
 		}
 
 		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
+			makeClientFactory(config.Index, maxWindowSize, compressLevel, timeout,
 				makeTLSClient(defaultPort, tlsConfig)))
 	} else {
 		clients, err = mode.MakeClients(config,
-			makeClientFactory(maxWindowSize, compressLevel, timeout,
+			makeClientFactory(config.Index, maxWindowSize, compressLevel, timeout,
 				makeTCPClient(defaultPort)))
 	}
 	if err != nil {
@@ -134,6 +134,7 @@ func (lj *logstash) init(
 }
 
 func makeClientFactory(
+	beat string,
 	maxWindowSize int,
 	compressLevel int,
 	timeout time.Duration,
@@ -144,7 +145,7 @@ func makeClientFactory(
 		if err != nil {
 			return nil, err
 		}
-		return newLumberjackClient(transp, compressLevel, maxWindowSize, timeout)
+		return newLumberjackClient(transp, compressLevel, maxWindowSize, timeout, beat)
 	}
 }
 
@@ -168,7 +169,6 @@ func (lj *logstash) PublishEvent(
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	lj.addMeta(event)
 	return lj.mode.PublishEvent(signaler, opts, event)
 }
 
@@ -179,19 +179,5 @@ func (lj *logstash) BulkPublish(
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {
-	for _, event := range events {
-		lj.addMeta(event)
-	}
 	return lj.mode.PublishEvents(trans, opts, events)
-}
-
-// addMeta adapts events to be compatible with logstash forwarer messages by renaming
-// the "message" field to "line". The lumberjack server in logstash will
-// decode/rename the "line" field into "message".
-func (lj *logstash) addMeta(event common.MapStr) {
-	// add metadata for indexing
-	event["@metadata"] = common.MapStr{
-		"beat": lj.index,
-		"type": event["type"].(string),
-	}
 }
