@@ -1,33 +1,18 @@
 /*
-
-This file is included in the main file to load all metricsets.
-
-In case only a subset of metricsets should be included, they can be specified manually in the main.go file.
-
+Package include imports all Module and MetricSet packages so that they register
+their factories with the global registry. This package can be imported in the
+main package to automatically register all of the standard supported Metricbeat
+modules.
 */
 package include
 
-// Make sure all active plugins are loaded
-// TODO: create a script to automatically generate this list
 import (
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
-
-	// List of all metrics to make sure they are registered
-	// Every new metric must be added here
+	// Every module and metricset must be added here so that they can register
+	// themselves.
+	_ "github.com/elastic/beats/metricbeat/module/apache"
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
+	_ "github.com/elastic/beats/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
-
-	// Redis module and metrics
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 )
-
-func ListAll() {
-	logp.Debug("beat", "Registered Modules and Metrics")
-	for module := range helper.Registry.Modulers {
-		for metricset := range helper.Registry.MetricSeters[module] {
-			logp.Debug("metricbeat", "Registred: Module: %v, MetricSet: %v", module, metricset)
-		}
-	}
-}

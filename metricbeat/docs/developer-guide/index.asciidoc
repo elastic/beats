@@ -137,7 +137,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("{module-name}", New)
+	if err := helper.Registry.AddModuler("{module-name}", New); err != nil {
+        panic(err)
+	}
 }
 
 // New creates new instance of Moduler
@@ -167,7 +169,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New)
+	if err := helper.Registry.AddMetricSeter("{module-name}", "{metricset-name}", New); err != nil {
+        panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter
@@ -299,7 +303,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("{module-name}", New)
+	if err := helper.Registry.AddModuler("{module-name}", New); err != nil {
+        panic(err)
+	}
 }
 
 // New creates new instance of Moduler
