@@ -9,6 +9,7 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -118,7 +119,7 @@ func (k *kafka) Close() error {
 }
 
 func (k *kafka) PublishEvent(
-	signal outputs.Signaler,
+	signal op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -126,7 +127,7 @@ func (k *kafka) PublishEvent(
 }
 
 func (k *kafka) BulkPublish(
-	signal outputs.Signaler,
+	signal op.Signaler,
 	opts outputs.Options,
 	event []common.MapStr,
 ) error {

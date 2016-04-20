@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/stretchr/testify/assert"
@@ -353,9 +354,9 @@ func testSendMultipleBatchesViaLogstash(
 	}
 
 	for _, batch := range batches {
-		sig := outputs.NewSyncSignal()
+		sig := op.NewSignalChannel()
 		ls.BulkPublish(sig, testOptions, batch)
-		ok := sig.Wait()
+		ok := sig.Wait() == op.SignalCompleted
 		assert.Equal(t, true, ok)
 	}
 

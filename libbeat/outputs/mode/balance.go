@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -40,8 +41,9 @@ type LoadBalancerMode struct {
 	// block until event has been successfully published.
 	maxAttempts int
 
-	// WorkerSignal for handling events and a clean shutdown
-	ws common.WorkerSignal
+	// waitGroup + signaling channel for handling shutdown
+	wg   sync.WaitGroup
+	done chan struct{}
 
 	// channels for forwarding work items to workers.
 	// The work channel is used by publisher to insert new events
@@ -56,7 +58,7 @@ type LoadBalancerMode struct {
 
 type eventsMessage struct {
 	attemptsLeft int
-	signaler     outputs.Signaler
+	signaler     op.Signaler
 	events       []common.MapStr
 	event        common.MapStr
 }
@@ -80,10 +82,11 @@ func NewLoadBalancerMode(
 		waitRetry:    waitRetry,
 		maxAttempts:  maxAttempts,
 
+		done: make(chan struct{}),
+
 		work:    make(chan eventsMessage),
 		retries: make(chan eventsMessage, len(clients)*2),
 	}
-	m.ws.Init()
 	m.start(clients)
 
 	return m, nil
@@ -91,13 +94,14 @@ func NewLoadBalancerMode(
 
 // Close waits for the workers to end and connections to close.
 func (m *LoadBalancerMode) Close() error {
-	m.ws.Stop()
+	close(m.done)
+	m.wg.Wait()
 	return nil
 }
 
 // PublishEvents forwards events to some load balancing worker.
 func (m *LoadBalancerMode) PublishEvents(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {
@@ -107,7 +111,7 @@ func (m *LoadBalancerMode) PublishEvents(
 
 // PublishEvent forwards the event to some load balancing worker.
 func (m *LoadBalancerMode) PublishEvent(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -125,9 +129,8 @@ func (m *LoadBalancerMode) publishEventsMessage(
 	}
 	msg.attemptsLeft = maxAttempts
 
-	m.ws.AddEvent(1)
 	if ok := m.forwardEvent(m.work, msg); !ok {
-		dropping(msg, &m.ws)
+		dropping(msg)
 	}
 	return nil
 }
@@ -139,7 +142,7 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 			if client.IsConnected() {
 				_ = client.Close()
 			}
-			m.ws.WorkerFinished()
+			m.wg.Done()
 		}()
 
 		waitStart.Done()
@@ -147,7 +150,7 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 	}
 
 	for _, client := range clients {
-		m.ws.WorkerStart()
+		m.wg.Add(1)
 		waitStart.Add(1)
 		go worker(client)
 	}
@@ -158,7 +161,7 @@ func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
 	debug("load balancer: start client loop")
 	defer debug("load balancer: stop client loop")
 
-	backoff := newBackoff(m.ws.Done, m.waitRetry, m.maxWaitRetry)
+	backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
 
 	done := false
 	for !done {
@@ -188,7 +191,7 @@ func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *backoff) boo
 	for {
 		var msg eventsMessage
 		select {
-		case <-m.ws.Done:
+		case <-m.done:
 			return true
 		case msg = <-m.retries: // receive message from other failed worker
 		case msg = <-m.work: // receive message from publisher
@@ -227,7 +230,7 @@ func (m *LoadBalancerMode) onMessage(
 			events, err = client.PublishEvents(events)
 			done = !backoff.WaitOnError(err)
 			if done && err != nil {
-				outputs.SignalFailed(msg.signaler, err)
+				op.SigFailed(msg.signaler, err)
 				return done, err
 			}
 
@@ -251,7 +254,7 @@ func (m *LoadBalancerMode) onMessage(
 
 				if m.maxAttempts > 0 && msg.attemptsLeft == 0 {
 					// no more attempts left => drop
-					dropping(msg, &m.ws)
+					dropping(msg)
 					return done, err
 				}
 
@@ -261,8 +264,7 @@ func (m *LoadBalancerMode) onMessage(
 		}
 	}
 
-	outputs.SignalCompleted(msg.signaler)
-	m.ws.DoneEvent()
+	op.SigCompleted(msg.signaler)
 	return done, nil
 }
 
@@ -270,7 +272,7 @@ func (m *LoadBalancerMode) onFail(msg eventsMessage, err error) {
 	logp.Info("Error publishing events (retrying): %s", err)
 
 	if !m.forwardEvent(m.retries, msg) {
-		dropping(msg, &m.ws)
+		dropping(msg)
 	}
 }
 
@@ -282,7 +284,7 @@ func (m *LoadBalancerMode) forwardEvent(
 		select {
 		case ch <- msg:
 			return true
-		case <-m.ws.Done: // shutdown
+		case <-m.done: // shutdown
 			return false
 		}
 	} else {
@@ -290,7 +292,7 @@ func (m *LoadBalancerMode) forwardEvent(
 			select {
 			case ch <- msg:
 				return true
-			case <-m.ws.Done: // shutdown
+			case <-m.done: // shutdown
 				return false
 			case <-time.After(m.timeout):
 			}
@@ -301,9 +303,8 @@ func (m *LoadBalancerMode) forwardEvent(
 
 // dropping is called when a message is dropped. It updates the
 // relevant counters and sends a failed signal.
-func dropping(msg eventsMessage, ws *common.WorkerSignal) {
+func dropping(msg eventsMessage) {
 	debug("messages dropped")
 	messagesDropped.Add(1)
-	outputs.SignalFailed(msg.signaler, nil)
-	ws.DoneEvent()
+	op.SigFailed(msg.signaler, nil)
 }

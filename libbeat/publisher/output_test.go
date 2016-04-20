@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,10 +24,10 @@ func (t *testOutputer) Close() error {
 
 // PublishEvent writes events to a channel then calls Completed on trans.
 // It always returns nil.
-func (t *testOutputer) PublishEvent(trans outputs.Signaler, opts outputs.Options,
+func (t *testOutputer) PublishEvent(trans op.Signaler, opts outputs.Options,
 	event common.MapStr) error {
 	t.events <- event
-	outputs.SignalCompleted(trans)
+	op.SigCompleted(trans)
 	return nil
 }
 
@@ -36,7 +37,7 @@ func TestOutputWorker(t *testing.T) {
 	ow := newOutputWorker(
 		common.NewConfig(),
 		outputer,
-		common.NewWorkerSignal(),
+		newWorkerSignal(),
 		1, 0)
 
 	ow.onStop() // Noop

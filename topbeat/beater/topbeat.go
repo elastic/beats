@@ -106,9 +106,9 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	return nil
 }
 
-func (tb *Topbeat) Setup(b *beat.Beat) error {
-	tb.events = b.Events
-	tb.done = make(chan struct{})
+func (t *Topbeat) Setup(b *beat.Beat) error {
+	t.events = b.Publisher.Connect()
+	t.done = make(chan struct{})
 	return nil
 }
 
@@ -170,5 +170,7 @@ func (tb *Topbeat) Cleanup(b *beat.Beat) error {
 }
 
 func (t *Topbeat) Stop() {
+	logp.Info("Send stop signal to topbeat main loop")
 	close(t.done)
+	t.events.Close()
 }

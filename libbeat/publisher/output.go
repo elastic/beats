@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -35,7 +36,7 @@ var (
 func newOutputWorker(
 	cfg *common.Config,
 	out outputs.Outputer,
-	ws *common.WorkerSignal,
+	ws *workerSignal,
 	hwm int,
 	bulkHWM int,
 ) *outputWorker {
@@ -78,7 +79,7 @@ func (o *outputWorker) onEvent(ctx *Context, event common.MapStr) {
 func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
 	if len(events) == 0 {
 		debug("output worker: no events to publish")
-		outputs.SignalCompleted(ctx.Signal)
+		op.SigCompleted(ctx.Signal)
 		return
 	}
 
@@ -89,7 +90,7 @@ func (o *outputWorker) onBulk(ctx *Context, events []common.MapStr) {
 
 	// start splitting bulk request
 	splits := (len(events) + (o.maxBulkSize - 1)) / o.maxBulkSize
-	ctx.Signal = outputs.NewSplitSignaler(ctx.Signal, splits)
+	ctx.Signal = op.SplitSignaler(ctx.Signal, splits)
 	for len(events) > 0 {
 		sz := o.maxBulkSize
 		if sz > len(events) {

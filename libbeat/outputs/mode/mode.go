@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -29,10 +30,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(trans outputs.Signaler, opts outputs.Options, events []common.MapStr) error
+	PublishEvents(sig op.Signaler, opts outputs.Options, events []common.MapStr) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(trans outputs.Signaler, opts outputs.Options, event common.MapStr) error
+	PublishEvent(sig op.Signaler, opts outputs.Options, event common.MapStr) error
 }
 
 type Connectable interface {

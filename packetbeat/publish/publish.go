@@ -19,7 +19,7 @@ type Flows interface {
 }
 
 type PacketbeatPublisher struct {
-	pub    *publisher.PublisherType
+	pub    *publisher.Publisher
 	client publisher.Client
 
 	wg   sync.WaitGroup
@@ -40,10 +40,10 @@ func (t *ChanTransactions) PublishTransaction(event common.MapStr) bool {
 
 var debugf = logp.MakeDebug("publish")
 
-func NewPublisher(pub *publisher.PublisherType, hwm, bulkHWM int) *PacketbeatPublisher {
+func NewPublisher(pub *publisher.Publisher, hwm, bulkHWM int) *PacketbeatPublisher {
 	return &PacketbeatPublisher{
 		pub:    pub,
-		client: pub.Client(),
+		client: pub.Connect(),
 		done:   make(chan struct{}),
 		trans:  make(chan common.MapStr, hwm),
 		flows:  make(chan []common.MapStr, bulkHWM),
@@ -100,6 +100,7 @@ func (t *PacketbeatPublisher) Start() {
 
 func (t *PacketbeatPublisher) Stop() {
 	close(t.done)
+	t.client.Close()
 	t.wg.Wait()
 }
 
@@ -160,7 +161,7 @@ func validateEvent(event common.MapStr) error {
 	return nil
 }
 
-func normalizeTransAddr(pub *publisher.PublisherType, event common.MapStr) bool {
+func normalizeTransAddr(pub *publisher.Publisher, event common.MapStr) bool {
 	debugf("normalize address for: %v", event)
 
 	var srcServer, dstServer string
@@ -228,7 +229,7 @@ func normalizeTransAddr(pub *publisher.PublisherType, event common.MapStr) bool 
 	return true
 }
 
-func addGeoIPToFlow(pub *publisher.PublisherType, event common.MapStr) bool {
+func addGeoIPToFlow(pub *publisher.Publisher, event common.MapStr) bool {
 
 	getLocation := func(host common.MapStr, ip_type string) string {
 

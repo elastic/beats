@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -69,14 +70,14 @@ func (out *fileOutput) Close() error {
 }
 
 func (out *fileOutput) PublishEvent(
-	trans outputs.Signaler,
+	sig op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
 		// mark as success so event is not sent again.
-		outputs.SignalCompleted(trans)
+		op.SigCompleted(sig)
 
 		logp.Err("Fail to json encode event(%v): %#v", err, event)
 		return err
@@ -90,6 +91,6 @@ func (out *fileOutput) PublishEvent(
 			logp.Err("Error when writing line to file: %s", err)
 		}
 	}
-	outputs.Signal(trans, err)
+	op.Sig(sig, err)
 	return err
 }
