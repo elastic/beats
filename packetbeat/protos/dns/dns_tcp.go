@@ -40,7 +40,7 @@ type dnsConnectionData struct {
 func (dns *Dns) Parse(pkt *protos.Packet, tcpTuple *common.TcpTuple, dir uint8, private protos.ProtocolData) protos.ProtocolData {
 	defer logp.Recover("Dns ParseTcp")
 
-	logp.Debug("dns", "Parsing packet addressed with %s of length %d.",
+	debugf("Parsing packet addressed with %s of length %d.",
 		pkt.Tuple.String(), len(pkt.Payload))
 
 	conn := ensureDnsConnection(private)
@@ -85,7 +85,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 
 		stream.rawData = append(stream.rawData, payload...)
 		if len(stream.rawData) > tcp.TCP_MAX_DATA_IN_STREAM {
-			logp.Debug("dns", "Stream data too large, dropping DNS stream")
+			debugf("Stream data too large, dropping DNS stream")
 			conn.Data[dir] = nil
 			return conn
 		}
@@ -95,7 +95,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 	if err != nil {
 
 		if err == IncompleteMsg {
-			logp.Debug("dns", "Waiting for more raw data")
+			debugf("Waiting for more raw data")
 			return conn
 		}
 
@@ -103,7 +103,7 @@ func (dns *Dns) doParse(conn *dnsConnectionData, pkt *protos.Packet, tcpTuple *c
 			dns.publishResponseError(conn, err)
 		}
 
-		logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
+		debugf("%s addresses %s, length %d", err.Error(),
 			tcpTuple.String(), len(stream.rawData))
 
 		// This means that malformed requests or responses are being sent...
@@ -177,7 +177,7 @@ func (dns *Dns) ReceivedFin(tcpTuple *common.TcpTuple, dir uint8, private protos
 		dns.publishResponseError(conn, err)
 	}
 
-	logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
+	debugf("%s addresses %s, length %d", err.Error(),
 		tcpTuple.String(), len(stream.rawData))
 
 	return conn
@@ -208,9 +208,9 @@ func (dns *Dns) GapInStream(tcpTuple *common.TcpTuple, dir uint8, nbytes int, pr
 		dns.publishResponseError(conn, err)
 	}
 
-	logp.Debug("dns", "%s addresses %s, length %d", err.Error(),
+	debugf("%s addresses %s, length %d", err.Error(),
 		tcpTuple.String(), len(stream.rawData))
-	logp.Debug("dns", "Dropping the stream %s", tcpTuple.String())
+	debugf("Dropping the stream %s", tcpTuple.String())
 
 	// drop the stream because it is binary Data and it would be unexpected to have a decodable message later
 	return private, true

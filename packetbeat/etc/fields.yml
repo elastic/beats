@@ -644,6 +644,22 @@ trans_event:
             The data describing the resource. The meaning of this data depends
             on the type and class of the resource record.
 
+        - name: opt.version
+          description: The EDNS version.
+          example: "0"
+
+        - name: opt.do
+          type: bool
+          description: If set, the transaction uses DNSSEC.
+
+        - name: opt.ext_rcode
+          description: Extended response code field.
+          example: "BADVERS"
+
+        - name: opt.udp_size
+          type: int
+          description: Requestor's UDP payload size (in bytes).
+
     - name: amqp
       type: group
       description: AMQP specific event fields.

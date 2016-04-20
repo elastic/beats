@@ -8,8 +8,10 @@
 package dns
 
 import (
+	"bytes"
 	"fmt"
 	"net"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +24,10 @@ import (
 
 	mkdns "github.com/miekg/dns"
 	"golang.org/x/net/publicsuffix"
+)
+
+var (
+	debugf = logp.MakeDebug("dns")
 )
 
 const MaxDnsTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
@@ -275,35 +281,64 @@ func (dns *Dns) ConnectionTimeout() time.Duration {
 }
 
 func (dns *Dns) receivedDnsRequest(tuple *DnsTuple, msg *DnsMessage) {
-	logp.Debug("dns", "Processing query. %s", tuple.String())
+	debugf("Processing query. %s", tuple.String())
 
 	trans := dns.deleteTransaction(tuple.Hashable())
 	if trans != nil {
 		// This happens if a client puts multiple requests in flight
 		// with the same ID.
 		trans.Notes = append(trans.Notes, DuplicateQueryMsg.Error())
-		logp.Debug("dns", "%s %s", DuplicateQueryMsg.Error(), tuple.String())
+		debugf("%s %s", DuplicateQueryMsg.Error(), tuple.String())
 		dns.publishTransaction(trans)
 		dns.deleteTransaction(trans.tuple.Hashable())
 	}
 
 	trans = newTransaction(msg.Ts, *tuple, *msg.CmdlineTuple)
+
+	if tuple.Transport == TransportUdp && (msg.Data.IsEdns0() != nil) && msg.Length > MaxDnsPacketSize {
+		trans.Notes = append(trans.Notes, UdpPacketTooLarge.Error())
+		debugf("%s", UdpPacketTooLarge.Error())
+	}
+
 	dns.transactions.Put(tuple.Hashable(), trans)
 	trans.Request = msg
 }
 
 func (dns *Dns) receivedDnsResponse(tuple *DnsTuple, msg *DnsMessage) {
-	logp.Debug("dns", "Processing response. %s", tuple.String())
+	debugf("Processing response. %s", tuple.String())
 
 	trans := dns.getTransaction(tuple.RevHashable())
 	if trans == nil {
 		trans = newTransaction(msg.Ts, tuple.Reverse(), common.CmdlineTuple{
 			Src: msg.CmdlineTuple.Dst, Dst: msg.CmdlineTuple.Src})
 		trans.Notes = append(trans.Notes, OrphanedResponse.Error())
-		logp.Debug("dns", "%s %s", OrphanedResponse.Error(), tuple.String())
+		debugf("%s %s", OrphanedResponse.Error(), tuple.String())
 	}
 
 	trans.Response = msg
+
+	if tuple.Transport == TransportUdp {
+		respIsEdns := msg.Data.IsEdns0() != nil
+		if !respIsEdns && msg.Length > MaxDnsPacketSize {
+			trans.Notes = append(trans.Notes, UdpPacketTooLarge.ResponseError())
+			debugf("%s", UdpPacketTooLarge.ResponseError())
+		}
+
+		request := trans.Request
+		if request != nil {
+			reqIsEdns := request.Data.IsEdns0() != nil
+
+			switch {
+			case reqIsEdns && !respIsEdns:
+				trans.Notes = append(trans.Notes, RespEdnsNoSupport.Error())
+				debugf("%s %s", RespEdnsNoSupport.Error(), tuple.String())
+			case !reqIsEdns && respIsEdns:
+				trans.Notes = append(trans.Notes, RespEdnsUnexpected.Error())
+				debugf("%s %s", RespEdnsUnexpected.Error(), tuple.String())
+			}
+		}
+	}
+
 	dns.publishTransaction(trans)
 	dns.deleteTransaction(trans.tuple.Hashable())
 }
@@ -313,7 +348,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 		return
 	}
 
-	logp.Debug("dns", "Publishing transaction. %s", t.tuple.String())
+	debugf("Publishing transaction. %s", t.tuple.String())
 
 	event := common.MapStr{}
 	event["@timestamp"] = common.Time(t.ts)
@@ -385,7 +420,7 @@ func (dns *Dns) publishTransaction(t *DnsTransaction) {
 
 func (dns *Dns) expireTransaction(t *DnsTransaction) {
 	t.Notes = append(t.Notes, NoResponse.Error())
-	logp.Debug("dns", "%s %s", NoResponse.Error(), t.tuple.String())
+	debugf("%s %s", NoResponse.Error(), t.tuple.String())
 	dns.publishTransaction(t)
 }
 
@@ -419,93 +454,233 @@ func addDnsToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		}
 	}
 
+	rrOPT := dns.IsEdns0()
+	if rrOPT != nil {
+		m["opt"] = optToMapStr(rrOPT)
+	}
+
 	m["answers_count"] = len(dns.Answer)
 	if len(dns.Answer) > 0 {
-		m["answers"] = rrToMapStr(dns.Answer)
+		m["answers"] = rrsToMapStrs(dns.Answer)
 	}
 
 	m["authorities_count"] = len(dns.Ns)
 	if authority && len(dns.Ns) > 0 {
-		m["authorities"] = rrToMapStr(dns.Ns)
+		m["authorities"] = rrsToMapStrs(dns.Ns)
 	}
 
-	m["additionals_count"] = len(dns.Extra)
-	if additional && len(dns.Extra) > 0 {
-		m["additionals"] = rrToMapStr(dns.Extra)
+	if rrOPT != nil {
+		m["additionals_count"] = len(dns.Extra) - 1
+	} else {
+		m["additionals_count"] = len(dns.Extra)
 	}
+	if additional && len(dns.Extra) > 0 {
+		rrsMapStrs := rrsToMapStrs(dns.Extra)
+		// We do not want OPT RR to appear in the 'additional' section,
+		// that's why rrsMapStrs could be empty even though len(dns.Extra) > 0
+		if len(rrsMapStrs) > 0 {
+			m["additionals"] = rrsMapStrs
+		}
+	}
+
 }
 
-// rrToMapStr converts an array of DNSResourceRecord's to an array of MapStr's.
-func rrToMapStr(records []mkdns.RR) []common.MapStr {
+func optToMapStr(rrOPT *mkdns.OPT) common.MapStr {
+	optMapStr := common.MapStr{
+		"do":        rrOPT.Do(), // true if DNSSEC
+		"version":   strconv.FormatUint(uint64(rrOPT.Version()), 10),
+		"udp_size":  rrOPT.UDPSize(),
+		"ext_rcode": dnsResponseCodeToString(rrOPT.ExtendedRcode()),
+	}
+	for _, o := range rrOPT.Option {
+		switch o.(type) {
+		case *mkdns.EDNS0_DAU:
+			optMapStr["dau"] = o.String()
+		case *mkdns.EDNS0_DHU:
+			optMapStr["dhu"] = o.String()
+		case *mkdns.EDNS0_EXPIRE:
+			optMapStr["local"] = o.String()
+		case *mkdns.EDNS0_LLQ:
+			optMapStr["llq"] = o.String()
+		case *mkdns.EDNS0_LOCAL:
+			optMapStr["local"] = o.String()
+		case *mkdns.EDNS0_N3U:
+			optMapStr["n3u"] = o.String()
+		case *mkdns.EDNS0_NSID:
+			optMapStr["nsid"] = o.String()
+		case *mkdns.EDNS0_SUBNET:
+			var draft string
+			if o.(*mkdns.EDNS0_SUBNET).DraftOption {
+				draft = " draft"
+			}
+			optMapStr["subnet"] = o.String() + draft
+		case *mkdns.EDNS0_UL:
+			optMapStr["ul"] = o.String()
+		}
+	}
+	return optMapStr
+}
+
+// rrsToMapStr converts an array of RR's to an array of MapStr's.
+func rrsToMapStrs(records []mkdns.RR) []common.MapStr {
 	mapStrArray := make([]common.MapStr, len(records))
 	for i, rr := range records {
 		rrHeader := rr.Header()
-		rrType := rrHeader.Rrtype
 
-		mapStr := common.MapStr{
-			"name":  rrHeader.Name,
-			"type":  dnsTypeToString(rrType),
-			"class": dnsClassToString(rrHeader.Class),
-			"ttl":   strconv.FormatInt(int64(rrHeader.Ttl), 10),
+		mapStr := rrToMapStr(rr)
+		if len(mapStr) == 0 { // OPT pseudo-RR returns an empty MapStr
+			resizeStrArray := make([]common.MapStr, len(mapStrArray)-1)
+			copy(resizeStrArray, mapStrArray)
+			mapStrArray = resizeStrArray
+			continue
 		}
+		mapStr["name"] = rrHeader.Name
+		mapStr["type"] = dnsTypeToString(rrHeader.Rrtype)
+		mapStr["class"] = dnsClassToString(rrHeader.Class)
+		mapStr["ttl"] = strconv.FormatInt(int64(rrHeader.Ttl), 10)
 		mapStrArray[i] = mapStr
+	}
+	return mapStrArray
+}
 
-		switch x := rr.(type) {
-		default:
-			// We don't have special handling for this type
-			logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
-			unsupportedRR := new(mkdns.RFC3597)
-			err := unsupportedRR.ToRFC3597(x)
-			if err == nil {
-				rData, err := hexStringToString(unsupportedRR.Rdata)
-				mapStr["data"] = rData
-				if err != nil {
-					logp.Debug("dns", "%s", err.Error())
-				}
-			} else {
-				logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
-			}
-		case *mkdns.A:
-			mapStr["data"] = x.A.String()
-		case *mkdns.AAAA:
-			mapStr["data"] = x.AAAA.String()
-		case *mkdns.CNAME:
-			mapStr["data"] = x.Target
-		case *mkdns.MX:
-			mapStr["preference"] = x.Preference
-			mapStr["data"] = x.Mx
-		case *mkdns.NS:
-			mapStr["data"] = x.Ns
-		case *mkdns.PTR:
-			mapStr["data"] = x.Ptr
-		case *mkdns.RFC3597:
-			// Miekg/dns lib doesn't handle this type
-			//TODO: write a test for this.
-			logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
-			rData, err := hexStringToString(x.Rdata)
-			mapStr["data"] = rData
-			if err != nil {
-				logp.Debug("dns", "%s", err.Error())
-			}
-		case *mkdns.SOA:
-			mapStr["rname"] = x.Mbox
-			mapStr["serial"] = x.Serial
-			mapStr["refresh"] = x.Refresh
-			mapStr["retry"] = x.Retry
-			mapStr["expire"] = x.Expire
-			mapStr["minimum"] = x.Minttl
-			mapStr["data"] = x.Ns
-		case *mkdns.SRV:
-			mapStr["priority"] = x.Priority
-			mapStr["weight"] = x.Weight
-			mapStr["port"] = x.Port
-			mapStr["data"] = x.Target
-		case *mkdns.TXT:
-			mapStr["data"] = strings.Join(x.Txt, " ")
+// Convert all RDATA fields of a RR to a single string
+// fields are ordered alphabetically with 'data' as the last element
+//
+// TODO An improvement would be to replace 'data' by the real field name
+// It would require some changes in unit tests
+func rrToString(rr mkdns.RR) string {
+	var st string
+	var keys []string
+
+	mapStr := rrToMapStr(rr)
+	data, ok := mapStr["data"]
+	delete(mapStr, "data")
+
+	for k, _ := range mapStr {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var b bytes.Buffer
+	for _, k := range keys {
+		v := mapStr[k]
+		switch x := v.(type) {
+		case int:
+			fmt.Fprintf(&b, "%s %d, ", k, x)
+		case string:
+			fmt.Fprintf(&b, "%s %s, ", k, x)
 		}
 	}
+	if !ok {
+		st = strings.TrimSuffix(b.String(), ", ")
+		return st
+	}
 
-	return mapStrArray
+	switch x := data.(type) {
+	case int:
+		fmt.Fprintf(&b, "%d", x)
+	case string:
+		fmt.Fprintf(&b, "%s", x)
+	}
+	return b.String()
+}
+
+func rrToMapStr(rr mkdns.RR) common.MapStr {
+	mapStr := common.MapStr{}
+	rrType := rr.Header().Rrtype
+
+	switch x := rr.(type) {
+	default:
+		// We don't have special handling for this type
+		debugf("No special handling for RR type %s", dnsTypeToString(rrType))
+		unsupportedRR := new(mkdns.RFC3597)
+		err := unsupportedRR.ToRFC3597(x)
+		if err == nil {
+			rData, err := hexStringToString(unsupportedRR.Rdata)
+			mapStr["data"] = rData
+			if err != nil {
+				debugf("%s", err.Error())
+			}
+		} else {
+			debugf("Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
+		}
+	case *mkdns.A:
+		mapStr["data"] = x.A.String()
+	case *mkdns.AAAA:
+		mapStr["data"] = x.AAAA.String()
+	case *mkdns.CNAME:
+		mapStr["data"] = x.Target
+	case *mkdns.DNSKEY:
+		mapStr["flags"] = strconv.Itoa(int(x.Flags))
+		mapStr["protocol"] = strconv.Itoa(int(x.Protocol))
+		mapStr["algorithm"] = dnsAlgorithmToString(x.Algorithm)
+		mapStr["data"] = x.PublicKey
+	case *mkdns.DS:
+		mapStr["key_tag"] = strconv.Itoa(int(x.KeyTag))
+		mapStr["algorithm"] = dnsAlgorithmToString(x.Algorithm)
+		mapStr["digest_type"] = dnsHashToString(x.DigestType)
+		mapStr["data"] = strings.ToUpper(x.Digest)
+	case *mkdns.MX:
+		mapStr["preference"] = x.Preference
+		mapStr["data"] = x.Mx
+	case *mkdns.NS:
+		mapStr["data"] = x.Ns
+	case *mkdns.NSEC:
+		mapStr["type_bits"] = dnsTypeBitsMapToString(x.TypeBitMap)
+		mapStr["data"] = x.NextDomain
+	case *mkdns.NSEC3:
+		mapStr["hash"] = dnsHashToString(x.Hash)
+		mapStr["flags"] = strconv.Itoa(int(x.Flags))
+		mapStr["iterations"] = strconv.Itoa(int(x.Iterations))
+		mapStr["salt"] = dnsSaltToString(x.Salt)
+		mapStr["type_bits"] = dnsTypeBitsMapToString(x.TypeBitMap)
+		mapStr["data"] = x.NextDomain
+	case *mkdns.NSEC3PARAM:
+		mapStr["hash"] = dnsHashToString(x.Hash)
+		mapStr["flags"] = strconv.Itoa(int(x.Flags))
+		mapStr["iterations"] = strconv.Itoa(int(x.Iterations))
+		mapStr["data"] = dnsSaltToString(x.Salt)
+	case *mkdns.OPT: // EDNS [RFC6891]
+		// OPT pseudo-RR is managed in addDnsToMapStr function
+		return nil
+	case *mkdns.PTR:
+		mapStr["data"] = x.Ptr
+	case *mkdns.RFC3597:
+		// Miekg/dns lib doesn't handle this type
+		debugf("Unknown RR type %s", dnsTypeToString(rrType))
+		rData, err := hexStringToString(x.Rdata)
+		mapStr["data"] = rData
+		if err != nil {
+			debugf("%s", err.Error())
+		}
+	case *mkdns.RRSIG:
+		mapStr["type_covered"] = dnsTypeToString(x.TypeCovered)
+		mapStr["algorithm"] = dnsAlgorithmToString(x.Algorithm)
+		mapStr["labels"] = strconv.Itoa(int(x.Labels))
+		mapStr["original_ttl"] = strconv.FormatInt(int64(x.OrigTtl), 10)
+		mapStr["expiration"] = mkdns.TimeToString(x.Expiration)
+		mapStr["inception"] = mkdns.TimeToString(x.Inception)
+		mapStr["key_tag"] = strconv.Itoa(int(x.KeyTag))
+		mapStr["signer_name"] = x.SignerName
+		mapStr["data"] = x.Signature
+	case *mkdns.SOA:
+		mapStr["rname"] = x.Mbox
+		mapStr["serial"] = x.Serial
+		mapStr["refresh"] = x.Refresh
+		mapStr["retry"] = x.Retry
+		mapStr["expire"] = x.Expire
+		mapStr["minimum"] = x.Minttl
+		mapStr["data"] = x.Ns
+	case *mkdns.SRV:
+		mapStr["priority"] = x.Priority
+		mapStr["weight"] = x.Weight
+		mapStr["port"] = x.Port
+		mapStr["data"] = x.Target
+	case *mkdns.TXT:
+		mapStr["data"] = strings.Join(x.Txt, " ")
+	}
+
+	return mapStr
 }
 
 // dnsQuestionToString converts a Question to a string.
@@ -516,70 +691,12 @@ func dnsQuestionToString(q mkdns.Question) string {
 		dnsTypeToString(q.Qtype), name)
 }
 
-// dnsResourceRecordToString converts a RR to a string.
-func dnsResourceRecordToString(rr mkdns.RR) string {
-	rrHeader := rr.Header()
-	rrType := rrHeader.Rrtype
-
-	var data string
-	switch x := rr.(type) {
-	default:
-		// We don't have special handling for this type
-		logp.Debug("dns", "No special handling for RR type %s", dnsTypeToString(rrType))
-		unsupportedRR := new(mkdns.RFC3597)
-		err := unsupportedRR.ToRFC3597(x)
-		if err == nil {
-			rData, err := hexStringToString(unsupportedRR.Rdata)
-			data = rData
-			if err != nil {
-				logp.Debug("dns", "%s", err.Error())
-			}
-		} else {
-			logp.Debug("dns", "Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
-		}
-	case *mkdns.A:
-		data = x.A.String()
-	case *mkdns.AAAA:
-		data = x.AAAA.String()
-	case *mkdns.CNAME:
-		data = x.Target
-	case *mkdns.MX:
-		data = fmt.Sprintf("preference %d, %s", x.Preference, x.Mx)
-	case *mkdns.NS:
-		data = x.Ns
-	case *mkdns.PTR:
-		data = x.Ptr
-	case *mkdns.RFC3597:
-		// Miekg/dns lib doesn't handle this type
-		logp.Debug("dns", "Unknown RR type %s", dnsTypeToString(rrType))
-		rData, err := hexStringToString(x.Rdata)
-		data = rData
-		if err != nil {
-			logp.Debug("dns", "%s", err.Error())
-		}
-	case *mkdns.SOA:
-		data = fmt.Sprintf("mname %s, rname %s, serial %d, refresh %d, "+
-			"retry %d, expire %d, minimum %d", x.Ns, x.Mbox,
-			x.Serial, x.Refresh, x.Retry, x.Expire,
-			x.Minttl)
-	case *mkdns.SRV:
-		data = fmt.Sprintf("priority %d, weight %d, port %d, %s", x.Priority,
-			x.Weight, x.Port, x.Target)
-	case *mkdns.TXT:
-		data = strings.Join(x.Txt, " ")
-	}
-
-	return fmt.Sprintf("%s: ttl %d, class %s, type %s, %s", rrHeader.Name,
-		int(rrHeader.Ttl), dnsClassToString(rrHeader.Class),
-		dnsTypeToString(rrType), data)
-}
-
-// dnsResourceRecordsToString converts an array of DNSResourceRecord's to a
+// rrsToString converts an array of RR's to a
 // string.
-func dnsResourceRecordsToString(r []mkdns.RR) string {
+func rrsToString(r []mkdns.RR) string {
 	var rrStrs []string
 	for _, rr := range r {
-		rrStrs = append(rrStrs, dnsResourceRecordToString(rr))
+		rrStrs = append(rrStrs, rrToString(rr))
 	}
 	return strings.Join(rrStrs, "; ")
 }
@@ -629,17 +746,17 @@ func dnsToString(dns *mkdns.Msg) string {
 
 	if len(dns.Answer) > 0 {
 		a = append(a, fmt.Sprintf("ANSWER %s",
-			dnsResourceRecordsToString(dns.Answer)))
+			rrsToString(dns.Answer)))
 	}
 
 	if len(dns.Ns) > 0 {
 		a = append(a, fmt.Sprintf("AUTHORITY %s",
-			dnsResourceRecordsToString(dns.Ns)))
+			rrsToString(dns.Ns)))
 	}
 
 	if len(dns.Extra) > 0 {
 		a = append(a, fmt.Sprintf("ADDITIONAL %s",
-			dnsResourceRecordsToString(dns.Extra)))
+			rrsToString(dns.Extra)))
 	}
 
 	return strings.Join(a, "; ")
