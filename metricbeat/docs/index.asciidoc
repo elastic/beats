@@ -22,6 +22,8 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
 include::./securing-metricbeat.asciidoc[]
 
 include::../../libbeat/docs/https.asciidoc[]
