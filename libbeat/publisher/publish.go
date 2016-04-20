@@ -4,9 +4,11 @@ import (
 	"errors"
 	"flag"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -26,15 +28,13 @@ var publishDisabled *bool
 
 var debug = logp.MakeDebug("publish")
 
-// EventPublisher provides the interface for beats to publish events.
-type eventPublisher interface {
-	PublishEvent(ctx Context, event common.MapStr) bool
-	PublishEvents(ctx Context, events []common.MapStr) bool
-}
-
 type Context struct {
 	publishOptions
-	Signal outputs.Signaler
+	Signal op.Signaler
+}
+
+type pipeline interface {
+	publish(m message) bool
 }
 
 type publishOptions struct {
@@ -43,10 +43,10 @@ type publishOptions struct {
 }
 
 type TransactionalEventPublisher interface {
-	PublishTransaction(transaction outputs.Signaler, events []common.MapStr)
+	PublishTransaction(transaction op.Signaler, events []common.MapStr)
 }
 
-type PublisherType struct {
+type Publisher struct {
 	shipperName    string // Shipper name as set in the configuration file
 	hostname       string // Host name as returned by the operation system
 	name           string // The shipperName if configured, the hostname otherwise
@@ -66,13 +66,17 @@ type PublisherType struct {
 	// On shutdown the publisher is finished first and the outputers next,
 	// so no publisher will attempt to send messages on closed channels.
 	// Note: beat data producers must be shutdown before the publisher plugin
-	wsPublisher common.WorkerSignal
-	wsOutput    common.WorkerSignal
+	wsPublisher workerSignal
+	wsOutput    workerSignal
 
-	syncPublisher  *syncPublisher
-	asyncPublisher *asyncPublisher
+	pipelines struct {
+		sync  pipeline
+		async pipeline
+	}
 
-	client *client
+	// keep count of clients connected to publisher. A publisher is allowed to
+	// Stop only if all clients have been disconnected
+	numClients uint32
 }
 
 type ShipperConfig struct {
@@ -103,7 +107,7 @@ func init() {
 	publishDisabled = flag.Bool("N", false, "Disable actual publishing for testing")
 }
 
-func (publisher *PublisherType) IsPublisherIP(ip string) bool {
+func (publisher *Publisher) IsPublisherIP(ip string) bool {
 	for _, myip := range publisher.IpAddrs {
 		if myip == ip {
 			return true
@@ -113,7 +117,7 @@ func (publisher *PublisherType) IsPublisherIP(ip string) bool {
 	return false
 }
 
-func (publisher *PublisherType) GetServerName(ip string) string {
+func (publisher *Publisher) GetServerName(ip string) string {
 	// in case the IP is localhost, return current shipper name
 	islocal, err := common.IsLoopback(ip)
 	if err != nil {
@@ -133,17 +137,18 @@ func (publisher *PublisherType) GetServerName(ip string) string {
 	return ""
 }
 
-func (publisher *PublisherType) Client() Client {
-	return publisher.client
+func (publisher *Publisher) Connect() Client {
+	atomic.AddUint32(&publisher.numClients, 1)
+	return newClient(publisher)
 }
 
-func (publisher *PublisherType) UpdateTopologyPeriodically() {
+func (publisher *Publisher) UpdateTopologyPeriodically() {
 	for range publisher.RefreshTopologyTimer {
 		_ = publisher.PublishTopology() // ignore errors
 	}
 }
 
-func (publisher *PublisherType) PublishTopology(params ...string) error {
+func (publisher *Publisher) PublishTopology(params ...string) error {
 
 	localAddrs := params
 	if len(params) == 0 {
@@ -167,7 +172,7 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *PublisherType) RegisterFilter(filters *filter.FilterList) error {
+func (publisher *Publisher) RegisterFilter(filters *filter.FilterList) error {
 
 	publisher.Filters = filters
 	return nil
@@ -178,9 +183,9 @@ func New(
 	beatName string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
-) (*PublisherType, error) {
+) (*Publisher, error) {
 
-	publisher := PublisherType{}
+	publisher := Publisher{}
 	err := publisher.init(beatName, configs, shipper)
 	if err != nil {
 		return nil, err
@@ -188,7 +193,7 @@ func New(
 	return &publisher, nil
 }
 
-func (publisher *PublisherType) init(
+func (publisher *Publisher) init(
 	beatName string,
 	configs map[string]*common.Config,
 	shipper ShipperConfig,
@@ -314,14 +319,16 @@ func (publisher *PublisherType) init(
 		go publisher.UpdateTopologyPeriodically()
 	}
 
-	publisher.asyncPublisher = newAsyncPublisher(publisher, hwm, bulkHWM, &publisher.wsPublisher)
-	publisher.syncPublisher = newSyncPublisher(publisher, hwm, bulkHWM)
-
-	publisher.client = newClient(publisher)
+	publisher.pipelines.async = newAsyncPipeline(publisher, hwm, bulkHWM, &publisher.wsPublisher)
+	publisher.pipelines.sync = newSyncPipeline(publisher, hwm, bulkHWM)
 	return nil
 }
 
-func (publisher *PublisherType) Stop() {
-	publisher.wsPublisher.Stop()
-	publisher.wsOutput.Stop()
+func (publisher *Publisher) Stop() {
+	if atomic.LoadUint32(&publisher.numClients) > 0 {
+		panic("All clients must disconnect before shutting down publisher pipeline")
+	}
+
+	publisher.wsPublisher.stop()
+	publisher.wsOutput.stop()
 }

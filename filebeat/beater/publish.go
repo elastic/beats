@@ -29,8 +29,8 @@ type asyncLogPublisher struct {
 	in, out chan []*input.FileEvent
 
 	// list of in-flight batches
-	active  batchList
-	failing bool
+	active   batchList
+	stopping bool
 
 	done chan struct{}
 	wg   sync.WaitGroup
@@ -48,13 +48,17 @@ type batchList struct {
 	head, tail *eventsBatch
 }
 
+type batchStatus int32
+
 const (
 	defaultGCTimeout = 1 * time.Second
 )
 
 const (
-	batchSuccess int32 = 1
-	batchFailed  int32 = 2
+	batchInProgress batchStatus = iota
+	batchSuccess
+	batchFailed
+	batchCanceled
 )
 
 func newPublisher(
@@ -115,6 +119,7 @@ func (p *syncLogPublisher) Start() {
 
 func (p *syncLogPublisher) Stop() {
 	close(p.done)
+	p.client.Close()
 	p.wg.Wait()
 }
 
@@ -169,6 +174,7 @@ func (p *asyncLogPublisher) Start() {
 
 func (p *asyncLogPublisher) Stop() {
 	close(p.done)
+	p.client.Close()
 	p.wg.Wait()
 }
 
@@ -177,9 +183,16 @@ func (p *asyncLogPublisher) Stop() {
 // as bulk-Events have been received by the spooler
 func (p *asyncLogPublisher) collect() bool {
 	for batch := p.active.head; batch != nil; batch = batch.next {
-		state := atomic.LoadInt32(&batch.flag)
-		if state == 0 && !p.failing {
+		state := batchStatus(atomic.LoadInt32(&batch.flag))
+		if state == batchInProgress && !p.stopping {
 			break
+		}
+
+		if state == batchFailed {
+			// with guaranteed enabled this must must not happen.
+			msg := "Failed to process batch"
+			logp.Critical(msg)
+			panic(msg)
 		}
 
 		// remove batch from active list
@@ -188,22 +201,28 @@ func (p *asyncLogPublisher) collect() bool {
 			p.active.tail = nil
 		}
 
-		// Batches get marked as failed, if publisher pipeline is shutting down
+		// Batches get marked as canceled, if publisher pipeline is shutting down
 		// In this case we do not want to send any more batches to the registrar
-		if state == batchFailed {
-			p.failing = true
+		if state == batchCanceled {
+			p.stopping = true
 		}
 
-		if p.failing {
-			logp.Warn("No registrar update for potentially published batch.")
+		if p.stopping {
+			logp.Info("Shutting down - No registrar update for potentially published batch.")
 
 			// if in failing state keep cleaning up queue
 			continue
 		}
 
-		// Tell the registrar that we've successfully sent these events
+		// Tell the registrar that we've successfully publish the last batch events.
+		// If registrar queue is blocking (quite unlikely), but stop signal has been
+		// received in the meantime (by closing p.done), we do not wait for
+		// registrar picking up the current batch. Instead prefer to shut-down and
+		// resend the last published batch on next restart, basically taking advantage
+		// of send-at-last-once semantics in order to speed up cleanup on shutdown.
 		select {
 		case <-p.done:
+			logp.Info("Shutting down - No registrar update for successfully published batch.")
 			return false
 		case p.out <- batch.events:
 		}
@@ -212,12 +231,17 @@ func (p *asyncLogPublisher) collect() bool {
 }
 
 func (b *eventsBatch) Completed() {
-	atomic.StoreInt32(&b.flag, batchSuccess)
+	atomic.StoreInt32(&b.flag, int32(batchSuccess))
 }
 
 func (b *eventsBatch) Failed() {
 	logp.Err("Failed to publish batch. Stop updating registrar.")
-	atomic.StoreInt32(&b.flag, batchFailed)
+	atomic.StoreInt32(&b.flag, int32(batchFailed))
+}
+
+func (b *eventsBatch) Canceled() {
+	logp.Info("In-flight batch has been canceled during shutdown")
+	atomic.StoreInt32(&b.flag, int32(batchCanceled))
 }
 
 func (l *batchList) append(b *eventsBatch) {

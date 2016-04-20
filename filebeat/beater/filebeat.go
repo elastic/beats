@@ -19,6 +19,7 @@ type Filebeat struct {
 	spooler       *Spooler
 	registrar     *crawler.Registrar
 	crawler       *crawler.Crawler
+	pub           logPublisher
 	done          chan struct{}
 }
 
@@ -92,9 +93,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Publishes event to output
-	pub := newPublisher(fb.FbConfig.Filebeat.PublishAsync,
-		fb.publisherChan, fb.registrar.Channel, b.Events)
-	pub.Start()
+	fb.pub = newPublisher(fb.FbConfig.Filebeat.PublishAsync,
+		fb.publisherChan, fb.registrar.Channel, b.Publisher.Connect())
+	fb.pub.Start()
 
 	// Blocks progressing
 	select {
@@ -118,6 +119,9 @@ func (fb *Filebeat) Stop() {
 
 	// Stopping spooler will flush items
 	fb.spooler.Stop()
+
+	// stopping publisher (might potentially drop items)
+	fb.pub.Stop()
 
 	// Stopping registrar will write last state
 	fb.registrar.Stop()

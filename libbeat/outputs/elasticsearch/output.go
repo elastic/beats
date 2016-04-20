@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
@@ -230,7 +231,7 @@ func (out *elasticsearchOutput) Close() error {
 }
 
 func (out *elasticsearchOutput) PublishEvent(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -238,7 +239,7 @@ func (out *elasticsearchOutput) PublishEvent(
 }
 
 func (out *elasticsearchOutput) BulkPublish(
-	trans outputs.Signaler,
+	trans op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {

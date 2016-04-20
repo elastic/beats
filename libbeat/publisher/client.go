@@ -1,16 +1,22 @@
 package publisher
 
 import (
+	"errors"
 	"expvar"
+	"sync/atomic"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
 )
 
 // Metrics that can retrieved through the expvar web interface.
 var (
 	publishedEvents = expvar.NewInt("libbeatPublishedEvents")
+)
+
+var (
+	ErrClientClosed = errors.New("client closed")
 )
 
 // Client is used by beats to publish new events.
@@ -39,6 +45,9 @@ var (
 //      }
 //  }
 type Client interface {
+	// Close disconnects the Client from the publisher pipeline.
+	Close() error
+
 	// PublishEvent publishes one event with given options. If Sync option is set,
 	// PublishEvent will block until output plugins report success or failure state
 	// being returned by this method.
@@ -50,56 +59,18 @@ type Client interface {
 	PublishEvents(events []common.MapStr, opts ...ClientOption) bool
 }
 
-// ChanClient will forward all published events one by one to the given channel
-type ChanClient struct {
-	Channel chan common.MapStr
-}
-
-type ExtChanClient struct {
-	Channel chan PublishMessage
-}
-
-type PublishMessage struct {
-	Context Context
-	Events  []common.MapStr
-}
-
 type client struct {
-	publisher           *PublisherType
+	canceler *op.Canceler
+
+	publisher           *Publisher
 	beatMeta            common.MapStr        // Beat metadata that is added to all events.
 	globalEventMetadata common.EventMetadata // Fields and tags that are added to all events.
 }
 
-// ClientOption allows API users to set additional options when publishing events.
-type ClientOption func(option Context) Context
+func newClient(pub *Publisher) *client {
+	c := &client{
+		canceler: op.NewCanceler(),
 
-// Guaranteed option will retry publishing the event, until send attempt have
-// been ACKed by output plugin.
-func Guaranteed(o Context) Context {
-	o.Guaranteed = true
-	return o
-}
-
-// Sync option will block the event publisher until an event has been ACKed by
-// the output plugin or failed.
-func Sync(o Context) Context {
-	o.Sync = true
-	return o
-}
-
-func Signal(signaler outputs.Signaler) ClientOption {
-	return func(ctx Context) Context {
-		if ctx.Signal == nil {
-			ctx.Signal = signaler
-		} else {
-			ctx.Signal = outputs.NewCompositeSignaler(ctx.Signal, signaler)
-		}
-		return ctx
-	}
-}
-
-func newClient(pub *PublisherType) *client {
-	return &client{
 		publisher: pub,
 		beatMeta: common.MapStr{
 			"name":     pub.name,
@@ -107,10 +78,18 @@ func newClient(pub *PublisherType) *client {
 		},
 		globalEventMetadata: pub.globalEventMetadata,
 	}
+	return c
+}
+
+func (c *client) Close() error {
+	c.canceler.Cancel()
+
+	// atomic decrement clients counter
+	atomic.AddUint32(&c.publisher.numClients, ^uint32(0))
+	return nil
 }
 
 func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-
 	c.annotateEvent(event)
 
 	publishEvent := c.filterEvent(event)
@@ -118,13 +97,12 @@ func (c *client) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
 		return false
 	}
 
-	ctx, client := c.getClient(opts)
+	ctx, pipeline := c.getPipeline(opts)
 	publishedEvents.Add(1)
-	return client.PublishEvent(ctx, *publishEvent)
+	return pipeline.publish(message{client: c, context: ctx, event: *publishEvent})
 }
 
 func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-
 	// optimization: shares the backing array and capacity
 	publishEvents := events[:0]
 
@@ -137,14 +115,14 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 		}
 	}
 
-	ctx, client := c.getClient(opts)
+	ctx, pipeline := c.getPipeline(opts)
 	if len(publishEvents) == 0 {
 		logp.Debug("filter", "No events to publish")
 		return true
 	}
 
 	publishedEvents.Add(int64(len(publishEvents)))
-	return client.PublishEvents(ctx, events)
+	return pipeline.publish(message{client: c, context: ctx, events: events})
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'
@@ -195,45 +173,15 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 	return &publishEvent
 }
 
-func (c *client) getClient(opts []ClientOption) (Context, eventPublisher) {
-	ctx := makeContext(opts)
+func (c *client) getPipeline(opts []ClientOption) (Context, pipeline) {
+	ctx := MakeContext(opts)
 	if ctx.Sync {
-		return ctx, c.publisher.syncPublisher.client()
+		return ctx, c.publisher.pipelines.sync
 	}
-	return ctx, c.publisher.asyncPublisher.client()
+	return ctx, c.publisher.pipelines.async
 }
 
-// PublishEvent will publish the event on the channel. Options will be ignored.
-// Always returns true.
-func (c ChanClient) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	c.Channel <- event
-	return true
-}
-
-// PublishEvents publishes all event on the configured channel. Options will be ignored.
-// Always returns true.
-func (c ChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	for _, event := range events {
-		c.Channel <- event
-	}
-	return true
-}
-
-// PublishEvent will publish the event on the channel. Options will be ignored.
-// Always returns true.
-func (c ExtChanClient) PublishEvent(event common.MapStr, opts ...ClientOption) bool {
-	c.Channel <- PublishMessage{makeContext(opts), []common.MapStr{event}}
-	return true
-}
-
-// PublishEvents publishes all event on the configured channel. Options will be ignored.
-// Always returns true.
-func (c ExtChanClient) PublishEvents(events []common.MapStr, opts ...ClientOption) bool {
-	c.Channel <- PublishMessage{makeContext(opts), events}
-	return true
-}
-
-func makeContext(opts []ClientOption) Context {
+func MakeContext(opts []ClientOption) Context {
 	var ctx Context
 	for _, opt := range opts {
 		ctx = opt(ctx)

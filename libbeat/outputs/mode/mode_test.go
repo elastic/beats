@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/stretchr/testify/assert"
@@ -238,8 +239,8 @@ func testMode(
 	}
 
 	var expectedEvents [][]common.MapStr
-	ch := make(chan bool, numSignals)
-	signal := outputs.NewChanSignal(ch)
+	ch := make(chan op.SignalResponse, numSignals)
+	signal := &op.SignalChannel{ch}
 	idx := 0
 	for _, pubEvents := range events {
 		if pubEvents.single {
@@ -261,7 +262,7 @@ func testMode(
 
 	results := make([]bool, len(expectedSignals))
 	for i := 0; i < len(expectedSignals); i++ {
-		results[i] = <-ch
+		results[i] = <-ch == op.SignalCompleted
 	}
 	assert.Equal(t, expectedSignals, results)
 

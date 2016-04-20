@@ -87,7 +87,7 @@ func (eb *Winlogbeat) Config(b *beat.Beat) error {
 // settings to allow the beat to be used.
 func (eb *Winlogbeat) Setup(b *beat.Beat) error {
 	eb.beat = b
-	eb.client = b.Events
+	eb.client = b.Publisher.Connect()
 	eb.done = make(chan struct{})
 
 	var err error
@@ -134,7 +134,6 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// Initialize metrics.
 	publishedEvents.Add("total", 0)
-	publishedEvents.Add("failures", 0)
 	ignoredEvents.Add("total", 0)
 
 	var wg sync.WaitGroup
@@ -175,6 +174,7 @@ func (eb *Winlogbeat) Stop() {
 	logp.Info("Stopping Winlogbeat")
 	if eb.done != nil {
 		close(eb.done)
+		eb.client.Close()
 	}
 }
 
@@ -192,8 +192,9 @@ func (eb *Winlogbeat) processEventLog(
 		return
 	}
 	defer func() {
-		err := api.Close()
-		if err != nil {
+		logp.Info("EventLog[%s] Stop processing.")
+
+		if err := api.Close(); err != nil {
 			logp.Warn("EventLog[%s] Close() error. %v", api.Name(), err)
 			return
 		}
@@ -201,11 +202,10 @@ func (eb *Winlogbeat) processEventLog(
 
 	debugf("EventLog[%s] opened successfully", api.Name())
 
-loop:
 	for {
 		select {
 		case <-eb.done:
-			break loop
+			return
 		default:
 		}
 
@@ -231,16 +231,16 @@ loop:
 		// Publish events.
 		numEvents := int64(len(events))
 		ok := eb.client.PublishEvents(events, publisher.Sync, publisher.Guaranteed)
-		if ok {
-			publishedEvents.Add("total", numEvents)
-			publishedEvents.Add(api.Name(), numEvents)
-			logp.Info("EventLog[%s] Successfully published %d events",
-				api.Name(), numEvents)
-		} else {
-			logp.Warn("EventLog[%s] Failed to publish %d events",
-				api.Name(), numEvents)
-			publishedEvents.Add("failures", 1)
+		if !ok {
+			// due to using Sync and Guaranteed the ok will only be false on shutdown.
+			// Do not update the internal state and return in this case
+			return
 		}
+
+		publishedEvents.Add("total", numEvents)
+		publishedEvents.Add(api.Name(), numEvents)
+		logp.Info("EventLog[%s] Successfully published %d events",
+			api.Name(), numEvents)
 
 		eb.checkpoint.Persist(api.Name(),
 			records[len(records)-1].RecordID,

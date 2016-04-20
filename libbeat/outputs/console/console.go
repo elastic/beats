@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -49,7 +50,7 @@ func (c *console) Close() error {
 }
 
 func (c *console) PublishEvent(
-	s outputs.Signaler,
+	s op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -63,7 +64,7 @@ func (c *console) PublishEvent(
 	}
 	if err != nil {
 		logp.Err("Fail to convert the event to JSON (%v): %#v", err, event)
-		outputs.SignalCompleted(s)
+		op.SigCompleted(s)
 		return err
 	}
 
@@ -74,12 +75,12 @@ func (c *console) PublishEvent(
 		goto fail
 	}
 
-	outputs.SignalCompleted(s)
+	op.SigCompleted(s)
 	return nil
 fail:
 	if opts.Guaranteed {
 		logp.Critical("Unable to publish events to console: %v", err)
 	}
-	outputs.SignalFailed(s, err)
+	op.SigFailed(s, err)
 	return err
 }

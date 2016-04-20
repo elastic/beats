@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
@@ -251,12 +252,12 @@ func testConnectionType(
 		output := makeOutputer()
 		t.Logf("new outputter: %v", output)
 
-		signal := outputs.NewSyncSignal()
+		signal := op.NewSignalChannel()
 		t.Log("publish event")
 		output.PublishEvent(signal, testOptions, testEvent())
 
 		t.Log("wait signal")
-		result.signal = signal.Wait()
+		result.signal = signal.Wait() == op.SignalCompleted
 	}()
 
 	// wait shutdown
@@ -329,9 +330,9 @@ func TestLogstashInvalidTLS(t *testing.T) {
 
 		output := newTestLumberjackOutput(t, "", config)
 
-		signal := outputs.NewSyncSignal()
+		signal := op.NewSignalChannel()
 		output.PublishEvent(signal, testOptions, testEvent())
-		result.signal = signal.Wait()
+		result.signal = signal.Wait() == op.SignalCompleted
 	}()
 
 	// wait shutdown
