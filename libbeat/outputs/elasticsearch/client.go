@@ -207,10 +207,15 @@ func getIndex(event common.MapStr, index string) string {
 
 	// Check for dynamic index
 	if _, ok := event["beat"]; ok {
-		beatMeta := event["beat"].(common.MapStr)
-		// Check if index is set dynamically
-		if dynamicIndex, ok := beatMeta["index"]; ok {
-			index = dynamicIndex.(string)
+		beatMeta, ok := event["beat"].(common.MapStr)
+		if ok {
+			// Check if index is set dynamically
+			if dynamicIndex, ok := beatMeta["index"]; ok {
+				dynamicIndexValue, ok := dynamicIndex.(string)
+				if ok {
+					index = dynamicIndexValue
+				}
+			}
 		}
 	}
 
