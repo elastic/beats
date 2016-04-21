@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.2.1...1.2[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.2.2...1.2[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v1.2.1...1.2[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410]
 
 *Packetbeat*
 
@@ -62,6 +61,21 @@ https://github.com/elastic/beats/compare/v1.2.1...1.2[Check the HEAD diff]
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.2.2]]
+=== Beats version 1.2.2
+https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix race when multiple outputs access the same event with Logstash output manipulating event. {issue}1410[1410]
+- Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH. {issue}1394[1394]
+
+*Filebeat*
+
+- Improvements in registrar dealing with file rotation. {issue}1281[1281]
+
 [[release-notes-1.2.1]]
 === Beats version 1.2.1
 https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
@@ -84,7 +98,6 @@ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
 - Fix issue with cpu.system_p being greater than 1 on Windows {pull}1128[1128]
 
 *Filebeat*
-- Improvements in registrar dealing with file rotation. {pull}1281[1281]
 
 ==== Added
 
