@@ -8,7 +8,8 @@ cd /build
 cp ${RUNID}.init /tmp/{{.beat_name}}.init
 
 # create script to reload systemd config
-echo "#!/bin/bash\nsystemctl daemon-reload 2> /dev/null || true" > /tmp/systemd-daemon-reload.sh
+echo "#!/bin/bash" > /tmp/systemd-daemon-reload.sh
+echo "systemctl daemon-reload 2> /dev/null || true" >> /tmp/systemd-daemon-reload.sh
 
 # add SNAPSHOT if it was requested
 VERSION="{{.version}}"
