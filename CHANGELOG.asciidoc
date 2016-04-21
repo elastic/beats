@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 
 - Add scripts for managing the dashboards of a single Beat {pull}1359[1359]
 - On DEB/RPM installations, the binary files are now found under `/usr/share/{{beat_name}}/bin`, not in `/usr/bin`. {pull}1385[1385]
+- The logs are written by default to self rotating files, instead of syslog. {pull}1371[1371]
 
 *Packetbeat*
 
@@ -60,11 +61,15 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Failover and load balancing support in redis output. {pull}1353[1353]
 - Multiple-worker per host support for redis output. {pull}1353[1353]
 - Added ability to escape `${x}` in config files to avoid environment variable expansion {pull}1389[1389]
+- Configuration options and CLI flags for setting the home, data and config paths. {pull}1373[1373]
+- Configuration options and CLI flags for setting the default logs path. {pull}1437[1437]
 
 *Packetbeat*
+
 - Add support for OpenBSD. {pull}1347[1347]
 
 *Topbeat*
+
 - Add support for OpenBSD. {pull}1403[1403]
 
 *Filebeat*
@@ -76,7 +81,6 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 
 *Affecting all Beats*
 
-* Configuration options and CLI flags for setting the home, data and config paths. {pull}1373[1373]
 
 *Packetbeat*
 

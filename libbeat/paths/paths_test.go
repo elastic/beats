@@ -60,6 +60,7 @@ func TestHomePath(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		t.Log("Executing test", test)
 		homePath = test.CLIHome
 		cfg := Path{Home: test.CfgHome}
 		assert.NoError(t, Paths.initPaths(&cfg))
@@ -126,12 +127,83 @@ func TestDataPath(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		t.Log("Executing test", test)
 		homePath = test.CLIHome
 		dataPath = test.CLIData
 		cfg := Path{Home: test.CfgHome, Data: test.CfgData}
 		assert.NoError(t, Paths.initPaths(&cfg))
 
 		assert.Equal(t, test.ResultData, Resolve(Data, test.Path))
+	}
+
+}
+
+func TestLogsPath(t *testing.T) {
+	type io struct {
+		CLIHome    *string // cli flag home setting
+		CfgHome    string  // config file home setting
+		CLILogs    *string // cli flag for data setting
+		CfgLogs    string  // config file data setting
+		Path       string  // requested path
+		ResultLogs string  // expected logs path
+	}
+
+	binDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	assert.NoError(t, err)
+	tmp := "/tmp/"
+	root := "/root/"
+
+	tests := []io{
+		{
+			CLIHome:    nil,
+			CfgHome:    "",
+			CLILogs:    nil,
+			CfgLogs:    "",
+			Path:       "",
+			ResultLogs: filepath.Join(binDir, "logs"),
+		},
+		{
+			CLIHome:    nil,
+			CfgHome:    "",
+			CLILogs:    nil,
+			CfgLogs:    "",
+			Path:       "test",
+			ResultLogs: filepath.Join(binDir, "logs", "test"),
+		},
+		{
+			CLIHome:    nil,
+			CfgHome:    "/tmp/",
+			CLILogs:    nil,
+			CfgLogs:    "/root/logs",
+			Path:       "",
+			ResultLogs: "/root/logs",
+		},
+		{
+			CLIHome:    &tmp,
+			CfgHome:    "",
+			CLILogs:    nil,
+			CfgLogs:    "/root/logs",
+			Path:       "",
+			ResultLogs: "/root/logs",
+		},
+		{
+			CLIHome:    &tmp,
+			CfgHome:    "",
+			CLILogs:    &root,
+			CfgLogs:    "/root/logs",
+			Path:       "",
+			ResultLogs: "/root",
+		},
+	}
+
+	for _, test := range tests {
+		t.Log("Executing test", test)
+		homePath = test.CLIHome
+		logsPath = test.CLILogs
+		cfg := Path{Home: test.CfgHome, Logs: test.CfgLogs}
+		assert.NoError(t, Paths.initPaths(&cfg))
+
+		assert.Equal(t, test.ResultLogs, Resolve(Logs, test.Path))
 	}
 
 }
