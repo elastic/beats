@@ -32,11 +32,12 @@ fpm --force -s dir -t deb \
         --after-install /tmp/systemd-daemon-reload.sh \
         --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml \
         homedirs/{{.beat_name}}=/usr/share/ \
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
         {{.beat_name}}.template.json=/etc/{{.beat_name}}/{{.beat_name}}.template.json \
         ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
-		god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
+        god-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god
 
 # move and rename so that the filename respects semver rules
 mkdir -p upload/{{.beat_name}}
