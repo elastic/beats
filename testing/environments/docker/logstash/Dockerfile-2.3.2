@@ -1,9 +1,8 @@
 FROM java:8-jre
 
-ENV LS_VERSION 5
+ENV LS_VERSION 2
 
-# As all snapshot builds have the same url, the image is cached. The date at then can be used to invalidate the image
-ENV DEB_URL https://download.elastic.co/logstash/logstash/packages/debian/logstash_5.0.0~alpha1-1_all.deb
+ENV DEB_URL https://download.elastic.co/logstash/logstash/logstash-2.3.2.snapshot1_all.deb?c=20160421
 
 ENV PATH $PATH:/opt/logstash/bin:/opt/logstash/vendor/jruby/bin
 
@@ -17,7 +16,7 @@ RUN set -x && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN logstash-plugin install logstash-input-beats
+RUN plugin install logstash-input-beats
 
 COPY logstash.conf.2.tmpl /logstash.conf.2.tmpl
 COPY docker-entrypoint.sh /entrypoint.sh
@@ -26,6 +25,6 @@ COPY pki /etc/pki
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD logstash -f /logstash.conf
+CMD logstash agent -f /logstash.conf
 
 
