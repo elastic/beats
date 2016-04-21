@@ -13,8 +13,13 @@
 [[configuration-path]]
 === Path
 
-The `path` section contains configuration options that define where the Beat
-is looking for certain types of files.
+The `path` section contains configuration options that define where the Beat is
+looking for its files. For example, all Beats look for the Elasticsearch
+template file in the configuration path, Filebeat and Winlogbeat look for their
+registry files in the data path and all Beats write their log files in the logs
+path.
+
+Please see the <<directory-layout>> section for more details.
 
 Here is an example configuration:
 
@@ -28,7 +33,6 @@ path:
 ------------------------------------------------------------------------------
 
 Note that it is possible to override these options via command line flags.
-Please see the <<directory-layout>> section for more details.
 
 ==== Path Options
 
@@ -67,7 +71,7 @@ path:
 ===== data
 
 The data path for a {beatname_uc} installation is the default base path for all
-the files in which {beatname_uc} needs to store its files. If not set via a CLI
+the files in which {beatname_uc} needs to store its data. If not set via a CLI
 flag or via the configuration file, the default for the data path is a `data`
 subdirectory inside the home path.
 
@@ -82,10 +86,9 @@ path:
 
 ===== logs
 
-The data path for a {beatname_uc} installation is the default base path for all
-the files in which {beatname_uc} needs to store its files. If not set via a CLI
-flag or via the configuration file, the default for the logs path is a `logs`
-subdirectory inside the home path.
+The logs path for a {beatname_uc} installation is the default location for its
+log files. If not set via a CLI flag or via the configuration file, the default
+for the logs path is a `logs` subdirectory inside the home path.
 
 Example:
 
