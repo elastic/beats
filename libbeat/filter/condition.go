@@ -217,25 +217,25 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 			}
 
 		case uint, uint8, uint16, uint32, uint64:
-			float_value := reflect.ValueOf(value).Uint()
+			uint_value := reflect.ValueOf(value).Uint()
 
 			if rangeValue.Gte != nil {
-				if float_value < uint64(*rangeValue.Gte) {
+				if uint_value < uint64(*rangeValue.Gte) {
 					return false
 				}
 			}
 			if rangeValue.Gt != nil {
-				if float_value <= uint64(*rangeValue.Gt) {
+				if uint_value <= uint64(*rangeValue.Gt) {
 					return false
 				}
 			}
 			if rangeValue.Lte != nil {
-				if float_value > uint64(*rangeValue.Lte) {
+				if uint_value > uint64(*rangeValue.Lte) {
 					return false
 				}
 			}
 			if rangeValue.Lt != nil {
-				if float_value >= uint64(*rangeValue.Lt) {
+				if uint_value >= uint64(*rangeValue.Lt) {
 					return false
 				}
 			}
