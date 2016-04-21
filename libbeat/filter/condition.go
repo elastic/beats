@@ -2,6 +2,7 @@ package filter
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -191,31 +192,56 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 		}
 
 		switch value.(type) {
-		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-			int_value := value.(int)
+		case int, int8, int16, int32, int64:
+			int_value := reflect.ValueOf(value).Int()
 
 			if rangeValue.Gte != nil {
-				if int_value < int(*rangeValue.Gte) {
+				if int_value < int64(*rangeValue.Gte) {
 					return false
 				}
 			}
 			if rangeValue.Gt != nil {
-				if int_value <= int(*rangeValue.Gt) {
+				if int_value <= int64(*rangeValue.Gt) {
 					return false
 				}
 			}
 			if rangeValue.Lte != nil {
-				if int_value > int(*rangeValue.Lte) {
+				if int_value > int64(*rangeValue.Lte) {
 					return false
 				}
 			}
 			if rangeValue.Lt != nil {
-				if int_value >= int(*rangeValue.Lt) {
+				if int_value >= int64(*rangeValue.Lt) {
 					return false
 				}
 			}
+
+		case uint, uint8, uint16, uint32, uint64:
+			float_value := reflect.ValueOf(value).Uint()
+
+			if rangeValue.Gte != nil {
+				if float_value < uint64(*rangeValue.Gte) {
+					return false
+				}
+			}
+			if rangeValue.Gt != nil {
+				if float_value <= uint64(*rangeValue.Gt) {
+					return false
+				}
+			}
+			if rangeValue.Lte != nil {
+				if float_value > uint64(*rangeValue.Lte) {
+					return false
+				}
+			}
+			if rangeValue.Lt != nil {
+				if float_value >= uint64(*rangeValue.Lt) {
+					return false
+				}
+			}
+
 		case float64, float32:
-			float_value := value.(float64)
+			float_value := reflect.ValueOf(value).Float()
 
 			if rangeValue.Gte != nil {
 				if float_value < *rangeValue.Gte {
