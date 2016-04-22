@@ -15,6 +15,7 @@ package harvester
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"sync"
 
@@ -28,6 +29,7 @@ type Harvester struct {
 	Config             *config.HarvesterConfig
 	offset             int64
 	offsetLock         sync.Mutex
+	fileInfo           os.FileInfo
 	Stat               *FileStat
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory

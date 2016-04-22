@@ -7,54 +7,10 @@ import (
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/text/transform"
 )
-
-const (
-	defaultMaxBytes = 10 * (1 << 20) // 10MB
-)
-
-func createLineReader(
-	in FileSource,
-	codec encoding.Encoding,
-	bufferSize int,
-	maxBytes int,
-	readerConfig logFileReaderConfig,
-	jsonConfig *config.JSONConfig,
-	mlrConfig *config.MultilineConfig,
-) (processor.LineProcessor, error) {
-	var p processor.LineProcessor
-	var err error
-
-	fileReader, err := newLogFileReader(in, readerConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	p, err = processor.NewLineSource(fileReader, codec, bufferSize)
-	if err != nil {
-		return nil, err
-	}
-
-	if jsonConfig != nil {
-		p = processor.NewJSONProcessor(p, jsonConfig)
-	}
-
-	if mlrConfig != nil {
-		p, err = processor.NewMultiline(p, maxBytes, mlrConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		return processor.NewStripNewline(p), nil
-	}
-
-	p = processor.NewStripNewline(p)
-	return processor.NewLimitProcessor(p, maxBytes), nil
-}
 
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
@@ -82,7 +38,7 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
-	info, err := h.file.Stat()
+	h.fileInfo, err = h.file.Stat()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected file stat rror: %s", err)
 		return
@@ -132,27 +88,43 @@ func (h *Harvester) Harvest() {
 			return
 		}
 
-		if h.shouldExportLine(text) {
-			event := &input.FileEvent{
-				EventMetadata: h.Config.EventMetadata,
-				ReadTime:      ts,
-				Source:        h.Path,
-				InputType:     h.Config.InputType,
-				DocumentType:  h.Config.DocumentType,
-				Offset:        h.GetOffset(),
-				Bytes:         bytesRead,
-				Text:          &text,
-				Fileinfo:      &info,
-				JSONFields:    jsonFields,
-				JSONConfig:    h.Config.JSON,
-			}
+		// Update offset if complete line has been processed
+		h.SetOffset(h.GetOffset() + int64(bytesRead))
 
-			h.SpoolerChan <- event // ship the new event downstream
+		event := h.createEvent()
+
+		if h.shouldExportLine(text) {
+
+			event.ReadTime = ts
+			event.Bytes = bytesRead
+			event.Text = &text
+			event.JSONFields = jsonFields
 		}
 
-		// Set Offset
-		h.SetOffset(h.GetOffset() + int64(bytesRead)) // Update offset if complete line has been processed
+		// Always send event to update state, also if lines was skipped
+		h.sendEvent(event)
 	}
+}
+
+// createEvent creates and empty event.
+// By default the offset is set to 0, means no bytes read. This can be used to report the status
+// of a harvester
+func (h *Harvester) createEvent() *input.FileEvent {
+	return &input.FileEvent{
+		EventMetadata: h.Config.EventMetadata,
+		Source:        h.Path,
+		InputType:     h.Config.InputType,
+		DocumentType:  h.Config.DocumentType,
+		Offset:        h.GetOffset(),
+		Bytes:         0,
+		Fileinfo:      &h.fileInfo,
+		JSONConfig:    h.Config.JSON,
+	}
+}
+
+// sendEvent sends event to the spooler channel
+func (h *Harvester) sendEvent(event *input.FileEvent) {
+	h.SpoolerChan <- event // ship the new event downstream
 }
 
 // shouldExportLine decides if the line is exported or not based on
