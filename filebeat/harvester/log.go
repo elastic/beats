@@ -22,6 +22,7 @@ func createLineReader(
 	codec encoding.Encoding,
 	bufferSize int,
 	maxBytes int,
+	chunkSize int,
 	readerConfig logFileReaderConfig,
 	jsonConfig *config.JSONConfig,
 	mlrConfig *config.MultilineConfig,
@@ -34,7 +35,11 @@ func createLineReader(
 		return nil, err
 	}
 
-	p, err = processor.NewLineSource(fileReader, codec, bufferSize)
+	if chunkSize <= 0 {
+		p, err = processor.NewLineSource(fileReader, codec, bufferSize)
+	} else {
+		p, err = processor.NewChunkSource(fileReader, codec, chunkSize, bufferSize)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +108,7 @@ func (h *Harvester) Harvest() {
 	}
 
 	reader, err := createLineReader(
-		h.file, enc, config.BufferSize, config.MaxBytes, readerConfig,
+		h.file, enc, config.BufferSize, config.MaxBytes, config.ChunkSize, readerConfig,
 		config.JSON, config.Multiline)
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)

@@ -39,6 +39,12 @@ type LineSource struct {
 	reader *encoding.LineReader
 }
 
+// LineSource produces lines by reading lines from an io.Reader
+// through a decoder converting the reader it's encoding to utf-8.
+type ChunkSource struct {
+	reader *encoding.ChunkReader
+}
+
 // StripNewline processor removes the last trailing newline characters from
 // read lines.
 type StripNewline struct {
@@ -70,6 +76,23 @@ func NewLineSource(
 
 // Next reads the next line from it's initial io.Reader
 func (p LineSource) Next() (Line, error) {
+	c, sz, err := p.reader.Next()
+	return Line{Ts: time.Now(), Content: c, Bytes: sz}, err
+}
+
+func NewChunkSource(
+	in io.Reader,
+	codec encoding.Encoding,
+	chunkSize int,
+	bufferSize int,
+) (ChunkSource, error) {
+	r, err := encoding.NewChunkReader(in, codec, chunkSize, bufferSize)
+	return ChunkSource{r}, err
+}
+
+// NewChunkSource creates a new ChunkSource from input reader by applying
+// the given codec
+func (p ChunkSource) Next() (Line, error) {
 	c, sz, err := p.reader.Next()
 	return Line{Ts: time.Now(), Content: c, Bytes: sz}, err
 }

@@ -171,3 +171,105 @@ func (l *LineReader) decode(end int) (int, error) {
 	l.byteCount += start
 	return start, err
 }
+
+type ChunkReader struct {
+	rawInput   io.Reader
+	codec      encoding.Encoding
+	bufferSize int
+	chunkSize  int
+
+	buffer    *streambuf.Buffer
+	rawBuffer *streambuf.Buffer
+	byteCount int // number of bytes decoded from input buffer into output buffer
+	decoder   transform.Transformer
+}
+
+// chunkReader reads chunks given a defined byte size from underlying reader,
+// decoding the input stream using the configured codec.
+func NewChunkReader(
+	input io.Reader,
+	codec encoding.Encoding,
+	chunkSize int,
+	bufferSize int,
+) (*ChunkReader, error) {
+	l := &ChunkReader{}
+
+	if err := l.init(input, codec, chunkSize, bufferSize); err != nil {
+		return nil, err
+	}
+	return l, nil
+}
+
+func (l *ChunkReader) init(
+	input io.Reader,
+	codec encoding.Encoding,
+	chunkSize int,
+	bufferSize int,
+) error {
+	l.rawInput = input
+	l.codec = codec
+	l.chunkSize = chunkSize
+	l.bufferSize = bufferSize
+
+	l.decoder = l.codec.NewDecoder()
+	l.buffer = streambuf.New(nil)
+	l.rawBuffer = streambuf.New(nil)
+	return nil
+}
+
+func (l *ChunkReader) Next() ([]byte, int, error) {
+	for l.rawBuffer.Len() < l.chunkSize {
+		n := 0
+		buf := make([]byte, l.bufferSize)
+		n, err := l.rawInput.Read(buf)
+		l.rawBuffer.Append(buf[:n])
+		if n == 0 {
+			if err != nil {
+				return nil, 0, err
+			}
+			return nil, 0, streambuf.ErrNoMoreBytes
+		}
+	}
+
+	// output chunk from the rawBuffer and reset the buffer
+	bytes, err := l.rawBuffer.Collect(l.chunkSize)
+	l.rawBuffer.Reset()
+	if err != nil {
+		// This should never happen as otherwise we have a broken state
+		panic(err)
+	}
+	// Decode data using provided codec
+	decodedBytes, _ := l.decode(bytes)
+	return decodedBytes, l.chunkSize, nil
+}
+
+// Decode data using given codec
+func (l *ChunkReader) decode(input []byte) ([]byte, error) {
+	var err error
+	buffer := make([]byte, 1024)
+	decoded := 0
+
+	for decoded < l.chunkSize {
+		var nDst, nSrc int
+
+		nDst, nSrc, err = l.decoder.Transform(buffer, input[decoded:], false)
+		decoded += nSrc
+
+		l.buffer.Write(buffer[:nDst])
+
+		if err != nil {
+			if err == transform.ErrShortDst { // continue transforming
+				continue
+			}
+			if err == transform.ErrShortSrc {
+				err = nil
+				break
+			}
+			break
+		}
+	}
+	resdata := l.buffer.Bytes()
+	l.buffer.Collect(l.buffer.Len())
+	l.buffer.Reset()
+	return resdata, err
+}
