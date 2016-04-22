@@ -16,6 +16,7 @@ configuration settings, you need to restart {beatname_uc} to pick up the changes
 * <<file-output>>
 * <<console-output>>
 * <<configuration-shipper>>
+* <<configuration-path>>
 * <<configuration-logging>>
 * <<configuration-run-options>>
 

@@ -68,9 +68,8 @@ the debug log level).
 
 ===== files.path
 
-The directory that log files are written to. For Windows
-systems the default path is `C:\ProgramData\<beat-name>\Logs`. The default for
-non-Windows systems is `/var/log/<beat-name>`.
+The directory that log files are written to. The default is the logs path, see the
+<<directory-layout>> section for details.
 
 ===== files.name
 
