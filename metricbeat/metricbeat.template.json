@@ -206,6 +206,27 @@
         },
         "rtt": {
           "type": "long"
+        },
+        "system-memory": {
+          "properties": {
+            "mem": {
+              "properties": {
+                "actual_used_p": {
+                  "type": "float"
+                },
+                "used_p": {
+                  "type": "float"
+                }
+              }
+            },
+            "swap": {
+              "properties": {
+                "used_p": {
+                  "type": "float"
+                }
+              }
+            }
+          }
         }
       }
     }
