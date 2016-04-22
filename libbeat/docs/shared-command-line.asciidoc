@@ -40,16 +40,17 @@ Write memory profile data to the specified output file. This option is useful fo
 troubleshooting the Beat.
 
 *`-path.config`*::
-Set the default location for configuration (e.g. the Elasticsearch template).
+Set the default location for configuration (e.g. the Elasticsearch template). See the <<directory-layout>> section for
+details.
 
 *`-path.data`*::
-Set the default location for data files.
+Set the default location for data files. See the <<directory-layout>> section for details.
 
 *`-path.home`*::
-Set the default location for miscellaneous files.
+Set the default location for miscellaneous files. See the <<directory-layout>> section for details.
 
 *`-path.logs`*::
-Set the default location for log files.
+Set the default location for log files. See the <<directory-layout>> section for details.
 
 *`-v`*::
 Enable verbose output to show INFO-level messages.
