@@ -111,6 +111,7 @@ func (c *Condition) CheckEquals(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
+			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -136,6 +137,7 @@ func (c *Condition) CheckContains(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
+			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -159,6 +161,7 @@ func (c *Condition) CheckRegexp(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
+			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -184,6 +187,7 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
+			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
