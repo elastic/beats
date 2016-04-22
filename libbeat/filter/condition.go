@@ -111,7 +111,7 @@ func (c *Condition) CheckEquals(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Err("unavailable field %s: %v", field, err)
+			logp.Warn("unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -121,7 +121,7 @@ func (c *Condition) CheckEquals(event common.MapStr) bool {
 		case string:
 			return value == equalValue.Str
 		default:
-			logp.Err("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
+			logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
 			return false
 		}
 
@@ -137,7 +137,7 @@ func (c *Condition) CheckContains(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Err("unavailable field %s: %v", field, err)
+			logp.Warn("unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -145,7 +145,7 @@ func (c *Condition) CheckContains(event common.MapStr) bool {
 		case string:
 			return strings.Contains(value.(string), equalValue)
 		default:
-			logp.Err("unexpected type %T in contains condition as it accepts only strings. ", value)
+			logp.Warn("unexpected type %T in contains condition as it accepts only strings. ", value)
 			return false
 		}
 
@@ -161,7 +161,7 @@ func (c *Condition) CheckRegexp(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Err("unavailable field %s: %v", field, err)
+			logp.Warn("unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -171,7 +171,7 @@ func (c *Condition) CheckRegexp(event common.MapStr) bool {
 				return false
 			}
 		default:
-			logp.Err("unexpected type %T in regexp condition as it accepts only strings. ", value)
+			logp.Warn("unexpected type %T in regexp condition as it accepts only strings. ", value)
 			return false
 		}
 
@@ -187,7 +187,7 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Err("unavailable field %s: %v", field, err)
+			logp.Warn("unavailable field %s: %v", field, err)
 			return false
 		}
 
@@ -265,7 +265,7 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 			}
 
 		default:
-			logp.Err("unexpected type %T in range condition as it accepts only strings. ", value)
+			logp.Warn("unexpected type %T in range condition as it accepts only strings. ", value)
 			return false
 		}
 
