@@ -20,8 +20,6 @@ include::./installing-beats.asciidoc[]
 
 include::./repositories.asciidoc[]
 
-include::./command-line.asciidoc[]
-
 include::./visualizing-data.asciidoc[]
 
 include::./dashboards.asciidoc[]
