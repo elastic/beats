@@ -21,6 +21,7 @@ env:
     - TARGETS="-C packetbeat testsuite"
     - TARGETS="-C metricbeat testsuite"
     - TARGETS="-C libbeat crosscompile"
+    - TARGETS="-C metricbeat crosscompile"
     - TARGETS="-C winlogbeat crosscompile"
   global:
     # Cross-compile for amd64 only to speed up testing.
@@ -35,6 +36,8 @@ matrix:
       env: TARGETS="-C filebeat crosscompile"
     - os: osx
       env: TARGETS="-C libbeat crosscompile"
+    - os: osx
+      env: TARGETS="-C metricbeat crosscompile"
     - os: osx
       env: TARGETS="-C winlogbeat crosscompile"
     - os: osx

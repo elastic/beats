@@ -1,3 +1,5 @@
+// +build darwin linux openbsd windows
+
 package cpu
 
 import (
