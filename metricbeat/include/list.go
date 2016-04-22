@@ -15,4 +15,9 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
+
+	// System module and metricsets
+	_ "github.com/elastic/beats/metricbeat/module/system"
+	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
+	_ "github.com/elastic/beats/metricbeat/module/system/memory"
 )

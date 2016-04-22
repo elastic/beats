@@ -13,6 +13,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-redis>>
 * <<exported-fields-mysql>>
+* <<exported-fields-system>>
 
 [[exported-fields-common]]
 === Common Fields
@@ -44,6 +45,16 @@ required: True
 The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
 
 
+==== module
+
+The name of the module that generated the event.
+
+
+==== metricset
+
+The name of the metricset that generated the event.
+
+
 ==== metricset-host
 
 Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
@@ -56,6 +67,15 @@ type: long
 required: True
 
 Event round trip time in microseconds
+
+
+==== type
+
+example: metricsets
+
+required: True
+
+The document type. Always set to "metricsets".
 
 
 [[exported-fields-apache]]
@@ -484,5 +504,107 @@ The number of bytes received from all clients.
 type: integer
 
 The number of bytes sent to all clients.
+
+
+[[exported-fields-system]]
+=== System Status Fields
+
+System status metrics, like CPU and memory usage, that are collected from the operating system.
+
+
+
+=== system-memory Fields
+
+`system-memory` contains local memory stats.
+
+
+
+[float]
+=== mem Fields
+
+This group contains statistics related to the memory usage on the system.
+
+
+==== system-memory.mem.total
+
+type: int
+
+Total memory.
+
+
+==== system-memory.mem.used
+
+type: int
+
+Used memory.
+
+
+==== system-memory.mem.free
+
+type: int
+
+Available memory.
+
+
+==== system-memory.mem.used_p
+
+type: float
+
+The percentage of used memory.
+
+
+==== system-memory.mem.actual_used
+
+type: int
+
+Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
+
+
+==== system-memory.mem.actual_free
+
+type: int
+
+Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
+
+
+==== system-memory.mem.actual_used_p
+
+type: float
+
+The percentage of actual used memory.
+
+
+[float]
+=== swap Fields
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+==== system-memory.swap.total
+
+type: int
+
+Total swap memory.
+
+
+==== system-memory.swap.used
+
+type: int
+
+Used swap memory.
+
+
+==== system-memory.swap.free
+
+type: int
+
+Available swap memory.
+
+
+==== system-memory.swap.used_p
+
+type: float
+
+The percentage of used swap memory.
 
 
