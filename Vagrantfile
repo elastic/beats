@@ -95,9 +95,9 @@ Vagrant.configure(2) do |config|
     freebsd.vm.provision "shell", inline: $unixProvision, privileged: false
   end
 
-  # OpenBSD 5.9
+  # OpenBSD 5.9-current
   config.vm.define "openbsd", primary: true do |openbsd|
-    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-virtualbox-2016-04-14_0019.box"
+    openbsd.vm.box = "https://s3.amazonaws.com/beats-files/vagrant/beats-openbsd-5.9-current-virtualbox-2016-04-22_0422.box"
     openbsd.vm.network :forwarded_port, guest: 22,   host: 2225,  id: "ssh", auto_correct: true
 
     config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: true
