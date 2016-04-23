@@ -9,6 +9,7 @@
 //// include::../../libbeat/docs/yaml.asciidoc[]
 //////////////////////////////////////////////////////////////////////////
 
+[[yaml-tips]]
 == YAML Tips and Gotchas
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax. When you edit the
