@@ -24,4 +24,5 @@ func TestXdrDecoding(t *testing.T) {
 	assert.Equal(t, uint64(2), uint64(xdr.getUHyper()))
 	assert.Equal(t, uint32(4), uint32(xdr.getUInt()))
 	assert.Equal(t, "test string", xdr.getString())
+	assert.Equal(t, len(test_msg), xdr.size())
 }
