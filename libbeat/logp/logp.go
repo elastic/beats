@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"runtime"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 // cmd line flags
@@ -57,29 +58,19 @@ func Init(name string, config *Logging) error {
 		logLevel = LOG_DEBUG
 	}
 
-	var defaultToFiles, defaultToSyslog bool
-	var defaultFilePath string
-	if runtime.GOOS == "windows" {
-		// always disabled on windows
-		defaultToSyslog = false
-		defaultToFiles = true
-		defaultFilePath = fmt.Sprintf("C:\\ProgramData\\%s\\Logs", name)
-	} else {
-		defaultToSyslog = true
-		defaultToFiles = false
-		defaultFilePath = fmt.Sprintf("/var/log/%s", name)
-	}
+	// default log location is in the logs path
+	defaultFilePath := paths.Resolve(paths.Logs, "")
 
 	var toSyslog, toFiles bool
 	if config.ToSyslog != nil {
 		toSyslog = *config.ToSyslog
 	} else {
-		toSyslog = defaultToSyslog
+		toSyslog = false
 	}
 	if config.ToFiles != nil {
 		toFiles = *config.ToFiles
 	} else {
-		toFiles = defaultToFiles
+		toFiles = true
 	}
 
 	// toStderr disables logging to syslog/files

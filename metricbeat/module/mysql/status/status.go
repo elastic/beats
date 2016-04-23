@@ -21,7 +21,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("mysql", "status", New)
+	if err := helper.Registry.AddMetricSeter("mysql", "status", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter

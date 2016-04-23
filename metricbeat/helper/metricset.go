@@ -125,7 +125,10 @@ func (m *MetricSet) createEvent(event common.MapStr, host string, rtt time.Durat
 	// Each metricset has a unique eventfieldname to prevent type conflicts
 	eventFieldName := m.Module.name + "-" + m.Name
 
-	event = applySelector(event, m.Config.Selectors)
+	// Makes sure filters are set and applies them
+	if m.Module.filters != nil {
+		event = m.Module.filters.Filter(event)
+	}
 
 	event = common.MapStr{
 		"type":                  typeName,
@@ -155,27 +158,6 @@ func (m *MetricSet) createEvent(event common.MapStr, host string, rtt time.Durat
 	}
 
 	return event
-}
-
-func applySelector(event common.MapStr, selectors []string) common.MapStr {
-
-	// No selectors set means return full events
-	if len(selectors) == 0 {
-		return event
-	}
-
-	newEvent := common.MapStr{}
-	logp.Debug("metricset", "Applying selectors: %v", selectors)
-
-	for _, selector := range selectors {
-
-		if value, ok := event[selector]; ok {
-			newEvent[selector] = value
-		}
-
-	}
-
-	return newEvent
 }
 
 // incrementFetcher increments the number of open fetcher

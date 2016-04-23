@@ -9,7 +9,9 @@ import (
 )
 
 func init() {
-	helper.Registry.AddModuler("redis", New)
+	if err := helper.Registry.AddModuler("redis", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of Moduler

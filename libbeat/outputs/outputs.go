@@ -2,6 +2,7 @@ package outputs
 
 import (
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -11,7 +12,7 @@ type Options struct {
 
 type Outputer interface {
 	// Publish event
-	PublishEvent(trans Signaler, opts Options, event common.MapStr) error
+	PublishEvent(sig op.Signaler, opts Options, event common.MapStr) error
 
 	Close() error
 }
@@ -28,7 +29,7 @@ type TopologyOutputer interface {
 // Outputers still might loop on events or use more efficient bulk-apis if present.
 type BulkOutputer interface {
 	Outputer
-	BulkPublish(trans Signaler, opts Options, event []common.MapStr) error
+	BulkPublish(sig op.Signaler, opts Options, event []common.MapStr) error
 }
 
 // Create and initialize the output plugin
@@ -100,11 +101,11 @@ func CastBulkOutputer(out Outputer) BulkOutputer {
 }
 
 func (b *bulkOutputAdapter) BulkPublish(
-	signal Signaler,
+	signal op.Signaler,
 	opts Options,
 	events []common.MapStr,
 ) error {
-	signal = NewSplitSignaler(signal, len(events))
+	signal = op.SplitSignaler(signal, len(events))
 	for _, evt := range events {
 		err := b.PublishEvent(signal, opts, evt)
 		if err != nil {

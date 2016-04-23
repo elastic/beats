@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/common/op"
 )
 
 type bulkWorker struct {
 	output worker
-	ws     *common.WorkerSignal
+	ws     *workerSignal
 
 	queue       chan message
 	bulkQueue   chan message
@@ -17,12 +17,12 @@ type bulkWorker struct {
 	flushTicker *time.Ticker
 
 	maxBatchSize int
-	events       []common.MapStr    // batched events
-	pending      []outputs.Signaler // pending signalers for batched events
+	events       []common.MapStr // batched events
+	pending      []op.Signaler   // pending signalers for batched events
 }
 
 func newBulkWorker(
-	ws *common.WorkerSignal, hwm int, bulkHWM int,
+	ws *workerSignal, hwm int, bulkHWM int,
 	output worker,
 	flushInterval time.Duration,
 	maxBatchSize int,
@@ -38,19 +38,13 @@ func newBulkWorker(
 		pending:      nil,
 	}
 
-	b.ws.WorkerStart()
+	b.ws.wg.Add(1)
 	go b.run()
 	return b
 }
 
 func (b *bulkWorker) send(m message) {
-	if m.events == nil {
-		b.ws.AddEvent(1)
-		b.queue <- m
-	} else {
-		b.ws.AddEvent(len(m.events))
-		b.bulkQueue <- m
-	}
+	send(b.queue, b.bulkQueue, m)
 }
 
 func (b *bulkWorker) run() {
@@ -58,7 +52,7 @@ func (b *bulkWorker) run() {
 
 	for {
 		select {
-		case <-b.ws.Done:
+		case <-b.ws.done:
 			return
 		case m := <-b.queue:
 			b.onEvent(&m.context, m.event)
@@ -105,7 +99,7 @@ func (b *bulkWorker) onEvents(ctx *Context, events []common.MapStr) {
 			if signal != nil {
 				// creating cascading signaler chain for
 				// subset of events being send
-				signal = outputs.NewSplitSignaler(signal, 2)
+				signal = op.SplitSignaler(signal, 2)
 			}
 		}
 
@@ -123,17 +117,15 @@ func (b *bulkWorker) onEvents(ctx *Context, events []common.MapStr) {
 }
 
 func (b *bulkWorker) publish() {
-	// TODO: remember/merge and forward context options to output worker
 	b.output.send(message{
 		context: Context{
 			publishOptions: publishOptions{Guaranteed: b.guaranteed},
-			Signal:         outputs.NewCompositeSignaler(b.pending...),
+			Signal:         op.CombineSignalers(b.pending...),
 		},
 		event:  nil,
 		events: b.events,
 	})
 
-	b.ws.AddEvent(-len(b.events))
 	b.pending = nil
 	b.guaranteed = false
 	b.events = make([]common.MapStr, 0, b.maxBatchSize)
@@ -141,7 +133,7 @@ func (b *bulkWorker) publish() {
 
 func (b *bulkWorker) shutdown() {
 	b.flushTicker.Stop()
-	close(b.queue)
-	close(b.bulkQueue)
-	b.ws.WorkerFinished()
+	stopQueue(b.queue)
+	stopQueue(b.bulkQueue)
+	b.ws.wg.Done()
 }

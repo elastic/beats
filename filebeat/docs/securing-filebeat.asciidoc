@@ -1,0 +1,7 @@
+[[securing-filebeat]]
+== Securing Filebeat
+
+The following topics describe how to secure communication between Filebeat and other products in the Elastic stack:
+
+* <<securing-communication-elasticsearch>>
+* <<configuring-tls-logstash>>

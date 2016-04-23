@@ -7,61 +7,17 @@ import (
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
 	"golang.org/x/text/transform"
 )
-
-const (
-	defaultMaxBytes = 10 * (1 << 20) // 10MB
-)
-
-func createLineReader(
-	in FileSource,
-	codec encoding.Encoding,
-	bufferSize int,
-	maxBytes int,
-	readerConfig logFileReaderConfig,
-	jsonConfig *config.JSONConfig,
-	mlrConfig *config.MultilineConfig,
-) (processor.LineProcessor, error) {
-	var p processor.LineProcessor
-	var err error
-
-	fileReader, err := newLogFileReader(in, readerConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	p, err = processor.NewLineSource(fileReader, codec, bufferSize)
-	if err != nil {
-		return nil, err
-	}
-
-	if jsonConfig != nil {
-		p = processor.NewJSONProcessor(p, jsonConfig)
-	}
-
-	if mlrConfig != nil {
-		p, err = processor.NewMultiline(p, maxBytes, mlrConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		return processor.NewStripNewline(p), nil
-	}
-
-	p = processor.NewStripNewline(p)
-	return processor.NewLimitProcessor(p, maxBytes), nil
-}
 
 // Log harvester reads files line by line and sends events to the defined output
 func (h *Harvester) Harvest() {
 	defer func() {
 		// On completion, push offset so we can continue where we left off if we relaunch on the same file
 		if h.Stat != nil {
-			h.Stat.Return <- h.Offset
+			h.Stat.Return <- h.GetOffset()
 		}
 
 		logp.Debug("harvester", "Stopping harvester for file: %s", h.Path)
@@ -82,7 +38,7 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
-	info, err := h.file.Stat()
+	h.fileInfo, err = h.file.Stat()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected file stat rror: %s", err)
 		return
@@ -123,8 +79,8 @@ func (h *Harvester) Harvest() {
 
 				logp.Info("File was truncated. Begin reading file from offset 0: %s", h.Path)
 
-				h.Offset = 0
-				seeker.Seek(h.Offset, os.SEEK_SET)
+				h.SetOffset(0)
+				seeker.Seek(h.GetOffset(), os.SEEK_SET)
 				continue
 			}
 
@@ -132,27 +88,43 @@ func (h *Harvester) Harvest() {
 			return
 		}
 
-		if h.shouldExportLine(text) {
-			event := &input.FileEvent{
-				EventMetadata: h.Config.EventMetadata,
-				ReadTime:      ts,
-				Source:        &h.Path,
-				InputType:     h.Config.InputType,
-				DocumentType:  h.Config.DocumentType,
-				Offset:        h.Offset,
-				Bytes:         bytesRead,
-				Text:          &text,
-				Fileinfo:      &info,
-				JSONFields:    jsonFields,
-				JSONConfig:    h.Config.JSON,
-			}
+		// Update offset if complete line has been processed
+		h.SetOffset(h.GetOffset() + int64(bytesRead))
 
-			h.SpoolerChan <- event // ship the new event downstream
+		event := h.createEvent()
+
+		if h.shouldExportLine(text) {
+
+			event.ReadTime = ts
+			event.Bytes = bytesRead
+			event.Text = &text
+			event.JSONFields = jsonFields
 		}
 
-		// Set Offset
-		h.Offset += int64(bytesRead) // Update offset if complete line has been processed
+		// Always send event to update state, also if lines was skipped
+		h.sendEvent(event)
 	}
+}
+
+// createEvent creates and empty event.
+// By default the offset is set to 0, means no bytes read. This can be used to report the status
+// of a harvester
+func (h *Harvester) createEvent() *input.FileEvent {
+	return &input.FileEvent{
+		EventMetadata: h.Config.EventMetadata,
+		Source:        h.Path,
+		InputType:     h.Config.InputType,
+		DocumentType:  h.Config.DocumentType,
+		Offset:        h.GetOffset(),
+		Bytes:         0,
+		Fileinfo:      &h.fileInfo,
+		JSONConfig:    h.Config.JSON,
+	}
+}
+
+// sendEvent sends event to the spooler channel
+func (h *Harvester) sendEvent(event *input.FileEvent) {
+	h.SpoolerChan <- event // ship the new event downstream
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -237,25 +209,52 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 func (h *Harvester) initFileOffset(file *os.File) error {
 	offset, err := file.Seek(0, os.SEEK_CUR)
 
-	if h.Offset > 0 {
+	if h.GetOffset() > 0 {
 		// continue from last known offset
 
 		logp.Debug("harvester",
-			"harvest: %q position:%d (offset snapshot:%d)", h.Path, h.Offset, offset)
-		_, err = file.Seek(h.Offset, os.SEEK_SET)
+			"harvest: %q position:%d (offset snapshot:%d)", h.Path, h.GetOffset(), offset)
+		_, err = file.Seek(h.GetOffset(), os.SEEK_SET)
 	} else if h.Config.TailFiles {
 		// tail file if file is new and tail_files config is set
 
 		logp.Debug("harvester",
 			"harvest: (tailing) %q (offset snapshot:%d)", h.Path, offset)
-		h.Offset, err = file.Seek(0, os.SEEK_END)
+		offset, err = file.Seek(0, os.SEEK_END)
+		h.SetOffset(offset)
 
 	} else {
 		// get offset from file in case of encoding factory was
 		// required to read some data.
 		logp.Debug("harvester", "harvest: %q (offset snapshot:%d)", h.Path, offset)
-		h.Offset = offset
+		h.SetOffset(offset)
 	}
 
 	return err
+}
+
+// GetState returns current state of harvester
+func (h *Harvester) GetState() *input.FileState {
+
+	state := input.FileState{
+		Source:      h.Path,
+		Offset:      h.GetOffset(),
+		FileStateOS: input.GetOSFileState(&h.Stat.Fileinfo),
+	}
+
+	return &state
+}
+
+func (h *Harvester) SetOffset(offset int64) {
+	h.offsetLock.Lock()
+	defer h.offsetLock.Unlock()
+
+	h.offset = offset
+}
+
+func (h *Harvester) GetOffset() int64 {
+	h.offsetLock.Lock()
+	defer h.offsetLock.Unlock()
+
+	return h.offset
 }

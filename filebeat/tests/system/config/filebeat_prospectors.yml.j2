@@ -9,7 +9,7 @@ filebeat:
       encoding: {{prospector.encoding | default("plain") }}
   {% endfor %}
   idle_timeout: 0.5s
-  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default(".filebeat")}}
+  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
 
 output:
   file:

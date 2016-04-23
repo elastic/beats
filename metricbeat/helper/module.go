@@ -9,7 +9,9 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 )
 
 // Module specifics. This must be defined by each module
@@ -31,11 +33,11 @@ type Module struct {
 	metricSets map[string]*MetricSet
 
 	Publish chan common.MapStr
+	events  publisher.Client
 
-	// MetricSet waitgroup
-	wg sync.WaitGroup
-
-	done chan struct{}
+	wg      sync.WaitGroup // MetricSet waitgroup
+	done    chan struct{}
+	filters *filter.FilterList
 }
 
 // NewModule creates a new module
@@ -52,6 +54,12 @@ func NewModule(cfg *common.Config, moduler func() Moduler) (*Module, error) {
 		return nil, err
 	}
 
+	filters, err := filter.New(config.Filters)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing filters: %v", err)
+	}
+	logp.Debug("module", "Filters: %+v", filters)
+
 	return &Module{
 		name:       config.Module,
 		Config:     config,
@@ -61,6 +69,7 @@ func NewModule(cfg *common.Config, moduler func() Moduler) (*Module, error) {
 		Publish:    make(chan common.MapStr), // TODO: What should be size of channel? @ruflin,20160316
 		wg:         sync.WaitGroup{},
 		done:       make(chan struct{}),
+		filters:    filters,
 	}, nil
 }
 
@@ -120,6 +129,7 @@ func (m *Module) Start(b *beat.Beat) error {
 
 	m.setupMetricSets()
 
+	m.events = b.Publisher.Connect()
 	go m.Run(period, b)
 
 	return nil
@@ -234,7 +244,7 @@ func (m *Module) publishing(b *beat.Beat) {
 		case event := <-m.Publish:
 			// TODO transform to publish events - @ruflin,20160314
 			// Will this merge multiple events together to use bulk sending?
-			b.Events.PublishEvent(event)
+			m.events.PublishEvent(event)
 		}
 	}
 }

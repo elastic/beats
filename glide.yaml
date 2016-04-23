@@ -42,7 +42,7 @@ import:
 - package: github.com/go-ole/go-ole
   version: v1.2.0
 - package: github.com/miekg/dns
-  version: 85b661b2a6fc95a5a83e66d7730c4bc0b6e9c99e
+  version: c9d1302d540edfb97d9ecbfe90b4fb515088630b
 - package: github.com/Shopify/sarama
   version: v1.8.0
 - package: github.com/klauspost/crc32

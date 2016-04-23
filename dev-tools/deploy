@@ -7,14 +7,19 @@ from subprocess import check_call
 def main():
     parser = argparse.ArgumentParser(
         description="Builds all the Beats artifacts")
-    parser.parse_args()
+    parser.add_argument("--no-snapshot", action="store_true",
+                        help="Don't append -SNAPSHOT to the version.")
+    args = parser.parse_args()
 
     dir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(dir + "/packer")
     check_call("make deps", shell=True)
     check_call("make clean", shell=True)
     check_call("make images", shell=True)
-    check_call("make", shell=True)
+    if args.no_snapshot:
+        check_call("make SNAPSHOT=no", shell=True)
+    else:
+        check_call("make SNAPSHOT=yes", shell=True)
 
 if __name__ == "__main__":
     main()

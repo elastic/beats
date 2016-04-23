@@ -143,7 +143,7 @@ system-tests: buildbeat.test prepare-tests python-env
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
 fast-system-tests: buildbeat.test python-env
-	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT)
+	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --processes=$(PROCESSES) --process-timeout=$(TIMEOUT) -a '!integration'
 
 # Run benchmark tests
 .PHONY: benchmark-tests
@@ -155,6 +155,7 @@ benchmark-tests:
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
 	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
 		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \
@@ -207,16 +208,15 @@ update:
 	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
 
 ### KIBANA FILES HANDLING ###
-
-KIBANA_ES?=http://localhost:9200/
-.PHONY: update
-kibana-export:
-	python ${ES_BEATS}/libbeat/scripts/kibana_export.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
+ES_URL?=http://localhost:9200/
 
 .PHONY: update
-kibana-import:
-	python ${ES_BEATS}/libbeat/scripts/kibana_import.py --url ${KIBANA_ES} --dir $(shell pwd)/etc/kibana
+export-dashboards:
+	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
+.PHONY: update
+import-dashboards:
+	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
 
 ### CONTAINER ENVIRONMENT ####
 
@@ -244,4 +244,18 @@ write-environment:
 	echo "ES_PORT=9200" >> ${BUILD_DIR}/test.env
 	echo "ES_USER=beats" >> ${BUILD_DIR}/test.env
 	echo "ES_PASS=testing" >> ${BUILD_DIR}/test.env
+
+
+### Packaging targets ####
+
+# Installs the files that need to get to the home path on installations
+HOME_PREFIX?=/tmp/${BEATNAME}
+.PHONY: install-home
+install-home:
+	mkdir -p ${HOME_PREFIX}
+	if [ -d "etc/kibana" ]; then \
+		cp -r etc/kibana ${HOME_PREFIX}/kibana; \
+		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
+		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
+	fi
 

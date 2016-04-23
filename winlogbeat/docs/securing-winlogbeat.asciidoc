@@ -1,0 +1,7 @@
+[[securing-winlogbeat]]
+== Securing Winlogbeat
+
+The following topics describe how to secure communication between Winlogbeat and other products in the Elastic stack:
+
+* <<securing-communication-elasticsearch>>
+* <<configuring-tls-logstash>>

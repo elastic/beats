@@ -21,8 +21,8 @@ const (
 // is sent after the flush timeout occurs.
 func TestBulkWorkerSendSingle(t *testing.T) {
 	enableLogging([]string{"*"})
-	ws := common.NewWorkerSignal()
-	defer ws.Stop()
+	ws := newWorkerSignal()
+	defer ws.stop()
 
 	mh := &testMessageHandler{
 		response: CompletedResponse,
@@ -41,34 +41,12 @@ func TestBulkWorkerSendSingle(t *testing.T) {
 	assert.Equal(t, m.event, msgs[0].events[0])
 }
 
-// Send a single event to a bulkWorker and verify that the event
-// is sent (flushed) after shutdown.
-func TestBulkWorkerShutdownSendSingle(t *testing.T) {
-	ws := common.NewWorkerSignal()
-	mh := &testMessageHandler{
-		response: CompletedResponse,
-		msgs:     make(chan message, queueSize),
-	}
-	bw := newBulkWorker(ws, queueSize, bulkQueueSize, mh, flushInterval, maxBatchSize)
-
-	s := newTestSignaler()
-	m := testMessage(s, testEvent())
-	bw.send(m)
-
-	ws.Stop()
-
-	close(mh.msgs)
-	assert.Equal(t, 1, len(mh.msgs))
-	assert.True(t, s.wait())
-	assert.Equal(t, m.event, (<-mh.msgs).events[0])
-}
-
 // Send a batch of events to the bulkWorker and verify that a single
 // message is distributed (not triggered by flush timeout).
 func TestBulkWorkerSendBatch(t *testing.T) {
 	// Setup
-	ws := common.NewWorkerSignal()
-	defer ws.Stop()
+	ws := newWorkerSignal()
+	defer ws.stop()
 
 	mh := &testMessageHandler{
 		response: CompletedResponse,
@@ -98,8 +76,8 @@ func TestBulkWorkerSendBatch(t *testing.T) {
 // that the events are split across two messages.
 func TestBulkWorkerSendBatchGreaterThanMaxBatchSize(t *testing.T) {
 	// Setup
-	ws := common.NewWorkerSignal()
-	defer ws.Stop()
+	ws := newWorkerSignal()
+	defer ws.stop()
 
 	mh := &testMessageHandler{
 		response: CompletedResponse,

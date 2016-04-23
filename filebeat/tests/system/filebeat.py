@@ -14,9 +14,9 @@ class BaseTest(TestCase):
         self.beat_name = "filebeat"
         super(BaseTest, self).setUpClass()
 
-    def get_dot_filebeat(self):
-        # Returns content of the .filebeat file
-        dotFilebeat = self.working_dir + '/.filebeat'
+    def get_registry(self):
+        # Returns content of the registry file
+        dotFilebeat = self.working_dir + '/registry'
         assert os.path.isfile(dotFilebeat) is True
 
         with open(dotFilebeat) as file:

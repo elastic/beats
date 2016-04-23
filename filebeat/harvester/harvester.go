@@ -15,7 +15,9 @@ package harvester
 
 import (
 	"fmt"
+	"os"
 	"regexp"
+	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -25,7 +27,9 @@ import (
 type Harvester struct {
 	Path               string /* the file path to harvest */
 	Config             *config.HarvesterConfig
-	Offset             int64
+	offset             int64
+	offsetLock         sync.Mutex
+	fileInfo           os.FileInfo
 	Stat               *FileStat
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
@@ -67,6 +71,5 @@ func NewHarvester(
 
 func (h *Harvester) Start() {
 	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-
 	go h.Harvest()
 }

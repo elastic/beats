@@ -1,32 +1,31 @@
-DATE:=$(shell date +%y%m%d%H%M%S)
-BUILDID?=$(DATE)
+BUILDID=$(shell git rev-parse HEAD)
+SNAPSHOT?=yes
 
 makefile_abspath:=$(abspath $(lastword $(MAKEFILE_LIST))/..)
 packer_absdir=$(shell dirname ${makefile_abspath})
 
 
 %/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/debian/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/centos/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin: %
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/darwin/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win: %
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/windows/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin: %
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/binary/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
 .PHONY: deps
 deps:
-	go get -u github.com/tsg/xgo
 	go get -u github.com/tsg/gotpl
 
 .PHONY: xgo-image
@@ -117,9 +116,3 @@ clean-images:
 clean:
 	rm -rf build/ || true
 	$(call rm-image,build-image)
-
-# Creates a latest file for the most recent build
-.PHONY: latest
-latest:
-	BUILDID=${BUILDID} \
-	$(packer_absdir)/xgo-scripts/latest.sh

@@ -1,65 +1,73 @@
 metricbeat:
   modules:
-    {% if redis %}
-    - module: redis
+    {% for m in modules -%}
+    - module: {{ m.name }}
+      {% if m.enabled is defined -%}
+      enabled: {{ m.enabled }}
+      {% endif -%}
+
+      {% if m.hosts -%}
       hosts:
-        - "{{ redis_host | default("127.0.0.1", true) }}:6379"
+        {% for host in m.hosts -%}
+        - '{{ host }}'
+        {% endfor %}
+      {% endif -%}
+
+      {% if m.metricsets -%}
       metricsets:
-        - info
-      period: 2s
-      enabled: true
-      selectors: {{ redis_selectors }}
-    {% endif %}
-    {% if mysql %}
-    - module: mysql:
-      # This expectd a full mysql dsn
-      # Example: [username[:password]@][protocol[(address)]]/
-      hosts:
-        - "@tcp(127.0.0.1:3306)/"
-      metricsets:
-        - status
-      period: 5s
-      enabled: true
-    {% endif %}
+        {% for ms in m.metricsets -%}
+        - {{ ms }}
+        {% endfor %}
+      {% endif -%}
 
+      {% if m.period -%}
+      period: {{ m.period }}
+      {% endif -%}
 
-############################# Output ############################################
+      {% if m.timeout -%}
+      timeout: {{ m.timeout }}
+      {% endif -%}
 
-# Configure what outputs to use when sending the data collected by metricbeat.
-# You can enable one or multiple outputs by setting enabled option to true.
+      {% if m.filters is defined -%}
+      filters:
+        {% for f in m.filters -%}
+        {% for k, v in f.items() -%}
+        - {{ k }}.fields: [
+          {%- for field in v -%}
+          '{{ field }}' {%- if not loop.last %}, {% endif -%}
+          {%- endfor -%}
+        ]
+        {%- endfor %}
+        {%- endfor %}
+      {% endif -%}
+
+      {% if m.tags is defined -%}
+      tags:
+        {% for tag in m.tags -%}
+        - {{ tag }}
+        {% endfor %}
+      {% endif -%}
+
+      {% if m.fields is defined -%}
+      {% if m.fields_under_root %}fields_under_root: true{% endif %}
+      fields:
+        {% for k, v in m.fields.items() -%}
+        {{ k }}: {{ v }}
+        {%- endfor %}
+      {% endif -%}
+
+      {% if m.extras -%}
+      {% for k, v in m.extras.items() -%}
+      {{ k }}: {{ v }}
+      {% endfor %}
+      {% endif -%}
+    {%- endfor %}
+
 output:
-
-  # Elasticsearch as output
-  # Options:
-  # host, port: where Elasticsearch is listening on
-  # save_topology: specify if the topology is saved in Elasticsearch
-  #elasticsearch:
-  #  enabled: false
-  #  host: localhost
-  #  port: 9200
-  #  save_topology: true
-
-  # Redis as output
-  # Options:
-  # host, port: where Redis is listening on
-  # save_topology: specify if the topology is saved in Redis
-  #redis:
-  #  enabled: false
-  #  host: localhost
-  #  port: 6379
-  #  save_topology: true
-
-  # File as output
-  # Options
-  # path: where to save the files
-  # filename: name of the files
-  # rotate_every_kb: maximum size of the files in path
-  # number of files: maximum number of files in path
   file:
     enabled: true
     path: {{ output_file_path|default(beat.working_dir + "/output") }}
     filename: "{{ output_file_filename|default("metricbeat") }}"
     rotate_every_kb: 1000
-    #number_of_files: 7
 
 # vim: set ft=jinja:

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -64,7 +65,7 @@ func (s *SingleConnectionMode) Close() error {
 // PublishEvents tries to publish the events with retries if connection becomes
 // unavailable. On failure PublishEvents tries to reconnect.
 func (s *SingleConnectionMode) PublishEvents(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {
@@ -88,7 +89,7 @@ func (s *SingleConnectionMode) PublishEvents(
 
 // PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
 func (s *SingleConnectionMode) PublishEvent(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -110,7 +111,7 @@ func (s *SingleConnectionMode) PublishEvent(
 // successful. If send was partially successful, the fail counter is reset thus up
 // to maxAttempts send attempts without any progress might be executed.
 func (s *SingleConnectionMode) publish(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	send func() (ok bool, resetFail bool),
 ) error {
@@ -135,7 +136,7 @@ func (s *SingleConnectionMode) publish(
 
 		debug("send completed")
 		s.backoff.Reset()
-		outputs.SignalCompleted(signaler)
+		op.SigCompleted(signaler)
 		return nil
 
 	sendFail:
@@ -157,6 +158,6 @@ func (s *SingleConnectionMode) publish(
 
 	debug("messages dropped")
 	messagesDropped.Add(1)
-	outputs.SignalFailed(signaler, err)
+	op.SigFailed(signaler, err)
 	return nil
 }

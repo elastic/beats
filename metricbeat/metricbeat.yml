@@ -2,21 +2,30 @@ metricbeat:
   modules:
 
     # Apache Module
-    # Server-status page (/server-status) is configurable string in apache and
-    # must be defined by user
     - module: apache
       metricsets: ["status"]
-      hosts: ["http://127.0.0.1/"]
-      period: 1s
       enabled: true
+      period: 1s
+
+      # Apache hosts
+      hosts: ["http://127.0.0.1/"]
 
       # Path to server status. Default server-status
       #server_status_path: "server-status"
 
+      # Username of hosts.  Empty by default
+      #username: test
+
+      # Password of hosts. Empty by default
+      #password: test123
+
     # Redis Module
     - module: redis
       metricsets: ["info"]
+      enabled: true
       period: 1s
+
+      # Redis hosts
       hosts: ["127.0.0.1:6379"]
 
       # Enabled defines if the module is enabled. Default: true
@@ -26,11 +35,6 @@ metricbeat:
       # Timeout is by default defined as period, as a fetch of a metricset
       # should never take longer then period, as otherwise calls can pile up.
       #timeout: 1s
-
-      # Selectors to only fetch a subset of metrics (whitelisting)
-      # If no selectors are set, all metrics are sent.
-      # Use filters for a more fine grained filtering.
-      #selectors: []
 
       # Optional fields to be added to each event
       #fields:
@@ -42,7 +46,10 @@ metricbeat:
       # Max number of concurrent connections. Default: 10
       #maxconn: 10
 
-      #filter: ...
+      # Filters can be used to reduce the number of fields sent.
+      #filters:
+      #  - include_fields:
+      #      fields: ["stats"]
 
       # Redis AUTH password. Empty by default.
       #password: foobared
@@ -62,6 +69,12 @@ metricbeat:
 
       # Password of hosts. Empty by default
       #password: test
+
+    # System module
+    - module: system
+      metricsets: ["cpu", "memory"]
+      enabled: true
+      period: 2s
 ###############################################################################
 ############################# Libbeat Config ##################################
 # Base config file used by all other beats for using libbeat features

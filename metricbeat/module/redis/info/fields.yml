@@ -1,12 +1,13 @@
-redis-info:
+redis:
   type: group
   description: >
-    Redis Stats
+    Redis metrics collected from the Redis `INFO` command.
   fields:
     - name: redis-info
       type: group
       description: >
-        Redis info stats
+        `redis-info` contains the information and statistics returned by the
+        `INFO` command.
       fields:
         - name: clients
           type: group

@@ -11,6 +11,11 @@ import (
 	"github.com/elastic/beats/topbeat/system"
 )
 
+const (
+	inputDeprecationWarning = "Using 'input' in configuration is deprecated " +
+		"and is scheduled to be removed in Topbeat 6.0."
+)
+
 type Topbeat struct {
 	period time.Duration
 
@@ -42,12 +47,13 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	}
 
 	if tb.TbConfig.Topbeat != nil && tb.TbConfig.Input != nil {
-		return fmt.Errorf("topbeat and input are set in config. Only one can be enabled. input is deprecated, use topbeat.")
+		return fmt.Errorf("'topbeat' and 'input' are both set in config. Only " +
+			"one can be enabled so use 'topbeat'. " + inputDeprecationWarning)
 	}
 
 	// Copy input config to topbeat @deprecated
 	if tb.TbConfig.Input != nil {
-		logp.Warn("The 'input' configuration section is deprecated. Please use 'topbeat' instead")
+		logp.Warn(inputDeprecationWarning + " Use 'topbeat' instead.")
 		tb.TbConfig.Topbeat = tb.TbConfig.Input
 	}
 
@@ -90,19 +96,19 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	}
 
 	logp.Debug("topbeat", "Init topbeat")
-	logp.Debug("topbeat", "Follow processes %q\n", tb.procStats.Procs)
-	logp.Debug("topbeat", "Period %v\n", tb.period)
-	logp.Debug("topbeat", "System statistics %t\n", tb.sysStats)
-	logp.Debug("topbeat", "Process statistics %t\n", tb.procStats.ProcStats)
-	logp.Debug("topbeat", "File system statistics %t\n", tb.fsStats)
-	logp.Debug("topbeat", "Cpu usage per core %t\n", tb.cpu.CpuPerCore)
+	logp.Debug("topbeat", "Follow processes %q", tb.procStats.Procs)
+	logp.Debug("topbeat", "Period %v", tb.period)
+	logp.Debug("topbeat", "System statistics %t", tb.sysStats)
+	logp.Debug("topbeat", "Process statistics %t", tb.procStats.ProcStats)
+	logp.Debug("topbeat", "File system statistics %t", tb.fsStats)
+	logp.Debug("topbeat", "Cpu usage per core %t", tb.cpu.CpuPerCore)
 
 	return nil
 }
 
-func (tb *Topbeat) Setup(b *beat.Beat) error {
-	tb.events = b.Events
-	tb.done = make(chan struct{})
+func (t *Topbeat) Setup(b *beat.Beat) error {
+	t.events = b.Publisher.Connect()
+	t.done = make(chan struct{})
 	return nil
 }
 
@@ -164,5 +170,7 @@ func (tb *Topbeat) Cleanup(b *beat.Beat) error {
 }
 
 func (t *Topbeat) Stop() {
+	logp.Info("Send stop signal to topbeat main loop")
 	close(t.done)
+	t.events.Close()
 }

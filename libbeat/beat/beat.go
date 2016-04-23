@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/satori/go.uuid"
@@ -88,14 +89,13 @@ type FlagsHandler interface {
 // Beat contains the basic beat data and the publisher client used to publish
 // events.
 type Beat struct {
-	Name      string                   // Beat name.
-	Version   string                   // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
-	UUID      uuid.UUID                // ID assigned to a Beat instance.
-	BT        Beater                   // Beater implementation.
-	RawConfig *common.Config           // Raw config that can be unpacked to get Beat specific config data.
-	Config    BeatConfig               // Common Beat configuration data.
-	Events    publisher.Client         // Client used for publishing events.
-	Publisher *publisher.PublisherType // Publisher
+	Name      string               // Beat name.
+	Version   string               // Beat version number. Defaults to the libbeat version when an implementation does not set a version.
+	UUID      uuid.UUID            // ID assigned to a Beat instance.
+	BT        Beater               // Beater implementation.
+	RawConfig *common.Config       // Raw config that can be unpacked to get Beat specific config data.
+	Config    BeatConfig           // Common Beat configuration data.
+	Publisher *publisher.Publisher // Publisher
 
 	filters *filter.FilterList // Filters
 }
@@ -106,6 +106,7 @@ type BeatConfig struct {
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
 	Filter  []filter.FilterConfig
+	Path    paths.Path
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -179,12 +180,20 @@ func (bc *instance) config() error {
 		return fmt.Errorf("error unpacking config data: %v", err)
 	}
 
+	err = paths.InitPaths(&bc.data.Config.Path)
+	if err != nil {
+		return fmt.Errorf("error setting default paths: %v", err)
+	}
+
 	err = logp.Init(bc.data.Name, &bc.data.Config.Logging)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %v", err)
 	}
 	// Disable stderr logging if requested by cmdline flag
 	logp.SetStderr()
+
+	// log paths values to help with troubleshooting
+	logp.Info(paths.Paths.String())
 
 	bc.data.filters, err = filter.New(bc.data.Config.Filter)
 	if err != nil {
@@ -224,8 +233,6 @@ func (bc *instance) setup() error {
 	}
 
 	bc.data.Publisher.RegisterFilter(bc.data.filters)
-	bc.data.Events = bc.data.Publisher.Client()
-
 	err = bc.beater.Setup(bc.data)
 	if err != nil {
 		return err
@@ -252,6 +259,7 @@ func (bc *instance) run() error {
 // reaches the setup stage.
 func (bc *instance) cleanup() error {
 	logp.Info("%s cleanup", bc.data.Name)
+	defer svc.Cleanup()
 	return bc.beater.Cleanup(bc.data)
 }
 
@@ -281,6 +289,7 @@ func (bc *instance) launch(exit bool) error {
 		return err
 	}
 
+	svc.BeforeRun()
 	svc.HandleSignals(bc.beater.Stop)
 	err = bc.run()
 	return err
