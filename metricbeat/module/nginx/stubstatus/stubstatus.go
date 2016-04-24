@@ -68,5 +68,10 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 		return nil, fmt.Errorf("HTTP Error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventMapping(m, resp.Body, u.Host, ms.Name), nil
+	mapping, err := eventMapping(m, resp.Body, u.Host, ms.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapping, nil
 }

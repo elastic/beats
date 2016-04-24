@@ -2,16 +2,16 @@ package stubstatus
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Map body to MapStr
-func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset string) common.MapStr {
+func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset string) (common.MapStr, error) {
 	// Nginx stub status sample:
 	// Active connections: 1
 	// server accepts handled requests
@@ -36,8 +36,7 @@ func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset
 	scanner.Scan()
 	re = regexp.MustCompile("Active connections: (\\d+)")
 	if matches := re.FindStringSubmatch(scanner.Text()); matches == nil {
-		logp.Warn("Fail to parse active connections from Nginx stub status")
-		active = -1
+		return nil, fmt.Errorf("cannot parse active connections from Nginx stub status")
 	} else {
 		active, _ = strconv.Atoi(matches[1])
 	}
@@ -49,12 +48,7 @@ func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset
 	scanner.Scan()
 	re = regexp.MustCompile("\\s(\\d+)\\s+(\\d+)\\s+(\\d+)")
 	if matches := re.FindStringSubmatch(scanner.Text()); matches == nil {
-		logp.Warn("Fail to parse request status from Nginx stub status")
-		accepts = -1
-		handled = -1
-		dropped = -1
-		requests = -1
-		current = -1
+		return nil, fmt.Errorf("cannot parse request status from Nginx stub status")
 	} else {
 		accepts, _ = strconv.Atoi(matches[1])
 		handled, _ = strconv.Atoi(matches[2])
@@ -71,12 +65,8 @@ func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset
 	// Parse connection status.
 	scanner.Scan()
 	re = regexp.MustCompile("Reading: (\\d+) Writing: (\\d+) Waiting: (\\d+)")
-	var ()
 	if matches := re.FindStringSubmatch(scanner.Text()); matches == nil {
-		logp.Warn("Fail to parse connection status from Nginx stub status")
-		reading = -1
-		writing = -1
-		waiting = -1
+		return nil, fmt.Errorf("cannot parse connection status from Nginx stub status")
 	} else {
 		reading, _ = strconv.Atoi(matches[1])
 		writing, _ = strconv.Atoi(matches[2])
@@ -97,5 +87,5 @@ func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset
 		"waiting":  waiting,
 	}
 
-	return event
+	return event, nil
 }
