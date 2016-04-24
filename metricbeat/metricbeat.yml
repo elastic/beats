@@ -16,7 +16,7 @@ metricbeat:
     # Nginx Module
     - module: nginx
       metricsets: ["stubstatus"]
-      hosts: ["http://127.0.0.1/"]
+      hosts: ["127.0.0.1"]
       period: 1s
       enabled: true
 

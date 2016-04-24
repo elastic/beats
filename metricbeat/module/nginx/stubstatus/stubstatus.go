@@ -48,7 +48,7 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
 
-	u, err := url.Parse(host + m.ServerStatusPath)
+	u, err := url.Parse(fmt.Sprintf("http://%s/%s", host, m.ServerStatusPath))
 	if err != nil {
 		logp.Err("Invalid Nginx stub server-status page: %v", err)
 		return nil, err
