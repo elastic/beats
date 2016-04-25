@@ -1,3 +1,5 @@
+// +build darwin linux openbsd windows
+
 package memory
 
 import (
@@ -5,7 +7,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	_ "github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/beats/topbeat/system"
 )
 
