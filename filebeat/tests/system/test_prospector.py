@@ -1,6 +1,7 @@
 from filebeat import BaseTest
 import os
 import time
+import unittest
 
 """
 Tests for the prospector functionality.
@@ -108,6 +109,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
 
+    @unittest.skip("Needs fix from #964")
     def test_rotating_close_older_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
@@ -356,7 +358,7 @@ class Test(BaseTest):
             file.write("Line {}\n".format(lines))
 
         self.wait_until(
-                # allow for events to be send multiple times due to log rotation
+                # allow for events to be sent multiple times due to log rotation
                 lambda: self.output_count(lambda x: x >= lines),
                 max_timeout=5)
 

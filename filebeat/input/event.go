@@ -23,6 +23,7 @@ type FileEvent struct {
 	Fileinfo     *os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *config.JSONConfig
+	Stat         *FileStat
 }
 
 // GetState builds and returns the FileState object based on the Event info.
