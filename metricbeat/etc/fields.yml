@@ -1,5 +1,3 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false

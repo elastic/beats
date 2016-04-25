@@ -4,19 +4,6 @@
       "_all": {
         "norms": false
       },
-      "dynamic_templates": [
-        {
-          "template1": {
-            "mapping": {
-              "doc_values": true,
-              "ignore_above": 1024,
-              "index": true,
-              "type": "keyword"
-            },
-            "match_mapping_type": "string"
-          }
-        }
-      ],
       "properties": {
         "@timestamp": {
           "type": "date"
@@ -144,6 +131,30 @@
             }
           }
         },
+        "beat": {
+          "properties": {
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "metricset": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "metricset-host": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "module": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
         "mysql-status": {
           "properties": {
             "aborted": {
@@ -227,10 +238,15 @@
               }
             }
           }
+        },
+        "type": {
+          "ignore_above": 1024,
+          "type": "keyword"
         }
       }
     }
   },
+  "order": 0,
   "settings": {
     "index.refresh_interval": "5s"
   },

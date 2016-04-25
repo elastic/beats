@@ -1,10 +1,7 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
   index: true
-  doc_values: true
   ignore_above: 1024
 
 flows_env:
@@ -45,6 +42,7 @@ trans_env:
       description: >
         The hostname as returned by the operating system on which the Beat is
         running.
+
 
     - name: server
       description: >
@@ -124,6 +122,12 @@ trans_env:
       description: >
         Arbitrary tags that can be set per Beat and per transaction
         type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.
 
 flows_event:
   type: group
@@ -783,7 +787,8 @@ trans_event:
           description: >
             Acknowledge multiple messages.
 
-        - name: arguments.*
+        - name: arguments
+          type: dict
           description: >
             Optional additional arguments passed to some methods. Can be of
             various types.
@@ -809,7 +814,9 @@ trans_event:
           description: >
             MIME content encoding.
 
-        - name: headers.*
+        - name: headers
+          type: dict
+          dict-type: keyword
           description: >
             Message header field table.
 
@@ -877,6 +884,7 @@ trans_event:
 
         - name: request_headers
           type: dict
+          dict-type: keyword
           description: >
             A map containing the captured header fields from the request.
             Which headers to capture is configurable. If headers with the same
@@ -885,6 +893,7 @@ trans_event:
 
         - name: response_headers
           type: dict
+          dict-type: keyword
           description: >
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If headers with the

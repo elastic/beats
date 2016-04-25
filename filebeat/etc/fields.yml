@@ -1,27 +1,26 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
   index: true
-  doc_values: true
-  ignore_above: 1024
 
 env:
   type: group
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: beat.name
-      description: >
-        The name of the Beat sending the log messages. If the shipper name is set
-        in the configuration file, then that value is used. If it is not set,
-        the hostname is used.
+    - type: group
+      name: beat
+      fields:
+      - name: name
+        description: >
+          The name of the Beat sending the log messages. If the shipper name is set
+          in the configuration file, then that value is used. If it is not set,
+          the hostname is used.
 
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
+      - name: hostname
+        description: >
+          The hostname as returned by the operating system on which the Beat is
+          running.
 
     - name: "@timestamp"
       type: date
@@ -62,7 +61,6 @@ log:
 
     - name: message
       type: text
-      doc_values: true
       ignore_above: 0
       required: true
       description: >
@@ -70,7 +68,7 @@ log:
 
     - name: fields
       type: dict
-      required: false
+      dict-type: keyword
       description: >
         Contains user configurable fields.
 

@@ -77,7 +77,7 @@ The name of the computer that generated the record. When using Windows event for
 
 ==== event_data
 
-type: dictionary
+type: dict
 
 required: False
 
@@ -95,7 +95,7 @@ The event identifier. The value is specific to the source of the event.
 
 ==== keywords
 
-type: keyword[]
+type: keyword
 
 required: False
 
@@ -212,7 +212,7 @@ The thread_id identifies the thread that generated the event.
 
 ==== user_data
 
-type: dictionary
+type: dict
 
 required: False
 

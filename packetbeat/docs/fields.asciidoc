@@ -830,7 +830,9 @@ type: bool
 Acknowledge multiple messages.
 
 
-==== amqp.arguments.*
+==== amqp.arguments
+
+type: dict
 
 Optional additional arguments passed to some methods. Can be of various types.
 
@@ -865,7 +867,9 @@ type: keyword
 MIME content encoding.
 
 
-==== amqp.headers.*
+==== amqp.headers
+
+type: dict
 
 Message header field table.
 
@@ -1748,6 +1752,13 @@ The software release of the service serving the transaction. This can be the com
 ==== tags
 
 Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
 
 
 [[exported-fields-flows_env]]
