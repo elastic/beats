@@ -1,7 +1,5 @@
 package ucfg
 
-import "fmt"
-
 // ******************************************************************************
 // Low level getters and setters (do we actually need this?)
 // ******************************************************************************
@@ -49,6 +47,15 @@ func (c *Config) Int(name string, idx int, opts ...Option) (int64, error) {
 	return i, convertErr(v, fail, "int")
 }
 
+func (c *Config) Uint(name string, idx int, opts ...Option) (uint64, error) {
+	v, err := c.getField(name, idx, opts)
+	if err != nil {
+		return 0, err
+	}
+	u, fail := v.toUint()
+	return u, convertErr(v, fail, "uint")
+}
+
 func (c *Config) Float(name string, idx int, opts ...Option) (float64, error) {
 	v, err := c.getField(name, idx, opts)
 	if err != nil {
@@ -75,6 +82,10 @@ func (c *Config) SetInt(name string, idx int, value int64, opts ...Option) error
 	return c.setField(name, idx, &cfgInt{i: value}, opts)
 }
 
+func (c *Config) SetUint(name string, idx int, value uint64, opts ...Option) error {
+	return c.setField(name, idx, &cfgUint{u: value}, opts)
+}
+
 func (c *Config) SetFloat(name string, idx int, value float64, opts ...Option) error {
 	return c.setField(name, idx, &cfgFloat{f: value}, opts)
 }
@@ -89,90 +100,29 @@ func (c *Config) SetChild(name string, idx int, value *Config, opts ...Option) e
 
 func (c *Config) getField(name string, idx int, options []Option) (value, Error) {
 	opts := makeOptions(options)
-
-	cfg, field, err := reifyCfgPath(c, opts, name)
+	p := parsePathIdx(name, opts.pathSep, idx)
+	v, err := p.GetValue(c)
 	if err != nil {
-		return nil, err
+		return v, err
 	}
 
-	v, ok := cfg.fields.fields[field]
-	if !ok {
-		return nil, raiseMissing(cfg, field)
+	if v == nil {
+		return nil, raiseMissing(c, p.String())
 	}
-
-	if arr, ok := v.(*cfgArray); ok {
-		if idx >= arr.Len() {
-			return nil, raiseIndexOutOfBounds(v, idx)
-		}
-
-		v = arr.arr[idx]
-		if v == nil {
-			return nil, raiseMissingArr(arr, idx)
-		}
-		return arr.arr[idx], nil
-	}
-
-	if idx > 0 {
-		return nil, raiseIndexOutOfBounds(v, idx)
-	}
-
 	return v, nil
 }
 
 func (c *Config) setField(name string, idx int, v value, options []Option) Error {
 	opts := makeOptions(options)
-	ctx := context{
-		parent: cfgSub{c},
-		field:  name,
-	}
-	orig := v
+	p := parsePathIdx(name, opts.pathSep, idx)
 
-	cfg, field, err := normalizeCfgPath(c, opts, name)
+	err := p.SetValue(c, v)
 	if err != nil {
 		return err
 	}
 
-	old, ok := cfg.fields.fields[field]
-	if !ok {
-		if idx > 0 {
-			slice := &cfgArray{
-				cfgPrimitive: cfgPrimitive{ctx: ctx},
-				arr:          make([]value, idx+1),
-			}
-			slice.arr[idx] = v
-			v = slice
-		} else {
-			idx = -1
-		}
-	} else if slice, ok := old.(*cfgArray); ok {
-		for idx >= len(slice.arr) {
-			slice.arr = append(slice.arr, nil)
-		}
-		slice.arr[idx] = v
-		v = slice
-	} else if idx > 0 {
-		slice := &cfgArray{
-			cfgPrimitive: cfgPrimitive{ctx: ctx},
-			arr:          make([]value, idx+1),
-		}
-		slice.arr[0] = old
-		slice.arr[idx] = v
-		v = slice
-	} else {
-		idx = -1
-	}
-
-	if idx >= 0 {
-		ctx.parent = v
-		ctx.field = fmt.Sprintf("%v", idx)
-	}
-	orig.SetContext(ctx)
-
 	if opts.meta != nil {
 		v.setMeta(opts.meta)
 	}
-
-	cfg.fields.fields[field] = v
-
 	return nil
 }

@@ -1,10 +1,69 @@
 package ucfg
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+type stUnpackable struct {
+	value int
+}
+
+type primUnpackable int
+
+func unpackI(v interface{}) (int, error) {
+	switch n := v.(type) {
+	case int64:
+		return int(n), nil
+	case uint64:
+		return int(n), nil
+	case float64:
+		return int(n), nil
+	}
+
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		return 0, errors.New("expected dictionary")
+	}
+
+	val, ok := m["i"]
+	if !ok {
+		return 0, errors.New("missing field i")
+	}
+
+	switch n := val.(type) {
+	case int64:
+		return int(n), nil
+	case uint64:
+		return int(n), nil
+	case float64:
+		return int(n), nil
+	default:
+		return 0, errors.New("not a number")
+	}
+}
+
+func (s *stUnpackable) Unpack(v interface{}) error {
+	i, err := unpackI(v)
+	s.value = i
+	return err
+}
+
+func (s *stUnpackable) Value() int {
+	return s.value
+}
+
+func (p *primUnpackable) Unpack(v interface{}) error {
+	i, err := unpackI(v)
+	*p = primUnpackable(i)
+	return err
+}
+
+func (p primUnpackable) Value() int {
+	return int(p)
+}
 
 func TestUnpackPrimitiveValues(t *testing.T) {
 	tests := []interface{}{
@@ -16,18 +75,21 @@ func TestUnpackPrimitiveValues(t *testing.T) {
 		&struct {
 			B bool
 			I int
+			U uint
 			F float64
 			S string
 		}{},
 		&struct {
 			B interface{}
 			I interface{}
+			U interface{}
 			F interface{}
 			S interface{}
 		}{},
 		&struct {
 			B *bool
 			I *int
+			U *uint
 			F *float64
 			S *string
 		}{},
@@ -36,6 +98,7 @@ func TestUnpackPrimitiveValues(t *testing.T) {
 	c, _ := NewFrom(node{
 		"b": true,
 		"i": 42,
+		"u": 23,
 		"f": 3.14,
 		"s": "string",
 	})
@@ -58,20 +121,24 @@ func TestUnpackPrimitiveValues(t *testing.T) {
 			continue
 		}
 
-		b, err := c.Bool("b", 0)
+		b, err := c.Bool("b", -1)
 		assert.NoError(t, err)
 
-		i, err := c.Int("i", 0)
+		i, err := c.Int("i", -1)
 		assert.NoError(t, err)
 
-		f, err := c.Float("f", 0)
+		u, err := c.Uint("u", -1)
 		assert.NoError(t, err)
 
-		s, err := c.String("s", 0)
+		f, err := c.Float("f", -1)
+		assert.NoError(t, err)
+
+		s, err := c.String("s", -1)
 		assert.NoError(t, err)
 
 		assert.Equal(t, true, b)
 		assert.Equal(t, 42, int(i))
+		assert.Equal(t, 23, int(u))
 		assert.Equal(t, 3.14, f)
 		assert.Equal(t, "string", s)
 	}
@@ -174,10 +241,10 @@ func TestUnpackNested(t *testing.T) {
 			continue
 		}
 
-		sub, err := c.Child("c", 0)
+		sub, err := c.Child("c", -1)
 		assert.NoError(t, err)
 
-		b, err := sub.Bool("b", 0)
+		b, err := sub.Bool("b", -1)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	}
@@ -229,9 +296,7 @@ func TestUnpackArray(t *testing.T) {
 		map[string]interface{}{
 			"a": []int{},
 		},
-		map[string][]int{
-			"a": []int{},
-		},
+		map[string][]int{"a": {}},
 		map[string]interface{}{
 			"a": []interface{}{},
 		},
@@ -331,8 +396,26 @@ func TestUnpackInline(t *testing.T) {
 			t.Fatalf("failed with: %v", err)
 		}
 
-		b, err := c.Bool("b", 0)
+		b, err := c.Bool("b", -1)
 		assert.NoError(t, err)
 		assert.Equal(t, true, b)
 	}
+}
+
+func TestReifyUnpackerInterface(t *testing.T) {
+	cfg, _ := NewFrom(map[string]interface{}{
+		"i": 10,
+	})
+
+	st := stUnpackable{}
+	err := cfg.Unpack(&st)
+	assert.NoError(t, err)
+	assert.Equal(t, 10, st.Value())
+
+	p := struct {
+		I primUnpackable
+	}{}
+	err = cfg.Unpack(&p)
+	assert.NoError(t, err)
+	assert.Equal(t, 10, p.I.Value())
 }

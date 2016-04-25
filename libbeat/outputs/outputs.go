@@ -74,7 +74,7 @@ func InitOutputs(
 		}
 
 		if !config.HasField("index") {
-			config.SetString("index", 0, beatName)
+			config.SetString("index", -1, beatName)
 		}
 
 		output, err := plugin(config, topologyExpire)
