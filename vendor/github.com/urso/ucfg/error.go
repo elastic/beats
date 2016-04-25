@@ -44,6 +44,8 @@ type pathError struct {
 var (
 	ErrMissing = errors.New("missing field")
 
+	ErrDuplicateValidator = errors.New("validator already registered")
+
 	ErrTypeNoArray = errors.New("field is no array")
 
 	ErrTypeMismatch = errors.New("type mismatch")
@@ -65,6 +67,14 @@ var (
 	ErrTODO = errors.New("TODO - implement me")
 
 	ErrDuplicateKeey = errors.New("duplicate key")
+
+	ErrOverflow = errors.New("integer overflow")
+
+	ErrNegative = errors.New("negative value")
+
+	ErrZeroValue = errors.New("zero value")
+
+	ErrRequired = errors.New("missing required field")
 )
 
 // error classes
@@ -162,9 +172,9 @@ func raiseMissing(c *Config, field string) Error {
 	return raisePathErr(ErrMissing, c.metadata, "", c.PathOf(field, "."))
 }
 
-func raiseMissingArr(arr *cfgArray, idx int) Error {
+func raiseMissingArr(ctx context, meta *Meta, idx int) Error {
 	message := fmt.Sprintf("no value in array at %v", idx)
-	return raisePathErr(ErrMissing, arr.meta(), message, arr.ctx.path("."))
+	return raisePathErr(ErrMissing, meta, message, ctx.path("."))
 }
 
 func raiseIndexOutOfBounds(value value, idx int) Error {
@@ -210,12 +220,12 @@ func raiseInlineNeedsObject(cfg *Config, f string, t reflect.Type) Error {
 		messagePath(reason, cfg.metadata, message, cfg.Path(".")))
 }
 
-func raiseUnsupportedInputType(ctx context, opts options, v reflect.Value) Error {
+func raiseUnsupportedInputType(ctx context, meta *Meta, v reflect.Value) Error {
 	reason := ErrTypeMismatch
 	message := fmt.Sprintf("unspported input type (%v) with value '%#v'",
 		v.Type(), v)
 
-	return raiseCritical(reason, messagePath(reason, opts.meta, message, ctx.path(".")))
+	return raiseCritical(reason, messagePath(reason, meta, message, ctx.path(".")))
 }
 
 func raiseNil(reason error) Error {
@@ -236,12 +246,12 @@ func raiseToTypeNotSupported(v value, t reflect.Type) Error {
 	return raiseCritical(reason, messagePath(reason, v.meta(), message, ctx.path(".")))
 }
 
-func raiseArraySize(to reflect.Type, arr *cfgArray) Error {
+func raiseArraySize(ctx context, meta *Meta, n int, to int) Error {
 	reason := ErrArraySizeMistach
 	message := fmt.Sprintf("array of length %v does not meet required length %v",
-		arr.Len(), to.Len())
+		n, to)
 
-	return raisePathErr(reason, arr.meta(), message, arr.ctx.path("."))
+	return raisePathErr(reason, meta, message, ctx.path("."))
 }
 
 func raiseConversion(v value, err error, to string) Error {
@@ -258,4 +268,14 @@ func raiseExpectedObject(v value) Error {
 		v.typeName(), path)
 
 	return raiseErr(ErrExpectedObject, messageMeta(message, v.meta()))
+}
+
+func raiseInvalidDuration(v value, err error) Error {
+	ctx := v.Context()
+	path := ctx.path(".")
+	return raisePathErr(err, v.meta(), "", path)
+}
+
+func raiseValidation(ctx context, meta *Meta, err error) Error {
+	return raiseErr(err, messagePath(err, meta, err.Error(), ctx.path(".")))
 }

@@ -24,8 +24,8 @@ func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("flush_interval", 0, -1)
-	cfg.SetInt("bulk_max_size", 0, -1)
+	cfg.SetInt("flush_interval", -1, -1)
+	cfg.SetInt("bulk_max_size", -1, -1)
 
 	output := &fileOutput{}
 	if err := output.init(config); err != nil {
