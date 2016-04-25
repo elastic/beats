@@ -103,7 +103,7 @@ func (p *Prospector) Run(wg *sync.WaitGroup) {
 }
 
 func (p *Prospector) Stop() {
-	// TODO: Wait until all prospectors have exited the Run part.
+	// : Wait until all prospectors have exited the Run part.
 	logp.Info("Stopping Prospector")
 	close(p.done)
 

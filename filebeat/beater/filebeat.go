@@ -16,7 +16,6 @@ type Filebeat struct {
 	FbConfig *cfg.Config
 	// Channel from harvesters to spooler
 	publisherChan chan []*input.FileEvent
-	publisher     logPublisher
 	spooler       *Spooler
 	registrar     *crawler.Registrar
 	crawler       *crawler.Crawler

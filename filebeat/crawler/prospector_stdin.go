@@ -38,7 +38,8 @@ func (p *ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		p.Prospector.RunHarvester(p.harvester)
+		p.harvester.Start()
+		p.started = true
 	}
 
 	// Wait time during endless loop

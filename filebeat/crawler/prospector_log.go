@@ -169,7 +169,6 @@ func (p *ProspectorLog) checkNewFile(h *harvester.Harvester) {
 				time.Since(h.Stat.Fileinfo.ModTime()),
 				h.Path)
 			h.Stat.Skip(h.Stat.Fileinfo.Size())
-			p.resumeHarvesting(h, h.Stat.Fileinfo.Size())
 		}
 	} else if previousFile, err := p.getPreviousFile(h.Path, h.Stat.Fileinfo); err == nil {
 		p.continueExistingFile(h, previousFile)
@@ -228,8 +227,9 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 			h.Stat.Ignore()
 
 			// Start a new harvester on the path
-			p.Prospector.RunHarvester(h)
-			//p.Prospector.registrar.Persist <- h.GetState()
+			h.Start()
+			p.Prospector.registrar.Persist <- h.GetState()
+
 		}
 
 		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
@@ -241,7 +241,7 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 		// Start a harvester on the path; a file was just modified and it doesn't have a harvester
 		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
 		p.resumeHarvesting(h, <-h.Stat.Return)
-		//p.Prospector.registrar.Persist <- h.GetState()
+		p.Prospector.registrar.Persist <- h.GetState()
 
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", h.Path)
@@ -256,17 +256,20 @@ func (p *ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFil
 
 	lastinfo := p.harvesterStats[previousFile]
 	h.Stat.Continue(&lastinfo)
-	h.Stop()
-	p.Prospector.RunHarvester(h)
+
+	// Update state because of file rotation
+	p.Prospector.registrar.Persist <- h.GetState()
 }
 
 // Start / resume harvester with a predefined offset
 func (p *ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
 
 	logp.Debug("prospector", "Start / resuming harvester of file: %s", h.Path)
-
 	h.SetOffset(offset)
-	p.Prospector.RunHarvester(h)
+	h.Start()
+
+	// Update state because of file rotation
+	p.Prospector.registrar.Persist <- h.GetState()
 }
 
 // Check if the given file was renamed. If file is known but with different path,

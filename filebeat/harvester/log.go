@@ -144,9 +144,9 @@ func (h *Harvester) createEvent() *input.FileEvent {
 		InputType:     h.Config.InputType,
 		DocumentType:  h.Config.DocumentType,
 		Offset:        h.GetOffset(),
-		JSONConfig:    h.Config.JSON,
 		Bytes:         0,
 		Fileinfo:      &h.fileInfo,
+		JSONConfig:    h.Config.JSON,
 	}
 }
 
