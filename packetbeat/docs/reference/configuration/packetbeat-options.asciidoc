@@ -474,7 +474,7 @@ protocol. Here is a sample configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-  AMQP:
+  amqp:
     ports: [5672]
     max_body_length: 1000
     parse_headers: true
