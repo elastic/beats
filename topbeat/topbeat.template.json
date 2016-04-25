@@ -6,20 +6,32 @@
       },
       "dynamic_templates": [
         {
-          "template1": {
+          "fields": {
             "mapping": {
-              "doc_values": true,
               "ignore_above": 1024,
               "index": true,
               "type": "keyword"
             },
-            "match_mapping_type": "string"
+            "match_mapping_type": "string",
+            "path_match": "fields.*"
           }
         }
       ],
       "properties": {
         "@timestamp": {
           "type": "date"
+        },
+        "beat": {
+          "properties": {
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
         },
         "cpu": {
           "properties": {
@@ -47,6 +59,14 @@
         },
         "fs": {
           "properties": {
+            "device_name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "mount_point": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "used_p": {
               "type": "float"
             }
@@ -77,8 +97,16 @@
         },
         "proc": {
           "properties": {
+            "cmdline": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "cpu": {
               "properties": {
+                "start_time": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "total_p": {
                   "type": "float"
                 }
@@ -90,6 +118,18 @@
                   "type": "float"
                 }
               }
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "state": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "username": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
         },
@@ -99,10 +139,19 @@
               "type": "float"
             }
           }
+        },
+        "tags": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "type": {
+          "ignore_above": 1024,
+          "type": "keyword"
         }
       }
     }
   },
+  "order": 0,
   "settings": {
     "index.refresh_interval": "5s"
   },

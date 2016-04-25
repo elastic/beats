@@ -1,39 +1,14 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
   index: true
-  doc_values: true
   ignore_above: 1024
 
-flows_env:
-  type: group
-  description: >
-    These fields contain data about the environment in which the flow data was
-    captured.
-  fields:
-    - name: beat.name
-      description: >
-        Name of the Beat sending the events. If the shipper name is set
-        in the configuration file, then that value is used. If it is not set,
-        the hostname is used.
-
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
-
-    - name: tags
-      description: >
-        Arbitrary tags that can be set per Beat and per transaction
-        type.
-
-trans_env:
+env:
   type: group
   description: >
       These fields contain data about the environment in which the
-      transaction was captured.
+      transaction or flow was captured.
   fields:
     - name: beat.name
       description: >
@@ -45,6 +20,7 @@ trans_env:
       description: >
         The hostname as returned by the operating system on which the Beat is
         running.
+
 
     - name: server
       description: >
@@ -124,6 +100,12 @@ trans_env:
       description: >
         Arbitrary tags that can be set per Beat and per transaction
         type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.
 
 flows_event:
   type: group
@@ -783,7 +765,8 @@ trans_event:
           description: >
             Acknowledge multiple messages.
 
-        - name: arguments.*
+        - name: arguments
+          type: dict
           description: >
             Optional additional arguments passed to some methods. Can be of
             various types.
@@ -809,7 +792,9 @@ trans_event:
           description: >
             MIME content encoding.
 
-        - name: headers.*
+        - name: headers
+          type: dict
+          dict-type: keyword
           description: >
             Message header field table.
 
@@ -877,6 +862,7 @@ trans_event:
 
         - name: request_headers
           type: dict
+          dict-type: keyword
           description: >
             A map containing the captured header fields from the request.
             Which headers to capture is configurable. If headers with the same
@@ -885,6 +871,7 @@ trans_event:
 
         - name: response_headers
           type: dict
+          dict-type: keyword
           description: >
             A map containing the captured header fields from the response.
             Which headers to capture is configurable. If headers with the
@@ -1469,7 +1456,6 @@ sections:
   - ["redis", "Redis"]
   - ["mongodb", "MongoDb"]
   - ["trans_measurements", "Measurements (Transactions)"]
-  - ["trans_env", "Environmental (Transactions)"]
-  - ["flows_env", "Environmental (Flows)"]
+  - ["env", "Environmental"]
   - ["raw", "Raw"]
   - ["nfs", "NFS"]

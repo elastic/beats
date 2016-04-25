@@ -6,14 +6,14 @@
       },
       "dynamic_templates": [
         {
-          "template1": {
+          "fields": {
             "mapping": {
-              "doc_values": true,
               "ignore_above": 1024,
               "index": true,
               "type": "keyword"
             },
-            "match_mapping_type": "string"
+            "match_mapping_type": "string",
+            "path_match": "fields.*"
           }
         }
       ],
@@ -144,6 +144,30 @@
             }
           }
         },
+        "beat": {
+          "properties": {
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "metricset": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "metricset-host": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "module": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
         "mysql-status": {
           "properties": {
             "aborted": {
@@ -227,10 +251,19 @@
               }
             }
           }
+        },
+        "tags": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "type": {
+          "ignore_above": 1024,
+          "type": "keyword"
         }
       }
     }
   },
+  "order": 0,
   "settings": {
     "index.refresh_interval": "5s"
   },

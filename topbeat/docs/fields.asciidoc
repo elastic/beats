@@ -51,6 +51,18 @@ Name of the Beat sending the events. If the shipper name is set in the configura
 The hostname as returned by the operating system on which the Beat is running.
 
 
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
 [[exported-fields-system]]
 === System-Wide Statistics Fields
 

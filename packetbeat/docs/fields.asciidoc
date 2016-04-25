@@ -21,8 +21,7 @@ grouped in the following categories:
 * <<exported-fields-redis>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-trans_measurements>>
-* <<exported-fields-trans_env>>
-* <<exported-fields-flows_env>>
+* <<exported-fields-env>>
 * <<exported-fields-raw>>
 * <<exported-fields-nfs>>
 
@@ -830,7 +829,9 @@ type: bool
 Acknowledge multiple messages.
 
 
-==== amqp.arguments.*
+==== amqp.arguments
+
+type: dict
 
 Optional additional arguments passed to some methods. Can be of various types.
 
@@ -865,7 +866,9 @@ type: keyword
 MIME content encoding.
 
 
-==== amqp.headers.*
+==== amqp.headers
+
+type: dict
 
 Message header field table.
 
@@ -1641,10 +1644,10 @@ type: int
 In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded. In terms of the W3 Navigation Timing API, this is the difference between `domContentLoadedEnd` and `domContentLoadedStart`.
 
 
-[[exported-fields-trans_env]]
-=== Environmental (Transactions) Fields
+[[exported-fields-env]]
+=== Environmental Fields
 
-These fields contain data about the environment in which the transaction was captured.
+These fields contain data about the environment in which the transaction or flow was captured.
 
 
 
@@ -1750,26 +1753,11 @@ The software release of the service serving the transaction. This can be the com
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-[[exported-fields-flows_env]]
-=== Environmental (Flows) Fields
+==== fields
 
-These fields contain data about the environment in which the flow data was captured.
+type: dict
 
-
-
-==== beat.name
-
-Name of the Beat sending the events. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
-
-
-==== beat.hostname
-
-The hostname as returned by the operating system on which the Beat is running.
-
-
-==== tags
-
-Arbitrary tags that can be set per Beat and per transaction type.
+Contains user configurable fields.
 
 
 [[exported-fields-raw]]

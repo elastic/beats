@@ -1,5 +1,3 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
@@ -44,6 +42,17 @@ common:
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
 
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.
+
 eventlog:
   type: group
   description: >
@@ -65,7 +74,8 @@ eventlog:
         event forwarding, this name can differ from the `beat.hostname`.
 
     - name: event_data
-      type: dictionary
+      type: dict
+      dict-type: keyword
       required: false
       description: >
         The event specific data. This field is mutually exclusive with
@@ -78,7 +88,7 @@ eventlog:
         The event identifier. The value is specific to the source of the event.
 
     - name: keywords
-      type: keyword[]
+      type: keyword
       required: false
       description: >
         The keywords are used to classify an event.
@@ -173,7 +183,8 @@ eventlog:
         The thread_id identifies the thread that generated the event.
 
     - name: user_data
-      type: dictionary
+      type: dict
+      dict-type: keyword
       required: false
       description: >
         The event specific data. This field is mutually exclusive with
