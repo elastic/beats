@@ -1,11 +1,13 @@
 package ucfg
 
 import (
+	"errors"
 	"flag"
 	"io/ioutil"
 	"path"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,12 +30,7 @@ func TestErrorMessages(t *testing.T) {
 	cNested.ctx = testNestedCtx
 	cNestedMeta.ctx = testNestedCtx
 
-	arr := &cfgArray{arr: make([]value, 3)}
-	arrNested := &cfgArray{cfgPrimitive{ctx: testNestedCtx}, make([]value, 3)}
-	arrMeta := &cfgArray{cfgPrimitive{metadata: testMeta}, make([]value, 3)}
-	arrNestedMeta := &cfgArray{
-		cfgPrimitive{metadata: testMeta, ctx: testNestedCtx},
-		make([]value, 3)}
+	_, timeErr := time.ParseDuration("1 hour")
 
 	tests := map[string]Error{
 		"duplicate_wo_meta":        raiseDuplicateKey(c, "test"),
@@ -46,15 +43,20 @@ func TestErrorMessages(t *testing.T) {
 		"missing_nested_wo_meta": raiseMissing(cNested, "field"),
 		"missing_nested_w_meta":  raiseMissing(cNestedMeta, "field"),
 
-		"arr_missing_wo_meta":        raiseMissingArr(arr, 5),
-		"arr_missing_w_meta":         raiseMissingArr(arrMeta, 5),
-		"arr_missing_nested_wo_meta": raiseMissingArr(arrNested, 5),
-		"arr_missing_nested_w_meta":  raiseMissingArr(arrNestedMeta, 5),
+		"arr_missing_wo_meta":        raiseMissingArr(context{}, nil, 5),
+		"arr_missing_w_meta":         raiseMissingArr(context{}, testMeta, 5),
+		"arr_missing_nested_wo_meta": raiseMissingArr(testNestedCtx, nil, 5),
+		"arr_missing_nested_w_meta":  raiseMissingArr(testNestedCtx, testMeta, 5),
 
-		"arr_oob_wo_meta":        raiseIndexOutOfBounds(arr, 5),
-		"arr_oob_w_meta":         raiseIndexOutOfBounds(arrMeta, 5),
-		"arr_oob_nested_wo_meta": raiseIndexOutOfBounds(arrNested, 5),
-		"arr_oob_nested_w_meta":  raiseIndexOutOfBounds(arrNestedMeta, 5),
+		"arr_oob_wo_meta":        raiseIndexOutOfBounds(cfgSub{c}, 5),
+		"arr_oob_w_meta":         raiseIndexOutOfBounds(cfgSub{cMeta}, 5),
+		"arr_oob_nested_wo_meta": raiseIndexOutOfBounds(cfgSub{cNested}, 5),
+		"arr_oob_nested_w_meta":  raiseIndexOutOfBounds(cfgSub{cNestedMeta}, 5),
+
+		"invalid_duration_wo_meta": raiseInvalidDuration(newString(
+			context{field: "timeout"}, nil, ""), timeErr),
+		"invalid_duration_w_meta": raiseInvalidDuration(newString(
+			context{field: "timeout"}, testMeta, ""), timeErr),
 
 		"invalid_type_top_level": raiseInvalidTopLevelType(""),
 
@@ -95,13 +97,13 @@ func TestErrorMessages(t *testing.T) {
 			cNestedMeta, "ABC", reflect.TypeOf("")),
 
 		"unsupported_input_type_wo_meta": raiseUnsupportedInputType(
-			context{}, options{}, reflect.ValueOf(1)),
+			context{}, nil, reflect.ValueOf(1)),
 		"unsupported_input_type_w_meta": raiseUnsupportedInputType(
-			context{}, options{meta: testMeta}, reflect.ValueOf(1)),
+			context{}, testMeta, reflect.ValueOf(1)),
 		"unsupported_input_type_nested_wo_meta": raiseUnsupportedInputType(
-			testNestedCtx, options{}, reflect.ValueOf(1)),
+			testNestedCtx, nil, reflect.ValueOf(1)),
 		"unsupported_input_type_nested_w_meta": raiseUnsupportedInputType(
-			testNestedCtx, options{meta: testMeta}, reflect.ValueOf(1)),
+			testNestedCtx, testMeta, reflect.ValueOf(1)),
 
 		"nil_value_error":  raiseNil(ErrNilValue),
 		"nil_config_error": raiseNil(ErrNilConfig),
@@ -117,13 +119,14 @@ func TestErrorMessages(t *testing.T) {
 		"to_type_not_supported_nested_w_meta": raiseToTypeNotSupported(
 			newInt(testNestedCtx, testMeta, 1), reflect.TypeOf(struct{}{})),
 
-		"array_size_wo_meta": raiseArraySize(reflect.TypeOf([10]int{}), arr),
+		"array_size_wo_meta": raiseArraySize(
+			context{}, nil, 3, 10),
 		"array_size_w_meta": raiseArraySize(
-			reflect.TypeOf([10]int{}), arrMeta),
+			context{}, testMeta, 3, 10),
 		"array_size_nested_wo_meta": raiseArraySize(
-			reflect.TypeOf([10]int{}), arrNested),
+			testNestedCtx, nil, 3, 10),
 		"array_size_nested_w_meta": raiseArraySize(
-			reflect.TypeOf([10]int{}), arrNestedMeta),
+			testNestedCtx, testMeta, 3, 10),
 
 		"conversion_wo_meta": raiseConversion(
 			newInt(context{}, nil, 1), ErrTypeMismatch, "bool"),
@@ -142,6 +145,15 @@ func TestErrorMessages(t *testing.T) {
 			newInt(testNestedCtx, nil, 1)),
 		"expected_object_nested_w_meta": raiseExpectedObject(
 			newInt(testNestedCtx, testMeta, 1)),
+
+		"validation_wo_meta": raiseValidation(
+			context{}, nil, errors.New("invalid value")),
+		"validation_w_meta": raiseValidation(
+			context{}, testMeta, errors.New("invalid value")),
+		"validation_nested_wo_meta": raiseValidation(
+			testNestedCtx, nil, errors.New("invalid value")),
+		"validation_nested_w_meta": raiseValidation(
+			testNestedCtx, testMeta, errors.New("invalid value")),
 	}
 
 	for name, result := range tests {
