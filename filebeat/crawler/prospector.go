@@ -107,11 +107,11 @@ func (p *Prospector) Stop() {
 	logp.Info("Stopping Prospector")
 	close(p.done)
 
-	logp.Debug("prospector", "Stopping %d harvesters.", len(p.harvesters))
+	//logp.Debug("prospector", "Stopping %d harvesters.", len(p.harvesters))
 	for _, h := range p.harvesters {
 		go h.Stop()
 	}
-	logp.Debug("prospector", "Waiting for %d harvesters to stop", len(p.harvesters))
+	//logp.Debug("prospector", "Waiting for %d harvesters to stop", len(p.harvesters))
 	p.harvestersWaitGroup.Wait()
 
 }

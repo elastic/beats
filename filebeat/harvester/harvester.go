@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
 	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Harvester struct {
@@ -38,6 +37,7 @@ type Harvester struct {
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
 	file               FileSource /* the file being watched */
+	fileLock           sync.Mutex
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
 	done               chan struct{}
@@ -82,6 +82,6 @@ func (h *Harvester) Start() {
 }
 
 func (h *Harvester) Stop() {
-	logp.Debug("harvester", "Stopping harvester: %v", h.Id)
+	//logp.Debug("harvester", "Stopping harvester: %v", h.Id)
 	close(h.done)
 }

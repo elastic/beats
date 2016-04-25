@@ -24,8 +24,8 @@ func (h *Harvester) Harvest() {
 
 		// Make sure file is closed as soon as harvester exits
 		// If file was never properly opened, it can't be closed
-		if h.file != nil {
-			h.file.Close()
+		if h.getFile() != nil {
+			h.closeFile()
 			logp.Debug("harvester", "Stopping harvester, closing file: %s", h.Path)
 		} else {
 			logp.Debug("harvester", "Stopping harvester, NOT closing file as file info not available: %s", h.Path)
@@ -38,7 +38,7 @@ func (h *Harvester) Harvest() {
 		return
 	}
 
-	h.fileInfo, err = h.file.Stat()
+	h.fileInfo, err = h.getFile().Stat()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected file stat rror: %s", err)
 		return
@@ -59,7 +59,7 @@ func (h *Harvester) Harvest() {
 	}
 
 	reader, err := createLineReader(
-		h.file, enc, config.BufferSize, config.MaxBytes, readerConfig,
+		h.getFile(), enc, config.BufferSize, config.MaxBytes, readerConfig,
 		config.JSON, config.Multiline, h.done)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func (h *Harvester) Harvest() {
 		// Closes file so readLine returns error
 		// TODO: What happens to this if h.done never closed?
 		<-h.done
-		h.file.Close()
+		h.closeFile()
 	}()
 
 	// Report status harvester
@@ -87,7 +87,7 @@ func (h *Harvester) Harvest() {
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
 		if err != nil {
 			if err == errFileTruncate {
-				seeker, ok := h.file.(io.Seeker)
+				seeker, ok := h.getFile().(io.Seeker)
 				if !ok {
 					logp.Err("can not seek source")
 					return
@@ -182,8 +182,8 @@ func (h *Harvester) open() (encoding.Encoding, error) {
 }
 
 func (h *Harvester) openStdin() (encoding.Encoding, error) {
-	h.file = pipeSource{os.Stdin}
-	return h.encoding(h.file)
+	h.setFile(pipeSource{os.Stdin})
+	return h.encoding(h.getFile())
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected
@@ -225,7 +225,7 @@ func (h *Harvester) openFile() (encoding.Encoding, error) {
 	}
 
 	// yay, open file
-	h.file = fileSource{file}
+	h.setFile(fileSource{file})
 	return encoding, nil
 }
 
@@ -280,4 +280,25 @@ func (h *Harvester) GetOffset() int64 {
 	defer h.offsetLock.Unlock()
 
 	return h.offset
+}
+
+func (h *Harvester) getFile() FileSource {
+	h.fileLock.Lock()
+	defer h.fileLock.Unlock()
+
+	return h.file
+}
+
+func (h *Harvester) setFile(file FileSource) {
+	h.fileLock.Lock()
+	defer h.fileLock.Unlock()
+
+	h.file = file
+}
+
+func (h *Harvester) closeFile() {
+	h.fileLock.Lock()
+	defer h.fileLock.Unlock()
+
+	h.file.Close()
 }
