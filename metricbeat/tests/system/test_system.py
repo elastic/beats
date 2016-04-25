@@ -1,7 +1,7 @@
-import os
+import re
+import sys
+import unittest
 import metricbeat
-from nose.plugins.attrib import attr
-
 
 SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "nice", "softirq",
                      "steal", "system", "system_p", "user", "user_p"]
@@ -9,6 +9,7 @@ SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "nice", "softirq",
 SYSTEM_MEMORY_FIELDS = ["swap", "mem"]
 
 
+@unittest.skipUnless(re.match("(?i)win|linux|darwin|openbsd", sys.platform), "os")
 class SystemTest(metricbeat.BaseTest):
     def test_cpu(self):
         """
@@ -63,5 +64,4 @@ class SystemTest(metricbeat.BaseTest):
         memory = evt["system-memory"]
         self.assertItemsEqual(SYSTEM_MEMORY_FIELDS, memory.keys())
 
-        # TODO: After fields.yml is updated this can be uncommented.
-        #self.assert_fields_are_documented(evt)
+        self.assert_fields_are_documented(evt)
