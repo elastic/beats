@@ -42,6 +42,35 @@ type TLSConfig struct {
 	CurveTypes     []string `config:"curve_types"`
 }
 
+func (c *TLSConfig) Validate() error {
+	hasCertificate := c.Certificate != ""
+	hasKey := c.CertificateKey != ""
+
+	switch {
+	case hasCertificate && !hasKey:
+		return ErrCertificateNoKey
+	case !hasCertificate && hasKey:
+		return ErrKeyNoCertificate
+	}
+
+	if _, err := parseTLSVersion(c.MinVersion); err != nil {
+		return err
+	}
+	if _, err := parseTLSVersion(c.MaxVersion); err != nil {
+		return err
+	}
+
+	if _, err := parseTLSCipherSuites(c.CipherSuites); err != nil {
+		return err
+	}
+
+	if _, err := parseCurveTypes(c.CurveTypes); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // LoadTLSConfig will load a certificate from config with all TLS based keys
 // defined. If Certificate and CertificateKey are configured, client authentication
 // will be configured. If no CAs are configured, the host CA will be used by go

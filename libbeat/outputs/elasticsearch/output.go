@@ -191,15 +191,9 @@ func makeClientFactory(
 
 		var proxyURL *url.URL
 		if config.ProxyURL != "" {
-			proxyURL, err = url.Parse(config.ProxyURL)
-			if err != nil || !strings.HasPrefix(proxyURL.Scheme, "http") {
-				// Proxy was bogus. Try prepending "http://" to it and
-				// see if that parses correctly. If not, we fall
-				// through and complain about the original one.
-				proxyURL, err = url.Parse("http://" + config.ProxyURL)
-				if err != nil {
-					return nil, err
-				}
+			proxyURL, err = parseProxyURL(config.ProxyURL)
+			if err != nil {
+				return nil, err
 			}
 
 			logp.Info("Using proxy URL: %s", proxyURL)
@@ -244,4 +238,15 @@ func (out *elasticsearchOutput) BulkPublish(
 	events []common.MapStr,
 ) error {
 	return out.mode.PublishEvents(trans, opts, events)
+}
+
+func parseProxyURL(raw string) (*url.URL, error) {
+	url, err := url.Parse(raw)
+	if err == nil && strings.HasPrefix(url.Scheme, "http") {
+		return url, err
+	}
+
+	// Proxy was bogus. Try prepending "http://" to it and
+	// see if that parses correctly.
+	return url.Parse("http://" + raw)
 }
