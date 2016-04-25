@@ -78,6 +78,18 @@ required: True
 The document type. Always set to "metricsets".
 
 
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
 [[exported-fields-apache]]
 === Apache Status Fields
 

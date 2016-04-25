@@ -42,6 +42,17 @@ common:
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
 
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.
+
 eventlog:
   type: group
   description: >
