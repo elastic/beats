@@ -244,7 +244,7 @@ protocols:
     ports: [80, 8080, 8000, 5000, 8002]
 
   amqp:
-  	ports: [5672]
+    ports: [5672]
 
   memcache:
     ports: [11211]
@@ -479,7 +479,7 @@ protocol. Here is a sample configuration:
     max_body_length: 1000
     parse_headers: true
     parse_arguments: false
-	hide_connection_information: true
+    hide_connection_information: true
 ------------------------------------------------------------------------------
 
 ===== max_body_length
@@ -492,9 +492,8 @@ send_request or send_response options is not activated. Default is 1000 bytes.
 ===== parse_headers
 
 Parse the additional arguments specified in the headers field of a message.
-Those arguments are key-value pairs provided by users of the protocol,
-and can specify informations like the content type of the message or the
-message priority. Default is true.
+Those arguments are key-value pairs specifying informations like the
+content type of the message or the message priority. Default is true.
 
 ===== parse_arguments
 
