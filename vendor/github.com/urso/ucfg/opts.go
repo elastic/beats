@@ -3,14 +3,21 @@ package ucfg
 type Option func(*options)
 
 type options struct {
-	tag     string
-	pathSep string
-	meta    *Meta
+	tag          string
+	validatorTag string
+	pathSep      string
+	meta         *Meta
 }
 
 func StructTag(tag string) Option {
 	return func(o *options) {
 		o.tag = tag
+	}
+}
+
+func ValidatorTag(tag string) Option {
+	return func(o *options) {
+		o.validatorTag = tag
 	}
 }
 
@@ -28,8 +35,9 @@ func MetaData(meta Meta) Option {
 
 func makeOptions(opts []Option) options {
 	o := options{
-		tag:     "config",
-		pathSep: "", // no separator by default
+		tag:          "config",
+		validatorTag: "validate",
+		pathSep:      "", // no separator by default
 	}
 	for _, opt := range opts {
 		opt(&o)

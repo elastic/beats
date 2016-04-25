@@ -50,7 +50,7 @@ var (
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
 func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
-		cfg.SetInt("bulk_max_size", 0, defaultBulkSize)
+		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
 	output := &elasticsearchOutput{}

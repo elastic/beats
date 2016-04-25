@@ -1,1 +1,1 @@
-index '5' out of range (length=3) accessing config (source:'test.source')
+index '5' out of range (length=1) accessing config (source:'test.source')

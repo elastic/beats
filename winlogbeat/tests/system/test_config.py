@@ -32,10 +32,7 @@ class Test(BaseTest):
         )
         self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
         assert self.log_contains(
-            "can not convert 'string' into 'duration' accessing 'ignore_older'")
-            # Latest ucfg update affected this error message and we lost the
-            # time.ParseDuration error message.
-            # "time: unknown unit  hour in duration 1 hour")
+            "unknown unit  hour in duration 1 hour accessing 'ignore_older'")
 
     def test_invalid_level(self):
         """
