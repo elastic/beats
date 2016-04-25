@@ -50,6 +50,18 @@ The event log API type used to read the record. The possible values are "wineven
 The Event Logging API was designed for Windows Server 2003, Windows XP, or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
 
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
 [[exported-fields-eventlog]]
 === Event Log Record Fields
 
@@ -77,7 +89,7 @@ The name of the computer that generated the record. When using Windows event for
 
 ==== event_data
 
-type: dictionary
+type: dict
 
 required: False
 
@@ -95,7 +107,7 @@ The event identifier. The value is specific to the source of the event.
 
 ==== keywords
 
-type: keyword[]
+type: keyword
 
 required: False
 
@@ -212,7 +224,7 @@ The thread_id identifies the thread that generated the event.
 
 ==== user_data
 
-type: dictionary
+type: dict
 
 required: False
 
