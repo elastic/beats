@@ -8,7 +8,8 @@ cd /build
 cp ${RUNID}.init /tmp/{{.beat_name}}.init
 
 # create script to reload systemd config
-echo "#!/bin/bash\nsystemctl daemon-reload 2> /dev/null || true" > /tmp/systemd-daemon-reload.sh
+echo "#!/bin/bash" > /tmp/systemd-daemon-reload.sh
+echo "systemctl daemon-reload 2> /dev/null || true" >> /tmp/systemd-daemon-reload.sh
 
 # add SNAPSHOT if it was requested
 VERSION="{{.version}}"
@@ -31,6 +32,7 @@ fpm --force -s dir -t rpm \
         --after-install /tmp/systemd-daemon-reload.sh \
         --config-files /etc/{{.beat_name}}/{{.beat_name}}.yml \
         homedirs/{{.beat_name}}=/usr/share/ \
+        beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
         {{.beat_name}}.template.json=/etc/{{.beat_name}}/{{.beat_name}}.template.json \

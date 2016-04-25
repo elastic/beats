@@ -25,20 +25,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 var (
 	homePath   = flag.String("path.home", "", "Home path")
 	configPath = flag.String("path.config", "", "Configuration path")
 	dataPath   = flag.String("path.data", "", "Data path")
+	logsPath   = flag.String("path.logs", "", "Logs path")
 )
 
 type Path struct {
 	Home   string
 	Config string
 	Data   string
+	Logs   string
 }
 
 // FileType is an enumeration type representing the file types.
@@ -49,6 +49,7 @@ const (
 	Home   FileType = "home"
 	Config FileType = "config"
 	Data   FileType = "data"
+	Logs   FileType = "logs"
 )
 
 // Paths is the Path singleton on which the top level functions from this
@@ -91,6 +92,7 @@ func (paths *Path) initPaths(cfg *Path) error {
 	paths.Home = cfg.Home
 	paths.Config = cfg.Config
 	paths.Data = cfg.Data
+	paths.Logs = cfg.Logs
 
 	// overwrite paths from CLI flags
 	if homePath != nil && len(*homePath) > 0 {
@@ -101,6 +103,9 @@ func (paths *Path) initPaths(cfg *Path) error {
 	}
 	if dataPath != nil && len(*dataPath) > 0 {
 		paths.Data = *dataPath
+	}
+	if logsPath != nil && len(*logsPath) > 0 {
+		paths.Logs = *logsPath
 	}
 
 	// default for the home path is the binary location
@@ -123,6 +128,11 @@ func (paths *Path) initPaths(cfg *Path) error {
 		paths.Data = filepath.Join(paths.Home, "data")
 	}
 
+	// default for logs path
+	if len(paths.Logs) == 0 {
+		paths.Logs = filepath.Join(paths.Home, "logs")
+	}
+
 	return nil
 }
 
@@ -142,9 +152,10 @@ func (paths *Path) Resolve(fileType FileType, path string) string {
 		return filepath.Join(paths.Config, path)
 	case Data:
 		return filepath.Join(paths.Data, path)
+	case Logs:
+		return filepath.Join(paths.Logs, path)
 	default:
-		logp.WTF("Unknown file type: %s", fileType)
-		return ""
+		panic(fmt.Sprintf("Unknown file type: %s", fileType))
 	}
 }
 
@@ -157,6 +168,6 @@ func Resolve(fileType FileType, path string) string {
 
 // String returns a textual representation
 func (paths *Path) String() string {
-	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s]",
-		paths.Home, paths.Config, paths.Data)
+	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s] Logs path: [%s]",
+		paths.Home, paths.Config, paths.Data, paths.Logs)
 }

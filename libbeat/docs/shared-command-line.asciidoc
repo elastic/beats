@@ -48,6 +48,9 @@ Set the default location for data files.
 *`-path.home`*::
 Set the default location for miscellaneous files.
 
+*`-path.logs`*::
+Set the default location for log files.
+
 *`-v`*::
 Enable verbose output to show INFO-level messages.
 

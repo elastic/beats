@@ -5,6 +5,11 @@ SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
 
+# Metricbeat can only be cross-compiled on platforms not requiring CGO which
+# are the same platforms where the system metrics (cpu, memory) are not
+# implemented.
+GOX_OS=solaris freebsd netbsd
+
 include ../libbeat/scripts/Makefile
 
 # Collects all module dashboards

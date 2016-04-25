@@ -5,7 +5,7 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/usr/share/{{.beat_name}}/bin/{{.beat_name}} -c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}}
+ExecStart=/usr/share/{{.beat_name}}/bin/{{.beat_name}} -c /etc/{{.beat_name}}/{{.beat_name}}.yml -path.home /usr/share/{{.beat_name}} -path.config /etc/{{.beat_name}} -path.data /var/lib/{{.beat_name}} -path.logs /var/log/{{.beat_name}}
 Restart=always
 
 [Install]

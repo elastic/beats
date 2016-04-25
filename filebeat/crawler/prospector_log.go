@@ -18,7 +18,7 @@ type ProspectorLog struct {
 	iteration      uint32
 	lastscan       time.Time
 	missingFiles   map[string]os.FileInfo
-	prospectorList map[string]harvester.FileStat
+	harvesterStats map[string]harvester.FileStat
 	config         cfg.ProspectorConfig
 }
 
@@ -31,7 +31,7 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	}
 
 	// Init File Stat list
-	prospectorer.prospectorList = make(map[string]harvester.FileStat)
+	prospectorer.harvesterStats = make(map[string]harvester.FileStat)
 
 	return prospectorer, nil
 }
@@ -47,9 +47,9 @@ func (p *ProspectorLog) Run() {
 	p.scan()
 
 	// Clear out files that disappeared and we've stopped harvesting
-	for file, lastinfo := range p.prospectorList {
+	for file, lastinfo := range p.harvesterStats {
 		if lastinfo.Finished() && lastinfo.LastIteration < p.iteration {
-			delete(p.prospectorList, file)
+			delete(p.harvesterStats, file)
 		}
 	}
 
@@ -112,7 +112,7 @@ func (p *ProspectorLog) scanGlob(glob string) {
 		}
 
 		// Check the current info against p.prospectorinfo[file]
-		lastinfo, isKnown := p.prospectorList[file]
+		lastinfo, isKnown := p.harvesterStats[file]
 
 		oldFile := input.NewFile(lastinfo.Fileinfo)
 
@@ -139,7 +139,7 @@ func (p *ProspectorLog) scanGlob(glob string) {
 
 		// Track the stat data for this file for later comparison to check for
 		// rotation/etc
-		p.prospectorList[h.Path] = *h.Stat
+		p.harvesterStats[h.Path] = *h.Stat
 	}
 }
 
@@ -254,7 +254,7 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 func (p *ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFile string) {
 	logp.Debug("prospector", "Launching harvester on renamed file. File rename was detected: %s -> %s", previousFile, h.Path)
 
-	lastinfo := p.prospectorList[previousFile]
+	lastinfo := p.harvesterStats[previousFile]
 	h.Stat.Continue(&lastinfo)
 
 	// Update state because of file rotation
@@ -277,7 +277,7 @@ func (p *ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
 // will be returned.
 func (p *ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, error) {
 
-	for path, pFileStat := range p.prospectorList {
+	for path, pFileStat := range p.harvesterStats {
 		if path == file {
 			continue
 		}

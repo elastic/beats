@@ -25,7 +25,7 @@ class Proc(object):
 
     def __init__(self, args, outputfile):
         self.args = args
-        self.output = open(outputfile, "wb")
+        self.output = open(outputfile, "ab")
 
     def start(self):
         self.stdin_read, self.stdin_write = os.pipe()
