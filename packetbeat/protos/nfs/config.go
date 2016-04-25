@@ -2,7 +2,7 @@ package nfs
 
 import (
 	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/protos"
+	"time"
 )
 
 type rpcConfig struct {
@@ -12,7 +12,7 @@ type rpcConfig struct {
 var (
 	defaultConfig = rpcConfig{
 		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
+			TransactionTimeout: 1 * time.Minute,
 		},
 	}
 )
