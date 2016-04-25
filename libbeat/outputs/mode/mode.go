@@ -182,7 +182,6 @@ func MakeAsyncClients(
 
 func ReadHostList(cfg *common.Config) ([]string, error) {
 	config := struct {
-		Host   string   `config:"host"`
 		Hosts  []string `config:"hosts"`
 		Worker int      `config:"worker"`
 	}{
@@ -194,14 +193,7 @@ func ReadHostList(cfg *common.Config) ([]string, error) {
 		return nil, err
 	}
 
-	// TODO: remove config.Host
-	var lst []string
-	if len(config.Hosts) > 0 {
-		lst = config.Hosts
-	} else if config.Host != "" {
-		lst = []string{config.Host}
-	}
-
+	lst := config.Hosts
 	if len(lst) == 0 || config.Worker <= 1 {
 		return lst, nil
 	}
