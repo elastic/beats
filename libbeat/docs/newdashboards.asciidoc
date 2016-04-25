@@ -94,7 +94,9 @@ On Windows systems:
 
 To export all the dashboards for a Beat together with all dependencies (visualizations, searches and index patterns), 
 you can use the python script `export_dashboards.py` from 
-https://github.com/elastic/beats/tree/master/dev-tools[dev-tools].  
+https://github.com/elastic/beats/tree/master/dev-tools[dev-tools].
+
+Note: Please, be aware that Dashboard name must be **prefixed** with name of the beat in order to work correctly. Example: Topbeat-Dashboard
 
 The command has the following options:
 
