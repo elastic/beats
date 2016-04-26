@@ -8,9 +8,9 @@ requests and their response codes are reported:
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
   - include_fields:
-      fields: 
+      fields:
         - bytes_in
         - bytes_out
         - ip

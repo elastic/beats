@@ -40,7 +40,7 @@ dropping the `beat.name` field from all documents.
 
 [source, yaml]
 ----
-filter:
+filters:
  - drop_fields.fields: ['beat.name']
 ----
 
