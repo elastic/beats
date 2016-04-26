@@ -7,7 +7,7 @@ The `interfaces` section configures the sniffer. Here is an example configuratio
 ------------------------------------------------------------------------------
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-interfaces:
+packetbeat.interfaces:
   # On which device to sniff
   device: any
 
@@ -34,7 +34,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
 ------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ first interface in the list:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: 0
 ------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
   snaplen: 1514
 ------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ the `af_packet` sniffing type:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
   type: af_packet
 ------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
   type: af_packet
   buffer_size_mb: 100
@@ -168,7 +168,7 @@ You can use the `bpf_filter` setting to overwrite the generated BPF filter. For 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
   bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
 ------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ disabled.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-flows:
+packetbeat.flows:
   timeout: 30s
   period: 10s
 ------------------------------------------------------------------------------
@@ -233,7 +233,7 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   icmp:
     enabled: true
 
@@ -314,7 +314,7 @@ The `dns` section specifies configuration options for the DNS protocol. The DNS 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   dns:
     ports: [53]
 
@@ -345,7 +345,7 @@ sample configuration section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   http:
 
     # Configure the ports where to listen for HTTP traffic. You can disable
@@ -418,7 +418,7 @@ Example configuration:
 
 [source,yml]
 ------------------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   http:
     ports: [80, 8080]
     send_response: true
@@ -709,7 +709,7 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-procs:
+packetbeat.procs:
   enabled: true
   monitored:
     - process: mysqld

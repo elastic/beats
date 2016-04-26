@@ -1,46 +1,12 @@
-############################# Shipper #########################################
-shipper:
-  # The name of the shipper that publishes the network data. It can be used to group
-  # all the transactions sent by a single shipper in the web interface.
-  # If this options is not defined, the hostname is used.
-  name:
-
-  # The tags of the shipper are included in their own field with each
-  # transaction published. Tags make it easy to group servers by different
-  # logical properties.
-  tags: [
-    {%- if agent_tags -%}
-        {%- for tag in agent_tags -%}
-            "{{ tag }}"
-            {%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
-    {%- endif -%}
-  ]
-
-  # Uncomment the following if you want to ignore transactions created
-  # by the server on which the shipper is installed. This option is useful
-  # to remove duplicates if shippers are installed on multiple servers.
-  # ignore_outgoing: true
-
-{% if geoip_paths is not none %}
-  geoip:
-    paths: [
-        {%- for path in geoip_paths -%}
-            "{{ beat.working_dir + '/' + path }}"
-            {%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
-    ]
-{%- endif %}
-
-############################# Sniffer #########################################
+############################# Packetbeat #########################################
 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-interfaces:
+packetbeat.interfaces:
   device: {{ iface_device|default("any") }}
 
 {% if flows %}
-flows:
+packetbeat.flows:
   period: -1s
   timeout: 10s
 {% endif %}
@@ -48,7 +14,7 @@ flows:
 # Configure which protocols to monitor and the ports where they are
 # running. You can disable a given protocol by commenting out its
 # configuration.
-protocols:
+packetbeat.protocols:
   icmp:
     enabled: true
 {% if icmp_send_request %}    send_request: true{%- endif %}
@@ -150,6 +116,87 @@ protocols:
 {% if mongodb_max_docs is not none %}    max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}    max_doc_length: {{mongodb_max_doc_length}}{% endif %}
 
+############################# Processes #######################################
+
+{% if procs_enabled %}
+# Configure the processes to be monitored and how to find them. If a process is
+# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
+# `client_proc` fields.
+# The processes can be found by searching their command line by a given string.
+#
+# Process matching is optional and can be enabled by uncommenting the following
+# lines.
+#
+packetbeat.procs:
+  enabled: true
+  monitored:
+    - process: mysqld
+      cmdline_grep: mysqld
+
+    - process: pgsql
+      cmdline_grep: postgres
+
+    - process: nginx
+      cmdline_grep: nginx
+
+    - process: app
+      cmdline_grep: gunicorn
+
+    - process: memcache
+      cmdline_grep: memcached
+{% endif %}
+
+{% if filter_enabled %}
+
+
+############################# Filters #########################################
+filters:
+
+    {%- if drop_fields %}
+    - drop_fields:
+        fields: {{drop_fields}}
+    {%- endif %}
+    {%- if include_fields is not none %}
+    - include_fields:
+        fields: {{include_fields}}
+    {%- endif %}
+{% endif %}
+# vim: set ft=jinja:
+
+############################# Shipper #########################################
+shipper:
+  # The name of the shipper that publishes the network data. It can be used to group
+  # all the transactions sent by a single shipper in the web interface.
+  # If this options is not defined, the hostname is used.
+  name:
+
+  # The tags of the shipper are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  tags: [
+    {%- if agent_tags -%}
+        {%- for tag in agent_tags -%}
+            "{{ tag }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+  ]
+
+  # Uncomment the following if you want to ignore transactions created
+  # by the server on which the shipper is installed. This option is useful
+  # to remove duplicates if shippers are installed on multiple servers.
+  # ignore_outgoing: true
+
+{% if geoip_paths is not none %}
+  geoip:
+    paths: [
+        {%- for path in geoip_paths -%}
+            "{{ beat.working_dir + '/' + path }}"
+            {%- if not loop.last %}, {% endif -%}
+        {%- endfor -%}
+    ]
+{%- endif %}
+
 ############################# Output ##########################################
 
 # Configure what outputs to use when sending the data collected by packetbeat.
@@ -177,48 +224,3 @@ output:
     filename: "{{ output_file_filename|default("packetbeat") }}"
     rotate_every_kb: 1000
     #number_of_files: 7
-
-############################# Processes #######################################
-
-{% if procs_enabled %}
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored than Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-procs:
-  enabled: true
-  monitored:
-    - process: mysqld
-      cmdline_grep: mysqld
-
-    - process: pgsql
-      cmdline_grep: postgres
-
-    - process: nginx
-      cmdline_grep: nginx
-
-    - process: app
-      cmdline_grep: gunicorn
-
-    - process: memcache
-      cmdline_grep: memcached
-{% endif %}
-
-{% if filter_enabled %}
-
-filters:
-
-    {%- if drop_fields %}
-    - drop_fields:
-        fields: {{drop_fields}}
-    {%- endif %}
-    {%- if include_fields is not none %}
-    - include_fields:
-        fields: {{include_fields}}
-    {%- endif %}
-{% endif %}
-# vim: set ft=jinja:
