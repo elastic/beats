@@ -105,7 +105,7 @@ type BeatConfig struct {
 	Output  map[string]*common.Config
 	Logging logp.Logging
 	Shipper publisher.ShipperConfig
-	Filter  []filter.FilterConfig
+	Filters []filter.FilterConfig
 	Path    paths.Path
 }
 
@@ -195,7 +195,7 @@ func (bc *instance) config() error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
-	bc.data.filters, err = filter.New(bc.data.Config.Filter)
+	bc.data.filters, err = filter.New(bc.data.Config.Filters)
 	if err != nil {
 		return fmt.Errorf("error initializing filters: %v", err)
 	}

@@ -7,7 +7,7 @@ When your use case requires only a subset of the data exported by Topbeat, you c
 ==== Topbeat Config Options for Filtering
 
 You can specify the <<procs-option,`procs`>> option in the `input` section of the config file to specify a list of
-regular expressions to match the processes that you want to monitor. 
+regular expressions to match the processes that you want to monitor.
 
 By default, all processes are monitored:
 
@@ -27,7 +27,7 @@ For example, the following filter configuration reduces the exported fields to i
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
  - include_fields:
      fields: ["load", "mem", "swap", "cpu.user_p"]
 -----------------------------------------------------
@@ -36,7 +36,7 @@ The following filter configuration drops all the swap information:
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
  - drop_fields:
      fields: ["swap"]
 -----------------------------------------------------
@@ -45,7 +45,7 @@ The following filter configuration uses multiple actions to keep the fields that
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
  - include_fields:
      fields: ["cpu"]
  - drop_fields:

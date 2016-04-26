@@ -7,7 +7,7 @@ For example, the following filter configuration drops a few fields that are rare
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
   - drop_fields:
       fields: [provider_guid, process_id, thread_id, version, event_data.ErrorSourceTable]
 -----------------------------------------------------
