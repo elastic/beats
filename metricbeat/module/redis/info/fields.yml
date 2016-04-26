@@ -1,70 +1,65 @@
-redis:
+- name: redis-info
   type: group
   description: >
-    Redis metrics collected from the Redis `INFO` command.
+    `redis-info` contains the information and statistics returned by the
+    `INFO` command.
   fields:
-    - name: redis-info
+    - name: clients
       type: group
       description: >
-        `redis-info` contains the information and statistics returned by the
-        `INFO` command.
+        Redis client stats
       fields:
-        - name: clients
-          type: group
+        - name: connected_clients
+          type: integer
           description: >
-            Redis client stats
-          fields:
-            - name: connected_clients
-              type: integer
-              description: >
-                Number of client connections (excluding connections from slaves)
+            Number of client connections (excluding connections from slaves)
 
-            - name: client_longest_output_list
-              type: integer
-              description: >
-                Longest output list among current client connections.
-
-            - name: client_biggest_input_buf
-              type: integer
-              description: >
-                Biggest input buffer among current client connections
-
-            - name: blocked_clients
-              type: integer
-              description: >
-                Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
-
-        - name: cluster
-          type: group
+        - name: client_longest_output_list
+          type: integer
           description: >
-            Redis cluster information
-          fields:
-            - name: cluster_enabled
-              type: bool
-              description: >
-                Indicate Redis cluster is enabled
+            Longest output list among current client connections.
 
-        - name: cpu
-          type: group
+        - name: client_biggest_input_buf
+          type: integer
           description: >
-            Redis CPU stats
-          fields:
-            - name: used_cpu_sys
-              type: float
-              description: >
-                System CPU consumed by the Redis server
+            Biggest input buffer among current client connections
 
-            - name: used_cpu_sys_children
-              type: float
-              description: >
-                User CPU consumed by the Redis server
+        - name: blocked_clients
+          type: integer
+          description: >
+            Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
 
-            - name: used_cpu_user
-              type: float
-              description: >
-                System CPU consumed by the background processes
+    - name: cluster
+      type: group
+      description: >
+        Redis cluster information
+      fields:
+        - name: cluster_enabled
+          type: bool
+          description: >
+            Indicate Redis cluster is enabled
 
-            - name: used_cpu_user_children
-              type: float
-              description: >
-                User CPU consumed by the background processes
+    - name: cpu
+      type: group
+      description: >
+        Redis CPU stats
+      fields:
+        - name: used_cpu_sys
+          type: float
+          description: >
+            System CPU consumed by the Redis server
+
+        - name: used_cpu_sys_children
+          type: float
+          description: >
+            User CPU consumed by the Redis server
+
+        - name: used_cpu_user
+          type: float
+          description: >
+            System CPU consumed by the background processes
+
+        - name: used_cpu_user_children
+          type: float
+          description: >
+            User CPU consumed by the background processes

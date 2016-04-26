@@ -231,12 +231,61 @@
         "rtt": {
           "type": "long"
         },
+        "system-cpu": {
+          "properties": {
+            "idle": {
+              "type": "integer"
+            },
+            "iowait": {
+              "type": "integer"
+            },
+            "irq": {
+              "type": "integer"
+            },
+            "nice": {
+              "type": "integer"
+            },
+            "softirq": {
+              "type": "integer"
+            },
+            "steal": {
+              "type": "integer"
+            },
+            "system": {
+              "type": "integer"
+            },
+            "system_p": {
+              "type": "float"
+            },
+            "user": {
+              "type": "integer"
+            },
+            "user_p": {
+              "type": "float"
+            }
+          }
+        },
         "system-memory": {
           "properties": {
             "mem": {
               "properties": {
+                "actual_free": {
+                  "type": "integer"
+                },
+                "actual_used": {
+                  "type": "integer"
+                },
                 "actual_used_p": {
                   "type": "float"
+                },
+                "free": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "used": {
+                  "type": "integer"
                 },
                 "used_p": {
                   "type": "float"
@@ -245,6 +294,15 @@
             },
             "swap": {
               "properties": {
+                "free": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "used": {
+                  "type": "integer"
+                },
                 "used_p": {
                   "type": "float"
                 }
