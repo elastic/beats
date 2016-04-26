@@ -1,5 +1,3 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
@@ -63,3 +61,14 @@ common:
       example: metricsets
       description: >
         The document type. Always set to "metricsets".
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.

@@ -1,0 +1,5 @@
+system:
+  type: group
+  description: >
+    System status metrics, like CPU and memory usage, that are collected from the operating system.
+  fields:

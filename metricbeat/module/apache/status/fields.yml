@@ -1,172 +1,167 @@
-apache:
+- name: apache-status
   type: group
   description: >
-    Apache HTTPD server metrics collected from the mod_status module.
+    `apache-status` contains the metrics that were scraped from the status
+    page.
   fields:
-    - name: apache-status
+    - name: hostname
+      type: string
+      description: >
+        Apache hostname
+    - name: totalAccesses
+      type: integer
+      description: >
+        Total number of access requests
+    - name: totalKBytes
+      type: integer
+      description: >
+        Total number of kilobytes served
+    - name: reqPerSec
+      type: float
+      description: >
+        Requests per second
+    - name: bytesPerSec
+      type: float
+      description: >
+        Bytes per second
+    - name: bytesPerReq
+      type: float
+      description: >
+        Bytes per request
+    - name: busyWorkers
+      type: integer
+      description: >
+        Number of busy workers
+    - name: idleWorkers
+      type: integer
+      description: >
+        Number of idle workers
+    - name: uptime
       type: group
       description: >
-        `apache-status` contains the metrics that were scraped from the status
-        page.
+        Uptime stats
       fields:
-        - name: hostname
-          type: string
-          description: >
-            Apache hostname
-        - name: totalAccesses
+        - name: serverUptimeSeconds
           type: integer
           description: >
-            Total number of access requests
-        - name: totalKBytes
-          type: integer
-          description: >
-            Total number of kilobytes served
-        - name: reqPerSec
-          type: float
-          description: >
-            Requests per second
-        - name: bytesPerSec
-          type: float
-          description: >
-            Bytes per second
-        - name: bytesPerReq
-          type: float
-          description: >
-            Bytes per request
-        - name: busyWorkers
-          type: integer
-          description: >
-            Number of busy workers
-        - name: idleWorkers
-          type: integer
-          description: >
-            Number of idle workers
+            Server uptime in seconds
         - name: uptime
-          type: group
+          type: integer
           description: >
-            Uptime stats
-          fields:
-            - name: serverUptimeSeconds
-              type: integer
-              description: >
-                Server uptime in seconds
-            - name: uptime
-              type: integer
-              description: >
-                Server uptime
-        - name: cpu
-          type: group
+            Server uptime
+    - name: cpu
+      type: group
+      description: >
+        CPU stats
+      fields:
+        - name: cpuLoad
+          type: float
           description: >
-            CPU stats
-          fields:
-            - name: cpuLoad
-              type: float
-              description: >
-                CPU Load
-            - name: cpuUser
-              type: float
-              description: >
-                cpu user load
-            - name: cpuSystem
-              type: float
-              description: >
-                System cpu
-            - name: cpuChildrenUser
-              type: float
-              description: >
-                CPU of children user
-            - name: cpuChildrenSystem
-              type: float
-              description: >
-                cpu of children system
-        - name: connections
-          type: group
+            CPU Load
+        - name: cpuUser
+          type: float
           description: >
-            Connection stats
-          fields:
-            - name: connsTotal
-              type: integer
-              description: >
-                Total connections
-            - name: connsAsyncWriting
-              type: integer
-              description: >
-                Async connectin writing
-            - name: connsAsyncKeepAlive
-              type: integer
-              description: >
-                Async keeped alive connetions
-            - name: connsAsyncClosing
-              type: integer
-              description: >
-                Async closed connections
-        - name: load
-          type: group
+            cpu user load
+        - name: cpuSystem
+          type: float
           description: >
-            Load averages
-          fields:
-            - name: load1
-              type: float
-              description: >
-                Load average for the last minute
-            - name: load5
-              type: float
-              description: >
-                Load avarage for the last 5 minutes
-            - name: load15
-              type: float
-              description: >
-                Load aferage for the last 15 minutes
-        - name: scoreboard
-          type: group
+            System cpu
+        - name: cpuChildrenUser
+          type: float
           description: >
-            Scoreboard metrics
-          fields:
-            - name: startingUp
-              type: integer
-              description: >
-                Starting up
-            - name: readingRequest
-              type: integer
-              description: >
-                Reading requests
-            - name: sendingReply
-              type: integer
-              description: >
-                Sending Reply
-            - name: keepalive
-              type: integer
-              description: >
-                Keep alive
-            - name: dnsLookup
-              type: integer
-              description: >
-                Dns Lookups
-            - name: closingConnection
-              type: integer
-              description: >
-                Closing connections
-            - name: logging
-              type: integer
-              description: >
-                Logging
-            - name: gracefullyFinishing
-              type: integer
-              description: >
-                Gracefully finishing
-            - name: idleCleanup
-              type: integer
-              description: >
-                Idle cleanups
-            - name: openSlot
-              type: integer
-              description: >
-                Open slots
-            - name: waitingForConnection
-              type: integer
-              description: >
-                Waiting for connections
-            - name: total
-              type: integer
-              description: >
-                Total
+            CPU of children user
+        - name: cpuChildrenSystem
+          type: float
+          description: >
+            cpu of children system
+    - name: connections
+      type: group
+      description: >
+        Connection stats
+      fields:
+        - name: connsTotal
+          type: integer
+          description: >
+            Total connections
+        - name: connsAsyncWriting
+          type: integer
+          description: >
+            Async connectin writing
+        - name: connsAsyncKeepAlive
+          type: integer
+          description: >
+            Async keeped alive connetions
+        - name: connsAsyncClosing
+          type: integer
+          description: >
+            Async closed connections
+    - name: load
+      type: group
+      description: >
+        Load averages
+      fields:
+        - name: load1
+          type: float
+          description: >
+            Load average for the last minute
+        - name: load5
+          type: float
+          description: >
+            Load avarage for the last 5 minutes
+        - name: load15
+          type: float
+          description: >
+            Load aferage for the last 15 minutes
+    - name: scoreboard
+      type: group
+      description: >
+        Scoreboard metrics
+      fields:
+        - name: startingUp
+          type: integer
+          description: >
+            Starting up
+        - name: readingRequest
+          type: integer
+          description: >
+            Reading requests
+        - name: sendingReply
+          type: integer
+          description: >
+            Sending Reply
+        - name: keepalive
+          type: integer
+          description: >
+            Keep alive
+        - name: dnsLookup
+          type: integer
+          description: >
+            Dns Lookups
+        - name: closingConnection
+          type: integer
+          description: >
+            Closing connections
+        - name: logging
+          type: integer
+          description: >
+            Logging
+        - name: gracefullyFinishing
+          type: integer
+          description: >
+            Gracefully finishing
+        - name: idleCleanup
+          type: integer
+          description: >
+            Idle cleanups
+        - name: openSlot
+          type: integer
+          description: >
+            Open slots
+        - name: waitingForConnection
+          type: integer
+          description: >
+            Waiting for connections
+        - name: total
+          type: integer
+          description: >
+            Total
