@@ -1,10 +1,8 @@
 beat:
-  build: .
+  build: ${PWD}/.
   links:
     - redis
     - sredis
-    - elasticsearch
-    - logstash
     - kafka
   environment:
     - REDIS_HOST=redis
@@ -21,24 +19,24 @@ beat:
     - KAFKA_HOST=kafka
     - KAFKA_PORT=9092
   env_file:
-    - build/test.env
+    - ${PWD}/build/test.env
   volumes:
-    - ..:/go/src/github.com/elastic/beats/
+    - ${PWD}/..:/go/src/github.com/elastic/beats/
   working_dir: /go/src/github.com/elastic/beats/libbeat
   command: make
   entrypoint: /go/src/github.com/elastic/beats/libbeat/scripts/docker-entrypoint.sh
 
-elasticsearch:
-  build: ../testing/environments/docker/elasticsearch
-  dockerfile: Dockerfile-5.0.0-alpha1
-  command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
+# This host name is fixed because of the certificate
+logstash:
+  env_file:
+    - ${PWD}/build/test.env
 
 redis:
   image: redis:3.0.7
 
 # This host name is fixed because of the certificate
 sredis: # stunnel proxy for redis
-  build: ../testing/environments/docker/sredis
+  build: ${PWD}/../testing/environments/docker/sredis
   expose:
     - 6380
   links:
@@ -47,16 +45,7 @@ sredis: # stunnel proxy for redis
     - REDIS_HOST=redis
     - REDIS_PORT=6379
   env_file:
-    - build/test.env
-
-# This host name is fixed because of the certificate
-logstash:
-  build: ../testing/environments/docker/logstash
-  dockerfile: Dockerfile-5.0.0-alpha1
-  env_file:
-    - build/test.env
-  links:
-    - elasticsearch
+    - ${PWD}/build/test.env
 
 kafka:
   image: spotify/kafka

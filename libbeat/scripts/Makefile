@@ -31,6 +31,7 @@ GOFILES = $(shell find . -type f -name '*.go')
 GOFILES_NOVENDOR = $(shell find . -type f -name '*.go' -not -path "*/vendor/*")
 SHELL=bash
 ES_HOST?="elasticsearch"
+PWD=$(shell pwd)
 BUILD_DIR?=$(shell pwd)/build
 COVERAGE_DIR=${BUILD_DIR}/coverage
 PROCESSES?= 4
@@ -38,9 +39,15 @@ TIMEOUT?= 90
 TEST_ENVIRONMENT?=false
 SYSTEM_TESTS?=false
 GOX_OS?=linux darwin windows solaris freebsd netbsd openbsd
-DOCKER_COMPOSE?=docker-compose -f docker-compose.yml
+TESTING_ENVIRONMENT?=snapshot
+DOCKER_COMPOSE?=docker-compose -f ${PWD}/../testing/environments/base.yml -f ${PWD}/../testing/environments/${TESTING_ENVIRONMENT}.yml -f docker-compose.yml
+DOCKER_CACHE?=1 # If set to 0, all docker images are created without cache
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))
 PYTHON_ENV?=${BUILD_DIR}/python-env
+
+ifeq ($(DOCKER_CACHE),0)
+	DOCKER_NOCACHE=--no-cache
+endif
 
 # Conditionally enable the race detector when RACE_DETECTOR=1.
 ifeq ($(RACE_DETECTOR),1)
@@ -223,7 +230,7 @@ import-dashboards:
 # Builds the environment to test beat
 .PHONY: build-image
 build-image: write-environment
-	${DOCKER_COMPOSE} build
+	${DOCKER_COMPOSE} build ${DOCKER_NOCACHE}
 
 # Runs the environment so the redis and elasticsearch can also be used for local development
 # To use it for running the test, set ES_HOST and REDIS_HOST environment variable to the ip of your docker-machine.
