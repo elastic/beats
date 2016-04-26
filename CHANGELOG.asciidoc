@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Add scripts for managing the dashboards of a single Beat {pull}1359[1359]
 - On DEB/RPM installations, the binary files are now found under `/usr/share/{{beat_name}}/bin`, not in `/usr/bin`. {pull}1385[1385]
 - The logs are written by default to self rotating files, instead of syslog. {pull}1371[1371]
+- Remove deprecated `host` option from elasticsearch, logstash and redis outputs. {pull}1474[1474]
 
 *Packetbeat*
 
