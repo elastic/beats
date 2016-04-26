@@ -7,7 +7,7 @@ When your use case requires only a subset of the data exported by Filebeat, you 
 ==== Filebeat Config Options for Filtering
 
 You can specify configuration options in the `filebeat` section of the config file to define regular expressions that
-match the lines you want to include and/or exclude from the output. The supported options are <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>. 
+match the lines you want to include and/or exclude from the output. The supported options are <<include-lines,`include_lines`>>, <<exclude-lines,`exclude_lines`>>, and <<exclude-files,`exclude_files`>>.
 
 For example, you can use the `include_lines` option to export any lines that start with "ERR" or "WARN":
 
@@ -34,7 +34,7 @@ with the mandatory fields.
 
 [source, yaml]
 -----------------------------------------------------
-filter:
+filters:
  - include_fields:
      fields: ["message", "source"]
 -----------------------------------------------------
