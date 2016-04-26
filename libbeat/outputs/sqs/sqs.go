@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/defaults"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -23,36 +26,50 @@ func init() {
 }
 
 func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	sqsConfig := defaultConfig
+	if err := cfg.Unpack(&sqsConfig); err != nil {
 		return nil, err
 	}
 
-	output := &sqsOutput{}
+	awsSqs := sqs.New(awsSession(sqsConfig))
 
-	if err := output.Init(&config); err != nil {
+	o, err := awsSqs.GetQueueUrl(&sqs.GetQueueUrlInput{QueueName: aws.String(sqsConfig.QueueName)})
+	if err != nil {
 		return nil, err
 	}
+
+	output := &sqsOutput{
+		sqs:      awsSqs,
+		queueURL: o.QueueUrl,
+	}
+
 	return output, nil
 }
 
-func (out *sqsOutput) Init(cfg *config) error {
-	out.sqs = sqs.New(session.New(
-		defaults.Config().
-			WithRegion(cfg.Region).
-			WithMaxRetries(3),
-	))
+func awsSession(cfg config) *session.Session {
+	sess := aws.NewConfig().
+		WithRegion(cfg.Region).
+		WithMaxRetries(5).
+		WithCredentialsChainVerboseErrors(true)
 
-	o, err := out.sqs.GetQueueUrl(&sqs.GetQueueUrlInput{
-		QueueName: aws.String(cfg.QueueName),
+	prods := make([]credentials.Provider, 0)
+	if cfg.AccessKeyID != "" && cfg.SecretAccessKey != "" {
+		prods = append(prods, &credentials.StaticProvider{
+			Value: credentials.Value{
+				AccessKeyID:     cfg.AccessKeyID,
+				SecretAccessKey: cfg.SecretAccessKey,
+				ProviderName:    credentials.StaticProviderName,
+			}})
+	}
+	prods = append(prods, &credentials.EnvProvider{})
+	prods = append(prods, &ec2rolecreds.EC2RoleProvider{
+		Client: ec2metadata.New(session.New(sess), &aws.Config{Endpoint: aws.String("http://169.254.169.254/latest")}),
 	})
 
-	if err != nil {
-		return err
-	}
-	out.queueURL = o.QueueUrl
+	creds := credentials.NewChainCredentials(prods)
+	sess.WithCredentials(creds)
+	return session.New(sess)
 
-	return nil
 }
 
 // Implement Outputer
@@ -61,16 +78,14 @@ func (out *sqsOutput) Close() error {
 }
 
 func (out *sqsOutput) PublishEvent(
-	trans outputs.Signaler,
+	s op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
 
 	jsonEvent, err := json.Marshal(event)
 	if err != nil {
-		// mark as success so event is not sent again.
-		outputs.SignalCompleted(trans)
-
+		op.SigCompleted(s)
 		logp.Err("Fail to json encode event(%v): %#v", err, event)
 		return err
 	}
@@ -81,9 +96,11 @@ func (out *sqsOutput) PublishEvent(
 	})
 
 	if err != nil {
-		logp.Err("Error when writing line to sqs: %s", err)
+		logp.Critical("Error when writing line to sqs: %s", err)
+		op.SigFailed(s, err)
+		return err
 	}
 
-	outputs.Signal(trans, err)
+	op.SigCompleted(s)
 	return err
 }
