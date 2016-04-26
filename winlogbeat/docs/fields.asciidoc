@@ -273,7 +273,7 @@ The type of account associated with this event.
 
 ==== version
 
-type: int
+type: integer
 
 required: False
 

@@ -417,11 +417,11 @@ trans_event:
           description: A human readable form of the request.
 
         - name: request.type
-          type: int
+          type: integer
           description: The request type.
 
         - name: request.code
-          type: int
+          type: integer
           description: The request code.
 
         - name: response.message
@@ -429,11 +429,11 @@ trans_event:
           description: A human readable form of the response.
 
         - name: response.type
-          type: int
+          type: integer
           description: The response type.
 
         - name: response.code
-          type: int
+          type: integer
           description: The response code.
 
     - name: dns
@@ -441,7 +441,7 @@ trans_event:
       description: DNS-specific event fields.
       fields:
         - name: id
-          type: int
+          type: integer
           description: >
             The DNS packet identifier assigned by the program that generated the
             query. The identifier is copied to the response.
@@ -518,7 +518,7 @@ trans_event:
           example: amazon.co.uk.
 
         - name: answers_count
-          type: int
+          type: integer
           description: >
             The number of resource records contained in the `dns.answers` field.
 
@@ -539,7 +539,7 @@ trans_event:
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: int
+          type: integer
 
         - name: answers.data
           description: >
@@ -553,7 +553,7 @@ trans_event:
             answer.
 
         - name: authorities_count
-          type: int
+          type: integer
           description: >
             The number of resource records contained in the `dns.authorities` field.
             The `dns.authorities` field may or may not be included depending on the
@@ -582,7 +582,7 @@ trans_event:
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: int
+          type: integer
 
         - name: answers.data
           description: >
@@ -596,7 +596,7 @@ trans_event:
             answer.
 
         - name: additionals_count
-          type: int
+          type: integer
           description: >
             The number of resource records contained in the `dns.additionals` field.
             The `dns.additionals` field may or may not be included depending on the
@@ -619,7 +619,7 @@ trans_event:
             The time interval in seconds that this resource record may be cached
             before it should be discarded. Zero values mean that the data should
             not be cached.
-          type: int
+          type: integer
 
         - name: additionals.data
           description: >
@@ -639,7 +639,7 @@ trans_event:
           example: "BADVERS"
 
         - name: opt.udp_size
-          type: int
+          type: integer
           description: Requestor's UDP payload size (in bytes).
 
     - name: amqp
@@ -647,7 +647,7 @@ trans_event:
       description: AMQP specific event fields.
       fields:
         - name: reply-code
-          type: int
+          type: integer
           description: >
             AMQP reply code to an error, similar to http reply-code
           example: 404
@@ -658,12 +658,12 @@ trans_event:
             Text explaining the error.
 
         - name: class-id
-          type: int
+          type: integer
           description: >
             Failing method class.
 
         - name: method-id
-          type: int
+          type: integer
           description: >
             Failing method ID.
 
@@ -708,23 +708,23 @@ trans_event:
             Identifier for the consumer, valid within the current channel.
 
         - name: delivery-tag
-          type: int
+          type: integer
           description: >
             The server-assigned and channel-specific delivery tag.
 
         - name: message-count
-          type: int
+          type: integer
           description: >
             The number of messages in the queue, which will be zero for
             newly-declared queues.
 
         - name: consumer-count
-          type: int
+          type: integer
           description: >
             The number of consumers of a queue.
 
         - name: routing-key
-          type: int
+          type: integer
           description: >
             Message routing key.
 
@@ -799,12 +799,12 @@ trans_event:
             Message header field table.
 
         - name: delivery-mode
-          type: int
+          type: integer
           description: >
             Non-persistent (1) or persistent (2).
 
         - name: priority
-          type: int
+          type: integer
           description: >
             Message priority, 0 to 9.
 
@@ -879,7 +879,7 @@ trans_event:
             by commas.
 
         - name: content_length
-          type: int
+          type: integer
           description: >
             The value of the Content-Length header if present.
 
@@ -946,29 +946,29 @@ trans_event:
             The binary protocol message opcode name.
 
         - name: request.opcode_value
-          type: int
+          type: integer
           description: >
             The binary protocol message opcode value.
 
         - name: response.opcode_value
-          type: int
+          type: integer
           description: >
             The binary protocol message opcode value.
 
         - name: request.opaque
-          type: int
+          type: integer
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
         - name: response.opaque
-          type: int
+          type: integer
           description: >
             The binary protocol opaque header value used for correlating request
             with response messages.
 
         - name: request.vbucket
-          type: int
+          type: integer
           description: >
             The vbucket index sent in the binary message.
 
@@ -979,7 +979,7 @@ trans_event:
             (binary protocol only).
 
         - name: response.status_code
-          type: int
+          type: integer
           description: >
             The status code value returned in the response (binary protocol only).
 
@@ -994,13 +994,13 @@ trans_event:
             The list of keys returned for the load command (if present).
 
         - name: request.count_values
-          type: int
+          type: integer
           description: >
             The number of values found in the memcache request message.
             If the command does not send any data, this field is missing.
 
         - name: response.count_values
-          type: int
+          type: integer
           description: >
             The number of values found in the memcache response message.
             If the command does not send any data, this field is missing.
@@ -1016,27 +1016,27 @@ trans_event:
             The list of base64 encoded values sent with the response (if present).
 
         - name: request.bytes
-          type: int
+          type: integer
           description: >
             The byte count of the values being transfered.
 
         - name: response.bytes
-          type: int
+          type: integer
           description: >
             The byte count of the values being transfered.
 
         - name: request.delta
-          type: int
+          type: integer
           description: >
             The counter increment/decrement delta value.
 
         - name: request.initial
-          type: int
+          type: integer
           description: >
             The counter increment/decrement initial value parameter (binary protocol only).
 
         - name: request.verbosity
-          type: int
+          type: integer
           description: >
             The value of the memcache "verbosity" command.
 
@@ -1046,12 +1046,12 @@ trans_event:
             The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands.
 
         - name: request.source_class
-          type: int
+          type: integer
           description: >
             The source class id in 'slab reassign' command.
 
         - name: request.dest_class
-          type: int
+          type: integer
           description: >
             The destination class id in 'slab reassign' command.
 
@@ -1063,29 +1063,29 @@ trans_event:
               the value is unknown.
 
         - name: request.flags
-          type: int
+          type: integer
           description: >
             The memcache command flags sent in the request (if present).
 
         - name: response.flags
-          type: int
+          type: integer
           description: >
             The memcache message flags sent in the response (if present).
 
         - name: request.exptime
-          type: int
+          type: integer
           description: >
             The data expiry time in seconds sent with the memcache command (if present).
             If the value is <30 days, the expiry time is relative to "now", or else it
             is an absolute Unix time in seconds (32-bit).
 
         - name: request.sleep_us
-          type: int
+          type: integer
           description: >
             The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
         - name: response.value
-          type: int
+          type: integer
           description: >
             The counter value returned by a counter operation.
 
@@ -1101,12 +1101,12 @@ trans_event:
             Set to true if the binary protocol message is to be treated as a quiet message.
 
         - name: request.cas_unique
-          type: int
+          type: integer
           description: >
             The CAS (compare-and-swap) identifier if present.
 
         - name: response.cas_unique
-          type: int
+          type: integer
           description: >
             The CAS (compare-and-swap) identifier to be used with CAS-based updates
             (if present).
@@ -1133,7 +1133,7 @@ trans_event:
            If the MySQL query returns an error, this field is set to true.
 
         - name: affected_rows
-          type: int
+          type: integer
           description: >
             If the MySQL command is successful, this field contains the affected
             number of rows of the last statement.
@@ -1158,7 +1158,7 @@ trans_event:
             The row mysql query as read from the transaction's request.
 
         - name: error_code
-          type: int
+          type: integer
           description: >
             The error code returned by MySQL.
 
@@ -1181,7 +1181,7 @@ trans_event:
 
         - name: error_code
           description: The PostgreSQL error code.
-          type: int
+          type: integer
 
         - name: error_message
           description: The PostgreSQL error message.
@@ -1390,28 +1390,28 @@ trans_measurements:
       description: >
         The wall clock time it took to complete the transaction.
         The precision is in milliseconds.
-      type: int
+      type: integer
 
     - name: cpu_time
       description: The CPU time it took to complete the transaction.
-      type: int
+      type: integer
 
     - name: bytes_in
       description: >
         The number of bytes of the request. Note that this size is
         the application layer message length, without the length of the IP or
         TCP headers.
-      type: int
+      type: integer
 
     - name: bytes_out
       description: >
         The number of bytes of the response. Note that this size is
         the application layer message length, without the length of the IP or
         TCP headers.
-      type: int
+      type: integer
 
     - name: dnstime
-      type: int
+      type: integer
       description: >
         The time it takes to query the name server for a given request.
         This is typically used for RUM (real-user-monitoring) but can
@@ -1420,14 +1420,14 @@ trans_measurements:
         The precision is in microseconds.
 
     - name: connecttime
-      type: int
+      type: integer
       description: >
         The time it takes for the TCP connection to be established for
         the given transaction.
         The precision is in microseconds.
 
     - name: loadtime
-      type: int
+      type: integer
       description: >
         The time it takes for the content to be loaded. This is typically
         used for RUM (real-user-monitoring) but it can make sense in other
@@ -1435,7 +1435,7 @@ trans_measurements:
         The precision is in microseconds.
 
     - name: domloadtime
-      type: int
+      type: integer
       description: >
         In RUM (real-user-monitoring), the total time it takes for the
         DOM to be loaded. In terms of the W3 Navigation Timing API, this is
