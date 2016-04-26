@@ -1,76 +1,71 @@
-system:
+- name: system-memory
   type: group
   description: >
-    System status metrics, like CPU and memory usage, that are collected from the operating system.
+    `system-memory` contains local memory stats.
   fields:
-    - name: system-memory
+    - name: mem
       type: group
-      description: >
-        `system-memory` contains local memory stats.
+      prefix: "[float]"
+      description: This group contains statistics related to the memory usage on the system.
       fields:
-        - name: mem
-          type: group
-          prefix: "[float]"
-          description: This group contains statistics related to the memory usage on the system.
-          fields:
-            - name: total
-              type: int
-              description: >
-                Total memory.
+        - name: total
+          type: integer
+          description: >
+            Total memory.
 
-            - name: used
-              type: int
-              description: >
-                Used memory.
+        - name: used
+          type: integer
+          description: >
+            Used memory.
 
-            - name: free
-              type: int
-              description: >
-                Available memory.
+        - name: free
+          type: integer
+          description: >
+            Available memory.
 
-            - name: used_p
-              type: float
-              description: >
-                The percentage of used memory.
+        - name: used_p
+          type: float
+          description: >
+            The percentage of used memory.
 
-            - name: actual_used
-              type: int
-              description: >
-                Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
-                Available only on Unix.
+        - name: actual_used
+          type: integer
+          description: >
+            Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
+            Available only on Unix.
 
-            - name: actual_free
-              type: int
-              description: >
-                Actual available memory. This value is the "free" memory plus the memory used for disk caches and
-                buffers. Available only on Unix.
+        - name: actual_free
+          type: integer
+          description: >
+            Actual available memory. This value is the "free" memory plus the memory used for disk caches and
+            buffers. Available only on Unix.
 
-            - name: actual_used_p
-              type: float
-              description: >
-                The percentage of actual used memory.
+        - name: actual_used_p
+          type: float
+          description: >
+            The percentage of actual used memory.
 
-        - name: swap
-          type: group
-          prefix: "[float]"
-          description: This group contains statistics related to the swap memory usage on the system.
-          fields:
-            - name: total
-              type: int
-              description: >
-                Total swap memory.
+    - name: swap
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to the swap memory usage on the system.
+      fields:
+        - name: total
+          type: integer
+          description: >
+            Total swap memory.
 
-            - name: used
-              type: int
-              description: >
-                Used swap memory.
+        - name: used
+          type: integer
+          description: >
+            Used swap memory.
 
-            - name: free
-              type: int
-              description: >
-                Available swap memory.
+        - name: free
+          type: integer
+          description: >
+            Available swap memory.
 
-            - name: used_p
-              type: float
-              description: >
-                The percentage of used swap memory.
+        - name: used_p
+          type: float
+          description: >
+            The percentage of used swap memory.

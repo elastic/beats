@@ -525,6 +525,81 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
+=== system-cpu Fields
+
+`system-cpu` contains local cpu stats.
+
+
+
+==== system-cpu.user
+
+type: integer
+
+The amount of CPU time spent in user space.
+
+
+==== system-cpu.user_p
+
+type: float
+
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+
+==== system-cpu.nice
+
+type: integer
+
+The amount of CPU time spent on low-priority processes.
+
+
+==== system-cpu.system
+
+type: integer
+
+The amount of CPU time spent in kernel space.
+
+
+==== system-cpu.system_p
+
+type: float
+
+The percentage of CPU time spent in kernel space.
+
+
+==== system-cpu.idle
+
+type: integer
+
+The amount of CPU time spent idle.
+
+
+==== system-cpu.iowait
+
+type: integer
+
+The amount of CPU time spent in wait (on disk).
+
+
+==== system-cpu.irq
+
+type: integer
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system-cpu.softirq
+
+type: integer
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+==== system-cpu.steal
+
+type: integer
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
 === system-memory Fields
 
 `system-memory` contains local memory stats.
@@ -539,21 +614,21 @@ This group contains statistics related to the memory usage on the system.
 
 ==== system-memory.mem.total
 
-type: int
+type: integer
 
 Total memory.
 
 
 ==== system-memory.mem.used
 
-type: int
+type: integer
 
 Used memory.
 
 
 ==== system-memory.mem.free
 
-type: int
+type: integer
 
 Available memory.
 
@@ -567,14 +642,14 @@ The percentage of used memory.
 
 ==== system-memory.mem.actual_used
 
-type: int
+type: integer
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
 ==== system-memory.mem.actual_free
 
-type: int
+type: integer
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
@@ -594,21 +669,21 @@ This group contains statistics related to the swap memory usage on the system.
 
 ==== system-memory.swap.total
 
-type: int
+type: integer
 
 Total swap memory.
 
 
 ==== system-memory.swap.used
 
-type: int
+type: integer
 
 Used swap memory.
 
 
 ==== system-memory.swap.free
 
-type: int
+type: integer
 
 Available swap memory.
 

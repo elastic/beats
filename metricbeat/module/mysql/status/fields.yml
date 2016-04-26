@@ -1,40 +1,35 @@
-mysql:
+- name: mysql-status
   type: group
   description: >
-    MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
+    `mysql-status` contains the metrics that were obtained the status SQL
+    query.
   fields:
-    - name: mysql-status
+    - name: aborted
       type: group
       description: >
-        `mysql-status` contains the metrics that were obtained the status SQL
-        query.
+        Aborted status fields
       fields:
-        - name: aborted
-          type: group
+        - name: Aborted_clients
+          type: integer
           description: >
-            Aborted status fields
-          fields:
-            - name: Aborted_clients
-              type: integer
-              description: >
-                The number of connections that were aborted because the client died without closing the connection properly.
+            The number of connections that were aborted because the client died without closing the connection properly.
 
-            - name: Aborted_connects
-              type: integer
-              description: >
-                The number of failed attempts to connect to the MySQL server.
-
-        - name: bytes
-          type: group
+        - name: Aborted_connects
+          type: integer
           description: >
-            Bytes stats
-          fields:
-            - name: Bytes_received
-              type: integer
-              description: >
-                The number of bytes received from all clients.
+            The number of failed attempts to connect to the MySQL server.
 
-            - name: Bytes_sent
-              type: integer
-              description: >
-                The number of bytes sent to all clients.
+    - name: bytes
+      type: group
+      description: >
+        Bytes stats
+      fields:
+        - name: Bytes_received
+          type: integer
+          description: >
+            The number of bytes received from all clients.
+
+        - name: Bytes_sent
+          type: integer
+          description: >
+            The number of bytes sent to all clients.

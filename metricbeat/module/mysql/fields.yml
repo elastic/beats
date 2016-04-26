@@ -1,0 +1,5 @@
+mysql:
+  type: group
+  description: >
+    MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
+  fields:

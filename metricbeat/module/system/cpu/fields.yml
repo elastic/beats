@@ -1,63 +1,58 @@
-system:
+- name: system-cpu
   type: group
   description: >
-    System status metrics, like CPU and memory usage, that are collected from the operating system.
+    `system-cpu` contains local cpu stats.
   fields:
-    - name: system-cpu
-      type: group
+    - name: user
+      type: integer
       description: >
-        `system-cpu` contains local cpu stats.
-      fields:
-        - name: user
-          type: int
-          description: >
-           The amount of CPU time spent in user space.
+       The amount of CPU time spent in user space.
 
-        - name: user_p
-          type: float
-          description: >
-            The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
-            For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+    - name: user_p
+      type: float
+      description: >
+        The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
+        For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
-        - name: nice
-          type: int
-          description: >
-            The amount of CPU time spent on low-priority processes.
+    - name: nice
+      type: integer
+      description: >
+        The amount of CPU time spent on low-priority processes.
 
-        - name: system
-          type: int
-          description: >
-            The amount of CPU time spent in kernel space.
+    - name: system
+      type: integer
+      description: >
+        The amount of CPU time spent in kernel space.
 
-        - name: system_p
-          type: float
-          description: >
-            The percentage of CPU time spent in kernel space.
+    - name: system_p
+      type: float
+      description: >
+        The percentage of CPU time spent in kernel space.
 
-        - name: idle
-          type: int
-          description: >
-            The amount of CPU time spent idle.
+    - name: idle
+      type: integer
+      description: >
+        The amount of CPU time spent idle.
 
-        - name: iowait
-          type: int
-          description: >
-            The amount of CPU time spent in wait (on disk).
+    - name: iowait
+      type: integer
+      description: >
+        The amount of CPU time spent in wait (on disk).
 
-        - name: irq
-          type: int
-          description: >
-            The amount of CPU time spent servicing and handling hardware interrupts.
+    - name: irq
+      type: integer
+      description: >
+        The amount of CPU time spent servicing and handling hardware interrupts.
 
-        - name: softirq
-          type: int
-          description:
-            The amount of CPU time spent servicing and handling software interrupts.
+    - name: softirq
+      type: integer
+      description:
+        The amount of CPU time spent servicing and handling software interrupts.
 
-        - name: steal
-          type: int
-          description: >
-            The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-            was servicing another processor.
-            Available only on Unix.
+    - name: steal
+      type: integer
+      description: >
+        The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor.
+        Available only on Unix.
 

@@ -22,7 +22,7 @@ kibana:
 .PHONY: fields
 fields:
 	cat etc/fields_base.yml > etc/fields.yml
-	cat module/*/*/fields.yml >> etc/fields.yml
+	python scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
 .PHONY: docs
