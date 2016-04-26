@@ -45,7 +45,7 @@ func TestConfigValidate(t *testing.T) {
 				map[string]interface{}{"other": "value"},
 			},
 			"1 error: Invalid top-level key 'other' found. Valid keys are " +
-				"filter, logging, output, shipper, winlogbeat",
+				"filters, logging, output, shipper, winlogbeat",
 		},
 		{
 			WinlogbeatConfig{},
