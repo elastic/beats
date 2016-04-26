@@ -26,7 +26,7 @@ env:
   global:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
-    - DOCKER_COMPOSE_VERSION: 1.5.2
+    - DOCKER_COMPOSE_VERSION: 1.7.0
 
 matrix:
   exclude:
@@ -58,6 +58,12 @@ addons:
       - geoip-database
 
 before_install:
+  # Update to most recent docker version
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sudo apt-get update;
+      sudo apt-cache search docker;
+      sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine;
+    fi
   # Redo the travis setup but with the elastic/beats path. This is needed so the package path is correct also for forks
   - mkdir -p $HOME/gopath/src/github.com/elastic/beats/
   - rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/gopath/src/github.com/elastic/beats/

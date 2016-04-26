@@ -2,12 +2,12 @@
 # This is based on base.yml
 elasticsearch:
   build: ./docker/elasticsearch
-  dockerfile: Dockerfile-5.0.0-alpha1
+  dockerfile: Dockerfile-snapshot
   command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
 
 logstash:
   build: ./docker/logstash
-  dockerfile: Dockerfile-5.0.0-alpha1
+  dockerfile: Dockerfile-snapshot
 
 kibana:
   build: ./docker/kibana
