@@ -74,6 +74,14 @@ func TestConvertNestedMapStr(t *testing.T) {
 				"@timestamp": MustParseTime("2015-03-01T12:34:56.123Z"),
 			},
 		},
+		io{
+			Input: MapStr{
+				"env": nil,
+			},
+			Output: MapStr{
+				"env": nil,
+			},
+		},
 	}
 
 	for _, test := range tests {

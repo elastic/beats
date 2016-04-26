@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
   the location for DEB and RPM packages stays the same. {pull}1373[1373]
 - Fix issue with JSON decoding where `@timestamp` or `type` keys with the wrong type could cause Filebeat
   to crash. {issue}1378[1378]
+- Fix issue with JSON decoding where values having `null` as values could crash Filebeat. {issue}1466[1466]
 
 *Winlogbeat*
 

@@ -241,3 +241,85 @@ class Test(BaseTest):
         assert output[2]["type"] == "log"
         assert output[2]["json_error"] == \
             "type not overwritten (not string)"
+
+    def test_with_generic_filtering(self):
+        """
+        It should work fine to combine JSON decoding with
+        removing fields via generic filtering. The test log file
+        in here also contains a null value.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                message_key="message",
+                keys_under_root=True,
+                overwrite_keys=True,
+                add_error_key=True,
+                ),
+            filter_enabled=True,
+            drop_fields=["headers.request-id"],
+            include_fields=None,
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_null.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+        assert len(output) == 1
+        o = output[0]
+
+        assert "headers.content-type" in o
+        assert "headers.request-id" not in o
+        assert o["res"] is None
+
+    def test_with_generic_filtering_remove_headers(self):
+        """
+        It should work fine to combine JSON decoding with
+        removing fields via generic filtering. The test log file
+        in here also contains a null value.
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            json=dict(
+                message_key="message",
+                keys_under_root=True,
+                overwrite_keys=True,
+                add_error_key=True,
+                ),
+            filter_enabled=True,
+            drop_fields=["headers", "res"],
+            include_fields=None,
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        self.copy_files(["logs/json_null.log"],
+                        source_dir="../files",
+                        target_dir="log")
+
+        proc = self.start_beat()
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+        proc.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )
+        assert len(output) == 1
+        o = output[0]
+
+        assert "headers.content-type" not in o
+        assert "headers.request-id" not in o
+        assert "res" not in o
+        assert o["method"] == "GET"
+        assert o["message"] == "Sent response: "
