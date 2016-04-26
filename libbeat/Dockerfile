@@ -14,6 +14,9 @@ RUN set -x \
 	github.com/tsg/goautotest \
 	golang.org/x/tools/cmd/vet
 
+
+RUN go get -u github.com/aws/aws-sdk-go
+
 ENV GO15VENDOREXPERIMENT=1
 ENV PYTHON_ENV=/tmp/python-env
 
