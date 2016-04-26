@@ -131,13 +131,9 @@ The number of workers per configured host publishing events to Elasticsearch. Th
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
-===== host (DEPRECATED)
+===== port
 
-The host of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
-
-===== port (DEPRECATED)
-
-The port of the Elasticsearch server. This option is deprecated because it is replaced by <<hosts-option>>.
+The default port of the Elasticsearch server if the port number is missing in <<hosts-option>> URL. The default port number is 9200.
 
 ===== username
 
