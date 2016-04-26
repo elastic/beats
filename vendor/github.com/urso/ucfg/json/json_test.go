@@ -12,6 +12,7 @@ func TestPrimitives(t *testing.T) {
   {
     "b": true,
     "i": 42,
+    "u": 23,
     "f": 3.14,
     "s": "string"
   }`)
@@ -24,6 +25,7 @@ func TestPrimitives(t *testing.T) {
 	verify := struct {
 		B bool
 		I int
+		U uint
 		F float64
 		S string
 	}{}
@@ -32,6 +34,7 @@ func TestPrimitives(t *testing.T) {
 
 	assert.Equal(t, true, verify.B)
 	assert.Equal(t, 42, verify.I)
+	assert.Equal(t, uint(23), verify.U)
 	assert.Equal(t, 3.14, verify.F)
 	assert.Equal(t, "string", verify.S)
 }

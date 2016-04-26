@@ -3,7 +3,6 @@ package ucfg
 import (
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 func (c *Config) Merge(from interface{}, options ...Option) error {
@@ -76,42 +75,6 @@ func normalize(opts options, from interface{}) (*Config, Error) {
 	return nil, raiseInvalidTopLevelType(from)
 }
 
-func normalizeCfgPath(cfg *Config, opts options, field string) (*Config, string, Error) {
-	if opts.pathSep == "" {
-		return cfg, field, nil
-	}
-
-	path := strings.Split(field, opts.pathSep)
-	for len(path) > 1 {
-		field = path[0]
-		path = path[1:]
-
-		sub, exists := cfg.fields.fields[field]
-		if exists {
-			vSub, ok := sub.(cfgSub)
-			if !ok {
-				return nil, field, raiseExpectedObject(sub)
-			}
-
-			cfg = vSub.c
-			continue
-		}
-
-		next := New()
-		next.metadata = opts.meta
-		v := cfgSub{next}
-		v.SetContext(context{
-			parent: cfgSub{cfg},
-			field:  field,
-		})
-		cfg.fields.fields[field] = v
-		cfg = next
-	}
-	field = path[0]
-
-	return cfg, field, nil
-}
-
 func normalizeMap(opts options, from reflect.Value) (*Config, Error) {
 	cfg := New()
 	cfg.metadata = opts.meta
@@ -133,7 +96,7 @@ func normalizeMapInto(cfg *Config, opts options, from reflect.Value) Error {
 			return raiseKeyInvalidTypeMerge(cfg, from.Type())
 		}
 
-		err := normalizeSetField(cfg, opts, k.String(), from.MapIndex(k))
+		err := normalizeSetField(cfg, opts, noTagOpts, k.String(), from.MapIndex(k))
 		if err != nil {
 			return err
 		}
@@ -171,7 +134,7 @@ func normalizeStructInto(cfg *Config, opts options, from reflect.Value) Error {
 			}
 		} else {
 			name = fieldName(name, stField.Name)
-			err = normalizeSetField(cfg, opts, name, v.Field(i))
+			err = normalizeSetField(cfg, opts, tagOpts, name, v.Field(i))
 		}
 
 		if err != nil {
@@ -181,26 +144,31 @@ func normalizeStructInto(cfg *Config, opts options, from reflect.Value) Error {
 	return nil
 }
 
-func normalizeSetField(cfg *Config, opts options, name string, v reflect.Value) Error {
-	to, name, err := normalizeCfgPath(cfg, opts, name)
-	if err != nil {
-		return err
-	}
-	if to.HasField(name) {
-		return raiseDuplicateKey(to, name)
-	}
-
-	ctx := context{
-		parent: cfgSub{cfg},
-		field:  name,
-	}
-	val, err := normalizeValue(opts, ctx, v)
+func normalizeSetField(
+	cfg *Config,
+	opts options,
+	tagOpts tagOptions,
+	name string,
+	v reflect.Value,
+) Error {
+	val, err := normalizeValue(opts, tagOpts, context{}, v)
 	if err != nil {
 		return err
 	}
 
-	to.fields.fields[name] = val
-	return nil
+	p := parsePath(name, opts.pathSep)
+	old, err := p.GetValue(cfg)
+	if err != nil {
+		if err.Reason() != ErrMissing {
+			return err
+		}
+		old = nil
+	}
+	if old != nil {
+		return raiseDuplicateKey(cfg, name)
+	}
+
+	return p.SetValue(cfg, val)
 }
 
 func normalizeStructValue(opts options, ctx context, from reflect.Value) (value, Error) {
@@ -223,29 +191,43 @@ func normalizeMapValue(opts options, ctx context, from reflect.Value) (value, Er
 	return v, nil
 }
 
-func normalizeArray(opts options, ctx context, v reflect.Value) (value, Error) {
+func normalizeArray(
+	opts options,
+	tagOpts tagOptions,
+	ctx context,
+	v reflect.Value,
+) (value, Error) {
 	l := v.Len()
 	out := make([]value, 0, l)
 
-	arr := &cfgArray{cfgPrimitive{ctx, opts.meta}, nil}
+	cfg := New()
+	cfg.metadata = opts.meta
+	cfg.ctx = ctx
+	val := cfgSub{cfg}
 
 	for i := 0; i < l; i++ {
+		idx := fmt.Sprintf("%v", i)
 		ctx := context{
-			parent: arr,
-			field:  fmt.Sprintf("%v", i),
+			parent: val,
+			field:  idx,
 		}
-		tmp, err := normalizeValue(opts, ctx, v.Index(i))
+		tmp, err := normalizeValue(opts, tagOpts, ctx, v.Index(i))
 		if err != nil {
 			return nil, err
 		}
 		out = append(out, tmp)
 	}
 
-	arr.arr = out
-	return arr, nil
+	cfg.fields.arr = out
+	return val, nil
 }
 
-func normalizeValue(opts options, ctx context, v reflect.Value) (value, Error) {
+func normalizeValue(
+	opts options,
+	tagOpts tagOptions,
+	ctx context,
+	v reflect.Value,
+) (value, Error) {
 	v = chaseValue(v)
 
 	// handle primitives
@@ -253,15 +235,20 @@ func normalizeValue(opts options, ctx context, v reflect.Value) (value, Error) {
 	case reflect.Bool:
 		return newBool(ctx, opts.meta, v.Bool()), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return newInt(ctx, opts.meta, v.Int()), nil
+		i := v.Int()
+		if i > 0 {
+			return newUint(ctx, opts.meta, uint64(i)), nil
+		}
+		return newInt(ctx, opts.meta, i), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return newInt(ctx, opts.meta, int64(v.Uint())), nil
+		return newUint(ctx, opts.meta, v.Uint()), nil
 	case reflect.Float32, reflect.Float64:
-		return newFloat(ctx, opts.meta, v.Float()), nil
+		f := v.Float()
+		return newFloat(ctx, opts.meta, f), nil
 	case reflect.String:
 		return newString(ctx, opts.meta, v.String()), nil
 	case reflect.Array, reflect.Slice:
-		return normalizeArray(opts, ctx, v)
+		return normalizeArray(opts, tagOpts, ctx, v)
 	case reflect.Map:
 		return normalizeMapValue(opts, ctx, v)
 	case reflect.Struct:
@@ -279,6 +266,6 @@ func normalizeValue(opts options, ctx context, v reflect.Value) (value, Error) {
 		if v.IsNil() {
 			return &cfgNil{cfgPrimitive{ctx, opts.meta}}, nil
 		}
-		return nil, raiseUnsupportedInputType(ctx, opts, v)
+		return nil, raiseUnsupportedInputType(ctx, opts.meta, v)
 	}
 }

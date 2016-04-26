@@ -221,6 +221,7 @@ Currently, Packetbeat supports the following protocols:
  - ICMP (v4 and v6)
  - DNS
  - HTTP
+ - AMQP 0.9.1
  - Mysql
  - PostgreSQL
  - Redis
@@ -241,6 +242,9 @@ protocols:
 
   http:
     ports: [80, 8080, 8000, 5000, 8002]
+
+  amqp:
+    ports: [5672]
 
   memcache:
     ports: [11211]
@@ -462,6 +466,48 @@ information. If this header is present and contains a valid IP addresses, the
 information is used for the `real_ip` and `client_location` indexed
 fields.
 
+
+==== AMQP Configuration Options
+
+The `amqp` section specifies configuration options for the AMQP 0.9.1
+protocol. Here is a sample configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+  amqp:
+    ports: [5672]
+    max_body_length: 1000
+    parse_headers: true
+    parse_arguments: false
+    hide_connection_information: true
+------------------------------------------------------------------------------
+
+===== max_body_length
+
+The maximum size of the message displayed in the request or response fields,
+in bytes. If the message is bigger than the size, it will be truncated. Use this
+option to avoid publishing huge messages. It is useless if one of
+send_request or send_response options is not activated. Default is 1000 bytes.
+
+===== parse_headers
+
+Parse the additional arguments specified in the headers field of a message.
+Those arguments are key-value pairs specifying informations like the
+content type of the message or the message priority. Default is true.
+
+===== parse_arguments
+
+Parse the additional arguments specified in AMQP methods. Those arguments
+are key-value pairs specified by the user, and can be of any length. Default
+is true.
+
+===== hide_connection_information
+
+If set to false, the connection layer methods of the protocol will also be
+displayed, like the opening and closing of connections and channels by clients,
+or the quality of service negociation. Default is true.
+
+
 ==== Memcache Configuration Options
 
 The `memcache` section specifies configuration options for the memcache
@@ -514,7 +560,7 @@ quiet requests with an error response are published immediately.
 
 ==== MySQL and PgSQL Configuration Options
 
-You can specify the following options in the `mysql` or `pgsql` sections: 
+You can specify the following options in the `mysql` or `pgsql` sections:
 
 ===== max_rows
 
@@ -707,4 +753,3 @@ include::../../../../libbeat/docs/loggingconfig.asciidoc[]
 include::../../../../libbeat/docs/runconfig.asciidoc[]
 
 include::../../../../libbeat/docs/filteringconfig.asciidoc[]
-

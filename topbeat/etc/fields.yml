@@ -1,10 +1,7 @@
-version: 1.0
-
 defaults:
   type: keyword
   required: false
   index: true
-  doc_values: true
   ignore_above: 1024
 
 env:
@@ -36,6 +33,17 @@ env:
       description: >
         The hostname as returned by the operating system on which the Beat is
         running.
+
+    - name: tags
+      description: >
+        Arbitrary tags that can be set per Beat and per transaction
+        type.
+
+    - name: fields
+      type: dict
+      dict-type: keyword
+      description: >
+        Contains user configurable fields.
 
 system:
   type: group

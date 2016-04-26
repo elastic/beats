@@ -6,7 +6,7 @@ the etc/fields.yml file.
 
 Example usage:
 
-   python generate_template.py etc/fields.yml topbeat.template.json
+   python generate_template.py filebeat/ filebeat
 """
 
 import sys
@@ -35,14 +35,21 @@ def fields_to_es_template(input, output, index):
 
     # Each template needs defaults
     if "defaults" not in docs.keys():
-        print "No defaults are defined. Each template needs at least defaults defined."
+        print("No defaults are defined. Each template needs at" +
+              " least defaults defined.")
         return
 
     defaults = docs["defaults"]
 
+    # de-dot
+    for doc, section in docs.items():
+        if doc != "defaults":
+            docs[doc] = dedot(section)
+
     # skeleton
     template = {
         "template": index,
+        "order": 0,
         "settings": {
             "index.refresh_interval": "5s"
         },
@@ -51,95 +58,148 @@ def fields_to_es_template(input, output, index):
                 "_all": {
                     "norms": False
                 },
-                "properties": {},
-                "dynamic_templates": [{
-                    "template1": {
-                        "match_mapping_type": "string",
-                        "mapping": {
-                            "type": "keyword",
-                            "index": defaults["index"],
-                            "doc_values": defaults["doc_values"],
-                            "ignore_above": defaults["ignore_above"]
-                        }
-                    }
-                }]
+                "properties": {}
             }
         }
     }
 
     properties = {}
+    dynamic_templates = []
     for doc, section in docs.items():
-        if doc not in ["version", "defaults"]:
-            prop = fill_section_properties(section, defaults)
+        if doc != "defaults":
+            prop, dynamic = fill_section_properties(section, defaults, "")
             properties.update(prop)
+            dynamic_templates.extend(dynamic)
 
     template["mappings"]["_default_"]["properties"] = properties
+    if len(dynamic_templates) > 0:
+        template["mappings"]["_default_"]["dynamic_templates"] = \
+            dynamic_templates
 
     json.dump(template, output,
               indent=2, separators=(',', ': '),
               sort_keys=True)
 
 
-def fill_section_properties(section, defaults):
+def dedot(group):
+    """
+    Walk the tree and transform keys like "beat.name" and "beat.hostname" into
+      - name: "beat"
+        type: group
+        fields:
+        - name: name
+            ...
+        - name: hostname
+            ...
+    """
+    fields = []
+    dedotted = {}
+    for field in group["fields"]:
+        if "." in field["name"]:
+            # dedot
+            newkey, rest = field["name"].split(".", 1)
+            field["name"] = rest    # move one level down
+            if newkey not in dedotted:
+                dedotted[newkey] = {
+                    "name": newkey,
+                    "type": "group",
+                    "fields": []
+                }
+            if field.get("type") == "group":
+                dedotted[newkey]["fields"].append(dedotted(field))
+            else:
+                dedotted[newkey]["fields"].append(field)
+        elif field.get("type") == "group":
+            # call recursively
+            fields.append(dedot(field))
+        else:
+            fields.append(field)
+    for _, field in dedotted.items():
+        fields.append(field)
+    group["fields"] = fields
+    return group
+
+
+def fill_section_properties(section, defaults, path):
     """
     Traverse the sections tree and fill in the properties
     map.
     """
     properties = {}
+    dynamic_templates = []
 
     for field in section["fields"]:
-        prop = fill_field_properties(field, defaults)
+        prop, dynamic = fill_field_properties(field, defaults, path)
         properties.update(prop)
+        dynamic_templates.extend(dynamic)
 
-    return properties
+    return properties, dynamic_templates
 
 
-def fill_field_properties(field, defaults):
+def fill_field_properties(field, defaults, path):
     """
     Add data about a particular field in the properties
     map.
     """
     properties = {}
+    dynamic_templates = []
 
     for key in defaults.keys():
         if key not in field:
             field[key] = defaults[key]
 
     # TODO: Make this more dyanmic
-    if field.get("type") == "text":
+    if field["type"] == "text":
         properties[field["name"]] = {
             "type": field["type"],
             "norms": False
         }
 
-    elif field.get("type")  == "keyword":
-        mapping = {
-        }
-        if field.get("doc_values") != defaults.get("doc_values"):
-             mapping["doc_values"] = field.get("doc_values")
-        if field.get("ignore_above") != defaults.get("ignore_above"):
-             mapping["ignore_above"] = field.get("ignore_above")
-        if len(mapping) > 0:
-            # only add the field if the mapping is different from the defaults
-            mapping["type"] = "keyword"
-            properties[field["name"]] = mapping
-
-    elif field.get("type") in ["geo_point", "date", "long", "integer", "double", "float"]:
+    elif field["type"] in ["geo_point", "date", "long", "integer",
+                           "double", "float", "keyword"]:
         properties[field["name"]] = {
             "type": field.get("type")
         }
+        if field["type"] == "keyword":
+            properties[field["name"]]["ignore_above"] = \
+                defaults.get("ignore_above", 1024)
+
+    elif field["type"] == "dict":
+        if field.get("dict-type") == "keyword":
+            # add a dynamic template to set all members of
+            # the dict as keywords
+            if len(path) > 0:
+                name = path + "." + field["name"]
+            else:
+                name = field["name"]
+
+            dynamic_templates.append({
+                name: {
+                    "mapping": {
+                        "index": True,
+                        "type": "keyword",
+                        "ignore_above": 1024
+                    },
+                    "match_mapping_type": "string",
+                    "path_match": name + ".*"
+                }
+            })
 
     elif field.get("type") == "group":
-        prop = fill_section_properties(field, defaults)
+        if len(path) > 0:
+            path = path + "." + field["name"]
+        else:
+            path = field["name"]
+        prop, dynamic = fill_section_properties(field, defaults, path)
 
         # Only add properties if they have a content
         if len(prop) is not 0:
             properties[field.get("name")] = {"properties": {}}
             properties[field.get("name")]["properties"] = prop
 
-    # Otherwise let dynamic mappings do the job
+        dynamic_templates.extend(dynamic)
 
-    return properties
+    return properties, dynamic_templates
 
 
 if __name__ == "__main__":

@@ -33,6 +33,10 @@ func (c *C) SetInt(name string, idx int, value int64) {
 	c.asConfig().SetInt(name, idx, value)
 }
 
+func (c *C) SetUint(name string, idx int, value uint64) {
+	c.asConfig().SetUint(name, idx, value)
+}
+
 func (c *C) SetFloat(name string, idx int, value float64) {
 	c.asConfig().SetFloat(name, idx, value)
 }

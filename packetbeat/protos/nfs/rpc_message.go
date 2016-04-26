@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/packetbeat/publish"
 )
 
 const (
@@ -29,9 +28,7 @@ var ACCEPT_STATUS = [...]string{
 	"system_err",
 }
 
-var calls_seen = common.NewCache(1*time.Minute, 8192)
-
-func (msg *RpcMessage) fillEvent(event common.MapStr, results publish.Transactions, size int) {
+func (msg *RpcMessage) fillEvent(event common.MapStr, rpc *Rpc, size int) {
 
 	xid := fmt.Sprintf("%.8x", msg.xdr.getUInt())
 
@@ -84,7 +81,7 @@ func (msg *RpcMessage) fillEvent(event common.MapStr, results publish.Transactio
 			nfs.getRequestInfo()
 
 			// populate cache to trach request processing time
-			calls_seen.Put(xid, &nfs)
+			rpc.callsSeen.Put(xid, &nfs)
 		}
 
 	} else {
@@ -99,7 +96,7 @@ func (msg *RpcMessage) fillEvent(event common.MapStr, results publish.Transactio
 		msg.xdr.getDynamicOpaque()
 
 		// get cached request
-		v := calls_seen.Delete(xid)
+		v := rpc.callsSeen.Delete(xid)
 		if v != nil {
 			nfs := *(v.(*Nfs))
 			rpcInfo := nfs.event["rpc"].(common.MapStr)
@@ -114,7 +111,7 @@ func (msg *RpcMessage) fillEvent(event common.MapStr, results publish.Transactio
 			if acceptStatus == 0 {
 				nfs.getReplyInfo(&msg.xdr)
 			}
-			results.PublishTransaction(nfs.event)
+			rpc.results.PublishTransaction(nfs.event)
 		}
 	}
 }
