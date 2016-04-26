@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -30,7 +29,7 @@ func New() *{{cookiecutter.beat|capitalize}} {
 func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
 	// Load beater beatConfig
-	err := cfgfile.Read(&bt.beatConfig, "")
+	err := b.RawConfig.Unpack(bt.beatConfig)
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}

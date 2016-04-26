@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file based on the
 - Add dev-tools/packer to package the beat for all supported platforms
 
 ### Changed
+- Use ucfg.Unpack() instead of cfgfile.Read() in Beater.Config method.
 - Rename `Configuration` variable in beat struct to `beatConfig` as generalization from @buehler.
 - Update Golang dependency to 1.6.0
 

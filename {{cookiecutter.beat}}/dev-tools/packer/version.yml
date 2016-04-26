@@ -1,3 +1,1 @@
-version: "0.1.0-${BUILDID}"
-rpm_version: "0.1.0"
-deb_version: "0.1.0"
+version: "0.1.0"

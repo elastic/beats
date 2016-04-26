@@ -1,7 +1,7 @@
 package: .
 import:
 - package: github.com/elastic/beats
-  version: 05cd6641cf6e4fa12caa6e85588e181f8eefe1e6
+  version: a0f543d88691f3081d63fcce83defc57a631cb8c
   subpackages:
   - /libbeat/beat
   - libbeat/cfgfile
