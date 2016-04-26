@@ -205,6 +205,64 @@ func TestRead(t *testing.T) {
 	assert.Equal(t, len(messages), int(numMessages))
 }
 
+// Verify that messages whose text is larger than the read buffer cause a
+// message error to be returned. Normally Winlogbeat is run with the largest
+// possible buffer so this error should not occur.
+func TestFormatMessageWithLargeMessage(t *testing.T) {
+	configureLogp()
+	log, err := initLog(providerName, sourceName, eventCreateMsgFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := uninstallLog(providerName, sourceName, log)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	message := "Hello"
+	err = log.Report(elog.Info, 1, []string{message})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Messages are received as UTF-16 so we must have enough space in the read
+	// buffer for the message, a windows newline, and a null-terminator.
+	requiredBufferSize := len(message+"\r\n")*2 + 2
+
+	// Read messages:
+	eventlog, err := newEventLogging(map[string]interface{}{
+		"name": providerName,
+		// Use a buffer smaller than what is required.
+		"format_buffer_size": requiredBufferSize / 2,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = eventlog.Open(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		err := eventlog.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+	records, err := eventlog.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Validate messages:
+	assert.Len(t, records, 1)
+	for _, record := range records {
+		t.Log(record)
+		assert.Equal(t, "The data area passed to a system call is too small.", record.RenderErr)
+	}
+}
+
 // Test that when an unknown Event ID is found, that a message containing the
 // insert strings (the message parameters) is returned.
 func TestReadUnknownEventId(t *testing.T) {
