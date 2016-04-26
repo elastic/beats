@@ -14,6 +14,7 @@ grouped in the following categories:
 * <<exported-fields-icmp>>
 * <<exported-fields-dns>>
 * <<exported-fields-http>>
+* <<exported-fields-amqp>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mysql>>
 * <<exported-fields-pgsql>>
@@ -384,13 +385,13 @@ A human readable form of the request.
 
 ==== icmp.request.type
 
-type: int
+type: integer
 
 The request type.
 
 ==== icmp.request.code
 
-type: int
+type: integer
 
 The request code.
 
@@ -402,13 +403,13 @@ A human readable form of the response.
 
 ==== icmp.response.type
 
-type: int
+type: integer
 
 The response type.
 
 ==== icmp.response.code
 
-type: int
+type: integer
 
 The response code.
 
@@ -420,7 +421,7 @@ DNS-specific event fields.
 
 ==== dns.id
 
-type: int
+type: integer
 
 The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
 
@@ -507,7 +508,7 @@ The effective top-level domain (eTLD) plus one more label. For example, the eTLD
 
 ==== dns.answers_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.answers` field.
 
@@ -532,7 +533,7 @@ The class of DNS data contained in this resource record.
 
 ==== dns.answers.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -551,7 +552,7 @@ An array containing a dictionary for each authority section from the answer.
 
 ==== dns.authorities_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -583,7 +584,7 @@ An array containing a dictionary about each answer section returned by the serve
 
 ==== dns.answers.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -602,7 +603,7 @@ An array containing a dictionary for each additional section from the answer.
 
 ==== dns.additionals_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -627,7 +628,7 @@ The class of DNS data contained in this resource record.
 
 ==== dns.additionals.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -657,18 +658,19 @@ Extended response code field.
 
 ==== dns.opt.udp_size
 
-type: int
+type: integer
 
 Requestor's UDP payload size (in bytes).
 
-=== amqp Fields
+[[exported-fields-amqp]]
+=== AMQP Fields
 
 AMQP specific event fields.
 
 
 ==== amqp.reply-code
 
-type: int
+type: integer
 
 example: 404
 
@@ -684,14 +686,14 @@ Text explaining the error.
 
 ==== amqp.class-id
 
-type: int
+type: integer
 
 Failing method class.
 
 
 ==== amqp.method-id
 
-type: int
+type: integer
 
 Failing method ID.
 
@@ -754,28 +756,28 @@ Identifier for the consumer, valid within the current channel.
 
 ==== amqp.delivery-tag
 
-type: int
+type: integer
 
 The server-assigned and channel-specific delivery tag.
 
 
 ==== amqp.message-count
 
-type: int
+type: integer
 
 The number of messages in the queue, which will be zero for newly-declared queues.
 
 
 ==== amqp.consumer-count
 
-type: int
+type: integer
 
 The number of consumers of a queue.
 
 
 ==== amqp.routing-key
 
-type: int
+type: integer
 
 Message routing key.
 
@@ -875,14 +877,14 @@ Message header field table.
 
 ==== amqp.delivery-mode
 
-type: int
+type: integer
 
 Non-persistent (1) or persistent (2).
 
 
 ==== amqp.priority
 
-type: int
+type: integer
 
 Message priority, 0 to 9.
 
@@ -977,7 +979,7 @@ A map containing the captured header fields from the response. Which headers to 
 
 ==== http.content_length
 
-type: int
+type: integer
 
 The value of the Content-Length header if present.
 
@@ -1053,35 +1055,35 @@ The binary protocol message opcode name.
 
 ==== memcache.request.opcode_value
 
-type: int
+type: integer
 
 The binary protocol message opcode value.
 
 
 ==== memcache.response.opcode_value
 
-type: int
+type: integer
 
 The binary protocol message opcode value.
 
 
 ==== memcache.request.opaque
 
-type: int
+type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
 ==== memcache.response.opaque
 
-type: int
+type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
 ==== memcache.request.vbucket
 
-type: int
+type: integer
 
 The vbucket index sent in the binary message.
 
@@ -1095,7 +1097,7 @@ The textual representation of the response error code (binary protocol only).
 
 ==== memcache.response.status_code
 
-type: int
+type: integer
 
 The status code value returned in the response (binary protocol only).
 
@@ -1116,14 +1118,14 @@ The list of keys returned for the load command (if present).
 
 ==== memcache.request.count_values
 
-type: int
+type: integer
 
 The number of values found in the memcache request message. If the command does not send any data, this field is missing.
 
 
 ==== memcache.response.count_values
 
-type: int
+type: integer
 
 The number of values found in the memcache response message. If the command does not send any data, this field is missing.
 
@@ -1144,35 +1146,35 @@ The list of base64 encoded values sent with the response (if present).
 
 ==== memcache.request.bytes
 
-type: int
+type: integer
 
 The byte count of the values being transfered.
 
 
 ==== memcache.response.bytes
 
-type: int
+type: integer
 
 The byte count of the values being transfered.
 
 
 ==== memcache.request.delta
 
-type: int
+type: integer
 
 The counter increment/decrement delta value.
 
 
 ==== memcache.request.initial
 
-type: int
+type: integer
 
 The counter increment/decrement initial value parameter (binary protocol only).
 
 
 ==== memcache.request.verbosity
 
-type: int
+type: integer
 
 The value of the memcache "verbosity" command.
 
@@ -1186,14 +1188,14 @@ The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands
 
 ==== memcache.request.source_class
 
-type: int
+type: integer
 
 The source class id in 'slab reassign' command.
 
 
 ==== memcache.request.dest_class
 
-type: int
+type: integer
 
 The destination class id in 'slab reassign' command.
 
@@ -1207,35 +1209,35 @@ The automove mode in the 'slab automove' command expressed as a string. This val
 
 ==== memcache.request.flags
 
-type: int
+type: integer
 
 The memcache command flags sent in the request (if present).
 
 
 ==== memcache.response.flags
 
-type: int
+type: integer
 
 The memcache message flags sent in the response (if present).
 
 
 ==== memcache.request.exptime
 
-type: int
+type: integer
 
 The data expiry time in seconds sent with the memcache command (if present). If the value is <30 days, the expiry time is relative to "now", or else it is an absolute Unix time in seconds (32-bit).
 
 
 ==== memcache.request.sleep_us
 
-type: int
+type: integer
 
 The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
 
 ==== memcache.response.value
 
-type: int
+type: integer
 
 The counter value returned by a counter operation.
 
@@ -1256,14 +1258,14 @@ Set to true if the binary protocol message is to be treated as a quiet message.
 
 ==== memcache.request.cas_unique
 
-type: int
+type: integer
 
 The CAS (compare-and-swap) identifier if present.
 
 
 ==== memcache.response.cas_unique
 
-type: int
+type: integer
 
 The CAS (compare-and-swap) identifier to be used with CAS-based updates (if present).
 
@@ -1297,7 +1299,7 @@ If the MySQL query returns an error, this field is set to true.
 
 ==== mysql.affected_rows
 
-type: int
+type: integer
 
 If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
@@ -1324,7 +1326,7 @@ The row mysql query as read from the transaction's request.
 
 ==== mysql.error_code
 
-type: int
+type: integer
 
 The error code returned by MySQL.
 
@@ -1354,7 +1356,7 @@ If the PgSQL query returns an error, this field is set to true.
 
 ==== pgsql.error_code
 
-type: int
+type: integer
 
 The PostgreSQL error code.
 
@@ -1591,55 +1593,55 @@ These fields contain measurements related to the transaction.
 
 ==== responsetime
 
-type: int
+type: integer
 
 The wall clock time it took to complete the transaction. The precision is in milliseconds.
 
 
 ==== cpu_time
 
-type: int
+type: integer
 
 The CPU time it took to complete the transaction.
 
 ==== bytes_in
 
-type: int
+type: integer
 
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
 ==== bytes_out
 
-type: int
+type: integer
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
 ==== dnstime
 
-type: int
+type: integer
 
 The time it takes to query the name server for a given request. This is typically used for RUM (real-user-monitoring) but can also have values for server-to-server communication when DNS is used for service discovery. The precision is in microseconds.
 
 
 ==== connecttime
 
-type: int
+type: integer
 
 The time it takes for the TCP connection to be established for the given transaction. The precision is in microseconds.
 
 
 ==== loadtime
 
-type: int
+type: integer
 
 The time it takes for the content to be loaded. This is typically used for RUM (real-user-monitoring) but it can make sense in other cases as well. The precision is in microseconds.
 
 
 ==== domloadtime
 
-type: int
+type: integer
 
 In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded. In terms of the W3 Navigation Timing API, this is the difference between `domContentLoadedEnd` and `domContentLoadedStart`.
 

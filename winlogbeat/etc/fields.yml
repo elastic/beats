@@ -223,7 +223,7 @@ eventlog:
         The type of account associated with this event.
 
     - name: version
-      type: int
+      type: integer
       required: false
       description: The version number of the event's definition.
 

@@ -143,6 +143,9 @@
               "type": "keyword"
             }
           }
+        },
+        "version": {
+          "type": "integer"
         }
       }
     }
