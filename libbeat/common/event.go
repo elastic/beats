@@ -29,6 +29,11 @@ func ConvertToGenericEvent(v MapStr) MapStr {
 
 	for key, value := range v {
 
+		if value == nil {
+			// leave nil values alone
+			continue
+		}
+
 		switch value.(type) {
 		case Time, *Time:
 			continue
