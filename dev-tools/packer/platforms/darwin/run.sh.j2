@@ -15,6 +15,7 @@ cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-darwin/
 cp {{.beat_name}}-darwin-amd64 /{{.beat_name}}-${VERSION}-darwin/{{.beat_name}}
 cp {{.beat_name}}-darwin.yml /{{.beat_name}}-${VERSION}-darwin/{{.beat_name}}.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-darwin/
+cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-darwin/
 
 mkdir -p upload/{{.beat_name}}
 tar czvf upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-darwin.tgz /{{.beat_name}}-${VERSION}-darwin

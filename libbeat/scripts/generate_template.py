@@ -9,12 +9,12 @@ Example usage:
    python generate_template.py filebeat/ filebeat
 """
 
-import sys
 import yaml
 import json
+import argparse
 
 
-def fields_to_es_template(input, output, index):
+def fields_to_es_template(args, input, output, index):
     """
     Reads the YAML file from input and generates the JSON for
     the ES template in output. input and output are both file
@@ -63,11 +63,18 @@ def fields_to_es_template(input, output, index):
         }
     }
 
+    if args.es2x:
+        # different syntax for norms
+        template["mappings"]["_default_"]["_all"]["norms"] = {
+            "enabled": False
+        }
+
     properties = {}
     dynamic_templates = []
     for doc, section in docs.items():
         if doc != "defaults":
-            prop, dynamic = fill_section_properties(section, defaults, "")
+            prop, dynamic = fill_section_properties(args, section,
+                                                    defaults, "")
             properties.update(prop)
             dynamic_templates.extend(dynamic)
 
@@ -120,7 +127,7 @@ def dedot(group):
     return group
 
 
-def fill_section_properties(section, defaults, path):
+def fill_section_properties(args, section, defaults, path):
     """
     Traverse the sections tree and fill in the properties
     map.
@@ -129,14 +136,14 @@ def fill_section_properties(section, defaults, path):
     dynamic_templates = []
 
     for field in section["fields"]:
-        prop, dynamic = fill_field_properties(field, defaults, path)
+        prop, dynamic = fill_field_properties(args, field, defaults, path)
         properties.update(prop)
         dynamic_templates.extend(dynamic)
 
     return properties, dynamic_templates
 
 
-def fill_field_properties(field, defaults, path):
+def fill_field_properties(args, field, defaults, path):
     """
     Add data about a particular field in the properties
     map.
@@ -148,21 +155,39 @@ def fill_field_properties(field, defaults, path):
         if key not in field:
             field[key] = defaults[key]
 
-    # TODO: Make this more dyanmic
     if field["type"] == "text":
-        properties[field["name"]] = {
-            "type": field["type"],
-            "norms": False
-        }
+        if args.es2x:
+            properties[field["name"]] = {
+                "type": "string",
+                "index": "analyzed",
+                "norms": {
+                    "enabled": False
+                }
+            }
+        else:
+            properties[field["name"]] = {
+                "type": field["type"],
+                "norms": False
+            }
+
+    elif field["type"] == "keyword":
+        if args.es2x:
+            properties[field["name"]] = {
+                "type": "string",
+                "index": "not_analyzed",
+                "ignore_above": 1024
+            }
+        else:
+            properties[field["name"]] = {
+                "type": "keyword",
+                "ignore_above": 1024
+            }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
-                           "double", "float", "keyword", "boolean"]:
+                           "double", "float", "boolean"]:
         properties[field["name"]] = {
             "type": field.get("type")
         }
-        if field["type"] == "keyword":
-            properties[field["name"]]["ignore_above"] = \
-                defaults.get("ignore_above", 1024)
 
     elif field["type"] in ["dict", "list"]:
         if field.get("dict-type") == "keyword":
@@ -173,24 +198,36 @@ def fill_field_properties(field, defaults, path):
             else:
                 name = field["name"]
 
-            dynamic_templates.append({
-                name: {
-                    "mapping": {
-                        "index": True,
-                        "type": "keyword",
-                        "ignore_above": 1024
-                    },
-                    "match_mapping_type": "string",
-                    "path_match": name + ".*"
-                }
-            })
+            if args.es2x:
+                dynamic_templates.append({
+                    name: {
+                        "mapping": {
+                            "type": "string",
+                            "index": "not_analyzed",
+                            "ignore_above": 1024
+                        },
+                        "match_mapping_type": "string",
+                        "path_match": name + ".*"
+                    }
+                })
+            else:
+                dynamic_templates.append({
+                    name: {
+                        "mapping": {
+                            "type": "keyword",
+                            "ignore_above": 1024
+                        },
+                        "match_mapping_type": "string",
+                        "path_match": name + ".*"
+                    }
+                })
 
     elif field.get("type") == "group":
         if len(path) > 0:
             path = path + "." + field["name"]
         else:
             path = field["name"]
-        prop, dynamic = fill_section_properties(field, defaults, path)
+        prop, dynamic = fill_section_properties(args, field, defaults, path)
 
         # Only add properties if they have a content
         if len(prop) is not 0:
@@ -207,7 +244,10 @@ def fill_field_properties(field, defaults, path):
 
         # Only add properties if they have a content
         if len(prop) is not 0:
-            properties[field.get("name")] = {"type": "nested", "properties": {}}
+            properties[field.get("name")] = {
+                "type": "nested",
+                "properties": {}
+            }
             properties[field.get("name")]["properties"] = prop
 
         dynamic_templates.extend(dynamic)
@@ -219,18 +259,19 @@ def fill_field_properties(field, defaults, path):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3:
-        print "Usage: %s beatpath beatname" % sys.argv[0]
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Generates the templates for a Beat.")
+    parser.add_argument("--es2x", action="store_true",
+                        help="Generate template for Elasticsearch 2.x.")
+    parser.add_argument("path", help="Path to the beat folder")
+    parser.add_argument("beatname", help="The beat fname")
+    args = parser.parse_args()
 
-    beat_path = sys.argv[1]
-    beat_name = sys.argv[2]
+    target = args.path + "/" + args.beatname + ".template"
+    if args.es2x:
+        target += "-es2x"
+    target += ".json"
 
-    input = open(beat_path + "/etc/fields.yml", 'r')
-    output = open(beat_path + "/" + beat_name + ".template.json", 'w')
-
-    try:
-        fields_to_es_template(input, output, beat_name + "-*")
-    finally:
-        input.close()
-        output.close()
+    with open(args.path + "/etc/fields.yml", 'r') as input:
+        with open(target, 'w') as output:
+            fields_to_es_template(args, input, output, args.beatname + "-*")
