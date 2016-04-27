@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Configuration options and CLI flags for setting the home, data and config paths. {pull}1373[1373]
 - Configuration options and CLI flags for setting the default logs path. {pull}1437[1437]
 - Update to Go 1.6.2 {pull}1447[1447]
+- Add Elasticsearch template files compatible with Elasticsearch 2.x. {pull}1501[1501]
 
 *Packetbeat*
 

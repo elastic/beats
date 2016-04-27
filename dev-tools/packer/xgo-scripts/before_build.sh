@@ -29,6 +29,7 @@ fi
 
 # Copy template
 cp $BEATNAME.template.json $PREFIX/$BEATNAME.template.json
+cp $BEATNAME.template-es2x.json $PREFIX/$BEATNAME.template-es2x.json
 
 # linux
 cp $BEATNAME.yml $PREFIX/$BEATNAME-linux.yml
