@@ -3,10 +3,14 @@
 package crawler
 
 import (
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -187,7 +191,9 @@ func TestProspectorInitInputTypeStdin(t *testing.T) {
 	}
 
 	prospector := Prospector{
-		ProspectorConfig: prospectorConfig,
+		ProspectorConfig:    prospectorConfig,
+		harvestersWaitGroup: &sync.WaitGroup{},
+		harvesters:          map[uuid.UUID]*harvester.Harvester{},
 	}
 
 	err := prospector.Init()
@@ -204,7 +210,8 @@ func TestProspectorInitInputTypeWrong(t *testing.T) {
 	}
 
 	prospector := Prospector{
-		ProspectorConfig: prospectorConfig,
+		ProspectorConfig:    prospectorConfig,
+		harvestersWaitGroup: &sync.WaitGroup{},
 	}
 
 	err := prospector.Init()
@@ -222,7 +229,8 @@ func TestProspectorFileExclude(t *testing.T) {
 	}
 
 	prospector := Prospector{
-		ProspectorConfig: prospectorConfig,
+		ProspectorConfig:    prospectorConfig,
+		harvestersWaitGroup: &sync.WaitGroup{},
 	}
 
 	prospector.Init()

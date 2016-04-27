@@ -38,8 +38,7 @@ class Test(BaseTest):
         c = self.log_contains_count("states written")
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 5 events"),
+            lambda: self.output_has(lines=5),
             max_timeout=15)
 
         # Make sure states written appears one more time
@@ -115,9 +114,9 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 10 events"),
+            lambda: self.output_has(lines=10),
             max_timeout=15)
+
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
@@ -147,8 +146,7 @@ class Test(BaseTest):
             f.write("hello world\n")
         filebeat = self.start_beat()
         self.wait_until(
-            lambda: self.log_contains(
-                "Processing 1 events"),
+            lambda: self.output_has(lines=1),
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.

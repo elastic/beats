@@ -1,9 +1,12 @@
 package crawler
 
 import (
+	"expvar"
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/satori/go.uuid"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
@@ -11,12 +14,17 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// Puts number of running harvesters into expvar
+var harvesterCounter = expvar.NewInt("harvesters")
+
 type Prospector struct {
-	ProspectorConfig cfg.ProspectorConfig
-	prospectorer     Prospectorer
-	channel          chan *input.FileEvent
-	registrar        *Registrar
-	done             chan struct{}
+	ProspectorConfig    cfg.ProspectorConfig
+	prospectorer        Prospectorer
+	channel             chan *input.FileEvent
+	registrar           *Registrar
+	harvesters          map[uuid.UUID]*harvester.Harvester
+	harvestersWaitGroup *sync.WaitGroup
+	done                chan struct{}
 }
 
 type Prospectorer interface {
@@ -26,10 +34,12 @@ type Prospectorer interface {
 
 func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, channel chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
-		ProspectorConfig: prospectorConfig,
-		registrar:        registrar,
-		channel:          channel,
-		done:             make(chan struct{}),
+		ProspectorConfig:    prospectorConfig,
+		registrar:           registrar,
+		channel:             channel,
+		harvesters:          map[uuid.UUID]*harvester.Harvester{},
+		harvestersWaitGroup: &sync.WaitGroup{},
+		done:                make(chan struct{}),
 	}
 
 	err := prospector.Init()
@@ -76,14 +86,9 @@ func (p *Prospector) Init() error {
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run(wg *sync.WaitGroup) {
 
-	// TODO: Defer the wg.Done() call to block shutdown
-	// Currently there are 2 cases where shutting down the prospector could be blocked:
-	// 1. reading from file
-	// 2. forwarding event to spooler
-	// As this is not implemented yet, no blocking on prospector shutdown is done.
-	wg.Done()
-
 	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
+
+	defer wg.Done()
 
 	for {
 		select {
@@ -98,16 +103,46 @@ func (p *Prospector) Run(wg *sync.WaitGroup) {
 }
 
 func (p *Prospector) Stop() {
+	// : Wait until all prospectors have exited the Run part.
 	logp.Info("Stopping Prospector")
 	close(p.done)
+
+	//logp.Debug("prospector", "Stopping %d harvesters.", len(p.harvesters))
+	for _, h := range p.harvesters {
+		go h.Stop()
+	}
+	//logp.Debug("prospector", "Waiting for %d harvesters to stop", len(p.harvesters))
+	p.harvestersWaitGroup.Wait()
+
 }
 
-func (p *Prospector) AddHarvester(file string, stat *harvester.FileStat) (*harvester.Harvester, error) {
+// CreateHarvester creates a harvester based on the given params
+// Note: Not every harvester that is created is necessarly started as it can
+// a harvester for the same file/input already exists
+func (p *Prospector) CreateHarvester(file string, stat *harvester.FileStat) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
 		&p.ProspectorConfig.Harvester, file, stat, p.channel)
 
+	p.harvesters[h.Id] = h
+
 	return h, err
+}
+
+func (p *Prospector) RunHarvester(h *harvester.Harvester) {
+	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
+	logp.Debug("harvester", "Starting harvester: %v", h.Id)
+
+	harvesterCounter.Add(1)
+	p.harvestersWaitGroup.Add(1)
+
+	go func(h2 *harvester.Harvester) {
+		defer func() {
+			p.harvestersWaitGroup.Done()
+			harvesterCounter.Add(-1)
+		}()
+		h2.Harvest()
+	}(h)
 }
 
 // Setup Prospector Config

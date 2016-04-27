@@ -120,7 +120,7 @@ func (p *ProspectorLog) scanGlob(glob string) {
 		newInfo := harvester.NewFileStat(newFile.FileInfo, p.iteration)
 
 		// Init harvester with info
-		h, err := p.Prospector.AddHarvester(file, newInfo)
+		h, err := p.Prospector.CreateHarvester(file, newInfo)
 
 		if err != nil {
 			logp.Err("Error initializing harvester: %v", err)
