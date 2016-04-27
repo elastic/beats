@@ -19,6 +19,22 @@ type ProxyConfig struct {
 	LocalResolve bool `config:"proxy_use_local_resolver"`
 }
 
+func (c *ProxyConfig) Validate() error {
+	if c.URL == "" {
+		return nil
+	}
+
+	url, err := url.Parse(c.URL)
+	if err != nil {
+		return err
+	}
+	if _, err := proxy.FromURL(url, nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ProxyDialer(config *ProxyConfig, forward Dialer) (Dialer, error) {
 	if config == nil || config.URL == "" {
 		return forward, nil

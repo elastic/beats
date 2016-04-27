@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/outputs"
@@ -39,3 +41,17 @@ var (
 		DbTopology:       1,
 	}
 )
+
+func (c *redisConfig) Validate() error {
+	switch c.DataType {
+	case "", "list", "channel":
+	default:
+		return fmt.Errorf("redis data type %v not supported", c.DataType)
+	}
+
+	if c.Index == "" {
+		return errors.New("index required")
+	}
+
+	return nil
+}
