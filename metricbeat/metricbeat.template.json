@@ -67,6 +67,10 @@
                 }
               }
             },
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "idleWorkers": {
               "type": "integer"
             },
@@ -207,6 +211,13 @@
                 },
                 "connected_clients": {
                   "type": "integer"
+                }
+              }
+            },
+            "cluster": {
+              "properties": {
+                "cluster_enabled": {
+                  "type": "boolean"
                 }
               }
             },

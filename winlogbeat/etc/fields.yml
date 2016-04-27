@@ -228,7 +228,7 @@ eventlog:
       description: The version number of the event's definition.
 
     - name: xml
-      type: string
+      type: keyword
       required: false
       description: >
         The raw XML representation of the event obtained from Windows. This

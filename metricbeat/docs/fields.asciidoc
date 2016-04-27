@@ -105,7 +105,7 @@ Apache HTTPD server metrics collected from the mod_status module.
 
 ==== apache-status.hostname
 
-type: string
+type: keyword
 
 Apache hostname
 
@@ -426,7 +426,7 @@ Redis cluster information
 
 ==== redis-info.cluster.cluster_enabled
 
-type: bool
+type: boolean
 
 Indicate Redis cluster is enabled
 

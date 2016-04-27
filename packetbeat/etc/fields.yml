@@ -454,37 +454,37 @@ trans_event:
           example: QUERY
 
         - name: flags.authoritative
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying that the responding server is an authority for
             the domain name used in the question.
 
         - name: flags.recursion_available
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying whether recursive query support is available in the
             name server.
 
         - name: flags.recursion_desired
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying that the client directs the server to pursue a
             query recursively. Recursive query support is optional.
 
         - name: flags.authentic_data
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying that the recursive server considers the response
             authentic.
 
         - name: flags.checking_disabled
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying that the client disables the server
             signature validation of the query.
 
         - name: flags.truncated_response
-          type: bool
+          type: boolean
           description: >
             A DNS flag specifying that only the first 512 bytes of the reply were
             returned.
@@ -631,7 +631,7 @@ trans_event:
           example: "0"
 
         - name: opt.do
-          type: bool
+          type: boolean
           description: If set, the transaction uses DNSSEC.
 
         - name: opt.ext_rcode
@@ -679,27 +679,27 @@ trans_event:
           example: fanout
 
         - name: passive
-          type: bool
+          type: boolean
           description: >
             If set, do not create exchange/queue.
 
         - name: durable
-          type: bool
+          type: boolean
           description: >
             If set, request a durable exchange/queue.
 
         - name: exclusive
-          type: bool
+          type: boolean
           description: >
             If set, request an exclusive queue.
 
         - name: auto-delete
-          type: bool
+          type: boolean
           description: >
             If set, auto-delete queue when unused.
 
         - name: no-wait
-          type: bool
+          type: boolean
           description: >
             If set, the server will not respond to the method.
 
@@ -729,23 +729,23 @@ trans_event:
             Message routing key.
 
         - name: no-ack
-          type: bool
+          type: boolean
           description: >
             If set, the server does not expect acknowledgements for messages.
 
         - name: no-local
-          type: bool
+          type: boolean
           description: >
             If set, the server will not send messages to the connection that
             published them.
 
         - name: if-unused
-          type: bool
+          type: boolean
           description: >
             Delete only if unused.
 
         - name: if-empty
-          type: bool
+          type: boolean
           description: >
             Delete only if empty.
 
@@ -755,13 +755,13 @@ trans_event:
             The queue name identifies the queue within the vhost.
 
         - name: redelivered
-          type: bool
+          type: boolean
           description: >
             Indicates that the message has been previously delivered to this
             or another client.
 
         - name: multiple
-          type: bool
+          type: boolean
           description: >
             Acknowledge multiple messages.
 
@@ -772,12 +772,12 @@ trans_event:
             various types.
 
         - name: mandatory
-          type: bool
+          type: boolean
           description: >
             Indicates mandatory routing.
 
         - name: immediate
-          type: bool
+          type: boolean
           description: >
             Request immediate delivery.
 
@@ -1090,13 +1090,13 @@ trans_event:
             The counter value returned by a counter operation.
 
         - name: request.noreply
-          type: bool
+          type: boolean
           description: >
             Set to true if noreply was set in the request.
             The `memcache.response` field will be missing.
 
         - name: request.quiet
-          type: bool
+          type: boolean
           description: >
             Set to true if the binary protocol message is to be treated as a quiet message.
 
@@ -1128,7 +1128,7 @@ trans_event:
       description: MySQL-specific event fields.
       fields:
         - name: iserror
-          type: bool
+          type: boolean
           description: >
            If the MySQL query returns an error, this field is set to true.
 
@@ -1175,7 +1175,7 @@ trans_event:
             The row pgsql query as read from the transaction's request.
 
         - name: iserror
-          type: bool
+          type: boolean
           description: >
             If the PgSQL query returns an error, this field is set to true.
 
@@ -1258,16 +1258,16 @@ trans_event:
             using a dot (.) for the concatenation.
             For example, for the database foo and the collection bar, the full collection name is foo.bar.
         - name: numberToSkip
-          type: number
+          type: integer
           description: >
             Sets the number of documents to omit - starting from the first document in the resulting dataset -
             when returning the result of the query.
         - name: numberToReturn
-          type: number
+          type: integer
           description: >
             The requested maximum number of documents to be returned.
         - name: numberReturned
-          type: number
+          type: integer
           description: >
             The number of documents in the reply.
         - name: startingFrom
@@ -1303,18 +1303,18 @@ trans_event:
           description: RPC message transaction identifier.
 
         - name: call_size
-          type: number
+          type: integer
           description: RPC call size with argument.
 
         - name: reply_size
-          type: number
+          type: integer
           description: RPC reply size with argument.
 
         - name: status
           description: RPC message reply status.
 
         - name: time
-          type: number
+          type: integer
           description: RPC message processing time.
 
         - name: time_str
@@ -1324,18 +1324,18 @@ trans_event:
           description: RPC authentication flavor.
 
         - name: cred.uid
-          type: number
+          type: integer
           description: RPC caller's user id, in case of auth-unix.
 
         - name: cred.gid
-          type: number
+          type: integer
           description: RPC caller's group id, in case of auth-unix.
 
         - name: cred.gids
           description: RPC caller's secondary group ids, in case of auth-unix.
 
         - name: cred.stamp
-          type: number
+          type: integer
           description: Arbitrary ID which the caller machine may generate.
 
         - name: cred.machinename
@@ -1346,11 +1346,11 @@ trans_event:
       description: NFS v4/3 specific event fields.
       fields:
         - name: version
-          type: number
+          type: integer
           description: NFS protocol version number.
 
         - name: minor_version
-          type: number
+          type: integer
           description: NFS protocol minor version number.
 
         - name: tag

@@ -84,7 +84,7 @@ apache:
         page.
       fields:
         - name: hostname
-          type: string
+          type: keyword
           description: >
             Apache hostname
         - name: totalAccesses
@@ -326,7 +326,7 @@ redis:
             Redis cluster information
           fields:
             - name: cluster_enabled
-              type: bool
+              type: boolean
               description: >
                 Indicate Redis cluster is enabled
 
