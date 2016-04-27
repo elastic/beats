@@ -151,7 +151,7 @@ func RenderEvents(
 		}
 
 		// Format the parametrized message using the insert strings.
-		event.Message, _, err = formatMessage(record.sourceName,
+		event.Message, err = formatMessage(record.sourceName,
 			record.eventID, lang, stringInsertPtrs, buffer, pubHandleProvider)
 		if err != nil {
 			event.RenderErr = err.Error()
@@ -173,7 +173,7 @@ func unixTime(sec uint32) time.Time {
 	return t
 }
 
-// formatmessage takes event data and formats the event message into a
+// formatMessage takes event data and formats the event message into a
 // normalized format.
 func formatMessage(
 	sourceName string,
@@ -182,7 +182,7 @@ func formatMessage(
 	stringInserts []uintptr,
 	buffer []byte,
 	pubHandleProvider func(string) sys.MessageFiles,
-) (string, int, error) {
+) (string, error) {
 	var addr uintptr
 	if len(stringInserts) > 0 {
 		addr = reflect.ValueOf(&stringInserts[0]).Pointer()
@@ -205,36 +205,44 @@ func formatMessage(
 			Handle(fh.Handle),
 			eventID,
 			lang,
-			&buffer[0],
-			uint32(len(buffer)),
+			&buffer[0],            // Max size allowed is 64k bytes.
+			uint32(len(buffer)/2), // Size of buffer in TCHARS
 			addr)
+		// bufferUsed = numChars * sizeof(TCHAR) + sizeof(null-terminator)
+		bufferUsed := int(numChars*2 + 2)
 		if err == syscall.ERROR_INSUFFICIENT_BUFFER {
-			return "", int(numChars), err
+			return "", err
 		}
 		if err != nil {
 			lastErr = err
 			continue
 		}
 
-		message, _, err = sys.UTF16BytesToString(buffer[:numChars*2])
+		if bufferUsed > len(buffer) {
+			return "", fmt.Errorf("Windows FormatMessage reported that "+
+				"message contains %d characters plus a null-terminator "+
+				"(%d bytes), but the buffer can only hold %d bytes",
+				numChars, bufferUsed, len(buffer))
+		}
+		message, _, err = sys.UTF16BytesToString(buffer[:bufferUsed])
 		if err != nil {
-			return "", 0, err
+			return "", err
 		}
 	}
 
 	if message == "" {
 		switch lastErr {
 		case nil:
-			return "", 0, messageFiles.Err
+			return "", messageFiles.Err
 		case ERROR_MR_MID_NOT_FOUND:
-			return "", 0, fmt.Errorf("The system cannot find message text for "+
+			return "", fmt.Errorf("The system cannot find message text for "+
 				"message number %d in the message file for %s.", eventID, fh.File)
 		default:
-			return "", 0, fh.Err
+			return "", fh.Err
 		}
 	}
 
-	return message, 0, nil
+	return message, nil
 }
 
 // parseEventLogRecord parses a single Windows EVENTLOGRECORD struct from the
