@@ -18,7 +18,7 @@ type ProspectorLog struct {
 	iteration      uint32
 	lastscan       time.Time
 	missingFiles   map[string]os.FileInfo
-	harvesterStats map[string]harvester.FileStat
+	harvesterStats map[string]input.FileStat
 	config         cfg.ProspectorConfig
 }
 
@@ -31,7 +31,7 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	}
 
 	// Init File Stat list
-	prospectorer.harvesterStats = make(map[string]harvester.FileStat)
+	prospectorer.harvesterStats = make(map[string]input.FileStat)
 
 	return prospectorer, nil
 }
@@ -117,7 +117,7 @@ func (p *ProspectorLog) scanGlob(glob string) {
 		oldFile := input.NewFile(lastinfo.Fileinfo)
 
 		// Create a new prospector info with the stat info for comparison
-		newInfo := harvester.NewFileStat(newFile.FileInfo, p.iteration)
+		newInfo := input.NewFileStat(newFile.FileInfo, p.iteration)
 
 		// Init harvester with info
 		h, err := p.Prospector.AddHarvester(file, newInfo)
@@ -228,8 +228,6 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 
 			// Start a new harvester on the path
 			h.Start()
-			p.Prospector.registrar.Persist <- h.GetState()
-
 		}
 
 		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
@@ -240,9 +238,7 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 		// Resume harvesting of an old file we've stopped harvesting from
 		// Start a harvester on the path; a file was just modified and it doesn't have a harvester
 		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
-		p.resumeHarvesting(h, <-h.Stat.Return)
-		p.Prospector.registrar.Persist <- h.GetState()
-
+		p.resumeHarvesting(h, <-h.Stat.Offset)
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", h.Path)
 	}
@@ -258,7 +254,7 @@ func (p *ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFil
 	h.Stat.Continue(&lastinfo)
 
 	// Update state because of file rotation
-	p.Prospector.registrar.Persist <- h.GetState()
+	h.UpdateState()
 }
 
 // Start / resume harvester with a predefined offset
@@ -267,9 +263,6 @@ func (p *ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
 	logp.Debug("prospector", "Start / resuming harvester of file: %s", h.Path)
 	h.SetOffset(offset)
 	h.Start()
-
-	// Update state because of file rotation
-	p.Prospector.registrar.Persist <- h.GetState()
 }
 
 // Check if the given file was renamed. If file is known but with different path,

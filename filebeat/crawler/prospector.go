@@ -14,7 +14,8 @@ import (
 type Prospector struct {
 	ProspectorConfig cfg.ProspectorConfig
 	prospectorer     Prospectorer
-	channel          chan *input.FileEvent
+	spoolerChan      chan *input.FileEvent
+	harvesterChan    chan *input.FileEvent
 	registrar        *Registrar
 	done             chan struct{}
 }
@@ -24,11 +25,12 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, channel chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
 		ProspectorConfig: prospectorConfig,
 		registrar:        registrar,
-		channel:          channel,
+		spoolerChan:      spoolerChan,
+		harvesterChan:    make(chan *input.FileEvent),
 		done:             make(chan struct{}),
 	}
 
@@ -85,6 +87,20 @@ func (p *Prospector) Run(wg *sync.WaitGroup) {
 
 	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
 
+	// Open channel to receive events from harvester and forward them to spooler
+	// Here potential filtering can happen
+	go func() {
+		for {
+			select {
+			case <-p.done:
+				logp.Info("Prospector stopped")
+				return
+			case event := <-p.harvesterChan:
+				p.spoolerChan <- event
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-p.done:
@@ -102,10 +118,10 @@ func (p *Prospector) Stop() {
 	close(p.done)
 }
 
-func (p *Prospector) AddHarvester(file string, stat *harvester.FileStat) (*harvester.Harvester, error) {
+func (p *Prospector) AddHarvester(file string, stat *input.FileStat) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
-		&p.ProspectorConfig.Harvester, file, stat, p.channel)
+		&p.ProspectorConfig.Harvester, file, stat, p.harvesterChan)
 
 	return h, err
 }

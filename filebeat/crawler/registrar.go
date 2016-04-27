@@ -20,8 +20,6 @@ type Registrar struct {
 	// Map with all file paths inside and the corresponding state
 	state      map[string]*FileState
 	stateMutex sync.Mutex
-	// Channel used by the prospector and crawler to send FileStates to be persisted
-	Persist chan *input.FileState
 
 	Channel chan []*FileEvent
 	done    chan struct{}
@@ -40,7 +38,6 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 
 func (r *Registrar) Init() error {
 	// Init state
-	r.Persist = make(chan *FileState)
 	r.state = map[string]*FileState{}
 	r.Channel = make(chan []*FileEvent, 1)
 
@@ -68,8 +65,6 @@ func (r *Registrar) Init() error {
 // loadState fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) LoadState() {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
 	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()
 		logp.Info("Loading registrar data from %s", r.registryFile)
@@ -89,11 +84,6 @@ func (r *Registrar) Run() {
 		case <-r.done:
 			logp.Info("Ending Registrar")
 			return
-		// Treats new log files to persist with higher priority then new events
-		case state := <-r.Persist:
-			source := state.Source
-			r.setState(source, state)
-			logp.Debug("prospector", "Registrar will re-save state for %s", source)
 		case events := <-r.Channel:
 			r.processEvents(events)
 		}
@@ -174,7 +164,6 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
-		r.updateStateSource(lastState, filePath)
 		return lastState.Offset, true
 	}
 
@@ -202,7 +191,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 		}
 
 		// Compare states
-		if newState.IsSame(oldState.FileStateOS) {
+		if newState.IsSame(&oldState.FileStateOS) {
 			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
 			return oldFilePath, nil
 		}
@@ -214,20 +203,16 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 func (r *Registrar) setState(path string, state *FileState) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+
 	r.state[path] = state
 }
 
 func (r *Registrar) getState(path string) (*FileState, bool) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
+
 	state, exist := r.state[path]
 	return state, exist
-}
-
-func (r *Registrar) updateStateSource(state *FileState, path string) {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
-	state.Source = path
 }
 
 func (r *Registrar) getStateCopy() map[string]FileState {
