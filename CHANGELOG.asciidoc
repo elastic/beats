@@ -59,6 +59,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 *Winlogbeat*
 
 - Fix panic when reading messages larger than 32K characters on Windows XP and 2003. {pull}1498[1498]
+- Fix panic that occurs when reading a large events on Windows Vista and newer. {pull}1499[1499]
+
 
 ==== Added
 
