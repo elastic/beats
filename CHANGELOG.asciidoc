@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 *Packetbeat*
 
 - Configuration of redis topology support changed. {pull}1353[1353]
+- Move all Packetbeat configuration options under the packetbeat namespace {issue}1417[1417]
 
 *Topbeat*
 

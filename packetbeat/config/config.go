@@ -5,19 +5,19 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/droppriv"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/packetbeat/procs"
 )
 
 type Config struct {
+	Packetbeat PacketbeatConfig
+}
+
+type PacketbeatConfig struct {
 	Interfaces InterfacesConfig
 	Flows      *Flows
 	Protocols  map[string]*common.Config
-	Shipper    publisher.ShipperConfig
 	Procs      procs.ProcsConfig
 	RunOptions droppriv.RunOptions
-	Logging    logp.Logging
 }
 
 type InterfacesConfig struct {
@@ -45,6 +45,3 @@ type ProtocolCommon struct {
 	SendResponse       bool          `config:"send_response"`
 	TransactionTimeout time.Duration `config:"transaction_timeout"`
 }
-
-// Config Singleton
-var ConfigSingleton Config
