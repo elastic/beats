@@ -46,7 +46,7 @@ func testSingleConnectFailConnectAndSend(t *testing.T, events []eventInfo) {
 			&mockClient{
 				connected: false,
 				close:     closeOK,
-				connect:   failConnect(4, errFail), // 3 fails + 1 on create
+				connect:   failConnect(3, errFail), // 3 fails
 				publish:   collectPublish(&collected),
 			},
 		},
