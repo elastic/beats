@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
@@ -17,7 +18,8 @@ type Registrar struct {
 	// Path to the Registry File
 	registryFile string
 	// Map with all file paths inside and the corresponding state
-	state map[string]*FileState
+	state      map[string]*FileState
+	stateMutex sync.Mutex
 
 	Channel chan []*FileEvent
 	done    chan struct{}
@@ -189,7 +191,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 		}
 
 		// Compare states
-		if newState.IsSame(oldState.FileStateOS) {
+		if newState.IsSame(&oldState.FileStateOS) {
 			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
 			return oldFilePath, nil
 		}
@@ -199,15 +201,24 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 }
 
 func (r *Registrar) setState(path string, state *FileState) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
 	r.state[path] = state
 }
 
 func (r *Registrar) getState(path string) (*FileState, bool) {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
 	state, exist := r.state[path]
 	return state, exist
 }
 
 func (r *Registrar) getStateCopy() map[string]FileState {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+
 	copy := make(map[string]FileState)
 	for k, v := range r.state {
 		copy[k] = *v

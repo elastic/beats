@@ -32,7 +32,7 @@ func (f *FileEvent) GetState() *FileState {
 	state := &FileState{
 		Source:      f.Source,
 		Offset:      f.Offset,
-		FileStateOS: GetOSFileState(f.Fileinfo),
+		FileStateOS: *GetOSFileState(f.Fileinfo),
 	}
 
 	return state
