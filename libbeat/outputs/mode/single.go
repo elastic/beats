@@ -45,7 +45,6 @@ func NewSingleConnectionMode(
 		maxAttempts: maxAttempts,
 	}
 
-	_ = s.connect() // try to connect, but ignore errors for now
 	return s, nil
 }
 
