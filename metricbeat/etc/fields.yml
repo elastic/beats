@@ -88,11 +88,11 @@ apache:
           description: >
             Apache hostname
         - name: totalAccesses
-          type: long
+          type: integer
           description: >
             Total number of access requests
         - name: totalKBytes
-          type: long
+          type: integer
           description: >
             Total number of kilobytes served
         - name: reqPerSec
@@ -276,12 +276,12 @@ mysql:
             Bytes stats
           fields:
             - name: Bytes_received
-              type: long
+              type: integer
               description: >
                 The number of bytes received from all clients.
 
             - name: Bytes_sent
-              type: long
+              type: integer
               description: >
                 The number of bytes sent to all clients.
 redis:
@@ -306,12 +306,12 @@ redis:
                 Number of client connections (excluding connections from slaves)
 
             - name: client_longest_output_list
-              type: long
+              type: integer
               description: >
                 Longest output list among current client connections.
 
             - name: client_biggest_input_buf
-              type: long
+              type: integer
               description: >
                 Biggest input buffer among current client connections
 
@@ -365,7 +365,7 @@ system:
         `system-cpu` contains local cpu stats.
       fields:
         - name: user
-          type: long
+          type: integer
           description: >
            The amount of CPU time spent in user space.
 
@@ -376,12 +376,12 @@ system:
             For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
         - name: nice
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent on low-priority processes.
 
         - name: system
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent in kernel space.
 
@@ -391,27 +391,27 @@ system:
             The percentage of CPU time spent in kernel space.
 
         - name: idle
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent idle.
 
         - name: iowait
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent in wait (on disk).
 
         - name: irq
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent servicing and handling hardware interrupts.
 
         - name: softirq
-          type: long
+          type: integer
           description:
             The amount of CPU time spent servicing and handling software interrupts.
 
         - name: steal
-          type: long
+          type: integer
           description: >
             The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
             was servicing another processor.
@@ -428,17 +428,17 @@ system:
           description: This group contains statistics related to the memory usage on the system.
           fields:
             - name: total
-              type: long
+              type: integer
               description: >
                 Total memory.
 
             - name: used
-              type: long
+              type: integer
               description: >
                 Used memory.
 
             - name: free
-              type: long
+              type: integer
               description: >
                 Available memory.
 
@@ -448,13 +448,13 @@ system:
                 The percentage of used memory.
 
             - name: actual_used
-              type: long
+              type: integer
               description: >
                 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
                 Available only on Unix.
 
             - name: actual_free
-              type: long
+              type: integer
               description: >
                 Actual available memory. This value is the "free" memory plus the memory used for disk caches and
                 buffers. Available only on Unix.
@@ -470,17 +470,17 @@ system:
           description: This group contains statistics related to the swap memory usage on the system.
           fields:
             - name: total
-              type: long
+              type: integer
               description: >
                 Total swap memory.
 
             - name: used
-              type: long
+              type: integer
               description: >
                 Used swap memory.
 
             - name: free
-              type: long
+              type: integer
               description: >
                 Available swap memory.
 
@@ -488,4 +488,91 @@ system:
               type: float
               description: >
                 The percentage of used swap memory.
+zookeeper:
+  type: group
+  description: >
+    Zookeeper metrics collected by the four-letter monitoring commands
+  fields:
+    - name: zookeeper-mntr
+      type: group
+      description: >
+        `zookeeper-mntr` contains the metrics reported by the four-letter `mntr`
+        command.
+      fields:
+        - name: hostname
+          type: keyword
+          description: >
+            Zookeeper hostname.
+        - name: zk_approximate_data_size
+          type: long
+          description: >
+            Approximate size of zookeeper data.
+        - name: zk_avg_latency
+          type: integer
+          description: >
+            Average latency between ensemble hosts in milliseconds.
+        - name: zk_ephemerals_count
+          type: integer
+          description: >
+            Number of ephemeral znodes.
+        - name: zk_followers
+          type: integer
+          description: >
+            Number of followers seen by the current host.
+        - name: zk_max_file_descriptor_count
+          type: integer
+          description: >
+            Maximum number of file descriptors allowed for the zookeeper process.
+        - name: zk_max_latency
+          type: integer
+          description: >
+            Maximum latency in milliseconds.
+        - name: zk_min_latency
+          type: integer
+          description: >
+            Minimum latency in milliseconds.
+        - name: zk_num_alive_connections
+          type: integer
+          description: >
+            Number of connections to zookeeper that are currently alive.
+        - name: zk_open_file_descriptor_count
+          type: integer
+          description: >
+            Number of file descriptors open by the zookeeper process.
+        - name: zk_outstanding_requests
+          type: integer
+          description: >
+            Number of outstanding requests that need to be processed by the cluster.
+        - name: zk_packets_received
+          type: integer
+          description: >
+            Number zookeeper network packets received.
+        - name: zk_packets_sent
+          type: long
+          description: >
+            Number zookeeper network packets sent.
+        - name: zk_pending_syncs
+          type: integer
+          description: >
+            Number of pending syncs to carry out to zookeeper ensemble followers.
+        - name: zk_server_state
+          type: keyword
+          description: >
+            Role in the zookeeper ensemble.
+        - name: zk_synced_followers
+          type: integer
+          description: >
+            Number of synced followers reported when a node server_state is leader.
+        - name: zk_version
+          type: keyword
+          description: >
+            Zookeeper version and build string reported.
+        - name: zk_watch_count
+          type: integer
+          description: >
+            Number of watches currently set on the local zookeeper process.
+        - name: zk_znode_count
+          type: integer
+          description: >
+            Number of znodes reported by the local zookeeper process.
 

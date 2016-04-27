@@ -134,10 +134,10 @@
               }
             },
             "totalAccesses": {
-              "type": "long"
+              "type": "integer"
             },
             "totalKBytes": {
-              "type": "long"
+              "type": "integer"
             },
             "uptime": {
               "properties": {
@@ -195,10 +195,10 @@
             "bytes": {
               "properties": {
                 "Bytes_received": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "Bytes_sent": {
-                  "type": "long"
+                  "type": "integer"
                 }
               }
             }
@@ -212,10 +212,10 @@
                   "type": "integer"
                 },
                 "client_biggest_input_buf": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "client_longest_output_list": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "connected_clients": {
                   "type": "integer"
@@ -253,31 +253,31 @@
         "system-cpu": {
           "properties": {
             "idle": {
-              "type": "long"
+              "type": "integer"
             },
             "iowait": {
-              "type": "long"
+              "type": "integer"
             },
             "irq": {
-              "type": "long"
+              "type": "integer"
             },
             "nice": {
-              "type": "long"
+              "type": "integer"
             },
             "softirq": {
-              "type": "long"
+              "type": "integer"
             },
             "steal": {
-              "type": "long"
+              "type": "integer"
             },
             "system": {
-              "type": "long"
+              "type": "integer"
             },
             "system_p": {
               "type": "float"
             },
             "user": {
-              "type": "long"
+              "type": "integer"
             },
             "user_p": {
               "type": "float"
@@ -289,22 +289,22 @@
             "mem": {
               "properties": {
                 "actual_free": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "actual_used": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "actual_used_p": {
                   "type": "float"
                 },
                 "free": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "total": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "used": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "used_p": {
                   "type": "float"
@@ -314,13 +314,13 @@
             "swap": {
               "properties": {
                 "free": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "total": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "used": {
-                  "type": "long"
+                  "type": "integer"
                 },
                 "used_p": {
                   "type": "float"
@@ -338,6 +338,73 @@
           "ignore_above": 1024,
           "index": "not_analyzed",
           "type": "string"
+        },
+        "zookeeper-mntr": {
+          "properties": {
+            "hostname": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "zk_approximate_data_size": {
+              "type": "long"
+            },
+            "zk_avg_latency": {
+              "type": "integer"
+            },
+            "zk_ephemerals_count": {
+              "type": "integer"
+            },
+            "zk_followers": {
+              "type": "integer"
+            },
+            "zk_max_file_descriptor_count": {
+              "type": "integer"
+            },
+            "zk_max_latency": {
+              "type": "integer"
+            },
+            "zk_min_latency": {
+              "type": "integer"
+            },
+            "zk_num_alive_connections": {
+              "type": "integer"
+            },
+            "zk_open_file_descriptor_count": {
+              "type": "integer"
+            },
+            "zk_outstanding_requests": {
+              "type": "integer"
+            },
+            "zk_packets_received": {
+              "type": "integer"
+            },
+            "zk_packets_sent": {
+              "type": "long"
+            },
+            "zk_pending_syncs": {
+              "type": "integer"
+            },
+            "zk_server_state": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "zk_synced_followers": {
+              "type": "integer"
+            },
+            "zk_version": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "zk_watch_count": {
+              "type": "integer"
+            },
+            "zk_znode_count": {
+              "type": "integer"
+            }
+          }
         }
       }
     }
