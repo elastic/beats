@@ -58,11 +58,6 @@ func (k *kafka) init(cfg *common.Config) error {
 		return err
 	}
 
-	if err := validateConfig(cfg, &config); err != nil {
-		logp.Err("Kafka configuration invalid: %v", err)
-		return err
-	}
-
 	libCfg, err := newKafkaConfig(&config)
 	if err != nil {
 		return err
@@ -132,47 +127,6 @@ func (k *kafka) BulkPublish(
 	event []common.MapStr,
 ) error {
 	return k.mode.PublishEvents(signal, opts, event)
-}
-
-func validateConfig(raw *common.Config, config *kafkaConfig) error {
-	errf := func(fld, msg string) error {
-		return fmt.Errorf("%v %v", raw.PathOf(fld), msg)
-	}
-
-	if len(config.Hosts) == 0 {
-		return errf("hosts", "is empty")
-	}
-	if config.Timeout <= 0 {
-		return errf("timeout", "must be > 0")
-	}
-	if config.BrokerTimeout <= 0 {
-		return errf("broker_timeout", "must be > 0")
-	}
-	if config.Worker <= 0 {
-		return errf("worker", "must be > 0")
-	}
-	if config.UseType == false && config.Topic == "" {
-		return fmt.Errorf("%v or %v",
-			errf("use_type", "must be true"),
-			errf("topic", "must be set"))
-	}
-	if config.KeepAlive < 0 {
-		return errf("keep_alive", "must be >= 0")
-	}
-	if config.MaxMessageBytes != nil && *config.MaxMessageBytes <= 0 {
-		return errf("max_message_bytes", "must be > 0")
-	}
-	if config.RequiredACKs != nil && *config.RequiredACKs < -1 {
-		return errf("required_acks", "must be >= -1")
-	}
-	if _, ok := compressionModes[strings.ToLower(config.Compression)]; !ok {
-		return errf("compression", fmt.Sprintf("'%v' is not supported", config.Compression))
-	}
-	if config.ChanBufferSize <= 0 {
-		return errf("channel_buffer_size", "must be > 0")
-	}
-
-	return nil
 }
 
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
