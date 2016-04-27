@@ -241,11 +241,11 @@ func (sniffer *SnifferSetup) Datalink() layers.LinkType {
 	return layers.LinkTypeEthernet
 }
 
-func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory) error {
+func (sniffer *SnifferSetup) Init(test_mode bool, factory WorkerFactory, interfaces *config.InterfacesConfig) error {
 	var err error
 
 	if !test_mode {
-		err = sniffer.setFromConfig(&config.ConfigSingleton.Interfaces)
+		err = sniffer.setFromConfig(interfaces)
 		if err != nil {
 			return fmt.Errorf("Error creating sniffer: %v", err)
 		}

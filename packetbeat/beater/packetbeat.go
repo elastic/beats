@@ -109,25 +109,23 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 		return err
 	}
 
+	cfg := &pb.PbConfig.Packetbeat
+
 	// CLI flags over-riding config
 	if *pb.CmdLineArgs.TopSpeed {
-		pb.PbConfig.Interfaces.TopSpeed = true
+		cfg.Interfaces.TopSpeed = true
 	}
 
 	if len(*pb.CmdLineArgs.File) > 0 {
-		pb.PbConfig.Interfaces.File = *pb.CmdLineArgs.File
+		cfg.Interfaces.File = *pb.CmdLineArgs.File
 	}
 
-	pb.PbConfig.Interfaces.Loop = *pb.CmdLineArgs.Loop
-	pb.PbConfig.Interfaces.OneAtATime = *pb.CmdLineArgs.OneAtAtime
+	cfg.Interfaces.Loop = *pb.CmdLineArgs.Loop
+	cfg.Interfaces.OneAtATime = *pb.CmdLineArgs.OneAtAtime
 
 	if len(*pb.CmdLineArgs.Dumpfile) > 0 {
-		pb.PbConfig.Interfaces.Dumpfile = *pb.CmdLineArgs.Dumpfile
+		cfg.Interfaces.Dumpfile = *pb.CmdLineArgs.Dumpfile
 	}
-
-	// assign global singleton as it is used in protocols
-	// TODO: Refactor
-	config.ConfigSingleton = pb.PbConfig
 
 	return nil
 }
@@ -135,24 +133,26 @@ func (pb *Packetbeat) Config(b *beat.Beat) error {
 // Setup packetbeat
 func (pb *Packetbeat) Setup(b *beat.Beat) error {
 
-	if err := procs.ProcWatcher.Init(pb.PbConfig.Procs); err != nil {
+	cfg := &pb.PbConfig.Packetbeat
+
+	if err := procs.ProcWatcher.Init(cfg.Procs); err != nil {
 		logp.Critical(err.Error())
 		return err
 	}
 
 	queueSize := defaultQueueSize
-	if pb.PbConfig.Shipper.QueueSize != nil {
-		queueSize = *pb.PbConfig.Shipper.QueueSize
+	if b.Config.Shipper.QueueSize != nil {
+		queueSize = *b.Config.Shipper.QueueSize
 	}
 	bulkQueueSize := defaultBulkQueueSize
-	if pb.PbConfig.Shipper.BulkQueueSize != nil {
-		bulkQueueSize = *pb.PbConfig.Shipper.BulkQueueSize
+	if b.Config.Shipper.BulkQueueSize != nil {
+		bulkQueueSize = *b.Config.Shipper.BulkQueueSize
 	}
 	pb.Pub = publish.NewPublisher(b.Publisher, queueSize, bulkQueueSize)
 	pb.Pub.Start()
 
 	logp.Debug("main", "Initializing protocol plugins")
-	err := protos.Protos.Init(false, pb.Pub, pb.PbConfig.Protocols)
+	err := protos.Protos.Init(false, pb.Pub, cfg.Protocols)
 	if err != nil {
 		return fmt.Errorf("Initializing protocol analyzers failed: %v", err)
 	}
@@ -163,7 +163,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 	}
 
 	// This needs to be after the sniffer Init but before the sniffer Run.
-	if err := droppriv.DropPrivileges(config.ConfigSingleton.RunOptions); err != nil {
+	if err := droppriv.DropPrivileges(cfg.RunOptions); err != nil {
 		return err
 	}
 
@@ -171,7 +171,7 @@ func (pb *Packetbeat) Setup(b *beat.Beat) error {
 }
 
 func (pb *Packetbeat) setupSniffer() error {
-	cfg := &pb.PbConfig
+	cfg := &pb.PbConfig.Packetbeat
 
 	withVlans := cfg.Interfaces.With_vlans
 	_, withICMP := cfg.Protocols["icmp"]
@@ -181,7 +181,7 @@ func (pb *Packetbeat) setupSniffer() error {
 	}
 
 	pb.Sniff = &sniffer.SnifferSetup{}
-	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter))
+	return pb.Sniff.Init(false, pb.makeWorkerFactory(filter), &pb.PbConfig.Packetbeat.Interfaces)
 }
 
 func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
@@ -189,8 +189,8 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 		var f *flows.Flows
 		var err error
 
-		if pb.PbConfig.Flows != nil {
-			f, err = flows.NewFlows(pb.Pub, pb.PbConfig.Flows)
+		if pb.PbConfig.Packetbeat.Flows != nil {
+			f, err = flows.NewFlows(pb.Pub, pb.PbConfig.Packetbeat.Flows)
 			if err != nil {
 				return nil, "", err
 			}
@@ -198,7 +198,7 @@ func (pb *Packetbeat) makeWorkerFactory(filter string) sniffer.WorkerFactory {
 
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
-		if cfg, exists := pb.PbConfig.Protocols["icmp"]; exists {
+		if cfg, exists := pb.PbConfig.Packetbeat.Protocols["icmp"]; exists {
 			icmp, err := icmp.New(false, pb.Pub, cfg)
 			if err != nil {
 				return nil, "", err

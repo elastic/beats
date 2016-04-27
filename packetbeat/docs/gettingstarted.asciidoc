@@ -106,7 +106,7 @@ server on which Packetbeat is installed. For this, use `any` as the device:
 ----------------------------------------------------------------------
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-interfaces:
+packetbeat.interfaces:
   device: any
 ----------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ Modify the `device` line to point to the index of the device:
 +
 [source,yml]
 ----------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: 0
 ----------------------------------------------------------------------
 
@@ -141,7 +141,7 @@ default values should do just fine.
 +
 [source,yaml]
 ----------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   dns:
     ports: [53]
 
