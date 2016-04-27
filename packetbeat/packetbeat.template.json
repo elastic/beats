@@ -60,6 +60,9 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
+            "auto-delete": {
+              "type": "boolean"
+            },
             "class-id": {
               "type": "integer"
             },
@@ -88,6 +91,9 @@
             "delivery-tag": {
               "type": "integer"
             },
+            "durable": {
+              "type": "boolean"
+            },
             "exchange": {
               "ignore_above": 1024,
               "type": "keyword"
@@ -96,9 +102,24 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
+            "exclusive": {
+              "type": "boolean"
+            },
             "expiration": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "if-empty": {
+              "type": "boolean"
+            },
+            "if-unused": {
+              "type": "boolean"
+            },
+            "immediate": {
+              "type": "boolean"
+            },
+            "mandatory": {
+              "type": "boolean"
             },
             "message-count": {
               "type": "integer"
@@ -110,12 +131,30 @@
             "method-id": {
               "type": "integer"
             },
+            "multiple": {
+              "type": "boolean"
+            },
+            "no-ack": {
+              "type": "boolean"
+            },
+            "no-local": {
+              "type": "boolean"
+            },
+            "no-wait": {
+              "type": "boolean"
+            },
+            "passive": {
+              "type": "boolean"
+            },
             "priority": {
               "type": "integer"
             },
             "queue": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "redelivered": {
+              "type": "boolean"
             },
             "reply-code": {
               "type": "integer"
@@ -325,6 +364,28 @@
             "authorities_count": {
               "type": "integer"
             },
+            "flags": {
+              "properties": {
+                "authentic_data": {
+                  "type": "boolean"
+                },
+                "authoritative": {
+                  "type": "boolean"
+                },
+                "checking_disabled": {
+                  "type": "boolean"
+                },
+                "recursion_available": {
+                  "type": "boolean"
+                },
+                "recursion_desired": {
+                  "type": "boolean"
+                },
+                "truncated_response": {
+                  "type": "boolean"
+                }
+              }
+            },
             "id": {
               "type": "integer"
             },
@@ -334,6 +395,9 @@
             },
             "opt": {
               "properties": {
+                "do": {
+                  "type": "boolean"
+                },
                 "ext_rcode": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -496,6 +560,9 @@
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "noreply": {
+                  "type": "boolean"
+                },
                 "opaque": {
                   "type": "integer"
                 },
@@ -505,6 +572,9 @@
                 },
                 "opcode_value": {
                   "type": "integer"
+                },
+                "quiet": {
+                  "type": "boolean"
                 },
                 "raw_args": {
                   "ignore_above": 1024,
@@ -600,6 +670,15 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
+            "numberReturned": {
+              "type": "integer"
+            },
+            "numberToReturn": {
+              "type": "integer"
+            },
+            "numberToSkip": {
+              "type": "integer"
+            },
             "query": {
               "ignore_above": 1024,
               "type": "keyword"
@@ -638,6 +717,9 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
+            "iserror": {
+              "type": "boolean"
+            },
             "num_fields": {
               "ignore_above": 1024,
               "type": "keyword"
@@ -654,6 +736,9 @@
         },
         "nfs": {
           "properties": {
+            "minor_version": {
+              "type": "integer"
+            },
             "opcode": {
               "ignore_above": 1024,
               "type": "keyword"
@@ -665,6 +750,9 @@
             "tag": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "version": {
+              "type": "integer"
             }
           }
         },
@@ -696,6 +784,9 @@
             "error_severity": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "iserror": {
+              "type": "boolean"
             },
             "num_fields": {
               "ignore_above": 1024,
@@ -764,8 +855,14 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
+            "call_size": {
+              "type": "integer"
+            },
             "cred": {
               "properties": {
+                "gid": {
+                  "type": "integer"
+                },
                 "gids": {
                   "ignore_above": 1024,
                   "type": "keyword"
@@ -773,12 +870,24 @@
                 "machinename": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "stamp": {
+                  "type": "integer"
+                },
+                "uid": {
+                  "type": "integer"
                 }
               }
+            },
+            "reply_size": {
+              "type": "integer"
             },
             "status": {
               "ignore_above": 1024,
               "type": "keyword"
+            },
+            "time": {
+              "type": "integer"
             },
             "time_str": {
               "ignore_above": 1024,

@@ -281,7 +281,7 @@ The version number of the event's definition.
 
 ==== xml
 
-type: string
+type: keyword
 
 required: False
 
