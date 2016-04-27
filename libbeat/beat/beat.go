@@ -1,10 +1,15 @@
 package beat
 
 import (
+	cryptRand "crypto/rand"
 	"flag"
 	"fmt"
+	"math"
+	"math/big"
+	"math/rand"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/logp"
@@ -51,6 +56,22 @@ var printVersion *bool
 
 func init() {
 	printVersion = flag.Bool("version", false, "Print version and exit")
+
+	// Initialize runtime random number generator seed using global, shared
+	// cryptographically strong pseudo random number generator.
+	//
+	// On linux Reader might use getrandom(2) or /udev/random. On windows systems
+	// CryptGenRandom is used.
+	n, err := cryptRand.Int(cryptRand.Reader, big.NewInt(math.MaxInt64))
+	var seed int64
+	if err != nil {
+		// fallback to current timestamp on error
+		seed = time.Now().UnixNano()
+	} else {
+		seed = n.Int64()
+	}
+
+	rand.Seed(seed)
 }
 
 // Initiates a new beat object
