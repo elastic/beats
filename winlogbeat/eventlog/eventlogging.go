@@ -20,12 +20,15 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
-var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older")
+var eventLoggingConfigKeys = append(commonConfigKeys, "ignore_older",
+	"read_buffer_size", "format_buffer_size")
 
 type eventLoggingConfig struct {
-	ConfigCommon `config:",inline"`
-	IgnoreOlder  time.Duration          `config:"ignore_older"`
-	Raw          map[string]interface{} `config:",inline"`
+	ConfigCommon     `config:",inline"`
+	IgnoreOlder      time.Duration          `config:"ignore_older"`
+	ReadBufferSize   uint                   `config:"read_buffer_size"   validate:"min=1"`
+	FormatBufferSize uint                   `config:"format_buffer_size" validate:"min=1"`
+	Raw              map[string]interface{} `config:",inline"`
 }
 
 // Validate validates the eventLoggingConfig data and returns an error
@@ -34,6 +37,16 @@ func (c *eventLoggingConfig) Validate() error {
 	var errs multierror.Errors
 	if c.Name == "" {
 		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
+	}
+
+	if c.ReadBufferSize > win.MaxEventBufferSize {
+		errs = append(errs, fmt.Errorf("'read_buffer_size' must be less than "+
+			"%d bytes", win.MaxEventBufferSize))
+	}
+
+	if c.FormatBufferSize > win.MaxFormatMessageBufferSize {
+		errs = append(errs, fmt.Errorf("'format_buffer_size' must be less than "+
+			"%d bytes", win.MaxFormatMessageBufferSize))
 	}
 
 	return errs.Err()
@@ -238,7 +251,10 @@ func (l *eventLogging) ignoreOlder(r *Record) bool {
 // newEventLogging creates and returns a new EventLog for reading event logs
 // using the Event Logging API.
 func newEventLogging(options map[string]interface{}) (EventLog, error) {
-	var c eventLoggingConfig
+	c := eventLoggingConfig{
+		ReadBufferSize:   win.MaxEventBufferSize,
+		FormatBufferSize: win.MaxFormatMessageBufferSize,
+	}
 	if err := readConfig(options, &c, eventLoggingConfigKeys); err != nil {
 		return nil, err
 	}
@@ -249,8 +265,8 @@ func newEventLogging(options map[string]interface{}) (EventLog, error) {
 		handles: newMessageFilesCache(c.Name, win.QueryEventMessageFiles,
 			win.FreeLibrary),
 		logPrefix:     fmt.Sprintf("EventLogging[%s]", c.Name),
-		readBuf:       make([]byte, 0, win.MaxEventBufferSize),
-		formatBuf:     make([]byte, win.MaxFormatMessageBufferSize),
+		readBuf:       make([]byte, 0, c.ReadBufferSize),
+		formatBuf:     make([]byte, c.FormatBufferSize),
 		eventMetadata: c.EventMetadata,
 	}, nil
 }
