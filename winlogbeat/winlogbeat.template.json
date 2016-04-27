@@ -146,6 +146,10 @@
         },
         "version": {
           "type": "integer"
+        },
+        "xml": {
+          "ignore_above": 1024,
+          "type": "keyword"
         }
       }
     }

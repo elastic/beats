@@ -435,42 +435,42 @@ The DNS operation code that specifies the kind of query in the message. This val
 
 ==== dns.flags.authoritative
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the responding server is an authority for the domain name used in the question.
 
 
 ==== dns.flags.recursion_available
 
-type: bool
+type: boolean
 
 A DNS flag specifying whether recursive query support is available in the name server.
 
 
 ==== dns.flags.recursion_desired
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
 
 
 ==== dns.flags.authentic_data
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the recursive server considers the response authentic.
 
 
 ==== dns.flags.checking_disabled
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the client disables the server signature validation of the query.
 
 
 ==== dns.flags.truncated_response
 
-type: bool
+type: boolean
 
 A DNS flag specifying that only the first 512 bytes of the reply were returned.
 
@@ -646,7 +646,7 @@ The EDNS version.
 
 ==== dns.opt.do
 
-type: bool
+type: boolean
 
 If set, the transaction uses DNSSEC.
 
@@ -716,35 +716,35 @@ Exchange type.
 
 ==== amqp.passive
 
-type: bool
+type: boolean
 
 If set, do not create exchange/queue.
 
 
 ==== amqp.durable
 
-type: bool
+type: boolean
 
 If set, request a durable exchange/queue.
 
 
 ==== amqp.exclusive
 
-type: bool
+type: boolean
 
 If set, request an exclusive queue.
 
 
 ==== amqp.auto-delete
 
-type: bool
+type: boolean
 
 If set, auto-delete queue when unused.
 
 
 ==== amqp.no-wait
 
-type: bool
+type: boolean
 
 If set, the server will not respond to the method.
 
@@ -784,28 +784,28 @@ Message routing key.
 
 ==== amqp.no-ack
 
-type: bool
+type: boolean
 
 If set, the server does not expect acknowledgements for messages.
 
 
 ==== amqp.no-local
 
-type: bool
+type: boolean
 
 If set, the server will not send messages to the connection that published them.
 
 
 ==== amqp.if-unused
 
-type: bool
+type: boolean
 
 Delete only if unused.
 
 
 ==== amqp.if-empty
 
-type: bool
+type: boolean
 
 Delete only if empty.
 
@@ -819,14 +819,14 @@ The queue name identifies the queue within the vhost.
 
 ==== amqp.redelivered
 
-type: bool
+type: boolean
 
 Indicates that the message has been previously delivered to this or another client.
 
 
 ==== amqp.multiple
 
-type: bool
+type: boolean
 
 Acknowledge multiple messages.
 
@@ -840,14 +840,14 @@ Optional additional arguments passed to some methods. Can be of various types.
 
 ==== amqp.mandatory
 
-type: bool
+type: boolean
 
 Indicates mandatory routing.
 
 
 ==== amqp.immediate
 
-type: bool
+type: boolean
 
 Request immediate delivery.
 
@@ -1244,14 +1244,14 @@ The counter value returned by a counter operation.
 
 ==== memcache.request.noreply
 
-type: bool
+type: boolean
 
 Set to true if noreply was set in the request. The `memcache.response` field will be missing.
 
 
 ==== memcache.request.quiet
 
-type: bool
+type: boolean
 
 Set to true if the binary protocol message is to be treated as a quiet message.
 
@@ -1292,7 +1292,7 @@ MySQL-specific event fields.
 
 ==== mysql.iserror
 
-type: bool
+type: boolean
 
 If the MySQL query returns an error, this field is set to true.
 
@@ -1349,7 +1349,7 @@ The row pgsql query as read from the transaction's request.
 
 ==== pgsql.iserror
 
-type: bool
+type: boolean
 
 If the PgSQL query returns an error, this field is set to true.
 
@@ -1439,21 +1439,21 @@ The full collection name. The full collection name is the concatenation of the d
 
 ==== mongodb.numberToSkip
 
-type: number
+type: integer
 
 Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
 
 ==== mongodb.numberToReturn
 
-type: number
+type: integer
 
 The requested maximum number of documents to be returned.
 
 
 ==== mongodb.numberReturned
 
-type: number
+type: integer
 
 The number of documents in the reply.
 
@@ -1499,13 +1499,13 @@ RPC message transaction identifier.
 
 ==== rpc.call_size
 
-type: number
+type: integer
 
 RPC call size with argument.
 
 ==== rpc.reply_size
 
-type: number
+type: integer
 
 RPC reply size with argument.
 
@@ -1515,7 +1515,7 @@ RPC message reply status.
 
 ==== rpc.time
 
-type: number
+type: integer
 
 RPC message processing time.
 
@@ -1529,13 +1529,13 @@ RPC authentication flavor.
 
 ==== rpc.cred.uid
 
-type: number
+type: integer
 
 RPC caller's user id, in case of auth-unix.
 
 ==== rpc.cred.gid
 
-type: number
+type: integer
 
 RPC caller's group id, in case of auth-unix.
 
@@ -1545,7 +1545,7 @@ RPC caller's secondary group ids, in case of auth-unix.
 
 ==== rpc.cred.stamp
 
-type: number
+type: integer
 
 Arbitrary ID which the caller machine may generate.
 
@@ -1561,13 +1561,13 @@ NFS v4/3 specific event fields.
 
 ==== nfs.version
 
-type: number
+type: integer
 
 NFS protocol version number.
 
 ==== nfs.minor_version
 
-type: number
+type: integer
 
 NFS protocol minor version number.
 

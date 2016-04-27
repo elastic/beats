@@ -156,7 +156,7 @@ def fill_field_properties(field, defaults, path):
         }
 
     elif field["type"] in ["geo_point", "date", "long", "integer",
-                           "double", "float", "keyword"]:
+                           "double", "float", "keyword", "boolean"]:
         properties[field["name"]] = {
             "type": field.get("type")
         }
@@ -164,7 +164,7 @@ def fill_field_properties(field, defaults, path):
             properties[field["name"]]["ignore_above"] = \
                 defaults.get("ignore_above", 1024)
 
-    elif field["type"] == "dict":
+    elif field["type"] in ["dict", "list"]:
         if field.get("dict-type") == "keyword":
             # add a dynamic template to set all members of
             # the dict as keywords
@@ -198,6 +198,21 @@ def fill_field_properties(field, defaults, path):
             properties[field.get("name")]["properties"] = prop
 
         dynamic_templates.extend(dynamic)
+    elif field.get("type") == "nested":
+        if len(path) > 0:
+            path = path + "." + field["name"]
+        else:
+            path = field["name"]
+        prop, dynamic = fill_section_properties(field, defaults, path)
+
+        # Only add properties if they have a content
+        if len(prop) is not 0:
+            properties[field.get("name")] = {"type": "nested", "properties": {}}
+            properties[field.get("name")]["properties"] = prop
+
+        dynamic_templates.extend(dynamic)
+    else:
+        raise ValueError("Unkown type found: " + field.get("type"))
 
     return properties, dynamic_templates
 
