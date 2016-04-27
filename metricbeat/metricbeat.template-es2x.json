@@ -2,14 +2,17 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "norms": false
+        "norms": {
+          "enabled": false
+        }
       },
       "dynamic_templates": [
         {
           "fields": {
             "mapping": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "match_mapping_type": "string",
             "path_match": "fields.*"
@@ -68,7 +71,8 @@
             },
             "hostname": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "idleWorkers": {
               "type": "integer"
@@ -151,25 +155,30 @@
           "properties": {
             "hostname": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
         "metricset": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "metricset-host": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "module": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "mysql-status": {
           "properties": {
@@ -322,11 +331,13 @@
         },
         "tags": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "type": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         }
       }
     }

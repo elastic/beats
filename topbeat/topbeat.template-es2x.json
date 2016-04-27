@@ -2,14 +2,17 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "norms": false
+        "norms": {
+          "enabled": false
+        }
       },
       "dynamic_templates": [
         {
           "fields": {
             "mapping": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "match_mapping_type": "string",
             "path_match": "fields.*"
@@ -24,11 +27,13 @@
           "properties": {
             "hostname": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
@@ -108,7 +113,8 @@
             },
             "device_name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "files": {
               "type": "integer"
@@ -118,7 +124,8 @@
             },
             "mount_point": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "total": {
               "type": "integer"
@@ -173,13 +180,15 @@
           "properties": {
             "cmdline": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "cpu": {
               "properties": {
                 "start_time": {
                   "ignore_above": 1024,
-                  "type": "keyword"
+                  "index": "not_analyzed",
+                  "type": "string"
                 },
                 "system": {
                   "type": "integer"
@@ -213,7 +222,8 @@
             },
             "name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "pid": {
               "type": "integer"
@@ -223,11 +233,13 @@
             },
             "state": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "username": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
@@ -249,11 +261,13 @@
         },
         "tags": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "type": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         }
       }
     }

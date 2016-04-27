@@ -43,3 +43,4 @@ python ${LIBBEAT}/scripts/generate_fields_docs.py $(pwd) ${BEATNAME}
 
 # Update templates
 python ${LIBBEAT}/scripts/generate_template.py $(pwd) ${BEATNAME}
+python ${LIBBEAT}/scripts/generate_template.py --es2x $(pwd) ${BEATNAME}

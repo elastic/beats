@@ -2,14 +2,17 @@
   "mappings": {
     "_default_": {
       "_all": {
-        "norms": false
+        "norms": {
+          "enabled": false
+        }
       },
       "dynamic_templates": [
         {
           "fields": {
             "mapping": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "match_mapping_type": "string",
             "path_match": "fields.*"
@@ -19,7 +22,8 @@
           "event_data": {
             "mapping": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "match_mapping_type": "string",
             "path_match": "event_data.*"
@@ -29,7 +33,8 @@
           "user_data": {
             "mapping": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "match_mapping_type": "string",
             "path_match": "user_data.*"
@@ -42,102 +47,125 @@
         },
         "activity_id": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "beat": {
           "properties": {
             "hostname": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
         "computer_name": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "event_id": {
           "type": "long"
         },
         "keywords": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "level": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "log_name": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "message": {
-          "norms": false,
-          "type": "text"
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
         },
         "message_error": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "opcode": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "process_id": {
           "type": "long"
         },
         "provider_guid": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "record_number": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "related_activity_id": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "source_name": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "tags": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "task": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "thread_id": {
           "type": "long"
         },
         "type": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         },
         "user": {
           "properties": {
             "domain": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "identifier": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "name": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             },
             "type": {
               "ignore_above": 1024,
-              "type": "keyword"
+              "index": "not_analyzed",
+              "type": "string"
             }
           }
         },
@@ -146,7 +174,8 @@
         },
         "xml": {
           "ignore_above": 1024,
-          "type": "keyword"
+          "index": "not_analyzed",
+          "type": "string"
         }
       }
     }
