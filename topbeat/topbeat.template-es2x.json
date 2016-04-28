@@ -40,31 +40,31 @@
         "cpu": {
           "properties": {
             "idle": {
-              "type": "integer"
+              "type": "long"
             },
             "iowait": {
-              "type": "integer"
+              "type": "long"
             },
             "irq": {
-              "type": "integer"
+              "type": "long"
             },
             "nice": {
-              "type": "integer"
+              "type": "long"
             },
             "softirq": {
-              "type": "integer"
+              "type": "long"
             },
             "steal": {
-              "type": "integer"
+              "type": "long"
             },
             "system": {
-              "type": "integer"
+              "type": "long"
             },
             "system_p": {
               "type": "float"
             },
             "user": {
-              "type": "integer"
+              "type": "long"
             },
             "user_p": {
               "type": "float"
@@ -76,28 +76,28 @@
             "cpuX": {
               "properties": {
                 "idle": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "iowait": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "nice": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "softirq": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "steal": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "system": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "system_p": {
                   "type": "float"
                 },
                 "user": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "user_p": {
                   "type": "float"
@@ -109,7 +109,7 @@
         "fs": {
           "properties": {
             "avail": {
-              "type": "integer"
+              "type": "long"
             },
             "device_name": {
               "ignore_above": 1024,
@@ -117,10 +117,10 @@
               "type": "string"
             },
             "files": {
-              "type": "integer"
+              "type": "long"
             },
             "free_files": {
-              "type": "integer"
+              "type": "long"
             },
             "mount_point": {
               "ignore_above": 1024,
@@ -128,10 +128,10 @@
               "type": "string"
             },
             "total": {
-              "type": "integer"
+              "type": "long"
             },
             "used": {
-              "type": "integer"
+              "type": "long"
             },
             "used_p": {
               "type": "float"
@@ -154,22 +154,22 @@
         "mem": {
           "properties": {
             "actual_free": {
-              "type": "integer"
+              "type": "long"
             },
             "actual_used": {
-              "type": "integer"
+              "type": "long"
             },
             "actual_used_p": {
               "type": "float"
             },
             "free": {
-              "type": "integer"
+              "type": "long"
             },
             "total": {
-              "type": "integer"
+              "type": "long"
             },
             "used": {
-              "type": "integer"
+              "type": "long"
             },
             "used_p": {
               "type": "float"
@@ -191,32 +191,32 @@
                   "type": "string"
                 },
                 "system": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total_p": {
                   "type": "float"
                 },
                 "user": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "mem": {
               "properties": {
                 "rss": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "rss_p": {
                   "type": "float"
                 },
                 "share": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "size": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
@@ -246,13 +246,13 @@
         "swap": {
           "properties": {
             "free": {
-              "type": "integer"
+              "type": "long"
             },
             "total": {
-              "type": "integer"
+              "type": "long"
             },
             "used": {
-              "type": "integer"
+              "type": "long"
             },
             "used_p": {
               "type": "float"
