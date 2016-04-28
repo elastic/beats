@@ -108,6 +108,11 @@ fi
 
 echo "Import dashboards,visualizations, searches and index pattern from ${DIR} to ${ELASTICSEARCH} in ${KIBANA_INDEX}"
 
+# Workaround for: https://github.com/elastic/beats-dashboards/issues/94
+$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX"
+$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -d'{"search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}'
+
+
 if [ -f ${BEAT_CONFIG} ]; then
   for ln in `cat ${BEAT_CONFIG}`; do
     BUILD_STRING="${BUILD_STRING}s/${ln}/g;"
