@@ -112,14 +112,14 @@ Apache hostname
 
 ==== apache-status.totalAccesses
 
-type: integer
+type: long
 
 Total number of access requests
 
 
 ==== apache-status.totalKBytes
 
-type: integer
+type: long
 
 Total number of kilobytes served
 
@@ -399,14 +399,14 @@ Number of client connections (excluding connections from slaves)
 
 ==== redis-info.clients.client_longest_output_list
 
-type: integer
+type: long
 
 Longest output list among current client connections.
 
 
 ==== redis-info.clients.client_biggest_input_buf
 
-type: integer
+type: long
 
 Biggest input buffer among current client connections
 
@@ -506,14 +506,14 @@ Bytes stats
 
 ==== mysql-status.bytes.Bytes_received
 
-type: integer
+type: long
 
 The number of bytes received from all clients.
 
 
 ==== mysql-status.bytes.Bytes_sent
 
-type: integer
+type: long
 
 The number of bytes sent to all clients.
 
@@ -533,7 +533,7 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 ==== system-cpu.user
 
-type: integer
+type: long
 
 The amount of CPU time spent in user space.
 
@@ -547,14 +547,14 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 
 ==== system-cpu.nice
 
-type: integer
+type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
 ==== system-cpu.system
 
-type: integer
+type: long
 
 The amount of CPU time spent in kernel space.
 
@@ -568,34 +568,34 @@ The percentage of CPU time spent in kernel space.
 
 ==== system-cpu.idle
 
-type: integer
+type: long
 
 The amount of CPU time spent idle.
 
 
 ==== system-cpu.iowait
 
-type: integer
+type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
 ==== system-cpu.irq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
 ==== system-cpu.softirq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
 ==== system-cpu.steal
 
-type: integer
+type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -614,21 +614,21 @@ This group contains statistics related to the memory usage on the system.
 
 ==== system-memory.mem.total
 
-type: integer
+type: long
 
 Total memory.
 
 
 ==== system-memory.mem.used
 
-type: integer
+type: long
 
 Used memory.
 
 
 ==== system-memory.mem.free
 
-type: integer
+type: long
 
 Available memory.
 
@@ -642,14 +642,14 @@ The percentage of used memory.
 
 ==== system-memory.mem.actual_used
 
-type: integer
+type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
 ==== system-memory.mem.actual_free
 
-type: integer
+type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
@@ -669,21 +669,21 @@ This group contains statistics related to the swap memory usage on the system.
 
 ==== system-memory.swap.total
 
-type: integer
+type: long
 
 Total swap memory.
 
 
 ==== system-memory.swap.used
 
-type: integer
+type: long
 
 Used swap memory.
 
 
 ==== system-memory.swap.free
 
-type: integer
+type: long
 
 Available swap memory.
 

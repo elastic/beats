@@ -78,7 +78,7 @@ system:
       description: This group contains statistics related to CPU usage.
       fields:
         - name: user
-          type: integer
+          type: long
           description: >
            The amount of CPU time spent in user space.
 
@@ -89,12 +89,12 @@ system:
             For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
         - name: nice
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent on low-priority processes.
 
         - name: system
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent in kernel space.
 
@@ -104,27 +104,27 @@ system:
             The percentage of CPU time spent in kernel space.
 
         - name: idle
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent idle.
 
         - name: iowait
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent in wait (on disk).
 
         - name: irq
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent servicing and handling hardware interrupts.
 
         - name: softirq
-          type: integer
+          type: long
           description:
             The amount of CPU time spent servicing and handling software interrupts.
 
         - name: steal
-          type: integer
+          type: long
           description: >
             The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
             was servicing another processor.
@@ -142,7 +142,7 @@ system:
           fields:
 
           - name: user
-            type: integer
+            type: long
             description: >
              The amount of CPU time spent in user space on core X.
 
@@ -152,12 +152,12 @@ system:
               The percentage of CPU time spent in user space on core X.
 
           - name: nice
-            type: integer
+            type: long
             description: >
               The amount of CPU time spent on low-priority processes on core X.
 
           - name: system
-            type: integer
+            type: long
             description: >
               The amount of CPU time spent in kernel space on core X.
 
@@ -167,22 +167,22 @@ system:
               The percentage of CPU time spent in kernel space on core X.
 
           - name: idle
-            type: integer
+            type: long
             description: >
               The amount of CPU time spent idle on core X.
 
           - name: iowait
-            type: integer
+            type: long
             description: >
               The amount of CPU time spent in wait (on disk) on core X.
 
           - name: softirq
-            type: integer
+            type: long
             description:
               The amount of CPU time spent servicing and handling software interrupts on core X.
 
           - name: steal
-            type: integer
+            type: long
             description: >
               The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
               was servicing another processor on core X.
@@ -196,17 +196,17 @@ system:
       description: This group contains statistics related to the memory usage on the system.
       fields:
         - name: total
-          type: integer
+          type: long
           description: >
             Total memory.
 
         - name: used
-          type: integer
+          type: long
           description: >
             Used memory.
 
         - name: free
-          type: integer
+          type: long
           description: >
             Available memory.
 
@@ -216,13 +216,13 @@ system:
             The percentage of used memory.
 
         - name: actual_used
-          type: integer
+          type: long
           description: >
             Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
             Available only on Unix.
 
         - name: actual_free
-          type: integer
+          type: long
           description: >
             Actual available memory. This value is the "free" memory plus the memory used for disk caches and
             buffers. Available only on Unix.
@@ -238,17 +238,17 @@ system:
       description: This group contains statistics related to the swap memory usage on the system.
       fields:
         - name: total
-          type: integer
+          type: long
           description: >
             Total swap memory.
 
         - name: used
-          type: integer
+          type: long
           description: >
             Used swap memory.
 
         - name: free
-          type: integer
+          type: long
           description: >
             Available swap memory.
 
@@ -309,7 +309,7 @@ process:
           description: CPU-specific statistics per process.
           fields:
             - name: user
-              type: integer
+              type: long
               description: >
                 The amount of CPU time the process spent in user space.
 
@@ -320,12 +320,12 @@ process:
                 %CPU value of the process displayed by the top command on unix systems.
 
             - name: system
-              type: integer
+              type: long
               description: >
                 The amount of CPU time the process spent in kernel space.
 
             - name: total
-              type: integer
+              type: long
               description: >
                 The total CPU time spent by the process.
 
@@ -340,12 +340,12 @@ process:
           prefix: "[float]"
           fields:
             - name: size
-              type: integer
+              type: long
               description: >
                 The total virtual memory the process has.
 
             - name: rss
-              type: integer
+              type: long
               description: >
                 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
@@ -355,7 +355,7 @@ process:
                 The percentage of memory the process occupied in main memory (RAM).
 
             - name: share
-              type: integer
+              type: long
               description: >
                 The shared memory the process uses.
 
@@ -372,7 +372,7 @@ filesystem:
         the device name and the mounting place.
       fields:
         - name: avail
-          type: integer
+          type: long
           description: >
             The available disk space in bytes.
 
@@ -387,22 +387,22 @@ filesystem:
             The mounting point. For example: `/`
 
         - name: files
-          type: integer
+          type: long
           description: >
             The total number of file nodes in the file system.
 
         - name: free_files
-          type: integer
+          type: long
           description: >
             The number of free file nodes in the file system.
 
         - name: total
-          type: integer
+          type: long
           description: >
             The total disk space in bytes.
 
         - name: used
-          type: integer
+          type: long
           description: >
             The used disk space in bytes.
 

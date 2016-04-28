@@ -130,10 +130,10 @@
               }
             },
             "totalAccesses": {
-              "type": "integer"
+              "type": "long"
             },
             "totalKBytes": {
-              "type": "integer"
+              "type": "long"
             },
             "uptime": {
               "properties": {
@@ -186,10 +186,10 @@
             "bytes": {
               "properties": {
                 "Bytes_received": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "Bytes_sent": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }
@@ -203,10 +203,10 @@
                   "type": "integer"
                 },
                 "client_biggest_input_buf": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "client_longest_output_list": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "connected_clients": {
                   "type": "integer"
@@ -244,31 +244,31 @@
         "system-cpu": {
           "properties": {
             "idle": {
-              "type": "integer"
+              "type": "long"
             },
             "iowait": {
-              "type": "integer"
+              "type": "long"
             },
             "irq": {
-              "type": "integer"
+              "type": "long"
             },
             "nice": {
-              "type": "integer"
+              "type": "long"
             },
             "softirq": {
-              "type": "integer"
+              "type": "long"
             },
             "steal": {
-              "type": "integer"
+              "type": "long"
             },
             "system": {
-              "type": "integer"
+              "type": "long"
             },
             "system_p": {
               "type": "float"
             },
             "user": {
-              "type": "integer"
+              "type": "long"
             },
             "user_p": {
               "type": "float"
@@ -280,22 +280,22 @@
             "mem": {
               "properties": {
                 "actual_free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used_p": {
                   "type": "float"
                 },
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
@@ -305,13 +305,13 @@
             "swap": {
               "properties": {
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
