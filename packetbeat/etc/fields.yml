@@ -879,7 +879,7 @@ trans_event:
             by commas.
 
         - name: content_length
-          type: integer
+          type: long
           description: >
             The value of the Content-Length header if present.
 
@@ -1016,12 +1016,12 @@ trans_event:
             The list of base64 encoded values sent with the response (if present).
 
         - name: request.bytes
-          type: integer
+          type: long
           description: >
             The byte count of the values being transfered.
 
         - name: response.bytes
-          type: integer
+          type: long
           description: >
             The byte count of the values being transfered.
 
@@ -1063,12 +1063,12 @@ trans_event:
               the value is unknown.
 
         - name: request.flags
-          type: integer
+          type: long
           description: >
             The memcache command flags sent in the request (if present).
 
         - name: response.flags
-          type: integer
+          type: long
           description: >
             The memcache message flags sent in the response (if present).
 
@@ -1080,12 +1080,12 @@ trans_event:
             is an absolute Unix time in seconds (32-bit).
 
         - name: request.sleep_us
-          type: integer
+          type: long
           description: >
             The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
         - name: response.value
-          type: integer
+          type: long
           description: >
             The counter value returned by a counter operation.
 
@@ -1101,12 +1101,12 @@ trans_event:
             Set to true if the binary protocol message is to be treated as a quiet message.
 
         - name: request.cas_unique
-          type: integer
+          type: long
           description: >
             The CAS (compare-and-swap) identifier if present.
 
         - name: response.cas_unique
-          type: integer
+          type: long
           description: >
             The CAS (compare-and-swap) identifier to be used with CAS-based updates
             (if present).
@@ -1314,7 +1314,7 @@ trans_event:
           description: RPC message reply status.
 
         - name: time
-          type: integer
+          type: long
           description: RPC message processing time.
 
         - name: time_str
@@ -1390,28 +1390,28 @@ trans_measurements:
       description: >
         The wall clock time it took to complete the transaction.
         The precision is in milliseconds.
-      type: integer
+      type: long
 
     - name: cpu_time
       description: The CPU time it took to complete the transaction.
-      type: integer
+      type: long
 
     - name: bytes_in
       description: >
         The number of bytes of the request. Note that this size is
         the application layer message length, without the length of the IP or
         TCP headers.
-      type: integer
+      type: long
 
     - name: bytes_out
       description: >
         The number of bytes of the response. Note that this size is
         the application layer message length, without the length of the IP or
         TCP headers.
-      type: integer
+      type: long
 
     - name: dnstime
-      type: integer
+      type: long
       description: >
         The time it takes to query the name server for a given request.
         This is typically used for RUM (real-user-monitoring) but can
@@ -1420,14 +1420,14 @@ trans_measurements:
         The precision is in microseconds.
 
     - name: connecttime
-      type: integer
+      type: long
       description: >
         The time it takes for the TCP connection to be established for
         the given transaction.
         The precision is in microseconds.
 
     - name: loadtime
-      type: integer
+      type: long
       description: >
         The time it takes for the content to be loaded. This is typically
         used for RUM (real-user-monitoring) but it can make sense in other
@@ -1435,7 +1435,7 @@ trans_measurements:
         The precision is in microseconds.
 
     - name: domloadtime
-      type: integer
+      type: long
       description: >
         In RUM (real-user-monitoring), the total time it takes for the
         DOM to be loaded. In terms of the W3 Navigation Timing API, this is

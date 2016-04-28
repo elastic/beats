@@ -216,10 +216,10 @@
           }
         },
         "bytes_in": {
-          "type": "integer"
+          "type": "long"
         },
         "bytes_out": {
-          "type": "integer"
+          "type": "long"
         },
         "client_ip": {
           "ignore_above": 1024,
@@ -255,10 +255,10 @@
           "type": "string"
         },
         "connecttime": {
-          "type": "integer"
+          "type": "long"
         },
         "cpu_time": {
-          "type": "integer"
+          "type": "long"
         },
         "dest": {
           "properties": {
@@ -491,10 +491,10 @@
           }
         },
         "dnstime": {
-          "type": "integer"
+          "type": "long"
         },
         "domloadtime": {
-          "type": "integer"
+          "type": "long"
         },
         "final": {
           "ignore_above": 1024,
@@ -514,7 +514,7 @@
               "type": "string"
             },
             "content_length": {
-              "type": "integer"
+              "type": "long"
             },
             "phrase": {
               "ignore_above": 1024,
@@ -576,7 +576,7 @@
           "type": "date"
         },
         "loadtime": {
-          "type": "integer"
+          "type": "long"
         },
         "memcache": {
           "properties": {
@@ -593,10 +593,10 @@
                   "type": "string"
                 },
                 "bytes": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "cas_unique": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "command": {
                   "ignore_above": 1024,
@@ -616,7 +616,7 @@
                   "type": "integer"
                 },
                 "flags": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "initial": {
                   "type": "integer"
@@ -649,7 +649,7 @@
                   "type": "string"
                 },
                 "sleep_us": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "source_class": {
                   "type": "integer"
@@ -670,10 +670,10 @@
             "response": {
               "properties": {
                 "bytes": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "cas_unique": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "command": {
                   "ignore_above": 1024,
@@ -689,7 +689,7 @@
                   "type": "string"
                 },
                 "flags": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "opaque": {
                   "type": "integer"
@@ -716,7 +716,7 @@
                   "type": "string"
                 },
                 "value": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "version": {
                   "ignore_above": 1024,
@@ -964,7 +964,7 @@
           "type": "string"
         },
         "responsetime": {
-          "type": "integer"
+          "type": "long"
         },
         "rpc": {
           "properties": {
@@ -1008,7 +1008,7 @@
               "type": "string"
             },
             "time": {
-              "type": "integer"
+              "type": "long"
             },
             "time_str": {
               "ignore_above": 1024,
