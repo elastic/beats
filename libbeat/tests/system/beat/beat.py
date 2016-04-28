@@ -200,6 +200,10 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
+                if len(line) == 0 or line[len(line)-1] != "\n":
+                    # hit EOF
+                    break
+
                 try:
                     jsons.append(self.flatten_object(json.loads(line), []))
                 except:
@@ -219,6 +223,10 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
+                if len(line) == 0 or line[len(line)-1] != "\n":
+                    # hit EOF
+                    break
+
                 jsons.append(json.loads(line))
         return jsons
 
