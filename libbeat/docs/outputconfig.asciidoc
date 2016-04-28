@@ -188,7 +188,7 @@ You can adjust the following settings to load your own template or overwrite an 
 *`name`*:: The name of the template. The default is +{beatname_lc}+.
 
 *`path`*:: The path to the template file. The default is +{beatname_lc}.template.json+. If a relative
-path is set, it is considered relative to the config path, see the <<directory-layout>> section for
+path is set, it is considered relative to the config path. See the <<directory-layout>> section for
 details.
 
 *`overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default

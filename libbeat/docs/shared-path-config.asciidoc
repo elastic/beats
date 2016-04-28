@@ -13,10 +13,10 @@
 [[configuration-path]]
 === Path
 
-The `path` section contains configuration options that define where the Beat is
-looking for its files. For example, all Beats look for the Elasticsearch
+The `path` section contains configuration options that define where the Beat
+looks for its files. For example, all Beats look for the Elasticsearch
 template file in the configuration path, Filebeat and Winlogbeat look for their
-registry files in the data path and all Beats write their log files in the logs
+registry files in the data path, and all Beats write their log files in the logs
 path.
 
 Please see the <<directory-layout>> section for more details.
@@ -32,7 +32,7 @@ path:
   logs: /var/log/
 ------------------------------------------------------------------------------
 
-Note that it is possible to override these options via command line flags.
+Note that it is possible to override these options by using command line flags. 
 
 ==== Path Options
 
@@ -40,9 +40,9 @@ You can specify the following options under the `path` section:
 
 ===== home
 
-The home path for a {beatname_uc} installation is the default base path for all the
-other path settings as well for miscellaneous files coming with the distribution (e.g. the
-sample dashboards). If not set via a CLI flag or via the configuration file, the default
+The home path for the {beatname_uc} installation. This is the default base path for all
+other path settings and for miscellaneous files that come with the distribution (for example, the
+sample dashboards). If not set by a CLI flag or in the configuration file, the default
 for the home path is the location of the {beatname_uc} binary.
 
 Example:
@@ -55,10 +55,10 @@ path:
 
 ===== conf
 
-The configuration path for a {beatname_uc} installation is the default base path
-for the configuration files, including the main YAML configuration file and the
-Elasticsearch template file. If not set via a CLI flag, the default for the
-configuration path is the same as the home path.
+The configuration path for the {beatname_uc} installation. This is the default base path
+for configuration files, including the main YAML configuration file and the
+Elasticsearch template file. If not set by a CLI flag or in the configuration file, the default for the
+configuration path is the home path.
 
 Example:
 
@@ -70,9 +70,9 @@ path:
 
 ===== data
 
-The data path for a {beatname_uc} installation is the default base path for all
-the files in which {beatname_uc} needs to store its data. If not set via a CLI
-flag or via the configuration file, the default for the data path is a `data`
+The data path for the {beatname_uc} installation. This is the default base path for all
+the files in which {beatname_uc} needs to store its data. If not set by a CLI
+flag or in the configuration file, the default for the data path is a `data`
 subdirectory inside the home path.
 
 
@@ -86,8 +86,8 @@ path:
 
 ===== logs
 
-The logs path for a {beatname_uc} installation is the default location for its
-log files. If not set via a CLI flag or via the configuration file, the default
+The logs path for a {beatname_uc} installation. This is the default location for the Beat's
+log files. If not set by a CLI flag or in the configuration file, the default
 for the logs path is a `logs` subdirectory inside the home path.
 
 Example:
