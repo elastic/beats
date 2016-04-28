@@ -104,7 +104,11 @@ if ($KIBANA_INDEX -eq "") {
   exit 1
 }
 
-echo "Import dashboards from $KIBANA_DIR to $ELASTICSEARCH in $KIBANA_INDEX"  
+echo "Import dashboards from $KIBANA_DIR to $ELASTICSEARCH in $KIBANA_INDEX"
+
+# Workaround for: https://github.com/elastic/beats-dashboards/issues/94
+&$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX" -Method PUT
+&$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -Method PUT -Body '{"search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}'
 
 ForEach ($file in Get-ChildItem "$KIBANA_DIR/search/" -Filter *.json) {
   $name = [io.path]::GetFileNameWithoutExtension($file.Name)
