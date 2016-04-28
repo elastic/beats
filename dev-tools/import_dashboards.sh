@@ -119,7 +119,11 @@ if [ -z ${SED_STRING} ]; then
   SED_STRING="s/packetbeat-/packetbeat-/g;s/filebeat-/filebeat-/g;s/topbeat-/topbeat-/g;s/winlogonbeat-/winlogonbeat-/g"
 fi
 
-TMP_SED_FILE="${DIR}/search/tmp_search.json"
+if [ -d /tmp ]; then
+	TMP_SED_FILE="/tmp/load-dashboards-tmp-search.json"
+else
+	TMP_SED_FILE="${DIR}/search/tmp_search.json"
+fi
 for file in ${DIR}/search/*.json
 do
     NAME=`basename ${file} .json`
