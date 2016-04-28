@@ -391,7 +391,7 @@ filebeat:
 ===== registry_file
 
 The name of the registry file. If a relative path is used, it is considered relative to the
-data path, see the <<directory-layout>> section for details. The default is `registry`.
+data path. See the <<directory-layout>> section for details. The default is `registry`.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
@@ -407,7 +407,7 @@ Each configuration file must end with `.yml`. Each config file must also specify
 config hierarchy even though only the prospector part of the file is processed. All global
 options, such as `spool_size`, are ignored.
 
-The `config_dir` option MUST point to a directory other than the directory where the  main Filebeat config file resides.
+The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
 
 If the specified path is not absolute, it is considered relative to the configuration path. See the
 <<directory-layout>> section for details.

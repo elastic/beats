@@ -16,27 +16,27 @@ The directory layout of an installation is as follows:
 
 [cols="<h,<,<m,<m",options="header",]
 |=======================================================================
-| Type | Description | Default Location | Setting
-| home | Home of {beatname_uc} installation. | | path.home
+| Type | Description | Default Location | Config Option
+| home | Home of the {beatname_uc} installation. | | path.home
 | bin  | The location for the binary files. | {path.home} |
 | conf | The location for configuration files. | {path.home} | path.conf
 | data | The location for persistent data files. | {path.home}/data| path.data
 | logs | The location for the logs created by {beatname_uc}. | {path.home}/logs | path.logs
 |=======================================================================
 
-These settings can be changed via CLI flags or via the
-<<configuration-path,path options>> in the configuration file.
+You can change these settings by using CLI flags or setting <<configuration-path,path options>> in the configuration
+file.
 
 ==== Default paths
 
-Below are the default paths that {beatname_uc} will use, if not explicitly changed. 
+{beatname_uc} uses the following default paths unless you explicitly change them. 
 
 [float]
 ===== deb and rpm
 [cols="<h,<,<m",options="header",]
 |=======================================================================
-| Type | Description | Location deb/rpm
-| home | Home of {beatname_uc} installation. | /usr/share/{beatname_lc}
+| Type | Description | Location
+| home | Home of the {beatname_uc} installation. | /usr/share/{beatname_lc}
 | bin  | The location for the binary files. | /usr/share/{beatname_lc}
 | conf | The location for configuration files. | /etc/{beatname_lc}
 | data | The location for persistent data files. | /var/lib/{beatname_lc}
@@ -44,24 +44,24 @@ Below are the default paths that {beatname_uc} will use, if not explicitly chang
 |=======================================================================
 
 For the deb and rpm distributions, these paths are set in the init script or in
-the systemd unit file.  Make sure to start the {beatname_uc} service by using
-the preferred operating system method (i.e. init scripts or `systemctl`),
-otherwise the paths might be set incorrectly.
+the systemd unit file.  Make sure that you start the {beatname_uc} service by using
+the preferred operating system method (init scripts or `systemctl`).
+Otherwise the paths might be set incorrectly.
 
 [float]
 ===== zip, tar.gz, and tgz
 [cols="<h,<,<m",options="header",]
 |=======================================================================
-| Type | Description | Location deb/rpm
-| home | Home of {beatname_uc} installation. | {extract.path}
+| Type | Description | Location
+| home | Home of the {beatname_uc} installation. | {extract.path}
 | bin  | The location for the binary files. | {extract.path}
 | conf | The location for configuration files. | {extract.path}
 | data | The location for persistent data files. | {extract.path}/data
 | logs | The location for the logs created by {beatname_uc}. | {extract.path}/logs
 |=======================================================================
 
-For the zip, tar.gz and tgz distributions, these paths are based on their defaults of using
-the binary location. This means that if you start {beatname_uc} with the simple following command,
+For the zip, tar.gz and tgz distributions, these paths are based on the location of the
+extracted binary file. This means that if you start {beatname_uc} with the following simple command,
 all paths are set correctly:
 
 
