@@ -12,6 +12,8 @@ include::./getting-started.asciidoc[]
 
 include::./command-line.asciidoc[]
 
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
@@ -19,8 +21,6 @@ include::./filebeat-filtering.asciidoc[]
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
-
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 
 include::./multiple-prospectors.asciidoc[]
 
