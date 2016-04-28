@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...master[Check the HEAD d
 - Fix race when multiple outputs access the same event with logstash output manipulating event {issue}1410[1410] {pull}1428[1428]
 - Seed random number generator using crypto.rand package. {pull}1503{1503]
 - Fix beats hanging in -configtest {issue}1213[1213]
+- Fix kafka log message output {pull}1516[1516]
 
 *Packetbeat*
 
