@@ -67,10 +67,19 @@ filebeat:
       #exclude_files: [".gz$"]
 
       # Optional additional fields. These field can be freely picked
-      # to add additional information to the crawled log files for filtering
+      # to add additional information to the crawled log files for filtering.
       #fields:
       #  level: debug
       #  review: 1
+      # If you're using the syslog output, there are three specific fields you
+      # can set, which change how the message is sent to the syslog server:
+      #   priority: 1
+      #   severity: 6
+      #   program: filebeat
+      # priority and severity set the syslog protocol values.
+      # program sets the program name in the syslog message. You may, for
+      # example, want to set this to "postfix" for postfix logs, or "httpd" for
+      # apache logs.
 
       # Set to true to store the additional fields as top level fields instead
       # of under the "fields" sub-dictionary. In case of name conflicts with the
@@ -371,6 +380,12 @@ output:
   # console:
     # Pretty print json event
     #pretty: false
+
+
+  ### Syslog output
+  # syslog:
+    # Array of syslog servers to connect to. The syslog output uses TCP to ship messages.
+    # hosts: ["syslog-server:514"]
 
 
 ############################# Shipper #########################################
