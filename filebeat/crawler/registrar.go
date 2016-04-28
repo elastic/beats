@@ -15,14 +15,11 @@ import (
 )
 
 type Registrar struct {
-	// Path to the Registry File
-	registryFile string
-	// Map with all file paths inside and the corresponding state
-	state      map[string]FileState
-	stateMutex sync.Mutex
-
-	Channel chan []*FileEvent
-	done    chan struct{}
+	Channel      chan []*FileEvent
+	done         chan struct{}
+	registryFile string               // Path to the Registry File
+	state        map[string]FileState // Map with all file paths inside and the corresponding state
+	stateMutex   sync.Mutex
 }
 
 func NewRegistrar(registryFile string) (*Registrar, error) {
@@ -30,16 +27,16 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
+		state:        map[string]FileState{},
+		Channel:      make(chan []*FileEvent, 1),
 	}
 	err := r.Init()
 
 	return r, err
 }
 
+// Init sets up the Registrar and make sure the registry file is setup correctly
 func (r *Registrar) Init() error {
-	// Init state
-	r.state = map[string]FileState{}
-	r.Channel = make(chan []*FileEvent, 1)
 
 	// Set to default in case it is not set
 	if r.registryFile == "" {
@@ -67,6 +64,7 @@ func (r *Registrar) Init() error {
 func (r *Registrar) LoadState() {
 	if existing, e := os.Open(r.registryFile); e == nil {
 		defer existing.Close()
+
 		logp.Info("Loading registrar data from %s", r.registryFile)
 		decoder := json.NewDecoder(existing)
 		decoder.Decode(&r.state)
@@ -85,17 +83,17 @@ func (r *Registrar) Run() {
 			logp.Info("Ending Registrar")
 			return
 		case events := <-r.Channel:
-			r.processEvents(events)
+			r.processEventStates(events)
 		}
 
 		if e := r.writeRegistry(); e != nil {
-			// REVU: but we should panic, or something, right?
 			logp.Err("Writing of registry returned error: %v. Continuing..", e)
 		}
 	}
 }
 
-func (r *Registrar) processEvents(events []*FileEvent) {
+// processEventStates gets the states from the events and writes them to the registrar state
+func (r *Registrar) processEventStates(events []*FileEvent) {
 	logp.Debug("registrar", "Processing %d events", len(events))
 
 	// Take the last event found for each file source
@@ -134,7 +132,7 @@ func (r *Registrar) writeRegistry() error {
 
 	encoder := json.NewEncoder(file)
 
-	state := r.getStateCopy()
+	state := r.getState()
 	encoder.Encode(state)
 
 	// Directly close file because of windows
@@ -181,9 +179,9 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 // In case an old file is found, the path to the file is returned, if not, an error is returned
 func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) (string, error) {
 
-	newState := input.GetOSFileState(&newFileInfo)
+	newState := input.GetOSFileState(newFileInfo)
 
-	for oldFilePath, oldState := range r.getStateCopy() {
+	for oldFilePath, oldState := range r.getState() {
 
 		// Skipping when path the same
 		if oldFilePath == newFilePath {
@@ -191,7 +189,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 		}
 
 		// Compare states
-		if newState.IsSame(&oldState.FileStateOS) {
+		if newState.IsSame(oldState.FileStateOS) {
 			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
 			return oldFilePath, nil
 		}
@@ -215,7 +213,7 @@ func (r *Registrar) getStateEntry(path string) (FileState, bool) {
 	return state, exist
 }
 
-func (r *Registrar) getStateCopy() map[string]FileState {
+func (r *Registrar) getState() map[string]FileState {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 
