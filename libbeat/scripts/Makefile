@@ -259,9 +259,9 @@ write-environment:
 HOME_PREFIX?=/tmp/${BEATNAME}
 .PHONY: install-home
 install-home:
-	mkdir -p ${HOME_PREFIX}
+	mkdir -p ${HOME_PREFIX}/kibana
 	if [ -d "etc/kibana" ]; then \
-		cp -r etc/kibana ${HOME_PREFIX}/kibana; \
+		cp -a etc/kibana/. ${HOME_PREFIX}/kibana/; \
 		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
 		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
 	fi
