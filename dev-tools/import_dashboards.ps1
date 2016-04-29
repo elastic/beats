@@ -114,27 +114,35 @@ try {
 }
 &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -Method PUT -Body '{"search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}'
 
-ForEach ($file in Get-ChildItem "$KIBANA_DIR/search/" -Filter *.json) {
-  $name = [io.path]::GetFileNameWithoutExtension($file.Name)
-  echo "Import search $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/search/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/search/$file")
+If (Test-Path "$KIBANA_DIR/search") {
+    ForEach ($file in Get-ChildItem "$KIBANA_DIR/search/" -Filter *.json) {
+      $name = [io.path]::GetFileNameWithoutExtension($file.Name)
+      echo "Import search $($name):"
+      &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/search/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/search/$file")
+    }
 }
 
-ForEach ($file in Get-ChildItem "$KIBANA_DIR/visualization/" -Filter *.json) {
-  $name = [io.path]::GetFileNameWithoutExtension($file.Name)
-  echo "Import visualization $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/visualization/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/visualization/$file")
+If (Test-Path "$KIBANA_DIR/visualization") {
+    ForEach ($file in Get-ChildItem "$KIBANA_DIR/visualization/" -Filter *.json) {
+      $name = [io.path]::GetFileNameWithoutExtension($file.Name)
+      echo "Import visualization $($name):"
+      &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/visualization/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/visualization/$file")
+    }
 }
 
-ForEach ($file in Get-ChildItem "$KIBANA_DIR/dashboard/" -Filter *.json) {
-  $name = [io.path]::GetFileNameWithoutExtension($file.Name)
-  echo "Import dashboard $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/dashboard/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/dashboard/$file")
+If (Test-Path "$KIBANA_DIR/dashboard") {
+    ForEach ($file in Get-ChildItem "$KIBANA_DIR/dashboard/" -Filter *.json) {
+      $name = [io.path]::GetFileNameWithoutExtension($file.Name)
+      echo "Import dashboard $($name):"
+      &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/dashboard/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/dashboard/$file")
+    }
 }
 
-ForEach ($file in Get-ChildItem "$KIBANA_DIR/index-pattern/" -Filter *.json) {
-  $json = Get-Content "$KIBANA_DIR/index-pattern/$file" -Raw | ConvertFrom-Json
-  $name = $json.title
-  echo "Import index-pattern $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/index-pattern/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/index-pattern/$file")
+If (Test-Path "$KIBANA_DIR/index-pattern") {
+    ForEach ($file in Get-ChildItem "$KIBANA_DIR/index-pattern/" -Filter *.json) {
+      $json = Get-Content "$KIBANA_DIR/index-pattern/$file" -Raw | ConvertFrom-Json
+      $name = $json.title
+      echo "Import index-pattern $($name):"
+      &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/index-pattern/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/index-pattern/$file")
+    }
 }
