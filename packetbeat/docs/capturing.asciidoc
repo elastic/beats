@@ -54,7 +54,7 @@ of the buffer is 30 MB, but you can increase it like this:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-interfaces:
+packetbeat.interfaces:
   device: eth0
   type: af_packet
   buffer_size_mb: 100
