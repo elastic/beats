@@ -107,7 +107,11 @@ if ($KIBANA_INDEX -eq "") {
 echo "Import dashboards from $KIBANA_DIR to $ELASTICSEARCH in $KIBANA_INDEX"
 
 # Workaround for: https://github.com/elastic/beats-dashboards/issues/94
-&$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX" -Method PUT
+try {
+  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX" -Method PUT
+} catch [System.Net.WebException] {
+  # suppress 400 error, index might exist already
+}
 &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -Method PUT -Body '{"search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}'
 
 ForEach ($file in Get-ChildItem "$KIBANA_DIR/search/" -Filter *.json) {
@@ -119,8 +123,7 @@ ForEach ($file in Get-ChildItem "$KIBANA_DIR/search/" -Filter *.json) {
 ForEach ($file in Get-ChildItem "$KIBANA_DIR/visualization/" -Filter *.json) {
   $name = [io.path]::GetFileNameWithoutExtension($file.Name)
   echo "Import visualization $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/visualization/$name" -Method PUT -Body $(Get-Content
-  "$KIBANA_DIR/visualization/$file")
+  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/visualization/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/visualization/$file")
 }
 
 ForEach ($file in Get-ChildItem "$KIBANA_DIR/dashboard/" -Filter *.json) {
@@ -133,6 +136,5 @@ ForEach ($file in Get-ChildItem "$KIBANA_DIR/index-pattern/" -Filter *.json) {
   $json = Get-Content "$KIBANA_DIR/index-pattern/$file" -Raw | ConvertFrom-Json
   $name = $json.title
   echo "Import index-pattern $($name):"
-  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/index-pattern/$name" -Method PUT -Body $(Get-Content
-  "$KIBANA_DIR/index-pattern/$file")
+  &$CURL -Headers $headers -Uri "$ELASTICSEARCH/$KIBANA_INDEX/index-pattern/$name" -Method PUT -Body $(Get-Content "$KIBANA_DIR/index-pattern/$file")
 }
