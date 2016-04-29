@@ -31,6 +31,7 @@ package beat
 
 import (
 	cryptRand "crypto/rand"
+	"errors"
 	"flag"
 	"fmt"
 	"math"
@@ -55,6 +56,9 @@ var (
 )
 
 var debugf = logp.MakeDebug("beat")
+
+// GracefulExit is an error that signals to exit with a code of 0.
+var GracefulExit = errors.New("graceful exit")
 
 // Beater is the interface that must be implemented every Beat. The full
 // lifecycle of a Beat instance is managed through this interface.
@@ -118,7 +122,7 @@ type BeatConfig struct {
 // Beat (e.g. packetbeat or topbeat). version is version number of the Beater
 // implementation. bt is Beater implementation to run.
 func Run(name, version string, bt Beater) error {
-	return newInstance(name, version, bt).launch(true)
+	return newInstance(name, version, bt).launch()
 }
 
 // instance contains everything related to a single instance of a beat.
@@ -232,14 +236,6 @@ func (bc *instance) config() error {
 	}
 
 	return bc.beater.Config(bc.data)
-
-	// TODO: If -configtest is set it should exit at this point. But changing
-	// this now would mean a change in behavior. Some Beats may depend on the
-	// Setup() method being invoked in order to do configuration validation.
-	// If we do not change this, it means -configtest requires the outputs to
-	// be available because the publisher is being started (this is not
-	// desirable - elastic/beats#1213). It (may?) also cause the index template
-	// to be loaded.
 }
 
 // setup initializes the Publisher and then invokes the Setup method of the
@@ -287,55 +283,43 @@ func (bc *instance) cleanup() error {
 }
 
 // launch manages the lifecycle of the beat and guarantees the order in which
-// the Beater methods are invokes and ensures a a proper exit code is set when
-// an error occurs. The exit flag controls if this method calls os.Exit when
-// it completes.
-func (bc *instance) launch(exit bool) error {
-	var err error
-	if exit {
-		defer func() { exitProcess(err) }()
-	}
+// the Beater methods are invoked. If an error occurs in the lifecycle of the
+// Beat it will be returned.
+func (bc *instance) launch() (err error) {
+	defer func() { err = handleError(err) }()
 
 	err = bc.handleFlags()
 	if err != nil {
-		return err
+		return
 	}
 
 	err = bc.config()
 	if err != nil {
-		return err
+		return
 	}
 
 	defer bc.cleanup()
 	err = bc.setup()
 	if err != nil {
-		return err
+		return
 	}
 
 	svc.BeforeRun()
 	svc.HandleSignals(bc.beater.Stop)
 	err = bc.run()
-	return err
+	return
 }
 
-// exitProcess causes the process to exit. If no error is provided then it will
-// exit with code 0. If an error is provided it will set a non-zero exit code
-// and log the error logp and to stderr.
-//
-// The exit code can controlled if the error is an ExitError.
-func exitProcess(err error) {
-	code := 0
-	if ee, ok := err.(ExitError); ok {
-		code = ee.ExitCode
-	} else if err != nil {
-		code = 1
+// handleError handles the given error by logging it and then returning the
+// error. If the err is nil or is a GracefulExit error then the method will
+// return nil without logging anything.
+func handleError(err error) error {
+	if err == nil || err == GracefulExit {
+		return nil
 	}
 
-	if err != nil && code != 0 {
-		// logp may not be initialized so log the err to stderr too.
-		logp.Critical("Exiting: %v", err)
-		fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
-	}
-
-	os.Exit(code)
+	// logp may not be initialized so log the err to stderr too.
+	logp.Critical("Exiting: %v", err)
+	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
+	return err
 }
