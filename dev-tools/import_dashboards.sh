@@ -109,8 +109,9 @@ fi
 echo "Import dashboards,visualizations, searches and index pattern from ${DIR} to ${ELASTICSEARCH} in ${KIBANA_INDEX}"
 
 # Workaround for: https://github.com/elastic/beats-dashboards/issues/94
-$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX"
-$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -d'{"search": {"properties": {"hits": {"type": "integer"}, "version": {"type": "integer"}}}}'
+$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX" > /dev/null 2>&1 
+$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -d'{"search": {"properties": {"hits": {"type": "integer"},
+"version": {"type": "integer"}}}}' > /dev/null 2>&1
 
 
 if [ -f ${BEAT_CONFIG} ]; then
@@ -129,43 +130,52 @@ if [ -d /tmp ]; then
 else
 	TMP_SED_FILE="${DIR}/search/tmp_search.json"
 fi
-for file in ${DIR}/search/*.json
-do
-    NAME=`basename ${file} .json`
-    echo "Import search ${NAME}:"
-    sed ${SED_STRING} ${file} > ${TMP_SED_FILE}
-    ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/search/${NAME} \
-        -d @${TMP_SED_FILE} || exit 1
-    echo
-done
-rm ${TMP_SED_FILE}
 
-for file in ${DIR}/visualization/*.json
-do
-    NAME=`basename ${file} .json`
-    echo "Import visualization ${NAME}:"
-    ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/visualization/${NAME} \
-        -d @${file} || exit 1
-    echo
-done
+if [ -d "${DIR}/search" ]; then
+    for file in ${DIR}/search/*.json
+    do
+        NAME=`basename ${file} .json`
+        echo "Import search ${NAME}:"
+        sed ${SED_STRING} ${file} > ${TMP_SED_FILE}
+        ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/search/${NAME} \
+            -d @${TMP_SED_FILE} || exit 1
+        echo
+    done
+    rm ${TMP_SED_FILE}
+fi
 
-for file in ${DIR}/dashboard/*.json
-do
-    NAME=`basename ${file} .json`
-    echo "Import dashboard ${NAME}:"
-    ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/dashboard/${NAME} \
-        -d @${file} || exit 1
-    echo
-done
+if [ -d "${DIR}/visualization" ]; then
+    for file in ${DIR}/visualization/*.json
+    do
+        NAME=`basename ${file} .json`
+        echo "Import visualization ${NAME}:"
+        ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/visualization/${NAME} \
+            -d @${file} || exit 1
+        echo
+    done
+fi
 
-for file in ${DIR}/index-pattern/*.json
-do
-    NAME=`awk '$1 == "\"title\":" {gsub(/[",]/, "", $2); print $2}' ${file}`
-    echo "Import index pattern ${NAME}:"
+if [ -d "${DIR}/dashboard" ]; then
+    for file in ${DIR}/dashboard/*.json
+    do
+        NAME=`basename ${file} .json`
+        echo "Import dashboard ${NAME}:"
+        ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/dashboard/${NAME} \
+            -d @${file} || exit 1
+        echo
+    done
+fi
 
-    ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/index-pattern/${NAME} \
-        -d @${file} || exit 1
-    echo
-done
+if [ -d "${DIR}/index-pattern" ]; then
+    for file in ${DIR}/index-pattern/*.json
+    do
+        NAME=`awk '$1 == "\"title\":" {gsub(/[",]/, "", $2); print $2}' ${file}`
+        echo "Import index pattern ${NAME}:"
+
+        ${CURL} -XPUT ${ELASTICSEARCH}/${KIBANA_INDEX}/index-pattern/${NAME} \
+            -d @${file} || exit 1
+        echo
+    done
+fi
 
 
