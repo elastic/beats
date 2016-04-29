@@ -31,8 +31,8 @@ type FileEvent struct {
 }
 
 type FileState struct {
-	Source      string `json:"source,omitempty"`
-	Offset      int64  `json:"offset,omitempty"`
+	Source      string `json:"source"`
+	Offset      int64  `json:"offset"`
 	FileStateOS *FileStateOS
 }
 
