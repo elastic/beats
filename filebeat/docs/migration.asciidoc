@@ -34,6 +34,16 @@ Logstash Forwarder to Filebeat, we recommend that you keep the Lumberjack plugin
 Beats input plugin on the same Logstash instances, but set up the Beats input plugin to use a different port. After you have migrated
 all the machines to Filebeat, you can remove the Lumberjack plugin.
 
+We realize that opening additional ports may not be feasible in your organization. Another option for phased migration
+to Filebeat is to ship data from Logstash Forwarder directly to the Beats input plugin. 
+
+IMPORTANT: This data shipping path is only supported for migrating to Filebeat and will no longer be supported when Logstash Forwarder reaches https://www.elastic.co/support/eol[End of Life].
+
+What's required?
+
+* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] 
+version 2.2.8 or later.
+* SSL must be explicitly enabled in the Beats input plugin (`ssl => true`) because SSL is on by default with Logstash Forwarder. The SSL/TLS configs should be the same for both the Logstash Forwarder and Filebeat instances.
 
 ==  Updating the Registry File
 
