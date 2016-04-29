@@ -96,8 +96,11 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 	nfs := Nfs{vers: nfsVers, proc: nfsProc, event: event}
 	event["nfs"] = nfs.getRequestInfo(xdr)
 
+	// use xid+src ip to uniquely identify request
+	reqId := xid + tcptuple.Src_ip.String()
+
 	// populate cache to trace request reply
-	rpc.callsSeen.Put(xid, &nfs)
+	rpc.callsSeen.Put(reqId, &nfs)
 }
 
 // called when we process a RPC reply
@@ -112,8 +115,18 @@ func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 	xdr.getUInt()
 	xdr.getDynamicOpaque()
 
+	// xid+src ip is used to uniquely identify request.
+	var reqId string
+	if dir == tcp.TcpDirectionReverse {
+		// stream in correct order: Src points to a client
+		reqId = xid + tcptuple.Src_ip.String()
+	} else {
+		// stream in reverse order: Dst points to a client
+		reqId = xid + tcptuple.Dst_ip.String()
+	}
+
 	// get cached request
-	v := rpc.callsSeen.Delete(xid)
+	v := rpc.callsSeen.Delete(reqId)
 	if v != nil {
 		nfs := v.(*Nfs)
 		event := nfs.event
