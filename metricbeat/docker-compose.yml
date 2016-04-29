@@ -4,10 +4,13 @@ beat:
     - apache
     - elasticsearch
     - mysql
+    - nginx
     - redis
   environment:
     - APACHE_HOST=http://apache/
     - APACHE_PORT=80
+    - NGINX_HOST=nginx
+    - NGINX_PORT=80
     - REDIS_HOST=redis
     - REDIS_PORT=6379
     - MYSQL_DSN=root:test@tcp(mysql:3306)/
@@ -31,6 +34,9 @@ mysql:
   image: mysql:5.7.10
   environment:
     - MYSQL_ROOT_PASSWORD=test
+
+nginx:
+  build: tests/environments/nginx
 
 redis:
   image: redis:3.0.7

@@ -13,6 +13,16 @@ metricbeat:
       # Path to server status. Default server-status
       #server_status_path: "server-status"
 
+    # Nginx Module
+    - module: nginx
+      metricsets: ["stubstatus"]
+      hosts: ["http://127.0.0.1/"]
+      period: 1s
+      enabled: true
+
+      # Path to server status. Default server-status
+      #server_status_path: "server-status"
+
     # Redis Module
     - module: redis
       metricsets: ["info"]
