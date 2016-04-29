@@ -1,4 +1,4 @@
-package mode
+package modeutil
 
 import (
 	"errors"
@@ -6,22 +6,23 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
 type failOverClient struct {
-	conns  []ProtocolClient
+	conns  []mode.ProtocolClient
 	active int
 }
 
 type asyncFailOverClient struct {
-	conns  []AsyncProtocolClient
+	conns  []mode.AsyncProtocolClient
 	active int
 }
 
 type clientList interface {
 	Active() int
 	Len() int
-	Get(i int) Connectable
+	Get(i int) mode.Connectable
 	Activate(i int)
 }
 
@@ -32,17 +33,17 @@ var (
 	errNoActiveConnection = errors.New("No active connection")
 )
 
-func NewFailoverClient(clients []ProtocolClient) []ProtocolClient {
+func NewFailoverClient(clients []mode.ProtocolClient) []mode.ProtocolClient {
 	if len(clients) <= 1 {
 		return clients
 	}
-	return []ProtocolClient{&failOverClient{conns: clients, active: -1}}
+	return []mode.ProtocolClient{&failOverClient{conns: clients, active: -1}}
 }
 
-func (f *failOverClient) Active() int           { return f.active }
-func (f *failOverClient) Len() int              { return len(f.conns) }
-func (f *failOverClient) Get(i int) Connectable { return f.conns[i] }
-func (f *failOverClient) Activate(i int)        { f.active = i }
+func (f *failOverClient) Active() int                { return f.active }
+func (f *failOverClient) Len() int                   { return len(f.conns) }
+func (f *failOverClient) Get(i int) mode.Connectable { return f.conns[i] }
+func (f *failOverClient) Activate(i int)             { f.active = i }
 
 func (f *failOverClient) Connect(to time.Duration) error {
 	return connect(f, to)
@@ -70,19 +71,19 @@ func (f *failOverClient) PublishEvent(event common.MapStr) error {
 	return f.conns[f.active].PublishEvent(event)
 }
 
-func NewAsyncFailoverClient(clients []AsyncProtocolClient) []AsyncProtocolClient {
+func NewAsyncFailoverClient(clients []mode.AsyncProtocolClient) []mode.AsyncProtocolClient {
 	if len(clients) <= 1 {
 		return clients
 	}
-	return []AsyncProtocolClient{
+	return []mode.AsyncProtocolClient{
 		&asyncFailOverClient{conns: clients, active: -1},
 	}
 }
 
-func (f *asyncFailOverClient) Active() int           { return f.active }
-func (f *asyncFailOverClient) Len() int              { return len(f.conns) }
-func (f *asyncFailOverClient) Get(i int) Connectable { return f.conns[i] }
-func (f *asyncFailOverClient) Activate(i int)        { f.active = i }
+func (f *asyncFailOverClient) Active() int                { return f.active }
+func (f *asyncFailOverClient) Len() int                   { return len(f.conns) }
+func (f *asyncFailOverClient) Get(i int) mode.Connectable { return f.conns[i] }
+func (f *asyncFailOverClient) Activate(i int)             { f.active = i }
 
 func (f *asyncFailOverClient) Connect(to time.Duration) error {
 	return connect(f, to)

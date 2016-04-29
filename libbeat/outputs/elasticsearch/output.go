@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -80,7 +81,7 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
+	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (out *elasticsearchOutput) init(
 
 	out.clients = clients
 	loadBalance := config.LoadBalance
-	m, err := mode.NewConnectionMode(clients, !loadBalance,
+	m, err := modeutil.NewConnectionMode(clients, !loadBalance,
 		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
 	if err != nil {
 		return err
@@ -181,7 +182,7 @@ func makeClientFactory(
 	tls *tls.Config,
 	config *elasticsearchConfig,
 	out *elasticsearchOutput,
-) func(string) (mode.ProtocolClient, error) {
+) modeutil.ClientFactory {
 	return func(host string) (mode.ProtocolClient, error) {
 		esURL, err := getURL(config.Protocol, config.Path, host)
 		if err != nil {
