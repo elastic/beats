@@ -235,6 +235,7 @@ func (rpc *Rpc) handleRpcFragment(
 func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
 	return &RpcStream{
 		tcpTuple: tcptuple,
+		rawData:  pkt.Payload,
 	}
 }
 
