@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 const NFS_PROGRAM_NUMBER = 100003
@@ -26,7 +27,7 @@ func (rpc *Rpc) handleExpiredPacket(nfs *Nfs) {
 }
 
 // called when we process a RPC call
-func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple) {
+func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
 
 	// eat rpc version number
 	xdr.getUInt()
@@ -43,6 +44,12 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 	dst := common.Endpoint{
 		Ip:   tcptuple.Dst_ip.String(),
 		Port: tcptuple.Dst_port,
+	}
+
+	// The directoion of the stream is based in the direction of first packet seen.
+	// if we have stored stream in reverse order, swap src and dst
+	if dir == tcp.TcpDirectionReverse {
+		src, dst = dst, src
 	}
 
 	event := common.MapStr{}
@@ -94,7 +101,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 }
 
 // called when we process a RPC reply
-func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple) {
+func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
 	replyStatus := xdr.getUInt()
 	// we are interesed only in accepted rpc reply
 	if replyStatus != 0 {

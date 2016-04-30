@@ -226,13 +226,13 @@ func (rpc *Rpc) handleRpcFragment(
 		// keep the rest of the next fragment
 		st.rawData = st.rawData[4+size:]
 
-		rpc.handleRpcPacket(xdr, pkt.Ts, tcptuple)
+		rpc.handleRpcPacket(xdr, pkt.Ts, tcptuple, dir)
 	}
 
 	return conn
 }
 
-func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple) {
+func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
 
 	xid := fmt.Sprintf("%.8x", xdr.getUInt())
 
@@ -240,9 +240,9 @@ func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTupl
 
 	switch msgType {
 	case RPC_CALL:
-		rpc.handleCall(xid, xdr, ts, tcptuple)
+		rpc.handleCall(xid, xdr, ts, tcptuple, dir)
 	case RPC_REPLY:
-		rpc.handleReply(xid, xdr, ts, tcptuple)
+		rpc.handleReply(xid, xdr, ts, tcptuple, dir)
 	default:
 		logp.Warn("Bad RPC message")
 	}
