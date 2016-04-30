@@ -1,37 +1,20 @@
+/*
+Package redis is a Metricbeat module for Redis servers.
+*/
 package redis
 
 import (
-	"github.com/garyburd/redigo/redis"
-
 	"github.com/elastic/beats/libbeat/logp"
 
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/garyburd/redigo/redis"
 )
 
-func init() {
-	if err := helper.Registry.AddModuler("redis", New); err != nil {
-		panic(err)
-	}
-}
-
-// New creates new instance of Moduler
-func New() helper.Moduler {
-	return &Moduler{}
-}
-
-type Moduler struct{}
-
-func (m *Moduler) Setup(mo *helper.Module) error {
-	return nil
-}
-
+// Connect connects to the Redis server at the given host address.
 func Connect(host string) (redis.Conn, error) {
-
 	conn, err := redis.Dial("tcp", host)
 	if err != nil {
 		logp.Err("Redis connection error: %v", err)
 	}
 
-	//defer conn.Close()
 	return conn, err
 }

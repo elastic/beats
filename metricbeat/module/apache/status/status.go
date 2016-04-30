@@ -9,7 +9,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/joeshaw/multierror"
 )
 
@@ -32,22 +33,19 @@ var (
 )
 
 func init() {
-	if err := helper.Registry.AddMetricSeter("apache", "status", New); err != nil {
+	if err := mb.Registry.AddMetricSet("apache", "status", New); err != nil {
 		panic(err)
 	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
-}
-
-type MetricSeter struct {
+// MetricSet for fetching Apache HTTPD server status.
+type MetricSet struct {
+	mb.BaseMetricSet
 	URLs map[string]string // Map of host to endpoint URL.
 }
 
-// Setup the URLs to the mod_status endpoints.
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
+// New creates new instance of MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Additional configuration options
 	config := struct {
 		ServerStatusPath string `config:"server_status_path"`
@@ -59,30 +57,33 @@ func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
 		Password:         "",
 	}
 
-	if err := ms.Module.ProcessConfig(&config); err != nil {
-		return err
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
 	}
 
-	m.URLs = make(map[string]string, len(ms.Config.Hosts))
+	metricSet := &MetricSet{
+		BaseMetricSet: base,
+		URLs:          make(map[string]string, len(base.Module().Config().Hosts)),
+	}
 
 	// Parse the config, create URLs, and check for errors.
 	var errs multierror.Errors
-	for _, host := range ms.Config.Hosts {
+	for _, host := range base.Module().Config().Hosts {
 		u, err := getURL(config.Username, config.Password, config.ServerStatusPath, host)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
-		m.URLs[host] = u.String()
+		metricSet.URLs[host] = u.String()
 		debugf("apache-status URL=%s", redactPassword(*u))
 	}
 
-	return errs.Err()
+	return metricSet, errs.Err()
 }
 
 // Fetch makes an HTTP request to fetch status metrics from the mod_status
 // endpoint.
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
+func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
 	url, ok := m.URLs[host]
 	if !ok {
 		return nil, fmt.Errorf("url not found for host '%s'", host)
@@ -92,7 +93,7 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making HTTP request: %v", err)
+		return nil, fmt.Errorf("error making http request: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -100,7 +101,7 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.Map
 		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventMapping(resp.Body, host, ms.Name), nil
+	return eventMapping(resp.Body, host, m.Name()), nil
 }
 
 // getURL constructs a URL from the rawHost value and adds the provided user,

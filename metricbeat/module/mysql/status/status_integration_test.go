@@ -5,34 +5,21 @@ package status
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/mysql"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
-
-	config := helper.ModuleConfig{
-		Hosts: []string{mysql.GetMySQLEnvDSN()},
-	}
-	module := &helper.Module{
-		Config: config,
+	f := mbtest.NewEventFetcher(t, getConfig())
+	event, err := f.Fetch(f.Module().Config().Hosts[0])
+	if !assert.NoError(t, err) {
+		t.FailNow()
 	}
 
-	ms, msErr := helper.NewMetricSet("status", New, module)
-	assert.NoError(t, msErr)
-
-	var err error
-
-	// Setup metricset
-	err = ms.Setup()
-	assert.NoError(t, err)
-
-	// Load events
-	event, err := ms.MetricSeter.Fetch(ms, module.Config.Hosts[0])
-	assert.NoError(t, err)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
 	connections := event["Connections"].(int)
@@ -45,4 +32,12 @@ func TestFetch(t *testing.T) {
 	assert.True(t, openTables > 0)
 	assert.True(t, openFiles >= 0)
 	assert.True(t, openStreams == 0)
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "mysql",
+		"metricsets": []string{"status"},
+		"hosts":      []string{mysql.GetMySQLEnvDSN()},
+	}
 }
