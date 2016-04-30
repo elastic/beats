@@ -251,6 +251,7 @@ func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTupl
 func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
 	return &RpcStream{
 		tcpTuple: tcptuple,
+		rawData:  pkt.Payload,
 	}
 }
 
