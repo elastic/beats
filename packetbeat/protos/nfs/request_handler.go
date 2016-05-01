@@ -46,7 +46,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 		Port: tcptuple.Dst_port,
 	}
 
-	// The directoion of the stream is based in the direction of first packet seen.
+	// The direction of the stream is based in the direction of first packet seen.
 	// if we have stored stream in reverse order, swap src and dst
 	if dir == tcp.TcpDirectionReverse {
 		src, dst = dst, src
@@ -54,7 +54,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 
 	event := common.MapStr{}
 	event["@timestamp"] = common.Time(ts)
-	event["status"] = common.OK_STATUS // all packes are OK for now
+	event["status"] = common.OK_STATUS // all packages are OK for now
 	event["src"] = &src
 	event["dst"] = &dst
 
@@ -106,7 +106,7 @@ func (rpc *Rpc) handleCall(xid string, xdr *Xdr, ts time.Time, tcptuple *common.
 // called when we process a RPC reply
 func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
 	replyStatus := xdr.getUInt()
-	// we are interesed only in accepted rpc reply
+	// we are interested only in accepted rpc reply
 	if replyStatus != 0 {
 		return
 	}
@@ -139,7 +139,7 @@ func (rpc *Rpc) handleReply(xid string, xdr *Xdr, ts time.Time, tcptuple *common
 		acceptStatus := int(xdr.getUInt())
 		rpcInfo["status"] = ACCEPT_STATUS[acceptStatus]
 
-		// populate nfs info for seccessfully executed requests
+		// populate nfs info for successfully executed requests
 		if acceptStatus == 0 {
 			nfsInfo := event["nfs"].(common.MapStr)
 			nfsInfo["status"] = nfs.getNFSReplyStatus(xdr)

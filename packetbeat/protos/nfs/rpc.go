@@ -254,5 +254,3 @@ func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
 		rawData:  pkt.Payload,
 	}
 }
-
-//
