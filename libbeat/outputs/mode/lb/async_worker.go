@@ -201,8 +201,12 @@ func (w *asyncWorker) handleResults(msg eventsMessage) func([]common.MapStr, err
 }
 
 func (w *asyncWorker) onFail(msg eventsMessage, err error) {
-	go func() {
-		logp.Info("Error publishing events (retrying): %s", err)
-		w.ctx.pushFailed(msg)
-	}()
+	if !w.ctx.tryPushFailed(msg) {
+		// break possible deadlock by spawning go-routine returning failed messages
+		// into retries queue
+		go func() {
+			logp.Info("Error publishing events (retrying): %s", err)
+			w.ctx.pushFailed(msg)
+		}()
+	}
 }

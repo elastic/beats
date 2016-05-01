@@ -23,6 +23,14 @@ type kafka struct {
 	modeGuaranteed mode.ConnectionMode
 }
 
+const (
+	defaultWaitRetry = 1 * time.Second
+
+	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
+	// not return ErrTempBulkFailure
+	defaultMaxWaitRetry = 60 * time.Second
+)
+
 func init() {
 	sarama.Logger = kafkaLogger{}
 	outputs.RegisterOutputPlugin("kafka", New)
@@ -108,14 +116,14 @@ func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
 		clients,
 		false,
 		maxAttempts,
-		1*time.Second,
+		defaultWaitRetry,
 		libCfg.Net.WriteTimeout,
-		10*time.Second)
+		defaultMaxWaitRetry)
 	if err != nil {
 		logp.Err("Failed to configure kafka connection: %v", err)
 		return nil, err
 	}
-	return mode, err
+	return mode, nil
 }
 
 func (k *kafka) getMode(opts outputs.Options) (mode.ConnectionMode, error) {
