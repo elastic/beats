@@ -28,9 +28,10 @@ type client struct {
 
 type msgRef struct {
 	count int32
-	err   atomic.Value
 	batch []common.MapStr
 	cb    func([]common.MapStr, error)
+
+	err error
 }
 
 var (
@@ -161,9 +162,7 @@ func (r *msgRef) done() {
 }
 
 func (r *msgRef) fail(err error) {
-	debugf("Kafka publish failed with: %v", err)
-
-	r.err.Store(err)
+	r.err = err
 	r.dec()
 }
 
@@ -175,11 +174,10 @@ func (r *msgRef) dec() {
 
 	debugf("finished kafka batch")
 
-	var err error
-	v := r.err.Load()
-	if v != nil {
-		err = v.(error)
+	err := r.err
+	if err != nil {
 		eventsNotAcked.Add(int64(len(r.batch)))
+		debugf("Kafka publish failed with: %v", err)
 		r.cb(r.batch, err)
 	} else {
 		ackedEvents.Add(int64(len(r.batch)))
