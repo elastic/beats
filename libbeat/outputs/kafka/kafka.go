@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 )
 
 type kafka struct {
@@ -93,7 +94,7 @@ func (k *kafka) init(cfg *common.Config) error {
 		clients = append(clients, client)
 	}
 
-	mode, err := mode.NewAsyncConnectionMode(
+	mode, err := modeutil.NewAsyncConnectionMode(
 		clients,
 		false,
 		config.MaxRetries,
