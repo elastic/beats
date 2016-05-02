@@ -118,7 +118,7 @@ func (p *Prospector) Stop() {
 	close(p.done)
 }
 
-func (p *Prospector) AddHarvester(file string, stat *input.FileStat) (*harvester.Harvester, error) {
+func (p *Prospector) createHarvester(file string, stat *input.FileStat) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
 		&p.ProspectorConfig.Harvester, file, stat, p.harvesterChan)

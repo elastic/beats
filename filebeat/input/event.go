@@ -20,7 +20,7 @@ type FileEvent struct {
 	Offset       int64
 	Bytes        int
 	Text         *string
-	Fileinfo     *os.FileInfo
+	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *config.JSONConfig
 	Stat         *FileStat
