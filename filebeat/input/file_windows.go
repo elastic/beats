@@ -16,22 +16,22 @@ type FileStateOS struct {
 }
 
 // GetOSFileState returns the platform specific FileStateOS
-func GetOSFileState(info *os.FileInfo) *FileStateOS {
+func GetOSFileState(info os.FileInfo) FileStateOS {
 
 	// os.SameFile must be called to populate the id fields. Otherwise in case for example
 	// os.Stat(file) is used to get the fileInfo, the ids are empty.
 	// https://github.com/elastic/beats/filebeat/pull/53
-	os.SameFile(*info, *info)
+	os.SameFile(info, info)
 
 	// Gathering fileStat (which is fileInfo) through reflection as otherwise not accessible
 	// See https://github.com/golang/go/blob/90c668d1afcb9a17ab9810bce9578eebade4db56/src/os/stat_windows.go#L33
-	fileStat := reflect.ValueOf(*info).Elem()
+	fileStat := reflect.ValueOf(info).Elem()
 
 	// Get the three fields required to uniquely identify file und windows
 	// More details can be found here: https://msdn.microsoft.com/en-us/library/aa363788(v=vs.85).aspx
 	// Uint should already return uint64, but making sure this is the case
 	// The required fiels can be found here: https://github.com/golang/go/blob/master/src/os/types_windows.go#L78
-	fileState := &FileStateOS{
+	fileState := FileStateOS{
 		IdxHi: uint64(fileStat.FieldByName("idxhi").Uint()),
 		IdxLo: uint64(fileStat.FieldByName("idxlo").Uint()),
 		Vol:   uint64(fileStat.FieldByName("vol").Uint()),
@@ -41,7 +41,7 @@ func GetOSFileState(info *os.FileInfo) *FileStateOS {
 }
 
 // IsSame file checks if the files are identical
-func (fs *FileStateOS) IsSame(state *FileStateOS) bool {
+func (fs FileStateOS) IsSame(state FileStateOS) bool {
 	return fs.IdxHi == state.IdxHi && fs.IdxLo == state.IdxLo && fs.Vol == state.Vol
 }
 
