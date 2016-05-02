@@ -251,7 +251,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
 
         # Make sure new file was picked up, old file should stay in
         assert len(data) == 2
@@ -315,7 +315,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
 
         # Make sure new file was picked up. As it has the same file name,
         # only one entry exists
@@ -373,7 +373,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        data = self.get_dot_filebeat()
+        data = self.get_registry()
 
         # Make sure new file was picked up. As it has the same file name,
         # only one entry exists

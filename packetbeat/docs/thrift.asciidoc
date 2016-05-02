@@ -44,7 +44,7 @@ Here is an example configuration section for the Thrift protocol:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-protocols:
+packetbeat.protocols:
   thrift:
     transport_type = "socket"
     protocol_type = "binary"

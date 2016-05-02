@@ -46,3 +46,13 @@ var (
 		LoadBalance: true,
 	}
 )
+
+func (c *elasticsearchConfig) Validate() error {
+	if c.ProxyURL != "" {
+		if _, err := parseProxyURL(c.ProxyURL); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

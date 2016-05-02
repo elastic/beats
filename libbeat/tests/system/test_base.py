@@ -46,9 +46,13 @@ class Test(BaseTest):
         """
         shutil.copy("../../etc/libbeat.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
+        with open(self.working_dir + "/beatname.template.json", "w") as f:
+            f.write('{"template": true}')
 
-        exit_code = self.run_beat(config="libbeat.yml",
-                                  extra_args=["-configtest"])
+        exit_code = self.run_beat(
+            config="libbeat.yml",
+            extra_args=["-configtest",
+                        "-path.config", self.working_dir])
 
         assert exit_code == 0
         assert self.log_contains("Config OK") is True
@@ -70,8 +74,8 @@ class Test(BaseTest):
 
         assert self.log_contains("error loading config file") is False
 
-        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb") \
-            as outputfile:
+        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb")  \
+                as outputfile:
             proc = subprocess.Popen(args,
                                     stdout=outputfile,
                                     stderr=subprocess.STDOUT)

@@ -1,0 +1,203 @@
+[[metricbeat-getting-started]]
+== Getting Started With Metricbeat
+
+Metricbeat helps you monitor your servers and the services they host by
+collecting metrics from the operating system and services.
+
+To get started with your own Metricbeat setup, install and configure these
+related products:
+
+ * Elasticsearch for storage and indexing the data.
+ * Kibana for the UI.
+ * Logstash (optional) for inserting data into Elasticsearch.
+
+See {libbeat}/getting-started.html[Getting Started with Beats and the Elastic
+Stack] for more information.
+
+After you have installed these products, you can start
+<<metricbeat-installation>>.
+
+
+[[metricbeat-installation]]
+=== Step 1: Installing Metricbeat
+
+To download and install Metricbeat, use the commands that work with your system
+(<<deb, deb>> for Debian/Ubuntu, <<rpm, rpm>> for Redhat/Centos/Fedora, <<mac,
+mac>> for OS X, and <<win, win>> for Windows).
+
+[NOTE]
+==================================================
+If you use Apt or Yum, you can
+{libbeat}/setup-repositories.html[install Metricbeat from our repositories] to
+update to the newest version more easily.
+
+See our https://www.elastic.co/downloads/beats/metricbeat[download page] for
+other installation options, such as 32-bit images.
+==================================================
+
+[[deb]]
+*deb:*
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat_{version}_amd64.deb
+sudo dpkg -i metricbeat_{version}_amd64.deb
+------------------------------------------------
+
+[[rpm]]
+*rpm:*
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-x86_64.rpm
+sudo rpm -vi metricbeat-{version}-x86_64.rpm
+------------------------------------------------
+
+[[mac]]
+*mac:*
+
+["source","sh",subs="attributes,callouts"]
+------------------------------------------------
+curl -L -O https://download.elastic.co/beats/metricbeat/metricbeat-{version}-darwin.tgz
+tar xzvf metricbeat-{version}-darwin.tgz
+------------------------------------------------
+
+[[win]]
+*win:*
+
+. Download the Metricbeat Windows zip file from the
+https://www.elastic.co/downloads/beats/metricbeat[downloads page].
+
+. Extract the contents of the zip file into `C:\Program Files`.
+
+. Rename the `metricbeat-<version>-windows` directory to `Metricbeat`.
+
+. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
+and select *Run As Administrator*). If you are running Windows XP, you may need
+to download and install PowerShell.
+
+. Run the following commands to install Metricbeat as a Windows service:
++
+[source,shell]
+----------------------------------------------------------------------
+PS > cd 'C:\Program Files\Metricbeat'
+PS C:\Program Files\Metricbeat> .\install-service-metricbeat.ps1
+----------------------------------------------------------------------
+
+NOTE: If script execution is disabled on your system, you need to set the
+execution policy for the current session to allow the script to run. For
+example: `PowerShell.exe -ExecutionPolicy UnRestricted -File
+.\install-service-metricbeat.ps1`.
+
+Before starting Metricbeat, you should look at the configuration options in the
+configuration file, for example `C:\Program Files\Metricbeat\metricbeat.yml`.
+For more information about these options, see
+<<metricbeat-configuration-options>>.
+
+[[metricbeat-configuration]]
+=== Step 2: Configuring Metricbeat
+
+To configure Metricbeat, you edit the configuration file. For rpm and deb,
+you'll find the configuration file at `/etc/metricbeat/metricbeat.yml`. For mac
+and win, look in the archive that you just extracted.
+
+Here is a sample of the `metricbeat.yml` file. Metricbeat uses modules to
+collect metrics, and each module must be individually configured. The example
+below shows how to configure the Apache HTTPD module.
+
+[source, shell]
+-------------------------------------
+metricbeat:
+  modules:
+    - module: apache
+      enabled: true
+      metricsets: ['status']
+      hosts: ['http://127.0.0.1/']
+      period: 1s
+-------------------------------------
+
+To configure Metricbeat:
+
+////
+TODO: Migrate the documentation ruflin has written to here.
+////
+
+. Define the metricbeat modules that you want enabled.
+
+. If you are sending output to Elasticsearch, set the IP address and port where
+Metricbeat can find the Elasticsearch installation:
++
+[source,yaml]
+----------------------------------------------------------------------
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+output:
+  ### Elasticsearch as output
+  elasticsearch:
+    # Array of hosts to connect to.
+     hosts: ["192.168.1.42:9200"]
+----------------------------------------------------------------------
++
+If you are sending output to Logstash, see <<config-metricbeat-logstash>>
+instead.
+
+[[metricbeat-template]]
+=== Step 3: Loading the Index Template in Elasticsearch
+
+:allplatforms:
+include::../../libbeat/docs/shared-template-load.asciidoc[]
+
+=== Step 4: Starting Metricbeat
+
+Run Metricbeat by issuing the following command:
+
+*deb:*
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/metricbeat start
+----------------------------------------------------------------------
+*rpm:*
+
+[source,shell]
+----------------------------------------------------------------------
+sudo /etc/init.d/metricbeat start
+----------------------------------------------------------------------
+
+*mac:*
+
+[source,shell]
+----------------------------------------------------------------------
+sudo ./metricbeat -e -c metricbeat.yml -d "publish"
+----------------------------------------------------------------------
+
+*win:*
+
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Metricbeat> Start-Service metricbeat
+----------------------------------------------------------------------
+
+By default the log files are stored in `C:\ProgramData\metricbeat\Logs`.
+
+NOTE: On Windows, statistics about system load and swap usage are currently
+not captured.
+
+==== Testing the Metricbeat Installation
+
+To verify that your server's statistics are present in Elasticsearch, issue
+the following command:
+
+[source,shell]
+----------------------------------------------------------------------
+curl -XGET 'http://localhost:9200/metricbeat-*/_search?pretty'
+----------------------------------------------------------------------
+
+Make sure that you replace `localhost:9200` with the address of your
+Elasticsearch instance.
+
+On Windows, if you don't have cURL installed, simply point your browser to the
+URL.
+
+
+Enjoy!

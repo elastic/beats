@@ -1,0 +1,13 @@
+[[metricbeat-modules]]
+= Modules
+
+[partintro]
+--
+This section contains detailed information about the metric collecting modules
+contained in {beatname_uc}.
+
+--
+
+include::modules/apache.asciidoc[]
+include::modules/mysql.asciidoc[]
+include::modules/redis.asciidoc[]

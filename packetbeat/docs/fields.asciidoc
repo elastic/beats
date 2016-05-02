@@ -14,6 +14,7 @@ grouped in the following categories:
 * <<exported-fields-icmp>>
 * <<exported-fields-dns>>
 * <<exported-fields-http>>
+* <<exported-fields-amqp>>
 * <<exported-fields-memcache>>
 * <<exported-fields-mysql>>
 * <<exported-fields-pgsql>>
@@ -21,8 +22,7 @@ grouped in the following categories:
 * <<exported-fields-redis>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-trans_measurements>>
-* <<exported-fields-trans_env>>
-* <<exported-fields-flows_env>>
+* <<exported-fields-env>>
 * <<exported-fields-raw>>
 * <<exported-fields-nfs>>
 
@@ -385,13 +385,13 @@ A human readable form of the request.
 
 ==== icmp.request.type
 
-type: int
+type: integer
 
 The request type.
 
 ==== icmp.request.code
 
-type: int
+type: integer
 
 The request code.
 
@@ -403,13 +403,13 @@ A human readable form of the response.
 
 ==== icmp.response.type
 
-type: int
+type: integer
 
 The response type.
 
 ==== icmp.response.code
 
-type: int
+type: integer
 
 The response code.
 
@@ -421,7 +421,7 @@ DNS-specific event fields.
 
 ==== dns.id
 
-type: int
+type: integer
 
 The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
 
@@ -435,42 +435,42 @@ The DNS operation code that specifies the kind of query in the message. This val
 
 ==== dns.flags.authoritative
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the responding server is an authority for the domain name used in the question.
 
 
 ==== dns.flags.recursion_available
 
-type: bool
+type: boolean
 
 A DNS flag specifying whether recursive query support is available in the name server.
 
 
 ==== dns.flags.recursion_desired
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
 
 
 ==== dns.flags.authentic_data
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the recursive server considers the response authentic.
 
 
 ==== dns.flags.checking_disabled
 
-type: bool
+type: boolean
 
 A DNS flag specifying that the client disables the server signature validation of the query.
 
 
 ==== dns.flags.truncated_response
 
-type: bool
+type: boolean
 
 A DNS flag specifying that only the first 512 bytes of the reply were returned.
 
@@ -508,7 +508,7 @@ The effective top-level domain (eTLD) plus one more label. For example, the eTLD
 
 ==== dns.answers_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.answers` field.
 
@@ -533,7 +533,7 @@ The class of DNS data contained in this resource record.
 
 ==== dns.answers.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -552,7 +552,7 @@ An array containing a dictionary for each authority section from the answer.
 
 ==== dns.authorities_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -584,7 +584,7 @@ An array containing a dictionary about each answer section returned by the serve
 
 ==== dns.answers.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -603,7 +603,7 @@ An array containing a dictionary for each additional section from the answer.
 
 ==== dns.additionals_count
 
-type: int
+type: integer
 
 The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
 
@@ -628,7 +628,7 @@ The class of DNS data contained in this resource record.
 
 ==== dns.additionals.ttl
 
-type: int
+type: integer
 
 The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
 
@@ -638,14 +638,39 @@ The time interval in seconds that this resource record may be cached before it s
 The data describing the resource. The meaning of this data depends on the type and class of the resource record.
 
 
-=== amqp Fields
+==== dns.opt.version
+
+example: 0
+
+The EDNS version.
+
+==== dns.opt.do
+
+type: boolean
+
+If set, the transaction uses DNSSEC.
+
+==== dns.opt.ext_rcode
+
+example: BADVERS
+
+Extended response code field.
+
+==== dns.opt.udp_size
+
+type: integer
+
+Requestor's UDP payload size (in bytes).
+
+[[exported-fields-amqp]]
+=== AMQP Fields
 
 AMQP specific event fields.
 
 
 ==== amqp.reply-code
 
-type: int
+type: integer
 
 example: 404
 
@@ -661,14 +686,14 @@ Text explaining the error.
 
 ==== amqp.class-id
 
-type: int
+type: integer
 
 Failing method class.
 
 
 ==== amqp.method-id
 
-type: int
+type: integer
 
 Failing method ID.
 
@@ -691,35 +716,35 @@ Exchange type.
 
 ==== amqp.passive
 
-type: bool
+type: boolean
 
 If set, do not create exchange/queue.
 
 
 ==== amqp.durable
 
-type: bool
+type: boolean
 
 If set, request a durable exchange/queue.
 
 
 ==== amqp.exclusive
 
-type: bool
+type: boolean
 
 If set, request an exclusive queue.
 
 
 ==== amqp.auto-delete
 
-type: bool
+type: boolean
 
 If set, auto-delete queue when unused.
 
 
 ==== amqp.no-wait
 
-type: bool
+type: boolean
 
 If set, the server will not respond to the method.
 
@@ -731,56 +756,56 @@ Identifier for the consumer, valid within the current channel.
 
 ==== amqp.delivery-tag
 
-type: int
+type: integer
 
 The server-assigned and channel-specific delivery tag.
 
 
 ==== amqp.message-count
 
-type: int
+type: integer
 
 The number of messages in the queue, which will be zero for newly-declared queues.
 
 
 ==== amqp.consumer-count
 
-type: int
+type: integer
 
 The number of consumers of a queue.
 
 
 ==== amqp.routing-key
 
-type: int
+type: integer
 
 Message routing key.
 
 
 ==== amqp.no-ack
 
-type: bool
+type: boolean
 
 If set, the server does not expect acknowledgements for messages.
 
 
 ==== amqp.no-local
 
-type: bool
+type: boolean
 
 If set, the server will not send messages to the connection that published them.
 
 
 ==== amqp.if-unused
 
-type: bool
+type: boolean
 
 Delete only if unused.
 
 
 ==== amqp.if-empty
 
-type: bool
+type: boolean
 
 Delete only if empty.
 
@@ -794,33 +819,35 @@ The queue name identifies the queue within the vhost.
 
 ==== amqp.redelivered
 
-type: bool
+type: boolean
 
 Indicates that the message has been previously delivered to this or another client.
 
 
 ==== amqp.multiple
 
-type: bool
+type: boolean
 
 Acknowledge multiple messages.
 
 
-==== amqp.arguments.*
+==== amqp.arguments
+
+type: dict
 
 Optional additional arguments passed to some methods. Can be of various types.
 
 
 ==== amqp.mandatory
 
-type: bool
+type: boolean
 
 Indicates mandatory routing.
 
 
 ==== amqp.immediate
 
-type: bool
+type: boolean
 
 Request immediate delivery.
 
@@ -841,21 +868,23 @@ type: keyword
 MIME content encoding.
 
 
-==== amqp.headers.*
+==== amqp.headers
+
+type: dict
 
 Message header field table.
 
 
 ==== amqp.delivery-mode
 
-type: int
+type: integer
 
 Non-persistent (1) or persistent (2).
 
 
 ==== amqp.priority
 
-type: int
+type: integer
 
 Message priority, 0 to 9.
 
@@ -950,7 +979,7 @@ A map containing the captured header fields from the response. Which headers to 
 
 ==== http.content_length
 
-type: int
+type: long
 
 The value of the Content-Length header if present.
 
@@ -1026,35 +1055,35 @@ The binary protocol message opcode name.
 
 ==== memcache.request.opcode_value
 
-type: int
+type: integer
 
 The binary protocol message opcode value.
 
 
 ==== memcache.response.opcode_value
 
-type: int
+type: integer
 
 The binary protocol message opcode value.
 
 
 ==== memcache.request.opaque
 
-type: int
+type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
 ==== memcache.response.opaque
 
-type: int
+type: integer
 
 The binary protocol opaque header value used for correlating request with response messages.
 
 
 ==== memcache.request.vbucket
 
-type: int
+type: integer
 
 The vbucket index sent in the binary message.
 
@@ -1068,7 +1097,7 @@ The textual representation of the response error code (binary protocol only).
 
 ==== memcache.response.status_code
 
-type: int
+type: integer
 
 The status code value returned in the response (binary protocol only).
 
@@ -1089,14 +1118,14 @@ The list of keys returned for the load command (if present).
 
 ==== memcache.request.count_values
 
-type: int
+type: integer
 
 The number of values found in the memcache request message. If the command does not send any data, this field is missing.
 
 
 ==== memcache.response.count_values
 
-type: int
+type: integer
 
 The number of values found in the memcache response message. If the command does not send any data, this field is missing.
 
@@ -1117,35 +1146,35 @@ The list of base64 encoded values sent with the response (if present).
 
 ==== memcache.request.bytes
 
-type: int
+type: long
 
 The byte count of the values being transfered.
 
 
 ==== memcache.response.bytes
 
-type: int
+type: long
 
 The byte count of the values being transfered.
 
 
 ==== memcache.request.delta
 
-type: int
+type: integer
 
 The counter increment/decrement delta value.
 
 
 ==== memcache.request.initial
 
-type: int
+type: integer
 
 The counter increment/decrement initial value parameter (binary protocol only).
 
 
 ==== memcache.request.verbosity
 
-type: int
+type: integer
 
 The value of the memcache "verbosity" command.
 
@@ -1159,14 +1188,14 @@ The text protocol raw arguments for the "stats ..." and "lru crawl ..." commands
 
 ==== memcache.request.source_class
 
-type: int
+type: integer
 
 The source class id in 'slab reassign' command.
 
 
 ==== memcache.request.dest_class
 
-type: int
+type: integer
 
 The destination class id in 'slab reassign' command.
 
@@ -1180,63 +1209,63 @@ The automove mode in the 'slab automove' command expressed as a string. This val
 
 ==== memcache.request.flags
 
-type: int
+type: long
 
 The memcache command flags sent in the request (if present).
 
 
 ==== memcache.response.flags
 
-type: int
+type: long
 
 The memcache message flags sent in the response (if present).
 
 
 ==== memcache.request.exptime
 
-type: int
+type: integer
 
 The data expiry time in seconds sent with the memcache command (if present). If the value is <30 days, the expiry time is relative to "now", or else it is an absolute Unix time in seconds (32-bit).
 
 
 ==== memcache.request.sleep_us
 
-type: int
+type: long
 
 The sleep setting in microseconds for the 'lru_crawler sleep' command.
 
 
 ==== memcache.response.value
 
-type: int
+type: long
 
 The counter value returned by a counter operation.
 
 
 ==== memcache.request.noreply
 
-type: bool
+type: boolean
 
 Set to true if noreply was set in the request. The `memcache.response` field will be missing.
 
 
 ==== memcache.request.quiet
 
-type: bool
+type: boolean
 
 Set to true if the binary protocol message is to be treated as a quiet message.
 
 
 ==== memcache.request.cas_unique
 
-type: int
+type: long
 
 The CAS (compare-and-swap) identifier if present.
 
 
 ==== memcache.response.cas_unique
 
-type: int
+type: long
 
 The CAS (compare-and-swap) identifier to be used with CAS-based updates (if present).
 
@@ -1263,14 +1292,14 @@ MySQL-specific event fields.
 
 ==== mysql.iserror
 
-type: bool
+type: boolean
 
 If the MySQL query returns an error, this field is set to true.
 
 
 ==== mysql.affected_rows
 
-type: int
+type: integer
 
 If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
@@ -1297,7 +1326,7 @@ The row mysql query as read from the transaction's request.
 
 ==== mysql.error_code
 
-type: int
+type: integer
 
 The error code returned by MySQL.
 
@@ -1320,14 +1349,14 @@ The row pgsql query as read from the transaction's request.
 
 ==== pgsql.iserror
 
-type: bool
+type: boolean
 
 If the PgSQL query returns an error, this field is set to true.
 
 
 ==== pgsql.error_code
 
-type: int
+type: integer
 
 The PostgreSQL error code.
 
@@ -1410,21 +1439,21 @@ The full collection name. The full collection name is the concatenation of the d
 
 ==== mongodb.numberToSkip
 
-type: number
+type: integer
 
 Sets the number of documents to omit - starting from the first document in the resulting dataset - when returning the result of the query.
 
 
 ==== mongodb.numberToReturn
 
-type: number
+type: integer
 
 The requested maximum number of documents to be returned.
 
 
 ==== mongodb.numberReturned
 
-type: number
+type: integer
 
 The number of documents in the reply.
 
@@ -1470,13 +1499,13 @@ RPC message transaction identifier.
 
 ==== rpc.call_size
 
-type: number
+type: integer
 
 RPC call size with argument.
 
 ==== rpc.reply_size
 
-type: number
+type: integer
 
 RPC reply size with argument.
 
@@ -1486,7 +1515,7 @@ RPC message reply status.
 
 ==== rpc.time
 
-type: number
+type: long
 
 RPC message processing time.
 
@@ -1500,13 +1529,13 @@ RPC authentication flavor.
 
 ==== rpc.cred.uid
 
-type: number
+type: integer
 
 RPC caller's user id, in case of auth-unix.
 
 ==== rpc.cred.gid
 
-type: number
+type: integer
 
 RPC caller's group id, in case of auth-unix.
 
@@ -1516,7 +1545,7 @@ RPC caller's secondary group ids, in case of auth-unix.
 
 ==== rpc.cred.stamp
 
-type: number
+type: integer
 
 Arbitrary ID which the caller machine may generate.
 
@@ -1532,13 +1561,13 @@ NFS v4/3 specific event fields.
 
 ==== nfs.version
 
-type: number
+type: integer
 
 NFS protocol version number.
 
 ==== nfs.minor_version
 
-type: number
+type: integer
 
 NFS protocol minor version number.
 
@@ -1564,63 +1593,63 @@ These fields contain measurements related to the transaction.
 
 ==== responsetime
 
-type: int
+type: long
 
 The wall clock time it took to complete the transaction. The precision is in milliseconds.
 
 
 ==== cpu_time
 
-type: int
+type: long
 
 The CPU time it took to complete the transaction.
 
 ==== bytes_in
 
-type: int
+type: long
 
 The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
 ==== bytes_out
 
-type: int
+type: long
 
 The number of bytes of the response. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 
 
 ==== dnstime
 
-type: int
+type: long
 
 The time it takes to query the name server for a given request. This is typically used for RUM (real-user-monitoring) but can also have values for server-to-server communication when DNS is used for service discovery. The precision is in microseconds.
 
 
 ==== connecttime
 
-type: int
+type: long
 
 The time it takes for the TCP connection to be established for the given transaction. The precision is in microseconds.
 
 
 ==== loadtime
 
-type: int
+type: long
 
 The time it takes for the content to be loaded. This is typically used for RUM (real-user-monitoring) but it can make sense in other cases as well. The precision is in microseconds.
 
 
 ==== domloadtime
 
-type: int
+type: long
 
 In RUM (real-user-monitoring), the total time it takes for the DOM to be loaded. In terms of the W3 Navigation Timing API, this is the difference between `domContentLoadedEnd` and `domContentLoadedStart`.
 
 
-[[exported-fields-trans_env]]
-=== Environmental (Transactions) Fields
+[[exported-fields-env]]
+=== Environmental Fields
 
-These fields contain data about the environment in which the transaction was captured.
+These fields contain data about the environment in which the transaction or flow was captured.
 
 
 
@@ -1726,26 +1755,11 @@ The software release of the service serving the transaction. This can be the com
 Arbitrary tags that can be set per Beat and per transaction type.
 
 
-[[exported-fields-flows_env]]
-=== Environmental (Flows) Fields
+==== fields
 
-These fields contain data about the environment in which the flow data was captured.
+type: dict
 
-
-
-==== beat.name
-
-Name of the Beat sending the events. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
-
-
-==== beat.hostname
-
-The hostname as returned by the operating system on which the Beat is running.
-
-
-==== tags
-
-Arbitrary tags that can be set per Beat and per transaction type.
+Contains user configurable fields.
 
 
 [[exported-fields-raw]]

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/stretchr/testify/assert"
@@ -72,7 +73,7 @@ func esConnect(t *testing.T, index string) *esConnection {
 
 	username := os.Getenv("ES_USER")
 	password := os.Getenv("ES_PASS")
-	client := elasticsearch.NewClient(host, "", nil, nil, username, password, nil)
+	client := elasticsearch.NewClient(host, "", nil, nil, username, password, nil, nil)
 
 	// try to drop old index if left over from failed test
 	_, _, _ = client.Delete(index, "", "", nil) // ignore error
@@ -353,9 +354,9 @@ func testSendMultipleBatchesViaLogstash(
 	}
 
 	for _, batch := range batches {
-		sig := outputs.NewSyncSignal()
+		sig := op.NewSignalChannel()
 		ls.BulkPublish(sig, testOptions, batch)
-		ok := sig.Wait()
+		ok := sig.Wait() == op.SignalCompleted
 		assert.Equal(t, true, ok)
 	}
 

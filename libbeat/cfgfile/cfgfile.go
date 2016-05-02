@@ -6,10 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Command line flags.
@@ -67,7 +65,10 @@ func Load(path string) (*common.Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s: %v", path, err)
 	}
-	fileContent = expandEnv(fileContent)
+	fileContent, err = expandEnv(filepath.Base(path), fileContent)
+	if err != nil {
+		return nil, err
+	}
 
 	config, err := common.NewConfigWithYAML(fileContent, path)
 	if err != nil {
@@ -80,90 +81,4 @@ func Load(path string) (*common.Config, error) {
 // IsTestConfig returns whether or not this is configuration used for testing
 func IsTestConfig() bool {
 	return *testConfig
-}
-
-// expandEnv replaces ${var} in config according to the values of the current
-// environment variables. The replacement is case-sensitive. References to
-// undefined variables are replaced by the empty string. A default value can be
-// given by using the form ${var:default value}.
-func expandEnv(config []byte) []byte {
-	return []byte(expand(string(config), func(key string) string {
-		keyAndDefault := strings.SplitN(key, ":", 2)
-		key = keyAndDefault[0]
-
-		v := os.Getenv(key)
-		if v == "" && len(keyAndDefault) == 2 {
-			// Set value to the default.
-			v = keyAndDefault[1]
-			logp.Info("Replacing config environment variable '${%s}' with "+
-				"default '%s'", key, keyAndDefault[1])
-		} else {
-			logp.Info("Replacing config environment variable '${%s}' with '%s'",
-				key, v)
-		}
-
-		return v
-	}))
-}
-
-// The following methods were copied from the os package of the stdlib. The
-// expand method was modified to only expand variables defined with braces and
-// ignore $var.
-
-// Expand replaces ${var} in the string based on the mapping function.
-func expand(s string, mapping func(string) string) string {
-	buf := make([]byte, 0, 2*len(s))
-	// ${} is all ASCII, so bytes are fine for this operation.
-	i := 0
-	for j := 0; j < len(s); j++ {
-		if s[j] == '$' && j+2 < len(s) && s[j+1] == '{' {
-			buf = append(buf, s[i:j]...)
-			name, w := getShellName(s[j+1:])
-			buf = append(buf, mapping(name)...)
-			j += w
-			i = j + 1
-		}
-	}
-	return string(buf) + s[i:]
-}
-
-// isShellSpecialVar reports whether the character identifies a special
-// shell variable such as $*.
-func isShellSpecialVar(c uint8) bool {
-	switch c {
-	case '*', '#', '$', '@', '!', '?', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-		return true
-	}
-	return false
-}
-
-// isAlphaNum reports whether the byte is an ASCII letter, number, or underscore
-func isAlphaNum(c uint8) bool {
-	return c == '_' || '0' <= c && c <= '9' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'
-}
-
-// getShellName returns the name that begins the string and the number of bytes
-// consumed to extract it.  If the name is enclosed in {}, it's part of a ${}
-// expansion and two more bytes are needed than the length of the name.
-func getShellName(s string) (string, int) {
-	switch {
-	case s[0] == '{':
-		if len(s) > 2 && isShellSpecialVar(s[1]) && s[2] == '}' {
-			return s[1:2], 3
-		}
-		// Scan to closing brace
-		for i := 1; i < len(s); i++ {
-			if s[i] == '}' {
-				return s[1:i], i + 1
-			}
-		}
-		return "", 1 // Bad syntax; just eat the brace.
-	case isShellSpecialVar(s[0]):
-		return s[0:1], 1
-	}
-	// Scan alphanumerics.
-	var i int
-	for i = 0; i < len(s) && isAlphaNum(s[i]); i++ {
-	}
-	return s[:i], i
 }

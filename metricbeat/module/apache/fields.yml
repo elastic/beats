@@ -1,0 +1,5 @@
+apache:
+  type: group
+  description: >
+    Apache HTTPD server metrics collected from the mod_status module.
+  fields:

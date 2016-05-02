@@ -25,8 +25,8 @@ import (
 type Harvester struct {
 	Path               string /* the file path to harvest */
 	Config             *config.HarvesterConfig
-	Offset             int64
-	Stat               *FileStat
+	offset             int64
+	Stat               *input.FileStat
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
 	file               FileSource /* the file being watched */
@@ -37,7 +37,7 @@ type Harvester struct {
 func NewHarvester(
 	cfg *config.HarvesterConfig,
 	path string,
-	stat *FileStat,
+	stat *input.FileStat,
 	spooler chan *input.FileEvent,
 ) (*Harvester, error) {
 
@@ -67,6 +67,5 @@ func NewHarvester(
 
 func (h *Harvester) Start() {
 	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-
 	go h.Harvest()
 }

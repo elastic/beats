@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
@@ -161,6 +162,7 @@ func TestLogstashTCP(t *testing.T) {
 	// create lumberjack output client
 	config := map[string]interface{}{
 		"hosts":   []string{server.Addr()},
+		"index":   testLogstashIndex("logstash-conn-tcp"),
 		"timeout": 2,
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
@@ -176,6 +178,7 @@ func TestLogstashTLS(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-conn-tls"),
 		"timeout":                     2,
 		"tls.certificate_authorities": []string{certName + ".pem"},
 	}
@@ -192,6 +195,7 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-conn-tls-invalid"),
 		"timeout":                     2,
 		"max_retries":                 1,
 		"tls.insecure":                true,
@@ -251,12 +255,12 @@ func testConnectionType(
 		output := makeOutputer()
 		t.Logf("new outputter: %v", output)
 
-		signal := outputs.NewSyncSignal()
+		signal := op.NewSignalChannel()
 		t.Log("publish event")
 		output.PublishEvent(signal, testOptions, testEvent())
 
 		t.Log("wait signal")
-		result.signal = signal.Wait()
+		result.signal = signal.Wait() == op.SignalCompleted
 	}()
 
 	// wait shutdown
@@ -289,6 +293,7 @@ func TestLogstashInvalidTLS(t *testing.T) {
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
+		"index":                       testLogstashIndex("logstash-tls-invalid"),
 		"timeout":                     1,
 		"max_retries":                 0,
 		"tls.certificate_authorities": []string{certName + ".pem"},
@@ -329,9 +334,9 @@ func TestLogstashInvalidTLS(t *testing.T) {
 
 		output := newTestLumberjackOutput(t, "", config)
 
-		signal := outputs.NewSyncSignal()
+		signal := op.NewSignalChannel()
 		output.PublishEvent(signal, testOptions, testEvent())
-		result.signal = signal.Wait()
+		result.signal = signal.Wait() == op.SignalCompleted
 	}()
 
 	// wait shutdown

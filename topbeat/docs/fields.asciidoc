@@ -51,6 +51,18 @@ Name of the Beat sending the events. If the shipper name is set in the configura
 The hostname as returned by the operating system on which the Beat is running.
 
 
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
 [[exported-fields-system]]
 === System-Wide Statistics Fields
 
@@ -94,7 +106,7 @@ This group contains statistics related to CPU usage.
 
 ==== cpu.user
 
-type: int
+type: long
 
 The amount of CPU time spent in user space.
 
@@ -108,14 +120,14 @@ The percentage of CPU time spent in user space. On multi-core systems, you can h
 
 ==== cpu.nice
 
-type: int
+type: long
 
 The amount of CPU time spent on low-priority processes.
 
 
 ==== cpu.system
 
-type: int
+type: long
 
 The amount of CPU time spent in kernel space.
 
@@ -129,34 +141,34 @@ The percentage of CPU time spent in kernel space.
 
 ==== cpu.idle
 
-type: int
+type: long
 
 The amount of CPU time spent idle.
 
 
 ==== cpu.iowait
 
-type: int
+type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
 ==== cpu.irq
 
-type: int
+type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
 ==== cpu.softirq
 
-type: int
+type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
 ==== cpu.steal
 
-type: int
+type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -175,7 +187,7 @@ This group contains CPU usage statistics of the core X, where 0<X<N and N is the
 
 ==== cpus.cpuX.user
 
-type: int
+type: long
 
 The amount of CPU time spent in user space on core X.
 
@@ -189,14 +201,14 @@ The percentage of CPU time spent in user space on core X.
 
 ==== cpus.cpuX.nice
 
-type: int
+type: long
 
 The amount of CPU time spent on low-priority processes on core X.
 
 
 ==== cpus.cpuX.system
 
-type: int
+type: long
 
 The amount of CPU time spent in kernel space on core X.
 
@@ -210,27 +222,27 @@ The percentage of CPU time spent in kernel space on core X.
 
 ==== cpus.cpuX.idle
 
-type: int
+type: long
 
 The amount of CPU time spent idle on core X.
 
 
 ==== cpus.cpuX.iowait
 
-type: int
+type: long
 
 The amount of CPU time spent in wait (on disk) on core X.
 
 
 ==== cpus.cpuX.softirq
 
-type: int
+type: long
 
 The amount of CPU time spent servicing and handling software interrupts on core X.
 
 ==== cpus.cpuX.steal
 
-type: int
+type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
@@ -243,21 +255,21 @@ This group contains statistics related to the memory usage on the system.
 
 ==== mem.total
 
-type: int
+type: long
 
 Total memory.
 
 
 ==== mem.used
 
-type: int
+type: long
 
 Used memory.
 
 
 ==== mem.free
 
-type: int
+type: long
 
 Available memory.
 
@@ -271,14 +283,14 @@ The percentage of used memory.
 
 ==== mem.actual_used
 
-type: int
+type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
 ==== mem.actual_free
 
-type: int
+type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
@@ -298,21 +310,21 @@ This group contains statistics related to the swap memory usage on the system.
 
 ==== swap.total
 
-type: int
+type: long
 
 Total swap memory.
 
 
 ==== swap.used
 
-type: int
+type: long
 
 Used swap memory.
 
 
 ==== swap.free
 
-type: int
+type: long
 
 Available swap memory.
 
@@ -354,14 +366,14 @@ The process state. For example: "running"
 
 ==== proc.pid
 
-type: int
+type: integer
 
 The process pid.
 
 
 ==== proc.ppid
 
-type: int
+type: integer
 
 The process parent pid.
 
@@ -388,7 +400,7 @@ CPU-specific statistics per process.
 
 ==== proc.cpu.user
 
-type: int
+type: long
 
 The amount of CPU time the process spent in user space.
 
@@ -402,14 +414,14 @@ The percentage of CPU time spent by the process since the last update. Its value
 
 ==== proc.cpu.system
 
-type: int
+type: long
 
 The amount of CPU time the process spent in kernel space.
 
 
 ==== proc.cpu.total
 
-type: int
+type: long
 
 The total CPU time spent by the process.
 
@@ -429,14 +441,14 @@ Memory-specific statistics per process.
 
 ==== proc.mem.size
 
-type: int
+type: long
 
 The total virtual memory the process has.
 
 
 ==== proc.mem.rss
 
-type: int
+type: long
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
@@ -450,7 +462,7 @@ The percentage of memory the process occupied in main memory (RAM).
 
 ==== proc.mem.share
 
-type: int
+type: long
 
 The shared memory the process uses.
 
@@ -471,7 +483,7 @@ Contains details about the mounted disks, such as the total or used disk space, 
 
 ==== fs.avail
 
-type: int
+type: long
 
 The available disk space in bytes.
 
@@ -492,28 +504,28 @@ The mounting point. For example: `/`
 
 ==== fs.files
 
-type: int
+type: long
 
 The total number of file nodes in the file system.
 
 
 ==== fs.free_files
 
-type: int
+type: long
 
 The number of free file nodes in the file system.
 
 
 ==== fs.total
 
-type: int
+type: long
 
 The total disk space in bytes.
 
 
 ==== fs.used
 
-type: int
+type: long
 
 The used disk space in bytes.
 

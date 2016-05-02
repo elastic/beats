@@ -12,6 +12,8 @@ include::./gettingstarted.asciidoc[]
 
 include::./command-line.asciidoc[]
 
+include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+
 include::./configuring-howto.asciidoc[]
 
 include::./topbeat-filtering.asciidoc[]
@@ -22,7 +24,11 @@ include::./configuring-logstash.asciidoc[]
 
 include::../../libbeat/docs/shared-env-vars.asciidoc[]
 
+include::./securing-topbeat.asciidoc[]
+
 include::../../libbeat/docs/https.asciidoc[]
+
+include::../../libbeat/docs/shared-tls-logstash-config.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 

@@ -40,7 +40,8 @@ type testDriverCommand struct {
 }
 
 func newLumberjackTestClient(conn *transport.Client) *client {
-	c, err := newLumberjackClient(conn, 3, testMaxWindowSize, 100*time.Millisecond)
+	c, err := newLumberjackClient(conn, 3,
+		testMaxWindowSize, 100*time.Millisecond, "test")
 	if err != nil {
 		panic(err)
 	}
@@ -95,7 +96,7 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	defer transp.Close()
 	defer sock.Close()
 
-	event := common.MapStr{"name": "me", "line": 10}
+	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 	client.Publish([]common.MapStr{event})
 
 	// receive window message
@@ -135,6 +136,7 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	defer sock.Close()
 
 	event := common.MapStr{
+		"type": "test",
 		"name": "test",
 		"struct": common.MapStr{
 			"field1": 1,
@@ -189,6 +191,7 @@ func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
 	defer client.Stop()
 
 	client.Publish([]common.MapStr{common.MapStr{
+		"type":    "test",
 		"message": "hello world",
 	}})
 
@@ -213,7 +216,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	defer transp.Close()
 	defer client.Stop()
 
-	event := common.MapStr{"name": "me", "line": 10}
+	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 
 	for i := 0; i < N; i++ {
 		await := server.Await()

@@ -1,0 +1,5 @@
+redis:
+  type: group
+  description: >
+    Redis metrics collected from the Redis `INFO` command.
+  fields:

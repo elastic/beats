@@ -42,60 +42,6 @@ func TestMetricSetTwoInstances(t *testing.T) {
 	assert.Equal(t, 1, event["counter"])
 }
 
-func TestApplySelectorEmpty(t *testing.T) {
-	event := common.MapStr{
-		"hello": "world",
-	}
-
-	newEvent := applySelector(event, []string{})
-
-	assert.Equal(t, event, newEvent)
-}
-
-func TestApplySelectorOne(t *testing.T) {
-	event := common.MapStr{
-		"hello": "world",
-		"test":  "value",
-	}
-
-	newEvent := applySelector(event, []string{"hello"})
-
-	assert.Equal(t, common.MapStr{"hello": "world"}, newEvent)
-}
-
-func TestApplySelectorNotExistant(t *testing.T) {
-	event := common.MapStr{
-		"hello": "world",
-		"test":  "value",
-		"cpu":   100,
-	}
-
-	newEvent := applySelector(event, []string{"hello", "notexistant"})
-
-	assert.Equal(t, common.MapStr{"hello": "world"}, newEvent)
-}
-
-func TestApplySelectorTwoNested(t *testing.T) {
-	event := common.MapStr{
-		"cpu": common.MapStr{
-			"p0": 100,
-		},
-		"test": "value",
-		"disk": common.MapStr{
-			"hd": "not available",
-		},
-	}
-
-	newEvent := applySelector(event, []string{"test", "disk"})
-
-	assert.Equal(t, common.MapStr{
-		"test": "value",
-		"disk": common.MapStr{
-			"hd": "not available",
-		},
-	}, newEvent)
-}
-
 func TestCreateEvent(t *testing.T) {
 	module := &Module{}
 	metricSet, _ := NewMetricSet("mockmetricset1", NewMockMetricSeter, module)

@@ -18,7 +18,7 @@ type ProspectorLog struct {
 	iteration      uint32
 	lastscan       time.Time
 	missingFiles   map[string]os.FileInfo
-	prospectorList map[string]harvester.FileStat
+	harvesterStats map[string]input.FileStat
 	config         cfg.ProspectorConfig
 }
 
@@ -31,25 +31,25 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	}
 
 	// Init File Stat list
-	prospectorer.prospectorList = make(map[string]harvester.FileStat)
+	prospectorer.harvesterStats = make(map[string]input.FileStat)
 
 	return prospectorer, nil
 }
 
-func (p ProspectorLog) Init() {
+func (p *ProspectorLog) Init() {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 	p.scan()
 }
 
-func (p ProspectorLog) Run() {
+func (p *ProspectorLog) Run() {
 
 	logp.Debug("prospector", "Start next scan")
 	p.scan()
 
 	// Clear out files that disappeared and we've stopped harvesting
-	for file, lastinfo := range p.prospectorList {
+	for file, lastinfo := range p.harvesterStats {
 		if lastinfo.Finished() && lastinfo.LastIteration < p.iteration {
-			delete(p.prospectorList, file)
+			delete(p.harvesterStats, file)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (p ProspectorLog) Run() {
 }
 
 // Scan starts a scanGlob for each provided path/glob
-func (p ProspectorLog) scan() {
+func (p *ProspectorLog) scan() {
 
 	newlastscan := time.Now()
 
@@ -74,7 +74,7 @@ func (p ProspectorLog) scan() {
 
 // Scans the specific path which can be a glob (/**/**/*.log)
 // For all found files it is checked if a harvester should be started
-func (p ProspectorLog) scanGlob(glob string) {
+func (p *ProspectorLog) scanGlob(glob string) {
 
 	logp.Debug("prospector", "scan path %s", glob)
 
@@ -112,12 +112,12 @@ func (p ProspectorLog) scanGlob(glob string) {
 		}
 
 		// Check the current info against p.prospectorinfo[file]
-		lastinfo, isKnown := p.prospectorList[file]
+		lastinfo, isKnown := p.harvesterStats[file]
 
 		oldFile := input.NewFile(lastinfo.Fileinfo)
 
 		// Create a new prospector info with the stat info for comparison
-		newInfo := harvester.NewFileStat(newFile.FileInfo, p.iteration)
+		newInfo := input.NewFileStat(newFile.FileInfo, p.iteration)
 
 		// Init harvester with info
 		h, err := p.Prospector.AddHarvester(file, newInfo)
@@ -139,13 +139,13 @@ func (p ProspectorLog) scanGlob(glob string) {
 
 		// Track the stat data for this file for later comparison to check for
 		// rotation/etc
-		p.prospectorList[h.Path] = *h.Stat
+		p.harvesterStats[h.Path] = *h.Stat
 	}
 }
 
 // Check if harvester for new file has to be started
 // For a new file the following options exist:
-func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
+func (p *ProspectorLog) checkNewFile(h *harvester.Harvester) {
 
 	logp.Debug("prospector", "Start harvesting unknown file: %s", h.Path)
 
@@ -179,7 +179,7 @@ func (p ProspectorLog) checkNewFile(h *harvester.Harvester) {
 
 // checkOldFile returns true if the given file is currently not harvested
 // and the last time was modified before ignore_older
-func (p ProspectorLog) checkOldFile(h *harvester.Harvester) bool {
+func (p *ProspectorLog) checkOldFile(h *harvester.Harvester) bool {
 
 	// Resuming never needed if ignore_older disabled
 	if p.config.IgnoreOlderDuration == 0 {
@@ -208,7 +208,7 @@ func (p ProspectorLog) checkOldFile(h *harvester.Harvester) bool {
 // * The new file is not the same as the old file, means file was renamed
 // ** New file is actually really a new file, start a new harvester
 // ** Renamed file has a state, continue there
-func (p ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.File, oldFile *input.File) {
+func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.File, oldFile *input.File) {
 
 	logp.Debug("prospector", "Update existing file for harvesting: %s", h.Path)
 
@@ -238,7 +238,7 @@ func (p ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.
 		// Resume harvesting of an old file we've stopped harvesting from
 		// Start a harvester on the path; a file was just modified and it doesn't have a harvester
 		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
-		p.resumeHarvesting(h, <-h.Stat.Return)
+		p.resumeHarvesting(h, <-h.Stat.Offset)
 	} else {
 		logp.Debug("prospector", "Not harvesting, file didn't change: %s", h.Path)
 	}
@@ -247,27 +247,30 @@ func (p ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.
 // Continue reading on an existing file.
 // The given file was renamed from another file we know -> The same harvester channel is linked as the old file
 // The file param is only used for logging
-func (p ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFile string) {
+func (p *ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFile string) {
 	logp.Debug("prospector", "Launching harvester on renamed file. File rename was detected: %s -> %s", previousFile, h.Path)
 
-	lastinfo := p.prospectorList[previousFile]
+	lastinfo := p.harvesterStats[previousFile]
 	h.Stat.Continue(&lastinfo)
+
+	// Update state because of file rotation
+	h.UpdateState()
 }
 
 // Start / resume harvester with a predefined offset
-func (p ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
+func (p *ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
 
 	logp.Debug("prospector", "Start / resuming harvester of file: %s", h.Path)
-	h.Offset = offset
+	h.SetOffset(offset)
 	h.Start()
 }
 
 // Check if the given file was renamed. If file is known but with different path,
 // the previous file path will be returned. If no file is found, an error
 // will be returned.
-func (p ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, error) {
+func (p *ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, error) {
 
-	for path, pFileStat := range p.prospectorList {
+	for path, pFileStat := range p.harvesterStats {
 		if path == file {
 			continue
 		}
@@ -288,7 +291,7 @@ func (p ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, e
 	return "", fmt.Errorf("No previous file found")
 }
 
-func (p ProspectorLog) isFileExcluded(file string) bool {
+func (p *ProspectorLog) isFileExcluded(file string) bool {
 
 	if len(p.config.ExcludeFilesRegexp) > 0 {
 

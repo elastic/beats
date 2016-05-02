@@ -6,20 +6,170 @@
       },
       "dynamic_templates": [
         {
-          "template1": {
+          "fields": {
             "mapping": {
-              "doc_values": true,
               "ignore_above": 1024,
-              "index": true,
               "type": "keyword"
             },
-            "match_mapping_type": "string"
+            "match_mapping_type": "string",
+            "path_match": "fields.*"
           }
         }
       ],
       "properties": {
         "@timestamp": {
           "type": "date"
+        },
+        "apache-status": {
+          "properties": {
+            "busyWorkers": {
+              "type": "integer"
+            },
+            "bytesPerReq": {
+              "type": "float"
+            },
+            "bytesPerSec": {
+              "type": "float"
+            },
+            "connections": {
+              "properties": {
+                "connsAsyncClosing": {
+                  "type": "integer"
+                },
+                "connsAsyncKeepAlive": {
+                  "type": "integer"
+                },
+                "connsAsyncWriting": {
+                  "type": "integer"
+                },
+                "connsTotal": {
+                  "type": "integer"
+                }
+              }
+            },
+            "cpu": {
+              "properties": {
+                "cpuChildrenSystem": {
+                  "type": "float"
+                },
+                "cpuChildrenUser": {
+                  "type": "float"
+                },
+                "cpuLoad": {
+                  "type": "float"
+                },
+                "cpuSystem": {
+                  "type": "float"
+                },
+                "cpuUser": {
+                  "type": "float"
+                }
+              }
+            },
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "idleWorkers": {
+              "type": "integer"
+            },
+            "load": {
+              "properties": {
+                "load1": {
+                  "type": "float"
+                },
+                "load15": {
+                  "type": "float"
+                },
+                "load5": {
+                  "type": "float"
+                }
+              }
+            },
+            "reqPerSec": {
+              "type": "float"
+            },
+            "scoreboard": {
+              "properties": {
+                "closingConnection": {
+                  "type": "integer"
+                },
+                "dnsLookup": {
+                  "type": "integer"
+                },
+                "gracefullyFinishing": {
+                  "type": "integer"
+                },
+                "idleCleanup": {
+                  "type": "integer"
+                },
+                "keepalive": {
+                  "type": "integer"
+                },
+                "logging": {
+                  "type": "integer"
+                },
+                "openSlot": {
+                  "type": "integer"
+                },
+                "readingRequest": {
+                  "type": "integer"
+                },
+                "sendingReply": {
+                  "type": "integer"
+                },
+                "startingUp": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "waitingForConnection": {
+                  "type": "integer"
+                }
+              }
+            },
+            "totalAccesses": {
+              "type": "long"
+            },
+            "totalKBytes": {
+              "type": "long"
+            },
+            "uptime": {
+              "properties": {
+                "serverUptimeSeconds": {
+                  "type": "integer"
+                },
+                "uptime": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "beat": {
+          "properties": {
+            "hostname": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "metricset": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "metricset-host": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "module": {
+          "ignore_above": 1024,
+          "type": "keyword"
         },
         "mysql-status": {
           "properties": {
@@ -36,10 +186,10 @@
             "bytes": {
               "properties": {
                 "Bytes_received": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "Bytes_sent": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }
@@ -53,13 +203,20 @@
                   "type": "integer"
                 },
                 "client_biggest_input_buf": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "client_longest_output_list": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "connected_clients": {
                   "type": "integer"
+                }
+              }
+            },
+            "cluster": {
+              "properties": {
+                "cluster_enabled": {
+                  "type": "boolean"
                 }
               }
             },
@@ -83,10 +240,98 @@
         },
         "rtt": {
           "type": "long"
+        },
+        "system-cpu": {
+          "properties": {
+            "idle": {
+              "type": "long"
+            },
+            "iowait": {
+              "type": "long"
+            },
+            "irq": {
+              "type": "long"
+            },
+            "nice": {
+              "type": "long"
+            },
+            "softirq": {
+              "type": "long"
+            },
+            "steal": {
+              "type": "long"
+            },
+            "system": {
+              "type": "long"
+            },
+            "system_p": {
+              "type": "float"
+            },
+            "user": {
+              "type": "long"
+            },
+            "user_p": {
+              "type": "float"
+            }
+          }
+        },
+        "system-memory": {
+          "properties": {
+            "mem": {
+              "properties": {
+                "actual_free": {
+                  "type": "long"
+                },
+                "actual_used": {
+                  "type": "long"
+                },
+                "actual_used_p": {
+                  "type": "float"
+                },
+                "free": {
+                  "type": "long"
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "type": "long"
+                },
+                "used_p": {
+                  "type": "float"
+                }
+              }
+            },
+            "swap": {
+              "properties": {
+                "free": {
+                  "type": "long"
+                },
+                "total": {
+                  "type": "long"
+                },
+                "used": {
+                  "type": "long"
+                },
+                "used_p": {
+                  "type": "float"
+                }
+              }
+            }
+          }
+        },
+        "tags": {
+          "ignore_above": 1024,
+          "type": "keyword"
+        },
+        "type": {
+          "ignore_above": 1024,
+          "type": "keyword"
         }
       }
     }
   },
+  "order": 0,
   "settings": {
     "index.refresh_interval": "5s"
   },

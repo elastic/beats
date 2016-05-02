@@ -5,6 +5,11 @@ SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
 
+# Metricbeat can only be cross-compiled on platforms not requiring CGO which
+# are the same platforms where the system metrics (cpu, memory) are not
+# implemented.
+GOX_OS=solaris freebsd netbsd
+
 include ../libbeat/scripts/Makefile
 
 # Collects all module dashboards
@@ -17,7 +22,7 @@ kibana:
 .PHONY: fields
 fields:
 	cat etc/fields_base.yml > etc/fields.yml
-	cat module/*/*/fields.yml >> etc/fields.yml
+	python scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
 .PHONY: docs

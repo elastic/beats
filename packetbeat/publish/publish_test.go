@@ -111,8 +111,8 @@ func TestDirectionIn(t *testing.T) {
 	assert.True(t, event["direction"] == "in")
 }
 
-func newTestPublisher(ips []string) *publisher.PublisherType {
-	p := &publisher.PublisherType{}
+func newTestPublisher(ips []string) *publisher.Publisher {
+	p := &publisher.Publisher{}
 	p.IpAddrs = ips
 	return p
 }

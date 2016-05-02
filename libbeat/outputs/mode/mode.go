@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -29,10 +30,10 @@ type ConnectionMode interface {
 
 	// PublishEvents will send all events (potentially asynchronous) to its
 	// clients.
-	PublishEvents(trans outputs.Signaler, opts outputs.Options, events []common.MapStr) error
+	PublishEvents(sig op.Signaler, opts outputs.Options, events []common.MapStr) error
 
 	// PublishEvent will send an event to its clients.
-	PublishEvent(trans outputs.Signaler, opts outputs.Options, event common.MapStr) error
+	PublishEvent(sig op.Signaler, opts outputs.Options, event common.MapStr) error
 }
 
 type Connectable interface {
@@ -81,6 +82,8 @@ type AsyncProtocolClient interface {
 	AsyncPublishEvent(cb func(error), event common.MapStr) error
 }
 
+type ClientFactory func(host string) (ProtocolClient, error)
+
 var (
 	// ErrTempBulkFailure indicates PublishEvents fail temporary to retry.
 	ErrTempBulkFailure = errors.New("temporary bulk send failure")
@@ -125,7 +128,7 @@ func NewAsyncConnectionMode(
 // outputer configuration host list and client factory function.
 func MakeClients(
 	config *common.Config,
-	newClient func(string) (ProtocolClient, error),
+	newClient ClientFactory,
 ) ([]ProtocolClient, error) {
 	hosts, err := ReadHostList(config)
 	if err != nil {
@@ -179,7 +182,6 @@ func MakeAsyncClients(
 
 func ReadHostList(cfg *common.Config) ([]string, error) {
 	config := struct {
-		Host   string   `config:"host"`
 		Hosts  []string `config:"hosts"`
 		Worker int      `config:"worker"`
 	}{
@@ -191,14 +193,7 @@ func ReadHostList(cfg *common.Config) ([]string, error) {
 		return nil, err
 	}
 
-	// TODO: remove config.Host
-	var lst []string
-	if len(config.Hosts) > 0 {
-		lst = config.Hosts
-	} else if config.Host != "" {
-		lst = []string{config.Host}
-	}
-
+	lst := config.Hosts
 	if len(lst) == 0 || config.Worker <= 1 {
 		return lst, nil
 	}

@@ -4,21 +4,28 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/paths"
 )
 
 type elasticsearchOutput struct {
 	index string
 	mode  mode.ConnectionMode
 	topology
+
+	templateContents []byte
+	templateMutex    sync.Mutex
 }
 
 func init() {
@@ -43,7 +50,7 @@ var (
 // NewOutput instantiates a new output plugin instance publishing to elasticsearch.
 func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
-		cfg.SetInt("bulk_max_size", 0, defaultBulkSize)
+		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
 	output := &elasticsearchOutput{}
@@ -68,7 +75,12 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config))
+	err = out.readTemplate(config.Template)
+	if err != nil {
+		return err
+	}
+
+	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
 	}
@@ -89,8 +101,6 @@ func (out *elasticsearchOutput) init(
 	if err != nil {
 		return err
 	}
-
-	loadTemplate(config.Template, clients)
 
 	if config.SaveTopology {
 		err := out.EnableTTL()
@@ -121,49 +131,56 @@ func (out *elasticsearchOutput) init(
 	return nil
 }
 
+// readTemplates reads the ES mapping template from the disk, if configured.
+func (out *elasticsearchOutput) readTemplate(config Template) error {
+	if len(config.Name) > 0 {
+		// Look for the template in the configuration path, if it's not absolute
+		templatePath := paths.Resolve(paths.Config, config.Path)
+
+		logp.Info("Loading template enabled. Reading template file: %v", templatePath)
+
+		var err error
+		out.templateContents, err = ioutil.ReadFile(templatePath)
+		if err != nil {
+			return fmt.Errorf("Error loading template %s: %v", templatePath, err)
+		}
+	}
+	return nil
+}
+
 // loadTemplate checks if the index mapping template should be loaded
-// In case template loading is enabled, template is written to index
-func loadTemplate(config Template, clients []mode.ProtocolClient) {
-	// Check if template should be loaded
-	// Not being able to load the template will output an error but will not stop execution
-	if config.Name != "" && len(clients) > 0 {
+// In case the template is not already loaded or overwritting is enabled, the
+// template is written to index
+func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) error {
+	out.templateMutex.Lock()
+	defer out.templateMutex.Unlock()
 
-		// Always takes the first client
-		esClient := clients[0].(*Client)
+	logp.Info("Trying to load template for client: %s", client)
 
-		logp.Info("Loading template enabled. Trying to load template: %v", config.Path)
+	// Check if template already exist or should be overwritten
+	exists := client.CheckTemplate(config.Name)
+	if !exists || config.Overwrite {
 
-		exists := esClient.CheckTemplate(config.Name)
-
-		// Check if template already exist or should be overwritten
-		if !exists || config.Overwrite {
-
-			if config.Overwrite {
-				logp.Info("Existing template will be overwritten, as overwrite is enabled.")
-			}
-
-			// Load template from file
-			content, err := ioutil.ReadFile(config.Path)
-			if err != nil {
-				logp.Err("Could not load template from file path: %s; Error: %s", config.Path, err)
-			} else {
-				reader := bytes.NewReader(content)
-				err = esClient.LoadTemplate(config.Name, reader)
-
-				if err != nil {
-					logp.Err("Could not load template: %v", err)
-				}
-			}
-		} else {
-			logp.Info("Template already exists and will not be overwritten.")
+		if config.Overwrite {
+			logp.Info("Existing template will be overwritten, as overwrite is enabled.")
 		}
 
+		reader := bytes.NewReader(out.templateContents)
+		err := client.LoadTemplate(config.Name, reader)
+		if err != nil {
+			return fmt.Errorf("Could not load template: %v", err)
+		}
+	} else {
+		logp.Info("Template already exists and will not be overwritten.")
 	}
+
+	return nil
 }
 
 func makeClientFactory(
 	tls *tls.Config,
 	config *elasticsearchConfig,
+	out *elasticsearchOutput,
 ) func(string) (mode.ProtocolClient, error) {
 	return func(host string) (mode.ProtocolClient, error) {
 		esURL, err := getURL(config.Protocol, config.Path, host)
@@ -174,15 +191,9 @@ func makeClientFactory(
 
 		var proxyURL *url.URL
 		if config.ProxyURL != "" {
-			proxyURL, err = url.Parse(config.ProxyURL)
-			if err != nil || !strings.HasPrefix(proxyURL.Scheme, "http") {
-				// Proxy was bogus. Try prepending "http://" to it and
-				// see if that parses correctly. If not, we fall
-				// through and complain about the original one.
-				proxyURL, err = url.Parse("http://" + config.ProxyURL)
-				if err != nil {
-					return nil, err
-				}
+			proxyURL, err = parseProxyURL(config.ProxyURL)
+			if err != nil {
+				return nil, err
 			}
 
 			logp.Info("Using proxy URL: %s", proxyURL)
@@ -192,10 +203,19 @@ func makeClientFactory(
 		if len(params) == 0 {
 			params = nil
 		}
+
+		// define a callback to be called on connection
+		var onConnected connectCallback
+		if len(out.templateContents) > 0 {
+			onConnected = func(client *Client) error {
+				return out.loadTemplate(config.Template, client)
+			}
+		}
+
 		client := NewClient(
 			esURL, config.Index, proxyURL, tls,
 			config.Username, config.Password,
-			params)
+			params, onConnected)
 		return client, nil
 	}
 }
@@ -205,7 +225,7 @@ func (out *elasticsearchOutput) Close() error {
 }
 
 func (out *elasticsearchOutput) PublishEvent(
-	signaler outputs.Signaler,
+	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
@@ -213,9 +233,20 @@ func (out *elasticsearchOutput) PublishEvent(
 }
 
 func (out *elasticsearchOutput) BulkPublish(
-	trans outputs.Signaler,
+	trans op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
 ) error {
 	return out.mode.PublishEvents(trans, opts, events)
+}
+
+func parseProxyURL(raw string) (*url.URL, error) {
+	url, err := url.Parse(raw)
+	if err == nil && strings.HasPrefix(url.Scheme, "http") {
+		return url, err
+	}
+
+	// Proxy was bogus. Try prepending "http://" to it and
+	// see if that parses correctly.
+	return url.Parse("http://" + raw)
 }

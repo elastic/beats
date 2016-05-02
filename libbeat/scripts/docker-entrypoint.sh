@@ -63,7 +63,6 @@ waitForElasticsearch() {
       return 0
     fi
 
-    ((i++))
     echo -n '.'
     sleep 1
   done

@@ -9,6 +9,8 @@ type tagOptions struct {
 	squash bool
 }
 
+var noTagOpts = tagOptions{}
+
 func parseTags(tag string) (string, tagOptions) {
 	s := strings.Split(tag, ",")
 	opts := tagOptions{}
@@ -101,4 +103,52 @@ func pointerize(t, base reflect.Type, v reflect.Value) reflect.Value {
 		}
 	}
 	return v
+}
+
+func isInt(k reflect.Kind) bool {
+	switch k {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isUint(k reflect.Kind) bool {
+	switch k {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	default:
+		return false
+	}
+}
+
+func implementsUnpacker(v reflect.Value) (reflect.Value, bool) {
+	for {
+		if v.Type().Implements(tUnpacker) {
+			return v, true
+		}
+
+		if !v.CanAddr() {
+			break
+		}
+		v = v.Addr()
+	}
+	return reflect.Value{}, false
+}
+
+func typeIsUnpacker(t reflect.Type) (reflect.Value, bool) {
+	if t.Implements(tUnpacker) {
+		return reflect.New(t).Elem(), true
+	}
+
+	if reflect.PtrTo(t).Implements(tUnpacker) {
+		return reflect.New(t), true
+	}
+
+	return reflect.Value{}, false
+}
+
+func unpackWith(v reflect.Value, with interface{}) error {
+	return v.Interface().(Unpacker).Unpack(with)
 }

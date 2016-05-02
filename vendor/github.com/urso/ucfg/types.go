@@ -2,6 +2,7 @@ package ucfg
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -25,6 +26,7 @@ type value interface {
 	toBool() (bool, error)
 	toString() (string, error)
 	toInt() (int64, error)
+	toUint() (uint64, error)
 	toFloat() (float64, error)
 	toConfig() (*Config, error)
 }
@@ -34,10 +36,12 @@ type context struct {
 	field  string
 }
 
+/*
 type cfgArray struct {
 	cfgPrimitive
 	arr []value
 }
+*/
 
 type cfgBool struct {
 	cfgPrimitive
@@ -47,6 +51,11 @@ type cfgBool struct {
 type cfgInt struct {
 	cfgPrimitive
 	i int64
+}
+
+type cfgUint struct {
+	cfgPrimitive
+	u uint64
 }
 
 type cfgFloat struct {
@@ -104,6 +113,10 @@ func newInt(ctx context, m *Meta, i int64) *cfgInt {
 	return &cfgInt{cfgPrimitive{ctx, m}, i}
 }
 
+func newUint(ctx context, m *Meta, u uint64) *cfgUint {
+	return &cfgUint{cfgPrimitive{ctx, m}, u}
+}
+
 func newFloat(ctx context, m *Meta, f float64) *cfgFloat {
 	return &cfgFloat{cfgPrimitive{ctx, m}, f}
 }
@@ -120,9 +133,11 @@ func (cfgPrimitive) Len() int                   { return 1 }
 func (cfgPrimitive) toBool() (bool, error)      { return false, ErrTypeMismatch }
 func (cfgPrimitive) toString() (string, error)  { return "", ErrTypeMismatch }
 func (cfgPrimitive) toInt() (int64, error)      { return 0, ErrTypeMismatch }
+func (cfgPrimitive) toUint() (uint64, error)    { return 0, ErrTypeMismatch }
 func (cfgPrimitive) toFloat() (float64, error)  { return 0, ErrTypeMismatch }
 func (cfgPrimitive) toConfig() (*Config, error) { return nil, ErrTypeMismatch }
 
+/*
 func (cfgArray) typeName() string          { return "array" }
 func (c *cfgArray) Len() int               { return len(c.arr) }
 func (c *cfgArray) reflect() reflect.Value { return reflect.ValueOf(c.arr) }
@@ -139,12 +154,14 @@ func (c *cfgArray) reify() interface{} {
 	}
 	return r
 }
+*/
 
 func (c *cfgNil) cpy(ctx context) value   { return &cfgNil{cfgPrimitive{ctx, c.metadata}} }
 func (*cfgNil) Len() int                  { return 0 }
 func (*cfgNil) typeName() string          { return "any" }
 func (*cfgNil) toString() (string, error) { return "null", nil }
 func (*cfgNil) toInt() (int64, error)     { return 0, ErrTypeMismatch }
+func (*cfgNil) toUint() (uint64, error)   { return 0, ErrTypeMismatch }
 func (*cfgNil) toFloat() (float64, error) { return 0, ErrTypeMismatch }
 func (*cfgNil) reify() interface{}        { return nil }
 func (*cfgNil) typ() reflect.Type         { return reflect.PtrTo(tConfig) }
@@ -177,6 +194,26 @@ func (c *cfgInt) reflect() reflect.Value    { return reflect.ValueOf(c.i) }
 func (c *cfgInt) reify() interface{}        { return c.i }
 func (c *cfgInt) toString() (string, error) { return fmt.Sprintf("%d", c.i), nil }
 func (c *cfgInt) typ() reflect.Type         { return tInt64 }
+func (c *cfgInt) toUint() (uint64, error) {
+	if c.i < 0 {
+		return 0, ErrNegative
+	}
+	return uint64(c.i), nil
+}
+
+func (c *cfgUint) cpy(ctx context) value     { return newUint(ctx, c.meta(), c.u) }
+func (c *cfgUint) typeName() string          { return "uint" }
+func (c *cfgUint) reflect() reflect.Value    { return reflect.ValueOf(c.u) }
+func (c *cfgUint) reify() interface{}        { return c.u }
+func (c *cfgUint) toString() (string, error) { return fmt.Sprintf("%d", c.u), nil }
+func (c *cfgUint) typ() reflect.Type         { return tUint64 }
+func (c *cfgUint) toUint() (uint64, error)   { return c.u, nil }
+func (c *cfgUint) toInt() (int64, error) {
+	if c.u > math.MaxInt64 {
+		return 0, ErrOverflow
+	}
+	return int64(c.u), nil
+}
 
 func (c *cfgFloat) cpy(ctx context) value     { return newFloat(ctx, c.meta(), c.f) }
 func (*cfgFloat) typeName() string            { return "float" }
@@ -185,6 +222,23 @@ func (c *cfgFloat) reflect() reflect.Value    { return reflect.ValueOf(c.f) }
 func (c *cfgFloat) reify() interface{}        { return c.f }
 func (c *cfgFloat) toString() (string, error) { return fmt.Sprintf("%v", c.f), nil }
 func (c *cfgFloat) typ() reflect.Type         { return tFloat64 }
+
+func (c *cfgFloat) toUint() (uint64, error) {
+	if c.f < 0 {
+		return 0, ErrNegative
+	}
+	if c.f > math.MaxUint64 {
+		return 0, ErrOverflow
+	}
+	return uint64(c.f), nil
+}
+
+func (c *cfgFloat) toInt() (int64, error) {
+	if c.f < math.MinInt64 || math.MaxInt64 < c.f {
+		return 0, ErrOverflow
+	}
+	return int64(c.f), nil
+}
 
 func (c *cfgString) cpy(ctx context) value     { return newString(ctx, c.meta(), c.s) }
 func (*cfgString) typeName() string            { return "string" }
@@ -199,6 +253,7 @@ func (c cfgSub) Context() context           { return c.c.ctx }
 func (cfgSub) toBool() (bool, error)        { return false, ErrTypeMismatch }
 func (cfgSub) toString() (string, error)    { return "", ErrTypeMismatch }
 func (cfgSub) toInt() (int64, error)        { return 0, ErrTypeMismatch }
+func (cfgSub) toUint() (uint64, error)      { return 0, ErrTypeMismatch }
 func (cfgSub) toFloat() (float64, error)    { return 0, ErrTypeMismatch }
 func (c cfgSub) toConfig() (*Config, error) { return c.c, nil }
 func (cfgSub) typ() reflect.Type            { return reflect.PtrTo(tConfig) }
@@ -224,9 +279,32 @@ func (c cfgSub) SetContext(ctx context) {
 }
 
 func (c cfgSub) reify() interface{} {
-	m := make(map[string]interface{})
-	for k, v := range c.c.fields.fields {
-		m[k] = v.reify()
+	fields := c.c.fields.fields
+	arr := c.c.fields.arr
+
+	switch {
+	case len(fields) == 0 && len(arr) == 0:
+		return nil
+	case len(fields) > 0 && len(arr) == 0:
+		m := make(map[string]interface{})
+		for k, v := range c.c.fields.fields {
+			m[k] = v.reify()
+		}
+		return m
+	case len(fields) == 0 && len(arr) > 0:
+		m := make([]interface{}, len(arr))
+		for i, v := range arr {
+			m[i] = v.reify()
+		}
+		return m
+	default:
+		m := make(map[string]interface{})
+		for k, v := range c.c.fields.fields {
+			m[k] = v.reify()
+		}
+		for i, v := range arr {
+			m[fmt.Sprintf("%d", i)] = v.reify()
+		}
+		return m
 	}
-	return m
 }

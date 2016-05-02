@@ -25,7 +25,7 @@ class Proc(object):
 
     def __init__(self, args, outputfile):
         self.args = args
-        self.output = open(outputfile, "wb")
+        self.output = open(outputfile, "ab")
 
     def start(self):
         self.stdin_read, self.stdin_write = os.pipe()
@@ -200,8 +200,16 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
-                jsons.append(self.flatten_object(json.loads(line),
-                                                 []))
+                if len(line) == 0 or line[len(line)-1] != "\n":
+                    # hit EOF
+                    break
+
+                try:
+                    jsons.append(self.flatten_object(json.loads(line), []))
+                except:
+                    print("Fail to load the json {}".format(line))
+                    raise
+
         self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
         return jsons
 
@@ -215,6 +223,10 @@ class TestCase(unittest.TestCase):
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
+                if len(line) == 0 or line[len(line)-1] != "\n":
+                    # hit EOF
+                    break
+
                 jsons.append(json.loads(line))
         return jsons
 
@@ -230,7 +242,8 @@ class TestCase(unittest.TestCase):
         )
 
         # create working dir
-        self.working_dir = os.path.join(self.build_path + "run", self.id())
+        self.working_dir = os.path.abspath(os.path.join(
+            self.build_path + "run", self.id()))
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
         os.makedirs(self.working_dir)
@@ -262,6 +275,18 @@ class TestCase(unittest.TestCase):
                                 .format(name) +
                                 "Waited {} seconds.".format(max_timeout))
             time.sleep(poll_interval)
+
+    def get_log(self, logfile=None):
+        """
+        Returns the log as a string.
+        """
+        if logfile is None:
+            logfile = self.beat_name + ".log"
+
+        with open(os.path.join(self.working_dir, logfile), 'r') as f:
+            data=f.read()
+
+        return data
 
     def log_contains(self, msg, logfile=None):
         """

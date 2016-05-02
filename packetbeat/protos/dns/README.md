@@ -35,8 +35,6 @@ When response error Notes are linked to the previous request, the transaction is
 
 **General**
 * Publish an event with Notes when a Query or a lone Response cannot be decoded.
-* Add EDNS and DNSSEC support (consider using miekg/dns instead
-  of gopacket).
 * Consider adding ICMP support to
      - correlate ICMP type 3, code 4 (datagram too big) with DNS messages,
      - correlate ICMP type 3, code 13 (administratively prohibited) or

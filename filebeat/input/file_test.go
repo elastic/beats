@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/libbeat/common"
@@ -60,50 +61,50 @@ func TestSafeFileRotateExistingFile(t *testing.T) {
 		assert.NoError(t, os.RemoveAll(tempdir))
 	}()
 
-	// create an existing .filebeat file
-	err = ioutil.WriteFile(filepath.Join(tempdir, ".filebeat"),
+	// create an existing registry file
+	err = ioutil.WriteFile(filepath.Join(tempdir, "registry"),
 		[]byte("existing filebeat"), 0x777)
 	assert.NoError(t, err)
 
-	// create a new .filebeat.new file
-	err = ioutil.WriteFile(filepath.Join(tempdir, ".filebeat.new"),
+	// create a new registry.new file
+	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
 		[]byte("new filebeat"), 0x777)
 	assert.NoError(t, err)
 
-	// rotate .filebeat.new into .filebeat
-	err = SafeFileRotate(filepath.Join(tempdir, ".filebeat"),
-		filepath.Join(tempdir, ".filebeat.new"))
+	// rotate registry.new into registry
+	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
+		filepath.Join(tempdir, "registry.new"))
 	assert.NoError(t, err)
 
-	contents, err := ioutil.ReadFile(filepath.Join(tempdir, ".filebeat"))
+	contents, err := ioutil.ReadFile(filepath.Join(tempdir, "registry"))
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("new filebeat"), contents)
 
 	// do it again to make sure we deal with deleting the old file
 
-	err = ioutil.WriteFile(filepath.Join(tempdir, ".filebeat.new"),
+	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
 		[]byte("new filebeat 1"), 0x777)
 	assert.NoError(t, err)
 
-	err = SafeFileRotate(filepath.Join(tempdir, ".filebeat"),
-		filepath.Join(tempdir, ".filebeat.new"))
+	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
+		filepath.Join(tempdir, "registry.new"))
 	assert.NoError(t, err)
 
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, ".filebeat"))
+	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("new filebeat 1"), contents)
 
 	// and again for good measure
 
-	err = ioutil.WriteFile(filepath.Join(tempdir, ".filebeat.new"),
+	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
 		[]byte("new filebeat 2"), 0x777)
 	assert.NoError(t, err)
 
-	err = SafeFileRotate(filepath.Join(tempdir, ".filebeat"),
-		filepath.Join(tempdir, ".filebeat.new"))
+	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
+		filepath.Join(tempdir, "registry.new"))
 	assert.NoError(t, err)
 
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, ".filebeat"))
+	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("new filebeat 2"), contents)
 }
@@ -123,6 +124,8 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 	}
 
 	text := "hello"
+
+	now := time.Now()
 
 	tests := []io{
 		{
@@ -177,10 +180,97 @@ func TestFileEventToMapStrJSON(t *testing.T) {
 				"type": "test_type",
 			},
 		},
+		{
+			// when @timestamp is in JSON and overwrite_keys is true, parse it
+			// in a common.Time
+			Event: FileEvent{
+				ReadTime:     now,
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.444Z"},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"@timestamp": common.MustParseTime("2016-04-05T18:47:18.444Z"),
+				"type":       "test",
+			},
+		},
+		{
+			// when the parsing on @timestamp fails, leave the existing value and add an error key
+			// in a common.Time
+			Event: FileEvent{
+				ReadTime:     now,
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "@timestamp": "2016-04-05T18:47:18.44XX4Z"},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"@timestamp": common.Time(now),
+				"type":       "test",
+				"json_error": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)",
+			},
+		},
+		{
+			// when the @timestamp has the wrong type, leave the existing value and add an error key
+			// in a common.Time
+			Event: FileEvent{
+				ReadTime:     now,
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "test", "@timestamp": 42},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"@timestamp": common.Time(now),
+				"type":       "test",
+				"json_error": "@timestamp not overwritten (not string)",
+			},
+		},
+		{
+			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": 42},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"type":       "test_type",
+				"json_error": "type not overwritten (not string)",
+			},
+		},
+		{
+			// if overwrite_keys is true, but the `type` key in json is empty, ignore it
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": ""},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"type":       "test_type",
+				"json_error": "type not overwritten (invalid value [])",
+			},
+		},
+		{
+			// if overwrite_keys is true, but the `type` key in json starts with _, ignore it
+			Event: FileEvent{
+				DocumentType: "test_type",
+				Text:         &text,
+				JSONFields:   common.MapStr{"type": "_type"},
+				JSONConfig:   &config.JSONConfig{KeysUnderRoot: true, OverwriteKeys: true},
+			},
+			ExpectedItems: common.MapStr{
+				"type":       "test_type",
+				"json_error": "type not overwritten (invalid value [_type])",
+			},
+		},
 	}
 
 	for _, test := range tests {
 		result := test.Event.ToMapStr()
+		t.Log("Executing test:", test)
 		for k, v := range test.ExpectedItems {
 			assert.Equal(t, v, result[k])
 		}

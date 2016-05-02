@@ -1,6 +1,17 @@
 # Testing environments
 
-These environments are intended for manual testing. To start an environment run:
+These environments are intended for manual and automated testing. The docker-compose files can be combined to create the different environment.
+
+
+# Manual testing
+
+The different environments can be started with the following commands for manual testing. These environments expose ports of Elasticsearch, Logstash and Kibana on the Docker-Machine ip.
+
+Running the environment chains the following docker-compose files together
+
+* base.yml: Basic environment
+* ports.yml: Definition of ports which have to be exposed
+* latest.yml: Latest version of elasticsearch, logstash, kibana
 
 
 ## Start / Stop environment
@@ -48,3 +59,28 @@ make clean
 ## Notes
 
 Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting an other environment. This is intentional to prevent conflicts.
+
+
+# Automated Testing
+
+These environments are also used for integration testing in the different beats. For this, `make testsuite` by default uses the snapshot environment. To select a different environment during testing, run the following command to use the latest environment:
+
+```
+TESTING_ENVIRONMENT=latest make testsuite
+```
+
+This will run the full testsuite but with latest environments instead of snapshot.
+
+
+## Defaults
+
+By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker-compose flies together:
+
+* base.yml: Basic environment
+* snapshot.yml: Snapshot version of elasticsearch, logstash, kibana
+* docker-compose.yml: Local beat docker-compose file
+
+
+## Updating environments
+
+If the snapshot environment is updated with a new build, all beats will automatically build with the most recent version.

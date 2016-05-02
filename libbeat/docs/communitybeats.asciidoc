@@ -16,9 +16,13 @@ https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes h
 https://github.com/YaSuenag/hsbeat[hsbeat]:: Reads all performance counters in Java HotSpot VM.
 https://github.com/christiangalsterer/httpbeat[httpbeat]:: Polls multiple HTTP(S) endpoints and sends the data to
 Logstash or Elasticsearch. Supports all HTTP methods and proxies.
+https://github.com/jasperla/hwsensorsbeat[hwsensorsbeat]:: Reads sensors information from OpenBSD.
+https://github.com/radoondas/jmxproxybeat[jmxproxybeat]:: Reads Tomcat JMX metrics exposed over 'JMX Proxy Servlet' to HTTP.
 https://github.com/eskibars/lmsensorsbeat[lmsensorsbeat]:: Collects data from lm-sensors (such as CPU temperatures, fan speeds, and voltages from i2c and smbus)
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
+https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
+managers.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
@@ -29,6 +33,7 @@ https://github.com/cleesmith/unifiedbeat[unifiedbeat]:: Reads records from Unifi
 network intrusion detection software and indexes the records in Elasticsearch.
 https://github.com/mrkschan/uwsgibeat[uwsgibeat]:: Reads stats from uWSGI.
 https://github.com/eskibars/wmibeat[wmibeat]:: Uses WMI to grab your favorite, configurable Windows metrics.
+
 
 Have you created a Beat that's not listed? If so, add the name and description of your Beat to the source document for     
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in GitHub to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/annoucements[announce] your new Beat in the Elastic

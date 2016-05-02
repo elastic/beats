@@ -12,8 +12,14 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 )
 
+var (
+	debugf = logp.MakeDebug("redis-info")
+)
+
 func init() {
-	helper.Registry.AddMetricSeter("redis", "info", New)
+	if err := helper.Registry.AddMetricSeter("redis", "info", New); err != nil {
+		panic(err)
+	}
 }
 
 // New creates new instance of MetricSeter
@@ -75,14 +81,13 @@ func createPool(host, password, network string, maxConn int, timeout time.Durati
 }
 
 func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
-
 	// Fetch default INFO
 	info, err := m.fetchRedisStats(host, "default")
-
 	if err != nil {
 		return nil, err
 	}
 
+	debugf("Redis INFO from %s: %+v", host, info)
 	return eventMapping(info), nil
 }
 
