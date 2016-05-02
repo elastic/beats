@@ -1,5 +1,7 @@
-###############################################################################
-############################# Winlogbeat ######################################
+################### Winlogbeat Configuration Example #########################
+
+##################### Winlogbeat general configuration ######################
+
 winlogbeat:
   # The registry file is where Winlogbeat persists its state so that the beat
   # can resume after shutdown or an outage. The default is .winlogbeat.yml

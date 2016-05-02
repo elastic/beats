@@ -1,6 +1,7 @@
 ################### Topbeat Configuration Example #########################
 
-############################# Topbeat ############################################
+##################### Topbeat general configuration #######################
+
 topbeat:
   # In seconds, defines how often to read server statistics
   period: 10
@@ -10,17 +11,17 @@ topbeat:
   procs: [".*"]
 
   # Statistics to collect (all enabled by default)
-  stats:
-    # per system statistics, by default is true
-    system: true
+  
+  # per system statistics, by default is true
+  stats.system: true
+    
+  # per process statistics, by default is true
+  stats.process: true
 
-    # per process statistics, by default is true
-    process: true
+  # file system information, by default is true
+  stats.filesystem: true
 
-    # file system information, by default is true
-    filesystem: true
-
-    # cpu usage per core, by default is false
-    cpu_per_core: false
+  # cpu usage per core, by default is false
+  stats.cpu_per_core: false
 
 
