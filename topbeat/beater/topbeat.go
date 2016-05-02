@@ -115,7 +115,10 @@ func (t *Topbeat) Setup(b *beat.Beat) error {
 func (t *Topbeat) Run(b *beat.Beat) error {
 	var err error
 
-	t.procStats.InitProcStats()
+	err = t.procStats.InitProcStats()
+	if err != nil {
+		return err
+	}
 
 	ticker := time.NewTicker(t.period)
 	defer ticker.Stop()
