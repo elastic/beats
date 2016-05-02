@@ -19,7 +19,7 @@ type SingleConnectionMode struct {
 	closed bool // mode closed flag to break publisher loop
 
 	timeout time.Duration // connection timeout
-	backoff *backoff
+	backoff *common.Backoff
 
 	// maximum number of configured send attempts. If set to 0, publisher will
 	// block until event has been successfully published.
@@ -41,7 +41,7 @@ func NewSingleConnectionMode(
 		conn: client,
 
 		timeout:     timeout,
-		backoff:     newBackoff(nil, waitRetry, maxWaitRetry),
+		backoff:     common.NewBackoff(nil, waitRetry, maxWaitRetry),
 		maxAttempts: maxAttempts,
 	}
 

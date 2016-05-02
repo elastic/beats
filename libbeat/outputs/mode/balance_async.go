@@ -149,7 +149,7 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 
 		waitStart.Done()
 
-		backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
+		backoff := common.NewBackoff(m.done, m.waitRetry, m.maxWaitRetry)
 		for {
 			// reconnect loop
 			for !client.IsConnected() {
