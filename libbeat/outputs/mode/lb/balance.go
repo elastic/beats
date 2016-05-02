@@ -1,4 +1,4 @@
-package mode
+package lb
 
 import (
 	"sync"
@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
 // LoadBalancerMode balances the sending of events between multiple connections.
@@ -64,8 +65,8 @@ type eventsMessage struct {
 }
 
 // NewLoadBalancerMode create a new load balancer connection mode.
-func NewLoadBalancerMode(
-	clients []ProtocolClient,
+func NewSync(
+	clients []mode.ProtocolClient,
 	maxAttempts int,
 	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*LoadBalancerMode, error) {
@@ -135,9 +136,9 @@ func (m *LoadBalancerMode) publishEventsMessage(
 	return nil
 }
 
-func (m *LoadBalancerMode) start(clients []ProtocolClient) {
+func (m *LoadBalancerMode) start(clients []mode.ProtocolClient) {
 	var waitStart sync.WaitGroup
-	worker := func(client ProtocolClient) {
+	worker := func(client mode.ProtocolClient) {
 		defer func() {
 			if client.IsConnected() {
 				_ = client.Close()
@@ -157,9 +158,9 @@ func (m *LoadBalancerMode) start(clients []ProtocolClient) {
 	waitStart.Wait()
 }
 
-func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
-	debug("load balancer: start client loop")
-	defer debug("load balancer: stop client loop")
+func (m *LoadBalancerMode) clientLoop(client mode.ProtocolClient) {
+	debugf("load balancer: start client loop")
+	defer debugf("load balancer: stop client loop")
 
 	backoff := common.NewBackoff(m.done, m.waitRetry, m.maxWaitRetry)
 
@@ -168,14 +169,14 @@ func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
 		if done = m.connect(client, backoff); !done {
 			done = m.sendLoop(client, backoff)
 		}
-		debug("close client")
+		debugf("close client")
 		client.Close()
 	}
 }
 
-func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *common.Backoff) bool {
+func (m *LoadBalancerMode) connect(client mode.ProtocolClient, backoff *common.Backoff) bool {
 	for {
-		debug("try to (re-)connect client")
+		debugf("try to (re-)connect client")
 		err := client.Connect(m.timeout)
 		if !backoff.WaitOnError(err) {
 			return true
@@ -187,7 +188,7 @@ func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *common.Backof
 	}
 }
 
-func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *common.Backoff) bool {
+func (m *LoadBalancerMode) sendLoop(client mode.ProtocolClient, backoff *common.Backoff) bool {
 	for {
 		var msg eventsMessage
 		select {
@@ -206,7 +207,7 @@ func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *common.Backo
 
 func (m *LoadBalancerMode) onMessage(
 	backoff *common.Backoff,
-	client ProtocolClient,
+	client mode.ProtocolClient,
 	msg eventsMessage,
 ) (bool, error) {
 	done := false
@@ -241,11 +242,11 @@ func (m *LoadBalancerMode) onMessage(
 
 				// reset attempt count if subset of messages has been processed
 				if len(events) < total && msg.attemptsLeft >= 0 {
-					debug("reset fails")
+					debugf("reset fails")
 					msg.attemptsLeft = m.maxAttempts
 				}
 
-				if err != ErrTempBulkFailure {
+				if err != mode.ErrTempBulkFailure {
 					// retry non-published subset of events in batch
 					msg.events = events
 					m.onFail(msg, err)
@@ -304,7 +305,7 @@ func (m *LoadBalancerMode) forwardEvent(
 // dropping is called when a message is dropped. It updates the
 // relevant counters and sends a failed signal.
 func dropping(msg eventsMessage) {
-	debug("messages dropped")
-	messagesDropped.Add(1)
+	debugf("messages dropped")
+	mode.Dropped(1)
 	op.SigFailed(msg.signaler, nil)
 }

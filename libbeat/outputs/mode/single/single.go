@@ -1,4 +1,4 @@
-package mode
+package single
 
 import (
 	"errors"
@@ -8,13 +8,14 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
-// SingleConnectionMode sends all Output on one single connection. If connection is
+// Mode sends all Output on one single connection. If connection is
 // not available, the output plugin blocks until the connection is either available
 // again or the connection mode is closed by Close.
-type SingleConnectionMode struct {
-	conn ProtocolClient
+type Mode struct {
+	conn mode.ProtocolClient
 
 	closed bool // mode closed flag to break publisher loop
 
@@ -28,16 +29,18 @@ type SingleConnectionMode struct {
 
 var (
 	errNeedBackoff = errors.New("need to backoff")
+
+	debugf = logp.MakeDebug("output")
 )
 
-// NewSingleConnectionMode creates a new single connection mode using exactly one
+// New creates a new single connection mode using exactly one
 // ProtocolClient connection.
-func NewSingleConnectionMode(
-	client ProtocolClient,
+func New(
+	client mode.ProtocolClient,
 	maxAttempts int,
 	waitRetry, timeout, maxWaitRetry time.Duration,
-) (*SingleConnectionMode, error) {
-	s := &SingleConnectionMode{
+) (*Mode, error) {
+	s := &Mode{
 		conn: client,
 
 		timeout:     timeout,
@@ -48,7 +51,7 @@ func NewSingleConnectionMode(
 	return s, nil
 }
 
-func (s *SingleConnectionMode) connect() error {
+func (s *Mode) connect() error {
 	if s.conn.IsConnected() {
 		return nil
 	}
@@ -56,14 +59,14 @@ func (s *SingleConnectionMode) connect() error {
 }
 
 // Close closes the underlying connection.
-func (s *SingleConnectionMode) Close() error {
+func (s *Mode) Close() error {
 	s.closed = true
 	return s.conn.Close()
 }
 
 // PublishEvents tries to publish the events with retries if connection becomes
 // unavailable. On failure PublishEvents tries to reconnect.
-func (s *SingleConnectionMode) PublishEvents(
+func (s *Mode) PublishEvents(
 	signaler op.Signaler,
 	opts outputs.Options,
 	events []common.MapStr,
@@ -87,7 +90,7 @@ func (s *SingleConnectionMode) PublishEvents(
 }
 
 // PublishEvent forwards a single event. On failure PublishEvent tries to reconnect.
-func (s *SingleConnectionMode) PublishEvent(
+func (s *Mode) PublishEvent(
 	signaler op.Signaler,
 	opts outputs.Options,
 	event common.MapStr,
@@ -109,7 +112,7 @@ func (s *SingleConnectionMode) PublishEvent(
 // processing events. If ok is false but resetFail is set, send was partially
 // successful. If send was partially successful, the fail counter is reset thus up
 // to maxAttempts send attempts without any progress might be executed.
-func (s *SingleConnectionMode) publish(
+func (s *Mode) publish(
 	signaler op.Signaler,
 	opts outputs.Options,
 	send func() (ok bool, resetFail bool),
@@ -133,7 +136,7 @@ func (s *SingleConnectionMode) publish(
 			goto sendFail
 		}
 
-		debug("send completed")
+		debugf("send completed")
 		s.backoff.Reset()
 		op.SigCompleted(signaler)
 		return nil
@@ -144,19 +147,19 @@ func (s *SingleConnectionMode) publish(
 
 		fails++
 		if resetFail {
-			debug("reset fails")
+			debugf("reset fails")
 			fails = 0
 		}
 
 		if !guaranteed && (s.maxAttempts > 0 && fails == s.maxAttempts) {
 			// max number of attempts reached
-			debug("max number of attempts reached")
+			debugf("max number of attempts reached")
 			break
 		}
 	}
 
-	debug("messages dropped")
-	messagesDropped.Add(1)
+	debugf("messages dropped")
+	mode.Dropped(1)
 	op.SigFailed(signaler, err)
 	return nil
 }
