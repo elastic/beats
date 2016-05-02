@@ -18,7 +18,7 @@ type Registrar struct {
 	// Path to the Registry File
 	registryFile string
 	// Map with all file paths inside and the corresponding state
-	state      map[string]*FileState
+	state      map[string]FileState
 	stateMutex sync.Mutex
 
 	Channel chan []*FileEvent
@@ -38,7 +38,7 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 
 func (r *Registrar) Init() error {
 	// Init state
-	r.state = map[string]*FileState{}
+	r.state = map[string]FileState{}
 	r.Channel = make(chan []*FileEvent, 1)
 
 	// Set to default in case it is not set
@@ -106,7 +106,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 			continue
 		}
 
-		r.setState(event.Source, event.GetState())
+		r.setState(event.Source, event.FileState)
 	}
 }
 
@@ -116,8 +116,8 @@ func (r *Registrar) Stop() {
 	// Note: don't block using waitGroup, cause this method is run by async signal handler
 }
 
-func (r *Registrar) GetFileState(path string) (*FileState, bool) {
-	state, exist := r.getState(path)
+func (r *Registrar) GetFileState(path string) (FileState, bool) {
+	state, exist := r.getStateEntry(path)
 	return state, exist
 }
 
@@ -200,14 +200,14 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 	return "", fmt.Errorf("No previous file found")
 }
 
-func (r *Registrar) setState(path string, state *FileState) {
+func (r *Registrar) setState(path string, state FileState) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 
 	r.state[path] = state
 }
 
-func (r *Registrar) getState(path string) (*FileState, bool) {
+func (r *Registrar) getStateEntry(path string) (FileState, bool) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 
@@ -220,8 +220,9 @@ func (r *Registrar) getStateCopy() map[string]FileState {
 	defer r.stateMutex.Unlock()
 
 	copy := make(map[string]FileState)
+
 	for k, v := range r.state {
-		copy[k] = *v
+		copy[k] = v
 	}
 
 	return copy

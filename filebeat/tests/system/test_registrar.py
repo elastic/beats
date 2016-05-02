@@ -313,6 +313,9 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=10)
 
+        # Wait a momemt to make sure registry is completely written
+        time.sleep(1)
+
         data = self.get_registry()
         assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
 
@@ -325,6 +328,9 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.output_has(lines=2),
             max_timeout=10)
+
+        # Wait a momemt to make sure registry is completely written
+        time.sleep(1)
 
         data = self.get_registry()
 
