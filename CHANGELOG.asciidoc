@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v5.0.0alpha1...v5.0.0-alpha2[View commi
 - Fix issue with JSON decoding where `@timestamp` or `type` keys with the wrong type could cause Filebeat
   to crash. {issue}1378[1378]
 - Fix issue with JSON decoding where values having `null` as values could crash Filebeat. {issue}1466[1466]
+- Multiline reader normalizing newline to use `\n`. {pull}1552[1552]
 
 *Winlogbeat*
 

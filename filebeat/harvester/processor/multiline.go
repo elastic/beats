@@ -22,10 +22,11 @@ import (
 // Errors will force the multiline processor to return the currently active
 // multiline event first and finally return the actual error on next call to Next.
 type MultiLine struct {
-	reader   LineProcessor
-	pred     matcher
-	maxBytes int // bytes stored in content
-	maxLines int
+	reader    LineProcessor
+	pred      matcher
+	maxBytes  int // bytes stored in content
+	maxLines  int
+	separator []byte
 
 	ts        time.Time
 	content   []byte
@@ -58,6 +59,7 @@ var (
 // line events into stream of multi-line events.
 func NewMultiline(
 	r LineProcessor,
+	separator string,
 	maxBytes int,
 	config *config.MultilineConfig,
 ) (*MultiLine, error) {
@@ -102,11 +104,12 @@ func NewMultiline(
 	}
 
 	mlr := &MultiLine{
-		reader:   r,
-		pred:     matcher,
-		state:    (*MultiLine).readFirst,
-		maxBytes: maxBytes,
-		maxLines: maxLines,
+		reader:    r,
+		pred:      matcher,
+		state:     (*MultiLine).readFirst,
+		maxBytes:  maxBytes,
+		maxLines:  maxLines,
+		separator: []byte(separator),
 	}
 	return mlr, nil
 }
@@ -239,14 +242,25 @@ func (mlr *MultiLine) addLine(l Line) {
 		return
 	}
 
-	space := mlr.maxBytes - len(mlr.content)
+	sz := len(mlr.content)
+	addSeparator := len(mlr.content) > 0 && len(mlr.separator) > 0
+	if addSeparator {
+		sz += len(mlr.separator)
+	}
+
+	space := mlr.maxBytes - sz
 	spaceLeft := (mlr.maxBytes <= 0 || space > 0) &&
 		(mlr.maxLines <= 0 || mlr.numLines < mlr.maxLines)
 	if spaceLeft {
 		if space < 0 || space > len(l.Content) {
 			space = len(l.Content)
 		}
-		mlr.content = append(mlr.content, l.Content[:space]...)
+
+		tmp := mlr.content
+		if addSeparator {
+			tmp = append(tmp, mlr.separator...)
+		}
+		mlr.content = append(tmp, l.Content[:space]...)
 		mlr.numLines++
 	}
 

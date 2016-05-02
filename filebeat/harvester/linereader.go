@@ -33,15 +33,13 @@ func createLineReader(
 		p = processor.NewJSONProcessor(p, jsonConfig)
 	}
 
+	p = processor.NewStripNewline(p)
 	if mlrConfig != nil {
-		p, err = processor.NewMultiline(p, maxBytes, mlrConfig)
+		p, err = processor.NewMultiline(p, "\n", maxBytes, mlrConfig)
 		if err != nil {
 			return nil, err
 		}
-
-		return processor.NewStripNewline(p), nil
 	}
 
-	p = processor.NewStripNewline(p)
 	return processor.NewLimitProcessor(p, maxBytes), nil
 }
