@@ -156,10 +156,12 @@ func TestMode(
 
 	if collectedEvents != nil {
 		assert.Equal(t, len(expectedEvents), len(*collectedEvents))
-		for i := range *collectedEvents {
-			expected := expectedEvents[i]
-			actual := (*collectedEvents)[i]
-			assert.Equal(t, expected, actual)
+		if len(expectedEvents) == len(*collectedEvents) {
+			for i := range *collectedEvents {
+				expected := expectedEvents[i]
+				actual := (*collectedEvents)[i]
+				assert.Equal(t, expected, actual)
+			}
 		}
 	}
 }

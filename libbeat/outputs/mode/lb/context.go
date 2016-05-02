@@ -75,6 +75,20 @@ func (ctx *context) pushFailed(msg eventsMessage) bool {
 	return ok
 }
 
+func (ctx *context) tryPushFailed(msg eventsMessage) bool {
+	if msg.attemptsLeft == 0 {
+		dropping(msg)
+		return true
+	}
+
+	select {
+	case ctx.retries <- msg:
+		return true
+	default:
+		return false
+	}
+}
+
 func (ctx *context) forwardEvent(ch chan eventsMessage, msg eventsMessage) bool {
 	debugf("forwards msg with attempts=%v", msg.attemptsLeft)
 
