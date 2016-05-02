@@ -5,6 +5,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/lb"
+	"github.com/elastic/beats/libbeat/outputs/mode/single"
 )
 
 type ClientFactory func(host string) (mode.ProtocolClient, error)
@@ -22,10 +24,9 @@ func NewConnectionMode(
 	}
 
 	if len(clients) == 1 {
-		return mode.NewSingleConnectionMode(clients[0], maxAttempts, waitRetry, timeout, maxWaitRetry)
+		return single.New(clients[0], maxAttempts, waitRetry, timeout, maxWaitRetry)
 	}
-	return mode.NewLoadBalancerMode(clients, maxAttempts,
-		waitRetry, timeout, maxWaitRetry)
+	return lb.NewSync(clients, maxAttempts, waitRetry, timeout, maxWaitRetry)
 }
 
 func NewAsyncConnectionMode(
@@ -37,8 +38,7 @@ func NewAsyncConnectionMode(
 	if failover {
 		clients = NewAsyncFailoverClient(clients)
 	}
-	return mode.NewAsyncLoadBalancerMode(
-		clients, maxAttempts, waitRetry, timeout, maxWaitRetry)
+	return lb.NewAsync(clients, maxAttempts, waitRetry, timeout, maxWaitRetry)
 }
 
 // MakeClients will create a list from of ProtocolClient instances from
