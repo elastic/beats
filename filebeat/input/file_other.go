@@ -15,12 +15,12 @@ type FileStateOS struct {
 }
 
 // GetOSFileState returns the FileStateOS for non windows systems
-func GetOSFileState(info *os.FileInfo) *FileStateOS {
+func GetOSFileState(info os.FileInfo) FileStateOS {
 
-	stat := (*(info)).Sys().(*syscall.Stat_t)
+	stat := info.Sys().(*syscall.Stat_t)
 
 	// Convert inode and dev to uint64 to be cross platform compatible
-	fileState := &FileStateOS{
+	fileState := FileStateOS{
 		Inode:  uint64(stat.Ino),
 		Device: uint64(stat.Dev),
 	}
@@ -29,7 +29,7 @@ func GetOSFileState(info *os.FileInfo) *FileStateOS {
 }
 
 // IsSame file checks if the files are identical
-func (fs *FileStateOS) IsSame(state *FileStateOS) bool {
+func (fs FileStateOS) IsSame(state FileStateOS) bool {
 	return fs.Inode == state.Inode && fs.Device == state.Device
 }
 

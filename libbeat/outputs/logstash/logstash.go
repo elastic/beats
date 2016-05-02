@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -63,13 +64,13 @@ func (lj *logstash) init(cfg *common.Config) error {
 		Proxy:   &config.Proxy,
 		TLS:     tls,
 	}
-	clients, err := mode.MakeClients(cfg, makeClientFactory(&config, transp))
+	clients, err := modeutil.MakeClients(cfg, makeClientFactory(&config, transp))
 	if err != nil {
 		return err
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := mode.NewConnectionMode(clients, !config.LoadBalance,
+	m, err := modeutil.NewConnectionMode(clients, !config.LoadBalance,
 		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
 	if err != nil {
 		return err
@@ -81,7 +82,10 @@ func (lj *logstash) init(cfg *common.Config) error {
 	return nil
 }
 
-func makeClientFactory(cfg *logstashConfig, tcfg *transport.Config) mode.ClientFactory {
+func makeClientFactory(
+	cfg *logstashConfig,
+	tcfg *transport.Config,
+) modeutil.ClientFactory {
 	compressLvl := cfg.CompressionLevel
 	maxBulkSz := cfg.BulkMaxSize
 	to := cfg.Timeout

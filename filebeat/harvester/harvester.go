@@ -69,3 +69,16 @@ func (h *Harvester) Start() {
 	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
 	go h.Harvest()
 }
+
+// open does open the file given under h.Path and assigns the file handler to h.file
+func (h *Harvester) open() (encoding.Encoding, error) {
+
+	switch h.Config.InputType {
+	case config.StdinInputType:
+		return h.openStdin()
+	case config.LogInputType:
+		return h.openFile()
+	default:
+		return nil, fmt.Errorf("Invalid input type")
+	}
+}

@@ -3,7 +3,6 @@
 package mode
 
 import (
-	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -306,85 +305,6 @@ func repeat(n int, evt []eventInfo) []eventInfo {
 
 func signals(s ...bool) []bool {
 	return s
-}
-
-func makeTestClients(c map[string]interface{},
-	newClient func(string) (ProtocolClient, error),
-) ([]ProtocolClient, error) {
-	cfg, err := common.NewConfigFrom(c)
-	if err != nil {
-		return nil, err
-	}
-
-	return MakeClients(cfg, newClient)
-}
-
-func TestMakeEmptyClientFail(t *testing.T) {
-	config := map[string]interface{}{}
-	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Equal(t, ErrNoHostsConfigured, err)
-	assert.Equal(t, 0, len(clients))
-}
-
-func TestMakeSingleClient(t *testing.T) {
-	config := map[string]interface{}{
-		"hosts": []string{"single"},
-	}
-
-	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(clients))
-}
-
-func TestMakeSingleClientWorkers(t *testing.T) {
-	config := map[string]interface{}{
-		"hosts":  []string{"single"},
-		"worker": 3,
-	}
-
-	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Nil(t, err)
-	assert.Equal(t, 3, len(clients))
-}
-
-func TestMakeTwoClient(t *testing.T) {
-	config := map[string]interface{}{
-		"hosts": []string{"client1", "client2"},
-	}
-
-	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Nil(t, err)
-	assert.Equal(t, 2, len(clients))
-}
-
-func TestMakeTwoClientWorkers(t *testing.T) {
-	config := map[string]interface{}{
-		"hosts":  []string{"client1", "client2"},
-		"worker": 3,
-	}
-
-	clients, err := makeTestClients(config, dummyMockClientFactory)
-	assert.Nil(t, err)
-	assert.Equal(t, 6, len(clients))
-}
-
-func TestMakeTwoClientFail(t *testing.T) {
-	config := map[string]interface{}{
-		"hosts":  []string{"client1", "client2"},
-		"worker": 3,
-	}
-
-	testError := errors.New("test")
-
-	i := 1
-	_, err := makeTestClients(config, func(host string) (ProtocolClient, error) {
-		if i%3 == 0 {
-			return nil, testError
-		}
-		i++
-		return dummyMockClientFactory(host)
-	})
-	assert.Equal(t, testError, err)
 }
 
 func dummyMockClientFactory(host string) (ProtocolClient, error) {
