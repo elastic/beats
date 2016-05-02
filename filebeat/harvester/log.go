@@ -107,7 +107,7 @@ func (h *Harvester) Harvest() {
 // By default the offset is set to 0, means no bytes read. This can be used to report the status
 // of a harvester
 func (h *Harvester) createEvent() *input.FileEvent {
-	return &input.FileEvent{
+	event := &input.FileEvent{
 		EventMetadata: h.Config.EventMetadata,
 		Source:        h.Path,
 		InputType:     h.Config.InputType,
@@ -117,6 +117,15 @@ func (h *Harvester) createEvent() *input.FileEvent {
 		Fileinfo:      &h.Stat.Fileinfo,
 		JSONConfig:    h.Config.JSON,
 	}
+
+	if h.Config.InputType != config.StdinInputType {
+		event.FileState = input.FileState{
+			Source:      h.Path,
+			Offset:      h.getOffset(),
+			FileStateOS: *input.GetOSFileState(&h.Stat.Fileinfo),
+		}
+	}
+	return event
 }
 
 // sendEvent sends event to the spooler channel
