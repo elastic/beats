@@ -3,59 +3,50 @@
 
 Kibana has a large set of visualization types that you can combine to create
 the perfect dashboards for your needs. But this flexibility can be a bit
-overwhelming at the beginning, so we have created a couple of
-https://github.com/elastic/beats-dashboards[Sample Dashboards] to get you
+overwhelming at the beginning, so we have created some sample dashboards to get you
 started and to demonstrate what is possible based on the Beats data.
 
 NOTE: The Beats dashboards require Kibana 4 or later.
 
-To load the sample dashboards, you run a load script. The load script
-uploads the example dashboards, visualizations, and searches
-that you can use. The load command also creates index patterns for each Beat:
+Each Beat comes packaged with a script that you can use to import the example dashboards,
+visualizations, and searches for that Beat. The script also creates index patterns, such as 
+`packetbeat-*` for Packetbeat, `topbeat-*` for Topbeat, and so on. 
 
-   - `packetbeat-*`
-   - `topbeat-*`
-   - `filebeat-*`
-   - `winlogbeat-*`
-   
 Use the following commands to run the script:
 
 *deb, rpm, and mac:*
 
+From the directory where you installed the Beat, change to the `kibana` directory and run the `import_dashboards.sh` script. For example:
+
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-curl -L -O http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip
-unzip beats-dashboards-{Dashboards-version}.zip
-cd beats-dashboards-{Dashboards-version}/
-./load.sh
+cd kibana/ 
+./import_dashboards.sh
 ----------------------------------------------------------------------
 
+On deb and rpm, the `kibana` folder is located under the home path, which is `/usr/share/beat_name/` unless you change it.
+
 By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `./load.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
+to specify a different location. For example: `./import_dashboards.sh -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
 
 *win:*
-
-. Download the Beats dashboards from 
-http://download.elastic.co/beats/dashboards/beats-dashboards-{Dashboards-version}.zip. 
-
-. Extract the contents of the archive.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*). If you are running Windows XP, you may need
 to download and install PowerShell. 
 
-. Run the following commands to load the dashboards:
+. From the directory where you installed the Beat, run the following commands to load the dashboards:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-PS > cd beats-dashboards-{Dashboards-version}
-PS > .\load.ps1
+PS > cd kibana
+PS > .\import_dashboards.ps1
 ----------------------------------------------------------------------
 +
 By default, the script assumes that you are running Elasticsearch on `127.0.0.1:9200`. Use the `-url` option
-to specify a different location. For example: `.\load.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
+to specify a different location. For example: `.\import_dashboards.ps1 -url http://192.168.33.60:9200`. To specify a Kibana index pattern or pass in user credentials, see <<dashboard-load-options>>.
 +
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\load.ps1 -url http://192.168.33.60:9200`.
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\import_dashboards.ps1 -url http://192.168.33.60:9200`.
 
 [[dashboard-load-options]]
 === Other Dashboard Load Options
@@ -65,32 +56,32 @@ When you load the Beats dashboards, you can also specify:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./load.sh -url http://test.com:9200 -index .kibana_env
+./import_dashboards.sh -url http://test.com:9200 -index .kibana_env
 ----------------------------------------------------------------------
 
 * The username and password to use for authentication. There are a few ways to pass in the username and password. For example:
 +
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-./load.sh -url https://xyz.found.io -u user:password <1>
+./import_dashboards.sh -url https://xyz.found.io -u user:password <1>
 
-./load.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
+./import_dashboards.sh -url https://xyz.found.io -u admin:$(cat ~/pass-file) <2> 
 
-./load.sh -url https://user:password@xyz.found.io <3>
+./import_dashboards.sh -url https://user:password@xyz.found.io <3>
 ----------------------------------------------------------------------
 +
 <1> Specify the username and password separated by a colon.
 <2> Use a file to avoid polluting the bash history with the password.
 <3> Put the username and password in the URL.
 
-These options are also available when you run `.\load.ps1` on Windows.
+These options are also available when you run `.\import_dashboards.ps1` on Windows.
 
 [[view-kibana-dashboards]]
 === Opening the Beats Dashboards in Kibana
 
 After <<load-kibana-dashboards,loading the Beats dashboards>>,
 launch the Kibana web interface by pointing your browser
-to port 5601. For example, `http://127.0.0.1:5601`.
+to port 5601. For example, http://127.0.0.1:5601[http://127.0.0.1:5601].
 
 If Kibana shows a `No default index pattern` warning, you must select or create
 an index pattern to continue. To resolve the issue, select one of the
@@ -102,6 +93,3 @@ To open the loaded dashboards, go to the *Dashboard* page and click *Open*.
 Select the dashboard that you want to open. 
 
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
-
-Of course, you won't see actual data until you've installed and
-configured your Beat.
