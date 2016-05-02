@@ -196,8 +196,8 @@ an example. We recommend that you
 http://www.elastic.co/guide/en/kibana/current/dashboard.html[customize] it
 to meet your needs.
 
-For more information about loading and viewing the Beats dashboards, see
-{libbeat}/visualizing-data.html[Visualizing Your Data in Kibana].
+For more information, see
+{libbeat}/load-kibana-dashboards.html[Loading the Beats Dashboards].
 
 image:./images/topbeat-dashboard.png[Topbeat statistics]
 
