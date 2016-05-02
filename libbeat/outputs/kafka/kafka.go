@@ -17,8 +17,19 @@ import (
 )
 
 type kafka struct {
-	mode mode.ConnectionMode
+	config kafkaConfig
+
+	modeRetry      mode.ConnectionMode
+	modeGuaranteed mode.ConnectionMode
 }
+
+const (
+	defaultWaitRetry = 1 * time.Second
+
+	// NOTE: maxWaitRetry has no effect on mode, as logstash client currently does
+	// not return ErrTempBulkFailure
+	defaultMaxWaitRetry = 60 * time.Second
+)
 
 func init() {
 	sarama.Logger = kafkaLogger{}
@@ -55,64 +66,95 @@ func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 func (k *kafka) init(cfg *common.Config) error {
 	debugf("initialize kafka output")
 
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	k.config = defaultConfig
+	if err := cfg.Unpack(&k.config); err != nil {
 		return err
 	}
 
-	libCfg, err := newKafkaConfig(&config)
+	_, err := newKafkaConfig(&k.config)
 	if err != nil {
 		return err
 	}
 
-	hosts := config.Hosts
-	if len(hosts) < 1 {
-		logp.Err("Kafka configuration failed with: %v", errNoHosts)
-		return errNoHosts
+	return nil
+}
+
+func (k *kafka) initMode(guaranteed bool) (mode.ConnectionMode, error) {
+	libCfg, err := newKafkaConfig(&k.config)
+	if err != nil {
+		return nil, err
 	}
-	debugf("hosts: %v", hosts)
 
-	useType := config.UseType
+	if guaranteed {
+		libCfg.Producer.Retry.Max = 1000
+	}
 
-	topic := config.Topic
-	if topic == "" && !useType {
-		logp.Err("Kafka configuration failed with: %v", errNoTopicSet)
-		return errNoTopicSet
+	worker := 1
+	if k.config.Worker > 1 {
+		worker = k.config.Worker
 	}
 
 	var clients []mode.AsyncProtocolClient
-	worker := 1
-	if config.Worker > 1 {
-		worker = config.Worker
-	}
+	hosts := k.config.Hosts
+	topic := k.config.Topic
+	useType := k.config.UseType
 	for i := 0; i < worker; i++ {
 		client, err := newKafkaClient(hosts, topic, useType, libCfg)
 		if err != nil {
 			logp.Err("Failed to create kafka client: %v", err)
-			return err
+			return nil, err
 		}
-
 		clients = append(clients, client)
+	}
+
+	maxAttempts := 1
+	if guaranteed {
+		maxAttempts = 0
 	}
 
 	mode, err := modeutil.NewAsyncConnectionMode(
 		clients,
 		false,
-		config.MaxRetries,
-		libCfg.Producer.Retry.Backoff,
+		maxAttempts,
+		defaultWaitRetry,
 		libCfg.Net.WriteTimeout,
-		10*time.Second)
+		defaultMaxWaitRetry)
 	if err != nil {
 		logp.Err("Failed to configure kafka connection: %v", err)
-		return err
+		return nil, err
+	}
+	return mode, nil
+}
+
+func (k *kafka) getMode(opts outputs.Options) (mode.ConnectionMode, error) {
+	var err error
+	guaranteed := opts.Guaranteed || k.config.MaxRetries == -1
+	if guaranteed {
+		if k.modeGuaranteed == nil {
+			k.modeGuaranteed, err = k.initMode(true)
+		}
+		return k.modeGuaranteed, err
 	}
 
-	k.mode = mode
-	return nil
+	if k.modeRetry == nil {
+		k.modeRetry, err = k.initMode(false)
+	}
+	return k.modeRetry, err
 }
 
 func (k *kafka) Close() error {
-	return k.mode.Close()
+	var err error
+
+	if k.modeGuaranteed != nil {
+		err = k.modeGuaranteed.Close()
+	}
+	if k.modeRetry != nil {
+		tmp := k.modeRetry.Close()
+		if err == nil {
+			err = tmp
+		}
+	}
+	return err
 }
 
 func (k *kafka) PublishEvent(
@@ -120,7 +162,11 @@ func (k *kafka) PublishEvent(
 	opts outputs.Options,
 	event common.MapStr,
 ) error {
-	return k.mode.PublishEvent(signal, opts, event)
+	mode, err := k.getMode(opts)
+	if err != nil {
+		return err
+	}
+	return mode.PublishEvent(signal, opts, event)
 }
 
 func (k *kafka) BulkPublish(
@@ -128,7 +174,11 @@ func (k *kafka) BulkPublish(
 	opts outputs.Options,
 	event []common.MapStr,
 ) error {
-	return k.mode.PublishEvents(signal, opts, event)
+	mode, err := k.getMode(opts)
+	if err != nil {
+		return err
+	}
+	return mode.PublishEvents(signal, opts, event)
 }
 
 func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
@@ -170,7 +220,11 @@ func newKafkaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Producer.Return.Errors = true
 
 	// have retries being handled by libbeat, disable retries in sarama library
-	k.Producer.Retry.Max = 0
+	retryMax := config.MaxRetries
+	if retryMax < 0 {
+		retryMax = 1000
+	}
+	k.Producer.Retry.Max = retryMax
 
 	// configure per broker go channel buffering
 	k.ChannelBufferSize = config.ChanBufferSize
