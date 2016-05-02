@@ -36,7 +36,7 @@ func testLoadBalancerFailSendWithoutActiveConnections(
 	events []eventInfo,
 ) {
 	errFail := errors.New("fail connect")
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: false,
@@ -49,7 +49,6 @@ func testLoadBalancerFailSendWithoutActiveConnections(
 				connect:   alwaysFailConnect(errFail),
 			},
 		},
-		false,
 		2,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -95,7 +94,7 @@ func TestLoadBalancerOKSendMult(t *testing.T) {
 
 func testLoadBalancerFlakyConnectionOkSend(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -110,7 +109,6 @@ func testLoadBalancerFlakyConnectionOkSend(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(1, collectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -129,7 +127,7 @@ func TestLoadBalancerFlakyConnectionOkSendMult(t *testing.T) {
 
 func testLoadBalancerFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -144,7 +142,6 @@ func testLoadBalancerFlakyFail(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(3, collectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -190,7 +187,7 @@ func TestLoadBalancerTemporayFailureMutlEvents(t *testing.T) {
 
 func testLoadBalancerTempFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -205,7 +202,6 @@ func testLoadBalancerTempFlakyFail(t *testing.T, events []eventInfo) {
 				publish:   publishFailWith(3, ErrTempBulkFailure, collectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -224,7 +220,7 @@ func TestLoadBalancerMultiTempFlakyFail(t *testing.T) {
 
 func testLoadBalancerFlakyInfAttempts(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -239,7 +235,6 @@ func testLoadBalancerFlakyInfAttempts(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(25, collectPublish(&collected)),
 			},
 		},
-		false,
 		0,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -258,7 +253,7 @@ func TestLoadBalancerMultiFlakyInfAttempts(t *testing.T) {
 
 func testLoadBalancerTempFlakyInfAttempts(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -273,7 +268,6 @@ func testLoadBalancerTempFlakyInfAttempts(t *testing.T, events []eventInfo) {
 				publish:   publishFailWith(25, ErrTempBulkFailure, collectPublish(&collected)),
 			},
 		},
-		false,
 		0,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -292,7 +286,7 @@ func TestLoadBalancerMultiTempFlakyInfAttempts(t *testing.T) {
 
 func testLoadBalancerFlakyGuaranteed(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -307,7 +301,6 @@ func testLoadBalancerFlakyGuaranteed(t *testing.T, events []eventInfo) {
 				publish:   publishFailStart(25, collectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -326,7 +319,7 @@ func TestLoadBalancerMultiFlakyGuaranteed(t *testing.T) {
 
 func testLoadBalancerTempFlakyGuaranteed(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
+	mode, _ := NewLoadBalancerMode(
 		[]ProtocolClient{
 			&mockClient{
 				connected: true,
@@ -341,7 +334,6 @@ func testLoadBalancerTempFlakyGuaranteed(t *testing.T, events []eventInfo) {
 				publish:   publishFailWith(25, ErrTempBulkFailure, collectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,

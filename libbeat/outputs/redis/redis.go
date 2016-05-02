@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -86,7 +87,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 	})
 
 	// configure publisher clients
-	clients, err := mode.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
+	clients, err := modeutil.MakeClients(cfg, func(host string) (mode.ProtocolClient, error) {
 		t, err := transport.NewClient(transp, "tcp", host, config.Port)
 		if err != nil {
 			return nil, err
@@ -98,7 +99,7 @@ func (r *redisOut) init(cfg *common.Config, expireTopo int) error {
 	}
 
 	logp.Info("Max Retries set to: %v", sendRetries)
-	m, err := mode.NewConnectionMode(clients, !config.LoadBalance,
+	m, err := modeutil.NewConnectionMode(clients, !config.LoadBalance,
 		maxAttempts, defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
 	if err != nil {
 		return err

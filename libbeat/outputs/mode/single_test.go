@@ -12,16 +12,13 @@ import (
 
 func testSingleSendOneEvent(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: true,
-				close:     closeOK,
-				connect:   connectOK,
-				publish:   collectPublish(&collected),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: true,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   collectPublish(&collected),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -41,16 +38,13 @@ func TestSingleSendMultiple(t *testing.T) {
 func testSingleConnectFailConnectAndSend(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
 	errFail := errors.New("fail connect")
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   failConnect(3, errFail), // 3 fails
-				publish:   collectPublish(&collected),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   failConnect(3, errFail), // 3 fails
+			publish:   collectPublish(&collected),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -70,16 +64,13 @@ func TestSingleConnectFailConnectAndSendMultiple(t *testing.T) {
 func testSingleConnectionFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
 	errFail := errors.New("fail connect")
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   alwaysFailConnect(errFail),
-				publish:   collectPublish(&collected),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   alwaysFailConnect(errFail),
+			publish:   collectPublish(&collected),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -98,16 +89,13 @@ func TestSingleConnectionFailMulti(t *testing.T) {
 
 func testSingleSendFlaky(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   connectOK,
-				publish:   publishFailStart(2, collectPublish(&collected)),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(2, collectPublish(&collected)),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -126,16 +114,13 @@ func TestSingleSendMultiFlaky(t *testing.T) {
 
 func testSingleSendFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   connectOK,
-				publish:   publishFailStart(3, collectPublish(&collected)),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(3, collectPublish(&collected)),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -156,16 +141,13 @@ func testSingleSendFlakyInfAttempts(t *testing.T, events []eventInfo) {
 	enableLogging([]string{"*"})
 
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   connectOK,
-				publish:   publishFailStart(25, collectPublish(&collected)),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(25, collectPublish(&collected)),
 		},
-		false,
 		0, // infinite number of send attempts
 		1*time.Millisecond,
 		1*time.Millisecond,
@@ -184,16 +166,13 @@ func TestSingleSendMultiFlakyInfAttempts(t *testing.T) {
 
 func testSingleSendFlakyGuaranteed(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewConnectionMode(
-		[]ProtocolClient{
-			&mockClient{
-				connected: false,
-				close:     closeOK,
-				connect:   connectOK,
-				publish:   publishFailStart(25, collectPublish(&collected)),
-			},
+	mode, _ := NewSingleConnectionMode(
+		&mockClient{
+			connected: false,
+			close:     closeOK,
+			connect:   connectOK,
+			publish:   publishFailStart(25, collectPublish(&collected)),
 		},
-		false,
 		3,
 		1*time.Millisecond,
 		1*time.Millisecond,
