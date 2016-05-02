@@ -17,6 +17,7 @@ type fileOutput struct {
 	rotator logp.FileRotator
 }
 
+// New instantiates a new file output instance.
 func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
