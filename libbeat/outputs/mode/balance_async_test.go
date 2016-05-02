@@ -12,9 +12,8 @@ import (
 )
 
 func TestAsyncLBStartStop(t *testing.T) {
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{},
-		false,
 		1,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -27,7 +26,7 @@ func testAsyncLBFailSendWithoutActiveConnection(t *testing.T, events []eventInfo
 	enableLogging([]string{"*"})
 
 	errFail := errors.New("fail connect")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected: false,
@@ -40,7 +39,6 @@ func testAsyncLBFailSendWithoutActiveConnection(t *testing.T, events []eventInfo
 				connect:   alwaysFailConnect(errFail),
 			},
 		},
-		false,
 		2,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -61,7 +59,7 @@ func testAsyncLBOKSend(t *testing.T, events []eventInfo) {
 	enableLogging([]string{"*"})
 
 	var collected [][]common.MapStr
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    false,
@@ -70,7 +68,6 @@ func testAsyncLBOKSend(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncCollectPublish(&collected),
 			},
 		},
-		false,
 		2,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -89,7 +86,7 @@ func TestAsyncLBOKSendMult(t *testing.T) {
 
 func testAsyncLBFlakyConnectionOkSend(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -104,7 +101,6 @@ func testAsyncLBFlakyConnectionOkSend(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailStart(1, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -125,7 +121,7 @@ func testAsyncLBFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
 
 	err := errors.New("flaky")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -140,7 +136,6 @@ func testAsyncLBFlakyFail(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailWith(3, err, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -159,7 +154,7 @@ func TestAsyncLBMultiFlakyFail(t *testing.T) {
 
 func testAsyncLBTemporayFailure(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected: true,
@@ -169,7 +164,6 @@ func testAsyncLBTemporayFailure(t *testing.T, events []eventInfo) {
 					asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -188,7 +182,7 @@ func TestAsyncLBTemporayFailureMutlEvents(t *testing.T) {
 
 func testAsyncLBTempFlakyFail(t *testing.T, events []eventInfo) {
 	var collected [][]common.MapStr
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected: true,
@@ -205,7 +199,6 @@ func testAsyncLBTempFlakyFail(t *testing.T, events []eventInfo) {
 					asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		100*time.Millisecond,
 		100*time.Millisecond,
@@ -229,7 +222,7 @@ func testAsyncLBFlakyInfAttempts(t *testing.T, events []eventInfo) {
 
 	var collected [][]common.MapStr
 	err := errors.New("flaky")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -244,7 +237,6 @@ func testAsyncLBFlakyInfAttempts(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailWith(50, err, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		0,
 		1*time.Nanosecond,
 		1*time.Millisecond,
@@ -268,7 +260,7 @@ func testAsyncLBFlakyInfAttempts2(t *testing.T, events []eventInfo) {
 
 	var collected [][]common.MapStr
 	err := errors.New("flaky")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -283,7 +275,6 @@ func testAsyncLBFlakyInfAttempts2(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailStartWith(50, err, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		0,
 		1*time.Nanosecond,
 		1*time.Millisecond,
@@ -307,7 +298,7 @@ func testAsyncLBFlakyGuaranteed(t *testing.T, events []eventInfo) {
 
 	var collected [][]common.MapStr
 	err := errors.New("flaky")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -322,7 +313,6 @@ func testAsyncLBFlakyGuaranteed(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailWith(50, err, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Nanosecond,
 		1*time.Millisecond,
@@ -346,7 +336,7 @@ func testAsyncLBFlakyGuaranteed2(t *testing.T, events []eventInfo) {
 
 	var collected [][]common.MapStr
 	err := errors.New("flaky")
-	mode, _ := NewAsyncConnectionMode(
+	mode, _ := NewAsyncLoadBalancerMode(
 		[]AsyncProtocolClient{
 			&mockClient{
 				connected:    true,
@@ -361,7 +351,6 @@ func testAsyncLBFlakyGuaranteed2(t *testing.T, events []eventInfo) {
 				asyncPublish: asyncFailStartWith(50, err, asyncCollectPublish(&collected)),
 			},
 		},
-		false,
 		3,
 		1*time.Nanosecond,
 		1*time.Millisecond,

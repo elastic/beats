@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 )
 
 type kafka struct {
@@ -41,6 +42,7 @@ var (
 	}
 )
 
+// New instantiates a new kafka output instance.
 func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	output := &kafka{}
 	err := output.init(cfg)
@@ -93,7 +95,7 @@ func (k *kafka) init(cfg *common.Config) error {
 		clients = append(clients, client)
 	}
 
-	mode, err := mode.NewAsyncConnectionMode(
+	mode, err := modeutil.NewAsyncConnectionMode(
 		clients,
 		false,
 		config.MaxRetries,
