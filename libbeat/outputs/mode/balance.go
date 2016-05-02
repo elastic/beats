@@ -161,7 +161,7 @@ func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
 	debug("load balancer: start client loop")
 	defer debug("load balancer: stop client loop")
 
-	backoff := newBackoff(m.done, m.waitRetry, m.maxWaitRetry)
+	backoff := common.NewBackoff(m.done, m.waitRetry, m.maxWaitRetry)
 
 	done := false
 	for !done {
@@ -173,7 +173,7 @@ func (m *LoadBalancerMode) clientLoop(client ProtocolClient) {
 	}
 }
 
-func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *backoff) bool {
+func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *common.Backoff) bool {
 	for {
 		debug("try to (re-)connect client")
 		err := client.Connect(m.timeout)
@@ -187,7 +187,7 @@ func (m *LoadBalancerMode) connect(client ProtocolClient, backoff *backoff) bool
 	}
 }
 
-func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *backoff) bool {
+func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *common.Backoff) bool {
 	for {
 		var msg eventsMessage
 		select {
@@ -205,7 +205,7 @@ func (m *LoadBalancerMode) sendLoop(client ProtocolClient, backoff *backoff) boo
 }
 
 func (m *LoadBalancerMode) onMessage(
-	backoff *backoff,
+	backoff *common.Backoff,
 	client ProtocolClient,
 	msg eventsMessage,
 ) (bool, error) {
