@@ -1,4 +1,4 @@
-package mode
+package lb
 
 import (
 	"sync"
@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/outputs/mode"
 )
 
 // AsyncLoadBalancerMode balances the sending of events between multiple connections.
@@ -59,13 +60,13 @@ type AsyncLoadBalancerMode struct {
 }
 
 // NewAsyncLoadBalancerMode create a new load balancer connection mode.
-func NewAsyncLoadBalancerMode(
-	clients []AsyncProtocolClient,
+func NewAsync(
+	clients []mode.AsyncProtocolClient,
 	maxAttempts int,
 	waitRetry, timeout, maxWaitRetry time.Duration,
 ) (*AsyncLoadBalancerMode, error) {
 
-	debug("configure maxattempts: %v", maxAttempts)
+	debugf("configure maxattempts: %v", maxAttempts)
 
 	// maxAttempts signals infinite retry. Convert to -1, so attempts left and
 	// and infinite retry can be more easily distinguished by load balancer
@@ -123,13 +124,13 @@ func (m *AsyncLoadBalancerMode) publishEventsMessage(
 ) error {
 	maxAttempts := m.maxAttempts
 	if opts.Guaranteed {
-		debug("guaranteed flag is set")
+		debugf("guaranteed flag is set")
 		maxAttempts = -1
 	} else {
-		debug("guaranteed flag is not set")
+		debugf("guaranteed flag is not set")
 	}
 	msg.attemptsLeft = maxAttempts
-	debug("publish events with attempts=%v", msg.attemptsLeft)
+	debugf("publish events with attempts=%v", msg.attemptsLeft)
 
 	if ok := m.forwardEvent(m.work, msg); !ok {
 		dropping(msg)
@@ -137,9 +138,9 @@ func (m *AsyncLoadBalancerMode) publishEventsMessage(
 	return nil
 }
 
-func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
+func (m *AsyncLoadBalancerMode) start(clients []mode.AsyncProtocolClient) {
 	var waitStart sync.WaitGroup
-	worker := func(client AsyncProtocolClient) {
+	worker := func(client mode.AsyncProtocolClient) {
 		defer func() {
 			if client.IsConnected() {
 				_ = client.Close()
@@ -168,9 +169,9 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 			case <-m.done:
 				return
 			case msg = <-m.retries: // receive message from other failed worker
-				debug("events from retries queue")
+				debugf("events from retries queue")
 			case msg = <-m.work: // receive message from publisher
-				debug("events from worker worker queue")
+				debugf("events from worker worker queue")
 			}
 
 			err := m.onMessage(client, msg)
@@ -189,7 +190,7 @@ func (m *AsyncLoadBalancerMode) start(clients []AsyncProtocolClient) {
 }
 
 func (m *AsyncLoadBalancerMode) onMessage(
-	client AsyncProtocolClient,
+	client mode.AsyncProtocolClient,
 	msg eventsMessage,
 ) error {
 	var err error
@@ -232,10 +233,10 @@ func handlePublishEventsResult(
 ) func([]common.MapStr, error) {
 	total := len(msg.events)
 	return func(events []common.MapStr, err error) {
-		debug("handlePublishEventsResult")
+		debugf("handlePublishEventsResult")
 
 		if err != nil {
-			debug("handle publish error: %v", err)
+			debugf("handle publish error: %v", err)
 
 			if msg.attemptsLeft > 0 {
 				msg.attemptsLeft--
@@ -246,7 +247,7 @@ func handlePublishEventsResult(
 				msg.attemptsLeft = m.maxAttempts
 			}
 
-			if err != ErrTempBulkFailure {
+			if err != mode.ErrTempBulkFailure {
 				// retry non-published subset of events in batch
 				msg.events = events
 				m.onFail(false, msg, err)
@@ -267,7 +268,7 @@ func handlePublishEventsResult(
 
 		// re-insert non-published events into pipeline
 		if len(events) != 0 {
-			debug("add non-published events back into pipeline: %v", len(events))
+			debugf("add non-published events back into pipeline: %v", len(events))
 			msg.events = events
 			if ok := m.forwardEvent(m.retries, msg); !ok {
 				dropping(msg)
@@ -276,7 +277,7 @@ func handlePublishEventsResult(
 		}
 
 		// all events published -> signal success
-		debug("async bulk publish success")
+		debugf("async bulk publish success")
 		op.SigCompleted(msg.signaler)
 	}
 }
@@ -301,28 +302,28 @@ func (m *AsyncLoadBalancerMode) forwardEvent(
 	ch chan eventsMessage,
 	msg eventsMessage,
 ) bool {
-	debug("forwards msg with attempts=%v", msg.attemptsLeft)
+	debugf("forwards msg with attempts=%v", msg.attemptsLeft)
 
 	if msg.attemptsLeft < 0 {
 		select {
 		case ch <- msg:
-			debug("message forwarded")
+			debugf("message forwarded")
 			return true
 		case <-m.done: // shutdown
-			debug("shutting down")
+			debugf("shutting down")
 			return false
 		}
 	} else {
 		for ; msg.attemptsLeft > 0; msg.attemptsLeft-- {
 			select {
 			case ch <- msg:
-				debug("message forwarded")
+				debugf("message forwarded")
 				return true
 			case <-m.done: // shutdown
-				debug("shutting down")
+				debugf("shutting down")
 				return false
 			case <-time.After(m.timeout):
-				debug("forward timed out")
+				debugf("forward timed out")
 			}
 		}
 	}
