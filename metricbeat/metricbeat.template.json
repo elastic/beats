@@ -275,6 +275,59 @@
             }
           }
         },
+        "system-filesystem": {
+          "properties": {
+            "avail": {
+              "type": "integer"
+            },
+            "device_name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "files": {
+              "type": "integer"
+            },
+            "free_files": {
+              "type": "integer"
+            },
+            "mount_point": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "total": {
+              "type": "integer"
+            },
+            "used": {
+              "type": "integer"
+            },
+            "used_p": {
+              "type": "float"
+            }
+          }
+        },
+        "system-fsstats": {
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "total_files": {
+              "type": "long"
+            },
+            "total_size": {
+              "properties": {
+                "avail": {
+                  "type": "integer"
+                },
+                "free": {
+                  "type": "integer"
+                },
+                "used": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
         "system-memory": {
           "properties": {
             "mem": {
@@ -317,6 +370,68 @@
                   "type": "float"
                 }
               }
+            }
+          }
+        },
+        "system-process": {
+          "properties": {
+            "cmdline": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "cpu": {
+              "properties": {
+                "start_time": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "system": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "total_p": {
+                  "type": "float"
+                },
+                "user": {
+                  "type": "integer"
+                }
+              }
+            },
+            "mem": {
+              "properties": {
+                "rss": {
+                  "type": "integer"
+                },
+                "rss_p": {
+                  "type": "float"
+                },
+                "share": {
+                  "type": "integer"
+                },
+                "size": {
+                  "type": "integer"
+                }
+              }
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "pid": {
+              "type": "integer"
+            },
+            "ppid": {
+              "type": "integer"
+            },
+            "state": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "username": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
         },

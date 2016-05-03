@@ -600,6 +600,112 @@ type: integer
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
+=== system-filesystem Fields
+
+`system-filesystem` contains local filesystem stats
+
+
+
+==== system-filesystem.avail
+
+type: integer
+
+The available disk space in bytes.
+
+
+==== system-filesystem.device_name
+
+type: keyword
+
+The disk name. For example: `/dev/disk1`
+
+
+==== system-filesystem.mount_point
+
+type: keyword
+
+The mounting point. For example: `/`
+
+
+==== system-filesystem.files
+
+type: integer
+
+The total number of file nodes in the file system.
+
+
+==== system-filesystem.free_files
+
+type: integer
+
+The number of free file nodes in the file system.
+
+
+==== system-filesystem.total
+
+type: integer
+
+The total disk space in bytes.
+
+
+==== system-filesystem.used
+
+type: integer
+
+The used disk space in bytes.
+
+
+==== system-filesystem.used_p
+
+type: float
+
+The percentage of used disk space.
+
+
+=== system-fsstats Fields
+
+`system-fsstats` contains local filesystem stats
+
+
+
+==== system-fsstats.count
+
+type: integer
+
+Number of file systems found
+
+==== system-fsstats.total_files
+
+type: long
+
+Number of total files
+
+=== total_size Fields
+
+Nested file system docs
+
+
+==== system-fsstats.total_size.avail
+
+type: integer
+
+Total available space.
+
+
+==== system-fsstats.total_size.free
+
+type: integer
+
+Total free space.
+
+
+==== system-fsstats.total_size.used
+
+type: integer
+
+Total used space.
+
+
 === system-memory Fields
 
 `system-memory` contains local memory stats.
@@ -693,5 +799,128 @@ Available swap memory.
 type: float
 
 The percentage of used swap memory.
+
+
+=== system-process Fields
+
+`system-process` contains process stats
+
+
+
+==== system-process.name
+
+type: keyword
+
+The process name.
+
+
+==== system-process.state
+
+type: keyword
+
+The process state. For example: "running"
+
+
+==== system-process.pid
+
+type: integer
+
+The process pid.
+
+
+==== system-process.ppid
+
+type: integer
+
+The process parent pid.
+
+
+==== system-process.cmdline
+
+type: keyword
+
+The full command-line used to start the process, including the arguments separated by space.
+
+
+==== system-process.username
+
+type: keyword
+
+The username of the user that created the process. If the username can not be determined then the the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
+
+
+[float]
+=== cpu Fields
+
+CPU-specific statistics per process.
+
+
+==== system-process.cpu.user
+
+type: integer
+
+The amount of CPU time the process spent in user space.
+
+
+==== system-process.cpu.total_p
+
+type: float
+
+The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
+
+
+==== system-process.cpu.system
+
+type: integer
+
+The amount of CPU time the process spent in kernel space.
+
+
+==== system-process.cpu.total
+
+type: integer
+
+The total CPU time spent by the process.
+
+
+==== system-process.cpu.start_time
+
+type: keyword
+
+The time when the process was started. Example: "17:45".
+
+
+[float]
+=== mem Fields
+
+Memory-specific statistics per process.
+
+
+==== system-process.mem.size
+
+type: integer
+
+The total virtual memory the process has.
+
+
+==== system-process.mem.rss
+
+type: integer
+
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
+
+
+==== system-process.mem.rss_p
+
+type: float
+
+The percentage of memory the process occupied in main memory (RAM).
+
+
+==== system-process.mem.share
+
+type: integer
+
+The shared memory the process uses.
 
 

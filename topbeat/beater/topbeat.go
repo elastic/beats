@@ -138,7 +138,7 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 			t.events.PublishEvent(event)
 		}
 		if t.procStats.ProcStats {
-			events, err := t.procStats.GetProcStats()
+			events, err := t.procStats.GetProcStatsEvents()
 			if err != nil {
 				logp.Err("Error reading proc stats: %v", err)
 				break

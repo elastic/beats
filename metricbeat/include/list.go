@@ -17,7 +17,10 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 	_ "github.com/elastic/beats/metricbeat/module/system"
 	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
+	_ "github.com/elastic/beats/metricbeat/module/system/filesystem"
+	_ "github.com/elastic/beats/metricbeat/module/system/fsstats"
 	_ "github.com/elastic/beats/metricbeat/module/system/memory"
+	_ "github.com/elastic/beats/metricbeat/module/system/process"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
 )
