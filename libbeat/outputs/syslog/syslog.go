@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -32,7 +33,7 @@ func New(cfg *common.Config, _ int) (outputs.Outputer, error) {
 	return output, nil
 }
 
-func makeClientFactory(cfg *config, tcfg *transport.Config) mode.ClientFactory {
+func makeClientFactory(cfg *config, tcfg *transport.Config) modeutil.ClientFactory {
 	return func(host string) (mode.ProtocolClient, error) {
 		t, err := transport.NewClient(tcfg, "tcp", host, cfg.Port)
 		if err != nil {
@@ -65,9 +66,9 @@ func (s *syslog) init(cfg *common.Config) error {
 		TLS:     tls,
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(&config, transp))
+	clients, err := modeutil.MakeClients(cfg, makeClientFactory(&config, transp))
 
-	m, err := mode.NewConnectionMode(clients, false, maxAttempts,
+	m, err := modeutil.NewConnectionMode(clients, false, maxAttempts,
 		defaultWaitRetry, config.Timeout, defaultMaxWaitRetry)
 	if err != nil {
 		return err
