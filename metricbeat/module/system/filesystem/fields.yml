@@ -1,0 +1,39 @@
+- name: system-filesystem
+  type: group
+  description: >
+    `system-filesystem` contains local filesystem stats
+  fields:
+    - name: avail
+      type: integer
+      description: >
+        The available disk space in bytes.
+    - name: device_name
+      type: keyword
+      description: >
+        The disk name. For example: `/dev/disk1`
+    - name: mount_point
+      type: keyword
+      description: >
+        The mounting point. For example: `/`
+    - name: files
+      type: integer
+      description: >
+        The total number of file nodes in the file system.
+    - name: free_files
+      type: integer
+      description: >
+        The number of free file nodes in the file system.
+    - name: total
+      type: integer
+      description: >
+        The total disk space in bytes.
+    - name: used
+      type: integer
+      description: >
+        The used disk space in bytes.
+    - name: used_p
+      type: float
+      description: >
+        The percentage of used disk space.
+
+

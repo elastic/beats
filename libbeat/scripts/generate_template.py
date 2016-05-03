@@ -240,7 +240,7 @@ def fill_field_properties(args, field, defaults, path):
             path = path + "." + field["name"]
         else:
             path = field["name"]
-        prop, dynamic = fill_section_properties(field, defaults, path)
+        prop, dynamic = fill_section_properties(args, field, defaults, path)
 
         # Only add properties if they have a content
         if len(prop) is not 0:

@@ -203,8 +203,9 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 		return nil, err
 	}
 
-	events := []common.MapStr{}
+	processes := []common.MapStr{}
 	newProcs := make(ProcsMap, len(pids))
+
 	for _, pid := range pids {
 		var cmdline string
 		if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
@@ -227,16 +228,32 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 			}
 			proc := GetProcessEvent(process, last)
 
-			event := common.MapStr{
-				"@timestamp": common.Time(time.Now()),
-				"type":       "process",
-				"proc":       proc,
-			}
-
-			events = append(events, event)
+			processes = append(processes, proc)
 		}
 	}
 
 	procStats.ProcsMap = newProcs
+	return processes, nil
+}
+
+func (procStats *ProcStats) GetProcStatsEvents() ([]common.MapStr, error) {
+
+	events := []common.MapStr{}
+
+	processes, err := procStats.GetProcStats()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, proc := range processes {
+		event := common.MapStr{
+			"@timestamp": common.Time(time.Now()),
+			"type":       "process",
+			"proc":       proc,
+		}
+
+		events = append(events, event)
+	}
+
 	return events, nil
 }
