@@ -5,10 +5,10 @@
 :filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
 :winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :security: X-Pack Security
-:ES-version: 5.0.0-alpha1
-:LS-version: 5.0.0-alpha1
-:Kibana-version: 5.0.0-alpha1
-:Dashboards-version: 5.0.0-alpha1
+:ES-version: 5.0.0-alpha2
+:LS-version: 5.0.0-alpha2
+:Kibana-version: 5.0.0-alpha2
+:Dashboards-version: 5.0.0-alpha2
 
 include::./overview.asciidoc[]
 
