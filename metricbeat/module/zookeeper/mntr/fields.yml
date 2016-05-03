@@ -1,0 +1,82 @@
+- name: zookeeper-mntr
+  type: group
+  description: >
+    `zookeeper-mntr` contains the metrics reported by the four-letter `mntr`
+    command.
+  fields:
+    - name: hostname
+      type: keyword
+      description: >
+        Zookeeper hostname.
+    - name: zk_approximate_data_size
+      type: long
+      description: >
+        Approximate size of zookeeper data.
+    - name: zk_avg_latency
+      type: integer
+      description: >
+        Average latency between ensemble hosts in milliseconds.
+    - name: zk_ephemerals_count
+      type: integer
+      description: >
+        Number of ephemeral znodes.
+    - name: zk_followers
+      type: integer
+      description: >
+        Number of followers seen by the current host.
+    - name: zk_max_file_descriptor_count
+      type: integer
+      description: >
+        Maximum number of file descriptors allowed for the zookeeper process.
+    - name: zk_max_latency
+      type: integer
+      description: >
+        Maximum latency in milliseconds.
+    - name: zk_min_latency
+      type: integer
+      description: >
+        Minimum latency in milliseconds.
+    - name: zk_num_alive_connections
+      type: integer
+      description: >
+        Number of connections to zookeeper that are currently alive.
+    - name: zk_open_file_descriptor_count
+      type: integer
+      description: >
+        Number of file descriptors open by the zookeeper process.
+    - name: zk_outstanding_requests
+      type: integer
+      description: >
+        Number of outstanding requests that need to be processed by the cluster.
+    - name: zk_packets_received
+      type: integer
+      description: >
+        Number zookeeper network packets received.
+    - name: zk_packets_sent
+      type: long
+      description: >
+        Number zookeeper network packets sent.
+    - name: zk_pending_syncs
+      type: integer
+      description: >
+        Number of pending syncs to carry out to zookeeper ensemble followers.
+    - name: zk_server_state
+      type: keyword
+      description: >
+        Role in the zookeeper ensemble.
+    - name: zk_synced_followers
+      type: integer
+      description: >
+        Number of synced followers reported when a node server_state is leader.
+    - name: zk_version
+      type: keyword
+      description: >
+        Zookeeper version and build string reported.
+    - name: zk_watch_count
+      type: integer
+      description: >
+        Number of watches currently set on the local zookeeper process.
+    - name: zk_znode_count
+      type: integer
+      description: >
+        Number of znodes reported by the local zookeeper process.
