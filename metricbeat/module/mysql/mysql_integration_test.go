@@ -9,7 +9,6 @@ import (
 )
 
 func TestConnect(t *testing.T) {
-
 	db, err := Connect(GetMySQLEnvDSN())
 	assert.NoError(t, err)
 

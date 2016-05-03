@@ -9,7 +9,7 @@ class Test(BaseTest):
         """
         self.render_config_template()
         proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("Setup Beat"))
+        self.wait_until(lambda: self.log_contains("start running"))
         proc.check_kill_and_wait()
 
         # Ensure no errors or warnings exist in the log.

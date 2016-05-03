@@ -317,6 +317,17 @@ class TestCase(unittest.TestCase):
 
         return counter
 
+    def output_lines(self, output_file=None):
+        """ Count number of lines in a file."""
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file), "r") as f:
+                return sum([1 for line in f])
+        except IOError:
+            return 0
+
     def output_has(self, lines, output_file=None):
         """
         Returns true if the output has a given number of lines.

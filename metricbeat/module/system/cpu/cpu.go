@@ -3,41 +3,35 @@
 package cpu
 
 import (
-	"github.com/elastic/beats/metricbeat/helper"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/topbeat/system"
+
+	"github.com/pkg/errors"
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("system", "cpu", New)
+	if err := mb.Registry.AddMetricSet("system", "cpu", New); err != nil {
+		panic(err)
+	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
+// MetricSet for fetching system CPU metrics.
+type MetricSet struct {
+	mb.BaseMetricSet
 }
 
-type MetricSeter struct{}
-
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
+// New is a mb.MetricSetFactory that returns a cpu.MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MetricSet{base}, nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
-
+// Fetch fetches CPU metrics from the OS.
+func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
 	cpuStat, err := system.GetCpuTimes()
 	if err != nil {
-		logp.Warn("Getting cpu times: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "cpu times")
 	}
 
-	event = system.GetCpuStatEvent(cpuStat)
-
-	return event, nil
-}
-
-func (m *MetricSeter) Cleanup() error {
-	return nil
+	return system.GetCpuStatEvent(cpuStat), nil
 }
