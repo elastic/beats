@@ -61,6 +61,6 @@ func TestModuleConfigDefaults(t *testing.T) {
 
 	assert.Equal(t, true, mc.Enabled)
 	assert.Equal(t, time.Second, mc.Period)
-	assert.Equal(t, time.Duration(0), mc.Timeout)
+	assert.Equal(t, time.Second, mc.Timeout)
 	assert.Empty(t, mc.Hosts)
 }

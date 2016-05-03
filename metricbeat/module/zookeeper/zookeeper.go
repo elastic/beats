@@ -1,41 +1,44 @@
+/*
+Package zookeeper is a Metricbeat module for ZooKeeper servers.
+*/
 package zookeeper
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
-// generic socket communication for four-letter commands.  returns a reader object to
-// pass to a mapping that'll dissect the output
-func RunCommand(command string, connectionString string, timeout time.Duration) (responseReader io.Reader, err error) {
-
-	conn, err := net.DialTimeout("tcp", connectionString, timeout)
+// RunCommand establishes a TCP connection the ZooKeeper command port that
+// accepts the four-letter ZooKeeper commands and sends the given command. It
+// reads all response data received on the socket and returns an io.Reader
+// containing that data.
+func RunCommand(command, address string, timeout time.Duration) (io.Reader, error) {
+	conn, err := net.DialTimeout("tcp", address, timeout)
 	if err != nil {
-		return nil, fmt.Errorf("Error connecting to host (%s): %v", connectionString, err)
+		return nil, errors.Wrapf(err, "connection to host '%s' failed", address)
 	}
-
 	defer conn.Close()
 
-	// Set read and write timeout
+	// Set read and write timeout.
 	err = conn.SetDeadline(time.Now().Add(timeout))
 	if err != nil {
 		return nil, err
 	}
 
-	// Write 4 letter command
+	// Write four-letter command.
 	_, err = conn.Write([]byte(command))
 	if err != nil {
-		return nil, fmt.Errorf("Error writing %s command: %v", command, err)
+		return nil, errors.Wrapf(err, "writing command '%s' failed", command)
 	}
 
-	// Read the data
 	result, err := ioutil.ReadAll(conn)
 	if err != nil {
-		return nil, fmt.Errorf("Error reading %s command: %v", command, err)
+		return nil, errors.Wrap(err, "read failed")
 	}
 
 	return bytes.NewReader(result), nil
