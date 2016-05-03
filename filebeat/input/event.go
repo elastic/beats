@@ -20,22 +20,11 @@ type FileEvent struct {
 	Offset       int64
 	Bytes        int
 	Text         *string
-	Fileinfo     *os.FileInfo
+	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *config.JSONConfig
 	Stat         *FileStat
-}
-
-// GetState builds and returns the FileState object based on the Event info.
-func (f *FileEvent) GetState() *FileState {
-
-	state := &FileState{
-		Source:      f.Source,
-		Offset:      f.Offset,
-		FileStateOS: *GetOSFileState(f.Fileinfo),
-	}
-
-	return state
+	FileState    FileState
 }
 
 // mergeJSONFields writes the JSON fields in the event map,

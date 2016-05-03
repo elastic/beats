@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -89,7 +90,7 @@ func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...strin
 		var tsZero time.Time
 
 		assert.NotEqual(t, tsZero, line.Ts)
-		assert.Equal(t, expected[i], string(line.Content))
+		assert.Equal(t, strings.TrimRight(expected[i], "\r\n "), string(line.Content))
 		assert.Equal(t, len(expected[i]), int(line.Bytes))
 	}
 }
@@ -111,7 +112,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg config.Multil
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	reader, err = NewMultiline(reader, 1<<20, &cfg)
+	reader, err = NewMultiline(NewStripNewline(reader), "\n", 1<<20, &cfg)
 	if err != nil {
 		t.Fatalf("failed to initializ reader: %v", err)
 	}

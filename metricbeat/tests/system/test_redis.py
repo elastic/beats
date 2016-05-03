@@ -24,11 +24,10 @@ class RedisInfoTest(metricbeat.BaseTest):
             "name": "redis",
             "metricsets": ["info"],
             "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+            "period": "5s"
         }])
         proc = self.start_beat()
-        self.wait_until(
-            lambda: self.output_has(lines=1)
-        )
+        self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
 
         # Ensure no errors or warnings exist in the log.
@@ -58,14 +57,13 @@ class RedisInfoTest(metricbeat.BaseTest):
             "name": "redis",
             "metricsets": ["info"],
             "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+            "period": "5s",
             "filters": [{
                 "include_fields": fields,
             }],
         }])
         proc = self.start_beat()
-        self.wait_until(
-            lambda: self.output_has(lines=1)
-        )
+        self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
 
         # Ensure no errors or warnings exist in the log.

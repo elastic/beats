@@ -104,12 +104,12 @@ func (p *ProspectorLog) scanGlob(glob string) {
 			continue
 		}
 
-		newFile := input.NewFile(fileinfo)
-
-		if newFile.FileInfo.IsDir() {
+		if fileinfo.IsDir() {
 			logp.Debug("prospector", "Skipping directory: %s", file)
 			continue
 		}
+
+		newFile := input.NewFile(fileinfo)
 
 		// Check the current info against p.prospectorinfo[file]
 		lastinfo, isKnown := p.harvesterStats[file]
@@ -120,8 +120,7 @@ func (p *ProspectorLog) scanGlob(glob string) {
 		newInfo := input.NewFileStat(newFile.FileInfo, p.iteration)
 
 		// Init harvester with info
-		h, err := p.Prospector.AddHarvester(file, newInfo)
-
+		h, err := p.Prospector.createHarvester(file, newInfo)
 		if err != nil {
 			logp.Err("Error initializing harvester: %v", err)
 			continue
@@ -225,6 +224,7 @@ func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input
 
 			// Forget about the previous harvester and let it continue on the old file - so start a new channel to use with the new harvester
 			h.Stat.Ignore()
+			//h.SetOffset(0)
 
 			// Start a new harvester on the path
 			h.Start()

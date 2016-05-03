@@ -21,7 +21,7 @@ type kafkaConfig struct {
 	RequiredACKs    *int               `config:"required_acks"       validate:"min=-1"`
 	BrokerTimeout   time.Duration      `config:"broker_timeout"      validate:"min=1"`
 	Compression     string             `config:"compression"`
-	MaxRetries      int                `config:"max_retries"`
+	MaxRetries      int                `config:"max_retries"         validate:"min=-1,nonzero"`
 	ClientID        string             `config:"client_id"`
 	ChanBufferSize  int                `config:"channel_buffer_size" validate:"min=1"`
 }

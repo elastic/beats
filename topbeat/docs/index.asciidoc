@@ -1,7 +1,7 @@
 = Topbeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha1
+:version: 5.0.0-alpha2
 :beatname_lc: topbeat
 :beatname_uc: Topbeat
 :security: X-Pack Security

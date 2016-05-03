@@ -4,12 +4,11 @@ import (
 	"strings"
 	"time"
 
-	rd "github.com/garyburd/redigo/redis"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 
-	"github.com/elastic/beats/metricbeat/helper"
+	rd "github.com/garyburd/redigo/redis"
 )
 
 var (
@@ -17,50 +16,48 @@ var (
 )
 
 func init() {
-	if err := helper.Registry.AddMetricSeter("redis", "info", New); err != nil {
+	if err := mb.Registry.AddMetricSet("redis", "info", New); err != nil {
 		panic(err)
 	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{
-		redisPools: map[string]*rd.Pool{},
-	}
-}
-
-type MetricSeter struct {
+// MetricSet for fetching Redis server information and statistics.
+type MetricSet struct {
+	mb.BaseMetricSet
 	redisPools map[string]*rd.Pool
 }
 
-// Configure connection pool for each Redis host
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-
-	// Additional configuration options
+// New creates new instance of MetricSeter
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	// Unpack additional configuration options.
 	config := struct {
 		Network  string `config:"network"`
-		MaxConn  int    `config:"maxconn"`
+		MaxConn  int    `config:"maxconn" validate:"min=1"`
 		Password string `config:"password"`
 	}{
 		Network:  "tcp",
 		MaxConn:  10,
 		Password: "",
 	}
-
-	if err := ms.Module.ProcessConfig(&config); err != nil {
-		return err
+	err := base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, err
 	}
 
-	for _, host := range ms.Config.Hosts {
-		redisPool := createPool(host, config.Password, config.Network, config.MaxConn, ms.Module.Timeout)
-		m.redisPools[host] = redisPool
+	redisPools := make(map[string]*rd.Pool, len(base.Module().Config().Hosts))
+	for _, host := range base.Module().Config().Hosts {
+		redisPool := createPool(host, config.Password, config.Network,
+			config.MaxConn, base.Module().Config().Timeout)
+		redisPools[host] = redisPool
 	}
 
-	return nil
+	return &MetricSet{
+		BaseMetricSet: base,
+		redisPools:    redisPools,
+	}, nil
 }
 
 func createPool(host, password, network string, maxConn int, timeout time.Duration) *rd.Pool {
-
 	return &rd.Pool{
 		MaxIdle:     maxConn,
 		IdleTimeout: timeout,
@@ -80,7 +77,8 @@ func createPool(host, password, network string, maxConn int, timeout time.Durati
 	}
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
+// Fetch fetches metrics from Redis by issuing the INFO command.
+func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
 	// Fetch default INFO
 	info, err := m.fetchRedisStats(host, "default")
 	if err != nil {
@@ -92,7 +90,7 @@ func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.Ma
 }
 
 // fetchRedisStats returns a map of requested stats
-func (m *MetricSeter) fetchRedisStats(host string, stat string) (map[string]string, error) {
+func (m *MetricSet) fetchRedisStats(host string, stat string) (map[string]string, error) {
 	c := m.redisPools[host].Get()
 	defer c.Close()
 	out, err := rd.String(c.Do("INFO", stat))

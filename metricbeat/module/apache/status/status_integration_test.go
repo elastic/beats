@@ -5,46 +5,29 @@ package status
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/apache"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestConnect(t *testing.T) {
+func TestFetch(t *testing.T) {
+	f := mbtest.NewEventFetcher(t, getConfig())
+	event, err := f.Fetch(f.Module().Config().Hosts[0])
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
-	config, _ := getApacheModuleConfig()
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	module, mErr := helper.NewModule(config, apache.New)
-	assert.NoError(t, mErr)
-	ms, msErr := helper.NewMetricSet("status", New, module)
-	assert.NoError(t, msErr)
-
-	// Setup metricset and metricseter
-	err := ms.Setup()
-	assert.NoError(t, err)
-	err = ms.MetricSeter.Setup(ms)
-	assert.NoError(t, err)
-
-	// Check that host is correctly set
-	assert.Equal(t, apache.GetApacheEnvHost(), ms.Config.Hosts[0])
-
-	data, err := ms.MetricSeter.Fetch(ms, ms.Config.Hosts[0])
-	assert.NoError(t, err)
-
-	// Check fields
-	assert.Equal(t, 13, len(data))
+	// Check number of fields.
+	assert.Equal(t, 13, len(event))
 }
 
-type ApacheModuleConfig struct {
-	Hosts  []string `config:"hosts"`
-	Module string   `config:"module"`
-}
-
-func getApacheModuleConfig() (*common.Config, error) {
-	return common.NewConfigFrom(ApacheModuleConfig{
-		Module: "apache",
-		Hosts:  []string{apache.GetApacheEnvHost()},
-	})
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "apache",
+		"metricsets": []string{"status"},
+		"hosts":      []string{apache.GetApacheEnvHost()},
+	}
 }

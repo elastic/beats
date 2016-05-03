@@ -4,6 +4,7 @@ beat:
     - apache
     - mysql
     - redis
+    - zookeeper
   environment:
     - APACHE_HOST=http://apache/
     - APACHE_PORT=80
@@ -12,6 +13,8 @@ beat:
     - MYSQL_DSN=root:test@tcp(mysql:3306)/
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - ZOOKEEPER_HOST=zookeeper
+    - ZOOKEEPER_PORT=2181
     - TEST_ENVIRONMENT=false
   working_dir: /go/src/github.com/elastic/beats/metricbeat
   volumes:
@@ -30,3 +33,6 @@ mysql:
 
 redis:
   image: redis:3.0.7
+
+zookeeper:
+  image: jplock/zookeeper:3.4.8
