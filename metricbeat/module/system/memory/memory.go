@@ -3,46 +3,43 @@
 package memory
 
 import (
-	"github.com/elastic/beats/metricbeat/helper"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/topbeat/system"
+
+	"github.com/pkg/errors"
 )
 
 func init() {
-	helper.Registry.AddMetricSeter("system", "memory", New)
+	if err := mb.Registry.AddMetricSet("system", "memory", New); err != nil {
+		panic(err)
+	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
+// MetricSet for fetching system memory metrics.
+type MetricSet struct {
+	mb.BaseMetricSet
 }
 
-type MetricSeter struct{}
-
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
+// New is a mb.MetricSetFactory that returns a memory.MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MetricSet{base}, nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (event common.MapStr, err error) {
-
+// Fetch fetches memory metrics from the OS.
+func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
 	memStat, err := system.GetMemory()
 	if err != nil {
-		logp.Warn("Getting memory details: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "memory")
 	}
 
 	swapStat, err := system.GetSwap()
 	if err != nil {
-		logp.Warn("Getting swap details: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "swap")
 	}
 
-	event = common.MapStr{
+	return common.MapStr{
 		"mem":  system.GetMemoryEvent(memStat),
 		"swap": system.GetSwapEvent(swapStat),
-	}
-
-	return event, nil
+	}, nil
 }
