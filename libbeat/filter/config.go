@@ -14,6 +14,11 @@ type RangeValue struct {
 	Lt  *float64 `config:"lt"`
 }
 
+type EqualsValue struct {
+	Int int
+	Str string
+}
+
 type DropFieldsConfig struct {
 	Fields          []string `config:"fields"`
 	ConditionConfig `config:",inline"`

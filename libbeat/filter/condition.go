@@ -11,11 +11,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-type EqualsValue struct {
-	Int int
-	Str string
-}
-
 type Condition struct {
 	Equals   map[string]EqualsValue
 	Contains map[string]string
