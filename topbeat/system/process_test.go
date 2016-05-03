@@ -99,7 +99,7 @@ func TestProcMemPercentage(t *testing.T) {
 	procStats.ProcsMap[p.Pid] = &p
 
 	rssPercent := GetProcMemPercentage(&p, 10000)
-	assert.Equal(t, rssPercent, 0.14)
+	assert.Equal(t, rssPercent, 0.1416)
 }
 
 func TestProcCpuPercentage(t *testing.T) {

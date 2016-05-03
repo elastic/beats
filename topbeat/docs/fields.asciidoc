@@ -485,7 +485,7 @@ Contains details about the mounted disks, such as the total or used disk space, 
 
 type: long
 
-The available disk space in bytes.
+The disk space available to an unprivileged user in bytes.
 
 
 ==== fs.device_name
@@ -507,6 +507,13 @@ The mounting point. For example: `/`
 type: long
 
 The total number of file nodes in the file system.
+
+
+==== fs.free
+
+type: long
+
+The disk space available in bytes.
 
 
 ==== fs.free_files

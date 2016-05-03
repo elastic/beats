@@ -423,9 +423,9 @@ system:
         `system-filesystem` contains local filesystem stats
       fields:
         - name: avail
-          type: integer
+          type: long
           description: >
-            The available disk space in bytes.
+            The disk space available to an unprivileged user in bytes.
         - name: device_name
           type: keyword
           description: >
@@ -435,19 +435,23 @@ system:
           description: >
             The mounting point. For example: `/`
         - name: files
-          type: integer
+          type: long
           description: >
             The total number of file nodes in the file system.
+        - name: free
+          type: long
+          description: >
+            The disk space available in bytes.
         - name: free_files
-          type: integer
+          type: long
           description: >
             The number of free file nodes in the file system.
         - name: total
-          type: integer
+          type: long
           description: >
             The total disk space in bytes.
         - name: used
-          type: integer
+          type: long
           description: >
             The used disk space in bytes.
         - name: used_p
@@ -459,30 +463,31 @@ system:
     - name: system-fsstats
       type: group
       description: >
-        `system-fsstats` contains local filesystem stats
+        `system-fsstats` contains filesystem metrics aggregated from all mounted
+        filesystems.
       fields:
         - name: count
-          type: integer
-          description: Number of file systems found
+          type: long
+          description: Number of file systems found.
         - name: total_files
           type: long
-          description: Number of total files
+          description: Total number of files.
         - name: total_size
           type: group
-          description: Nested file system docs
+          description: Nested file system docs.
           fields:
-            - name: avail
-              type: integer
-              description: >
-                Total available space.
             - name: free
-              type: integer
+              type: long
               description: >
                 Total free space.
             - name: used
-              type: integer
+              type: long
               description: >
                 Total used space.
+            - name: total
+              type: long
+              description: >
+                Total space (used plus free).
     - name: system-memory
       type: group
       description: >
@@ -557,7 +562,7 @@ system:
     - name: system-process
       type: group
       description: >
-        `system-process` contains process stats
+        `system-process` contains process metadata, CPU metrics, and memory metrics.
       fields:
         - name: name
           type: keyword
@@ -593,7 +598,7 @@ system:
           description: CPU-specific statistics per process.
           fields:
             - name: user
-              type: integer
+              type: long
               description: >
                 The amount of CPU time the process spent in user space.
             - name: total_p
@@ -602,11 +607,11 @@ system:
                 The percentage of CPU time spent by the process since the last update. Its value is similar with the
                 %CPU value of the process displayed by the top command on unix systems.
             - name: system
-              type: integer
+              type: long
               description: >
                 The amount of CPU time the process spent in kernel space.
             - name: total
-              type: integer
+              type: long
               description: >
                 The total CPU time spent by the process.
             - name: start_time
@@ -619,11 +624,11 @@ system:
           prefix: "[float]"
           fields:
             - name: size
-              type: integer
+              type: long
               description: >
                 The total virtual memory the process has.
             - name: rss
-              type: integer
+              type: long
               description: >
                 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
             - name: rss_p
@@ -631,7 +636,7 @@ system:
               description: >
                 The percentage of memory the process occupied in main memory (RAM).
             - name: share
-              type: integer
+              type: long
               description: >
                 The shared memory the process uses.
 zookeeper:
