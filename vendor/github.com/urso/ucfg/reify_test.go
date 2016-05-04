@@ -419,3 +419,131 @@ func TestReifyUnpackerInterface(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 10, p.I.Value())
 }
+
+func TestUnpackUnknown(t *testing.T) {
+	c := New()
+
+	tests := []interface{}{
+		&struct {
+			B bool   `config:"b"`
+			I int    `config:"i"`
+			U uint   `config:"u"`
+			S string `config:"s"`
+		}{true, 23, 42, "test"},
+
+		map[string]interface{}{
+			"b": true,
+			"i": 23,
+			"u": 42,
+			"s": "test",
+		},
+
+		node{
+			"b": true,
+			"i": 23,
+			"u": 42,
+			"s": "test",
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("test (%v): %v", i, test)
+
+		err := c.Unpack(test)
+		if err != nil {
+			assert.NoError(t, err)
+			continue
+		}
+
+		t.Logf("unpacked empty (%v): %v", i, test)
+
+		tmp, err := NewFrom(test, PathSep("."))
+		if err != nil {
+			assert.NoError(t, err)
+			continue
+		}
+
+		b, err := tmp.Bool("b", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, true, b)
+
+		i, err := tmp.Int("i", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, 23, int(i))
+
+		u, err := tmp.Uint("u", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, 42, int(u))
+
+		s, err := tmp.String("s", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, "test", s)
+	}
+}
+
+func TestUnpackUnknownNested(t *testing.T) {
+	c, _ := NewFrom(map[string]interface{}{
+		"s": nil,
+	})
+
+	tests := []interface{}{
+		&struct {
+			B bool   `config:"s.b"`
+			I int    `config:"s.i"`
+			U uint   `config:"s.u"`
+			S string `config:"s.s"`
+		}{true, 23, 42, "test"},
+
+		node{
+			"s": node{
+				"b": true,
+				"i": 23,
+				"u": 42,
+				"s": "test",
+			},
+		},
+
+		node{
+			"s": &struct {
+				B bool
+				I int
+				U uint
+				S string
+			}{true, 23, 42, "test"},
+		},
+	}
+
+	for i, test := range tests {
+		t.Logf("test (%v): %v", i, test)
+
+		err := c.Unpack(test)
+		if err != nil {
+			assert.NoError(t, err)
+			continue
+		}
+
+		t.Logf("unpacked empty (%v): %v", i, test)
+
+		tmp, err := NewFrom(test, PathSep("."))
+		if err != nil {
+			assert.NoError(t, err)
+			continue
+		}
+
+		b, err := tmp.Bool("s.b", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, true, b)
+
+		i, err := tmp.Int("s.i", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, 23, int(i))
+
+		u, err := tmp.Uint("s.u", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, 42, int(u))
+
+		s, err := tmp.String("s.s", -1, PathSep("."))
+		assert.NoError(t, err)
+		assert.Equal(t, "test", s)
+	}
+}

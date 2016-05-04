@@ -3,6 +3,7 @@ package ucfg
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -87,7 +88,11 @@ func runValidators(val interface{}, validators []validatorTag) error {
 	return nil
 }
 
-func validateNonZero(v interface{}, _ string) error {
+// validateNonZero implements the `nonzero` validation tag.
+// If nonzero is set, the validator is only run if field is present in config.
+// It checks for numbers and durations to be != 0, and for strings/arrays/slices
+// not being empty.
+func validateNonZero(v interface{}, name string) error {
 	if v == nil {
 		return nil
 	}
@@ -114,7 +119,7 @@ func validateNonZero(v interface{}, _ string) error {
 			return nil
 		}
 	default:
-		return nil
+		return validateNonEmpty(v, name)
 	}
 
 	return ErrZeroValue
@@ -249,11 +254,40 @@ func validateMax(v interface{}, param string) error {
 	return fmt.Errorf("requires value > %v", param)
 }
 
-func validateRequired(v interface{}, _ string) error {
-	if v != nil {
+// validateRequired implements the `required` validation tag.
+// If a field is required, it must be present in the config.
+// If field is a string, regex or slice its length must be > 0.
+func validateRequired(v interface{}, name string) error {
+	if v == nil {
+		return ErrRequired
+	}
+	return validateNonEmpty(v, name)
+}
+
+func validateNonEmpty(v interface{}, _ string) error {
+	if s, ok := v.(string); ok {
+		if s == "" {
+			return ErrEmpty
+		}
 		return nil
 	}
-	return ErrRequired
+
+	if r, ok := v.(regexp.Regexp); ok {
+		if r.String() == "" {
+			return ErrEmpty
+		}
+		return nil
+	}
+
+	val := reflect.ValueOf(v)
+	if val.Kind() == reflect.Array || val.Kind() == reflect.Slice {
+		if val.Len() == 0 {
+			return ErrEmpty
+		}
+		return nil
+	}
+
+	return nil
 }
 
 func param2Duration(param string) (time.Duration, error) {

@@ -2,6 +2,7 @@ package ucfg
 
 import (
 	"errors"
+	"regexp"
 	"testing"
 	"time"
 
@@ -223,5 +224,168 @@ func TestValidationFail(t *testing.T) {
 
 		err := c.Unpack(test)
 		assert.True(t, err != nil)
+	}
+}
+
+func TestValidateRequiredFailing(t *testing.T) {
+	c, _ := NewFrom(node{
+		"b": "",
+		"c": nil,
+		"d": []string{},
+	})
+
+	tests := []struct {
+		err    error
+		config interface{}
+	}{
+		// Access missing field 'a'
+		{ErrRequired, &struct {
+			A *int `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			A int `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			A string `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			A []string `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			A time.Duration `validate:"required"`
+		}{}},
+
+		// Access empty string field "b"
+		{ErrEmpty, &struct {
+			B string `validate:"required"`
+		}{}},
+		{ErrEmpty, &struct {
+			B *string `validate:"required"`
+		}{}},
+		{ErrEmpty, &struct {
+			B *regexp.Regexp `validate:"required"`
+		}{}},
+
+		// Access nil value "c"
+		{ErrRequired, &struct {
+			C *int `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			C int `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			C string `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			C []string `validate:"required"`
+		}{}},
+		{ErrRequired, &struct {
+			C time.Duration `validate:"required"`
+		}{}},
+
+		// Check empty []string field 'd'
+		{ErrEmpty, &struct {
+			D []string `validate:"required"`
+		}{}},
+	}
+
+	for i, test := range tests {
+		t.Logf("Test config (%v): %#v => %v", i, test.config, test.err)
+
+		err := c.Unpack(test.config)
+		if err == nil {
+			t.Error("Expected error")
+			continue
+		}
+
+		t.Logf("Unpack returned error: %v", err)
+		err = err.(Error).Reason()
+		assert.Equal(t, test.err, err)
+	}
+}
+
+func TestValidateNonzeroFailing(t *testing.T) {
+	c, _ := NewFrom(node{
+		"i": 0,
+		"s": "",
+		"a": []int{},
+	})
+
+	tests := []struct {
+		err    error
+		config interface{}
+	}{
+		// test integer types accessing 'i'
+		{ErrZeroValue, &struct {
+			I int `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I int8 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I int16 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I int32 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I int64 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I uint `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I uint8 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I uint16 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I uint32 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I uint64 `validate:"nonzero"`
+		}{}},
+
+		// test float types accessing 'i'
+		{ErrZeroValue, &struct {
+			I float32 `validate:"nonzero"`
+		}{}},
+		{ErrZeroValue, &struct {
+			I float64 `validate:"nonzero"`
+		}{}},
+
+		// test string types accessing 's'
+		{ErrEmpty, &struct {
+			S string `validate:"nonzero"`
+		}{}},
+		{ErrEmpty, &struct {
+			S *string `validate:"nonzero"`
+		}{}},
+		{ErrEmpty, &struct {
+			S *regexp.Regexp `validate:"nonzero"`
+		}{}},
+
+		// test array type accessing 'a'
+		{ErrEmpty, &struct {
+			A []int `validate:"nonzero"`
+		}{}},
+		{ErrEmpty, &struct {
+			A []uint8 `validate:"nonzero"`
+		}{}},
+	}
+
+	for i, test := range tests {
+		t.Logf("Test config (%v): %#v => %v", i, test.config, test.err)
+
+		err := c.Unpack(test.config)
+		if err == nil {
+			t.Error("Expected error")
+			continue
+		}
+
+		t.Logf("Unpack returned error: %v", err)
+		err = err.(Error).Reason()
+		assert.Equal(t, test.err, err)
 	}
 }

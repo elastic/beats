@@ -7,12 +7,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
+- Report error message from regexp.Compile if compilation fails #21
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+## [0.2.1]
+
+### Changed
+- Report error message from regexp.Compile if compilation fails #21
+
+### Fixed
+- Handle empty slices, strings, regular expression by nonzero,required validation tags #20, #23
 
 ## [0.2.0]
 
@@ -50,7 +59,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Introduced CHANGELOG.md for documenting changes to ucfg.
 
 
-[Unreleased]: https://github.com/urso/ucfg/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/urso/ucfg/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/urso/ucfg/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/urso/ucfg/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/urso/ucfg/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/urso/ucfg/compare/v0.0.0...v0.1.0
