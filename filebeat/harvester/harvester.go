@@ -40,8 +40,6 @@ func NewHarvester(
 	stat *input.FileStat,
 	spooler chan *input.FileEvent,
 ) (*Harvester, error) {
-
-	var err error
 	encoding, ok := encoding.FindEncoding(cfg.Encoding)
 	if !ok || encoding == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
@@ -54,14 +52,8 @@ func NewHarvester(
 		SpoolerChan: spooler,
 		encoding:    encoding,
 	}
-	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
-	if err != nil {
-		return h, err
-	}
-	h.IncludeLinesRegexp, err = InitRegexps(cfg.IncludeLines)
-	if err != nil {
-		return h, err
-	}
+	h.ExcludeLinesRegexp = cfg.ExcludeLines
+	h.IncludeLinesRegexp = cfg.IncludeLines
 	return h, nil
 }
 

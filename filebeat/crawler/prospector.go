@@ -140,10 +140,6 @@ func (p *Prospector) setupProspectorConfig() error {
 	if err != nil {
 		return err
 	}
-	config.ExcludeFilesRegexp, err = harvester.InitRegexps(config.ExcludeFiles)
-	if err != nil {
-		return err
-	}
 
 	if config.Harvester.InputType == cfg.LogInputType && len(config.Paths) == 0 {
 		return fmt.Errorf("No paths were defined for prospector")

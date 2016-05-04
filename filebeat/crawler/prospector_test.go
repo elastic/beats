@@ -3,6 +3,7 @@
 package crawler
 
 import (
+	"regexp"
 	"testing"
 	"time"
 
@@ -215,7 +216,7 @@ func TestProspectorInitInputTypeWrong(t *testing.T) {
 func TestProspectorFileExclude(t *testing.T) {
 
 	prospectorConfig := config.ProspectorConfig{
-		ExcludeFiles: []string{"\\.gz$"},
+		ExcludeFiles: []*regexp.Regexp{regexp.MustCompile(`\.gz$`)},
 		Harvester: config.HarvesterConfig{
 			BufferSize: 0,
 		},
