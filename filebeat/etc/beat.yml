@@ -168,7 +168,7 @@ filebeat.prospectors:
 
 ######################### Filebeat general configuration #############################
 
-filebeat:
+#filebeat:
   
   # Event count spool threshold - forces network flush if exceeded
   #spool_size: 2048
