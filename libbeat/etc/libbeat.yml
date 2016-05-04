@@ -14,7 +14,7 @@ output:
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["localhost:9200"]
+    hosts: ${ES_HOSTS:["localhost:9200"]}
 
     # Optional protocol and basic auth credentials.
     #protocol: "https"
@@ -186,12 +186,12 @@ shipper:
   # The name of the shipper that publishes the network data. It can be used to group
   # all the transactions sent by a single shipper in the web interface.
   # If this options is not defined, the hostname is used.
-  #name:
+  name: ${SHIPPER_NAME}
 
   # The tags of the shipper are included in their own field with each
   # transaction published. Tags make it easy to group servers by different
   # logical properties.
-  #tags: ["service-X", "web-tier"]
+  tags: ${SHIPPER_TAGS}
 
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested
@@ -270,6 +270,6 @@ logging:
 
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
-  #level: error
+  level: ${BEAT_LOG_LEVEL:error}
 
 
