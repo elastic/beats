@@ -65,7 +65,7 @@ func TestMemPercentage(t *testing.T) {
 		},
 	}
 	AddMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 0.71)
+	assert.Equal(t, m.UsedPercent, 0.7143)
 
 	m = MemStat{
 		Mem: gosigar.Mem{Total: 0},
@@ -84,7 +84,7 @@ func TestActualMemPercentage(t *testing.T) {
 		},
 	}
 	AddMemPercentage(&m)
-	assert.Equal(t, m.ActualUsedPercent, 0.71)
+	assert.Equal(t, m.ActualUsedPercent, 0.7143)
 
 	m = MemStat{
 		Mem: gosigar.Mem{

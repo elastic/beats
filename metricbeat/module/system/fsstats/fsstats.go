@@ -1,34 +1,5 @@
 // +build darwin linux openbsd windows
 
-/*
-
-An example event looks as following:
-
-	{
-	  "@timestamp": "2016-05-03T15:11:04.610Z",
-	  "beat": {
-	    "hostname": "ruflin",
-	    "name": "ruflin"
-	  },
-	  "metricset": "fsstats",
-	  "module": "system",
-	  "rtt": 84,
-	  "system-fsstats": {
-	    "count": 4,
-	    "total_files": 60982450,
-	    "total_size": {
-	      "free": 32586960896,
-	      "total": 249779548160,
-	      "used": 217192587264
-	    }
-	  },
-	  "type": "metricsets"
-	}
-
-
-
-*/
-
 package fsstats
 
 import (
@@ -36,7 +7,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/topbeat/system"
+
+	"github.com/pkg/errors"
 )
+
+var debugf = logp.MakeDebug("system-fsstats")
 
 func init() {
 	if err := mb.Registry.AddMetricSet("system", "fsstats", New); err != nil {
@@ -44,23 +19,24 @@ func init() {
 	}
 }
 
+// MetricSet for fetching a summary of filesystem stats.
 type MetricSet struct {
 	mb.BaseMetricSet
 }
 
-// New creates new instance of MetricSeter
+// New creates and returns a new instance of MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 	}, nil
 }
 
-func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
-
+// Fetch fetches filesystem metrics for all mounted filesystems and returns
+// a single event containing aggregated data.
+func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
 	fss, err := system.GetFileSystemList()
 	if err != nil {
-		logp.Warn("Getting filesystem list: %v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "filesystem list")
 	}
 
 	// These values are optional and could also be calculated by Kibana
@@ -69,7 +45,7 @@ func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
 	for _, fs := range fss {
 		fsStat, err := system.GetFileSystemStat(fs)
 		if err != nil {
-			logp.Debug("filesystem", "Skip filesystem %d: %v", fsStat, err)
+			debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
 
@@ -79,7 +55,7 @@ func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
 		totalSizeUsed += fsStat.Used
 	}
 
-	event := common.MapStr{
+	return common.MapStr{
 		"total_size": common.MapStr{
 			"free":  totalSizeFree,
 			"used":  totalSizeUsed,
@@ -87,7 +63,5 @@ func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
 		},
 		"count":       len(fss),
 		"total_files": totalFiles,
-	}
-
-	return event, nil
+	}, nil
 }

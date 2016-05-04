@@ -113,6 +113,9 @@
             "files": {
               "type": "long"
             },
+            "free": {
+              "type": "long"
+            },
             "free_files": {
               "type": "long"
             },

@@ -1,27 +1,28 @@
 - name: system-fsstats
   type: group
   description: >
-    `system-fsstats` contains local filesystem stats
+    `system-fsstats` contains filesystem metrics aggregated from all mounted
+    filesystems.
   fields:
     - name: count
-      type: integer
-      description: Number of file systems found
+      type: long
+      description: Number of file systems found.
     - name: total_files
       type: long
-      description: Number of total files
+      description: Total number of files.
     - name: total_size
       type: group
-      description: Nested file system docs
+      description: Nested file system docs.
       fields:
-        - name: avail
-          type: integer
-          description: >
-            Total available space.
         - name: free
-          type: integer
+          type: long
           description: >
             Total free space.
         - name: used
-          type: integer
+          type: long
           description: >
             Total used space.
+        - name: total
+          type: long
+          description: >
+            Total space (used plus free).

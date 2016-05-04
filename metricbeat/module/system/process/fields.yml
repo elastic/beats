@@ -1,7 +1,7 @@
 - name: system-process
   type: group
   description: >
-    `system-process` contains process stats
+    `system-process` contains process metadata, CPU metrics, and memory metrics.
   fields:
     - name: name
       type: keyword
@@ -37,7 +37,7 @@
       description: CPU-specific statistics per process.
       fields:
         - name: user
-          type: integer
+          type: long
           description: >
             The amount of CPU time the process spent in user space.
         - name: total_p
@@ -46,11 +46,11 @@
             The percentage of CPU time spent by the process since the last update. Its value is similar with the
             %CPU value of the process displayed by the top command on unix systems.
         - name: system
-          type: integer
+          type: long
           description: >
             The amount of CPU time the process spent in kernel space.
         - name: total
-          type: integer
+          type: long
           description: >
             The total CPU time spent by the process.
         - name: start_time
@@ -63,11 +63,11 @@
       prefix: "[float]"
       fields:
         - name: size
-          type: integer
+          type: long
           description: >
             The total virtual memory the process has.
         - name: rss
-          type: integer
+          type: long
           description: >
             The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
         - name: rss_p
@@ -75,6 +75,6 @@
           description: >
             The percentage of memory the process occupied in main memory (RAM).
         - name: share
-          type: integer
+          type: long
           description: >
             The shared memory the process uses.

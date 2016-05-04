@@ -27,7 +27,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches CPU metrics from the OS.
-func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
+func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
 	cpuStat, err := system.GetCpuTimes()
 	if err != nil {
 		return nil, errors.Wrap(err, "cpu times")
