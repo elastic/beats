@@ -9,17 +9,17 @@
       description: This group contains statistics related to the memory usage on the system.
       fields:
         - name: total
-          type: integer
+          type: long
           description: >
             Total memory.
 
         - name: used
-          type: integer
+          type: long
           description: >
             Used memory.
 
         - name: free
-          type: integer
+          type: long
           description: >
             Available memory.
 
@@ -29,13 +29,13 @@
             The percentage of used memory.
 
         - name: actual_used
-          type: integer
+          type: long
           description: >
             Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers.
             Available only on Unix.
 
         - name: actual_free
-          type: integer
+          type: long
           description: >
             Actual available memory. This value is the "free" memory plus the memory used for disk caches and
             buffers. Available only on Unix.
@@ -51,17 +51,17 @@
       description: This group contains statistics related to the swap memory usage on the system.
       fields:
         - name: total
-          type: integer
+          type: long
           description: >
             Total swap memory.
 
         - name: used
-          type: integer
+          type: long
           description: >
             Used swap memory.
 
         - name: free
-          type: integer
+          type: long
           description: >
             Available swap memory.
 
