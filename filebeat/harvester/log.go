@@ -17,6 +17,8 @@ import (
 func (h *Harvester) Harvest() {
 	defer h.close()
 
+	h.State.Finished = false
+
 	enc, err := h.open()
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected file opening error: %s", err)
@@ -46,7 +48,7 @@ func (h *Harvester) Harvest() {
 	}
 
 	// Always report the state before starting a harvester
-	h.sendEvent(h.createEvent())
+	h.SendStateUpdate()
 
 	for {
 		// Partial lines return error and are only read on completion
@@ -99,16 +101,12 @@ func (h *Harvester) createEvent() *input.FileEvent {
 		DocumentType:  h.Config.DocumentType,
 		Offset:        h.getOffset(),
 		Bytes:         0,
-		Fileinfo:      h.Stat.Fileinfo,
+		Fileinfo:      h.State.Fileinfo,
 		JSONConfig:    h.Config.JSON,
 	}
 
 	if h.Config.InputType != config.StdinInputType {
-		event.FileState = input.FileState{
-			Source:      h.Path,
-			Offset:      h.getOffset(),
-			FileStateOS: input.GetOSFileState(h.Stat.Fileinfo),
-		}
+		event.FileState = h.GetState()
 	}
 	return event
 }
@@ -223,16 +221,34 @@ func (h *Harvester) updateOffset(increment int64) {
 	h.offset += increment
 }
 
-func (h *Harvester) UpdateState() {
-	logp.Debug("Update state: %s, offset: %v", h.Path, h.offset)
+// SendStateUpdate send an empty event with the current state to update the registry
+func (h *Harvester) SendStateUpdate() {
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.Path, h.offset)
 	h.sendEvent(h.createEvent())
 }
 
+func (h *Harvester) GetState() input.FileState {
+	h.stateMutex.Lock()
+	defer h.stateMutex.Unlock()
+
+	h.refreshState()
+	return h.State
+}
+
+// refreshState refreshes the values in State with the values from the harvester itself
+func (h *Harvester) refreshState() {
+
+	h.State.Source = h.Path
+	h.State.Offset = h.getOffset()
+	h.State.FileStateOS = input.GetOSFileState(h.State.Fileinfo)
+}
+
 func (h *Harvester) close() {
+	// Mark harvester as finished
+	h.State.Finished = true
+
 	// On completion, push offset so we can continue where we left off if we relaunch on the same file
-	if h.Stat != nil {
-		h.Stat.Offset <- h.getOffset()
-	}
+	h.SendStateUpdate()
 
 	logp.Debug("harvester", "Stopping harvester for file: %s", h.Path)
 

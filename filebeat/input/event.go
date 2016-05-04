@@ -23,7 +23,6 @@ type FileEvent struct {
 	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
 	JSONConfig   *config.JSONConfig
-	Stat         *FileStat
 	FileState    FileState
 }
 

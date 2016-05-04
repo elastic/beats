@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
@@ -22,7 +21,7 @@ func NewProspectorStdin(p *Prospector) (*ProspectorStdin, error) {
 
 	var err error
 
-	prospectorer.harvester, err = p.createHarvester("-", &input.FileStat{})
+	prospectorer.harvester, err = p.createHarvester(input.FileState{Source: "-"})
 	if err != nil {
 		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
 	}
@@ -41,8 +40,4 @@ func (p *ProspectorStdin) Run() {
 		p.harvester.Start()
 		p.started = true
 	}
-
-	// Wait time during endless loop
-	oneSecond, _ := time.ParseDuration("1s")
-	time.Sleep(oneSecond)
 }
