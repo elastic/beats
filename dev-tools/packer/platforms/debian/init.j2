@@ -23,6 +23,10 @@ PIDFILE=/var/run/{{.beat_name}}.pid
 WRAPPER="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
+# Value of oom_adj for packetbeat.
+# If the value is greater than 1000, it will be ignored.
+# valud values are -1000 < value < 1000
+OOM_ADJ=42000
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
@@ -60,6 +64,9 @@ do_start()
                 --pidfile $PIDFILE  \
 		--exec $WRAPPER -- $WRAPPER_ARGS -- $DAEMON $DAEMON_ARGS \
 		|| return 2
+    if test $OOM_ADJ -lt 1000; then
+        echo "$OOM_ADJ" > "/proc/$(pidof packetbeat)/oom_score_adj"
+    fi
 }
 
 #

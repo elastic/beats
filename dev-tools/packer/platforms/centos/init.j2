@@ -29,6 +29,10 @@ test_args="-e -configtest"
 wrapper="/usr/share/{{.beat_name}}/bin/{{.beat_name}}-god"
 wrapperopts="-r / -n -p $pidfile"
 RETVAL=0
+# Value of oom_adj for packetbeat.
+# If the value is greater than 1000, it will be ignored.
+# valud values are -1000 < value < 1000
+oom_adj=42000
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -54,6 +58,9 @@ start() {
     daemon $daemonopts $wrapper $wrapperopts -- $agent $args
     RETVAL=$?
     echo
+    if [ $oom_adj -lt 1000 ]; then
+        echo "$oom_adj" > "/proc/$(pidof packetbeat)/oom_score_adj"
+    fi
     return $RETVAL
 }
 
