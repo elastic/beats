@@ -1,0 +1,24 @@
+{
+    "@timestamp":"2016-05-11T07:14:06.329Z",
+    "beat":{
+        "hostname":"ruflin",
+        "name":"ruflin"
+    },
+    "metricset":"cores",
+    "module":"system",
+    "rtt":135,
+    "system-cores":{
+        "core":0,
+        "idle":26880742,
+        "iowait":0,
+        "irq":0,
+        "nice":0,
+        "softirq":0,
+        "steal":0,
+        "system":7499682,
+        "system_p":0,
+        "user":9354158,
+        "user_p":0
+    },
+    "type":"metricsets"
+}

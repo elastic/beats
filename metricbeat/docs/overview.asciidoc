@@ -9,9 +9,11 @@ like:
 
 *Service metrics*
 
-  * <<metricbeat-apache-module,Apache HTTPD>>
-  * <<metricbeat-mysql-module,MySQL>>
-  * <<metricbeat-redis-module,Redis>>
+  * <<metricbeat-module-apache,Apache HTTPD>>
+  * <<metricbeat-module-mysql,MySQL>>
+  * <<metricbeat-module-redis,Redis>>
+  * <<metricbeat-module-system,System>>
+  * <<metricbeat-module-zookeper,Zookeeper>>
 
 Metricbeat can insert the collected metrics directly into Elasticsearch
 or send them to Logstash, Redis, or Kafka.

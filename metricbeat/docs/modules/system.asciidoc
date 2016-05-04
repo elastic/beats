@@ -1,18 +1,32 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-system]]
 [[metricbeat-system-module]]
 == System Module
 
 
-=== Configuration
+
+=== Example Configuration
+
+The Apache module supports the standard configuration options which can be found
+here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
-metricbeat:
-  modules:
-    - module: system
-      metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
-      period: 1s
+  # System module
+  - module: system
+    metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+    enabled: true
+    period: 2s
 ----
 
 === MetricSets
 
-
+* <<metricbeat-metricset-system-cores,cores>>
+* <<metricbeat-metricset-system-cpu,cpu>>
+* <<metricbeat-metricset-system-filesystem,filesystem>>
+* <<metricbeat-metricset-system-fsstats,fsstats>>
+* <<metricbeat-metricset-system-memory,memory>>
+* <<metricbeat-metricset-system-process,process>>

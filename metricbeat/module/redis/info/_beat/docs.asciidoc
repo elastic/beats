@@ -1,0 +1,4 @@
+==== Redis Info
+
+The Redis Info MetricSet collects information and statistics from Redis by running the
+http://redis.io/commands/INFO[`INFO`] command and parsing the returned result.

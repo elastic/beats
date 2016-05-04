@@ -1,0 +1,14 @@
+== MySQL Module
+
+This modules periodically fetches metrics from https://www.mysql.com/[MySQL]
+servers.
+
+=== Configuration Options
+
+A basic configuration for the mysql module can be found below. The host must be passed as a MySQL Data Source Name (DSN). The format of the
+DSN is as following:
+
+----
+[username[:password]@][protocol[(address)]]/
+----
+
