@@ -105,4 +105,5 @@ type ModuleConfig struct {
 var defaultModuleConfig = ModuleConfig{
 	Enabled: true,
 	Period:  time.Second,
+	Timeout: time.Second,
 }
