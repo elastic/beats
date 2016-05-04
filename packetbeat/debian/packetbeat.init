@@ -27,6 +27,8 @@ PIDFILE=/var/run/packetbeat.pid
 WRAPPER="/usr/bin/packetbeat-god"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
+# valid ranges are between -1000 and 1000. Anything above 1000 will be ingored
+OOM_ADJ=1000
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
@@ -64,6 +66,9 @@ do_start()
                 --pidfile $PIDFILE  \
 		--exec $WRAPPER -- $WRAPPER_ARGS -- $DAEMON $DAEMON_ARGS \
 		|| return 2
+    if test $OOM_ADJ -lt 1000; then
+        echo "$OOM_ADJ" > "/proc/$(cat $PIDFILE)/oom_score_adj"
+    fi
 }
 
 #
