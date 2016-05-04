@@ -289,9 +289,76 @@ class Test(BaseTest):
         assert len(data) == 2
 
 
-    def test_rotating_file_with_shutdown(self):
+    def test_restart_continue(self):
         """
-        Check that inodes are properly written during file rotation and shutdown
+        Check that file readining continues after restart
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            scan_frequency="1s"
+        )
+
+        if os.name == "nt":
+            raise SkipTest
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile = self.working_dir + "/log/input"
+
+        filebeat = self.start_beat()
+
+        with open(testfile, 'w') as f:
+            f.write("entry1\n")
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        # Wait a momemt to make sure registry is completely written
+        time.sleep(1)
+
+        data = self.get_registry()
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+
+        filebeat.check_kill_and_wait()
+
+        # Store first registry file
+        shutil.copyfile(self.working_dir + "/registry", self.working_dir + "/registry.first")
+
+        # Append file
+        with open(testfile, 'a') as f:
+            f.write("entry2\n")
+
+        filebeat = self.start_beat(output="filebeat2.log")
+
+        # Output file was rotated
+        self.wait_until(
+            lambda: self.output_has(lines=1, output_file="output/filebeat.1"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        filebeat.check_kill_and_wait()
+
+        data = self.get_registry()
+
+        # Compare file inodes and the one in the registry
+        assert os.stat(testfile).st_ino == data[os.path.abspath(testfile)]["FileStateOS"]["inode"]
+
+        # Check that 1 files are part of the registrar file. The deleted file should never have been detected
+        assert len(data) == 1
+
+        output = self.read_output()
+
+        # Check that output file has the same number of lines as the log file
+        assert 1 == len(output)
+        assert output[0]["message"] == "entry2"
+
+
+    def test_rotating_file_with_restart(self):
+        """
+        Check that inodes are properly written during file rotation and restart
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
@@ -376,5 +443,3 @@ class Test(BaseTest):
 
         # Check that 2 files are part of the registrar file. The deleted file should never have been detected
         assert len(data) == 2
-
-
