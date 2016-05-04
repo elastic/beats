@@ -374,7 +374,7 @@ filesystem:
         - name: avail
           type: long
           description: >
-            The available disk space in bytes.
+            The disk space available to an unprivileged user in bytes.
 
         - name: device_name
           type: keyword
@@ -390,6 +390,11 @@ filesystem:
           type: long
           description: >
             The total number of file nodes in the file system.
+
+        - name: free
+          type: long
+          description: >
+            The disk space available in bytes.
 
         - name: free_files
           type: long

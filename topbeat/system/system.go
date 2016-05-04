@@ -88,10 +88,10 @@ func AddMemPercentage(m *MemStat) {
 	}
 
 	perc := float64(m.Mem.Used) / float64(m.Mem.Total)
-	m.UsedPercent = Round(perc, .5, 2)
+	m.UsedPercent = Round(perc, .5, 4)
 
 	actual_perc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
-	m.ActualUsedPercent = Round(actual_perc, .5, 2)
+	m.ActualUsedPercent = Round(actual_perc, .5, 4)
 }
 
 func AddSwapPercentage(s *SwapStat) {
@@ -100,5 +100,5 @@ func AddSwapPercentage(s *SwapStat) {
 	}
 
 	perc := float64(s.Swap.Used) / float64(s.Swap.Total)
-	s.UsedPercent = Round(perc, .5, 2)
+	s.UsedPercent = Round(perc, .5, 4)
 }

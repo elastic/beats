@@ -27,7 +27,7 @@ type MetricSet struct {
 	redisPools map[string]*rd.Pool
 }
 
-// New creates new instance of MetricSeter
+// New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Unpack additional configuration options.
 	config := struct {

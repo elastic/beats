@@ -115,7 +115,10 @@ func (t *Topbeat) Setup(b *beat.Beat) error {
 func (t *Topbeat) Run(b *beat.Beat) error {
 	var err error
 
-	t.procStats.InitProcStats()
+	err = t.procStats.InitProcStats()
+	if err != nil {
+		return err
+	}
 
 	ticker := time.NewTicker(t.period)
 	defer ticker.Stop()
@@ -138,7 +141,7 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 			t.events.PublishEvent(event)
 		}
 		if t.procStats.ProcStats {
-			events, err := t.procStats.GetProcStats()
+			events, err := t.procStats.GetProcStatsEvents()
 			if err != nil {
 				logp.Err("Error reading proc stats: %v", err)
 				break

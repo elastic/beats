@@ -40,6 +40,5 @@ func getConfig() map[string]interface{} {
 		"module":     "zookeeper",
 		"metricsets": []string{"mntr"},
 		"hosts":      []string{zookeeper.GetZookeeperEnvHost() + ":" + zookeeper.GetZookeeperEnvPort()},
-		"timeout":    "5s",
 	}
 }
