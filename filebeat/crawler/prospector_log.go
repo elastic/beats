@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,12 +13,8 @@ import (
 
 type ProspectorLog struct {
 	Prospector *Prospector
-
-	iteration      uint32
-	lastscan       time.Time
-	missingFiles   map[string]os.FileInfo
-	harvesterStats map[string]input.FileStat
-	config         cfg.ProspectorConfig
+	lastscan   time.Time
+	config     cfg.ProspectorConfig
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
@@ -27,11 +22,7 @@ func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 	prospectorer := &ProspectorLog{
 		Prospector: p,
 		config:     p.ProspectorConfig,
-		lastscan:   time.Now(),
 	}
-
-	// Init File Stat list
-	prospectorer.harvesterStats = make(map[string]input.FileStat)
 
 	return prospectorer, nil
 }
@@ -41,6 +32,7 @@ func (p *ProspectorLog) Init() {
 
 	logp.Info("Load previous states from registry into memory")
 
+	// Load the initial state from the registry
 	for path, fileinfo := range p.getFiles() {
 
 		// Check for each path found, if there is a previous state
@@ -48,32 +40,23 @@ func (p *ProspectorLog) Init() {
 
 		// Offset found -> skip to previous state
 		if offset > 0 {
-			fs := input.NewFileStat(fileinfo, 0)
-			fs.Skip(offset)
-			p.harvesterStats[path] = *fs
+			state := input.NewFileState(fileinfo, path)
+			state.Offset = offset
+			// Make sure new harvester is started for all states
+			state.Finished = true
+			// Prospector must update all states as it has to detect also file rotation
+			p.Prospector.updateState(state)
 		}
 	}
 
-	logp.Info("Previous states loaded: %v", len(p.harvesterStats))
+	logp.Info("Previous states loaded: %v", len(p.Prospector.harvesterStates))
 }
 
 func (p *ProspectorLog) Run() {
-
 	logp.Debug("prospector", "Start next scan")
+
 	p.scan()
-
-	// Clear out files that disappeared and we've stopped harvesting
-	for file, lastinfo := range p.harvesterStats {
-		if lastinfo.Finished() && lastinfo.LastIteration < p.iteration {
-			delete(p.harvesterStats, file)
-		}
-	}
-
-	p.iteration++ // Overflow is allowed
-
-	// Defer next scan for the defined scanFrequency
-	time.Sleep(p.config.ScanFrequencyDuration)
-
+	p.Prospector.cleanupStates()
 }
 
 // getFiles returns all files which have to be harvested
@@ -93,7 +76,6 @@ func (p *ProspectorLog) getFiles() map[string]os.FileInfo {
 
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
-			logp.Debug("prospector", "Check file for harvesting: %s", file)
 
 			// check if the file is in the exclude_files list
 			if p.isFileExcluded(file) {
@@ -125,192 +107,72 @@ func (p *ProspectorLog) scan() {
 
 	newlastscan := time.Now()
 
-	p.missingFiles = map[string]os.FileInfo{}
+	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
 
 	// Now let's do one quick scan to pick up new files
 	for file, fileinfo := range p.getFiles() {
 
 		logp.Debug("prospector", "Check file for harvesting: %s", file)
 
-		newFile := input.NewFile(fileinfo)
+		// Create new state for comparison
+		newState := input.NewFileState(fileinfo, file)
 
-		// Check the current info against p.prospectorinfo[file]
-		lastinfo, isKnown := p.harvesterStats[file]
+		// TODO: This currently blocks writing updates every time state is fetched. Should be improved for performance
+		p.Prospector.stateMutex.Lock()
+		// Load last state
+		index, lastState := p.Prospector.findPreviousState(newState)
+		p.Prospector.stateMutex.Unlock()
 
-		oldFile := input.NewFile(lastinfo.Fileinfo)
-
-		// Create a new prospector info with the stat info for comparison
-		newInfo := input.NewFileStat(newFile.FileInfo, p.iteration)
-
-		// Init harvester with info
-		h, err := p.Prospector.createHarvester(file, newInfo)
-		if err != nil {
-			logp.Err("Error initializing harvester: %v", err)
-			continue
-		}
-
-		// Conditions for starting a new harvester:
-		// - file path hasn't been seen before
-		// - the file's inode or device changed
-		if !isKnown {
-			p.checkNewFile(h)
+		// Decides if previous state exists
+		if index == -1 {
+			p.harvestNewFile(newState)
 		} else {
-			h.Stat.Continue(&lastinfo)
-			p.checkExistingFile(h, &newFile, &oldFile)
+			p.harvestExistingFile(newState, lastState)
 		}
-
-		// Track the stat data for this file for later comparison to check for
-		// rotation/etc
-		p.harvesterStats[h.Path] = *h.Stat
 	}
 
 	p.lastscan = newlastscan
 }
 
-// Check if harvester for new file has to be started
-// For a new file the following options exist:
-func (p *ProspectorLog) checkNewFile(h *harvester.Harvester) {
+// harvestNewFile harvest a new file
+func (p *ProspectorLog) harvestNewFile(state input.FileState) {
 
-	logp.Debug("prospector", "Start harvesting unknown file: %s", h.Path)
-
-	if p.checkOldFile(h) {
-
-		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
-		// This is safe as the harvester, once it hits the EOF and a timeout, will stop harvesting
-		// Once we detect changes again we can resume another harvester again - this keeps number of go routines to a minimum
-		logp.Debug("prospector", "Fetching old state of file to resume: %s", h.Path)
-
-		// Old file, skip it, but push offset of file size so we start from the end if this file changes and needs picking up
-		logp.Debug("prospector", "Skipping file (older than ignore older of %v, %v): %s",
-			p.config.IgnoreOlderDuration,
-			time.Since(h.Stat.Fileinfo.ModTime()),
-			h.Path)
-		h.Stat.Skip(h.Stat.Fileinfo.Size())
-
-	} else if previousFile, err := p.getPreviousFile(h.Path, h.Stat.Fileinfo); err == nil {
-		p.continueExistingFile(h, previousFile)
+	if !p.Prospector.isIgnoreOlder(state) {
+		logp.Debug("prospector", "Start harvester for new file: %s", state.Source)
+		p.Prospector.startHarvester(state, 0)
 	} else {
-		p.resumeHarvesting(h, 0)
+		logp.Debug("prospector", "Ignore file because ignore_older reached: %s", state.Source)
 	}
 }
 
-// checkOldFile returns true if the given file is currently not harvested
-// and the last time was modified before ignore_older
-func (p *ProspectorLog) checkOldFile(h *harvester.Harvester) bool {
+// harvestExistingFile continues harvesting a file with a known state if needed
+func (p *ProspectorLog) harvestExistingFile(newState input.FileState, oldState input.FileState) {
 
-	// Resuming never needed if ignore_older disabled
-	if p.config.IgnoreOlderDuration == 0 {
-		return false
-	}
+	logp.Debug("prospector", "Update existing file for harvesting: %s, offset: %v", newState.Source, oldState.Offset)
 
-	modTime := h.Stat.Fileinfo.ModTime()
-
-	// Make sure modification time is before the last scan started to not pick it up twice
-	if !modTime.Before(p.lastscan) {
-		return false
-	}
-
-	// Only should be checked if older then ignore_older
-	if time.Since(modTime) <= p.config.IgnoreOlderDuration {
-		return false
-	}
-
-	return true
-}
-
-// checkExistingFile checks if a harvester has to be started for a already known file
-// For existing files the following options exist:
-// * Last reading position is 0, no harvester has to be started as old harvester probably still busy
-// * The old known modification time is older then the current one. Start at last known position
-// * The new file is not the same as the old file, means file was renamed
-// ** New file is actually really a new file, start a new harvester
-// ** Renamed file has a state, continue there
-func (p *ProspectorLog) checkExistingFile(h *harvester.Harvester, newFile *input.File, oldFile *input.File) {
-
-	logp.Debug("prospector", "Update existing file for harvesting: %s", h.Path)
-
-	// We assume it is the same file, but it wasn't
-	if !oldFile.IsSameFile(newFile) {
-
-		logp.Debug("prospector", "File previously found: %s", h.Path)
-
-		if previousFile, err := p.getPreviousFile(h.Path, h.Stat.Fileinfo); err == nil {
-			p.continueExistingFile(h, previousFile)
-		} else {
-			// File is not the same file we saw previously, it must have rotated and is a new file
-			logp.Debug("prospector", "Launching harvester on rotated file: %s", h.Path)
-
-			// Forget about the previous harvester and let it continue on the old file - so start a new channel to use with the new harvester
-			h.Stat.Ignore()
-
-			// Start a new harvester on the path
-			h.Start()
-		}
-
-		// Keep the old file in missingFiles so we don't rescan it if it was renamed and we've not yet reached the new filename
-		// We only need to keep it for the remainder of this iteration then we can assume it was deleted and forget about it
-		p.missingFiles[h.Path] = oldFile.FileInfo
-
-	} else if h.Stat.Finished() && oldFile.FileInfo.ModTime() != h.Stat.Fileinfo.ModTime() {
+	// No harvester is running for the file, start a new harvester
+	if oldState.Finished {
+		// TODO: should we check if modtime old / new is the same -> no harvester has to be started -> prevent duplicates?
 		// Resume harvesting of an old file we've stopped harvesting from
-		// Start a harvester on the path; a file was just modified and it doesn't have a harvester
-		// The offset to continue from will be stored in the harvester channel - so take that to use and also clear the channel
-		p.resumeHarvesting(h, <-h.Stat.Offset)
-	} else if h.Stat.Finished() {
-		logp.Debug("prospector", "Update state because of an unwritten offset update: %s", h.Path)
-		p.resumeHarvesting(h, <-h.Stat.Offset)
+		// This could also be an issue with force_close_older that a new harvester is started after each scan but not needed?
+		// One problem with comparing modTime is that it is in seconds, and scans can happen more then once a second
+		logp.Debug("prospector", "Resuming harvesting of file: %s, offset: %v", newState.Source, oldState.Offset)
+		p.Prospector.startHarvester(newState, oldState.Offset)
+
+	} else if oldState.Source != "" && oldState.Source != newState.Source {
+		logp.Debug("prospector", "File rename was detected, updating state: %s -> %s, Current offset: %v", oldState.Source, newState.Source, oldState.Offset)
+
+		h, _ := p.Prospector.createHarvester(newState)
+		h.SetOffset(oldState.Offset)
+		// Update state because of file rotation
+		h.SendStateUpdate()
 	} else {
-		logp.Debug("prospector", "Not harvesting, file didn't change: %s", h.Path)
+		// TODO: It could be that a harvester is still harvesting the file?
+		logp.Debug("prospector", "Not harvesting, file didn't change: %s", newState.Source)
 	}
 }
 
-// Continue reading on an existing file.
-// The given file was renamed from another file we know -> The same harvester channel is linked as the old file
-// The file param is only used for logging
-func (p *ProspectorLog) continueExistingFile(h *harvester.Harvester, previousFile string) {
-	logp.Debug("prospector", "Launching harvester on renamed file. File rename was detected: %s -> %s", previousFile, h.Path)
-
-	lastinfo := p.harvesterStats[previousFile]
-	h.Stat.Continue(&lastinfo)
-
-	// Update state because of file rotation
-	h.UpdateState()
-}
-
-// Start / resume harvester with a predefined offset
-func (p *ProspectorLog) resumeHarvesting(h *harvester.Harvester, offset int64) {
-
-	logp.Debug("prospector", "Start / resuming harvester of file: %s", h.Path)
-	h.SetOffset(offset)
-	h.Start()
-}
-
-// Check if the given file was renamed. If file is known but with different path,
-// the previous file path will be returned. If no file is found, an error
-// will be returned.
-func (p *ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, error) {
-
-	for path, pFileStat := range p.harvesterStats {
-		if path == file {
-			continue
-		}
-
-		if os.SameFile(info, pFileStat.Fileinfo) {
-			return path, nil
-		}
-	}
-
-	// Now check the missingfiles
-	for path, fileInfo := range p.missingFiles {
-
-		if os.SameFile(info, fileInfo) {
-			return path, nil
-		}
-	}
-
-	return "", fmt.Errorf("No previous file found")
-}
-
+// isFileExcluded checks if the given path should be excluded
 func (p *ProspectorLog) isFileExcluded(file string) bool {
 	patterns := p.config.ExcludeFiles
 	return len(patterns) > 0 && harvester.MatchAnyRegexps(patterns, file)

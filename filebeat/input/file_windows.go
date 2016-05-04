@@ -10,9 +10,9 @@ import (
 )
 
 type FileStateOS struct {
-	IdxHi uint64 `json:"idxhi,omitempty"`
-	IdxLo uint64 `json:"idxlo,omitempty"`
-	Vol   uint64 `json:"vol,omitempty"`
+	IdxHi uint64 `json:"idxhi,"`
+	IdxLo uint64 `json:"idxlo,"`
+	Vol   uint64 `json:"vol,"`
 }
 
 // GetOSFileState returns the platform specific FileStateOS
