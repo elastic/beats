@@ -1,6 +1,7 @@
 package mb
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,12 +13,25 @@ import (
 
 var debugf = logp.MakeDebug("mb")
 
+var (
+	// ErrEmptyConfig indicates that modules configuration list is nil or empty.
+	ErrEmptyConfig = errors.New("one or more modules must be configured")
+
+	// ErrAllModulesDisabled indicates that all modules are disabled. At least
+	// one module must be enabled.
+	ErrAllModulesDisabled = errors.New("all modules are disabled")
+)
+
 // NewModules builds new Modules and their associated MetricSets based on the
 // provided configuration data. config is a list module config data (the data
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a mapping of Modules to MetricSets or an error.
 func NewModules(config []*common.Config, r *Register) (map[Module][]MetricSet, error) {
+	if config == nil || len(config) == 0 {
+		return nil, ErrEmptyConfig
+	}
+
 	baseModules, err := newBaseModulesFromConfig(config)
 	if err != nil {
 		return nil, err
@@ -81,6 +95,10 @@ func NewModules(config []*common.Config, r *Register) (map[Module][]MetricSet, e
 		return nil, errs.Err()
 	}
 
+	if len(modToMetricSets) == 0 {
+		return nil, ErrAllModulesDisabled
+	}
+
 	debugf("mb.NewModules() is returning %s", modToMetricSets)
 	return modToMetricSets, nil
 }
@@ -97,7 +115,9 @@ func newBaseModulesFromConfig(config []*common.Config) ([]BaseModule, error) {
 			continue
 		}
 
-		baseModules = append(baseModules, bm)
+		if bm.config.Enabled {
+			baseModules = append(baseModules, bm)
+		}
 	}
 
 	return baseModules, errs.Err()

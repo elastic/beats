@@ -7,7 +7,11 @@ class Test(BaseTest):
         """
         Metricbeat starts and stops without error.
         """
-        self.render_config_template()
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["cpu"],
+            "period": "5s"
+        }])
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("start running"))
         proc.check_kill_and_wait()
