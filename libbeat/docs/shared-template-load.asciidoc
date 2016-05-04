@@ -16,14 +16,14 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-Before using {beatname_uc}, you need to load the
-http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
-template], which lets Elasticsearch know which fields should be analyzed
-in which way.
+In Elasticsearch, http://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html[index
+templates] are used to define settings and mappings that determine how fields should be analyzed. 
 
-The recommended template file is installed by the {beatname_uc} packages. By default, {beatname_uc} 
-loads the template automatically when you start the Beat if no template was previously loaded.
-However, if you want to disable automatic template loading, or you want to load your own template, 
+The recommended index template file for {beatname_uc} is installed by the {beatname_uc} packages. By default,
+{beatname_uc} loads the template automatically after successfully connecting to Elasticsearch. If the template
+already exists, it's not overwritten unless you configure {beatname_uc} to do so.
+
+If you want to disable automatic template loading, or you want to load your own template, 
 you can change the settings for template loading in the {beatname_uc} configuration file. If you 
 choose to disable automatic template loading, you need to load the template manually. 
 For more information, see:
