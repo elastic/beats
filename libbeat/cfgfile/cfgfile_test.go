@@ -83,7 +83,7 @@ func TestExpandEnv(t *testing.T) {
 		{`password: "abc$${!"`, `password: "abc${!"`, ""},
 
 		// The full error contains the line number.
-		{"shipper:\n  name: ${var", "", "failure while expanding environment " +
+		{"test:\n  name: ${var", "", "failure while expanding environment " +
 			"variables in config.yml at line=2, unterminated brace"},
 	}
 

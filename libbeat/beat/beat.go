@@ -113,7 +113,7 @@ type Beat struct {
 type BeatConfig struct {
 	Output  map[string]*common.Config
 	Logging logp.Logging
-	Shipper publisher.ShipperConfig
+	Shipper publisher.ShipperConfig `config:",inline"`
 	Filters []filter.FilterConfig
 	Path    paths.Path
 }
