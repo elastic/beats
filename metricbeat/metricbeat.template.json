@@ -336,22 +336,22 @@
             "mem": {
               "properties": {
                 "actual_free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used_p": {
                   "type": "float"
                 },
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
@@ -361,13 +361,13 @@
             "swap": {
               "properties": {
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
