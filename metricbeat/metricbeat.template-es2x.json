@@ -287,7 +287,7 @@
         "system-filesystem": {
           "properties": {
             "avail": {
-              "type": "integer"
+              "type": "long"
             },
             "device_name": {
               "ignore_above": 1024,
@@ -295,10 +295,13 @@
               "type": "string"
             },
             "files": {
-              "type": "integer"
+              "type": "long"
+            },
+            "free": {
+              "type": "long"
             },
             "free_files": {
-              "type": "integer"
+              "type": "long"
             },
             "mount_point": {
               "ignore_above": 1024,
@@ -306,10 +309,10 @@
               "type": "string"
             },
             "total": {
-              "type": "integer"
+              "type": "long"
             },
             "used": {
-              "type": "integer"
+              "type": "long"
             },
             "used_p": {
               "type": "float"
@@ -319,21 +322,21 @@
         "system-fsstats": {
           "properties": {
             "count": {
-              "type": "integer"
+              "type": "long"
             },
             "total_files": {
               "type": "long"
             },
             "total_size": {
               "properties": {
-                "avail": {
-                  "type": "integer"
-                },
                 "free": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "total": {
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             }
@@ -344,22 +347,22 @@
             "mem": {
               "properties": {
                 "actual_free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "actual_used_p": {
                   "type": "float"
                 },
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
@@ -369,13 +372,13 @@
             "swap": {
               "properties": {
                 "free": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "used_p": {
                   "type": "float"
@@ -399,32 +402,32 @@
                   "type": "string"
                 },
                 "system": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "total_p": {
                   "type": "float"
                 },
                 "user": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
             "mem": {
               "properties": {
                 "rss": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "rss_p": {
                   "type": "float"
                 },
                 "share": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "size": {
-                  "type": "integer"
+                  "type": "long"
                 }
               }
             },
