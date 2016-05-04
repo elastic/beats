@@ -2,26 +2,25 @@
 
 ##################### Topbeat general configuration #######################
 
-topbeat:
-  # In seconds, defines how often to read server statistics
-  period: 10
+# In seconds, defines how often to read server statistics
+topbeat.period: 10
 
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
+# Regular expression to match the processes that are monitored
+# By default, all the processes are monitored
+topbeat.procs: [".*"]
 
-  # Statistics to collect (all enabled by default)
-  
+# Statistics to collect (all enabled by default)
+topbeat.stats:
   # per system statistics, by default is true
-  stats.system: true
+  system: true
     
   # per process statistics, by default is true
-  stats.process: true
+  process: true
 
   # file system information, by default is true
-  stats.filesystem: true
+  filesystem: true
 
   # cpu usage per core, by default is false
-  stats.cpu_per_core: false
+  cpu_per_core: false
 
 

@@ -2,27 +2,26 @@
 
 ##################### Topbeat general configuration #######################
 
-topbeat:
-  # In seconds, defines how often to read server statistics
-  period: 10
+# In seconds, defines how often to read server statistics
+topbeat.period: 10
 
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
+# Regular expression to match the processes that are monitored
+# By default, all the processes are monitored
+topbeat.procs: [".*"]
 
-  # Statistics to collect (all enabled by default)
-  
+# Statistics to collect (all enabled by default)
+topbeat.stats:
   # per system statistics, by default is true
-  stats.system: true
+  system: true
     
   # per process statistics, by default is true
-  stats.process: true
+  process: true
 
   # file system information, by default is true
-  stats.filesystem: true
+  filesystem: true
 
   # cpu usage per core, by default is false
-  stats.cpu_per_core: false
+  cpu_per_core: false
 
 
 ###############################################################################
@@ -262,20 +261,6 @@ logging:
   # limit is reached.
   #to_files: false
 
-  # To enable logging to files, to_files option has to be set to true
-  # The directory where the log files will written to.
-  #files.path: /var/log/mybeat
-
-  # The name of the files where the logs are written to.
-  #files.name: mybeat
-
-  # Configure log file size limit. If limit is reached, log file will be
-  # automatically rotated
-  files.rotateeverybytes: 10485760 # = 10MB
-
-  # Number of rotated log files to keep. Oldest files will be deleted first.
-  #files.keepfiles: 7
-
   # Enable debug output for selected components. To enable all selectors use ["*"]
   # Other available selectors are beat, publish, service
   # Multiple selectors can be chained.
@@ -284,3 +269,18 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
+
+# To enable logging to files, to_files option has to be set to true
+# The directory where the log files will written to.
+logging.files:
+  #path: /var/log/mybeat
+
+  # The name of the files where the logs are written to.
+  #name: mybeat
+
+  # Configure log file size limit. If limit is reached, log file will be
+  # automatically rotated
+  rotateeverybytes: 10485760 # = 10MB
+
+  # Number of rotated log files to keep. Oldest files will be deleted first.
+  #keepfiles: 7
