@@ -31,6 +31,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Topbeat*
 
+- Fixed high CPU usage when using filtering under Windows. {pull}1562[1562]
+
 *Filebeat*
 
 *Winlogbeat*
