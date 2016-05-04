@@ -224,6 +224,7 @@ func (h *Harvester) updateOffset(increment int64) {
 }
 
 func (h *Harvester) UpdateState() {
+	logp.Debug("Update state: %s, offset: %v", h.Path, h.offset)
 	h.sendEvent(h.createEvent())
 }
 
