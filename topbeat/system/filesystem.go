@@ -50,7 +50,7 @@ func AddFileSystemUsedPercentage(f *FileSystemStat) {
 	}
 
 	perc := float64(f.Used) / float64(f.Total)
-	f.UsedPercent = Round(perc, .5, 2)
+	f.UsedPercent = Round(perc, .5, 4)
 }
 
 func CollectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {

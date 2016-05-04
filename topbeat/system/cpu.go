@@ -78,7 +78,7 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 		calculate := func(field2 uint64, field1 uint64, all_delta uint64) float64 {
 
 			perc := 0.0
-			delta := field2 - field1
+			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
 			return Round(perc, .5, 4)
 		}

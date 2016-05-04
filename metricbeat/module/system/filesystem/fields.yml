@@ -4,9 +4,9 @@
     `system-filesystem` contains local filesystem stats
   fields:
     - name: avail
-      type: integer
+      type: long
       description: >
-        The available disk space in bytes.
+        The disk space available to an unprivileged user in bytes.
     - name: device_name
       type: keyword
       description: >
@@ -16,19 +16,23 @@
       description: >
         The mounting point. For example: `/`
     - name: files
-      type: integer
+      type: long
       description: >
         The total number of file nodes in the file system.
+    - name: free
+      type: long
+      description: >
+        The disk space available in bytes.
     - name: free_files
-      type: integer
+      type: long
       description: >
         The number of free file nodes in the file system.
     - name: total
-      type: integer
+      type: long
       description: >
         The total disk space in bytes.
     - name: used
-      type: integer
+      type: long
       description: >
         The used disk space in bytes.
     - name: used_p

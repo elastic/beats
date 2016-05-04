@@ -608,9 +608,9 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 ==== system-filesystem.avail
 
-type: integer
+type: long
 
-The available disk space in bytes.
+The disk space available to an unprivileged user in bytes.
 
 
 ==== system-filesystem.device_name
@@ -629,28 +629,35 @@ The mounting point. For example: `/`
 
 ==== system-filesystem.files
 
-type: integer
+type: long
 
 The total number of file nodes in the file system.
 
 
+==== system-filesystem.free
+
+type: long
+
+The disk space available in bytes.
+
+
 ==== system-filesystem.free_files
 
-type: integer
+type: long
 
 The number of free file nodes in the file system.
 
 
 ==== system-filesystem.total
 
-type: integer
+type: long
 
 The total disk space in bytes.
 
 
 ==== system-filesystem.used
 
-type: integer
+type: long
 
 The used disk space in bytes.
 
@@ -664,46 +671,46 @@ The percentage of used disk space.
 
 === system-fsstats Fields
 
-`system-fsstats` contains local filesystem stats
+`system-fsstats` contains filesystem metrics aggregated from all mounted filesystems.
 
 
 
 ==== system-fsstats.count
 
-type: integer
+type: long
 
-Number of file systems found
+Number of file systems found.
 
 ==== system-fsstats.total_files
 
 type: long
 
-Number of total files
+Total number of files.
 
 === total_size Fields
 
-Nested file system docs
-
-
-==== system-fsstats.total_size.avail
-
-type: integer
-
-Total available space.
+Nested file system docs.
 
 
 ==== system-fsstats.total_size.free
 
-type: integer
+type: long
 
 Total free space.
 
 
 ==== system-fsstats.total_size.used
 
-type: integer
+type: long
 
 Total used space.
+
+
+==== system-fsstats.total_size.total
+
+type: long
+
+Total space (used plus free).
 
 
 === system-memory Fields
@@ -803,7 +810,7 @@ The percentage of used swap memory.
 
 === system-process Fields
 
-`system-process` contains process stats
+`system-process` contains process metadata, CPU metrics, and memory metrics.
 
 
 
@@ -857,7 +864,7 @@ CPU-specific statistics per process.
 
 ==== system-process.cpu.user
 
-type: integer
+type: long
 
 The amount of CPU time the process spent in user space.
 
@@ -871,14 +878,14 @@ The percentage of CPU time spent by the process since the last update. Its value
 
 ==== system-process.cpu.system
 
-type: integer
+type: long
 
 The amount of CPU time the process spent in kernel space.
 
 
 ==== system-process.cpu.total
 
-type: integer
+type: long
 
 The total CPU time spent by the process.
 
@@ -898,14 +905,14 @@ Memory-specific statistics per process.
 
 ==== system-process.mem.size
 
-type: integer
+type: long
 
 The total virtual memory the process has.
 
 
 ==== system-process.mem.rss
 
-type: integer
+type: long
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
@@ -919,7 +926,7 @@ The percentage of memory the process occupied in main memory (RAM).
 
 ==== system-process.mem.share
 
-type: integer
+type: long
 
 The shared memory the process uses.
 

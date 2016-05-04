@@ -32,11 +32,13 @@ func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "memory")
 	}
+	system.AddMemPercentage(memStat)
 
 	swapStat, err := system.GetSwap()
 	if err != nil {
 		return nil, errors.Wrap(err, "swap")
 	}
+	system.AddSwapPercentage(swapStat)
 
 	return common.MapStr{
 		"mem":  system.GetMemoryEvent(memStat),
