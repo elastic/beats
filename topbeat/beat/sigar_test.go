@@ -83,12 +83,13 @@ func TestGetProcess(t *testing.T) {
 
 	for _, pid := range pids {
 
-		process, err := GetProcess(pid, "")
-
+		process, err := newProcess(pid)
 		if err != nil {
 			continue
 		}
 		assert.NotNil(t, process)
+		err = process.getDetails("")
+		assert.NoError(t, err)
 
 		assert.True(t, (process.Pid > 0))
 		assert.True(t, (process.Ppid >= 0))
@@ -166,7 +167,11 @@ func BenchmarkGetProcess(b *testing.B) {
 			cmdline = p.CmdLine
 		}
 
-		process, err := GetProcess(pid, cmdline)
+		process, err := newProcess(pid)
+		if err != nil {
+			continue
+		}
+		err = process.getDetails(cmdline)
 		if err != nil {
 			continue
 		}

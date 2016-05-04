@@ -12,13 +12,16 @@ func TestMatchProcs(t *testing.T) {
 	var beat = Topbeat{}
 
 	beat.procs = []string{".*"}
+	beat.initProcStats()
 	assert.True(t, beat.MatchProcess("topbeat"))
 
 	beat.procs = []string{"topbeat"}
+	beat.initProcStats()
 	assert.False(t, beat.MatchProcess("burn"))
 
 	// match no processes
 	beat.procs = []string{"$^"}
+	beat.initProcStats()
 	assert.False(t, beat.MatchProcess("burn"))
 }
 

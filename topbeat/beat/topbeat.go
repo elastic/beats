@@ -2,6 +2,7 @@ package beat
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -21,6 +22,7 @@ type ProcsMap map[int]*Process
 type Topbeat struct {
 	period           time.Duration
 	procs            []string
+	regexps          []*regexp.Regexp
 	procsMap         ProcsMap
 	lastCpuTimes     *CpuTimes
 	lastCpuTimesList []CpuTimes
@@ -101,9 +103,10 @@ func (tb *Topbeat) Setup(b *beat.Beat) error {
 }
 
 func (t *Topbeat) Run(b *beat.Beat) error {
-	var err error
-
-	t.initProcStats()
+	err := t.initProcStats()
+	if err != nil {
+		return err
+	}
 
 	ticker := time.NewTicker(t.period)
 	defer ticker.Stop()
@@ -157,12 +160,21 @@ func (t *Topbeat) Stop() {
 	close(t.done)
 }
 
-func (t *Topbeat) initProcStats() {
+func (t *Topbeat) initProcStats() error {
 
 	t.procsMap = make(ProcsMap)
 
 	if len(t.procs) == 0 {
-		return
+		return nil
+	}
+
+	t.regexps = []*regexp.Regexp{}
+	for _, pattern := range t.procs {
+		reg, err := regexp.Compile(pattern)
+		if err != nil {
+			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
+		}
+		t.regexps = append(t.regexps, reg)
 	}
 
 	pids, err := Pids()
@@ -171,13 +183,20 @@ func (t *Topbeat) initProcStats() {
 	}
 
 	for _, pid := range pids {
-		process, err := GetProcess(pid, "")
+		process, err := newProcess(pid)
 		if err != nil {
 			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
+		err = process.getDetails("")
+		if err != nil {
+			logp.Err("Error getting process details pid=%d: %v", pid, err)
+			continue
+		}
 		t.procsMap[process.Pid] = process
 	}
+
+	return nil
 }
 
 func (t *Topbeat) exportProcStats() error {
@@ -199,13 +218,19 @@ func (t *Topbeat) exportProcStats() error {
 			cmdline = previousProc.CmdLine
 		}
 
-		process, err := GetProcess(pid, cmdline)
+		process, err := newProcess(pid)
 		if err != nil {
 			logp.Debug("topbeat", "Skip process pid=%d: %v", pid, err)
 			continue
 		}
 
 		if t.MatchProcess(process.Name) {
+
+			err = process.getDetails(cmdline)
+			if err != nil {
+				logp.Err("Error getting process details. pid=%d: %v", process.Pid, err)
+				continue
+			}
 
 			t.addProcCpuPercentage(process)
 			t.addProcMemPercentage(process, 0 /*read total mem usage */)
@@ -334,9 +359,8 @@ func collectFileSystemStats(fss []sigar.FileSystem) []common.MapStr {
 
 func (t *Topbeat) MatchProcess(name string) bool {
 
-	for _, reg := range t.procs {
-		matched, _ := regexp.MatchString(reg, name)
-		if matched {
+	for _, reg := range t.regexps {
+		if reg.MatchString(name) {
 			return true
 		}
 	}
