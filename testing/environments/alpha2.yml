@@ -1,15 +1,16 @@
 # This should test the environment with the latest snapshots
 # This is based on base.yml
+
 elasticsearch:
   build: ./docker/elasticsearch
-  dockerfile: Dockerfile-snapshot
+  dockerfile: Dockerfile-5.0.0-alpha1    # still using alpha1 because alpha2 doesn't work fine in docker
   command: elasticsearch -Ees.network.host=0.0.0.0 -Ees.discovery.zen.minimum_master_nodes=1
 
 logstash:
   build: ./docker/logstash
-  dockerfile: Dockerfile-snapshot
+  dockerfile: Dockerfile-5.0.0-alpha2
 
 kibana:
   build: ./docker/kibana
-  dockerfile: Dockerfile-snapshot
+  dockerfile: Dockerfile-5.0.0-alpha2
 
