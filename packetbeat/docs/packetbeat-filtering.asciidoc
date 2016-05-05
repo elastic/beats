@@ -1,6 +1,7 @@
 [[filtering-data]]
 === Filtering the Exported Data
 
+pass::[<?edit_url https://github.com/elastic/beats/edit/master/libbeat/docs/filtering.asciidoc ?>]
 include::../../libbeat/docs/filtering.asciidoc[]
 
 For example, the following filter configuration includes a subset of the Packetbeat DNS fields so that only the
