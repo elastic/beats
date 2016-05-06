@@ -22,7 +22,7 @@ The features vary by operating system.
 | Feature         | Linux | Darwin | Windows | OpenBSD |
 |-----------------|:-----:|:------:|:-------:|:-------:|
 | Cpu             |   X   |    X   |    X    |    X    |
-| CpuList         |   X   |    X   |         |         |
+| CpuList         |   X   |    X   |         |    X    |
 | FileSystemList  |   X   |    X   |    X    |    X    |
 | FileSystemUsage |   X   |    X   |    X    |    X    |
 | LoadAverage     |   X   |    X   |         |    X    |
