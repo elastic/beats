@@ -212,6 +212,8 @@ func (self *ProcState) Get(pid int) error {
 
 	self.Ppid, _ = strconv.Atoi(fields[1])
 
+	self.Pgid, _ = strconv.Atoi(fields[2])
+
 	self.Tty, _ = strconv.Atoi(fields[4])
 
 	self.Priority, _ = strconv.Atoi(fields[15])
