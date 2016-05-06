@@ -20,12 +20,14 @@ type FilterRule interface {
 type IncludeFields struct {
 	Fields []string
 	// condition
+	Cond Condition
 }
 
 /* extend FilterRule */
 type DropFields struct {
 	Fields []string
 	// condition
+	Cond Condition
 }
 
 type FilterList struct {
@@ -38,14 +40,21 @@ func New(config []FilterConfig) (*FilterList, error) {
 	Filters := &FilterList{}
 	Filters.filters = []FilterRule{}
 
-	logp.Debug("filter", "configuration %v", config)
 	for _, filterConfig := range config {
 		if filterConfig.DropFields != nil {
-			Filters.Register(NewDropFields(filterConfig.DropFields.Fields))
+			rule, err := NewDropFields(*filterConfig.DropFields)
+			if err != nil {
+				return nil, err
+			}
+			Filters.Register(rule)
 		}
 
 		if filterConfig.IncludeFields != nil {
-			Filters.Register(NewIncludeFields(filterConfig.IncludeFields.Fields))
+			rule, err := NewIncludeFields(*filterConfig.IncludeFields)
+			if err != nil {
+				return nil, err
+			}
+			Filters.Register(rule)
 		}
 	}
 
@@ -95,25 +104,33 @@ func (filters *FilterList) String() string {
 }
 
 /* IncludeFields methods */
-func NewIncludeFields(fields []string) *IncludeFields {
+func NewIncludeFields(config IncludeFieldsConfig) (*IncludeFields, error) {
 
 	/* add read only fields if they are not yet */
 	for _, readOnly := range MandatoryExportedFields {
 		found := false
-		for _, field := range fields {
+		for _, field := range config.Fields {
 			if readOnly == field {
 				found = true
 			}
 		}
 		if !found {
-			fields = append(fields, readOnly)
+			config.Fields = append(config.Fields, readOnly)
 		}
 	}
 
-	return &IncludeFields{Fields: fields}
+	cond, err := NewCondition(config.ConditionConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &IncludeFields{Fields: config.Fields, Cond: *cond}, nil
 }
 
 func (f *IncludeFields) Filter(event common.MapStr) (common.MapStr, error) {
+
+	if !f.Cond.Check(event) {
+		return event, nil
+	}
 
 	filtered := common.MapStr{}
 
@@ -135,24 +152,33 @@ func (f *IncludeFields) Filter(event common.MapStr) (common.MapStr, error) {
 }
 
 func (f *IncludeFields) String() string {
-	return "include_fields=" + strings.Join(f.Fields, ", ")
+	return "include_fields=" + strings.Join(f.Fields, ", ") + ", condition=" + f.Cond.String()
 }
 
 /* DropFields methods */
-func NewDropFields(fields []string) *DropFields {
+func NewDropFields(config DropFieldsConfig) (*DropFields, error) {
 
 	/* remove read only fields */
 	for _, readOnly := range MandatoryExportedFields {
-		for i, field := range fields {
+		for i, field := range config.Fields {
 			if readOnly == field {
-				fields = append(fields[:i], fields[i+1:]...)
+				config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
 			}
 		}
 	}
-	return &DropFields{Fields: fields}
+
+	cond, err := NewCondition(config.ConditionConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &DropFields{Fields: config.Fields, Cond: *cond}, nil
 }
 
 func (f *DropFields) Filter(event common.MapStr) (common.MapStr, error) {
+
+	if !f.Cond.Check(event) {
+		return event, nil
+	}
 
 	for _, field := range f.Fields {
 		err := event.Delete(field)
@@ -166,5 +192,5 @@ func (f *DropFields) Filter(event common.MapStr) (common.MapStr, error) {
 
 func (f *DropFields) String() string {
 
-	return "drop_fields=" + strings.Join(f.Fields, ", ")
+	return "drop_fields=" + strings.Join(f.Fields, ", ") + ", condition=" + f.Cond.String()
 }

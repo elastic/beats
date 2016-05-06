@@ -154,6 +154,29 @@ func (m MapStr) HasKey(key string) (bool, error) {
 	return true, nil
 }
 
+func (m MapStr) GetValue(key string) (interface{}, error) {
+
+	keyParts := strings.Split(key, ".")
+	keyPartsLen := len(keyParts)
+
+	mapp := m
+	for i := 0; i < keyPartsLen; i++ {
+		keyPart := keyParts[i]
+
+		if _, ok := mapp[keyPart]; ok {
+			if i < keyPartsLen-1 {
+				mapp, ok = mapp[keyPart].(MapStr)
+				if !ok {
+					return nil, fmt.Errorf("Unknown type of %s key", keyPart)
+				}
+			}
+		} else {
+			return nil, fmt.Errorf("Missing %s key", keyPart)
+		}
+	}
+	return mapp[keyParts[keyPartsLen-1]], nil
+}
+
 func (m MapStr) StringToPrint() string {
 	json, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
