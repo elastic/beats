@@ -16,7 +16,15 @@ func TestIncludeFields(t *testing.T) {
 
 	Filters := FilterList{}
 
-	Filters.Register(NewIncludeFields([]string{"proc.cpu.total_p", "proc.mem", "dd"}))
+	rule, err := NewIncludeFields(IncludeFieldsConfig{
+		Fields: []string{"proc.cpu.total_p", "proc.mem", "dd"},
+		ConditionConfig: ConditionConfig{Contains: map[string]string{
+			"proc.name": "test",
+		}},
+	})
+	assert.True(t, err == nil)
+
+	Filters.Register(rule)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -24,7 +32,6 @@ func TestIncludeFields(t *testing.T) {
 			"hostname": "mar",
 			"name":     "my-shipper-1",
 		},
-		"count": 1,
 		"proc": common.MapStr{
 			"cpu": common.MapStr{
 				"start_time": "Jan14",
@@ -33,6 +40,7 @@ func TestIncludeFields(t *testing.T) {
 				"total_p":    0,
 				"user":       53363,
 			},
+			"name":    "test-1",
 			"cmdline": "/sbin/launchd",
 			"mem": common.MapStr{
 				"rss":   11194368,
@@ -73,7 +81,15 @@ func TestIncludeFields1(t *testing.T) {
 
 	Filters := FilterList{}
 
-	Filters.Register(NewIncludeFields([]string{"proc.cpu.total_ddd"}))
+	rule, err := NewIncludeFields(IncludeFieldsConfig{
+		Fields: []string{"proc.cpu.total_ddd"},
+		ConditionConfig: ConditionConfig{Regexp: map[string]string{
+			"proc.cmdline": "launchd",
+		}},
+	})
+	assert.True(t, err == nil)
+
+	Filters.Register(rule)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -81,7 +97,6 @@ func TestIncludeFields1(t *testing.T) {
 			"hostname": "mar",
 			"name":     "my-shipper-1",
 		},
-		"count": 1,
 
 		"proc": common.MapStr{
 			"cpu": common.MapStr{
@@ -116,7 +131,15 @@ func TestDropFields(t *testing.T) {
 
 	Filters := FilterList{}
 
-	Filters.Register(NewDropFields([]string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"}))
+	rule, err := NewDropFields(DropFieldsConfig{
+		Fields: []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"},
+		ConditionConfig: ConditionConfig{Equals: map[string]string{
+			"beat.hostname": "mar",
+		}},
+	})
+	assert.True(t, err == nil)
+
+	Filters.Register(rule)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -124,7 +147,6 @@ func TestDropFields(t *testing.T) {
 			"hostname": "mar",
 			"name":     "my-shipper-1",
 		},
-		"count": 1,
 
 		"proc": common.MapStr{
 			"cpu": common.MapStr{
@@ -149,7 +171,6 @@ func TestDropFields(t *testing.T) {
 
 	expectedEvent := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
-		"count":      1,
 		"proc": common.MapStr{
 			"cpu": common.MapStr{
 				"system":  26027,
@@ -171,9 +192,23 @@ func TestMultipleIncludeFields(t *testing.T) {
 	}
 	Filters := FilterList{}
 
-	Filters.Register(NewIncludeFields([]string{"proc"}))
-	Filters.Register(NewIncludeFields([]string{"proc.cpu.start_time", "proc.cpu.total_p",
-		"proc.mem.rss_p", "proc.cmdline"}))
+	rule, err := NewIncludeFields(IncludeFieldsConfig{
+		Fields: []string{"proc"},
+		ConditionConfig: ConditionConfig{Contains: map[string]string{
+			"beat.name": "my-shipper",
+		}},
+	})
+	assert.True(t, err == nil)
+
+	Filters.Register(rule)
+
+	rule, err = NewIncludeFields(IncludeFieldsConfig{
+		Fields: []string{"proc.cpu.start_time", "proc.cpu.total_p",
+			"proc.mem.rss_p", "proc.cmdline"},
+	})
+	assert.True(t, err == nil)
+
+	Filters.Register(rule)
 
 	event1 := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -181,7 +216,6 @@ func TestMultipleIncludeFields(t *testing.T) {
 			"hostname": "mar",
 			"name":     "my-shipper-1",
 		},
-		"count": 1,
 
 		"proc": common.MapStr{
 			"cpu": common.MapStr{
@@ -208,7 +242,6 @@ func TestMultipleIncludeFields(t *testing.T) {
 			"hostname": "mar",
 			"name":     "my-shipper-1",
 		},
-		"count": 1,
 		"fs": common.MapStr{
 			"device_name": "devfs",
 			"total":       198656,
