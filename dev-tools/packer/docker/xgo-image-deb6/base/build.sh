@@ -14,6 +14,9 @@
 #   OUT         - Optional output prefix to override the package name
 #   FLAG_V      - Optional verbosity flag to set on the Go builder
 #   FLAG_RACE   - Optional race flag to set on the Go builder
+#   TARGETS        - Comma separated list of build targets to compile for
+
+
 
 # Download the canonical import path (may fail, don't allow failures beyond)
 
@@ -68,12 +71,19 @@ fi
 
 # Download all the C dependencies
 echo "Fetching dependencies..."
-mkdir -p /deps
+BUILD_DEPS=/build_deps.sh
+DEPS_FOLDER=/deps
+LIST_DEPS=""
+mkdir -p $DEPS_FOLDER
 DEPS=($DEPS) && for dep in "${DEPS[@]}"; do
-  echo Downloading $dep
-  if [ "${dep##*.}" == "tar" ]; then wget -q $dep -O - | tar -C /deps -x; fi
-  if [ "${dep##*.}" == "gz" ]; then wget -q $dep -O - | tar -C /deps -xz; fi
-  if [ "${dep##*.}" == "bz2" ]; then wget -q $dep -O - | tar -C /deps -xj; fi
+  dep_filename=${dep##*/}
+  echo "Downloading $dep to $DEPS_FOLDER/$dep_filename"
+  wget -q $dep --directory-prefix=$DEPS_FOLDER
+  dep_name=$(tar --list --no-recursion --file=$DEPS_FOLDER/$dep_filename  --exclude="*/*" | sed 's/\///g')
+  LIST_DEPS="${LIST_DEPS} ${dep_name}"
+  if [ "${dep_filename##*.}" == "tar" ]; then tar -xf  $DEPS_FOLDER/$dep_filename --directory $DEPS_FOLDER/  ; fi
+  if [ "${dep_filename##*.}" == "gz"  ]; then tar -xzf $DEPS_FOLDER/$dep_filename --directory $DEPS_FOLDER/  ; fi
+  if [ "${dep_filename##*.}" == "bz2" ]; then tar -xj  $DEPS_FOLDER/$dep_filename --directory $DEPS_FOLDER/  ; fi
 done
 
 # Configure some global build parameters
@@ -93,45 +103,80 @@ if [ -n $BEFORE_BUILD ]; then
 	/scripts/$BEFORE_BUILD ${1}
 fi
 
-# Build for each platform individually
-echo "Compiling $PACK for linux/amd64..."
-HOST=x86_64-linux PREFIX=/usr/local $BUILD_DEPS /deps
-GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-amd64$R ./$PACK"
 
-echo "Compiling $PACK for linux/386..."
-HOST=i686-linux PREFIX=/usr/local $BUILD_DEPS /deps
-GOOS=linux GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $V $LDARGS -o $NAME-linux-386 ./$PACK"
+# If no build targets were specified, inject a catch all wildcard
+if [ "$TARGETS" == "" ]; then
+  TARGETS="./."
+fi
 
-#echo "Compiling $PACK for linux/arm..."
-#CC=arm-linux-gnueabi-gcc HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps
-#CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go get -d ./$PACK
-#CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
 
-#echo "Compiling $PACK for windows/amd64..."
-#CC=x86_64-w64-mingw32-gcc HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps
-#CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-#CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
+built_targets=0
+for TARGET in $TARGETS; do
+	# Split the target into platform and architecture
+	XGOOS=`echo $TARGET | cut -d '/' -f 1`
+	XGOARCH=`echo $TARGET | cut -d '/' -f 2`
 
-#echo "Compiling $PACK for windows/386..."
-#CC=i686-w64-mingw32-gcc HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps
-#CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-#CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-windows-386.exe ./$PACK
+	# Check and build for Linux targets
+	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
+		echo "Compiling $PACK for linux/amd64..."
+		HOST=x86_64-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
+		sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-amd64$R ./$PACK"
+		built_targets=$((built_targets+1))
+	fi
+	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
+		echo "Compiling $PACK for linux/386..."
+		HOST=i686-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		GOOS=linux GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
+		sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-386$R ./$PACK"
+		built_targets=$((built_targets+1))
+	fi	
+	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "arm" ]); then
+		echo "Compiling $PACK for linux/arm..."
+		CC=arm-linux-gnueabi-gcc HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps $LIST_DEPS
+		CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go get -d ./$PACK
+		CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
+		built_targets=$((built_targets+1))
+	fi
+	
+	# Check and build for Windows targets
+	if ([ $XGOOS == "." ] || [ $XGOOS == "windows" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
+		echo "Compiling $PACK for windows/amd64..."
+		CC=x86_64-w64-mingw32-gcc HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
+		CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
+		CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
+		built_targets=$((built_targets+1))
+	fi
+	
+	if ([ $XGOOS == "." ] || [ $XGOOS == "windows" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
+		echo "Compiling $PACK for windows/386..."
+		CC=i686-w64-mingw32-gcc HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
+		CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
+		CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-windows-386.exe ./$PACK
+		built_targets=$((built_targets+1))
+	fi
+	
+	# Check and build for OSX targets
+	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
+		echo "Compiling $PACK for darwin/amd64..."
+		CC=o64-clang HOST=x86_64-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
+		CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -ldflags=-s $V $R -o $NAME-darwin-amd64$R ./$PACK
+		built_targets=$((built_targets+1))
+	fi
+	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
+		echo "Compiling for darwin/386..."
+		CC=o32-clang HOST=i386-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
+		CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-darwin-386 ./$PACK
+		built_targets=$((built_targets+1))
+	fi
+done
 
-#echo "Compiling $PACK for darwin/amd64..."
-#CC=o64-clang HOST=x86_64-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps
-#CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-#CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build $V $R -o $NAME-darwin-amd64$R ./$PACK
 
-#echo "Compiling $PACK for darwin/386..."
-#CC=o32-clang HOST=i386-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps
-#CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-#CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-darwin-386 ./$PACK
-
-# The binary files are the 2 last created files
-echo "Moving binaries to host..."
-ls -t | head -n 2
-cp `ls -t | head -n 2` /build
+# The binary files are the last created files
+echo "Moving $built_targets $PACK binaries to host folder..."
+ls -t | head -n $built_targets 
+cp `ls -t | head -n $built_targets ` /build
 
 echo "Build process completed"
