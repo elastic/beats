@@ -74,6 +74,7 @@ release-upload:
 run-interactive:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
 		--entrypoint=bash tudorg/beats-builder-deb6
 
 .PHONY: images
