@@ -6,23 +6,23 @@ packer_absdir=$(shell dirname ${makefile_abspath})
 
 
 %/deb: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	-ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
+	-ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/debian/build.sh
 
 %/rpm: % build/god-linux-386 build/god-linux-amd64 fpm-image
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	-ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
+	-ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/centos/build.sh
 
 %/darwin: %
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
+	-ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/darwin/build.sh
 
 %/win: %
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	-ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
+	-ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/windows/build.sh
 
 %/bin: %
-	ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
-	ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	-ARCH=386 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
+	-ARCH=amd64 BEAT=$(@D) BUILDID=$(BUILDID) SNAPSHOT=$(SNAPSHOT) $(packer_absdir)/platforms/binary/build.sh
 
 .PHONY: deps
 deps:
@@ -70,12 +70,19 @@ package-upload:
 release-upload:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
-.PHONY: run-interactive
-run-interactive:
+.PHONY: run-interactive-builder-deb6
+run-interactive-builder-deb6:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
 		-v $(shell pwd)/../..:/source \
 		--entrypoint=bash tudorg/beats-builder-deb6
+
+.PHONY: run-interactive-builder
+run-interactive-builder:
+	docker run -t -i -v $(shell pwd)/build:/build \
+		-v $(packer_absdir)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
+		--entrypoint=bash tudorg/beats-builder
 
 .PHONY: images
 images: xgo-image fpm-image go-daemon-image
