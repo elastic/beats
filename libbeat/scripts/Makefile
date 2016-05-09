@@ -219,11 +219,11 @@ update: python-env
 
 	# Update fields
 	echo "Update fields"
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME}
 
 	# Update templates
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME}
-	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200/
