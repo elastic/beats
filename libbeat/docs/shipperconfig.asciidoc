@@ -11,57 +11,56 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuration-shipper]]
-=== Shipper
+=== Top level configuration options
 
-The `shipper` section contains configuration options for the Beat and some
+The top level section contains configuration options for the Beat and some
 general settings that control its behaviour.
 
 Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-shipper:
-  # The name of the shipper that publishes the network data. It can be used to group
-  # all the transactions sent by a single shipper in the web interface.
-  # If this options is not defined, the hostname is used.
-  #name:
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+#name:
 
-  # The tags of the shipper are included in their own field with each
-  # transaction published. Tags make it easy to group servers by different
-  # logical properties.
-  tags: ["service-X", "web-tier"]
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+tags: ["service-X", "web-tier"]
 
-  # Uncomment the following if you want to ignore transactions created
-  # by the server on which the shipper is installed. This option is useful
-  # to remove duplicates if shippers are installed on multiple servers.
-  ignore_outgoing: true
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+ignore_outgoing: true
 
-  # How often (in seconds) shippers are publishing their IPs to the topology map.
-  # The default is 10 seconds.
-  refresh_topology_freq: 10
+# How often (in seconds) shippers are publishing their IPs to the topology map.
+# The default is 10 seconds.
+refresh_topology_freq: 10
 
-  # Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-  # All the IPs will be deleted afterwards. Note, that the value must be higher than
-  # refresh_topology_freq. The default is 15 seconds.
-  topology_expire: 15
+# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+# All the IPs will be deleted afterwards. Note, that the value must be higher than
+# refresh_topology_freq. The default is 15 seconds.
+topology_expire: 15
 
-  # Configure local GeoIP database support.
-  # If no paths are not configured geoip is disabled.
-  #geoip:
-    #paths:
-    #  - "/usr/share/GeoIP/GeoLiteCity.dat"
-    #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
+# Configure local GeoIP database support.
+# If no paths are not configured geoip is disabled.
+#geoip:
+#paths:
+#  - "/usr/share/GeoIP/GeoLiteCity.dat"
+#  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
 
 ------------------------------------------------------------------------------
 
-==== Shipper Options
+==== Top Level Options
 
-You can specify the following options under the `shipper` section:
+You can specify the following options:
 
 ===== name
 
 The name of the Beat. If this option is empty, the `hostname` of the server is
-used. The name is included as the `shipper` field in each published transaction. You can
+used. The name is included as the `beat.name` field in each published transaction. You can
 use the name to group all transactions sent by a single Beat.
 
 At startup, each Beat can publish its IP, port, and name to Elasticsearch. This information
@@ -81,8 +80,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-shipper:
-  name: "my-shipper"
+name: "my-shipper"
 ------------------------------------------------------------------------------
 
 ===== tags
@@ -97,8 +95,7 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-shipper:
-  tags: ["my-service", "hardware", "test"]
+tags: ["my-service", "hardware", "test"]
 --------------------------------------------------------------------------------
 
 [[libbeat-configuration-fields]]
@@ -114,8 +111,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-shipper:
-  fields: {project: "myproject", instance-id: "574734885120952459"}
+fields: {project: "myproject", instance-id: "574734885120952459"}
 ------------------------------------------------------------------------------
 
 ===== fields_under_root
@@ -129,11 +125,10 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-shipper:
-  fields_under_root: true
-  fields:
-    instance_id: i-10a64379
-    region: us-east-1
+fields_under_root: true
+fields:
+  instance_id: i-10a64379
+  region: us-east-1
 ------------------------------------------------------------------------------
 
 ===== ignore_outgoing

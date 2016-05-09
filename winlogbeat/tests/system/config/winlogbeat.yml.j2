@@ -64,24 +64,23 @@ output:
 
 ############################# Shipper #########################################
 
-shipper:
-  {%- if shipper_name %}
-  name: {{ shipper_name }}
-  {% endif %}
+{%- if shipper_name %}
+name: {{ shipper_name }}
+{% endif %}
 
-  {%- if tags %}
-  tags:
-    {% for tag in tags -%}
-    - {{ tag }}
-    {% endfor -%}
-  {% endif %}
+{%- if tags %}
+tags:
+  {% for tag in tags -%}
+  - {{ tag }}
+  {% endfor -%}
+{% endif %}
 
-  {%- if fields %}
-  {% if fields_under_root %}fields_under_root: true{% endif %}
-  fields:
-    {% for k, v in fields.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor -%}
-  {% endif %}
+{%- if fields %}
+{% if fields_under_root %}fields_under_root: true{% endif %}
+fields:
+  {% for k, v in fields.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor -%}
+{% endif %}
 
 # vim: set ft=jinja:
