@@ -24,8 +24,9 @@ const (
 )
 
 var (
-	debugf  = logp.MakeDebug("metricbeat")
-	fetches = expvar.NewMap("fetches")
+	debugf      = logp.MakeDebug("metricbeat")
+	fetchesLock = sync.Mutex{}
+	fetches     = expvar.NewMap("fetches")
 )
 
 // moduleWrapper contains the Module and the private data associated with
@@ -63,7 +64,7 @@ func newModuleWrappers(
 	var wrappers []*moduleWrapper
 	var errs multierror.Errors
 	for k, v := range modules {
-		debugf("initializing Module type %s, %T=%+v", k.Name(), k, k)
+		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
 		f, err := filter.New(k.Config().Filters)
 		if err != nil {
 			errs = append(errs, errors.Wrapf(err, "module %s", k.Name()))
@@ -79,20 +80,20 @@ func newModuleWrappers(
 
 		msws := make([]*metricSetWrapper, 0, len(v))
 		for _, ms := range v {
-			debugf("initializing MetricSet type %s/%s, %T=%+v",
-				ms.Module().Name(), ms.Name(), ms, ms)
+			debugf("Initializing MetricSet type '%s/%s' for host '%s': %T=%+v",
+				ms.Module().Name(), ms.Name(), ms.Host(), ms, ms)
+
+			expMap, err := getMetricSetExpvarMap(mw.Name(), ms.Name())
+			if err != nil {
+				return nil, err
+			}
+
 			msw := &metricSetWrapper{
 				MetricSet: ms,
 				module:    mw,
-				stats:     new(expvar.Map).Init(),
+				stats:     expMap,
 			}
 			msws = append(msws, msw)
-
-			// Initialize expvar stats for this MetricSet.
-			fetches.Set(fmt.Sprintf("%s-%s", mw.Name(), msw.Name()), msw.stats)
-			msw.stats.Add(successesKey, 0)
-			msw.stats.Add(failuresKey, 0)
-			msw.stats.Add(eventsKey, 0)
 		}
 		mw.metricSets = msws
 	}
@@ -112,12 +113,13 @@ func newModuleWrappers(
 func (msw *metricSetWrapper) startFetching(
 	done <-chan struct{},
 	wg *sync.WaitGroup,
-	host string,
 ) {
 	defer wg.Done()
+	debugf("Starting %s", msw)
+	defer debugf("Stopped %s", msw)
 
 	// Fetch immediately.
-	err := msw.fetch(host)
+	err := msw.fetch()
 	if err != nil {
 		logp.Err("fetch error: %v", err)
 	}
@@ -130,7 +132,7 @@ func (msw *metricSetWrapper) startFetching(
 		case <-done:
 			return
 		case <-t.C:
-			err := msw.fetch(host)
+			err := msw.fetch()
 			if err != nil {
 				logp.Err("%v", err)
 			}
@@ -141,24 +143,24 @@ func (msw *metricSetWrapper) startFetching(
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch(host string) error {
+func (msw *metricSetWrapper) fetch() error {
 	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
-		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), host))
+		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
-		return msw.singleEventFetch(fetcher, host)
+		return msw.singleEventFetch(fetcher)
 	case mb.EventsFetcher:
-		return msw.multiEventFetch(fetcher, host)
+		return msw.multiEventFetch(fetcher)
 	default:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement a Fetcher "+
 			"interface", msw.Module().Name(), msw.Name())
 	}
 }
 
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, host string) error {
+func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) error {
 	start := time.Now()
-	event, err := fetcher.Fetch(host)
+	event, err := fetcher.Fetch()
 	elapsed := time.Since(start)
 	if err == nil {
 		msw.stats.Add(successesKey, 1)
@@ -166,7 +168,7 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, host stri
 		msw.stats.Add(failuresKey, 1)
 	}
 
-	event, err = createEvent(msw, host, event, err, start, elapsed)
+	event, err = createEvent(msw, event, err, start, elapsed)
 	if err != nil {
 		logp.Warn("createEvent error: %v", err)
 	}
@@ -179,15 +181,15 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher, host stri
 	return nil
 }
 
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, host string) error {
+func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) error {
 	start := time.Now()
-	events, err := fetcher.Fetch(host)
+	events, err := fetcher.Fetch()
 	elapsed := time.Since(start)
 	if err == nil {
 		msw.stats.Add(successesKey, 1)
 
 		for _, event := range events {
-			event, err = createEvent(msw, host, event, nil, start, elapsed)
+			event, err = createEvent(msw, event, nil, start, elapsed)
 			if err != nil {
 				logp.Warn("createEvent error: %v", err)
 			}
@@ -200,7 +202,7 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, host stri
 	} else {
 		msw.stats.Add(failuresKey, 1)
 
-		event, err := createEvent(msw, host, nil, err, start, elapsed)
+		event, err := createEvent(msw, nil, err, start, elapsed)
 		if err != nil {
 			logp.Warn("createEvent error: %v", err)
 		}
@@ -212,4 +214,32 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher, host stri
 	}
 
 	return nil
+}
+
+func (msw *metricSetWrapper) String() string {
+	return fmt.Sprintf("metricSetWrapper[module=%s, name=%s, host=%s]",
+		msw.module.Name(), msw.Name(), msw.Host())
+}
+
+// other utility functions
+
+func getMetricSetExpvarMap(module, name string) (*expvar.Map, error) {
+	key := fmt.Sprintf("%s-%s", module, name)
+	fetchesLock.Lock()
+	defer fetchesLock.Unlock()
+
+	expVar := fetches.Get(key)
+	switch m := expVar.(type) {
+	case nil:
+		expMap := new(expvar.Map).Init()
+		fetches.Set(key, expMap)
+		expMap.Add(successesKey, 0)
+		expMap.Add(failuresKey, 0)
+		expMap.Add(eventsKey, 0)
+		return expMap, nil
+	case *expvar.Map:
+		return m, nil
+	default:
+		return nil, fmt.Errorf("unexpected expvar.Var type (%T) found for key '%s'", m, key)
+	}
 }

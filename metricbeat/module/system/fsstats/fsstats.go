@@ -33,7 +33,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // a single event containing aggregated data.
-func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	fss, err := system.GetFileSystemList()
 	if err != nil {
 		return nil, errors.Wrap(err, "filesystem list")

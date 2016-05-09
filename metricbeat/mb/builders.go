@@ -1,7 +1,6 @@
 package mb
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 )
 
 var debugf = logp.MakeDebug("mb")
@@ -123,15 +123,26 @@ func newBaseModulesFromConfig(config []*common.Config) ([]BaseModule, error) {
 	return baseModules, errs.Err()
 }
 
-// newBaseModuleFromConfig creates a new BaseModule from config.
+// newBaseModuleFromConfig creates a new BaseModule from config. The returned
+// BaseModule's name will always be lower case.
 func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    defaultModuleConfig,
 		rawConfig: rawConfig,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
+	if err != nil {
+		return baseModule, err
+	}
+
 	baseModule.name = strings.ToLower(baseModule.config.Module)
-	return baseModule, err
+
+	err = mustNotContainDuplicates(baseModule.config.Hosts)
+	if err != nil {
+		return baseModule, errors.Wrapf(err, "invalid hosts for module '%s'", baseModule.name)
+	}
+
+	return baseModule, nil
 }
 
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
@@ -139,11 +150,19 @@ func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 func newBaseMetricSets(modules []Module) []BaseMetricSet {
 	baseMetricSets := make([]BaseMetricSet, 0, len(modules))
 	for _, m := range modules {
+		hosts := []string{""}
+		if len(m.Config().Hosts) > 0 {
+			hosts = m.Config().Hosts
+		}
+
 		for _, name := range m.Config().MetricSets {
-			baseMetricSets = append(baseMetricSets, BaseMetricSet{
-				name:   strings.ToLower(name),
-				module: m,
-			})
+			for _, host := range hosts {
+				baseMetricSets = append(baseMetricSets, BaseMetricSet{
+					name:   strings.ToLower(name),
+					module: m,
+					host:   host,
+				})
+			}
 		}
 	}
 	return baseMetricSets
@@ -183,4 +202,29 @@ func mustImplementFetcher(ms MetricSet) error {
 			"Fetcher interface, but implements %v", ms.Module().Name(),
 			ms.Name(), ifcs)
 	}
+}
+
+// mustNotContainDuplicates returns an error if the given slice contains
+// duplicate values.
+func mustNotContainDuplicates(s []string) error {
+	duplicates := map[string]struct{}{}
+	set := make(map[string]struct{}, len(s))
+	for _, v := range s {
+		_, encountered := set[v]
+		if encountered {
+			duplicates[v] = struct{}{}
+			continue
+		}
+		set[v] = struct{}{}
+	}
+
+	if len(duplicates) > 0 {
+		var keys []string
+		for dup := range duplicates {
+			keys = append(keys, dup)
+		}
+		return fmt.Errorf("duplicates detected [%s]", strings.Join(keys, ", "))
+	}
+
+	return nil
 }
