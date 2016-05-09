@@ -443,3 +443,160 @@ class Test(BaseTest):
 
         # Check that 2 files are part of the registrar file. The deleted file should never have been detected
         assert len(data) == 2
+
+    def test_state_after_rotation(self):
+        """
+        Checks that the state is written correctly after rotation
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            ignoreOlder="2m",
+            scan_frequency="1s"
+        )
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/input"
+        testfile2 = self.working_dir + "/log/input.1"
+        testfile3 = self.working_dir + "/log/input.2"
+
+        with open(testfile1, 'w') as f:
+            f.write("entry10\n")
+
+        with open(testfile2, 'w') as f:
+            f.write("entry0\n")
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=2),
+            max_timeout=10)
+
+        # Wait a moment to make sure file exists
+        time.sleep(1)
+        data = self.get_registry()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+            assert data[os.path.abspath(testfile2)]["offset"] == 8
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 8
+            assert data[os.path.abspath(testfile2)]["offset"] == 7
+
+        # Rotate files and remove old one
+        os.rename(testfile2, testfile3)
+        os.rename(testfile1, testfile2)
+
+        with open(testfile1, 'w') as f:
+            f.write("entry200\n")
+
+        # Remove file afterwards to make sure not inode reuse happens
+        os.remove(testfile3)
+
+        # Now wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains(
+                "File rename was detected"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Registry file updated. 2 states written.") >= 1,
+            max_timeout=15)
+
+        time.sleep(5)
+        filebeat.kill_and_wait()
+
+
+        data = self.get_registry()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 10
+            assert data[os.path.abspath(testfile2)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+            assert data[os.path.abspath(testfile2)]["offset"] == 8
+
+
+
+    def test_state_after_rotation_ignore_older(self):
+        """
+        Checks that the state is written correctly after rotation and ignore older
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/input*",
+            ignoreOlder="2m",
+            scan_frequency="1s"
+        )
+
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/input"
+        testfile2 = self.working_dir + "/log/input.1"
+        testfile3 = self.working_dir + "/log/input.2"
+
+        with open(testfile1, 'w') as f:
+            f.write("entry10\n")
+
+        with open(testfile2, 'w') as f:
+            f.write("entry0\n")
+
+        # Change modification time so file extends ignore_older
+        yesterday = time.time() - 3600*24
+        os.utime(testfile2, (yesterday, yesterday))
+
+        filebeat = self.start_beat()
+
+        self.wait_until(
+            lambda: self.output_has(lines=1),
+            max_timeout=10)
+
+        # Wait a moment to make sure file exists
+        time.sleep(1)
+        data = self.get_registry()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 8
+
+        # Rotate files and remove old one
+        os.rename(testfile2, testfile3)
+        os.rename(testfile1, testfile2)
+
+        with open(testfile1, 'w') as f:
+            f.write("entry200\n")
+
+        # Remove file afterwards to make sure not inode reuse happens
+        os.remove(testfile3)
+
+        # Now wait until rotation is detected
+        self.wait_until(
+            lambda: self.log_contains(
+                "File rename was detected"),
+            max_timeout=10)
+
+        self.wait_until(
+            lambda: self.log_contains_count(
+                "Registry file updated. 2 states written.") >= 1,
+            max_timeout=15)
+
+        time.sleep(5)
+        filebeat.kill_and_wait()
+
+
+        data = self.get_registry()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 10
+            assert data[os.path.abspath(testfile2)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+            assert data[os.path.abspath(testfile2)]["offset"] == 8

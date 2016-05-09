@@ -176,7 +176,7 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 
 		// Compare states
 		if newState.IsSame(oldState.FileStateOS) {
-			logp.Info("Old file with new name found: %s is no %s", oldFilePath, newFilePath)
+			logp.Info("Old file with new name found: %s -> %s", oldFilePath, newFilePath)
 			return oldFilePath, nil
 		}
 	}

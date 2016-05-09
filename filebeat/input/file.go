@@ -17,13 +17,6 @@ type File struct {
 	FileState *FileState
 }
 
-// NewFile create new File object
-func NewFile(fileInfo os.FileInfo) File {
-	return File{
-		FileInfo: fileInfo,
-	}
-}
-
 // Check that the file isn't a symlink, mode is regular or file is nil
 func (f *File) IsRegularFile() bool {
 	if f.File == nil {
