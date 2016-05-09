@@ -241,6 +241,43 @@
         "rtt": {
           "type": "long"
         },
+        "system-cores": {
+          "properties": {
+            "core": {
+              "type": "integer"
+            },
+            "idle": {
+              "type": "integer"
+            },
+            "iowait": {
+              "type": "integer"
+            },
+            "irq": {
+              "type": "integer"
+            },
+            "nice": {
+              "type": "integer"
+            },
+            "softirq": {
+              "type": "integer"
+            },
+            "steal": {
+              "type": "integer"
+            },
+            "system": {
+              "type": "integer"
+            },
+            "system_p": {
+              "type": "float"
+            },
+            "user": {
+              "type": "integer"
+            },
+            "user_p": {
+              "type": "float"
+            }
+          }
+        },
         "system-cpu": {
           "properties": {
             "idle": {
@@ -251,6 +288,19 @@
             },
             "irq": {
               "type": "integer"
+            },
+            "load": {
+              "properties": {
+                "load1": {
+                  "type": "float"
+                },
+                "load15": {
+                  "type": "float"
+                },
+                "load5": {
+                  "type": "float"
+                }
+              }
             },
             "nice": {
               "type": "integer"

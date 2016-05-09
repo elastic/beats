@@ -72,9 +72,12 @@ metricbeat:
 
     # System module
     - module: system
-      metricsets: ["cpu", "filesystem", "fsstats", "memory", "process"]
+      metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
       enabled: true
       period: 2s
+
+      # Per core cpu statistics
+      #cpu_per_core: false
 
     # Zookeeper module
     - module: zookeeper

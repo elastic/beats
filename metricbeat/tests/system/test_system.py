@@ -3,8 +3,11 @@ import sys
 import unittest
 import metricbeat
 
-SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "nice", "softirq",
+SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "load", "nice", "softirq",
                      "steal", "system", "system_p", "user", "user_p"]
+
+SYSTEM_CORES = ["core", "idle", "iowait", "irq", "nice", "softirq",
+                "steal", "system", "system_p", "user", "user_p"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used",
@@ -44,6 +47,31 @@ class SystemTest(metricbeat.BaseTest):
 
         cpu = evt["system-cpu"]
         self.assertItemsEqual(SYSTEM_CPU_FIELDS, cpu.keys())
+
+    def test_cores(self):
+        """
+        Test cores system output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["cores"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            cores = evt["system-cores"]
+            self.assertItemsEqual(SYSTEM_CORES, cores.keys())
 
     def test_filesystem(self):
         """
