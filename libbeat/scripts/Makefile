@@ -211,17 +211,28 @@ coverage-report:
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
-update:
-	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
+update: python-env
+	# Update config
+	echo "Update config file"
+	rm -f etc/${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/etc/libbeat.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+
+	# Update fields
+	echo "Update fields"
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME}
+
+	# Update templates
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME}
+	${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200/
 
-.PHONY: update
+.PHONY: export-dashboards
 export-dashboards:
 	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
-.PHONY: update
+.PHONY: import-dashboards
 import-dashboards:
 	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
 
@@ -265,4 +276,3 @@ install-home:
 		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
 		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
 	fi
-
