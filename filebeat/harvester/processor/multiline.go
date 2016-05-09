@@ -63,8 +63,7 @@ func NewMultiline(
 	maxBytes int,
 	config *config.MultilineConfig,
 ) (*MultiLine, error) {
-	type matcherFactory func(pattern string) (matcher, error)
-	types := map[string]matcherFactory{
+	types := map[string]func(*regexp.Regexp) (matcher, error){
 		"before": beforeMatcher,
 		"after":  afterMatcher,
 	}
@@ -89,11 +88,8 @@ func NewMultiline(
 	}
 
 	timeout := defaultMultilineTimeout
-	if config.Timeout != "" {
-		timeout, err = time.ParseDuration(config.Timeout)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse duration '%s': %v", config.Timeout, err)
-		}
+	if config.Timeout != nil {
+		timeout = *config.Timeout
 		if timeout < 0 {
 			return nil, fmt.Errorf("timeout %v must not be negative", config.Timeout)
 		}
@@ -274,14 +270,14 @@ func (mlr *MultiLine) reset() {
 
 // matchers
 
-func afterMatcher(pattern string) (matcher, error) {
-	return genPatternMatcher(pattern, func(last, current []byte) []byte {
+func afterMatcher(regex *regexp.Regexp) (matcher, error) {
+	return genPatternMatcher(regex, func(last, current []byte) []byte {
 		return current
 	})
 }
 
-func beforeMatcher(pattern string) (matcher, error) {
-	return genPatternMatcher(pattern, func(last, current []byte) []byte {
+func beforeMatcher(regex *regexp.Regexp) (matcher, error) {
+	return genPatternMatcher(regex, func(last, current []byte) []byte {
 		return last
 	})
 }
@@ -293,17 +289,12 @@ func negatedMatcher(m matcher) matcher {
 }
 
 func genPatternMatcher(
-	pattern string,
+	regex *regexp.Regexp,
 	sel func(last, current []byte) []byte,
 ) (matcher, error) {
-	reg, err := regexp.CompilePOSIX(pattern)
-	if err != nil {
-		return nil, err
-	}
-
 	matcher := func(last, current []byte) bool {
 		line := sel(last, current)
-		return reg.Match(line)
+		return regex.Match(line)
 	}
 	return matcher, nil
 }

@@ -312,13 +312,6 @@ func (p *ProspectorLog) getPreviousFile(file string, info os.FileInfo) (string, 
 }
 
 func (p *ProspectorLog) isFileExcluded(file string) bool {
-
-	if len(p.config.ExcludeFilesRegexp) > 0 {
-
-		if harvester.MatchAnyRegexps(p.config.ExcludeFilesRegexp, file) {
-			return true
-		}
-	}
-
-	return false
+	patterns := p.config.ExcludeFiles
+	return len(patterns) > 0 && harvester.MatchAnyRegexps(patterns, file)
 }

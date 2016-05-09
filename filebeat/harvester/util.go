@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/filebeat/harvester/processor"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 // readLine reads a full line into buffer and returns it.
@@ -21,23 +20,6 @@ func readLine(reader processor.LineProcessor) (time.Time, string, int, common.Ma
 	}
 
 	return time.Time{}, "", 0, nil, err
-}
-
-// InitRegexps initializes a list of compiled regular expressions.
-func InitRegexps(exprs []string) ([]*regexp.Regexp, error) {
-
-	result := []*regexp.Regexp{}
-
-	for _, exp := range exprs {
-
-		rexp, err := regexp.CompilePOSIX(exp)
-		if err != nil {
-			logp.Err("Fail to compile the regexp %s: %s", exp, err)
-			return nil, err
-		}
-		result = append(result, rexp)
-	}
-	return result, nil
 }
 
 // MatchAnyRegexps checks if the text matches any of the regular expressions
