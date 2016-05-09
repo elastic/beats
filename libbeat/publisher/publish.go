@@ -81,11 +81,11 @@ type Publisher struct {
 
 type ShipperConfig struct {
 	common.EventMetadata `config:",inline"` // Fields and tags to add to each event.
-	Name                 string
-	RefreshTopologyFreq  time.Duration `config:"refresh_topology_freq"`
-	Ignore_outgoing      bool          `config:"ignore_outgoing"`
-	Topology_expire      int           `config:"topology_expire"`
-	Geoip                common.Geoip  `config:"geoip"`
+	Name                 string             `config:"name"`
+	RefreshTopologyFreq  time.Duration      `config:"refresh_topology_freq"`
+	Ignore_outgoing      bool               `config:"ignore_outgoing"`
+	Topology_expire      int                `config:"topology_expire"`
+	Geoip                common.Geoip       `config:"geoip"`
 
 	// internal publisher queue sizes
 	QueueSize     *int `config:"queue_size"`

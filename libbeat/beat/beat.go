@@ -111,11 +111,11 @@ type Beat struct {
 
 // BeatConfig struct contains the basic configuration of every beat
 type BeatConfig struct {
-	Output  map[string]*common.Config
-	Logging logp.Logging
-	Shipper publisher.ShipperConfig
-	Filters []filter.FilterConfig
-	Path    paths.Path
+	Shipper publisher.ShipperConfig   `config:",inline"`
+	Output  map[string]*common.Config `config:"output"`
+	Logging logp.Logging              `config:"logging"`
+	Filters []filter.FilterConfig     `config:"filters"`
+	Path    paths.Path                `config:"path"`
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
