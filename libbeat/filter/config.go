@@ -1,10 +1,12 @@
 package filter
 
+import "regexp"
+
 type ConditionConfig struct {
-	Equals   map[string]string     `config:"equals"`
-	Contains map[string]string     `config:"contains"`
-	Regexp   map[string]string     `config:"regexp"`
-	Range    map[string]RangeValue `config:"range"`
+	Equals   map[string]string         `config:"equals"`
+	Contains map[string]string         `config:"contains"`
+	Regexp   map[string]*regexp.Regexp `config:"regexp"`
+	Range    map[string]RangeValue     `config:"range"`
 }
 
 type RangeValue struct {

@@ -62,13 +62,8 @@ func (c *Condition) AddContains(contains map[string]string) error {
 	return nil
 }
 
-func (c *Condition) AddRegexp(r map[string]string) error {
-
-	for field, value := range r {
-		reg, err := regexp.CompilePOSIX(value)
-		if err != nil {
-			return err
-		}
+func (c *Condition) AddRegexp(r map[string]*regexp.Regexp) error {
+	for field, reg := range r {
 		c.Regexp[field] = reg
 	}
 	return nil

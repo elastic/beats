@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -126,8 +127,8 @@ func TestRegexpCondition(t *testing.T) {
 
 	// first simple condition
 	config1 := ConditionConfig{
-		Regexp: map[string]string{
-			"source": "apache2/error.*",
+		Regexp: map[string]*regexp.Regexp{
+			"source": regexp.MustCompile("apache2/error.*"),
 		},
 	}
 	cond1, err := NewCondition(config1)
@@ -135,8 +136,8 @@ func TestRegexpCondition(t *testing.T) {
 
 	// second simple condition
 	config2 := ConditionConfig{
-		Regexp: map[string]string{
-			"source": "apache2/access.*",
+		Regexp: map[string]*regexp.Regexp{
+			"source": regexp.MustCompile("apache2/access.*"),
 		},
 	}
 	cond2, err := NewCondition(config2)
@@ -144,9 +145,9 @@ func TestRegexpCondition(t *testing.T) {
 
 	// third complex condition
 	config3 := ConditionConfig{
-		Regexp: map[string]string{
-			"source":  "apache2/error.*",
-			"message": "[client 1.2.3.4]",
+		Regexp: map[string]*regexp.Regexp{
+			"source":  regexp.MustCompile("apache2/error.*"),
+			"message": regexp.MustCompile("[client 1.2.3.4]"),
 		},
 	}
 	cond3, err := NewCondition(config3)
@@ -217,7 +218,7 @@ func TestRangeCondition(t *testing.T) {
 	assert.True(t, err == nil)
 
 	// float condition
-	var v05 float64 = 0.5
+	var v05 = 0.5
 	config4 := ConditionConfig{
 		Range: map[string]RangeValue{
 			"proc.cpu.total_p": RangeValue{Gte: &v05},
