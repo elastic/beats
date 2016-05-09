@@ -148,3 +148,23 @@ class Test(WriteReadTest):
         )
         self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
         assert self.log_contains("4 errors: Invalid event log key")
+
+    def test_utf16_characters(self):
+        """
+        eventlogging - UTF-16 characters
+        """
+        msg = (u'\u89E3\u51CD\u3057\u305F\u30D5\u30A9\u30EB\u30C0\u306E'
+               u'\u30A4\u30F3\u30B9\u30C8\u30FC\u30EB\u30B9\u30AF\u30EA'
+               u'\u30D7\u30C8\u3092\u5B9F\u884C\u3057'
+               u'\u8C61\u5F62\u5B57')
+        self.write_event_log(msg)
+        evts = self.read_events(config={
+            "event_logs": [
+                {
+                    "name": self.providerName,
+                    "api": self.api,
+                }
+            ]
+        })
+        self.assertTrue(len(evts), 1)
+        self.assertEqual(evts[0]["message"], msg)
