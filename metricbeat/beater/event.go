@@ -127,7 +127,6 @@ func getTimestamp(event common.MapStr, timestamp common.Time) common.Time {
 // createEvent creates a new event from the fetched MetricSet data.
 func createEvent(
 	msw *metricSetWrapper,
-	host string,
 	event common.MapStr,
 	fetchErr error,
 	start time.Time,
@@ -136,7 +135,7 @@ func createEvent(
 	return eventBuilder{
 		moduleName:    msw.Module().Name(),
 		metricSetName: msw.Name(),
-		host:          host,
+		host:          msw.Host(),
 		startTime:     start,
 		fetchDuration: elapsed,
 		event:         event,

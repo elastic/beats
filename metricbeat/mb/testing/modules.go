@@ -16,7 +16,7 @@ that Metricbeat does it and with the same validations.
 
 	func TestFetch(t *testing.T) {
 		f := mbtest.NewEventFetcher(t, getConfig())
-		event, err := f.Fetch(f.Module().Config().Hosts[0])
+		event, err := f.Fetch()
 		if err != nil {
 			t.Fatal(err)
 		}

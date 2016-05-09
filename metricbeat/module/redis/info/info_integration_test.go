@@ -22,7 +22,7 @@ var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig(""))
-	event, err := f.Fetch(f.Module().Config().Hosts[0])
+	event, err := f.Fetch()
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
@@ -45,7 +45,7 @@ func TestKeyspace(t *testing.T) {
 
 	// Fetch metrics
 	f := mbtest.NewEventFetcher(t, getConfig(""))
-	event, err := f.Fetch(f.Module().Config().Hosts[0])
+	event, err := f.Fetch()
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
@@ -65,21 +65,21 @@ func TestPasswords(t *testing.T) {
 
 	// Test Fetch metrics with missing password
 	f := mbtest.NewEventFetcher(t, getConfig(""))
-	_, err = f.Fetch(f.Module().Config().Hosts[0])
+	_, err = f.Fetch()
 	if assert.Error(t, err, "missing password") {
 		assert.Contains(t, err, "NOAUTH Authentication required.")
 	}
 
 	// Config redis and metricset with an invalid password
 	f = mbtest.NewEventFetcher(t, getConfig("blah"))
-	_, err = f.Fetch(f.Module().Config().Hosts[0])
+	_, err = f.Fetch()
 	if assert.Error(t, err, "invalid password") {
 		assert.Contains(t, err, "ERR invalid password")
 	}
 
 	// Config redis and metricset with a valid password
 	f = mbtest.NewEventFetcher(t, getConfig(password))
-	_, err = f.Fetch(f.Module().Config().Hosts[0])
+	_, err = f.Fetch()
 	assert.NoError(t, err, "valid password")
 }
 

@@ -38,7 +38,7 @@ func NewMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (ms *MetricSet) Fetch(host string) (common.MapStr, error) {
+func (ms *MetricSet) Fetch() (common.MapStr, error) {
 	// Fetch data from host and return the data.
 	return common.MapStr{
 		"someParam":  "value",

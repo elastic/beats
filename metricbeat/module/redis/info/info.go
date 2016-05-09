@@ -24,7 +24,7 @@ func init() {
 // MetricSet for fetching Redis server information and statistics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	redisPools map[string]*rd.Pool
+	pool *rd.Pool
 }
 
 // New creates new instance of MetricSet
@@ -44,16 +44,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	redisPools := make(map[string]*rd.Pool, len(base.Module().Config().Hosts))
-	for _, host := range base.Module().Config().Hosts {
-		redisPool := createPool(host, config.Password, config.Network,
-			config.MaxConn, base.Module().Config().Timeout)
-		redisPools[host] = redisPool
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
-		redisPools:    redisPools,
+		pool: createPool(base.Host(), config.Password, config.Network,
+			config.MaxConn, base.Module().Config().Timeout),
 	}, nil
 }
 
@@ -78,23 +72,23 @@ func createPool(host, password, network string, maxConn int, timeout time.Durati
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch(host string) (events common.MapStr, err error) {
-	// Fetch default INFO
-	info, err := m.fetchRedisStats(host, "default")
+func (m *MetricSet) Fetch() (events common.MapStr, err error) {
+	// Fetch default INFO.
+	info, err := m.fetchRedisStats("default")
 	if err != nil {
 		return nil, err
 	}
 
-	debugf("Redis INFO from %s: %+v", host, info)
+	debugf("Redis INFO from %s: %+v", m.Host(), info)
 	return eventMapping(info), nil
 }
 
 // fetchRedisStats returns a map of requested stats
-func (m *MetricSet) fetchRedisStats(host string, stat string) (map[string]string, error) {
-	c := m.redisPools[host].Get()
+func (m *MetricSet) fetchRedisStats(stat string) (map[string]string, error) {
+	c := m.pool.Get()
 	defer c.Close()
-	out, err := rd.String(c.Do("INFO", stat))
 
+	out, err := rd.String(c.Do("INFO", stat))
 	if err != nil {
 		logp.Err("Error retrieving INFO stats: %v", err)
 		return nil, err

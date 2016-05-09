@@ -40,7 +40,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
-func (m *MetricSet) Fetch(host string) ([]common.MapStr, error) {
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	procs, err := m.stats.GetProcStats()
 	if err != nil {
 		return nil, errors.Wrap(err, "process stats")

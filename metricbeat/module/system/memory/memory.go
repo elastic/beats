@@ -27,7 +27,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches memory metrics from the OS.
-func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
+func (m *MetricSet) Fetch() (event common.MapStr, err error) {
 	memStat, err := system.GetMemory()
 	if err != nil {
 		return nil, errors.Wrap(err, "memory")

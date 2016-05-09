@@ -30,6 +30,7 @@ values are stored under the same type "metricsets".
 package beater
 
 import (
+	"expvar"
 	"sync"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -82,18 +83,9 @@ func (bt *Metricbeat) Setup(b *beat.Beat) error {
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 	for _, mw := range bt.modules {
+		wg.Add(len(mw.metricSets))
 		for _, msw := range mw.metricSets {
-			hosts := msw.Module().Config().Hosts
-			if len(hosts) == 0 {
-				wg.Add(1)
-				go msw.startFetching(bt.done, &wg, "")
-				continue
-			}
-
-			wg.Add(len(hosts))
-			for _, host := range hosts {
-				go msw.startFetching(bt.done, &wg, host)
-			}
+			go msw.startFetching(bt.done, &wg)
 		}
 	}
 
@@ -103,6 +95,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 // Cleanup performs clean-up after Run completes.
 func (bt *Metricbeat) Cleanup(b *beat.Beat) error {
+	logp.Info("Dumping runtime metrics...")
+	expvar.Do(func(kv expvar.KeyValue) {
+		if kv.Key != "memstats" {
+			logp.Info("%s=%s", kv.Key, kv.Value.String())
+		}
+	})
 	return nil
 }
 

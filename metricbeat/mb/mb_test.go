@@ -96,6 +96,21 @@ func TestNewModulesWithAllDisabled(t *testing.T) {
 	assert.Equal(t, ErrAllModulesDisabled, err)
 }
 
+// TestNewModulesDuplicateHosts verifies that an error is returned by
+// NewModules if any module configuration contains duplicate hosts.
+func TestNewModulesDuplicateHosts(t *testing.T) {
+	r := newTestRegistry(t)
+
+	c := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{metricSetName},
+		"hosts":      []string{"a", "b", "a"},
+	})
+
+	_, err := NewModules(c, r)
+	assert.Error(t, err)
+}
+
 func newTestRegistry(t testing.TB) *Register {
 	r := NewRegister()
 
