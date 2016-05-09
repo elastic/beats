@@ -50,19 +50,22 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 type MetricSet interface {
 	Name() string   // Name returns the name of the MetricSet.
 	Module() Module // Module returns the parent Module for the MetricSet.
+	Host() string   // Host returns a hostname or other module specific value
+	// that identifies a specific host or service instance from which to collect
+	// metrics.
 }
 
 // EventFetcher is a MetricSet that returns a single event when collecting data.
 type EventFetcher interface {
 	MetricSet
-	Fetch(host string) (common.MapStr, error)
+	Fetch() (common.MapStr, error)
 }
 
 // EventsFetcher is a MetricSet that returns a multiple events when collecting
 // data.
 type EventsFetcher interface {
 	MetricSet
-	Fetch(host string) ([]common.MapStr, error)
+	Fetch() ([]common.MapStr, error)
 }
 
 // BaseMetricSet implements the MetricSet interface.
@@ -73,6 +76,7 @@ type EventsFetcher interface {
 type BaseMetricSet struct {
 	name   string
 	module Module
+	host   string
 }
 
 // Name returns the name of the MetricSet. It should not include the name of
@@ -84,6 +88,12 @@ func (b *BaseMetricSet) Name() string {
 // Module returns the parent Module for the MetricSet.
 func (b *BaseMetricSet) Module() Module {
 	return b.module
+}
+
+// Host returns the hostname or other module specific value that identifies a
+// specific host or service instance from which to collect metrics.
+func (b *BaseMetricSet) Host() string {
+	return b.host
 }
 
 // Configuration types

@@ -15,7 +15,6 @@ TODO @ruflin, 20160315
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -38,8 +37,8 @@ func init() {
 // MetricSet for fetching MySQL server status.
 type MetricSet struct {
 	mb.BaseMetricSet
-	hostToDSN   map[string]string
-	connections map[string]*sql.DB
+	dsn string
+	db  *sql.DB
 }
 
 // New creates and returns a new MetricSet instance.
@@ -57,39 +56,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	hostToDSN := make(map[string]string, len(base.Module().Config().Hosts))
-	for _, host := range base.Module().Config().Hosts {
-		// TODO (akroh): Apply validation to the mysql DSN format.
-		dsn := mysql.CreateDSN(host, config.Username, config.Password)
-		hostToDSN[host] = dsn
-	}
+	// TODO (akroh): Apply validation to the mysql DSN format.
+	dsn := mysql.CreateDSN(base.Host(), config.Username, config.Password)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		hostToDSN:     hostToDSN,
-		connections:   map[string]*sql.DB{},
+		dsn:           dsn,
 	}, nil
 }
 
-// Fetch fetches status messages from mysql hosts.
-func (m *MetricSet) Fetch(host string) (event common.MapStr, err error) {
-	// TODO (akroh): reading and writing to map are not concurrent-safe
-	db, found := m.connections[host]
-	if !found {
-		dsn, found := m.hostToDSN[host]
-		if !found {
-			return nil, fmt.Errorf("DSN not found for host '%s'", host)
-		}
-
+// Fetch fetches status messages from a mysql host.
+func (m *MetricSet) Fetch() (event common.MapStr, err error) {
+	if m.db == nil {
 		var err error
-		db, err = mysql.Connect(dsn)
+		m.db, err = mysql.Connect(m.dsn)
 		if err != nil {
 			return nil, errors.Wrap(err, "mysql-status connect to host")
 		}
-		m.connections[host] = db
 	}
 
-	status, err := m.loadStatus(db)
+	status, err := m.loadStatus(m.db)
 	if err != nil {
 		return nil, err
 	}

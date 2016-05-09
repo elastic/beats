@@ -13,7 +13,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch(f.Module().Config().Hosts[0])
+	event, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}

@@ -10,8 +10,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -41,7 +39,7 @@ func init() {
 // MetricSet for fetching Apache HTTPD server status.
 type MetricSet struct {
 	mb.BaseMetricSet
-	URLs map[string]string // Map of host to endpoint URL.
+	url string // Endpoint URL.
 }
 
 // New creates new instance of MetricSet.
@@ -56,40 +54,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Username:         "",
 		Password:         "",
 	}
-
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	metricSet := &MetricSet{
+	u, err := getURL(config.Username, config.Password, config.ServerStatusPath, base.Host())
+	if err != nil {
+		return nil, err
+	}
+
+	debugf("apache-status URL=%s", redactPassword(*u))
+	return &MetricSet{
 		BaseMetricSet: base,
-		URLs:          make(map[string]string, len(base.Module().Config().Hosts)),
-	}
-
-	// Parse the config, create URLs, and check for errors.
-	var errs multierror.Errors
-	for _, host := range base.Module().Config().Hosts {
-		u, err := getURL(config.Username, config.Password, config.ServerStatusPath, host)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		metricSet.URLs[host] = u.String()
-		debugf("apache-status URL=%s", redactPassword(*u))
-	}
-
-	return metricSet, errs.Err()
+		url:           u.String(),
+	}, nil
 }
 
 // Fetch makes an HTTP request to fetch status metrics from the mod_status
 // endpoint.
-func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
-	url, ok := m.URLs[host]
-	if !ok {
-		return nil, fmt.Errorf("url not found for host '%s'", host)
-	}
-
-	req, err := http.NewRequest("GET", url, nil)
+func (m *MetricSet) Fetch() (common.MapStr, error) {
+	req, err := http.NewRequest("GET", m.url, nil)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -101,7 +85,7 @@ func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
 		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventMapping(resp.Body, host, m.Name()), nil
+	return eventMapping(resp.Body, m.Host(), m.Name()), nil
 }
 
 // getURL constructs a URL from the rawHost value and adds the provided user,

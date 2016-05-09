@@ -54,8 +54,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics from ZooKeeper by making a tcp connection to the
 // command port and sending the "mntr" command and parsing the output.
-func (m *MetricSet) Fetch(host string) (common.MapStr, error) {
-	outputReader, err := zookeeper.RunCommand("mntr", host, m.Module().Config().Timeout)
+func (m *MetricSet) Fetch() (common.MapStr, error) {
+	outputReader, err := zookeeper.RunCommand("mntr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
 		return nil, errors.Wrap(err, "mntr command failed")
 	}
