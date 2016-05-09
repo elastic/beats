@@ -140,7 +140,8 @@ func reifyGetField(
 	if err != nil {
 		return err
 	}
-	if value == nil {
+
+	if _, ok := value.(*cfgNil); value == nil || ok {
 		if err := runValidators(nil, opts.validators); err != nil {
 			return raiseValidation(cfg.ctx, cfg.metadata, err)
 		}
@@ -151,6 +152,7 @@ func reifyGetField(
 	if err != nil {
 		return err
 	}
+
 	to.Set(v)
 	return nil
 }
@@ -183,12 +185,7 @@ func reifyValue(
 	if baseType.Kind() == reflect.Struct {
 		sub, err := val.toConfig()
 		if err != nil {
-			// try primitive
-			if v, check := reifyPrimitive(opts, val, t, baseType); check == nil {
-				return v, nil
-			}
-
-			return reflect.Value{}, raiseExpectedObject(val)
+			return reifyPrimitive(opts, val, t, baseType)
 		}
 
 		newSt := reflect.New(baseType)
@@ -464,7 +461,8 @@ func reifyDuration(
 	case *cfgString:
 		d, err = time.ParseDuration(v.s)
 	default:
-		s, err := val.toString()
+		var s string
+		s, err = val.toString()
 		if err != nil {
 			return reflect.Value{}, raiseInvalidDuration(val, err)
 		}
@@ -490,7 +488,7 @@ func reifyRegexp(
 
 	r, err := regexp.Compile(s)
 	if err != nil {
-		return reflect.Value{}, raiseConversion(val, err, "regex")
+		return reflect.Value{}, raiseInvalidRegexp(val, err)
 	}
 	return reflect.ValueOf(r).Elem(), nil
 }
