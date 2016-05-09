@@ -12,7 +12,7 @@
 [[regexp-support]]
 == Regular Expression Support
 
-coming [5.0.0-beta1]
+coming[5.0.0-beta1]
 
 {beatname_uc} regular expression support is based on https://godoc.org/regexp/syntax[RE2].
 
