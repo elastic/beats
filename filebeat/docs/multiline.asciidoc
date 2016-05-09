@@ -15,7 +15,7 @@ See the full documentation for <<multiline>> to learn more about these options. 
 ==== Testing Your Regexp Pattern for Multiline
 
 To make it easier for you to test the regexp patterns in your multiline config, we've created a 
-http://play.golang.org/p/ABEJaX_lsK[Go Playground]. You can simply plug in the regexp pattern along with
+https://play.golang.org/p/uAd5XHxscu[Go Playground]. You can simply plug in the regexp pattern along with
 the `negate` setting that you plan to use, and paste a sample message between the content backticks (` `).
 Then click Run, and you'll see which lines in the message match your specified configuration. For example:
 
