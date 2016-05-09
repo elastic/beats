@@ -35,6 +35,8 @@ https://github.com/elastic/beats/compare/v1.2.2...1.2[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003. {pull}1498[1498]
+
 ==== Added
 
 *Affecting all Beats*
