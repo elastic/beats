@@ -23,6 +23,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- The state for files which fall under ignore_older is not stored anymore. This has the consequence, that if a file which fell under ignore_older is updated, the hole file will be crawled.
+
 *Winlogbeat*
 
 

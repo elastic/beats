@@ -10,7 +10,7 @@ Tests for the prospector functionality.
 
 class Test(BaseTest):
 
-    def test_ignore_old_files(self):
+    def test_ignore_older_files(self):
         """
         Should ignore files there were not modified for longer then
         the `ignore_older` setting.
@@ -38,7 +38,7 @@ class Test(BaseTest):
         # wait for the "Skipping file" log message
         self.wait_until(
             lambda: self.log_contains(
-                "Skipping file (older than ignore older of 1s"),
+                "Ignore file because ignore_older reached"),
             max_timeout=10)
 
         proc.check_kill_and_wait()
@@ -109,7 +109,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert len(objs) == iterations1 + iterations2
 
-    @unittest.skip("Needs fix from #964")
+    #@unittest.skip("Needs fix from #964")
     def test_rotating_close_older_larger_write_rate(self):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
