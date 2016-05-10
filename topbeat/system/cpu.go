@@ -10,8 +10,7 @@ import (
 )
 
 type CPU struct {
-	CpuPerCore bool
-
+	CpuPerCore       bool
 	LastCpuTimes     *CpuTimes
 	LastCpuTimesList []CpuTimes
 }
@@ -31,7 +30,6 @@ func GetCpuTimes() (*CpuTimes, error) {
 	}
 
 	return &CpuTimes{Cpu: cpu}, nil
-
 }
 
 func GetCpuTimesList() ([]CpuTimes, error) {

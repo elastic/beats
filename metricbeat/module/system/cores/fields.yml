@@ -1,8 +1,13 @@
-- name: system-cpu
+- name: system-cores
   type: group
   description: >
-    `system-cpu` contains local cpu stats.
+    `system-cores` contains local cpu core stats.
   fields:
+    - name: core
+      type: integer
+      description: >
+        CPU Core number.
+
     - name: user
       type: integer
       description: >
@@ -56,20 +61,3 @@
         was servicing another processor.
         Available only on Unix.
 
-    - name: load
-      type: group
-      description: >
-        Load averages.
-      fields:
-        - name: load1
-          type: float
-          description: >
-            Load average for the last minute.
-        - name: load5
-          type: float
-          description: >
-            Load average for the last 5 minutes.
-        - name: load15
-          type: float
-          description: >
-            Load average for the last 15 minutes.
