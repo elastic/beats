@@ -192,7 +192,7 @@ func (eb *Winlogbeat) processEventLog(
 		return
 	}
 	defer func() {
-		logp.Info("EventLog[%s] Stop processing.")
+		logp.Info("EventLog[%s] Stop processing.", api.Name())
 
 		if err := api.Close(); err != nil {
 			logp.Warn("EventLog[%s] Close() error. %v", api.Name(), err)

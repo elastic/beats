@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Adding missing argument to the "Stop processing" log message. {pull}1590[1590]
+
 ==== Added
 
 *Affecting all Beats*
