@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v1.2.2...1.2[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v1.2.3...1.2[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -31,13 +31,9 @@ https://github.com/elastic/beats/compare/v1.2.2...1.2[Check the HEAD diff]
 
 *Topbeat*
 
-- Fixed high CPU usage when using filtering under Windows. {pull}1562[1562]
-
 *Filebeat*
 
 *Winlogbeat*
-
-- Fix panic when reading messages larger than 32K characters on Windows XP and 2003. {pull}1498[1498]
 
 ==== Added
 
@@ -64,6 +60,24 @@ https://github.com/elastic/beats/compare/v1.2.2...1.2[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-1.2.3]]
+=== Beats version 1.2.3
+https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+
+==== Bugfixes
+
+*Topbeat*
+
+- Fix high CPU usage when using filtering under Windows. {pull}1598[1598]
+
+*Filebeat*
+
+- Fix rotation issue with ignore_older. {issue}1528[1528]
+
+*Winlogbeat*
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003. {pull}1498[1498]
 
 [[release-notes-1.2.2]]
 === Beats version 1.2.2
