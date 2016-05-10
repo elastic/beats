@@ -120,6 +120,8 @@ for TARGET in $TARGETS; do
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
 		echo "Compiling $PACK for linux/amd64..."
 		HOST=x86_64-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		export PKG_CONFIG_PATH=/usr/aarch64-linux-gnu/lib/pkgconfig
+
 		GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
 		sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-amd64$R ./$PACK"
 		built_targets=$((built_targets+1))
@@ -133,42 +135,62 @@ for TARGET in $TARGETS; do
 	fi	
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "arm" ]); then
 		echo "Compiling $PACK for linux/arm..."
-		CC=arm-linux-gnueabi-gcc HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps $LIST_DEPS
-		CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go get -d ./$PACK
-		CC=arm-linux-gnueabi-gcc GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
+		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps $LIST_DEPS
+
+		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go get -d ./$PACK
+		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
 		built_targets=$((built_targets+1))
 	fi
-	
+
 	# Check and build for Windows targets
-	if ([ $XGOOS == "." ] || [ $XGOOS == "windows" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
-		echo "Compiling $PACK for windows/amd64..."
-		CC=x86_64-w64-mingw32-gcc HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
-		CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-		CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
-		built_targets=$((built_targets+1))
-	fi
-	
-	if ([ $XGOOS == "." ] || [ $XGOOS == "windows" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
-		echo "Compiling $PACK for windows/386..."
-		CC=i686-w64-mingw32-gcc HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
-		CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-		CC=i686-w64-mingw32-gcc GOOS=windows GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-windows-386.exe ./$PACK
-		built_targets=$((built_targets+1))
+	if [ $XGOOS == "." ] || [[ $XGOOS == windows* ]]; then
+		# Split the platform version and configure the Windows NT version
+		PLATFORM=`echo $XGOOS | cut -d '-' -f 2`
+		if [ "$PLATFORM" == "" ] || [ "$PLATFORM" == "." ] || [ "$PLATFORM" == "windows" ]; then
+		  PLATFORM=4.0 # Windows NT
+		fi
+
+	    MAJOR=`echo $PLATFORM | cut -d '.' -f 1`
+		if [ "${PLATFORM/.}" != "$PLATFORM" ] ; then
+		  MINOR=`echo $PLATFORM | cut -d '.' -f 2`
+		fi
+		CGO_NTDEF="-D_WIN32_WINNT=0x`printf "%02d" $MAJOR``printf "%02d" $MINOR`"
+
+		# Build the requested windows binaries
+		if [ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]; then
+			echo "Compiling for windows-$PLATFORM/amd64..."
+			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
+			export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig
+
+			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
+			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
+			built_targets=$((built_targets+1))
+		fi
+
+		if [ $XGOARCH == "." ] || [ $XGOARCH == "386" ]; then
+			echo "Compiling for windows-$PLATFORM/386..."
+			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
+			export PKG_CONFIG_PATH=/usr/i686-w64-mingw32/lib/pkgconfig
+
+			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
+			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build $V -o $NAME-windows-386.exe ./$PACK
+			built_targets=$((built_targets+1))
+		fi
 	fi
 	
 	# Check and build for OSX targets
 	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
 		echo "Compiling $PACK for darwin/amd64..."
-		CC=o64-clang HOST=x86_64-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
-		CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-		CC=o64-clang GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -ldflags=-s $V $R -o $NAME-darwin-amd64$R ./$PACK
+		CC=o64-clang CXX=o64-clang++ HOST=x86_64-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
+		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -ldflags=-s $V $R -o $NAME-darwin-amd64$R ./$PACK
 		built_targets=$((built_targets+1))
 	fi
 	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
 		echo "Compiling for darwin/386..."
-		CC=o32-clang HOST=i386-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
-		CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-		CC=o32-clang GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-darwin-386 ./$PACK
+		CC=o32-clang CXX=o32-clang++ HOST=i386-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
+		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-darwin-386 ./$PACK
 		built_targets=$((built_targets+1))
 	fi
 done
