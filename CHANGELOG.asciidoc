@@ -61,6 +61,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- The support for doing GeoIP lookups is deprecated and will be removed in version 6.0. {pull}1601[1601]
+
 *Packetbeat*
 
 *Topbeat*
