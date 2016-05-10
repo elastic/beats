@@ -7,140 +7,140 @@
     - name: hostname
       type: keyword
       description: >
-        Apache hostname
+        Apache hostname.
     - name: totalAccesses
       type: integer
       description: >
-        Total number of access requests
+        Total number of access requests.
     - name: totalKBytes
       type: integer
       description: >
-        Total number of kilobytes served
+        Total number of kilobytes served.
     - name: reqPerSec
       type: float
       description: >
-        Requests per second
+        Requests per second.
     - name: bytesPerSec
       type: float
       description: >
-        Bytes per second
+        Bytes per second.
     - name: bytesPerReq
       type: float
       description: >
-        Bytes per request
+        Bytes per request.
     - name: busyWorkers
       type: integer
       description: >
-        Number of busy workers
+        Number of busy workers.
     - name: idleWorkers
       type: integer
       description: >
-        Number of idle workers
+        Number of idle workers.
     - name: uptime
       type: group
       description: >
-        Uptime stats
+        Uptime stats.
       fields:
         - name: serverUptimeSeconds
           type: integer
           description: >
-            Server uptime in seconds
+            Server uptime in seconds.
         - name: uptime
           type: integer
           description: >
-            Server uptime
+            Server uptime.
     - name: cpu
       type: group
       description: >
-        CPU stats
+        CPU stats.
       fields:
         - name: cpuLoad
           type: float
           description: >
-            CPU Load
+            CPU Load.
         - name: cpuUser
           type: float
           description: >
-            cpu user load
+            CPU user load.
         - name: cpuSystem
           type: float
           description: >
-            System cpu
+            System cpu.
         - name: cpuChildrenUser
           type: float
           description: >
-            CPU of children user
+            CPU of children user.
         - name: cpuChildrenSystem
           type: float
           description: >
-            cpu of children system
+            CPU of children system.
     - name: connections
       type: group
       description: >
-        Connection stats
+        Connection stats.
       fields:
         - name: connsTotal
           type: integer
           description: >
-            Total connections
+            Total connections.
         - name: connsAsyncWriting
           type: integer
           description: >
-            Async connectin writing
+            Async connection writing.
         - name: connsAsyncKeepAlive
           type: integer
           description: >
-            Async keeped alive connetions
+            Async keeped alive connections.
         - name: connsAsyncClosing
           type: integer
           description: >
-            Async closed connections
+            Async closed connections.
     - name: load
       type: group
       description: >
-        Load averages
+        Load averages.
       fields:
         - name: load1
           type: float
           description: >
-            Load average for the last minute
+            Load average for the last minute.
         - name: load5
           type: float
           description: >
-            Load avarage for the last 5 minutes
+            Load average for the last 5 minutes.
         - name: load15
           type: float
           description: >
-            Load aferage for the last 15 minutes
+            Load average for the last 15 minutes.
     - name: scoreboard
       type: group
       description: >
-        Scoreboard metrics
+        Scoreboard metrics.
       fields:
         - name: startingUp
           type: integer
           description: >
-            Starting up
+            Starting up.
         - name: readingRequest
           type: integer
           description: >
-            Reading requests
+            Reading requests.
         - name: sendingReply
           type: integer
           description: >
-            Sending Reply
+            Sending Reply.
         - name: keepalive
           type: integer
           description: >
-            Keep alive
+            Keep alive.
         - name: dnsLookup
           type: integer
           description: >
-            Dns Lookups
+            Dns Lookups.
         - name: closingConnection
           type: integer
           description: >
-            Closing connections
+            Closing connections.
         - name: logging
           type: integer
           description: >
@@ -148,7 +148,7 @@
         - name: gracefullyFinishing
           type: integer
           description: >
-            Gracefully finishing
+            Gracefully finishing.
         - name: idleCleanup
           type: integer
           description: >
@@ -156,12 +156,12 @@
         - name: openSlot
           type: integer
           description: >
-            Open slots
+            Open slots.
         - name: waitingForConnection
           type: integer
           description: >
-            Waiting for connections
+            Waiting for connections.
         - name: total
           type: integer
           description: >
-            Total
+            Total.

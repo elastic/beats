@@ -107,61 +107,61 @@ Apache HTTPD server metrics collected from the mod_status module.
 
 type: keyword
 
-Apache hostname
+Apache hostname.
 
 
 ==== apache-status.totalAccesses
 
 type: integer
 
-Total number of access requests
+Total number of access requests.
 
 
 ==== apache-status.totalKBytes
 
 type: integer
 
-Total number of kilobytes served
+Total number of kilobytes served.
 
 
 ==== apache-status.reqPerSec
 
 type: float
 
-Requests per second
+Requests per second.
 
 
 ==== apache-status.bytesPerSec
 
 type: float
 
-Bytes per second
+Bytes per second.
 
 
 ==== apache-status.bytesPerReq
 
 type: float
 
-Bytes per request
+Bytes per request.
 
 
 ==== apache-status.busyWorkers
 
 type: integer
 
-Number of busy workers
+Number of busy workers.
 
 
 ==== apache-status.idleWorkers
 
 type: integer
 
-Number of idle workers
+Number of idle workers.
 
 
 === uptime Fields
 
-Uptime stats
+Uptime stats.
 
 
 
@@ -169,19 +169,19 @@ Uptime stats
 
 type: integer
 
-Server uptime in seconds
+Server uptime in seconds.
 
 
 ==== apache-status.uptime.uptime
 
 type: integer
 
-Server uptime
+Server uptime.
 
 
 === cpu Fields
 
-CPU stats
+CPU stats.
 
 
 
@@ -189,40 +189,40 @@ CPU stats
 
 type: float
 
-CPU Load
+CPU Load.
 
 
 ==== apache-status.cpu.cpuUser
 
 type: float
 
-cpu user load
+CPU user load.
 
 
 ==== apache-status.cpu.cpuSystem
 
 type: float
 
-System cpu
+System cpu.
 
 
 ==== apache-status.cpu.cpuChildrenUser
 
 type: float
 
-CPU of children user
+CPU of children user.
 
 
 ==== apache-status.cpu.cpuChildrenSystem
 
 type: float
 
-cpu of children system
+CPU of children system.
 
 
 === connections Fields
 
-Connection stats
+Connection stats.
 
 
 
@@ -230,33 +230,33 @@ Connection stats
 
 type: integer
 
-Total connections
+Total connections.
 
 
 ==== apache-status.connections.connsAsyncWriting
 
 type: integer
 
-Async connectin writing
+Async connection writing.
 
 
 ==== apache-status.connections.connsAsyncKeepAlive
 
 type: integer
 
-Async keeped alive connetions
+Async keeped alive connections.
 
 
 ==== apache-status.connections.connsAsyncClosing
 
 type: integer
 
-Async closed connections
+Async closed connections.
 
 
 === load Fields
 
-Load averages
+Load averages.
 
 
 
@@ -264,26 +264,26 @@ Load averages
 
 type: float
 
-Load average for the last minute
+Load average for the last minute.
 
 
 ==== apache-status.load.load5
 
 type: float
 
-Load avarage for the last 5 minutes
+Load average for the last 5 minutes.
 
 
 ==== apache-status.load.load15
 
 type: float
 
-Load aferage for the last 15 minutes
+Load average for the last 15 minutes.
 
 
 === scoreboard Fields
 
-Scoreboard metrics
+Scoreboard metrics.
 
 
 
@@ -291,42 +291,42 @@ Scoreboard metrics
 
 type: integer
 
-Starting up
+Starting up.
 
 
 ==== apache-status.scoreboard.readingRequest
 
 type: integer
 
-Reading requests
+Reading requests.
 
 
 ==== apache-status.scoreboard.sendingReply
 
 type: integer
 
-Sending Reply
+Sending Reply.
 
 
 ==== apache-status.scoreboard.keepalive
 
 type: integer
 
-Keep alive
+Keep alive.
 
 
 ==== apache-status.scoreboard.dnsLookup
 
 type: integer
 
-Dns Lookups
+Dns Lookups.
 
 
 ==== apache-status.scoreboard.closingConnection
 
 type: integer
 
-Closing connections
+Closing connections.
 
 
 ==== apache-status.scoreboard.logging
@@ -340,7 +340,7 @@ Logging
 
 type: integer
 
-Gracefully finishing
+Gracefully finishing.
 
 
 ==== apache-status.scoreboard.idleCleanup
@@ -354,21 +354,21 @@ Idle cleanups
 
 type: integer
 
-Open slots
+Open slots.
 
 
 ==== apache-status.scoreboard.waitingForConnection
 
 type: integer
 
-Waiting for connections
+Waiting for connections.
 
 
 ==== apache-status.scoreboard.total
 
 type: integer
 
-Total
+Total.
 
 
 [[exported-fields-redis]]
@@ -525,6 +525,88 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
+=== system-cores Fields
+
+`system-cores` contains local cpu core stats.
+
+
+
+==== system-cores.core
+
+type: integer
+
+CPU Core number.
+
+
+==== system-cores.user
+
+type: integer
+
+The amount of CPU time spent in user space.
+
+
+==== system-cores.user_p
+
+type: float
+
+The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
+
+
+==== system-cores.nice
+
+type: integer
+
+The amount of CPU time spent on low-priority processes.
+
+
+==== system-cores.system
+
+type: integer
+
+The amount of CPU time spent in kernel space.
+
+
+==== system-cores.system_p
+
+type: float
+
+The percentage of CPU time spent in kernel space.
+
+
+==== system-cores.idle
+
+type: integer
+
+The amount of CPU time spent idle.
+
+
+==== system-cores.iowait
+
+type: integer
+
+The amount of CPU time spent in wait (on disk).
+
+
+==== system-cores.irq
+
+type: integer
+
+The amount of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system-cores.softirq
+
+type: integer
+
+The amount of CPU time spent servicing and handling software interrupts.
+
+==== system-cores.steal
+
+type: integer
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
 === system-cpu Fields
 
 `system-cpu` contains local cpu stats.
@@ -598,6 +680,33 @@ The amount of CPU time spent servicing and handling software interrupts.
 type: integer
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+=== load Fields
+
+Load averages.
+
+
+
+==== system-cpu.load.load1
+
+type: float
+
+Load average for the last minute.
+
+
+==== system-cpu.load.load5
+
+type: float
+
+Load average for the last 5 minutes.
+
+
+==== system-cpu.load.load15
+
+type: float
+
+Load average for the last 15 minutes.
 
 
 === system-filesystem Fields
