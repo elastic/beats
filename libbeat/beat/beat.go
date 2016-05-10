@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
+	_ "github.com/elastic/beats/libbeat/filter/rules"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/publisher"
@@ -106,7 +107,7 @@ type Beat struct {
 	Config    BeatConfig           // Common Beat configuration data.
 	Publisher *publisher.Publisher // Publisher
 
-	filters *filter.FilterList // Filters
+	filters *filter.Filters // Filters
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -114,7 +115,7 @@ type BeatConfig struct {
 	Shipper publisher.ShipperConfig   `config:",inline"`
 	Output  map[string]*common.Config `config:"output"`
 	Logging logp.Logging              `config:"logging"`
-	Filters []filter.FilterConfig     `config:"filters"`
+	Filters filter.FilterPluginConfig `config:"filters"`
 	Path    paths.Path                `config:"path"`
 }
 
@@ -226,7 +227,6 @@ func (bc *instance) config() error {
 	if err != nil {
 		return fmt.Errorf("error initializing filters: %v", err)
 	}
-	debugf("Filters: %+v", bc.data.filters)
 
 	if bc.data.Config.Shipper.MaxProcs != nil {
 		maxProcs := *bc.data.Config.Shipper.MaxProcs

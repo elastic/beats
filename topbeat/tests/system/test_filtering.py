@@ -14,7 +14,7 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            drop_fields=["proc"]
+            drop_fields={"fields": ["proc"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -39,6 +39,75 @@ class Test(BaseTest):
         ]:
             assert key not in output
 
+    def test_dropfields_with_condition(self):
+        """
+        Check drop_fields action works when a condition is associated.
+        """
+        self.render_config_template(
+            system_stats=False,
+            process_stats=True,
+            filesystem_stats=False,
+            drop_fields={
+                "fields": ["proc"],
+                "condition": "range.proc.cpu.total_p.lt: 0.5",
+            },
+        )
+        topbeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
+
+        topbeat.kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )[0]
+
+        for key in [
+            "proc.cpu.start_time",
+            "proc.cpu.total",
+            "proc.cpu.total_p",
+            "proc.cpu.user",
+            "proc.cpu.system",
+            "proc.cmdline",
+            "proc.mem.rss_p",
+        ]:
+            assert key not in output
+
+    def test_dropevent_with_condition(self):
+        """
+        Check drop_event action works when a condition is associated.
+        """
+        self.render_config_template(
+            system_stats=False,
+            process_stats=True,
+            filesystem_stats=False,
+            drop_event={
+                "condition": "range.proc.cpu.total_p.gt: 0.001",
+            },
+        )
+        topbeat = self.start_beat()
+        self.wait_until(
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
+
+        topbeat.kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )[0]
+
+        for key in [
+            "proc.cpu.start_time",
+            "proc.cpu.total",
+            "proc.cpu.total_p",
+            "proc.cpu.user",
+            "proc.cpu.system",
+            "proc.cmdline",
+            "proc.mem.rss_p",
+        ]:
+            assert key in output
+
     def test_include_fields(self):
         """
         Check include_fields filtering action
@@ -47,7 +116,7 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            include_fields=["proc.cpu", "proc.mem"]
+            include_fields={"fields": ["proc.cpu", "proc.mem"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -88,8 +157,8 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            include_fields=["proc"],
-            drop_fields=["proc.mem"],
+            include_fields={"fields": ["proc"]},
+            drop_fields={"fields": ["proc.mem"]},
         )
         topbeat = self.start_beat()
         self.wait_until(
@@ -128,8 +197,8 @@ class Test(BaseTest):
             system_stats=False,
             process_stats=True,
             filesystem_stats=False,
-            include_fields=["proc.mem.size", "proc.mem.rss_p"],
-            drop_fields=["proc.mem.size", "proc.mem.rss_p"],
+            include_fields={"fields": ["proc.mem.size", "proc.mem.rss_p"]},
+            drop_fields={"fields": ["proc.mem.size", "proc.mem.rss_p"]},
         )
         topbeat = self.start_beat()
         self.wait_until(

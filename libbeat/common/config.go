@@ -98,3 +98,6 @@ func fromConfig(in *ucfg.Config) *Config {
 func (c *Config) access() *ucfg.Config {
 	return (*ucfg.Config)(c)
 }
+func (c *Config) GetFields() []string {
+	return c.access().GetFields()
+}

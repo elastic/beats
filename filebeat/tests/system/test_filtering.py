@@ -13,9 +13,9 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            filter_enabled=True,
-            drop_fields=["beat"],
-            include_fields=None,
+            drop_fields={
+                "fields": ["beat"],
+            },
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -36,8 +36,9 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/test.log",
-            filter_enabled=True,
-            include_fields=["source", "offset", "message"]
+            include_fields={
+                "fields": ["source", "offset", "message"],
+            },
         )
         with open(self.working_dir + "/test.log", "w") as f:
             f.write("test message\n")
@@ -51,3 +52,30 @@ class Test(BaseTest):
         )[0]
         assert "beat.name" not in output
         assert "message" in output
+
+    def test_drop_event(self):
+        """
+        Check drop_event filtering action
+        """
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/test*.log",
+            drop_event={
+                "condition": "contains.source: test1",
+            },
+        )
+        with open(self.working_dir + "/test1.log", "w") as f:
+            f.write("test1 message\n")
+
+        with open(self.working_dir + "/test2.log", "w") as f:
+            f.write("test2 message\n")
+
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output(
+            required_fields=["@timestamp", "type"],
+        )[0]
+        assert "beat.name" in output
+        assert "message" in output
+        assert "test" in output["message"]

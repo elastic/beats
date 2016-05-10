@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -9,43 +8,85 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestBadCondition(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	configs := []ConditionConfig{
+		ConditionConfig{
+			Equals: &ConditionFilter{fields: map[string]interface{}{
+				"proc.pid": 0.08,
+			}},
+		},
+
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"gtr": 0.3,
+			}},
+		},
+
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"gt": "fdfdd",
+			}},
+		},
+		ConditionConfig{
+			Regexp: &ConditionFilter{fields: map[string]interface{}{
+				"proc.name": "58gdhsga-=kw++w00",
+			}},
+		},
+	}
+
+	for _, config := range configs {
+		_, err := NewCondition(config)
+		assert.NotNil(t, err)
+	}
+}
+
+func GetConditions(t *testing.T, configs []ConditionConfig) []Condition {
+	conds := []Condition{}
+
+	for _, config := range configs {
+
+		cond, err := NewCondition(config)
+		assert.Nil(t, err)
+		conds = append(conds, *cond)
+	}
+	assert.True(t, len(conds) == len(configs))
+
+	return conds
+}
+
 func TestEqualsCondition(t *testing.T) {
 
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	config1 := ConditionConfig{
-		Equals: map[string]string{
-			"type": "process",
+	configs := []ConditionConfig{
+		ConditionConfig{
+			Equals: &ConditionFilter{fields: map[string]interface{}{
+				"type": "process",
+			}},
 		},
-	}
-	cond1, err := NewCondition(config1)
-	assert.True(t, err == nil)
 
-	config2 := ConditionConfig{
-		Equals: map[string]string{
-			"proc.pid": "305",
+		ConditionConfig{
+			Equals: &ConditionFilter{fields: map[string]interface{}{
+				"type":     "process",
+				"proc.pid": 305,
+			}},
 		},
-	}
-	cond2, err := NewCondition(config2)
-	assert.True(t, err == nil)
 
-	config3 := ConditionConfig{
-		Equals: map[string]string{
-			"proc.pid": "0.08",
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"proc.cpu.total_p.gt": 0.5,
+			}},
 		},
 	}
-	cond3, err := NewCondition(config3)
-	assert.True(t, err == nil)
 
-	config4 := ConditionConfig{
-		Equals: map[string]string{
-			"proc.cpu.total_p": "0.08",
-		},
-	}
-	cond4, err := NewCondition(config4)
-	assert.True(t, err == nil)
+	conds := GetConditions(t, configs)
 
 	event := common.MapStr{
 		"@timestamp": "2016-04-14T20:41:06.258Z",
@@ -67,10 +108,9 @@ func TestEqualsCondition(t *testing.T) {
 		"type": "process",
 	}
 
-	assert.True(t, cond1.Check(event))
-	assert.True(t, cond2.Check(event))
-	assert.False(t, cond3.Check(event))
-	assert.False(t, cond4.Check(event))
+	assert.True(t, conds[0].Check(event))
+	assert.True(t, conds[1].Check(event))
+	assert.False(t, conds[2].Check(event))
 }
 
 func TestContainsCondition(t *testing.T) {
@@ -79,21 +119,23 @@ func TestContainsCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	config1 := ConditionConfig{
-		Contains: map[string]string{
-			"proc.name": "sec",
+	configs := []ConditionConfig{
+		ConditionConfig{
+			Contains: &ConditionFilter{fields: map[string]interface{}{
+				"proc.name":     "sec",
+				"proc.username": "monica",
+			}},
 		},
-	}
-	cond1, err := NewCondition(config1)
-	assert.True(t, err == nil)
 
-	config2 := ConditionConfig{
-		Contains: map[string]string{
-			"proc.name": "secddd",
+		ConditionConfig{
+			Contains: &ConditionFilter{fields: map[string]interface{}{
+				"type":      "process",
+				"proc.name": "secddd",
+			}},
 		},
 	}
-	cond2, err := NewCondition(config2)
-	assert.True(t, err == nil)
+
+	conds := GetConditions(t, configs)
 
 	event := common.MapStr{
 		"@timestamp": "2016-04-14T20:41:06.258Z",
@@ -115,8 +157,8 @@ func TestContainsCondition(t *testing.T) {
 		"type": "process",
 	}
 
-	assert.True(t, cond1.Check(event))
-	assert.False(t, cond2.Check(event))
+	assert.True(t, conds[0].Check(event))
+	assert.False(t, conds[1].Check(event))
 }
 
 func TestRegexpCondition(t *testing.T) {
@@ -125,33 +167,28 @@ func TestRegexpCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	// first simple condition
-	config1 := ConditionConfig{
-		Regexp: map[string]*regexp.Regexp{
-			"source": regexp.MustCompile("apache2/error.*"),
+	configs := []ConditionConfig{
+		ConditionConfig{
+			Regexp: &ConditionFilter{fields: map[string]interface{}{
+				"source": "apache2/error.*",
+			}},
 		},
-	}
-	cond1, err := NewCondition(config1)
-	assert.True(t, err == nil)
 
-	// second simple condition
-	config2 := ConditionConfig{
-		Regexp: map[string]*regexp.Regexp{
-			"source": regexp.MustCompile("apache2/access.*"),
+		ConditionConfig{
+			Regexp: &ConditionFilter{fields: map[string]interface{}{
+				"source": "apache2/access.*",
+			}},
 		},
-	}
-	cond2, err := NewCondition(config2)
-	assert.True(t, err == nil)
 
-	// third complex condition
-	config3 := ConditionConfig{
-		Regexp: map[string]*regexp.Regexp{
-			"source":  regexp.MustCompile("apache2/error.*"),
-			"message": regexp.MustCompile("[client 1.2.3.4]"),
+		ConditionConfig{
+			Regexp: &ConditionFilter{fields: map[string]interface{}{
+				"source":  "apache2/error.*",
+				"message": "[client 1.2.3.4]",
+			}},
 		},
 	}
-	cond3, err := NewCondition(config3)
-	assert.True(t, err == nil)
+
+	conds := GetConditions(t, configs)
 
 	event := common.MapStr{
 		"@timestamp": "2016-04-14T20:41:06.258Z",
@@ -171,12 +208,12 @@ func TestRegexpCondition(t *testing.T) {
 		"offset":     30,
 	}
 
-	assert.True(t, cond1.Check(event))
-	assert.False(t, cond2.Check(event))
-	assert.True(t, cond3.Check(event))
+	assert.True(t, conds[0].Check(event))
+	assert.False(t, conds[1].Check(event))
+	assert.True(t, conds[2].Check(event))
 
-	assert.False(t, cond1.Check(event1))
-	assert.True(t, cond2.Check(event1))
+	assert.True(t, conds[1].Check(event1))
+	assert.False(t, conds[2].Check(event1))
 }
 
 func TestRangeCondition(t *testing.T) {
@@ -185,47 +222,35 @@ func TestRangeCondition(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	// first condition
-	var v400 float64 = 400
-	var v500 float64 = 500
-	config1 := ConditionConfig{
-		Range: map[string]RangeValue{
-			"http.code": RangeValue{Gte: &v400, Lt: &v500},
+	configs := []ConditionConfig{
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"http.code.gte": 400,
+				"http.code.lt":  500,
+			}},
 		},
-	}
-	cond1, err := NewCondition(config1)
-	assert.True(t, err == nil)
 
-	// second condition
-	var v2800 float64 = 28000
-	config2 := ConditionConfig{
-		Range: map[string]RangeValue{
-			"bytes_out": RangeValue{Gte: &v2800},
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"bytes_out.gte": 2800,
+			}},
 		},
-	}
-	cond2, err := NewCondition(config2)
-	assert.True(t, err == nil)
 
-	// complex condition
-	var v30 float64 = 30
-	config3 := ConditionConfig{
-		Range: map[string]RangeValue{
-			"bytes_out":    RangeValue{Gte: &v2800},
-			"responsetime": RangeValue{Gt: &v30},
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"bytes_out.gte":   2800,
+				"responsetime.gt": 30,
+			}},
 		},
-	}
-	cond3, err := NewCondition(config3)
-	assert.True(t, err == nil)
 
-	// float condition
-	var v05 = 0.5
-	config4 := ConditionConfig{
-		Range: map[string]RangeValue{
-			"proc.cpu.total_p": RangeValue{Gte: &v05},
+		ConditionConfig{
+			Range: &ConditionFilter{fields: map[string]interface{}{
+				"proc.cpu.total_p.gte": 0.5,
+			}},
 		},
 	}
-	cond4, err := NewCondition(config4)
-	assert.True(t, err == nil)
+
+	conds := GetConditions(t, configs)
 
 	event := common.MapStr{
 		"@timestamp":    "2015-06-11T09:51:23.642Z",
@@ -273,9 +298,9 @@ func TestRangeCondition(t *testing.T) {
 		"type": "process",
 	}
 
-	assert.True(t, cond1.Check(event))
-	assert.True(t, cond2.Check(event))
-	assert.False(t, cond3.Check(event))
-	assert.True(t, cond4.Check(event1))
-	assert.False(t, cond4.Check(event))
+	assert.True(t, conds[0].Check(event))
+	assert.True(t, conds[1].Check(event))
+	assert.False(t, conds[2].Check(event))
+	assert.True(t, conds[3].Check(event1))
+	assert.False(t, conds[3].Check(event))
 }

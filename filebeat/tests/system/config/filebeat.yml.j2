@@ -132,19 +132,29 @@ output:
     rotate_every_kb: 1000
     number_of_files: 2
 
-{% if filter_enabled %}
-
+############################# Filters #########################################
+{%- if drop_fields or drop_event or include_fields %}
 filters:
+
+    {%- if include_fields %}
+    - include_fields:
+        {{include_fields.condition | default()}}
+        fields: {{include_fields.fields | default([])}}
+    {%- endif %}
 
     {%- if drop_fields %}
     - drop_fields:
-        fields: {{drop_fields}}
+        {{drop_fields.condition | default()}}
+        fields: {{drop_fields.fields | default([])}}
     {%- endif %}
-    {%- if include_fields is not none %}
-    - include_fields:
-        fields: {{include_fields}}
+
+
+    {%- if drop_event %}
+    - drop_event:
+        {{ drop_event.condition | default()}}
     {%- endif %}
-{% endif %}
+
+{%- endif %}
 
 {% if path_data %}
 path:
