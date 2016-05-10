@@ -126,7 +126,7 @@ for TARGET in $TARGETS; do
 	fi
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
 		echo "Compiling $PACK for linux/386..."
-		HOST=i686-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
+		CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 HOST=i686-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
 		GOOS=linux GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
 		sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-386$R ./$PACK"
 		built_targets=$((built_targets+1))
