@@ -250,13 +250,6 @@ output:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
-# Configure local GeoIP database support.
-# If no paths are not configured geoip is disabled.
-#geoip:
-  #paths:
-  #  - "/usr/share/GeoIP/GeoLiteCity.dat"
-  #  - "/usr/local/var/GeoIP/GeoLiteCity.dat"
-
 
 ############################# Logging #########################################
 
