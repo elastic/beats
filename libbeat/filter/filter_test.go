@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -83,8 +84,8 @@ func TestIncludeFields1(t *testing.T) {
 
 	rule, err := NewIncludeFields(IncludeFieldsConfig{
 		Fields: []string{"proc.cpu.total_ddd"},
-		ConditionConfig: ConditionConfig{Regexp: map[string]string{
-			"proc.cmdline": "launchd",
+		ConditionConfig: ConditionConfig{Regexp: map[string]*regexp.Regexp{
+			"proc.cmdline": regexp.MustCompile("launchd"),
 		}},
 	})
 	assert.True(t, err == nil)
