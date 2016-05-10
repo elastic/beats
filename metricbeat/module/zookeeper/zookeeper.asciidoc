@@ -1,0 +1,20 @@
+[[metricbeat-zookeeper-module]]
+== Zookeeper Module
+
+
+=== Configuration
+
+[source,yaml]
+----
+metricbeat:
+  modules:
+    - module: zookeeper
+      metricsets: ["mntr"]
+      hosts: ["localhost:2181"]
+      period: 1s
+----
+
+=== MetricSets
+
+==== mntr Metricset
+

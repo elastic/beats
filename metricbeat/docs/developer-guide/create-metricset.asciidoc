@@ -29,8 +29,8 @@ of this example in detail.
 Each metricseter consists 3 parts:
 
 * Registration of metricseter
-* MetricSeter Type definition
-* MetricSeter Interface methods
+* MetricSeter Type definition and setup
+* MetricSeter Interface method
 
 [source,go]
 ----
@@ -38,8 +38,7 @@ package {metricset-name}
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func init() {
@@ -48,21 +47,19 @@ func init() {
 	}
 }
 
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
+// MetricSet for fetching metrics.
+type MetricSet struct {
+	mb.BaseMetricSet
 }
 
-type MetricSeter struct {}
-
-// Setup Metricset
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
+// New is a mb.MetricSetFactory that returns a cpu.MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MetricSet{base}, nil
 }
 
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event := common.MapStr{"hello": "world"}
-	return event
+	return event, nil
 }
 ----
 
@@ -80,8 +77,7 @@ package {metricset-name}
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 ----
 
@@ -98,34 +94,29 @@ func init() {
 }
 ----
 
-The New function is used to created a new MetricSeter object. The example below
-is an empty struct, but MetricSeter can also be used to store local variables
+The New function is used to created a new MetricSet object. The example below
+is an struct with the base metricset only, but the MetricSet can also be used to store local variables
 (state) of the MetricSet. This can be useful to store information between two
-calls. These variables must be defined as part of MetricSeter and initiated in
+calls. These variables must be defined as part of MetricSet and initiated in
 the `New` function. The `New` function is called when a module instantiates a
 module.
 
-[source,go]
-----
-// New creates new instance of MetricSeter
-func New() helper.MetricSeter {
-	return &MetricSeter{}
-}
-
-type MetricSeter struct {}
-----
-
-The `Setup` method is called once before the `Fetch methods is called. `Setup`
-can be used to load specific local configuration variables (more on this here)
+The `New` method method must also be used to load specific local configuration variables (more on this here)
 or setting up connections to the hosts.
 
 [source,go]
 ----
-// Setup Metricset
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
-	return nil
+// MetricSet for fetching metrics.
+type MetricSet struct {
+	mb.BaseMetricSet
+}
+
+// New is a mb.MetricSetFactory that returns a cpu.MetricSet.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MetricSet{base}, nil
 }
 ----
+
 
 The `Fetch` method is the central part of the metricset. Fetch is called every
 time new data is retrieved. In case more then one host is defined, fetch is
@@ -140,9 +131,21 @@ error is.
 
 [source,go]
 ----
-func (m *MetricSeter) Fetch(ms *helper.MetricSet, host string) (events common.MapStr, err error) {
+func (m *MetricSet) Fetch() (common.MapStr, error) {
 	event := common.MapStr{"hello": "world"}
-	return event
+	return event, nil
+}
+----
+
+There exist two flavors of the Fetch interface. In case your implementation returns multiple events
+per Fetch request, you can alternatively use the following Fetch method:
+
+[source,go]
+----
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+    events := []common.MapStr{}
+	events = append(events, common.MapStr{"hello": "world"})
+	return events, nil
 }
 ----
 
@@ -168,7 +171,7 @@ metricbeat:
       metricsets: ["{metricset-name}"]
 ----
 
-Now if your run `make update` to update all files and `make` to compile the
+Now if your run `make collect` to update all files and `make` to compile the
 binary, you can start `./metricbeat -e -d "*"` and you should see your new
 metricset sending data.
 
@@ -197,20 +200,28 @@ Second as the values of the struct, default values can be set if needed.
 
 [source,go]
 ----
-func (m *MetricSeter) Setup(ms *helper.MetricSet) error {
+type MetricSet struct {
+	mb.BaseMetricSet
+	password string
+}
 
-	// Additional configuration options
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+
+	// Unpack additional configuration options.
 	config := struct {
 		Password string `config:"password"`
 	}{
 		Password: "",
 	}
-
-	if err := ms.Module.ProcessConfig(&config); err != nil {
-		return err
+	err := base.Module().UnpackConfig(&config)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &MetricSet{
+		BaseMetricSet: base,
+		password:      Password,
+	}, nil
 }
 ----
 
