@@ -1,0 +1,72 @@
+[[developerguide-testing]]
+== Testing
+
+To test a beat there exist three different type of tests:
+
+* unit tests
+* integration tests
+* system tests
+
+When creating a beat we recommend to make use of all three. Unit tests are
+written in Golang and have no dependencies. Integration tests are also written
+in Golang but require the service that is required for the module to be running.
+System-tests for metricbeat also require the service to be running and are
+written in Python based on our small python test framework.
+
+It is recommended to use a combination of the three tests to test your module as
+each method has its advantage and disavantages. The unit and integration tests
+can be found in the `_test.go` files under modules and metricsets. The system
+tests are under `tests/systems`. To get started with your own tests, it is best
+having a look at the existing tests.
+
+=== Run tests
+
+To run all the tests, run `make testsuite`. To only run unit tests, run `make
+unit-tests` or for integration tests `make integration-tests`. Be aware that for
+integration and system tests a running docker environment is needed.
+
+
+=== Add environment
+
+Integration and system tests need an environment running with the service to
+test. This is done with docker and a docker-compose file. In case you add a
+module which requires a service, you must add this to the virtual environment.
+For this two steps are required:
+
+* Update the `docker-compose.yml` file with your environment
+* Update the `docker-entrypoint.sh` script
+
+The `docker-compose.yml` file is at the root of metricbeat. Most services have
+existing docker modules and can be added as simple as redis:
+
+[source,yaml]
+----
+redis:
+  image: redis:3.0.7
+----
+
+To make sure the service is running before the tests are started, the
+`docker-entrypoint.sh` must be modified to add a check for your service to be
+running. An example for redis looks as following:
+
+[source,shell]
+----
+waitForRedis() {
+    echo -n "Waiting for redis(${REDIS_HOST}:${REDIS_PORT}) to start."
+    for ((i=1; i<=90; i++)) do
+        if nc -vz ${REDIS_HOST} ${REDIS_PORT} 2>/dev/null; then
+            echo
+            echo "Redis is ready!"
+            return 0
+        fi
+
+        ((i++))
+        echo -n '.'
+        sleep 1
+    done
+
+    echo
+    echo >&2 'Redis is not available'
+    echo >&2 "Address: ${REDIS_HOST}:${REDIS_PORT}"
+}
+----
