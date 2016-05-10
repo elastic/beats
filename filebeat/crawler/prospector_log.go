@@ -108,7 +108,6 @@ func (p *ProspectorLog) scan() {
 	newlastscan := time.Now()
 
 	// TODO: Track harvesters to prevent any file from being harvested twice. Finished state could be delayed?
-
 	// Now let's do one quick scan to pick up new files
 	for file, fileinfo := range p.getFiles() {
 

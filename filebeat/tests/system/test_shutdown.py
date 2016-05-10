@@ -9,7 +9,7 @@ Tests that Filebeat shuts down cleanly.
 """
 
 class Test(BaseTest):
-    @unittest.skip("Needs fix from #964")
+
     def test_shutdown(self):
         """
         Test starting and stopping Filebeat under load.

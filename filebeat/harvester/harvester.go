@@ -34,6 +34,7 @@ type Harvester struct {
 	file               FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
+	done               chan struct{}
 }
 
 func NewHarvester(
@@ -42,7 +43,7 @@ func NewHarvester(
 	state input.FileState,
 	spooler chan *input.FileEvent,
 	offset int64,
-
+	done chan struct{},
 ) (*Harvester, error) {
 	encoding, ok := encoding.FindEncoding(cfg.Encoding)
 	if !ok || encoding == nil {
@@ -56,15 +57,11 @@ func NewHarvester(
 		SpoolerChan: spooler,
 		encoding:    encoding,
 		offset:      offset,
+		done:        done,
 	}
 	h.ExcludeLinesRegexp = cfg.ExcludeLines
 	h.IncludeLinesRegexp = cfg.IncludeLines
 	return h, nil
-}
-
-func (h *Harvester) Start() {
-	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-	go h.Harvest()
 }
 
 // open does open the file given under h.Path and assigns the file handler to h.file

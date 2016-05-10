@@ -15,11 +15,12 @@ func createLineReader(
 	readerConfig logFileReaderConfig,
 	jsonConfig *config.JSONConfig,
 	mlrConfig *config.MultilineConfig,
+	done chan struct{},
 ) (processor.LineProcessor, error) {
 	var p processor.LineProcessor
 	var err error
 
-	fileReader, err := newLogFileReader(in, readerConfig)
+	fileReader, err := newLogFileReader(in, readerConfig, done)
 	if err != nil {
 		return nil, err
 	}
