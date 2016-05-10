@@ -73,6 +73,22 @@ Packetbeat:
 Some of the Beats might have extra development requirements, in which case a
 CONTRIBUTING.md file is find in the Beat directory.
 
+## Update scripts
+
+The beats use a variety of scripts based on python to generate configuration files
+and documentations. The command used for this is:
+
+    $ make update
+
+This command has the following dependencies:
+
+* Python >=2.7.9
+* [virtualenv](https://virtualenv.pypa.io/en/latest/) for Python
+
+Virtualenv can be installed with the command `easy_install virtualenv` or `pip install virtualenv`.
+More details can be [here](https://virtualenv.pypa.io/en/latest/installation.html).
+
+
 ## Testing
 
 You can run the whole testsuite with the following command:
@@ -86,11 +102,6 @@ Running the testsuite has the following requirements:
 * Docker-compose >= 1.7.0
 
 ## Dependencies
-
-The Beats project is using the [Go 1.5 vendor
-experiment](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit)
-for its dependencies. This means the Go dependencies code is copied under the
-`vendor/` directory and committed into source control.
 
 To manage the `vendor/` folder we use
 [glide](https://github.com/Masterminds/glide), which uses
