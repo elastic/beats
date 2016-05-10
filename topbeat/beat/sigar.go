@@ -244,28 +244,12 @@ func getProcState(b byte) string {
 	return "unknown"
 }
 
-func GetProcess(pid int, cmdline string) (*Process, error) {
+// newProcess creates a new Process object based on the state information.
+func newProcess(pid int) (*Process, error) {
+
 	state := sigar.ProcState{}
 	if err := state.Get(pid); err != nil {
 		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
-	}
-
-	mem := sigar.ProcMem{}
-	if err := mem.Get(pid); err != nil {
-		return nil, fmt.Errorf("error getting process mem for pid=%d: %v", pid, err)
-	}
-
-	cpu := sigar.ProcTime{}
-	if err := cpu.Get(pid); err != nil {
-		return nil, fmt.Errorf("error getting process cpu time for pid=%d: %v", pid, err)
-	}
-
-	if cmdline == "" {
-		args := sigar.ProcArgs{}
-		if err := args.Get(pid); err != nil {
-			return nil, fmt.Errorf("error getting process arguments for pid=%d: %v", pid, err)
-		}
-		cmdline = strings.Join(args.List, " ")
 	}
 
 	proc := Process{
@@ -274,22 +258,47 @@ func GetProcess(pid int, cmdline string) (*Process, error) {
 		Name:     state.Name,
 		State:    getProcState(byte(state.State)),
 		Username: state.Username,
-		CmdLine:  cmdline,
-		Mem: &ProcMemStat{
-			Size:  mem.Size,
-			Rss:   mem.Resident,
-			Share: mem.Share,
-		},
-		Cpu: &ProcCpuTime{
-			Start:  cpu.FormatStartTime(),
-			Total:  cpu.Total,
-			User:   cpu.User,
-			System: cpu.Sys,
-		},
-		ctime: time.Now(),
+		ctime:    time.Now(),
 	}
 
 	return &proc, nil
+}
+
+// getDetails fills in CPU, memory, and command line details for the process
+func (proc *Process) getDetails(cmdline string) error {
+
+	mem := sigar.ProcMem{}
+	if err := mem.Get(proc.Pid); err != nil {
+		return fmt.Errorf("error getting process mem for pid=%d: %v", proc.Pid, err)
+	}
+	proc.Mem = &ProcMemStat{
+		Size:  mem.Size,
+		Rss:   mem.Resident,
+		Share: mem.Share,
+	}
+
+	cpu := sigar.ProcTime{}
+	if err := cpu.Get(proc.Pid); err != nil {
+		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
+	}
+	proc.Cpu = &ProcCpuTime{
+		Start:  cpu.FormatStartTime(),
+		Total:  cpu.Total,
+		User:   cpu.User,
+		System: cpu.Sys,
+	}
+
+	if cmdline == "" {
+		args := sigar.ProcArgs{}
+		if err := args.Get(proc.Pid); err != nil {
+			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
+		}
+		proc.CmdLine = strings.Join(args.List, " ")
+	} else {
+		proc.CmdLine = cmdline
+	}
+
+	return nil
 }
 
 func GetFileSystemList() ([]sigar.FileSystem, error) {
