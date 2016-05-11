@@ -51,9 +51,18 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 	logp.Info("Loading Prospectors completed. Number of prospectors: %v", len(c.prospectors))
 
 	c.wg = sync.WaitGroup{}
-	for _, prospector := range c.prospectors {
+	for i, p := range c.prospectors {
 		c.wg.Add(1)
-		go prospector.Run(&c.wg)
+
+		go func(id int, prospector *Prospector) {
+			defer func() {
+				c.wg.Done()
+				logp.Debug("crawler", "Prospector %v stopped", id)
+			}()
+			logp.Debug("crawler", "Starting prospector %v", id)
+			prospector.Run()
+		}(i, p)
+
 	}
 
 	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.getState()))
@@ -66,7 +75,9 @@ func (c *Crawler) Stop() {
 
 	logp.Info("Stopping %v prospectors", len(c.prospectors))
 	for _, prospector := range c.prospectors {
-		prospector.Stop()
+		// Stop prospectors in parallel
+		c.wg.Add(1)
+		go prospector.Stop(&c.wg)
 	}
 	c.wg.Wait()
 	logp.Info("Crawler stopped")

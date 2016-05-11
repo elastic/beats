@@ -18,6 +18,7 @@ type logFileReader struct {
 
 	lastTimeRead time.Time
 	backoff      time.Duration
+	done         chan struct{}
 }
 
 type logFileReaderConfig struct {
@@ -37,6 +38,7 @@ var (
 func newLogFileReader(
 	fs FileSource,
 	config logFileReaderConfig,
+	done chan struct{},
 ) (*logFileReader, error) {
 	var offset int64
 	if seeker, ok := fs.(io.Seeker); ok {
@@ -53,6 +55,7 @@ func newLogFileReader(
 		config:       config,
 		lastTimeRead: time.Now(),
 		backoff:      config.backoffDuration,
+		done:         done,
 	}, nil
 }
 
@@ -71,6 +74,12 @@ func (r *logFileReader) Read(buf []byte) (int, error) {
 	}
 
 	for {
+		select {
+		case <-r.done:
+			return 0, nil
+		default:
+		}
+
 		n, err := r.fs.Read(buf)
 		if n > 0 {
 			r.offset += int64(n)

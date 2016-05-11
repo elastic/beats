@@ -20,6 +20,7 @@ type Registrar struct {
 	registryFile string               // Path to the Registry File
 	state        map[string]FileState // Map with all file paths inside and the corresponding state
 	stateMutex   sync.Mutex
+	wg           sync.WaitGroup
 }
 
 func NewRegistrar(registryFile string) (*Registrar, error) {
@@ -29,6 +30,7 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 		done:         make(chan struct{}),
 		state:        map[string]FileState{},
 		Channel:      make(chan []*FileEvent, 1),
+		wg:           sync.WaitGroup{},
 	}
 	err := r.Init()
 
@@ -71,11 +73,18 @@ func (r *Registrar) LoadState() {
 	}
 }
 
+func (r *Registrar) Start() {
+	r.wg.Add(1)
+	go r.Run()
+}
+
 func (r *Registrar) Run() {
 	logp.Info("Starting Registrar")
-
 	// Writes registry on shutdown
-	defer r.writeRegistry()
+	defer func() {
+		r.writeRegistry()
+		r.wg.Done()
+	}()
 
 	for {
 		select {
@@ -111,7 +120,7 @@ func (r *Registrar) processEventStates(events []*FileEvent) {
 func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
 	close(r.done)
-	// Note: don't block using waitGroup, cause this method is run by async signal handler
+	r.wg.Wait()
 }
 
 func (r *Registrar) GetFileState(path string) (FileState, bool) {
