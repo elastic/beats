@@ -161,12 +161,12 @@ benchmark-tests:
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
-	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip ; \
+	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
-		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \
-		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
 
 # Runs unit and system tests without coverage reports
