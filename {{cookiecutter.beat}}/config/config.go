@@ -8,5 +8,5 @@ type Config struct {
 }
 
 type {{cookiecutter.beat|capitalize}}Config struct {
-	Period string `yaml:"period"`
+	Period string `config:"period"`
 }

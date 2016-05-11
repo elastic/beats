@@ -7,6 +7,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/publisher"
 
 	"{{cookiecutter.beat_path}}/{{cookiecutter.beat}}/config"
 )
@@ -15,6 +16,7 @@ type {{cookiecutter.beat|capitalize}} struct {
 	beatConfig *config.Config
 	done       chan struct{}
 	period     time.Duration
+	client     publisher.Client
 }
 
 // Creates beater
@@ -29,7 +31,7 @@ func New() *{{cookiecutter.beat|capitalize}} {
 func (bt *{{cookiecutter.beat|capitalize}}) Config(b *beat.Beat) error {
 
 	// Load beater beatConfig
-	err := b.RawConfig.Unpack(bt.beatConfig)
+	err := b.RawConfig.Unpack(&bt.beatConfig)
 	if err != nil {
 		return fmt.Errorf("Error reading config file: %v", err)
 	}
@@ -43,6 +45,8 @@ func (bt *{{cookiecutter.beat|capitalize}}) Setup(b *beat.Beat) error {
 	if bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period == "" {
 		bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period = "1s"
 	}
+
+	bt.client = b.Publisher.Connect()
 
 	var err error
 	bt.period, err = time.ParseDuration(bt.beatConfig.{{cookiecutter.beat|capitalize}}.Period)
@@ -70,7 +74,7 @@ func (bt *{{cookiecutter.beat|capitalize}}) Run(b *beat.Beat) error {
 			"type":       b.Name,
 			"counter":    counter,
 		}
-		b.Events.PublishEvent(event)
+		bt.client.PublishEvent(event)
 		logp.Info("Event sent")
 		counter++
 	}
