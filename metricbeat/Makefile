@@ -15,20 +15,28 @@ include ../libbeat/scripts/Makefile
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	cp -r module/*/.kibana/ etc/kibana
+	rm -r etc/kibana
+	mkdir -p etc/kibana
+	cp -r module/*/_beat/kibana/ etc/kibana
 
 
 # Collects all module and metricset fields
 .PHONY: fields
 fields:
-	cat etc/fields_base.yml > etc/fields.yml
+	cat etc/_beat/fields_base.yml > etc/fields.yml
 	python scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
 .PHONY: docs
 docs:
-	cp -r module/*/*.asciidoc docs/modules
+	rm -r docs/modules
+	mkdir -p docs/modules
+	python scripts/docs_collector.py
 
+# Collects all module configs
+.PHONY: configs
+configs:
+	python scripts/config_collector.py > etc/beat.yml
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
@@ -36,4 +44,4 @@ before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: kibana fields docs update
+collect: kibana fields docs configs update

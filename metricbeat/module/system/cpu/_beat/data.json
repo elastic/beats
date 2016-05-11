@@ -1,0 +1,28 @@
+{
+    "@timestamp":"2016-05-11T07:14:07.110Z",
+    "beat":{
+        "hostname":"ruflin",
+        "name":"ruflin"
+    },
+    "metricset":"cpu",
+    "module":"system",
+    "rtt":51,
+    "system-cpu":{
+        "idle":125752409,
+        "iowait":0,
+        "irq":0,
+        "load":{
+            "load1":5.07275390625,
+            "load15":3.84912109375,
+            "load5":3.5869140625
+        },
+        "nice":0,
+        "softirq":0,
+        "steal":0,
+        "system":19051706,
+        "system_p":0,
+        "user":30123229,
+        "user_p":0
+    },
+    "type":"metricsets"
+}

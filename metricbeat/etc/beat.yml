@@ -1,87 +1,85 @@
-metricbeat:
-  modules:
+metricbeat.modules:
 
-    # Apache Module
-    - module: apache
-      metricsets: ["status"]
-      enabled: true
-      period: 1s
+  # Apache Module
+  - module: apache
+    metricsets: ["status"]
+    enabled: true
+    period: 1s
 
-      # Apache hosts
-      hosts: ["http://127.0.0.1/"]
+    # Apache hosts
+    hosts: ["http://127.0.0.1/"]
 
-      # Path to server status. Default server-status
-      #server_status_path: "server-status"
+    # Path to server status. Default server-status
+    #server_status_path: "server-status"
 
-      # Username of hosts.  Empty by default
-      #username: test
+    # Username of hosts.  Empty by default
+    #username: test
 
-      # Password of hosts. Empty by default
-      #password: test123
+    # Password of hosts. Empty by default
+    #password: test123
 
-    # Redis Module
-    - module: redis
-      metricsets: ["info"]
-      enabled: true
-      period: 1s
+  # MySQL Module
+  - module: mysql
+    metricsets: ["status"]
+    enabled: true
+    period: 2s
 
-      # Redis hosts
-      hosts: ["127.0.0.1:6379"]
+    # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+    # The username and password can either be set in the DSN or for all hosts in username and password config option
+    hosts: ["root@tcp(127.0.0.1:3306)/"]
 
-      # Enabled defines if the module is enabled. Default: true
-      #enabled: true
+    # Username of hosts. Empty by default
+    #username: root
 
-      # Timeout after which time a metricset should return an error
-      # Timeout is by default defined as period, as a fetch of a metricset
-      # should never take longer then period, as otherwise calls can pile up.
-      #timeout: 1s
+    # Password of hosts. Empty by default
+    #password: test
 
-      # Optional fields to be added to each event
-      #fields:
-      #  datacenter: west
+  # Redis Module
+  - module: redis
+    metricsets: ["info"]
+    enabled: true
+    period: 1s
 
-      # Network type to be used for redis connection. Default: tcp
-      #network: tcp
+    # Redis hosts
+    hosts: ["127.0.0.1:6379"]
 
-      # Max number of concurrent connections. Default: 10
-      #maxconn: 10
+    # Enabled defines if the module is enabled. Default: true
+    #enabled: true
 
-      # Filters can be used to reduce the number of fields sent.
-      #filters:
-      #  - include_fields:
-      #      fields: ["stats"]
+    # Timeout after which time a metricset should return an error
+    # Timeout is by default defined as period, as a fetch of a metricset
+    # should never take longer then period, as otherwise calls can pile up.
+    #timeout: 1s
 
-      # Redis AUTH password. Empty by default.
-      #password: foobared
+    # Optional fields to be added to each event
+    #fields:
+    #  datacenter: west
 
-    # MySQL Module
-    - module: mysql
-      metricsets: ["status"]
-      enabled: true
-      period: 2s
+    # Network type to be used for redis connection. Default: tcp
+    #network: tcp
 
-      # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-      # The username and password can either be set in the DSN or for all hosts in username and password config option
-      hosts: ["root@tcp(127.0.0.1:3306)/"]
+    # Max number of concurrent connections. Default: 10
+    #maxconn: 10
 
-      # Username of hosts. Empty by default
-      #username: root
+    # Filters can be used to reduce the number of fields sent.
+    #filters:
+    #  - include_fields:
+    #      fields: ["stats"]
 
-      # Password of hosts. Empty by default
-      #password: test
+    # Redis AUTH password. Empty by default.
+    #password: foobared
 
-    # System module
-    - module: system
-      metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
-      enabled: true
-      period: 2s
+  # System module
+  - module: system
+    metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+    enabled: true
+    period: 2s
 
-      # Per core cpu statistics
-      #cpu_per_core: false
+  # Zookeeper module
+  - module: zookeeper
+    metricsets: ["mntr"]
+    enabled: true
+    period: 5s
+    hosts: ["localhost:2181"]
 
-    # Zookeeper module
-    - module: zookeeper
-      metricsets: ["mntr"]
-      enabled: true
-      period: 5s
-      hosts: ["localhost:2181"]
+

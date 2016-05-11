@@ -1,0 +1,5 @@
+# System module
+- module: system
+  metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+  enabled: true
+  period: 2s

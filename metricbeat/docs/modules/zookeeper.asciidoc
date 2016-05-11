@@ -1,20 +1,29 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-zookeeper]]
 [[metricbeat-zookeeper-module]]
 == Zookeeper Module
 
 
-=== Configuration
+
+
+=== Example Configuration
+
+The Apache module supports the standard configuration options which can be found
+here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
-metricbeat:
-  modules:
-    - module: zookeeper
-      metricsets: ["mntr"]
-      hosts: ["localhost:2181"]
-      period: 1s
+  # Zookeeper module
+  - module: zookeeper
+    metricsets: ["mntr"]
+    enabled: true
+    period: 5s
+    hosts: ["localhost:2181"]
 ----
 
 === MetricSets
 
-==== mntr Metricset
-
+* <<metricbeat-metricset-zookeeper-mntr,mntr>>

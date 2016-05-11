@@ -101,6 +101,7 @@ def dedot(group):
     """
     fields = []
     dedotted = {}
+
     for field in group["fields"]:
         if "." in field["name"]:
             # dedot
