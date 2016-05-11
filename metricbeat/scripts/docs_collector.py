@@ -48,6 +48,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
 """
 
             # Load metricset yaml
@@ -63,6 +64,11 @@ here (add link). Below is an example of a configuration option:
 
         # Add metricsets title as below each metricset adds its link
         module_file += "=== MetricSets\n\n"
+        module_file += "The following MetricSets are available:\n\n"
+
+
+        module_links = ""
+        module_includes = ""
 
         # Iterate over all metricsets
         for metricset in os.listdir(base_dir + "/" + module):
@@ -77,7 +83,9 @@ here (add link). Below is an example of a configuration option:
             link = "<<" + link_name + "," + metricset + ">>"
             reference = "[[" + link_name + "]]"
 
-            module_file += "* " + link + "\n"
+            module_links += "* " + link + "\n\n"
+
+            module_includes += "include::" + module + "/" + metricset + ".asciidoc[]\n\n"
 
 
             metricset_file = generated_note
@@ -87,12 +95,13 @@ here (add link). Below is an example of a configuration option:
             with file(metricset_docs) as f:
                 metricset_file += f.read()
 
+            # TODO: This should point directly to the exported fields of the metricset, not the whole module
             metricset_file += """
 
-===== Fields
+==== Fields
 
 A description of each field in the MetricSet can be found in the
-<<exported-fields-""" + module + """-""" + metricset + """,exported fields>> section
+<<exported-fields-""" + module + """,exported fields>> section
 
 """
 
@@ -114,6 +123,9 @@ A description of each field in the MetricSet can be found in the
             # Write metricset docs
             with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:
                 f.write(metricset_file)
+
+        module_file += module_links
+        module_file += module_includes
 
         # Write module docs
         with open(os.path.abspath("docs") + "/modules/" + module + ".asciidoc", 'w') as f:

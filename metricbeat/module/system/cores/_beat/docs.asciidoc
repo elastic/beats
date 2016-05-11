@@ -1,3 +1,3 @@
-==== System Cores
+=== System Cores MetricSet
 
 The System Cores MetricSet provides load statistics for each CPU core.
