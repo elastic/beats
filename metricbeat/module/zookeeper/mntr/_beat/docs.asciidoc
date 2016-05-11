@@ -1,0 +1,3 @@
+==== Zookeeper mntr
+
+The Zookeeper mntr MetricSet collects Zookeeper monitoring statistics.
