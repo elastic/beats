@@ -63,3 +63,5 @@ import:
   version: 3a873e99f5400ad7706e464e905ffcc94b3ff247
 - package: github.com/pkg/errors
   version: cd6e0b425dfeaa184e93ed993aaee9dea03dc14d
+- package: github.com/shirou/gopsutil
+  version: v2.0.0
