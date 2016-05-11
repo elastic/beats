@@ -1,32 +1,3 @@
-/*
-Package beater provides the implementation of the libbeat Beater interface for
-Metricbeat. The main event loop is implemented in this package. The public
-interfaces used in implementing Modules and MetricSets are defined in the
-github.com/elastic/beats/metricbeat/mb package.
-
-Metricbeat collects metric sets from different modules.
-
-Each event created has the following format:
-
-	curl -XPUT http://localhost:9200/metricbeat/metricsets -d
-	{
-		"metriset": metricsetName,
-		"module": moduleName,
-		"moduleName-metricSetName": {
-			"metric1": "value",
-			"metric2": "value",
-			"metric3": "value",
-			"nestedmetric": {
-				"metric4": "value"
-			}
-		},
-		"@timestamp": timestamp
-	}
-
-All documents are stored in one index called metricbeat. It is important to use
-an independent namespace for each MetricSet to prevent type conflicts. Also all
-values are stored under the same type "metricsets".
-*/
 package beater
 
 import (

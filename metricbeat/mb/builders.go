@@ -127,7 +127,7 @@ func newBaseModulesFromConfig(config []*common.Config) ([]BaseModule, error) {
 // BaseModule's name will always be lower case.
 func newBaseModuleFromConfig(rawConfig *common.Config) (BaseModule, error) {
 	baseModule := BaseModule{
-		config:    defaultModuleConfig,
+		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
