@@ -9,7 +9,7 @@ To create your own beat based on this template, run inside your GOPATH where you
 cookiecutter https://github.com/elastic/beat-generator.git
 ```
 
-This requires python and cookiecutter to be installed (`pip install cookiecutter`).
+This requires [python](https://www.python.org/downloads/) and [cookiecutter](https://github.com/audreyr/cookiecutter) to be installed. More details on how to install cookiecutter can be found [here](http://cookiecutter.readthedocs.io/en/latest/installation.html).
 
 
 # Goals
