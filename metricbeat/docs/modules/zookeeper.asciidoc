@@ -3,7 +3,6 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-zookeeper]]
-[[metricbeat-zookeeper-module]]
 == Zookeeper Module
 
 
@@ -16,6 +15,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
   # Zookeeper module
   - module: zookeeper
     metricsets: ["mntr"]
@@ -26,4 +26,9 @@ here (add link). Below is an example of a configuration option:
 
 === MetricSets
 
+The following MetricSets are available:
+
 * <<metricbeat-metricset-zookeeper-mntr,mntr>>
+
+include::zookeeper/mntr.asciidoc[]
+

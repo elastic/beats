@@ -24,6 +24,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
   # Redis Module
   - module: redis
     metricsets: ["info"]
@@ -62,4 +63,9 @@ here (add link). Below is an example of a configuration option:
 
 === MetricSets
 
+The following MetricSets are available:
+
 * <<metricbeat-metricset-redis-info,info>>
+
+include::redis/info.asciidoc[]
+

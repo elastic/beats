@@ -3,7 +3,6 @@ This file is generated! See scripts/docs_collector.py
 ////
 
 [[metricbeat-module-system]]
-[[metricbeat-system-module]]
 == System Module
 
 
@@ -15,6 +14,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
   # System module
   - module: system
     metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
@@ -24,9 +24,29 @@ here (add link). Below is an example of a configuration option:
 
 === MetricSets
 
+The following MetricSets are available:
+
 * <<metricbeat-metricset-system-cores,cores>>
+
 * <<metricbeat-metricset-system-cpu,cpu>>
+
 * <<metricbeat-metricset-system-filesystem,filesystem>>
+
 * <<metricbeat-metricset-system-fsstats,fsstats>>
+
 * <<metricbeat-metricset-system-memory,memory>>
+
 * <<metricbeat-metricset-system-process,process>>
+
+include::system/cores.asciidoc[]
+
+include::system/cpu.asciidoc[]
+
+include::system/filesystem.asciidoc[]
+
+include::system/fsstats.asciidoc[]
+
+include::system/memory.asciidoc[]
+
+include::system/process.asciidoc[]
+
