@@ -117,3 +117,8 @@ var defaultModuleConfig = ModuleConfig{
 	Period:  time.Second,
 	Timeout: time.Second,
 }
+
+// DefaultModuleConfig returns a ModuleConfig with the default values populated.
+func DefaultModuleConfig() ModuleConfig {
+	return defaultModuleConfig
+}

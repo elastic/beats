@@ -110,6 +110,18 @@ func newModuleWrappers(
 //
 // startFetching manages fetching for a single host so it should be called once
 // per host.
+
+// String returns a string representation of moduleWrapper.
+func (mw *moduleWrapper) String() string {
+	return fmt.Sprintf("moduleWrapper[name=%s, len(metricSetWrappers)=%d]",
+		mw.Name(), len(mw.metricSets))
+}
+
+// metricSetWrapper methods
+
+// startFetching performs an immediate fetch for the MetricSet then it
+// begins a continuous timer scheduled loop to fetch data. To stop the loop the
+// done channel should be closed.
 func (msw *metricSetWrapper) startFetching(
 	done <-chan struct{},
 	wg *sync.WaitGroup,
@@ -121,7 +133,7 @@ func (msw *metricSetWrapper) startFetching(
 	// Fetch immediately.
 	err := msw.fetch()
 	if err != nil {
-		logp.Err("fetch error: %v", err)
+		logp.Err("%v", err)
 	}
 
 	// Start timer for future fetches.
@@ -149,19 +161,34 @@ func (msw *metricSetWrapper) fetch() error {
 
 	switch fetcher := msw.MetricSet.(type) {
 	case mb.EventFetcher:
-		return msw.singleEventFetch(fetcher)
+		event, err := msw.singleEventFetch(fetcher)
+		if err != nil {
+			return err
+		}
+		msw.stats.Add(eventsKey, 1)
+		msw.module.pubClient.PublishEvent(event)
 	case mb.EventsFetcher:
-		return msw.multiEventFetch(fetcher)
+		events, err := msw.multiEventFetch(fetcher)
+		if err != nil {
+			return err
+		}
+		for _, event := range events {
+			msw.stats.Add(eventsKey, 1)
+			msw.module.pubClient.PublishEvent(event)
+		}
 	default:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement a Fetcher "+
 			"interface", msw.Module().Name(), msw.Name())
 	}
+
+	return nil
 }
 
-func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) error {
+func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) (common.MapStr, error) {
 	start := time.Now()
 	event, err := fetcher.Fetch()
 	elapsed := time.Since(start)
+
 	if err == nil {
 		msw.stats.Add(successesKey, 1)
 	} else {
@@ -170,52 +197,42 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) error {
 
 	event, err = createEvent(msw, event, err, start, elapsed)
 	if err != nil {
-		logp.Warn("createEvent error: %v", err)
+		return nil, errors.Wrap(err, "createEvent failed")
 	}
 
-	if event != nil {
-		msw.module.pubClient.PublishEvent(event)
-		msw.stats.Add(eventsKey, 1)
-	}
-
-	return nil
+	return event, nil
 }
 
-func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) error {
+func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common.MapStr, error) {
 	start := time.Now()
 	events, err := fetcher.Fetch()
 	elapsed := time.Since(start)
+
+	var rtnEvents []common.MapStr
 	if err == nil {
 		msw.stats.Add(successesKey, 1)
 
 		for _, event := range events {
 			event, err = createEvent(msw, event, nil, start, elapsed)
 			if err != nil {
-				logp.Warn("createEvent error: %v", err)
+				return nil, errors.Wrap(err, "createEvent failed")
 			}
-
-			if event != nil {
-				msw.module.pubClient.PublishEvent(event)
-				msw.stats.Add(eventsKey, 1)
-			}
+			rtnEvents = append(rtnEvents, event)
 		}
 	} else {
 		msw.stats.Add(failuresKey, 1)
 
 		event, err := createEvent(msw, nil, err, start, elapsed)
 		if err != nil {
-			logp.Warn("createEvent error: %v", err)
+			return nil, errors.Wrap(err, "createEvent failed")
 		}
-
-		if event != nil {
-			msw.module.pubClient.PublishEvent(event)
-			msw.stats.Add(eventsKey, 1)
-		}
+		rtnEvents = append(rtnEvents, event)
 	}
 
-	return nil
+	return rtnEvents, nil
 }
 
+// String returns a string representation of metricSetWrapper.
 func (msw *metricSetWrapper) String() string {
 	return fmt.Sprintf("metricSetWrapper[module=%s, name=%s, host=%s]",
 		msw.module.Name(), msw.Name(), msw.Host())

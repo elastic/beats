@@ -21,31 +21,77 @@ func (m *testMetricSet) Fetch(host string) (common.MapStr, error) {
 
 func TestModuleConfig(t *testing.T) {
 	tests := []struct {
-		in  map[string]interface{}
+		in  interface{}
 		out ModuleConfig
 		err string
 	}{
 		{
 			in:  map[string]interface{}{},
-			out: defaultModuleConfig,
+			err: "missing required field accessing config",
+		},
+		{
+			in: map[string]interface{}{
+				"module": "example",
+			},
+			err: "missing required field accessing config",
+		},
+		{
+			in: map[string]interface{}{
+				"module":     "example",
+				"metricsets": []string{},
+			},
+			err: "empty field accessing 'metricsets'",
+		},
+		{
+			in: map[string]interface{}{
+				"module":     "example",
+				"metricsets": []string{"test"},
+			},
+			out: ModuleConfig{
+				Module:     "example",
+				MetricSets: []string{"test"},
+				Enabled:    true,
+				Period:     time.Second,
+				Timeout:    time.Second,
+			},
+		},
+		{
+			in: map[string]interface{}{
+				"module":     "example",
+				"metricsets": []string{"test"},
+				"period":     -1,
+			},
+			err: "negative value accessing 'period'",
+		},
+		{
+			in: map[string]interface{}{
+				"module":     "example",
+				"metricsets": []string{"test"},
+				"timeout":    -1,
+			},
+			err: "negative value accessing 'timeout'",
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		c, err := common.NewConfigFrom(test.in)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mc := defaultModuleConfig
-		err = c.Unpack(&mc)
-		if test.err != "" {
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), test.err)
+		unpackedConfig := DefaultModuleConfig()
+		err = c.Unpack(&unpackedConfig)
+		if err != nil && test.err == "" {
+			t.Errorf("unexpected error while unpacking in testcase %d: %v", i, err)
+			continue
+		}
+		if test.err != "" &&
+			assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
+			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
 			continue
 		}
 
-		assert.Equal(t, test.out, mc)
+		assert.Equal(t, test.out, unpackedConfig)
 	}
 }
 
@@ -61,7 +107,7 @@ func TestModuleConfigDefaults(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mc := defaultModuleConfig
+	mc := DefaultModuleConfig()
 	err = c.Unpack(&mc)
 	if err != nil {
 		t.Fatal(err)
@@ -111,6 +157,25 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// TestNewBaseModuleFromModuleConfigStruct tests using a ModuleConfig struct
+func TestNewBaseModuleFromModuleConfigStruct(t *testing.T) {
+	moduleConf := DefaultModuleConfig()
+	moduleConf.Module = moduleName
+	moduleConf.MetricSets = []string{metricSetName}
+
+	c := newConfig(t, moduleConf)
+
+	baseModule, err := newBaseModuleFromConfig(c[0])
+	assert.NoError(t, err)
+
+	assert.Equal(t, moduleName, baseModule.Name())
+	assert.Equal(t, moduleName, baseModule.Config().Module)
+	assert.Equal(t, true, baseModule.Config().Enabled)
+	//assert.Equal(t, time.Second, baseModule.Config().Period)  // TODO (urso/ucfg#25)
+	//assert.Equal(t, time.Second, baseModule.Config().Timeout) // TODO (urso/ucfg#25)
+	assert.Empty(t, baseModule.Config().Hosts)
+}
+
 func newTestRegistry(t testing.TB) *Register {
 	r := NewRegister()
 
@@ -129,7 +194,7 @@ func newTestRegistry(t testing.TB) *Register {
 	return r
 }
 
-func newConfig(t testing.TB, moduleConfig map[string]interface{}) []*common.Config {
+func newConfig(t testing.TB, moduleConfig interface{}) []*common.Config {
 	config, err := common.NewConfigFrom(moduleConfig)
 	if err != nil {
 		t.Fatal(err)
