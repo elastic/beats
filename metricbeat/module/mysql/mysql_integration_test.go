@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConnect(t *testing.T) {
-	db, err := Connect(GetMySQLEnvDSN())
+func TestNewDB(t *testing.T) {
+	db, err := NewDB(GetMySQLEnvDSN())
 	assert.NoError(t, err)
 
 	err = db.Ping()
