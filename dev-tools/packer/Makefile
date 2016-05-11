@@ -18,6 +18,7 @@ packetbeat topbeat filebeat metricbeat winlogbeat: build/upload
 		-e PACK=$@ \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
+		-e TARGETS="windows/amd64 windows/386 darwin/amd64" \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder \
 		github.com/elastic/beats
@@ -29,6 +30,7 @@ packetbeat topbeat filebeat metricbeat winlogbeat: build/upload
 		-e PACK=$@ \
 		-e BEFORE_BUILD=before_build.sh \
 		-e SOURCE=/source \
+		-e TARGETS="linux/amd64 linux/386" \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder-deb6 \
 		github.com/elastic/beats

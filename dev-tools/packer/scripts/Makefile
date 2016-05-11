@@ -70,11 +70,19 @@ package-upload:
 release-upload:
 	aws s3 cp --recursive --acl public-read build/upload s3://download.elasticsearch.org/beats/
 
-.PHONY: run-interactive
-run-interactive:
+.PHONY: run-interactive-builder-deb6
+run-interactive-builder-deb6:
 	docker run -t -i -v $(shell pwd)/build:/build \
 		-v $(shell pwd)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
 		--entrypoint=bash tudorg/beats-builder-deb6
+
+.PHONY: run-interactive-builder
+run-interactive-builder:
+	docker run -t -i -v $(shell pwd)/build:/build \
+		-v $(packer_absdir)/xgo-scripts/:/scripts \
+		-v $(shell pwd)/../..:/source \
+		--entrypoint=bash tudorg/beats-builder
 
 .PHONY: images
 images: xgo-image fpm-image go-daemon-image
