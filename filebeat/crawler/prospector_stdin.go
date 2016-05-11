@@ -37,7 +37,7 @@ func (p *ProspectorStdin) Run() {
 
 	// Make sure stdin harvester is only started once
 	if !p.started {
-		p.harvester.Start()
+		go p.harvester.Harvest()
 		p.started = true
 	}
 }

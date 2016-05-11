@@ -41,16 +41,25 @@ func (h *Harvester) Harvest() {
 
 	reader, err := createLineReader(
 		h.file, enc, cfg.BufferSize, cfg.MaxBytes, readerConfig,
-		cfg.JSON, cfg.Multiline)
+		cfg.JSON, cfg.Multiline, h.done)
 	if err != nil {
 		logp.Err("Stop Harvesting. Unexpected encoding line reader error: %s", err)
 		return
 	}
 
 	// Always report the state before starting a harvester
-	h.SendStateUpdate()
+	if !h.SendStateUpdate() {
+		return
+	}
 
 	for {
+
+		select {
+		case <-h.done:
+			return
+		default:
+		}
+
 		// Partial lines return error and are only read on completion
 		ts, text, bytesRead, jsonFields, err := readLine(reader)
 		if err != nil {
@@ -86,7 +95,9 @@ func (h *Harvester) Harvest() {
 		}
 
 		// Always send event to update state, also if lines was skipped
-		h.sendEvent(event)
+		if !h.sendEvent(event) {
+			return
+		}
 	}
 }
 
@@ -112,9 +123,14 @@ func (h *Harvester) createEvent() *input.FileEvent {
 }
 
 // sendEvent sends event to the spooler channel
-func (h *Harvester) sendEvent(event *input.FileEvent) {
-	// FIXME: This will send on closed channel if not properly exited
-	h.SpoolerChan <- event // ship the new event downstream
+// Return false if event was not sent
+func (h *Harvester) sendEvent(event *input.FileEvent) bool {
+	select {
+	case <-h.done:
+		return false
+	case h.SpoolerChan <- event: // ship the new event downstream
+		return true
+	}
 }
 
 // shouldExportLine decides if the line is exported or not based on
@@ -222,9 +238,9 @@ func (h *Harvester) updateOffset(increment int64) {
 }
 
 // SendStateUpdate send an empty event with the current state to update the registry
-func (h *Harvester) SendStateUpdate() {
+func (h *Harvester) SendStateUpdate() bool {
 	logp.Debug("harvester", "Update state: %s, offset: %v", h.Path, h.offset)
-	h.sendEvent(h.createEvent())
+	return h.sendEvent(h.createEvent())
 }
 
 func (h *Harvester) GetState() input.FileState {

@@ -20,6 +20,7 @@ type Prospector struct {
 	done             chan struct{}
 	harvesterStates  []input.FileState
 	stateMutex       sync.Mutex
+	wg               sync.WaitGroup
 }
 
 type Prospectorer interface {
@@ -35,6 +36,7 @@ func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, 
 		harvesterChan:    make(chan *input.FileEvent),
 		done:             make(chan struct{}),
 		harvesterStates:  []input.FileState{},
+		wg:               sync.WaitGroup{},
 	}
 
 	err := prospector.Init()
@@ -79,28 +81,29 @@ func (p *Prospector) Init() error {
 }
 
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
-func (p *Prospector) Run(wg *sync.WaitGroup) {
-
-	// TODO: Defer the wg.Done() call to block shutdown
-	// Currently there are 2 cases where shutting down the prospector could be blocked:
-	// 1. reading from file
-	// 2. forwarding event to spooler
-	// As this is not implemented yet, no blocking on prospector shutdown is done.
-	wg.Done()
+func (p *Prospector) Run() {
 
 	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
+	p.wg.Add(2)
+	defer p.wg.Done()
 
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
 	go func() {
+		defer p.wg.Done()
 		for {
 			select {
 			case <-p.done:
-				logp.Info("Prospector stopped")
+				logp.Info("Prospector channel stopped")
 				return
 			case event := <-p.harvesterChan:
-				p.spoolerChan <- event
-				p.updateState(event.FileState)
+				select {
+				case <-p.done:
+					logp.Info("Prospector channel stopped")
+					return
+				case p.spoolerChan <- event:
+					p.updateState(event.FileState)
+				}
 			}
 		}
 	}()
@@ -111,7 +114,7 @@ func (p *Prospector) Run(wg *sync.WaitGroup) {
 	for {
 		select {
 		case <-p.done:
-			logp.Info("Prospector stopped")
+			logp.Info("Prospector ticker stopped")
 			return
 		case <-time.After(p.ProspectorConfig.ScanFrequencyDuration):
 			logp.Info("Run prospector")
@@ -170,9 +173,11 @@ func (p *Prospector) cleanupStates() {
 	}
 }
 
-func (p *Prospector) Stop() {
+func (p *Prospector) Stop(wg *sync.WaitGroup) {
 	logp.Info("Stopping Prospector")
 	close(p.done)
+	p.wg.Wait()
+	wg.Done()
 }
 
 // createHarvester creates a new harvester instance from the given state
@@ -184,6 +189,7 @@ func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harveste
 		state,
 		p.harvesterChan,
 		state.Offset,
+		p.done,
 	)
 
 	return h, err
@@ -197,7 +203,12 @@ func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harve
 		return nil, err
 	}
 
-	h.Start()
+	p.wg.Add(1)
+	go func() {
+		defer p.wg.Done()
+		// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
+		h.Harvest()
+	}()
 
 	return h, nil
 }
