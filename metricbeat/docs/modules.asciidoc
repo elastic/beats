@@ -11,3 +11,7 @@ contained in {beatname_uc}.
 include::modules/apache.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/redis.asciidoc[]
+include::modules/system.asciidoc[]
+include::modules/zookeeper.asciidoc[]
+
+

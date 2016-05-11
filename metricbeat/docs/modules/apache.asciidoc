@@ -17,6 +17,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
   # Apache Module
   - module: apache
     metricsets: ["status"]
@@ -38,4 +39,9 @@ here (add link). Below is an example of a configuration option:
 
 === MetricSets
 
+The following MetricSets are available:
+
 * <<metricbeat-metricset-apache-status,status>>
+
+include::apache/status.asciidoc[]
+

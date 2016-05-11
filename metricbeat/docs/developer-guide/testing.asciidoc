@@ -19,14 +19,15 @@ can be found in the `_test.go` files under modules and metricsets. The system
 tests are under `tests/systems`. To get started with your own tests, it is best
 having a look at the existing tests.
 
-=== Run tests
+
+== Run tests
 
 To run all the tests, run `make testsuite`. To only run unit tests, run `make
 unit-tests` or for integration tests `make integration-tests`. Be aware that for
 integration and system tests a running docker environment is needed.
 
 
-=== Add environment
+== Add environment
 
 Integration and system tests need an environment running with the service to
 test. This is done with docker and a docker-compose file. In case you add a

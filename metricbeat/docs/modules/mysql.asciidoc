@@ -26,6 +26,7 @@ here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
+metricbeat.modules:
   # MySQL Module
   - module: mysql
     metricsets: ["status"]
@@ -45,4 +46,9 @@ here (add link). Below is an example of a configuration option:
 
 === MetricSets
 
+The following MetricSets are available:
+
 * <<metricbeat-metricset-mysql-status,status>>
+
+include::mysql/status.asciidoc[]
+

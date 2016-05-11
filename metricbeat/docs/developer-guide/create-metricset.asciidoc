@@ -1,4 +1,4 @@
-=== Create a Metricset for a Metricbeat Module
+== Create a Metricset for a Metricbeat Module
 
 A Metricset is the part of a metricbeat module that fetches and structures the
 data from the remote service. Each module can have multiple metricsets.
@@ -6,7 +6,7 @@ data from the remote service. Each module can have multiple metricsets.
 This guide should help you to create your own metricset. This assumes you have
 an existing metricbeat Module where you want to add one more metricset.
 
-==== Create the basic metricset
+== Create the basic metricset
 
 To get started with a new metricset, you must first decide for a name of your
 metricset. This name can only contain lower case letters oder underline. In the
@@ -178,7 +178,7 @@ metricset sending data.
 In general it helps before creating your own metricset, to have a look at the
 implementation of the existing metricsets as inspiration.
 
-==== Add special configuration options
+== Add special configuration options
 
 Each metricset can have it's own configuration variables defined. To make use of
 these variables, the Setup method must be extended. Assuming `password` should
@@ -225,7 +225,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 ----
 
-==== Connections to Services
+== Connections to Services
 
 As each time the Fetch method is called, it makes a request to the service, it
 is important to handle the connections correctly. It is recommended to setup the
@@ -244,7 +244,7 @@ return a good error message. This error message is also sent to Elasticesarch in
 index. This makes it possible to not only fetch metrics from the service, but
 also report potential problems / errors with the metricset.
 
-==== Data Transformation
+== Data Transformation
 
 In case the data transformation that has to happen in the `Fetch` method is
 large, we recommend to create a second file called `data.go` in the same package
@@ -252,13 +252,13 @@ which contains a function `eventMapping(...)`. This is not required but
 currently best practice. This keeps the functionality of the metricset separate
 from the data mapping part.
 
-==== Dashboards
+== Dashboards
 
 Dashboards are an important part of each metricset. Data gets much more useful
 when visualized. To create dashboards for the metricset, follow the guide here
 (link to dashboard guide).
 
-==== fields.yml
+== fields.yml
 
 Must be created
 
@@ -267,8 +267,9 @@ Must be created
 * How should this file be used -> generic guide?
 * Define all types in details
 * Link to common fields.yml guide
+* Note to add it in fields_base.yml
 
-==== Testing
+== Testing
 
 It is important to also add tests to your metricset. To find out more about how
 to add tests for your metricset, follow the <<developerguide-testing,general

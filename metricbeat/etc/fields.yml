@@ -11,6 +11,7 @@ sections:
   - ["redis", "Redis Info"]
   - ["mysql", "MySQL Status"]
   - ["system", "System Status"]
+  - ["zookeeper", "Zookeeper Status"]
 
 common:
   type: group

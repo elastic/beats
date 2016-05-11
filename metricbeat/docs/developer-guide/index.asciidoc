@@ -1,3 +1,8 @@
+
+include::./create-metricset.asciidoc[]
+
+include::./testing.asciidoc[]
+
 [[metricbeat-developer-guide]]
 = Metricbeat Developer Guide
 
@@ -27,7 +32,7 @@ multiple metrics which are normally retrieved with one request from the remote
 system (e.g. redis-info, mysql-status).
 
 
-==== Module & Metricsets Requirements
+== Module & Metricsets Requirements
 
 It is important for us that only high quality modules are part metricbeat to
 guarantee the best user experience. Modules and Metricsets which are contributed
@@ -46,10 +51,6 @@ have as few movable parts as possible and that metricbeat runs as close as
 possible to the service which should be monitored.
 
 
-== Metricseter Details
-
-include::./create-metricset.asciidoc[]
-
 
 
 == Documentation
@@ -62,3 +63,6 @@ on what should be documented, check the existing documented modules.
 == Dashboards
 
 TODO: Add details on how to create dashboards
+
+
+
