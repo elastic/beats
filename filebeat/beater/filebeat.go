@@ -95,9 +95,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.pub.Start()
 
 	// Blocks progressing
-	select {
-	case <-fb.done:
-	}
+	<-fb.done
 
 	return nil
 }

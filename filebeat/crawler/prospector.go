@@ -84,7 +84,8 @@ func (p *Prospector) Init() error {
 func (p *Prospector) Run() {
 
 	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
-	p.wg.Add(1)
+	p.wg.Add(2)
+	defer p.wg.Done()
 
 	// Open channel to receive events from harvester and forward them to spooler
 	// Here potential filtering can happen
@@ -172,10 +173,11 @@ func (p *Prospector) cleanupStates() {
 	}
 }
 
-func (p *Prospector) Stop() {
+func (p *Prospector) Stop(wg *sync.WaitGroup) {
 	logp.Info("Stopping Prospector")
 	close(p.done)
 	p.wg.Wait()
+	wg.Done()
 }
 
 // createHarvester creates a new harvester instance from the given state

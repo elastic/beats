@@ -76,7 +76,8 @@ func (c *Crawler) Stop() {
 	logp.Info("Stopping %v prospectors", len(c.prospectors))
 	for _, prospector := range c.prospectors {
 		// Stop prospectors in parallel
-		go prospector.Stop()
+		c.wg.Add(1)
+		go prospector.Stop(&c.wg)
 	}
 	c.wg.Wait()
 	logp.Info("Crawler stopped")
