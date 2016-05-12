@@ -29,6 +29,11 @@ common:
       description: >
         The document type. Always set to "metricsets".
 
+    - name: id
+      type: keyword
+      description: >
+        Unique identifier for each event or a combination of multiple events.
+
 sections:
   common: "Common"
   apache: "Apache Status"

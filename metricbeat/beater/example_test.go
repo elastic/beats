@@ -44,8 +44,9 @@ func ExampleModuleWrapper() {
 	go func() {
 		defer wg.Done()
 		for event := range output {
-			// Make rtt a constant so that the output is constant.
+			// Make rtt and id a constant so that the output is constant.
 			event["rtt"] = 111
+			event["id"] = "12345"
 			fmt.Println(event.StringToPrint())
 		}
 	}()
@@ -70,6 +71,7 @@ func ExampleModuleWrapper() {
 	//   "fake-status": {
 	//     "metric": 1
 	//   },
+	//   "id": "12345",
 	//   "metricset": "status",
 	//   "module": "fake",
 	//   "rtt": 111,
