@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/joeshaw/multierror"
@@ -29,39 +28,51 @@ var (
 	fetches     = expvar.NewMap("fetches")
 )
 
-// moduleWrapper contains the Module and the private data associated with
-// running the Module and its MetricSets. The moduleWrapper contains a list
-// of pointer to its associated MetricSets.
-type moduleWrapper struct {
+// ModuleWrapper contains the Module and the private data associated with
+// running the Module and its MetricSets.
+//
+// Use NewModuleWrapper or NewModuleWrappers to construct new ModuleWrappers.
+type ModuleWrapper struct {
 	mb.Module
 	filters    *filter.FilterList
-	pubClient  publisher.Client
-	metricSets []*metricSetWrapper
+	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
 }
 
 // metricSetWrapper contains the MetricSet and the private data associated with
 // running the MetricSet. It contains a pointer to the parent Module.
 type metricSetWrapper struct {
 	mb.MetricSet
-	module *moduleWrapper // Parent Module.
+	module *ModuleWrapper // Parent Module.
 	stats  *expvar.Map    // expvar stats for this MetricSet.
 }
 
-// newModuleWrappers creates new Modules and their associated MetricSets based
-// on the given configuration. It constructs the supporting filters and
-// publisher client and stores it all in a moduleWrapper.
-func newModuleWrappers(
-	modulesConfig []*common.Config,
-	r *mb.Register,
-	publisher *publisher.Publisher,
-) ([]*moduleWrapper, error) {
+// NewModuleWrapper create a new Module and its associated MetricSets based
+// on the given configuration. It constructs the supporting filters and stores
+// them in the ModuleWrapper.
+func NewModuleWrapper(moduleConfig *common.Config, r *mb.Register) (*ModuleWrapper, error) {
+	mws, err := NewModuleWrappers([]*common.Config{moduleConfig}, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(mws) == 0 {
+		return nil, fmt.Errorf("module not created")
+	}
+
+	return mws[0], nil
+}
+
+// NewModuleWrappers creates new Modules and their associated MetricSets based
+// on the given configuration. It constructs the supporting filters and stores
+// them all in a ModuleWrapper.
+func NewModuleWrappers(modulesConfig []*common.Config, r *mb.Register) ([]*ModuleWrapper, error) {
 	modules, err := mb.NewModules(modulesConfig, r)
 	if err != nil {
 		return nil, err
 	}
 
 	// Wrap the Modules and MetricSet's.
-	var wrappers []*moduleWrapper
+	var wrappers []*ModuleWrapper
 	var errs multierror.Errors
 	for k, v := range modules {
 		debugf("Initializing Module type '%s': %T=%+v", k.Name(), k, k)
@@ -71,10 +82,9 @@ func newModuleWrappers(
 			continue
 		}
 
-		mw := &moduleWrapper{
-			Module:    k,
-			filters:   f,
-			pubClient: publisher.Connect(),
+		mw := &ModuleWrapper{
+			Module:  k,
+			filters: f,
 		}
 		wrappers = append(wrappers, mw)
 
@@ -101,19 +111,45 @@ func newModuleWrappers(
 	return wrappers, errs.Err()
 }
 
-// metricSetWrapper methods
+// ModuleWrapper methods
 
-// startFetching performs an immediate fetch for the specified host then it
-// begins continuous timer scheduled loop to fetch data. To stop the loop the
-// done channel should be closed. On exit the method will decrement the
-// WaitGroup counter.
+// Start starts the Module's MetricSet workers which are responsible for
+// fetching metrics. The workers will continue to periodically fetch until the
+// done channel is closed. When the done channel is closed all MetricSet workers
+// will stop and the returned output channel will be closed.
 //
-// startFetching manages fetching for a single host so it should be called once
-// per host.
+// The returned channel is buffered with a length one one. It must drained to
+// prevent blocking the operation of the MetricSets.
+//
+// Start should be called only once in the life of a ModuleWrapper.
+func (mw *ModuleWrapper) Start(done <-chan struct{}) <-chan common.MapStr {
+	debugf("Starting %s", mw)
+	defer debugf("Stopped %s", mw)
 
-// String returns a string representation of moduleWrapper.
-func (mw *moduleWrapper) String() string {
-	return fmt.Sprintf("moduleWrapper[name=%s, len(metricSetWrappers)=%d]",
+	out := make(chan common.MapStr, 1)
+
+	// Start one worker per MetricSet + host combination.
+	var wg sync.WaitGroup
+	wg.Add(len(mw.metricSets))
+	for _, msw := range mw.metricSets {
+		go func(msw *metricSetWrapper) {
+			defer wg.Done()
+			msw.startFetching(done, out)
+		}(msw)
+	}
+
+	// Close the output channel when all writers to the channel have stopped.
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	return out
+}
+
+// String returns a string representation of ModuleWrapper.
+func (mw *ModuleWrapper) String() string {
+	return fmt.Sprintf("ModuleWrapper[name=%s, len(metricSetWrappers)=%d]",
 		mw.Name(), len(mw.metricSets))
 }
 
@@ -124,14 +160,13 @@ func (mw *moduleWrapper) String() string {
 // done channel should be closed.
 func (msw *metricSetWrapper) startFetching(
 	done <-chan struct{},
-	wg *sync.WaitGroup,
+	out chan<- common.MapStr,
 ) {
-	defer wg.Done()
 	debugf("Starting %s", msw)
 	defer debugf("Stopped %s", msw)
 
 	// Fetch immediately.
-	err := msw.fetch()
+	err := msw.fetch(done, out)
 	if err != nil {
 		logp.Err("%v", err)
 	}
@@ -144,7 +179,7 @@ func (msw *metricSetWrapper) startFetching(
 		case <-done:
 			return
 		case <-t.C:
-			err := msw.fetch()
+			err := msw.fetch(done, out)
 			if err != nil {
 				logp.Err("%v", err)
 			}
@@ -155,7 +190,7 @@ func (msw *metricSetWrapper) startFetching(
 // fetch invokes the appropriate Fetch method for the MetricSet and publishes
 // the result using the publisher client. This method will recover from panics
 // and log a stack track if one occurs.
-func (msw *metricSetWrapper) fetch() error {
+func (msw *metricSetWrapper) fetch(done <-chan struct{}, out chan<- common.MapStr) error {
 	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
@@ -166,7 +201,7 @@ func (msw *metricSetWrapper) fetch() error {
 			return err
 		}
 		msw.stats.Add(eventsKey, 1)
-		msw.module.pubClient.PublishEvent(event)
+		writeEvent(done, out, event)
 	case mb.EventsFetcher:
 		events, err := msw.multiEventFetch(fetcher)
 		if err != nil {
@@ -174,7 +209,9 @@ func (msw *metricSetWrapper) fetch() error {
 		}
 		for _, event := range events {
 			msw.stats.Add(eventsKey, 1)
-			msw.module.pubClient.PublishEvent(event)
+			if !writeEvent(done, out, event) {
+				break
+			}
 		}
 	default:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement a Fetcher "+
@@ -239,6 +276,15 @@ func (msw *metricSetWrapper) String() string {
 }
 
 // other utility functions
+
+func writeEvent(done <-chan struct{}, out chan<- common.MapStr, event common.MapStr) bool {
+	select {
+	case <-done:
+		return false
+	case out <- event:
+		return true
+	}
+}
 
 func getMetricSetExpvarMap(module, name string) (*expvar.Map, error) {
 	key := fmt.Sprintf("%s-%s", module, name)
