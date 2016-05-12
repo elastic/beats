@@ -31,9 +31,10 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Unpack additional configuration options.
 	config := struct {
-		Network  string `config:"network"`
-		MaxConn  int    `config:"maxconn" validate:"min=1"`
-		Password string `config:"password"`
+		IdleTimeout time.Duration `config:"idle_timeout"`
+		Network     string        `config:"network"`
+		MaxConn     int           `config:"maxconn" validate:"min=1"`
+		Password    string        `config:"password"`
 	}{
 		Network:  "tcp",
 		MaxConn:  10,
@@ -47,16 +48,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		pool: createPool(base.Host(), config.Password, config.Network,
-			config.MaxConn, base.Module().Config().Timeout),
+			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
 	}, nil
 }
 
-func createPool(host, password, network string, maxConn int, timeout time.Duration) *rd.Pool {
+func createPool(
+	host, password, network string,
+	maxConn int,
+	idleTimeout, connTimeout time.Duration,
+) *rd.Pool {
 	return &rd.Pool{
 		MaxIdle:     maxConn,
-		IdleTimeout: timeout,
+		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
-			c, err := rd.Dial(network, host)
+			c, err := rd.Dial(network, host,
+				rd.DialConnectTimeout(connTimeout),
+				rd.DialReadTimeout(connTimeout),
+				rd.DialWriteTimeout(connTimeout))
 			if err != nil {
 				return nil, err
 			}
