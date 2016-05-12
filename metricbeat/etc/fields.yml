@@ -5,38 +5,11 @@ defaults:
   doc_values: true
   ignore_above: 1024
 
-sections:
-  - ["common", "Common"]
-  - ["apache", "Apache Status"]
-  - ["redis", "Redis Info"]
-  - ["mysql", "MySQL Status"]
-  - ["system", "System Status"]
-  - ["zookeeper", "Zookeeper Status"]
-
 common:
   type: group
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: beat.name
-      description: >
-        The name of the Beat sending the log messages. If the shipper name is set
-        in the configuration file, then that value is used. If it is not set,
-        the hostname is used.
-
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
-
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp when the log line was read. The precision is in
-        milliseconds. The timezone is UTC.
 
     - name: module
       description: >
@@ -63,16 +36,13 @@ common:
       description: >
         The document type. Always set to "metricsets".
 
-    - name: tags
-      description: >
-        Arbitrary tags that can be set per Beat and per transaction
-        type.
-
-    - name: fields
-      type: dict
-      dict-type: keyword
-      description: >
-        Contains user configurable fields.
+sections:
+  common: "Common"
+  apache: "Apache Status"
+  redis: "Redis Info"
+  mysql: "MySQL Status"
+  system: "System Status"
+  zookeeper: "Zookeeper Status"
 apache:
   type: group
   description: >

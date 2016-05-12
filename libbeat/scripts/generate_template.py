@@ -266,6 +266,8 @@ if __name__ == "__main__":
                         help="Generate template for Elasticsearch 2.x.")
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("beatname", help="The beat fname")
+    parser.add_argument("es_beats", help="The path to the general beats folder")
+
     args = parser.parse_args()
 
     target = args.path + "/" + args.beatname + ".template"
@@ -273,6 +275,12 @@ if __name__ == "__main__":
         target += "-es2x"
     target += ".json"
 
-    with open(args.path + "/etc/fields.yml", 'r') as input:
+    with open(args.path + "/etc/fields.yml", 'r') as f:
+        fields = f.read()
+
+        # Appends beat fields from libbeat
+        with file(args.es_beats + "/libbeat/_beat/fields.yml") as f:
+            fields += f.read()
+
         with open(target, 'w') as output:
-            fields_to_es_template(args, input, output, args.beatname + "-*")
+            fields_to_es_template(args, fields, output, args.beatname + "-*")

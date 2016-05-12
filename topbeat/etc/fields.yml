@@ -1,49 +1,12 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-  ignore_above: 1024
-
-env:
+common:
   type: group
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp of when the measurements were taken. The precision is in milliseconds.
-        The timezone is UTC.
-
     - name: type
       description: >
         Set to "system" to indicate that the statistics are system-wide.
       required: true
-
-    - name: beat.name
-      description: >
-        Name of the Beat sending the events. If the shipper name is set
-        in the configuration file, then that value is used. If it is not set,
-        the hostname is used.
-
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
-
-    - name: tags
-      description: >
-        Arbitrary tags that can be set per Beat and per transaction
-        type.
-
-    - name: fields
-      type: dict
-      dict-type: keyword
-      description: >
-        Contains user configurable fields.
 
 system:
   type: group
@@ -417,7 +380,7 @@ filesystem:
             The percentage of used disk space.
 
 sections:
-  - ["env", "Common"]
-  - ["system", "System-Wide Statistics"]
-  - ["process", "Per-Process Statistics"]
-  - ["filesystem", "File System Statistics"]
+  common: "Common"
+  system: "System-Wide Statistics"
+  process: "Per-Process Statistics"
+  filesystem: "File System Statistics"

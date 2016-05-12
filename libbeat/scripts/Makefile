@@ -215,15 +215,16 @@ update: python-env
 	# Update config
 	echo "Update config file"
 	rm -f etc/${BEATNAME}.yml
-	cat etc/beat.yml ${ES_BEATS}/libbeat/etc/libbeat.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
 
 	# Update fields
 	echo "Update fields"
+
 	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME}
 
 	# Update templates
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME}
-	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200/

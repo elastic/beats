@@ -9,17 +9,14 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
-* <<exported-fields-env>>
+* <<exported-fields-beat>>
 * <<exported-fields-log>>
 
-[[exported-fields-env]]
-=== Common Fields
+[[exported-fields-beat]]
+=== Beat Fields
 
-Contains common fields available in all event types.
+Contains common beat fields available in all event types.
 
-
-
-=== beat Fields
 
 
 ==== beat.name
@@ -42,21 +39,19 @@ format: YYYY-MM-DDTHH:MM:SS.milliZ
 
 required: True
 
-The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
+The timestamp when the event log record was generated.
 
 
-==== type
+==== tags
 
-required: True
-
-The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+Arbitrary tags that can be set per Beat and per transaction type.
 
 
-==== input_type
+==== fields
 
-required: True
+type: dict
 
-The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
+Contains user configurable fields.
 
 
 [[exported-fields-log]]
@@ -93,10 +88,17 @@ required: True
 The content of the line read from the log file.
 
 
-==== fields
+==== type
 
-type: dict
+required: True
 
-Contains user configurable fields.
+The name of the log event. This field is set to the value specified for the `document_type` option in the prospector section of the Filebeat config file.
+
+
+==== input_type
+
+required: True
+
+The input type from which the event was generated. This field is set to the value specified for the `input_type` option in the prospector section of the Filebeat config file.
 
 
