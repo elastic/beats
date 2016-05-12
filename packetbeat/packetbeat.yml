@@ -1,16 +1,15 @@
 ###################### Packetbeat Configuration Example #######################
 
-# This file contains an overview of various configuration settings. Please consult
-# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-configuration.html
-# for more details.
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see packetbeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/packetbeat/index.html
 
-# The Packetbeat shipper works by sniffing the network traffic between your
-# application components. It inserts meta-data about each transaction into
-# Elasticsearch.
+#============================== Network device ================================
 
-#================================ Interfaces ==================================
-
-# Select the network interfaces to sniff the data. You can use the "any"
+# Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
@@ -324,7 +323,6 @@ output.elasticsearch:
 
 
 #----------------------------- Logstash output --------------------------------
-### Logstash as output
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
@@ -399,15 +397,14 @@ output.elasticsearch:
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 
+# Sets log level. The default log level is error.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: error
 
-  # Enable debug output for selected components. To enable all selectors use ["*"]
-  # Other available selectors are beat, publish, service
-  # Multiple selectors can be chained.
-  #selectors: [ ]
-
-  # Sets log level. The default log level is error.
-  # Available log levels are: critical, error, warning, info, debug
-  #level: error
+# Enable debug output for selected components. To enable all selectors use ["*"]
+# Other available selectors are beat, publish, service
+# Multiple selectors can be chained.
+#logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true

@@ -38,6 +38,7 @@ docs:
 .PHONY: configs
 configs:
 	python ${ES_BEATS}/metricbeat/scripts/config_collector.py > etc/beat.yml
+	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --short > etc/beat.short.yml
 
 # This is called by the beats packer before building starts
 .PHONY: before-build

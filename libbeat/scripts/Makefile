@@ -221,6 +221,8 @@ update: python-env
 	echo "Update config file"
 	rm -f etc/${BEATNAME}.yml
 	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+	rm -f etc/${BEATNAME}.short.yml
+	cat etc/beat.short.yml ${ES_BEATS}/libbeat/_beat/config.short.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.short.yml
 
 	# Update fields
 	echo "Update fields"
