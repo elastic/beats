@@ -4,39 +4,39 @@ BEATNAME=metricbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
+ES_BEATS?=..
 
 # Metricbeat can only be cross-compiled on platforms not requiring CGO which
 # are the same platforms where the system metrics (cpu, memory) are not
 # implemented.
 GOX_OS=solaris freebsd netbsd
 
-include ../libbeat/scripts/Makefile
+include ${ES_BEATS}/libbeat/scripts/Makefile
 
 # Collects all module dashboards
 .PHONY: kibana
 kibana:
-	rm -r etc/kibana
+	-rm -r etc/kibana
 	mkdir -p etc/kibana
-	cp -r module/*/_beat/kibana/ etc/kibana
-
+	-cp -r module/*/_beat/kibana/ etc/kibana
 
 # Collects all module and metricset fields
 .PHONY: fields
 fields:
-	cat etc/_beat/fields_base.yml > etc/fields.yml
-	python scripts/fields_collector.py >> etc/fields.yml
+	cat ${ES_BEATS}/metricbeat/etc/_beat/fields_base.yml > etc/fields.yml
+	python ${ES_BEATS}/metricbeat/scripts/fields_collector.py >> etc/fields.yml
 
 # Collects all module docs
 .PHONY: docs
 docs:
-	rm -r docs/modules
+	-rm -r docs/modules
 	mkdir -p docs/modules
-	python scripts/docs_collector.py
+	python ${ES_BEATS}/metricbeat/scripts/docs_collector.py
 
 # Collects all module configs
 .PHONY: configs
 configs:
-	python scripts/config_collector.py > etc/beat.yml
+	python ${ES_BEATS}/metricbeat/scripts/config_collector.py > etc/beat.yml
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
