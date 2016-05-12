@@ -16,7 +16,7 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  # Zookeeper module
+  #---------------------------- Zookeeper Module --------------------------------
   - module: zookeeper
     metricsets: ["mntr"]
     enabled: true

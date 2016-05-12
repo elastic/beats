@@ -27,7 +27,7 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  # MySQL Module
+  #------------------------------- Mysql Module ---------------------------------
   - module: mysql
     metricsets: ["status"]
     enabled: true

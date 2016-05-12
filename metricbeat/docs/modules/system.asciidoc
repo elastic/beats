@@ -15,7 +15,7 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  # System module
+  #------------------------------ System Module ---------------------------------
   - module: system
     metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
     enabled: true
