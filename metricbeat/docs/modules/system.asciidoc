@@ -30,6 +30,8 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-system-cpu,cpu>>
 
+* <<metricbeat-metricset-system-disk,disk>>
+
 * <<metricbeat-metricset-system-filesystem,filesystem>>
 
 * <<metricbeat-metricset-system-fsstats,fsstats>>
@@ -41,6 +43,8 @@ The following MetricSets are available:
 include::system/cores.asciidoc[]
 
 include::system/cpu.asciidoc[]
+
+include::system/disk.asciidoc[]
 
 include::system/filesystem.asciidoc[]
 

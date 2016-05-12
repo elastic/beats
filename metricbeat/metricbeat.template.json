@@ -325,6 +325,39 @@
             }
           }
         },
+        "system-disk": {
+          "properties": {
+            "io_time": {
+              "type": "long"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "read_bytes": {
+              "type": "long"
+            },
+            "read_count": {
+              "type": "long"
+            },
+            "read_time": {
+              "type": "long"
+            },
+            "serial_number": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "write_bytes": {
+              "type": "long"
+            },
+            "write_count": {
+              "type": "long"
+            },
+            "write_time": {
+              "type": "long"
+            }
+          }
+        },
         "system-filesystem": {
           "properties": {
             "avail": {
