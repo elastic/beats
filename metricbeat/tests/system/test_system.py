@@ -9,6 +9,9 @@ SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "load", "nice", "softirq",
 SYSTEM_CORES = ["core", "idle", "iowait", "irq", "nice", "softirq",
                 "steal", "system", "system_p", "user", "user_p"]
 
+SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
+                      "write_bytes", "read_time", "write_time", "io_time"]
+
 SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used",
                             "used_p"]
@@ -72,6 +75,32 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             cores = evt["system-cores"]
             self.assertItemsEqual(SYSTEM_CORES, cores.keys())
+
+    @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
+    def test_disk(self):
+        """
+        Test system/disk output.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["disk"],
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            disk = evt["system-disk"]
+            self.assertItemsEqual(SYSTEM_DISK_FIELDS, disk.keys())
 
     def test_filesystem(self):
         """

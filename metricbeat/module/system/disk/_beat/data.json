@@ -1,0 +1,21 @@
+{
+    "@timestamp": "2016-05-11T23:25:32.317Z",
+    "beat": {
+        "hostname": "5ff05546664c",
+        "name": "5ff05546664c"
+    },
+    "metricset": "disk",
+    "module": "system",
+    "rtt": 17082,
+    "system-disk": {
+        "io_time": 21110,
+        "name": "sda2",
+        "read_bytes": 160079872,
+        "read_count": 21292,
+        "read_time": 20070,
+        "write_bytes": 799186944,
+        "write_count": 3208,
+        "write_time": 90070
+    },
+    "type": "metricsets"
+}

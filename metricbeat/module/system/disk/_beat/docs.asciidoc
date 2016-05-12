@@ -1,0 +1,4 @@
+=== System Disk MetricSet
+
+The System Disk MetricSet provides disk IO metrics collected from the operating
+system. One event is created for each disk mounted on the system.
