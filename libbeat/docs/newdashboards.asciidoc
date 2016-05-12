@@ -90,8 +90,10 @@ The Elasticsearch index pattern where Kibana saves its configuration. The defaul
 === Exporting New and Modified Beat Dashboards
 
 To export all the dashboards for a Beat, including any new or modified dashboards and all dependencies such as
-visualizations, searches, and index patterns, you can use the python script `export_dashboards.py` from  
-https://github.com/elastic/beats/tree/master/dev-tools[dev-tools].
+visualizations, searches, and index patterns, you can use the Python script `export_dashboards.py` from  
+https://github.com/elastic/beats/tree/master/dev-tools[dev-tools]. Before running the script for the first time, you
+need to create an environment that contains all the required Python packages. See the dev-tools
+https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
 NOTE: Dashboard names must be **prefixed** with the name of the beat in order to work correctly. For example:
 Topbeat-Dashboard.
