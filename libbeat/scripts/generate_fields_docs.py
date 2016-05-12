@@ -26,10 +26,9 @@ def document_fields(output, section, sections, path):
 
         if "type" in field and field["type"] == "group":
 
-            for value in sections:
-                sec = value[0]
-                name = value[1]
-                if sec == field["name"]:
+            for key in sections:
+                name = sections[key]
+                if key == field["name"]:
                     field["anchor"] = field["name"]
                     field["name"] = name
                     break
@@ -90,26 +89,28 @@ grouped in the following categories:
 
     sections = docs["sections"]
 
+    # Add default section
+    sections["beat"] = "Beat"
+
     # Check if sections is define
     if sections is None:
         print "No sections are defined in fields.yml. fields.asciidoc cannot be generated."
         return
 
-    for doc, _ in sections:
-        output.write("* <<exported-fields-{}>>\n".format(doc))
+
+    for key in sorted(sections):
+        output.write("* <<exported-fields-{}>>\n".format(key))
     output.write("\n")
 
-    for value in sections:
+    for key in sorted(sections):
+        name = sections[key]
 
-        doc = value[0]
-        name = value[1]
-
-        if doc in docs:
-            section = docs[doc]
+        if key in docs:
+            section = docs[key]
             if "type" in section:
                 if section["type"] == "group":
                     section["name"] = name
-                    section["anchor"] = doc
+                    section["anchor"] = key
                     document_fields(output, section, sections, "")
 
 
@@ -122,11 +123,17 @@ if __name__ == "__main__":
     beat_path = sys.argv[1]
     beat_name = sys.argv[2]
 
-    input = open(beat_path + "/etc/fields.yml", 'r')
+    # Read fields.yml
+    with file(beat_path + "/etc/fields.yml") as f:
+        fields = f.read()
+
+    # Appends beat fields from libbeat
+    with file(beat_path + "/../libbeat/_beat/fields.yml") as f:
+        fields += f.read()
+
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
 
     try:
-        fields_to_asciidoc(input, output, beat_name.title())
+        fields_to_asciidoc(fields, output, beat_name.title())
     finally:
-        input.close()
         output.close()

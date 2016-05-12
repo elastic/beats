@@ -1,34 +1,8 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-  doc_values: true
-  ignore_above: 1024
-
 common:
   type: group
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: beat.name
-      description: >
-        The name of the Beat sending the log messages. If the shipper name is
-        set in the configuration file, then that value is used. If it is not
-        set, the hostname is used.
-
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
-
-    - name: "@timestamp"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The timestamp when the event log record was generated.
-
     - name: type
       required: true
       description: >
@@ -41,17 +15,6 @@ common:
         infrastructure was redesigned. On Windows Vista or later operating
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
-
-    - name: tags
-      description: >
-        Arbitrary tags that can be set per Beat and per transaction
-        type.
-
-    - name: fields
-      type: dict
-      dict-type: keyword
-      description: >
-        Contains user configurable fields.
 
 eventlog:
   type: group
@@ -244,5 +207,5 @@ eventlog:
         to the data in the XML to diagnose problems.
 
 sections:
-  - ["common", "Common Beat"]
-  - ["eventlog", "Event Log Record"]
+  common: "Common Beat"
+  eventlog: "Event Log Record"
