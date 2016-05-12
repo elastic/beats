@@ -2,7 +2,7 @@
 
 ##################### Winlogbeat general configuration ######################
 
-winlogbeat:
+#winlogbeat:
   # The registry file is where Winlogbeat persists its state so that the beat
   # can resume after shutdown or an outage. The default is .winlogbeat.yml
   # in the directory in which it was started.
