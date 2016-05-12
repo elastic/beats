@@ -187,8 +187,8 @@ filebeat.prospectors:
 # the prospector part is processed. All global options like spool_size are ignored.
 # The config_dir MUST point to a different directory then where the main filebeat config file is in.
 #filebeat.config_dir:
-#================================ General =====================================
 
+#================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
