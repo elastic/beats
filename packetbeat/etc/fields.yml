@@ -1,27 +1,9 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-  ignore_above: 1024
-
-env:
+common:
   type: group
   description: >
       These fields contain data about the environment in which the
       transaction or flow was captured.
   fields:
-    - name: beat.name
-      description: >
-        Name of the Beat sending the events. If the shipper name is set
-        in the configuration file, then that value is used. If it is not set,
-        the hostname is used.
-
-    - name: beat.hostname
-      description: >
-        The hostname as returned by the operating system on which the Beat is
-        running.
-
-
     - name: server
       description: >
         The name of the server that served the transaction.
@@ -95,17 +77,6 @@ env:
       description: >
         The software release of the service serving the transaction.
         This can be the commit id or a semantic version.
-
-    - name: tags
-      description: >
-        Arbitrary tags that can be set per Beat and per transaction
-        type.
-
-    - name: fields
-      type: dict
-      dict-type: keyword
-      description: >
-        Contains user configurable fields.
 
 flows_event:
   type: group
@@ -1443,19 +1414,19 @@ trans_measurements:
         `domContentLoadedStart`.
 
 sections:
-  - ["flows_event", "Flow Event"]
-  - ["trans_event", "Transaction Event"]
-  - ["icmp", "ICMP"]
-  - ["dns", "DNS"]
-  - ["http", "Http"]
-  - ["amqp", "AMQP"]
-  - ["memcache", "Memcache"]
-  - ["mysql", "Mysql"]
-  - ["pgsql", "PostgreSQL"]
-  - ["thrift", "Thrift-RPC"]
-  - ["redis", "Redis"]
-  - ["mongodb", "MongoDb"]
-  - ["trans_measurements", "Measurements (Transactions)"]
-  - ["env", "Environmental"]
-  - ["raw", "Raw"]
-  - ["nfs", "NFS"]
+  flows_event: "Flow Event"
+  trans_event: "Transaction Event"
+  icmp: "ICMP"
+  dns: "DNS"
+  http: "Http"
+  amqp: "AMQP"
+  memcache: "Memcache"
+  mysql: "Mysql"
+  pgsql: "PostgreSQL"
+  thrift: "Thrift-RPC"
+  redis: "Redis"
+  mongodb: "MongoDb"
+  trans_measurements: "Measurements (Transactions)"
+  common: "Common"
+  raw: "Raw"
+  nfs: "NFS"

@@ -9,87 +9,13 @@ This file is generated! See etc/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Metricbeat. They are
 grouped in the following categories:
 
-* <<exported-fields-common>>
 * <<exported-fields-apache>>
-* <<exported-fields-redis>>
+* <<exported-fields-beat>>
+* <<exported-fields-common>>
 * <<exported-fields-mysql>>
+* <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
-
-[[exported-fields-common]]
-=== Common Fields
-
-Contains common fields available in all event types.
-
-
-
-==== beat.name
-
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
-
-
-==== beat.hostname
-
-The hostname as returned by the operating system on which the Beat is running.
-
-
-==== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp when the log line was read. The precision is in milliseconds. The timezone is UTC.
-
-
-==== module
-
-The name of the module that generated the event.
-
-
-==== metricset
-
-The name of the metricset that generated the event.
-
-
-==== metricset-host
-
-Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
-
-
-==== rtt
-
-type: long
-
-required: True
-
-Event round trip time in microseconds
-
-
-==== type
-
-example: metricsets
-
-required: True
-
-The document type. Always set to "metricsets".
-
-
-==== tags
-
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
-==== fields
-
-type: dict
-
-Contains user configurable fields.
-
 
 [[exported-fields-apache]]
 === Apache Status Fields
@@ -372,6 +298,141 @@ type: integer
 Total.
 
 
+[[exported-fields-beat]]
+=== Beat Fields
+
+Contains common beat fields available in all event types.
+
+
+
+==== beat.name
+
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
+[[exported-fields-common]]
+=== Common Fields
+
+Contains common fields available in all event types.
+
+
+
+==== module
+
+The name of the module that generated the event.
+
+
+==== metricset
+
+The name of the metricset that generated the event.
+
+
+==== metricset-host
+
+Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+
+
+==== rtt
+
+type: long
+
+required: True
+
+Event round trip time in microseconds
+
+
+==== type
+
+example: metricsets
+
+required: True
+
+The document type. Always set to "metricsets".
+
+
+[[exported-fields-mysql]]
+=== MySQL Status Fields
+
+MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
+
+
+
+=== mysql-status Fields
+
+`mysql-status` contains the metrics that were obtained the status SQL query.
+
+
+
+=== aborted Fields
+
+Aborted status fields
+
+
+
+==== mysql-status.aborted.Aborted_clients
+
+type: integer
+
+The number of connections that were aborted because the client died without closing the connection properly.
+
+
+==== mysql-status.aborted.Aborted_connects
+
+type: integer
+
+The number of failed attempts to connect to the MySQL server.
+
+
+=== bytes Fields
+
+Bytes stats
+
+
+
+==== mysql-status.bytes.Bytes_received
+
+type: integer
+
+The number of bytes received from all clients.
+
+
+==== mysql-status.bytes.Bytes_sent
+
+type: integer
+
+The number of bytes sent to all clients.
+
+
 [[exported-fields-redis]]
 === Redis Info Fields
 
@@ -464,59 +525,6 @@ System CPU consumed by the background processes
 type: float
 
 User CPU consumed by the background processes
-
-
-[[exported-fields-mysql]]
-=== MySQL Status Fields
-
-MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
-
-
-
-=== mysql-status Fields
-
-`mysql-status` contains the metrics that were obtained the status SQL query.
-
-
-
-=== aborted Fields
-
-Aborted status fields
-
-
-
-==== mysql-status.aborted.Aborted_clients
-
-type: integer
-
-The number of connections that were aborted because the client died without closing the connection properly.
-
-
-==== mysql-status.aborted.Aborted_connects
-
-type: integer
-
-The number of failed attempts to connect to the MySQL server.
-
-
-=== bytes Fields
-
-Bytes stats
-
-
-
-==== mysql-status.bytes.Bytes_received
-
-type: integer
-
-The number of bytes received from all clients.
-
-
-==== mysql-status.bytes.Bytes_sent
-
-type: integer
-
-The number of bytes sent to all clients.
 
 
 [[exported-fields-system]]
