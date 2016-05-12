@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -28,7 +28,7 @@ type Crawler struct {
 	wg          sync.WaitGroup
 }
 
-func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan chan *input.FileEvent) error {
+func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *input.FileEvent) error {
 
 	if len(prospectorConfigs) == 0 {
 		return fmt.Errorf("No prospectors defined. You must have at least one prospector defined in the config file.")
@@ -38,8 +38,6 @@ func (c *Crawler) Start(prospectorConfigs []config.ProspectorConfig, eventChan c
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range prospectorConfigs {
-
-		logp.Debug("prospector", "File Configs: %v", prospectorConfig.Paths)
 
 		prospector, err := NewProspector(prospectorConfig, c.Registrar, eventChan)
 		if err != nil {

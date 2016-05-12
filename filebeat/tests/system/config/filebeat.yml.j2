@@ -11,8 +11,8 @@ filebeat:
         - {{ path }}{% endif %}
       # Type of the files. Annotated in every documented
       scan_frequency: {{scan_frequency | default("0.1s") }}
-      ignore_older: "{{ignoreOlder}}"
-      close_older: "{{closeOlder}}"
+      ignore_older: {{ignoreOlder}}
+      close_older: {{closeOlder}}
       harvester_buffer_size:
       encoding: {{encoding | default("utf-8") }}
       tail_files: {{tailFiles}}
