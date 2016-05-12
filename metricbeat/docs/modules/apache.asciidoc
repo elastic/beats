@@ -18,7 +18,7 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  # Apache Module
+  #----------------------------- Apache Module ----------------------------------
   - module: apache
     metricsets: ["status"]
     enabled: true
