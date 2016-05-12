@@ -3,8 +3,8 @@ package harvester
 import (
 	"golang.org/x/text/encoding"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/processor"
+	"github.com/elastic/beats/filebeat/input"
 )
 
 func createLineReader(
@@ -13,8 +13,8 @@ func createLineReader(
 	bufferSize int,
 	maxBytes int,
 	readerConfig logFileReaderConfig,
-	jsonConfig *config.JSONConfig,
-	mlrConfig *config.MultilineConfig,
+	jsonConfig *input.JSONConfig,
+	mlrConfig *input.MultilineConfig,
 	done chan struct{},
 ) (processor.LineProcessor, error) {
 	var p processor.LineProcessor

@@ -6,8 +6,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -54,7 +54,7 @@ type LimitProcessor struct {
 
 type JSONProcessor struct {
 	reader LineProcessor
-	cfg    *config.JSONConfig
+	cfg    *input.JSONConfig
 }
 
 // NewLineSource creates a new LineSource from input reader by applying
@@ -106,7 +106,7 @@ func (p *LimitProcessor) Next() (Line, error) {
 }
 
 // NewJSONProcessor creates a new processor that can decode JSON.
-func NewJSONProcessor(in LineProcessor, cfg *config.JSONConfig) *JSONProcessor {
+func NewJSONProcessor(in LineProcessor, cfg *input.JSONConfig) *JSONProcessor {
 	return &JSONProcessor{reader: in, cfg: cfg}
 }
 

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +26,7 @@ func (p bufferSource) Continuable() bool          { return false }
 
 func TestMultilineAfterOK(t *testing.T) {
 	testMultilineOK(t,
-		config.MultilineConfig{
+		input.MultilineConfig{
 			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
 			Match:   "after",
 		},
@@ -37,7 +37,7 @@ func TestMultilineAfterOK(t *testing.T) {
 
 func TestMultilineBeforeOK(t *testing.T) {
 	testMultilineOK(t,
-		config.MultilineConfig{
+		input.MultilineConfig{
 			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
 			Match:   "before",
 		},
@@ -48,7 +48,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 
 func TestMultilineAfterNegateOK(t *testing.T) {
 	testMultilineOK(t,
-		config.MultilineConfig{
+		input.MultilineConfig{
 			Pattern: regexp.MustCompile(`^-`), // first line starts with '-' at beginning of line
 			Negate:  true,
 			Match:   "after",
@@ -60,7 +60,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 
 func TestMultilineBeforeNegateOK(t *testing.T) {
 	testMultilineOK(t,
-		config.MultilineConfig{
+		input.MultilineConfig{
 			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
 			Negate:  true,
 			Match:   "before",
@@ -70,7 +70,7 @@ func TestMultilineBeforeNegateOK(t *testing.T) {
 	)
 }
 
-func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...string) {
+func testMultilineOK(t *testing.T, cfg input.MultilineConfig, expected ...string) {
 	_, buf := createLineBuffer(expected...)
 	reader := createMultilineTestReader(t, buf, cfg)
 
@@ -96,7 +96,7 @@ func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...strin
 	}
 }
 
-func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg config.MultilineConfig) LineProcessor {
+func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg input.MultilineConfig) LineProcessor {
 	encFactory, ok := encoding.FindEncoding("plain")
 	if !ok {
 		t.Fatalf("unable to find 'plain' encoding")
