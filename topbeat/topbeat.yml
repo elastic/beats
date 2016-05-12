@@ -94,7 +94,7 @@ output.elasticsearch:
   # These settings can be adjusted to load your own template or overwrite existing ones
 
   # Template name. By default the template name is topbeat.
-  template.name:"topbeat"
+  template.name: "topbeat"
 
   # Path to template file
   template.path: "topbeat.template.json"
@@ -251,7 +251,7 @@ output.elasticsearch:
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
-logging:
+#logging:
 
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
@@ -269,6 +269,7 @@ logging:
   # Sets log level. The default log level is error.
   # Available log levels are: critical, error, warning, info, debug
   #level: error
+
 
 # To enable logging to files, to_files option has to be set to true
 # The directory where the log files will written to.

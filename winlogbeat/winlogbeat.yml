@@ -99,7 +99,7 @@ output.elasticsearch:
   # These settings can be adjusted to load your own template or overwrite existing ones
 
   # Template name. By default the template name is winlogbeat.
-  template.name:"winlogbeat"
+  template.name: "winlogbeat"
 
   # Path to template file
   template.path: "winlogbeat.template.json"
@@ -256,7 +256,7 @@ output.elasticsearch:
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
-logging:
+#logging:
 
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
