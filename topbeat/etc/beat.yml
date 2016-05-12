@@ -1,6 +1,6 @@
-################### Topbeat Configuration Example #########################
+###################### Topbeat Configuration Example ##########################
 
-##################### Topbeat general configuration #######################
+#======================== Topbeat specific options ============================
 
 # In seconds, defines how often to read server statistics
 topbeat.period: 10
@@ -22,5 +22,4 @@ topbeat.stats:
 
   # cpu usage per core, by default is false
   cpu_per_core: false
-
 

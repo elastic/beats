@@ -1,4 +1,4 @@
-################### Packetbeat Configuration Example ##########################
+###################### Packetbeat Configuration Example #######################
 
 # This file contains an overview of various configuration settings. Please consult
 # the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-configuration.html
@@ -8,26 +8,22 @@
 # application components. It inserts meta-data about each transaction into
 # Elasticsearch.
 
-############################# Interfaces #########################################
+#================================ Interfaces ==================================
 
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces:
-  device: any
+packetbeat.interfaces.device: any
 
+#================================== Flows =====================================
 
-############################# Flows ##############################################
+# Set network flow timeout. Flow is killed if no packet is received before being
+# timed out.
+packetbeat.flows.timeout: 30s
 
-packetbeat.flows:
-  # Set network flow timeout. Flow is killed if no packet is received before being
-  # timed out.
-  #timeout: 30s
+# Configure reporting period. If set to -1, only killed flows will be reported
+packetbeat.flows.period: 10s
 
-  # Configure reporting period. If set to -1, only killed flows will be reported
-  #period: 10s
-
-
-########################### Transaction protocols ################################
+#========================== Transaction protocols =============================
 
 packetbeat.protocols.icmp:
   # Enable ICMPv4 and ICMPv6 monitoring. Default: false
@@ -155,7 +151,7 @@ packetbeat.protocols.nfs:
   # the NFS protocol by commenting out the list of ports.
   ports: [2049]
 
-########################## Monitored processes ################################
+#=========================== Monitored processes ==============================
 
 # Configure the processes to be monitored and how to find them. If a process is
 # monitored then Packetbeat attempts to use it's name to fill in the `proc` and

@@ -25,7 +25,7 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  # Redis Module
+  #------------------------------- Redis Module ---------------------------------
   - module: redis
     metricsets: ["info"]
     enabled: true

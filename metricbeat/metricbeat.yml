@@ -1,98 +1,142 @@
+###################### Metricbeat Configuration Example #######################
+
+#==========================  Modules configuration ============================
 metricbeat.modules:
 
-  # Apache Module
-  - module: apache
-    metricsets: ["status"]
-    enabled: true
-    period: 1s
+#----------------------------- Apache Module ----------------------------------
+- module: apache
+  metricsets: ["status"]
+  enabled: true
+  period: 1s
 
-    # Apache hosts
-    hosts: ["http://127.0.0.1/"]
+  # Apache hosts
+  hosts: ["http://127.0.0.1/"]
 
-    # Path to server status. Default server-status
-    #server_status_path: "server-status"
+  # Path to server status. Default server-status
+  #server_status_path: "server-status"
 
-    # Username of hosts.  Empty by default
-    #username: test
+  # Username of hosts.  Empty by default
+  #username: test
 
-    # Password of hosts. Empty by default
-    #password: test123
+  # Password of hosts. Empty by default
+  #password: test123
 
-  # MySQL Module
-  - module: mysql
-    metricsets: ["status"]
-    enabled: true
-    period: 2s
+#------------------------------- Mysql Module ---------------------------------
+- module: mysql
+  metricsets: ["status"]
+  enabled: true
+  period: 2s
 
-    # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
-    # The username and password can either be set in the DSN or for all hosts in username and password config option
-    hosts: ["root@tcp(127.0.0.1:3306)/"]
+  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or for all hosts in username and password config option
+  hosts: ["root@tcp(127.0.0.1:3306)/"]
 
-    # Username of hosts. Empty by default
-    #username: root
+  # Username of hosts. Empty by default
+  #username: root
 
-    # Password of hosts. Empty by default
-    #password: test
+  # Password of hosts. Empty by default
+  #password: test
 
-  # Redis Module
-  - module: redis
-    metricsets: ["info"]
-    enabled: true
-    period: 1s
+#------------------------------- Redis Module ---------------------------------
+- module: redis
+  metricsets: ["info"]
+  enabled: true
+  period: 1s
 
-    # Redis hosts
-    hosts: ["127.0.0.1:6379"]
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
 
-    # Enabled defines if the module is enabled. Default: true
-    #enabled: true
+  # Enabled defines if the module is enabled. Default: true
+  #enabled: true
 
-    # Timeout after which time a metricset should return an error
-    # Timeout is by default defined as period, as a fetch of a metricset
-    # should never take longer then period, as otherwise calls can pile up.
-    #timeout: 1s
+  # Timeout after which time a metricset should return an error
+  # Timeout is by default defined as period, as a fetch of a metricset
+  # should never take longer then period, as otherwise calls can pile up.
+  #timeout: 1s
 
-    # Optional fields to be added to each event
-    #fields:
-    #  datacenter: west
+  # Optional fields to be added to each event
+  #fields:
+  #  datacenter: west
 
-    # Network type to be used for redis connection. Default: tcp
-    #network: tcp
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
 
-    # Max number of concurrent connections. Default: 10
-    #maxconn: 10
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
 
-    # Filters can be used to reduce the number of fields sent.
-    #filters:
-    #  - include_fields:
-    #      fields: ["stats"]
+  # Filters can be used to reduce the number of fields sent.
+  #filters:
+  #  - include_fields:
+  #      fields: ["stats"]
 
-    # Redis AUTH password. Empty by default.
-    #password: foobared
+  # Redis AUTH password. Empty by default.
+  #password: foobared
 
-  # System module
-  - module: system
-    metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
-    enabled: true
-    period: 2s
+#------------------------------ System Module ---------------------------------
+- module: system
+  metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+  enabled: true
+  period: 2s
 
-  # Zookeeper module
-  - module: zookeeper
-    metricsets: ["mntr"]
-    enabled: true
-    period: 5s
-    hosts: ["localhost:2181"]
+#---------------------------- Zookeeper Module --------------------------------
+- module: zookeeper
+  metricsets: ["mntr"]
+  enabled: true
+  period: 5s
+  hosts: ["localhost:2181"]
 
 
-###############################################################################
-############################# Libbeat Config ##################################
-# Base config file used by all other beats for using libbeat features
 
-############################# Output ##########################################
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output. Fields can be scalar values, arrays, dictionaries, or any nested
+# combination of these.
+#fields:
+#  env: staging
+
+# If this option is set to true, the custom fields are stored as top-level
+# fields in the output document instead of being grouped under a fields
+# sub-dictionary. Default is false.
+#fields_under_root: false
+
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+#ignore_outgoing: true
+
+# How often (in seconds) shippers are publishing their IPs to the topology map.
+# The default is 10 seconds.
+#refresh_topology_freq: 10
+
+# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
+# All the IPs will be deleted afterwards. Note, that the value must be higher than
+# refresh_topology_freq. The default is 15 seconds.
+#topology_expire: 15
+
+# Internal queue size for single events in processing pipeline
+#queue_size: 1000
+
+# Sets the maximum number of CPUs that can be executing simultaneously. The
+# default is the number of logical CPUs available in the system.
+#max_procs:
+
+#================================ Outputs =====================================
 
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-### Elasticsearch as output
+#-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
@@ -190,6 +234,7 @@ output.elasticsearch:
   #tls.max_version: 1.2
 
 
+#----------------------------- Logstash output --------------------------------
 ### Logstash as output
 #output.logstash:
   # The Logstash hosts
@@ -237,7 +282,7 @@ output.elasticsearch:
   #tls.curve_types: []
 
 
-### File as output
+#------------------------------- File output ----------------------------------
 #output.file:
   # Path to the directory where to save the generated files. The option is mandatory.
   #path: "/tmp/metricbeat"
@@ -255,70 +300,16 @@ output.elasticsearch:
   #number_of_files: 7
 
 
-### Console output
+#----------------------------- Console output ---------------------------------
 #output.console:
   # Pretty print json event
   #pretty: false
 
-
-############################# General #########################################
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-#tags: ["service-X", "web-tier"]
-
-# Optional fields that you can specify to add additional information to the
-# output. Fields can be scalar values, arrays, dictionaries, or any nested
-# combination of these.
-#fields:
-#  env: staging
-
-# If this option is set to true, the custom fields are stored as top-level
-# fields in the output document instead of being grouped under a fields
-# sub-dictionary. Default is false.
-#fields_under_root: false
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
-
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-#refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
-#topology_expire: 15
-
-# Internal queue size for single events in processing pipeline
-#queue_size: 1000
-
-# Sets the maximum number of CPUs that can be executing simultaneously. The
-# default is the number of logical CPUs available in the system.
-#max_procs:
-
-############################# Logging #########################################
-
+#================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
-#logging:
 
-  # Send all logging output to syslog. On Windows default is false, otherwise
-  # default is true.
-  #to_syslog: true
-
-  # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
-  # limit is reached.
-  #to_files: false
 
   # Enable debug output for selected components. To enable all selectors use ["*"]
   # Other available selectors are beat, publish, service
@@ -329,10 +320,15 @@ output.elasticsearch:
   # Available log levels are: critical, error, warning, info, debug
   #level: error
 
+# Send all logging output to syslog. The default is false.
+#logging.to_syslog: true
 
-# To enable logging to files, to_files option has to be set to true
-# The directory where the log files will written to.
+# Logging to rotating files files. Set logging.to_files to false to disable logging to
+# files.
+logging.to_files: true
 logging.files:
+  # Configure the path where the logs are written. The default is the logs directory
+  # under the home path (the binary location).
   #path: /var/log/mybeat
 
   # The name of the files where the logs are written to.
@@ -340,7 +336,7 @@ logging.files:
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
-  rotateeverybytes: 10485760 # = 10MB
+  #rotateeverybytes: 10485760 # = 10MB
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
