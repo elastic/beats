@@ -4,6 +4,7 @@ package mysql
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -13,12 +14,15 @@ func TestCreateDSN(t *testing.T) {
 	username := "root"
 	password := "test"
 
-	dsn := CreateDSN(hostname, username, password)
+	dsn, _ := CreateDSN(hostname, username, password, 0)
 	assert.Equal(t, "root:test@tcp(127.0.0.1:3306)/", dsn)
 
-	dsn = CreateDSN(hostname, username, "")
+	dsn, _ = CreateDSN(hostname, username, "", 0)
 	assert.Equal(t, "root@tcp(127.0.0.1:3306)/", dsn)
 
-	dsn = CreateDSN(hostname, "", "")
+	dsn, _ = CreateDSN(hostname, "", "", 0)
 	assert.Equal(t, "tcp(127.0.0.1:3306)/", dsn)
+
+	dsn, _ = CreateDSN(hostname, "", "", time.Second)
+	assert.Equal(t, "tcp(127.0.0.1:3306)/?readTimeout=1s&timeout=1s&writeTimeout=1s", dsn)
 }
