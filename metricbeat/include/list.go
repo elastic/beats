@@ -18,6 +18,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/system"
 	_ "github.com/elastic/beats/metricbeat/module/system/cores"
 	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
+	_ "github.com/elastic/beats/metricbeat/module/system/disk"
 	_ "github.com/elastic/beats/metricbeat/module/system/filesystem"
 	_ "github.com/elastic/beats/metricbeat/module/system/fsstats"
 	_ "github.com/elastic/beats/metricbeat/module/system/memory"

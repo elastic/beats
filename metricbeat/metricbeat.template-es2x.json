@@ -334,6 +334,41 @@
             }
           }
         },
+        "system-disk": {
+          "properties": {
+            "io_time": {
+              "type": "long"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "read_bytes": {
+              "type": "long"
+            },
+            "read_count": {
+              "type": "long"
+            },
+            "read_time": {
+              "type": "long"
+            },
+            "serial_number": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "write_bytes": {
+              "type": "long"
+            },
+            "write_count": {
+              "type": "long"
+            },
+            "write_time": {
+              "type": "long"
+            }
+          }
+        },
         "system-filesystem": {
           "properties": {
             "avail": {
