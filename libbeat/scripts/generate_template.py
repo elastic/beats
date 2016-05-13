@@ -29,10 +29,6 @@ def fields_to_es_template(args, input, output, index):
         print "fields.yml is empty. Cannot generate template."
         return
 
-    # Remove sections as only needed for docs
-    if "sections" in docs.keys():
-        del docs["sections"]
-
     # Each template needs defaults
     if "defaults" not in docs.keys():
         print("No defaults are defined. Each template needs at" +
@@ -41,10 +37,8 @@ def fields_to_es_template(args, input, output, index):
 
     defaults = docs["defaults"]
 
-    # de-dot
-    for doc, section in docs.items():
-        if doc != "defaults":
-            docs[doc] = dedot(section)
+    for k, section in enumerate(docs["fields"]):
+        docs["fields"][k] = dedot(section)
 
     # skeleton
     template = {
@@ -71,12 +65,11 @@ def fields_to_es_template(args, input, output, index):
 
     properties = {}
     dynamic_templates = []
-    for doc, section in docs.items():
-        if doc != "defaults":
-            prop, dynamic = fill_section_properties(args, section,
-                                                    defaults, "")
-            properties.update(prop)
-            dynamic_templates.extend(dynamic)
+    for section in docs["fields"]:
+        prop, dynamic = fill_section_properties(args, section,
+                                                defaults, "")
+        properties.update(prop)
+        dynamic_templates.extend(dynamic)
 
     template["mappings"]["_default_"]["properties"] = properties
     if len(dynamic_templates) > 0:
@@ -278,9 +271,9 @@ if __name__ == "__main__":
     with open(args.path + "/etc/fields.yml", 'r') as f:
         fields = f.read()
 
-        # Appends beat fields from libbeat
+        # Prepend beat fields from libbeat
         with file(args.es_beats + "/libbeat/_beat/fields.yml") as f:
-            fields += f.read()
+            fields = f.read() + fields
 
         with open(target, 'w') as output:
             fields_to_es_template(args, fields, output, args.beatname + "-*")

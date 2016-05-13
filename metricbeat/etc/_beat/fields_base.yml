@@ -1,5 +1,5 @@
-common:
-  type: group
+- key: common
+  title: Common
   description: >
     Contains common fields available in all event types.
   fields:
@@ -28,11 +28,3 @@ common:
       example: metricsets
       description: >
         The document type. Always set to "metricsets".
-
-sections:
-  common: "Common"
-  apache: "Apache Status"
-  redis: "Redis Info"
-  mysql: "MySQL Status"
-  system: "System Status"
-  zookeeper: "Zookeeper Status"

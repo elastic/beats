@@ -1,5 +1,6 @@
-mysql:
-  type: group
+- key: mysql
+  title: "MySQL Status"
   description: >
     MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
   fields:
+

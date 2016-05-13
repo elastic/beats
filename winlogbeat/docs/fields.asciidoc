@@ -56,7 +56,7 @@ Contains user configurable fields.
 
 
 [[exported-fields-common]]
-=== Common Beat Fields
+=== Common Winlogbeat Fields
 
 Contains common fields available in all event types.
 

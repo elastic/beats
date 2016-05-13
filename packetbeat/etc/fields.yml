@@ -1,5 +1,5 @@
-common:
-  type: group
+- key: common
+  title: Common
   description: >
       These fields contain data about the environment in which the
       transaction or flow was captured.
@@ -78,8 +78,8 @@ common:
         The software release of the service serving the transaction.
         This can be the commit id or a semantic version.
 
-flows_event:
-  type: group
+- key: flows_event
+  title: "Flow Event"
   description: >
     These fields contain data about the flow itself.
   fields:
@@ -280,7 +280,6 @@ flows_event:
             - name: net_bytes_total
               description: >
                 Total number of bytes
-
     - name: icmp_id
       description: >
         ICMP id used in ICMP based flow.
@@ -293,9 +292,8 @@ flows_event:
       description: >
         optional TCP connection id
 
-
-trans_event:
-  type: group
+- key: trans_event
+  title: "Transaction Event"
   description: >
     These fields contain data about the transaction itself.
   fields:
@@ -373,9 +371,13 @@ trans_event:
         Messages from Packetbeat itself. This field usually contains error messages for
         interpreting the raw data. This information can be helpful for troubleshooting.
 
+- key: icmp
+  title: "ICMP"
+  description: >
+    ICMP specific event fields.
+  fields:
     - name: icmp
       type: group
-      description: ICMP specific event fields.
       fields:
         - name: version
           description: The version of the ICMP protocol.
@@ -407,9 +409,12 @@ trans_event:
           type: integer
           description: The response code.
 
+- key: dns
+  title: "DNS"
+  description: DNS-specific event fields.
+  fields:
     - name: dns
       type: group
-      description: DNS-specific event fields.
       fields:
         - name: id
           type: integer
@@ -613,9 +618,12 @@ trans_event:
           type: integer
           description: Requestor's UDP payload size (in bytes).
 
+- key: amqp
+  title: "AMQP"
+  description: AMQP specific event fields.
+  fields:
     - name: amqp
       type: group
-      description: AMQP specific event fields.
       fields:
         - name: reply-code
           type: integer
@@ -819,9 +827,12 @@ trans_event:
           description: >
             Creating application id.
 
+- key: http
+  title: "HTTP"
+  description: HTTP-specific event fields.
+  fields:
     - name: http
       type: group
-      description: HTTP-specific event fields.
       fields:
         - name: code
           description: The HTTP status code.
@@ -854,9 +865,12 @@ trans_event:
           description: >
             The value of the Content-Length header if present.
 
+- key: memcache
+  title: "Memcache"
+  description: Memcached-specific event fields
+  fields:
     - name: memcache
       type: group
-      description: Memcached-specific event fields
       fields:
         - name: protocol_type
           type: keyword
@@ -1093,10 +1107,13 @@ trans_event:
           description: >
             The returned memcache version string.
 
-
+- key: mysql
+  title: "MySQL"
+  description: >
+    MySQL-specific event fields.
+  fields:
     - name: mysql
       type: group
-      description: MySQL-specific event fields.
       fields:
         - name: iserror
           type: boolean
@@ -1136,10 +1153,13 @@ trans_event:
         - name: error_message
           description: >
             The error info message returned by MySQL.
-
+- key: pgsql
+  title: "PostgreSQL"
+  description: >
+    PostgreSQL-specific event fields.
+  fields:
     - name: pgsql
       type: group
-      description: PostgreSQL-specific event fields.
       fields:
         - name: query
           description: >
@@ -1174,9 +1194,14 @@ trans_event:
             If the SELECT query if successful, this field is set to the number
             of rows returned.
 
+
+- key: thrift
+  title: "Thrift-RPC"
+  description: >
+    Thrift-RPC specific event fields.
+  fields:
     - name: thrift
       type: group
-      description: Thrift-RPC specific event fields.
       fields:
         - name: params
           description: >
@@ -1198,9 +1223,13 @@ trans_event:
             If the call resulted in exceptions, this field contains the exceptions in a human
             readable format.
 
+- key: redis
+  title: "Redis"
+  description: >
+    Redis-specific event fields.
+  fields:
     - name: redis
       type: group
-      description: Redis-specific event fields.
       fields:
         - name: return_value
           description: >
@@ -1211,12 +1240,15 @@ trans_event:
             If the Redis command has resulted in an error, this field contains the
             error message returned by the Redis server.
 
+- key: mongodb
+  title: "MongoDb"
+  description: >
+    MongoDB-specific event fields. These fields mirror closely
+    the fields for the MongoDB wire protocol. The higher level fields
+    (for example, `query` and `resource`) apply to MongoDB events as well.
+  fields:
     - name: mongodb
       type: group
-      description: >
-         MongoDB-specific event fields. These fields mirror closely
-         the fields for the MongoDB wire protocol. The higher level fields
-         (for example, `query` and `resource`) apply to MongoDB events as well.
       fields:
         - name: error
           description: >
@@ -1312,9 +1344,12 @@ trans_event:
         - name: cred.machinename
           description: The name of the caller's machine.
 
+- key: nfs
+  title: "NFS"
+  description: NFS v4/3 specific event fields.
+  fields:
     - name: nfs
       type: group
-      description: NFS v4/3 specific event fields.
       fields:
         - name: version
           type: integer
@@ -1334,8 +1369,10 @@ trans_event:
 
         - name: status
           description: NFS operation reply status.
-raw:
-  type: group
+
+
+- key: raw
+  title: Raw
   description: These fields contain the raw transaction data.
   fields:
     - name: request
@@ -1352,8 +1389,8 @@ raw:
         (application layer only). For binary protocols this is our
         representation of the request.
 
-trans_measurements:
-  type: group
+- key: trans_measurements
+  title: "Measurements (Transactions)"
   description: >
     These fields contain measurements related to the transaction.
   fields:
@@ -1413,20 +1450,3 @@ trans_measurements:
         the difference between `domContentLoadedEnd` and
         `domContentLoadedStart`.
 
-sections:
-  flows_event: "Flow Event"
-  trans_event: "Transaction Event"
-  icmp: "ICMP"
-  dns: "DNS"
-  http: "Http"
-  amqp: "AMQP"
-  memcache: "Memcache"
-  mysql: "Mysql"
-  pgsql: "PostgreSQL"
-  thrift: "Thrift-RPC"
-  redis: "Redis"
-  mongodb: "MongoDb"
-  trans_measurements: "Measurements (Transactions)"
-  common: "Common"
-  raw: "Raw"
-  nfs: "NFS"
