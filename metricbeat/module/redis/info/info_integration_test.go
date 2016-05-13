@@ -15,7 +15,7 @@ import (
 
 const (
 	password = "foobared"
-	version  = "3.0.7"
+	version  = "3.2.0"
 )
 
 var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
