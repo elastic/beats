@@ -1,5 +1,10 @@
 - key: redis
-  title: "Redis Info"
+  title: "Redis"
   description: >
-    Redis metrics collected from the Redis `INFO` command.
+    Redis metrics collected from the Redis
   fields:
+    - name: redis
+      type: group
+      description: >
+        `redis` contains the information and statistics from Redis
+      fields:

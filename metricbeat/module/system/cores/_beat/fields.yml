@@ -1,4 +1,4 @@
-- name: system-cores
+- name: cores
   type: group
   description: >
     `system-cores` contains local cpu core stats.

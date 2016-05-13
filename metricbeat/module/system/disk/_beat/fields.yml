@@ -1,7 +1,7 @@
-- name: system-disk
+- name: disk
   type: group
   description: >
-    `system-disk` contains disk IO metrics collected from the operating system.
+    `disk` contains disk IO metrics collected from the operating system.
   fields:
     - name: name
       type: keyword

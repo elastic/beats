@@ -1,7 +1,7 @@
-- name: system-cpu
+- name: cpu
   type: group
   description: >
-    `system-cpu` contains local cpu stats.
+    `cpu` contains local cpu stats.
   fields:
     - name: user
       type: integer

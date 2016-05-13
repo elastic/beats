@@ -1,8 +1,7 @@
-- name: apache-status
+- name: status
   type: group
   description: >
-    `apache-status` contains the metrics that were scraped from the status
-    page.
+    `status` contains the metrics that were scraped from the apache status page.
   fields:
     - name: hostname
       type: keyword
