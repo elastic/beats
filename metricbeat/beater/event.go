@@ -1,12 +1,12 @@
 package beater
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/satori/go.uuid"
 )
 
 const (
@@ -22,10 +22,19 @@ type eventBuilder struct {
 	host          string
 	startTime     time.Time
 	fetchDuration time.Duration
+	id            eventId
 	event         common.MapStr
 	fetchErr      error
 	filters       *filter.FilterList
 	metadata      common.EventMetadata
+}
+
+// eventId is a unique id for each event or event set.
+type eventId string
+
+func NewEventId() eventId {
+	// TODO: Implement own UUID: https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
+	return eventId(uuid.NewV4().String())
 }
 
 // build builds an event from MetricSet data and applies the Module-level
@@ -42,9 +51,6 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	typeName := getType(event, defaultType)
 	timestamp := getTimestamp(event, common.Time(b.startTime))
 
-	// Each metricset has a unique event field name to prevent type conflicts.
-	eventFieldName := fmt.Sprintf("%s-%s", b.moduleName, b.metricSetName)
-
 	// Apply filters.
 	if b.filters != nil {
 		event = b.filters.Filter(event)
@@ -53,11 +59,16 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	event = common.MapStr{
 		"@timestamp": timestamp,
 		"type":       typeName,
-		"module":     b.moduleName,
-		"metricset":  b.metricSetName,
-		"rtt":        b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
+		"metricset": common.MapStr{
+			"id":     b.id,
+			"name":   b.metricSetName,
+			"module": b.moduleName,
+			"rtt":    b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
+		},
 		common.EventMetadataKey: b.metadata,
-		eventFieldName:          event,
+		b.moduleName: common.MapStr{
+			b.metricSetName: event,
+		},
 	}
 
 	// Overwrite default index if set.
@@ -131,6 +142,7 @@ func createEvent(
 	fetchErr error,
 	start time.Time,
 	elapsed time.Duration,
+	id eventId,
 ) (common.MapStr, error) {
 	return eventBuilder{
 		moduleName:    msw.Module().Name(),
@@ -138,6 +150,7 @@ func createEvent(
 		host:          msw.Host(),
 		startTime:     start,
 		fetchDuration: elapsed,
+		id:            id,
 		event:         event,
 		fetchErr:      fetchErr,
 		filters:       msw.module.filters,

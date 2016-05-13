@@ -232,7 +232,8 @@ func (msw *metricSetWrapper) singleEventFetch(fetcher mb.EventFetcher) (common.M
 		msw.stats.Add(failuresKey, 1)
 	}
 
-	event, err = createEvent(msw, event, err, start, elapsed)
+	id := NewEventId()
+	event, err = createEvent(msw, event, err, start, elapsed, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "createEvent failed")
 	}
@@ -244,13 +245,14 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common
 	start := time.Now()
 	events, err := fetcher.Fetch()
 	elapsed := time.Since(start)
+	id := NewEventId()
 
 	var rtnEvents []common.MapStr
 	if err == nil {
 		msw.stats.Add(successesKey, 1)
 
 		for _, event := range events {
-			event, err = createEvent(msw, event, nil, start, elapsed)
+			event, err = createEvent(msw, event, nil, start, elapsed, id)
 			if err != nil {
 				return nil, errors.Wrap(err, "createEvent failed")
 			}
@@ -259,7 +261,7 @@ func (msw *metricSetWrapper) multiEventFetch(fetcher mb.EventsFetcher) ([]common
 	} else {
 		msw.stats.Add(failuresKey, 1)
 
-		event, err := createEvent(msw, nil, err, start, elapsed)
+		event, err := createEvent(msw, nil, err, start, elapsed, id)
 		if err != nil {
 			return nil, errors.Wrap(err, "createEvent failed")
 		}
