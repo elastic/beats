@@ -24,62 +24,68 @@ Apache HTTPD server metrics collected from the mod_status module.
 
 
 
-=== apache-status Fields
+=== apache Fields
 
-`apache-status` contains the metrics that were scraped from the status page.
+apache contains the metrics that were scraped from apache.
 
 
 
-==== apache-status.hostname
+=== status Fields
+
+`status` contains the metrics that were scraped from the apache status page.
+
+
+
+==== apache.status.hostname
 
 type: keyword
 
 Apache hostname.
 
 
-==== apache-status.totalAccesses
+==== apache.status.totalAccesses
 
 type: integer
 
 Total number of access requests.
 
 
-==== apache-status.totalKBytes
+==== apache.status.totalKBytes
 
 type: integer
 
 Total number of kilobytes served.
 
 
-==== apache-status.reqPerSec
+==== apache.status.reqPerSec
 
 type: float
 
 Requests per second.
 
 
-==== apache-status.bytesPerSec
+==== apache.status.bytesPerSec
 
 type: float
 
 Bytes per second.
 
 
-==== apache-status.bytesPerReq
+==== apache.status.bytesPerReq
 
 type: float
 
 Bytes per request.
 
 
-==== apache-status.busyWorkers
+==== apache.status.busyWorkers
 
 type: integer
 
 Number of busy workers.
 
 
-==== apache-status.idleWorkers
+==== apache.status.idleWorkers
 
 type: integer
 
@@ -92,14 +98,14 @@ Uptime stats.
 
 
 
-==== apache-status.uptime.serverUptimeSeconds
+==== apache.status.uptime.serverUptimeSeconds
 
 type: integer
 
 Server uptime in seconds.
 
 
-==== apache-status.uptime.uptime
+==== apache.status.uptime.uptime
 
 type: integer
 
@@ -112,35 +118,35 @@ CPU stats.
 
 
 
-==== apache-status.cpu.cpuLoad
+==== apache.status.cpu.cpuLoad
 
 type: float
 
 CPU Load.
 
 
-==== apache-status.cpu.cpuUser
+==== apache.status.cpu.cpuUser
 
 type: float
 
 CPU user load.
 
 
-==== apache-status.cpu.cpuSystem
+==== apache.status.cpu.cpuSystem
 
 type: float
 
 System cpu.
 
 
-==== apache-status.cpu.cpuChildrenUser
+==== apache.status.cpu.cpuChildrenUser
 
 type: float
 
 CPU of children user.
 
 
-==== apache-status.cpu.cpuChildrenSystem
+==== apache.status.cpu.cpuChildrenSystem
 
 type: float
 
@@ -153,28 +159,28 @@ Connection stats.
 
 
 
-==== apache-status.connections.connsTotal
+==== apache.status.connections.connsTotal
 
 type: integer
 
 Total connections.
 
 
-==== apache-status.connections.connsAsyncWriting
+==== apache.status.connections.connsAsyncWriting
 
 type: integer
 
 Async connection writing.
 
 
-==== apache-status.connections.connsAsyncKeepAlive
+==== apache.status.connections.connsAsyncKeepAlive
 
 type: integer
 
 Async keeped alive connections.
 
 
-==== apache-status.connections.connsAsyncClosing
+==== apache.status.connections.connsAsyncClosing
 
 type: integer
 
@@ -187,21 +193,21 @@ Load averages.
 
 
 
-==== apache-status.load.load1
+==== apache.status.load.load1
 
 type: float
 
 Load average for the last minute.
 
 
-==== apache-status.load.load5
+==== apache.status.load.load5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== apache-status.load.load15
+==== apache.status.load.load15
 
 type: float
 
@@ -214,84 +220,84 @@ Scoreboard metrics.
 
 
 
-==== apache-status.scoreboard.startingUp
+==== apache.status.scoreboard.startingUp
 
 type: integer
 
 Starting up.
 
 
-==== apache-status.scoreboard.readingRequest
+==== apache.status.scoreboard.readingRequest
 
 type: integer
 
 Reading requests.
 
 
-==== apache-status.scoreboard.sendingReply
+==== apache.status.scoreboard.sendingReply
 
 type: integer
 
 Sending Reply.
 
 
-==== apache-status.scoreboard.keepalive
+==== apache.status.scoreboard.keepalive
 
 type: integer
 
 Keep alive.
 
 
-==== apache-status.scoreboard.dnsLookup
+==== apache.status.scoreboard.dnsLookup
 
 type: integer
 
 Dns Lookups.
 
 
-==== apache-status.scoreboard.closingConnection
+==== apache.status.scoreboard.closingConnection
 
 type: integer
 
 Closing connections.
 
 
-==== apache-status.scoreboard.logging
+==== apache.status.scoreboard.logging
 
 type: integer
 
 Logging
 
 
-==== apache-status.scoreboard.gracefullyFinishing
+==== apache.status.scoreboard.gracefullyFinishing
 
 type: integer
 
 Gracefully finishing.
 
 
-==== apache-status.scoreboard.idleCleanup
+==== apache.status.scoreboard.idleCleanup
 
 type: integer
 
 Idle cleanups
 
 
-==== apache-status.scoreboard.openSlot
+==== apache.status.scoreboard.openSlot
 
 type: integer
 
 Open slots.
 
 
-==== apache-status.scoreboard.waitingForConnection
+==== apache.status.scoreboard.waitingForConnection
 
 type: integer
 
 Waiting for connections.
 
 
-==== apache-status.scoreboard.total
+==== apache.status.scoreboard.total
 
 type: integer
 
@@ -383,13 +389,19 @@ The document type. Always set to "metricsets".
 [[exported-fields-mysql]]
 === MySQL Status Fields
 
-MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
+MySQL server status metrics collected from MySQL
 
 
 
-=== mysql-status Fields
+=== mysql Fields
 
-`mysql-status` contains the metrics that were obtained the status SQL query.
+mysql contains the metrics that were obtained from MySQL query.
+
+
+
+=== status Fields
+
+`status` contains the metrics that were obtained by the status SQL query.
 
 
 
@@ -399,14 +411,14 @@ Aborted status fields
 
 
 
-==== mysql-status.aborted.Aborted_clients
+==== mysql.status.aborted.Aborted_clients
 
 type: integer
 
 The number of connections that were aborted because the client died without closing the connection properly.
 
 
-==== mysql-status.aborted.Aborted_connects
+==== mysql.status.aborted.Aborted_connects
 
 type: integer
 
@@ -419,14 +431,14 @@ Bytes stats
 
 
 
-==== mysql-status.bytes.Bytes_received
+==== mysql.status.bytes.Bytes_received
 
 type: integer
 
 The number of bytes received from all clients.
 
 
-==== mysql-status.bytes.Bytes_sent
+==== mysql.status.bytes.Bytes_sent
 
 type: integer
 
@@ -434,15 +446,21 @@ The number of bytes sent to all clients.
 
 
 [[exported-fields-redis]]
-=== Redis Info Fields
+=== Redis Fields
 
-Redis metrics collected from the Redis `INFO` command.
+Redis metrics collected from the Redis
 
 
 
-=== redis-info Fields
+=== redis Fields
 
-`redis-info` contains the information and statistics returned by the `INFO` command.
+`redis` contains the information and statistics from Redis
+
+
+
+=== info Fields
+
+`info` contains the information and statistics returned by the `INFO` command.
 
 
 
@@ -452,28 +470,28 @@ Redis client stats
 
 
 
-==== redis-info.clients.connected_clients
+==== redis.info.clients.connected_clients
 
 type: integer
 
 Number of client connections (excluding connections from slaves)
 
 
-==== redis-info.clients.client_longest_output_list
+==== redis.info.clients.client_longest_output_list
 
 type: integer
 
 Longest output list among current client connections.
 
 
-==== redis-info.clients.client_biggest_input_buf
+==== redis.info.clients.client_biggest_input_buf
 
 type: integer
 
 Biggest input buffer among current client connections
 
 
-==== redis-info.clients.blocked_clients
+==== redis.info.clients.blocked_clients
 
 type: integer
 
@@ -486,7 +504,7 @@ Redis cluster information
 
 
 
-==== redis-info.cluster.cluster_enabled
+==== redis.info.cluster.cluster_enabled
 
 type: boolean
 
@@ -499,28 +517,28 @@ Redis CPU stats
 
 
 
-==== redis-info.cpu.used_cpu_sys
+==== redis.info.cpu.used_cpu_sys
 
 type: float
 
 System CPU consumed by the Redis server
 
 
-==== redis-info.cpu.used_cpu_sys_children
+==== redis.info.cpu.used_cpu_sys_children
 
 type: float
 
 User CPU consumed by the Redis server
 
 
-==== redis-info.cpu.used_cpu_user
+==== redis.info.cpu.used_cpu_user
 
 type: float
 
 System CPU consumed by the background processes
 
 
-==== redis-info.cpu.used_cpu_user_children
+==== redis.info.cpu.used_cpu_user_children
 
 type: float
 
@@ -534,157 +552,163 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
-=== system-cores Fields
+=== system Fields
+
+`system` contains local system metrics
+
+
+
+=== cores Fields
 
 `system-cores` contains local cpu core stats.
 
 
 
-==== system-cores.core
+==== system.cores.core
 
 type: integer
 
 CPU Core number.
 
 
-==== system-cores.user
+==== system.cores.user
 
 type: integer
 
 The amount of CPU time spent in user space.
 
 
-==== system-cores.user_p
+==== system.cores.user_p
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system-cores.nice
+==== system.cores.nice
 
 type: integer
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system-cores.system
+==== system.cores.system
 
 type: integer
 
 The amount of CPU time spent in kernel space.
 
 
-==== system-cores.system_p
+==== system.cores.system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system-cores.idle
+==== system.cores.idle
 
 type: integer
 
 The amount of CPU time spent idle.
 
 
-==== system-cores.iowait
+==== system.cores.iowait
 
 type: integer
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system-cores.irq
+==== system.cores.irq
 
 type: integer
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system-cores.softirq
+==== system.cores.softirq
 
 type: integer
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system-cores.steal
+==== system.cores.steal
 
 type: integer
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-=== system-cpu Fields
+=== cpu Fields
 
-`system-cpu` contains local cpu stats.
+`cpu` contains local cpu stats.
 
 
 
-==== system-cpu.user
+==== system.cpu.user
 
 type: integer
 
 The amount of CPU time spent in user space.
 
 
-==== system-cpu.user_p
+==== system.cpu.user_p
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system-cpu.nice
+==== system.cpu.nice
 
 type: integer
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system-cpu.system
+==== system.cpu.system
 
 type: integer
 
 The amount of CPU time spent in kernel space.
 
 
-==== system-cpu.system_p
+==== system.cpu.system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system-cpu.idle
+==== system.cpu.idle
 
 type: integer
 
 The amount of CPU time spent idle.
 
 
-==== system-cpu.iowait
+==== system.cpu.iowait
 
 type: integer
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system-cpu.irq
+==== system.cpu.irq
 
 type: integer
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system-cpu.softirq
+==== system.cpu.softirq
 
 type: integer
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system-cpu.steal
+==== system.cpu.steal
 
 type: integer
 
@@ -697,34 +721,34 @@ Load averages.
 
 
 
-==== system-cpu.load.load1
+==== system.cpu.load.load1
 
 type: float
 
 Load average for the last minute.
 
 
-==== system-cpu.load.load5
+==== system.cpu.load.load5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== system-cpu.load.load15
+==== system.cpu.load.load15
 
 type: float
 
 Load average for the last 15 minutes.
 
 
-=== system-disk Fields
+=== disk Fields
 
-`system-disk` contains disk IO metrics collected from the operating system.
+`disk` contains disk IO metrics collected from the operating system.
 
 
 
-==== system-disk.name
+==== system.disk.name
 
 type: keyword
 
@@ -733,144 +757,144 @@ example: sda1
 The disk name.
 
 
-==== system-disk.serial_number
+==== system.disk.serial_number
 
 type: keyword
 
 The disk's serial number. This may not be provided by all operating systems.
 
 
-==== system-disk.read_count
+==== system.disk.read_count
 
 type: long
 
 This is the total number of reads completed successfully.
 
 
-==== system-disk.write_count
+==== system.disk.write_count
 
 type: long
 
 This is the total number of writes completed successfully.
 
 
-==== system-disk.read_bytes
+==== system.disk.read_bytes
 
 type: long
 
 This is the total number of bytes read successfully. On Linux this is the number of sectors read multiplied by an assumed sector size of 512.
 
 
-==== system-disk.write_bytes
+==== system.disk.write_bytes
 
 type: long
 
 This is the total number of bytes written successfully. On Linux this is the number of sectors written multiplied by an assumed sector size of 512.
 
 
-==== system-disk.read_time
+==== system.disk.read_time
 
 type: long
 
 This is the total number of milliseconds spent by all reads.
 
 
-==== system-disk.write_time
+==== system.disk.write_time
 
 type: long
 
 This is the total number of milliseconds spent by all writes.
 
 
-==== system-disk.io_time
+==== system.disk.io_time
 
 type: long
 
 This is the total number of of milliseconds spent doing I/Os.
 
 
-=== system-filesystem Fields
+=== filesystem Fields
 
-`system-filesystem` contains local filesystem stats
+`filesystem` contains local filesystem stats
 
 
 
-==== system-filesystem.avail
+==== system.filesystem.avail
 
 type: long
 
 The disk space available to an unprivileged user in bytes.
 
 
-==== system-filesystem.device_name
+==== system.filesystem.device_name
 
 type: keyword
 
 The disk name. For example: `/dev/disk1`
 
 
-==== system-filesystem.mount_point
+==== system.filesystem.mount_point
 
 type: keyword
 
 The mounting point. For example: `/`
 
 
-==== system-filesystem.files
+==== system.filesystem.files
 
 type: long
 
 The total number of file nodes in the file system.
 
 
-==== system-filesystem.free
+==== system.filesystem.free
 
 type: long
 
 The disk space available in bytes.
 
 
-==== system-filesystem.free_files
+==== system.filesystem.free_files
 
 type: long
 
 The number of free file nodes in the file system.
 
 
-==== system-filesystem.total
+==== system.filesystem.total
 
 type: long
 
 The total disk space in bytes.
 
 
-==== system-filesystem.used
+==== system.filesystem.used
 
 type: long
 
 The used disk space in bytes.
 
 
-==== system-filesystem.used_p
+==== system.filesystem.used_p
 
 type: float
 
 The percentage of used disk space.
 
 
-=== system-fsstats Fields
+=== fsstats Fields
 
 `system-fsstats` contains filesystem metrics aggregated from all mounted filesystems.
 
 
 
-==== system-fsstats.count
+==== system.fsstats.count
 
 type: long
 
 Number of file systems found.
 
-==== system-fsstats.total_files
+==== system.fsstats.total_files
 
 type: long
 
@@ -881,30 +905,30 @@ Total number of files.
 Nested file system docs.
 
 
-==== system-fsstats.total_size.free
+==== system.fsstats.total_size.free
 
 type: long
 
 Total free space.
 
 
-==== system-fsstats.total_size.used
+==== system.fsstats.total_size.used
 
 type: long
 
 Total used space.
 
 
-==== system-fsstats.total_size.total
+==== system.fsstats.total_size.total
 
 type: long
 
 Total space (used plus free).
 
 
-=== system-memory Fields
+=== memory Fields
 
-`system-memory` contains local memory stats.
+`memory` contains local memory stats.
 
 
 
@@ -914,49 +938,49 @@ Total space (used plus free).
 This group contains statistics related to the memory usage on the system.
 
 
-==== system-memory.mem.total
+==== system.memory.mem.total
 
 type: long
 
 Total memory.
 
 
-==== system-memory.mem.used
+==== system.memory.mem.used
 
 type: long
 
 Used memory.
 
 
-==== system-memory.mem.free
+==== system.memory.mem.free
 
 type: long
 
 Available memory.
 
 
-==== system-memory.mem.used_p
+==== system.memory.mem.used_p
 
 type: float
 
 The percentage of used memory.
 
 
-==== system-memory.mem.actual_used
+==== system.memory.mem.actual_used
 
 type: long
 
 Actual used memory. This value is the "used" memory minus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system-memory.mem.actual_free
+==== system.memory.mem.actual_free
 
 type: long
 
 Actual available memory. This value is the "free" memory plus the memory used for disk caches and buffers. Available only on Unix.
 
 
-==== system-memory.mem.actual_used_p
+==== system.memory.mem.actual_used_p
 
 type: float
 
@@ -969,76 +993,76 @@ The percentage of actual used memory.
 This group contains statistics related to the swap memory usage on the system.
 
 
-==== system-memory.swap.total
+==== system.memory.swap.total
 
 type: long
 
 Total swap memory.
 
 
-==== system-memory.swap.used
+==== system.memory.swap.used
 
 type: long
 
 Used swap memory.
 
 
-==== system-memory.swap.free
+==== system.memory.swap.free
 
 type: long
 
 Available swap memory.
 
 
-==== system-memory.swap.used_p
+==== system.memory.swap.used_p
 
 type: float
 
 The percentage of used swap memory.
 
 
-=== system-process Fields
+=== process Fields
 
-`system-process` contains process metadata, CPU metrics, and memory metrics.
+`process` contains process metadata, CPU metrics, and memory metrics.
 
 
 
-==== system-process.name
+==== system.process.name
 
 type: keyword
 
 The process name.
 
 
-==== system-process.state
+==== system.process.state
 
 type: keyword
 
 The process state. For example: "running"
 
 
-==== system-process.pid
+==== system.process.pid
 
 type: integer
 
 The process pid.
 
 
-==== system-process.ppid
+==== system.process.ppid
 
 type: integer
 
 The process parent pid.
 
 
-==== system-process.cmdline
+==== system.process.cmdline
 
 type: keyword
 
 The full command-line used to start the process, including the arguments separated by space.
 
 
-==== system-process.username
+==== system.process.username
 
 type: keyword
 
@@ -1051,35 +1075,35 @@ The username of the user that created the process. If the username can not be de
 CPU-specific statistics per process.
 
 
-==== system-process.cpu.user
+==== system.process.cpu.user
 
 type: long
 
 The amount of CPU time the process spent in user space.
 
 
-==== system-process.cpu.total_p
+==== system.process.cpu.total_p
 
 type: float
 
 The percentage of CPU time spent by the process since the last update. Its value is similar with the %CPU value of the process displayed by the top command on unix systems.
 
 
-==== system-process.cpu.system
+==== system.process.cpu.system
 
 type: long
 
 The amount of CPU time the process spent in kernel space.
 
 
-==== system-process.cpu.total
+==== system.process.cpu.total
 
 type: long
 
 The total CPU time spent by the process.
 
 
-==== system-process.cpu.start_time
+==== system.process.cpu.start_time
 
 type: keyword
 
@@ -1092,28 +1116,28 @@ The time when the process was started. Example: "17:45".
 Memory-specific statistics per process.
 
 
-==== system-process.mem.size
+==== system.process.mem.size
 
 type: long
 
 The total virtual memory the process has.
 
 
-==== system-process.mem.rss
+==== system.process.mem.rss
 
 type: long
 
 The Resident Set Size. The amount of memory the process occupied in main memory (RAM).
 
 
-==== system-process.mem.rss_p
+==== system.process.mem.rss_p
 
 type: float
 
 The percentage of memory the process occupied in main memory (RAM).
 
 
-==== system-process.mem.share
+==== system.process.mem.share
 
 type: long
 
@@ -1127,139 +1151,145 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
-=== zookeeper-mntr Fields
+=== zookeeper Fields
 
-`zookeeper-mntr` contains the metrics reported by the four-letter `mntr` command.
+`zookeeper` contains the metrics reported by zookeeper command.
 
 
 
-==== zookeeper-mntr.hostname
+=== mntr Fields
+
+`mntr` contains the metrics reported by the four-letter `mntr` command.
+
+
+
+==== zookeeper.mntr.hostname
 
 type: keyword
 
 Zookeeper hostname.
 
 
-==== zookeeper-mntr.zk_approximate_data_size
+==== zookeeper.mntr.zk_approximate_data_size
 
 type: long
 
 Approximate size of zookeeper data.
 
 
-==== zookeeper-mntr.zk_avg_latency
+==== zookeeper.mntr.zk_avg_latency
 
 type: integer
 
 Average latency between ensemble hosts in milliseconds.
 
 
-==== zookeeper-mntr.zk_ephemerals_count
+==== zookeeper.mntr.zk_ephemerals_count
 
 type: integer
 
 Number of ephemeral znodes.
 
 
-==== zookeeper-mntr.zk_followers
+==== zookeeper.mntr.zk_followers
 
 type: integer
 
 Number of followers seen by the current host.
 
 
-==== zookeeper-mntr.zk_max_file_descriptor_count
+==== zookeeper.mntr.zk_max_file_descriptor_count
 
 type: integer
 
 Maximum number of file descriptors allowed for the zookeeper process.
 
 
-==== zookeeper-mntr.zk_max_latency
+==== zookeeper.mntr.zk_max_latency
 
 type: integer
 
 Maximum latency in milliseconds.
 
 
-==== zookeeper-mntr.zk_min_latency
+==== zookeeper.mntr.zk_min_latency
 
 type: integer
 
 Minimum latency in milliseconds.
 
 
-==== zookeeper-mntr.zk_num_alive_connections
+==== zookeeper.mntr.zk_num_alive_connections
 
 type: integer
 
 Number of connections to zookeeper that are currently alive.
 
 
-==== zookeeper-mntr.zk_open_file_descriptor_count
+==== zookeeper.mntr.zk_open_file_descriptor_count
 
 type: integer
 
 Number of file descriptors open by the zookeeper process.
 
 
-==== zookeeper-mntr.zk_outstanding_requests
+==== zookeeper.mntr.zk_outstanding_requests
 
 type: integer
 
 Number of outstanding requests that need to be processed by the cluster.
 
 
-==== zookeeper-mntr.zk_packets_received
+==== zookeeper.mntr.zk_packets_received
 
 type: integer
 
 Number zookeeper network packets received.
 
 
-==== zookeeper-mntr.zk_packets_sent
+==== zookeeper.mntr.zk_packets_sent
 
 type: long
 
 Number zookeeper network packets sent.
 
 
-==== zookeeper-mntr.zk_pending_syncs
+==== zookeeper.mntr.zk_pending_syncs
 
 type: integer
 
 Number of pending syncs to carry out to zookeeper ensemble followers.
 
 
-==== zookeeper-mntr.zk_server_state
+==== zookeeper.mntr.zk_server_state
 
 type: keyword
 
 Role in the zookeeper ensemble.
 
 
-==== zookeeper-mntr.zk_synced_followers
+==== zookeeper.mntr.zk_synced_followers
 
 type: integer
 
 Number of synced followers reported when a node server_state is leader.
 
 
-==== zookeeper-mntr.zk_version
+==== zookeeper.mntr.zk_version
 
 type: keyword
 
 Zookeeper version and build string reported.
 
 
-==== zookeeper-mntr.zk_watch_count
+==== zookeeper.mntr.zk_watch_count
 
 type: integer
 
 Number of watches currently set on the local zookeeper process.
 
 
-==== zookeeper-mntr.zk_znode_count
+==== zookeeper.mntr.zk_znode_count
 
 type: integer
 

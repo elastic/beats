@@ -67,8 +67,10 @@ func ExampleModuleWrapper() {
 	//     "FieldsUnderRoot": false,
 	//     "Tags": null
 	//   },
-	//   "fake-status": {
-	//     "metric": 1
+	//   "fake": {
+	//     "status": {
+	//       "metric": 1
+	//     }
 	//   },
 	//   "metricset": "status",
 	//   "module": "fake",

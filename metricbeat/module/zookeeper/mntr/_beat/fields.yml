@@ -1,7 +1,7 @@
-- name: zookeeper-mntr
+- name: mntr
   type: group
   description: >
-    `zookeeper-mntr` contains the metrics reported by the four-letter `mntr`
+    `mntr` contains the metrics reported by the four-letter `mntr`
     command.
   fields:
     - name: hostname

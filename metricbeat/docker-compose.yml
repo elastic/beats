@@ -6,7 +6,7 @@ beat:
     - redis
     - zookeeper
   environment:
-    - APACHE_HOST=http://apache/
+    - APACHE_HOST=apache
     - APACHE_PORT=80
     - REDIS_HOST=redis
     - REDIS_PORT=6379

@@ -1,7 +1,7 @@
-- name: system-memory
+- name: memory
   type: group
   description: >
-    `system-memory` contains local memory stats.
+    `memory` contains local memory stats.
   fields:
     - name: mem
       type: group

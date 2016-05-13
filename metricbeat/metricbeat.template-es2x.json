@@ -23,129 +23,133 @@
         "@timestamp": {
           "type": "date"
         },
-        "apache-status": {
+        "apache": {
           "properties": {
-            "busyWorkers": {
-              "type": "integer"
-            },
-            "bytesPerReq": {
-              "type": "float"
-            },
-            "bytesPerSec": {
-              "type": "float"
-            },
-            "connections": {
+            "status": {
               "properties": {
-                "connsAsyncClosing": {
+                "busyWorkers": {
                   "type": "integer"
                 },
-                "connsAsyncKeepAlive": {
-                  "type": "integer"
-                },
-                "connsAsyncWriting": {
-                  "type": "integer"
-                },
-                "connsTotal": {
-                  "type": "integer"
-                }
-              }
-            },
-            "cpu": {
-              "properties": {
-                "cpuChildrenSystem": {
+                "bytesPerReq": {
                   "type": "float"
                 },
-                "cpuChildrenUser": {
+                "bytesPerSec": {
                   "type": "float"
                 },
-                "cpuLoad": {
+                "connections": {
+                  "properties": {
+                    "connsAsyncClosing": {
+                      "type": "integer"
+                    },
+                    "connsAsyncKeepAlive": {
+                      "type": "integer"
+                    },
+                    "connsAsyncWriting": {
+                      "type": "integer"
+                    },
+                    "connsTotal": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "cpu": {
+                  "properties": {
+                    "cpuChildrenSystem": {
+                      "type": "float"
+                    },
+                    "cpuChildrenUser": {
+                      "type": "float"
+                    },
+                    "cpuLoad": {
+                      "type": "float"
+                    },
+                    "cpuSystem": {
+                      "type": "float"
+                    },
+                    "cpuUser": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "idleWorkers": {
+                  "type": "integer"
+                },
+                "load": {
+                  "properties": {
+                    "load1": {
+                      "type": "float"
+                    },
+                    "load15": {
+                      "type": "float"
+                    },
+                    "load5": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "reqPerSec": {
                   "type": "float"
                 },
-                "cpuSystem": {
-                  "type": "float"
+                "scoreboard": {
+                  "properties": {
+                    "closingConnection": {
+                      "type": "integer"
+                    },
+                    "dnsLookup": {
+                      "type": "integer"
+                    },
+                    "gracefullyFinishing": {
+                      "type": "integer"
+                    },
+                    "idleCleanup": {
+                      "type": "integer"
+                    },
+                    "keepalive": {
+                      "type": "integer"
+                    },
+                    "logging": {
+                      "type": "integer"
+                    },
+                    "openSlot": {
+                      "type": "integer"
+                    },
+                    "readingRequest": {
+                      "type": "integer"
+                    },
+                    "sendingReply": {
+                      "type": "integer"
+                    },
+                    "startingUp": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "waitingForConnection": {
+                      "type": "integer"
+                    }
+                  }
                 },
-                "cpuUser": {
-                  "type": "float"
-                }
-              }
-            },
-            "hostname": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "idleWorkers": {
-              "type": "integer"
-            },
-            "load": {
-              "properties": {
-                "load1": {
-                  "type": "float"
-                },
-                "load15": {
-                  "type": "float"
-                },
-                "load5": {
-                  "type": "float"
-                }
-              }
-            },
-            "reqPerSec": {
-              "type": "float"
-            },
-            "scoreboard": {
-              "properties": {
-                "closingConnection": {
+                "totalAccesses": {
                   "type": "integer"
                 },
-                "dnsLookup": {
-                  "type": "integer"
-                },
-                "gracefullyFinishing": {
-                  "type": "integer"
-                },
-                "idleCleanup": {
-                  "type": "integer"
-                },
-                "keepalive": {
-                  "type": "integer"
-                },
-                "logging": {
-                  "type": "integer"
-                },
-                "openSlot": {
-                  "type": "integer"
-                },
-                "readingRequest": {
-                  "type": "integer"
-                },
-                "sendingReply": {
-                  "type": "integer"
-                },
-                "startingUp": {
-                  "type": "integer"
-                },
-                "total": {
-                  "type": "integer"
-                },
-                "waitingForConnection": {
-                  "type": "integer"
-                }
-              }
-            },
-            "totalAccesses": {
-              "type": "integer"
-            },
-            "totalKBytes": {
-              "type": "integer"
-            },
-            "uptime": {
-              "properties": {
-                "serverUptimeSeconds": {
+                "totalKBytes": {
                   "type": "integer"
                 },
                 "uptime": {
-                  "type": "integer"
+                  "properties": {
+                    "serverUptimeSeconds": {
+                      "type": "integer"
+                    },
+                    "uptime": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             }
@@ -180,68 +184,76 @@
           "index": "not_analyzed",
           "type": "string"
         },
-        "mysql-status": {
+        "mysql": {
           "properties": {
-            "aborted": {
+            "status": {
               "properties": {
-                "Aborted_clients": {
-                  "type": "integer"
+                "aborted": {
+                  "properties": {
+                    "Aborted_clients": {
+                      "type": "integer"
+                    },
+                    "Aborted_connects": {
+                      "type": "integer"
+                    }
+                  }
                 },
-                "Aborted_connects": {
-                  "type": "integer"
-                }
-              }
-            },
-            "bytes": {
-              "properties": {
-                "Bytes_received": {
-                  "type": "integer"
-                },
-                "Bytes_sent": {
-                  "type": "integer"
+                "bytes": {
+                  "properties": {
+                    "Bytes_received": {
+                      "type": "integer"
+                    },
+                    "Bytes_sent": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             }
           }
         },
-        "redis-info": {
+        "redis": {
           "properties": {
-            "clients": {
+            "info": {
               "properties": {
-                "blocked_clients": {
-                  "type": "integer"
+                "clients": {
+                  "properties": {
+                    "blocked_clients": {
+                      "type": "integer"
+                    },
+                    "client_biggest_input_buf": {
+                      "type": "integer"
+                    },
+                    "client_longest_output_list": {
+                      "type": "integer"
+                    },
+                    "connected_clients": {
+                      "type": "integer"
+                    }
+                  }
                 },
-                "client_biggest_input_buf": {
-                  "type": "integer"
+                "cluster": {
+                  "properties": {
+                    "cluster_enabled": {
+                      "type": "boolean"
+                    }
+                  }
                 },
-                "client_longest_output_list": {
-                  "type": "integer"
-                },
-                "connected_clients": {
-                  "type": "integer"
-                }
-              }
-            },
-            "cluster": {
-              "properties": {
-                "cluster_enabled": {
-                  "type": "boolean"
-                }
-              }
-            },
-            "cpu": {
-              "properties": {
-                "used_cpu_sys": {
-                  "type": "float"
-                },
-                "used_cpu_sys_children": {
-                  "type": "float"
-                },
-                "used_cpu_user": {
-                  "type": "float"
-                },
-                "used_cpu_user_children": {
-                  "type": "float"
+                "cpu": {
+                  "properties": {
+                    "used_cpu_sys": {
+                      "type": "float"
+                    },
+                    "used_cpu_sys_children": {
+                      "type": "float"
+                    },
+                    "used_cpu_user": {
+                      "type": "float"
+                    },
+                    "used_cpu_user_children": {
+                      "type": "float"
+                    }
+                  }
                 }
               }
             }
@@ -250,292 +262,296 @@
         "rtt": {
           "type": "long"
         },
-        "system-cores": {
+        "system": {
           "properties": {
-            "core": {
-              "type": "integer"
-            },
-            "idle": {
-              "type": "integer"
-            },
-            "iowait": {
-              "type": "integer"
-            },
-            "irq": {
-              "type": "integer"
-            },
-            "nice": {
-              "type": "integer"
-            },
-            "softirq": {
-              "type": "integer"
-            },
-            "steal": {
-              "type": "integer"
-            },
-            "system": {
-              "type": "integer"
-            },
-            "system_p": {
-              "type": "float"
-            },
-            "user": {
-              "type": "integer"
-            },
-            "user_p": {
-              "type": "float"
-            }
-          }
-        },
-        "system-cpu": {
-          "properties": {
-            "idle": {
-              "type": "integer"
-            },
-            "iowait": {
-              "type": "integer"
-            },
-            "irq": {
-              "type": "integer"
-            },
-            "load": {
+            "cores": {
               "properties": {
-                "load1": {
+                "core": {
+                  "type": "integer"
+                },
+                "idle": {
+                  "type": "integer"
+                },
+                "iowait": {
+                  "type": "integer"
+                },
+                "irq": {
+                  "type": "integer"
+                },
+                "nice": {
+                  "type": "integer"
+                },
+                "softirq": {
+                  "type": "integer"
+                },
+                "steal": {
+                  "type": "integer"
+                },
+                "system": {
+                  "type": "integer"
+                },
+                "system_p": {
                   "type": "float"
                 },
-                "load15": {
-                  "type": "float"
+                "user": {
+                  "type": "integer"
                 },
-                "load5": {
+                "user_p": {
                   "type": "float"
                 }
               }
-            },
-            "nice": {
-              "type": "integer"
-            },
-            "softirq": {
-              "type": "integer"
-            },
-            "steal": {
-              "type": "integer"
-            },
-            "system": {
-              "type": "integer"
-            },
-            "system_p": {
-              "type": "float"
-            },
-            "user": {
-              "type": "integer"
-            },
-            "user_p": {
-              "type": "float"
-            }
-          }
-        },
-        "system-disk": {
-          "properties": {
-            "io_time": {
-              "type": "long"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "read_bytes": {
-              "type": "long"
-            },
-            "read_count": {
-              "type": "long"
-            },
-            "read_time": {
-              "type": "long"
-            },
-            "serial_number": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "write_bytes": {
-              "type": "long"
-            },
-            "write_count": {
-              "type": "long"
-            },
-            "write_time": {
-              "type": "long"
-            }
-          }
-        },
-        "system-filesystem": {
-          "properties": {
-            "avail": {
-              "type": "long"
-            },
-            "device_name": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "files": {
-              "type": "long"
-            },
-            "free": {
-              "type": "long"
-            },
-            "free_files": {
-              "type": "long"
-            },
-            "mount_point": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "total": {
-              "type": "long"
-            },
-            "used": {
-              "type": "long"
-            },
-            "used_p": {
-              "type": "float"
-            }
-          }
-        },
-        "system-fsstats": {
-          "properties": {
-            "count": {
-              "type": "long"
-            },
-            "total_files": {
-              "type": "long"
-            },
-            "total_size": {
-              "properties": {
-                "free": {
-                  "type": "long"
-                },
-                "total": {
-                  "type": "long"
-                },
-                "used": {
-                  "type": "long"
-                }
-              }
-            }
-          }
-        },
-        "system-memory": {
-          "properties": {
-            "mem": {
-              "properties": {
-                "actual_free": {
-                  "type": "long"
-                },
-                "actual_used": {
-                  "type": "long"
-                },
-                "actual_used_p": {
-                  "type": "float"
-                },
-                "free": {
-                  "type": "long"
-                },
-                "total": {
-                  "type": "long"
-                },
-                "used": {
-                  "type": "long"
-                },
-                "used_p": {
-                  "type": "float"
-                }
-              }
-            },
-            "swap": {
-              "properties": {
-                "free": {
-                  "type": "long"
-                },
-                "total": {
-                  "type": "long"
-                },
-                "used": {
-                  "type": "long"
-                },
-                "used_p": {
-                  "type": "float"
-                }
-              }
-            }
-          }
-        },
-        "system-process": {
-          "properties": {
-            "cmdline": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
             },
             "cpu": {
               "properties": {
-                "start_time": {
+                "idle": {
+                  "type": "integer"
+                },
+                "iowait": {
+                  "type": "integer"
+                },
+                "irq": {
+                  "type": "integer"
+                },
+                "load": {
+                  "properties": {
+                    "load1": {
+                      "type": "float"
+                    },
+                    "load15": {
+                      "type": "float"
+                    },
+                    "load5": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "nice": {
+                  "type": "integer"
+                },
+                "softirq": {
+                  "type": "integer"
+                },
+                "steal": {
+                  "type": "integer"
+                },
+                "system": {
+                  "type": "integer"
+                },
+                "system_p": {
+                  "type": "float"
+                },
+                "user": {
+                  "type": "integer"
+                },
+                "user_p": {
+                  "type": "float"
+                }
+              }
+            },
+            "disk": {
+              "properties": {
+                "io_time": {
+                  "type": "long"
+                },
+                "name": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "system": {
+                "read_bytes": {
                   "type": "long"
+                },
+                "read_count": {
+                  "type": "long"
+                },
+                "read_time": {
+                  "type": "long"
+                },
+                "serial_number": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "write_bytes": {
+                  "type": "long"
+                },
+                "write_count": {
+                  "type": "long"
+                },
+                "write_time": {
+                  "type": "long"
+                }
+              }
+            },
+            "filesystem": {
+              "properties": {
+                "avail": {
+                  "type": "long"
+                },
+                "device_name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "files": {
+                  "type": "long"
+                },
+                "free": {
+                  "type": "long"
+                },
+                "free_files": {
+                  "type": "long"
+                },
+                "mount_point": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
                 },
                 "total": {
                   "type": "long"
                 },
-                "total_p": {
-                  "type": "float"
-                },
-                "user": {
+                "used": {
                   "type": "long"
+                },
+                "used_p": {
+                  "type": "float"
                 }
               }
             },
-            "mem": {
+            "fsstats": {
               "properties": {
-                "rss": {
+                "count": {
                   "type": "long"
                 },
-                "rss_p": {
-                  "type": "float"
-                },
-                "share": {
+                "total_files": {
                   "type": "long"
                 },
-                "size": {
-                  "type": "long"
+                "total_size": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    }
+                  }
                 }
               }
             },
-            "name": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
+            "memory": {
+              "properties": {
+                "mem": {
+                  "properties": {
+                    "actual_free": {
+                      "type": "long"
+                    },
+                    "actual_used": {
+                      "type": "long"
+                    },
+                    "actual_used_p": {
+                      "type": "float"
+                    },
+                    "free": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    },
+                    "used_p": {
+                      "type": "float"
+                    }
+                  }
+                },
+                "swap": {
+                  "properties": {
+                    "free": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    },
+                    "used": {
+                      "type": "long"
+                    },
+                    "used_p": {
+                      "type": "float"
+                    }
+                  }
+                }
+              }
             },
-            "pid": {
-              "type": "integer"
-            },
-            "ppid": {
-              "type": "integer"
-            },
-            "state": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "username": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
+            "process": {
+              "properties": {
+                "cmdline": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "cpu": {
+                  "properties": {
+                    "start_time": {
+                      "ignore_above": 1024,
+                      "index": "not_analyzed",
+                      "type": "string"
+                    },
+                    "system": {
+                      "type": "long"
+                    },
+                    "total": {
+                      "type": "long"
+                    },
+                    "total_p": {
+                      "type": "float"
+                    },
+                    "user": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "mem": {
+                  "properties": {
+                    "rss": {
+                      "type": "long"
+                    },
+                    "rss_p": {
+                      "type": "float"
+                    },
+                    "share": {
+                      "type": "long"
+                    },
+                    "size": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "name": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "pid": {
+                  "type": "integer"
+                },
+                "ppid": {
+                  "type": "integer"
+                },
+                "state": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "username": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                }
+              }
             }
           }
         },
@@ -549,70 +565,74 @@
           "index": "not_analyzed",
           "type": "string"
         },
-        "zookeeper-mntr": {
+        "zookeeper": {
           "properties": {
-            "hostname": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "zk_approximate_data_size": {
-              "type": "long"
-            },
-            "zk_avg_latency": {
-              "type": "integer"
-            },
-            "zk_ephemerals_count": {
-              "type": "integer"
-            },
-            "zk_followers": {
-              "type": "integer"
-            },
-            "zk_max_file_descriptor_count": {
-              "type": "integer"
-            },
-            "zk_max_latency": {
-              "type": "integer"
-            },
-            "zk_min_latency": {
-              "type": "integer"
-            },
-            "zk_num_alive_connections": {
-              "type": "integer"
-            },
-            "zk_open_file_descriptor_count": {
-              "type": "integer"
-            },
-            "zk_outstanding_requests": {
-              "type": "integer"
-            },
-            "zk_packets_received": {
-              "type": "integer"
-            },
-            "zk_packets_sent": {
-              "type": "long"
-            },
-            "zk_pending_syncs": {
-              "type": "integer"
-            },
-            "zk_server_state": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "zk_synced_followers": {
-              "type": "integer"
-            },
-            "zk_version": {
-              "ignore_above": 1024,
-              "index": "not_analyzed",
-              "type": "string"
-            },
-            "zk_watch_count": {
-              "type": "integer"
-            },
-            "zk_znode_count": {
-              "type": "integer"
+            "mntr": {
+              "properties": {
+                "hostname": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "zk_approximate_data_size": {
+                  "type": "long"
+                },
+                "zk_avg_latency": {
+                  "type": "integer"
+                },
+                "zk_ephemerals_count": {
+                  "type": "integer"
+                },
+                "zk_followers": {
+                  "type": "integer"
+                },
+                "zk_max_file_descriptor_count": {
+                  "type": "integer"
+                },
+                "zk_max_latency": {
+                  "type": "integer"
+                },
+                "zk_min_latency": {
+                  "type": "integer"
+                },
+                "zk_num_alive_connections": {
+                  "type": "integer"
+                },
+                "zk_open_file_descriptor_count": {
+                  "type": "integer"
+                },
+                "zk_outstanding_requests": {
+                  "type": "integer"
+                },
+                "zk_packets_received": {
+                  "type": "integer"
+                },
+                "zk_packets_sent": {
+                  "type": "long"
+                },
+                "zk_pending_syncs": {
+                  "type": "integer"
+                },
+                "zk_server_state": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "zk_synced_followers": {
+                  "type": "integer"
+                },
+                "zk_version": {
+                  "ignore_above": 1024,
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "zk_watch_count": {
+                  "type": "integer"
+                },
+                "zk_znode_count": {
+                  "type": "integer"
+                }
+              }
             }
           }
         }

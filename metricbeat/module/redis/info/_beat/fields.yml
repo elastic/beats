@@ -1,8 +1,7 @@
-- name: redis-info
+- name: info
   type: group
   description: >
-    `redis-info` contains the information and statistics returned by the
-    `INFO` command.
+    `info` contains the information and statistics returned by the `INFO` command.
   fields:
     - name: clients
       type: group

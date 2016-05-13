@@ -3,4 +3,8 @@
   description: >
     Apache HTTPD server metrics collected from the mod_status module.
   fields:
-
+    - name: apache
+      type: group
+      description: >
+        apache contains the metrics that were scraped from apache.
+      fields:

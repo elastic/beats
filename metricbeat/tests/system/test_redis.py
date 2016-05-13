@@ -2,7 +2,7 @@ import os
 import metricbeat
 from nose.plugins.attrib import attr
 
-REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis-info"]
+REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
 
 REDIS_INFO_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
                      "persistence", "replication", "server", "stats"]
@@ -39,7 +39,7 @@ class RedisInfoTest(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertItemsEqual(REDIS_FIELDS, evt.keys())
-        redis_info = evt["redis-info"]
+        redis_info = evt["redis"]["info"]
         self.assertItemsEqual(REDIS_INFO_FIELDS, redis_info.keys())
         self.assertItemsEqual(CLIENTS_FIELDS, redis_info["clients"].keys())
         self.assertItemsEqual(CPU_FIELDS, redis_info["cpu"].keys())
@@ -75,7 +75,7 @@ class RedisInfoTest(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertItemsEqual(REDIS_FIELDS, evt.keys())
-        redis_info = evt["redis-info"]
+        redis_info = evt["redis"]["info"]
         self.assertItemsEqual(fields, redis_info.keys())
         self.assertItemsEqual(CLIENTS_FIELDS, redis_info["clients"].keys())
         self.assertItemsEqual(CPU_FIELDS, redis_info["cpu"].keys())

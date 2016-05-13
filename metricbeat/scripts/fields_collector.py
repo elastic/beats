@@ -40,7 +40,7 @@ def collect():
                 # Add 4 spaces for indentation in front of each line
                 for line in f:
                     if len(line.strip()) > 0:
-                        fields_yml += "    " + line
+                        fields_yml += "    " + "    " + line
                     else:
                         fields_yml += line
 

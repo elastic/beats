@@ -48,7 +48,7 @@ class SystemTest(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        cpu = evt["system-cpu"]
+        cpu = evt["system"]["cpu"]
         self.assertItemsEqual(SYSTEM_CPU_FIELDS, cpu.keys())
 
     def test_cores(self):
@@ -73,7 +73,7 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            cores = evt["system-cores"]
+            cores = evt["system"]["cores"]
             self.assertItemsEqual(SYSTEM_CORES, cores.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
@@ -99,7 +99,7 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            disk = evt["system-disk"]
+            disk = evt["system"]["disk"]
             self.assertItemsEqual(SYSTEM_DISK_FIELDS, disk.keys())
 
     def test_filesystem(self):
@@ -124,7 +124,7 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            filesystem = evt["system-filesystem"]
+            filesystem = evt["system"]["filesystem"]
             self.assertItemsEqual(SYSTEM_FILESYSTEM_FIELDS, filesystem.keys())
 
     def test_fsstats(self):
@@ -149,7 +149,7 @@ class SystemTest(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        fsstats = evt["system-fsstats"]
+        fsstats = evt["system"]["fsstats"]
         self.assertItemsEqual(SYSTEM_FSSTATS_FIELDS, fsstats.keys())
 
     def test_memory(self):
@@ -174,7 +174,7 @@ class SystemTest(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        memory = evt["system-memory"]
+        memory = evt["system"]["memory"]
         self.assertItemsEqual(SYSTEM_MEMORY_FIELDS, memory.keys())
 
         # Check that percentages are calculated.
@@ -213,5 +213,5 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            process = evt["system-process"]
+            process = evt["system"]["process"]
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
