@@ -62,7 +62,7 @@
             "redis_git_dirty": "0",
             "redis_git_sha1": "00000000",
             "redis_mode": "standalone",
-            "redis_version": "3.0.7",
+            "redis_version": "3.2.0",
             "run_id": "8e1659f076c248591812705a24e545257ee6e090",
             "tcp_port": "6379",
             "uptime_in_days": "20",

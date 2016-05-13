@@ -43,7 +43,7 @@ existing docker modules and can be added as simple as redis:
 [source,yaml]
 ----
 redis:
-  image: redis:3.0.7
+  image: redis:3.2.0
 ----
 
 To make sure the service is running before the tests are started, the
