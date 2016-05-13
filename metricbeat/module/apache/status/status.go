@@ -39,7 +39,8 @@ func init() {
 // MetricSet for fetching Apache HTTPD server status.
 type MetricSet struct {
 	mb.BaseMetricSet
-	url string // Endpoint URL.
+	client *http.Client // HTTP client that is reused across requests.
+	url    string       // Apache HTTP server status endpoint URL.
 }
 
 // New creates new instance of MetricSet.
@@ -67,6 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		url:           u.String(),
+		client:        &http.Client{Timeout: base.Module().Config().Timeout},
 	}, nil
 }
 
@@ -74,8 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // endpoint.
 func (m *MetricSet) Fetch() (common.MapStr, error) {
 	req, err := http.NewRequest("GET", m.url, nil)
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := m.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %v", err)
 	}
