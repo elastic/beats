@@ -5,8 +5,9 @@ defaults:
   doc_values: true
   ignore_above: 1024
 
-beat:
-  type: group
+fields:
+- key: beat
+  title: Beat
   description: >
     Contains common beat fields available in all event types.
   fields:

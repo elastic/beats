@@ -1,12 +1,5 @@
-defaults:
-  type: keyword
-  required: false
-  index: true
-  doc_values: true
-  ignore_above: 1024
-
-common:
-  type: group
+- key: common
+  title: Common
   description: >
     Contains common fields available in all event types.
   fields:
@@ -35,19 +28,12 @@ common:
       example: metricsets
       description: >
         The document type. Always set to "metricsets".
-
-sections:
-  common: "Common"
-  apache: "Apache Status"
-  redis: "Redis Info"
-  mysql: "MySQL Status"
-  system: "System Status"
-  zookeeper: "Zookeeper Status"
-apache:
-  type: group
+- key: apache
+  title: "Apache Status"
   description: >
     Apache HTTPD server metrics collected from the mod_status module.
   fields:
+
     - name: apache-status
       type: group
       description: >
@@ -215,11 +201,12 @@ apache:
               type: integer
               description: >
                 Total.
-mysql:
-  type: group
+- key: mysql
+  title: "MySQL Status"
   description: >
     MySQL server status metrics collected from a `SHOW GLOBAL STATUS` SQL query.
   fields:
+
     - name: mysql-status
       type: group
       description: >
@@ -255,8 +242,8 @@ mysql:
               type: integer
               description: >
                 The number of bytes sent to all clients.
-redis:
-  type: group
+- key: redis
+  title: "Redis Info"
   description: >
     Redis metrics collected from the Redis `INFO` command.
   fields:
@@ -325,11 +312,12 @@ redis:
               type: float
               description: >
                 User CPU consumed by the background processes
-system:
-  type: group
+- key: system
+  title: System Status
   description: >
     System status metrics, like CPU and memory usage, that are collected from the operating system.
   fields:
+
     - name: system-cores
       type: group
       description: >
@@ -744,11 +732,12 @@ system:
               type: long
               description: >
                 The shared memory the process uses.
-zookeeper:
-  type: group
+- key: zookeeper
+  title: "Zookeeper Status"
   description: >
     ZooKeeper metrics collected by the four-letter monitoring commands.
   fields:
+
     - name: zookeeper-mntr
       type: group
       description: >

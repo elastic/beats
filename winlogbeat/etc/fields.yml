@@ -1,5 +1,5 @@
-common:
-  type: group
+- key: common
+  title: "Common Winlogbeat"
   description: >
     Contains common fields available in all event types.
   fields:
@@ -16,8 +16,9 @@ common:
         systems, the Windows Event Log API is used. Winlogbeat automatically
         detects which API to use for reading event logs.
 
-eventlog:
-  type: group
+
+- key: eventlog
+  title: Event Log Record
   description: >
     Contains data from a Windows event log record.
   fields:
@@ -205,7 +206,3 @@ eventlog:
         The XML representation of the event is useful for troubleshooting
         purposes. The data in the fields reported by Winlogbeat can be compared
         to the data in the XML to diagnose problems.
-
-sections:
-  common: "Common Beat"
-  eventlog: "Event Log Record"

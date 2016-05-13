@@ -1,5 +1,6 @@
-apache:
-  type: group
+- key: apache
+  title: "Apache Status"
   description: >
     Apache HTTPD server metrics collected from the mod_status module.
   fields:
+
