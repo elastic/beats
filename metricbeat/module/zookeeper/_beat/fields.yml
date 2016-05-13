@@ -1,5 +1,6 @@
-zookeeper:
-  type: group
+- key: zookeeper
+  title: "Zookeeper Status"
   description: >
     ZooKeeper metrics collected by the four-letter monitoring commands.
   fields:
+

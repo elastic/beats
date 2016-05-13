@@ -412,14 +412,14 @@ class TestCase(unittest.TestCase):
 
             content += f.read()
             doc = yaml.load(content)
+
             fields = []
             dictfields = []
-            for key, value in doc.items():
-                if isinstance(value, dict) and \
-                        value.get("type") == "group":
-                    subfields, subdictfields = extract_fields(value["fields"], "")
-                    fields.extend(subfields)
-                    dictfields.extend(subdictfields)
+
+            for item in doc["fields"]:
+                subfields, subdictfields = extract_fields(item["fields"], "")
+                fields.extend(subfields)
+                dictfields.extend(subdictfields)
             return fields, dictfields
 
     def flatten_object(self, obj, dict_fields, prefix=""):

@@ -27,802 +27,11 @@ grouped in the following categories:
 * <<exported-fields-trans_event>>
 * <<exported-fields-trans_measurements>>
 
-[[exported-fields-beat]]
-=== Beat Fields
-
-Contains common beat fields available in all event types.
-
-
-
-==== beat.name
-
-The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
-
-
-==== beat.hostname
-
-The hostname as returned by the operating system on which the Beat is running.
-
-
-==== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
-==== tags
-
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
-==== fields
-
-type: dict
-
-Contains user configurable fields.
-
-
-[[exported-fields-common]]
-=== Common Fields
-
-These fields contain data about the environment in which the transaction or flow was captured.
-
-
-
-==== server
-
-The name of the server that served the transaction.
-
-
-==== client_server
-
-The name of the server that initiated the transaction.
-
-
-==== service
-
-The name of the logical service that served the transaction.
-
-
-==== client_service
-
-The name of the logical service that initiated the transaction.
-
-
-==== ip
-
-format: dotted notation.
-
-The IP address of the server that served the transaction.
-
-
-==== client_ip
-
-format: dotted notation.
-
-The IP address of the server that initiated the transaction.
-
-
-==== real_ip
-
-format: Dotted notation.
-
-If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
-Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
-
-
-==== client_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== client_port
-
-format: dotted notation.
-
-The layer 4 port of the process that initiated the transaction.
-
-
-==== transport
-
-example: udp
-
-The transport protocol used for the transaction. If not specified, then tcp is assumed.
-
-
-==== port
-
-format: dotted notation.
-
-The layer 4 port of the process that served the transaction.
-
-
-==== proc
-
-The name of the process that served the transaction.
-
-
-==== client_proc
-
-The name of the process that initiated the transaction.
-
-
-==== release
-
-The software release of the service serving the transaction. This can be the commit id or a semantic version.
-
-
-[[exported-fields-flows_event]]
-=== Flow Event Fields
-
-These fields contain data about the flow itself.
-
-
-
-==== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured by the Beat. The precision is in milliseconds. The timezone is UTC.
-
-
-==== start_time
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The time, the first packet for the flow has been seen.
-
-
-==== last_time
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The time, the most recent processed packet for the flow has been seen.
-
-
-==== type
-
-required: True
-
-Indicates the event to be a flow event. This field is always set to "flow".
-
-
-==== final
-
-Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
-
-
-==== flow_id
-
-Internal flow id based on connection meta data and address.
-
-
-==== vlan
-
-Innermost VLAN address used in network packets.
-
-
-==== outer_vlan
-
-Second innermost VLAN address used in network packets.
-
-
-=== source Fields
-
-Properties of the source host
-
-
-
-==== source.mac
-
-Source MAC address as indicated by first packet seen for the current flow.
-
-
-==== source.ip
-
-Innermost IPv4 source address as indicated by first packet seen for the current flow.
-
-
-==== source.ip_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== source.outer_ip
-
-Second innermost IPv4 source address as indicated by first packet seen for the current flow.
-
-
-==== source.outer_ip_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== source.ipv6
-
-Innermost IPv6 source address as indicated by first packet seen for the current flow.
-
-
-==== source.ipv6_location
-
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== source.outer_ipv6
-
-Second innermost IPv6 source address as indicated by first packet seen for the current flow.
-
-
-==== source.outer_ipv6_location
-
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== source.port
-
-Source port number as indicated by first packet seen for the current flow.
-
-
-=== stats Fields
-
-Object with source to destination flow measurements.
-
-
-
-==== source.stats.net_packets_total
-
-Total number of packets
-
-
-==== source.stats.net_bytes_total
-
-Total number of bytes
-
-
-=== dest Fields
-
-Properties of the destination host
-
-
-
-==== dest.mac
-
-Destination MAC address as indicated by first packet seen for the current flow.
-
-
-==== dest.ip
-
-Innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
-==== dest.ip_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== dest.outer_ip
-
-Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
-
-
-==== dest.outer_ip_location
-
-type: geo_point
-
-example: 40.715, -74.011
-
-The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== dest.ipv6
-
-Innermost IPv6 destination address as indicated by first packet seen for the current flow.
-
-
-==== dest.ipv6_location
-
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== dest.outer_ipv6
-
-Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
-
-
-==== dest.outer_ipv6_location
-
-type: geo_point
-
-example: 60.715, -76.011
-
-The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
-
-
-==== dest.port
-
-Destination port number as indicated by first packet seen for the current flow.
-
-
-=== stats Fields
-
-Object with destination to source flow measurements.
-
-
-
-==== dest.stats.net_packets_total
-
-Total number of packets
-
-
-==== dest.stats.net_bytes_total
-
-Total number of bytes
-
-
-==== icmp_id
-
-ICMP id used in ICMP based flow.
-
-
-==== transport
-
-The transport protocol used by the flow. If known, one of "udp" or "tcp".
-
-
-==== connection_id
-
-optional TCP connection id
-
-
-[[exported-fields-raw]]
-=== Raw Fields
-
-These fields contain the raw transaction data.
-
-
-==== request
-
-type: text
-
-For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
-
-
-==== response
-
-type: text
-
-For text protocols, this is the response as seen on the wire (application layer only). For binary protocols this is our representation of the request.
-
-
-[[exported-fields-trans_event]]
-=== Transaction Event Fields
-
-These fields contain data about the transaction itself.
-
-
-
-==== @timestamp
-
-type: date
-
-example: 2015-01-24 14:06:05.071000
-
-format: YYYY-MM-DDTHH:MM:SS.milliZ
-
-required: True
-
-The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
-
-
-==== type
-
-required: True
-
-The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
-
-
-==== direction
-
-required: True
-
-Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
-
-
-==== status
-
-required: True
-
-The high level status of the transaction. The way to compute this value depends on the protocol, but the result has a meaning independent of the protocol.
-
-
-==== method
-
-The command/verb/method of the transaction. For HTTP, this is the method name (GET, POST, PUT, and so on), for SQL this is the verb (SELECT, UPDATE, DELETE, and so on).
-
-
-==== resource
-
-The logical resource that this transaction refers to. For HTTP, this is the URL path up to the last slash (/). For example, if the URL is `/users/1`, the resource is `/users`. For databases, the resource is typically the table name. The field is not filled for all transaction types.
-
-
-==== path
-
-required: True
-
-The path the transaction refers to. For HTTP, this is the URL. For SQL databases, this is the table name. For key-value stores, this is the key.
-
-
-==== query
-
-type: keyword
-
-The query in a human readable format. For HTTP, it will typically be something like `GET /users/_search?name=test`. For MySQL, it is something like `SELECT id from users where name=test`.
-
-
-==== params
-
-type: text
-
-The request parameters. For HTTP, these are the POST or GET parameters. For Thrift-RPC, these are the parameters from the request.
-
-
-==== notes
-
-Messages from Packetbeat itself. This field usually contains error messages for interpreting the raw data. This information can be helpful for troubleshooting.
-
-
-[[exported-fields-icmp]]
-=== ICMP Fields
-
-ICMP specific event fields.
-
-
-==== icmp.version
-
-The version of the ICMP protocol.
-
-==== icmp.request.message
-
-type: keyword
-
-A human readable form of the request.
-
-==== icmp.request.type
-
-type: integer
-
-The request type.
-
-==== icmp.request.code
-
-type: integer
-
-The request code.
-
-==== icmp.response.message
-
-type: keyword
-
-A human readable form of the response.
-
-==== icmp.response.type
-
-type: integer
-
-The response type.
-
-==== icmp.response.code
-
-type: integer
-
-The response code.
-
-[[exported-fields-dns]]
-=== DNS Fields
-
-DNS-specific event fields.
-
-
-==== dns.id
-
-type: integer
-
-The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
-
-
-==== dns.op_code
-
-example: QUERY
-
-The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
-
-
-==== dns.flags.authoritative
-
-type: boolean
-
-A DNS flag specifying that the responding server is an authority for the domain name used in the question.
-
-
-==== dns.flags.recursion_available
-
-type: boolean
-
-A DNS flag specifying whether recursive query support is available in the name server.
-
-
-==== dns.flags.recursion_desired
-
-type: boolean
-
-A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
-
-
-==== dns.flags.authentic_data
-
-type: boolean
-
-A DNS flag specifying that the recursive server considers the response authentic.
-
-
-==== dns.flags.checking_disabled
-
-type: boolean
-
-A DNS flag specifying that the client disables the server signature validation of the query.
-
-
-==== dns.flags.truncated_response
-
-type: boolean
-
-A DNS flag specifying that only the first 512 bytes of the reply were returned.
-
-
-==== dns.response_code
-
-example: NOERROR
-
-The DNS status code.
-
-==== dns.question.name
-
-example: www.google.com.
-
-The domain name being queried. If the name field contains non-printable characters (below 32 or above 126), then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds are converted to \t, \r, and \n respectively.
-
-
-==== dns.question.type
-
-example: AAAA
-
-The type of records being queried.
-
-==== dns.question.class
-
-example: IN
-
-The class of of records being queried.
-
-==== dns.question.etld_plus_one
-
-example: amazon.co.uk.
-
-The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
-
-==== dns.answers_count
-
-type: integer
-
-The number of resource records contained in the `dns.answers` field.
-
-
-==== dns.answers.name
-
-example: example.com.
-
-The domain name to which this resource record pertains.
-
-==== dns.answers.type
-
-example: MX
-
-The type of data contained in this resource record.
-
-==== dns.answers.class
-
-example: IN
-
-The class of DNS data contained in this resource record.
-
-==== dns.answers.ttl
-
-type: integer
-
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
-
-
-==== dns.answers.data
-
-The data describing the resource. The meaning of this data depends on the type and class of the resource record.
-
-
-==== dns.authorities
-
-type: dict
-
-An array containing a dictionary for each authority section from the answer.
-
-
-==== dns.authorities_count
-
-type: integer
-
-The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
-
-
-==== dns.authorities.name
-
-example: example.com.
-
-The domain name to which this resource record pertains.
-
-==== dns.authorities.type
-
-example: NS
-
-The type of data contained in this resource record.
-
-==== dns.authorities.class
-
-example: IN
-
-The class of DNS data contained in this resource record.
-
-==== dns.answers
-
-type: dict
-
-An array containing a dictionary about each answer section returned by the server.
-
-
-==== dns.answers.ttl
-
-type: integer
-
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
-
-
-==== dns.answers.data
-
-The data describing the resource. The meaning of this data depends on the type and class of the resource record.
-
-
-==== dns.additionals
-
-type: dict
-
-An array containing a dictionary for each additional section from the answer.
-
-
-==== dns.additionals_count
-
-type: integer
-
-The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
-
-
-==== dns.additionals.name
-
-example: example.com.
-
-The domain name to which this resource record pertains.
-
-==== dns.additionals.type
-
-example: NS
-
-The type of data contained in this resource record.
-
-==== dns.additionals.class
-
-example: IN
-
-The class of DNS data contained in this resource record.
-
-==== dns.additionals.ttl
-
-type: integer
-
-The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
-
-
-==== dns.additionals.data
-
-The data describing the resource. The meaning of this data depends on the type and class of the resource record.
-
-
-==== dns.opt.version
-
-example: 0
-
-The EDNS version.
-
-==== dns.opt.do
-
-type: boolean
-
-If set, the transaction uses DNSSEC.
-
-==== dns.opt.ext_rcode
-
-example: BADVERS
-
-Extended response code field.
-
-==== dns.opt.udp_size
-
-type: integer
-
-Requestor's UDP payload size (in bytes).
-
 [[exported-fields-amqp]]
 === AMQP Fields
 
 AMQP specific event fields.
+
 
 
 ==== amqp.reply-code
@@ -1102,10 +311,661 @@ type: keyword
 Creating application id.
 
 
+[[exported-fields-beat]]
+=== Beat Fields
+
+Contains common beat fields available in all event types.
+
+
+
+==== beat.name
+
+The name of the Beat sending the log messages. If the shipper name is set in the configuration file, then that value is used. If it is not set, the hostname is used.
+
+
+==== beat.hostname
+
+The hostname as returned by the operating system on which the Beat is running.
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp when the event log record was generated.
+
+
+==== tags
+
+Arbitrary tags that can be set per Beat and per transaction type.
+
+
+==== fields
+
+type: dict
+
+Contains user configurable fields.
+
+
+[[exported-fields-common]]
+=== Common Fields
+
+These fields contain data about the environment in which the transaction or flow was captured.
+
+
+
+==== server
+
+The name of the server that served the transaction.
+
+
+==== client_server
+
+The name of the server that initiated the transaction.
+
+
+==== service
+
+The name of the logical service that served the transaction.
+
+
+==== client_service
+
+The name of the logical service that initiated the transaction.
+
+
+==== ip
+
+format: dotted notation.
+
+The IP address of the server that served the transaction.
+
+
+==== client_ip
+
+format: dotted notation.
+
+The IP address of the server that initiated the transaction.
+
+
+==== real_ip
+
+format: Dotted notation.
+
+If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
+Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
+
+
+==== client_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `real_ip` IP address or of the `client_ip` address if the `real_ip` is disabled. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== client_port
+
+format: dotted notation.
+
+The layer 4 port of the process that initiated the transaction.
+
+
+==== transport
+
+example: udp
+
+The transport protocol used for the transaction. If not specified, then tcp is assumed.
+
+
+==== port
+
+format: dotted notation.
+
+The layer 4 port of the process that served the transaction.
+
+
+==== proc
+
+The name of the process that served the transaction.
+
+
+==== client_proc
+
+The name of the process that initiated the transaction.
+
+
+==== release
+
+The software release of the service serving the transaction. This can be the commit id or a semantic version.
+
+
+[[exported-fields-dns]]
+=== DNS Fields
+
+DNS-specific event fields.
+
+
+
+==== dns.id
+
+type: integer
+
+The DNS packet identifier assigned by the program that generated the query. The identifier is copied to the response.
+
+
+==== dns.op_code
+
+example: QUERY
+
+The DNS operation code that specifies the kind of query in the message. This value is set by the originator of a query and copied into the response.
+
+
+==== dns.flags.authoritative
+
+type: boolean
+
+A DNS flag specifying that the responding server is an authority for the domain name used in the question.
+
+
+==== dns.flags.recursion_available
+
+type: boolean
+
+A DNS flag specifying whether recursive query support is available in the name server.
+
+
+==== dns.flags.recursion_desired
+
+type: boolean
+
+A DNS flag specifying that the client directs the server to pursue a query recursively. Recursive query support is optional.
+
+
+==== dns.flags.authentic_data
+
+type: boolean
+
+A DNS flag specifying that the recursive server considers the response authentic.
+
+
+==== dns.flags.checking_disabled
+
+type: boolean
+
+A DNS flag specifying that the client disables the server signature validation of the query.
+
+
+==== dns.flags.truncated_response
+
+type: boolean
+
+A DNS flag specifying that only the first 512 bytes of the reply were returned.
+
+
+==== dns.response_code
+
+example: NOERROR
+
+The DNS status code.
+
+==== dns.question.name
+
+example: www.google.com.
+
+The domain name being queried. If the name field contains non-printable characters (below 32 or above 126), then those characters are represented as escaped base 10 integers (\DDD). Back slashes and quotes are escaped. Tabs, carriage returns, and line feeds are converted to \t, \r, and \n respectively.
+
+
+==== dns.question.type
+
+example: AAAA
+
+The type of records being queried.
+
+==== dns.question.class
+
+example: IN
+
+The class of of records being queried.
+
+==== dns.question.etld_plus_one
+
+example: amazon.co.uk.
+
+The effective top-level domain (eTLD) plus one more label. For example, the eTLD+1 for "foo.bar.golang.org." is "golang.org.". The data for determining the eTLD comes from an embedded copy of the data from http://publicsuffix.org.
+
+==== dns.answers_count
+
+type: integer
+
+The number of resource records contained in the `dns.answers` field.
+
+
+==== dns.answers.name
+
+example: example.com.
+
+The domain name to which this resource record pertains.
+
+==== dns.answers.type
+
+example: MX
+
+The type of data contained in this resource record.
+
+==== dns.answers.class
+
+example: IN
+
+The class of DNS data contained in this resource record.
+
+==== dns.answers.ttl
+
+type: integer
+
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+
+==== dns.answers.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.authorities
+
+type: dict
+
+An array containing a dictionary for each authority section from the answer.
+
+
+==== dns.authorities_count
+
+type: integer
+
+The number of resource records contained in the `dns.authorities` field. The `dns.authorities` field may or may not be included depending on the configuration of Packetbeat.
+
+
+==== dns.authorities.name
+
+example: example.com.
+
+The domain name to which this resource record pertains.
+
+==== dns.authorities.type
+
+example: NS
+
+The type of data contained in this resource record.
+
+==== dns.authorities.class
+
+example: IN
+
+The class of DNS data contained in this resource record.
+
+==== dns.answers
+
+type: dict
+
+An array containing a dictionary about each answer section returned by the server.
+
+
+==== dns.answers.ttl
+
+type: integer
+
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+
+==== dns.answers.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.additionals
+
+type: dict
+
+An array containing a dictionary for each additional section from the answer.
+
+
+==== dns.additionals_count
+
+type: integer
+
+The number of resource records contained in the `dns.additionals` field. The `dns.additionals` field may or may not be included depending on the configuration of Packetbeat.
+
+
+==== dns.additionals.name
+
+example: example.com.
+
+The domain name to which this resource record pertains.
+
+==== dns.additionals.type
+
+example: NS
+
+The type of data contained in this resource record.
+
+==== dns.additionals.class
+
+example: IN
+
+The class of DNS data contained in this resource record.
+
+==== dns.additionals.ttl
+
+type: integer
+
+The time interval in seconds that this resource record may be cached before it should be discarded. Zero values mean that the data should not be cached.
+
+
+==== dns.additionals.data
+
+The data describing the resource. The meaning of this data depends on the type and class of the resource record.
+
+
+==== dns.opt.version
+
+example: 0
+
+The EDNS version.
+
+==== dns.opt.do
+
+type: boolean
+
+If set, the transaction uses DNSSEC.
+
+==== dns.opt.ext_rcode
+
+example: BADVERS
+
+Extended response code field.
+
+==== dns.opt.udp_size
+
+type: integer
+
+Requestor's UDP payload size (in bytes).
+
+[[exported-fields-flows_event]]
+=== Flow Event Fields
+
+These fields contain data about the flow itself.
+
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp of the event, as measured by the Beat. The precision is in milliseconds. The timezone is UTC.
+
+
+==== start_time
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The time, the first packet for the flow has been seen.
+
+
+==== last_time
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The time, the most recent processed packet for the flow has been seen.
+
+
+==== type
+
+required: True
+
+Indicates the event to be a flow event. This field is always set to "flow".
+
+
+==== final
+
+Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
+
+
+==== flow_id
+
+Internal flow id based on connection meta data and address.
+
+
+==== vlan
+
+Innermost VLAN address used in network packets.
+
+
+==== outer_vlan
+
+Second innermost VLAN address used in network packets.
+
+
+=== source Fields
+
+Properties of the source host
+
+
+
+==== source.mac
+
+Source MAC address as indicated by first packet seen for the current flow.
+
+
+==== source.ip
+
+Innermost IPv4 source address as indicated by first packet seen for the current flow.
+
+
+==== source.ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== source.outer_ip
+
+Second innermost IPv4 source address as indicated by first packet seen for the current flow.
+
+
+==== source.outer_ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `outer_ip_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== source.ipv6
+
+Innermost IPv6 source address as indicated by first packet seen for the current flow.
+
+
+==== source.ipv6_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== source.outer_ipv6
+
+Second innermost IPv6 source address as indicated by first packet seen for the current flow.
+
+
+==== source.outer_ipv6_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `outer_ipv6_source` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== source.port
+
+Source port number as indicated by first packet seen for the current flow.
+
+
+=== stats Fields
+
+Object with source to destination flow measurements.
+
+
+
+==== source.stats.net_packets_total
+
+Total number of packets
+
+
+==== source.stats.net_bytes_total
+
+Total number of bytes
+
+
+=== dest Fields
+
+Properties of the destination host
+
+
+
+==== dest.mac
+
+Destination MAC address as indicated by first packet seen for the current flow.
+
+
+==== dest.ip
+
+Innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.outer_ip
+
+Second innermost IPv4 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.outer_ip_location
+
+type: geo_point
+
+example: 40.715, -74.011
+
+The GeoIP location of the `outer_ip_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.ipv6
+
+Innermost IPv6 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.ipv6_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.outer_ipv6
+
+Second innermost IPv6 destination address as indicated by first packet seen for the current flow.
+
+
+==== dest.outer_ipv6_location
+
+type: geo_point
+
+example: 60.715, -76.011
+
+The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string containing the latitude and longitude separated by a comma.
+
+
+==== dest.port
+
+Destination port number as indicated by first packet seen for the current flow.
+
+
+=== stats Fields
+
+Object with destination to source flow measurements.
+
+
+
+==== dest.stats.net_packets_total
+
+Total number of packets
+
+
+==== dest.stats.net_bytes_total
+
+Total number of bytes
+
+
+==== icmp_id
+
+ICMP id used in ICMP based flow.
+
+
+==== transport
+
+The transport protocol used by the flow. If known, one of "udp" or "tcp".
+
+
+==== connection_id
+
+optional TCP connection id
+
+
 [[exported-fields-http]]
-=== Http Fields
+=== HTTP Fields
 
 HTTP-specific event fields.
+
 
 
 ==== http.code
@@ -1141,10 +1001,59 @@ type: long
 The value of the Content-Length header if present.
 
 
+[[exported-fields-icmp]]
+=== ICMP Fields
+
+ICMP specific event fields.
+
+
+
+
+==== icmp.version
+
+The version of the ICMP protocol.
+
+==== icmp.request.message
+
+type: keyword
+
+A human readable form of the request.
+
+==== icmp.request.type
+
+type: integer
+
+The request type.
+
+==== icmp.request.code
+
+type: integer
+
+The request code.
+
+==== icmp.response.message
+
+type: keyword
+
+A human readable form of the response.
+
+==== icmp.response.type
+
+type: integer
+
+The response type.
+
+==== icmp.response.code
+
+type: integer
+
+The response code.
+
 [[exported-fields-memcache]]
 === Memcache Fields
 
 Memcached-specific event fields
+
 
 
 ==== memcache.protocol_type
@@ -1441,146 +1350,11 @@ type: keyword
 The returned memcache version string.
 
 
-[[exported-fields-mysql]]
-=== Mysql Fields
-
-MySQL-specific event fields.
-
-
-==== mysql.iserror
-
-type: boolean
-
-If the MySQL query returns an error, this field is set to true.
-
-
-==== mysql.affected_rows
-
-type: integer
-
-If the MySQL command is successful, this field contains the affected number of rows of the last statement.
-
-
-==== mysql.insert_id
-
-If the INSERT query is successful, this field contains the id of the newly inserted row.
-
-
-==== mysql.num_fields
-
-If the SELECT query is successful, this field is set to the number of fields returned.
-
-
-==== mysql.num_rows
-
-If the SELECT query is successful, this field is set to the number of rows returned.
-
-
-==== mysql.query
-
-The row mysql query as read from the transaction's request.
-
-
-==== mysql.error_code
-
-type: integer
-
-The error code returned by MySQL.
-
-
-==== mysql.error_message
-
-The error info message returned by MySQL.
-
-
-[[exported-fields-pgsql]]
-=== PostgreSQL Fields
-
-PostgreSQL-specific event fields.
-
-
-==== pgsql.query
-
-The row pgsql query as read from the transaction's request.
-
-
-==== pgsql.iserror
-
-type: boolean
-
-If the PgSQL query returns an error, this field is set to true.
-
-
-==== pgsql.error_code
-
-type: integer
-
-The PostgreSQL error code.
-
-==== pgsql.error_message
-
-The PostgreSQL error message.
-
-==== pgsql.error_severity
-
-The PostgreSQL error severity.
-
-==== pgsql.num_fields
-
-If the SELECT query if successful, this field is set to the number of fields returned.
-
-
-==== pgsql.num_rows
-
-If the SELECT query if successful, this field is set to the number of rows returned.
-
-
-[[exported-fields-thrift]]
-=== Thrift-RPC Fields
-
-Thrift-RPC specific event fields.
-
-
-==== thrift.params
-
-The RPC method call parameters in a human readable format. If the IDL files are available, the parameters use names whenever possible. Otherwise, the IDs from the message are used.
-
-
-==== thrift.service
-
-The name of the Thrift-RPC service as defined in the IDL files.
-
-
-==== thrift.return_value
-
-The value returned by the Thrift-RPC call. This is encoded in a human readable format.
-
-
-==== thrift.exceptions
-
-If the call resulted in exceptions, this field contains the exceptions in a human readable format.
-
-
-[[exported-fields-redis]]
-=== Redis Fields
-
-Redis-specific event fields.
-
-
-==== redis.return_value
-
-The return value of the Redis command in a human readable format.
-
-
-==== redis.error
-
-If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
-
-
 [[exported-fields-mongodb]]
 === MongoDb Fields
 
 MongoDB-specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to MongoDB events as well.
+
 
 
 
@@ -1710,10 +1484,65 @@ Arbitrary ID which the caller machine may generate.
 
 The name of the caller's machine.
 
+[[exported-fields-mysql]]
+=== MySQL Fields
+
+MySQL-specific event fields.
+
+
+
+
+==== mysql.iserror
+
+type: boolean
+
+If the MySQL query returns an error, this field is set to true.
+
+
+==== mysql.affected_rows
+
+type: integer
+
+If the MySQL command is successful, this field contains the affected number of rows of the last statement.
+
+
+==== mysql.insert_id
+
+If the INSERT query is successful, this field contains the id of the newly inserted row.
+
+
+==== mysql.num_fields
+
+If the SELECT query is successful, this field is set to the number of fields returned.
+
+
+==== mysql.num_rows
+
+If the SELECT query is successful, this field is set to the number of rows returned.
+
+
+==== mysql.query
+
+The row mysql query as read from the transaction's request.
+
+
+==== mysql.error_code
+
+type: integer
+
+The error code returned by MySQL.
+
+
+==== mysql.error_message
+
+The error info message returned by MySQL.
+
+
 [[exported-fields-nfs]]
 === NFS Fields
 
 NFS v4/3 specific event fields.
+
 
 
 ==== nfs.version
@@ -1740,6 +1569,193 @@ NFS operation name, or main operation name, in case of COMPOUND calls.
 ==== nfs.status
 
 NFS operation reply status.
+
+[[exported-fields-pgsql]]
+=== PostgreSQL Fields
+
+PostgreSQL-specific event fields.
+
+
+
+
+==== pgsql.query
+
+The row pgsql query as read from the transaction's request.
+
+
+==== pgsql.iserror
+
+type: boolean
+
+If the PgSQL query returns an error, this field is set to true.
+
+
+==== pgsql.error_code
+
+type: integer
+
+The PostgreSQL error code.
+
+==== pgsql.error_message
+
+The PostgreSQL error message.
+
+==== pgsql.error_severity
+
+The PostgreSQL error severity.
+
+==== pgsql.num_fields
+
+If the SELECT query if successful, this field is set to the number of fields returned.
+
+
+==== pgsql.num_rows
+
+If the SELECT query if successful, this field is set to the number of rows returned.
+
+
+[[exported-fields-raw]]
+=== Raw Fields
+
+These fields contain the raw transaction data.
+
+
+==== request
+
+type: text
+
+For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
+
+
+==== response
+
+type: text
+
+For text protocols, this is the response as seen on the wire (application layer only). For binary protocols this is our representation of the request.
+
+
+[[exported-fields-redis]]
+=== Redis Fields
+
+Redis-specific event fields.
+
+
+
+
+==== redis.return_value
+
+The return value of the Redis command in a human readable format.
+
+
+==== redis.error
+
+If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
+
+
+[[exported-fields-thrift]]
+=== Thrift-RPC Fields
+
+Thrift-RPC specific event fields.
+
+
+
+
+==== thrift.params
+
+The RPC method call parameters in a human readable format. If the IDL files are available, the parameters use names whenever possible. Otherwise, the IDs from the message are used.
+
+
+==== thrift.service
+
+The name of the Thrift-RPC service as defined in the IDL files.
+
+
+==== thrift.return_value
+
+The value returned by the Thrift-RPC call. This is encoded in a human readable format.
+
+
+==== thrift.exceptions
+
+If the call resulted in exceptions, this field contains the exceptions in a human readable format.
+
+
+[[exported-fields-trans_event]]
+=== Transaction Event Fields
+
+These fields contain data about the transaction itself.
+
+
+
+==== @timestamp
+
+type: date
+
+example: 2015-01-24 14:06:05.071000
+
+format: YYYY-MM-DDTHH:MM:SS.milliZ
+
+required: True
+
+The timestamp of the event, as measured either by the Beat or by a common collector point. The precision is in milliseconds. The timezone is UTC.
+
+
+==== type
+
+required: True
+
+The type of the transaction (for example, HTTP, MySQL, Redis, or RUM).
+
+
+==== direction
+
+required: True
+
+Indicates whether the transaction is inbound (emitted by server) or outbound (emitted by the client). Values can be in or out. No defaults.
+
+
+==== status
+
+required: True
+
+The high level status of the transaction. The way to compute this value depends on the protocol, but the result has a meaning independent of the protocol.
+
+
+==== method
+
+The command/verb/method of the transaction. For HTTP, this is the method name (GET, POST, PUT, and so on), for SQL this is the verb (SELECT, UPDATE, DELETE, and so on).
+
+
+==== resource
+
+The logical resource that this transaction refers to. For HTTP, this is the URL path up to the last slash (/). For example, if the URL is `/users/1`, the resource is `/users`. For databases, the resource is typically the table name. The field is not filled for all transaction types.
+
+
+==== path
+
+required: True
+
+The path the transaction refers to. For HTTP, this is the URL. For SQL databases, this is the table name. For key-value stores, this is the key.
+
+
+==== query
+
+type: keyword
+
+The query in a human readable format. For HTTP, it will typically be something like `GET /users/_search?name=test`. For MySQL, it is something like `SELECT id from users where name=test`.
+
+
+==== params
+
+type: text
+
+The request parameters. For HTTP, these are the POST or GET parameters. For Thrift-RPC, these are the parameters from the request.
+
+
+==== notes
+
+Messages from Packetbeat itself. This field usually contains error messages for interpreting the raw data. This information can be helpful for troubleshooting.
+
 
 [[exported-fields-trans_measurements]]
 === Measurements (Transactions) Fields

@@ -1,5 +1,5 @@
-redis:
-  type: group
+- key: redis
+  title: "Redis Info"
   description: >
     Redis metrics collected from the Redis `INFO` command.
   fields:
