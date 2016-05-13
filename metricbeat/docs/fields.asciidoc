@@ -380,6 +380,13 @@ required: True
 The document type. Always set to "metricsets".
 
 
+==== id
+
+type: keyword
+
+Unique identifier for each event or a combination of multiple events.
+
+
 [[exported-fields-mysql]]
 === MySQL Status Fields
 

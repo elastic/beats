@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/filter"
 	"github.com/elastic/beats/libbeat/logp"
@@ -21,11 +23,20 @@ type eventBuilder struct {
 	metricSetName string
 	host          string
 	startTime     time.Time
+	id            eventId
 	fetchDuration time.Duration
 	event         common.MapStr
 	fetchErr      error
 	filters       *filter.FilterList
 	metadata      common.EventMetadata
+}
+
+// eventId is a unique id for each event or event set.
+type eventId string
+
+func newEventId() eventId {
+	// TODO: Implement own UUID: https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/common/TimeBasedUUIDGenerator.java
+	return eventId(uuid.NewV4().String())
 }
 
 // build builds an event from MetricSet data and applies the Module-level
@@ -58,6 +69,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 		"rtt":        b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
 		common.EventMetadataKey: b.metadata,
 		eventFieldName:          event,
+		"id":                    b.id,
 	}
 
 	// Overwrite default index if set.
@@ -131,6 +143,7 @@ func createEvent(
 	fetchErr error,
 	start time.Time,
 	elapsed time.Duration,
+	id eventId,
 ) (common.MapStr, error) {
 	return eventBuilder{
 		moduleName:    msw.Module().Name(),
@@ -142,5 +155,6 @@ func createEvent(
 		fetchErr:      fetchErr,
 		filters:       msw.module.filters,
 		metadata:      msw.module.Config().EventMetadata,
+		id:            id,
 	}.build()
 }
