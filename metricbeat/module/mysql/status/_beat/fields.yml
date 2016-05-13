@@ -1,8 +1,7 @@
-- name: mysql-status
+- name: status
   type: group
   description: >
-    `mysql-status` contains the metrics that were obtained the status SQL
-    query.
+    `status` contains the metrics that were obtained by the status SQL query.
   fields:
     - name: aborted
       type: group

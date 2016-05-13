@@ -1,7 +1,6 @@
 package beater
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -42,9 +41,6 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	typeName := getType(event, defaultType)
 	timestamp := getTimestamp(event, common.Time(b.startTime))
 
-	// Each metricset has a unique event field name to prevent type conflicts.
-	eventFieldName := fmt.Sprintf("%s-%s", b.moduleName, b.metricSetName)
-
 	// Apply filters.
 	if b.filters != nil {
 		event = b.filters.Filter(event)
@@ -57,7 +53,9 @@ func (b eventBuilder) build() (common.MapStr, error) {
 		"metricset":  b.metricSetName,
 		"rtt":        b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
 		common.EventMetadataKey: b.metadata,
-		eventFieldName:          event,
+		b.moduleName: common.MapStr{
+			b.metricSetName: event,
+		},
 	}
 
 	// Overwrite default index if set.

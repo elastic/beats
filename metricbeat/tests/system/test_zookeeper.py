@@ -2,7 +2,7 @@ import os
 import metricbeat
 from nose.plugins.attrib import attr
 
-ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper-mntr"]
+ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
 
 MNTR_FIELDS = ["zk_version", "zk_avg_latency", "zk_max_latency",
                "zk_min_latency", "zk_packets_received", "zk_packets_sent",
@@ -40,7 +40,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertItemsEqual(ZK_FIELDS, evt.keys())
-        zk_mntr = evt["zookeeper-mntr"]
+        zk_mntr = evt["zookeeper"]["mntr"]
         self.assertItemsEqual(MNTR_FIELDS, zk_mntr.keys())
 
         self.assert_fields_are_documented(evt)

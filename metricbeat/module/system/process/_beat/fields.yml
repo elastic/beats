@@ -1,7 +1,7 @@
-- name: system-process
+- name: process
   type: group
   description: >
-    `system-process` contains process metadata, CPU metrics, and memory metrics.
+    `process` contains process metadata, CPU metrics, and memory metrics.
   fields:
     - name: name
       type: keyword

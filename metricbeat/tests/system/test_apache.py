@@ -2,7 +2,7 @@ import os
 import metricbeat
 from nose.plugins.attrib import attr
 
-APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache-status"]
+APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
 APACHE_STATUS_FIELDS = ["hostname", "totalAccesses", "totalKBytes",
                         "reqPerSec", "bytesPerSec", "bytesPerReq",
@@ -39,7 +39,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
         # Verify the required fields are present.
         self.assertItemsEqual(APACHE_FIELDS, evt.keys())
-        apache_status = evt["apache-status"]
+        apache_status = evt["apache"]["status"]
         self.assertItemsEqual(APACHE_STATUS_FIELDS, apache_status.keys())
         self.assertItemsEqual(CPU_FIELDS, apache_status["cpu"].keys())
         # There are more fields that could be checked.

@@ -12,12 +12,11 @@ import (
 )
 
 const (
-	moduleName     = "mymodule"
-	metricSetName  = "mymetricset"
-	eventFieldName = moduleName + "-" + metricSetName
-	host           = "localhost"
-	elapsed        = time.Duration(500 * time.Millisecond)
-	tag            = "alpha"
+	moduleName    = "mymodule"
+	metricSetName = "mymetricset"
+	host          = "localhost"
+	elapsed       = time.Duration(500 * time.Millisecond)
+	tag           = "alpha"
 )
 
 var (
@@ -52,7 +51,7 @@ func TestEventBuilder(t *testing.T) {
 	assert.Equal(t, common.Time(startTime), event["@timestamp"])
 	assert.Equal(t, int64(500000), event["rtt"])
 	assert.Equal(t, host, event["metricset-host"])
-	assert.Equal(t, common.MapStr{}, event[eventFieldName])
+	assert.Equal(t, common.MapStr{}, event[moduleName].(common.MapStr)[metricSetName])
 	assert.Nil(t, event["error"])
 }
 
