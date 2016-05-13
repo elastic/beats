@@ -4,27 +4,7 @@
 The following command line options from libbeat are also available for Topbeat.
 To use these options, you need to start Topbeat in the foreground.
 
-[source,shell]
----------------------------------------------------------
-
-$ ./topbeat -h
-Usage of ./topbeat:
-  -N  Disable actual publishing for testing
-  -c string
-      Configuration file (default "/etc/topbeat/topbeat.yml")
-  -configtest
-      Test configuration and exit.
-  -cpuprofile string
-      Write cpu profile to file
-  -d string
-      Enable certain debug selectors
-  -e  Log to stderr and disable syslog/file output
-  -memprofile string
-      Write memory profile to this file
-  -v  Log at INFO level
-  -version
-      Print version and exit
----------------------------------------------------------
+TIP: Run `./topbeat -h` to see the full list of options from the command line.
 
 include::../../libbeat/docs/shared-command-line.asciidoc[]
 
