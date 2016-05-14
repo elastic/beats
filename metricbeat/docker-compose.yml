@@ -32,7 +32,7 @@ mysql:
     - MYSQL_ROOT_PASSWORD=test
 
 nginx:
-  build: tests/environments/nginx
+  build: ${PWD}/tests/environments/nginx
 
 redis:
   image: redis:3.0.7

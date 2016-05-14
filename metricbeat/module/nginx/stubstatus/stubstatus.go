@@ -1,4 +1,4 @@
-// Reads server status from nginx host under /server-status, stub_status module is required.
+// Reads server status from nginx host under /server-status, ngx_http_stub_status_module is required.
 package stubstatus
 
 import (
