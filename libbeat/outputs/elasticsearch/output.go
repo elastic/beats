@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/mode"
+	"github.com/elastic/beats/libbeat/outputs/mode/modeutil"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -44,10 +45,10 @@ var (
 	ErrJSONEncodeFailed = errors.New("json encode failed")
 
 	// ErrResponseRead indicates error parsing Elasticsearch response
-	ErrResponseRead = errors.New("bulk item status parse failed.")
+	ErrResponseRead = errors.New("bulk item status parse failed")
 )
 
-// NewOutput instantiates a new output plugin instance publishing to elasticsearch.
+// New instantiates a new output plugin instance publishing to elasticsearch.
 func New(cfg *common.Config, topologyExpire int) (outputs.Outputer, error) {
 	if !cfg.HasField("bulk_max_size") {
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
@@ -80,7 +81,7 @@ func (out *elasticsearchOutput) init(
 		return err
 	}
 
-	clients, err := mode.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
+	clients, err := modeutil.MakeClients(cfg, makeClientFactory(tlsConfig, &config, out))
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (out *elasticsearchOutput) init(
 
 	out.clients = clients
 	loadBalance := config.LoadBalance
-	m, err := mode.NewConnectionMode(clients, !loadBalance,
+	m, err := modeutil.NewConnectionMode(clients, !loadBalance,
 		maxAttempts, waitRetry, config.Timeout, maxWaitRetry)
 	if err != nil {
 		return err

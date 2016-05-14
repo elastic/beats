@@ -22,10 +22,11 @@ import (
 // Errors will force the multiline processor to return the currently active
 // multiline event first and finally return the actual error on next call to Next.
 type MultiLine struct {
-	reader   LineProcessor
-	pred     matcher
-	maxBytes int // bytes stored in content
-	maxLines int
+	reader    LineProcessor
+	pred      matcher
+	maxBytes  int // bytes stored in content
+	maxLines  int
+	separator []byte
 
 	ts        time.Time
 	content   []byte
@@ -58,11 +59,11 @@ var (
 // line events into stream of multi-line events.
 func NewMultiline(
 	r LineProcessor,
+	separator string,
 	maxBytes int,
 	config *config.MultilineConfig,
 ) (*MultiLine, error) {
-	type matcherFactory func(pattern string) (matcher, error)
-	types := map[string]matcherFactory{
+	types := map[string]func(*regexp.Regexp) (matcher, error){
 		"before": beforeMatcher,
 		"after":  afterMatcher,
 	}
@@ -87,11 +88,8 @@ func NewMultiline(
 	}
 
 	timeout := defaultMultilineTimeout
-	if config.Timeout != "" {
-		timeout, err = time.ParseDuration(config.Timeout)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse duration '%s': %v", config.Timeout, err)
-		}
+	if config.Timeout != nil {
+		timeout = *config.Timeout
 		if timeout < 0 {
 			return nil, fmt.Errorf("timeout %v must not be negative", config.Timeout)
 		}
@@ -102,11 +100,12 @@ func NewMultiline(
 	}
 
 	mlr := &MultiLine{
-		reader:   r,
-		pred:     matcher,
-		state:    (*MultiLine).readFirst,
-		maxBytes: maxBytes,
-		maxLines: maxLines,
+		reader:    r,
+		pred:      matcher,
+		state:     (*MultiLine).readFirst,
+		maxBytes:  maxBytes,
+		maxLines:  maxLines,
+		separator: []byte(separator),
 	}
 	return mlr, nil
 }
@@ -239,14 +238,25 @@ func (mlr *MultiLine) addLine(l Line) {
 		return
 	}
 
-	space := mlr.maxBytes - len(mlr.content)
+	sz := len(mlr.content)
+	addSeparator := len(mlr.content) > 0 && len(mlr.separator) > 0
+	if addSeparator {
+		sz += len(mlr.separator)
+	}
+
+	space := mlr.maxBytes - sz
 	spaceLeft := (mlr.maxBytes <= 0 || space > 0) &&
 		(mlr.maxLines <= 0 || mlr.numLines < mlr.maxLines)
 	if spaceLeft {
 		if space < 0 || space > len(l.Content) {
 			space = len(l.Content)
 		}
-		mlr.content = append(mlr.content, l.Content[:space]...)
+
+		tmp := mlr.content
+		if addSeparator {
+			tmp = append(tmp, mlr.separator...)
+		}
+		mlr.content = append(tmp, l.Content[:space]...)
 		mlr.numLines++
 	}
 
@@ -260,14 +270,14 @@ func (mlr *MultiLine) reset() {
 
 // matchers
 
-func afterMatcher(pattern string) (matcher, error) {
-	return genPatternMatcher(pattern, func(last, current []byte) []byte {
+func afterMatcher(regex *regexp.Regexp) (matcher, error) {
+	return genPatternMatcher(regex, func(last, current []byte) []byte {
 		return current
 	})
 }
 
-func beforeMatcher(pattern string) (matcher, error) {
-	return genPatternMatcher(pattern, func(last, current []byte) []byte {
+func beforeMatcher(regex *regexp.Regexp) (matcher, error) {
+	return genPatternMatcher(regex, func(last, current []byte) []byte {
 		return last
 	})
 }
@@ -279,17 +289,12 @@ func negatedMatcher(m matcher) matcher {
 }
 
 func genPatternMatcher(
-	pattern string,
+	regex *regexp.Regexp,
 	sel func(last, current []byte) []byte,
 ) (matcher, error) {
-	reg, err := regexp.CompilePOSIX(pattern)
-	if err != nil {
-		return nil, err
-	}
-
 	matcher := func(last, current []byte) bool {
 		line := sel(last, current)
-		return reg.Match(line)
+		return regex.Match(line)
 	}
 	return matcher, nil
 }

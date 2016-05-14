@@ -6,6 +6,8 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -25,7 +27,7 @@ func (p bufferSource) Continuable() bool          { return false }
 func TestMultilineAfterOK(t *testing.T) {
 	testMultilineOK(t,
 		config.MultilineConfig{
-			Pattern: "^[ \t] +", // next line is indented by spaces
+			Pattern: regexp.MustCompile(`^[ \t] +`), // next line is indented by spaces
 			Match:   "after",
 		},
 		"line1\n  line1.1\n  line1.2\n",
@@ -36,7 +38,7 @@ func TestMultilineAfterOK(t *testing.T) {
 func TestMultilineBeforeOK(t *testing.T) {
 	testMultilineOK(t,
 		config.MultilineConfig{
-			Pattern: "\\\\$", // previous line ends with \
+			Pattern: regexp.MustCompile(`\\$`), // previous line ends with \
 			Match:   "before",
 		},
 		"line1 \\\nline1.1 \\\nline1.2\n",
@@ -47,7 +49,7 @@ func TestMultilineBeforeOK(t *testing.T) {
 func TestMultilineAfterNegateOK(t *testing.T) {
 	testMultilineOK(t,
 		config.MultilineConfig{
-			Pattern: "^-", // first line starts with '-' at beginning of line
+			Pattern: regexp.MustCompile(`^-`), // first line starts with '-' at beginning of line
 			Negate:  true,
 			Match:   "after",
 		},
@@ -59,7 +61,7 @@ func TestMultilineAfterNegateOK(t *testing.T) {
 func TestMultilineBeforeNegateOK(t *testing.T) {
 	testMultilineOK(t,
 		config.MultilineConfig{
-			Pattern: ";$", // last line ends with ';'
+			Pattern: regexp.MustCompile(`;$`), // last line ends with ';'
 			Negate:  true,
 			Match:   "before",
 		},
@@ -89,7 +91,7 @@ func testMultilineOK(t *testing.T, cfg config.MultilineConfig, expected ...strin
 		var tsZero time.Time
 
 		assert.NotEqual(t, tsZero, line.Ts)
-		assert.Equal(t, expected[i], string(line.Content))
+		assert.Equal(t, strings.TrimRight(expected[i], "\r\n "), string(line.Content))
 		assert.Equal(t, len(expected[i]), int(line.Bytes))
 	}
 }
@@ -111,7 +113,7 @@ func createMultilineTestReader(t *testing.T, in *bytes.Buffer, cfg config.Multil
 		t.Fatalf("Failed to initialize line reader: %v", err)
 	}
 
-	reader, err = NewMultiline(reader, 1<<20, &cfg)
+	reader, err = NewMultiline(NewStripNewline(reader), "\n", 1<<20, &cfg)
 	if err != nil {
 		t.Fatalf("failed to initializ reader: %v", err)
 	}

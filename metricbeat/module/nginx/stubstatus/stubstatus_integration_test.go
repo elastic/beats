@@ -5,46 +5,29 @@ package stubstatus
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/nginx"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestConnect(t *testing.T) {
+func TestFetch(t *testing.T) {
+	f := mbtest.NewEventFetcher(t, getConfig())
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
-	config, _ := getNginxModuleConfig()
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	module, mErr := helper.NewModule(config, nginx.New)
-	assert.NoError(t, mErr)
-	ms, msErr := helper.NewMetricSet("stubstatus", New, module)
-	assert.NoError(t, msErr)
-
-	// Setup metricset and metricseter
-	err := ms.Setup()
-	assert.NoError(t, err)
-	err = ms.MetricSeter.Setup(ms)
-	assert.NoError(t, err)
-
-	// Check that host is correctly set
-	assert.Equal(t, nginx.GetNginxEnvHost(), ms.Config.Hosts[0])
-
-	data, err := ms.MetricSeter.Fetch(ms, ms.Config.Hosts[0])
-	assert.NoError(t, err)
-
-	// Check fields
-	assert.Equal(t, 10, len(data))
+	// Check number of fields.
+	assert.Equal(t, 10, len(event))
 }
 
-type NginxModuleConfig struct {
-	Hosts  []string `config:"hosts"`
-	Module string   `config:"module"`
-}
-
-func getNginxModuleConfig() (*common.Config, error) {
-	return common.NewConfigFrom(NginxModuleConfig{
-		Module: "nginx",
-		Hosts:  []string{nginx.GetNginxEnvHost()},
-	})
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "nginx",
+		"metricsets": []string{"stubstatus"},
+		"hosts":      []string{nginx.GetNginxEnvHost()},
+	}
 }

@@ -1,0 +1,34 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-zookeeper]]
+== Zookeeper Module
+
+
+
+
+=== Example Configuration
+
+The Apache module supports the standard configuration options which can be found
+here (add link). Below is an example of a configuration option:
+
+[source,yaml]
+----
+metricbeat.modules:
+  #---------------------------- Zookeeper Module --------------------------------
+  - module: zookeeper
+    metricsets: ["mntr"]
+    enabled: true
+    period: 5s
+    hosts: ["localhost:2181"]
+----
+
+=== MetricSets
+
+The following MetricSets are available:
+
+* <<metricbeat-metricset-zookeeper-mntr,mntr>>
+
+include::zookeeper/mntr.asciidoc[]
+

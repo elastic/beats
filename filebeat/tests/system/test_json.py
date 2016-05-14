@@ -157,7 +157,8 @@ class Test(BaseTest):
             json=dict(
                 keys_under_root=True),
             multiline=True,
-            pattern="^["
+            match="after",
+            pattern="^\\["
         )
 
         proc = self.start_beat()

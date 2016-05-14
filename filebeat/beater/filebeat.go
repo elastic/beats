@@ -81,11 +81,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Start up spooler
+	fb.registrar.Start()
 	fb.spooler.Start()
-
-	// registrar records last acknowledged positions in all files.
-	go fb.registrar.Run()
 
 	err = fb.crawler.Start(fb.FbConfig.Filebeat.Prospectors, fb.spooler.Channel)
 	if err != nil {
@@ -98,9 +95,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	fb.pub.Start()
 
 	// Blocks progressing
-	select {
-	case <-fb.done:
-	}
+	<-fb.done
 
 	return nil
 }
@@ -114,6 +109,7 @@ func (fb *Filebeat) Cleanup(b *beat.Beat) error {
 func (fb *Filebeat) Stop() {
 
 	logp.Info("Stopping filebeat")
+
 	// Stop crawler -> stop prospectors -> stop harvesters
 	fb.crawler.Stop()
 

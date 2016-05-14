@@ -16,7 +16,7 @@ type Error interface {
 
 	Message() string
 
-	// [optional] path of config element error occured for
+	// [optional] path of config element error occurred for
 	Path() string
 
 	// [optional] stack trace
@@ -75,6 +75,8 @@ var (
 	ErrZeroValue = errors.New("zero value")
 
 	ErrRequired = errors.New("missing required field")
+
+	ErrEmpty = errors.New("empty field")
 )
 
 // error classes
@@ -278,4 +280,11 @@ func raiseInvalidDuration(v value, err error) Error {
 
 func raiseValidation(ctx context, meta *Meta, err error) Error {
 	return raiseErr(err, messagePath(err, meta, err.Error(), ctx.path(".")))
+}
+
+func raiseInvalidRegexp(v value, err error) Error {
+	ctx := v.Context()
+	path := ctx.path(".")
+	message := fmt.Sprintf("Failed to compile regular expression with '%v'", err)
+	return raisePathErr(err, v.meta(), message, path)
 }

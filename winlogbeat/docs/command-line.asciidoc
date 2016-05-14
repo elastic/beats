@@ -8,27 +8,6 @@ configuration file.
 The following command line options from libbeat are also available for
 Winlogbeat.
 
-[source,shell]
---------------------------------------------------------------------------------
-$ winlogbeat -h
-Usage of ./winlogbeat:
-  -N	Disable actual publishing for testing
-  -c string
-    	Configuration file (defaults to winlogbeat.yml in the same dir as winlogbeat.exe)
-  -configtest
-    	Test configuration and exit.
-  -cpuprofile string
-    	Write cpu profile to file
-  -d string
-    	Enable certain debug selectors
-  -e	Log to stderr and disable syslog/file output
-  -httpprof string
-    	Start pprof http server
-  -memprofile string
-    	Write memory profile to this file
-  -v	Log at INFO level
-  -version
-    	Print version and exit
---------------------------------------------------------------------------------
+TIP: Run `winlogbeat -h` to see the full list of options from the command line.
 
 include::../../libbeat/docs/shared-command-line.asciidoc[]

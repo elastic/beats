@@ -144,8 +144,10 @@ func (s *Spooler) flush() {
 		// clear buffer
 		s.spool = s.spool[:0]
 
-		// send
-		s.publisher <- tmpCopy
+		select {
+		case <-s.exit:
+		case s.publisher <- tmpCopy: // send
+		}
 	}
 	s.nextFlushTime = time.Now().Add(s.idleTimeout)
 }

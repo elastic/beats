@@ -80,49 +80,49 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 		// CPULoad: .000408393
 		re = regexp.MustCompile("CPULoad: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			cpuLoad = ParseMatchFloat(matches[1], hostname, "cpuLoad")
+			cpuLoad = parseMatchFloat(matches[1], hostname, "cpuLoad")
 		}
 
 		// CPUUser: 0
 		re = regexp.MustCompile("CPUUser: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			cpuUser = ParseMatchFloat(matches[1], hostname, "cpuUser")
+			cpuUser = parseMatchFloat(matches[1], hostname, "cpuUser")
 		}
 
 		// CPUSystem: .01
 		re = regexp.MustCompile("CPUSystem: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			cpuSystem = ParseMatchFloat(matches[1], hostname, "cpuSystem")
+			cpuSystem = parseMatchFloat(matches[1], hostname, "cpuSystem")
 		}
 
 		// CPUChildrenUser: 0
 		re = regexp.MustCompile("CPUChildrenUser: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			cpuChildrenUser = ParseMatchFloat(matches[1], hostname, "cpuChildrenUser")
+			cpuChildrenUser = parseMatchFloat(matches[1], hostname, "cpuChildrenUser")
 		}
 
 		// CPUChildrenSystem: 0
 		re = regexp.MustCompile("CPUChildrenSystem: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			cpuChildrenSystem = ParseMatchFloat(matches[1], hostname, "cpuChildrenSystem")
+			cpuChildrenSystem = parseMatchFloat(matches[1], hostname, "cpuChildrenSystem")
 		}
 
 		// ReqPerSec: .00499949
 		re = regexp.MustCompile("ReqPerSec: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			reqPerSec = ParseMatchFloat(matches[1], hostname, "reqPerSec")
+			reqPerSec = parseMatchFloat(matches[1], hostname, "reqPerSec")
 		}
 
 		// BytesPerSec: 4.1179
 		re = regexp.MustCompile("BytesPerSec: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			bytesPerSec = ParseMatchFloat(matches[1], hostname, "bytesPerSec")
+			bytesPerSec = parseMatchFloat(matches[1], hostname, "bytesPerSec")
 		}
 
 		// BytesPerReq: 823.665
 		re = regexp.MustCompile("BytesPerReq: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			bytesPerReq = ParseMatchFloat(matches[1], hostname, "bytesPerReq")
+			bytesPerReq = parseMatchFloat(matches[1], hostname, "bytesPerReq")
 		}
 
 		// BusyWorkers: 1
@@ -170,19 +170,19 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 		//Load1: 0.01
 		re = regexp.MustCompile("Load1: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			load1 = ParseMatchFloat(matches[1], hostname, "load1")
+			load1 = parseMatchFloat(matches[1], hostname, "load1")
 		}
 
 		//Load5: 0.10
 		re = regexp.MustCompile("Load5: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			load5 = ParseMatchFloat(matches[1], hostname, "load5")
+			load5 = parseMatchFloat(matches[1], hostname, "load5")
 		}
 
 		//Load15: 0.06
 		re = regexp.MustCompile("Load15: (\\d*.*\\d+)")
 		if matches := re.FindStringSubmatch(scanner.Text()); matches != nil {
-			load15 = ParseMatchFloat(matches[1], hostname, "load15")
+			load15 = parseMatchFloat(matches[1], hostname, "load15")
 		}
 
 		// Scoreboard Key:
@@ -261,7 +261,7 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 
 }
 
-func ParseMatchFloat(inputString, hostname, fieldName string) float64 {
+func parseMatchFloat(inputString, hostname, fieldName string) float64 {
 	var parseString string
 	if strings.HasPrefix(inputString, ".") {
 		parseString = strings.Replace(inputString, ".", "0.", 1)

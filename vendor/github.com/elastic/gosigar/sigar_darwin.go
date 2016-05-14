@@ -252,6 +252,8 @@ func (self *ProcState) Get(pid int) error {
 
 	self.Ppid = int(info.pbsd.pbi_ppid)
 
+	self.Pgid = int(info.pbsd.pbi_pgid)
+
 	self.Tty = int(info.pbsd.e_tdev)
 
 	self.Priority = int(info.ptinfo.pti_priority)

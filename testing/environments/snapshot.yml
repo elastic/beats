@@ -11,5 +11,5 @@ logstash:
 
 kibana:
   build: ./docker/kibana
-  dockerfile: Dockerfile-5.0.0-alpha1
+  dockerfile: Dockerfile-snapshot
 

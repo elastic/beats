@@ -1,0 +1,20 @@
+{
+    "@timestamp":"2016-05-11T07:14:08.298Z",
+    "beat":{
+        "hostname":"ruflin",
+        "name":"ruflin"
+    },
+    "metricset":"fsstats",
+    "module":"system",
+    "rtt":89,
+    "system-fsstats":{
+        "count":5,
+        "total_files":61059264,
+        "total_size":{
+            "free":31879966720,
+            "total":250094125568,
+            "used":218214158848
+        }
+    },
+    "type":"metricsets"
+}

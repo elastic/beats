@@ -315,6 +315,32 @@ func (self *Cpu) Get() error {
 }
 
 func (self *CpuList) Get() error {
+	mib := [2]int32{C.CTL_HW, C.HW_NCPU}
+	var ncpu int
+
+	n := uintptr(0)
+	// First we determine how much memory we'll need to pass later on (via `n`)
+	_, _, errno := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 2, 0, uintptr(unsafe.Pointer(&n)), 0, 0)
+
+	if errno != 0 || n == 0 {
+		return nil
+	}
+
+	// Now perform the actual sysctl(3) call, storing the result in ncpu
+	_, _, errno = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 2, uintptr(unsafe.Pointer(&ncpu)), uintptr(unsafe.Pointer(&n)), 0, 0)
+
+	if errno != 0 || n == 0 {
+		return nil
+	}
+
+	load := [C.CPUSTATES]C.long{C.CP_USER, C.CP_NICE, C.CP_SYS, C.CP_INTR, C.CP_IDLE}
+
+	self.List = make([]Cpu, ncpu)
+	for curcpu, _ := range self.List {
+		sysctlCptime(ncpu, curcpu, &load)
+		fillCpu(&self.List[curcpu], load)
+	}
+
 	return nil
 }
 
@@ -339,5 +365,41 @@ func (self *ProcTime) Get(pid int) error {
 }
 
 func (self *ProcExe) Get(pid int) error {
+	return nil
+}
+
+func fillCpu(cpu *Cpu, load [C.CPUSTATES]C.long) {
+	cpu.User = uint64(load[0])
+	cpu.Nice = uint64(load[1])
+	cpu.Sys = uint64(load[2])
+	cpu.Irq = uint64(load[3])
+	cpu.Idle = uint64(load[4])
+}
+
+func sysctlCptime(ncpu int, curcpu int, load *[C.CPUSTATES]C.long) error {
+	var mib []int32
+
+	// Use the correct mib based on the number of CPUs and fill out the
+	// current CPU number in case of SMP. (0 indexed cf. self.List)
+	if ncpu == 0 {
+		mib = []int32{C.CTL_KERN, C.KERN_CPTIME}
+	} else {
+		mib = []int32{C.CTL_KERN, C.KERN_CPTIME2, int32(curcpu)}
+	}
+
+	len := len(mib)
+
+	n := uintptr(0)
+	// First we determine how much memory we'll need to pass later on (via `n`)
+	_, _, errno := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), uintptr(len), 0, uintptr(unsafe.Pointer(&n)), 0, 0)
+	if errno != 0 || n == 0 {
+		return nil
+	}
+
+	_, _, errno = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), uintptr(len), uintptr(unsafe.Pointer(load)), uintptr(unsafe.Pointer(&n)), 0, 0)
+	if errno != 0 || n == 0 {
+		return nil
+	}
+
 	return nil
 }

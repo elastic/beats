@@ -16,6 +16,7 @@ package harvester
 import (
 	"fmt"
 	"regexp"
+	"sync"
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester/encoding"
@@ -26,22 +27,24 @@ type Harvester struct {
 	Path               string /* the file path to harvest */
 	Config             *config.HarvesterConfig
 	offset             int64
-	Stat               *input.FileStat
+	State              input.FileState
+	stateMutex         sync.Mutex
 	SpoolerChan        chan *input.FileEvent
 	encoding           encoding.EncodingFactory
 	file               FileSource /* the file being watched */
 	ExcludeLinesRegexp []*regexp.Regexp
 	IncludeLinesRegexp []*regexp.Regexp
+	done               chan struct{}
 }
 
 func NewHarvester(
 	cfg *config.HarvesterConfig,
 	path string,
-	stat *input.FileStat,
+	state input.FileState,
 	spooler chan *input.FileEvent,
+	offset int64,
+	done chan struct{},
 ) (*Harvester, error) {
-
-	var err error
 	encoding, ok := encoding.FindEncoding(cfg.Encoding)
 	if !ok || encoding == nil {
 		return nil, fmt.Errorf("unknown encoding('%v')", cfg.Encoding)
@@ -50,22 +53,26 @@ func NewHarvester(
 	h := &Harvester{
 		Path:        path,
 		Config:      cfg,
-		Stat:        stat,
+		State:       state,
 		SpoolerChan: spooler,
 		encoding:    encoding,
+		offset:      offset,
+		done:        done,
 	}
-	h.ExcludeLinesRegexp, err = InitRegexps(cfg.ExcludeLines)
-	if err != nil {
-		return h, err
-	}
-	h.IncludeLinesRegexp, err = InitRegexps(cfg.IncludeLines)
-	if err != nil {
-		return h, err
-	}
+	h.ExcludeLinesRegexp = cfg.ExcludeLines
+	h.IncludeLinesRegexp = cfg.IncludeLines
 	return h, nil
 }
 
-func (h *Harvester) Start() {
-	// Starts harvester and picks the right type. In case type is not set, set it to defeault (log)
-	go h.Harvest()
+// open does open the file given under h.Path and assigns the file handler to h.file
+func (h *Harvester) open() (encoding.Encoding, error) {
+
+	switch h.Config.InputType {
+	case config.StdinInputType:
+		return h.openStdin()
+	case config.LogInputType:
+		return h.openFile()
+	default:
+		return nil, fmt.Errorf("Invalid input type")
+	}
 }

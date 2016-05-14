@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-waitForApache() {
-    echo -n "Waiting for apache(${APACHE_HOST}:${APACHE_PORT}) to start."
+# Wait for. Params: host, port, service
+waitFor() {
+    echo -n "Waiting for ${3}(${1}:${2}) to start."
     for ((i=1; i<=90; i++)) do
-        if nc -vz ${APACHE_HOST} ${APACHE_PORT} 2>/dev/null; then
+        if nc -vz ${1} ${2} 2>/dev/null; then
             echo
-            echo "Apache is ready!"
+            echo "${3} is ready!"
             return 0
         fi
 
@@ -16,71 +17,14 @@ waitForApache() {
     done
 
     echo
-    echo >&2 'Apache is not available'
-    echo >&2 "Address: ${APACHE_HOST}:${APACHE_PORT}"
-}
-
-waitForNginx() {
-    echo -n "Waiting for nginx(${NGINX_HOST}:${NGINX_PORT}) to start."
-    for ((i=1; i<=90; i++)) do
-        if nc -vz ${NGINX_HOST} ${NGINX_PORT} 2>/dev/null; then
-            echo
-            echo "Nginx is ready!"
-            return 0
-        fi
-
-        ((i++))
-        echo -n '.'
-        sleep 1
-    done
-
-    echo
-    echo >&2 'Nginx is not available'
-    echo >&2 "Address: ${NGINX_HOST}:${NGINX_PORT}"
-}
-
-waitForRedis() {
-    echo -n "Waiting for redis(${REDIS_HOST}:${REDIS_PORT}) to start."
-    for ((i=1; i<=90; i++)) do
-        if nc -vz ${REDIS_HOST} ${REDIS_PORT} 2>/dev/null; then
-            echo
-            echo "Redis is ready!"
-            return 0
-        fi
-
-        ((i++))
-        echo -n '.'
-        sleep 1
-    done
-
-    echo
-    echo >&2 'Redis is not available'
-    echo >&2 "Address: ${REDIS_HOST}:${REDIS_PORT}"
-}
-
-
-waitForMySQL() {
-    echo -n "Waiting for mysql(${MYSQL_HOST}:${MYSQL_PORT}) to start."
-    for ((i=1; i<=90; i++)) do
-        if nc -vz ${MYSQL_HOST} ${MYSQL_PORT} 2>/dev/null; then
-            echo
-            echo "MYSQL_HOST is ready!"
-            return 0
-        fi
-
-        ((i++))
-        echo -n '.'
-        sleep 1
-    done
-
-    echo
-    echo >&2 'MySQL is not available'
-    echo >&2 "Address: ${MYSQL_HOST}:${MYSQL_PORT}"
+    echo >&2 '${3} is not available'
+    echo >&2 "Address: ${1}:${2}"
 }
 
 # Main
-waitForApache
-waitForNginx
-waitForRedis
-waitForMySQL
+waitFor ${APACHE_HOST} ${APACHE_PORT} Apache
+waitFor ${MYSQL_HOST} ${MYSQL_PORT} MySQL
+waitFor ${NGINX_HOST} ${NGINX_PORT} Nginx
+waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
+waitFor ${ZOOKEEPER_HOST} ${ZOOKEEPER_PORT} Zookeeper
 exec "$@"

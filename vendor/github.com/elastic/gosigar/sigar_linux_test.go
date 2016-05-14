@@ -67,6 +67,7 @@ func TestLinuxProcState(t *testing.T) {
 			state := sigar.ProcState{}
 			if assert.NoError(t, state.Get(pid)) {
 				assert.Equal(t, n, state.Name)
+				assert.Equal(t, 2, state.Pgid)
 				assert.Equal(t, strconv.Itoa(uid), state.Username)
 			}
 		}()
@@ -218,9 +219,9 @@ DirectMap2M:      333824 kB
 }
 
 func writePidStats(pid int, procName string, path string) error {
-	stats := "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 " +
+	stats := "S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 " +
 		"20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 " +
-		"35 36 37 38 39 40"
+		"35 36 37 38 39"
 
 	statContents := []byte(fmt.Sprintf("%d (%s) %s", pid, procName, stats))
 	return ioutil.WriteFile(path, statContents, 0644)

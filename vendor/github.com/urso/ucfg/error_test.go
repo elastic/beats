@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path"
 	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ func TestErrorMessages(t *testing.T) {
 	cNestedMeta.ctx = testNestedCtx
 
 	_, timeErr := time.ParseDuration("1 hour")
+	_, regexpErr := regexp.Compile(`[`)
 
 	tests := map[string]Error{
 		"duplicate_wo_meta":        raiseDuplicateKey(c, "test"),
@@ -57,6 +59,11 @@ func TestErrorMessages(t *testing.T) {
 			context{field: "timeout"}, nil, ""), timeErr),
 		"invalid_duration_w_meta": raiseInvalidDuration(newString(
 			context{field: "timeout"}, testMeta, ""), timeErr),
+
+		"invalid_regexp_wo_meta": raiseInvalidRegexp(newString(
+			context{field: "regex"}, nil, ""), regexpErr),
+		"invalid_regexp_w_meta": raiseInvalidRegexp(newString(
+			context{field: "regex"}, testMeta, ""), regexpErr),
 
 		"invalid_type_top_level": raiseInvalidTopLevelType(""),
 

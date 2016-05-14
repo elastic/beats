@@ -1,5 +1,0 @@
-nginx:
-  type: group
-  description: >
-    Nginx server status metrics collected from various modules.
-  fields:

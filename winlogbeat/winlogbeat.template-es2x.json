@@ -173,8 +173,10 @@
           "type": "integer"
         },
         "xml": {
-          "ignore_above": 1024,
-          "index": "not_analyzed",
+          "index": "analyzed",
+          "norms": {
+            "enabled": false
+          },
           "type": "string"
         }
       }

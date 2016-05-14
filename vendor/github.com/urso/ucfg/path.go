@@ -136,15 +136,6 @@ func (i idxField) GetValue(elem value) (value, Error) {
 		return nil, raiseExpectedObject(elem)
 	}
 
-	/*
-		if len(cfg.fields.arr) == 0 {
-			if i.i != 0 {
-				return nil, nil
-			}
-			return elem, nil
-		}
-	*/
-
 	if i.i >= len(cfg.fields.arr) {
 		return nil, raiseMissing(cfg, i.String())
 	}

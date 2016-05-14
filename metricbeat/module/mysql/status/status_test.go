@@ -1,48 +1,80 @@
-// +build integration
-
 package status
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/module/mysql"
+	"github.com/elastic/beats/metricbeat/mb"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestFetch(t *testing.T) {
-
-	config := helper.ModuleConfig{
-		Hosts: []string{mysql.GetMySQLEnvDSN()},
+// TestConfigValidation validates that the configuration and the DSN are
+// validated when the MetricSet is created.
+func TestConfigValidation(t *testing.T) {
+	tests := []struct {
+		in  interface{}
+		err string
+	}{
+		{
+			// Missing 'hosts'
+			in: map[string]interface{}{
+				"module":     "mysql",
+				"metricsets": []string{"status"},
+			},
+			err: "missing required field accessing config",
+		},
+		{
+			// Invalid DSN
+			in: map[string]interface{}{
+				"module":     "mysql",
+				"metricsets": []string{"status"},
+				"hosts":      []string{"127.0.0.1"},
+			},
+			err: "config error for host '127.0.0.1': invalid DSN: missing the slash separating the database name",
+		},
+		{
+			// Local unix socket
+			in: map[string]interface{}{
+				"module":     "mysql",
+				"metricsets": []string{"status"},
+				"hosts":      []string{"user@unix(/path/to/socket)/"},
+			},
+		},
+		{
+			// TCP on a remote host, e.g. Amazon RDS:
+			in: map[string]interface{}{
+				"module":     "mysql",
+				"metricsets": []string{"status"},
+				"hosts":      []string{"id:password@tcp(your-amazonaws-uri.com:3306)/}"},
+			},
+		},
+		{
+			// TCP on a remote host with user/pass specified separately
+			in: map[string]interface{}{
+				"module":     "mysql",
+				"metricsets": []string{"status"},
+				"hosts":      []string{"tcp(your-amazonaws-uri.com:3306)/}"},
+				"username":   "id",
+				"password":   "mypass",
+			},
+		},
 	}
-	module := &helper.Module{
-		Config: config,
+
+	for i, test := range tests {
+		c, err := common.NewConfigFrom(test.in)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = mb.NewModules([]*common.Config{c}, mb.Registry)
+		if err != nil && test.err == "" {
+			t.Errorf("unexpected error in testcase %d: %v", i, err)
+			continue
+		}
+		if test.err != "" && assert.Error(t, err, "expected '%v' in testcase %d", test.err, i) {
+			assert.Contains(t, err.Error(), test.err, "testcase %d", i)
+			continue
+		}
 	}
-
-	ms, msErr := helper.NewMetricSet("status", New, module)
-	assert.NoError(t, msErr)
-
-	var err error
-
-	// Setup metricset
-	err = ms.Setup()
-	assert.NoError(t, err)
-
-	// Load events
-	event, err := ms.MetricSeter.Fetch(ms, module.Config.Hosts[0])
-	assert.NoError(t, err)
-
-	// Check event fields
-	connections := event["Connections"].(int)
-	open := event["open"].(common.MapStr)
-	openTables := open["Open_tables"].(int)
-	openFiles := open["Open_files"].(int)
-	openStreams := open["Open_streams"].(int)
-
-	assert.True(t, connections > 0)
-	assert.True(t, openTables > 0)
-	assert.True(t, openFiles >= 0)
-	assert.True(t, openStreams == 0)
 }

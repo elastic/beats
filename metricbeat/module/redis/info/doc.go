@@ -1,6 +1,8 @@
 /*
+Package info fetches Redis server information and statistics using the Redis
+INFO command.
 
-The current implementation is tested with redis 3.0.7
+The current implementation is tested with redis 3.2.0
 More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
 
 `info.go` uses the Redis `INFO default` command for stats. This allows us to fetch  all metrics at once and filter out
@@ -38,7 +40,7 @@ The document sent to elasticsearch has the following structure:
 	      "used_memory_peak": "1164080",
 	      "used_memory_rss": "778240"
 	    },
-	    "presistence": {
+	    "persistence": {
 	      "aof_current_rewrite_time_sec": "-1",
 	      "aof_enabled": "0",
 	      "aof_last_bgrewrite_status": "ok",
@@ -76,7 +78,7 @@ The document sent to elasticsearch has the following structure:
 	      "redis_git_dirty": "0",
 	      "redis_git_sha1": "00000000",
 	      "redis_mode": "standalone",
-	      "redis_version": "3.0.7",
+	      "redis_version": "3.2.0",
 	      "run_id": "8e1659f076c248591812705a24e545257ee6e090",
 	      "tcp_port": "6379",
 	      "uptime_in_days": "20",
@@ -118,5 +120,4 @@ The document sent to elasticsearch has the following structure:
 	  }
 	}
 */
-
 package info

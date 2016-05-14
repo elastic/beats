@@ -1,28 +1,42 @@
 [[new-dashboards]]
-== Developer Guide: Creating new Kibana dashboards
+== Developer Guide: Creating New Kibana Dashboards for a Beat
 
-This guide walks you through the steps for creating a new Kibana dashboards
-or changing the existing Kibana dashboards for a single Beat.
+When contributing to Beats development, you may want to add new dashboards or modify existing ones. To make this easier,
+we've created an `import_dashboards` script that you can use to <<import-dashboards,import the dashboards>> from an
+existing Beat into Kibana, where you can modify the dashboards or use them as a starting point to create new dashboards. 
 
-If the Beat you are targeting has already few dashboards, the first step would be to import
-those dashboards to Kibana and then start changing or adding a dashboard from the existing ones. 
+Kibana saves the dashboards, along with all the dependencies such as visualizations, searches, and index patterns, in
+a special index in Elasticsearch. By default the index is `.kibana`, but you can specify a different index.
 
-Kibana saves the dashboards together with all the dependencies (visualizations, searches and
-index patterns) in a special index in Elasticsearch. By default the index is `.kibana`, but it can be changed to anything.
+When you're done making changes to the dashboards in Kibana, you can use the `export_dashboards` script to <<export-dashboards,export the dashboards>>, along with all dependencies, to a local directory.
 
-After you have created or changed a dashboard in Kibana for a certain Beat, you can export it together with all dependencies to
-your local directory.
+To make sure the dashboards are compatible with the latest version of Kibana and Elasticsearch, we
+recommend that you use the virtual environment under
+https://github.com/elastic/beats/tree/master/testing/environments[beats/testing/environments] to import, create, and
+export the Kibana dashboards.
 
-We recommend you use the virtual environment under
-https://github.com/elastic/beats/tree/master/testing/environments[beats/testing/environments] with the latest version of
-Kibana and Elasticsearch to import, create and export the Kibana dashboards, so the latest dashboards are exported from 
-the same Kibana version.
+[[import-dashboards]]
+=== Importing Existing Beat Dashboards
 
-=== Import existing Beat dashboards
+To import all the dashboards for a Beat, including dependencies such as visualizations, searches, and index
+patterns, you can use the bash script `import_dashboards.sh` (on Unix) or the Powershell script `import_dashboards.ps1`
+(on Windows) from https://github.com/elastic/beats/tree/master/dev-tools[dev-tools]. 
 
-For Unix systems, you can use the bash script `import_dashboards.sh` 
-and for Windows you can use the powershell script `import_dashboards.ps1` from
-https://github.com/elastic/beats/tree/master/dev-tools[dev-tools].
+For example, to import the dashboards for Packetbeat, you can run the following command from the `packetbeat` directory in the `beats` repository:
+
+*Unix*:
+
+[source,shell]
+----------------------------------------------------------------------
+../dev-tools/import_dashboards.sh -dir etc/kibana
+----------------------------------------------------------------------
+
+*Windows*:
+
+[source,shell]
+----------------------------------------------------------------------
+..\dev-tools\import_dashboards.ps1 -dir .\etc\kibana
+----------------------------------------------------------------------
 
 The command has the following options:
 
@@ -35,7 +49,7 @@ Import the dashboards, visualizations and index patterns into Kibana.
 
 The Kibana dashboards together with its dependencies are saved into a
 special index pattern in Elasticsearch (by default .kibana), so you need to
-specify the Elasticsearch URL and optionally an username and password.
+specify the Elasticsearch URL and optionally a username and password.
 
 Usage:
   import_dashboards.sh -url http://localhost:9200 -user admin:secret -index .kibana
@@ -60,43 +74,37 @@ Options:
 ----------------------------------------------------------------------
 
 ==== dir
-The input directory with the dashboards together with its dependencies. The default value is current directory.
+The input directory that contains the dashboards and all the dependencies. The default value is the current directory.
 
 ==== url
 The Elasticsearch URL. The default value is http://localhost:9200.
 
 ==== user
-The username and password for authenticating the connection to Elasticsearch using Basic Authentication. The username and password should be separated by a colon. By default no username and password are used.
+The username and password for authenticating the connection to Elasticsearch by using Basic Authentication. The username
+and password should be separated by a colon. By default no username and password are used.
 
 ==== kibana
-The Elasticsearch index pattern where Kibana saved its configuration. The default value is `.kibana`.
+The Elasticsearch index pattern where Kibana saves its configuration. The default value is `.kibana`.
 
+[[export-dashboards]]
+=== Exporting New and Modified Beat Dashboards
 
-To import all the dashboards together with  all the dependencies (visualizations, searches and index patterns), you just
-need to run the following command in the beats repository:
+To export all the dashboards for a Beat, including any new or modified dashboards and all dependencies such as
+visualizations, searches, and index patterns, you can use the Python script `export_dashboards.py` from  
+https://github.com/elastic/beats/tree/master/dev-tools[dev-tools]. Before running the script for the first time, you
+need to create an environment that contains all the required Python packages. See the dev-tools
+https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
-On Unix systems:
+NOTE: Dashboard names must be **prefixed** with the name of the beat in order to work correctly. For example:
+Topbeat-Dashboard.
+
+For example, to export all Packetbeat dashboards, you can run the following command from the `packetbeat` directory in
+the `beats` repository:
 
 [source,shell]
 ----------------------------------------------------------------------
-../dev-tools/import_dashboards.sh -dir etc/kibana
+../dev-tools/export_dashboards.py --beat packetbeat
 ----------------------------------------------------------------------
-
-On Windows systems:
-
-[source,shell]
-----------------------------------------------------------------------
-..\dev-tools\import_dashboards.ps1 -dir .\etc\kibana
-----------------------------------------------------------------------
-
-
-=== Export the Beat dashboards
-
-To export all the dashboards for a Beat together with all dependencies (visualizations, searches and index patterns), 
-you can use the python script `export_dashboards.py` from 
-https://github.com/elastic/beats/tree/master/dev-tools[dev-tools].
-
-Note: Please, be aware that Dashboard name must be **prefixed** with name of the beat in order to work correctly. Example: Topbeat-Dashboard
 
 The command has the following options:
 
@@ -129,28 +137,11 @@ The name of the Beat. This argument is required.
 The Elasticsearch index pattern where the Beat is storing the data. The default value is constructed from the Beat name + `-*` string.
 
 ==== kibana
-The Elasticsearch index pattern where Kibana saved its configuration. The default value is `.kibana`.
+The Elasticsearch index pattern where Kibana saves its configuration. The default value is `.kibana`.
 
 ==== dir
-The output directory where to save the dashboards together with its dependencies. The default value is `output`.
+The output directory where the dashboards and all dependencies will be saved. The default value is `output`.
 
-For example to export all Packetbeat dashboards, you can run the following command in the `packetbeat` repository:
-
-[source,shell]
-----------------------------------------------------------------------
-../dev-tools/export_dashboards.py --beat packetbeat
-----------------------------------------------------------------------
-
-NOTE:: We have made it even easier for you to import and export the dashboards
-by running the following commands in the Beats repository:
-
-[source,shell]
-----------------------------------------------------------------------
-make import-dashboards
-----------------------------------------------------------------------
-
-[source,shell]
-----------------------------------------------------------------------
-make export-dashboards
-----------------------------------------------------------------------
+NOTE: To make made it even easier for you to import and export the dashboards, we've also added support for running the
+following commands in the Beats repository: `make import-dashboards` and `make export-dashboards`.
 

@@ -147,6 +147,11 @@ system-tests: buildbeat.test prepare-tests python-env
 	. ${PYTHON_ENV}/bin/activate; nosetests -w tests/system --process-timeout=$(TIMEOUT) --with-timer
 	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ./build/system-tests/run
 
+# Runs the system tests
+.PHONY: system-tests-environment
+system-tests-environment:
+	${DOCKER_COMPOSE} run beat make system-tests;
+
 # Runs system tests without coverage reports and in parallel
 .PHONY: fast-system-tests
 fast-system-tests: buildbeat.test python-env
@@ -161,12 +166,12 @@ benchmark-tests:
 # Sets up the virtual python environment
 .PHONY: python-env
 python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
-	. ${PYTHON_ENV}/bin/activate && pip install --upgrade pip ; \
+	@test -d ${PYTHON_ENV} || virtualenv ${PYTHON_ENV}
+	@. ${PYTHON_ENV}/bin/activate && pip install -q --upgrade pip ; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
-		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \
-		. ${PYTHON_ENV}/bin/activate && pip install -Ur ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip install -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
 
 # Runs unit and system tests without coverage reports
@@ -211,17 +216,29 @@ coverage-report:
 
 # Update expects the most recent version of libbeat in the GOPATH
 .PHONY: update
-update:
-	bash ${ES_BEATS}/libbeat/scripts/update.sh ${BEATNAME} ${BEAT_DIR}/${BEATNAME} ${ES_BEATS}/libbeat
+update: python-env
+	# Update config
+	echo "Update config file"
+	rm -f etc/${BEATNAME}.yml
+	cat etc/beat.yml ${ES_BEATS}/libbeat/_beat/config.yml | sed -e "s/beatname/${BEATNAME}/g" > ${BEATNAME}.yml
+
+	# Update fields
+	echo "Update fields"
+
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEATNAME}
+
+	# Update templates
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py $(PWD) ${BEATNAME} ${ES_BEATS}
+	. ${PYTHON_ENV}/bin/activate && python ${ES_BEATS}/libbeat/scripts/generate_template.py --es2x $(PWD) ${BEATNAME} ${ES_BEATS}
 
 ### KIBANA FILES HANDLING ###
 ES_URL?=http://localhost:9200/
 
-.PHONY: update
+.PHONY: export-dashboards
 export-dashboards:
 	python ${ES_BEATS}/dev-tools//export_dashboards.py --url ${ES_URL} --dir $(shell pwd)/etc/kibana --beat ${BEATNAME}
 
-.PHONY: update
+.PHONY: import-dashboards
 import-dashboards:
 	bash ${ES_BEATS}/dev-tools/import_dashboards.sh -url ${ES_URL} -dir $(shell pwd)/etc/kibana
 
@@ -265,4 +282,3 @@ install-home:
 		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
 		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
 	fi
-

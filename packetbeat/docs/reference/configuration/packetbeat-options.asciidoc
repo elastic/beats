@@ -484,29 +484,28 @@ protocol. Here is a sample configuration:
 
 ===== max_body_length
 
-The maximum size of the message displayed in the request or response fields,
-in bytes. If the message is bigger than the size, it will be truncated. Use this
-option to avoid publishing huge messages. It is useless if one of
-send_request or send_response options is not activated. Default is 1000 bytes.
+The maximum size in bytes of the message displayed in the request or response fields.
+Messages that are bigger than the specified size are truncated. Use this option to
+avoid publishing huge messages when <<send-request-option>> or <<send-request-option>>
+is enabled. The default is 1000 bytes.
 
 ===== parse_headers
 
-Parse the additional arguments specified in the headers field of a message.
-Those arguments are key-value pairs specifying informations like the
-content type of the message or the message priority. Default is true.
+If set to true, Packetbeat parses the additional arguments specified in the headers field
+of a message. Those arguments are key-value pairs that specify information such as the
+content type of the message or the message priority. The default is true.
 
 ===== parse_arguments
 
-Parse the additional arguments specified in AMQP methods. Those arguments
-are key-value pairs specified by the user, and can be of any length. Default
-is true.
+If set to true, Packetbeat parses the additional arguments specified in AMQP methods.
+Those arguments are key-value pairs specified by the user and can be of any length.
+The default is true.
 
 ===== hide_connection_information
 
-If set to false, the connection layer methods of the protocol will also be
-displayed, like the opening and closing of connections and channels by clients,
-or the quality of service negociation. Default is true.
-
+If set to false, the connection layer methods of the protocol are also
+displayed, such as the opening and closing of connections and channels by clients,
+or the quality of service negotiation. The default is true.
 
 ==== Memcache Configuration Options
 

@@ -317,6 +317,17 @@ class TestCase(unittest.TestCase):
 
         return counter
 
+    def output_lines(self, output_file=None):
+        """ Count number of lines in a file."""
+        if output_file is None:
+            output_file = "output/" + self.beat_name
+
+        try:
+            with open(os.path.join(self.working_dir, output_file), "r") as f:
+                return sum([1 for line in f])
+        except IOError:
+            return 0
+
     def output_has(self, lines, output_file=None):
         """
         Returns true if the output has a given number of lines.
@@ -393,16 +404,22 @@ class TestCase(unittest.TestCase):
                         dictfields.append(newName)
             return fields, dictfields
 
+        # TODO: Make fields_doc path more generic to work with beat-generator
         with open(fields_doc, "r") as f:
-            doc = yaml.load(f)
+            # TODO: Make this path more generic to work with beat-generator.
+            with open("../../../libbeat/_beat/fields.yml") as f2:
+                content = f2.read()
+
+            content += f.read()
+            doc = yaml.load(content)
+
             fields = []
             dictfields = []
-            for key, value in doc.items():
-                if isinstance(value, dict) and \
-                        value.get("type") == "group":
-                    subfields, subdictfields = extract_fields(value["fields"], "")
-                    fields.extend(subfields)
-                    dictfields.extend(subdictfields)
+
+            for item in doc["fields"]:
+                subfields, subdictfields = extract_fields(item["fields"], "")
+                fields.extend(subfields)
+                dictfields.extend(subdictfields)
             return fields, dictfields
 
     def flatten_object(self, obj, dict_fields, prefix=""):

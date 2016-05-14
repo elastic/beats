@@ -1,0 +1,12 @@
+== Redis Module
+
+This module periodically fetches metrics from http://redis.io/[Redis] servers.
+
+=== Configuration Options
+
+Redis has two additional config options:
+
+* `network` - Network type to be used for redis connection. The default value is
+  `tcp`.
+* `maxconn` - Maximum number of concurrent connections to Redis. The default value
+  is 10.

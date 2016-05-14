@@ -145,8 +145,8 @@
           "type": "integer"
         },
         "xml": {
-          "ignore_above": 1024,
-          "type": "keyword"
+          "norms": false,
+          "type": "text"
         }
       }
     }

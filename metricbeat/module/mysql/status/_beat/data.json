@@ -1,0 +1,44 @@
+{
+    "@timestamp": "2016-04-18T12:16:13.382Z",
+    "beat": {
+        "hostname": "example.com",
+        "name": "example.com"
+    },
+    "metricset": "status",
+    "module": "mysql",
+    "mysql-status": {
+        "Connections": 690,
+        "Flush_commands": 2,
+        "Max_used_connections": 2,
+        "aborted": {
+            "Aborted_clients": 88,
+            "Aborted_connects": 597
+        },
+        "binlog": {
+            "Binlog_cache_disk_use": 0,
+            "Binlog_cache_use": 0
+        },
+        "bytes": {
+            "Bytes_received": 549749,
+            "Bytes_sent": 144506849
+        },
+        "created": {
+            "Created_tmp_disk_tables": 1,
+            "Created_tmp_files": 5,
+            "Created_tmp_tables": 2
+        },
+        "delayed": {
+            "Delayed_errors": 0,
+            "Delayed_insert_threads": 0,
+            "Delayed_writes": 0
+        },
+        "open": {
+            "Open_files": 0,
+            "Open_streams": 0,
+            "Open_tables": 15,
+            "Opened_tables": 142
+        }
+    },
+    "rtt": 4861,
+    "type": "metricsets"
+}

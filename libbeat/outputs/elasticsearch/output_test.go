@@ -102,7 +102,7 @@ func TestOneEvent(t *testing.T) {
 	event["dst_port"] = 6379
 	event["src_ip"] = "192.168.22.2"
 	event["src_port"] = 6378
-	event["shipper"] = "appserver1"
+	event["name"] = "appserver1"
 	r := common.MapStr{}
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
@@ -140,7 +140,7 @@ func TestOneEvent(t *testing.T) {
 	}()
 
 	params := map[string]string{
-		"q": "shipper:appserver1",
+		"q": "name:appserver1",
 	}
 	_, resp, err := client.SearchURI(index, "", params)
 
@@ -174,7 +174,7 @@ func TestEvents(t *testing.T) {
 	event["dst_port"] = 6379
 	event["src_ip"] = "192.168.22.2"
 	event["src_port"] = 6378
-	event["shipper"] = "appserver1"
+	event["name"] = "appserver1"
 	r := common.MapStr{}
 	r["request"] = "MGET key1"
 	r["response"] = "value1"
@@ -210,7 +210,7 @@ func TestEvents(t *testing.T) {
 	output.randomClient().Refresh(index)
 
 	params := map[string]string{
-		"q": "shipper:appserver1",
+		"q": "name:appserver1",
 	}
 
 	defer func() {

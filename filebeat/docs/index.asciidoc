@@ -1,7 +1,11 @@
 = Filebeat Reference
 :libbeat: http://www.elastic.co/guide/en/beats/libbeat/master
+:packetbeat: http://www.elastic.co/guide/en/beats/packetbeat/master
+:topbeat: http://www.elastic.co/guide/en/beats/topbeat/master
+:filebeat: http://www.elastic.co/guide/en/beats/filebeat/master
+:winlogbeat: http://www.elastic.co/guide/en/beats/winlogbeat/master
 :elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/master/
-:version: 5.0.0-alpha1
+:version: 5.0.0-alpha2
 :beatname_lc: filebeat
 :beatname_uc: Filebeat
 :security: X-Pack Security
@@ -17,6 +21,8 @@ include::../../libbeat/docs/shared-directory-layout.asciidoc[]
 include::./configuring-howto.asciidoc[]
 
 include::./filebeat-filtering.asciidoc[]
+
+include::./multiline.asciidoc[]
 
 include::../../libbeat/docs/shared-config-ingest.asciidoc[]
 

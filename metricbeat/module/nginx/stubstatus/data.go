@@ -11,7 +11,7 @@ import (
 )
 
 // Map body to MapStr
-func eventMapping(m *MetricSeter, body io.ReadCloser, hostname string, metricset string) (common.MapStr, error) {
+func eventMapping(m *MetricSet, body io.ReadCloser, hostname string, metricset string) (common.MapStr, error) {
 	// Nginx stub status sample:
 	// Active connections: 1
 	// server accepts handled requests

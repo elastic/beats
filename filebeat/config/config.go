@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -46,9 +47,8 @@ type FilebeatConfig struct {
 }
 
 type ProspectorConfig struct {
-	ExcludeFiles          []string `config:"exclude_files"`
-	ExcludeFilesRegexp    []*regexp.Regexp
-	Harvester             HarvesterConfig `config:",inline"`
+	ExcludeFiles          []*regexp.Regexp `config:"exclude_files"`
+	Harvester             HarvesterConfig  `config:",inline"`
 	Input                 string
 	IgnoreOlder           string `config:"ignore_older"`
 	IgnoreOlderDuration   time.Duration
@@ -73,8 +73,8 @@ type HarvesterConfig struct {
 	CloseOlder         string `config:"close_older"`
 	CloseOlderDuration time.Duration
 	ForceCloseFiles    bool             `config:"force_close_files"`
-	ExcludeLines       []string         `config:"exclude_lines"`
-	IncludeLines       []string         `config:"include_lines"`
+	ExcludeLines       []*regexp.Regexp `config:"exclude_lines"`
+	IncludeLines       []*regexp.Regexp `config:"include_lines"`
 	MaxBytes           int              `config:"max_bytes"`
 	Multiline          *MultilineConfig `config:"multiline"`
 	JSON               *JSONConfig      `config:"json"`
@@ -88,11 +88,11 @@ type JSONConfig struct {
 }
 
 type MultilineConfig struct {
-	Negate   bool   `config:"negate"`
-	Match    string `config:"match"`
-	MaxLines *int   `config:"max_lines"`
-	Pattern  string `config:"pattern"`
-	Timeout  string `config:"timeout"`
+	Negate   bool           `config:"negate"`
+	Match    string         `config:"match"       validate:"required"`
+	MaxLines *int           `config:"max_lines"`
+	Pattern  *regexp.Regexp `config:"pattern"`
+	Timeout  *time.Duration `config:"timeout"     validate:"positive"`
 }
 
 const (
@@ -104,6 +104,13 @@ const (
 var ValidInputType = map[string]struct{}{
 	StdinInputType: {},
 	LogInputType:   {},
+}
+
+func (c *MultilineConfig) Validate() error {
+	if c.Match != "after" && c.Match != "before" {
+		return fmt.Errorf("unknown matcher type: %s", c.Match)
+	}
+	return nil
 }
 
 // getConfigFiles returns list of config files.
