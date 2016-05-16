@@ -1,0 +1,102 @@
+########################## Metricbeat Configuration ###########################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see metricbeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
+
+#==========================  Modules configuration ============================
+metricbeat.modules:
+
+#----------------------------- Apache Module ----------------------------------
+- module: apache
+  metricsets: ["status"]
+  enabled: true
+  period: 1s
+
+  # Apache hosts
+  hosts: ["http://127.0.0.1/"]
+
+#------------------------------- Mysql Module ---------------------------------
+- module: mysql
+  metricsets: ["status"]
+  enabled: true
+  period: 2s
+
+  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or for all hosts in username and password config option
+  hosts: ["root@tcp(127.0.0.1:3306)/"]
+
+#------------------------------- Redis Module ---------------------------------
+- module: redis
+  metricsets: ["info"]
+  enabled: true
+  period: 1s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+#------------------------------ System Module ---------------------------------
+- module: system
+  metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+  enabled: true
+  period: 2s
+
+
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Template name. By default the template name is metricbeat.
+  template.name: "metricbeat"
+
+  # Path to template file
+  template.path: "metricbeat.template.json"
+
+  # Overwrite existing template
+  template.overwrite: false
+
+#----------------------------- Logstash output --------------------------------
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["localhost:5044"]
+
+  # Optional TLS. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for TLS client authentication
+  #tls.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #tls.certificate_key: "/etc/pki/client/cert.key"
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is error.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: error

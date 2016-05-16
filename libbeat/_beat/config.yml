@@ -147,7 +147,6 @@ output.elasticsearch:
 
 
 #----------------------------- Logstash output --------------------------------
-### Logstash as output
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
@@ -222,15 +221,14 @@ output.elasticsearch:
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 
+# Sets log level. The default log level is error.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: error
 
-  # Enable debug output for selected components. To enable all selectors use ["*"]
-  # Other available selectors are beat, publish, service
-  # Multiple selectors can be chained.
-  #selectors: [ ]
-
-  # Sets log level. The default log level is error.
-  # Available log levels are: critical, error, warning, info, debug
-  #level: error
+# Enable debug output for selected components. To enable all selectors use ["*"]
+# Other available selectors are beat, publish, service
+# Multiple selectors can be chained.
+#logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true

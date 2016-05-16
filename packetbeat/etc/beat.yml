@@ -1,16 +1,15 @@
 ###################### Packetbeat Configuration Example #######################
 
-# This file contains an overview of various configuration settings. Please consult
-# the docs at https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-configuration.html
-# for more details.
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see packetbeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/packetbeat/index.html
 
-# The Packetbeat shipper works by sniffing the network traffic between your
-# application components. It inserts meta-data about each transaction into
-# Elasticsearch.
+#============================== Network device ================================
 
-#================================ Interfaces ==================================
-
-# Select the network interfaces to sniff the data. You can use the "any"
+# Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 

@@ -1,10 +1,19 @@
-###################### Filebeat Configuration Example #########################
+##################$$$###### Filebeat Configuration ############################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see filebeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/filebeat/index.html
 
 #=========================== Filebeat prospectors =============================
 
 # List of prospectors to fetch data.
 filebeat.prospectors:
-# Each - is a prospector. Below are the prospector specific configurations
+# Each - is a prospector. Most options can be set at the prospector level, so
+# you can use different prospectors for various configurations.
+# Below are the prospector specific configurations.
 
 # Type of the files. Based on this the way the file is read is decided.
 # The different types cannot be mixed in one prospector
@@ -32,25 +41,6 @@ filebeat.prospectors:
   #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
   #encoding: plain
 
-  # Decode JSON options. Enable this if your logs are structured in JSON.
-  # JSON key on which to apply the line filtering and multiline settings. This key
-  # must be top level and its value must be string, otherwise it is ignored. If
-  # no text key is defined, the line filtering and multiline features cannot be used.
-  #json.message_key:
-
-  # By default, the decoded JSON is placed under a "json" key in the output document.
-  # If you enable this setting, the keys are copied top level in the output document.
-  #json.keys_under_root: false
-
-  # If keys_under_root and this setting are enabled, then the values from the decoded
-  # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
-  # in case of conflicts.
-  #json.overwrite_keys: false
-
-  # If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
-  # unmarshaling errors or when a text key is defined in the configuration but cannot
-  # be used.
-  #json.add_error_key: false
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list. The include_lines is called before
@@ -106,9 +96,33 @@ filebeat.prospectors:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
+  ### JSON configuration
+
+  # Decode JSON options. Enable this if your logs are structured in JSON.
+  # JSON key on which to apply the line filtering and multiline settings. This key
+  # must be top level and its value must be string, otherwise it is ignored. If
+  # no text key is defined, the line filtering and multiline features cannot be used.
+  #json.message_key:
+
+  # By default, the decoded JSON is placed under a "json" key in the output document.
+  # If you enable this setting, the keys are copied top level in the output document.
+  #json.keys_under_root: false
+
+  # If keys_under_root and this setting are enabled, then the values from the decoded
+  # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
+  # in case of conflicts.
+  #json.overwrite_keys: false
+
+  # If this setting is enabled, Filebeat adds a "json_error" key in case of JSON
+  # unmarshaling errors or when a text key is defined in the configuration but cannot
+  # be used.
+  #json.add_error_key: false
+
+  ### Multiline options
+
   # Mutiline can be used for log messages spanning multiple lines. This is common
   # for Java Stack Traces or C-Line Continuation
-  
+
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
   #multiline.pattern: ^\[
 
@@ -336,7 +350,6 @@ output.elasticsearch:
 
 
 #----------------------------- Logstash output --------------------------------
-### Logstash as output
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
@@ -411,15 +424,14 @@ output.elasticsearch:
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 
+# Sets log level. The default log level is error.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: error
 
-  # Enable debug output for selected components. To enable all selectors use ["*"]
-  # Other available selectors are beat, publish, service
-  # Multiple selectors can be chained.
-  #selectors: [ ]
-
-  # Sets log level. The default log level is error.
-  # Available log levels are: critical, error, warning, info, debug
-  #level: error
+# Enable debug output for selected components. To enable all selectors use ["*"]
+# Other available selectors are beat, publish, service
+# Multiple selectors can be chained.
+#logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true

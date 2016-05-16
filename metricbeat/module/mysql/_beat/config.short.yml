@@ -1,0 +1,9 @@
+#------------------------------- Mysql Module ---------------------------------
+- module: mysql
+  metricsets: ["status"]
+  enabled: true
+  period: 2s
+
+  # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
+  # The username and password can either be set in the DSN or for all hosts in username and password config option
+  hosts: ["root@tcp(127.0.0.1:3306)/"]
