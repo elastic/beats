@@ -1,4 +1,13 @@
-###################### Winlogbeat Configuration Example #######################
+########################## Winlogbeat Configuration ###########################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see winlogbeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/winlogbeat/index.html
+
+#======================= Winlogbeat specific options ==========================
 
 # The registry file is where Winlogbeat persists its state so that the beat
 # can resume after shutdown or an outage. The default is .winlogbeat.yml
@@ -24,5 +33,3 @@ winlogbeat.event_logs:
     ignore_older: 72h
   - name: Security
   - name: System
-
-

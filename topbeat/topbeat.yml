@@ -1,4 +1,11 @@
-###################### Topbeat Configuration Example ##########################
+########################### Topbeat Configuration #############################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see topbeat.short.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/topbeat/index.html
 
 #======================== Topbeat specific options ============================
 
@@ -13,7 +20,7 @@ topbeat.procs: [".*"]
 topbeat.stats:
   # per system statistics, by default is true
   system: true
-    
+
   # per process statistics, by default is true
   process: true
 
@@ -22,7 +29,6 @@ topbeat.stats:
 
   # cpu usage per core, by default is false
   cpu_per_core: false
-
 
 #================================ General =====================================
 
@@ -172,7 +178,6 @@ output.elasticsearch:
 
 
 #----------------------------- Logstash output --------------------------------
-### Logstash as output
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
@@ -247,15 +252,14 @@ output.elasticsearch:
 # Under Windows systems, the log files are per default sent to the file output,
 # under all other system per default to syslog.
 
+# Sets log level. The default log level is error.
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: error
 
-  # Enable debug output for selected components. To enable all selectors use ["*"]
-  # Other available selectors are beat, publish, service
-  # Multiple selectors can be chained.
-  #selectors: [ ]
-
-  # Sets log level. The default log level is error.
-  # Available log levels are: critical, error, warning, info, debug
-  #level: error
+# Enable debug output for selected components. To enable all selectors use ["*"]
+# Other available selectors are beat, publish, service
+# Multiple selectors can be chained.
+#logging.selectors: [ ]
 
 # Send all logging output to syslog. The default is false.
 #logging.to_syslog: true
