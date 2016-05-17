@@ -24,13 +24,12 @@ Redis has two additional config options:
 
 === Example Configuration
 
-The Apache module supports the standard configuration options which can be found
+The Redis Status module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
 metricbeat.modules:
-  #------------------------------- Redis Module ---------------------------------
   - module: redis
     metricsets: ["info"]
     enabled: true
