@@ -6,6 +6,11 @@ This module periodically fetches metrics from http://redis.io/[Redis] servers.
 
 Redis has two additional config options:
 
+* `idle_timeout` - Close connections after remaining idle for this duration. If
+  the value is zero, then idle connections are not closed. The default value
+  is 2 times the module period to allow a connection to be reused across
+  fetches. The `idle_timeout` should be set less than the server's connection
+  timeout.
 * `network` - Network type to be used for redis connection. The default value is
   `tcp`.
 * `maxconn` - Maximum number of concurrent connections to Redis. The default value
