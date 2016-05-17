@@ -13,6 +13,7 @@ grouped in the following categories:
 * <<exported-fields-beat>>
 * <<exported-fields-common>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nginx>>
 * <<exported-fields-redis>>
 * <<exported-fields-system>>
 * <<exported-fields-zookeeper>>
@@ -443,6 +444,89 @@ The number of bytes received from all clients.
 type: integer
 
 The number of bytes sent to all clients.
+
+
+[[exported-fields-nginx]]
+=== Nginx Status Fields
+
+Nginx server status metrics collected from various modules.
+
+
+
+=== nginx-stubstatus Fields
+
+`nginx-stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
+
+
+
+==== nginx-stubstatus.hostname
+
+type: keyword
+
+Nginx hostname
+
+
+==== nginx-stubstatus.active
+
+type: integer
+
+The current number of active client connections including Waiting connections.
+
+
+==== nginx-stubstatus.accepts
+
+type: integer
+
+The total number of accepted client connections.
+
+
+==== nginx-stubstatus.handled
+
+type: integer
+
+The total number of handled client connections.
+
+
+==== nginx-stubstatus.dropped
+
+type: integer
+
+The total number of dropped client connections.
+
+
+==== nginx-stubstatus.requests
+
+type: integer
+
+The total number of client requests.
+
+
+==== nginx-stubstatus.current
+
+type: integer
+
+The current number of client requests.
+
+
+==== nginx-stubstatus.reading
+
+type: integer
+
+The current number of connections where nginx is reading the request header.
+
+
+==== nginx-stubstatus.writing
+
+type: integer
+
+The current number of connections where nginx is writing the response back to the client.
+
+
+==== nginx-stubstatus.waiting
+
+type: integer
+
+The current number of idle client connections waiting for a request.
 
 
 [[exported-fields-redis]]

@@ -1,0 +1,40 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-nginx]]
+== Nginx Module
+
+This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
+
+
+
+=== Example Configuration
+
+The Nginx module supports the standard configuration options which can be found
+here (add link). Below is an example of a configuration option:
+
+[source,yaml]
+----
+metricbeat.modules:
+  #----------------------------- Nginx Module ----------------------------------
+  - module: nginx
+    metricsets: ["stubstatus"]
+    enabled: true
+    period: 1s
+
+    # Nginx hosts
+    hosts: ["http://127.0.0.1/"]
+
+    # Path to server status. Default server-status
+    #server_status_path: "server-status"
+----
+
+=== MetricSets
+
+The following MetricSets are available:
+
+* <<metricbeat-metricset-nginx-stubstatus,stubstatus>>
+
+include::nginx/stubstatus.asciidoc[]
+

@@ -13,6 +13,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/apache/status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
+	_ "github.com/elastic/beats/metricbeat/module/nginx"
+	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 	_ "github.com/elastic/beats/metricbeat/module/system"
