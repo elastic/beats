@@ -17,13 +17,12 @@ const (
 	// the host config.
 	defaultScheme = "http"
 
-	// defaultPath is the default path to the mod_status endpoint on the
-	// Apache HTTPD server.
+	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
 	defaultPath = "/server-status"
 )
 
 var (
-	debugf = logp.MakeDebug("apache-status")
+	debugf = logp.MakeDebug("nginx-status")
 )
 
 func init() {
@@ -101,7 +100,7 @@ func getURL(statusPath, rawHost string) (*url.URL, error) {
 	}
 
 	if u.Host == "" {
-		return nil, fmt.Errorf("error parsing apache host: empty host")
+		return nil, fmt.Errorf("error parsing nginx host: empty host")
 	}
 
 	if u.Path == "" {

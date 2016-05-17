@@ -11,7 +11,7 @@ This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 
 === Example Configuration
 
-The Apache module supports the standard configuration options which can be found
+The Nginx module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
