@@ -4,7 +4,6 @@ beat:
   links:
     - elasticsearch
     - logstash
-    - kibana
   environment:
     - LS_HOST=logstash
   container_name: beat
