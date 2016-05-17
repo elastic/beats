@@ -5,7 +5,7 @@ package processor
 import (
 	"testing"
 
-	"github.com/elastic/beats/filebeat/config"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,7 +46,7 @@ func TestLineEndingChars(t *testing.T) {
 func TestDecodeJSON(t *testing.T) {
 	type io struct {
 		Text         string
-		Config       config.JSONConfig
+		Config       input.JSONConfig
 		ExpectedText string
 		ExpectedMap  common.MapStr
 	}
@@ -54,60 +54,60 @@ func TestDecodeJSON(t *testing.T) {
 	var tests = []io{
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       config.JSONConfig{MessageKey: "message"},
+			Config:       input.JSONConfig{MessageKey: "message"},
 			ExpectedText: "test",
 			ExpectedMap:  common.MapStr{"message": "test", "value": float64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       config.JSONConfig{MessageKey: "message1"},
+			Config:       input.JSONConfig{MessageKey: "message1"},
 			ExpectedText: "",
 			ExpectedMap:  common.MapStr{"message": "test", "value": float64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       config.JSONConfig{MessageKey: "value"},
+			Config:       input.JSONConfig{MessageKey: "value"},
 			ExpectedText: "",
 			ExpectedMap:  common.MapStr{"message": "test", "value": float64(1)},
 		},
 		{
 			Text:         `{"message": "test", "value": "1"}`,
-			Config:       config.JSONConfig{MessageKey: "value"},
+			Config:       input.JSONConfig{MessageKey: "value"},
 			ExpectedText: "1",
 			ExpectedMap:  common.MapStr{"message": "test", "value": "1"},
 		},
 		{
 			// in case of JSON decoding errors, the text is passed as is
 			Text:         `{"message": "test", "value": "`,
-			Config:       config.JSONConfig{MessageKey: "value"},
+			Config:       input.JSONConfig{MessageKey: "value"},
 			ExpectedText: `{"message": "test", "value": "`,
 			ExpectedMap:  nil,
 		},
 		{
 			// Add key error helps debugging this
 			Text:         `{"message": "test", "value": "`,
-			Config:       config.JSONConfig{MessageKey: "value", AddErrorKey: true},
+			Config:       input.JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: `{"message": "test", "value": "`,
 			ExpectedMap:  common.MapStr{"json_error": "Error decoding JSON: unexpected end of JSON input"},
 		},
 		{
 			// If the text key is not found, put an error
 			Text:         `{"message": "test", "value": "1"}`,
-			Config:       config.JSONConfig{MessageKey: "hello", AddErrorKey: true},
+			Config:       input.JSONConfig{MessageKey: "hello", AddErrorKey: true},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": "1", "json_error": "Key 'hello' not found"},
 		},
 		{
 			// If the text key is found, but not a string, put an error
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       config.JSONConfig{MessageKey: "value", AddErrorKey: true},
+			Config:       input.JSONConfig{MessageKey: "value", AddErrorKey: true},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": float64(1), "json_error": "Value of key 'value' is not a string"},
 		},
 		{
 			// Without a text key, simple return the json and an empty text
 			Text:         `{"message": "test", "value": 1}`,
-			Config:       config.JSONConfig{AddErrorKey: true},
+			Config:       input.JSONConfig{AddErrorKey: true},
 			ExpectedText: ``,
 			ExpectedMap:  common.MapStr{"message": "test", "value": float64(1)},
 		},

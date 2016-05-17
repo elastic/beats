@@ -10,41 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadConfig(t *testing.T) {
-	absPath, err := filepath.Abs("../tests/files/")
-
-	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
-
-	config := &Config{}
-
-	err = cfgfile.Read(config, absPath+"/config.yml")
-
-	assert.Nil(t, err)
-
-	assert.Equal(t, uint64(DefaultSpoolSize), config.Filebeat.SpoolSize)
-	assert.Equal(t, "/prospectorConfigs/", config.Filebeat.ConfigDir)
-
-	prospectors := config.Filebeat.Prospectors
-
-	// Check if multiple paths were read in
-	assert.Equal(t, 3, len(prospectors))
-
-	// Check if full array can be read. Assumed that are ordered same as in config file
-	assert.Equal(t, 2, len(prospectors[0].Paths))
-	assert.Equal(t, "/var/log/s*.log", prospectors[0].Paths[1])
-	assert.Equal(t, "log", prospectors[0].Input)
-	assert.Equal(t, 3, len(prospectors[0].Harvester.Fields))
-	assert.Equal(t, uint64(1), prospectors[0].Harvester.Fields["review"])
-	assert.Equal(t, "0", prospectors[0].IgnoreOlder)
-	assert.Equal(t, "1h", prospectors[0].Harvester.CloseOlder)
-	assert.Equal(t, "10s", prospectors[0].ScanFrequency)
-
-	assert.Equal(t, "stdin", prospectors[2].Input)
-	assert.Equal(t, 0, len(prospectors[2].Paths))
-	assert.Equal(t, "", prospectors[1].ScanFrequency)
-}
-
 func TestReadConfig2(t *testing.T) {
 	// Tests with different params from config file
 	absPath, err := filepath.Abs("../tests/files/")
