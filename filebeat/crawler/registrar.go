@@ -98,9 +98,8 @@ func (r *Registrar) Run() {
 			return
 		// Treats new log files to persist with higher priority then new events
 		case state := <-r.Persist:
-			source := state.Source
-			r.setState(source, state)
-			logp.Debug("prospector", "Registrar will re-save state for %s", source)
+			r.setState(state)
+			logp.Debug("prospector", "Registrar will re-save state for %s", state.Source)
 		case events := <-r.Channel:
 			r.processEvents(events)
 		}
@@ -126,7 +125,7 @@ func (r *Registrar) processEvents(events []*FileEvent) {
 			continue
 		}
 
-		r.setState(event.Source, event.GetState())
+		r.setState(event.GetState())
 	}
 }
 
@@ -170,7 +169,9 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 	// Check if there is a state for this file
 	lastState, isFound := r.GetFileState(filePath)
 
-	if isFound && input.IsSameFile(filePath, fileInfo) {
+	// Use os info to compare files as old fileInfo not necessary available
+	if isFound && lastState.FileStateOS.IsSame(GetOSFileState(&fileInfo)) {
+
 		logp.Debug("registar", "Same file as before found. Fetch the state.")
 		// We're resuming - throw the last state back downstream so we resave it
 		// And return the offset - also force harvest in case the file is old and we're about to skip it
@@ -184,7 +185,6 @@ func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) (int64, bo
 		logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
 
 		lastState, _ := r.GetFileState(previous)
-		r.updateStateSource(lastState, filePath)
 		return lastState.Offset, true
 	}
 
@@ -219,10 +219,10 @@ func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo)
 	return "", fmt.Errorf("No previous file found")
 }
 
-func (r *Registrar) setState(path string, state *FileState) {
+func (r *Registrar) setState(state *FileState) {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	r.state[path] = state
+	r.state[state.Source] = state
 }
 
 func (r *Registrar) getState(path string) (*FileState, bool) {
@@ -230,12 +230,6 @@ func (r *Registrar) getState(path string) (*FileState, bool) {
 	defer r.stateMutex.Unlock()
 	state, exist := r.state[path]
 	return state, exist
-}
-
-func (r *Registrar) updateStateSource(state *FileState, path string) {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
-	state.Source = path
 }
 
 func (r *Registrar) getStateCopy() map[string]FileState {

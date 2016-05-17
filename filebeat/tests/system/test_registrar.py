@@ -355,9 +355,9 @@ class Test(TestCase):
         assert len(data) == 2
 
 
-    def test_state_after_rotation(self):
+    def test_state_after_rotation_ignore_older(self):
         """
-        Checks that the state is written correctly after rotation
+        Checks that the state is written correctly after rotation and file under ignore_older before
         """
         self.render_config_template(
                 path=os.path.abspath(self.working_dir) + "/log/input*",
@@ -424,6 +424,7 @@ class Test(TestCase):
                         "Registry file updated. 2 states written.") >= 4,
                 max_timeout=15)
 
+        time.sleep(1)
         filebeat.kill_and_wait()
 
 
@@ -437,4 +438,84 @@ class Test(TestCase):
         else:
             assert data[os.path.abspath(testfile1)]["offset"] == 9
             assert data[os.path.abspath(testfile2)]["offset"] == 8
+
+
+
+    def test_state_after_rotation2(self):
+        """
+        Checks that the state is written correctly after rotation
+        """
+        self.render_config_template(
+                path=os.path.abspath(self.working_dir) + "/log/input*",
+                scan_frequency="1s"
+        )
+
+        filebeat = self.start_filebeat()
+
+
+        os.mkdir(self.working_dir + "/log/")
+        testfile1 = self.working_dir + "/log/input"
+        testfile2 = self.working_dir + "/log/input.1"
+
+        with open(testfile1, 'w') as f:
+            f.write("entry10\n")
+
+        self.wait_until(
+                lambda: self.output_has(lines=1),
+                max_timeout=10)
+
+        # Wait a moment to make sure file exists
+        time.sleep(1)
+        data = self.get_dot_filebeat()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 8
+
+        # Rotate files and remove old one
+        os.rename(testfile1, testfile2)
+
+        # Now wait until rotation is detected
+        self.wait_until(
+                lambda: self.log_contains(
+                        "File rename was detected, not a new file"),
+                max_timeout=10)
+
+        # Wait a moment to make sure file exists
+        time.sleep(1)
+        data = self.get_dot_filebeat()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile2)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile2)]["offset"] == 8
+
+
+        with open(testfile1, 'w') as f:
+            f.write("entry200\n")
+
+        self.wait_until(
+                lambda: self.output_has(lines=2),
+                max_timeout=10)
+
+        filebeat.kill_and_wait()
+
+        # Wait a moment to make sure file exists
+        data = self.get_dot_filebeat()
+
+        # Check that offsets are correct
+        if os.name == "nt":
+            # Under windows offset is +1 because of additional newline char
+            assert data[os.path.abspath(testfile1)]["offset"] == 10
+            assert data[os.path.abspath(testfile2)]["offset"] == 9
+        else:
+            assert data[os.path.abspath(testfile1)]["offset"] == 9
+            assert data[os.path.abspath(testfile2)]["offset"] == 8
+
+
 
