@@ -395,10 +395,11 @@ class Test(TestCase):
         if os.name == "nt":
             # Under windows offset is +1 because of additional newline char
             assert data[os.path.abspath(testfile1)]["offset"] == 9
+            assert data[os.path.abspath(testfile2)]["offset"] == 8
         else:
             assert data[os.path.abspath(testfile1)]["offset"] == 8
+            assert data[os.path.abspath(testfile2)]["offset"] == 7
 
-        assert data[os.path.abspath(testfile2)]["offset"] == 0
 
         # Rotate files and remove old one
         os.rename(testfile2, testfile3)

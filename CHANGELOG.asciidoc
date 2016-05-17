@@ -65,6 +65,12 @@ https://github.com/elastic/beats/compare/v1.2.3...1.2[Check the HEAD diff]
 === Beats version 1.2.3
 https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
 
+==== Added
+
+*Filebeat*
+
+- Prevent file opening for files which reached ignore_older.
+
 ==== Bugfixes
 
 *Topbeat*
