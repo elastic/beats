@@ -1,5 +1,6 @@
 import yaml
 import sys
+import argparse
 
 def document_fields(output, section, sections, path):
     if "anchor" in section:
@@ -92,19 +93,25 @@ grouped in the following categories:
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 3:
-        print "Usage: %s beatpath beatname" % sys.argv[0]
-        sys.exit(1)
 
-    beat_path = sys.argv[1]
-    beat_name = sys.argv[2]
+    parser = argparse.ArgumentParser(
+        description="Generates the documentation for a Beat.")
+    parser.add_argument("path", help="Path to the beat folder")
+    parser.add_argument("beatname", help="The beat name")
+    parser.add_argument("es_beats", help="The path to the general beats folder")
+
+    args = parser.parse_args()
+
+    beat_path = args.path
+    beat_name = args.beatname
+    es_beats = args.es_beats
 
     # Read fields.yml
     with file(beat_path + "/etc/fields.yml") as f:
         fields = f.read()
 
     # Prepends beat fields from libbeat
-    with file(beat_path + "/../libbeat/_beat/fields.yml") as f:
+    with file(es_beats + "/libbeat/_beat/fields.yml") as f:
         fields = f.read() + fields
 
     output = open(beat_path + "/docs/fields.asciidoc", 'w')
