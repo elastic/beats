@@ -106,7 +106,3 @@ func (fs *FileStat) Continue(old *FileStat) {
 		fs.Return = old.Return
 	}
 }
-
-func (fs *FileStat) Skip(returnOffset int64) {
-	fs.Return <- returnOffset
-}

@@ -358,6 +358,11 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 		p.ProspectorConfig.IgnoreOlderDuration != 0 &&
 		time.Since(newinfo.Fileinfo.ModTime()) > p.ProspectorConfig.IgnoreOlderDuration {
 
+		if oldState.offset == newinfo.Fileinfo.Size() {
+			logp.Debug("prospector", "File size of ignore_file didn't change. Nothing to do: %s", file)
+			return
+		}
+
 		logp.Debug("prospector", "Fetching old state of file to resume: %s", file)
 
 		// Are we resuming a dead file? We have to resume even if dead so we catch any old updates to the file
@@ -374,7 +379,7 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 				p.ProspectorConfig.IgnoreOlderDuration,
 				time.Since(newinfo.Fileinfo.ModTime()),
 				file)
-			newinfo.Skip(newinfo.Fileinfo.Size())
+			h.SetOffset(newinfo.Fileinfo.Size())
 		}
 		p.registrar.Persist <- h.GetState()
 	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
