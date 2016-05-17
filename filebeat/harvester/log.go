@@ -311,6 +311,13 @@ func (h *Harvester) SetOffset(offset int64) {
 	h.offset = offset
 }
 
+func (h *Harvester) SetPath(path string) {
+	h.offsetLock.Lock()
+	defer h.offsetLock.Unlock()
+
+	h.Path = path
+}
+
 func (h *Harvester) GetOffset() int64 {
 	h.offsetLock.Lock()
 	defer h.offsetLock.Unlock()

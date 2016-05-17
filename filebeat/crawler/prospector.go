@@ -380,8 +380,10 @@ func (p *Prospector) checkNewFile(newinfo *harvester.FileStat, file string, outp
 	} else if previousFile, err := p.getPreviousFile(file, newinfo.Fileinfo); err == nil {
 		// This file was simply renamed (known inode+dev) - link the same harvester channel as the old file
 		logp.Debug("prospector", "File rename was detected, not a new file: %s -> %s", previousFile, file)
-		lastinfo := p.prospectorList[previousFile]
-		newinfo.Continue(&lastinfo)
+
+		h.SetOffset(oldState.offset)
+		h.SetPath(file)
+
 		p.registrar.Persist <- h.GetState()
 	} else {
 
@@ -425,9 +427,9 @@ func (p *Prospector) checkExistingFile(newinfo *harvester.FileStat, newFile *inp
 			logp.Debug("prospector", "File rename was detected, existing file: %s -> %s", previousFile, file)
 			logp.Debug("prospector", "Launching harvester on renamed file: %s", file)
 
-			lastinfo := p.prospectorList[previousFile]
-			h.SetOffset(p.oldStates[previousFile].offset)
-			newinfo.Continue(&lastinfo)
+			h.SetOffset(oldState.offset)
+			h.SetPath(file)
+
 			p.registrar.Persist <- h.GetState()
 		} else {
 			// File is not the same file we saw previously, it must have rotated and is a new file
