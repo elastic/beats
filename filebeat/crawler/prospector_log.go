@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"time"
 
-	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,14 +13,14 @@ import (
 type ProspectorLog struct {
 	Prospector *Prospector
 	lastscan   time.Time
-	config     cfg.ProspectorConfig
+	config     prospectorConfig
 }
 
 func NewProspectorLog(p *Prospector) (*ProspectorLog, error) {
 
 	prospectorer := &ProspectorLog{
 		Prospector: p,
-		config:     p.ProspectorConfig,
+		config:     p.config,
 	}
 
 	return prospectorer, nil

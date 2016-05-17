@@ -8,19 +8,20 @@ import (
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Prospector struct {
-	ProspectorConfig cfg.ProspectorConfig
-	prospectorer     Prospectorer
-	spoolerChan      chan *input.FileEvent
-	harvesterChan    chan *input.FileEvent
-	registrar        *Registrar
-	done             chan struct{}
-	harvesterStates  []input.FileState
-	stateMutex       sync.Mutex
-	wg               sync.WaitGroup
+	config          prospectorConfig
+	prospectorer    Prospectorer
+	spoolerChan     chan *input.FileEvent
+	harvesterChan   chan *input.FileEvent
+	registrar       *Registrar
+	done            chan struct{}
+	harvesterStates []input.FileState
+	stateMutex      sync.Mutex
+	wg              sync.WaitGroup
 }
 
 type Prospectorer interface {
@@ -28,15 +29,19 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, registrar *Registrar, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
-		ProspectorConfig: prospectorConfig,
-		registrar:        registrar,
-		spoolerChan:      spoolerChan,
-		harvesterChan:    make(chan *input.FileEvent),
-		done:             make(chan struct{}),
-		harvesterStates:  []input.FileState{},
-		wg:               sync.WaitGroup{},
+		config:          defaultConfig,
+		registrar:       registrar,
+		spoolerChan:     spoolerChan,
+		harvesterChan:   make(chan *input.FileEvent),
+		done:            make(chan struct{}),
+		harvesterStates: []input.FileState{},
+		wg:              sync.WaitGroup{},
+	}
+
+	if err := cfg.Unpack(&prospector.config); err != nil {
+		return nil, err
 	}
 
 	err := prospector.Init()
@@ -44,6 +49,8 @@ func NewProspector(prospectorConfig cfg.ProspectorConfig, registrar *Registrar, 
 	if err != nil {
 		return nil, err
 	}
+
+	logp.Debug("prospector", "File Configs: %v", prospector.config.Paths)
 
 	return prospector, nil
 }
@@ -63,7 +70,7 @@ func (p *Prospector) Init() error {
 
 	var prospectorer Prospectorer
 
-	switch p.ProspectorConfig.Harvester.InputType {
+	switch p.config.Harvester.InputType {
 	case cfg.StdinInputType:
 		prospectorer, err = NewProspectorStdin(p)
 		prospectorer.Init()
@@ -72,7 +79,7 @@ func (p *Prospector) Init() error {
 		prospectorer.Init()
 
 	default:
-		return fmt.Errorf("Invalid prospector type: %v", p.ProspectorConfig.Harvester.InputType)
+		return fmt.Errorf("Invalid prospector type: %v", p.config.Harvester.InputType)
 	}
 
 	p.prospectorer = prospectorer
@@ -83,7 +90,7 @@ func (p *Prospector) Init() error {
 // Starts scanning through all the file paths and fetch the related files. Start a harvester for each file
 func (p *Prospector) Run() {
 
-	logp.Info("Starting prospector of type: %v", p.ProspectorConfig.Harvester.InputType)
+	logp.Info("Starting prospector of type: %v", p.config.Harvester.InputType)
 	p.wg.Add(2)
 	defer p.wg.Done()
 
@@ -116,7 +123,7 @@ func (p *Prospector) Run() {
 		case <-p.done:
 			logp.Info("Prospector ticker stopped")
 			return
-		case <-time.After(p.ProspectorConfig.ScanFrequencyDuration):
+		case <-time.After(p.config.ScanFrequency):
 			logp.Info("Run prospector")
 			p.prospectorer.Run()
 		}
@@ -162,7 +169,7 @@ func (p *Prospector) cleanupStates() {
 	defer p.stateMutex.Unlock()
 
 	// Cleanup can only happen after file reaches ignore_older
-	if p.ProspectorConfig.IgnoreOlderDuration != 0 {
+	if p.config.IgnoreOlder != 0 {
 		for i, state := range p.harvesterStates {
 			// File is older then ignore_older -> remove state
 			if p.isIgnoreOlder(state) {
@@ -184,7 +191,7 @@ func (p *Prospector) Stop(wg *sync.WaitGroup) {
 func (p *Prospector) createHarvester(state input.FileState) (*harvester.Harvester, error) {
 
 	h, err := harvester.NewHarvester(
-		&p.ProspectorConfig.Harvester,
+		&p.config.Harvester,
 		state.Source,
 		state,
 		p.harvesterChan,
@@ -215,18 +222,7 @@ func (p *Prospector) startHarvester(state input.FileState, offset int64) (*harve
 
 // Setup Prospector Config
 func (p *Prospector) setupProspectorConfig() error {
-	var err error
-	config := &p.ProspectorConfig
-
-	config.IgnoreOlderDuration, err = getConfigDuration(config.IgnoreOlder, cfg.DefaultIgnoreOlderDuration, "ignore_older")
-	if err != nil {
-		return err
-	}
-
-	config.ScanFrequencyDuration, err = getConfigDuration(config.ScanFrequency, cfg.DefaultScanFrequency, "scan_frequency")
-	if err != nil {
-		return err
-	}
+	config := &p.config
 
 	if config.Harvester.InputType == cfg.LogInputType && len(config.Paths) == 0 {
 		return fmt.Errorf("No paths were defined for prospector")
@@ -251,7 +247,7 @@ func (p *Prospector) setupProspectorConfig() error {
 func (p *Prospector) setupHarvesterConfig() error {
 
 	var err error
-	config := &p.ProspectorConfig.Harvester
+	config := &p.config.Harvester
 
 	// Setup Buffer Size
 	if config.BufferSize <= 0 {
@@ -294,7 +290,7 @@ func (p *Prospector) setupHarvesterConfig() error {
 		logp.Info("force_close_file is disabled")
 	}
 
-	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlderDuration, "close_older")
+	config.CloseOlderDuration, err = getConfigDuration(config.CloseOlder, cfg.DefaultCloseOlder, "close_older")
 	if err != nil {
 		return err
 	}
@@ -330,13 +326,13 @@ func getConfigDuration(config string, duration time.Duration, name string) (time
 func (p *Prospector) isIgnoreOlder(state input.FileState) bool {
 
 	// ignore_older is disable
-	if p.ProspectorConfig.IgnoreOlderDuration == 0 {
+	if p.config.IgnoreOlder == 0 {
 		return false
 	}
 
 	modTime := state.Fileinfo.ModTime()
 
-	if time.Since(modTime) > p.ProspectorConfig.IgnoreOlderDuration {
+	if time.Since(modTime) > p.config.IgnoreOlder {
 		return true
 	}
 

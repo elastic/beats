@@ -3,9 +3,9 @@ package input
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
-	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -22,8 +22,30 @@ type FileEvent struct {
 	Text         *string
 	Fileinfo     os.FileInfo
 	JSONFields   common.MapStr
-	JSONConfig   *config.JSONConfig
+	JSONConfig   *JSONConfig
 	FileState    FileState
+}
+
+type JSONConfig struct {
+	MessageKey    string `config:"message_key"`
+	KeysUnderRoot bool   `config:"keys_under_root"`
+	OverwriteKeys bool   `config:"overwrite_keys"`
+	AddErrorKey   bool   `config:"add_error_key"`
+}
+
+type MultilineConfig struct {
+	Negate   bool           `config:"negate"`
+	Match    string         `config:"match"       validate:"required"`
+	MaxLines *int           `config:"max_lines"`
+	Pattern  *regexp.Regexp `config:"pattern"`
+	Timeout  *time.Duration `config:"timeout"     validate:"positive"`
+}
+
+func (c *MultilineConfig) Validate() error {
+	if c.Match != "after" && c.Match != "before" {
+		return fmt.Errorf("unknown matcher type: %s", c.Match)
+	}
+	return nil
 }
 
 // mergeJSONFields writes the JSON fields in the event map,
