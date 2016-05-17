@@ -19,12 +19,12 @@ waitFor() {
     echo
     echo >&2 '${3} is not available'
     echo >&2 "Address: ${1}:${2}"
-
 }
 
 # Main
 waitFor ${APACHE_HOST} ${APACHE_PORT} Apache
-waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
 waitFor ${MYSQL_HOST} ${MYSQL_PORT} MySQL
+waitFor ${NGINX_HOST} ${NGINX_PORT} Nginx
+waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
 waitFor ${ZOOKEEPER_HOST} ${ZOOKEEPER_PORT} Zookeeper
 exec "$@"
