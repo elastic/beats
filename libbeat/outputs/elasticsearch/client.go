@@ -71,6 +71,8 @@ func NewClient(
 		proxy = http.ProxyURL(proxyURL)
 	}
 
+	logp.Info("Elasticsearch url: %s", esURL)
+
 	client := &Client{
 		Connection: Connection{
 			URL:      esURL,
