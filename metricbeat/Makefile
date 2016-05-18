@@ -40,10 +40,15 @@ configs:
 	python ${ES_BEATS}/metricbeat/scripts/config_collector.py > etc/beat.yml
 	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --short > etc/beat.short.yml
 
+# Generates imports for all modules and metricsets
+.PHONY: imports
+imports:
+	python ${ES_BEATS}/metricbeat/scripts/generate_imports.py > include/list.go
+
 # This is called by the beats packer before building starts
 .PHONY: before-build
 before-build:
 
 # Runs all collection steps and updates afterwards
 .PHONY: collect
-collect: kibana fields docs configs update
+collect: kibana fields docs configs update imports
