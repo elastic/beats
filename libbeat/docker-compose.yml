@@ -52,3 +52,8 @@ kafka:
   expose:
     - 9092
     - 2181
+
+# Overloading kibana with a simple image as it is not needed here
+kibana:
+  build: ${PWD}/../testing/environments/
+  dockerfile: Dockerfile

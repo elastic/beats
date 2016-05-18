@@ -25,6 +25,11 @@ beat:
   command: make
   entrypoint: /go/src/github.com/elastic/beats/metricbeat/docker-entrypoint.sh
 
+# Overloading kibana with a simple image as it is not needed here
+kibana:
+  build: ${PWD}/../testing/environments/
+  dockerfile: Dockerfile
+
 # Modules
 apache:
   build: ${PWD}/tests/environments/apache
@@ -42,3 +47,4 @@ redis:
 
 zookeeper:
   image: jplock/zookeeper:3.4.8
+

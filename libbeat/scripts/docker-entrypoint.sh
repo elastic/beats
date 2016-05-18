@@ -2,28 +2,19 @@
 set -e
 
 # This script is the entrypoint to the libbeat Docker container. This will
-# verify that the Elasticsearch and Redis environment variables are set
-# and that Elasticsearch is running before executing the command provided
+# verify that all services are running before executing the command provided
 # to the docker container.
 
-# Read parameters from the environment and validate them.
-checkHost() {
-    if [ -z "$$1" ]; then
-        echo >&2 'Error: missing required $1 environment variable'
-        echo >&2 '  Did you forget to -e $1=... ?'
-        exit 1
-    fi
-}
-
-readParams() {
-  checkHost "ES_HOST"
-  checkHost "REDIS_HOST"
-  checkHost "LS_HOST"
-
-  # Use default ports if not specified.
+setDefaults() {
+  # Use default ports and hosts if not specified.
+  : ${ES_HOST:=localhost}
   : ${ES_PORT:=9200}
+  : ${REDIS_HOST:=localhost}
   : ${REDIS_PORT:=6379}
-  : ${LS_TCP_PORT:=12345}
+  : ${LS_HOST:=localhost}
+  : ${LS_TCP_PORT:=5044}
+  : ${KAFKA_HOST:=localhost}
+  : ${KAFKA_PORT:=9092}
 }
 
 es_url() {
@@ -74,12 +65,13 @@ waitForElasticsearch() {
   exit 1
 }
 
-waitForLogstash() {
-    echo -n "Waiting for logstash(${LS_HOST}:${LS_TCP_PORT}) to start."
+# Wait for. Params: host, port, service
+waitFor() {
+    echo -n "Waiting for ${3}(${1}:${2}) to start."
     for ((i=1; i<=90; i++)) do
-        if nc -vz ${LS_HOST} ${LS_TCP_PORT} 2>/dev/null; then
+        if nc -vz ${1} ${2} 2>/dev/null; then
             echo
-            echo "Logstash is ready!"
+            echo "${3} is ready!"
             return 0
         fi
 
@@ -89,32 +81,18 @@ waitForLogstash() {
     done
 
     echo
-    echo >&2 'Logstash is not available'
-    echo >&2 "Address: ${LS_HOST}:${LS_TCP_PORT} and ${LS_HOST}:${LS_TLS_PORT}"
-}
-
-waitForKafka() {
-    echo -n "Waiting for kafka(${KAFKA_HOST}:${KAFKA_PORT}) to start."
-    for ((i=1; i<=90; i++)) do
-        if nc -vz ${KAFKA_HOST} ${KAFKA_PORT} 2>/dev/null; then
-            echo
-            echo "Kafka is ready!"
-            return 0
-        fi
-
-        ((i++))
-        echo -n '.'
-        sleep 1
-    done
-
-    echo
-    echo >&2 'Kafka is not available'
-    echo >&2 "Address: ${KAFKA_HOST}:${KAFKA_PORT}"
+    echo >&2 '${3} is not available'
+    echo >&2 "Address: ${1}:${2}"
 }
 
 # Main
-readParams
+setDefaults
+
+# Services need to test outputs
+# Wait until all services are started
 waitForElasticsearch
-waitForLogstash
-waitForKafka
+waitFor ${KAFKA_HOST} ${KAFKA_PORT} Kafka
+waitFor ${LS_HOST} ${LS_TCP_PORT} Logstash
+waitFor ${REDIS_HOST} ${REDIS_PORT} Redis
+
 exec "$@"
