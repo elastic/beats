@@ -32,7 +32,7 @@ kibana:
 
 # Modules
 apache:
-  build: ${PWD}/tests/environments/apache
+  build: ${PWD}/module/apache/_beat
 
 mysql:
   image: mysql:5.7.10
@@ -40,7 +40,7 @@ mysql:
     - MYSQL_ROOT_PASSWORD=test
 
 nginx:
-  build: ${PWD}/tests/environments/nginx
+  build: ${PWD}/module/nginx/_beat
 
 redis:
   image: redis:3.2.0
