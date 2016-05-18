@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BEATNAME=metricbeat
+# Name can be overwritten, as Metricbeat is also a library
+BEATNAME?=metricbeat
 SYSTEM_TESTS=true
 TEST_ENVIRONMENT?=true
 GOPACKAGES=$(shell go list ${BEAT_DIR}/${BEATNAME}/... | grep -v /vendor/)
@@ -37,8 +38,8 @@ docs:
 # Collects all module configs
 .PHONY: configs
 configs:
-	python ${ES_BEATS}/metricbeat/scripts/config_collector.py > etc/beat.yml
-	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --short > etc/beat.short.yml
+	python ${ES_BEATS}/metricbeat/scripts/config_collector.py $(PWD) > etc/beat.yml
+	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --short $(PWD) > etc/beat.short.yml
 
 # This is called by the beats packer before building starts
 .PHONY: before-build

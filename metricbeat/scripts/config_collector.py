@@ -33,10 +33,10 @@ metricbeat.modules:
 """
 
 
-def collect(short=False):
+def collect(beat_path, short=False):
 
-    base_dir = "module"
-    path = os.path.abspath("module")
+    base_dir = beat_path + "/module"
+    path = os.path.abspath(base_dir)
 
     # yml file
     config_yml = header
@@ -82,9 +82,14 @@ def get_title_line(title):
     return line[0:78] + "\n"
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser(
-        description="Collects modules docs")
+        description="Collects modules config")
+    parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("--short", action="store_true",
                         help="Collect the short versions")
+
     args = parser.parse_args()
-    collect(args.short)
+    beat_path = args.path
+
+    collect(beat_path, args.short)
