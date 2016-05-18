@@ -48,7 +48,7 @@ class Test(BaseTest):
             process_stats=True,
             filesystem_stats=False,
             drop_fields={
-                "fields": ["proc"],
+                "fields": ["proc.mem"],
                 "condition": "range.proc.cpu.total_p.lt: 0.5",
             },
         )
@@ -61,18 +61,13 @@ class Test(BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp", "type"],
-        )[0]
+        )
 
-        for key in [
-            "proc.cpu.start_time",
-            "proc.cpu.total",
-            "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
-            "proc.cmdline",
-            "proc.mem.rss_p",
-        ]:
-            assert key not in output
+        for event in output:
+            if float(event["proc.cpu.total_p"]) < 0.5:
+                assert "proc.mem" not in event
+            else:
+                assert "proc.mem" in event
 
     def test_dropevent_with_condition(self):
         """
@@ -83,7 +78,7 @@ class Test(BaseTest):
             process_stats=True,
             filesystem_stats=False,
             drop_event={
-                "condition": "range.proc.cpu.total_p.gt: 0.001",
+                "condition": "range.proc.cpu.total_p.lt: 0.001",
             },
         )
         topbeat = self.start_beat()
@@ -95,18 +90,9 @@ class Test(BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp", "type"],
-        )[0]
-
-        for key in [
-            "proc.cpu.start_time",
-            "proc.cpu.total",
-            "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
-            "proc.cmdline",
-            "proc.mem.rss_p",
-        ]:
-            assert key in output
+        )
+        for event in output:
+            assert float(event["proc.cpu.total_p"]) >= 0.001
 
     def test_include_fields(self):
         """
