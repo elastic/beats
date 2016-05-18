@@ -1,4 +1,3 @@
-#------------------------------- Redis Module ---------------------------------
 - module: redis
   metricsets: ["info"]
   enabled: true

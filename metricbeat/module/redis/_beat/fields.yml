@@ -1,5 +1,5 @@
 - key: redis
-  title: "Redis"
+  title: "Redis Status"
   description: >
     Redis metrics collected from the Redis
   fields:

@@ -11,13 +11,12 @@ This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 
 === Example Configuration
 
-The Nginx module supports the standard configuration options which can be found
+The Nginx Status module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
 metricbeat.modules:
-  #----------------------------- Nginx Module ----------------------------------
   - module: nginx
     metricsets: ["stubstatus"]
     enabled: true

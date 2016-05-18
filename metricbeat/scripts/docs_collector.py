@@ -1,5 +1,5 @@
 import os
-import shutil
+import yaml
 
 # Collects docs for all modules and metricset
 
@@ -33,8 +33,14 @@ This file is generated! See scripts/docs_collector.py
         with file(module_doc) as f:
             module_file += f.read()
 
+        beat_path = path + "/" + module + "/_beat"
 
-        config_file = path + "/" + module + "/_beat/config.yml"
+         # Load title from fields.yml
+        with open(beat_path + "/fields.yml") as f:
+            fields = yaml.load(f.read())
+            title = fields[0]["title"]
+
+        config_file = beat_path + "/config.yml"
 
         # Add example config file
         if os.path.isfile(config_file) == True:
@@ -43,7 +49,7 @@ This file is generated! See scripts/docs_collector.py
 
 === Example Configuration
 
-The Apache module supports the standard configuration options which can be found
+The """ + title + """ module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]

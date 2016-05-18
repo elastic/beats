@@ -1,5 +1,6 @@
 import os
 import argparse
+import yaml
 
 # Collects config for all modules
 
@@ -43,14 +44,22 @@ def collect(short=False):
     # Iterate over all modules
     for module in os.listdir(base_dir):
 
+        beat_path = path + "/" + module + "/_beat"
         if short:
-            module_configs = path + "/" + module + "/_beat/config.short.yml"
+            module_configs = beat_path + "/config.short.yml"
         else:
-            module_configs = path + "/" + module + "/_beat/config.yml"
+            module_configs = beat_path + "/config.yml"
 
-        # Only check folders where fields.yml exists
+        # Only check folders where config exists
         if not os.path.isfile(module_configs):
             continue
+
+        # Load title from fields.yml
+        with open(beat_path + "/fields.yml") as f:
+            fields = yaml.load(f.read())
+            title = fields[0]["title"]
+
+        config_yml += get_title_line(title)
 
         # Load module yaml
         with file(module_configs) as f:
@@ -60,6 +69,17 @@ def collect(short=False):
         config_yml += "\n"
     # output string so it can be concatenated
     print config_yml
+
+# Makes sure every title line is 79 + newline chars long
+def get_title_line(title):
+    dashes = (79 - 10 - len(title)) / 2
+
+    line = "#"
+    line += "-" * dashes
+    line += " " + title + " Module "
+    line += "-" * dashes
+
+    return line[0:78] + "\n"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

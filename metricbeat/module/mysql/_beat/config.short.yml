@@ -1,4 +1,3 @@
-#------------------------------- Mysql Module ---------------------------------
 - module: mysql
   metricsets: ["status"]
   enabled: true

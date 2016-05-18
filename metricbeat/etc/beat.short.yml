@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#----------------------------- Apache Module ----------------------------------
+#---------------------------- Apache Status Module ---------------------------
 - module: apache
   metricsets: ["status"]
   enabled: true
@@ -19,7 +19,7 @@ metricbeat.modules:
   # Apache hosts
   hosts: ["http://127.0.0.1/"]
 
-#------------------------------- Mysql Module ---------------------------------
+#---------------------------- MySQL Status Module ----------------------------
 - module: mysql
   metricsets: ["status"]
   enabled: true
@@ -29,7 +29,7 @@ metricbeat.modules:
   # The username and password can either be set in the DSN or for all hosts in username and password config option
   hosts: ["root@tcp(127.0.0.1:3306)/"]
 
-#------------------------------- Redis Module ---------------------------------
+#---------------------------- Redis Status Module ----------------------------
 - module: redis
   metricsets: ["info"]
   enabled: true
@@ -38,7 +38,7 @@ metricbeat.modules:
   # Redis hosts
   hosts: ["127.0.0.1:6379"]
 
-#------------------------------ System Module ---------------------------------
+#---------------------------- System Status Module ---------------------------
 - module: system
   metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
   enabled: true
