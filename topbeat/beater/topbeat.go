@@ -1,7 +1,6 @@
 package beater
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -40,60 +39,38 @@ func New() *Topbeat {
 
 func (tb *Topbeat) Config(b *beat.Beat) error {
 
-	err := b.RawConfig.Unpack(&tb.TbConfig)
+	topbeatSection := "topbeat"
+	if b.RawConfig.HasField("input") {
+		// Copy input config to topbeat @deprecated
+		logp.Warn(inputDeprecationWarning + " Use 'topbeat' instead.")
+		topbeatSection = "input"
+
+		if b.RawConfig.HasField("topbeat") {
+			return fmt.Errorf("'topbeat' and 'input' are both set in config. Only " +
+				"one can be enabled so use 'topbeat'. " + inputDeprecationWarning)
+		}
+	}
+
+	rawTopbeatConfig, err := b.RawConfig.Child(topbeatSection, -1)
 	if err != nil {
 		logp.Err("Error reading configuration file: %v", err)
 		return err
 	}
 
-	if tb.TbConfig.Topbeat != nil && tb.TbConfig.Input != nil {
-		return fmt.Errorf("'topbeat' and 'input' are both set in config. Only " +
-			"one can be enabled so use 'topbeat'. " + inputDeprecationWarning)
-	}
-
-	// Copy input config to topbeat @deprecated
-	if tb.TbConfig.Input != nil {
-		logp.Warn(inputDeprecationWarning + " Use 'topbeat' instead.")
-		tb.TbConfig.Topbeat = tb.TbConfig.Input
+	tb.TbConfig.Topbeat = defaultConfig
+	err = rawTopbeatConfig.Unpack(&tb.TbConfig.Topbeat)
+	if err != nil {
+		logp.Err("Error reading configuration file: %v", err)
+		return err
 	}
 
 	topbeatConfig := tb.TbConfig.Topbeat
-
-	if topbeatConfig.Period != nil {
-		tb.period = time.Duration(*topbeatConfig.Period) * time.Second
-	} else {
-		tb.period = 10 * time.Second
-	}
-	if topbeatConfig.Procs != nil {
-		tb.procStats.Procs = *topbeatConfig.Procs
-	} else {
-		tb.procStats.Procs = []string{".*"} //all processes
-	}
-
-	if topbeatConfig.Stats.System != nil {
-		tb.sysStats = *topbeatConfig.Stats.System
-	} else {
-		tb.sysStats = true
-	}
-	if topbeatConfig.Stats.Proc != nil {
-		tb.procStats.ProcStats = *topbeatConfig.Stats.Proc
-	} else {
-		tb.procStats.ProcStats = true
-	}
-	if topbeatConfig.Stats.Filesystem != nil {
-		tb.fsStats = *topbeatConfig.Stats.Filesystem
-	} else {
-		tb.fsStats = true
-	}
-	if topbeatConfig.Stats.CpuPerCore != nil {
-		tb.cpu.CpuPerCore = *topbeatConfig.Stats.CpuPerCore
-	} else {
-		tb.cpu.CpuPerCore = false
-	}
-
-	if !tb.sysStats && !tb.procStats.ProcStats && !tb.fsStats {
-		return errors.New("Invalid statistics configuration")
-	}
+	tb.period = topbeatConfig.Period
+	tb.procStats.Procs = topbeatConfig.Procs
+	tb.sysStats = topbeatConfig.Stats.System
+	tb.procStats.ProcStats = topbeatConfig.Stats.Proc
+	tb.fsStats = topbeatConfig.Stats.Filesystem
+	tb.cpu.CpuPerCore = topbeatConfig.Stats.CPUPerCore
 
 	logp.Debug("topbeat", "Init topbeat")
 	logp.Debug("topbeat", "Follow processes %q", tb.procStats.Procs)
