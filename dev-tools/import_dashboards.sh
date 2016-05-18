@@ -109,8 +109,8 @@ fi
 echo "Import dashboards,visualizations, searches and index pattern from ${DIR} to ${ELASTICSEARCH} in ${KIBANA_INDEX}"
 
 # Workaround for: https://github.com/elastic/beats-dashboards/issues/94
-$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX" > /dev/null 2>&1 
-$CURL -XPUT "$ELASTICSEARCH/$KIBANA_INDEX/_mapping/search" -d'{"search": {"properties": {"hits": {"type": "integer"},
+${CURL} -XPUT "${ELASTICSEARCH}/${KIBANA_INDEX}" > /dev/null 2>&1
+${CURL} -XPUT "${ELASTICSEARCH}/${KIBANA_INDEX}/_mapping/search" -d'{"search": {"properties": {"hits": {"type": "integer"},
 "version": {"type": "integer"}}}}' > /dev/null 2>&1
 
 
@@ -141,7 +141,9 @@ if [ -d "${DIR}/search" ]; then
             -d @${TMP_SED_FILE} || exit 1
         echo
     done
-    rm ${TMP_SED_FILE}
+    if [ -f "${TMP_SED_FILE}" ]; then
+      rm ${TMP_SED_FILE}
+    fi
 fi
 
 if [ -d "${DIR}/visualization" ]; then
