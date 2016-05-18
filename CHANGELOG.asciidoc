@@ -73,6 +73,31 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-1.2.3]]
+=== Beats version 1.2.3
+https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+
+==== Bugfixes
+
+*Topbeat*
+
+- Fix high CPU usage when using filtering under Windows. {pull}1598[1598]
+
+*Filebeat*
+
+- Fix rotation issue with ignore_older. {issue}1528[1528]
+
+*Winlogbeat*
+
+- Fix panic when reading messages larger than 32K characters on Windows XP and 2003. {pull}1498[1498]
+
+==== Added
+
+*Filebeat*
+
+- Prevent file opening for files which reached ignore_older. {pull}1649[1649]
+
+
 [[release-notes-5.0.0-alpha2]]
 === Beats version 5.0.0-alpha2
 https://github.com/elastic/beats/compare/v5.0.0alpha1...v5.0.0-alpha2[View commits]
@@ -144,6 +169,22 @@ https://github.com/elastic/beats/compare/v5.0.0alpha1...v5.0.0-alpha2[View commi
 *Topbeat*
 
 - Updated elastic/gosigar version so Topbeat can compile on OpenBSD. {pull}1403[1403]
+
+[[release-notes-1.2.2]]
+=== Beats version 1.2.2
+https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix race when multiple outputs access the same event with Logstash output manipulating event. {issue}1410[1410]
+- Fix go-daemon (supervisor used in init scripts) hanging when executed over SSH. {issue}1394[1394]
+
+*Filebeat*
+
+- Improvements in registrar dealing with file rotation. {issue}1281[1281]
+
 
 [[release-notes-1.2.1]]
 === Beats version 1.2.1
