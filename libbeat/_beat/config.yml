@@ -258,7 +258,7 @@ logging.files:
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 # Supported actions: drop_fields, drop_event, include_fields
 #filters:
-  #- drop_fields:
-  #   equals:
-  #     status: OK
-  #   fields: [ ]
+#  - drop_fields:
+#      equals:
+#        status: OK
+#      fields: [ ]
