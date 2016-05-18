@@ -9,13 +9,12 @@ This file is generated! See scripts/docs_collector.py
 
 === Example Configuration
 
-The Apache module supports the standard configuration options which can be found
+The System Status module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
 metricbeat.modules:
-  #------------------------------ System Module ---------------------------------
   - module: system
     metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
     enabled: true

@@ -12,13 +12,12 @@ HTTPD] servers.
 
 === Example Configuration
 
-The Apache module supports the standard configuration options which can be found
+The Apache Status module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
 ----
 metricbeat.modules:
-  #----------------------------- Apache Module ----------------------------------
   - module: apache
     metricsets: ["status"]
     enabled: true

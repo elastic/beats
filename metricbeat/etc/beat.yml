@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#----------------------------- Apache Module ----------------------------------
+#---------------------------- Apache Status Module ---------------------------
 - module: apache
   metricsets: ["status"]
   enabled: true
@@ -28,7 +28,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test123
 
-#------------------------------- Mysql Module ---------------------------------
+#---------------------------- MySQL Status Module ----------------------------
 - module: mysql
   metricsets: ["status"]
   enabled: true
@@ -44,7 +44,7 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: test
 
-#----------------------------- Nginx Module ----------------------------------
+#---------------------------- Nginx Status Module ----------------------------
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
@@ -56,7 +56,7 @@ metricbeat.modules:
   # Path to server status. Default server-status
   #server_status_path: "server-status"
 
-#------------------------------- Redis Module ---------------------------------
+#---------------------------- Redis Status Module ----------------------------
 - module: redis
   metricsets: ["info"]
   enabled: true
@@ -91,13 +91,13 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
-#------------------------------ System Module ---------------------------------
+#---------------------------- System Status Module ---------------------------
 - module: system
   metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
   enabled: true
   period: 2s
 
-#---------------------------- Zookeeper Module --------------------------------
+#-------------------------- Zookeeper Status Module --------------------------
 - module: zookeeper
   metricsets: ["mntr"]
   enabled: true

@@ -203,38 +203,42 @@
             }
           }
         },
-        "nginx-stubstatus": {
+        "nginx": {
           "properties": {
-            "accepts": {
-              "type": "integer"
-            },
-            "active": {
-              "type": "integer"
-            },
-            "current": {
-              "type": "integer"
-            },
-            "dropped": {
-              "type": "integer"
-            },
-            "handled": {
-              "type": "integer"
-            },
-            "hostname": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "reading": {
-              "type": "integer"
-            },
-            "requests": {
-              "type": "integer"
-            },
-            "waiting": {
-              "type": "integer"
-            },
-            "writing": {
-              "type": "integer"
+            "stubstatus": {
+              "properties": {
+                "accepts": {
+                  "type": "integer"
+                },
+                "active": {
+                  "type": "integer"
+                },
+                "current": {
+                  "type": "integer"
+                },
+                "dropped": {
+                  "type": "integer"
+                },
+                "handled": {
+                  "type": "integer"
+                },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "reading": {
+                  "type": "integer"
+                },
+                "requests": {
+                  "type": "integer"
+                },
+                "waiting": {
+                  "type": "integer"
+                },
+                "writing": {
+                  "type": "integer"
+                }
+              }
             }
           }
         },

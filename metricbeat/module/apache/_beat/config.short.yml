@@ -1,4 +1,3 @@
-#----------------------------- Apache Module ----------------------------------
 - module: apache
   metricsets: ["status"]
   enabled: true

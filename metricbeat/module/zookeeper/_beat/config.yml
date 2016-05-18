@@ -1,4 +1,3 @@
-#---------------------------- Zookeeper Module --------------------------------
 - module: zookeeper
   metricsets: ["mntr"]
   enabled: true

@@ -259,10 +259,10 @@
       description: >
         nginx contains the metrics that were scraped from nginx.
       fields:
-        - name: nginx-stubstatus
+        - name: stubstatus
           type: group
           description: >
-            `nginx-stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
+            `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
           fields:
             - name: hostname
               type: keyword
@@ -305,7 +305,7 @@
               description: >
                 The current number of idle client connections waiting for a request.
 - key: redis
-  title: "Redis"
+  title: "Redis Status"
   description: >
     Redis metrics collected from the Redis
   fields:
@@ -379,7 +379,7 @@
                   description: >
                     User CPU consumed by the background processes
 - key: system
-  title: System Status
+  title: "System Status"
   description: >
     System status metrics, like CPU and memory usage, that are collected from the operating system.
   fields:

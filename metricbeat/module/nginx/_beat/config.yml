@@ -1,4 +1,3 @@
-#----------------------------- Nginx Module ----------------------------------
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
