@@ -19,6 +19,7 @@ metricbeat.modules:
     metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
     enabled: true
     period: 2s
+    processes: ['.*']
 ----
 
 === MetricSets
