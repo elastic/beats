@@ -17,8 +17,8 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-# replace - with ~ to allow the GA versions to be installed over alpahs/betas/snapshots
-RPM_VERSION=`echo ${VERSION} | sed 's/-/~/'`
+# fpm replaces - with _ in the version
+RPM_VERSION=`echo ${VERSION} | sed 's/-/~/g'`
 
 # create rpm
 fpm --force -s dir -t rpm \
