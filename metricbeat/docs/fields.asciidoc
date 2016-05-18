@@ -1260,126 +1260,126 @@ type: keyword
 Zookeeper hostname.
 
 
-==== zookeeper.mntr.zk_approximate_data_size
+==== zookeeper.mntr.approximate_data_size
 
 type: long
 
 Approximate size of zookeeper data.
 
 
-==== zookeeper.mntr.zk_avg_latency
+==== zookeeper.mntr.latency.avg
 
 type: integer
 
 Average latency between ensemble hosts in milliseconds.
 
 
-==== zookeeper.mntr.zk_ephemerals_count
+==== zookeeper.mntr.ephemerals_count
 
 type: integer
 
 Number of ephemeral znodes.
 
 
-==== zookeeper.mntr.zk_followers
+==== zookeeper.mntr.followers
 
 type: integer
 
 Number of followers seen by the current host.
 
 
-==== zookeeper.mntr.zk_max_file_descriptor_count
+==== zookeeper.mntr.max_file_descriptor_count
 
 type: integer
 
 Maximum number of file descriptors allowed for the zookeeper process.
 
 
-==== zookeeper.mntr.zk_max_latency
+==== zookeeper.mntr.latency.max
 
 type: integer
 
 Maximum latency in milliseconds.
 
 
-==== zookeeper.mntr.zk_min_latency
+==== zookeeper.mntr.latency.min
 
 type: integer
 
 Minimum latency in milliseconds.
 
 
-==== zookeeper.mntr.zk_num_alive_connections
+==== zookeeper.mntr.num_alive_connections
 
 type: integer
 
 Number of connections to zookeeper that are currently alive.
 
 
-==== zookeeper.mntr.zk_open_file_descriptor_count
+==== zookeeper.mntr.open_file_descriptor_count
 
 type: integer
 
 Number of file descriptors open by the zookeeper process.
 
 
-==== zookeeper.mntr.zk_outstanding_requests
+==== zookeeper.mntr.outstanding_requests
 
 type: integer
 
 Number of outstanding requests that need to be processed by the cluster.
 
 
-==== zookeeper.mntr.zk_packets_received
+==== zookeeper.mntr.packets.received
 
 type: integer
 
 Number zookeeper network packets received.
 
 
-==== zookeeper.mntr.zk_packets_sent
+==== zookeeper.mntr.packets.sent
 
 type: long
 
 Number zookeeper network packets sent.
 
 
-==== zookeeper.mntr.zk_pending_syncs
+==== zookeeper.mntr.pending_syncs
 
 type: integer
 
 Number of pending syncs to carry out to zookeeper ensemble followers.
 
 
-==== zookeeper.mntr.zk_server_state
+==== zookeeper.mntr.server_state
 
 type: keyword
 
 Role in the zookeeper ensemble.
 
 
-==== zookeeper.mntr.zk_synced_followers
+==== zookeeper.mntr.synced_followers
 
 type: integer
 
 Number of synced followers reported when a node server_state is leader.
 
 
-==== zookeeper.mntr.zk_version
+==== zookeeper.mntr.version
 
 type: keyword
 
 Zookeeper version and build string reported.
 
 
-==== zookeeper.mntr.zk_watch_count
+==== zookeeper.mntr.watch_count
 
 type: integer
 
 Number of watches currently set on the local zookeeper process.
 
 
-==== zookeeper.mntr.zk_znode_count
+==== zookeeper.mntr.znode_count
 
 type: integer
 

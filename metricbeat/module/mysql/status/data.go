@@ -8,6 +8,7 @@ import (
 )
 
 // Map data to MapStr of server stats variables: http://dev.mysql.com/doc/refman/5.7/en/server-status-variables.html
+// This is only a subset of the available values
 func eventMapping(status map[string]string) common.MapStr {
 
 	event := common.MapStr{

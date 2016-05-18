@@ -609,67 +609,75 @@
           "properties": {
             "mntr": {
               "properties": {
+                "approximate_data_size": {
+                  "type": "long"
+                },
+                "ephemerals_count": {
+                  "type": "integer"
+                },
+                "followers": {
+                  "type": "integer"
+                },
                 "hostname": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "zk_approximate_data_size": {
-                  "type": "long"
+                "latency": {
+                  "properties": {
+                    "avg": {
+                      "type": "integer"
+                    },
+                    "max": {
+                      "type": "integer"
+                    },
+                    "min": {
+                      "type": "integer"
+                    }
+                  }
                 },
-                "zk_avg_latency": {
+                "max_file_descriptor_count": {
                   "type": "integer"
                 },
-                "zk_ephemerals_count": {
+                "num_alive_connections": {
                   "type": "integer"
                 },
-                "zk_followers": {
+                "open_file_descriptor_count": {
                   "type": "integer"
                 },
-                "zk_max_file_descriptor_count": {
+                "outstanding_requests": {
                   "type": "integer"
                 },
-                "zk_max_latency": {
+                "packets": {
+                  "properties": {
+                    "received": {
+                      "type": "integer"
+                    },
+                    "sent": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "pending_syncs": {
                   "type": "integer"
                 },
-                "zk_min_latency": {
-                  "type": "integer"
-                },
-                "zk_num_alive_connections": {
-                  "type": "integer"
-                },
-                "zk_open_file_descriptor_count": {
-                  "type": "integer"
-                },
-                "zk_outstanding_requests": {
-                  "type": "integer"
-                },
-                "zk_packets_received": {
-                  "type": "integer"
-                },
-                "zk_packets_sent": {
-                  "type": "long"
-                },
-                "zk_pending_syncs": {
-                  "type": "integer"
-                },
-                "zk_server_state": {
+                "server_state": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "zk_synced_followers": {
+                "synced_followers": {
                   "type": "integer"
                 },
-                "zk_version": {
+                "version": {
                   "ignore_above": 1024,
                   "index": "not_analyzed",
                   "type": "string"
                 },
-                "zk_watch_count": {
+                "watch_count": {
                   "type": "integer"
                 },
-                "zk_znode_count": {
+                "znode_count": {
                   "type": "integer"
                 }
               }

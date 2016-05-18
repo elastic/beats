@@ -30,24 +30,28 @@ func eventMapping(response io.Reader) common.MapStr {
 
 	// Manually convert and select fields which are used
 	event := common.MapStr{
-		"zk_version":                    fullEvent["zk_version"],
-		"zk_avg_latency":                toInt(fullEvent["zk_avg_latency"]),
-		"zk_min_latency":                toInt(fullEvent["zk_min_latency"]),
-		"zk_max_latency":                toInt(fullEvent["zk_max_latency"]),
-		"zk_packets_received":           toInt(fullEvent["zk_packets_received"]),
-		"zk_packets_sent":               toInt(fullEvent["zk_packets_sent"]),
-		"zk_num_alive_connections":      toInt(fullEvent["zk_num_alive_connections"]),
-		"zk_outstanding_requests":       toInt(fullEvent["zk_outstanding_requests"]),
-		"zk_server_state":               fullEvent["zk_server_state"],
-		"zk_znode_count":                toInt(fullEvent["zk_znode_count"]),
-		"zk_watch_count":                toInt(fullEvent["zk_watch_count"]),
-		"zk_ephemerals_count":           toInt(fullEvent["zk_ephemerals_count"]),
-		"zk_approximate_data_size":      toInt(fullEvent["zk_approximate_data_size"]),
-		"zk_open_file_descriptor_count": toInt(fullEvent["zk_open_file_descriptor_count"]),
-		"zk_max_file_descriptor_count":  toInt(fullEvent["zk_max_file_descriptor_count"]),
-		"zk_followers":                  toInt(fullEvent["zk_followers"]),
-		"zk_synced_followers":           toInt(fullEvent["zk_synced_followers"]),
-		"zk_pending_syncs":              toInt(fullEvent["zk_pending_syncs"]),
+		"version": fullEvent["zk_version"],
+		"latency": common.MapStr{
+			"avg": toInt(fullEvent["zk_avg_latency"]),
+			"min": toInt(fullEvent["zk_min_latency"]),
+			"max": toInt(fullEvent["zk_max_latency"]),
+		},
+		"packets": common.MapStr{
+			"received": toInt(fullEvent["zk_packets_received"]),
+			"sent":     toInt(fullEvent["zk_packets_sent"]),
+		},
+		"num_alive_connections":      toInt(fullEvent["zk_num_alive_connections"]),
+		"outstanding_requests":       toInt(fullEvent["zk_outstanding_requests"]),
+		"server_state":               fullEvent["zk_server_state"],
+		"znode_count":                toInt(fullEvent["zk_znode_count"]),
+		"watch_count":                toInt(fullEvent["zk_watch_count"]),
+		"ephemerals_count":           toInt(fullEvent["zk_ephemerals_count"]),
+		"approximate_data_size":      toInt(fullEvent["zk_approximate_data_size"]),
+		"open_file_descriptor_count": toInt(fullEvent["zk_open_file_descriptor_count"]),
+		"max_file_descriptor_count":  toInt(fullEvent["zk_max_file_descriptor_count"]),
+		"followers":                  toInt(fullEvent["zk_followers"]),
+		"synced_followers":           toInt(fullEvent["zk_synced_followers"]),
+		"pending_syncs":              toInt(fullEvent["zk_pending_syncs"]),
 	}
 
 	return event
