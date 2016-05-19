@@ -16,10 +16,12 @@ type TopConfig struct {
 }
 
 type StatsEnableConfig struct {
-	System     bool `config:"system"`
-	Proc       bool `config:"process"`
-	Filesystem bool `config:"filesystem"`
-	CPUPerCore bool `config:"cpu_per_core"`
+	System          bool `config:"system"`
+	Proc            bool `config:"process"`
+	Filesystem      bool `config:"filesystem"`
+	CPUPerCore      bool `config:"cpu_per_core"`
+	CPUTicks        bool `config:"cpu_ticks"`
+	CPUTicksPerProc bool `config:"cpu_ticks_per_proc"`
 }
 
 var (
@@ -27,10 +29,12 @@ var (
 		Period: 10 * time.Second,
 		Procs:  []string{".*"}, //all processes
 		Stats: StatsEnableConfig{
-			System:     true,
-			Proc:       true,
-			Filesystem: true,
-			CPUPerCore: false,
+			System:          true,
+			Proc:            true,
+			Filesystem:      true,
+			CPUPerCore:      false,
+			CPUTicks:        false,
+			CPUTicksPerProc: false,
 		},
 	}
 )

@@ -13,12 +13,20 @@ type CPU struct {
 	CpuPerCore       bool
 	LastCpuTimes     *CpuTimes
 	LastCpuTimesList []CpuTimes
+	CpuTicks         bool
+	CpuTicksPerProc  bool
 }
 
 type CpuTimes struct {
 	sigar.Cpu
-	UserPercent   float64 `json:"user_p"`
-	SystemPercent float64 `json:"system_p"`
+	UserPercent    float64 `json:"user_p"`
+	SystemPercent  float64 `json:"system_p"`
+	IdlePercent    float64 `json:"idle_p"`
+	IOwaitPercent  float64 `json:"iowait_p"`
+	IrqPercent     float64 `json:"irq_p"`
+	NicePercent    float64 `json:"nice_p"`
+	SoftIrqPercent float64 `json:"softirq_p"`
+	StealPercent   float64 `json: "steal_p"`
 }
 
 func GetCpuTimes() (*CpuTimes, error) {
@@ -64,6 +72,12 @@ func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
 
 		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)
 		current.SystemPercent = calculate(current.Cpu.Sys, last.Cpu.Sys)
+		current.IdlePercent = calculate(current.Cpu.Idle, last.Cpu.Idle)
+		current.IOwaitPercent = calculate(current.Cpu.Wait, last.Cpu.Wait)
+		current.IrqPercent = calculate(current.Cpu.Irq, last.Cpu.Irq)
+		current.NicePercent = calculate(current.Cpu.Nice, last.Cpu.Nice)
+		current.SoftIrqPercent = calculate(current.Cpu.SoftIrq, last.Cpu.SoftIrq)
+		current.StealPercent = calculate(current.Cpu.Stolen, last.Cpu.Stolen)
 	}
 
 	return current
@@ -85,6 +99,13 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 			all_delta := current[i].Cpu.Total() - last[i].Cpu.Total()
 			current[i].UserPercent = calculate(current[i].Cpu.User, last[i].Cpu.User, all_delta)
 			current[i].SystemPercent = calculate(current[i].Cpu.Sys, last[i].Cpu.Sys, all_delta)
+			current[i].IdlePercent = calculate(current[i].Cpu.Idle, last[i].Cpu.Idle, all_delta)
+			current[i].IOwaitPercent = calculate(current[i].Cpu.Wait, last[i].Cpu.Wait, all_delta)
+			current[i].IrqPercent = calculate(current[i].Cpu.Irq, last[i].Cpu.Irq, all_delta)
+			current[i].NicePercent = calculate(current[i].Cpu.Nice, last[i].Cpu.Nice, all_delta)
+			current[i].SoftIrqPercent = calculate(current[i].Cpu.SoftIrq, last[i].Cpu.SoftIrq, all_delta)
+			current[i].StealPercent = calculate(current[i].Cpu.Stolen, last[i].Cpu.Stolen, all_delta)
+
 		}
 
 	}
@@ -92,19 +113,33 @@ func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
 	return current
 }
 
-func GetCpuStatEvent(cpuStat *CpuTimes) common.MapStr {
-	return common.MapStr{
-		"user":     cpuStat.User,
-		"system":   cpuStat.Sys,
-		"nice":     cpuStat.Nice,
-		"idle":     cpuStat.Idle,
-		"iowait":   cpuStat.Wait,
-		"irq":      cpuStat.Irq,
-		"softirq":  cpuStat.SoftIrq,
-		"steal":    cpuStat.Stolen,
-		"user_p":   cpuStat.UserPercent,
-		"system_p": cpuStat.SystemPercent,
+func (cpu *CPU) GetCpuStatEvent(cpuStat *CpuTimes) common.MapStr {
+	result := common.MapStr{
+		"user_p":    cpuStat.UserPercent,
+		"system_p":  cpuStat.SystemPercent,
+		"idle_p":    cpuStat.IdlePercent,
+		"iowait_p":  cpuStat.IOwaitPercent,
+		"irq_p":     cpuStat.IrqPercent,
+		"nice_p":    cpuStat.NicePercent,
+		"softirq_p": cpuStat.SoftIrqPercent,
+		"steal_p":   cpuStat.StealPercent,
 	}
+
+	if cpu.CpuTicks {
+		m := common.MapStr{
+			"user":    cpuStat.User,
+			"system":  cpuStat.Sys,
+			"nice":    cpuStat.Nice,
+			"idle":    cpuStat.Idle,
+			"iowait":  cpuStat.Wait,
+			"irq":     cpuStat.Irq,
+			"softirq": cpuStat.SoftIrq,
+			"steal":   cpuStat.Stolen,
+		}
+		return common.MapStrUnion(result, m)
+	}
+	return result
+
 }
 
 func (cpu *CPU) AddCpuPercentage(t2 *CpuTimes) {
@@ -147,7 +182,7 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
 		"load":       loadStat,
-		"cpu":        GetCpuStatEvent(cpuStat),
+		"cpu":        cpu.GetCpuStatEvent(cpuStat),
 		"mem":        GetMemoryEvent(memStat),
 		"swap":       GetSwapEvent(swapStat),
 	}
@@ -164,7 +199,7 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		cpus := common.MapStr{}
 
 		for coreNumber, stat := range cpuCoreStat {
-			cpus["cpu"+strconv.Itoa(coreNumber)] = GetCpuStatEvent(&stat)
+			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.GetCpuStatEvent(&stat)
 		}
 		event["cpus"] = cpus
 	}
