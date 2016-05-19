@@ -111,6 +111,7 @@ class Test(BaseTest):
             "mem.actual_used_p",
             "swap.used_p",
         ]:
+            assert key in output.keys()
             assert type(output[key]) in [float, int]
 
         for key in [
@@ -131,4 +132,5 @@ class Test(BaseTest):
             "swap.used",
             "swap.free",
         ]:
+            assert key in output.keys()
             assert type(output[key]) is int or type(output[key]) is long
