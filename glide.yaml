@@ -65,3 +65,18 @@ import:
   version: cd6e0b425dfeaa184e93ed993aaee9dea03dc14d
 - package: github.com/shirou/gopsutil
   version: v2.0.0
+- package: github.com/urso/go-lumber
+  version: 91a9ea0b6f96371cc00ef6ffeaee98997be51062
+  subpackages:
+  - /lj
+  - /log
+  - /client/v2
+  - /server/internal
+  - /server/v2
+  - /protocol/v2
+- package: github.com/klauspost/compress
+  version: 14eb9c4951195779ecfbec34431a976de7335b0a
+  subpackages:
+  - zlib
+- package: github.com/klauspost/cpuid
+  version: 09cded8978dc9e80714c4d85b0322337b0a1e5e0
