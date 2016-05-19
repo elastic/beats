@@ -6,3 +6,9 @@
   # Host DSN should be defined as "tcp(127.0.0.1:3306)/"
   # The username and password can either be set in the DSN or for all hosts in username and password config option
   hosts: ["root@tcp(127.0.0.1:3306)/"]
+
+  # Username of hosts. Empty by default
+  #username: root
+
+  # Password of hosts. Empty by default
+  #password: test

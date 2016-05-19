@@ -39,7 +39,7 @@ docs:
 .PHONY: configs
 configs:
 	python ${ES_BEATS}/metricbeat/scripts/config_collector.py $(PWD) > etc/beat.yml
-	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --short $(PWD) > etc/beat.short.yml
+	python ${ES_BEATS}/metricbeat/scripts/config_collector.py --full $(PWD) > etc/beat.full.yml
 
 # This is called by the beats packer before building starts
 .PHONY: before-build
