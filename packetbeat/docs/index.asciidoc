@@ -44,8 +44,6 @@ include::./visualizing-data-packetbeat.asciidoc[]
 
 include::./filtering.asciidoc[]
 
-include::./kibana3.asciidoc[]
-
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
