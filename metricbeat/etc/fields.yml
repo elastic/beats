@@ -806,6 +806,7 @@
   title: "Zookeeper Status"
   description: >
     ZooKeeper metrics collected by the four-letter monitoring commands.
+  short_config: false
   fields:
     - name: zookeeper
       type: group

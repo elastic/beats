@@ -45,19 +45,34 @@ def collect(beat_path, short=False):
     for module in os.listdir(base_dir):
 
         beat_path = path + "/" + module + "/_beat"
+
+        module_configs = beat_path + "/config.yml"
+
+        # By default, short config is read if short is set
+        short_config = True
+
+        # Check if short config exists
         if short:
-            module_configs = beat_path + "/config.short.yml"
-        else:
-            module_configs = beat_path + "/config.yml"
+            short_module_config = beat_path + "/config.short.yml"
+            if os.path.isfile(short_module_config):
+                module_configs = short_module_config
 
         # Only check folders where config exists
         if not os.path.isfile(module_configs):
             continue
 
+
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
             fields = yaml.load(f.read())
             title = fields[0]["title"]
+
+            # Check if short config was disabled in fields.yml
+            if short and "short_config" in fields[0]:
+                short_config = fields[0]["short_config"]
+
+        if short and short_config == False:
+            continue
 
         config_yml += get_title_line(title)
 
