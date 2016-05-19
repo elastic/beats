@@ -34,7 +34,7 @@ var (
 // Use NewModuleWrapper or NewModuleWrappers to construct new ModuleWrappers.
 type ModuleWrapper struct {
 	mb.Module
-	filters    *filter.FilterList
+	filters    *filter.Filters
 	metricSets []*metricSetWrapper // List of pointers to its associated MetricSets.
 }
 

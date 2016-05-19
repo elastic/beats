@@ -426,3 +426,15 @@ logging.files:
 
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
+
+#================================ Filters =====================================
+
+# This section defines a list of filtering rules that are applied one by one starting with the
+# exported event:
+#   event -> filter1 -> event1 -> filter2 ->event2 ...
+# Supported actions: drop_fields, drop_event, include_fields
+#filters:
+#  - drop_fields:
+#      equals:
+#        status: OK
+#      fields: [ ]

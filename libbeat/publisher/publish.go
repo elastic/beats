@@ -57,7 +57,7 @@ type Publisher struct {
 	TopologyOutput outputs.TopologyOutputer
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
-	Filters        *filter.FilterList
+	Filters        *filter.Filters
 
 	globalEventMetadata common.EventMetadata // Fields and tags to add to each event.
 
@@ -172,7 +172,7 @@ func (publisher *Publisher) PublishTopology(params ...string) error {
 	return nil
 }
 
-func (publisher *Publisher) RegisterFilter(filters *filter.FilterList) error {
+func (publisher *Publisher) RegisterFilter(filters *filter.Filters) error {
 
 	publisher.Filters = filters
 	return nil

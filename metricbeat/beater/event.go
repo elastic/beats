@@ -23,7 +23,7 @@ type eventBuilder struct {
 	fetchDuration time.Duration
 	event         common.MapStr
 	fetchErr      error
-	filters       *filter.FilterList
+	filters       *filter.Filters
 	metadata      common.EventMetadata
 }
 

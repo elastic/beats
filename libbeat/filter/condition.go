@@ -11,247 +11,313 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+type RangeValue struct {
+	gte *float64
+	gt  *float64
+	lte *float64
+	lt  *float64
+}
+
+type EqualsValue struct {
+	Int uint64
+	Str string
+}
+
 type Condition struct {
-	Equals   map[string]EqualsValue
-	Contains map[string]string
-	Regexp   map[string]*regexp.Regexp
-	Range    map[string]RangeValue
+	equals   map[string]EqualsValue
+	contains map[string]string
+	regexp   map[string]*regexp.Regexp
+	rangexp  map[string]RangeValue
+}
+
+func AvailableCondition(name string) bool {
+
+	switch name {
+	case "equals", "contains", "range", "regexp":
+		return true
+	default:
+		return false
+	}
 }
 
 func NewCondition(config ConditionConfig) (*Condition, error) {
 
 	c := Condition{}
-	c.Equals = map[string]EqualsValue{}
-	c.Contains = map[string]string{}
-	c.Regexp = map[string]*regexp.Regexp{}
-	c.Range = map[string]RangeValue{}
 
-	if err := c.AddEquals(config.Equals); err != nil {
-		return nil, err
-	}
-	if err := c.AddContains(config.Contains); err != nil {
-		return nil, err
-	}
-	if err := c.AddRegexp(config.Regexp); err != nil {
-		return nil, err
-	}
-	if err := c.AddRange(config.Range); err != nil {
-		return nil, err
+	if config.Equals != nil {
+		if err := c.setEquals(config.Equals); err != nil {
+			return nil, err
+		}
+	} else if config.Contains != nil {
+		if err := c.setContains(config.Contains); err != nil {
+			return nil, err
+		}
+	} else if config.Regexp != nil {
+		if err := c.setRegexp(config.Regexp); err != nil {
+			return nil, err
+		}
+	} else if config.Range != nil {
+		if err := c.setRange(config.Range); err != nil {
+			return nil, err
+		}
+	} else {
+		// empty condition
+		return nil, nil
 	}
 
 	return &c, nil
 }
 
-func (c *Condition) AddEquals(equals map[string]string) error {
+func (c *Condition) setEquals(cfg *ConditionFilter) error {
 
-	for field, value := range equals {
+	c.equals = map[string]EqualsValue{}
 
-		i, err := strconv.Atoi(value)
+	for field, value := range cfg.fields {
+		uintValue, err := extractInt(value)
 		if err == nil {
-			c.Equals[field] = EqualsValue{Int: i}
+			c.equals[field] = EqualsValue{Int: uintValue}
 		} else {
-			c.Equals[field] = EqualsValue{Str: value}
+			sValue, err := extractString(value)
+			if err != nil {
+				return err
+			}
+			c.equals[field] = EqualsValue{Str: sValue}
+		}
+	}
+
+	return nil
+}
+
+func (c *Condition) setContains(cfg *ConditionFilter) error {
+
+	c.contains = map[string]string{}
+
+	for field, value := range cfg.fields {
+		switch v := value.(type) {
+		case string:
+			c.contains[field] = v
+		default:
+			return fmt.Errorf("unexpected type %T of %v", value, value)
+		}
+	}
+
+	return nil
+}
+
+func (c *Condition) setRegexp(cfg *ConditionFilter) error {
+
+	var err error
+
+	c.regexp = map[string]*regexp.Regexp{}
+	for field, value := range cfg.fields {
+		switch v := value.(type) {
+		case string:
+			c.regexp[field], err = regexp.Compile(v)
+			if err != nil {
+				return err
+			}
+
+		default:
+			return fmt.Errorf("unexpected type %T of %v", value, value)
 		}
 	}
 	return nil
 }
 
-func (c *Condition) AddContains(contains map[string]string) error {
+func (c *Condition) setRange(cfg *ConditionFilter) error {
 
-	c.Contains = contains
-	return nil
-}
+	c.rangexp = map[string]RangeValue{}
 
-func (c *Condition) AddRegexp(r map[string]*regexp.Regexp) error {
-	for field, reg := range r {
-		c.Regexp[field] = reg
+	updateRangeValue := func(key string, op string, value float64) error {
+
+		field := strings.TrimSuffix(key, "."+op)
+		_, exists := c.rangexp[field]
+		if !exists {
+			c.rangexp[field] = RangeValue{}
+		}
+		rv := c.rangexp[field]
+		switch op {
+		case "gte":
+			rv.gte = &value
+		case "gt":
+			rv.gt = &value
+		case "lt":
+			rv.lt = &value
+		case "lte":
+			rv.lte = &value
+		default:
+			return fmt.Errorf("unexpected field %s", op)
+		}
+		c.rangexp[field] = rv
+		return nil
 	}
-	return nil
-}
 
-func (c *Condition) AddRange(config map[string]RangeValue) error {
+	for key, value := range cfg.fields {
 
-	for field, rangeValue := range config {
-		c.Range[field] = rangeValue
+		floatValue, err := extractFloat(value)
+		if err != nil {
+			return err
+		}
+
+		list := strings.Split(key, ".")
+		err = updateRangeValue(key, list[len(list)-1], floatValue)
+		if err != nil {
+			return err
+		}
+
 	}
+
 	return nil
 }
 
 func (c *Condition) Check(event common.MapStr) bool {
 
-	if !c.CheckEquals(event) {
+	if !c.checkEquals(event) {
 		return false
 	}
-	if !c.CheckContains(event) {
+	if !c.checkContains(event) {
 		return false
 	}
-	if !c.CheckRegexp(event) {
+	if !c.checkRegexp(event) {
 		return false
 	}
-	if !c.CheckRange(event) {
+	if !c.checkRange(event) {
 		return false
 	}
 
 	return true
 }
 
-func (c *Condition) CheckEquals(event common.MapStr) bool {
+func (c *Condition) checkEquals(event common.MapStr) bool {
 
-	for field, equalValue := range c.Equals {
+	for field, equalValue := range c.equals {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
-		switch value.(type) {
-		case uint8, uint16, uint32, uint64, int8, int16, int32, int64, int, uint:
-			return value == equalValue.Int
-		case string:
-			return value == equalValue.Str
-		default:
-			logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
-			return false
+		intValue, err := extractInt(value)
+		if err == nil {
+			if intValue != equalValue.Int {
+				return false
+			}
+		} else {
+			sValue, err := extractString(value)
+			if err != nil {
+				logp.Warn("unexpected type %T in equals condition as it accepts only integers and strings. ", value)
+				return false
+			}
+			if sValue != equalValue.Str {
+				return false
+			}
 		}
-
 	}
 
 	return true
 
 }
 
-func (c *Condition) CheckContains(event common.MapStr) bool {
+func (c *Condition) checkContains(event common.MapStr) bool {
 
-	for field, equalValue := range c.Contains {
+	for field, equalValue := range c.contains {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
-		switch value.(type) {
-		case string:
-			return strings.Contains(value.(string), equalValue)
-		default:
+		sValue, err := extractString(value)
+		if err != nil {
 			logp.Warn("unexpected type %T in contains condition as it accepts only strings. ", value)
 			return false
 		}
-
+		if !strings.Contains(sValue, equalValue) {
+			return false
+		}
 	}
 
 	return true
 
 }
 
-func (c *Condition) CheckRegexp(event common.MapStr) bool {
+func (c *Condition) checkRegexp(event common.MapStr) bool {
 
-	for field, equalValue := range c.Regexp {
+	for field, equalValue := range c.regexp {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
-		switch value.(type) {
-		case string:
-			if !equalValue.MatchString(value.(string)) {
-				return false
-			}
-		default:
+		sValue, err := extractString(value)
+		if err != nil {
 			logp.Warn("unexpected type %T in regexp condition as it accepts only strings. ", value)
 			return false
 		}
-
+		if !equalValue.MatchString(sValue) {
+			return false
+		}
 	}
 
 	return true
 
 }
 
-func (c *Condition) CheckRange(event common.MapStr) bool {
+func (c *Condition) checkRange(event common.MapStr) bool {
 
-	for field, rangeValue := range c.Range {
+	checkValue := func(value float64, rangeValue RangeValue) bool {
+
+		if rangeValue.gte != nil {
+			if value < *rangeValue.gte {
+				return false
+			}
+		}
+		if rangeValue.gt != nil {
+			if value <= *rangeValue.gt {
+				return false
+			}
+		}
+		if rangeValue.lte != nil {
+			if value > *rangeValue.lte {
+				return false
+			}
+		}
+		if rangeValue.lt != nil {
+			if value >= *rangeValue.lt {
+				return false
+			}
+		}
+		return true
+	}
+
+	for field, rangeValue := range c.rangexp {
 
 		value, err := event.GetValue(field)
 		if err != nil {
-			logp.Debug("filter", "unavailable field %s: %v", field, err)
 			return false
 		}
 
 		switch value.(type) {
 		case int, int8, int16, int32, int64:
-			int_value := reflect.ValueOf(value).Int()
+			intValue := reflect.ValueOf(value).Int()
 
-			if rangeValue.Gte != nil {
-				if int_value < int64(*rangeValue.Gte) {
-					return false
-				}
-			}
-			if rangeValue.Gt != nil {
-				if int_value <= int64(*rangeValue.Gt) {
-					return false
-				}
-			}
-			if rangeValue.Lte != nil {
-				if int_value > int64(*rangeValue.Lte) {
-					return false
-				}
-			}
-			if rangeValue.Lt != nil {
-				if int_value >= int64(*rangeValue.Lt) {
-					return false
-				}
+			if !checkValue(float64(intValue), rangeValue) {
+				return false
 			}
 
 		case uint, uint8, uint16, uint32, uint64:
-			uint_value := reflect.ValueOf(value).Uint()
+			uintValue := reflect.ValueOf(value).Uint()
 
-			if rangeValue.Gte != nil {
-				if uint_value < uint64(*rangeValue.Gte) {
-					return false
-				}
-			}
-			if rangeValue.Gt != nil {
-				if uint_value <= uint64(*rangeValue.Gt) {
-					return false
-				}
-			}
-			if rangeValue.Lte != nil {
-				if uint_value > uint64(*rangeValue.Lte) {
-					return false
-				}
-			}
-			if rangeValue.Lt != nil {
-				if uint_value >= uint64(*rangeValue.Lt) {
-					return false
-				}
+			if !checkValue(float64(uintValue), rangeValue) {
+				return false
 			}
 
 		case float64, float32:
-			float_value := reflect.ValueOf(value).Float()
+			floatValue := reflect.ValueOf(value).Float()
 
-			if rangeValue.Gte != nil {
-				if float_value < *rangeValue.Gte {
-					return false
-				}
-			}
-			if rangeValue.Gt != nil {
-				if float_value <= *rangeValue.Gt {
-					return false
-				}
-			}
-			if rangeValue.Lte != nil {
-				if float_value > *rangeValue.Lte {
-					return false
-				}
-			}
-			if rangeValue.Lt != nil {
-				if float_value >= *rangeValue.Lt {
-					return false
-				}
+			if !checkValue(floatValue, rangeValue) {
+				return false
 			}
 
 		default:
@@ -263,21 +329,21 @@ func (c *Condition) CheckRange(event common.MapStr) bool {
 	return true
 }
 
-func (c *Condition) String() string {
+func (c Condition) String() string {
 
 	s := ""
 
-	if len(c.Equals) > 0 {
-		s = s + fmt.Sprintf("equals: %v", c.Equals)
+	if len(c.equals) > 0 {
+		s = s + fmt.Sprintf("equals: %v", c.equals)
 	}
-	if len(c.Contains) > 0 {
-		s = s + fmt.Sprintf("contains: %v", c.Contains)
+	if len(c.contains) > 0 {
+		s = s + fmt.Sprintf("contains: %v", c.contains)
 	}
-	if len(c.Regexp) > 0 {
-		s = s + fmt.Sprintf("regexp: %v", c.Regexp)
+	if len(c.regexp) > 0 {
+		s = s + fmt.Sprintf("regexp: %v", c.regexp)
 	}
-	if len(c.Range) > 0 {
-		s = s + fmt.Sprintf("range: %v", c.Range)
+	if len(c.rangexp) > 0 {
+		s = s + fmt.Sprintf("range: %v", c.rangexp)
 	}
 	return s
 }
@@ -285,28 +351,28 @@ func (c *Condition) String() string {
 func (r RangeValue) String() string {
 
 	s := ""
-	if r.Gte != nil {
-		s = s + fmt.Sprintf(">= %v", *r.Gte)
+	if r.gte != nil {
+		s = s + fmt.Sprintf(">= %v", *r.gte)
 	}
 
-	if r.Gt != nil {
+	if r.gt != nil {
 		if len(s) > 0 {
 			s = s + " and "
 		}
-		s = s + fmt.Sprintf("> %v", *r.Gt)
+		s = s + fmt.Sprintf("> %v", *r.gt)
 	}
 
-	if r.Lte != nil {
+	if r.lte != nil {
 		if len(s) > 0 {
 			s = s + " and "
 		}
-		s = s + fmt.Sprintf("<= %v", *r.Lte)
+		s = s + fmt.Sprintf("<= %v", *r.lte)
 	}
-	if r.Lt != nil {
+	if r.lt != nil {
 		if len(s) > 0 {
 			s = s + " and "
 		}
-		s = s + fmt.Sprintf("< %v", *r.Lt)
+		s = s + fmt.Sprintf("< %v", *r.lt)
 	}
 	return s
 }
@@ -316,5 +382,5 @@ func (e EqualsValue) String() string {
 	if len(e.Str) > 0 {
 		return e.Str
 	}
-	return strconv.Itoa(e.Int)
+	return strconv.Itoa(int(e.Int))
 }

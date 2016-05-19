@@ -122,7 +122,7 @@ func (c *client) PublishEvents(events []common.MapStr, opts ...ClientOption) boo
 	}
 
 	publishedEvents.Add(int64(len(publishEvents)))
-	return pipeline.publish(message{client: c, context: ctx, events: events})
+	return pipeline.publish(message{client: c, context: ctx, events: publishEvents})
 }
 
 // annotateEvent adds fields that are common to all events. This adds the 'beat'
@@ -167,6 +167,11 @@ func (c *client) filterEvent(event common.MapStr) *common.MapStr {
 
 	// filter the event by applying the configured rules
 	publishEvent := c.publisher.Filters.Filter(event)
+	if publishEvent == nil {
+		// the event is dropped
+		logp.Debug("publish", "Drop event %s", event.StringToPrint())
+		return nil
+	}
 	if logp.IsDebug("publish") {
 		logp.Debug("publish", "Publish: %s", publishEvent.StringToPrint())
 	}
