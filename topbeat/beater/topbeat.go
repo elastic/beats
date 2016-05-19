@@ -21,8 +21,9 @@ type Topbeat struct {
 	TbConfig ConfigSettings
 	events   publisher.Client
 
-	sysStats bool
-	fsStats  bool
+	sysStats  bool
+	fsStats   bool
+	coreStats bool
 
 	cpu       *system.CPU
 	procStats *system.ProcStats
@@ -67,10 +68,12 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	topbeatConfig := tb.TbConfig.Topbeat
 	tb.period = topbeatConfig.Period
 	tb.procStats.Procs = topbeatConfig.Procs
+	tb.procStats.CpuTicks = topbeatConfig.Stats.CPUTicks
 	tb.sysStats = topbeatConfig.Stats.System
 	tb.procStats.ProcStats = topbeatConfig.Stats.Proc
 	tb.fsStats = topbeatConfig.Stats.Filesystem
-	tb.cpu.CpuPerCore = topbeatConfig.Stats.CPUPerCore
+	tb.coreStats = topbeatConfig.Stats.Core
+	tb.cpu.CpuTicks = topbeatConfig.Stats.CPUTicks
 
 	logp.Debug("topbeat", "Init topbeat")
 	logp.Debug("topbeat", "Follow processes %q", tb.procStats.Procs)
@@ -78,7 +81,8 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	logp.Debug("topbeat", "System statistics %t", tb.sysStats)
 	logp.Debug("topbeat", "Process statistics %t", tb.procStats.ProcStats)
 	logp.Debug("topbeat", "File system statistics %t", tb.fsStats)
-	logp.Debug("topbeat", "Cpu usage per core %t", tb.cpu.CpuPerCore)
+	logp.Debug("topbeat", "Export CPU usage for each core %t", tb.coreStats)
+	logp.Debug("topbeat", "Export CPU usage in ticks %t", tb.cpu.CpuTicks)
 
 	return nil
 }
@@ -116,6 +120,14 @@ func (t *Topbeat) Run(b *beat.Beat) error {
 				break
 			}
 			t.events.PublishEvent(event)
+		}
+		if t.coreStats {
+			events, err := t.cpu.GetCoreStats()
+			if err != nil {
+				logp.Err("Error reading per core stats: %v", err)
+				break
+			}
+			t.events.PublishEvents(events)
 		}
 		if t.procStats.ProcStats {
 			events, err := t.procStats.GetProcStatsEvents()

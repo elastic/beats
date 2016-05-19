@@ -8,6 +8,90 @@
         Set to "system" to indicate that the statistics are system-wide.
       required: true
 
+- key: core
+  title: "CPU statistics per core"
+  description: >
+    Contains CPU statistics for each core. These statistics are the details that you can get by running the *top* command on Unix systems.
+  fields:
+    - name: id
+      type: integer
+      description: >
+       The id of the core X.
+
+    - name: user
+      type: long
+      description: >
+       The amount of CPU time spent in user space on core X.
+
+    - name: user_p
+      type: float
+      description: >
+        The percentage of CPU time spent in user space on core X.
+
+    - name: nice
+      type: long
+      description: >
+        The amount of CPU time spent on low-priority processes on core X.
+
+    - name: nice_p
+      type: float
+      description: >
+        The percentage of CPU time spent on low-priority processes on core X.
+
+    - name: system
+      type: long
+      description: >
+        The amount of CPU time spent in kernel space on core X.
+
+    - name: system_p
+      type: float
+      description: >
+        The percentage of CPU time spent in kernel space on core X.
+
+    - name: idle
+      type: long
+      description: >
+        The amount of CPU time spent idle on core X.
+
+    - name: idle_p
+      type: float
+      description: >
+        The percentage of CPU time spent idle on core X.
+
+    - name: iowait
+      type: long
+      description: >
+        The amount of CPU time spent in wait (on disk) on core X.
+
+    - name: iowait_p
+      type: float
+      description: >
+        The percentage of CPU time spent in wait (on disk) on core X.
+
+    - name: softirq
+      type: long
+      description:
+        The amount of CPU time spent servicing and handling software interrupts on core X.
+
+    - name: softirq_p
+      type: float
+      description:
+        The percentage of CPU time spent servicing and handling software interrupts on core X.
+
+    - name: steal
+      type: long
+      description: >
+        The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor on core X.
+        Available only on Unix.
+
+    - name: steal_p
+      type: float
+      description: >
+        The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor on core X.
+        Available only on Unix.
+
 - key: system
   title: "System-Wide Statistics"
   description: >
@@ -56,6 +140,11 @@
           description: >
             The amount of CPU time spent on low-priority processes.
 
+        - name: nice_p
+          type: float
+          description: >
+            The percentage of CPU time spent on low-priority processes.
+
         - name: system
           type: long
           description: >
@@ -71,20 +160,40 @@
           description: >
             The amount of CPU time spent idle.
 
+        - name: idle_p
+          type: float
+          description: >
+            The percentage of CPU time spent idle.
+ 
         - name: iowait
           type: long
           description: >
             The amount of CPU time spent in wait (on disk).
+
+        - name: iowait_p
+          type: float
+          description: >
+            The percentage of CPU time spent in wait (on disk).
 
         - name: irq
           type: long
           description: >
             The amount of CPU time spent servicing and handling hardware interrupts.
 
+        - name: irq_p
+          type: float
+          description: >
+            The percentage of CPU time spent servicing and handling hardware interrupts.
+
         - name: softirq
           type: long
           description:
             The amount of CPU time spent servicing and handling software interrupts.
+
+        - name: softirq_p
+          type: float
+          description:
+            The percentage of CPU time spent servicing and handling software interrupts.
 
         - name: steal
           type: long
@@ -93,64 +202,12 @@
             was servicing another processor.
             Available only on Unix.
 
-    - name: cpus
-      type: group
-      prefix: "[float]"
-      description: This group contains CPU usage per core statistics.
-      fields:
-        - name: cpuX
-          prefix: "[float]"
-          type: group
-          description: This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
-          fields:
-
-          - name: user
-            type: long
-            description: >
-             The amount of CPU time spent in user space on core X.
-
-          - name: user_p
-            type: float
-            description: >
-              The percentage of CPU time spent in user space on core X.
-
-          - name: nice
-            type: long
-            description: >
-              The amount of CPU time spent on low-priority processes on core X.
-
-          - name: system
-            type: long
-            description: >
-              The amount of CPU time spent in kernel space on core X.
-
-          - name: system_p
-            type: float
-            description: >
-              The percentage of CPU time spent in kernel space on core X.
-
-          - name: idle
-            type: long
-            description: >
-              The amount of CPU time spent idle on core X.
-
-          - name: iowait
-            type: long
-            description: >
-              The amount of CPU time spent in wait (on disk) on core X.
-
-          - name: softirq
-            type: long
-            description:
-              The amount of CPU time spent servicing and handling software interrupts on core X.
-
-          - name: steal
-            type: long
-            description: >
-              The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
-              was servicing another processor on core X.
-              Available only on Unix.
-
+        - name: steal_p
+          type: float
+          description: >
+            The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+            was servicing another processor.
+            Available only on Unix.
 
 
     - name: mem

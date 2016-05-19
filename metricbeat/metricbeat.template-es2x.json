@@ -658,35 +658,53 @@
           "properties": {
             "core": {
               "properties": {
-                "core": {
+                "id": {
                   "type": "integer"
                 },
                 "idle": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "idle_p": {
+                  "type": "float"
                 },
                 "iowait": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "iowait_p": {
+                  "type": "float"
                 },
                 "irq": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "irq_p": {
+                  "type": "float"
                 },
                 "nice": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "nice_p": {
+                  "type": "float"
                 },
                 "softirq": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "softirq_p": {
+                  "type": "float"
                 },
                 "steal": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "steal_p": {
+                  "type": "float"
                 },
                 "system": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "system_p": {
                   "type": "float"
                 },
                 "user": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "user_p": {
                   "type": "float"
@@ -696,13 +714,22 @@
             "cpu": {
               "properties": {
                 "idle": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "idle_p": {
+                  "type": "float"
                 },
                 "iowait": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "iowait_p": {
+                  "type": "float"
                 },
                 "irq": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "irq_p": {
+                  "type": "float"
                 },
                 "load": {
                   "properties": {
@@ -718,22 +745,31 @@
                   }
                 },
                 "nice": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "nice_p": {
+                  "type": "float"
                 },
                 "softirq": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "softirq_p": {
+                  "type": "float"
                 },
                 "steal": {
-                  "type": "integer"
+                  "type": "long"
+                },
+                "steal_p": {
+                  "type": "float"
                 },
                 "system": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "system_p": {
                   "type": "float"
                 },
                 "user": {
-                  "type": "integer"
+                  "type": "long"
                 },
                 "user_p": {
                   "type": "float"

@@ -103,23 +103,22 @@ geoip:
 #================================ Filters =====================================
 filters:
 
-    {%- if include_fields %}
-    - include_fields:
-        {{include_fields.condition | default()}}
-        fields: {{include_fields.fields | default([])}}
-    {%- endif %}
+  {%- if include_fields %}
+  - include_fields:
+      {{include_fields.condition | default()}}
+      fields: {{include_fields.fields | default([])}}
+  {%- endif %}
 
-    {%- if drop_fields %}
-    - drop_fields:
-        {{drop_fields.condition | default()}}
-        fields: {{drop_fields.fields | default([])}}
-    {%- endif %}
+  {%- if drop_fields %}
+  - drop_fields:
+      {{drop_fields.condition | default()}}
+      fields: {{drop_fields.fields | default([])}}
+  {%- endif %}
 
-
-    {%- if drop_event %}
-    - drop_event:
-        {{ drop_event.condition | default()}}
-    {%- endif %}
+  {%- if drop_event %}
+  - drop_event:
+      {{ drop_event.condition | default()}}
+  {%- endif %}
 
 {%- endif %}
 

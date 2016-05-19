@@ -11,6 +11,7 @@ grouped in the following categories:
 
 * <<exported-fields-beat>>
 * <<exported-fields-common>>
+* <<exported-fields-core>>
 * <<exported-fields-filesystem>>
 * <<exported-fields-process>>
 * <<exported-fields-system>>
@@ -69,6 +70,116 @@ Contains common fields available in all event types.
 required: True
 
 Set to "system" to indicate that the statistics are system-wide.
+
+
+[[exported-fields-core]]
+=== CPU statistics per core Fields
+
+Contains CPU statistics for each core. These statistics are the details that you can get by running the *top* command on Unix systems.
+
+
+
+==== id
+
+type: integer
+
+The id of the core X.
+
+
+==== user
+
+type: long
+
+The amount of CPU time spent in user space on core X.
+
+
+==== user_p
+
+type: float
+
+The percentage of CPU time spent in user space on core X.
+
+
+==== nice
+
+type: long
+
+The amount of CPU time spent on low-priority processes on core X.
+
+
+==== nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes on core X.
+
+
+==== system
+
+type: long
+
+The amount of CPU time spent in kernel space on core X.
+
+
+==== system_p
+
+type: float
+
+The percentage of CPU time spent in kernel space on core X.
+
+
+==== idle
+
+type: long
+
+The amount of CPU time spent idle on core X.
+
+
+==== idle_p
+
+type: float
+
+The percentage of CPU time spent idle on core X.
+
+
+==== iowait
+
+type: long
+
+The amount of CPU time spent in wait (on disk) on core X.
+
+
+==== iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk) on core X.
+
+
+==== softirq
+
+type: long
+
+The amount of CPU time spent servicing and handling software interrupts on core X.
+
+==== softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts on core X.
+
+==== steal
+
+type: long
+
+The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
+
+
+==== steal_p
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
 
 
 [[exported-fields-filesystem]]
@@ -341,6 +452,13 @@ type: long
 The amount of CPU time spent on low-priority processes.
 
 
+==== cpu.nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
 ==== cpu.system
 
 type: long
@@ -362,11 +480,25 @@ type: long
 The amount of CPU time spent idle.
 
 
+==== cpu.idle_p
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
 ==== cpu.iowait
 
 type: long
 
 The amount of CPU time spent in wait (on disk).
+
+
+==== cpu.iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
 
 
 ==== cpu.irq
@@ -376,11 +508,24 @@ type: long
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
+==== cpu.irq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
 ==== cpu.softirq
 
 type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
+
+==== cpu.softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
 
 ==== cpu.steal
 
@@ -389,78 +534,11 @@ type: long
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
-[float]
-=== cpus Fields
-
-This group contains CPU usage per core statistics.
-
-
-[float]
-=== cpuX Fields
-
-This group contains CPU usage statistics of the core X, where 0<X<N and N is the number of cores.
-
-
-==== cpus.cpuX.user
-
-type: long
-
-The amount of CPU time spent in user space on core X.
-
-
-==== cpus.cpuX.user_p
+==== cpu.steal_p
 
 type: float
 
-The percentage of CPU time spent in user space on core X.
-
-
-==== cpus.cpuX.nice
-
-type: long
-
-The amount of CPU time spent on low-priority processes on core X.
-
-
-==== cpus.cpuX.system
-
-type: long
-
-The amount of CPU time spent in kernel space on core X.
-
-
-==== cpus.cpuX.system_p
-
-type: float
-
-The percentage of CPU time spent in kernel space on core X.
-
-
-==== cpus.cpuX.idle
-
-type: long
-
-The amount of CPU time spent idle on core X.
-
-
-==== cpus.cpuX.iowait
-
-type: long
-
-The amount of CPU time spent in wait (on disk) on core X.
-
-
-==== cpus.cpuX.softirq
-
-type: long
-
-The amount of CPU time spent servicing and handling software interrupts on core X.
-
-==== cpus.cpuX.steal
-
-type: long
-
-The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor on core X. Available only on Unix.
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
 [float]
