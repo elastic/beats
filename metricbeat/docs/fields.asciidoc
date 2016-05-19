@@ -354,22 +354,22 @@ Contains common fields available in all event types.
 
 
 
-==== module
+==== metricset.module
 
 The name of the module that generated the event.
 
 
-==== metricset
+==== metricset.name
 
 The name of the metricset that generated the event.
 
 
-==== metricset-host
+==== metricset.host
 
 Hostname of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
 
 
-==== rtt
+==== metricset.rtt
 
 type: long
 

@@ -170,19 +170,26 @@
           }
         },
         "metricset": {
-          "ignore_above": 1024,
-          "index": "not_analyzed",
-          "type": "string"
-        },
-        "metricset-host": {
-          "ignore_above": 1024,
-          "index": "not_analyzed",
-          "type": "string"
-        },
-        "module": {
-          "ignore_above": 1024,
-          "index": "not_analyzed",
-          "type": "string"
+          "properties": {
+            "host": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "module": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "rtt": {
+              "type": "long"
+            }
+          }
         },
         "mysql": {
           "properties": {
@@ -569,9 +576,6 @@
               }
             }
           }
-        },
-        "rtt": {
-          "type": "long"
         },
         "system": {
           "properties": {

@@ -38,10 +38,10 @@ class ApacheStatusTest(metricbeat.BaseTest):
         evt = output[0]
 
         # Verify the required fields are present.
-        self.assertItemsEqual(APACHE_FIELDS, evt.keys())
+        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
         apache_status = evt["apache"]["status"]
-        self.assertItemsEqual(APACHE_STATUS_FIELDS, apache_status.keys())
-        self.assertItemsEqual(CPU_FIELDS, apache_status["cpu"].keys())
+        self.assertItemsEqual(self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
         # There are more fields that could be checked.
 
         # Verify all fields present are documented.
