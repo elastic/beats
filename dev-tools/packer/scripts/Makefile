@@ -31,6 +31,8 @@ deps:
 .PHONY: xgo-image
 xgo-image:
 	cd $(packer_absdir)/docker/xgo-image/; ./build.sh
+	# copy build.sh script in the xgo-image-deb6 to avoid code duplication
+	cp $(packer_absdir)/docker/xgo-image/base/build.sh $(packer_absdir)/docker/xgo-image-deb6/base/build.sh
 	cd $(packer_absdir)/docker/xgo-image-deb6/; ./build.sh
 
 .PHONY: fpm-image
