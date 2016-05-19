@@ -52,31 +52,44 @@ a future.
 
 Building all Beats for all platforms:
 
-     make clean && make -j2
+     make clean && make
 
-Which currently produces the following:
+## Naming conventions
 
-        topbeat-1.0.0-nightly.150813173034-darwin.tgz
-        topbeat-1.0.0-nightly.150813173034-darwin.tgz.sha1
-        topbeat_1.0.0-nightly.150813173034_i386.deb
-        topbeat_1.0.0-nightly.150813173034_i386.deb.sha1
-        topbeat-1.0.0-nightly.150813173034-windows.zip
-        topbeat-1.0.0-nightly.150813173034-windows.zip.sha1
-        topbeat-1.0.0-nightly.150813173034-i686.rpm
-        topbeat-1.0.0-nightly.150813173034-i686.rpm
-        topbeat_1.0.0-nightly.150813173034_amd64.deb
-        topbeat_1.0.0-nightly.150813173034_amd64.deb.sha1
-        topbeat-1.0.0-nightly.150813173034-x86_64.rpm
-        topbeat-1.0.0-nightly.150813173034-x86_64.rpm
-        packetbeat-1.0.0-nightly.150813173058-windows.zip
-        packetbeat-1.0.0-nightly.150813173058-windows.zip.sha1
-        packetbeat-1.0.0-nightly.150813173058-darwin.tgz
-        packetbeat-1.0.0-nightly.150813173058-darwin.tgz.sha1
-        packetbeat_1.0.0-nightly.150813173058_i386.deb
-        packetbeat_1.0.0-nightly.150813173058_i386.deb.sha1
-        packetbeat-1.0.0-nightly.150813173058-i686.rpm
-        packetbeat-1.0.0-nightly.150813173058-i686.rpm
-        packetbeat_1.0.0-nightly.150813173058_amd64.deb
-        packetbeat_1.0.0-nightly.150813173058_amd64.deb.sha1
-        packetbeat-1.0.0-nightly.150813173058-x86_64.rpm
-        packetbeat-1.0.0-nightly.150813173058-x86_64.rpm
+We use a set of package name conventions across all the Elastic stack:
+
+* The general form is `name-version-os-arch.ext`. Note that this means we
+  use dashes even for Deb files.
+* The archs are called `x86` and `x64` except for deb/rpm where we keep the
+  OS preferred names (i386/amd64, i686/x86_64).
+* For version strings like `5.0.0-alpha3` we keep them with a dash in the
+  filename but use `~` in the deb/rpm metadata.
+* We omit the release number from the filenames. It's always `1` in the metadata.
+
+For example, here are the artifacts created for Filebeat:
+
+```
+filebeat-5.0.0-amd64.deb
+filebeat-5.0.0-darwin-x86.tar.gz
+filebeat-5.0.0-i386.deb
+filebeat-5.0.0-i686.rpm
+filebeat-5.0.0-linux-x64.tar.gz
+filebeat-5.0.0-linux-x86.tar.gz
+filebeat-5.0.0-windows-x64.zip
+filebeat-5.0.0-windows-x86.zip
+filebeat-5.0.0-x86_64.rpm
+```
+
+And the SNAPSHOT versions:
+
+```
+filebeat-5.0.0-SNAPSHOT-amd64.deb
+filebeat-5.0.0-SNAPSHOT-i386.deb
+filebeat-5.0.0-SNAPSHOT-i686.rpm
+filebeat-5.0.0-SNAPSHOT-x86_64.rpm
+filebeat-5.0.0-SNAPSHOT-darwin-x86.tar.gz
+filebeat-5.0.0-SNAPSHOT-linux-x64.tar.gz
+filebeat-5.0.0-SNAPSHOT-linux-x86.tar.gz
+filebeat-5.0.0-SNAPSHOT-windows-x64.zip
+filebeat-5.0.0-SNAPSHOT-windows-x86.zip
+```
