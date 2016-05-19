@@ -24,11 +24,21 @@ type MetricSet struct {
 
 // New creates and returns a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	config := struct {
+		Procs []string `config:"processes"` // collect all processes by default
+	}{
+		Procs: []string{".*"},
+	}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &system.ProcStats{
 			ProcStats: true,
-			Procs:     []string{".*"}, // Collect all processes.
+			Procs:     config.Procs,
 		},
 	}
 	err := m.stats.InitProcStats()
