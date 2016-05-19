@@ -65,9 +65,9 @@ class Test(BaseTest):
 
         for event in output:
             if float(event["proc.cpu.total_p"]) < 0.5:
-                assert "proc.mem" not in event
+                assert "proc.mem.size" not in event
             else:
-                assert "proc.mem" in event
+                assert "proc.mem.size" in event
 
     def test_dropevent_with_condition(self):
         """
