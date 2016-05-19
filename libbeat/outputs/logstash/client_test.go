@@ -3,13 +3,13 @@
 package logstash
 
 import (
-	"net"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/urso/go-lumber/server/v2"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/streambuf"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
 
@@ -48,12 +48,6 @@ func newLumberjackTestClient(conn *transport.Client) *client {
 	return c
 }
 
-func enableLogging(selectors []string) {
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, selectors)
-	}
-}
-
 const testMaxWindowSize = 64
 
 func testSendZero(t *testing.T, factory clientFactory) {
@@ -85,55 +79,46 @@ func testSendZero(t *testing.T, factory clientFactory) {
 
 func testSimpleEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
-	server := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	server, _ := v2.NewWithListener(mock.Listener)
+	defer server.Close()
 
-	sock, transp, err := server.ConnectPair()
+	transp, err := mock.Connect()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to connect: %v", err)
 	}
 	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
-	defer sock.Close()
+	defer client.Stop()
 
 	event := common.MapStr{"type": "test", "name": "me", "line": 10}
-	client.Publish([]common.MapStr{event})
+	go client.Publish([]common.MapStr{event})
 
-	// receive window message
-	err = sock.SetReadDeadline(time.Now().Add(1 * time.Second))
-	win, err := conn.recvMessage()
-	assert.Nil(t, err)
-
-	// receive data message
-	msg, err := conn.recvMessage()
-	assert.Nil(t, err)
-
-	// send ack
-	conn.sendACK(1)
-
-	client.Stop()
+	// try to receive event from server
+	batch := server.Receive()
+	batch.ACK()
 
 	// validate
-	assert.NotNil(t, win)
-	assert.NotNil(t, msg)
-	assert.Equal(t, 1, len(msg.events))
-	msg = msg.events[0]
-	assert.Equal(t, "me", msg.doc["name"])
-	assert.Equal(t, 10.0, msg.doc["line"])
+	events := batch.Events
+	assert.Equal(t, 1, len(events))
+	msg := events[0].(map[string]interface{})
+	assert.Equal(t, "me", msg["name"])
+	assert.Equal(t, 10.0, msg["line"])
 }
 
 func testStructuredEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
-	server := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	server, _ := v2.NewWithListener(mock.Listener)
+	defer server.Close()
 
-	sock, transp, err := server.ConnectPair()
+	transp, err := mock.Connect()
 	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
+		t.Fatalf("Failed to connect: %v", err)
 	}
 	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
 	defer transp.Close()
-	defer sock.Close()
+	defer client.Stop()
 
 	event := common.MapStr{
 		"type": "test",
@@ -154,127 +139,59 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 			},
 		},
 	}
-	client.Publish([]common.MapStr{event})
-
-	win, err := conn.recvMessage()
-	assert.Nil(t, err)
-
-	msg, err := conn.recvMessage()
-	assert.Nil(t, err)
-
-	conn.sendACK(1)
+	go client.Publish([]common.MapStr{event})
 	defer client.Stop()
 
-	// validate
-	assert.NotNil(t, win)
-	assert.NotNil(t, msg)
-	assert.Equal(t, 1, len(msg.events))
-	msg = msg.events[0]
-	assert.Equal(t, "test", msg.doc["name"])
-	assert.Equal(t, 1.0, msg.doc.get("struct.field1"))
-	assert.Equal(t, true, msg.doc.get("struct.field2"))
-	assert.Equal(t, 2.0, msg.doc.get("struct.field5.sub1"))
-}
+	// try to receive event from server
+	batch := server.Receive()
+	batch.ACK()
 
-func testCloseAfterWindowSize(t *testing.T, factory clientFactory) {
-	enableLogging([]string{"*"})
-	server := transptest.NewMockServerTCP(t, 100*time.Millisecond, "", nil)
-
-	sock, transp, err := server.ConnectPair()
-	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
-	}
-	client := factory(transp)
-	conn := &mockConn{sock, streambuf.New(nil)}
-	defer transp.Close()
-	defer sock.Close()
-	defer client.Stop()
-
-	client.Publish([]common.MapStr{common.MapStr{
-		"type":    "test",
-		"message": "hello world",
-	}})
-
-	_, err = conn.recvMessage()
-	if err != nil {
-		t.Fatalf("failed to read window size message: %v", err)
-	}
-
+	events := batch.Events
+	assert.Equal(t, 1, len(events))
+	msg := events[0]
+	assert.Equal(t, "test", eventGet(msg, "name"))
+	assert.Equal(t, 1.0, eventGet(msg, "struct.field1"))
+	assert.Equal(t, true, eventGet(msg, "struct.field2"))
+	assert.Equal(t, 2.0, eventGet(msg, "struct.field5.sub1"))
 }
 
 func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 
-	server := transptest.NewMockServerTCP(t, 100*time.Millisecond, "", nil)
-	transp, err := server.Transp()
-	if err != nil {
-		t.Fatalf("Failed to connect server and client: %v", err)
-	}
+	mock := transptest.NewMockServerTCP(t, 100*time.Millisecond, "", nil)
+	server, _ := v2.NewWithListener(mock.Listener)
+	defer server.Close()
 
-	N := 8
+	transp, err := mock.Transp()
+	if err != nil {
+		t.Fatalf("Failed to connect: %v", err)
+	}
 	client := factory(transp)
 	defer transp.Close()
 	defer client.Stop()
 
+	N := 8
 	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 
 	for i := 0; i < N; i++ {
-		await := server.Await()
 		err = transp.Connect()
 		if err != nil {
 			t.Fatalf("Transport client Failed to connect: %v", err)
 		}
-		sock := <-await
-		conn := &mockConn{sock, streambuf.New(nil)}
-
-		// close socket only once test has finished
-		// so no EOF error can be generated
-		defer sock.Close()
 
 		// publish event. With client returning on timeout, we have to send
 		// messages again
-		client.Publish([]common.MapStr{event})
+		go client.Publish([]common.MapStr{event})
 
-		// read window
-		msg, err := conn.recvMessage()
-		if err != nil {
-			t.Errorf("Failed receiving window size: %v", err)
-			break
-		}
-		if msg.code != 'W' {
-			t.Errorf("expected window size message")
-			break
-		}
+		// read batch + never ACK in order to enforce timeout
+		server.Receive()
 
-		// read message
-		msg, err = conn.recvMessage()
-		if err != nil {
-			t.Errorf("Failed receiving data message: %v", err)
-			break
-		}
-		if msg.code != 'C' {
-			t.Errorf("expected data message")
-			break
-		}
-		// do not respond -> enforce timeout
-
-		// check connection being closed,
-		// timeout required in case of sender not closing the connection
-		// correctly
-		sock.SetDeadline(time.Now().Add(30 * time.Second))
-		msg, err = conn.recvMessage()
-		if msg != nil {
-			t.Errorf("Received message on connection expected to be closed")
-			break
-		}
-		if nerr, ok := err.(net.Error); ok && nerr.Timeout() {
-			t.Errorf("Unexpected timeout error (client did not close connection in time?): %v", err)
-			break
+		// wait for client being disconnected
+		for transp.IsConnected() {
 		}
 	}
 
 	client.Stop()
-
 	returns := client.Returns()
 	if len(returns) != N {
 		t.Fatalf("PublishEvents did not return")
@@ -284,4 +201,13 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 		assert.Equal(t, 0, ret.n)
 		assert.NotNil(t, ret.err)
 	}
+}
+
+func eventGet(event interface{}, path string) interface{} {
+	doc := event.(map[string]interface{})
+	elems := strings.Split(path, ".")
+	for i := 0; i < len(elems)-1; i++ {
+		doc = doc[elems[i]].(map[string]interface{})
+	}
+	return doc[elems[len(elems)-1]]
 }
