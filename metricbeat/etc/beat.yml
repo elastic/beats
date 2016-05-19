@@ -1,8 +1,8 @@
-########################## Metricbeat Configuration ###########################
+###################### Metricbeat Configuration Example #######################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see metricbeat.short.yml in the same directory.
+# This file is an example configuration file highlighting only the most common
+# options. The metricbeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
@@ -19,15 +19,6 @@ metricbeat.modules:
   # Apache hosts
   hosts: ["http://127.0.0.1/"]
 
-  # Path to server status. Default server-status
-  #server_status_path: "server-status"
-
-  # Username of hosts.  Empty by default
-  #username: test
-
-  # Password of hosts. Empty by default
-  #password: test123
-
 #---------------------------- MySQL Status Module ----------------------------
 - module: mysql
   metricsets: ["status"]
@@ -38,12 +29,6 @@ metricbeat.modules:
   # The username and password can either be set in the DSN or for all hosts in username and password config option
   hosts: ["root@tcp(127.0.0.1:3306)/"]
 
-  # Username of hosts. Empty by default
-  #username: root
-
-  # Password of hosts. Empty by default
-  #password: test
-
 #---------------------------- Nginx Status Module ----------------------------
 - module: nginx
   metricsets: ["stubstatus"]
@@ -53,8 +38,6 @@ metricbeat.modules:
   # Nginx hosts
   hosts: ["http://127.0.0.1/"]
 
-  # Path to server status. Default server-status
-  #server_status_path: "server-status"
 
 #---------------------------- Redis Status Module ----------------------------
 - module: redis
@@ -65,44 +48,11 @@ metricbeat.modules:
   # Redis hosts
   hosts: ["127.0.0.1:6379"]
 
-  # Enabled defines if the module is enabled. Default: true
-  #enabled: true
-
-  # Timeout after which time a metricset should return an error
-  # Timeout is by default defined as period, as a fetch of a metricset
-  # should never take longer then period, as otherwise calls can pile up.
-  #timeout: 1s
-
-  # Optional fields to be added to each event
-  #fields:
-  #  datacenter: west
-
-  # Network type to be used for redis connection. Default: tcp
-  #network: tcp
-
-  # Max number of concurrent connections. Default: 10
-  #maxconn: 10
-
-  # Filters can be used to reduce the number of fields sent.
-  #filters:
-  #  - include_fields:
-  #      fields: ["stats"]
-
-  # Redis AUTH password. Empty by default.
-  #password: foobared
-
 #---------------------------- System Status Module ---------------------------
 - module: system
   metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
   enabled: true
   period: 2s
   processes: ['.*']
-
-#-------------------------- Zookeeper Status Module --------------------------
-- module: zookeeper
-  metricsets: ["mntr"]
-  enabled: true
-  period: 5s
-  hosts: ["localhost:2181"]
 
 

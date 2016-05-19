@@ -1,24 +1,13 @@
-########################## Winlogbeat Configuration ###########################
+###################### Winlogbeat Configuration Example ##########################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see winlogbeat.short.yml in the same directory.
+# This file is an example configuration file highlighting only the most common
+# options. The winlogbeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/winlogbeat/index.html
 
 #======================= Winlogbeat specific options ==========================
-
-# The registry file is where Winlogbeat persists its state so that the beat
-# can resume after shutdown or an outage. The default is .winlogbeat.yml
-# in the directory in which it was started.
-#winlogbeat.registry_file: .winlogbeat.yml
-
-# Diagnostic metrics that can retrieved through a web interface if a
-# bindaddress value (host:port) is specified. The web address will be
-# http://<bindaddress>/debug/vars
-#winlogbeat.metrics:
-#  bindaddress: 'localhost:8123'
 
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of

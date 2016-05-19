@@ -1,8 +1,8 @@
-########################### Topbeat Configuration #############################
+###################### Topbeat Configuration Example ##########################
 
-# This file is a full configuration example documenting all non-deprecated
-# options in comments. For a shorter configuration example, that contains only
-# the most common options, please see topbeat.short.yml in the same directory.
+# This file is an example configuration file highlighting only the most common
+# options. The topbeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
 #
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/topbeat/index.html
@@ -34,45 +34,16 @@ topbeat.stats:
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
 #name:
 
 # The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
+# transaction published.
 #tags: ["service-X", "web-tier"]
 
 # Optional fields that you can specify to add additional information to the
-# output. Fields can be scalar values, arrays, dictionaries, or any nested
-# combination of these.
+# output.
 #fields:
 #  env: staging
-
-# If this option is set to true, the custom fields are stored as top-level
-# fields in the output document instead of being grouped under a fields
-# sub-dictionary. Default is false.
-#fields_under_root: false
-
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
-
-# How often (in seconds) shippers are publishing their IPs to the topology map.
-# The default is 10 seconds.
-#refresh_topology_freq: 10
-
-# Expiration time (in seconds) of the IPs published by a shipper to the topology map.
-# All the IPs will be deleted afterwards. Note, that the value must be higher than
-# refresh_topology_freq. The default is 15 seconds.
-#topology_expire: 15
-
-# Internal queue size for single events in processing pipeline
-#queue_size: 1000
-
-# Sets the maximum number of CPUs that can be executing simultaneously. The
-# default is the number of logical CPUs available in the system.
-#max_procs:
 
 #================================ Outputs =====================================
 
@@ -82,62 +53,7 @@ topbeat.stats:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  # Scheme and port can be left out and will be set to the default (http and 9200)
-  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
-
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "admin"
-  #password: "s3cr3t"
-
-  # Dictionary of HTTP parameters to pass within the url with index operations.
-  #parameters:
-    #param1: value1
-    #param2: value2
-
-  # Number of workers per Elasticsearch host.
-  #worker: 1
-
-  # Optional index name. The default is "topbeat" and generates
-  # [topbeat-]YYYY.MM.DD keys.
-  #index: "topbeat"
-
-  # Optional HTTP Path
-  #path: "/elasticsearch"
-
-  # Proxy server url
-  #proxy_url: http://proxy:3128
-
-  # The number of times a particular Elasticsearch index operation is attempted. If
-  # the indexing operation doesn't succeed after this many retries, the events are
-  # dropped. The default is 3.
-  #max_retries: 3
-
-  # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-  # The default is 50.
-  #bulk_max_size: 50
-
-  # Configure http request timeout before failing an request to Elasticsearch.
-  #timeout: 90
-
-  # The number of seconds to wait for new events between two bulk API index requests.
-  # If `bulk_max_size` is reached before this interval expires, addition bulk index
-  # requests are made.
-  #flush_interval: 1
-
-  # Boolean that sets if the topology is kept in Elasticsearch. The default is
-  # false. This option makes sense only for Packetbeat.
-  #save_topology: false
-
-  # The time to live in seconds for the topology information that is stored in
-  # Elasticsearch. The default is 15 seconds.
-  #topology_expire: 15
-
-  # A template is used to set the mapping in Elasticsearch
-  # By default template loading is enabled and the template is loaded.
-  # These settings can be adjusted to load your own template or overwrite existing ones
 
   # Template name. By default the template name is topbeat.
   template.name: "topbeat"
@@ -148,58 +64,10 @@ output.elasticsearch:
   # Overwrite existing template
   template.overwrite: false
 
-  # TLS configuration. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for TLS client authentication
-  #tls.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #tls.certificate_key: "/etc/pki/client/cert.key"
-
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
-
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
-
-  # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
-
-  # Configure minimum TLS version allowed for connection to logstash
-  #tls.min_version: 1.0
-
-  # Configure maximum TLS version allowed for connection to logstash
-  #tls.max_version: 1.2
-
-
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
-
-  # Number of workers per Logstash host.
-  #worker: 1
-
-  # Set gzip compression level.
-  #compression_level: 3
-
-  # Optional load balance the events between the Logstash hosts
-  #loadbalance: true
-
-  # Optional index name. The default index name is set to name of the beat
-  # in all lowercase.
-  #index: topbeat
-
-  # SOCKS5 proxy server URL
-  #proxy_url: socks5://user:password@socks5-server:2233
-
-  # Resolve names locally when using a proxy server. Defaults to false.
-  #proxy_use_local_resolver: false
 
   # Optional TLS. By default is off.
   # List of root certificates for HTTPS server verifications
@@ -211,85 +79,8 @@ output.elasticsearch:
   # Client Certificate Key
   #tls.certificate_key: "/etc/pki/client/cert.key"
 
-  # Controls whether the client verifies server certificates and host name.
-  # If insecure is set to true, all server host names and certificates will be
-  # accepted. In this mode TLS based connections are susceptible to
-  # man-in-the-middle attacks. Use only for testing.
-  #tls.insecure: true
-
-  # Configure cipher suites to be used for TLS connections
-  #tls.cipher_suites: []
-
-  # Configure curve types for ECDHE based cipher suites
-  #tls.curve_types: []
-
-
-#------------------------------- File output ----------------------------------
-#output.file:
-  # Path to the directory where to save the generated files. The option is mandatory.
-  #path: "/tmp/topbeat"
-
-  # Name of the generated files. The default is `topbeat` and it generates files: `topbeat`, `topbeat.1`, `topbeat.2`, etc.
-  #filename: topbeat
-
-  # Maximum size in kilobytes of each file. When this size is reached, the files are
-  # rotated. The default value is 10240 kB.
-  #rotate_every_kb: 10000
-
-  # Maximum number of files under path. When this number of files is reached, the
-  # oldest file is deleted and the rest are shifted from last to first. The default
-  # is 7 files.
-  #number_of_files: 7
-
-
-#----------------------------- Console output ---------------------------------
-#output.console:
-  # Pretty print json event
-  #pretty: false
-
 #================================ Logging =====================================
-# There are three options for the log output: syslog, file, stderr.
-# Under Windows systems, the log files are per default sent to the file output,
-# under all other system per default to syslog.
 
 # Sets log level. The default log level is error.
 # Available log levels are: critical, error, warning, info, debug
 #logging.level: error
-
-# Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are beat, publish, service
-# Multiple selectors can be chained.
-#logging.selectors: [ ]
-
-# Send all logging output to syslog. The default is false.
-#logging.to_syslog: true
-
-# Logging to rotating files files. Set logging.to_files to false to disable logging to
-# files.
-logging.to_files: true
-logging.files:
-  # Configure the path where the logs are written. The default is the logs directory
-  # under the home path (the binary location).
-  #path: /var/log/mybeat
-
-  # The name of the files where the logs are written to.
-  #name: mybeat
-
-  # Configure log file size limit. If limit is reached, log file will be
-  # automatically rotated
-  #rotateeverybytes: 10485760 # = 10MB
-
-  # Number of rotated log files to keep. Oldest files will be deleted first.
-  #keepfiles: 7
-
-#================================ Filters =====================================
-
-# This section defines a list of filtering rules that are applied one by one starting with the
-# exported event:
-#   event -> filter1 -> event1 -> filter2 ->event2 ...
-# Supported actions: drop_fields, drop_event, include_fields
-#filters:
-#  - drop_fields:
-#      equals:
-#        status: OK
-#      fields: [ ]
