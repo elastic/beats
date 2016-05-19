@@ -8,8 +8,8 @@ all: packetbeat/deb packetbeat/rpm packetbeat/darwin packetbeat/win packetbeat/b
 	winlogbeat/win \
 	build/upload/build_id.txt
 
-.PHONY: packetbeat topbeat filebeat metricbeat winlogbeat
-packetbeat topbeat filebeat metricbeat winlogbeat: build/upload
+.PHONY: packetbeat topbeat metricbeat
+packetbeat topbeat metricbeat: build/upload
 	# cross compile on ubuntu
 	docker run --rm \
 		-v $(abspath build):/build \
@@ -33,6 +33,39 @@ packetbeat topbeat filebeat metricbeat winlogbeat: build/upload
 		-e TARGETS="linux/amd64 linux/386" \
 		-e BUILDID=${BUILDID} \
 		tudorg/beats-builder-deb6 \
+		github.com/elastic/beats
+
+.PHONY: filebeat
+filebeat:
+	# pure go cross compiling doesn't need C compilers but
+	# we do it using the same docker instances for simplicity
+	docker run --rm \
+		-v $(abspath build):/build \
+		-v $(abspath xgo-scripts):/scripts \
+		-v $(abspath ../..):/source \
+		-e PUREGO="yes" \
+		-e PACK=$@ \
+		-e BEFORE_BUILD=before_build.sh \
+		-e SOURCE=/source \
+		-e TARGETS="linux/amd64 linux/386 windows/amd64 windows/386 darwin/amd64" \
+		-e BUILDID=${BUILDID} \
+		tudorg/beats-builder \
+		github.com/elastic/beats
+
+.PHONY: winlogbeat
+winlogbeat:
+	# Winlogbeat is pure go and only needs Windows
+	docker run --rm \
+		-v $(abspath build):/build \
+		-v $(abspath xgo-scripts):/scripts \
+		-v $(abspath ../..):/source \
+		-e PUREGO="yes" \
+		-e PACK=$@ \
+		-e BEFORE_BUILD=before_build.sh \
+		-e SOURCE=/source \
+		-e TARGETS="windows/amd64 windows/386" \
+		-e BUILDID=${BUILDID} \
+		tudorg/beats-builder \
 		github.com/elastic/beats
 
 include ./scripts/Makefile

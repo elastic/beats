@@ -23,6 +23,12 @@
 SRC_FOLDER=$SOURCE
 DST_FOLDER=$GOPATH/src/$1
 
+if [ "$PUREGO" == "yes" ]; then
+    CGO_ENABLED=0
+else
+    CGO_ENABLED=1
+fi
+
 if [ $1 = "github.com/elastic/beats" ]; then
         WORKING_DIRECTORY=$GOPATH/src/$1
 else
@@ -122,23 +128,23 @@ for TARGET in $TARGETS; do
 		HOST=x86_64-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
 		export PKG_CONFIG_PATH=/usr/aarch64-linux-gnu/lib/pkgconfig
 
-		GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-		sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-amd64$R ./$PACK"
+		GOOS=linux GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} go get -d ./$PACK
+		sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} go build $V $R $LDARGS -o $NAME-linux-amd64$R ./$PACK"
 		built_targets=$((built_targets+1))
 	fi
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
 		echo "Compiling $PACK for linux/386..."
 		CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 HOST=i686-linux PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
-		GOOS=linux GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-		sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=1 go build $V $R $LDARGS -o $NAME-linux-386$R ./$PACK"
+		GOOS=linux GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go get -d ./$PACK
+		sh -c "GOOS=linux GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go build $V $R $LDARGS -o $NAME-linux-386$R ./$PACK"
 		built_targets=$((built_targets+1))
 	fi	
 	if ([ $XGOOS == "." ] || [ $XGOOS == "linux" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "arm" ]); then
 		echo "Compiling $PACK for linux/arm..."
 		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ HOST=arm-linux PREFIX=/usr/local/arm $BUILD_DEPS /deps $LIST_DEPS
 
-		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go get -d ./$PACK
-		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=1 GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
+		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=${CGO_ENABLED} GOARM=5 go get -d ./$PACK
+		CC=arm-linux-gnueabi-gcc CXX=rm-linux-gnueabi-g++ GOOS=linux GOARCH=arm CGO_ENABLED=${CGO_ENABLED} GOARM=5 go build $V -o $NAME-linux-arm ./$PACK
 		built_targets=$((built_targets+1))
 	fi
 
@@ -162,8 +168,8 @@ for TARGET in $TARGETS; do
 			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=x86_64-w64-mingw32 PREFIX=/usr/x86_64-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig
 
-			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
-			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
+			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
+			CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GOOS=windows GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build  $V $R -o $NAME-windows-amd64$R.exe ./$PACK
 			built_targets=$((built_targets+1))
 		fi
 
@@ -172,8 +178,8 @@ for TARGET in $TARGETS; do
 			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ CFLAGS="$CGO_NTDEF" CXXFLAGS="$CGO_NTDEF" HOST=i686-w64-mingw32 PREFIX=/usr/i686-w64-mingw32 $BUILD_DEPS /deps $LIST_DEPS
 			export PKG_CONFIG_PATH=/usr/i686-w64-mingw32/lib/pkgconfig
 
-			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
-			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=1 CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build $V -o $NAME-windows-386.exe ./$PACK
+			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=${CGO_ENABLED} CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go get -d ./$PACK
+			CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GOOS=windows GOARCH=386 CGO_ENABLED=${CGO_ENABLED} CGO_CFLAGS="$CGO_NTDEF" CGO_CXXFLAGS="$CGO_NTDEF" go build $V -o $NAME-windows-386.exe ./$PACK
 			built_targets=$((built_targets+1))
 		fi
 	fi
@@ -182,15 +188,15 @@ for TARGET in $TARGETS; do
 	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "amd64" ]); then
 		echo "Compiling $PACK for darwin/amd64..."
 		CC=o64-clang CXX=o64-clang++ HOST=x86_64-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
-		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go get -d ./$PACK
-		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -ldflags=-s $V $R -o $NAME-darwin-amd64$R ./$PACK
+		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} go get -d ./$PACK
+		CC=o64-clang CXX=o64-clang++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=${CGO_ENABLED} go build -ldflags=-s $V $R -o $NAME-darwin-amd64$R ./$PACK
 		built_targets=$((built_targets+1))
 	fi
 	if ([ $XGOOS == "." ] || [ $XGOOS == "darwin" ]) && ([ $XGOARCH == "." ] || [ $XGOARCH == "386" ]); then
 		echo "Compiling for darwin/386..."
 		CC=o32-clang CXX=o32-clang++ HOST=i386-apple-darwin10 PREFIX=/usr/local $BUILD_DEPS /deps $LIST_DEPS
-		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=1 go get -d ./$PACK
-		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=1 go build $V -o $NAME-darwin-386 ./$PACK
+		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go get -d ./$PACK
+		CC=o32-clang CXX=o32-clang++ GOOS=darwin GOARCH=386 CGO_ENABLED=${CGO_ENABLED} go build $V -o $NAME-darwin-386 ./$PACK
 		built_targets=$((built_targets+1))
 	fi
 done
