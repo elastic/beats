@@ -48,6 +48,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Add conditions to generic filtering {pull}1623[1623]
+
 *Packetbeat*
 
 *Topbeat*

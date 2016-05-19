@@ -257,9 +257,9 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True,
                 ),
-            filter_enabled=True,
-            drop_fields=["headers.request-id"],
-            include_fields=None,
+            drop_fields={
+                "fields": ["headers.request-id"],
+            },
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -297,9 +297,9 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True,
                 ),
-            filter_enabled=True,
-            drop_fields=["headers", "res"],
-            include_fields=None,
+            drop_fields={
+                "fields": ["headers", "res"],
+            },
         )
 
         os.mkdir(self.working_dir + "/log/")

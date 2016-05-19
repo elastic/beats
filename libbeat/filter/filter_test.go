@@ -1,13 +1,77 @@
-package filter
+package filter_test
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/filter"
+	_ "github.com/elastic/beats/libbeat/filter/rules"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/stretchr/testify/assert"
 )
+
+func GetFilters(t *testing.T, yml []map[string]interface{}) *filter.Filters {
+
+	config := filter.FilterPluginConfig{}
+
+	for _, rule := range yml {
+		c := map[string]common.Config{}
+
+		for name, ruleYml := range rule {
+			ruleConfig, err := common.NewConfigFrom(ruleYml)
+			assert.Nil(t, err)
+
+			c[name] = *ruleConfig
+		}
+		config = append(config, c)
+
+	}
+
+	filters, err := filter.New(config)
+	assert.Nil(t, err)
+
+	return filters
+
+}
+
+func TestBadConfig(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"contains": map[string]string{
+					"proc.name": "test",
+				},
+				"fields": []string{"proc.cpu.total_p", "proc.mem", "dd"},
+			},
+			"drop_fields": map[string]interface{}{
+				"fields": []string{"proc.cpu"},
+			},
+		},
+	}
+
+	config := filter.FilterPluginConfig{}
+
+	for _, rule := range yml {
+		c := map[string]common.Config{}
+
+		for name, ruleYml := range rule {
+			ruleConfig, err := common.NewConfigFrom(ruleYml)
+			assert.Nil(t, err)
+
+			c[name] = *ruleConfig
+		}
+		config = append(config, c)
+	}
+
+	_, err := filter.New(config)
+	assert.NotNil(t, err)
+
+}
 
 func TestIncludeFields(t *testing.T) {
 
@@ -15,17 +79,18 @@ func TestIncludeFields(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	Filters := FilterList{}
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"contains": map[string]string{
+					"proc.name": "test",
+				},
+				"fields": []string{"proc.cpu.total_p", "proc.mem", "dd"},
+			},
+		},
+	}
 
-	rule, err := NewIncludeFields(IncludeFieldsConfig{
-		Fields: []string{"proc.cpu.total_p", "proc.mem", "dd"},
-		ConditionConfig: ConditionConfig{Contains: map[string]string{
-			"proc.name": "test",
-		}},
-	})
-	assert.True(t, err == nil)
-
-	Filters.Register(rule)
+	filters := GetFilters(t, yml)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -53,7 +118,7 @@ func TestIncludeFields(t *testing.T) {
 		"type": "process",
 	}
 
-	filteredEvent := Filters.Filter(event)
+	filteredEvent := filters.Filter(event)
 
 	expectedEvent := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -80,17 +145,18 @@ func TestIncludeFields1(t *testing.T) {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
 
-	Filters := FilterList{}
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"regexp": map[string]string{
+					"proc.cmdline": "launchd",
+				},
+				"fields": []string{"proc.cpu.total_add"},
+			},
+		},
+	}
 
-	rule, err := NewIncludeFields(IncludeFieldsConfig{
-		Fields: []string{"proc.cpu.total_ddd"},
-		ConditionConfig: ConditionConfig{Regexp: map[string]*regexp.Regexp{
-			"proc.cmdline": regexp.MustCompile("launchd"),
-		}},
-	})
-	assert.True(t, err == nil)
-
-	Filters.Register(rule)
+	filters := GetFilters(t, yml)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -118,7 +184,7 @@ func TestIncludeFields1(t *testing.T) {
 		"type": "process",
 	}
 
-	filteredEvent := Filters.Filter(event)
+	filteredEvent := filters.Filter(event)
 
 	expectedEvent := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -130,17 +196,18 @@ func TestIncludeFields1(t *testing.T) {
 
 func TestDropFields(t *testing.T) {
 
-	Filters := FilterList{}
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"drop_fields": map[string]interface{}{
+				"equals": map[string]string{
+					"beat.hostname": "mar",
+				},
+				"fields": []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"},
+			},
+		},
+	}
 
-	rule, err := NewDropFields(DropFieldsConfig{
-		Fields: []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"},
-		ConditionConfig: ConditionConfig{Equals: map[string]string{
-			"beat.hostname": "mar",
-		}},
-	})
-	assert.True(t, err == nil)
-
-	Filters.Register(rule)
+	filters := GetFilters(t, yml)
 
 	event := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -168,7 +235,7 @@ func TestDropFields(t *testing.T) {
 		"type": "process",
 	}
 
-	filteredEvent := Filters.Filter(event)
+	filteredEvent := filters.Filter(event)
 
 	expectedEvent := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -191,25 +258,24 @@ func TestMultipleIncludeFields(t *testing.T) {
 	if testing.Verbose() {
 		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
 	}
-	Filters := FilterList{}
 
-	rule, err := NewIncludeFields(IncludeFieldsConfig{
-		Fields: []string{"proc"},
-		ConditionConfig: ConditionConfig{Contains: map[string]string{
-			"beat.name": "my-shipper",
-		}},
-	})
-	assert.True(t, err == nil)
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"contains": map[string]string{
+					"beat.name": "my-shipper",
+				},
+				"fields": []string{"proc"},
+			},
+		},
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"fields": []string{"proc.cpu.start_time", "proc.cpu.total_p", "proc.mem.rss_p", "proc.cmdline"},
+			},
+		},
+	}
 
-	Filters.Register(rule)
-
-	rule, err = NewIncludeFields(IncludeFieldsConfig{
-		Fields: []string{"proc.cpu.start_time", "proc.cpu.total_p",
-			"proc.mem.rss_p", "proc.cmdline"},
-	})
-	assert.True(t, err == nil)
-
-	Filters.Register(rule)
+	filters := GetFilters(t, yml)
 
 	event1 := common.MapStr{
 		"@timestamp": "2016-01-24T18:35:19.308Z",
@@ -275,9 +341,175 @@ func TestMultipleIncludeFields(t *testing.T) {
 		"type":       "process",
 	}
 
-	actual1 := Filters.Filter(event1)
-	actual2 := Filters.Filter(event2)
+	actual1 := filters.Filter(event1)
+	actual2 := filters.Filter(event2)
 
 	assert.Equal(t, expected1, actual1)
 	assert.Equal(t, expected2, actual2)
+}
+
+func TestDropEvent(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"drop_event": map[string]interface{}{
+				"range": map[string]interface{}{
+					"proc.cpu.total_p": map[string]float64{
+						"lt": 0.5,
+					},
+				},
+			},
+		},
+	}
+
+	filters := GetFilters(t, yml)
+
+	event := common.MapStr{
+		"@timestamp": "2016-01-24T18:35:19.308Z",
+		"beat": common.MapStr{
+			"hostname": "mar",
+			"name":     "my-shipper-1",
+		},
+		"proc": common.MapStr{
+			"cpu": common.MapStr{
+				"start_time": "Jan14",
+				"system":     26027,
+				"total":      79390,
+				"total_p":    0,
+				"user":       53363,
+			},
+			"name":    "test-1",
+			"cmdline": "/sbin/launchd",
+			"mem": common.MapStr{
+				"rss":   11194368,
+				"rss_p": 0,
+				"share": 0,
+				"size":  2555572224,
+			},
+		},
+		"type": "process",
+	}
+
+	filteredEvent := filters.Filter(event)
+
+	assert.Nil(t, filteredEvent)
+}
+
+func TestEmptyCondition(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"drop_event": map[string]interface{}{},
+		},
+	}
+
+	filters := GetFilters(t, yml)
+
+	event := common.MapStr{
+		"@timestamp": "2016-01-24T18:35:19.308Z",
+		"beat": common.MapStr{
+			"hostname": "mar",
+			"name":     "my-shipper-1",
+		},
+		"proc": common.MapStr{
+			"cpu": common.MapStr{
+				"start_time": "Jan14",
+				"system":     26027,
+				"total":      79390,
+				"total_p":    0,
+				"user":       53363,
+			},
+			"name":    "test-1",
+			"cmdline": "/sbin/launchd",
+			"mem": common.MapStr{
+				"rss":   11194368,
+				"rss_p": 0,
+				"share": 0,
+				"size":  2555572224,
+			},
+		},
+		"type": "process",
+	}
+
+	filteredEvent := filters.Filter(event)
+
+	assert.Nil(t, filteredEvent)
+}
+
+func TestBadCondition(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"drop_event": map[string]interface{}{
+				"equal": map[string]string{
+					"type": "process",
+				},
+			},
+		},
+	}
+
+	config := filter.FilterPluginConfig{}
+
+	for _, rule := range yml {
+		c := map[string]common.Config{}
+
+		for name, ruleYml := range rule {
+			ruleConfig, err := common.NewConfigFrom(ruleYml)
+			assert.Nil(t, err)
+
+			c[name] = *ruleConfig
+		}
+		config = append(config, c)
+	}
+
+	_, err := filter.New(config)
+	assert.NotNil(t, err)
+
+}
+
+func TestMissingFields(t *testing.T) {
+
+	if testing.Verbose() {
+		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
+	}
+
+	yml := []map[string]interface{}{
+		map[string]interface{}{
+			"include_fields": map[string]interface{}{
+				"equals": map[string]string{
+					"type": "process",
+				},
+			},
+		},
+	}
+
+	config := filter.FilterPluginConfig{}
+
+	for _, rule := range yml {
+		c := map[string]common.Config{}
+
+		for name, ruleYml := range rule {
+			ruleConfig, err := common.NewConfigFrom(ruleYml)
+			assert.Nil(t, err)
+
+			c[name] = *ruleConfig
+		}
+		config = append(config, c)
+	}
+
+	_, err := filter.New(config)
+	assert.NotNil(t, err)
+
 }
