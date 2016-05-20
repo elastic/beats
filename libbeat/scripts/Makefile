@@ -284,3 +284,5 @@ install-home:
 		install -m 755  ../dev-tools/import_dashboards.sh ${HOME_PREFIX}/kibana/; \
 		install -m 755 ../dev-tools/import_dashboards.ps1 ${HOME_PREFIX}/kibana/; \
 	fi
+	install -d -m 755 ${HOME_PREFIX}/scripts/
+	install -m 755 ../libbeat/scripts/migrate_beat_config_1_x_to_5_0.py ${HOME_PREFIX}/scripts/
