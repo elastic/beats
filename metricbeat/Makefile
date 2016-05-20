@@ -48,3 +48,18 @@ before-build:
 # Runs all collection steps and updates afterwards
 .PHONY: collect
 collect: kibana fields docs configs update
+
+# Import a module from a metricbeat repository
+import:
+
+	mkdir -p build/modules/$(shell basename https://github.com/ruflin/countbeat)
+
+	# Clone remote repo
+	git clone https://github.com/ruflin/countbeat build/modules/$(shell basename https://github.com/ruflin/countbeat)
+
+	# Copy modules to metricbeat
+	cp -r build/modules/$(shell basename https://github.com/ruflin/countbeat)/module/* module/
+
+	# Collect new dependencies
+	make collect
+
