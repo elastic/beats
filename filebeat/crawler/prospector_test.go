@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/input"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/stretchr/testify/assert"
 )
@@ -40,6 +41,7 @@ func TestProspectorInitInputTypeLog(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig,
+		states: input.NewStates(),
 	}
 
 	err := prospector.Init()
@@ -91,6 +93,7 @@ func TestProspectorInitInputTypeWrong(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig,
+		states: input.NewStates(),
 	}
 
 	err := prospector.Init()
@@ -109,6 +112,7 @@ func TestProspectorFileExclude(t *testing.T) {
 
 	prospector := Prospector{
 		config: prospectorConfig,
+		states: input.NewStates(),
 	}
 
 	prospector.Init()
