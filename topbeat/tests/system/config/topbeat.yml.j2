@@ -14,10 +14,12 @@ topbeat:
 
   # Statistics to collect (all enabled by default)
   stats:
-    system: {{ "false" if system_stats == false else "true" }}
-    process: {{ "false" if process_stats == false else "true" }}
-    filesystem: {{ "false" if filesystem_stats == false else "true" }}
-    cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
+    system: {{ system_stats|default("true") }}
+    process: {{ process_stats|default("true") }}
+    filesystem: {{ filesystem_stats|default("true") }}
+    cpu_per_core: {{ cpu_per_core|default("false") }}
+    cpu_ticks: {{ cpu_ticks|default("false") }}
+    cpu_ticks_per_proc: {{ cpu_ticks_per_proc|default("false") }}
 
 ############################# Output ##########################################
 

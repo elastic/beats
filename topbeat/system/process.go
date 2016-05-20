@@ -26,10 +26,11 @@ type Process struct {
 }
 
 type ProcStats struct {
-	ProcStats bool
-	Procs     []string
-	regexps   []*regexp.Regexp
-	ProcsMap  ProcsMap
+	ProcStats       bool
+	Procs           []string
+	regexps         []*regexp.Regexp
+	ProcsMap        ProcsMap
+	CpuTicksPerProc bool
 }
 
 // newProcess creates a new Process object based on the state information.
@@ -88,7 +89,7 @@ func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
 			logp.Warn("Getting memory details: %v", err)
 			return 0
 		}
-		total_phymem = memStat.Mem.Total
+		total_phymem = memStat.Total
 	}
 
 	perc := (float64(proc.Mem.Resident) / float64(total_phymem))
@@ -123,7 +124,7 @@ func getProcState(b byte) string {
 	return "unknown"
 }
 
-func GetProcessEvent(process *Process, last *Process) common.MapStr {
+func (procStats *ProcStats) GetProcessEvent(process *Process, last *Process) common.MapStr {
 	proc := common.MapStr{
 		"pid":      process.Pid,
 		"ppid":     process.Ppid,
@@ -136,17 +137,25 @@ func GetProcessEvent(process *Process, last *Process) common.MapStr {
 			"rss_p": GetProcMemPercentage(process, 0 /* read total mem usage */),
 			"share": process.Mem.Share,
 		},
-		"cpu": common.MapStr{
+	}
+
+	if process.CmdLine != "" {
+		proc["cmdline"] = process.CmdLine
+	}
+
+	if procStats.CpuTicksPerProc {
+		proc["cpu"] = common.MapStr{
 			"user":       process.Cpu.User,
 			"system":     process.Cpu.Sys,
 			"total":      process.Cpu.Total,
 			"total_p":    GetProcCpuPercentage(last, process),
 			"start_time": process.Cpu.FormatStartTime(),
-		},
-	}
-
-	if process.CmdLine != "" {
-		proc["cmdline"] = process.CmdLine
+		}
+	} else {
+		proc["cpu"] = common.MapStr{
+			"total_p":    GetProcCpuPercentage(last, process),
+			"start_time": process.Cpu.FormatStartTime(),
+		}
 	}
 
 	return proc
@@ -251,7 +260,7 @@ func (procStats *ProcStats) GetProcStats() ([]common.MapStr, error) {
 			newProcs[process.Pid] = process
 
 			last, _ := procStats.ProcsMap[process.Pid]
-			proc := GetProcessEvent(process, last)
+			proc := procStats.GetProcessEvent(process, last)
 
 			processes = append(processes, proc)
 		}

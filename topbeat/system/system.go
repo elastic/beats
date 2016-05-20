@@ -5,21 +5,10 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
-type SwapStat struct {
-	sigar.Swap
-	UsedPercent float64 `json:"used_p"`
-}
-
 type SystemLoad struct {
 	Load1  float64 `json:"load1"`
 	Load5  float64 `json:"load5"`
 	Load15 float64 `json:"load15"`
-}
-
-type MemStat struct {
-	sigar.Mem
-	UsedPercent       float64 `json:"used_p"`
-	ActualUsedPercent float64 `json:"actual_used_p"`
 }
 
 func GetSystemLoad() (*SystemLoad, error) {
@@ -37,7 +26,7 @@ func GetSystemLoad() (*SystemLoad, error) {
 	}, nil
 }
 
-func GetMemory() (*MemStat, error) {
+func GetMemory() (*sigar.Mem, error) {
 
 	mem := sigar.Mem{}
 	err := mem.Get()
@@ -45,22 +34,24 @@ func GetMemory() (*MemStat, error) {
 		return nil, err
 	}
 
-	return &MemStat{Mem: mem}, nil
+	return &mem, nil
 }
 
-func GetMemoryEvent(memStat *MemStat) common.MapStr {
-	return common.MapStr{
-		"total":         memStat.Total,
-		"used":          memStat.Used,
-		"free":          memStat.Free,
-		"actual_used":   memStat.ActualUsed,
-		"actual_free":   memStat.ActualFree,
-		"used_p":        memStat.UsedPercent,
-		"actual_used_p": memStat.ActualUsedPercent,
-	}
+func GetMemoryEvent(memStat *sigar.Mem) common.MapStr {
+
+	stats := getMemPercentage(memStat)
+
+	return common.MapStrUnion(stats,
+		common.MapStr{
+			"total":       memStat.Total,
+			"used":        memStat.Used,
+			"free":        memStat.Free,
+			"actual_used": memStat.ActualUsed,
+			"actual_free": memStat.ActualFree,
+		})
 }
 
-func GetSwap() (*SwapStat, error) {
+func GetSwap() (*sigar.Swap, error) {
 
 	swap := sigar.Swap{}
 	err := swap.Get()
@@ -68,37 +59,49 @@ func GetSwap() (*SwapStat, error) {
 		return nil, err
 	}
 
-	return &SwapStat{Swap: swap}, nil
+	return &swap, nil
 
 }
 
-func GetSwapEvent(swapStat *SwapStat) common.MapStr {
+func GetSwapEvent(swapStat *sigar.Swap) common.MapStr {
+	stats := getSwapPercentage(swapStat)
+
+	return common.MapStrUnion(stats,
+		common.MapStr{
+			"total": swapStat.Total,
+			"used":  swapStat.Used,
+			"free":  swapStat.Free,
+		})
+}
+
+func getMemPercentage(m *sigar.Mem) common.MapStr {
+
+	if m.Total == 0 {
+		return common.MapStr{
+			"used_p":        0.0,
+			"actual_used_p": 0.0,
+		}
+	}
+
+	used_p := float64(m.Used) / float64(m.Total)
+	actual_used_p := float64(m.ActualUsed) / float64(m.Total)
+
 	return common.MapStr{
-		"total":  swapStat.Total,
-		"used":   swapStat.Used,
-		"free":   swapStat.Free,
-		"used_p": swapStat.UsedPercent,
+		"used_p":        Round(used_p, .5, 4),
+		"actual_used_p": Round(actual_used_p, .5, 4),
 	}
 }
 
-func AddMemPercentage(m *MemStat) {
+func getSwapPercentage(s *sigar.Swap) common.MapStr {
 
-	if m.Mem.Total == 0 {
-		return
+	if s.Total == 0 {
+		return common.MapStr{
+			"used_p": 0.0,
+		}
 	}
 
-	perc := float64(m.Mem.Used) / float64(m.Mem.Total)
-	m.UsedPercent = Round(perc, .5, 4)
-
-	actual_perc := float64(m.Mem.ActualUsed) / float64(m.Mem.Total)
-	m.ActualUsedPercent = Round(actual_perc, .5, 4)
-}
-
-func AddSwapPercentage(s *SwapStat) {
-	if s.Swap.Total == 0 {
-		return
+	perc := float64(s.Used) / float64(s.Total)
+	return common.MapStr{
+		"used_p": Round(perc, .5, 4),
 	}
-
-	perc := float64(s.Swap.Used) / float64(s.Swap.Total)
-	s.UsedPercent = Round(perc, .5, 4)
 }
