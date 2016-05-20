@@ -4,10 +4,10 @@
         "hostname":"ruflin",
         "name":"ruflin"
     },
-    "metricset":"cores",
+    "metricset":"core",
     "module":"system",
     "rtt":135,
-    "system-cores":{
+    "system-core":{
         "core":0,
         "idle":26880742,
         "iowait":0,

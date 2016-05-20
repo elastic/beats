@@ -587,7 +587,7 @@
         },
         "system": {
           "properties": {
-            "cores": {
+            "core": {
               "properties": {
                 "core": {
                   "type": "integer"

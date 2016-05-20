@@ -17,7 +17,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
 	_ "github.com/elastic/beats/metricbeat/module/system"
-	_ "github.com/elastic/beats/metricbeat/module/system/cores"
+	_ "github.com/elastic/beats/metricbeat/module/system/core"
 	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
 	_ "github.com/elastic/beats/metricbeat/module/system/disk"
 	_ "github.com/elastic/beats/metricbeat/module/system/filesystem"
