@@ -1,139 +1,111 @@
-############################# Filebeat ######################################
-filebeat:
-  prospectors:
-    {% if prospectors is not defined %}
-    {% set prospectors = true %}
-    {% endif %}
-    {% if prospectors %}
-    - input_type: {{input_type | default("log") }}
-      # Paths that should be crawled and fetched
-      {% if path %}paths:
-        - {{ path }}{% endif %}
-      # Type of the files. Annotated in every documented
-      scan_frequency: {{scan_frequency | default("0.1s") }}
-      ignore_older: {{ignoreOlder}}
-      close_older: {{closeOlder}}
-      harvester_buffer_size:
-      encoding: {{encoding | default("utf-8") }}
-      tail_files: {{tailFiles}}
-      backoff: 0.1s
-      backoff_factor: 1
-      max_backoff: 0.1s
-      force_close_files: {{force_close_files}}
+###################### Filebeat Config Template ###############################
 
-      {% if fields %}
-      fields:
-      {% for k,v in fields.items() %}
-        {{k}}: {{v}}
-      {% endfor %}
-      {% endif %}
+filebeat.prospectors:
+{% if prospectors is not defined %}
+{% set prospectors = true %}
+{% endif %}
+{% if prospectors %}
+- input_type: {{input_type | default("log") }}
+  # Paths that should be crawled and fetched
+  {% if path %}paths:
+    - {{ path }}{% endif %}
+  # Type of the files. Annotated in every documented
+  scan_frequency: {{scan_frequency | default("0.1s") }}
+  ignore_older: {{ignoreOlder}}
+  close_older: {{closeOlder}}
+  harvester_buffer_size:
+  encoding: {{encoding | default("utf-8") }}
+  tail_files: {{tailFiles}}
+  backoff: 0.1s
+  backoff_factor: 1
+  max_backoff: 0.1s
+  force_close_files: {{force_close_files}}
 
-      fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
+  {% if fields %}
+  fields:
+  {% for k,v in fields.items() %}
+    {{k}}: {{v}}
+  {% endfor %}
+  {% endif %}
 
-      {% if include_lines %}
-      include_lines: {{include_lines}}
-      {% endif %}
+  fields_under_root: {{"true" if fieldsUnderRoot else "false"}}
 
-      {% if exclude_lines %}
-      exclude_lines: {{exclude_lines}}
-      {% endif %}
+  {% if include_lines %}
+  include_lines: {{include_lines}}
+  {% endif %}
 
-      {% if exclude_files %}
-      exclude_files: {{exclude_files}}
-      {% endif %}
+  {% if exclude_lines %}
+  exclude_lines: {{exclude_lines}}
+  {% endif %}
 
-      max_bytes: {{ max_bytes|default(10485760) }}
+  {% if exclude_files %}
+  exclude_files: {{exclude_files}}
+  {% endif %}
 
-      {% if json %}
-      json:
-        {% if json.message_key %}message_key: {{json.message_key}}{% endif %}
-        {% if json.keys_under_root %}keys_under_root: true{% endif %}
-        {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
-        {% if json.add_error_key %}add_error_key: true{% endif %}
-      {% endif %}
+  max_bytes: {{ max_bytes|default(10485760) }}
 
-      {% if multiline %}
-      multiline:
-        pattern: {{pattern}}
-        negate: {{negate}}
-        match: {{match}}
-        timeout: 1s
-        max_lines: {{ max_lines|default(500) }}
-      {% endif %}
-    {% endif %}
-  spool_size:
-  idle_timeout: 0.1s
-  {% if not skip_registry_config %}
-  registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
-  {%endif%}
+  {% if json %}
+  json:
+    {% if json.message_key %}message_key: {{json.message_key}}{% endif %}
+    {% if json.keys_under_root %}keys_under_root: true{% endif %}
+    {% if json.overwrite_keys %}overwrite_keys: true{% endif %}
+    {% if json.add_error_key %}add_error_key: true{% endif %}
+  {% endif %}
+
+  {% if multiline %}
+  multiline:
+    pattern: {{pattern}}
+    negate: {{negate}}
+    match: {{match}}
+    timeout: 1s
+    max_lines: {{ max_lines|default(500) }}
+  {% endif %}
+{% endif %}
+
+filebeat.spool_size:
+filebeat.idle_timeout: 0.1s
+{% if not skip_registry_config %}
+filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+{%endif%}
 
 
-############################# Shipper ############################################
+#================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
 # If this options is not defined, the hostname is used.
-name: {{shipperName}}
+name: {{shipper_name}}
 
 # The tags of the shipper are included in their own field with each
 # transaction published. Tags make it easy to group servers by different
 # logical properties.
 tags: [
-{%- if agent_tags -%}
-	{%- for tag in agent_tags -%}
-		"{{ tag }}"
-		{%- if not loop.last %}, {% endif -%}
-	{%- endfor -%}
-{%- endif -%}]
-
+  {%- if agent_tags -%}
+      {%- for tag in agent_tags -%}
+          "{{ tag }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  {%- endif -%}
+]
 
 # Uncomment the following if you want to ignore transactions created
 # by the server on which the shipper is installed. This option is useful
 # to remove duplicates if shippers are installed on multiple servers.
 # ignore_outgoing: true
 
+{% if geoip_paths is not none %}
+geoip:
+  paths: [
+      {%- for path in geoip_paths -%}
+          "{{ beat.working_dir + '/' + path }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
 
-############################# Output ############################################
-
-# Configure what outputs to use when sending the data collected by filebeat.
-# You can enable one or multiple outputs by setting enabled option to true.
-output:
-
-  # Elasticsearch as output
-  # Options:
-  # host, port: where Elasticsearch is listening on
-  # save_topology: specify if the topology is saved in Elasticsearch
-  #elasticsearch:
-  #  enabled: false
-  #  host: localhost
-  #  port: 9200
-  #  save_topology: true
-
-  # Redis as output
-  # Options:
-  # host, port: where Redis is listening on
-  # save_topology: specify if the topology is saved in Redis
-  #redis:
-  #  enabled: false
-  #  host: localhost
-  #  port: 6379
-  #  save_topology: true
-
-  # File as output
-  # Options
-  # path: where to save the files
-  # filename: name of the files
-  # rotate_every_kb: maximum size of the files in path
-  # number of files: maximum number of files in path
-  file:
-    enabled: true
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
-    filename: "{{ output_file_filename|default("filebeat") }}"
-    rotate_every_kb: 1000
-    number_of_files: 2
-
-############################# Filters #########################################
 {%- if drop_fields or drop_event or include_fields %}
+
+#================================ Filters =====================================
 filters:
 
     {%- if include_fields %}
@@ -156,9 +128,20 @@ filters:
 
 {%- endif %}
 
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#------------------------------- File output ----------------------------------
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("filebeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7
+
 {% if path_data %}
+#================================ Paths =====================================
 path:
   data: {{path_data}}
 {%endif%}
-
-# vim: set ft=jinja:

@@ -1,122 +1,97 @@
 ################### Topbeat Configuration Example #########################
 
 ############################# Topbeat ############################################
-topbeat:
-  # In seconds, defines how often to read server statistics
-  period: {{ period | default(1) }}
+# In seconds, defines how often to read server statistics
+topbeat.period: {{ period | default(1) }}
 
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [
-    {%- for proc_pattern in proc_patterns|default([".*"]) -%}
-        "{{ proc_pattern}}" {%- if not loop.last %}, {% endif -%}
-    {%- endfor %}]
+# Regular expression to match the processes that are monitored
+# By default, all the processes are monitored
+topbeat.procs: [
+{%- for proc_pattern in proc_patterns|default([".*"]) -%}
+    "{{ proc_pattern}}" {%- if not loop.last %}, {% endif -%}
+{%- endfor %}]
 
-  # Statistics to collect (all enabled by default)
-  stats:
-    system: {{ "false" if system_stats == false else "true" }}
-    process: {{ "false" if process_stats == false else "true" }}
-    filesystem: {{ "false" if filesystem_stats == false else "true" }}
-    cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
-
-############################# Output ##########################################
-
-# Configure what outputs to use when sending the data collected by the beat.
-# You can enable one or multiple outputs by setting enabled option to true.
-output:
-
-  ### File as output
-  file:
-    # Enabling file output
-    enabled: true
-
-    # Path to the directory where to save the generated files. The option is mandatory.
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
+# Statistics to collect (all enabled by default)
+topbeat.stats:
+  system: {{ "false" if system_stats == false else "true" }}
+  process: {{ "false" if process_stats == false else "true" }}
+  filesystem: {{ "false" if filesystem_stats == false else "true" }}
+  cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
 
 
-    # Name of the generated files. The default is `topbeat` and it generates
-    # files: `topbeat`, `topbeat.1`, `topbeat.2`, etc.
-    filename: "{{ output_file_filename|default("topbeat") }}"
-
-    # Maximum size in kilobytes of each file. When this size is reached, the files are
-    # rotated. The default value is 10 MB.
-    #rotate_every_kb: 10000
-
-    # Maximum number of files under path. When this number of files is reached, the
-    # oldest file is deleted and the rest are shifted from last to first. The default
-    # is 7 files.
-    #number_of_files: 7
-
-
-
-############################# Shipper #########################################
+#================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
 # If this options is not defined, the hostname is used.
-#name:
+name: {{shipper_name}}
 
 # The tags of the shipper are included in their own field with each
 # transaction published. Tags make it easy to group servers by different
 # logical properties.
-#tags: ["service-X", "web-tier"]
+tags: [
+  {%- if agent_tags -%}
+      {%- for tag in agent_tags -%}
+          "{{ tag }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  {%- endif -%}
+]
 
 # Uncomment the following if you want to ignore transactions created
 # by the server on which the shipper is installed. This option is useful
 # to remove duplicates if shippers are installed on multiple servers.
-#ignore_outgoing: true
+# ignore_outgoing: true
 
+{% if geoip_paths is not none %}
+geoip:
+  paths: [
+      {%- for path in geoip_paths -%}
+          "{{ beat.working_dir + '/' + path }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
 
-############################# Logging #########################################
+{%- if drop_fields or drop_event or include_fields %}
 
-#logging:
-  # Send all logging output to syslog. On Windows default is false, otherwise
-  # default is true.
-  #to_syslog: true
-
-  # Write all logging output to files. Beats automatically rotate files if configurable
-  # limit is reached.
-  #to_files: false
-
-  # Enable debug output for selected components.
-  #selectors: []
-
-  # Set log level
-  #level: error
-
-  #files:
-    # The directory where the log files will written to.
-    #path: /var/log/mybeat
-
-    # The name of the files where the logs are written to.
-    #name: mybeat
-
-    # Configure log file size limit. If limit is reached, log file will be
-    # automatically rotated
-    #rotateeverybytes: 10485760 # = 10MB
-
-    # Number of rotated log files to keep. Oldest files will be deleted first.
-    #keepfiles: 7
-
-############################# Filters #########################################
-
-{%- if include_fields or drop_fields or drop_event %}
+#================================ Filters =====================================
 filters:
 
     {%- if include_fields %}
     - include_fields:
-        {{ include_fields.condition | default() }}
-        fields: {{ include_fields.fields }}
+        {{include_fields.condition | default()}}
+        fields: {{include_fields.fields | default([])}}
     {%- endif %}
 
     {%- if drop_fields %}
     - drop_fields:
-        {{ drop_fields.condition | default() }}
-        fields: {{ drop_fields.fields | default([]) }}
+        {{drop_fields.condition | default()}}
+        fields: {{drop_fields.fields | default([])}}
     {%- endif %}
+
 
     {%- if drop_event %}
     - drop_event:
-        {{ drop_event.condition | default() }}
+        {{ drop_event.condition | default()}}
     {%- endif %}
+
 {%- endif %}
+
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#------------------------------- File output ----------------------------------
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("topbeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7
+
+{% if path_data %}
+#================================ Paths =====================================
+path:
+  data: {{path_data}}
+{%endif%}

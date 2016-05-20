@@ -18,7 +18,9 @@ class Test(BaseTest):
             filesystem_stats=True
         )
         topbeat = self.start_beat()
-        self.wait_until(lambda: self.log_contains(msg="output worker: publish"))
+        self.wait_until(
+            lambda: self.output_count(lambda x: x >= 1),
+            max_timeout=15)
         topbeat.check_kill_and_wait()
 
         output = self.read_output()[0]

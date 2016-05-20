@@ -1,52 +1,51 @@
-###############################################################################
 ############################# Winlogbeat ######################################
-winlogbeat:
-  {%- if event_logs %}
-  event_logs:
-    {% for log in event_logs -%}
-    - name: {{ log.name }}
-      {%- if log.api is defined %}
-      api: {{ log.api }}
-      {% endif %}
-      {%- if log.ignore_older is defined %}
-      ignore_older: {{ log.ignore_older }}
-      {% endif %}
-      {%- if log.event_id is defined %}
-      event_id: {{ log.event_id }}
-      {% endif %}
-      {%- if log.level is defined %}
-      level: {{ log.level }}
-      {% endif %}
-      {%- if log.provider %}
-      provider:
-        {% for p in log.provider -%}
-        - {{ p }}
-        {% endfor -%}
-      {% endif -%}
-      {%- if log.include_message is defined %}
-      include_message: {{ log.include_message }}
-      {% endif %}
-      {%- if log.include_xml is defined %}
-      include_xml: {{ log.include_xml }}
-      {% endif %}
-      {%- if log.tags is defined %}
-      tags:
-        {% for tag in log.tags -%}
-        - {{ tag }}
-        {% endfor -%}
-      {% endif -%}
-      {%- if log.fields is defined %}
-      {% if log.fields_under_root %}fields_under_root: true{% endif %}
-      fields:
-        {% for k, v in log.fields.items() -%}
-        {{ k }}: {{ v }}
-        {% endfor -%}
-      {% endif %}
-      {%- if log.invalid is defined %}
-      invalid: {{ log.invalid }}
-      {% endif %}
-    {% endfor -%}
-  {% endif %}
+
+{%- if event_logs %}
+winlogbeat.event_logs:
+  {% for log in event_logs -%}
+  - name: {{ log.name }}
+    {%- if log.api is defined %}
+    api: {{ log.api }}
+    {% endif %}
+    {%- if log.ignore_older is defined %}
+    ignore_older: {{ log.ignore_older }}
+    {% endif %}
+    {%- if log.event_id is defined %}
+    event_id: {{ log.event_id }}
+    {% endif %}
+    {%- if log.level is defined %}
+    level: {{ log.level }}
+    {% endif %}
+    {%- if log.provider %}
+    provider:
+      {% for p in log.provider -%}
+      - {{ p }}
+      {% endfor -%}
+    {% endif -%}
+    {%- if log.include_message is defined %}
+    include_message: {{ log.include_message }}
+    {% endif %}
+    {%- if log.include_xml is defined %}
+    include_xml: {{ log.include_xml }}
+    {% endif %}
+    {%- if log.tags is defined %}
+    tags:
+      {% for tag in log.tags -%}
+      - {{ tag }}
+      {% endfor -%}
+    {% endif -%}
+    {%- if log.fields is defined %}
+    {% if log.fields_under_root %}fields_under_root: true{% endif %}
+    fields:
+      {% for k, v in log.fields.items() -%}
+      {{ k }}: {{ v }}
+      {% endfor -%}
+    {% endif %}
+    {%- if log.invalid is defined %}
+    invalid: {{ log.invalid }}
+    {% endif %}
+  {% endfor -%}
+{% endif %}
 
 ###############################################################################
 ############################# Libbeat Config ##################################
@@ -54,16 +53,11 @@ winlogbeat:
 
 ############################# Output ##########################################
 
-output:
-  file:
-    path: {{ output_file_path | default(beat.working_dir + "/output") }}
-    {% if output_file_filename %}
-    filename: "{{ output_file_filename }}"
-    {% endif %}
-    rotate_every_kb: 1000
+#================================ General =====================================
 
-############################# Shipper #########################################
-
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
 {%- if shipper_name %}
 name: {{ shipper_name }}
 {% endif %}
@@ -83,4 +77,16 @@ fields:
   {% endfor -%}
 {% endif %}
 
-# vim: set ft=jinja:
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#------------------------------- File output ----------------------------------
+output.file:
+  path: {{ output_file_path | default(beat.working_dir + "/output") }}
+  {% if output_file_filename %}
+  filename: "{{ output_file_filename }}"
+  {% endif %}
+  rotate_every_kb: 1000
+
