@@ -24,46 +24,47 @@
           "properties": {
             "status": {
               "properties": {
-                "busyWorkers": {
-                  "type": "integer"
-                },
-                "bytesPerReq": {
+                "bytes_per_request": {
                   "type": "float"
                 },
-                "bytesPerSec": {
+                "bytes_per_sec": {
                   "type": "float"
                 },
                 "connections": {
                   "properties": {
-                    "connsAsyncClosing": {
-                      "type": "integer"
+                    "async": {
+                      "properties": {
+                        "closing": {
+                          "type": "integer"
+                        },
+                        "keep_alive": {
+                          "type": "integer"
+                        },
+                        "writing": {
+                          "type": "integer"
+                        }
+                      }
                     },
-                    "connsAsyncKeepAlive": {
-                      "type": "integer"
-                    },
-                    "connsAsyncWriting": {
-                      "type": "integer"
-                    },
-                    "connsTotal": {
+                    "total": {
                       "type": "integer"
                     }
                   }
                 },
                 "cpu": {
                   "properties": {
-                    "cpuChildrenSystem": {
+                    "children_system": {
                       "type": "float"
                     },
-                    "cpuChildrenUser": {
+                    "children_user": {
                       "type": "float"
                     },
-                    "cpuLoad": {
+                    "load": {
                       "type": "float"
                     },
-                    "cpuSystem": {
+                    "system": {
                       "type": "float"
                     },
-                    "cpuUser": {
+                    "user": {
                       "type": "float"
                     }
                   }
@@ -72,37 +73,34 @@
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
-                "idleWorkers": {
-                  "type": "integer"
-                },
                 "load": {
                   "properties": {
-                    "load1": {
+                    "1": {
                       "type": "float"
                     },
-                    "load15": {
+                    "15": {
                       "type": "float"
                     },
-                    "load5": {
+                    "5": {
                       "type": "float"
                     }
                   }
                 },
-                "reqPerSec": {
+                "requests_per_sec": {
                   "type": "float"
                 },
                 "scoreboard": {
                   "properties": {
-                    "closingConnection": {
+                    "closing_connection": {
                       "type": "integer"
                     },
-                    "dnsLookup": {
+                    "dns_lookup": {
                       "type": "integer"
                     },
-                    "gracefullyFinishing": {
+                    "gracefully_finishing": {
                       "type": "integer"
                     },
-                    "idleCleanup": {
+                    "idle_cleanup": {
                       "type": "integer"
                     },
                     "keepalive": {
@@ -111,38 +109,48 @@
                     "logging": {
                       "type": "integer"
                     },
-                    "openSlot": {
+                    "open_slot": {
                       "type": "integer"
                     },
-                    "readingRequest": {
+                    "reading_request": {
                       "type": "integer"
                     },
-                    "sendingReply": {
+                    "sending_reply": {
                       "type": "integer"
                     },
-                    "startingUp": {
+                    "starting_up": {
                       "type": "integer"
                     },
                     "total": {
                       "type": "integer"
                     },
-                    "waitingForConnection": {
+                    "waiting_for_connection": {
                       "type": "integer"
                     }
                   }
                 },
-                "totalAccesses": {
+                "total_accesses": {
                   "type": "integer"
                 },
-                "totalKBytes": {
+                "total_kbytes": {
                   "type": "integer"
                 },
                 "uptime": {
                   "properties": {
-                    "serverUptimeSeconds": {
+                    "server_uptime": {
                       "type": "integer"
                     },
                     "uptime": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "workers": {
+                  "properties": {
+                    "busy": {
+                      "type": "integer"
+                    },
+                    "idle": {
                       "type": "integer"
                     }
                   }

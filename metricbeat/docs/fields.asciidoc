@@ -44,49 +44,49 @@ type: keyword
 Apache hostname.
 
 
-==== apache.status.totalAccesses
+==== apache.status.total_accesses
 
 type: integer
 
 Total number of access requests.
 
 
-==== apache.status.totalKBytes
+==== apache.status.total_kbytes
 
 type: integer
 
 Total number of kilobytes served.
 
 
-==== apache.status.reqPerSec
+==== apache.status.requests_per_sec
 
 type: float
 
 Requests per second.
 
 
-==== apache.status.bytesPerSec
+==== apache.status.bytes_per_sec
 
 type: float
 
 Bytes per second.
 
 
-==== apache.status.bytesPerReq
+==== apache.status.bytes_per_request
 
 type: float
 
 Bytes per request.
 
 
-==== apache.status.busyWorkers
+==== apache.status.workers.busy
 
 type: integer
 
 Number of busy workers.
 
 
-==== apache.status.idleWorkers
+==== apache.status.workers.idle
 
 type: integer
 
@@ -99,7 +99,7 @@ Uptime stats.
 
 
 
-==== apache.status.uptime.serverUptimeSeconds
+==== apache.status.uptime.server_uptime
 
 type: integer
 
@@ -119,35 +119,35 @@ CPU stats.
 
 
 
-==== apache.status.cpu.cpuLoad
+==== apache.status.cpu.load
 
 type: float
 
 CPU Load.
 
 
-==== apache.status.cpu.cpuUser
+==== apache.status.cpu.user
 
 type: float
 
 CPU user load.
 
 
-==== apache.status.cpu.cpuSystem
+==== apache.status.cpu.system
 
 type: float
 
 System cpu.
 
 
-==== apache.status.cpu.cpuChildrenUser
+==== apache.status.cpu.children_user
 
 type: float
 
 CPU of children user.
 
 
-==== apache.status.cpu.cpuChildrenSystem
+==== apache.status.cpu.children_system
 
 type: float
 
@@ -160,28 +160,28 @@ Connection stats.
 
 
 
-==== apache.status.connections.connsTotal
+==== apache.status.connections.total
 
 type: integer
 
 Total connections.
 
 
-==== apache.status.connections.connsAsyncWriting
+==== apache.status.connections.async.writing
 
 type: integer
 
 Async connection writing.
 
 
-==== apache.status.connections.connsAsyncKeepAlive
+==== apache.status.connections.async.keep_alive
 
 type: integer
 
 Async keeped alive connections.
 
 
-==== apache.status.connections.connsAsyncClosing
+==== apache.status.connections.async.closing
 
 type: integer
 
@@ -194,21 +194,21 @@ Load averages.
 
 
 
-==== apache.status.load.load1
+==== apache.status.load.1
 
 type: float
 
 Load average for the last minute.
 
 
-==== apache.status.load.load5
+==== apache.status.load.5
 
 type: float
 
 Load average for the last 5 minutes.
 
 
-==== apache.status.load.load15
+==== apache.status.load.15
 
 type: float
 
@@ -221,21 +221,21 @@ Scoreboard metrics.
 
 
 
-==== apache.status.scoreboard.startingUp
+==== apache.status.scoreboard.starting_up
 
 type: integer
 
 Starting up.
 
 
-==== apache.status.scoreboard.readingRequest
+==== apache.status.scoreboard.reading_request
 
 type: integer
 
 Reading requests.
 
 
-==== apache.status.scoreboard.sendingReply
+==== apache.status.scoreboard.sending_reply
 
 type: integer
 
@@ -249,14 +249,14 @@ type: integer
 Keep alive.
 
 
-==== apache.status.scoreboard.dnsLookup
+==== apache.status.scoreboard.dns_lookup
 
 type: integer
 
 Dns Lookups.
 
 
-==== apache.status.scoreboard.closingConnection
+==== apache.status.scoreboard.closing_connection
 
 type: integer
 
@@ -270,28 +270,28 @@ type: integer
 Logging
 
 
-==== apache.status.scoreboard.gracefullyFinishing
+==== apache.status.scoreboard.gracefully_finishing
 
 type: integer
 
 Gracefully finishing.
 
 
-==== apache.status.scoreboard.idleCleanup
+==== apache.status.scoreboard.idle_cleanup
 
 type: integer
 
 Idle cleanups
 
 
-==== apache.status.scoreboard.openSlot
+==== apache.status.scoreboard.open_slot
 
 type: integer
 
 Open slots.
 
 
-==== apache.status.scoreboard.waitingForConnection
+==== apache.status.scoreboard.waiting_for_connection
 
 type: integer
 

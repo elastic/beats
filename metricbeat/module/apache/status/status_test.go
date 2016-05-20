@@ -74,51 +74,54 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
-	assert.Equal(t, 1, event["busyWorkers"])
-	assert.Equal(t, 386.299, event["bytesPerReq"])
-	assert.Equal(t, .0628293, event["bytesPerSec"])
+	assert.Equal(t, 386.299, event["bytes_per_request"])
+	assert.Equal(t, .0628293, event["bytes_per_sec"])
+
+	workers := event["workers"].(common.MapStr)
+	assert.Equal(t, 1, workers["busy"])
+	assert.Equal(t, 99, workers["idle"])
 
 	connections := event["connections"].(common.MapStr)
-	assert.Equal(t, 3, connections["connsAsyncClosing"])
-	assert.Equal(t, 2, connections["connsAsyncKeepAlive"])
-	assert.Equal(t, 1, connections["connsAsyncWriting"])
-	assert.Equal(t, 6, connections["connsTotal"])
+	async := connections["async"].(common.MapStr)
+	assert.Equal(t, 3, async["closing"])
+	assert.Equal(t, 2, async["keep_alive"])
+	assert.Equal(t, 1, async["writing"])
+	assert.Equal(t, 6, connections["total"])
 
 	cpu := event["cpu"].(common.MapStr)
-	assert.Equal(t, 11.2, cpu["cpuChildrenSystem"])
-	assert.Equal(t, 10.1, cpu["cpuChildrenUser"])
-	assert.Equal(t, 2.02841, cpu["cpuLoad"])
-	assert.Equal(t, 6750.8, cpu["cpuSystem"])
-	assert.Equal(t, 14076.6, cpu["cpuUser"])
+	assert.Equal(t, 11.2, cpu["children_system"])
+	assert.Equal(t, 10.1, cpu["children_user"])
+	assert.Equal(t, 2.02841, cpu["load"])
+	assert.Equal(t, 6750.8, cpu["system"])
+	assert.Equal(t, 14076.6, cpu["user"])
 
 	assert.Equal(t, server.URL, event["hostname"])
-	assert.Equal(t, 99, event["idleWorkers"])
 
 	load := event["load"].(common.MapStr)
-	assert.Equal(t, .02, load["load1"])
-	assert.Equal(t, .05, load["load15"])
-	assert.Equal(t, .01, load["load5"])
+	assert.Equal(t, .02, load["1"])
+	assert.Equal(t, .05, load["15"])
+	assert.Equal(t, .01, load["5"])
 
-	assert.Equal(t, .000162644, event["reqPerSec"])
+	assert.Equal(t, .000162644, event["requests_per_sec"])
 
 	scoreboard := event["scoreboard"].(common.MapStr)
-	assert.Equal(t, 0, scoreboard["closingConnection"])
-	assert.Equal(t, 0, scoreboard["dnsLookup"])
-	assert.Equal(t, 0, scoreboard["gracefullyFinishing"])
-	assert.Equal(t, 0, scoreboard["idleCleanup"])
+	assert.Equal(t, 0, scoreboard["closing_connection"])
+	assert.Equal(t, 0, scoreboard["dns_lookup"])
+	assert.Equal(t, 0, scoreboard["gracefully_finishing"])
+	assert.Equal(t, 0, scoreboard["idle_cleanup"])
 	assert.Equal(t, 0, scoreboard["keepalive"])
 	assert.Equal(t, 0, scoreboard["logging"])
-	assert.Equal(t, 300, scoreboard["openSlot"]) // Number of '.'
-	assert.Equal(t, 0, scoreboard["readingRequest"])
-	assert.Equal(t, 1, scoreboard["sendingReply"])          // Number of 'W'
-	assert.Equal(t, 400, scoreboard["total"])               // Number of scorecard chars.
-	assert.Equal(t, 99, scoreboard["waitingForConnection"]) // Number of '_'
+	assert.Equal(t, 300, scoreboard["open_slot"]) // Number of '.'
+	assert.Equal(t, 0, scoreboard["reading_request"])
+	assert.Equal(t, 1, scoreboard["sending_reply"])           // Number of 'W'
+	assert.Equal(t, 400, scoreboard["total"])                 // Number of scorecard chars.
+	assert.Equal(t, 99, scoreboard["waiting_for_connection"]) // Number of '_'
 
-	assert.Equal(t, 167, event["totalAccesses"])
-	assert.Equal(t, 63, event["totalKBytes"])
+	assert.Equal(t, 167, event["total_accesses"])
+	assert.Equal(t, 63, event["total_kbytes"])
 
 	uptime := event["uptime"].(common.MapStr)
-	assert.Equal(t, 1026782, uptime["serverUptimeSeconds"])
+	assert.Equal(t, 1026782, uptime["server_uptime"])
 	assert.Equal(t, 1026782, uptime["uptime"])
 }
 
