@@ -4,13 +4,13 @@ from nose.plugins.attrib import attr
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
-APACHE_STATUS_FIELDS = ["hostname", "totalAccesses", "totalKBytes",
-                        "reqPerSec", "bytesPerSec", "bytesPerReq",
-                        "busyWorkers", "idleWorkers", "uptime", "cpu",
+APACHE_STATUS_FIELDS = ["hostname", "total_accesses", "total_kbytes",
+                        "requests_per_sec", "bytes_per_sec", "bytes_per_request",
+                        "workers.busy", "workers.idle", "uptime", "cpu",
                         "connections", "load", "scoreboard"]
 
-CPU_FIELDS = ["cpuLoad", "cpuUser", "cpuSystem", "cpuChildrenUser",
-              "cpuChildrenSystem"]
+CPU_FIELDS = ["load", "user", "system", "children_user",
+              "children_system"]
 
 
 class ApacheStatusTest(metricbeat.BaseTest):
@@ -22,7 +22,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "apache",
             "metricsets": ["status"],
-            "hosts": [os.getenv('APACHE_HOST')],
+            "hosts": self.get_hosts(),
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -46,3 +46,8 @@ class ApacheStatusTest(metricbeat.BaseTest):
 
         # Verify all fields present are documented.
         self.assert_fields_are_documented(evt)
+
+
+    def get_hosts(self):
+        return ['http://' + os.getenv('APACHE_HOST', 'localhost') + ':' +
+                os.getenv('APACHE_PORT', '80')]
