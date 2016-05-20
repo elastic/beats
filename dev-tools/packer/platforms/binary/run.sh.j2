@@ -13,7 +13,8 @@ fi
 mkdir /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}
 cp -a homedirs/{{.beat_name}}/. /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 cp {{.beat_name}}-linux-{{.arch}} /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}
-cp {{.beat_name}}-binary.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
+cp {{.beat_name}}-linux.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.yml
+cp {{.beat_name}}-linux.full.yml /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/{{.beat_name}}.full.yml
 cp {{.beat_name}}.template.json /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 cp {{.beat_name}}.template-es2x.json /{{.beat_name}}-${VERSION}-linux-{{.bin_arch}}/
 
