@@ -45,7 +45,7 @@ func ExampleModuleWrapper() {
 		defer wg.Done()
 		for event := range output {
 			// Make rtt a constant so that the output is constant.
-			event["rtt"] = 111
+			event["metricset"].(common.MapStr)["rtt"] = 111
 			fmt.Println(event.StringToPrint())
 		}
 	}()
@@ -72,9 +72,11 @@ func ExampleModuleWrapper() {
 	//       "metric": 1
 	//     }
 	//   },
-	//   "metricset": "status",
-	//   "module": "fake",
-	//   "rtt": 111,
+	//   "metricset": {
+	//     "module": "fake",
+	//     "name": "status",
+	//     "rtt": 111
+	//   },
 	//   "type": "metricsets"
 	// }
 }

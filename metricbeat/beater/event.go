@@ -49,12 +49,15 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	event = common.MapStr{
 		"@timestamp": timestamp,
 		"type":       typeName,
-		"module":     b.moduleName,
-		"metricset":  b.metricSetName,
-		"rtt":        b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
+
 		common.EventMetadataKey: b.metadata,
 		b.moduleName: common.MapStr{
 			b.metricSetName: event,
+		},
+		"metricset": common.MapStr{
+			"module": b.moduleName,
+			"name":   b.metricSetName,
+			"rtt":    b.fetchDuration.Nanoseconds() / int64(time.Microsecond),
 		},
 	}
 
@@ -70,7 +73,7 @@ func (b eventBuilder) build() (common.MapStr, error) {
 	if b.host != "" {
 		// TODO (akroh): allow metricset to specify this value so that
 		// a proper URL can be specified and passwords be redacted.
-		event["metricset-host"] = b.host
+		event["metricset"].(common.MapStr)["host"] = b.host
 	}
 
 	// Adds error to event in case error happened

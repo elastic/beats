@@ -37,7 +37,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(ZK_FIELDS, evt.keys())
+        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
         zk_mntr = evt["zookeeper"]["mntr"]
         self.assertItemsEqual(self.de_dot(MNTR_FIELDS), zk_mntr.keys())
 

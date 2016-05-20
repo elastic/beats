@@ -3,8 +3,8 @@ import sys
 sys.path.append('../../../libbeat/tests/system')
 from beat.beat import TestCase
 
-COMMON_FIELDS = ["@timestamp", "beat", "metricset", "metricset-host",
-                 "module", "rtt", "type"]
+COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
+                 "metricset.module", "metricset.rtt", "type"]
 
 
 class BaseTest(TestCase):
