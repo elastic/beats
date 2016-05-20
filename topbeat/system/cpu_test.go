@@ -5,7 +5,6 @@ package system
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/logp"
 	sigar "github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,9 +23,6 @@ func TestGetCpuTimes(t *testing.T) {
 
 func TestCpuPercentage(t *testing.T) {
 
-	if testing.Verbose() {
-		logp.LogInit(logp.LOG_DEBUG, "", false, true, []string{"*"})
-	}
 	cpu := CPU{}
 
 	cpu1 := sigar.Cpu{
