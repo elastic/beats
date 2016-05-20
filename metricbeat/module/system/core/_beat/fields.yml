@@ -1,7 +1,7 @@
-- name: cores
+- name: core
   type: group
   description: >
-    `system-cores` contains local cpu core stats.
+    `system-core` contains local cpu core stats.
   fields:
     - name: core
       type: integer

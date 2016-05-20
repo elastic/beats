@@ -6,7 +6,7 @@ import metricbeat
 SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "load", "nice", "softirq",
                      "steal", "system", "system_p", "user", "user_p"]
 
-SYSTEM_CORES = ["core", "idle", "iowait", "irq", "nice", "softirq",
+SYSTEM_CORE = ["core", "idle", "iowait", "irq", "nice", "softirq",
                 "steal", "system", "system_p", "user", "user_p"]
 
 SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
@@ -51,13 +51,13 @@ class SystemTest(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         self.assertItemsEqual(SYSTEM_CPU_FIELDS, cpu.keys())
 
-    def test_cores(self):
+    def test_core(self):
         """
-        Test cores system output.
+        Test core system output.
         """
         self.render_config_template(modules=[{
             "name": "system",
-            "metricsets": ["cores"],
+            "metricsets": ["core"],
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -73,8 +73,8 @@ class SystemTest(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            cores = evt["system"]["cores"]
-            self.assertItemsEqual(SYSTEM_CORES, cores.keys())
+            core = evt["system"]["core"]
+            self.assertItemsEqual(SYSTEM_CORE, core.keys())
 
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd", sys.platform), "os")
     def test_disk(self):

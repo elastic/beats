@@ -1,6 +1,6 @@
 // +build darwin linux openbsd windows
 
-package cores
+package core
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "cores", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "core", New); err != nil {
 		panic(err)
 	}
 }
