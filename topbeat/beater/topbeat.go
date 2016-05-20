@@ -67,12 +67,12 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	topbeatConfig := tb.TbConfig.Topbeat
 	tb.period = topbeatConfig.Period
 	tb.procStats.Procs = topbeatConfig.Procs
+	tb.procStats.CpuTicksPerProc = topbeatConfig.Stats.CPUTicksPerProc
 	tb.sysStats = topbeatConfig.Stats.System
 	tb.procStats.ProcStats = topbeatConfig.Stats.Proc
 	tb.fsStats = topbeatConfig.Stats.Filesystem
 	tb.cpu.CpuPerCore = topbeatConfig.Stats.CPUPerCore
 	tb.cpu.CpuTicks = topbeatConfig.Stats.CPUTicks
-	tb.cpu.CpuTicksPerProc = topbeatConfig.Stats.CPUTicksPerProc
 
 	logp.Debug("topbeat", "Init topbeat")
 	logp.Debug("topbeat", "Follow processes %q", tb.procStats.Procs)
@@ -80,9 +80,9 @@ func (tb *Topbeat) Config(b *beat.Beat) error {
 	logp.Debug("topbeat", "System statistics %t", tb.sysStats)
 	logp.Debug("topbeat", "Process statistics %t", tb.procStats.ProcStats)
 	logp.Debug("topbeat", "File system statistics %t", tb.fsStats)
-	logp.Debug("topbeat", "Add CPU info per core %t", tb.cpu.CpuPerCore)
-	logp.Debug("topbeat", "Add CPU ticks info %t", tb.cpu.CpuTicks)
-	logp.Debug("topbeat", "Add CPU ticks info per process %t", tb.cpu.CpuTicksPerProc)
+	logp.Debug("topbeat", "cpu_per_core=%t", tb.cpu.CpuPerCore)
+	logp.Debug("topbeat", "cpu_ticks=%t", tb.cpu.CpuTicks)
+	logp.Debug("topbeat", "cpu_ticks_per_proc=%t", tb.procStats.CpuTicksPerProc)
 
 	return nil
 }

@@ -29,10 +29,7 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total",
             "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
             "proc.name",
             "proc.state",
             "proc.pid",
@@ -63,10 +60,7 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total",
             "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
             "proc.mem.size",
             "proc.mem.rss",
             "proc.mem.rss_p"
@@ -104,10 +98,7 @@ class Test(BaseTest):
 
         for key in [
             "proc.cpu.start_time",
-            "proc.cpu.total",
             "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
             "proc.name",
             "proc.pid",
         ]:
@@ -145,10 +136,7 @@ class Test(BaseTest):
             "proc.mem.size",
             "proc.mem.rss",
             "proc.cpu.start_time",
-            "proc.cpu.total",
             "proc.cpu.total_p",
-            "proc.cpu.user",
-            "proc.cpu.system",
             "proc.name",
             "proc.pid",
             "proc.mem.rss_p"

@@ -14,7 +14,6 @@ type CPU struct {
 	LastCpuTimes     *sigar.Cpu
 	LastCpuTimesList []sigar.Cpu
 	CpuTicks         bool
-	CpuTicksPerProc  bool
 }
 
 func GetCpuTimes() (*sigar.Cpu, error) {
@@ -62,7 +61,7 @@ func calculateCpuPercentages(last, current *sigar.Cpu) common.MapStr {
 		all_delta := current.Total() - last.Total()
 
 		if all_delta == 0 {
-			// first run of the Beat
+			// first inquiry
 			return emptyMapStr
 		}
 
