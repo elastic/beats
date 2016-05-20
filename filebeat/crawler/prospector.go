@@ -13,15 +13,14 @@ import (
 )
 
 type Prospector struct {
-	config          prospectorConfig
-	prospectorer    Prospectorer
-	spoolerChan     chan *input.FileEvent
-	harvesterChan   chan *input.FileEvent
-	registrar       *Registrar
-	done            chan struct{}
-	harvesterStates []input.FileState
-	stateMutex      sync.Mutex
-	wg              sync.WaitGroup
+	config        prospectorConfig
+	prospectorer  Prospectorer
+	spoolerChan   chan *input.FileEvent
+	harvesterChan chan *input.FileEvent
+	registrar     *Registrar
+	done          chan struct{}
+	states        *input.States
+	wg            sync.WaitGroup
 }
 
 type Prospectorer interface {
@@ -31,13 +30,13 @@ type Prospectorer interface {
 
 func NewProspector(cfg *common.Config, registrar *Registrar, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
-		config:          defaultConfig,
-		registrar:       registrar,
-		spoolerChan:     spoolerChan,
-		harvesterChan:   make(chan *input.FileEvent),
-		done:            make(chan struct{}),
-		harvesterStates: []input.FileState{},
-		wg:              sync.WaitGroup{},
+		config:        defaultConfig,
+		registrar:     registrar,
+		spoolerChan:   spoolerChan,
+		harvesterChan: make(chan *input.FileEvent),
+		done:          make(chan struct{}),
+		states:        input.NewStates(),
+		wg:            sync.WaitGroup{},
 	}
 
 	if err := cfg.Unpack(&prospector.config); err != nil {
@@ -109,7 +108,7 @@ func (p *Prospector) Run() {
 					logp.Info("Prospector channel stopped")
 					return
 				case p.spoolerChan <- event:
-					p.updateState(event.FileState)
+					p.states.Update(event.FileState)
 				}
 			}
 		}
@@ -126,56 +125,6 @@ func (p *Prospector) Run() {
 		case <-time.After(p.config.ScanFrequency):
 			logp.Info("Run prospector")
 			p.prospectorer.Run()
-		}
-	}
-}
-
-func (p *Prospector) updateState(newState input.FileState) {
-
-	p.stateMutex.Lock()
-	defer p.stateMutex.Unlock()
-
-	index, oldState := p.findPreviousState(newState)
-
-	if index >= 0 {
-		p.harvesterStates[index] = newState
-		logp.Debug("prospector", "Old state overwritten for %s", oldState.Source)
-	} else {
-		// No existing state found, add new one
-		p.harvesterStates = append(p.harvesterStates, newState)
-		logp.Debug("prospector", "New state added for %s", newState.Source)
-	}
-}
-
-// findPreviousState returns the previous state fo the file
-// In case no previous state exists, index -1 is returned
-func (p *Prospector) findPreviousState(newState input.FileState) (int, input.FileState) {
-
-	// TODO: This could be made potentially more performance by using an index (harvester id) and only use iteration as fall back
-	for index, oldState := range p.harvesterStates {
-		// This is using the FileStateOS for comparison as FileInfo identifiers can only be fetched for existing files
-		if oldState.FileStateOS.IsSame(newState.FileStateOS) {
-			return index, oldState
-		}
-	}
-
-	return -1, input.FileState{}
-}
-
-// cleanupState cleans up the internal prospector state after each scan
-// Files which reached ignore_older are removed from the state as these states are not needed anymore
-func (p *Prospector) cleanupStates() {
-	p.stateMutex.Lock()
-	defer p.stateMutex.Unlock()
-
-	// Cleanup can only happen after file reaches ignore_older
-	if p.config.IgnoreOlder != 0 {
-		for i, state := range p.harvesterStates {
-			// File is older then ignore_older -> remove state
-			if p.isIgnoreOlder(state) {
-				logp.Debug("prospector", "State removed for %s because of ignore_older: %s", state.Source)
-				p.harvesterStates = append(p.harvesterStates[:i], p.harvesterStates[i+1:]...)
-			}
 		}
 	}
 }
