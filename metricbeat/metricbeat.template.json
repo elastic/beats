@@ -248,40 +248,295 @@
               "properties": {
                 "clients": {
                   "properties": {
-                    "blocked_clients": {
+                    "biggest_input_buf": {
                       "type": "integer"
                     },
-                    "client_biggest_input_buf": {
+                    "blocked": {
                       "type": "integer"
                     },
-                    "client_longest_output_list": {
+                    "connected": {
                       "type": "integer"
                     },
-                    "connected_clients": {
+                    "longest_output_list": {
                       "type": "integer"
                     }
                   }
                 },
                 "cluster": {
                   "properties": {
-                    "cluster_enabled": {
+                    "enabled": {
                       "type": "boolean"
                     }
                   }
                 },
                 "cpu": {
                   "properties": {
-                    "used_cpu_sys": {
+                    "used": {
+                      "properties": {
+                        "sys": {
+                          "type": "float"
+                        },
+                        "sys_children": {
+                          "type": "float"
+                        },
+                        "user": {
+                          "type": "float"
+                        },
+                        "user_children": {
+                          "type": "float"
+                        }
+                      }
+                    }
+                  }
+                },
+                "memory": {
+                  "properties": {
+                    "allocator": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "used": {
+                      "properties": {
+                        "lua": {
+                          "type": "integer"
+                        },
+                        "peak": {
+                          "type": "integer"
+                        },
+                        "rss": {
+                          "type": "integer"
+                        },
+                        "value": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "persistence": {
+                  "properties": {
+                    "loading": {
+                      "type": "boolean"
+                    },
+                    "rdb": {
+                      "properties": {
+                        "bgsave_in_progress": {
+                          "type": "boolean"
+                        },
+                        "changes_since_last_save": {
+                          "type": "integer"
+                        },
+                        "current_bgsave_time_sec": {
+                          "type": "integer"
+                        },
+                        "last_bgsave_status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "last_bgsave_time_sec": {
+                          "type": "integer"
+                        },
+                        "last_save_time": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "used": {
+                      "properties": {
+                        "current_rewrite_time_sec": {
+                          "type": "integer"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "last_bgrewrite_status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "last_rewrite_time_sec": {
+                          "type": "integer"
+                        },
+                        "last_write_status": {
+                          "ignore_above": 1024,
+                          "type": "keyword"
+                        },
+                        "rewrite_in_progress": {
+                          "type": "boolean"
+                        },
+                        "rewrite_scheduled": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                },
+                "replication": {
+                  "properties": {
+                    "backlog": {
+                      "properties": {
+                        "active": {
+                          "type": "integer"
+                        },
+                        "first_byte_offset": {
+                          "type": "integer"
+                        },
+                        "histlen": {
+                          "type": "integer"
+                        },
+                        "size": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "connected_slaves": {
+                      "type": "integer"
+                    },
+                    "master_offset": {
+                      "type": "integer"
+                    },
+                    "role": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "server": {
+                  "properties": {
+                    "arch_bits": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "build_id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "config_file": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "gcc_version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "git_dirty": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "git_sha1": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "hz": {
+                      "type": "integer"
+                    },
+                    "lru_clock": {
+                      "type": "integer"
+                    },
+                    "mode": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "multiplexing_api": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "os": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "process_id": {
+                      "type": "integer"
+                    },
+                    "run_id": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "tcp_port": {
+                      "type": "integer"
+                    },
+                    "uptime": {
+                      "type": "integer"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "stats": {
+                  "properties": {
+                    "connections": {
+                      "properties": {
+                        "received": {
+                          "type": "integer"
+                        },
+                        "rejected": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "instantaneous_input_kbps": {
                       "type": "float"
                     },
-                    "used_cpu_sys_children": {
+                    "instantaneous_ops_per_sec": {
+                      "type": "integer"
+                    },
+                    "instantaneous_output_kbps": {
                       "type": "float"
                     },
-                    "used_cpu_user": {
-                      "type": "float"
+                    "keys": {
+                      "properties": {
+                        "evicted": {
+                          "type": "integer"
+                        },
+                        "expired": {
+                          "type": "integer"
+                        }
+                      }
                     },
-                    "used_cpu_user_children": {
-                      "type": "float"
+                    "keyspace": {
+                      "properties": {
+                        "hits": {
+                          "type": "integer"
+                        },
+                        "misses": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "latest_fork_usec": {
+                      "type": "integer"
+                    },
+                    "migrate_cached_sockets": {
+                      "type": "integer"
+                    },
+                    "pubsub_channels": {
+                      "type": "integer"
+                    },
+                    "pubsub_patterns": {
+                      "type": "integer"
+                    },
+                    "sync": {
+                      "properties": {
+                        "full": {
+                          "type": "integer"
+                        },
+                        "partial_err": {
+                          "type": "integer"
+                        },
+                        "partial_ok": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "total_commands_processed": {
+                      "type": "integer"
+                    },
+                    "total_net_input_bytes": {
+                      "type": "integer"
+                    },
+                    "total_net_output_bytes": {
+                      "type": "integer"
                     }
                   }
                 }

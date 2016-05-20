@@ -32,8 +32,8 @@ func TestFetch(t *testing.T) {
 	// Check fields
 	assert.Equal(t, 9, len(event))
 	server := event["server"].(common.MapStr)
-	assert.Equal(t, version, server["redis_version"])
-	assert.Equal(t, "standalone", server["redis_mode"])
+	assert.Equal(t, version, server["version"])
+	assert.Equal(t, "standalone", server["mode"])
 }
 
 func TestKeyspace(t *testing.T) {

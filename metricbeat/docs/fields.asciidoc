@@ -560,28 +560,28 @@ Redis client stats
 
 
 
-==== redis.info.clients.connected_clients
+==== redis.info.clients.connected
 
 type: integer
 
 Number of client connections (excluding connections from slaves)
 
 
-==== redis.info.clients.client_longest_output_list
+==== redis.info.clients.longest_output_list
 
 type: integer
 
 Longest output list among current client connections.
 
 
-==== redis.info.clients.client_biggest_input_buf
+==== redis.info.clients.biggest_input_buf
 
 type: integer
 
 Biggest input buffer among current client connections
 
 
-==== redis.info.clients.blocked_clients
+==== redis.info.clients.blocked
 
 type: integer
 
@@ -594,7 +594,7 @@ Redis cluster information
 
 
 
-==== redis.info.cluster.cluster_enabled
+==== redis.info.cluster.enabled
 
 type: boolean
 
@@ -607,33 +607,434 @@ Redis CPU stats
 
 
 
-==== redis.info.cpu.used_cpu_sys
+==== redis.info.cpu.used.sys
 
 type: float
 
 System CPU consumed by the Redis server
 
 
-==== redis.info.cpu.used_cpu_sys_children
+==== redis.info.cpu.used.sys_children
 
 type: float
 
 User CPU consumed by the Redis server
 
 
-==== redis.info.cpu.used_cpu_user
+==== redis.info.cpu.used.user
 
 type: float
 
 System CPU consumed by the background processes
 
 
-==== redis.info.cpu.used_cpu_user_children
+==== redis.info.cpu.used.user_children
 
 type: float
 
 User CPU consumed by the background processes
 
+
+=== memory Fields
+
+Redis CPU stats
+
+
+
+==== redis.info.memory.used.value
+
+type: integer
+
+Used memory
+
+
+==== redis.info.memory.used.rss
+
+type: integer
+
+Used memory rss
+
+
+==== redis.info.memory.used.peak
+
+type: integer
+
+Used memory peak
+
+
+==== redis.info.memory.used.lua
+
+type: integer
+
+Used memory lua
+
+
+==== redis.info.memory.allocator
+
+type: keyword
+
+Memory allocator
+
+
+=== persistence Fields
+
+Redis CPU stats
+
+
+
+==== redis.info.persistence.loading
+
+type: boolean
+
+None
+
+==== redis.info.persistence.rdb.changes_since_last_save
+
+type: integer
+
+None
+
+==== redis.info.persistence.rdb.bgsave_in_progress
+
+type: boolean
+
+None
+
+==== redis.info.persistence.rdb.last_save_time
+
+type: integer
+
+None
+
+==== redis.info.persistence.rdb.last_bgsave_status
+
+type: keyword
+
+None
+
+==== redis.info.persistence.rdb.last_bgsave_time_sec
+
+type: integer
+
+None
+
+==== redis.info.persistence.rdb.current_bgsave_time_sec
+
+type: integer
+
+None
+
+==== redis.info.persistence.used.enabled
+
+type: boolean
+
+None
+
+==== redis.info.persistence.used.rewrite_in_progress
+
+type: boolean
+
+None
+
+==== redis.info.persistence.used.rewrite_scheduled
+
+type: boolean
+
+None
+
+==== redis.info.persistence.used.last_rewrite_time_sec
+
+type: integer
+
+None
+
+==== redis.info.persistence.used.current_rewrite_time_sec
+
+type: integer
+
+None
+
+==== redis.info.persistence.used.last_bgrewrite_status
+
+type: keyword
+
+None
+
+==== redis.info.persistence.used.last_write_status
+
+type: keyword
+
+None
+
+=== replication Fields
+
+Replication
+
+
+
+==== redis.info.replication.role
+
+type: keyword
+
+None
+
+==== redis.info.replication.connected_slaves
+
+type: integer
+
+None
+
+==== redis.info.replication.master_offset
+
+type: integer
+
+None
+
+==== redis.info.replication.backlog.active
+
+type: integer
+
+None
+
+==== redis.info.replication.backlog.size
+
+type: integer
+
+None
+
+==== redis.info.replication.backlog.first_byte_offset
+
+type: integer
+
+None
+
+==== redis.info.replication.backlog.histlen
+
+type: integer
+
+None
+
+=== server Fields
+
+Server info
+
+
+
+==== redis.info.server.version
+
+type: keyword
+
+None
+
+==== redis.info.server.git_sha1
+
+type: keyword
+
+None
+
+==== redis.info.server.git_dirty
+
+type: keyword
+
+None
+
+==== redis.info.server.build_id
+
+type: keyword
+
+None
+
+==== redis.info.server.mode
+
+type: keyword
+
+None
+
+==== redis.info.server.os
+
+type: keyword
+
+None
+
+==== redis.info.server.arch_bits
+
+type: keyword
+
+None
+
+==== redis.info.server.multiplexing_api
+
+type: keyword
+
+None
+
+==== redis.info.server.gcc_version
+
+type: keyword
+
+None
+
+==== redis.info.server.process_id
+
+type: integer
+
+None
+
+==== redis.info.server.run_id
+
+type: keyword
+
+None
+
+==== redis.info.server.tcp_port
+
+type: integer
+
+None
+
+==== redis.info.server.uptime
+
+type: integer
+
+None
+
+==== redis.info.server.hz
+
+type: integer
+
+None
+
+==== redis.info.server.lru_clock
+
+type: integer
+
+None
+
+==== redis.info.server.config_file
+
+type: keyword
+
+None
+
+=== stats Fields
+
+Redis stats
+
+
+
+==== redis.info.stats.connections.received
+
+type: integer
+
+None
+
+==== redis.info.stats.connections.rejected
+
+type: integer
+
+None
+
+==== redis.info.stats.total_commands_processed
+
+type: integer
+
+None
+
+==== redis.info.stats.total_net_input_bytes
+
+type: integer
+
+None
+
+==== redis.info.stats.total_net_output_bytes
+
+type: integer
+
+None
+
+==== redis.info.stats.instantaneous_ops_per_sec
+
+type: integer
+
+None
+
+==== redis.info.stats.instantaneous_input_kbps
+
+type: float
+
+None
+
+==== redis.info.stats.instantaneous_output_kbps
+
+type: float
+
+None
+
+==== redis.info.stats.sync.full
+
+type: integer
+
+None
+
+==== redis.info.stats.sync.partial_ok
+
+type: integer
+
+None
+
+==== redis.info.stats.sync.partial_err
+
+type: integer
+
+None
+
+==== redis.info.stats.keys.expired
+
+type: integer
+
+None
+
+==== redis.info.stats.keys.evicted
+
+type: integer
+
+None
+
+==== redis.info.stats.keyspace.hits
+
+type: integer
+
+None
+
+==== redis.info.stats.keyspace.misses
+
+type: integer
+
+None
+
+==== redis.info.stats.pubsub_channels
+
+type: integer
+
+None
+
+==== redis.info.stats.pubsub_patterns
+
+type: integer
+
+None
+
+==== redis.info.stats.latest_fork_usec
+
+type: integer
+
+None
+
+==== redis.info.stats.migrate_cached_sockets
+
+type: integer
+
+None
 
 [[exported-fields-system]]
 === System Status Fields

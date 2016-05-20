@@ -7,11 +7,11 @@ REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
 REDIS_INFO_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
                      "persistence", "replication", "server", "stats"]
 
-CPU_FIELDS = ["used_cpu_sys", "used_cpu_sys_children", "used_cpu_user",
-              "used_cpu_user_children"]
+CPU_FIELDS = ["used.sys", "used.sys_children", "used.user",
+              "used.user_children"]
 
-CLIENTS_FIELDS = ["blocked_clients", "client_biggest_input_buf",
-                  "client_longest_output_list", "connected_clients"]
+CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
+                  "longest_output_list", "connected"]
 
 
 class RedisInfoTest(metricbeat.BaseTest):
@@ -23,7 +23,7 @@ class RedisInfoTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
-            "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+            "hosts": self.get_hosts(),
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -40,12 +40,14 @@ class RedisInfoTest(metricbeat.BaseTest):
 
         self.assertItemsEqual(REDIS_FIELDS, evt.keys())
         redis_info = evt["redis"]["info"]
-        self.assertItemsEqual(REDIS_INFO_FIELDS, redis_info.keys())
-        self.assertItemsEqual(CLIENTS_FIELDS, redis_info["clients"].keys())
-        self.assertItemsEqual(CPU_FIELDS, redis_info["cpu"].keys())
+        self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
+        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
 
-        # TODO: After fields.yml is updated this can be uncommented.
-        #self.assert_fields_are_documented(evt)
+        # Delete keyspace entry as this one is dynamic
+        del evt["redis"]["info"]["keyspace"]
+
+        self.assert_fields_are_documented(evt)
 
     @attr('integration')
     def test_filters(self):
@@ -56,7 +58,7 @@ class RedisInfoTest(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
-            "hosts": [os.getenv('REDIS_HOST') + ":6379"],
+            "hosts": self.get_hosts(),
             "period": "5s",
             "filters": [{
                 "include_fields": fields,
@@ -74,8 +76,13 @@ class RedisInfoTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(REDIS_FIELDS, evt.keys())
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
+        print redis_info
         self.assertItemsEqual(fields, redis_info.keys())
-        self.assertItemsEqual(CLIENTS_FIELDS, redis_info["clients"].keys())
-        self.assertItemsEqual(CPU_FIELDS, redis_info["cpu"].keys())
+        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+
+    def get_hosts(self):
+        return [os.getenv('REDIS_HOST', 'localhost') + ':' +
+                os.getenv('REDIS_PORT', '6379')]
