@@ -30,10 +30,10 @@ class GlobalFiltering(metricbeat.BaseTest):
 
         print(evt)
         print(evt.keys())
-        self.assertItemsEqual([
-            'beat', '@timestamp', 'system', 'module',
-            'rtt', 'type', 'metricset'
-        ], evt.keys())
+        self.assertItemsEqual(self.de_dot([
+            'beat', '@timestamp', 'system', 'metricset.module',
+            'metricset.rtt', 'type', 'metricset.name'
+        ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
         self.assertItemsEqual([

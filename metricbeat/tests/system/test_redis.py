@@ -38,7 +38,7 @@ class RedisInfoTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(REDIS_FIELDS, evt.keys())
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
         self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
@@ -86,3 +86,4 @@ class RedisInfoTest(metricbeat.BaseTest):
     def get_hosts(self):
         return [os.getenv('REDIS_HOST', 'localhost') + ':' +
                 os.getenv('REDIS_PORT', '6379')]
+

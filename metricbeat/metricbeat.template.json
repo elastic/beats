@@ -164,16 +164,23 @@
           }
         },
         "metricset": {
-          "ignore_above": 1024,
-          "type": "keyword"
-        },
-        "metricset-host": {
-          "ignore_above": 1024,
-          "type": "keyword"
-        },
-        "module": {
-          "ignore_above": 1024,
-          "type": "keyword"
+          "properties": {
+            "host": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "module": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "rtt": {
+              "type": "long"
+            }
+          }
         },
         "mysql": {
           "properties": {
@@ -543,9 +550,6 @@
               }
             }
           }
-        },
-        "rtt": {
-          "type": "long"
         },
         "system": {
           "properties": {
