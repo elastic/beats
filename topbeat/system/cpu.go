@@ -176,6 +176,13 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		"swap":       GetSwapEvent(swapStat),
 	}
 
+	return event, nil
+}
+
+func (cpu *CPU) GetPerCoreStats() ([]common.MapStr, error) {
+
+	var result []common.MapStr
+
 	if cpu.CpuPerCore {
 
 		cpuCoreStat, err := GetCpuTimesList()
@@ -183,8 +190,8 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 			logp.Warn("Getting cpu core times: %v", err)
 			return nil, err
 		}
-		event["cpus"] = cpu.GetCpuStatForCores(cpuCoreStat)
+		cpuCoreStat["core"] = cpu.GetCpuStatForCores(cpuCoreStat)
 	}
 
-	return event, nil
+	return result, nil
 }

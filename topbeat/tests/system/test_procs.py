@@ -27,7 +27,6 @@ class Test(BaseTest):
 
         output = self.read_output()[0]
 
-        print output["proc.name"]
         assert re.match("(?i)topbeat.test(.exe)?", output["proc.name"])
         assert re.match("(?i).*topbeat.test(.exe)? -systemTest", output["proc.cmdline"])
         assert isinstance(output["proc.state"], basestring)
@@ -37,7 +36,6 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.cpu.total_p",
             "proc.mem.size",
             "proc.mem.rss",
             "proc.mem.share",
@@ -48,7 +46,7 @@ class Test(BaseTest):
             "proc.cpu.total_p",
             "proc.mem.rss_p",
         ]:
-            assert type(output[key]) in [int, float]
+            assert type(output[key]) in float
 
     def test_cpu_ticks_per_proc_option(self):
         """
