@@ -7,31 +7,31 @@
       type: keyword
       description: >
         Apache hostname.
-    - name: totalAccesses
+    - name: total_accesses
       type: integer
       description: >
         Total number of access requests.
-    - name: totalKBytes
+    - name: total_kbytes
       type: integer
       description: >
         Total number of kilobytes served.
-    - name: reqPerSec
+    - name: requests_per_sec
       type: float
       description: >
         Requests per second.
-    - name: bytesPerSec
+    - name: bytes_per_sec
       type: float
       description: >
         Bytes per second.
-    - name: bytesPerReq
+    - name: bytes_per_request
       type: float
       description: >
         Bytes per request.
-    - name: busyWorkers
+    - name: workers.busy
       type: integer
       description: >
         Number of busy workers.
-    - name: idleWorkers
+    - name: workers.idle
       type: integer
       description: >
         Number of idle workers.
@@ -40,7 +40,7 @@
       description: >
         Uptime stats.
       fields:
-        - name: serverUptimeSeconds
+        - name: server_uptime
           type: integer
           description: >
             Server uptime in seconds.
@@ -53,23 +53,23 @@
       description: >
         CPU stats.
       fields:
-        - name: cpuLoad
+        - name: load
           type: float
           description: >
             CPU Load.
-        - name: cpuUser
+        - name: user
           type: float
           description: >
             CPU user load.
-        - name: cpuSystem
+        - name: system
           type: float
           description: >
             System cpu.
-        - name: cpuChildrenUser
+        - name: children_user
           type: float
           description: >
             CPU of children user.
-        - name: cpuChildrenSystem
+        - name: children_system
           type: float
           description: >
             CPU of children system.
@@ -78,19 +78,19 @@
       description: >
         Connection stats.
       fields:
-        - name: connsTotal
+        - name: total
           type: integer
           description: >
             Total connections.
-        - name: connsAsyncWriting
+        - name: async.writing
           type: integer
           description: >
             Async connection writing.
-        - name: connsAsyncKeepAlive
+        - name: async.keep_alive
           type: integer
           description: >
             Async keeped alive connections.
-        - name: connsAsyncClosing
+        - name: async.closing
           type: integer
           description: >
             Async closed connections.
@@ -99,15 +99,15 @@
       description: >
         Load averages.
       fields:
-        - name: load1
+        - name: "1"
           type: float
           description: >
             Load average for the last minute.
-        - name: load5
+        - name: "5"
           type: float
           description: >
             Load average for the last 5 minutes.
-        - name: load15
+        - name: "15"
           type: float
           description: >
             Load average for the last 15 minutes.
@@ -116,15 +116,15 @@
       description: >
         Scoreboard metrics.
       fields:
-        - name: startingUp
+        - name: starting_up
           type: integer
           description: >
             Starting up.
-        - name: readingRequest
+        - name: reading_request
           type: integer
           description: >
             Reading requests.
-        - name: sendingReply
+        - name: sending_reply
           type: integer
           description: >
             Sending Reply.
@@ -132,11 +132,11 @@
           type: integer
           description: >
             Keep alive.
-        - name: dnsLookup
+        - name: dns_lookup
           type: integer
           description: >
             Dns Lookups.
-        - name: closingConnection
+        - name: closing_connection
           type: integer
           description: >
             Closing connections.
@@ -144,19 +144,19 @@
           type: integer
           description: >
             Logging
-        - name: gracefullyFinishing
+        - name: gracefully_finishing
           type: integer
           description: >
             Gracefully finishing.
-        - name: idleCleanup
+        - name: idle_cleanup
           type: integer
           description: >
             Idle cleanups
-        - name: openSlot
+        - name: open_slot
           type: integer
           description: >
             Open slots.
-        - name: waitingForConnection
+        - name: waiting_for_connection
           type: integer
           description: >
             Waiting for connections.

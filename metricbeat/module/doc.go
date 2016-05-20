@@ -14,6 +14,7 @@ For the key names, metricbeat follows the naming conventions below:
 * If two fields are the same but with different units, remove the less granular one
 * In case the value correlates with the name of a nested document, use value inside the document
 * Do not use . in the names
+* Use singular and plural properly for the fields. Example: sec_per_request vs open_requests
 
 The goal is to have a similar experience across all metrics.
 
@@ -23,12 +24,13 @@ The goal is to have a similar experience across all metrics.
 List of standardised words and units across all metricsets. On the left are the ones to be used, on the right the options seen in metricsets.
 
 * avg: average
+* connection: conn
 * count:
 * day: days, d
 * max: maximumg
 * min: minimum
 * pct: precentage
-* request:
+* request: req
 * sec: seconds, second, s
 *
 
