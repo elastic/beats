@@ -1,8 +1,6 @@
 package logstash
 
 import (
-	"bytes"
-	"encoding/json"
 	"expvar"
 	"time"
 
@@ -28,12 +26,7 @@ const (
 type client struct {
 	*transport.Client
 	client *v2.SyncClient
-
-	// the beat name
-	beat []byte
-	enc  encoder
-
-	win window
+	win    window
 }
 
 func newLumberjackClient(
@@ -46,16 +39,14 @@ func newLumberjackClient(
 	c := &client{}
 	c.Client = conn
 	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
-	c.enc.buf = bytes.NewBuffer(nil)
 
-	encodedBeat, err := json.Marshal(beat)
+	enc, err := makeLogstashEventEncoder(beat)
 	if err != nil {
 		return nil, err
 	}
-	c.beat = encodedBeat
 
 	cl, err := v2.NewSyncClientWithConn(conn,
-		v2.JSONEncoder(c.jsonEncode),
+		v2.JSONEncoder(enc),
 		v2.Timeout(timeout),
 		v2.CompressionLevel(compressLevel))
 	if err != nil {
@@ -147,31 +138,4 @@ func (c *client) sendEvents(events []common.MapStr) (int, error) {
 		window[i] = event
 	}
 	return c.client.Send(window)
-}
-
-func (c *client) jsonEncode(rawEvent interface{}) ([]byte, error) {
-	event := rawEvent.(common.MapStr)
-	buf := c.enc.buf
-	buf.Reset()
-
-	buf.WriteRune('{')
-	if _, hasMeta := event["@metadata"]; !hasMeta {
-		typ := event["type"].(string)
-		buf.WriteString(`"@metadata":{"type":`)
-		encodeString(buf, typ)
-	}
-
-	buf.WriteString(`,"beat":`)
-	buf.Write(c.beat)
-	buf.WriteString(`},`)
-	err := c.enc.encodeKeyValues(event)
-	if err != nil {
-		logp.Err("jsonEncode failed with: %v", err)
-		return nil, err
-	}
-
-	b := buf.Bytes()
-	b[len(b)-1] = '}'
-
-	return buf.Bytes(), nil
 }

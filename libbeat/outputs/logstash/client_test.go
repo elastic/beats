@@ -19,9 +19,13 @@ import (
 const (
 	driverCmdQuit = iota
 	driverCmdPublish
+	driverCmdConnect
+	driverCmdClose
 )
 
 type testClientDriver interface {
+	Connect()
+	Close()
 	Stop()
 	Publish(events []common.MapStr)
 	Returns() []testClientReturn
@@ -174,10 +178,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 	event := common.MapStr{"type": "test", "name": "me", "line": 10}
 
 	for i := 0; i < N; i++ {
-		err = transp.Connect()
-		if err != nil {
-			t.Fatalf("Transport client Failed to connect: %v", err)
-		}
+		client.Connect()
 
 		// publish event. With client returning on timeout, we have to send
 		// messages again
@@ -186,7 +187,7 @@ func testMultiFailMaxTimeouts(t *testing.T, factory clientFactory) {
 		// read batch + never ACK in order to enforce timeout
 		server.Receive()
 
-		// wait for client being disconnected
+		// close client
 		for transp.IsConnected() {
 		}
 	}
