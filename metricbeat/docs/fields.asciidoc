@@ -1049,82 +1049,82 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
-=== cores Fields
+=== core Fields
 
-`system-cores` contains local cpu core stats.
+`system-core` contains local cpu core stats.
 
 
 
-==== system.cores.core
+==== system.core.core
 
 type: integer
 
 CPU Core number.
 
 
-==== system.cores.user
+==== system.core.user
 
 type: integer
 
 The amount of CPU time spent in user space.
 
 
-==== system.cores.user_p
+==== system.core.user_p
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.cores.nice
+==== system.core.nice
 
 type: integer
 
 The amount of CPU time spent on low-priority processes.
 
 
-==== system.cores.system
+==== system.core.system
 
 type: integer
 
 The amount of CPU time spent in kernel space.
 
 
-==== system.cores.system_p
+==== system.core.system_p
 
 type: float
 
 The percentage of CPU time spent in kernel space.
 
 
-==== system.cores.idle
+==== system.core.idle
 
 type: integer
 
 The amount of CPU time spent idle.
 
 
-==== system.cores.iowait
+==== system.core.iowait
 
 type: integer
 
 The amount of CPU time spent in wait (on disk).
 
 
-==== system.cores.irq
+==== system.core.irq
 
 type: integer
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
-==== system.cores.softirq
+==== system.core.softirq
 
 type: integer
 
 The amount of CPU time spent servicing and handling software interrupts.
 
-==== system.cores.steal
+==== system.core.steal
 
 type: integer
 

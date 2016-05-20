@@ -16,7 +16,7 @@ here (add link). Below is an example of a configuration option:
 ----
 metricbeat.modules:
   - module: system
-    metricsets: ["cpu", "cores", "filesystem", "fsstats", "memory", "process"]
+    metricsets: ["cpu", "core", "filesystem", "fsstats", "memory", "process"]
     enabled: true
     period: 2s
     processes: ['.*']
@@ -26,7 +26,7 @@ metricbeat.modules:
 
 The following MetricSets are available:
 
-* <<metricbeat-metricset-system-cores,cores>>
+* <<metricbeat-metricset-system-core,core>>
 
 * <<metricbeat-metricset-system-cpu,cpu>>
 
@@ -40,7 +40,7 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-system-process,process>>
 
-include::system/cores.asciidoc[]
+include::system/core.asciidoc[]
 
 include::system/cpu.asciidoc[]
 
