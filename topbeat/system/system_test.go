@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/gosigar"
+	sigar "github.com/elastic/gosigar"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,40 +57,30 @@ func TestGetSwap(t *testing.T) {
 
 func TestMemPercentage(t *testing.T) {
 
-	m := MemStat{
-		Mem: gosigar.Mem{
-			Total: 7,
-			Used:  5,
-			Free:  2,
-		},
+	m := sigar.Mem{
+		Total: 7,
+		Used:  5,
+		Free:  2,
 	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 0.7143)
+	stats := GetMemoryEvent(&m)
+	assert.Equal(t, stats["used_p"], 0.7143)
 
-	m = MemStat{
-		Mem: gosigar.Mem{Total: 0},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.UsedPercent, 0.0)
+	m = sigar.Mem{Total: 0}
+	stats = GetMemoryEvent(&m)
+	assert.Equal(t, stats["used_p"], 0.0)
 }
 
 func TestActualMemPercentage(t *testing.T) {
 
-	m := MemStat{
-		Mem: gosigar.Mem{
-			Total:      7,
-			ActualUsed: 5,
-			ActualFree: 2,
-		},
+	m := sigar.Mem{
+		Total:      7,
+		ActualUsed: 5,
+		ActualFree: 2,
 	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.ActualUsedPercent, 0.7143)
+	stats := GetMemoryEvent(&m)
+	assert.Equal(t, stats["actual_used_p"], 0.7143)
 
-	m = MemStat{
-		Mem: gosigar.Mem{
-			Total: 0,
-		},
-	}
-	AddMemPercentage(&m)
-	assert.Equal(t, m.ActualUsedPercent, 0.0)
+	m = sigar.Mem{Total: 0}
+	stats = GetMemoryEvent(&m)
+	assert.Equal(t, stats["actual_used_p"], 0.0)
 }

@@ -11,25 +11,13 @@ import (
 
 type CPU struct {
 	CpuPerCore       bool
-	LastCpuTimes     *CpuTimes
-	LastCpuTimesList []CpuTimes
+	LastCpuTimes     *sigar.Cpu
+	LastCpuTimesList []sigar.Cpu
 	CpuTicks         bool
 	CpuTicksPerProc  bool
 }
 
-type CpuTimes struct {
-	sigar.Cpu
-	UserPercent    float64 `json:"user_p"`
-	SystemPercent  float64 `json:"system_p"`
-	IdlePercent    float64 `json:"idle_p"`
-	IOwaitPercent  float64 `json:"iowait_p"`
-	IrqPercent     float64 `json:"irq_p"`
-	NicePercent    float64 `json:"nice_p"`
-	SoftIrqPercent float64 `json:"softirq_p"`
-	StealPercent   float64 `json: "steal_p"`
-}
-
-func GetCpuTimes() (*CpuTimes, error) {
+func GetCpuTimes() (*sigar.Cpu, error) {
 
 	cpu := sigar.Cpu{}
 	err := cpu.Get()
@@ -37,10 +25,10 @@ func GetCpuTimes() (*CpuTimes, error) {
 		return nil, err
 	}
 
-	return &CpuTimes{Cpu: cpu}, nil
+	return &cpu, nil
 }
 
-func GetCpuTimesList() ([]CpuTimes, error) {
+func GetCpuTimesList() ([]sigar.Cpu, error) {
 
 	cpuList := sigar.CpuList{}
 	err := cpuList.Get()
@@ -48,106 +36,112 @@ func GetCpuTimesList() ([]CpuTimes, error) {
 		return nil, err
 	}
 
-	cpuTimes := make([]CpuTimes, len(cpuList.List))
+	cpuTimes := make([]sigar.Cpu, len(cpuList.List))
 
 	for i, cpu := range cpuList.List {
-		cpuTimes[i] = CpuTimes{Cpu: cpu}
+		cpuTimes[i] = cpu
 	}
 
 	return cpuTimes, nil
 }
 
-func GetCpuPercentage(last *CpuTimes, current *CpuTimes) *CpuTimes {
+func calculateCpuPercentages(last, current *sigar.Cpu) common.MapStr {
+
+	emptyMapStr := common.MapStr{
+		"user_p":    0.0,
+		"system_p":  0.0,
+		"idle_p":    0.0,
+		"iowait_p":  0.0,
+		"irq_p":     0.0,
+		"softirq_p": 0.0,
+		"nice_p":    0.0,
+		"steal_p":   0.0,
+	}
 
 	if last != nil && current != nil {
-		all_delta := current.Cpu.Total() - last.Cpu.Total()
+		all_delta := current.Total() - last.Total()
+
+		if all_delta == 0 {
+			// first run of the Beat
+			return emptyMapStr
+		}
 
 		calculate := func(field2 uint64, field1 uint64) float64 {
 
 			perc := 0.0
 			delta := int64(field2 - field1)
 			perc = float64(delta) / float64(all_delta)
+			logp.Debug("system", "perc %f", perc)
 			return Round(perc, .5, 4)
 		}
-
-		current.UserPercent = calculate(current.Cpu.User, last.Cpu.User)
-		current.SystemPercent = calculate(current.Cpu.Sys, last.Cpu.Sys)
-		current.IdlePercent = calculate(current.Cpu.Idle, last.Cpu.Idle)
-		current.IOwaitPercent = calculate(current.Cpu.Wait, last.Cpu.Wait)
-		current.IrqPercent = calculate(current.Cpu.Irq, last.Cpu.Irq)
-		current.NicePercent = calculate(current.Cpu.Nice, last.Cpu.Nice)
-		current.SoftIrqPercent = calculate(current.Cpu.SoftIrq, last.Cpu.SoftIrq)
-		current.StealPercent = calculate(current.Cpu.Stolen, last.Cpu.Stolen)
+		return common.MapStr{
+			"user_p":    calculate(current.User, last.User),
+			"system_p":  calculate(current.Sys, last.Sys),
+			"idle_p":    calculate(current.Idle, last.Idle),
+			"iowait_p":  calculate(current.Wait, last.Wait),
+			"irq_p":     calculate(current.Irq, last.Irq),
+			"nice_p":    calculate(current.Nice, last.Nice),
+			"softirq_p": calculate(current.SoftIrq, last.SoftIrq),
+			"steal_p":   calculate(current.Stolen, last.Stolen),
+		}
 	}
-
-	return current
+	return emptyMapStr
 }
 
-func GetCpuPercentageList(last, current []CpuTimes) []CpuTimes {
+func (cpu *CPU) generateCpuStatEvent(last, current *sigar.Cpu) common.MapStr {
 
-	if last != nil && current != nil && len(last) == len(current) {
-
-		calculate := func(field2 uint64, field1 uint64, all_delta uint64) float64 {
-
-			perc := 0.0
-			delta := int64(field2 - field1)
-			perc = float64(delta) / float64(all_delta)
-			return Round(perc, .5, 4)
-		}
-
-		for i := 0; i < len(last); i++ {
-			all_delta := current[i].Cpu.Total() - last[i].Cpu.Total()
-			current[i].UserPercent = calculate(current[i].Cpu.User, last[i].Cpu.User, all_delta)
-			current[i].SystemPercent = calculate(current[i].Cpu.Sys, last[i].Cpu.Sys, all_delta)
-			current[i].IdlePercent = calculate(current[i].Cpu.Idle, last[i].Cpu.Idle, all_delta)
-			current[i].IOwaitPercent = calculate(current[i].Cpu.Wait, last[i].Cpu.Wait, all_delta)
-			current[i].IrqPercent = calculate(current[i].Cpu.Irq, last[i].Cpu.Irq, all_delta)
-			current[i].NicePercent = calculate(current[i].Cpu.Nice, last[i].Cpu.Nice, all_delta)
-			current[i].SoftIrqPercent = calculate(current[i].Cpu.SoftIrq, last[i].Cpu.SoftIrq, all_delta)
-			current[i].StealPercent = calculate(current[i].Cpu.Stolen, last[i].Cpu.Stolen, all_delta)
-
-		}
-
-	}
-
-	return current
-}
-
-func (cpu *CPU) GetCpuStatEvent(cpuStat *CpuTimes) common.MapStr {
-	result := common.MapStr{
-		"user_p":    cpuStat.UserPercent,
-		"system_p":  cpuStat.SystemPercent,
-		"idle_p":    cpuStat.IdlePercent,
-		"iowait_p":  cpuStat.IOwaitPercent,
-		"irq_p":     cpuStat.IrqPercent,
-		"nice_p":    cpuStat.NicePercent,
-		"softirq_p": cpuStat.SoftIrqPercent,
-		"steal_p":   cpuStat.StealPercent,
-	}
+	cpuStats := calculateCpuPercentages(last, current)
 
 	if cpu.CpuTicks {
 		m := common.MapStr{
-			"user":    cpuStat.User,
-			"system":  cpuStat.Sys,
-			"nice":    cpuStat.Nice,
-			"idle":    cpuStat.Idle,
-			"iowait":  cpuStat.Wait,
-			"irq":     cpuStat.Irq,
-			"softirq": cpuStat.SoftIrq,
-			"steal":   cpuStat.Stolen,
+			"user":    current.User,
+			"system":  current.Sys,
+			"nice":    current.Nice,
+			"idle":    current.Idle,
+			"iowait":  current.Wait,
+			"irq":     current.Irq,
+			"softirq": current.SoftIrq,
+			"steal":   current.Stolen,
 		}
-		return common.MapStrUnion(result, m)
+		return common.MapStrUnion(cpuStats, m)
 	}
-	return result
+	return cpuStats
 
 }
-
-func (cpu *CPU) AddCpuPercentage(t2 *CpuTimes) {
-	cpu.LastCpuTimes = GetCpuPercentage(cpu.LastCpuTimes, t2)
+func (cpu *CPU) saveCpuTimes(t *sigar.Cpu) {
+	cpu.LastCpuTimes = t
 }
 
-func (cpu *CPU) AddCpuPercentageList(t2 []CpuTimes) {
-	cpu.LastCpuTimesList = GetCpuPercentageList(cpu.LastCpuTimesList, t2)
+func (cpu *CPU) saveCpuTimesList(t []sigar.Cpu) {
+	cpu.LastCpuTimesList = t
+}
+
+func (cpu *CPU) GetCpuStatEvent(current *sigar.Cpu) common.MapStr {
+
+	last := cpu.LastCpuTimes
+
+	cpuStats := cpu.generateCpuStatEvent(last, current)
+
+	cpu.saveCpuTimes(current)
+
+	return cpuStats
+}
+
+func (cpu *CPU) GetCpuStatForCores(current []sigar.Cpu) common.MapStr {
+
+	cpus := common.MapStr{}
+
+	for coreNumber, stat := range current {
+		if len(cpu.LastCpuTimesList) < coreNumber+1 {
+			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.generateCpuStatEvent(nil, &stat)
+		} else {
+			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.generateCpuStatEvent(&cpu.LastCpuTimesList[coreNumber], &stat)
+		}
+	}
+
+	cpu.saveCpuTimesList(current)
+
+	return cpus
 }
 
 func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
@@ -162,21 +156,17 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		return nil, err
 	}
 
-	cpu.AddCpuPercentage(cpuStat)
-
 	memStat, err := GetMemory()
 	if err != nil {
 		logp.Warn("Getting memory details: %v", err)
 		return nil, err
 	}
-	AddMemPercentage(memStat)
 
 	swapStat, err := GetSwap()
 	if err != nil {
 		logp.Warn("Getting swap details: %v", err)
 		return nil, err
 	}
-	AddSwapPercentage(swapStat)
 
 	event := common.MapStr{
 		"@timestamp": common.Time(time.Now()),
@@ -194,14 +184,7 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 			logp.Warn("Getting cpu core times: %v", err)
 			return nil, err
 		}
-		cpu.AddCpuPercentageList(cpuCoreStat)
-
-		cpus := common.MapStr{}
-
-		for coreNumber, stat := range cpuCoreStat {
-			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.GetCpuStatEvent(&stat)
-		}
-		event["cpus"] = cpus
+		event["cpus"] = cpu.GetCpuStatForCores(cpuCoreStat)
 	}
 
 	return event, nil

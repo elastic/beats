@@ -88,7 +88,7 @@ func GetProcMemPercentage(proc *Process, total_phymem uint64) float64 {
 			logp.Warn("Getting memory details: %v", err)
 			return 0
 		}
-		total_phymem = memStat.Mem.Total
+		total_phymem = memStat.Total
 	}
 
 	perc := (float64(proc.Mem.Resident) / float64(total_phymem))
