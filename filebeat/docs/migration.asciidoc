@@ -136,6 +136,7 @@ filebeat:
       fields:
         service: apache
         zone: us-east-1
+      fields_under_root: true
     - input_type: stdin <2>
       document_type: stdin
     - input_type: log
