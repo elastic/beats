@@ -29,6 +29,10 @@ output:
 In this configuration, `hosts` specifies the Logstash server and the port (`5044`)
 where Logstash is configured to listen for incoming Beats connections.
 
+TIP: To test your configuration file, run {beatname_uc} in the foreground with the following options specified:
++./{beatname_lc} -configtest -e+.
+
 To use this configuration, you must also
 {libbeat}/logstash-installation.html#logstash-setup[set up Logstash] to receive events
 from Beats.
+
