@@ -36,9 +36,10 @@ func TestCpuPercentage(t *testing.T) {
 		Stolen:  0,
 	}
 
-	per := cpu.GetCpuStatEvent(&cpu1)
-	assert.Equal(t, per["user_p"], 0.0)
-	assert.Equal(t, per["system_p"], 0.0)
+	stats, err := cpu.GetCpuStats(&cpu1)
+	assert.Nil(t, err)
+	assert.Equal(t, stats["user_p"], 0.0)
+	assert.Equal(t, stats["system_p"], 0.0)
 
 	cpu2 := sigar.Cpu{
 		User:    10855693,
@@ -51,8 +52,8 @@ func TestCpuPercentage(t *testing.T) {
 		Stolen:  0,
 	}
 
-	per = cpu.GetCpuStatEvent(&cpu2)
-
-	assert.Equal(t, per["user_p"], 0.9502)
-	assert.Equal(t, per["system_p"], 0.0448)
+	stats, err = cpu.GetCpuStats(&cpu2)
+	assert.Nil(t, err)
+	assert.Equal(t, stats["user_p"], 0.9502)
+	assert.Equal(t, stats["system_p"], 0.0448)
 }

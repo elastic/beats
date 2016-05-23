@@ -40,13 +40,15 @@ class Test(BaseTest):
             "proc.mem.rss",
             "proc.mem.share",
         ]:
+            assert key in output
             assert type(output[key]) is int
 
         for key in [
             "proc.cpu.total_p",
             "proc.mem.rss_p",
         ]:
-            assert type(output[key]) in float
+            assert key in output
+            assert type(output[key]) in [float, int]
 
     def test_cpu_ticks_per_proc_option(self):
         """
@@ -64,7 +66,6 @@ class Test(BaseTest):
 
         output = self.read_output()[0]
 
-        print(output)
         for key in [
             "proc.pid",
             "proc.ppid",

@@ -87,7 +87,7 @@ func calculateCpuPercentages(last, current *sigar.Cpu) common.MapStr {
 	return emptyMapStr
 }
 
-func (cpu *CPU) generateCpuStatEvent(last, current *sigar.Cpu) common.MapStr {
+func (cpu *CPU) generateCpuStatsEvent(last, current *sigar.Cpu) common.MapStr {
 
 	cpuStats := calculateCpuPercentages(last, current)
 
@@ -115,32 +115,50 @@ func (cpu *CPU) saveCpuTimesList(t []sigar.Cpu) {
 	cpu.LastCpuTimesList = t
 }
 
-func (cpu *CPU) GetCpuStatEvent(current *sigar.Cpu) common.MapStr {
+func (cpu *CPU) GetCpuStats(cpuStat *sigar.Cpu) (common.MapStr, error) {
 
+	var err error
 	last := cpu.LastCpuTimes
 
-	cpuStats := cpu.generateCpuStatEvent(last, current)
-
-	cpu.saveCpuTimes(current)
-
-	return cpuStats
-}
-
-func (cpu *CPU) GetCpuStatForCores(current []sigar.Cpu) common.MapStr {
-
-	cpus := common.MapStr{}
-
-	for coreNumber, stat := range current {
-		if len(cpu.LastCpuTimesList) < coreNumber+1 {
-			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.generateCpuStatEvent(nil, &stat)
-		} else {
-			cpus["cpu"+strconv.Itoa(coreNumber)] = cpu.generateCpuStatEvent(&cpu.LastCpuTimesList[coreNumber], &stat)
+	if cpuStat == nil {
+		cpuStat, err = GetCpuTimes()
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	cpu.saveCpuTimesList(current)
+	cpuStats := cpu.generateCpuStatsEvent(last, cpuStat)
 
-	return cpus
+	cpu.saveCpuTimes(cpuStat)
+
+	return cpuStats, nil
+}
+
+func (cpu *CPU) GetCpuStatsPerCore() (common.MapStr, error) {
+
+	var coreStat common.MapStr
+	cores := common.MapStr{}
+
+	if cpu.CpuPerCore {
+
+		cpuTimesList, err := GetCpuTimesList()
+		if err != nil {
+			return nil, err
+		}
+		for coreNumber, stat := range cpuTimesList {
+			if len(cpu.LastCpuTimesList) < coreNumber+1 {
+				coreStat = cpu.generateCpuStatsEvent(nil, &stat)
+			} else {
+				coreStat = cpu.generateCpuStatsEvent(&cpu.LastCpuTimesList[coreNumber], &stat)
+			}
+			coreStat["core"] = coreNumber
+			cores["cpu"+strconv.Itoa(coreNumber)] = coreStat
+		}
+
+		cpu.saveCpuTimesList(cpuTimesList)
+	}
+
+	return cores, nil
 }
 
 func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
@@ -149,9 +167,10 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		logp.Warn("Getting load statistics: %v", err)
 		return nil, err
 	}
-	cpuStat, err := GetCpuTimes()
+
+	cpuStat, err := cpu.GetCpuStats(nil)
 	if err != nil {
-		logp.Warn("Getting cpu times: %v", err)
+		logp.Warn("Getting CPU statistics: %v", err)
 		return nil, err
 	}
 
@@ -171,27 +190,19 @@ func (cpu *CPU) GetSystemStats() (common.MapStr, error) {
 		"@timestamp": common.Time(time.Now()),
 		"type":       "system",
 		"load":       loadStat,
-		"cpu":        cpu.GetCpuStatEvent(cpuStat),
+		"cpu":        cpuStat,
 		"mem":        GetMemoryEvent(memStat),
 		"swap":       GetSwapEvent(swapStat),
 	}
 
-	return event, nil
-}
-
-func (cpu *CPU) GetPerCoreStats() ([]common.MapStr, error) {
-
-	var result []common.MapStr
-
 	if cpu.CpuPerCore {
-
-		cpuCoreStat, err := GetCpuTimesList()
+		cores, err := cpu.GetCpuStatsPerCore()
 		if err != nil {
-			logp.Warn("Getting cpu core times: %v", err)
+			logp.Warn("Getting CPU details per core: %v", err)
 			return nil, err
 		}
-		cpuCoreStat["core"] = cpu.GetCpuStatForCores(cpuCoreStat)
+		event["cpus"] = cores
 	}
 
-	return result, nil
+	return event, nil
 }
