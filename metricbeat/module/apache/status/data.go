@@ -87,7 +87,7 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 
 		} else {
 
-			logp.Warn("Unexpected line in apache server-status output: %s", scanner.Text())
+			debugf("Unexpected line in apache server-status output: %s", scanner.Text())
 		}
 	}
 
