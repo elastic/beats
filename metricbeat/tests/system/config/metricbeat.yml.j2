@@ -1,93 +1,142 @@
-metricbeat:
-  modules:
-    {% for m in modules -%}
-    - module: {{ m.name }}
-      {% if m.enabled is defined -%}
-      enabled: {{ m.enabled }}
-      {% endif -%}
+###################### Metricbeat Configuration Template #######################
 
-      {% if m.hosts -%}
-      hosts:
-        {% for host in m.hosts -%}
-        - '{{ host }}'
-        {% endfor %}
-      {% endif -%}
+metricbeat.modules:
+{% for m in modules -%}
+- module: {{ m.name }}
+  {% if m.enabled is defined -%}
+  enabled: {{ m.enabled }}
+  {% endif -%}
 
-      {% if m.metricsets -%}
-      metricsets:
-        {% for ms in m.metricsets -%}
-        - {{ ms }}
-        {% endfor %}
-      {% endif -%}
+  {% if m.hosts -%}
+  hosts:
+    {% for host in m.hosts -%}
+    - '{{ host }}'
+    {% endfor %}
+  {% endif -%}
 
-      {% if m.period -%}
-      period: {{ m.period }}
-      {% endif -%}
+  {% if m.metricsets -%}
+  metricsets:
+    {% for ms in m.metricsets -%}
+    - {{ ms }}
+    {% endfor %}
+  {% endif -%}
 
-      {% if m.timeout -%}
-      timeout: {{ m.timeout }}
-      {% endif -%}
+  {% if m.period -%}
+  period: {{ m.period }}
+  {% endif -%}
 
-      {% if m.filters is defined -%}
-      filters:
-        {% for f in m.filters -%}
-        {% for k, v in f.items() -%}
-        - {{ k }}.fields: [
-          {%- for field in v -%}
-          '{{ field }}' {%- if not loop.last %}, {% endif -%}
-          {%- endfor -%}
-        ]
-        {%- endfor %}
-        {%- endfor %}
-      {% endif -%}
+  {% if m.timeout -%}
+  timeout: {{ m.timeout }}
+  {% endif -%}
 
-      {% if m.tags is defined -%}
-      tags:
-        {% for tag in m.tags -%}
-        - {{ tag }}
-        {% endfor %}
-      {% endif -%}
-
-      {% if m.fields is defined -%}
-      {% if m.fields_under_root %}fields_under_root: true{% endif %}
-      fields:
-        {% for k, v in m.fields.items() -%}
-        {{ k }}: {{ v }}
-        {%- endfor %}
-      {% endif -%}
-
-      {% if m.extras -%}
-      {% for k, v in m.extras.items() -%}
-      {{ k }}: {{ v }}
-      {% endfor %}
-      {% endif -%}
+  {% if m.filters is defined -%}
+  filters:
+    {% for f in m.filters -%}
+    {% for k, v in f.items() -%}
+    - {{ k }}.fields: [
+      {%- for field in v -%}
+      '{{ field }}' {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+    ]
     {%- endfor %}
+    {%- endfor %}
+  {% endif -%}
 
-output:
-  file:
-    enabled: true
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
-    filename: "{{ output_file_filename|default("metricbeat") }}"
-    rotate_every_kb: 1000
+  {% if m.tags is defined -%}
+  tags:
+    {% for tag in m.tags -%}
+    - {{ tag }}
+    {% endfor %}
+  {% endif -%}
 
-{%- if include_fields or drop_fields or drop_event %}
+  {% if m.fields is defined -%}
+  {% if m.fields_under_root %}fields_under_root: true{% endif %}
+  fields:
+    {% for k, v in m.fields.items() -%}
+    {{ k }}: {{ v }}
+    {%- endfor %}
+  {% endif -%}
+
+  {% if m.extras -%}
+  {% for k, v in m.extras.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor %}
+  {% endif -%}
+{%- endfor %}
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+name: {{shipper_name}}
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+tags: [
+  {%- if agent_tags -%}
+      {%- for tag in agent_tags -%}
+          "{{ tag }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  {%- endif -%}
+]
+
+# Uncomment the following if you want to ignore transactions created
+# by the server on which the shipper is installed. This option is useful
+# to remove duplicates if shippers are installed on multiple servers.
+# ignore_outgoing: true
+
+{% if geoip_paths is not none %}
+geoip:
+  paths: [
+      {%- for path in geoip_paths -%}
+          "{{ beat.working_dir + '/' + path }}"
+          {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+  ]
+{%- endif %}
+
+{%- if drop_fields or drop_event or include_fields %}
+
+#================================ Filters =====================================
 filters:
 
     {%- if include_fields %}
     - include_fields:
-        {{ include_fields.condition | default() }}
-        fields: {{ include_fields.fields }}
+        {{include_fields.condition | default()}}
+        fields: {{include_fields.fields | default([])}}
     {%- endif %}
 
     {%- if drop_fields %}
     - drop_fields:
-        {{ drop_fields.condition | default() }}
-        fields: {{ drop_fields.fields | default([]) }}
+        {{drop_fields.condition | default()}}
+        fields: {{drop_fields.fields | default([])}}
     {%- endif %}
+
 
     {%- if drop_event %}
     - drop_event:
-        {{ drop_event.condition | default() }}
+        {{ drop_event.condition | default()}}
     {%- endif %}
+
 {%- endif %}
-# vim: set ft=jinja:
+
+#================================ Outputs =====================================
+
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+
+#------------------------------- File output ----------------------------------
+output.file:
+  path: {{ output_file_path|default(beat.working_dir + "/output") }}
+  filename: "{{ output_file_filename|default("metricbeat") }}"
+  rotate_every_kb: 1000
+  #number_of_files: 7
+
+{% if path_data %}
+#================================ Paths =====================================
+path:
+  data: {{path_data}}
+{%endif%}
