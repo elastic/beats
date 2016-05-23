@@ -34,7 +34,7 @@ system (e.g. redis-info, mysql-status).
 
 == Module & Metricsets Requirements
 
-It is important for us that only high quality modules are part metricbeat to
+It is important for us that only high quality modules are part of metricbeat to
 guarantee the best user experience. Modules and Metricsets which are contributed
 must fulfill the following requirements:
 
