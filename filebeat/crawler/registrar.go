@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"sync"
 
+	"time"
+
 	cfg "github.com/elastic/beats/filebeat/config"
 	"github.com/elastic/beats/filebeat/input"
 	. "github.com/elastic/beats/filebeat/input"
@@ -17,9 +19,8 @@ import (
 type Registrar struct {
 	Channel      chan []*FileEvent
 	done         chan struct{}
-	registryFile string               // Path to the Registry File
-	state        map[string]FileState // Map with all file paths inside and the corresponding state
-	stateMutex   sync.Mutex
+	registryFile string        // Path to the Registry File
+	state        *input.States // Map with all file paths inside and the corresponding state
 	wg           sync.WaitGroup
 }
 
@@ -28,7 +29,7 @@ func NewRegistrar(registryFile string) (*Registrar, error) {
 	r := &Registrar{
 		registryFile: registryFile,
 		done:         make(chan struct{}),
-		state:        map[string]FileState{},
+		state:        input.NewStates(),
 		Channel:      make(chan []*FileEvent, 1),
 		wg:           sync.WaitGroup{},
 	}
@@ -63,14 +64,84 @@ func (r *Registrar) Init() error {
 
 // loadState fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
-func (r *Registrar) LoadState() {
-	if existing, e := os.Open(r.registryFile); e == nil {
-		defer existing.Close()
+func (r *Registrar) LoadState() error {
 
-		logp.Info("Loading registrar data from %s", r.registryFile)
-		decoder := json.NewDecoder(existing)
-		decoder.Decode(&r.state)
+	// Check if files exists
+	_, err := os.Stat(r.registryFile)
+	if err != nil && !os.IsNotExist(err) {
+		return err
 	}
+
+	// Error means no file found
+	if err != nil {
+		logp.Info("No registry file found under: %s. Creating a new registry file.", r.registryFile)
+		return nil
+	}
+
+	file, err := os.Open(r.registryFile)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	logp.Info("Loading registrar data from %s", r.registryFile)
+
+	// DEPRECATED: This should be removed in 6.0
+	oldStates := r.loadAndConvertOldState(file)
+	if oldStates {
+		return nil
+	}
+
+	decoder := json.NewDecoder(file)
+	states := []input.FileState{}
+	decoder.Decode(&states)
+
+	r.state.SetStates(states)
+	logp.Info("States Loaded from registrar: %+v", len(states))
+
+	return nil
+}
+
+// loadAndConvertOldState loads the old state file and converts it to the new state
+// This is designed so it can be easily removed in later versions
+func (r *Registrar) loadAndConvertOldState(file *os.File) bool {
+	// Make sure file reader is reset afterwards
+	defer file.Seek(0, 0)
+
+	decoder := json.NewDecoder(file)
+	oldStates := map[string]FileState{}
+	err := decoder.Decode(&oldStates)
+
+	if err != nil {
+		logp.Debug("registrar", "Error decoding old state: %+v", err)
+		return false
+	}
+
+	// No old states found -> probably already new format
+	if oldStates == nil {
+		return false
+	}
+
+	// Convert old states to new states
+	states := make([]input.FileState, len(oldStates))
+	logp.Info("Old registry states found: %v", len(oldStates))
+	counter := 0
+	for _, state := range oldStates {
+		// Makes time last_seen time of migration, as this is the best guess
+		state.LastSeen = time.Now()
+		states[counter] = state
+		counter++
+	}
+
+	r.state.SetStates(states)
+
+	// Rewrite registry in new format
+	r.writeRegistry()
+
+	logp.Info("Old states converted to new states and written to registrar: %v", len(oldStates))
+
+	return true
 }
 
 func (r *Registrar) Start() {
@@ -112,20 +183,15 @@ func (r *Registrar) processEventStates(events []*FileEvent) {
 		if event.InputType == cfg.StdinInputType {
 			continue
 		}
-
-		r.setState(event.Source, event.FileState)
+		r.state.Update(event.FileState)
 	}
 }
 
+// Stop stops the registry. It waits until Run function finished.
 func (r *Registrar) Stop() {
 	logp.Info("Stopping Registrar")
 	close(r.done)
 	r.wg.Wait()
-}
-
-func (r *Registrar) GetFileState(path string) (FileState, bool) {
-	state, exist := r.getStateEntry(path)
-	return state, exist
 }
 
 // writeRegistry writes the new json registry file to disk.
@@ -139,84 +205,15 @@ func (r *Registrar) writeRegistry() error {
 		return e
 	}
 
-	encoder := json.NewEncoder(file)
+	states := r.state.GetStates()
 
-	state := r.getState()
-	encoder.Encode(state)
+	encoder := json.NewEncoder(file)
+	encoder.Encode(states)
 
 	// Directly close file because of windows
 	file.Close()
 
-	logp.Info("Registry file updated. %d states written.", len(state))
+	logp.Info("Registry file updated. %d states written.", len(states))
 
 	return SafeFileRotate(r.registryFile, tempfile)
-}
-
-func (r *Registrar) fetchState(filePath string, fileInfo os.FileInfo) int64 {
-
-	if previous, err := r.getPreviousFile(filePath, fileInfo); err == nil {
-
-		if previous != filePath {
-			// File has rotated between shutdown and startup
-			// We return last state downstream, with a modified event source with the new file name
-			// And return the offset - also force harvest in case the file is old and we're about to skip it
-			logp.Info("Detected rename of a previously harvested file: %s -> %s", previous, filePath)
-		}
-
-		logp.Info("Previous state for file %s found", filePath)
-
-		lastState, _ := r.GetFileState(previous)
-		return lastState.Offset
-	}
-
-	logp.Info("New file. Start reading from the beginning: %s", filePath)
-
-	// New file so just start from the beginning
-	return 0
-}
-
-// getPreviousFile checks in the registrar if there is the newFile already exist with a different name
-// In case an old file is found, the path to the file is returned, if not, an error is returned
-func (r *Registrar) getPreviousFile(newFilePath string, newFileInfo os.FileInfo) (string, error) {
-
-	newState := input.GetOSFileState(newFileInfo)
-
-	for oldFilePath, oldState := range r.getState() {
-
-		// Compare states
-		if newState.IsSame(oldState.FileStateOS) {
-			logp.Info("Old file with new name found: %s -> %s", oldFilePath, newFilePath)
-			return oldFilePath, nil
-		}
-	}
-
-	return "", fmt.Errorf("No previous file found")
-}
-
-func (r *Registrar) setState(path string, state FileState) {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
-
-	r.state[path] = state
-}
-
-func (r *Registrar) getStateEntry(path string) (FileState, bool) {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
-
-	state, exist := r.state[path]
-	return state, exist
-}
-
-func (r *Registrar) getState() map[string]FileState {
-	r.stateMutex.Lock()
-	defer r.stateMutex.Unlock()
-
-	copy := make(map[string]FileState)
-
-	for k, v := range r.state {
-		copy[k] = v
-	}
-
-	return copy
 }

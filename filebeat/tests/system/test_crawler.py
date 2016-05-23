@@ -318,8 +318,8 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Make sure new file was picked up. As it has the same file name,
-        # only one entry exists
-        assert len(data) == 1
+        # one entry for the new file and one for the old should exist
+        assert len(data) == 2
 
         # Make sure output has 11 entries, the new file was started
         # from scratch
@@ -376,8 +376,8 @@ class Test(BaseTest):
         data = self.get_registry()
 
         # Make sure new file was picked up. As it has the same file name,
-        # only one entry exists
-        assert len(data) == 1
+        # one entry for the new and one for the old should exist
+        assert len(data) == 2
 
         # Make sure output has 11 entries, the new file was started
         # from scratch

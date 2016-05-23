@@ -71,7 +71,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Load the previous log file locations now, for use in prospector
-	fb.registrar.LoadState()
+	err = fb.registrar.LoadState()
+	if err != nil {
+		logp.Err("Error loading state: %v", err)
+		return err
+	}
 
 	// Init and Start spooler: Harvesters dump events into the spooler.
 	fb.spooler = NewSpooler(fb.FbConfig.Filebeat, fb.publisherChan)
