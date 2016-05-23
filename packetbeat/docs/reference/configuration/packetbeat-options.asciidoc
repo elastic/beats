@@ -186,15 +186,7 @@ common options like `ports`, `send_request`, `send_response`, and options that a
 
 Currently, Packetbeat supports the following protocols:
 
- - ICMP (v4 and v6)
- - DNS
- - HTTP
- - Mysql
- - PostgreSQL
- - Redis
- - Thrift-RPC
- - MongoDB
- - Memcache
+include::../../shared-protocol-list.asciidoc[]
 
 Example configuration:
 
