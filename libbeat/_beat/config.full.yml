@@ -170,7 +170,7 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Optional TLS. By default is off.
+  # Optional TLS configuration options. TLS is off by default.
   # List of root certificates for HTTPS server verifications
   #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -227,8 +227,7 @@ output.elasticsearch:
   # default is 10s.
   #broker_timeout: 10s
 
-  # Per Kafka broker number of messages buffered in output pipeline. The default
-  # is 256.
+  # The number of messages buffered for each Kafka broker. The default is 256.
   #channel_buffer_size: 256
 
   # The keep-alive period for an active network connection. If 0s, keep-alives
@@ -257,7 +256,7 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Optional TLS. By default is off.
+  # Optional TLS configuration options. TLS is off by default.
   # List of root certificates for HTTPS server verifications
   #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -353,7 +352,7 @@ output.elasticsearch:
   # occurs on the proxy server.
   #proxy_use_local_resolver: false
 
-  # Optional TLS. By default is off.
+  # Optional TLS configuration options. TLS is off by default.
   # List of root certificates for HTTPS server verifications
   #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -385,8 +384,9 @@ output.elasticsearch:
   # files: `beatname`, `beatname.1`, `beatname.2`, etc.
   #filename: beatname
 
-  # Maximum size in kilobytes of each file. When this size is reached, the files
-  # are rotated. The default value is 10240 kB.
+  # Maximum size in kilobytes of each file. When this size is reached, and on
+  # every beatname restart, the files are rotated. The default value is 10240
+  # kB.
   #rotate_every_kb: 10000
 
   # Maximum number of files under path. When this number of files is reached,
