@@ -50,7 +50,7 @@ metricbeat.modules:
 
 #---------------------------- System Status Module ---------------------------
 - module: system
-  metricsets: ["cpu", "core", "filesystem", "fsstats", "memory", "process"]
+  metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
   enabled: true
   period: 2s
   processes: ['.*']
