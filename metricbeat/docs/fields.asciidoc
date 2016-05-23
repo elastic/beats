@@ -1373,19 +1373,19 @@ type: float
 The percentage of used disk space.
 
 
-=== fsstats Fields
+=== fsstat Fields
 
-`system-fsstats` contains filesystem metrics aggregated from all mounted filesystems.
+`system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
 
 
-==== system.fsstats.count
+==== system.fsstat.count
 
 type: long
 
 Number of file systems found.
 
-==== system.fsstats.total_files
+==== system.fsstat.total_files
 
 type: long
 
@@ -1396,21 +1396,21 @@ Total number of files.
 Nested file system docs.
 
 
-==== system.fsstats.total_size.free
+==== system.fsstat.total_size.free
 
 type: long
 
 Total free space.
 
 
-==== system.fsstats.total_size.used
+==== system.fsstat.total_size.used
 
 type: long
 
 Total used space.
 
 
-==== system.fsstats.total_size.total
+==== system.fsstat.total_size.total
 
 type: long
 

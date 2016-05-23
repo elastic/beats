@@ -24,4 +24,4 @@ An example event looks as following:
 	  "type": "metricsets"
 	}
 */
-package fsstats
+package fsstat
