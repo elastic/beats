@@ -196,23 +196,92 @@
               "properties": {
                 "aborted": {
                   "properties": {
-                    "Aborted_clients": {
+                    "clients": {
                       "type": "integer"
                     },
-                    "Aborted_connects": {
+                    "connects": {
                       "type": "integer"
+                    }
+                  }
+                },
+                "binlog": {
+                  "properties": {
+                    "cache": {
+                      "properties": {
+                        "disk_use": {
+                          "type": "integer"
+                        },
+                        "use": {
+                          "type": "integer"
+                        }
+                      }
                     }
                   }
                 },
                 "bytes": {
                   "properties": {
-                    "Bytes_received": {
+                    "received": {
                       "type": "integer"
                     },
-                    "Bytes_sent": {
+                    "sent": {
                       "type": "integer"
                     }
                   }
+                },
+                "connections": {
+                  "type": "integer"
+                },
+                "created": {
+                  "properties": {
+                    "tmp": {
+                      "properties": {
+                        "disk_tables": {
+                          "type": "integer"
+                        },
+                        "files": {
+                          "type": "integer"
+                        },
+                        "tables": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "delayed": {
+                  "properties": {
+                    "errors": {
+                      "type": "integer"
+                    },
+                    "insert_threads": {
+                      "type": "integer"
+                    },
+                    "writes": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "flush_commands": {
+                  "type": "integer"
+                },
+                "max_used_connections": {
+                  "type": "integer"
+                },
+                "open": {
+                  "properties": {
+                    "files": {
+                      "type": "integer"
+                    },
+                    "streams": {
+                      "type": "integer"
+                    },
+                    "tables": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "opened_tables": {
+                  "type": "integer"
                 }
               }
             }

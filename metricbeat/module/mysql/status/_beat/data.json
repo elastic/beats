@@ -1,44 +1,53 @@
 {
-    "@timestamp": "2016-04-18T12:16:13.382Z",
-    "beat": {
-        "hostname": "example.com",
-        "name": "example.com"
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"ruflin",
+        "name":"ruflin"
     },
-    "metricset": "status",
-    "module": "mysql",
-    "mysql-status": {
-        "Connections": 690,
-        "Flush_commands": 2,
-        "Max_used_connections": 2,
-        "aborted": {
-            "Aborted_clients": 88,
-            "Aborted_connects": 597
-        },
-        "binlog": {
-            "Binlog_cache_disk_use": 0,
-            "Binlog_cache_use": 0
-        },
-        "bytes": {
-            "Bytes_received": 549749,
-            "Bytes_sent": 144506849
-        },
-        "created": {
-            "Created_tmp_disk_tables": 1,
-            "Created_tmp_files": 5,
-            "Created_tmp_tables": 2
-        },
-        "delayed": {
-            "Delayed_errors": 0,
-            "Delayed_insert_threads": 0,
-            "Delayed_writes": 0
-        },
-        "open": {
-            "Open_files": 0,
-            "Open_streams": 0,
-            "Open_tables": 15,
-            "Opened_tables": 142
+    "metricset":{
+        "host":"root:test@tcp(localhost:3306)/",
+        "module":"mysql",
+        "name":"status",
+        "rtt":44269
+    },
+    "mysql":{
+        "status":{
+            "aborted":{
+                "clients":2,
+                "connects":0
+            },
+            "binlog":{
+                "cache":{
+                    "disk_use":0,
+                    "use":0
+                }
+            },
+            "bytes":{
+                "received":456,
+                "sent":20079
+            },
+            "connections":5,
+            "created":{
+                "tmp":{
+                    "disk_tables":0,
+                    "files":6,
+                    "tables":0
+                }
+            },
+            "delayed":{
+                "errors":0,
+                "insert_threads":0,
+                "writes":0
+            },
+            "flush_commands":1,
+            "max_used_connections":1,
+            "open":{
+                "files":14,
+                "streams":0,
+                "tables":101
+            },
+            "opened_tables":108
         }
     },
-    "rtt": 4861,
-    "type": "metricsets"
+    "type":"metricsets"
 }

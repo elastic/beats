@@ -14,7 +14,7 @@ CLIENTS_FIELDS = ["blocked", "biggest_input_buf",
                   "longest_output_list", "connected"]
 
 
-class RedisInfoTest(metricbeat.BaseTest):
+class Test(metricbeat.BaseTest):
     @attr('integration')
     def test_output(self):
         """

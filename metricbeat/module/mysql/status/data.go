@@ -13,42 +13,40 @@ func eventMapping(status map[string]string) common.MapStr {
 
 	event := common.MapStr{
 		"aborted": common.MapStr{
-
-			"Aborted_clients":  toInt(status["Aborted_clients"]),
-			"Aborted_connects": toInt(status["Aborted_connects"]),
+			"clients":  toInt(status["Aborted_clients"]),
+			"connects": toInt(status["Aborted_connects"]),
 		},
 		"binlog": common.MapStr{
-
-			"Binlog_cache_disk_use": toInt(status["Binlog_cache_disk_use"]),
-			"Binlog_cache_use":      toInt(status["Binlog_cache_use"]),
+			"cache": common.MapStr{
+				"disk_use": toInt(status["Binlog_cache_disk_use"]),
+				"use":      toInt(status["Binlog_cache_use"]),
+			},
 		},
 		"bytes": common.MapStr{
-
-			"Bytes_received": toInt(status["Bytes_received"]),
-			"Bytes_sent":     toInt(status["Bytes_sent"]),
+			"received": toInt(status["Bytes_received"]),
+			"sent":     toInt(status["Bytes_sent"]),
 		},
-		"Connections": toInt(status["Connections"]),
+		"connections": toInt(status["Connections"]),
 		"created": common.MapStr{
-
-			"Created_tmp_disk_tables": toInt(status["Created_tmp_disk_tables"]),
-			"Created_tmp_files":       toInt(status["Created_tmp_files"]),
-			"Created_tmp_tables":      toInt(status["Created_tmp_tables"]),
+			"tmp": common.MapStr{
+				"disk_tables": toInt(status["Created_tmp_disk_tables"]),
+				"files":       toInt(status["Created_tmp_files"]),
+				"tables":      toInt(status["Created_tmp_tables"]),
+			},
 		},
-
 		"delayed": common.MapStr{
-			"Delayed_errors":         toInt(status["Delayed_errors"]),
-			"Delayed_insert_threads": toInt(status["Delayed_insert_threads"]),
-			"Delayed_writes":         toInt(status["Delayed_writes"]),
+			"errors":         toInt(status["Delayed_errors"]),
+			"insert_threads": toInt(status["Delayed_insert_threads"]),
+			"writes":         toInt(status["Delayed_writes"]),
 		},
-		"Flush_commands":       toInt(status["Flush_commands"]),
-		"Max_used_connections": toInt(status["Max_used_connections"]),
+		"flush_commands":       toInt(status["Flush_commands"]),
+		"max_used_connections": toInt(status["Max_used_connections"]),
 		"open": common.MapStr{
-
-			"Open_files":    toInt(status["Open_files"]),
-			"Open_streams":  toInt(status["Open_streams"]),
-			"Open_tables":   toInt(status["Open_tables"]),
-			"Opened_tables": toInt(status["Opened_tables"]),
+			"files":   toInt(status["Open_files"]),
+			"streams": toInt(status["Open_streams"]),
+			"tables":  toInt(status["Open_tables"]),
 		},
+		"opened_tables": toInt(status["Opened_tables"]),
 	}
 
 	return event
