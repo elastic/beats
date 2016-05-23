@@ -152,6 +152,9 @@ output:
 +
 If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.
 
+TIP: To test your configuration file, run Filebeat in the foreground with the following options specified:
++./filebeat -configtest -e+.
+
 See <<filebeat-configuration-details>> for more details about each configuration option.
 
 [[config-filebeat-logstash]]
