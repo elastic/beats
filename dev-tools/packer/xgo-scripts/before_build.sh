@@ -33,15 +33,15 @@ cp $BEATNAME.template-es2x.json $PREFIX/$BEATNAME.template-es2x.json
 
 # linux
 cp $BEATNAME.yml $PREFIX/$BEATNAME-linux.yml
-
-# binary
-cp $BEATNAME.yml $PREFIX/$BEATNAME-binary.yml
+cp $BEATNAME.full.yml $PREFIX/$BEATNAME-linux.full.yml
 
 # darwin
 cp $BEATNAME.yml $PREFIX/$BEATNAME-darwin.yml
+cp $BEATNAME.full.yml $PREFIX/$BEATNAME-darwin.full.yml
 
 # win
 cp $BEATNAME.yml $PREFIX/$BEATNAME-win.yml
+cp $BEATNAME.full.yml $PREFIX/$BEATNAME-win.full.yml
 
 # Contains beat specific adjustments. As it is platform specific knowledge, it should be in packer not the beats itself
 PREFIX=$PREFIX make before-build

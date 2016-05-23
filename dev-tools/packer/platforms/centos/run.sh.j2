@@ -35,6 +35,7 @@ fpm --force -s dir -t rpm \
         beatname-${RUNID}.sh=/usr/bin/{{.beat_name}}.sh \
         {{.beat_name}}-linux-{{.arch}}=/usr/share/{{.beat_name}}/bin/{{.beat_name}} \
         {{.beat_name}}-linux.yml=/etc/{{.beat_name}}/{{.beat_name}}.yml \
+        {{.beat_name}}-linux.full.yml=/etc/{{.beat_name}}/{{.beat_name}}.full.yml \
         {{.beat_name}}.template.json=/etc/{{.beat_name}}/{{.beat_name}}.template.json \
         {{.beat_name}}.template-es2x.json=/etc/{{.beat_name}}/{{.beat_name}}.template-es2x.json \
         ${RUNID}.service=/lib/systemd/system/{{.beat_name}}.service \
