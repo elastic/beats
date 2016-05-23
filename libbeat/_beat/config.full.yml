@@ -94,7 +94,7 @@ output.elasticsearch:
   # The number of seconds to wait for new events between two bulk API index requests.
   # If `bulk_max_size` is reached before this interval expires, addition bulk index
   # requests are made.
-  #flush_interval: 1
+  #flush_interval: 1s
 
   # Boolean that sets if the topology is kept in Elasticsearch. The default is
   # false. This option makes sense only for Packetbeat.
@@ -194,7 +194,8 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
-  # The list of Kafka broker addresses to connect to.
+  # The list of Kafka broker addresses from where to fetch the cluster
+  # metadata.
   #hosts: ["localhost:9092"]
 
   # The Kafka topic used for produced events. If use_type is set to true, the
@@ -235,8 +236,8 @@ output.elasticsearch:
   #keep_alive: 0
 
   # Sets the output compression codec. Must be one of none, snappy and gzip. The
-  # default is snappy.
-  #compression: snappy
+  # default is gzip.
+  #compression: gzip
 
   # The maximum permitted size of JSON-encoded messages. Bigger messages will be
   # dropped. The default value is 1000000 (bytes). This value should be equal to
@@ -247,10 +248,10 @@ output.elasticsearch:
   # local commit, -1=wait for all replicas to commit. The default is 1.  Note:
   # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
   # on error.
-  #required_acks: 0
+  #required_acks: 1
 
   # The number of seconds to wait for new events between two producer API calls.
-  #flush_interval: 1
+  #flush_interval: 1s
 
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
