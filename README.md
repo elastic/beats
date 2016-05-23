@@ -22,3 +22,12 @@ This beat generator has several goals:
 * Provide all files needed to build up and grow a community around a beat
 * Allow release management of a beat
 * Make a beat easy to update to the most recent version of libbeat
+ 
+# Dependencies
+ 
+In order to build your beat, you need the following :
+ * [go](https://golang.org/doc/install) version >= 1.6
+ * [glide](https://github.com/Masterminds/glide) version >= 0.10.0
+ * [python](https://www.python.org/) version 2.x
+ * [virtualenv](https://virtualenv.pypa.io/en/stable/)
+ * [docker](https://www.docker.com/)
