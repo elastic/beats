@@ -17,7 +17,6 @@ type Prospector struct {
 	prospectorer  Prospectorer
 	spoolerChan   chan *input.FileEvent
 	harvesterChan chan *input.FileEvent
-	registrar     *Registrar
 	done          chan struct{}
 	states        *input.States
 	wg            sync.WaitGroup
@@ -28,14 +27,13 @@ type Prospectorer interface {
 	Run()
 }
 
-func NewProspector(cfg *common.Config, registrar *Registrar, spoolerChan chan *input.FileEvent) (*Prospector, error) {
+func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *input.FileEvent) (*Prospector, error) {
 	prospector := &Prospector{
 		config:        defaultConfig,
-		registrar:     registrar,
 		spoolerChan:   spoolerChan,
 		harvesterChan: make(chan *input.FileEvent),
 		done:          make(chan struct{}),
-		states:        input.NewStates(),
+		states:        &states,
 		wg:            sync.WaitGroup{},
 	}
 
@@ -44,7 +42,6 @@ func NewProspector(cfg *common.Config, registrar *Registrar, spoolerChan chan *i
 	}
 
 	err := prospector.Init()
-
 	if err != nil {
 		return nil, err
 	}
@@ -72,15 +69,13 @@ func (p *Prospector) Init() error {
 	switch p.config.Harvester.InputType {
 	case cfg.StdinInputType:
 		prospectorer, err = NewProspectorStdin(p)
-		prospectorer.Init()
 	case cfg.LogInputType:
 		prospectorer, err = NewProspectorLog(p)
-		prospectorer.Init()
-
 	default:
 		return fmt.Errorf("Invalid prospector type: %v", p.config.Harvester.InputType)
 	}
 
+	prospectorer.Init()
 	p.prospectorer = prospectorer
 
 	return nil
