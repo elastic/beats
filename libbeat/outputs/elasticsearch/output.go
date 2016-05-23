@@ -156,7 +156,7 @@ func (out *elasticsearchOutput) loadTemplate(config Template, client *Client) er
 	out.templateMutex.Lock()
 	defer out.templateMutex.Unlock()
 
-	logp.Info("Trying to load template for client: %s", client)
+	logp.Info("Trying to load template for client: %s", client.Connection.URL)
 
 	// Check if template already exist or should be overwritten
 	exists := client.CheckTemplate(config.Name)
