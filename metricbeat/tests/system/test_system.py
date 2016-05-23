@@ -16,7 +16,7 @@ SYSTEM_FILESYSTEM_FIELDS = ["avail", "device_name", "files", "free",
                             "free_files", "mount_point", "total", "used",
                             "used_p"]
 
-SYSTEM_FSSTATS_FIELDS = ["count", "total_files", "total_size"]
+SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "mem"]
 
@@ -127,13 +127,13 @@ class SystemTest(metricbeat.BaseTest):
             filesystem = evt["system"]["filesystem"]
             self.assertItemsEqual(SYSTEM_FILESYSTEM_FIELDS, filesystem.keys())
 
-    def test_fsstats(self):
+    def test_fsstat(self):
         """
-        Test system/fsstats output.
+        Test system/fsstat output.
         """
         self.render_config_template(modules=[{
             "name": "system",
-            "metricsets": ["fsstats"],
+            "metricsets": ["fsstat"],
             "period": "5s"
         }])
         proc = self.start_beat()
@@ -149,8 +149,8 @@ class SystemTest(metricbeat.BaseTest):
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
-        fsstats = evt["system"]["fsstats"]
-        self.assertItemsEqual(SYSTEM_FSSTATS_FIELDS, fsstats.keys())
+        fsstat = evt["system"]["fsstat"]
+        self.assertItemsEqual(SYSTEM_FSSTAT_FIELDS, fsstat.keys())
 
     def test_memory(self):
         """

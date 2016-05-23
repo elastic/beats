@@ -1,6 +1,6 @@
 // +build darwin linux openbsd windows
 
-package fsstats
+package fsstat
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-var debugf = logp.MakeDebug("system-fsstats")
+var debugf = logp.MakeDebug("system-fsstat")
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "fsstats", New); err != nil {
+	if err := mb.Registry.AddMetricSet("system", "fsstat", New); err != nil {
 		panic(err)
 	}
 }

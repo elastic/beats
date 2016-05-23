@@ -2,6 +2,7 @@
 /.vagrant
 /.idea
 /build
+/*/data
 
 # Files
 .DS_Store
