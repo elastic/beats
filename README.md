@@ -50,3 +50,8 @@ guide](https://www.elastic.co/guide/en/beats/libbeat/current/new-beat.html).
 After you have a working prototype, open a pull request to add your Beat to the
 list of [community
 Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc).
+
+## Building Beats from the Source
+
+See our [CONTRIBUTING](CONTRIBUTING.md) file for information about setting up your dev
+environment to build Beats from the source.
