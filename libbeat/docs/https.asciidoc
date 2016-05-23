@@ -18,7 +18,7 @@ and basic authentication. Here is a sample configuration:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-elasticsearch:
+output.elasticsearch:
   username: {beatname_lc} <1>
   password: verysecret <2>
   protocol: https <3>
@@ -47,17 +47,16 @@ configuration:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-elasticsearch:
+output.elasticsearch:
   username: {beatname_lc}
   password: verysecret
   protocol: https
   hosts: ["elasticsearch.example.com:9200"]
-  tls:
-    certificate_authorities: <1>
-      - /etc/pki/my_root_ca.pem
-      - /etc/pki/my_other_ca.pem
-    certificate: "/etc/pki/client.pem" <2>
-    certificate_key: "/etc/pki/key.pem" <3>
+  tls.certificate_authorities: <1>
+    - /etc/pki/my_root_ca.pem
+    - /etc/pki/my_other_ca.pem
+  tls.certificate: "/etc/pki/client.pem" <2>
+  tls.certificate_key: "/etc/pki/key.pem" <3>
 ----------------------------------------------------------------------
 <1> The list of CA certificates to trust
 <2> The path to the certificate for TLS client authentication

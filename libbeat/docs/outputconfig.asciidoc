@@ -20,30 +20,33 @@ Example configuration:
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 
-output:
-  elasticsearch:
-    # The Elasticsearch cluster
-    hosts: ["http://localhost:9200"]
+output.elasticsearch:
+  # The Elasticsearch cluster
+  hosts: ["http://localhost:9200"]
 
-    # Comment this option if you don't want to store the topology in
-    # Elasticsearch. The default is false.
-    # This option makes sense only for Packetbeat
-    # save_topology: false
+  # Template name. By default the template name is {beatname_lc}.
+  template.name: "{beatname_lc}"
 
-    # Optional index name. The default is "{beatname_lc}" and generates
-    # [{beatname_lc}-]YYYY.MM.DD keys.
-    index: "{beatname_lc}"
+  # Path to template file
+  template.path: "{beatname_lc}.template.json"
 
-    # tls configuration. By default is off.
-    tls:
-      # List of root certificates for HTTPS server verifications
-      certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # Overwrite existing template
+  template.overwrite: false
 
-      # Certificate for TLS client authentication
-      certificate: "/etc/pki/client/cert.pem"
+  # Optional index name. The default is "{beatname_lc}" and generates
+  # [{beatname_lc}-]YYYY.MM.DD keys.
+  index: "{beatname_lc}"
 
-      # Client Certificate Key
-      certificatekey: "/etc/pki/client/cert.key"
+  # Optional TLS configuration options. TLS is off by default.
+
+  # List of root certificates for HTTPS server verifications
+  tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for TLS client authentication
+  tls.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  tls.certificatekey: "/etc/pki/client/cert.key"
 
 ------------------------------------------------------------------------------
 
@@ -52,19 +55,13 @@ To enable SSL, just add `https` to all URLs defined under __hosts__.
 ["source","yaml",subs="attributes,callouts"]
 ------------------------------------------------------------------------------
 
-output:
-  elasticsearch:
-    # The Elasticsearch cluster
-    hosts: ["https://localhost:9200"]
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["https://localhost:9200"]
 
-    # Comment this option if you don't want to store the topology in
-    # Elasticsearch. The default is false.
-    # This option makes sense only for Packetbeat
-    # save_topology: false
-
-    # HTTP basic auth
-    username: "admin"
-    password: "s3cr3t"
+  # HTTP basic auth
+  username: "admin"
+  password: "s3cr3t"
 
 ------------------------------------------------------------------------------
 
@@ -73,22 +70,21 @@ If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` 
 [source,yaml]
 ------------------------------------------------------------------------------
 
-output:
-  elasticsearch:
-    # The Elasticsearch cluster
-    hosts: ["localhost"]
+output.elasticsearch:
+  # The Elasticsearch cluster
+  hosts: ["localhost"]
 
-    # Optional http or https. Default is http
-    protocol: "https"
+  # Optional http or https. Default is http
+  protocol: "https"
 
-    # Comment this option if you don't want to store the topology in
-    # Elasticsearch. The default is false.
-    # This option makes sense only for Packetbeat
-    # save_topology: false
+  # Comment this option if you don't want to store the topology in
+  # Elasticsearch. The default is false.
+  # This option makes sense only for Packetbeat
+  # save_topology: false
 
-    # HTTP basic auth
-    username: "admin"
-    password: "s3cr3t"
+  # HTTP basic auth
+  username: "admin"
+  password: "s3cr3t"
 
 ------------------------------------------------------------------------------
 
@@ -110,16 +106,15 @@ NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  elasticsearch:
-    # The Elasticsearch cluster
-    hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
+output.elasticsearch:
+  # The Elasticsearch cluster
+  hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
 
-    # Optional http or https. Default is http
-    protocol: https
+  # Optional http or https. Default is http
+  protocol: https
 
-    # HTTP Path at which each Elasticsearch server lives
-    path: /elasticsearch
+  # HTTP Path at which each Elasticsearch server lives
+  path: /elasticsearch
 ------------------------------------------------------------------------------
 
 In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
@@ -198,13 +193,11 @@ For example:
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["localhost:9200"]
-    template:
-      name: "{beatname_lc}"
-      path: "{beatname_lc}.template.json"
-      overwrite: false
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  template.name: "{beatname_lc}"
+  template.path: "{beatname_lc}.template.json"
+  template.overwrite: false
 ----------------------------------------------------------------------
 
 To disable automatic template loading, comment out the template part under elasticsearch output.
@@ -347,15 +340,14 @@ Here is an example of how to configure the Beat to use Logstash:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["localhost:5044"]
+output.logstash:
+  hosts: ["localhost:5044"]
 
-    # index configures '@metadata.beat' field to be used by Logstash for
-    # indexing. The default index name depends on the each beat.
-    # For Packetbeat, the default is set to packetbeat, for Topbeat to
-    # topbeat and for Filebeat to filebeat.
-    index: {beatname_lc}
+  # index configures '@metadata.beat' field to be used by Logstash for
+  # indexing. The default index name depends on the each beat.
+  # For Packetbeat, the default is set to packetbeat, for Topbeat to
+  # topbeat and for Filebeat to filebeat.
+  index: {beatname_lc}
 ------------------------------------------------------------------------------
 
 ==== Logstash Output Options
@@ -392,15 +384,14 @@ will switch to another host if the selected one becomes unresponsive. The defaul
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["localhost:5044", "localhost:5045"]
+output.logstash:
+  hosts: ["localhost:5044", "localhost:5045"]
 
-    # configure logstash plugin to loadbalance events between the logstash instances
-    loadbalance: true
+  # configure logstash plugin to loadbalance events between the logstash instances
+  loadbalance: true
 
-    # configure index prefix name
-    index: {beatname_lc}
+  # configure index prefix name
+  index: {beatname_lc}
 ------------------------------------------------------------------------------
 
 [[port]]
@@ -424,10 +415,9 @@ client. You can change this behavior by setting the
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["remote-host:5044"]
-    proxy_url: socks5://user:password@socks5-proxy:2233
+output.logstash:
+  hosts: ["remote-host:5044"]
+  proxy_url: socks5://user:password@socks5-proxy:2233
 ------------------------------------------------------------------------------
 
 [[logstash-proxy-use-local-resolver]]
@@ -493,25 +483,24 @@ Example configuration:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-output:
-  redis:
-    # Set the host and port where to find Redis.
-    hosts: ["localhost"]
+output.redis:
+  # Set the host and port where to find Redis.
+  hosts: ["localhost"]
 
-    # Optional password to authenticate with. By default, no
-    # password is set.
-    password: "my_password"
+  # Optional password to authenticate with. By default, no
+  # password is set.
+  password: "my_password"
 
-    # Optional index name. The default is {beatname_lc} and generates {beatname_lc} keys.
-    index: "{beatname_lc}"
+  # Optional index name. The default is {beatname_lc} and generates {beatname_lc} keys.
+  index: "{beatname_lc}"
 
-    # Optional Redis database number where the events are stored
-    # The default is 0.
-    db: 0
+  # Optional Redis database number where the events are stored
+  # The default is 0.
+  db: 0
 
-    # Optional Redis initial connection timeout in seconds.
-    # The default is 5 seconds.
-    timeout: 5
+  # Optional Redis initial connection timeout in seconds.
+  # The default is 5 seconds.
+  timeout: 5
 ------------------------------------------------------------------------------
 
 ==== Redis Output Options
@@ -725,19 +714,22 @@ Logstash.
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
-output:
+output.file:
+  # Path to the directory where to save the generated files. The option is mandatory.
+  path: "/tmp/{beatname_lc}"
 
-  # File as output
-  # Options:
-  # path: where to save the files
-  # filename: name of the files
-  # rotate_every_kb: maximum size of the files in path
-  # number of files: maximum number of files in path
-  file:
-    path: "/tmp/{beatname_lc}"
-    filename: {beatname_lc}
-    rotate_every_kb: 1000
-    number_of_files: 7
+  # Name of the generated files. The default is `beatname` and it generates
+  # files: `beatname`, `beatname.1`, `beatname.2`, etc.
+  filename: {beatname_lc}
+
+  # Maximum size in kilobytes of each file. When this size is reached, the files are
+  # rotated. The default value is 10240 kB.
+  #rotate_every_kb: 10000
+
+  # Maximum number of files under path. When this number of files is reached, the
+  # oldest file is deleted and the rest are shifted from last to first. The default
+  # is 7 files.
+  #number_of_files: 7
 ------------------------------------------------------------------------------
 
 ==== File Output Options
@@ -773,9 +765,8 @@ The Console output writes events in JSON format to stdout.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  console:
-    pretty: true
+output.console:
+  pretty: true
 ------------------------------------------------------------------------------
 
 ==== Console Output Options
@@ -805,19 +796,17 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["192.168.1.42:9200"]
+output.elasticsearch:
+  hosts: ["192.168.1.42:9200"]
 
-    tls:
-      # List of root certificates for HTTPS server verifications
-      certificate_authorities: ["/etc/pki/root/ca.pem"]
+  # List of root certificates for HTTPS server verifications
+  tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-      # Certificate for TLS client authentication
-      certificate: "/etc/pki/client/cert.pem"
+  # Certificate for TLS client authentication
+  tls.certificate: "/etc/pki/client/cert.pem"
 
-      # Client Certificate Key
-      certificate_key: "/etc/pki/client/cert.key"
+  # Client Certificate Key
+  tls.certificate_key: "/etc/pki/client/cert.key"
 ------------------------------------------------------------------------------
 
 ==== TLS Options

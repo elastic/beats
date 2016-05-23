@@ -90,26 +90,17 @@ default values for most configuration options.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  # List of prospectors to fetch data.
-  prospectors:
-    # Each - is a prospector. Below are the prospector specific configurations
+filebeat.prospectors:
+# Each - is a prospector. Most options can be set at the prospector level, so
+# you can use different prospectors for various configurations.
+# Below are the prospector specific configurations.
 
-      # Type of the files. Based on this the way the file is read is decided.
-      # The different types cannot be mixed in one prospector
-      #
-      # Possible options are:
-      # * log: Reads every line of the log file (default)
-      # * stdin: Reads the standard in
-    - input_type: log
+- input_type: log
 
-      # Paths that should be crawled and fetched. Glob based paths.
-      # For each file found under this path, a harvester is started.
-      paths:
-        - "/var/log/*.log"
-        #- c:\programdata\elasticsearch\logs\*
-
-
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
 
 -------------------------------------------------------------------------------------
 
@@ -121,11 +112,10 @@ For the most basic Filebeat configuration, you can define a single prospector wi
 +
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - "/var/log/*.log"
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - "/var/log/*.log"
 -------------------------------------------------------------------------------------
 +
 The prospector in this example harvests all files in the path `/var/log/*.log`, which means
@@ -143,11 +133,10 @@ fetch all files in all subdirectories of a directory.
 ----------------------------------------------------------------------
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
-output:
-  ### Elasticsearch as output
-  elasticsearch:
-    # Array of hosts to connect to.
-     hosts: ["192.168.1.42:9200"]
+
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see <<config-filebeat-logstash>> instead.

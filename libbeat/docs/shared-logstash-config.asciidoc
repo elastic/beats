@@ -18,12 +18,9 @@ logstash section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["127.0.0.1:5044"]
-
-    # Optional load balance the events between the Logstash hosts
-    #loadbalance: true
+#----------------------------- Logstash output --------------------------------
+output.logstash:
+  hosts: ["127.0.0.1:5044"]
 ------------------------------------------------------------------------------
 
 In this configuration, `hosts` specifies the Logstash server and the port (`5044`)

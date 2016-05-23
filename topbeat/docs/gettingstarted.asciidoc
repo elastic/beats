@@ -93,9 +93,8 @@ default values for most configuration options.
 
 [source, shell]
 -------------------------------------
-topbeat:
-  period: 10
-  procs: [".*"]
+topbeat.period: 10
+topbeat.procs: [".*"]
 -------------------------------------
 
 To configure Topbeat:
@@ -111,9 +110,8 @@ If you are not interested in collecting per-process statistics, you can use:
 +
 [source, shell]
 -------------------------------------
-topbeat:
-  stats:
-    process: false
+topbeat.stats:
+  process: false
 -------------------------------------
 
 . If you are sending output to Elasticsearch, set the IP address and port where Topbeat can find the Elasticsearch installation:
@@ -122,11 +120,10 @@ topbeat:
 ----------------------------------------------------------------------
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
-output:
-  ### Elasticsearch as output
-  elasticsearch:
-    # Array of hosts to connect to.
-     hosts: ["192.168.1.42:9200"]
+
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see <<config-topbeat-logstash>> instead.

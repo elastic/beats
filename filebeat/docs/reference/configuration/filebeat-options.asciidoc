@@ -10,24 +10,22 @@ Here is a sample configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  # List of prospectors to fetch data.
-  prospectors:
-    # Each - is a prospector. Below are the prospector specific configurations
-    - input_type: log
-      # Paths that should be crawled and fetched. Glob based paths.
-      # For each file found under this path, a harvester is started.
-      paths:
-        - "/var/log/apache/httpd-*.log"
-      # Type to be published in the 'type' field. For Elasticsearch output,
-      # the type defines the document type these entries should be stored
-      # in. Default: log
-      document_type: apache
+filebeat.prospectors:
+# Each - is a prospector. Below are the prospector specific configurations
+- input_type: log
+  # Paths that should be crawled and fetched. Glob based paths.
+  # For each file found under this path, a harvester is started.
+  paths:
+    - "/var/log/apache/httpd-*.log"
+  # Type to be published in the 'type' field. For Elasticsearch output,
+  # the type defines the document type these entries should be stored
+  # in. Default: log
+  document_type: apache
 
-    - input_type: log
-      paths:
-        - /var/log/messages
-        - "/var/log/*.log"
+- input_type: log
+  paths:
+    - /var/log/messages
+    - "/var/log/*.log"
 
 -------------------------------------------------------------------------------------
 
@@ -58,11 +56,10 @@ The following example configures Filebeat to drop any lines that start with "DBG
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - paths:
-        - /var/log/myapp/*.log
-      exclude_lines: ["^DBG"]
+filebeat.prospectors:
+- paths:
+    - /var/log/myapp/*.log
+  exclude_lines: ["^DBG"]
 -------------------------------------------------------------------------------------
 
 See <<regexp-support>> for a list of supported regexp patterns.
@@ -78,11 +75,10 @@ The following example configures Filebeat to export any lines that start with "E
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - paths:
-        - /var/log/myapp/*.log
-      include_lines: ["^ERR", "^WARN"]
+filebeat.prospectors:
+- paths:
+    - /var/log/myapp/*.log
+  include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
 NOTE: If both `include_lines` and `exclude_lines` are defined, Filebeat executes `include_lines` first and then executes `exclude_lines`. So, for example, to export all Apache log lines except the debugging messages (DBGs), you can use:
@@ -120,10 +116,9 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - paths: ["/var/log/app/*.json"]
-      tags: ["json"]
+filebeat.prospectors:
+- paths: ["/var/log/app/*.json"]
+  tags: ["json"]
 --------------------------------------------------------------------------------
 
 [[configuration-fields]]
@@ -140,11 +135,10 @@ will be overwritten by the value declared here.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - paths: ["/var/log/app/*.log"]
-      fields:
-        app_id: query_engine_12
+filebeat.prospectors:
+- paths: ["/var/log/app/*.log"]
+  fields:
+    app_id: query_engine_12
 --------------------------------------------------------------------------------
 
 [[fields-under-root]]
@@ -220,10 +214,9 @@ Example configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-json:
-  message_key: log
-  keys_under_root: true
-  add_error_key: true
+json.message_key: log
+json.keys_under_root: true
+json.add_error_key: true
 -------------------------------------------------------------------------------------
 
 
@@ -249,10 +242,9 @@ The following example shows how to configure Filebeat to handle a multiline mess
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-multiline:
-    pattern: '^\['
-    negate: true
-    match: after
+multiline.pattern: '^\['
+multiline.negate: true
+multiline.match: after
 
 -------------------------------------------------------------------------------------
 
@@ -344,8 +336,7 @@ the specified value.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  spool_size: 2048
+filebeat.spool_size: 2048
 -------------------------------------------------------------------------------------
 
 
@@ -363,8 +354,7 @@ A duration string that specifies how often the spooler is flushed. After the
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  idle_timeout: 5s
+filebeat.idle_timeout: 5s
 -------------------------------------------------------------------------------------
 
 
@@ -375,8 +365,7 @@ data path. See the <<directory-layout>> section for details. The default is `reg
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  registry_file: registry
+filebeat.registry_file: registry
 -------------------------------------------------------------------------------------
 
 
@@ -394,8 +383,7 @@ If the specified path is not absolute, it is considered relative to the configur
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  config_dir: path/to/configs
+filebeat.config_dir: path/to/configs
 -------------------------------------------------------------------------------------
 
 ===== encoding

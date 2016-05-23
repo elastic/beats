@@ -25,10 +25,9 @@ After defining the pipeline in Elasticsearch, you simply configure your Beat to 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["localhost:9200"]
-    parameters: {pipeline: my_pipeline_id}
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  parameters: {pipeline: my_pipeline_id}
 ------------------------------------------------------------------------------
 
 For example, let's say that you've defined the following pipeline in a file named `pipeline.json`:
@@ -58,10 +57,9 @@ Then in the +{beatname_lc}.yml+ file, you would specify:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["localhost:9200"]
-    parameters: {pipeline: "test-pipeline"}
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  parameters: {pipeline: "test-pipeline"}
 ------------------------------------------------------------------------------
 
 When you run {beatname_uc}, the value of `beat.name` is converted to lowercase before indexing.
