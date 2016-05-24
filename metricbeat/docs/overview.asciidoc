@@ -1,16 +1,15 @@
 == Overview
 
 Metricbeat is a lightweight shipper that you can install on your servers to
-periodically collect metrics from the operating system and the services running
+periodically collect metric sets from the operating system and the services running
 on the server.
 
-Metricbeat helps you monitor your servers by collecting metrics from services
-like:
+Metricbeat helps you monitor your servers by collecting metrics from the system
+and the following services:
 
-*Service metrics*
-
-  * <<metricbeat-module-apache,Apache HTTPD>>
+  * <<metricbeat-module-apache,Apache>>
   * <<metricbeat-module-mysql,MySQL>>
+  * <<metricbeat-module-nginx,Nginx>>
   * <<metricbeat-module-redis,Redis>>
   * <<metricbeat-module-system,System>>
   * <<metricbeat-module-zookeeper,Zookeeper>>

@@ -47,6 +47,7 @@ This file is generated! See scripts/docs_collector.py
 
             module_file += """
 
+[float]
 === Example Configuration
 
 The """ + title + """ module supports the standard configuration options which can be found
@@ -66,6 +67,7 @@ metricbeat.modules:
             module_file += "----\n\n"
 
         # Add metricsets title as below each metricset adds its link
+        module_file += "[float]\n"
         module_file += "=== MetricSets\n\n"
         module_file += "The following MetricSets are available:\n\n"
 
@@ -121,7 +123,7 @@ A description of each field in the MetricSet can be found in the
                 with file(data_file) as f:
                     metricset_file += f.read()
 
-                metricset_file += "----\n"
+                metricset_file += "\n----\n"
 
             # Write metricset docs
             with open(os.path.abspath("docs") + "/modules/" + module + "/" + metricset + ".asciidoc", 'w') as f:

@@ -7,3 +7,76 @@ This section describes some common use cases for changing configuration options.
 
 For a complete description of all {beatname_uc} configuration options, see
 <<metricbeat-configuration-options>>.
+
+
+[float]
+== Basic Configuration
+
+A Metricbeat configuration contains a list of modules. Each module contains the following config options:
+
+* module: Name of the module to run
+* metricsets: List of metricsets of the module which should be executed
+* hosts: List of hosts that the metricsets should connected to. For some modules this is not required (e.g. system). For the details how to define the hosts string for each module, please check the documentation of the module.
+* period: Period how often the metricsets are executed. If a system is not reachable it will return an error for each period.
+* enabled: Enabled is by default set to true and is not required. It can be set to false to disable a module
+* fields: Fields is optional. Here you can define additional fields which should be sent with the metricset event
+* tags: Tags is optional. Here you can define additional tags which should be sent with the metricset event
+* filters: With filters you can reduce the amount of data is sent. For details on the available filter options check (link to filters).
+
+
+[source,yaml]
+----
+metricbeat:
+  modules:
+    - module: apache
+      metricsets: ["status"]
+      hosts: ["http://127.0.0.1/"]
+      period: 10s
+      enabled: true
+      selectors: []
+      fields:
+        dc: west
+      tags: ["tag"]
+      filters:
+        ....
+----
+
+[float]
+== Configuration Combinations
+
+This configuration allows to create different combinations of module, metricsets, period, hosts and selectors. In the example below, the same hosts is crawled for the `stats` information every second as this is critical data, and the full list of metricsets is only fetched every 30 seconds as it is less critical.
+
+
+[source,yaml]
+----
+metricbeat:
+  modules:
+    - module: redis
+      metricsets: ["info"]
+      hosts: ["host1"]
+      period: 1s
+      enabled: true
+      selectors: ["stats"]
+    - module: apache
+      metricsets: ["info"]
+      hosts: ["host1"]
+      period: 30s
+      enabled: true
+      selectors: []
+----
+
+For a module with multiple metricsets its also possible to run define the module twice and run it in once case with both metricsets and in the second case only with one metricset with a different period:
+
+[source,yaml]
+----
+metricbeat:
+  modules:
+    - module: example
+      metricsets: ["set1"]
+      hosts: ["host1"]
+      period: 10s
+    - module: example
+      metricsets: ["set2"]
+      hosts: ["host1"]
+      period: 2m
+----

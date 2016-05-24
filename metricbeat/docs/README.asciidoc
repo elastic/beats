@@ -15,17 +15,6 @@ elasticsearch server.
 In case multiple instances of the same service are running on a host, Metricbeat
 allows for each module to define multiple hosts.
 
-== Supported Services
-
-Currently the following services are supported
-
-* Apache
-* MySQL
-* Redis
-
-Each service is a module with its own metricsets. More details on each module
-and configuration can be found under the module docs.
-
 ==  Event Structure
 
 Every event sent has the same base structure. It contains the following fields:
@@ -54,6 +43,8 @@ An example of an event can be seen below:
 }
 
 ```
+
+For more information about the exported fields, see <<exported-fields>>.
 
 === Error events
 
