@@ -9,6 +9,10 @@ type Xdr struct {
 	offset uint32
 }
 
+func (xdr *Xdr) size() int {
+	return len(xdr.data)
+}
+
 func (xdr *Xdr) getInt() int32 {
 	i := int32(binary.BigEndian.Uint32(xdr.data[xdr.offset : xdr.offset+4]))
 	xdr.offset += 4

@@ -25,9 +25,9 @@ var nfs_opnum3 = [...]string{
 	"COMMIT",
 }
 
-func (nfs *Nfs) getV3Opcode() string {
-	if int(nfs.proc) < len(nfs_opnum3) {
-		return nfs_opnum3[nfs.proc]
+func (nfs *Nfs) getV3Opcode(proc int) string {
+	if proc < len(nfs_opnum3) {
+		return nfs_opnum3[proc]
 	} else {
 		return "ILLEGAL"
 	}

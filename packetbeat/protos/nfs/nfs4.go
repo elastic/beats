@@ -122,22 +122,22 @@ var nfs_opnum4 = map[int]string{
 	10044: "ILLEGAL",
 }
 
-func (nfs *Nfs) eatData(op int) {
+func (nfs *Nfs) eatData(op int, xdr *Xdr) {
 
 	switch op {
 	case OP_GETATTR:
-		nfs.xdr.getUIntVector()
+		xdr.getUIntVector()
 	case OP_GETFH:
 		// nothing to eat
 	case OP_LOOKUP:
-		nfs.xdr.getDynamicOpaque()
+		xdr.getDynamicOpaque()
 	case OP_LOOKUPP:
 		// nothing to eat
 	case OP_NVERIFY:
-		nfs.xdr.getUIntVector()
-		nfs.xdr.getDynamicOpaque()
+		xdr.getUIntVector()
+		xdr.getDynamicOpaque()
 	case OP_PUTFH:
-		nfs.xdr.getDynamicOpaque()
+		xdr.getDynamicOpaque()
 	case OP_PUTPUBFH:
 		// nothing to eat
 	case OP_PUTROOTFH:
@@ -145,34 +145,34 @@ func (nfs *Nfs) eatData(op int) {
 	case OP_READLINK:
 		// nothing to eat
 	case OP_RENEW:
-		nfs.xdr.getUHyper()
+		xdr.getUHyper()
 	case OP_RESTOREFH:
 		// nothing to eat
 	case OP_SAVEFH:
 		// nothing to eat
 	case OP_SECINFO:
-		nfs.xdr.getDynamicOpaque()
+		xdr.getDynamicOpaque()
 	case OP_VERIFY:
-		nfs.xdr.getUIntVector()
-		nfs.xdr.getDynamicOpaque()
+		xdr.getUIntVector()
+		xdr.getDynamicOpaque()
 	case OP_SEQUENCE:
-		nfs.xdr.getOpaque(16)
-		nfs.xdr.getUInt()
-		nfs.xdr.getUInt()
-		nfs.xdr.getUInt()
-		nfs.xdr.getUInt()
+		xdr.getOpaque(16)
+		xdr.getUInt()
+		xdr.getUInt()
+		xdr.getUInt()
+		xdr.getUInt()
 
 	}
 }
 
-func (nfs *Nfs) getV4Opcode() string {
+func (nfs *Nfs) getV4Opcode(xdr *Xdr) string {
 
 	// default op code
 	current_opname := "ILLEGAL"
 
-	opcount := int(nfs.xdr.getUInt())
+	opcount := int(xdr.getUInt())
 	for i := 0; i < opcount; i++ {
-		op := int(nfs.xdr.getUInt())
+		op := int(xdr.getUInt())
 		opname, ok := nfs_opnum4[op]
 
 		if !ok {
@@ -234,7 +234,7 @@ func (nfs *Nfs) getV4Opcode() string {
 
 			break
 		default:
-			nfs.eatData(op)
+			nfs.eatData(op, xdr)
 		}
 	}
 	return current_opname
