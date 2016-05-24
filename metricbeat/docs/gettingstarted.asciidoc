@@ -107,13 +107,12 @@ below shows how to configure the Apache HTTPD module.
 
 [source, shell]
 -------------------------------------
-metricbeat:
-  modules:
-    - module: apache
-      enabled: true
-      metricsets: ['status']
-      hosts: ['http://127.0.0.1/']
-      period: 1s
+metricbeat.modules:
+- module: apache
+  enabled: true
+  metricsets: ['status']
+  hosts: ['http://127.0.0.1/']
+  period: 1s
 -------------------------------------
 
 To configure Metricbeat:
@@ -131,11 +130,10 @@ Metricbeat can find the Elasticsearch installation:
 ----------------------------------------------------------------------
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
-output:
-  ### Elasticsearch as output
-  elasticsearch:
-    # Array of hosts to connect to.
-     hosts: ["192.168.1.42:9200"]
+
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see <<config-metricbeat-logstash>>

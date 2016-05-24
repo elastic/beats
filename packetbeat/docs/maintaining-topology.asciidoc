@@ -14,10 +14,8 @@ For example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
+output.elasticsearch:
+  hosts: ["localhost:9200"]
 
-  elasticsearch:
-    hosts: ["localhost:9200"]
-
-    save_topology: true
+  save_topology: true
 ------------------------------------------------------------------------------

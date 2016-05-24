@@ -36,13 +36,11 @@ For example:
 +
 [source,yaml]
 ------------------------------------------------------------------------------
-output:
-  logstash:
-    hosts: ["logs.mycompany.com:5044"]
-    tls:
-      certificate_authorities: ["/etc/ca.crt"]
-      certificate: "/etc/client.crt"
-      certificate_key: "/etc/client.key"
+output.logstash:
+  hosts: ["logs.mycompany.com:5044"]
+  tls.certificate_authorities: ["/etc/ca.crt"]
+  tls.certificate: "/etc/client.crt"
+  tls.certificate_key: "/etc/client.key"
 ------------------------------------------------------------------------------
 +
 For more information about these configuration options, see <<configuration-output-tls>>.

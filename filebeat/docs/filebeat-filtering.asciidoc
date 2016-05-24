@@ -13,11 +13,11 @@ For example, you can use the `include_lines` option to export any lines that sta
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - paths:
-        - /var/log/myapp/*.log
-      include_lines: ["^ERR", "^WARN"]
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/myapp/*.log
+  include_lines: ["^ERR", "^WARN"]
 -------------------------------------------------------------------------------------
 
 The disadvantage of this approach is that you need to implement a configuration option for each filtering criteria that you need.

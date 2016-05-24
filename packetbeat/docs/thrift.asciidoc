@@ -44,16 +44,15 @@ Here is an example configuration section for the Thrift protocol:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols:
-  thrift:
-    transport_type = "socket"
-    protocol_type = "binary"
-    idl_files = ["tutorial.thrift", "shared.thrift"]
-    string_max_size = 200
-    collection_max_size = 20
-    capture_reply = true
-    obfuscate_strings = true
-    drop_after_n_struct_fields = 100
+packetbeat.protocols.thrift:
+  transport_type: socket
+  protocol_type: binary
+  idl_files: ["tutorial.thrift", "shared.thrift"]
+  string_max_size: 200
+  collection_max_size: 20
+  capture_reply: true
+  obfuscate_strings: true
+  drop_after_n_struct_fields: 100
 ------------------------------------------------------------------------------
 
 For more details about the configuration options, see the

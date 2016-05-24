@@ -11,13 +11,11 @@ Here is a sample configuration:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
-  event_logs:
-    - name: Application
-      ignore_older: 72h
-    - name: Security
-    - name: System
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+  - name: Security
+  - name: System
 --------------------------------------------------------------------------------
 
 ==== Winlogbeat Options
@@ -34,8 +32,7 @@ Windows service, it's recommended that you set the value to
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
 --------------------------------------------------------------------------------
 
 NOTE: The forward slashes (/) in the path are automatically changed to
@@ -52,9 +49,8 @@ The `name` field is the only required field for each event log.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Application
+winlogbeat.event_logs:
+  - name: Application
 --------------------------------------------------------------------------------
 
 [[configuration-winlogbeat-options-event_logs-name]]
@@ -107,9 +103,8 @@ You must specify the full name of the channel in the configuration file.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
+winlogbeat.event_logs:
+  - name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 --------------------------------------------------------------------------------
 
 ===== event_logs.ignore_older
@@ -122,10 +117,9 @@ optional.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Application
-      ignore_older: 168h
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 168h
 --------------------------------------------------------------------------------
 
 ===== event_logs.event_id
@@ -137,10 +131,9 @@ IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735).
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Security
-      event_id: 4624, 4625, 4700-4800, -4735
+winlogbeat.event_logs:
+  - name: Security
+    event_id: 4624, 4625, 4700-4800, -4735
 --------------------------------------------------------------------------------
 
 ===== event_logs.level
@@ -171,10 +164,9 @@ levels. *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Security
-      level: critical, error, warning
+winlogbeat.event_logs:
+  - name: Security
+    level: critical, error, warning
 --------------------------------------------------------------------------------
 
 ===== event_logs.provider
@@ -184,14 +176,13 @@ A list of providers (source names) to include. The value is a YAML list.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Application
-      provider:
-        - Application Error
-        - Application Hang
-        - Windows Error Reporting
-        - EMET
+winlogbeat.event_logs:
+  - name: Application
+    provider:
+      - Application Error
+      - Application Hang
+      - Windows Error Reporting
+      - EMET
 --------------------------------------------------------------------------------
 
 You can obtain a list of providers associated with a log by using PowerShell.
@@ -227,10 +218,9 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: Microsoft-Windows-Windows Defender/Operational
-      include_xml: true
+winlogbeat.event_logs:
+  - name: Microsoft-Windows-Windows Defender/Operational
+    include_xml: true
 --------------------------------------------------------------------------------
 
 ===== event_logs.tags
@@ -244,10 +234,9 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: CustomLog
-      tags: ["web"]
+winlogbeat.event_logs:
+  - name: CustomLog
+    tags: ["web"]
 --------------------------------------------------------------------------------
 
 [[winlogbeat-configuration-fields]]
@@ -264,11 +253,10 @@ will be overwritten by the value declared here.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  event_logs:
-    - name: CustomLog
-      fields:
-        customer_id: 51415432
+winlogbeat.event_logs:
+  - name: CustomLog
+    fields:
+      customer_id: 51415432
 --------------------------------------------------------------------------------
 
 ===== event_logs.fields_under_root
@@ -289,9 +277,8 @@ http://localhost:8128/debug/vars:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  metrics:
-    bindaddress: 'localhost:8123'
+winlogbeat.metrics:
+  bindaddress: 'localhost:8123'
 --------------------------------------------------------------------------------
 
 The metrics are served as a JSON document. The metrics include:

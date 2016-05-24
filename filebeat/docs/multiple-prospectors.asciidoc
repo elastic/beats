@@ -14,18 +14,17 @@ to unexpected behaviour.
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - /var/log/system.log
-        - /var/log/wifi.log
-    - input_type: log
-      paths:
-        - "/var/log/apache2/*"
-      fields:
-        apache: true
-      fields_under_root: true
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/system.log
+    - /var/log/wifi.log
+- input_type: log
+  paths:
+    - "/var/log/apache2/*"
+  fields:
+    apache: true
+  fields_under_root: true
 -------------------------------------------------------------------------------------
 
 The config file in the example starts two prospectors (the list of prospectors is a http://yaml.org/[YAML]

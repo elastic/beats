@@ -6,27 +6,26 @@ statistics it captures. Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-topbeat:
-  # In seconds, defines how often to read server statistics
-  period: 10
+# In seconds, defines how often to read server statistics
+topbeat.period: 10
 
-  # Regular expression to match the processes that are monitored
-  # By default, all the processes are monitored
-  procs: [".*"]
+# Regular expression to match the processes that are monitored
+# By default, all the processes are monitored
+topbeat.procs: [".*"]
 
-  # Statistics to collect (all enabled by default)
-  stats:
-    # per system statistics, by default is true
-    system: true
+# Statistics to collect (all enabled by default)
+topbeat.stats:
+  # per system statistics, by default is true
+  system: true
 
-    # per process statistics, by default is true
-    process: true
+  # per process statistics, by default is true
+  process: true
 
-    # file system information, by default is true
-    filesystem: true
+  # file system information, by default is true
+  filesystem: true
 
-    # cpu usage per core, by default is false
-    cpu_per_core: false
+  # cpu usage per core, by default is false
+  cpu_per_core: false
 
 
 ------------------------------------------------------------------------------

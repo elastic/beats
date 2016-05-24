@@ -40,27 +40,22 @@ by adjusting the `name` and `path` options under `template` in +{beatname_lc}.ym
 
 ["source","yaml",subs="attributes,callouts"]
 ----------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts: ["localhost:9200"]
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
 
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is disabled and no template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones
-    template:
+  # Template name. By default the template name is packetbeat.
+  template.name: "{beatname_lc}"
 
-      # Template name. By default the template name is {beatname_lc}.
-      name: "{beatname_lc}"
+  # Path to template file
+  template.path: "{beatname_lc}.template.json"
 
-      # Path to template file
-      path: "{beatname_lc}.template.json"
-
-      # Overwrite existing template
-      overwrite: false
+  # Overwrite existing template
+  template.overwrite: false
 ----------------------------------------------------------------------
 
 By default, if a template already exists in the index, it is not overwritten. To overwrite an existing
-template, set `overwrite: true` in the configuration file.
+template, set `template.overwrite: true` in the configuration file.
 
 To disable automatic template loading, comment out the template part under elasticsearch output.
 

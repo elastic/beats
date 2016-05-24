@@ -18,13 +18,13 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  - module: apache
-    metricsets: ["status"]
-    enabled: true
-    period: 1s
+- module: apache
+  metricsets: ["status"]
+  enabled: true
+  period: 1s
 
-    # Apache hosts
-    hosts: ["http://127.0.0.1/"]
+  # Apache hosts
+  hosts: ["http://127.0.0.1/"]
 ----
 
 === MetricSets

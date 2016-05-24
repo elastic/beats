@@ -15,19 +15,18 @@ module data prior to the addition of the common beat fields like `beat.hostname`
 and `type` so they can only be used to filter fields from the module.
 
 The following example reduces the exported fields of the Redis module to
-include only the `redis-info.memory` fields.
+include only the `redis.info.memory` fields.
 
 [source,yaml]
 ----
-metricbeat:
-  modules:
-    - module: redis
-      metricsets: ["info"]
-      period: 1s
-      hosts: ["127.0.0.1:6379"]
-      enabled: true
-      filters:
-        - include_fields.fields: ['redis-info.memory']
+metricbeat.modules:
+- module: redis
+  metricsets: ["info"]
+  period: 1s
+  hosts: ["127.0.0.1:6379"]
+  enabled: true
+  filters:
+    - include_fields.fields: ['redis.info.memory']
 ----
 
 [[generic-filtering-overview-metricbeat]]

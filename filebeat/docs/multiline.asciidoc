@@ -46,10 +46,9 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 
 [source,json]
 -------------------------------------------------------------------------------------
-multiline:
-  pattern: '^[[:space:]]'
-  negate: false
-  match: after
+multiline.pattern: '^[[:space:]]'
+multiline.negate: false
+multiline.match: after
 -------------------------------------------------------------------------------------
 
 This configuration merges any line that begins with whitespace up to the previous line.
@@ -71,10 +70,9 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 
 ["source","sh",subs="attributes,callouts"]
 -------------------------------------------------------------------------------------
-multiline:
-    pattern: '^[[:space:]]+|^Caused by:'
-    negate: false
-    match: after
+multiline.pattern: '^[[:space:]]+|^Caused by:'
+multiline.negate: false
+multiline.match: after
 -------------------------------------------------------------------------------------
 
 In this example, the pattern matches the following lines:
@@ -98,10 +96,9 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 
 [source,json]
 -------------------------------------------------------------------------------------
-multiline:
-  pattern: '\\$'
-  negate: false
-  match: after
+multiline.pattern: '\\$'
+multiline.negate: false
+multiline.match: after
 -------------------------------------------------------------------------------------
 
 This configuration merges any line that ends with the `\` character with the line that follows.
@@ -122,10 +119,9 @@ To consolidate these lines into a single event in Filebeat, use the following mu
 [source,json]
 [source,yaml]
 -------------------------------------------------------------------------------------
-multiline:
-  pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
-  negate: true
-  match: after
+multiline.pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
+multiline.negate: true
+multiline.match: after
 -------------------------------------------------------------------------------------
 
 This configuration uses the `negate: true` and `match: after` settings to specify that any line that does not match the 

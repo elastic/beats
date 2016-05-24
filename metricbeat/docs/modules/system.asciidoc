@@ -15,11 +15,11 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  - module: system
-    metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
-    enabled: true
-    period: 2s
-    processes: ['.*']
+- module: system
+  metricsets: ["cpu", "core", "filesystem", "fsstat", "memory", "process"]
+  enabled: true
+  period: 2s
+  processes: ['.*']
 ----
 
 === MetricSets

@@ -78,6 +78,33 @@ winlogbeat.event_logs:
 # default is the number of logical CPUs available in the system.
 #max_procs:
 
+#================================ Filters =====================================
+
+# This section defines a list of filtering rules that are applied one by one
+# starting with the exported event:
+#
+#   event -> filter1 -> event1 -> filter2 ->event2 ...
+#
+# Supported actions: drop_fields, drop_event, include_fields
+#
+# For example, the following filter configuration uses multiple actions to keep
+# the fields that contain CPU load percentages, but remove the fields that
+# contain CPU ticks values:
+#
+#filters:
+#- include_fields:
+#    fields: ["cpu"]
+#- drop_fields:
+#    fields: ["cpu.user", "cpu.system"]
+#
+# The following example drops the events that have the HTTP response code 200:
+#
+#filters:
+#- drop_event:
+#    equals:
+#       http.code: 200
+#
+
 #================================ Outputs =====================================
 
 # Configure what outputs to use when sending the data collected by the beat.
@@ -435,6 +462,32 @@ output.elasticsearch:
   # Pretty print json event
   #pretty: false
 
+#================================= Paths ======================================
+
+# The home path for the winlogbeat installation. This is the default base path
+# for all other path settings and for miscellaneous files that come with the
+# distribution (for example, the sample dashboards).
+# If not set by a CLI flag or in the configuration file, the default for the
+# home path is the location of the binary.
+#path.home:
+
+# The configuration path for the winlogbeat installation. This is the default
+# base path for configuration files, including the main YAML configuration file
+# and the Elasticsearch template file. If not set by a CLI flag or in the
+# configuration file, the default for the configuration path is the home path.
+#path.config:
+
+# The data path for the winlogbeat installation. This is the default base path
+# for all the files in which winlogbeat needs to store its data. If not set by a
+# CLI flag or in the configuration file, the default for the data path is a data
+# subdirectory inside the home path.
+#path.data:
+
+# The logs path for a winlogbeat installation. This is the default location for
+# the Beat’s log files. If not set by a CLI flag or in the configuration file,
+# the default for the logs path is a logs subdirectory inside the home path.
+#path.logs:
+
 #================================ Logging =====================================
 # There are three options for the log output: syslog, file, stderr.
 # Under Windows systems, the log files are per default sent to the file output,
@@ -470,14 +523,3 @@ logging.files:
   # Number of rotated log files to keep. Oldest files will be deleted first.
   #keepfiles: 7
 
-#================================ Filters =====================================
-
-# This section defines a list of filtering rules that are applied one by one starting with the
-# exported event:
-#   event -> filter1 -> event1 -> filter2 ->event2 ...
-# Supported actions: drop_fields, drop_event, include_fields
-#filters:
-#  - drop_fields:
-#      equals:
-#        status: OK
-#      fields: [ ]

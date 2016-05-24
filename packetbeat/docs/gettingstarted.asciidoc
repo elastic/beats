@@ -104,10 +104,9 @@ server on which Packetbeat is installed. For this, use `any` as the device:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-# Select the network interfaces to sniff the data. You can use the "any"
+# Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces:
-  device: any
+packetbeat.interfaces.device: any
 ----------------------------------------------------------------------
 
 * On OS X, capturing from the `any` device doesn't work. You would
@@ -131,8 +130,7 @@ Modify the `device` line to point to the index of the device:
 +
 [source,yml]
 ----------------------------------------------------------------------
-packetbeat.interfaces:
-  device: 0
+packetbeat.interfaces.device: 0
 ----------------------------------------------------------------------
 
 . In the protocols section, configure the ports on which Packetbeat can find each
@@ -141,33 +139,32 @@ default values should do just fine.
 +
 [source,yaml]
 ----------------------------------------------------------------------
-packetbeat.protocols:
-  dns:
-    ports: [53]
+packetbeat.protocols.dns:
+  ports: [53]
 
-    include_authorities: true
-    include_additionals: true
+  include_authorities: true
+  include_additionals: true
 
-  http:
-    ports: [80, 8080, 8081, 5000, 8002]
+packetbeat.protocols.http:
+  ports: [80, 8080, 8081, 5000, 8002]
 
-  memcache:
-    ports: [11211]
+packetbeat.protocols.memcache:
+  ports: [11211]
 
-  mysql:
-    ports: [3306]
+packetbeat.protocols.mysql:
+  ports: [3306]
 
-  pgsql:
-    ports: [5432]
+packetbeat.protocols.pgsql:
+  ports: [5432]
 
-  redis:
-    ports: [6379]
+packetbeat.protocols.redis:
+  ports: [6379]
 
-  thrift:
-    ports: [9090]
+packetbeat.protocols.thrift:
+  ports: [9090]
 
-  mongodb:
-    ports: [27017]
+packetbeat.protocols.mongodb:
+  ports: [27017]
 ----------------------------------------------------------------------
 +
 . Set the IP address and port where Packetbeat can find the Elasticsearch
@@ -177,11 +174,11 @@ installation:
 ----------------------------------------------------------------------
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
-output:
-  ### Elasticsearch as output
-  elasticsearch:
-    # Array of hosts to connect to.
-     hosts: ["192.168.1.42:9200"]
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["192.168.1.42:9200"]
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see <<config-packetbeat-logstash>> instead.

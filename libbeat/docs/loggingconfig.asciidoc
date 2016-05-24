@@ -20,19 +20,18 @@ output is used on Linux and OS X.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-logging:
-  level: warning
+logging.level: warning
 
-  # enable file rotation with default configuration
-  to_files: true
+# enable file rotation with default configuration
+logging.to_files: true
 
-  # do not log to syslog
-  to_syslog: false
+# do not log to syslog
+logging.to_syslog: false
 
-  files:
-    path: /var/log/mybeat
-    name: mybeat.log
-    keepfiles: 7
+logging.files:
+  path: /var/log/mybeat
+  name: mybeat.log
+  keepfiles: 7
 ------------------------------------------------------------------------------
 
 In addition to the logging system, the logging output configuration can be

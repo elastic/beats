@@ -59,24 +59,19 @@ is a sample of the `winlogbeat.yml` file:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat:
-  registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.event_logs:
+  - name: Application
+  - name: Security
+  - name: System
 
-  event_logs:
-    - name: Application
-    - name: Security
-    - name: System
+output.elasticsearch:
+  hosts:
+    - localhost:9200
 
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-
-logging:
-  to_files: true
-  files:
-    path: C:/ProgramData/winlogbeat/Logs
-  level: info
+logging.to_files: true
+logging.files:
+  path: C:/ProgramData/winlogbeat/Logs
+logging.level: info
 --------------------------------------------------------------------------------
 
 To configure Winlogbeat:
@@ -86,10 +81,10 @@ By default, Winlogbeat is set to monitor application, security, and system logs:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-  event_logs:
-    - name: Application
-    - name: Security
-    - name: System
+winlogbeat.event_logs:
+  - name: Application
+  - name: Security
+  - name: System
 ----------------------------------------------------------------------
 +
 To obtain a list of available event logs, run `Get-EventLog *` in PowerShell.
@@ -101,10 +96,9 @@ Winlogbeat can find the Elasticsearch installation:
 +
 [source,yaml]
 ----------------------------------------------------------------------
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
+output.elasticsearch:
+  hosts:
+    - localhost:9200
 ----------------------------------------------------------------------
 +
 If you are sending output to Logstash, see <<config-winlogbeat-logstash>> instead.
