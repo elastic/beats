@@ -54,6 +54,19 @@ func (m *MockServer) Await() chan net.Conn {
 	return c
 }
 
+func (m *MockServer) Connect() (*transport.Client, error) {
+	transp, err := m.Transp()
+	if err != nil {
+		return nil, err
+	}
+
+	err = transp.Connect()
+	if err != nil {
+		return nil, err
+	}
+	return transp, nil
+}
+
 func (m *MockServer) ConnectPair() (net.Conn, *transport.Client, error) {
 	transp, err := m.Transp()
 	if err != nil {

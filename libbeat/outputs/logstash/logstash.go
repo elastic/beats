@@ -6,6 +6,8 @@ package logstash
 import (
 	"time"
 
+	"github.com/urso/go-lumber/log"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/op"
 	"github.com/elastic/beats/libbeat/logp"
@@ -26,6 +28,8 @@ const (
 )
 
 func init() {
+	log.Logger = logstashLogger{}
+
 	outputs.RegisterOutputPlugin("logstash", new)
 }
 

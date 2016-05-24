@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/streambuf"
 	"github.com/elastic/beats/libbeat/outputs/mode"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/outputs/transport/transptest"
@@ -37,33 +36,12 @@ func TestClientStructuredEvent(t *testing.T) {
 	testStructuredEvent(t, makeTestClient)
 }
 
-func TestClientCloseAfterWindowSize(t *testing.T) {
-	testCloseAfterWindowSize(t, makeTestClient)
-}
-
 func TestClientMultiFailMaxTimeouts(t *testing.T) {
 	testMultiFailMaxTimeouts(t, makeTestClient)
 }
 
 func newClientServerTCP(t *testing.T, to time.Duration) *clientServer {
 	return &clientServer{transptest.NewMockServerTCP(t, to, "", nil)}
-}
-
-func (s *clientServer) connectPair(compressLevel int) (*mockConn, *client, error) {
-	client, transp, err := s.MockServer.ConnectPair()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	lc, err := newLumberjackClient(transp, compressLevel,
-		defaultConfig.BulkMaxSize, 100*time.Millisecond,
-		"test")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	conn := &mockConn{client, streambuf.New(nil)}
-	return conn, lc, nil
 }
 
 func makeTestClient(conn *transport.Client) testClientDriver {
