@@ -44,7 +44,7 @@ go-daemon-image:
 	docker build --rm=true -t tudorg/go-daemon $(packer_absdir)/docker/go-daemon/
 
 build/god-linux-386 build/god-linux-amd64:
-	docker run -v $(shell pwd)/build:/build tudorg/go-daemon
+	docker run --rm -v $(shell pwd)/build:/build tudorg/go-daemon
 
 build/upload:
 	mkdir -p build/upload
