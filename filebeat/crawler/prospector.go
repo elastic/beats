@@ -33,7 +33,7 @@ func NewProspector(cfg *common.Config, states input.States, spoolerChan chan *in
 		spoolerChan:   spoolerChan,
 		harvesterChan: make(chan *input.FileEvent),
 		done:          make(chan struct{}),
-		states:        &states,
+		states:        states.Copy(),
 		wg:            sync.WaitGroup{},
 	}
 

@@ -125,3 +125,10 @@ func (s *States) SetStates(states []FileState) {
 	defer s.mutex.Unlock()
 	s.states = states
 }
+
+// Copy create a new copy of the states object
+func (s *States) Copy() *States {
+	states := NewStates()
+	states.states = s.GetStates()
+	return states
+}
