@@ -30,23 +30,16 @@ func (p *ProspectorLog) Init() {
 	logp.Debug("prospector", "exclude_files: %s", p.config.ExcludeFiles)
 
 	logp.Info("Load previous states from registry into memory")
+	fileStates := p.Prospector.states.GetStates()
 
-	// Load the initial state from the registry
-	for path, fileinfo := range p.getFiles() {
-
-		// Check for each path found, if there is a previous state
-		offset := p.Prospector.registrar.fetchState(path, fileinfo)
-
-		// Offset found -> skip to previous state
-		if offset > 0 {
-			state := input.NewFileState(fileinfo, path)
-			state.Offset = offset
-			// Make sure new harvester is started for all states
-			state.Finished = true
-			// Prospector must update all states as it has to detect also file rotation
-			p.Prospector.states.Update(state)
-		}
+	// Make sure all states are set as finished
+	for key, state := range fileStates {
+		state.Finished = true
+		fileStates[key] = state
 	}
+
+	// Overwrite prospector states
+	p.Prospector.states.SetStates(fileStates)
 
 	logp.Info("Previous states loaded: %v", p.Prospector.states.Count())
 }

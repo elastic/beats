@@ -15,7 +15,7 @@ import (
 
 func TestProspectorDefaultConfigs(t *testing.T) {
 
-	prospector, err := NewProspector(common.NewConfig(), nil, nil)
+	prospector, err := NewProspector(common.NewConfig(), *input.NewStates(), nil)
 	assert.NoError(t, err)
 
 	// Default values expected

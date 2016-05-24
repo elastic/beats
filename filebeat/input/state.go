@@ -15,6 +15,7 @@ type FileState struct {
 	Finished    bool        `json:"-"` // harvester state
 	Fileinfo    os.FileInfo `json:"-"` // the file info
 	FileStateOS FileStateOS
+	LastSeen    time.Time `json:"last_seen"`
 }
 
 // NewFileState creates a new file state
@@ -24,6 +25,7 @@ func NewFileState(fileInfo os.FileInfo, path string) FileState {
 		Source:      path,
 		Finished:    false,
 		FileStateOS: GetOSFileState(fileInfo),
+		LastSeen:    time.Now(),
 	}
 }
 
@@ -45,6 +47,7 @@ func (s *States) Update(newState FileState) {
 	defer s.mutex.Unlock()
 
 	index, oldState := s.findPrevious(newState)
+	newState.LastSeen = time.Now()
 
 	if index >= 0 {
 		s.states[index] = newState
@@ -84,10 +87,9 @@ func (s *States) Cleanup(older time.Duration) {
 	defer s.mutex.Unlock()
 
 	for i, state := range s.states {
-		// File is older then ignore_older -> remove state
-		modTime := state.Fileinfo.ModTime()
 
-		if time.Since(modTime) > older {
+		// File wasn't seen for longer then older -> remove state
+		if time.Since(state.LastSeen) > older {
 			logp.Debug("prospector", "State removed for %s because of older: %s", state.Source)
 			s.states = append(s.states[:i], s.states[i+1:]...)
 		}
@@ -100,4 +102,29 @@ func (s *States) Count() int {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	return len(s.states)
+}
+
+// Returns a copy of the file states
+func (s *States) GetStates() []FileState {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	newStates := make([]FileState, len(s.states))
+	copy(newStates, s.states)
+
+	return newStates
+}
+
+// SetStates overwrites all internal states with the given states array
+func (s *States) SetStates(states []FileState) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	s.states = states
+}
+
+// Copy create a new copy of the states object
+func (s *States) Copy() *States {
+	states := NewStates()
+	states.states = s.GetStates()
+	return states
 }
