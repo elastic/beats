@@ -37,20 +37,38 @@
             "idle": {
               "type": "long"
             },
+            "idle_p": {
+              "type": "float"
+            },
             "iowait": {
               "type": "long"
+            },
+            "iowait_p": {
+              "type": "float"
             },
             "irq": {
               "type": "long"
             },
+            "irq_p": {
+              "type": "float"
+            },
             "nice": {
               "type": "long"
+            },
+            "nice_p": {
+              "type": "float"
             },
             "softirq": {
               "type": "long"
             },
+            "softirq_p": {
+              "type": "float"
+            },
             "steal": {
               "type": "long"
+            },
+            "steal_p": {
+              "type": "float"
             },
             "system": {
               "type": "long"
@@ -63,41 +81,6 @@
             },
             "user_p": {
               "type": "float"
-            }
-          }
-        },
-        "cpus": {
-          "properties": {
-            "cpuX": {
-              "properties": {
-                "idle": {
-                  "type": "long"
-                },
-                "iowait": {
-                  "type": "long"
-                },
-                "nice": {
-                  "type": "long"
-                },
-                "softirq": {
-                  "type": "long"
-                },
-                "steal": {
-                  "type": "long"
-                },
-                "system": {
-                  "type": "long"
-                },
-                "system_p": {
-                  "type": "float"
-                },
-                "user": {
-                  "type": "long"
-                },
-                "user_p": {
-                  "type": "float"
-                }
-              }
             }
           }
         },
@@ -133,6 +116,21 @@
               "type": "float"
             }
           }
+        },
+        "id": {
+          "type": "integer"
+        },
+        "idle": {
+          "type": "long"
+        },
+        "idle_p": {
+          "type": "float"
+        },
+        "iowait": {
+          "type": "long"
+        },
+        "iowait_p": {
+          "type": "float"
         },
         "load": {
           "properties": {
@@ -171,6 +169,12 @@
               "type": "float"
             }
           }
+        },
+        "nice": {
+          "type": "long"
+        },
+        "nice_p": {
+          "type": "float"
         },
         "proc": {
           "properties": {
@@ -234,6 +238,18 @@
             }
           }
         },
+        "softirq": {
+          "type": "long"
+        },
+        "softirq_p": {
+          "type": "float"
+        },
+        "steal": {
+          "type": "long"
+        },
+        "steal_p": {
+          "type": "float"
+        },
         "swap": {
           "properties": {
             "free": {
@@ -250,6 +266,12 @@
             }
           }
         },
+        "system": {
+          "type": "long"
+        },
+        "system_p": {
+          "type": "float"
+        },
         "tags": {
           "ignore_above": 1024,
           "type": "keyword"
@@ -257,6 +279,12 @@
         "type": {
           "ignore_above": 1024,
           "type": "keyword"
+        },
+        "user": {
+          "type": "long"
+        },
+        "user_p": {
+          "type": "float"
         }
       }
     }

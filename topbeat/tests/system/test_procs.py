@@ -37,9 +37,6 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.cpu.user",
-            "proc.cpu.system",
-            "proc.cpu.total",
             "proc.mem.size",
             "proc.mem.rss",
             "proc.mem.share",
@@ -51,6 +48,37 @@ class Test(BaseTest):
             "proc.mem.rss_p",
         ]:
             assert type(output[key]) in [int, float]
+
+    def test_cpu_ticks_per_proc_option(self):
+        """
+        Checks the cpu_ticks_per_proc configuration option.
+        """
+        self.render_config_template(
+            system_stats=False,
+            process_stats=True,
+            filesystem_stats=False,
+            cpu_ticks=True,
+        )
+        topbeat = self.start_beat()
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
+        topbeat.check_kill_and_wait()
+
+        output = self.read_output()[0]
+
+        print(output)
+        for key in [
+            "proc.pid",
+            "proc.ppid",
+            "proc.cpu.total_p",
+            "proc.cpu.total",
+            "proc.cpu.user",
+            "proc.cpu.system",
+            "proc.cpu.start_time",
+            "proc.mem.size",
+            "proc.mem.rss",
+            "proc.mem.share",
+        ]:
+            assert key in output
 
     def check_username(self, observed, expected = None):
         if expected == None:

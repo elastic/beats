@@ -20,6 +20,8 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 *Topbeat*
+- Export CPU stats per core in type=core documents instead of type=system documents. {pull}1705[1705]
+- Export CPU usage in percentage and optionally the values in ticks if `cpu_ticks` option is enabled. {pull}1705[1705]
 
 *Filebeat*
 
@@ -58,6 +60,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...master[Check the HEAD d
 - The registry format was changed to an array instead of dict. The migration to the new format will happen automatically at the first startup. {pull}1703[1703]
 
 *Winlogbeat*
+
 
 
 ==== Deprecated

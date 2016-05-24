@@ -3,54 +3,87 @@
   description: >
     `cpu` contains local cpu stats.
   fields:
-    - name: user
-      type: integer
-      description: >
-       The amount of CPU time spent in user space.
-
     - name: user_p
       type: float
       description: >
         The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%.
         For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
-    - name: nice
-      type: integer
-      description: >
-        The amount of CPU time spent on low-priority processes.
-
-    - name: system
-      type: integer
-      description: >
-        The amount of CPU time spent in kernel space.
-
     - name: system_p
       type: float
       description: >
         The percentage of CPU time spent in kernel space.
 
+    - name: nice_p
+      type: float
+      description: >
+        The percentage of CPU time spent on low-priority processes.
+
+    - name: idle_p
+      type: float
+      description: >
+        The percentage of CPU time spent idle.
+
+    - name: iowait_p
+      type: float
+      description: >
+        The percentage of CPU time spent in wait (on disk).
+
+    - name: irq_p
+      type: float
+      description: >
+        The percentage of CPU time spent servicing and handling hardware interrupts.
+
+    - name: softirq_p
+      type: float
+      description:
+        The percentage of CPU time spent servicing and handling software interrupts.
+
+    - name: steal_p
+      type: float
+      description: >
+        The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
+        was servicing another processor.
+        Available only on Unix.
+
+
+    - name: user
+      type: long
+      description: >
+       The amount of CPU time spent in user space.
+
+    - name: system
+      type: long
+      description: >
+        The amount of CPU time spent in kernel space.
+
+    - name: nice
+      type: long
+      description: >
+        The amount of CPU time spent on low-priority processes.
+
     - name: idle
-      type: integer
+      type: long
       description: >
         The amount of CPU time spent idle.
 
     - name: iowait
-      type: integer
+      type: long
       description: >
         The amount of CPU time spent in wait (on disk).
 
     - name: irq
-      type: integer
+      type: long
       description: >
         The amount of CPU time spent servicing and handling hardware interrupts.
 
     - name: softirq
-      type: integer
+      type: long
       description:
         The amount of CPU time spent servicing and handling software interrupts.
 
     - name: steal
-      type: integer
+      type: long
       description: >
         The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor
         was servicing another processor.

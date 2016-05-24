@@ -45,8 +45,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	cores := []common.MapStr{}
 
 	for core, stat := range cpuCoreStat {
-		coreStat := system.GetCpuStatEvent(&stat)
-		coreStat["core"] = core
+		coreStat := m.cpu.GetCpuStatEvent(&stat)
+		coreStat["id"] = core
 		cores = append(cores, coreStat)
 
 	}
