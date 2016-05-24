@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"fmt"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 	"github.com/elastic/beats/packetbeat/publish"
@@ -21,6 +22,11 @@ var debugf = logp.MakeDebug("rpc")
 const (
 	RPC_LAST_FRAG = 0x80000000
 	RPC_SIZE_MASK = 0x7fffffff
+)
+
+const (
+	RPC_CALL  = 0
+	RPC_REPLY = 1
 )
 
 type RpcStream struct {
@@ -69,8 +75,17 @@ func New(
 func (rpc *Rpc) init(results publish.Transactions, config *rpcConfig) error {
 	rpc.setFromConfig(config)
 	rpc.results = results
-	rpc.callsSeen = common.NewCache(rpc.transactionTimeout,
-		protos.DefaultTransactionHashSize)
+	rpc.callsSeen = common.NewCacheWithRemovalListener(
+		rpc.transactionTimeout,
+		protos.DefaultTransactionHashSize,
+		func(k common.Key, v common.Value) {
+			nfs, ok := v.(*Nfs)
+			if !ok {
+				logp.Err("Expired value is not a MapStr (%T).", v)
+				return
+			}
+			rpc.handleExpiredPacket(nfs)
+		})
 
 	rpc.callsSeen.StartJanitor(rpc.transactionTimeout)
 	return nil
@@ -206,36 +221,36 @@ func (rpc *Rpc) handleRpcFragment(
 			break
 		}
 
-		xdr := Xdr{data: st.rawData[4 : 4+size], offset: 0}
-		msg := &RpcMessage{ts: pkt.Ts, xdr: xdr}
+		xdr := &Xdr{data: st.rawData[4 : 4+size], offset: 0}
 
-		src := common.Endpoint{
-			Ip:   tcptuple.Src_ip.String(),
-			Port: tcptuple.Src_port,
-		}
-		dst := common.Endpoint{
-			Ip:   tcptuple.Dst_ip.String(),
-			Port: tcptuple.Dst_port,
-		}
-
-		event := common.MapStr{}
-		event["@timestamp"] = common.Time(pkt.Ts)
-		event["status"] = common.OK_STATUS // all packes are OK for now
-		event["src"] = &src
-		event["dst"] = &dst
-
-		msg.fillEvent(event, rpc, size)
-
+		// keep the rest of the next fragment
 		st.rawData = st.rawData[4+size:]
+
+		rpc.handleRpcPacket(xdr, pkt.Ts, tcptuple, dir)
 	}
 
 	return conn
 }
 
-func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
-	return &RpcStream{
-		tcpTuple: tcptuple,
+func (rpc *Rpc) handleRpcPacket(xdr *Xdr, ts time.Time, tcptuple *common.TcpTuple, dir uint8) {
+
+	xid := fmt.Sprintf("%.8x", xdr.getUInt())
+
+	msgType := xdr.getUInt()
+
+	switch msgType {
+	case RPC_CALL:
+		rpc.handleCall(xid, xdr, ts, tcptuple, dir)
+	case RPC_REPLY:
+		rpc.handleReply(xid, xdr, ts, tcptuple, dir)
+	default:
+		logp.Warn("Bad RPC message")
 	}
 }
 
-//
+func newStream(pkt *protos.Packet, tcptuple *common.TcpTuple) *RpcStream {
+	return &RpcStream{
+		tcpTuple: tcptuple,
+		rawData:  pkt.Payload,
+	}
+}
