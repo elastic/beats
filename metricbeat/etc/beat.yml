@@ -10,7 +10,7 @@
 #==========================  Modules configuration ============================
 metricbeat.modules:
 
-#---------------------------- Apache Status Module ---------------------------
+#------------------------------- Apache Module -------------------------------
 - module: apache
   metricsets: ["status"]
   enabled: true

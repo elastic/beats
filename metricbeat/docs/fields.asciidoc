@@ -19,15 +19,15 @@ grouped in the following categories:
 * <<exported-fields-zookeeper>>
 
 [[exported-fields-apache]]
-=== Apache Status Fields
+=== Apache Fields
 
-Apache HTTPD server metrics collected from the mod_status module.
+Apache HTTPD server metric sets collected from the apache web server.
 
 
 
 === apache Fields
 
-apache contains the metrics that were scraped from apache.
+Apache contains the metrics that were scraped from apache.
 
 
 
