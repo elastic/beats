@@ -17,12 +17,9 @@ if [ "$SNAPSHOT" = "yes" ]; then
     VERSION="${VERSION}-SNAPSHOT"
 fi
 
-# fpm replaces - with _ in the version
-DEB_VERSION=`echo ${VERSION} | sed 's/-/~/g'`
-
 # create deb
 fpm --force -s dir -t deb \
-        -n {{.beat_name}} -v ${DEB_VERSION} \
+        -n {{.beat_name}} -v ${VERSION} \
         --vendor "Elastic" \
         --license "ASL 2.0" \
         --architecture {{.deb_arch}} \
@@ -43,7 +40,7 @@ fpm --force -s dir -t deb \
 
 # move and rename to use the elastic conventions
 mkdir -p upload/{{.beat_name}}
-mv {{.beat_name}}_${DEB_VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
+mv {{.beat_name}}_${VERSION}_{{.deb_arch}}.deb upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb
 echo "Created upload/{{.beat_name}}/{{.beat_name}}-${VERSION}-{{.deb_arch}}.deb"
 
 # create sha1 file

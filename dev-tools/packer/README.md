@@ -62,8 +62,9 @@ We use a set of package name conventions across all the Elastic stack:
   use dashes even for Deb files.
 * The archs are called `x86` and `x64` except for deb/rpm where we keep the
   OS preferred names (i386/amd64, i686/x86_64).
-* For version strings like `5.0.0-alpha3` we keep them with a dash in the
-  filename but use `~` in the deb/rpm metadata.
+* For version strings like `5.0.0-alpha3` we use dashes in all filenames. The
+  only exception is the RPM metadata (not the filename) where we replace the
+  dash with an underscore (`5.0.0_alpha3`).
 * We omit the release number from the filenames. It's always `1` in the metadata.
 
 For example, here are the artifacts created for Filebeat:
