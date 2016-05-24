@@ -633,6 +633,7 @@ You can specify the following options in the `kafka` section:
 ===== hosts
 
 The list of Kafka broker addresses from where to fetch the cluster metadata.
+The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== topic
 

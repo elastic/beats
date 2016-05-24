@@ -221,8 +221,9 @@ output.elasticsearch:
 
 #------------------------------- Kafka output ---------------------------------
 #output.kafka:
-  # The list of Kafka broker addresses from where to fetch the cluster
-  # metadata.
+  # The list of Kafka broker addresses from where to fetch the cluster metadata.
+  # The cluster metadata contain the actual Kafka brokers events are published
+  # to.
   #hosts: ["localhost:9092"]
 
   # The Kafka topic used for produced events. If use_type is set to true, the
