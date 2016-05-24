@@ -1,9 +1,12 @@
 package logstash
 
 import (
-	"errors"
+	"bytes"
+	"encoding/json"
 	"expvar"
 	"time"
+
+	"github.com/urso/go-lumber/client/v2"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -17,29 +20,21 @@ var (
 	publishEventsCallCount = expvar.NewInt("libbeatLogstashPublishEventsCallCount")
 )
 
-// client implements the ProtocolClient interface to be used
-// with different mode. The client implements slow start with low window sizes +
-// window size backoff in case of long running transactions.
-//
-// it is suggested to use lumberjack in conjunction with roundRobinConnectionMode
-// if logstash becomes unresponsive
-type client struct {
-	*transport.Client
-	*protocol
-
-	win             window
-	countTimeoutErr int
-}
-
 const (
 	minWindowSize             int = 1
 	defaultStartMaxWindowSize int = 10
 )
 
-// errors
-var (
-	ErrNotConnected = errors.New("lumberjack client is not connected")
-)
+type client struct {
+	*transport.Client
+	client *v2.SyncClient
+
+	// the beat name
+	beat []byte
+	enc  encoder
+
+	win window
+}
 
 func newLumberjackClient(
 	conn *transport.Client,
@@ -48,28 +43,41 @@ func newLumberjackClient(
 	timeout time.Duration,
 	beat string,
 ) (*client, error) {
-	p, err := newClientProcol(conn, timeout, compressLevel, beat)
+	c := &client{}
+	c.Client = conn
+	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c.enc.buf = bytes.NewBuffer(nil)
+
+	encodedBeat, err := json.Marshal(beat)
+	if err != nil {
+		return nil, err
+	}
+	c.beat = encodedBeat
+
+	cl, err := v2.NewSyncClientWithConn(conn,
+		v2.JSONEncoder(c.jsonEncode),
+		v2.Timeout(timeout),
+		v2.CompressionLevel(compressLevel))
 	if err != nil {
 		return nil, err
 	}
 
-	c := &client{Client: conn, protocol: p}
-	c.win.init(defaultStartMaxWindowSize, maxWindowSize)
+	c.client = cl
 	return c, nil
 }
 
-func (l *client) Connect(timeout time.Duration) error {
+func (c *client) Connect(timeout time.Duration) error {
 	logp.Debug("logstash", "connect")
-	return l.Client.Connect()
+	return c.Client.Connect()
 }
 
-func (l *client) Close() error {
+func (c *client) Close() error {
 	logp.Debug("logstash", "close connection")
-	return l.Client.Close()
+	return c.Client.Close()
 }
 
-func (l *client) PublishEvent(event common.MapStr) error {
-	_, err := l.PublishEvents([]common.MapStr{event})
+func (c *client) PublishEvent(event common.MapStr) error {
+	_, err := c.PublishEvents([]common.MapStr{event})
 	return err
 }
 
@@ -105,13 +113,13 @@ func (l *client) PublishEvents(
 // publishWindowed published events with current maximum window size to logstash
 // returning the total number of events sent (due to window size, or acks until
 // failure).
-func (l *client) publishWindowed(events []common.MapStr) (int, error) {
+func (c *client) publishWindowed(events []common.MapStr) (int, error) {
 	if len(events) == 0 {
 		return 0, nil
 	}
 
 	batchSize := len(events)
-	windowSize := l.win.get()
+	windowSize := c.win.get()
 	debug("Try to publish %v events to logstash with window size %v",
 		batchSize, windowSize)
 
@@ -120,19 +128,50 @@ func (l *client) publishWindowed(events []common.MapStr) (int, error) {
 		events = events[:windowSize]
 	}
 
-	outEvents, err := l.sendEvents(events)
-	count := uint32(len(outEvents))
+	n, err := c.sendEvents(events)
 	if err != nil {
-		if err == errAllEventsEncoding {
-			return len(events), nil
-		}
-		return 0, err
+		return n, err
 	}
 
-	if seq, err := l.awaitACK(count); err != nil {
-		return int(seq), err
-	}
-
-	l.win.tryGrowWindow(batchSize)
+	c.win.tryGrowWindow(batchSize)
 	return len(events), nil
+}
+
+func (c *client) sendEvents(events []common.MapStr) (int, error) {
+	if len(events) == 0 {
+		return 0, nil
+	}
+
+	window := make([]interface{}, len(events))
+	for i, event := range events {
+		window[i] = event
+	}
+	return c.client.Send(window)
+}
+
+func (c *client) jsonEncode(rawEvent interface{}) ([]byte, error) {
+	event := rawEvent.(common.MapStr)
+	buf := c.enc.buf
+	buf.Reset()
+
+	buf.WriteRune('{')
+	if _, hasMeta := event["@metadata"]; !hasMeta {
+		typ := event["type"].(string)
+		buf.WriteString(`"@metadata":{"type":`)
+		encodeString(buf, typ)
+	}
+
+	buf.WriteString(`,"beat":`)
+	buf.Write(c.beat)
+	buf.WriteString(`},`)
+	err := c.enc.encodeKeyValues(event)
+	if err != nil {
+		logp.Err("jsonEncode failed with: %v", err)
+		return nil, err
+	}
+
+	b := buf.Bytes()
+	b[len(b)-1] = '}'
+
+	return buf.Bytes(), nil
 }

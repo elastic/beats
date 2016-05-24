@@ -243,6 +243,7 @@ func TestSendMessageViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
+	enableLogging([]string{"*"})
 
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
