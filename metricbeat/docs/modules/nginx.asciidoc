@@ -17,13 +17,13 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  - module: nginx
-    metricsets: ["stubstatus"]
-    enabled: true
-    period: 1s
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 1s
 
-    # Nginx hosts
-    hosts: ["http://127.0.0.1/"]
+  # Nginx hosts
+  hosts: ["http://127.0.0.1/"]
 
 ----
 

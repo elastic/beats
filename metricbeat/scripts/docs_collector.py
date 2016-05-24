@@ -61,10 +61,7 @@ metricbeat.modules:
             with file(config_file) as f:
                 # Add 2 spaces for indentation in front of each line
                 for line in f:
-                    if len(line.strip()) > 0:
-                        module_file += "  " + line
-                    else:
-                        module_file += line
+                    module_file += line
 
             module_file += "----\n\n"
 

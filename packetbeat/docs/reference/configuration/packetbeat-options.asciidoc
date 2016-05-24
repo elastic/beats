@@ -7,18 +7,16 @@ The `interfaces` section configures the sniffer. Here is an example configuratio
 ------------------------------------------------------------------------------
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces:
-  # On which device to sniff
-  device: any
+packetbeat.interfaces.device: any
 
-  # The maximum capture size of a single packet.
-  snaplen: 1514
+# The maximum capture size of a single packet.
+packetbeat.interfaces.snaplen: 1514
 
-  # The type of the sniffer to use
-  type: af_packet
+# The type of the sniffer to use
+packetbeat.interfaces.type: af_packet
 
-  # The size of the sniffing buffer
-  buffer_size_mb: 100
+# The size of the sniffing buffer
+packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
 ==== Sniffing Options
@@ -34,8 +32,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: eth0
+packetbeat.interfaces.device: eth0
 ------------------------------------------------------------------------------
 
 On Linux, you can specify `any` for the device, and Packetbeat captures all
@@ -73,8 +70,7 @@ first interface in the list:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: 0
+packetbeat.interfaces.device: 0
 ------------------------------------------------------------------------------
 
 Specifying the index is especially useful on Windows where device names can be long.
@@ -90,9 +86,8 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: eth0
-  snaplen: 1514
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.snaplen: 1514
 ------------------------------------------------------------------------------
 
 ===== type
@@ -114,9 +109,8 @@ the `af_packet` sniffing type:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: eth0
-  type: af_packet
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.type: af_packet
 ------------------------------------------------------------------------------
 
 On Linux, if you are trying to optimize the CPU usage of Packetbeat,
@@ -137,10 +131,9 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: eth0
-  type: af_packet
-  buffer_size_mb: 100
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
 ===== with_vlans
@@ -168,9 +161,8 @@ You can use the `bpf_filter` setting to overwrite the generated BPF filter. For 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.interfaces:
-  device: eth0
-  bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
+packetbeat.interfaces.device: eth0
+packetbeat.interfaces.bpf_filter: "net 192.168.238.0/0 and port 80 and port 3306"
 ------------------------------------------------------------------------------
 
 NOTE: This setting disables automatic generation of the BPF filter. If
@@ -187,9 +179,8 @@ disabled.
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.flows:
-  timeout: 30s
-  period: 10s
+packetbeat.flows.timeout: 30s
+packetbeat.flows.period: 10s
 ------------------------------------------------------------------------------
 
 ==== Options
@@ -224,33 +215,32 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols:
-  icmp:
-    enabled: true
+packetbeat.protocols.icmp:
+  enabled: true
 
-  dns:
-    ports: [53]
+packetbeat.protocols.dns:
+  ports: [53]
 
-  http:
-    ports: [80, 8080, 8000, 5000, 8002]
+packetbeat.protocols.http:
+  ports: [80, 8080, 8000, 5000, 8002]
 
-  amqp:
-    ports: [5672]
+packetbeat.protocols.amqp:
+  ports: [5672]
 
-  memcache:
-    ports: [11211]
+packetbeat.protocols.memcache:
+  ports: [11211]
 
-  mysql:
-    ports: [3306]
+packetbeat.protocols.mysql:
+  ports: [3306]
 
-  redis:
-    ports: [6379]
+packetbeat.protocols.redis:
+  ports: [6379]
 
-  pgsql:
-    ports: [5432]
+packetbeat.protocols.pgsql:
+  ports: [5432]
 
-  thrift:
-    ports: [9090]
+packetbeat.protocols.thrift:
+  ports: [9090]
 ------------------------------------------------------------------------------
 
 ==== Common Protocol Options
@@ -305,18 +295,18 @@ The `dns` section specifies configuration options for the DNS protocol. The DNS 
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols:
-  dns:
-    ports: [53]
+packetbeat.protocols.dns:
+  ports: [53]
 
-    # include_authorities controls whether or not the dns.authorities field
-    # (authority resource records) is added to messages.
-    # Default: false
-    include_authorities: true
-    # include_additionals controls whether or not the dns.additionals field
-    # (additional resource records) is added to messages.
-    # Default: false
-    include_additionals: true
+  # include_authorities controls whether or not the dns.authorities field
+  # (authority resource records) is added to messages.
+  # Default: false
+  include_authorities: true
+
+  # include_additionals controls whether or not the dns.additionals field
+  # (additional resource records) is added to messages.
+  # Default: false
+  include_additionals: true
 ------------------------------------------------------------------------------
 
 ===== include_authorities
@@ -336,30 +326,29 @@ sample configuration section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.protocols:
-  http:
+packetbeat.protocols.http:
 
-    # Configure the ports where to listen for HTTP traffic. You can disable
-    # the http protocol by commenting the list of ports.
-    ports: [80, 8080, 8000, 5000, 8002]
+  # Configure the ports where to listen for HTTP traffic. You can disable
+  # the http protocol by commenting the list of ports.
+  ports: [80, 8080, 8000, 5000, 8002]
 
-    # Uncomment the following to hide certain parameters in URL or forms attached
-    # to HTTP requests. The names of the parameters are case insensitive.
-    # The value of the parameters will be replaced with the 'xxxxx' string.
-    # This is generally useful for avoiding storing user passwords or other
-    # sensitive information.
-    hide_keywords: ["pass", "password", "passwd"]
+  # Uncomment the following to hide certain parameters in URL or forms attached
+  # to HTTP requests. The names of the parameters are case insensitive.
+  # The value of the parameters will be replaced with the 'xxxxx' string.
+  # This is generally useful for avoiding storing user passwords or other
+  # sensitive information.
+  hide_keywords: ["pass", "password", "passwd"]
 
-    # Uncomment the following to export a list of extra HTTP headers. By
-    default is none sent.
-    send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
+  # A list of header names to capture and send to Elasticsearch. These headers
+  # are placed under the `headers` dictionary in the resulting JSON.
+  send_headers: ["User-Agent", "Cookie", "Set-Cookie"]
 
-    # Uncomment the following to export Cookie or Set-Cookie headers. By
-    # default is false.
-    split_coookie: true
+  # If the Cookie or Set-Cookie headers are sent, this option controls whether
+  # they are split into individual values.
+  split_coookie: true
 
-    # Configure the HTTP header that contains the real IP address.
-    real_ip_header: "X-Forwarded-For"
+  # Configure the HTTP header that contains the real IP address.
+  real_ip_header: "X-Forwarded-For"
 ------------------------------------------------------------------------------
 
 ===== hide_keywords
@@ -409,11 +398,10 @@ Example configuration:
 
 [source,yml]
 ------------------------------------------------------------------------------
-packetbeat.protocols:
-  http:
-    ports: [80, 8080]
-    send_response: true
-    include_body_for: ["text/html"]
+packetbeat.protocols.http:
+  ports: [80, 8080]
+  send_response: true
+  include_body_for: ["text/html"]
 ------------------------------------------------------------------------------
 
 
@@ -465,12 +453,12 @@ protocol. Here is a sample configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-  amqp:
-    ports: [5672]
-    max_body_length: 1000
-    parse_headers: true
-    parse_arguments: false
-    hide_connection_information: true
+packetbeat.protocols.amqp:
+  ports: [5672]
+  max_body_length: 1000
+  parse_headers: true
+  parse_arguments: false
+  hide_connection_information: true
 ------------------------------------------------------------------------------
 
 ===== max_body_length
@@ -505,13 +493,13 @@ protocol. Here is a sample configuration section for memcache:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-  memcache:
-    ports: [11211]
-    parseunknown: false
-    maxvalues: 0
-    maxbytespervalue: 100
-    transaction_timeout: 200
-    udptransactiontimeout: 200
+packetbeat.protocols.memcache:
+  ports: [11211]
+  parseunknown: false
+  maxvalues: 0
+  maxbytespervalue: 100
+  transaction_timeout: 200
+  udptransactiontimeout: 200
 ------------------------------------------------------------------------------
 
 ===== parseunknown
@@ -571,15 +559,15 @@ sample configuration section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-  thrift:
-    transport_type: socket
-    protocol_type: binary
-    idl_files: ["tutorial.thrift", "shared.thrift"]
-    string_max_size: 200
-    collection_max_size: 20
-    capture_reply: true
-    obfuscate_strings: true
-    drop_after_n_struct_fields: 100
+packetbeat.protocols.thrift:
+  transport_type: socket
+  protocol_type: binary
+  idl_files: ["tutorial.thrift", "shared.thrift"]
+  string_max_size: 200
+  collection_max_size: 20
+  capture_reply: true
+  obfuscate_strings: true
+  drop_after_n_struct_fields: 100
 ------------------------------------------------------------------------------
 
 ===== transport_type
@@ -641,11 +629,11 @@ configuration section:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-  mongodb:
-    send_request: true
-    send_response: true
-    max_docs: 0
-    max_doc_length: 0
+packetbeat.protocols.mongodb:
+  send_request: true
+  send_response: true
+  max_docs: 0
+  max_doc_length: 0
 ------------------------------------------------------------------------------
 
 The following two settings are useful for limiting the amount of data

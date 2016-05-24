@@ -124,25 +124,23 @@ The equivalent `prospectors` section would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  # List of prospectors to fetch data.
-  prospectors:
-    # Each - is a prospector. Below are the prospector specific configurations
-    - input_type: log
-      paths:
-        - /var/log/messages
-        - "/var/log/*.log"
-      document_type: syslog <1>
-      fields:
-        service: apache
-        zone: us-east-1
-      fields_under_root: true
-    - input_type: stdin <2>
-      document_type: stdin
-    - input_type: log
-      paths:
-        - "/var/log/apache2/httpd-*.log"
-      document_type: apache
+filebeat.prospectors:
+# Each - is a prospector. Below are the prospector specific configurations
+- input_type: log
+  paths:
+    - /var/log/messages
+    - "/var/log/*.log"
+  document_type: syslog <1>
+  fields:
+    service: apache
+    zone: us-east-1
+  fields_under_root: true
+- input_type: stdin <2>
+  document_type: stdin
+- input_type: log
+  paths:
+    - "/var/log/apache2/httpd-*.log"
+  document_type: apache
 -------------------------------------------------------------------------------------
 
 <1> The `document_type` option controls the output `type` field, which is used by the
@@ -202,33 +200,32 @@ The equivalent in Filebeat would look like this:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-output:
-  logstash:
-    # The Logstash hosts. <1>
-    hosts:
-      - localhost:5043
+output.logstash:
+  # The Logstash hosts. <1>
+  hosts:
+    - localhost:5043
 
-    # Network timeout in seconds.
-    timeout: 15
+  # Network timeout in seconds.
+  timeout: 15
 
-    tls: <2>
-      # List of root certificates for HTTPS server verifications
-      certificate_authorities:
-        - ./logstash-forwarder.crt
+  # Optional TLS settings <2>
+  # List of root certificates for HTTPS server verifications
+  tls.certificate_authorities:
+    - ./logstash-forwarder.crt
 
-      # Certificate for TLS client authentication
-      certificate: ./logstash-forwarder.crt
+  # Certificate for TLS client authentication
+  tls.certificate: ./logstash-forwarder.crt
 
-      # Client Certificate Key
-      certificate_key: ./logstash-forwarder.key
+  # Client Certificate Key
+  tls.certificate_key: ./logstash-forwarder.key
 -------------------------------------------------------------------------------------
 
 <1> When multiple hosts are defined, the default behavior in Filebeat is to
     pick a random host for new connections, similar to the Logstash Forwarder
     behavior. Filebeat can optionally do load balancing. For more details, see the
     <<loadbalance>> configuration option.
-<2> Note that if the `tls` section is missing, then TLS is disabled. TLS is
-    automatically enabled when you add the `tls` section. For more information about
+<2> Note that if the `tls` settings are missing, then TLS is disabled. TLS is
+    automatically enabled when you add any of the `tls` options. For more information about
     specific configuration options, see <<configuration-output-tls>>.
 
 
@@ -287,17 +284,15 @@ Filebeat configuration:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - "/var/log/*.log"
-      document_type: syslog
-      fields:
-        service: test01
-output:
-  elasticsearch:
-    hosts: ["http://localhost:5043"]
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - "/var/log/*.log"
+  document_type: syslog
+  fields:
+    service: test01
+output.elasticsearch:
+  hosts: ["http://localhost:5043"]
 -------------------------------------------------------------------------------------
 
 == Changes to Command Line Options
@@ -376,15 +371,14 @@ you can use the <<fields-under-root>> configuration option:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-filebeat:
-  prospectors:
-    - input_type: log
-      paths:
-        - "/var/log/*.log"
-      document_type: syslog
-      fields:
-        service: test01
-      fields_under_root: true
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - "/var/log/*.log"
+  document_type: syslog
+  fields:
+    service: test01
+  fields_under_root: true
 -------------------------------------------------------------------------------------
 
 [float]

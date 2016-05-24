@@ -25,11 +25,10 @@ Here is an example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path:
-  home: /usr/share/beat
-  conf: /etc/beat
-  data: /var/lib/beat
-  logs: /var/log/
+path.home: /usr/share/beat
+path.conf: /etc/beat
+path.data: /var/lib/beat
+path.logs: /var/log/
 ------------------------------------------------------------------------------
 
 Note that it is possible to override these options by using command line flags. 
@@ -49,8 +48,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path:
-  home: /usr/share/beats
+path.home: /usr/share/beats
 ------------------------------------------------------------------------------
 
 ===== conf
@@ -64,8 +62,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path:
-  conf: /usr/share/beats/config
+path.conf: /usr/share/beats/config
 ------------------------------------------------------------------------------
 
 ===== data
@@ -80,8 +77,7 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path:
-  data: /var/lib/beats
+path.data: /var/lib/beats
 ------------------------------------------------------------------------------
 
 ===== logs
@@ -94,6 +90,5 @@ Example:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-path:
-  logs: /var/log/beats
+path.logs: /var/log/beats
 ------------------------------------------------------------------------------

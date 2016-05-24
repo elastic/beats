@@ -30,13 +30,13 @@ here (add link). Below is an example of a configuration option:
 [source,yaml]
 ----
 metricbeat.modules:
-  - module: redis
-    metricsets: ["info"]
-    enabled: true
-    period: 1s
+- module: redis
+  metricsets: ["info"]
+  enabled: true
+  period: 1s
 
-    # Redis hosts
-    hosts: ["127.0.0.1:6379"]
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
 ----
 
 === MetricSets
