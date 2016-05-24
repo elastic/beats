@@ -36,10 +36,13 @@ func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *inpu
 
 	logp.Info("Loading Prospectors: %v", len(prospectorConfigs))
 
+	// Get existing states
+	states := *c.Registrar.state
+
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, prospectorConfig := range prospectorConfigs {
 
-		prospector, err := NewProspector(prospectorConfig, c.Registrar, eventChan)
+		prospector, err := NewProspector(prospectorConfig, states, eventChan)
 		if err != nil {
 			return fmt.Errorf("Error in initing prospector: %s", err)
 		}
@@ -60,10 +63,9 @@ func (c *Crawler) Start(prospectorConfigs []*common.Config, eventChan chan *inpu
 			logp.Debug("crawler", "Starting prospector %v", id)
 			prospector.Run()
 		}(i, p)
-
 	}
 
-	logp.Info("All prospectors are initialised and running with %d states to persist", len(c.Registrar.getState()))
+	logp.Info("All prospectors are initialised and running with %d states to persist", c.Registrar.state.Count())
 
 	return nil
 }
