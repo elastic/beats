@@ -37,7 +37,6 @@ class Test(BaseTest):
         for key in [
             "proc.pid",
             "proc.ppid",
-            "proc.cpu.total_p",
             "proc.mem.size",
             "proc.mem.rss",
             "proc.mem.share",
