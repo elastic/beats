@@ -8,6 +8,7 @@ This file is generated! See scripts/docs_collector.py
 This modules periodically fetches metrics from https://www.mysql.com/[MySQL]
 servers.
 
+[float]
 === Configuration Options
 
 A basic configuration for the mysql module can be found below. The host must be passed as a MySQL Data Source Name (DSN). The format of the
@@ -19,6 +20,7 @@ DSN is as following:
 
 
 
+[float]
 === Example Configuration
 
 The MySQL Status module supports the standard configuration options which can be found
@@ -37,6 +39,7 @@ metricbeat.modules:
   hosts: ["root@tcp(127.0.0.1:3306)/"]
 ----
 
+[float]
 === MetricSets
 
 The following MetricSets are available:

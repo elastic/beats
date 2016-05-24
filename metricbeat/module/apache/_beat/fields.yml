@@ -1,10 +1,10 @@
 - key: apache
-  title: "Apache Status"
+  title: "Apache"
   description: >
-    Apache HTTPD server metrics collected from the mod_status module.
+    Apache HTTPD server metric sets collected from the apache web server.
   fields:
     - name: apache
       type: group
       description: >
-        apache contains the metrics that were scraped from apache.
+        Apache contains the metrics that were scraped from apache.
       fields:

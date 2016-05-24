@@ -10,9 +10,10 @@ HTTPD] servers.
 
 
 
+[float]
 === Example Configuration
 
-The Apache Status module supports the standard configuration options which can be found
+The Apache module supports the standard configuration options which can be found
 here (add link). Below is an example of a configuration option:
 
 [source,yaml]
@@ -27,6 +28,7 @@ metricbeat.modules:
   hosts: ["http://127.0.0.1/"]
 ----
 
+[float]
 === MetricSets
 
 The following MetricSets are available:

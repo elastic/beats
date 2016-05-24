@@ -8,6 +8,7 @@ This file is generated! See scripts/docs_collector.py
 
 
 
+[float]
 === Example Configuration
 
 The Zookeeper Status module supports the standard configuration options which can be found
@@ -23,6 +24,7 @@ metricbeat.modules:
   hosts: ["localhost:2181"]
 ----
 
+[float]
 === MetricSets
 
 The following MetricSets are available:
