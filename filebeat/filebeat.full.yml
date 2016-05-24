@@ -395,22 +395,206 @@ output.elasticsearch:
   # Configure curve types for ECDHE based cipher suites
   #tls.curve_types: []
 
+#------------------------------- Kafka output ---------------------------------
+#output.kafka:
+  # The list of Kafka broker addresses to connect to.
+  #hosts: ["localhost:9092"]
+
+  # The Kafka topic used for produced events. If use_type is set to true, the
+  # topic will not be used.
+  #topic: beats
+
+  # Set Kafka topic by event type. If use_type is false, the topic option must
+  # be configured. The default is false.
+  #use_type: false
+
+  # The number of concurrent load-balanced Kafka output workers.
+  #worker: 1
+
+  # The number of times to retry publishing an event after a publishing failure.
+  # After the specified number of retries, the events are typically dropped.
+  # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
+  # all events are published.  Set max_retries to a value less than 0 to retry
+  # until all events are published. The default is 3.
+  #max_retries: 3
+
+  # The maximum number of events to bulk in a single Kafka request. The default
+  # is 2048.
+  #bulk_max_size: 2048
+
+  # The number of seconds to wait for responses from the Kafka brokers before
+  # timing out. The default is 30s.
+  #timeout: 30s
+
+  # The maximum duration a broker will wait for number of required ACKs. The
+  # default is 10s.
+  #broker_timeout: 10s
+
+  # Per Kafka broker number of messages buffered in output pipeline. The default
+  # is 256.
+  #channel_buffer_size: 256
+
+  # The keep-alive period for an active network connection. If 0s, keep-alives
+  # are disabled. The default is 0 seconds.
+  #keep_alive: 0
+
+  # Sets the output compression codec. Must be one of none, snappy and gzip. The
+  # default is snappy.
+  #compression: snappy
+
+  # The maximum permitted size of JSON-encoded messages. Bigger messages will be
+  # dropped. The default value is 1000000 (bytes). This value should be equal to
+  # or less than the broker’s message.max.bytes.
+  #max_message_bytes: 1000000
+
+  # The ACK reliability level required from broker. 0=no response, 1=wait for
+  # local commit, -1=wait for all replicas to commit. The default is 1.  Note:
+  # If set to 0, no ACKs are returned by Kafka. Messages might be lost silently
+  # on error.
+  #required_acks: 0
+
+  # The number of seconds to wait for new events between two producer API calls.
+  #flush_interval: 1
+
+  # The configurable ClientID used for logging, debugging, and auditing
+  # purposes.  The default is "beats".
+  #client_id: beats
+
+  # Optional TLS. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for TLS client authentication
+  #tls.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #tls.certificate_key: "/etc/pki/client/cert.key"
+
+  # Controls whether the client verifies server certificates and host name.
+  # If insecure is set to true, all server host names and certificates will be
+  # accepted. In this mode TLS based connections are susceptible to
+  # man-in-the-middle attacks. Use only for testing.
+  #tls.insecure: true
+
+  # Configure cipher suites to be used for TLS connections
+  #tls.cipher_suites: []
+
+  # Configure curve types for ECDHE based cipher suites
+  #tls.curve_types: []
+
+#------------------------------- Redis output ---------------------------------
+#output.redis:
+  # The list of Redis servers to connect to. If load balancing is enabled, the
+  # events are distributed to the servers in the list. If one server becomes
+  # unreachable, the events are distributed to the reachable servers only.
+  #hosts: ["localhost:6379"]
+
+  # The Redis port to use if hosts does not contain a port number. The default
+  # is 6379.
+  #port: 6379
+
+  # The name of the Redis list or channel the events are published to. The
+  # default is filebeat.
+  #index: filebeat
+
+  # The password to authenticate with. The default is no authentication.
+  #password:
+
+  # The Redis database number where the events are published. The default is 0.
+  #db: 0
+
+  # The Redis data type to use for publishing events. If the data type is list,
+  # the Redis RPUSH command is used. If the data type is channel, the Redis
+  # PUBLISH command is used. The default value is list.
+  #datetype: list
+
+  # The Redis host to connect to when using topology map support. Topology map
+  # support is disabled if this option is not set.
+  #host_topology:
+
+  # The password to use for authenticating with the Redis topology server. The
+  # default is no authentication.
+  #password_topology:
+
+  # The Redis database number where the topology information is stored. The
+  # default is 1.
+  #db_topology: 1
+
+  # The number of workers to use for each host configured to publish events to
+  # Redis. Use this setting along with the loadbalance option. For example, if
+  # you have 2 hosts and 3 workers, in total 6 workers are started (3 for each
+  # host).
+  #worker: 1
+
+  # If set to true and multiple hosts or workers are configured, the output
+  # plugin load balances published events onto all Redis hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
+
+  # The Redis connection timeout in seconds. The default is 5 seconds.
+  #timeout: 5s
+
+  # The number of times to retry publishing an event after a publishing failure.
+  # After the specified number of retries, the events are typically dropped.
+  # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
+  # all events are published. Set max_retries to a value less than 0 to retry
+  # until all events are published. The default is 3.
+  #max_retries: 3
+
+  # The maximum number of events to bulk in a single Redis request or pipeline.
+  # The default is 2048.
+  #bulk_max_size: 2048
+
+  # The URL of the SOCKS5 proxy to use when connecting to the Redis servers. The
+  # value must be a URL with a scheme of socks5://.
+  #proxy_url:
+
+  # This option determines whether Redis hostnames are resolved locally when
+  # using a proxy. The default value is false, which means that name resolution
+  # occurs on the proxy server.
+  #proxy_use_local_resolver: false
+
+  # Optional TLS. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #tls.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for TLS client authentication
+  #tls.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #tls.certificate_key: "/etc/pki/client/cert.key"
+
+  # Controls whether the client verifies server certificates and host name.
+  # If insecure is set to true, all server host names and certificates will be
+  # accepted. In this mode TLS based connections are susceptible to
+  # man-in-the-middle attacks. Use only for testing.
+  #tls.insecure: true
+
+  # Configure cipher suites to be used for TLS connections
+  #tls.cipher_suites: []
+
+  # Configure curve types for ECDHE based cipher suites
+  #tls.curve_types: []
 
 #------------------------------- File output ----------------------------------
 #output.file:
-  # Path to the directory where to save the generated files. The option is mandatory.
+  # Path to the directory where to save the generated files. The option is
+  # mandatory.
   #path: "/tmp/filebeat"
 
-  # Name of the generated files. The default is `filebeat` and it generates files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
+  # Name of the generated files. The default is `filebeat` and it generates
+  # files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
   #filename: filebeat
 
-  # Maximum size in kilobytes of each file. When this size is reached, the files are
-  # rotated. The default value is 10240 kB.
+  # Maximum size in kilobytes of each file. When this size is reached, the files
+  # are rotated. The default value is 10240 kB.
   #rotate_every_kb: 10000
 
-  # Maximum number of files under path. When this number of files is reached, the
-  # oldest file is deleted and the rest are shifted from last to first. The default
-  # is 7 files.
+  # Maximum number of files under path. When this number of files is reached,
+  # the oldest file is deleted and the rest are shifted from last to first. The
+  # default is 7 files.
   #number_of_files: 7
 
 
