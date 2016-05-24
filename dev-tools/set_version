@@ -7,8 +7,7 @@ template_go = '''package beat
 const defaultBeatVersion = "{}"
 '''
 
-template_packer = '''
-version: "{version}"
+template_packer = '''version: "{version}"
 '''
 
 
