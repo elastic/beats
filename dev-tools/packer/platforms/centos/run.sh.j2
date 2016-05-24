@@ -18,7 +18,7 @@ if [ "$SNAPSHOT" = "yes" ]; then
 fi
 
 # fpm replaces - with _ in the version
-RPM_VERSION=`echo ${VERSION} | sed 's/-/~/g'`
+RPM_VERSION=`echo ${VERSION} | sed 's/-/_/g'`
 
 # create rpm
 fpm --force -s dir -t rpm \
