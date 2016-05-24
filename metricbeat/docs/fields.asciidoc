@@ -1165,18 +1165,11 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
-==== system.core.core
+==== system.core.id
 
 type: integer
 
 CPU Core number.
-
-
-==== system.core.user
-
-type: integer
-
-The amount of CPU time spent in user space.
 
 
 ==== system.core.user_p
@@ -1186,20 +1179,6 @@ type: float
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
 
 
-==== system.core.nice
-
-type: integer
-
-The amount of CPU time spent on low-priority processes.
-
-
-==== system.core.system
-
-type: integer
-
-The amount of CPU time spent in kernel space.
-
-
 ==== system.core.system_p
 
 type: float
@@ -1207,36 +1186,98 @@ type: float
 The percentage of CPU time spent in kernel space.
 
 
+==== system.core.nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+==== system.core.idle_p
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
+==== system.core.iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+==== system.core.irq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system.core.softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+==== system.core.steal_p
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+==== system.core.user
+
+type: long
+
+The amount of CPU time spent in user space.
+
+
+==== system.core.system
+
+type: long
+
+The amount of CPU time spent in kernel space.
+
+
+==== system.core.nice
+
+type: long
+
+The amount of CPU time spent on low-priority processes.
+
+
 ==== system.core.idle
 
-type: integer
+type: long
 
 The amount of CPU time spent idle.
 
 
 ==== system.core.iowait
 
-type: integer
+type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
 ==== system.core.irq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
 ==== system.core.softirq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
 ==== system.core.steal
 
-type: integer
+type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
@@ -1247,32 +1288,11 @@ The amount of CPU time spent in involuntary wait by the virtual CPU while the hy
 
 
 
-==== system.cpu.user
-
-type: integer
-
-The amount of CPU time spent in user space.
-
-
 ==== system.cpu.user_p
 
 type: float
 
 The percentage of CPU time spent in user space. On multi-core systems, you can have percentages that are greater than 100%. For example, if 3 cores are at 60% use, then the `cpu.user_p` will be 180%.
-
-
-==== system.cpu.nice
-
-type: integer
-
-The amount of CPU time spent on low-priority processes.
-
-
-==== system.cpu.system
-
-type: integer
-
-The amount of CPU time spent in kernel space.
 
 
 ==== system.cpu.system_p
@@ -1282,36 +1302,98 @@ type: float
 The percentage of CPU time spent in kernel space.
 
 
+==== system.cpu.nice_p
+
+type: float
+
+The percentage of CPU time spent on low-priority processes.
+
+
+==== system.cpu.idle_p
+
+type: float
+
+The percentage of CPU time spent idle.
+
+
+==== system.cpu.iowait_p
+
+type: float
+
+The percentage of CPU time spent in wait (on disk).
+
+
+==== system.cpu.irq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling hardware interrupts.
+
+
+==== system.cpu.softirq_p
+
+type: float
+
+The percentage of CPU time spent servicing and handling software interrupts.
+
+==== system.cpu.steal_p
+
+type: float
+
+The percentage of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
+
+
+==== system.cpu.user
+
+type: long
+
+The amount of CPU time spent in user space.
+
+
+==== system.cpu.system
+
+type: long
+
+The amount of CPU time spent in kernel space.
+
+
+==== system.cpu.nice
+
+type: long
+
+The amount of CPU time spent on low-priority processes.
+
+
 ==== system.cpu.idle
 
-type: integer
+type: long
 
 The amount of CPU time spent idle.
 
 
 ==== system.cpu.iowait
 
-type: integer
+type: long
 
 The amount of CPU time spent in wait (on disk).
 
 
 ==== system.cpu.irq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling hardware interrupts.
 
 
 ==== system.cpu.softirq
 
-type: integer
+type: long
 
 The amount of CPU time spent servicing and handling software interrupts.
 
 ==== system.cpu.steal
 
-type: integer
+type: long
 
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 

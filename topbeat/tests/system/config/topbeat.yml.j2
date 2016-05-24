@@ -13,10 +13,11 @@ topbeat.procs: [
 
 # Statistics to collect (all enabled by default)
 topbeat.stats:
-  system: {{ "false" if system_stats == false else "true" }}
-  process: {{ "false" if process_stats == false else "true" }}
-  filesystem: {{ "false" if filesystem_stats == false else "true" }}
-  cpu_per_core: {{ "false" if cpu_per_core == false else "true" }}
+  system: {{ system_stats|default("true") }}
+  process: {{ process_stats|default("true") }}
+  filesystem: {{ filesystem_stats|default("true") }}
+  core: {{ core_stats|default("false") }}
+  cpu_ticks: {{ cpu_ticks|default("false") }}
 
 
 #================================ General =====================================
@@ -58,23 +59,22 @@ geoip:
 #================================ Filters =====================================
 filters:
 
-    {%- if include_fields %}
-    - include_fields:
-        {{include_fields.condition | default()}}
-        fields: {{include_fields.fields | default([])}}
-    {%- endif %}
+  {%- if include_fields %}
+  - include_fields:
+      {{include_fields.condition | default()}}
+      fields: {{include_fields.fields | default([])}}
+  {%- endif %}
 
-    {%- if drop_fields %}
-    - drop_fields:
-        {{drop_fields.condition | default()}}
-        fields: {{drop_fields.fields | default([])}}
-    {%- endif %}
+  {%- if drop_fields %}
+  - drop_fields:
+      {{drop_fields.condition | default()}}
+      fields: {{drop_fields.fields | default([])}}
+  {%- endif %}
 
-
-    {%- if drop_event %}
-    - drop_event:
-        {{ drop_event.condition | default()}}
-    {%- endif %}
+  {%- if drop_event %}
+  - drop_event:
+      {{ drop_event.condition | default()}}
+  {%- endif %}
 
 {%- endif %}
 

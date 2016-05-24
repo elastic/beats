@@ -3,11 +3,14 @@ import sys
 import unittest
 import metricbeat
 
-SYSTEM_CPU_FIELDS = ["idle", "iowait", "irq", "load", "nice", "softirq",
-                     "steal", "system", "system_p", "user", "user_p"]
+SYSTEM_CPU_FIELDS = ["idle_p", "iowait_p", "irq_p", "load", "nice_p",
+                     "softirq_p", "steal_p", "system_p", "user_p"]
 
-SYSTEM_CORE = ["core", "idle", "iowait", "irq", "nice", "softirq",
-                "steal", "system", "system_p", "user", "user_p"]
+SYSTEM_CPU_ALL_FIELDS = ["idle_p", "idle", "iowait_p", "iowait", "irq_p", "irq", "load", "nice_p", "nice",
+                     "softirq_p", "softirq", "steal_p", "steal", "system_p", "system", "user_p", "user"]
+
+SYSTEM_CORE = ["id", "idle_p", "iowait_p", "irq_p", "nice_p", 
+               "softirq_p", "steal_p", "system_p", "user_p"]
 
 SYSTEM_DISK_FIELDS = ["name", "read_count", "write_count", "read_bytes",
                       "write_bytes", "read_time", "write_time", "io_time"]
@@ -215,3 +218,33 @@ class SystemTest(metricbeat.BaseTest):
             self.assert_fields_are_documented(evt)
             process = evt["system"]["process"]
             self.assertItemsEqual(SYSTEM_PROCESS_FIELDS, process.keys())
+
+    def test_cpu_ticks_option(self):
+        """
+        Test cpu_ticks configuration option.
+        """
+        self.render_config_template(modules=[{
+            "name": "system",
+            "metricsets": ["cpu"],
+            "period": "5s",
+            "extras": {
+                "cpu_ticks": True,
+            },
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        # Ensure no errors or warnings exist in the log.
+        log = self.get_log()
+        self.assertNotRegexpMatches(log, "ERR|WARN")
+
+        output = self.read_output_json()
+        self.assertGreater(len(output), 0)
+
+        for evt in output:
+            self.assert_fields_are_documented(evt)
+            cpuStats = evt["system"]["cpu"]
+            print cpuStats.keys()
+
+            self.assertItemsEqual(SYSTEM_CPU_ALL_FIELDS, cpuStats.keys())

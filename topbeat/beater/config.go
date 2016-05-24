@@ -19,7 +19,8 @@ type StatsEnableConfig struct {
 	System     bool `config:"system"`
 	Proc       bool `config:"process"`
 	Filesystem bool `config:"filesystem"`
-	CPUPerCore bool `config:"cpu_per_core"`
+	Core       bool `config:"core"`
+	CPUTicks   bool `config:"cpu_ticks"`
 }
 
 var (
@@ -30,7 +31,8 @@ var (
 			System:     true,
 			Proc:       true,
 			Filesystem: true,
-			CPUPerCore: false,
+			Core:       false,
+			CPUTicks:   false,
 		},
 	}
 )

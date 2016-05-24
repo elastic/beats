@@ -28,4 +28,7 @@ topbeat.stats:
   filesystem: true
 
   # cpu usage per core, by default is false
-  cpu_per_core: false
+  core: false
+
+  # cpu usage expressed in ticks, by default is false
+  cpu_ticks: false

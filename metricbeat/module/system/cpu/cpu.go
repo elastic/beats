@@ -25,9 +25,21 @@ type MetricSet struct {
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
+	config := struct {
+		CpuTicks bool `config:"cpu_ticks"` // export CPU usage in ticks
+	}{
+		CpuTicks: false,
+	}
+
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
-		cpu:           &system.CPU{},
+		cpu: &system.CPU{
+			CpuTicks: config.CpuTicks,
+		},
 	}, nil
 }
 
@@ -45,7 +57,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, errors.Wrap(err, "load statistics")
 	}
 
-	event := system.GetCpuStatEvent(cpuStat)
+	event := m.cpu.GetCpuStatEvent(cpuStat)
 	event["load"] = loadStat
 
 	return event, nil

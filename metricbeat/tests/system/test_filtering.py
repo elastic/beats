@@ -37,6 +37,6 @@ class GlobalFiltering(metricbeat.BaseTest):
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
         self.assertItemsEqual([
-            "system_p", "user_p", "softirq", "iowait", "system",
-            "idle", "user", "irq", "steal", "nice"
+            "system_p", "user_p", "softirq_p", "iowait_p",
+            "idle_p", "irq_p", "steal_p", "nice_p"
         ], cpu.keys())
