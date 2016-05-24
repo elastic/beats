@@ -412,18 +412,35 @@ Aborted status fields
 
 
 
-==== mysql.status.aborted.Aborted_clients
+==== mysql.status.aborted.clients
 
 type: integer
 
 The number of connections that were aborted because the client died without closing the connection properly.
 
 
-==== mysql.status.aborted.Aborted_connects
+==== mysql.status.aborted.connects
 
 type: integer
 
 The number of failed attempts to connect to the MySQL server.
+
+
+=== binlog Fields
+
+
+
+
+==== mysql.status.binlog.cache.disk_use
+
+type: integer
+
+
+
+==== mysql.status.binlog.cache.use
+
+type: integer
+
 
 
 === bytes Fields
@@ -432,18 +449,111 @@ Bytes stats
 
 
 
-==== mysql.status.bytes.Bytes_received
+==== mysql.status.bytes.received
 
 type: integer
 
 The number of bytes received from all clients.
 
 
-==== mysql.status.bytes.Bytes_sent
+==== mysql.status.bytes.sent
 
 type: integer
 
 The number of bytes sent to all clients.
+
+
+==== mysql.status.connections
+
+type: integer
+
+
+
+=== created Fields
+
+
+
+
+==== mysql.status.created.tmp.disk_tables
+
+type: integer
+
+
+
+==== mysql.status.created.tmp.files
+
+type: integer
+
+
+
+==== mysql.status.created.tmp.tables
+
+type: integer
+
+
+
+=== delayed Fields
+
+
+
+
+==== mysql.status.delayed.errors
+
+type: integer
+
+
+
+==== mysql.status.delayed.insert_threads
+
+type: integer
+
+
+
+==== mysql.status.delayed.writes
+
+type: integer
+
+
+
+==== mysql.status.flush_commands
+
+type: integer
+
+
+
+==== mysql.status.max_used_connections
+
+type: integer
+
+
+
+=== open Fields
+
+
+
+
+==== mysql.status.open.files
+
+type: integer
+
+
+
+==== mysql.status.open.streams
+
+type: integer
+
+
+
+==== mysql.status.open.tables
+
+type: integer
+
+
+
+==== mysql.status.opened_tables
+
+type: integer
+
 
 
 [[exported-fields-nginx]]
