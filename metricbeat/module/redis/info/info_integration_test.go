@@ -51,7 +51,7 @@ func TestKeyspace(t *testing.T) {
 	}
 
 	keyspace := event["keyspace"].(map[string]common.MapStr)
-	keyCount := keyspace["db0"]["keys"].(int)
+	keyCount := keyspace["db0"]["keys"].(int64)
 	assert.True(t, (keyCount > 0))
 }
 

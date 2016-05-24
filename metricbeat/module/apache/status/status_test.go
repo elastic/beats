@@ -78,15 +78,15 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Equal(t, .0628293, event["bytes_per_sec"])
 
 	workers := event["workers"].(common.MapStr)
-	assert.Equal(t, 1, workers["busy"])
-	assert.Equal(t, 99, workers["idle"])
+	assert.EqualValues(t, 1, workers["busy"])
+	assert.EqualValues(t, 99, workers["idle"])
 
 	connections := event["connections"].(common.MapStr)
 	async := connections["async"].(common.MapStr)
-	assert.Equal(t, 3, async["closing"])
-	assert.Equal(t, 2, async["keep_alive"])
-	assert.Equal(t, 1, async["writing"])
-	assert.Equal(t, 6, connections["total"])
+	assert.EqualValues(t, 3, async["closing"])
+	assert.EqualValues(t, 2, async["keep_alive"])
+	assert.EqualValues(t, 1, async["writing"])
+	assert.EqualValues(t, 6, connections["total"])
 
 	cpu := event["cpu"].(common.MapStr)
 	assert.Equal(t, 11.2, cpu["children_system"])
@@ -117,12 +117,12 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Equal(t, 400, scoreboard["total"])                 // Number of scorecard chars.
 	assert.Equal(t, 99, scoreboard["waiting_for_connection"]) // Number of '_'
 
-	assert.Equal(t, 167, event["total_accesses"])
-	assert.Equal(t, 63, event["total_kbytes"])
+	assert.EqualValues(t, 167, event["total_accesses"])
+	assert.EqualValues(t, 63, event["total_kbytes"])
 
 	uptime := event["uptime"].(common.MapStr)
-	assert.Equal(t, 1026782, uptime["server_uptime"])
-	assert.Equal(t, 1026782, uptime["uptime"])
+	assert.EqualValues(t, 1026782, uptime["server_uptime"])
+	assert.EqualValues(t, 1026782, uptime["uptime"])
 }
 
 // TestFetchTimeout verifies that the HTTP request times out and an error is

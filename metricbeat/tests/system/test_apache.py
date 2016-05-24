@@ -1,6 +1,8 @@
 import os
 import metricbeat
 from nose.plugins.attrib import attr
+import urllib2
+import time
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
@@ -19,12 +21,23 @@ class ApacheStatusTest(metricbeat.BaseTest):
         """
         Apache module outputs an event.
         """
+
+        hosts = self.get_hosts()
         self.render_config_template(modules=[{
             "name": "apache",
             "metricsets": ["status"],
-            "hosts": self.get_hosts(),
+            "hosts": hosts,
             "period": "5s"
         }])
+
+        found = False
+        # Waits until CPULoad is part of the status
+        while found == False:
+            res = urllib2.urlopen(hosts[0] + "/server-status?auto").read()
+            if "CPULoad"  in res:
+                found = True
+            time.sleep(0.5)
+
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
