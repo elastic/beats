@@ -106,17 +106,13 @@ func (s *States) Count() int {
 
 // Returns a copy of the file states
 func (s *States) GetStates() []FileState {
-
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	copy := make([]FileState, len(s.states))
+	newStates := make([]FileState, len(s.states))
+	copy(newStates, s.states)
 
-	for i := range s.states {
-		copy[i] = s.states[i]
-	}
-
-	return copy
+	return newStates
 }
 
 // SetStates overwrites all internal states with the given states array
