@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"io"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	h "github.com/elastic/beats/metricbeat/helper"
 )
 
 var (
@@ -19,7 +18,7 @@ var (
 )
 
 // Map body to MapStr
-func eventMapping(body io.ReadCloser, hostname string, metricset string) common.MapStr {
+func eventMapping(body io.ReadCloser, hostname string) common.MapStr {
 	var (
 		totalS          int
 		totalR          int
@@ -35,7 +34,7 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 		totalAll        int
 	)
 
-	fullEvent := common.MapStr{}
+	fullEvent := map[string]string{}
 	scanner := bufio.NewScanner(body)
 
 	// Iterate through all events to gather data
@@ -84,47 +83,45 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 			totalI = strings.Count(match[2], "I")
 			totalDot = strings.Count(match[2], ".")
 			totalAll = totalUnderscore + totalS + totalR + totalW + totalK + totalD + totalC + totalL + totalG + totalI + totalDot
-
 		} else {
-
 			debugf("Unexpected line in apache server-status output: %s", scanner.Text())
 		}
 	}
 
 	event := common.MapStr{
 		"hostname":          hostname,
-		"total_accesses":    toInt(fullEvent["Total Accesses"]),
-		"total_kbytes":      toInt(fullEvent["Total kBytes"]),
-		"requests_per_sec":  parseMatchFloat(fullEvent["ReqPerSec"], hostname, "ReqPerSec"),
-		"bytes_per_sec":     parseMatchFloat(fullEvent["BytesPerSec"], hostname, "BytesPerSec"),
-		"bytes_per_request": parseMatchFloat(fullEvent["BytesPerReq"], hostname, "BytesPerReq"),
+		"total_accesses":    h.ToInt("Total Accesses", fullEvent),
+		"total_kbytes":      h.ToInt("Total kBytes", fullEvent),
+		"requests_per_sec":  h.ToFloat("ReqPerSec", fullEvent),
+		"bytes_per_sec":     h.ToFloat("BytesPerSec", fullEvent),
+		"bytes_per_request": h.ToFloat("BytesPerReq", fullEvent),
 		"workers": common.MapStr{
-			"busy": toInt(fullEvent["BusyWorkers"]),
-			"idle": toInt(fullEvent["IdleWorkers"]),
+			"busy": h.ToInt("BusyWorkers", fullEvent),
+			"idle": h.ToInt("IdleWorkers", fullEvent),
 		},
 		"uptime": common.MapStr{
-			"server_uptime": toInt(fullEvent["ServerUptimeSeconds"]),
-			"uptime":        toInt(fullEvent["Uptime"]),
+			"server_uptime": h.ToInt("ServerUptimeSeconds", fullEvent),
+			"uptime":        h.ToInt("Uptime", fullEvent),
 		},
 		"cpu": common.MapStr{
-			"load":            parseMatchFloat(fullEvent["CPULoad"], hostname, "CPULoad"),
-			"user":            parseMatchFloat(fullEvent["CPUUser"], hostname, "CPUUser"),
-			"system":          parseMatchFloat(fullEvent["CPUSystem"], hostname, "CPUSystem"),
-			"children_user":   parseMatchFloat(fullEvent["CPUChildrenUser"], hostname, "CPUChildrenUser"),
-			"children_system": parseMatchFloat(fullEvent["CPUChildrenSystem"], hostname, "CPUChildrenSystem"),
+			"load":            h.ToFloat("CPULoad", fullEvent),
+			"user":            h.ToFloat("CPUUser", fullEvent),
+			"system":          h.ToFloat("CPUSystem", fullEvent),
+			"children_user":   h.ToFloat("CPUChildrenUser", fullEvent),
+			"children_system": h.ToFloat("CPUChildrenSystem", fullEvent),
 		},
 		"connections": common.MapStr{
-			"total": toInt(fullEvent["ConnsTotal"]),
+			"total": h.ToInt("ConnsTotal", fullEvent),
 			"async": common.MapStr{
-				"writing":    toInt(fullEvent["ConnsAsyncWriting"]),
-				"keep_alive": toInt(fullEvent["ConnsAsyncKeepAlive"]),
-				"closing":    toInt(fullEvent["ConnsAsyncClosing"]),
+				"writing":    h.ToInt("ConnsAsyncWriting", fullEvent),
+				"keep_alive": h.ToInt("ConnsAsyncKeepAlive", fullEvent),
+				"closing":    h.ToInt("ConnsAsyncClosing", fullEvent),
 			},
 		},
 		"load": common.MapStr{
-			"1":  parseMatchFloat(fullEvent["Load1"], hostname, "Load1"),
-			"5":  parseMatchFloat(fullEvent["Load5"], hostname, "Load5"),
-			"15": parseMatchFloat(fullEvent["Load15"], hostname, "Load15"),
+			"1":  h.ToFloat("Load1", fullEvent),
+			"5":  h.ToFloat("Load5", fullEvent),
+			"15": h.ToFloat("Load15", fullEvent),
 		},
 		"scoreboard": common.MapStr{
 			"starting_up":            totalS,
@@ -145,7 +142,8 @@ func eventMapping(body io.ReadCloser, hostname string, metricset string) common.
 	return event
 }
 
-func parseMatchFloat(input interface{}, hostname, fieldName string) float64 {
+/*
+func parseMatchFloat(input interface{}, fieldName string) float64 {
 	var parseString string
 
 	if input != nil {
@@ -154,31 +152,14 @@ func parseMatchFloat(input interface{}, hostname, fieldName string) float64 {
 		} else {
 			parseString = input.(string)
 		}
-		outputFloat, er := strconv.ParseFloat(parseString, 64)
 
-		/* Do we need to log failure? */
-		if er != nil {
-			debugf("Host: %s - cannot parse string %s: %s to float.", hostname, fieldName, input.(string))
+		outputFloat, err := strconv.ParseFloat(parseString, 64)
+		if err != nil {
+			logp.Err("Cannot parse string '%s' to float for field '%s'. Error: %+v", input.(string), fieldName, err)
 			return 0.0
 		}
 		return outputFloat
 	} else {
 		return 0.0
 	}
-}
-
-// toInt converts value to int. In case of error, returns 0
-func toInt(param interface{}) int {
-	if param == nil {
-		return 0
-	}
-
-	value, err := strconv.Atoi(param.(string))
-
-	if err != nil {
-		logp.Err("Error converting param to int: %s", param)
-		value = 0
-	}
-
-	return value
-}
+}*/

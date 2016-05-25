@@ -22,11 +22,11 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	// Check event fields
-	connections := event["connections"].(int)
+	connections := event["connections"].(int64)
 	open := event["open"].(common.MapStr)
-	openTables := open["tables"].(int)
-	openFiles := open["files"].(int)
-	openStreams := open["streams"].(int)
+	openTables := open["tables"].(int64)
+	openFiles := open["files"].(int64)
+	openStreams := open["streams"].(int64)
 
 	assert.True(t, connections > 0)
 	assert.True(t, openTables > 0)

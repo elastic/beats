@@ -1,11 +1,10 @@
 package info
 
 import (
-	"strconv"
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	h "github.com/elastic/beats/metricbeat/helper"
 )
 
 // Map data to MapStr
@@ -14,108 +13,108 @@ func eventMapping(info map[string]string) common.MapStr {
 	// Full mapping from info
 	event := common.MapStr{
 		"clients": common.MapStr{
-			"connected":           toInt(info["connected_clients"]),
-			"longest_output_list": toInt(info["client_longest_output_list"]),
-			"biggest_input_buf":   toInt(info["client_biggest_input_buf"]),
-			"blocked":             toInt(info["blocked_clients"]),
+			"connected":           h.ToInt("connected_clients", info),
+			"longest_output_list": h.ToInt("client_longest_output_list", info),
+			"biggest_input_buf":   h.ToInt("client_biggest_input_buf", info),
+			"blocked":             h.ToInt("blocked_clients", info),
 		},
 		"cluster": common.MapStr{
-			"enabled": toBool(info["cluster_enabled"]),
+			"enabled": h.ToBool("cluster_enabled", info),
 		},
 		"cpu": common.MapStr{
 			"used": common.MapStr{
-				"sys":           toFloat(info["used_cpu_sys"]),
-				"user":          toFloat(info["used_cpu_user"]),
-				"sys_children":  toFloat(info["used_cpu_sys_children"]),
-				"user_children": toFloat(info["used_cpu_user_children"]),
+				"sys":           h.ToFloat("used_cpu_sys", info),
+				"user":          h.ToFloat("used_cpu_user", info),
+				"sys_children":  h.ToFloat("used_cpu_sys_children", info),
+				"user_children": h.ToFloat("used_cpu_user_children", info),
 			},
 		},
 		"memory": common.MapStr{
 			"used": common.MapStr{
-				"value": toInt(info["used_memory"]), // As it is a top key, this goes into value
-				"rss":   toInt(info["used_memory_rss"]),
-				"peak":  toInt(info["used_memory_peak"]),
-				"lua":   toInt(info["used_memory_lua"]),
+				"value": h.ToInt("used_memory", info), // As it is a top key, this goes into value
+				"rss":   h.ToInt("used_memory_rss", info),
+				"peak":  h.ToInt("used_memory_peak", info),
+				"lua":   h.ToInt("used_memory_lua", info),
 			},
-			"allocator": info["mem_allocator"], // Could be moved to server as it rarely changes
+			"allocator": h.ToStr("mem_allocator", info), // Could be moved to server as it rarely changes
 		},
 		"persistence": common.MapStr{
-			"loading": toBool(info["loading"]),
+			"loading": h.ToBool("loading", info),
 			"rdb": common.MapStr{
-				"changes_since_last_save": toInt(info["rdb_changes_since_last_save"]),
-				"bgsave_in_progress":      toBool(info["rdb_bgsave_in_progress"]),
-				"last_save_time":          toInt(info["rdb_last_save_time"]),
-				"last_bgsave_status":      info["rdb_last_bgsave_status"],
-				"last_bgsave_time_sec":    toInt(info["rdb_last_bgsave_time_sec"]),
-				"current_bgsave_time_sec": toInt(info["rdb_current_bgsave_time_sec"]),
+				"changes_since_last_save": h.ToInt("rdb_changes_since_last_save", info),
+				"bgsave_in_progress":      h.ToBool("rdb_bgsave_in_progress", info),
+				"last_save_time":          h.ToInt("rdb_last_save_time", info),
+				"last_bgsave_status":      h.ToStr("rdb_last_bgsave_status", info),
+				"last_bgsave_time_sec":    h.ToInt("rdb_last_bgsave_time_sec", info),
+				"current_bgsave_time_sec": h.ToInt("rdb_current_bgsave_time_sec", info),
 			},
 			"used": common.MapStr{
-				"enabled":                  toBool(info["aof_enabled"]),
-				"rewrite_in_progress":      toBool(info["aof_rewrite_in_progress"]),
-				"rewrite_scheduled":        toBool(info["aof_rewrite_scheduled"]),
-				"last_rewrite_time_sec":    toInt(info["aof_last_rewrite_time_sec"]),
-				"current_rewrite_time_sec": toInt(info["aof_current_rewrite_time_sec"]),
-				"last_bgrewrite_status":    info["aof_last_bgrewrite_status"],
-				"last_write_status":        info["aof_last_write_status"],
+				"enabled":                  h.ToBool("aof_enabled", info),
+				"rewrite_in_progress":      h.ToBool("aof_rewrite_in_progress", info),
+				"rewrite_scheduled":        h.ToBool("aof_rewrite_scheduled", info),
+				"last_rewrite_time_sec":    h.ToInt("aof_last_rewrite_time_sec", info),
+				"current_rewrite_time_sec": h.ToInt("aof_current_rewrite_time_sec", info),
+				"last_bgrewrite_status":    h.ToStr("aof_last_bgrewrite_status", info),
+				"last_write_status":        h.ToStr("aof_last_write_status", info),
 			},
 		},
 		"replication": common.MapStr{
-			"role":             info["role"],
-			"connected_slaves": toInt(info["connected_slaves"]),
-			"master_offset":    toInt(info["master_repl_offset"]),
+			"role":             h.ToStr("role", info),
+			"connected_slaves": h.ToInt("connected_slaves", info),
+			"master_offset":    h.ToInt("master_repl_offset", info),
 			"backlog": common.MapStr{
-				"active":            toInt(info["repl_backlog_active"]),
-				"size":              toInt(info["repl_backlog_size"]),
-				"first_byte_offset": toInt(info["repl_backlog_first_byte_offset"]),
-				"histlen":           toInt(info["repl_backlog_histlen"]),
+				"active":            h.ToInt("repl_backlog_active", info),
+				"size":              h.ToInt("repl_backlog_size", info),
+				"first_byte_offset": h.ToInt("repl_backlog_first_byte_offset", info),
+				"histlen":           h.ToInt("repl_backlog_histlen", info),
 			},
 		},
 		"server": common.MapStr{
-			"version":          info["redis_version"],
-			"git_sha1":         info["redis_git_sha1"],
-			"git_dirty":        info["redis_git_dirty"],
-			"build_id":         info["redis_build_id"],
-			"mode":             info["redis_mode"],
-			"os":               info["os"],
-			"arch_bits":        info["arch_bits"],
-			"multiplexing_api": info["multiplexing_api"],
-			"gcc_version":      info["gcc_version"],
-			"process_id":       toInt(info["process_id"]),
-			"run_id":           info["run_id"],
-			"tcp_port":         toInt(info["tcp_port"]),
-			"uptime":           toInt(info["uptime_in_seconds"]), // Uptime days was removed as duplicate
-			"hz":               toInt(info["hz"]),
-			"lru_clock":        toInt(info["lru_clock"]),
-			"config_file":      info["config_file"],
+			"version":          h.ToStr("redis_version", info),
+			"git_sha1":         h.ToStr("redis_git_sha1", info),
+			"git_dirty":        h.ToStr("redis_git_dirty", info),
+			"build_id":         h.ToStr("redis_build_id", info),
+			"mode":             h.ToStr("redis_mode", info),
+			"os":               h.ToStr("os", info),
+			"arch_bits":        h.ToStr("arch_bits", info),
+			"multiplexing_api": h.ToStr("multiplexing_api", info),
+			"gcc_version":      h.ToStr("gcc_version", info),
+			"process_id":       h.ToInt("process_id", info),
+			"run_id":           h.ToStr("run_id", info),
+			"tcp_port":         h.ToInt("tcp_port", info),
+			"uptime":           h.ToInt("uptime_in_seconds", info), // Uptime days was removed as duplicate
+			"hz":               h.ToInt("hz", info),
+			"lru_clock":        h.ToInt("lru_clock", info),
+			"config_file":      h.ToStr("config_file", info),
 		},
 		"stats": common.MapStr{
 			"connections": common.MapStr{
-				"received": toInt(info["total_connections_received"]),
-				"rejected": toInt(info["rejected_connections"]),
+				"received": h.ToInt("total_connections_received", info),
+				"rejected": h.ToInt("rejected_connections", info),
 			},
-			"total_commands_processed":  toInt(info["total_commands_processed"]),
-			"total_net_input_bytes":     toInt(info["total_net_input_bytes"]),
-			"total_net_output_bytes":    toInt(info["total_net_output_bytes"]),
-			"instantaneous_ops_per_sec": toInt(info["instantaneous_ops_per_sec"]),
-			"instantaneous_input_kbps":  toFloat(info["instantaneous_input_kbps"]),
-			"instantaneous_output_kbps": toFloat(info["instantaneous_output_kbps"]),
+			"total_commands_processed":  h.ToInt("total_commands_processed", info),
+			"total_net_input_bytes":     h.ToInt("total_net_input_bytes", info),
+			"total_net_output_bytes":    h.ToInt("total_net_output_bytes", info),
+			"instantaneous_ops_per_sec": h.ToInt("instantaneous_ops_per_sec", info),
+			"instantaneous_input_kbps":  h.ToFloat("instantaneous_input_kbps", info),
+			"instantaneous_output_kbps": h.ToFloat("instantaneous_output_kbps", info),
 			"sync": common.MapStr{
-				"full":        toInt(info["sync_full"]),
-				"partial_ok":  toInt(info["sync_partial_ok"]),
-				"partial_err": toInt(info["sync_partial_err"]),
+				"full":        h.ToInt("sync_full", info),
+				"partial_ok":  h.ToInt("sync_partial_ok", info),
+				"partial_err": h.ToInt("sync_partial_err", info),
 			},
 			"keys": common.MapStr{
-				"expired": toInt(info["expired_keys"]),
-				"evicted": toInt(info["evicted_keys"]),
+				"expired": h.ToInt("expired_keys", info),
+				"evicted": h.ToInt("evicted_keys", info),
 			},
 			"keyspace": common.MapStr{
-				"hits":   toInt(info["keyspace_hits"]),
-				"misses": toInt(info["keyspace_misses"]),
+				"hits":   h.ToInt("keyspace_hits", info),
+				"misses": h.ToInt("keyspace_misses", info),
 			},
-			"pubsub_channels":        toInt(info["pubsub_channels"]),
-			"pubsub_patterns":        toInt(info["pubsub_patterns"]),
-			"latest_fork_usec":       toInt(info["latest_fork_usec"]),
-			"migrate_cached_sockets": toInt(info["migrate_cached_sockets"]),
+			"pubsub_channels":        h.ToInt("pubsub_channels", info),
+			"pubsub_patterns":        h.ToInt("pubsub_patterns", info),
+			"latest_fork_usec":       h.ToInt("latest_fork_usec", info),
+			"migrate_cached_sockets": h.ToInt("migrate_cached_sockets", info),
 		},
 		"keyspace": getKeyspaceStats(info),
 	}
@@ -159,47 +158,11 @@ func parseKeyspaceStats(keyspaceMap map[string]string) map[string]common.MapStr 
 				}
 			}
 			keyspace[k] = common.MapStr{
-				"keys":    toInt(db["keys"]),
-				"expires": toInt(db["expires"]),
-				"avg_ttl": toInt(db["avg_ttl"]),
+				"keys":    h.ToInt("keys", db),
+				"expires": h.ToInt("expires", db),
+				"avg_ttl": h.ToInt("avg_ttl", db),
 			}
 		}
 	}
 	return keyspace
-}
-
-// toInt converts value to int. In case of error, returns 0
-func toInt(param string) int {
-	value, err := strconv.Atoi(param)
-
-	if err != nil {
-		logp.Err("Error converting param to int: %s", param)
-		value = 0
-	}
-
-	return value
-}
-
-// toBool converts value to bool. In case of error, returns false
-func toBool(param string) bool {
-	value, err := strconv.ParseBool(param)
-
-	if err != nil {
-		logp.Err("Error converting param to bool: %s", param)
-		value = false
-	}
-
-	return value
-}
-
-// toFloat converts value to float64. In case of error, returns 0.0
-func toFloat(param string) float64 {
-	value, err := strconv.ParseFloat(param, 64)
-
-	if err != nil {
-		logp.Err("Error converting param to float: %s", param)
-		value = 0.0
-	}
-
-	return value
 }
