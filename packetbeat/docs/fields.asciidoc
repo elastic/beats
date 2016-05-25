@@ -770,6 +770,7 @@ Innermost VLAN address used in network packets.
 Second innermost VLAN address used in network packets.
 
 
+[float]
 === source Fields
 
 Properties of the source host
@@ -842,6 +843,7 @@ The GeoIP location of the `outer_ipv6_source` IP address. The field is a string 
 Source port number as indicated by first packet seen for the current flow.
 
 
+[float]
 === stats Fields
 
 Object with source to destination flow measurements.
@@ -858,6 +860,7 @@ Total number of packets
 Total number of bytes
 
 
+[float]
 === dest Fields
 
 Properties of the destination host
@@ -930,6 +933,7 @@ The GeoIP location of the `outer_ipv6_dest` IP address. The field is a string co
 Destination port number as indicated by first packet seen for the current flow.
 
 
+[float]
 === stats Fields
 
 Object with destination to source flow measurements.
@@ -1419,6 +1423,7 @@ A BSON document that specifies the update to be performed. For information on sp
 The cursor identifier returned in the OP_REPLY. This must be the value that was returned from the database.
 
 
+[float]
 === rpc Fields
 
 OncRPC specific event fields.
