@@ -1,10 +1,8 @@
 package status
 
 import (
-	"strconv"
-
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	h "github.com/elastic/beats/metricbeat/helper"
 )
 
 // Map data to MapStr of server stats variables: http://dev.mysql.com/doc/refman/5.7/en/server-status-variables.html
@@ -13,52 +11,41 @@ func eventMapping(status map[string]string) common.MapStr {
 
 	event := common.MapStr{
 		"aborted": common.MapStr{
-			"clients":  toInt(status["Aborted_clients"]),
-			"connects": toInt(status["Aborted_connects"]),
+			"clients":  h.ToInt("Aborted_clients", status),
+			"connects": h.ToInt("Aborted_connects", status),
 		},
 		"binlog": common.MapStr{
 			"cache": common.MapStr{
-				"disk_use": toInt(status["Binlog_cache_disk_use"]),
-				"use":      toInt(status["Binlog_cache_use"]),
+				"disk_use": h.ToInt("Binlog_cache_disk_use", status),
+				"use":      h.ToInt("Binlog_cache_use", status),
 			},
 		},
 		"bytes": common.MapStr{
-			"received": toInt(status["Bytes_received"]),
-			"sent":     toInt(status["Bytes_sent"]),
+			"received": h.ToInt("Bytes_received", status),
+			"sent":     h.ToInt("Bytes_sent", status),
 		},
-		"connections": toInt(status["Connections"]),
+		"connections": h.ToInt("Connections", status),
 		"created": common.MapStr{
 			"tmp": common.MapStr{
-				"disk_tables": toInt(status["Created_tmp_disk_tables"]),
-				"files":       toInt(status["Created_tmp_files"]),
-				"tables":      toInt(status["Created_tmp_tables"]),
+				"disk_tables": h.ToInt("Created_tmp_disk_tables", status),
+				"files":       h.ToInt("Created_tmp_files", status),
+				"tables":      h.ToInt("Created_tmp_tables", status),
 			},
 		},
 		"delayed": common.MapStr{
-			"errors":         toInt(status["Delayed_errors"]),
-			"insert_threads": toInt(status["Delayed_insert_threads"]),
-			"writes":         toInt(status["Delayed_writes"]),
+			"errors":         h.ToInt("Delayed_errors", status),
+			"insert_threads": h.ToInt("Delayed_insert_threads", status),
+			"writes":         h.ToInt("Delayed_writes", status),
 		},
-		"flush_commands":       toInt(status["Flush_commands"]),
-		"max_used_connections": toInt(status["Max_used_connections"]),
+		"flush_commands":       h.ToInt("Flush_commands", status),
+		"max_used_connections": h.ToInt("Max_used_connections", status),
 		"open": common.MapStr{
-			"files":   toInt(status["Open_files"]),
-			"streams": toInt(status["Open_streams"]),
-			"tables":  toInt(status["Open_tables"]),
+			"files":   h.ToInt("Open_files", status),
+			"streams": h.ToInt("Open_streams", status),
+			"tables":  h.ToInt("Open_tables", status),
 		},
-		"opened_tables": toInt(status["Opened_tables"]),
+		"opened_tables": h.ToInt("Opened_tables", status),
 	}
 
 	return event
-}
-
-func toInt(param string) int {
-	value, err := strconv.Atoi(param)
-
-	if err != nil {
-		logp.Err("Error converting param to int: %s", param)
-		value = 0
-	}
-
-	return value
 }

@@ -150,6 +150,8 @@ system-tests: buildbeat.test prepare-tests python-env
 # Runs the system tests
 .PHONY: system-tests-environment
 system-tests-environment:
+	$(MAKE) prepare-tests
+	$(MAKE) build-image
 	${DOCKER_COMPOSE} run beat make system-tests;
 
 # Runs system tests without coverage reports and in parallel

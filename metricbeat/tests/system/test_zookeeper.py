@@ -8,10 +8,7 @@ MNTR_FIELDS = ["version", "latency.avg", "latency.max",
                "latency.min", "packets.received", "packets.sent",
                "outstanding_requests", "server_state", "znode_count",
                "watch_count", "ephemerals_count",
-               "approximate_data_size", "followers",
-               "synced_followers", "pending_syncs",
-               "open_file_descriptor_count", "max_file_descriptor_count",
-               "num_alive_connections"]
+               "approximate_data_size", "num_alive_connections"]
 
 class ZooKeeperMntrTest(metricbeat.BaseTest):
     @attr('integration')
@@ -39,6 +36,13 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
 
         self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
         zk_mntr = evt["zookeeper"]["mntr"]
+
+        zk_mntr.pop("pending_syncs", None)
+        zk_mntr.pop("open_file_descriptor_count", None)
+        zk_mntr.pop("synced_followers", None)
+        zk_mntr.pop("max_file_descriptor_count", None)
+        zk_mntr.pop("followers", None)
+
         self.assertItemsEqual(self.de_dot(MNTR_FIELDS), zk_mntr.keys())
 
         self.assert_fields_are_documented(evt)

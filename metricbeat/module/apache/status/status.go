@@ -86,7 +86,7 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		return nil, fmt.Errorf("HTTP error %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return eventMapping(resp.Body, m.Host(), m.Name()), nil
+	return eventMapping(resp.Body, m.Host()), nil
 }
 
 // getURL constructs a URL from the rawHost value and adds the provided user,
