@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:8.4
 
 RUN apt-get update \
   && apt-get upgrade -y \
