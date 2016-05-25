@@ -31,7 +31,7 @@ An example event looks as following:
       "pid": 97801,
       "ppid": 1,
       "state": "running",
-      "username": "monica"
+      "username": "elastic"
     }
   },
   "type": "metricsets"
