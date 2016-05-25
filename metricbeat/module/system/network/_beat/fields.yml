@@ -1,0 +1,51 @@
+- name: network
+  type: group
+  description: >
+    `network` contains network IO metrics for a single network interface.
+  fields:
+    - name: name
+      type: keyword
+      example: eth0
+      description: >
+        The network interface name.
+
+    - name: bytes_sent
+      type: long
+      description: >
+        The number of bytes sent.
+
+    - name: bytes_recv
+      type: long
+      description: >
+        The number of bytes received.
+
+    - name: packets_sent
+      type: long
+      description: >
+        The number of packets sent.
+
+    - name: packets_recv
+      type: long
+      description: >
+        The number or packets received.
+
+    - name: errin
+      type: long
+      description: >
+        The number of errors while receiving.
+
+    - name: errout
+      type: long
+      description: >
+        The number of errors while sending.
+
+    - name: dropin
+      type: long
+      description: >
+        The number of incoming packets that were dropped.
+
+    - name: dropout
+      type: long
+      description: >
+        The number of outgoing packets that were dropped. This value is always
+        0 on Darwin and BSD because it is not reported by the operating system.

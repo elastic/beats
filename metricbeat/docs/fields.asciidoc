@@ -1741,6 +1741,78 @@ The percentage of used swap memory.
 
 
 [float]
+=== network Fields
+
+`network` contains network IO metrics for a single network interface.
+
+
+
+==== system.network.name
+
+type: keyword
+
+example: eth0
+
+The network interface name.
+
+
+==== system.network.bytes_sent
+
+type: long
+
+The number of bytes sent.
+
+
+==== system.network.bytes_recv
+
+type: long
+
+The number of bytes received.
+
+
+==== system.network.packets_sent
+
+type: long
+
+The number of packets sent.
+
+
+==== system.network.packets_recv
+
+type: long
+
+The number or packets received.
+
+
+==== system.network.errin
+
+type: long
+
+The number of errors while receiving.
+
+
+==== system.network.errout
+
+type: long
+
+The number of errors while sending.
+
+
+==== system.network.dropin
+
+type: long
+
+The number of incoming packets that were dropped.
+
+
+==== system.network.dropout
+
+type: long
+
+The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
+
+
+[float]
 === process Fields
 
 `process` contains process metadata, CPU metrics, and memory metrics.

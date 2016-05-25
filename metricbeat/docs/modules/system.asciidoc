@@ -82,6 +82,8 @@ The following MetricSets are available:
 
 * <<metricbeat-metricset-system-memory,memory>>
 
+* <<metricbeat-metricset-system-network,network>>
+
 * <<metricbeat-metricset-system-process,process>>
 
 include::system/core.asciidoc[]
@@ -95,6 +97,8 @@ include::system/filesystem.asciidoc[]
 include::system/fsstat.asciidoc[]
 
 include::system/memory.asciidoc[]
+
+include::system/network.asciidoc[]
 
 include::system/process.asciidoc[]
 
