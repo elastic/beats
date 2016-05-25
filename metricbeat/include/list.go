@@ -16,6 +16,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
+	_ "github.com/elastic/beats/metricbeat/module/redis/keyspace"
 	_ "github.com/elastic/beats/metricbeat/module/system"
 	_ "github.com/elastic/beats/metricbeat/module/system/core"
 	_ "github.com/elastic/beats/metricbeat/module/system/cpu"
