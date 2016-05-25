@@ -1,8 +1,8 @@
 {
     "@timestamp": "2016-05-11T23:25:32.317Z",
     "beat": {
-        "hostname": "5ff05546664c",
-        "name": "5ff05546664c"
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
     "metricset": "disk",
     "module": "system",

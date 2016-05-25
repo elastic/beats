@@ -7,8 +7,8 @@ An example event looks as following:
     {
       "@timestamp": "2016-04-26T19:30:19.475Z",
       "beat": {
-        "hostname": "ruflin",
-        "name": "ruflin"
+        "hostname": "host.example.com",
+        "name": "host.example.com"
       },
       "metricset": "filesystem",
       "module": "system",

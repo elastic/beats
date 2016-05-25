@@ -1,8 +1,8 @@
 {
     "@timestamp":"2016-05-11T07:14:07.390Z",
     "beat":{
-        "hostname":"ruflin",
-        "name":"ruflin"
+        "hostname":"host.example.com",
+        "name":"host.example.com"
     },
     "metricset":"filesystem",
     "module":"system",
