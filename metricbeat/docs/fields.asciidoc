@@ -25,12 +25,14 @@ Apache HTTPD server metric sets collected from the apache web server.
 
 
 
+[float]
 === apache Fields
 
 Apache contains the metrics that were scraped from apache.
 
 
 
+[float]
 === status Fields
 
 `status` contains the metrics that were scraped from the apache status page.
@@ -93,6 +95,7 @@ type: integer
 Number of idle workers.
 
 
+[float]
 === uptime Fields
 
 Uptime stats.
@@ -113,6 +116,7 @@ type: integer
 Server uptime.
 
 
+[float]
 === cpu Fields
 
 CPU stats.
@@ -154,6 +158,7 @@ type: float
 CPU of children system.
 
 
+[float]
 === connections Fields
 
 Connection stats.
@@ -188,6 +193,7 @@ type: integer
 Async closed connections.
 
 
+[float]
 === load Fields
 
 Load averages.
@@ -215,6 +221,7 @@ type: float
 Load average for the last 15 minutes.
 
 
+[float]
 === scoreboard Fields
 
 Scoreboard metrics.
@@ -394,18 +401,21 @@ MySQL server status metrics collected from MySQL
 
 
 
+[float]
 === mysql Fields
 
 mysql contains the metrics that were obtained from MySQL query.
 
 
 
+[float]
 === status Fields
 
 `status` contains the metrics that were obtained by the status SQL query.
 
 
 
+[float]
 === aborted Fields
 
 Aborted status fields
@@ -426,6 +436,7 @@ type: integer
 The number of failed attempts to connect to the MySQL server.
 
 
+[float]
 === binlog Fields
 
 
@@ -443,6 +454,7 @@ type: integer
 
 
 
+[float]
 === bytes Fields
 
 Bytes stats
@@ -469,6 +481,7 @@ type: integer
 
 
 
+[float]
 === created Fields
 
 
@@ -492,6 +505,7 @@ type: integer
 
 
 
+[float]
 === delayed Fields
 
 
@@ -527,6 +541,7 @@ type: integer
 
 
 
+[float]
 === open Fields
 
 
@@ -563,12 +578,14 @@ Nginx server status metrics collected from various modules.
 
 
 
+[float]
 === nginx Fields
 
 nginx contains the metrics that were scraped from nginx.
 
 
 
+[float]
 === stubstatus Fields
 
 `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
@@ -652,18 +669,21 @@ Redis metrics collected from the Redis
 
 
 
+[float]
 === redis Fields
 
 `redis` contains the information and statistics from Redis
 
 
 
+[float]
 === info Fields
 
 `info` contains the information and statistics returned by the `INFO` command.
 
 
 
+[float]
 === clients Fields
 
 Redis client stats
@@ -698,6 +718,7 @@ type: integer
 Number of clients pending on a blocking call (BLPOP, BRPOP, BRPOPLPUSH)
 
 
+[float]
 === cluster Fields
 
 Redis cluster information
@@ -711,6 +732,7 @@ type: boolean
 Indicate Redis cluster is enabled
 
 
+[float]
 === cpu Fields
 
 Redis CPU stats
@@ -745,6 +767,7 @@ type: float
 User CPU consumed by the background processes
 
 
+[float]
 === memory Fields
 
 Redis CPU stats
@@ -786,6 +809,7 @@ type: keyword
 Memory allocator
 
 
+[float]
 === persistence Fields
 
 Redis CPU stats
@@ -876,6 +900,7 @@ type: keyword
 
 None
 
+[float]
 === replication Fields
 
 Replication
@@ -924,6 +949,7 @@ type: integer
 
 None
 
+[float]
 === server Fields
 
 Server info
@@ -1026,6 +1052,7 @@ type: keyword
 
 None
 
+[float]
 === stats Fields
 
 Redis stats
@@ -1153,12 +1180,14 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 
+[float]
 === system Fields
 
 `system` contains local system metrics
 
 
 
+[float]
 === core Fields
 
 `system-core` contains local cpu core stats.
@@ -1282,6 +1311,7 @@ type: long
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
+[float]
 === cpu Fields
 
 `cpu` contains local cpu stats.
@@ -1398,6 +1428,7 @@ type: long
 The amount of CPU time spent in involuntary wait by the virtual CPU while the hypervisor was servicing another processor. Available only on Unix.
 
 
+[float]
 === load Fields
 
 Load averages.
@@ -1425,6 +1456,7 @@ type: float
 Load average for the last 15 minutes.
 
 
+[float]
 === disk Fields
 
 `disk` contains disk IO metrics collected from the operating system.
@@ -1496,6 +1528,7 @@ type: long
 This is the total number of of milliseconds spent doing I/Os.
 
 
+[float]
 === filesystem Fields
 
 `filesystem` contains local filesystem stats
@@ -1565,6 +1598,7 @@ type: float
 The percentage of used disk space.
 
 
+[float]
 === fsstat Fields
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
@@ -1583,6 +1617,7 @@ type: long
 
 Total number of files.
 
+[float]
 === total_size Fields
 
 Nested file system docs.
@@ -1609,6 +1644,7 @@ type: long
 Total space (used plus free).
 
 
+[float]
 === memory Fields
 
 `memory` contains local memory stats.
@@ -1704,6 +1740,7 @@ type: float
 The percentage of used swap memory.
 
 
+[float]
 === process Fields
 
 `process` contains process metadata, CPU metrics, and memory metrics.
@@ -1834,12 +1871,14 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
+[float]
 === zookeeper Fields
 
 `zookeeper` contains the metrics reported by zookeeper command.
 
 
 
+[float]
 === mntr Fields
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.

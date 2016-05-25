@@ -1,7 +1,4 @@
 
-include::./create-metricset.asciidoc[]
-
-include::./testing.asciidoc[]
 
 [[metricbeat-developer-guide]]
 = Metricbeat Developer Guide
@@ -66,3 +63,7 @@ TODO: Add details on how to create dashboards
 
 
 
+
+include::./create-metricset.asciidoc[]
+
+include::./testing.asciidoc[]
